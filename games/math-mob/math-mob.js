@@ -600,12 +600,6 @@
     hide(shopScreen);
     refreshMenu(); show(menu);
   };
-  $("reset-btn").onclick = () => {
-    if (confirm("Erase all coins, upgrades, and records? This can't be undone.")) {
-      save = defaultSave(); persist();
-      renderShop(); refreshMenu();
-    }
-  };
 
   // ---- Boot -----------------------------------------------------------
   resize();
