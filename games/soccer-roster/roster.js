@@ -272,7 +272,7 @@
     r.lineups.forEach(function (lu, i) {
       html += '<div class="pcard">';
       html += '<div class="ptitle">' + esc(ordinal(i, state.periods)) + "</div>";
-      html += '<div class="goalie"><small>🧤 Goalie</small>' + esc(lu.goalie || "—") + "</div>";
+      html += '<div class="goalie"><small><span class="gk-emoji">🧤</span> Goalie</small>' + esc(lu.goalie || "—") + "</div>";
       html += "<ol>";
       lu.field.forEach(function (name) { html += "<li>" + esc(name) + "</li>"; });
       // pad empty field spots if short-handed
@@ -286,7 +286,7 @@
     html += "</div></div>";
 
     // ---- verification grid ----
-    html += '<div class="panel">';
+    html += '<div class="panel grid-panel">';
     html += "<h2>✅ Double-check grid</h2>";
     html += '<p class="hint">Each column = one period. Scan down: every column should have exactly one 🧤 and ' + FIELD + " ●. Scan across each row to see who plays when, and the totals on the right.</p>";
     html += '<div class="grid-scroll"><table class="gridtbl"><thead><tr><th>Player</th>';

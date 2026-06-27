@@ -132,18 +132,32 @@
 
     .empty-note { text-align: center; color: #8a82a6; padding: 1.5rem; }
 
-    /* ---- print ---- */
+    /* ---- print: plain black & white, one page, names only ---- */
     @media print {
-      body { background: #fff !important; }
-      .bg-blobs, .back-link, .no-print, .footer { display: none !important; }
+      @page { margin: 0.5in; }
+      body { background: #fff !important; color: #000; }
+
+      /* drop everything except the quarter line-ups */
+      .bg-blobs, .back-link, .no-print, .footer, .hero,
+      .checks, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
+
+      /* strip panel chrome — just the content */
       .wrap { max-width: none; padding: 0; }
-      .panel { box-shadow: none; border: 1px solid #ccc; margin-bottom: 0.6rem; padding: 0.6rem 0.8rem; page-break-inside: avoid; }
-      .periods-grid { grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
-      .pcard { border-color: #999; }
-      .pcard .ptitle { background: #444 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .pcard .goalie, table.gridtbl td.g, table.gridtbl td.f, table.gridtbl th, .check.ok .mark { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .hero { padding: 0.25rem 0 !important; }
-      .title { font-size: 1.6rem !important; }
+      .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 0 0.4rem !important; }
+
+      /* simple text header (team • opponent • date • quarters) */
+      .roster-head { text-align: left; margin: 0 0 0.5rem; }
+      .roster-head h2 { font-size: 1.2rem; }
+      .roster-head p { color: #000; font-size: 0.9rem; margin-top: 0.15rem; }
+
+      /* quarter cards, black & white */
+      .periods-grid { grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
+      .pcard { border: 1.5px solid #000 !important; border-radius: 0; }
+      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 1rem; padding: 0.3rem; }
+      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.35rem 0.5rem; }
+      .pcard .goalie small { color: #000 !important; }
+      .pcard ol { padding: 0.35rem 0.5rem 0.5rem 1.4rem; }
+      .pcard ol li { font-size: 0.95rem; padding: 0.12rem 0; }
     }
   </style>
 </head>
