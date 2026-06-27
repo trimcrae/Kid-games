@@ -352,6 +352,17 @@ const GAMES = {
     if (await page.locator(".player-row").count() < 7) throw new Error("team roster did not render");
     if (await page.locator('.period-btn[data-p="8"].active').count() !== 1) throw new Error("8 periods should be selected by default on load");
 
+    // button starts as "Make roster", becomes "Shuffle" once a roster exists
+    if (!/Make roster/.test(await page.locator("#generateBtn").textContent())) throw new Error("button should say Make roster before any roster");
+    await page.locator("#generateBtn").click();
+    await page.waitForTimeout(150);
+    if (!/Shuffle/.test(await page.locator("#generateBtn").textContent())) throw new Error("button should say Shuffle after a roster exists");
+    // editing setup resets it back to Make roster
+    await page.locator(".player-row .chip.present").first().click();
+    await page.waitForTimeout(100);
+    if (!/Make roster/.test(await page.locator("#generateBtn").textContent())) throw new Error("button should revert to Make roster after a setup change");
+    await page.locator(".player-row .chip.absent").first().click(); // restore present
+
     // try each period count and verify the invariants in the grid
     for (const p of [2, 4, 8]) {
       await page.locator(`.period-btn[data-p="${p}"]`).click();

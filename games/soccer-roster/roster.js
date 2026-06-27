@@ -323,9 +323,16 @@
      =========================================================== */
   var hasRoster = false;
 
+  // Button reads "Make roster" until one exists, then becomes "Shuffle".
+  function setHasRoster(v) {
+    hasRoster = v;
+    var btn = document.getElementById("generateBtn");
+    if (btn) btn.textContent = v ? "🔀 Shuffle" : "⚽ Make roster";
+  }
+
   // Empty state: a clear "your move" prompt instead of a surprise roster.
   function showPrompt() {
-    hasRoster = false;
+    setHasRoster(false);
     document.getElementById("output").innerHTML =
       '<div class="panel empty-note">Pick who\'s <b>Here</b> and who can play <b>Goalie</b> above, then tap <b>⚽ Make roster</b>.</div>';
   }
@@ -335,7 +342,7 @@
     if (hasRoster) {
       document.getElementById("output").innerHTML =
         '<div class="panel empty-note">Setup changed — tap <b>⚽ Make roster</b> to build the line-up.</div>';
-      hasRoster = false;
+      setHasRoster(false);
     }
   }
 
@@ -344,15 +351,27 @@
     if (!state.team.some(function (g) { return g.present; })) {
       document.getElementById("output").innerHTML =
         '<div class="panel empty-note">Nobody is marked “Here” yet — tap a player to add them to today\'s game.</div>';
-      hasRoster = false; save();
+      setHasRoster(false); save();
       return;
     }
     renderRoster(buildRoster(state.team, state.periods, state.seed));
-    hasRoster = true;
+    setHasRoster(true);
     save();
   }
 
   function init() {
+    // Draw the essential UI FIRST so nothing below (e.g. a stale cached HTML
+    // missing a button) can ever stop the team list from rendering.
+    renderPeriodButtons();
+    renderTeam();
+    showPrompt();
+
+    // wire handlers defensively — a missing element is skipped, not thrown
+    function on(id, handler) {
+      var el = document.getElementById(id);
+      if (el) el.onclick = handler;
+    }
+
     document.querySelectorAll(".period-btn").forEach(function (b) {
       b.onclick = function () {
         state.periods = Number(b.dataset.p);
@@ -360,28 +379,25 @@
       };
     });
 
-    document.getElementById("addBtn").onclick = addPlayer;
-    document.getElementById("newName").addEventListener("keydown", function (e) {
+    on("addBtn", addPlayer);
+    var newName = document.getElementById("newName");
+    if (newName) newName.addEventListener("keydown", function (e) {
       if (e.key === "Enter") addPlayer();
     });
 
     // one button: each tap builds a fresh fair line-up (no separate "shuffle")
-    document.getElementById("generateBtn").onclick = function () { makeRoster(true); scrollToOutput(); };
-    document.getElementById("printFab").onclick = function () {
+    on("generateBtn", function () { makeRoster(true); scrollToOutput(); });
+    on("printFab", function () {
       // never print the empty prompt — make the roster first, let her review, then print
       if (!hasRoster) { makeRoster(true); scrollToOutput(); return; }
       window.print();
-    };
-    document.getElementById("resetBtn").onclick = function () {
+    });
+    on("resetBtn", function () {
       if (confirm("Reset the whole team back to the original roster?")) {
         state.team = DEFAULT_TEAM.map(function (g) { return Object.assign({}, g); });
         save(); renderTeam(); showPrompt();
       }
-    };
-
-    renderPeriodButtons();
-    renderTeam();
-    showPrompt();
+    });
   }
 
   function addPlayer() {
