@@ -268,6 +268,95 @@ const GAMES = {
     if (parseInt(await page.locator("#dist").textContent(), 10) <= 0) throw new Error("distance never advanced");
     return `ran ${await page.locator("#dist").textContent()}m; steering + shop guard work`;
   },
+
+  async "Spelling Bee"(page, g, d) {
+    await page.goto(`${BASE}/games/spelling-bee/`, { waitUntil: "networkidle" });
+    if (await page.locator(".puz-card").count() < 1) throw new Error("no hives in the picker");
+    await page.locator(".puz-card").first().click();
+    await page.waitForTimeout(200);
+    if (await page.locator("#play:not(.hidden)").count() < 1) throw new Error("play screen did not open");
+    const sample = await page.locator("#play").getAttribute("data-sample");
+    if (!sample) throw new Error("no sample word exposed");
+    for (const ch of sample.split("")) {
+      const cell = page.locator(`.cell[data-letter="${ch}"]`).first();
+      if (await cell.count() === 0) throw new Error(`no hive cell for "${ch}"`);
+      await cell.click();
+      await page.waitForTimeout(40);
+    }
+    await page.locator("#enter-btn").click();
+    await page.waitForTimeout(200);
+    if (parseInt(await page.locator("#wordcount").textContent(), 10) < 1) throw new Error("valid word was not accepted");
+    return `spelled "${sample}"; word counted`;
+  },
+
+  async "Connections"(page, g, d) {
+    await page.goto(`${BASE}/games/connections/`, { waitUntil: "networkidle" });
+    if (await page.locator(".puz-card").count() < 1) throw new Error("no puzzles in the picker");
+    await page.locator(".puz-card").first().click();
+    await page.waitForTimeout(200);
+    if (await page.locator(".tile").count() !== 16) throw new Error("expected 16 tiles");
+    const groups = JSON.parse(await page.locator("#board").getAttribute("data-solution"));
+    for (const item of groups[0]) {
+      await page.locator(`.tile[data-item="${item}"]`).first().click();
+      await page.waitForTimeout(40);
+    }
+    await page.locator("#submit-btn").click();
+    await page.waitForTimeout(450);
+    if (await page.locator(".solved-row").count() < 1) throw new Error("correct group was not accepted");
+    return "solved a group of four";
+  },
+
+  async "Word Guess"(page, g, d) {
+    await page.goto(`${BASE}/games/word-guess/`, { waitUntil: "networkidle" });
+    if (await page.locator(".key").count() < 26) throw new Error("on-screen keyboard missing");
+    for (const ch of "tiger".split("")) {
+      await page.locator(`.key[data-key="${ch}"]`).first().click();
+      await page.waitForTimeout(30);
+    }
+    await page.locator('.key[data-key="enter"]').click();
+    await page.waitForTimeout(300);
+    // the first row should now be coloured (each cell has a status class)
+    const coloured = await page.locator(".grid .row").first().locator(".cell.correct, .cell.present, .cell.absent").count();
+    if (coloured !== 5) throw new Error(`guessed row not fully scored (got ${coloured}/5)`);
+    return "guess scored with colour clues";
+  },
+
+  async "Word Strands"(page, g, d) {
+    await page.goto(`${BASE}/games/strands/`, { waitUntil: "networkidle" });
+    if (await page.locator(".puz-card").count() < 1) throw new Error("no word hunts in the picker");
+    await page.locator(".puz-card").first().click();
+    await page.waitForTimeout(200);
+    if (await page.locator(".scell").count() < 1) throw new Error("letter grid did not render");
+    const words = JSON.parse(await page.locator("#board").getAttribute("data-solution"));
+    const w = words[0];
+    for (const [r, c] of w.path) {
+      await page.locator(`.scell[data-r="${r}"][data-c="${c}"]`).click();
+      await page.waitForTimeout(30);
+    }
+    await page.waitForTimeout(200);
+    if (await page.locator(".found-chip").count() < 1) throw new Error(`tracing "${w.word}" did not register a found word`);
+    return `traced "${w.word}"`;
+  },
+
+  async "Crossword"(page, g, d) {
+    await page.goto(`${BASE}/games/crossword/`, { waitUntil: "networkidle" });
+    if (await page.locator(".puz-card").count() < 1) throw new Error("no crosswords in the picker");
+    await page.locator(".puz-card").first().click();
+    await page.waitForTimeout(200);
+    const inputs = page.locator(".xinput");
+    const n = await inputs.count();
+    if (n < 1) throw new Error("no fillable cells");
+    if (await page.locator(".clue-li").count() < 1) throw new Error("no clues rendered");
+    for (let i = 0; i < n; i++) {
+      const inp = inputs.nth(i);
+      const sol = await inp.getAttribute("data-sol");
+      await inp.fill(sol);
+      await page.waitForTimeout(15);
+    }
+    await page.waitForTimeout(200);
+    if (!/solved/i.test(await page.locator("#feedback").textContent())) throw new Error("filled grid was not detected as solved");
+    return `filled ${n} cells; puzzle solved`;
+  },
 };
 
 /* ---------- run everything ---------- */

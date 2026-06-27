@@ -21,6 +21,11 @@ For **every game** (and the landing page), at **each of the three sizes**:
   - **Spooky Stories** — a book opens, pages turn, and the story finishes
   - **Comic Maker** — stickers add, drag, talk-bubbles, new pages and Undo work
   - **Math Mob Run** — the run starts, steering moves you, the shop is coin-gated
+  - **Spelling Bee** — a hive opens and a valid word is accepted & counted
+  - **Connections** — picking a correct group of four locks it in
+  - **Word Guess** — a guess is scored with green/yellow/grey colour clues
+  - **Word Strands** — tracing a theme word's path registers it as found
+  - **Crossword** — filling every cell with the answer solves the puzzle
 
 ## How to run it
 
