@@ -50,7 +50,7 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 0.6rem 0.8rem;
+      padding: 0.6rem 3.4rem 0.6rem 0.8rem;
       pointer-events: none;
       font-weight: bold;
       text-shadow: 0 2px 6px rgba(0,0,0,0.25);
@@ -66,6 +66,34 @@
       gap: 0.35rem;
     }
     .hud .crew { font-size: 1.5rem; background: rgba(138, 92, 255, 0.85); }
+    .hud .combo {
+      background: rgba(255, 122, 61, 0.9);
+      font-size: 1.05rem;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .hud .combo.on { opacity: 1; transform: scale(1); }
+
+    /* Sound toggle — always reachable in the corner */
+    .mute-btn {
+      position: absolute;
+      top: 0.6rem; right: 0.7rem;
+      z-index: 5;
+      width: 2.4rem; height: 2.4rem;
+      border: none;
+      border-radius: 50%;
+      background: rgba(43, 36, 64, 0.55);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      touch-action: manipulation;
+    }
+    .mute-btn:active { transform: scale(0.9); }
 
     /* Overlays (menu, shop, game over) */
     .overlay {
@@ -181,9 +209,12 @@
   <div id="stage">
     <canvas id="game"></canvas>
 
+    <button class="mute-btn" id="mute-btn" aria-label="Toggle sound">🔊</button>
+
     <!-- Live HUD -->
     <div class="hud" id="hud" style="display:none">
       <div class="pill crew">🏃 <span id="crew">1</span></div>
+      <div class="pill combo" id="combo-pill">🔥 <span id="combo">0</span></div>
       <div class="pill">🪙 <span id="run-coins">0</span></div>
       <div class="pill">📏 <span id="dist">0</span>m</div>
     </div>
@@ -192,7 +223,8 @@
     <div class="overlay" id="menu">
       <h2>🏃 Math Mob Run</h2>
       <p>Swipe (or use ← →) to steer your crew through the gate that makes the
-         <b>biggest</b> mob. Dodge the red barriers. Grow your math brain! 🧠</p>
+         <b>biggest</b> mob. Dodge red barriers, smash through ⚔️ number walls,
+         and build a 🔥 streak by always picking the bigger gate. 🧠</p>
       <div class="coinbar">🪙 <span id="bank">0</span> coins</div>
       <button class="btn" id="play-btn">Play ▶</button>
       <button class="btn secondary" id="shop-btn">🛒 Upgrades</button>
