@@ -85,3 +85,18 @@ site, you can serve the folder with any static server, e.g.:
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
+
+## 🧪 Play-testing the games
+
+There's an automated play-tester in [`tests/`](tests/) that opens **every game**
+in a real browser at **Desktop, iPad and iPhone** sizes and checks each one
+loads with no errors, fits the screen, and actually plays:
+
+```bash
+cd tests
+npm install   # one-time
+npm test
+```
+
+See [`tests/README.md`](tests/README.md) for details. The games themselves stay
+dependency-free — the test robot is the only thing that uses `npm`.
