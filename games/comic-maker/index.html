@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💥 Comic Maker</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💥</text></svg>" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    .maker { max-width: 1100px; margin: 0 auto; padding: 0 0.75rem 3rem; }
+
+    .how {
+      text-align: center; color: #6a6385; font-size: 1.02rem;
+      margin: 0 auto 0.8rem; max-width: 42rem;
+    }
+
+    /* editable book title */
+    .book-title {
+      text-align: center; font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 900; color: var(--purple);
+      border: 3px dashed transparent; border-radius: 14px;
+      padding: 0.1rem 0.6rem; margin: 0 auto 0.7rem; max-width: 90%;
+      outline: none; cursor: text; min-width: 4rem;
+    }
+    .book-title:hover, .book-title:focus { border-color: #d8c9ff; background: rgba(255,255,255,0.55); }
+
+    /* ---- the comic page ---- */
+    .stage { display: flex; justify-content: center; }
+    .page {
+      width: min(94vw, 620px);
+      aspect-ratio: 3 / 4;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 14px 36px rgba(43,36,64,0.20);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      touch-action: manipulation;
+    }
+    .page.l-1  { grid-template: 1fr / 1fr; }
+    .page.l-2v { grid-template: 1fr / 1fr 1fr; }
+    .page.l-2h { grid-template: 1fr 1fr / 1fr; }
+    .page.l-3  { grid-template: "a a" "b c" / 1fr 1fr; }
+    .page.l-3 .panel:nth-child(1) { grid-area: a; }
+    .page.l-3 .panel:nth-child(2) { grid-area: b; }
+    .page.l-3 .panel:nth-child(3) { grid-area: c; }
+    .page.l-4  { grid-template: 1fr 1fr / 1fr 1fr; }
+
+    .panel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 3px solid #2b2440;
+      background: linear-gradient(#aee3ff, #e9f8ff);
+      container-type: size;
+      cursor: pointer;
+    }
+    .panel.sel { box-shadow: 0 0 0 4px var(--yellow), 0 0 0 7px var(--purple); }
+    .panel.empty::after {
+      content: "Tap a sticker ✨";
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(43,36,64,0.35); font-weight: bold;
+      font-size: 4.5cqmin; pointer-events: none; text-align: center;
+    }
+
+    /* ---- items inside a panel ---- */
+    .item {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      user-select: none;
+      touch-action: none;
+    }
+    .item .emoji {
+      display: block; line-height: 1;
+      font-size: calc(var(--sz, 14) * 1cqmin);
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));
+    }
+    .item.flip .emoji { transform: scaleX(-1); }
+
+    .item .txt {
+      font-size: calc(var(--sz, 5.5) * 1cqmin);
+      font-weight: 700; line-height: 1.15;
+      max-width: 58cqmin; min-width: 8cqmin;
+      text-align: center; outline: none;
+      word-break: break-word; cursor: text;
+    }
+
+    /* bubble styles */
+    .item.speech .txt, .item.thought .txt, .item.shout .txt {
+      background: #fff; color: #1c1830;
+      padding: 2.4cqmin 3.2cqmin; border-radius: 4cqmin;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .item.speech .txt { border: 0.6cqmin solid #1c1830; position: relative; }
+    .item.speech .txt::after {
+      content: ""; position: absolute; left: 22%; bottom: -3.4cqmin;
+      border-width: 3.6cqmin 2.6cqmin 0 0; border-style: solid;
+      border-color: #1c1830 transparent transparent transparent;
+    }
+    .item.speech .txt::before {
+      content: ""; position: absolute; left: 24%; bottom: -2cqmin; z-index: 1;
+      border-width: 2.4cqmin 1.6cqmin 0 0; border-style: solid;
+      border-color: #fff transparent transparent transparent;
+    }
+    .item.thought .txt { border: 0.6cqmin solid #1c1830; border-radius: 8cqmin; position: relative; }
+    .item.thought .txt::after {
+      content: "○ ○"; position: absolute; left: 12%; bottom: -5cqmin;
+      font-size: 2.6cqmin; color: #1c1830; letter-spacing: 0.4cqmin;
+    }
+    .item.shout .txt {
+      border: none; background: none; color: #1c1830;
+      padding: 3.4cqmin 4cqmin; position: relative; z-index: 1;
+    }
+    .item.shout { z-index: 1; }
+    .item.shout .txt::before {
+      content: ""; position: absolute; inset: -1.2cqmin; z-index: -2;
+      background: #ffce3a;
+      clip-path: polygon(50% 0,61% 18%,82% 12%,76% 33%,98% 38%,80% 50%,98% 62%,76% 67%,82% 88%,61% 82%,50% 100%,39% 82%,18% 88%,24% 67%,2% 62%,20% 50%,2% 38%,24% 33%,18% 12%,39% 18%);
+    }
+    .item.shout .txt::after {
+      content: ""; position: absolute; inset: 0.4cqmin; z-index: -1;
+      background: #fff;
+      clip-path: polygon(50% 0,61% 18%,82% 12%,76% 33%,98% 38%,80% 50%,98% 62%,76% 67%,82% 88%,61% 82%,50% 100%,39% 82%,18% 88%,24% 67%,2% 62%,20% 50%,2% 38%,24% 33%,18% 12%,39% 18%);
+    }
+    .item.caption .txt {
+      background: #fff3c4; color: #5a4a00;
+      border: 0.5cqmin solid #d8b94a; border-radius: 2cqmin;
+      padding: 2cqmin 3cqmin; box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+    }
+
+    .item.sel { z-index: 50 !important; }
+    .item.sel .emoji,
+    .item.sel .txt { outline: 0.6cqmin dashed var(--purple); outline-offset: 0.8cqmin; }
+
+    /* per-item floating tools */
+    .item-tools {
+      position: absolute; left: 50%; top: -2.2rem;
+      transform: translateX(-50%);
+      display: none; gap: 4px; z-index: 60;
+      background: #fff; padding: 4px; border-radius: 999px;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.3); white-space: nowrap;
+    }
+    .item.sel .item-tools { display: flex; }
+    .item-tools button {
+      font-family: var(--font); font-size: 1rem; line-height: 1;
+      width: 1.9rem; height: 1.9rem; border-radius: 50%;
+      border: none; cursor: pointer; background: #f1ecff; color: var(--ink);
+    }
+    .item-tools button:hover { background: var(--purple); color: #fff; }
+    .item-tools .del:hover { background: #e23b3b; }
+    .item .grip {
+      position: absolute; left: -0.7rem; top: -0.7rem;
+      width: 1.6rem; height: 1.6rem; border-radius: 50%;
+      background: var(--purple); color: #fff; display: none;
+      align-items: center; justify-content: center; cursor: grab;
+      font-size: 0.9rem; z-index: 60; box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      touch-action: none;
+    }
+    .item.text.sel .grip { display: flex; }
+
+    /* ---- toolbox below the page ---- */
+    .toolbox { max-width: 720px; margin: 1rem auto 0; }
+    .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin-bottom: 0.6rem; }
+    .tab {
+      font-family: var(--font); font-weight: bold; font-size: 1rem;
+      border: 3px solid #e0d6ff; background: #fff; color: var(--purple);
+      border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer;
+    }
+    .tab.on { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+    .tray {
+      background: #fff; border-radius: 16px; padding: 0.8rem;
+      box-shadow: 0 8px 22px rgba(43,36,64,0.12); min-height: 4rem;
+    }
+    .tray.hide { display: none; }
+
+    .pad {
+      display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center;
+    }
+    .sticker-btn {
+      font-size: 1.9rem; line-height: 1; background: #faf8ff;
+      border: 2px solid transparent; border-radius: 12px;
+      width: 3rem; height: 3rem; cursor: pointer; padding: 0;
+    }
+    .sticker-btn:hover { border-color: var(--purple); transform: scale(1.08); }
+
+    .cat-row { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; margin-bottom: 0.6rem; }
+    .cat {
+      font-family: var(--font); font-size: 0.9rem; font-weight: bold;
+      border: 2px solid #e0d6ff; background: #fff; color: var(--purple);
+      border-radius: 999px; padding: 0.3rem 0.7rem; cursor: pointer;
+    }
+    .cat.on { background: var(--pink); color: #fff; border-color: var(--pink); }
+
+    .scene-btn {
+      width: 4.2rem; height: 3rem; border-radius: 12px; cursor: pointer;
+      border: 3px solid #fff; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      color: #1c1830; font-size: 0.7rem; font-weight: bold;
+      display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2px;
+    }
+    .scene-btn.dark { color: #fff; }
+    .scene-btn:hover { transform: scale(1.06); border-color: var(--purple); }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; align-items: center; }
+    .big-btn {
+      font-family: var(--font); font-size: 1.05rem; font-weight: bold;
+      color: #fff; background: linear-gradient(90deg, var(--pink), var(--purple));
+      border: none; border-radius: 14px; padding: 0.6rem 1rem; cursor: pointer;
+      box-shadow: 0 6px 14px rgba(138,92,255,0.3);
+    }
+    .big-btn:hover { transform: scale(1.04); }
+    .ghost-btn {
+      font-family: var(--font); font-size: 0.95rem; font-weight: bold;
+      border: 2px solid #cdbfff; background: #fff; color: var(--purple);
+      border-radius: 999px; padding: 0.45rem 0.9rem; cursor: pointer;
+    }
+    .ghost-btn:hover { background: #f3efff; }
+    .layout-btn.on { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+    .page-nav { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 0.9rem 0 0.4rem; font-weight: bold; color: var(--purple); }
+    .nav-arrow {
+      font-family: var(--font); font-size: 1.3rem; font-weight: bold;
+      width: 2.6rem; height: 2.6rem; border-radius: 50%;
+      border: 2px solid #cdbfff; background: #fff; color: var(--purple); cursor: pointer;
+    }
+    .nav-arrow:disabled { opacity: 0.35; cursor: default; }
+    .nav-arrow:not(:disabled):hover { background: var(--purple); color: #fff; }
+
+    .hint { text-align: center; min-height: 1.3rem; font-weight: bold; color: #7a52d6; margin-top: 0.4rem; }
+
+    .tray-label { text-align: center; color: #6a6385; font-size: 0.9rem; margin: 0 0 0.5rem; }
+
+    /* ---- printing: only the comic ---- */
+    @media print {
+      body { background: #fff; }
+      .bg-blobs, .back-link, .hero, .how, .toolbox, .page-nav, .hint, .footer, .item-tools, .grip { display: none !important; }
+      .page { box-shadow: none; width: 100%; aspect-ratio: auto; height: 96vh; }
+      .panel.sel { box-shadow: none; }
+      .item.sel .emoji, .item.sel .txt { outline: none; }
+      .maker { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <a class="back-link" href="../../">← Back to the Arcade</a>
+
+  <header class="hero" style="padding-top: 0.5rem; padding-bottom: 0.25rem;">
+    <h1 class="title">💥 Comic Maker</h1>
+  </header>
+
+  <div class="maker">
+    <p class="how">
+      Make your own <b>graphic novel</b>! Pick a panel, drop in characters, add
+      <b>talk bubbles</b> &amp; a <b>story caption</b>, then turn the page to keep the story going. ✨
+    </p>
+
+    <h2 class="book-title" id="book-title" contenteditable="true" spellcheck="false"
+        aria-label="Comic title — tap to rename">My Comic</h2>
+
+    <div class="stage">
+      <div class="page l-4" id="page" aria-label="Comic page"></div>
+    </div>
+
+    <div class="page-nav">
+      <button class="nav-arrow" id="prev-page" aria-label="Previous page">◀</button>
+      <span id="page-label">Page 1 of 1</span>
+      <button class="nav-arrow" id="next-page" aria-label="Next page">▶</button>
+    </div>
+
+    <div class="hint" id="hint">Tap a panel, then tap a sticker to begin! 👇</div>
+
+    <div class="toolbox">
+      <div class="tabs">
+        <button class="tab on" data-tab="stickers">🧸 Stickers</button>
+        <button class="tab" data-tab="words">💬 Words</button>
+        <button class="tab" data-tab="scenes">🎨 Scenes</button>
+        <button class="tab" data-tab="page">📄 Page</button>
+        <button class="tab" data-tab="book">📚 Book</button>
+      </div>
+
+      <!-- Stickers -->
+      <div class="tray" id="tray-stickers">
+        <div class="cat-row" id="cat-row"></div>
+        <div class="pad" id="sticker-pad"></div>
+      </div>
+
+      <!-- Words -->
+      <div class="tray hide" id="tray-words">
+        <p class="tray-label">Add a bubble to the selected panel, then tap it to type your words.</p>
+        <div class="btn-row">
+          <button class="big-btn" data-add="speech">💬 Talk bubble</button>
+          <button class="big-btn" data-add="thought">💭 Thought</button>
+          <button class="big-btn" data-add="shout">💥 Shout!</button>
+          <button class="big-btn" data-add="caption">📃 Story caption</button>
+        </div>
+      </div>
+
+      <!-- Scenes -->
+      <div class="tray hide" id="tray-scenes">
+        <p class="tray-label">Tap a background for the selected panel.</p>
+        <div class="pad" id="scene-pad"></div>
+      </div>
+
+      <!-- Page -->
+      <div class="tray hide" id="tray-page">
+        <p class="tray-label">How many panels on this page?</p>
+        <div class="btn-row" id="layout-row" style="margin-bottom:0.7rem;">
+          <button class="ghost-btn layout-btn" data-layout="1">▭ 1</button>
+          <button class="ghost-btn layout-btn" data-layout="2v">▯▯ 2</button>
+          <button class="ghost-btn layout-btn" data-layout="2h">⬓ 2</button>
+          <button class="ghost-btn layout-btn" data-layout="3">▤ 3</button>
+          <button class="ghost-btn layout-btn" data-layout="4">⊞ 4</button>
+        </div>
+        <div class="btn-row">
+          <button class="ghost-btn" id="clear-panel">🧹 Clear this panel</button>
+          <button class="ghost-btn" id="del-page">🗑️ Delete this page</button>
+        </div>
+      </div>
+
+      <!-- Book -->
+      <div class="tray hide" id="tray-book">
+        <div class="btn-row">
+          <button class="big-btn" id="add-page">➕ New page</button>
+          <button class="big-btn" id="print">🖨️ Print / Save PDF</button>
+        </div>
+        <div class="btn-row" style="margin-top:0.7rem;">
+          <button class="ghost-btn" id="example">✨ Show an example</button>
+          <button class="ghost-btn" id="new-book">📕 Start a new book</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>Made with ❤️ for Jeannie — your story, your way!</p>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="comic-maker.js"></script>
+</body>
+</html>
