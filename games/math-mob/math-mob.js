@@ -30,7 +30,20 @@
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
     stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0 },
     ach: [],
+    skin: "classic",
+    skinsOwned: ["classic"],
   });
+
+  // ---- Crew skins (cosmetic, bought with coins) -----------------------
+  const SKINS = [
+    { id: "classic", name: "Classic Crew", ico: "🏃", body: "#3a6ff0", head: "#ffd9a8", cost: 0 },
+    { id: "knights", name: "Knights",      ico: "🛡️", body: "#8a93a6", head: "#dde4ee", cost: 150 },
+    { id: "kittens", name: "Kittens",      ico: "🐱", body: "#ff9e3d", head: "#ffe0b8", cost: 200 },
+    { id: "royals",  name: "Royals",       ico: "👑", body: "#ff5d8f", head: "#ffe0ec", cost: 200 },
+    { id: "robots",  name: "Robots",       ico: "🤖", body: "#2bb6a8", head: "#d6f5f0", cost: 250, blocky: true },
+    { id: "blocky",  name: "Blocky Buddies",ico: "🟩", body: "#5bbf57", head: "#83d97e", cost: 300, blocky: true },
+  ];
+  const currentSkin = () => SKINS.find(s => s.id === save.skin) || SKINS[0];
 
   // ---- Difficulty modes -----------------------------------------------
   // Same game, three brains: gentle for the littles, spicy for the bigs.
@@ -55,6 +68,8 @@
       s.upg = Object.assign(defaultSave().upg, s.upg || {});
       s.stats = Object.assign(defaultSave().stats, s.stats || {});
       if (!Array.isArray(s.ach)) s.ach = [];
+      if (!Array.isArray(s.skinsOwned) || !s.skinsOwned.length) s.skinsOwned = ["classic"];
+      if (!s.skin) s.skin = "classic";
       return s;
     } catch (e) {
       return defaultSave();
@@ -140,6 +155,7 @@
   const menu     = $("menu");
   const shopScreen = $("shop-screen");
   const badgesScreen = $("badges-screen");
+  const skinsScreen = $("skins-screen");
   const gameover = $("gameover");
 
   // ---- Canvas sizing (crisp on retina) --------------------------------
@@ -788,23 +804,30 @@
     ctx.font = "bold 26px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
     ctx.lineWidth = 5; ctx.strokeStyle = "rgba(255,255,255,0.95)";
-    const label = "🏃 " + crew;
+    const label = currentSkin().ico + " " + crew;
     ctx.strokeText(label, crewX, py - R - 14);
     ctx.fillText(label, crewX, py - R - 14);
   }
 
   function drawRunner(x, y, i) {
-    // little blue runner with a gentle running bob
+    // a little runner with a gentle running bob, drawn in the chosen skin
+    const sk = currentSkin();
     const bob = Math.sin(now * 12 + i * 1.3) * 1.6;
     y += bob;
-    ctx.fillStyle = "#3a6ff0";
-    ctx.beginPath();
-    ctx.roundRect(x - 4, y - 4, 8, 13, 3);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x, y - 9, 4.6, 0, Math.PI * 2);
-    ctx.fillStyle = "#ffd9a8";
-    ctx.fill();
+    ctx.fillStyle = sk.body;
+    if (sk.blocky) {
+      ctx.fillRect(x - 4, y - 4, 8, 13);          // square body
+      ctx.fillStyle = sk.head;
+      ctx.fillRect(x - 4.5, y - 13, 9, 8);        // square head
+    } else {
+      ctx.beginPath();
+      ctx.roundRect(x - 4, y - 4, 8, 13, 3);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x, y - 9, 4.6, 0, Math.PI * 2);
+      ctx.fillStyle = sk.head;
+      ctx.fill();
+    }
   }
 
   if (!CanvasRenderingContext2D.prototype.roundRect) {
@@ -939,6 +962,42 @@
     }
   }
 
+  function renderSkins() {
+    $("bank3").textContent = save.coins;
+    const wrap = $("skins");
+    wrap.innerHTML = "";
+    for (const sk of SKINS) {
+      const owned = save.skinsOwned.includes(sk.id);
+      const selected = save.skin === sk.id;
+      const row = document.createElement("div");
+      row.className = "shop-row";
+      row.innerHTML = `
+        <span class="ico">${sk.ico}</span>
+        <span class="info"><b>${sk.name}</b><small>${owned ? (selected ? "Wearing now" : "Tap to wear") : "Cosmetic crew"}</small></span>`;
+      const btn = document.createElement("button");
+      btn.className = "buy-btn" + (selected ? " maxed" : "");
+      if (selected) { btn.textContent = "Wearing ✓"; btn.disabled = true; }
+      else if (owned) {
+        btn.textContent = "Wear";
+        btn.onclick = () => { save.skin = sk.id; persist(); renderSkins(); };
+      } else {
+        btn.textContent = `🪙 ${sk.cost}`;
+        btn.disabled = save.coins < sk.cost;
+        btn.onclick = () => {
+          if (save.coins < sk.cost) return;
+          save.coins -= sk.cost;
+          save.skinsOwned.push(sk.id);
+          save.skin = sk.id;
+          persist();
+          initAudio(); sfx.coin();
+          renderSkins();
+        };
+      }
+      row.appendChild(btn);
+      wrap.appendChild(row);
+    }
+  }
+
   function renderBadges() {
     const wrap = $("badges");
     wrap.innerHTML = "";
@@ -962,6 +1021,8 @@
   $("shop-back").onclick   = () => { hide(shopScreen); refreshMenu(); show(menu); };
   $("badges-btn").onclick  = () => { renderBadges(); hide(menu); show(badgesScreen); };
   $("badges-back").onclick = () => { hide(badgesScreen); refreshMenu(); show(menu); };
+  $("skins-btn").onclick   = () => { renderSkins(); hide(menu); show(skinsScreen); };
+  $("skins-back").onclick  = () => { hide(skinsScreen); refreshMenu(); show(menu); };
 
   // ---- Boot -----------------------------------------------------------
   resize();
