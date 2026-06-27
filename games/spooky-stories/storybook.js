@@ -352,6 +352,85 @@
         },
         { end: true, text: "The End. 🦇", art: () => endArt("#3a5fb0", [bat({x:200,y:150,scale:1.6})]) }
       ]
+    },
+
+    {
+      id: "pumpkin-smile",
+      title: "The Pumpkin Who Lost Its Smile",
+      color: "#c25a14",
+      cover: () => svg(nightBg({moonX:300}) + castle(320,255,0.5) +
+        kid(Object.assign({x:130,y:235,scale:1.2}, ELLIE)) + pumpkin({x:255,y:235,scale:1.3})),
+      pages: [
+        {
+          text: "One crisp autumn night, Princess Ellie skipped out to the pumpkin patch.",
+          art: () => svg(nightBg({moonX:330}) + castle(320, 255, 0.5) +
+            kid(Object.assign({x:160, y:240, scale:1.4}, ELLIE)) +
+            pumpkin({x:280, y:255, scale:0.9}))
+        },
+        {
+          text: "Every pumpkin glowed with a happy grin — except one tiny pumpkin in the back.",
+          art: () => svg(nightBg({moonX:70}) +
+            pumpkin({x:90, y:235, scale:1}) + pumpkin({x:200, y:245, scale:1.1}) +
+            pumpkin({x:305, y:235, scale:0.7}))
+        },
+        {
+          text: "“Why so sad, little one?” asked Ellie. “I lost my smile,” it sniffled.",
+          art: () => svg(nightBg({moon:false}) +
+            kid(Object.assign({x:130, y:240, scale:1.2}, ELLIE)) +
+            pumpkin({x:265, y:215, scale:1.7}))
+        },
+        {
+          text: "Ellie waved her sparkly wand and drew a great big grin. Ta-daa!",
+          art: () => svg(nightBg({moonX:90}) +
+            kid(Object.assign({x:140, y:240, scale:1.2}, ELLIE)) +
+            pumpkin({x:265, y:230, scale:1.4}))
+        },
+        {
+          text: "Now the little pumpkin glowed the brightest of all! They danced till moonset.",
+          art: () => svg(nightBg({moonX:200, moonY:72, moonR:42}) +
+            kid(Object.assign({x:120, y:245, scale:1.1}, ELLIE)) +
+            pumpkin({x:230, y:250, scale:1}) + cat({x:310, y:248, scale:1}))
+        },
+        { end: true, text: "The End. 🎃", art: () => endArt("#c25a14", [pumpkin({x:200,y:160,scale:1.7})]) }
+      ]
+    },
+
+    {
+      id: "castle-sleepover",
+      title: "The Cozy Castle Sleepover",
+      color: "#5a3fb0",
+      cover: () => svg(nightBg({moonX:300}) + castle(200,250,1) +
+        ghost({x:120,y:150,scale:0.9}) + cat({x:290,y:235,scale:1})),
+      pages: [
+        {
+          text: "Tonight the whole family had a cozy sleepover high up in the castle.",
+          art: () => svg(nightBg({moonX:330}) + castle(200, 252, 1.1))
+        },
+        {
+          text: "Jeannie read a story and Cory built the tallest pillow fort ever.",
+          art: () => svg(nightBg({moonX:70}) +
+            kid(Object.assign({x:140, y:240, scale:1.3, crown:false}, JEANNIE)) +
+            kid(Object.assign({x:260, y:240, scale:1.3}, CORY)))
+        },
+        {
+          text: "Knock, knock! Boo the giggly ghost floated in with marshmallows to share.",
+          art: () => svg(nightBg({moon:false}) +
+            kid(Object.assign({x:140, y:240, scale:1.3}, ELLIE)) +
+            ghost({x:265, y:150, scale:1.4}))
+        },
+        {
+          text: "Midnight the cat curled up warm, and baby Kieran giggled at the swooping bats.",
+          art: () => svg(nightBg({moonX:320}) +
+            bat({x:90, y:90, scale:0.9}) + bat({x:300, y:80, scale:0.7, color:"#9a7ae0"}) +
+            cat({x:150, y:245, scale:1.3}) + babyPumpkin(270, 225, 1))
+        },
+        {
+          text: "Snuggled together under the twinkly stars, everyone drifted off to sweet dreams.",
+          art: () => svg(nightBg({moonX:200, moonY:72, moonR:44}) + castle(330, 255, 0.45) +
+            ghost({x:90, y:150, scale:0.8}))
+        },
+        { end: true, text: "The End. 💜", art: () => endArt("#5a3fb0", [ghost({x:200,y:150,scale:1.4})]) }
+      ]
     }
   ];
 
