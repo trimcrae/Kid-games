@@ -21,12 +21,12 @@
 
 const GAMES = [
   {
-    title: "Soccer Roster Maker",
-    emoji: "⚽",
-    blurb: "Coach tool for Shannon — fair soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
+    title: "Pumpkin Pies Roster",
+    emoji: "🥧",
+    blurb: "Coach tool for Shannon — fair Pumpkin Pies soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
     url:   "games/soccer-roster/",
     ages:  "Grown-ups",
-    color: "#3ddc84",
+    color: "#f4791f",
     ready: true
   },
 
