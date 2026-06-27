@@ -30,6 +30,16 @@ const GAMES = [
     ready: true
   },
 
+  {
+    title: "Color Grid Quest",
+    emoji: "🌈",
+    blurb: "Match colours + letters to build a block wall — Cory's grid idea!",
+    url:   "games/color-grid/",
+    ages:  "6+",
+    color: "#9b3fc4",
+    ready: true
+  },
+
   // ---- Coming soon: ideas tailored to each kid ----
   {
     title: "Word Wizard",
@@ -38,15 +48,6 @@ const GAMES = [
     url:   "#",
     ages:  "7+",
     color: "#ff5d8f",
-    ready: false
-  },
-  {
-    title: "Grid Quest",
-    emoji: "🟩",
-    blurb: "Math and grid puzzles with a Minecraft vibe — for Cory!",
-    url:   "#",
-    ages:  "6+",
-    color: "#3ddc84",
     ready: false
   },
   {
