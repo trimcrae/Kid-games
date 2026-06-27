@@ -114,6 +114,7 @@
     const word = el.wordInput.value.trim();
     if (!word) { el.wordInput.focus(); return; }   // need a word to move on
     answers[step] = word;
+    window.SFX && SFX.good();   // a happy chime for each silly word
     if (step < story.blanks.length - 1) {
       step++;
       renderStep();
@@ -162,6 +163,9 @@
 
     state.completed[story.id] = true;
     save();
+
+    window.SFX && SFX.win();
+    window.Confetti && Confetti.burst({ count: 70 });
 
     speak(story.title + ". " + fillTemplate(false));
   }

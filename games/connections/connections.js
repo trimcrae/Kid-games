@@ -289,6 +289,7 @@
     save();
     if (won) {
       if (window.SFX) SFX.win();
+      window.Confetti && Confetti.burst({ count: 100 });
       flash("🏆 You found all four groups! Amazing!", "var(--green)");
       el.lives.textContent = "Solved with " + (MAX_MISTAKES - mistakes) + " guesses to spare!";
     } else {

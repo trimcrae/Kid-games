@@ -184,6 +184,7 @@
     if (!first) {
       flashHint("Try a word that starts with a letter! 🙂", true);
       shake();
+      window.SFX && SFX.nope();
       return;
     }
     var letter = first[0];
@@ -207,6 +208,7 @@
     td.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
 
     flashHint('"' + word + '" goes in row ' + letter + "! ✨", false);
+    window.SFX && SFX.good();
     input.value = "";
     input.focus();
   }
