@@ -195,43 +195,32 @@
       #output { padding-bottom: 5rem; }
     }
 
-    /* ---- print: plain black & white, ONE landscape page, names only ---- */
+    /* ---- print: plain black & white, ONE upright page, names only ----
+       Normal portrait flow in 2 columns. No rotation/overflow, so it is
+       physically guaranteed to stay on a single page on every device. */
     @media print {
-      /* Keep the PAGE portrait (US Letter) but rotate the content 90° so it
-         prints landscape on every device — iPhone Safari ignores
-         @page{size:landscape}. Sizing/placement is in physical inches (not
-         vw/vh, which iOS resolves wrong) so nothing gets clipped. */
-      @page { size: 8.5in 11in; margin: 0; }
-      /* fixed page box + clip, so the rotated block never spawns a 2nd page */
-      html, body { margin: 0 !important; padding: 0 !important; width: 8.5in; height: 11in; overflow: hidden !important; background: #fff !important; color: #000; }
+      @page { size: portrait; margin: 0.35in; }
+      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000; }
 
       /* drop everything except the quarter line-ups */
       .bg-blobs, .back-link, .no-print, .footer, .hero,
       .checks, .warn-panel, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
 
-      /* page-sized container that CLIPS — guarantees a single page */
-      .wrap { position: relative; width: 8.5in; height: 11in; overflow: hidden; margin: 0; padding: 0; max-width: none; }
-      /* the landscape roster, a touch smaller than the page, centered + rotated */
-      .print-area {
-        position: absolute; left: 50%; top: 50%;
-        width: 10.6in; height: 8.0in;
-        transform-origin: center center;
-        transform: translate(-50%, -50%) rotate(90deg);
-        box-sizing: border-box; padding: 0.25in; overflow: hidden;
-      }
+      .wrap { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+      .print-area { padding: 0 !important; }
       .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
 
       /* team name at the top of the sheet */
-      .print-title { display: block; font-weight: bold; font-size: 1.1rem; color: #000; margin: 0 0 0.4rem; }
+      .print-title { display: block; font-weight: bold; font-size: 1.05rem; color: #000; margin: 0 0 0.25rem; }
 
-      /* up to 4 quarters across; 8 periods wrap to a 2nd row — all on one landscape page */
-      .periods-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 0.35rem; }
+      /* two columns: 8 periods = 2×4, 4 quarters = 2×2, all on one page */
+      .periods-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 0.4rem !important; align-content: start; }
       .pcard { border: 1.5px solid #000 !important; border-radius: 0; break-inside: avoid; page-break-inside: avoid; }
-      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 0.95rem; padding: 0.25rem; }
-      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.3rem 0.4rem; }
+      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 1.05rem; padding: 0.28rem; text-align: center; }
+      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.3rem 0.5rem; text-align: center; font-size: 1.05rem; }
       .pcard .goalie small { color: #000 !important; font-size: 0.62rem; }
-      .pcard ol { padding: 0.3rem 0.4rem 0.4rem 1.3rem; }
-      .pcard ol li { font-size: 0.9rem; padding: 0.1rem 0; }
+      .pcard ol { padding: 0.3rem 0.5rem 0.35rem 1.5rem; }
+      .pcard ol li { font-size: 1rem; padding: 0.09rem 0; }
     }
   </style>
 </head>
@@ -298,6 +287,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=5"></script>
+  <script src="roster.js?v=6"></script>
 </body>
 </html>
