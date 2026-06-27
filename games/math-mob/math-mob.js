@@ -26,8 +26,18 @@
     bestDist: 0,
     bestCrew: 0,
     muted: false,
+    mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
   });
+
+  // ---- Difficulty modes -----------------------------------------------
+  // Same game, three brains: gentle for the littles, spicy for the bigs.
+  const MODES = {
+    easy:   { label: "🌱 Easy",   sub: "add & double", speed: 200, smax: 270, barrier: 0.20, bossBase: 4, bossK: 0.04 },
+    medium: { label: "⭐ Medium", sub: "add & times",  speed: 240, smax: 380, barrier: 0.30, bossBase: 6, bossK: 0.07 },
+    hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 280, smax: 470, barrier: 0.36, bossBase: 9, bossK: 0.10 },
+  };
+  const mode = () => MODES[save.mode] || MODES.medium;
 
   function loadSave() {
     try {
@@ -196,34 +206,45 @@
   }
 
   function makeGatePair() {
-    const tier = dist < 150 ? 1 : dist < 450 ? 2 : 3;
     let a, b;
     const r = Math.random();
-    if (tier === 1) {
-      if (r < 0.6) { a = makeOp("add", pick([2, 3, 5])); b = makeOp("add", pick([6, 8, 10])); }
+    if (save.mode === "easy") {
+      // Just adding and doubling — no take-aways. Gentle for little ones.
+      if (r < 0.7) { a = makeOp("add", pick([2, 3, 4, 5])); b = makeOp("add", pick([6, 8, 10])); }
       else         { a = makeOp("mul", 2); b = makeOp("add", pick([3, 4, 5])); }
-    } else if (tier === 2) {
-      if (r < 0.45)      { a = makeOp("mul", pick([2, 3])); b = makeOp("add", pick([8, 10, 12, 15])); }
-      else if (r < 0.8)  { a = makeOp("add", pick([10, 15, 20])); b = makeOp("sub", pick([3, 5, 8])); }
-      else               { a = makeOp("mul", 2); b = makeOp("mul", 3); }
+    } else if (save.mode === "hard") {
+      // Big numbers and all four operations, including traps.
+      if (r < 0.35)      { a = makeOp("mul", pick([2, 3, 4, 5])); b = makeOp("add", pick([15, 20, 25, 30, 40])); }
+      else if (r < 0.6)  { a = makeOp("mul", pick([3, 4])); b = makeOp("div", pick([2, 3])); }
+      else if (r < 0.8)  { a = makeOp("add", pick([20, 30, 40])); b = makeOp("sub", pick([5, 8, 12])); }
+      else               { a = makeOp("mul", pick([2, 3])); b = makeOp("mul", pick([4, 5])); }
     } else {
-      if (r < 0.4)       { a = makeOp("mul", pick([2, 3, 4])); b = makeOp("add", pick([15, 20, 25, 30])); }
-      else if (r < 0.7)  { a = makeOp("mul", pick([3, 4])); b = makeOp("div", 2); }
-      else               { a = makeOp("add", pick([20, 30])); b = makeOp("mul", pick([2, 3])); }
+      // Medium — ramps a little with distance.
+      const tier = dist < 200 ? 1 : 2;
+      if (tier === 1) {
+        if (r < 0.5)      { a = makeOp("add", pick([3, 5])); b = makeOp("add", pick([8, 10])); }
+        else if (r < 0.8) { a = makeOp("mul", 2); b = makeOp("add", pick([4, 5, 6])); }
+        else              { a = makeOp("mul", pick([2, 3])); b = makeOp("add", pick([8, 10, 12])); }
+      } else {
+        if (r < 0.45)     { a = makeOp("mul", pick([2, 3])); b = makeOp("add", pick([10, 12, 15, 20])); }
+        else if (r < 0.8) { a = makeOp("add", pick([10, 15, 20])); b = makeOp("sub", pick([3, 5, 8])); }
+        else              { a = makeOp("mul", 2); b = makeOp("mul", 3); }
+      }
     }
     return Math.random() < 0.5 ? [a, b] : [b, a];
   }
 
   function spawnRow() {
     // A number wall is due?
+    const M = mode();
     if (bossPending) {
       bossPending = false;
-      const need = Math.max(5, Math.round(6 + dist * 0.07));
+      const need = Math.max(3, Math.round(M.bossBase + dist * M.bossK));
       rows.push({ kind: "boss", y: -bandH, need, done: false });
       nextBossDist = dist + rand(200, 280);
       return;
     }
-    const barrierChance = dist < 80 ? 0 : 0.30;
+    const barrierChance = dist < 80 ? 0 : M.barrier;
     if (Math.random() < barrierChance) {
       const side = Math.random() < 0.5 ? "L" : "R";
       rows.push({ kind: "barrier", y: -bandH, side, done: false });
@@ -259,7 +280,7 @@
     crewX = targetX = W / 2;
     dist = 0; runCoins = 0; bestCrewThisRun = crew;
     shieldsLeft = upgLevel("shield");
-    speed = 240;
+    speed = mode().speed;
     rows = []; coins = []; floaters = []; particles = [];
     spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0;
     keyDir = 0; combo = 0;
@@ -310,7 +331,8 @@
   }
 
   function update(dt) {
-    speed = 240 + Math.min(dist * 0.9, 380);
+    const M = mode();
+    speed = M.speed + Math.min(dist * 0.9, M.smax - M.speed);
     const dy = speed * dt;
     dist += dy / 26;
     worldScroll += dy;
@@ -710,6 +732,20 @@
     $("best-line").textContent = save.bestDist
       ? `Best run: ${save.bestDist} m • biggest mob 🏃 ${save.bestCrew}`
       : "Your first run awaits!";
+    renderModes();
+  }
+
+  function renderModes() {
+    const wrap = $("modes");
+    wrap.innerHTML = "";
+    for (const key of ["easy", "medium", "hard"]) {
+      const m = MODES[key];
+      const btn = document.createElement("button");
+      btn.className = "mode-btn" + (save.mode === key ? " sel" : "");
+      btn.innerHTML = `<b>${m.label}</b><small>${m.sub}</small>`;
+      btn.onclick = () => { save.mode = key; persist(); renderModes(); };
+      wrap.appendChild(btn);
+    }
   }
 
   function renderShop() {
