@@ -28,6 +28,8 @@
     muted: false,
     mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
+    stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0 },
+    ach: [],
   });
 
   // ---- Difficulty modes -----------------------------------------------
@@ -39,12 +41,20 @@
   };
   const mode = () => MODES[save.mode] || MODES.medium;
 
+  // Respect "reduce motion" (skip screen shake, fewer particles), and add
+  // a gentle phone buzz on big moments.
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function buzz(ms) { try { if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+
   function loadSave() {
     try {
       const raw = localStorage.getItem(SAVE_KEY);
       if (!raw) return defaultSave();
       const s = Object.assign(defaultSave(), JSON.parse(raw));
       s.upg = Object.assign(defaultSave().upg, s.upg || {});
+      s.stats = Object.assign(defaultSave().stats, s.stats || {});
+      if (!Array.isArray(s.ach)) s.ach = [];
       return s;
     } catch (e) {
       return defaultSave();
@@ -82,6 +92,38 @@
   ];
   const upgLevel = key => save.upg[key] || 0;
 
+  // ---- Achievements ---------------------------------------------------
+  // Goals that outlast a single run. `s` is a snapshot of lifetime stats
+  // plus the just-finished run's peaks.
+  const ACHIEVEMENTS = [
+    { id: "first",   ico: "🏁", name: "First Steps",     desc: "Finish your first run.",        ok: s => s.runs >= 1 },
+    { id: "run100",  ico: "👟", name: "Getting Going",    desc: "Run 100 m in one go.",          ok: s => s.bestDist >= 100 },
+    { id: "run500",  ico: "🏃", name: "Marathoner",       desc: "Run 500 m in one go.",          ok: s => s.bestDist >= 500 },
+    { id: "mob100",  ico: "👥", name: "Big Crowd",        desc: "Grow a mob of 100.",            ok: s => s.bestCrew >= 100 },
+    { id: "mob1000", ico: "🌊", name: "Huge Crowd",       desc: "Grow a mob of 1,000!",          ok: s => s.bestCrew >= 1000 },
+    { id: "walls10", ico: "⚔️", name: "Wall Breaker",     desc: "Smash 10 number walls.",        ok: s => s.walls >= 10 },
+    { id: "quiz25",  ico: "🧠", name: "Quiz Whiz",        desc: "Answer 25 quiz gates right.",   ok: s => s.quizCorrect >= 25 },
+    { id: "combo6",  ico: "🔥", name: "On Fire",          desc: "Reach a 6× streak.",            ok: s => s.bestCombo >= 6 },
+    { id: "spend5",  ico: "🛒", name: "Big Spender",      desc: "Buy 5 upgrades.",               ok: s => s.upgradesBought >= 5 },
+    { id: "hard200", ico: "💪", name: "Hard Mode Hero",   desc: "Run 200 m on Hard.",            ok: s => s.hardBestDist >= 200 },
+  ];
+
+  function statsSnapshot() {
+    return Object.assign({ bestDist: save.bestDist, bestCrew: save.bestCrew }, save.stats);
+  }
+  // Returns the achievement defs newly unlocked by the current stats.
+  function checkAchievements() {
+    const snap = statsSnapshot();
+    const fresh = [];
+    for (const a of ACHIEVEMENTS) {
+      if (!save.ach.includes(a.id) && a.ok(snap)) {
+        save.ach.push(a.id);
+        fresh.push(a);
+      }
+    }
+    return fresh;
+  }
+
   // ---- DOM refs -------------------------------------------------------
   const $ = id => document.getElementById(id);
   const stage   = $("stage");
@@ -97,6 +139,7 @@
 
   const menu     = $("menu");
   const shopScreen = $("shop-screen");
+  const badgesScreen = $("badges-screen");
   const gameover = $("gameover");
 
   // ---- Canvas sizing (crisp on retina) --------------------------------
@@ -177,7 +220,7 @@
   let spawnAccum = 0, coinAccum = 0;
   let keyDir = 0;
   let lastT = 0, now = 0;
-  let combo = 0;
+  let combo = 0, bestComboThisRun = 0;
   let worldScroll = 0;         // for scrolling speed-chevrons
   let shake = 0;               // screen-shake magnitude
   let nextBossDist = 220;      // distance of the next number wall
@@ -296,6 +339,7 @@
     floaters.push({ x, y, text, color, life: 1, big: !!big });
   }
   function burst(x, y, color, n, power) {
+    if (reduceMotion) n = Math.ceil(n / 3);
     for (let i = 0; i < n; i++) {
       const a = rand(0, Math.PI * 2), sp = rand(0.2, 1) * (power || 220);
       particles.push({
@@ -304,7 +348,7 @@
       });
     }
   }
-  function addShake(m) { shake = Math.max(shake, m); }
+  function addShake(m) { if (!reduceMotion) shake = Math.max(shake, m); }
 
   // ---- Start / end ----------------------------------------------------
   function startRun() {
@@ -318,7 +362,7 @@
     speed = mode().speed;
     rows = []; coins = []; floaters = []; particles = [];
     spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0;
-    keyDir = 0; combo = 0;
+    keyDir = 0; combo = 0; bestComboThisRun = 0;
     nextBossDist = 220; bossPending = false;
     state = "playing";
     hide(menu); hide(shopScreen); hide(gameover);
@@ -341,11 +385,25 @@
     const newBestCrew = bestCrewThisRun > save.bestCrew;
     if (newBestDist) save.bestDist = distR;
     if (newBestCrew) save.bestCrew = bestCrewThisRun;
+
+    // Lifetime stats for badges.
+    save.stats.runs++;
+    save.stats.bestCombo = Math.max(save.stats.bestCombo, bestComboThisRun);
+    if (save.mode === "hard") save.stats.hardBestDist = Math.max(save.stats.hardBestDist, distR);
+    const freshBadges = checkAchievements();
     persist();
 
     $("go-dist").textContent = distR;
     $("go-crew").textContent = bestCrewThisRun;
     $("go-coins").textContent = earned;
+    const badgeBox = $("go-badges");
+    badgeBox.innerHTML = "";
+    for (const a of freshBadges) {
+      const d = document.createElement("div");
+      d.className = "new-badge";
+      d.textContent = `🏅 New badge: ${a.ico} ${a.name}!`;
+      badgeBox.appendChild(d);
+    }
     $("go-title").textContent = newBestDist ? "New record! 🏆" : "Run finished! 🏁";
     $("go-best").textContent =
       `Best: ${save.bestDist} m • biggest mob 🏃 ${save.bestCrew}` +
@@ -472,6 +530,7 @@
     if (side === row.correctSide) {
       crew = clamp(Math.round(crew * 1.3) + 5, 0, MAX_CREW);
       combo++;
+      save.stats.quizCorrect++;
       const bonus = Math.min(combo, 6);
       runCoins += bonus;
       setCombo(combo);
@@ -506,6 +565,7 @@
     addFloater(crewX, playerY() - 30, "-" + (before - crew), "#ff4d6d", true);
     burst(crewX, playerY() - 24, "#ff4d6d", 18, 300);
     addShake(10);
+    buzz(40);
     sfx.barrier();
   }
 
@@ -513,6 +573,8 @@
     const before = crew;
     if (crew > row.need) {
       crew = crew - row.need;          // punch through, lose its strength
+      save.stats.walls++;
+      buzz(60);
       runCoins += 12 + Math.round(row.need / 2);
       addFloater(W / 2, playerY() - 36, "SMASH! 🏆", "#2bb673", true);
       addFloater(W / 2, playerY() - 64, "+" + (12 + Math.round(row.need / 2)) + "🪙", "#c98a00");
@@ -772,6 +834,7 @@
   function setCombo(n) {
     comboEl.textContent = n;
     comboPill.classList.toggle("on", n >= 2);
+    if (n > bestComboThisRun) bestComboThisRun = n;
   }
 
   // ---- Input ----------------------------------------------------------
@@ -864,6 +927,8 @@
           if (save.coins < cost) return;
           save.coins -= cost;
           save.upg[u.key] = lvl + 1;
+          save.stats.upgradesBought++;
+          checkAchievements();
           persist();
           initAudio(); sfx.coin();
           renderShop();
@@ -874,12 +939,29 @@
     }
   }
 
+  function renderBadges() {
+    const wrap = $("badges");
+    wrap.innerHTML = "";
+    for (const a of ACHIEVEMENTS) {
+      const got = save.ach.includes(a.id);
+      const row = document.createElement("div");
+      row.className = "badge-row" + (got ? "" : " locked");
+      row.innerHTML = `
+        <span class="ico">${a.ico}</span>
+        <span class="info"><b>${a.name}</b><small>${a.desc}</small></span>
+        <span class="tick">${got ? "✓" : "🔒"}</span>`;
+      wrap.appendChild(row);
+    }
+  }
+
   // ---- Button wiring --------------------------------------------------
   $("play-btn").onclick    = startRun;
   $("again-btn").onclick   = startRun;
   $("shop-btn").onclick    = () => { renderShop(); hide(menu); show(shopScreen); };
   $("go-shop-btn").onclick = () => { renderShop(); hide(gameover); show(shopScreen); };
   $("shop-back").onclick   = () => { hide(shopScreen); refreshMenu(); show(menu); };
+  $("badges-btn").onclick  = () => { renderBadges(); hide(menu); show(badgesScreen); };
+  $("badges-back").onclick = () => { hide(badgesScreen); refreshMenu(); show(menu); };
 
   // ---- Boot -----------------------------------------------------------
   resize();

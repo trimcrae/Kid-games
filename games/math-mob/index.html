@@ -198,6 +198,39 @@
 
     .hint { font-size: 0.9rem; color: #6a6385; }
 
+    .menu-row { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
+    .menu-row .btn { padding: 0.7rem 1.3rem; font-size: 1.05rem; }
+
+    /* Badges */
+    .badge-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: #fff;
+      border-radius: 16px;
+      padding: 0.55rem 0.8rem;
+      box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
+      text-align: left;
+    }
+    .badge-row.locked { opacity: 0.55; filter: grayscale(0.8); }
+    .badge-row .ico { font-size: 1.9rem; line-height: 1; }
+    .badge-row .info b { display: block; font-size: 1.02rem; }
+    .badge-row .info small { color: #6a6385; }
+    .badge-row .tick { margin-left: auto; font-size: 1.3rem; color: var(--green); }
+
+    .new-badge {
+      background: linear-gradient(90deg, var(--yellow), #ffe39a);
+      color: #7a5400;
+      font-weight: bold;
+      border-radius: 14px;
+      padding: 0.5rem 0.9rem;
+      margin: 0.15rem auto;
+      max-width: 22rem;
+      box-shadow: 0 6px 14px rgba(255, 209, 102, 0.5);
+      animation: pop-in 0.4s ease;
+    }
+    @keyframes pop-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
     /* Difficulty picker */
     .modes {
       display: flex;
@@ -255,7 +288,10 @@
       <div class="coinbar">🪙 <span id="bank">0</span> coins</div>
       <div class="modes" id="modes"></div>
       <button class="btn" id="play-btn">Play ▶</button>
-      <button class="btn secondary" id="shop-btn">🛒 Upgrades</button>
+      <div class="menu-row">
+        <button class="btn secondary" id="shop-btn">🛒 Upgrades</button>
+        <button class="btn secondary" id="badges-btn">🏅 Badges</button>
+      </div>
       <div class="hint" id="best-line"></div>
     </div>
 
@@ -267,12 +303,20 @@
       <button class="btn" id="shop-back">Done</button>
     </div>
 
+    <!-- Badges screen -->
+    <div class="overlay hidden" id="badges-screen">
+      <h2>🏅 Badges</h2>
+      <div class="shop" id="badges"></div>
+      <button class="btn" id="badges-back">Done</button>
+    </div>
+
     <!-- Game over -->
     <div class="overlay hidden" id="gameover">
       <h2 id="go-title">Run finished! 🏁</h2>
       <p class="big">You ran <span id="go-dist">0</span> m</p>
       <p>Biggest mob: 🏃 <span id="go-crew">0</span></p>
       <p>🪙 <span id="go-coins">0</span> coins collected</p>
+      <div id="go-badges"></div>
       <p class="hint" id="go-best"></p>
       <button class="btn" id="again-btn">Run again ▶</button>
       <button class="btn secondary" id="go-shop-btn">🛒 Spend coins</button>
