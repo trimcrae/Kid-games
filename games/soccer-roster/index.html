@@ -50,12 +50,14 @@
     /* ---- team editor ---- */
     .team-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.55rem; }
     .player-row {
-      display: flex; align-items: center; gap: 0.5rem;
+      display: flex; flex-direction: column; align-items: stretch; gap: 0.45rem;
       background: #faf8ff; border: 2px solid #eee6ff; border-radius: 14px;
-      padding: 0.4rem 0.55rem;
+      padding: 0.5rem 0.7rem;
     }
     .player-row.away { opacity: 0.5; }
-    .pname { flex: 1; min-width: 0; font-weight: bold; font-size: 0.96rem; line-height: 1.15; overflow-wrap: anywhere; }
+    .pname { font-weight: bold; font-size: 0.98rem; line-height: 1.2; }
+    .player-controls { display: flex; align-items: center; gap: 0.5rem; }
+    .player-controls .chip-x { margin-left: auto; }
     .chip {
       font: inherit; font-size: 0.78rem; font-weight: bold; cursor: pointer;
       border: 2px solid transparent; border-radius: 999px;
@@ -293,6 +295,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=10"></script>
+  <script src="roster.js?v=11"></script>
 </body>
 </html>

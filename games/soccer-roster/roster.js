@@ -217,10 +217,14 @@
         }
       };
 
-      row.appendChild(name);
-      row.appendChild(pres);
-      row.appendChild(gk);
-      row.appendChild(x);
+      var controls = document.createElement("div");
+      controls.className = "player-controls";
+      controls.appendChild(pres);
+      controls.appendChild(gk);
+      controls.appendChild(x);
+
+      row.appendChild(name);      // name on its own line
+      row.appendChild(controls);  // Here / goalie / remove below it
       list.appendChild(row);
     });
   }
