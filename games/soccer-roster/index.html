@@ -132,32 +132,27 @@
 
     .empty-note { text-align: center; color: #8a82a6; padding: 1.5rem; }
 
-    /* ---- print: plain black & white, one page, names only ---- */
+    /* ---- print: plain black & white, ONE landscape page, names only ---- */
     @media print {
-      @page { margin: 0.5in; }
-      body { background: #fff !important; color: #000; }
+      @page { size: landscape; margin: 0.4in; }
+      html, body { width: 100%; height: auto; background: #fff !important; color: #000; }
 
       /* drop everything except the quarter line-ups */
       .bg-blobs, .back-link, .no-print, .footer, .hero,
       .checks, .warn-panel, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
 
       /* strip panel chrome — just the content */
-      .wrap { max-width: none; padding: 0; }
-      .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 0 0.4rem !important; }
+      .wrap { max-width: none; padding: 0; margin: 0; }
+      .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
 
-      /* simple text header (team • opponent • date • quarters) */
-      .roster-head { text-align: left; margin: 0 0 0.5rem; }
-      .roster-head h2 { font-size: 1.2rem; }
-      .roster-head p { color: #000; font-size: 0.9rem; margin-top: 0.15rem; }
-
-      /* quarter cards, black & white */
-      .periods-grid { grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
-      .pcard { border: 1.5px solid #000 !important; border-radius: 0; }
-      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 1rem; padding: 0.3rem; }
-      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.35rem 0.5rem; }
-      .pcard .goalie small { color: #000 !important; }
-      .pcard ol { padding: 0.35rem 0.5rem 0.5rem 1.4rem; }
-      .pcard ol li { font-size: 0.95rem; padding: 0.12rem 0; }
+      /* up to 4 quarters across; 8 periods wrap to a 2nd row — all on one landscape page */
+      .periods-grid { grid-template-columns: repeat(4, 1fr) !important; gap: 0.35rem; }
+      .pcard { border: 1.5px solid #000 !important; border-radius: 0; break-inside: avoid; page-break-inside: avoid; }
+      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 0.95rem; padding: 0.25rem; }
+      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.3rem 0.4rem; }
+      .pcard .goalie small { color: #000 !important; font-size: 0.62rem; }
+      .pcard ol { padding: 0.3rem 0.4rem 0.4rem 1.3rem; }
+      .pcard ol li { font-size: 0.9rem; padding: 0.1rem 0; }
     }
   </style>
 </head>
