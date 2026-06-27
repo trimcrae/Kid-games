@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🧶 Word Strands</title>
+  <meta name="description" content="Trace the hidden theme words through a grid of letters — a kid-friendly Strands. Every letter belongs to a word!" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧶</text></svg>" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    .btn {
+      font-family: var(--font); font-size: 1.1rem; font-weight: bold; color: #fff;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      border: none; border-radius: 999px; padding: 0.7rem 1.5rem; cursor: pointer;
+      box-shadow: 0 8px 20px rgba(56,182,255,0.35); transition: transform 0.15s ease; touch-action: manipulation;
+    }
+    .btn:hover { transform: scale(1.05); }
+    .btn.ghost { background: var(--paper); color: var(--blue); box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
+
+    /* picker */
+    #puzzles.hidden, #play.hidden { display: none; }
+    .puz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1.1rem; max-width: 720px; margin: 0 auto; }
+    .puz-card {
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      background: var(--paper); border: 4px solid transparent; border-radius: 22px;
+      padding: 1.3rem 1rem; cursor: pointer; box-shadow: 0 10px 26px rgba(43,36,64,0.12);
+      transition: transform 0.15s ease, border-color 0.15s ease; font-family: var(--font); color: var(--ink); text-align: center;
+    }
+    .puz-card:hover, .puz-card:focus-visible { transform: translateY(-6px); border-color: var(--blue); outline: none; }
+    .puz-card .pz-emoji { font-size: 2.6rem; }
+    .puz-card h3 { margin: 0; font-size: 1.1rem; }
+    .puz-card .pz-progress { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
+    .puz-card.done { border-color: var(--green); }
+
+    .clue-card {
+      max-width: 460px; margin: 0 auto 0.75rem; background: var(--paper); border-radius: 18px;
+      padding: 0.75rem 1rem; box-shadow: 0 8px 20px rgba(43,36,64,0.12);
+    }
+    .clue-card .ttl { font-weight: bold; color: var(--purple); font-size: 1.15rem; }
+    .clue-card .cl { color: #6a6385; font-size: 0.98rem; }
+
+    .progress-line { font-size: 1.05rem; font-weight: bold; color: var(--blue); margin: 0.25rem 0; }
+    .feedback { min-height: 1.5rem; font-size: 1.15rem; font-weight: bold; color: var(--green); margin: 0.25rem 0 0.5rem; }
+
+    /* board */
+    .board-wrap { position: relative; width: 340px; max-width: 92vw; margin: 0.5rem auto 1rem; touch-action: none; }
+    .board { display: grid; gap: 0.35rem; position: relative; z-index: 2; }
+    .lines { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+    .scell {
+      aspect-ratio: 1/1; border: none; border-radius: 50%; background: rgba(255,255,255,0.85);
+      color: var(--ink); font-family: var(--font); font-weight: bold; font-size: clamp(1rem,4.5vw,1.6rem);
+      text-transform: uppercase; cursor: pointer; box-shadow: 0 3px 8px rgba(43,36,64,0.12);
+      display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none;
+      transition: transform 0.08s ease, background 0.12s ease, color 0.12s ease;
+    }
+    .scell.sel { background: var(--purple); color: #fff; transform: scale(1.05); }
+    .scell.found { color: #fff; }
+    .scell:active { transform: scale(0.95); }
+
+    .controls { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; }
+
+    .found-list { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; max-width: 520px; margin: 0.75rem auto 0; }
+    .found-chip { background: var(--paper); border-radius: 999px; padding: 0.3rem 0.8rem; font-weight: bold; box-shadow: 0 4px 10px rgba(43,36,64,0.1); }
+    .found-chip.span { background: var(--yellow); color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span>
+  </div>
+
+  <a class="back-link" href="../../">← Back to the Arcade</a>
+
+  <header class="hero" style="padding-top: 0.5rem;">
+    <h1 class="title">🧶 Word Strands</h1>
+    <p class="subtitle">Trace the hidden words! Every letter belongs to one — find them all.</p>
+  </header>
+
+  <main class="game-stage" style="max-width: 700px;">
+
+    <section id="puzzles">
+      <p style="font-weight:bold;color:var(--blue);font-size:1.2rem;margin-top:0;">Pick a word hunt:</p>
+      <div class="puz-grid" id="puz-grid"></div>
+    </section>
+
+    <section id="play" class="hidden">
+      <div class="clue-card">
+        <div class="ttl" id="puz-title">…</div>
+        <div class="cl" id="puz-clue">…</div>
+      </div>
+      <div class="progress-line" id="progress" aria-live="polite"></div>
+      <p class="feedback" id="feedback" aria-live="polite"></p>
+
+      <div class="board-wrap" id="board-wrap">
+        <svg class="lines" id="lines"></svg>
+        <div class="board" id="board"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn ghost" id="clear-btn">✋ Clear</button>
+        <button class="btn ghost" id="hint-btn">💡 Hint</button>
+        <button class="btn ghost" id="quit-btn">🧶 All hunts</button>
+      </div>
+
+      <div class="found-list" id="found-list"></div>
+    </section>
+
+  </main>
+
+  <script src="strands.js"></script>
+</body>
+</html>

@@ -21,6 +21,56 @@
 
 const GAMES = [
   {
+    title: "Crossword",
+    emoji: "✏️",
+    blurb: "Themed mini crosswords — Minecraft, Bluey, Frozen, taekwondo & more. Read a clue, fill the grid! Spelling & vocabulary.",
+    url:   "games/crossword/",
+    ages:  "6+",
+    color: "#ff5d8f",
+    ready: true
+  },
+
+  {
+    title: "Word Strands",
+    emoji: "🧶",
+    blurb: "Trace the hidden theme words through a grid of letters — every letter belongs to a word! Find the golden spangram.",
+    url:   "games/strands/",
+    ages:  "6+",
+    color: "#38b6ff",
+    ready: true
+  },
+
+  {
+    title: "Spelling Bee",
+    emoji: "🐝",
+    blurb: "Make as many words as you can from a honeycomb of letters — every word uses the middle letter! Spelling & vocabulary.",
+    url:   "games/spelling-bee/",
+    ages:  "6+",
+    color: "#ffd166",
+    ready: true
+  },
+
+  {
+    title: "Connections",
+    emoji: "🔗",
+    blurb: "Sort 16 cards into 4 secret groups of 4 — Pokémon, Bluey, books & more. Builds logic & categories!",
+    url:   "games/connections/",
+    ages:  "6+",
+    color: "#8a5cff",
+    ready: true
+  },
+
+  {
+    title: "Word Guess",
+    emoji: "🟩",
+    blurb: "Guess the secret 5-letter word in 6 tries, with colour clues and hints — a kid-friendly Wordle. Spelling & reasoning.",
+    url:   "games/word-guess/",
+    ages:  "6+",
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Math Mob Run",
     emoji: "🏃",
     blurb: "Steer your crew through +, −, ×, ÷ gates to grow the biggest mob — mental math on the run, with upgrades that save!",

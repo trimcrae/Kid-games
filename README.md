@@ -23,10 +23,23 @@ no logins.
 │   └── js/
 │       ├── games.js        ← ⭐ the LIST of games (edit this to add one)
 │       └── app.js          ← builds the cards (you won't need to touch this)
-└── games/
-    ├── _template/          ← copy this folder to start a new game
-    └── bubble-pop/         ← our first game 🫧
+├── games/
+│   ├── _template/          ← copy this folder to start a new game
+│   ├── bubble-pop/         ← our first game 🫧
+│   ├── crossword/          ← themed mini crosswords ✏️
+│   ├── strands/            ← trace hidden theme words 🧶
+│   ├── spelling-bee/       ← make words from a honeycomb 🐝
+│   ├── connections/        ← sort 16 cards into 4 groups 🔗
+│   └── word-guess/         ← a kid-friendly Wordle 🟩
+└── tools/                  ← offline puzzle generators (Node) for
+                              crossword & strands — run, then paste output
 ```
+
+> **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
+> Connections and Word Guess are friendly versions of the New York Times
+> daily games. Crossword & Strands puzzles are built by the small Node
+> generators in `tools/` — to add a theme, add a word/clue list there and
+> re-run it (no randomness, so the output is stable to paste in).
 
 ---
 
