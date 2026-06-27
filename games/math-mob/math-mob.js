@@ -234,6 +234,39 @@
     return Math.random() < 0.5 ? [a, b] : [b, a];
   }
 
+  // A direct "what's the answer?" gate — explicit arithmetic practice.
+  const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  function makeWrong(c) {
+    const cands = [c + 1, c - 1, c + 2, c - 2, c + rint(3, 6), c - rint(3, 6), c + 10];
+    let w;
+    do { w = pick(cands); } while (w < 0 || w === c);
+    return w;
+  }
+  function makeQuiz() {
+    let aN, bN, res, sym;
+    const r = Math.random();
+    if (save.mode === "easy") {
+      if (r < 0.6) { aN = rint(1, 12); bN = rint(1, 8); res = aN + bN; sym = "+"; }
+      else         { aN = rint(5, 15); bN = rint(1, aN); res = aN - bN; sym = "−"; }
+    } else if (save.mode === "hard") {
+      if (r < 0.55)     { aN = rint(2, 12); bN = rint(2, 12); res = aN * bN; sym = "×"; }
+      else if (r < 0.8) { bN = rint(2, 9); res = rint(2, 9); aN = bN * res; sym = "÷"; } // aN÷bN
+      else              { aN = rint(15, 40); bN = rint(8, 25); res = aN + bN; sym = "+"; }
+    } else {
+      if (r < 0.4)      { aN = rint(5, 25); bN = rint(4, 18); res = aN + bN; sym = "+"; }
+      else if (r < 0.7) { aN = rint(2, 5); bN = rint(2, 5); res = aN * bN; sym = "×"; }
+      else              { aN = rint(10, 30); bN = rint(1, aN - 1); res = aN - bN; sym = "−"; }
+    }
+    const wrong = makeWrong(res);
+    const leftCorrect = Math.random() < 0.5;
+    return {
+      qText: `${aN} ${sym} ${bN}`, answer: res,
+      left: leftCorrect ? res : wrong,
+      right: leftCorrect ? wrong : res,
+      correctSide: leftCorrect ? "L" : "R",
+    };
+  }
+
   function spawnRow() {
     // A number wall is due?
     const M = mode();
@@ -248,6 +281,8 @@
     if (Math.random() < barrierChance) {
       const side = Math.random() < 0.5 ? "L" : "R";
       rows.push({ kind: "barrier", y: -bandH, side, done: false });
+    } else if (dist > 60 && Math.random() < 0.25) {
+      rows.push(Object.assign({ kind: "quiz", y: -bandH, done: false }, makeQuiz()));
     } else {
       rows.push({ kind: "gate", y: -bandH, ops: makeGatePair(), done: false });
     }
@@ -357,6 +392,7 @@
         row.done = true;
         if (row.kind === "gate") applyGate(row);
         else if (row.kind === "barrier") applyBarrier(row);
+        else if (row.kind === "quiz") applyQuiz(row);
         else applyBoss(row);
       }
     }
@@ -427,6 +463,29 @@
       if (combo >= 2) addFloater(crewX - 34, playerY() - 56, "streak lost", "#ff7a3d");
       combo = 0; setCombo(0);
       sfx.bad();
+    }
+  }
+
+  function applyQuiz(row) {
+    const side = crewX >= W / 2 ? "R" : "L";
+    const before = crew;
+    if (side === row.correctSide) {
+      crew = clamp(Math.round(crew * 1.3) + 5, 0, MAX_CREW);
+      combo++;
+      const bonus = Math.min(combo, 6);
+      runCoins += bonus;
+      setCombo(combo);
+      sfx.good(combo);
+      addFloater(crewX, playerY() - 30, "Correct! +" + (crew - before), "#2bb673", true);
+      addFloater(crewX + 30, playerY() - 58, "+" + bonus + "🪙", "#c98a00");
+      burst(crewX, playerY() - 24, "#2bb673", 14, 240);
+    } else {
+      crew = Math.max(0, Math.round(crew * 0.7));
+      combo = 0; setCombo(0);
+      sfx.bad();
+      addFloater(crewX, playerY() - 30, "Oops!", "#ff4d6d", true);
+      addFloater(W / 2, playerY() - 60, row.qText + " = " + row.answer, "#6a6385");
+      burst(crewX, playerY() - 24, "#ff4d6d", 12, 220);
     }
   }
 
@@ -518,6 +577,7 @@
     for (const row of rows) {
       if (row.kind === "gate") drawGate(row);
       else if (row.kind === "barrier") drawBarrier(row);
+      else if (row.kind === "quiz") drawQuiz(row);
       else drawBoss(row);
     }
 
@@ -596,6 +656,36 @@
     ctx.font = "bold 26px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.fillText("⛔", x + w / 2, y + h / 2 + 1);
+  }
+
+  function drawQuiz(row) {
+    const y = row.y, h = bandH;
+    // Both halves the same teal — colour must not give away the answer.
+    const col = "#0fa3a3";
+    [[0, row.left], [W / 2, row.right]].forEach(([x, val]) => {
+      ctx.fillStyle = hexA(col, 0.82);
+      ctx.fillRect(x, y, W / 2, h);
+      ctx.fillStyle = hexA(col, 1);
+      ctx.fillRect(x, y, W / 2, 6);
+      ctx.fillStyle = "#fff";
+      ctx.font = "bold 30px " + FONT;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(val, x + W / 4, y + h / 2 + 2);
+    });
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(W / 2 - 3, y - 4, 6, h + 8);
+
+    // Question banner floating just above the answer band.
+    const text = row.qText + " = ?";
+    ctx.font = "bold 22px " + FONT;
+    const tw = ctx.measureText(text).width + 28;
+    const bx = W / 2 - tw / 2, by = y - 38;
+    ctx.fillStyle = "#fff";
+    ctx.roundRect(bx, by, tw, 32, 16); ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = col; ctx.stroke();
+    ctx.fillStyle = "#1c6e6e";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(text, W / 2, by + 17);
   }
 
   function drawBoss(row) {
