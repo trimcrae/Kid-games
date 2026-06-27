@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Math Mob Run",
+    emoji: "🏃",
+    blurb: "Steer your crew through +, −, ×, ÷ gates to grow the biggest mob — mental math on the run, with upgrades that save!",
+    url:   "games/math-mob/",
+    ages:  "6+",
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Spooky Princess Stories",
     emoji: "👻",
     blurb: "Friendly-spooky read-aloud storybooks starring Ellie & her siblings — tap the pictures to play! For Ellie!",
