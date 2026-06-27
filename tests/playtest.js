@@ -413,8 +413,8 @@ const GAMES = {
     if (await page.locator(".pcard").count() !== 0) throw new Error("a roster was generated before Make roster was pressed");
     if (await page.locator(".empty-note").count() < 1) throw new Error("no setup prompt on first load");
 
-    // Print with no roster should build one (never print the empty prompt)
-    await page.locator("#printBtn").click();
+    // floating Print button with no roster should build one (never print the empty prompt)
+    await page.locator("#printFab").click();
     await page.waitForTimeout(150);
     if (await page.locator(".pcard").count() < 1) throw new Error("Print did not build a roster when none existed");
 

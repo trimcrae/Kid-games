@@ -65,6 +65,7 @@
     .chip.absent  { background: #ffecec; color: #c0392b; border-color: #ffc9c9; }
     .chip.gk-on   { background: #fff6da; color: #b8860b; border-color: #ffe49b; }
     .chip.gk-off  { background: #f0edf7; color: #8a82a6; border-color: #e3ddf5; }
+    .chip:disabled { cursor: default; }
     .chip-x { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 1rem; padding: 0 0.2rem; }
 
     .add-row { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
@@ -136,38 +137,61 @@
        Pumpkin Pies team theme — orange, with white & black
        (screen only; the printout stays plain black & white)
        ========================================================= */
-    .title {
-      background: linear-gradient(90deg, #f4791f, #c75a00);
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-      text-shadow: 0 4px 14px rgba(244, 121, 31, 0.25);
-    }
-    .subtitle  { color: #c75a00; }
-    .back-link { color: #c75a00; }
+    /* warm pumpkin background; panels stay white. Orange is only ever a
+       FILL — never text — and black/white carry the writing. */
+    body { background: #fdf2e6; }
+    .blob-1 { background: #ff9a4d; }
+    .blob-2 { background: #ffc188; }
+    .blob-3 { background: #ffdcbb; }
+
+    .title { background: none; -webkit-text-fill-color: #1f1a14; color: #1f1a14; }
+    .subtitle  { color: #4a4038; }
+    .back-link { color: #1f1a14; }
 
     /* buttons: orange (primary) + black + white */
-    .btn.green  { background: #f4791f; }     /* Make roster */
-    .btn.purple { background: #1f1a14; }     /* Shuffle (black) */
-    .btn.blue   { background: #1f1a14; }     /* Print (black) */
-    .btn.ghost  { color: #c75a00; box-shadow: inset 0 0 0 2px #f4791f; }
+    .btn.green  { background: #f4791f; color: #1f1a14; }     /* Make roster */
+    .btn.purple { background: #1f1a14; }
+    .btn.blue   { background: #1f1a14; }
+    .btn.ghost  { color: #1f1a14; box-shadow: inset 0 0 0 2px #f4791f; }
 
     .period-btn.active { border-color: #f4791f; background: #fff3e6; }
 
-    /* status chips: Here = orange, Away = grey, Goalie = black outline */
-    .chip.present { background: #fff3e6; color: #c75a00; border-color: #ffd9b0; }
-    .chip.absent  { background: #ededed; color: #777; border-color: #ddd; }
-    .chip.gk-on   { background: #fff; color: #1f1a14; border-color: #1f1a14; }
+    /* status chips: Here = orange fill, Away = grey, Goalie ✓ = black fill */
+    .chip.present { background: #f4791f; color: #1f1a14; border-color: #f4791f; }
+    .chip.absent  { background: #e9e6e2; color: #1f1a14; border-color: #dcd7d1; }
+    .chip.gk-on   { background: #1f1a14; color: #fff; border-color: #1f1a14; }
+    /* fixed widths so toggling ✓/— (or Here/Away) never shifts the layout */
+    .chip.present, .chip.absent { min-width: 4rem; text-align: center; justify-content: center; }
+    .chip.gk-on, .chip.gk-off  { min-width: 5.45rem; text-align: center; justify-content: center; }
 
     /* period cards */
     .pcard { border-color: #f4791f; }
-    .pcard .ptitle { background: #f4791f; }
+    .pcard .ptitle { background: #f4791f; color: #1f1a14; }
     .pcard .goalie { background: #fff3e6; border-bottom-color: #ffd9b0; }
-    .pcard .goalie small { color: #c75a00; }
+    .pcard .goalie small { color: #1f1a14; }
 
     /* verification grid accents */
-    table.gridtbl td.g { background: #fff3e6; color: #c75a00; }
+    table.gridtbl td.g { background: #fff3e6; color: #1f1a14; }
     table.gridtbl td.f { background: #fff; color: #1f1a14; }
 
     .print-title { display: none; }  /* hidden on screen, shown when printing */
+
+    /* floating Print button — always visible, no scrolling needed */
+    .print-fab {
+      position: fixed; z-index: 60;
+      right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      display: flex; align-items: center; gap: 0.45rem;
+      padding: 0.85rem 1.25rem; border: none; border-radius: 999px; cursor: pointer;
+      background: #f4791f; color: #1f1a14; font: inherit; font-weight: bold; font-size: 1.1rem;
+      box-shadow: 0 10px 24px rgba(31, 26, 20, 0.4);
+      transition: transform .12s ease;
+    }
+    .print-fab span { line-height: 1; }
+    .print-fab:active { transform: scale(0.94); }
+    @media (max-width: 480px) {
+      /* leave room above the fixed button so it never hides the last card */
+      #output { padding-bottom: 5rem; }
+    }
 
     /* ---- print: plain black & white, ONE landscape page, names only ---- */
     @media print {
@@ -176,7 +200,8 @@
          @page{size:landscape}. Sizing/placement is in physical inches (not
          vw/vh, which iOS resolves wrong) so nothing gets clipped. */
       @page { size: 8.5in 11in; margin: 0; }
-      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000; }
+      /* fixed page box + clip, so the rotated block never spawns a 2nd page */
+      html, body { margin: 0 !important; padding: 0 !important; width: 8.5in; height: 11in; overflow: hidden !important; background: #fff !important; color: #000; }
 
       /* drop everything except the quarter line-ups */
       .bg-blobs, .back-link, .no-print, .footer, .hero,
@@ -254,11 +279,9 @@
     <section class="panel no-print">
       <div class="toolbar">
         <button class="btn green" id="generateBtn">⚽ Make roster</button>
-        <button class="btn purple" id="shuffleBtn">🔀 Shuffle again</button>
-        <button class="btn blue" id="printBtn">🖨️ Print</button>
         <button class="btn ghost" id="resetBtn">↺ Reset team</button>
       </div>
-      <p class="hint" style="margin-bottom:0;">On an iPhone, tap <b>Allow</b> if it asks about printing.</p>
+      <p class="hint" style="margin-bottom:0;">Tap <b>Make roster</b> again any time for a different fair mix. On an iPhone, tap <b>Allow</b> if it asks about printing.</p>
     </section>
 
     <!-- ====== OUTPUT ====== -->
@@ -267,6 +290,9 @@
   </div>
 
   <footer class="footer no-print">Made with ⚽ for the McRae Family Arcade</footer>
+
+  <!-- always-visible floating Print button -->
+  <button class="print-fab no-print" id="printFab" aria-label="Print roster">🖨️<span>Print</span></button>
 
   <script src="roster.js"></script>
 </body>

@@ -182,10 +182,17 @@
       pres.onclick = function () { g.present = !g.present; save(); renderTeam(); settingsChanged(); };
 
       var gk = document.createElement("button");
-      gk.className = "chip " + (g.goalie ? "gk-on" : "gk-off");
-      gk.textContent = g.goalie ? "Goalie ✓" : "Goalie —";
-      gk.title = "Can this girl play goalie?";
-      gk.onclick = function () { g.goalie = !g.goalie; save(); renderTeam(); settingsChanged(); };
+      // while a girl is Away, show the goalie chip in its "no" state (her real
+      // setting is kept underneath and returns when she's marked Here again)
+      var goalieOn = g.present && g.goalie;
+      gk.className = "chip " + (goalieOn ? "gk-on" : "gk-off");
+      gk.textContent = goalieOn ? "Goalie ✓" : "Goalie —";
+      gk.title = g.present ? "Can this girl play goalie?" : "Away today — not available as goalie";
+      gk.disabled = !g.present;
+      gk.onclick = function () {
+        if (!g.present) return;
+        g.goalie = !g.goalie; save(); renderTeam(); settingsChanged();
+      };
 
       var x = document.createElement("button");
       x.className = "chip-x";
@@ -358,11 +365,11 @@
       if (e.key === "Enter") addPlayer();
     });
 
-    document.getElementById("generateBtn").onclick = function () { makeRoster(false); scrollToOutput(); };
-    document.getElementById("shuffleBtn").onclick = function () { makeRoster(true); scrollToOutput(); };
-    document.getElementById("printBtn").onclick = function () {
+    // one button: each tap builds a fresh fair line-up (no separate "shuffle")
+    document.getElementById("generateBtn").onclick = function () { makeRoster(true); scrollToOutput(); };
+    document.getElementById("printFab").onclick = function () {
       // never print the empty prompt — make the roster first, let her review, then print
-      if (!hasRoster) { makeRoster(false); scrollToOutput(); return; }
+      if (!hasRoster) { makeRoster(true); scrollToOutput(); return; }
       window.print();
     };
     document.getElementById("resetBtn").onclick = function () {
