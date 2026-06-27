@@ -63,5 +63,17 @@ window.SFX = (function () {
       ]);
     },
     nope() { play([{ f: 220, t: 0, d: 0.16, type: "triangle", g: 0.08 }]); },
+
+    /* A quick bubbly "pop" — great for tapping/popping things. */
+    pop() { play([{ f: 520, t: 0, d: 0.08, type: "triangle", g: 0.16 }, { f: 940, t: 0.04, d: 0.1 }]); },
+
+    /* A bright coin/treasure "ting". */
+    coin() { play([{ f: 988, t: 0, d: 0.09 }, { f: 1319, t: 0.07, d: 0.14 }]); },
+
+    /* A rising blip whose pitch climbs with a combo streak (clamped). */
+    streak(n) {
+      const step = Math.min(Math.max(n || 1, 1), 12);
+      play([{ f: 440 + step * 60, t: 0, d: 0.1, type: "square", g: 0.1 }]);
+    },
   };
 })();
