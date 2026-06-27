@@ -500,7 +500,7 @@
       steps.forEach((s, i) => {
         setTimeout(() => bounce(ctx.cellMap[s.x + "," + s.y]), i * 40);
       });
-      setTimeout(() => { sfx("win"); sparkle(lvl.emoji); }, Math.min(steps.length * 40, 500));
+      setTimeout(() => { sfx("win"); sparkle(lvl.emoji); window.Confetti && Confetti.burst({ count: 100 }); }, Math.min(steps.length * 40, 500));
       say(firstTime ? "New blueprint complete — ⭐ earned!" : "Built it again — nice!");
 
       const banner = document.createElement("div");
@@ -580,7 +580,7 @@
       instr.innerHTML = `All ${TARGETS} treasures found! 💎✨`;
       const best = save.treasureBest;
       if (best === null || wrong < best) { save.treasureBest = wrong; persist(); }
-      sfx("win"); sparkle("💎"); disableCursor();
+      sfx("win"); sparkle("💎"); window.Confetti && Confetti.burst({ count: 100 }); disableCursor();
       const banner = document.createElement("div");
       banner.className = "win-banner";
       banner.innerHTML = `

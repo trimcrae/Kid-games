@@ -353,7 +353,7 @@
     renderEntry();
     renderFound();
     updateHud();
-    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); speak("Pangram!"); if (window.SFX) SFX.win(); }
+    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); speak("Pangram!"); if (window.SFX) SFX.win(); window.Confetti && Confetti.burst({ count: 110 }); }
     else { flash("Nice! +" + pts + " 🍯", "var(--green)"); if (window.SFX) SFX.good(); }
   }
 

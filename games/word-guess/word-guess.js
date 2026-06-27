@@ -315,6 +315,7 @@
     el.hint.textContent = answer.emoji + " " + answer.word.toUpperCase();
     sparkleBurst();
     if (window.SFX) SFX.win();
+    window.Confetti && Confetti.burst({ count: 100 });
   }
   function lose() {
     over = true;
