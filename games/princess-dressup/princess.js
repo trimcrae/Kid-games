@@ -105,12 +105,14 @@
     if (ch === target) {
       locked = true;
       btn.classList.add("correct");
+      window.SFX && SFX.good();
       revealSlot(SLOTS[slotIndex]);
       slotIndex += 1;
       speak(pick(PRAISE) + " " + target + "!");
       setTimeout(newRound, 900);
     } else {
       btn.classList.add("wrong");
+      window.SFX && SFX.nope();
       speak("Try again!");
       setTimeout(function () { btn.classList.remove("wrong"); }, 500);
     }
@@ -130,6 +132,8 @@
     overlayText.textContent = "You dressed the whole princess! Want to dress another one?";
     startBtn.textContent = "Dress Another 👗";
     overlay.classList.remove("hidden");
+    window.SFX && SFX.win();
+    window.Confetti && Confetti.burst({ count: 110 });
     speak("Beautiful! Your princess is all dressed up!");
   }
 

@@ -245,6 +245,7 @@
   function finish() {
     over = true;
     if (window.SFX) SFX.win();
+    window.Confetti && Confetti.burst({ count: 100 });
     flash("🏆 You found every word! Great hunting!", "var(--green)");
     renderPuzzles();
   }

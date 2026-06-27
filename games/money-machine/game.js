@@ -251,6 +251,8 @@
         if (!silent) {
           flashGoal("🎉 You reached " + money(g) + "!");
           coinRain();
+          window.SFX && SFX.coin();
+          window.Confetti && Confetti.burst({ count: 90 });
         }
       }
     });

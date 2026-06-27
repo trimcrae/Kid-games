@@ -347,6 +347,7 @@
     el.feedback.style.color = "var(--green)";
     el.feedback.textContent = firstTime ? "✨ New word learned! ✨" : "✅ Spelled it!";
     sparkleBurst();
+    window.SFX && SFX.good();
     speak(current.word);
     setTimeout(nextWord, 1300);
   }
@@ -376,6 +377,8 @@
       : "Wow — you finished every spellbook! You're a true Word Wizard. 🪄";
     el.winNext.style.display = hasNext ? "" : "none";
     show("win");
+    window.SFX && SFX.win();
+    window.Confetti && Confetti.burst({ count: 120 });
     speak("You did it!");
   }
 
