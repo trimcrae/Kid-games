@@ -411,6 +411,19 @@ const GAMES = {
       if (data.goalieRepeat) throw new Error(`goalie repeated at ${p} periods with plenty of eligible goalies`);
       // with 13 girls nobody should ever rest two periods back-to-back
       if (data.maxConsecSit > 1) throw new Error(`a girl rests ${data.maxConsecSit} periods in a row at ${p} periods (should be spaced out)`);
+
+      // PRINT MUST FIT ONE US-LETTER PAGE. Measure the printable block with the
+      // print stylesheet applied, at the real on-paper width (7.8in @96dpi), so
+      // we catch the spill-to-page-2 bug that pdf() page counts miss.
+      const prevVp = page.viewportSize();
+      await page.setViewportSize({ width: 749, height: 1600 });
+      await page.emulateMedia({ media: "print" });
+      await page.waitForTimeout(60);
+      const inches = await page.evaluate(() => document.querySelector(".print-area").getBoundingClientRect().height / 96);
+      await page.emulateMedia({ media: "screen" });
+      await page.setViewportSize(prevVp);
+      // usable height on Letter with 0.35in margins is ~10.3in; keep a safe margin
+      if (inches > 9.3) throw new Error(`print for ${p} periods is ${inches.toFixed(2)}in tall — won't fit one page (budget 9.3in)`);
     }
 
     // editing the setup should clear the old roster (no stale/unrequested roster)

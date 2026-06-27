@@ -211,16 +211,17 @@
       .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
 
       /* team name at the top of the sheet */
-      .print-title { display: block; font-weight: bold; font-size: 1.05rem; color: #000; margin: 0 0 0.25rem; }
+      .print-title { display: block; font-weight: bold; font-size: 1rem; line-height: 1.2; color: #000; margin: 0 0 0.2rem; }
 
-      /* two columns: 8 periods = 2×4, 4 quarters = 2×2, all on one page */
-      .periods-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 0.4rem !important; align-content: start; }
+      /* Explicit line-heights everywhere so Safari and Chrome render the SAME
+         height (their default line-heights differ, which caused 2-page spill). */
+      .periods-grid { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 0.3rem !important; align-content: start; }
       .pcard { border: 1.5px solid #000 !important; border-radius: 0; break-inside: avoid; page-break-inside: avoid; }
-      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 1.05rem; padding: 0.28rem; text-align: center; }
-      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.3rem 0.5rem; text-align: center; font-size: 1.05rem; }
-      .pcard .goalie small { color: #000 !important; font-size: 0.62rem; }
-      .pcard ol { padding: 0.3rem 0.5rem 0.35rem 1.5rem; }
-      .pcard ol li { font-size: 1rem; padding: 0.09rem 0; }
+      .pcard .ptitle { background: #fff !important; color: #000 !important; border-bottom: 1.5px solid #000; font-size: 0.95rem; line-height: 1.2; padding: 0.16rem; text-align: center; }
+      .pcard .goalie { background: #fff !important; color: #000; border-bottom: 1px solid #000; padding: 0.16rem 0.45rem; text-align: center; font-size: 0.95rem; line-height: 1.2; }
+      .pcard .goalie small { display: block; color: #000 !important; font-size: 0.58rem; line-height: 1.1; }
+      .pcard ol { margin: 0; padding: 0.14rem 0.45rem 0.18rem 1.4rem; }
+      .pcard ol li { font-size: 0.88rem; line-height: 1.18; padding: 0; }
     }
   </style>
 </head>
@@ -287,6 +288,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=6"></script>
+  <script src="roster.js?v=7"></script>
 </body>
 </html>
