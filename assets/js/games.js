@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Comic Maker",
+    emoji: "💥",
+    blurb: "Make your own graphic novel — panels, characters, talk bubbles & captions! For Jeannie!",
+    url:   "games/comic-maker/",
+    ages:  "6+",
+    color: "#ff5d8f",
+    ready: true
+  },
+
+  {
     title: "Number Bubble Pop",
     emoji: "🫧",
     blurb: "Find and pop the matching number — practice counting & number recognition!",
