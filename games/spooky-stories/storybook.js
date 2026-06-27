@@ -441,6 +441,29 @@
   function stopSpeak() { if (synth) synth.cancel(); }
 
   /* -----------------------------------------------------------
+     4b. Narration — play the pre-rendered neural-voice clips
+     (warm Piper "lessac" voice, in /audio/<storyId>-<page>.m4a),
+     and gracefully fall back to the device's Web Speech voice if
+     a clip is missing or can't be played.
+     ----------------------------------------------------------- */
+  const narrator = new Audio();
+  narrator.preload = "auto";
+
+  function narrate(storyId, pageIndex, text) {
+    stopNarration();
+    // If audio can't load or play, fall back to the speech synth voice.
+    narrator.onerror = () => speak(text);
+    narrator.src = "audio/" + storyId + "-" + pageIndex + ".mp3";
+    const pr = narrator.play();
+    if (pr && pr.catch) pr.catch(() => speak(text));
+  }
+  function stopNarration() {
+    try { narrator.pause(); } catch (e) {}
+    narrator.onerror = null;
+    stopSpeak();
+  }
+
+  /* -----------------------------------------------------------
      5. App / engine
      ----------------------------------------------------------- */
   const grid = document.getElementById("story-grid");
@@ -494,7 +517,7 @@
   }
 
   function goHome() {
-    stopSpeak();
+    stopNarration();
     current = null;
     reader.classList.remove("active");
     library.style.display = "";
@@ -540,8 +563,8 @@
       confetti();
     }
 
-    // read this page aloud automatically
-    speak(p.text);
+    // read this page aloud automatically (pre-rendered voice + fallback)
+    narrate(current.id, page, p.text);
   }
 
   function wireTaps() {
@@ -616,7 +639,7 @@
   nextBtn.addEventListener("click", nextPage);
   prevBtn.addEventListener("click", prevPage);
   homeBtn.addEventListener("click", goHome);
-  readBtn.addEventListener("click", () => { if (current) speak(current.pages[page].text); });
+  readBtn.addEventListener("click", () => { if (current) narrate(current.id, page, current.pages[page].text); });
 
   // keyboard niceties (arrows / space)
   document.addEventListener("keydown", e => {
@@ -627,8 +650,8 @@
   });
 
   // stop reading if the page is hidden/closed
-  window.addEventListener("pagehide", stopSpeak);
-  document.addEventListener("visibilitychange", () => { if (document.hidden) stopSpeak(); });
+  window.addEventListener("pagehide", stopNarration);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) stopNarration(); });
 
   buildLibrary();
 })();
