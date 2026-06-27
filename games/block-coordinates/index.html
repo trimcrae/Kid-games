@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⛏️ Block Coordinates</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛏️</text></svg>" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    /* ====== Block Coordinates — game-specific styles ====== */
+    .game-stage { max-width: 640px; }
+
+    .intro {
+      color: #6a6385;
+      font-size: 1rem;
+      margin: 0 auto 1.25rem;
+      max-width: 30rem;
+      line-height: 1.4;
+    }
+
+    /* --- big menu / mode buttons --- */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0 0.5rem;
+    }
+    .mode-btn {
+      font-family: var(--font);
+      cursor: pointer;
+      border: 4px solid transparent;
+      border-radius: 22px;
+      background: var(--paper);
+      box-shadow: 0 10px 26px rgba(43, 36, 64, 0.14);
+      padding: 1.4rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+    .mode-btn:hover, .mode-btn:focus-visible {
+      transform: translateY(-5px);
+      border-color: var(--accent, var(--green));
+      outline: none;
+    }
+    .mode-btn .big { font-size: 2.6rem; line-height: 1; }
+    .mode-btn .name { font-weight: bold; font-size: 1.15rem; }
+    .mode-btn .desc { font-size: 0.82rem; color: #6a6385; }
+
+    /* --- level picker --- */
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .level-card {
+      position: relative;
+      cursor: pointer;
+      font-family: var(--font);
+      border: 3px solid #e7e0ff;
+      border-radius: 16px;
+      background: var(--paper);
+      padding: 0.7rem 0.4rem 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      transition: transform 0.14s ease, border-color 0.14s ease;
+    }
+    .level-card:hover, .level-card:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--green);
+      outline: none;
+    }
+    .level-card .lvemoji { font-size: 1.9rem; line-height: 1; }
+    .level-card .lvname { font-size: 0.8rem; font-weight: bold; }
+    .level-card .lvsize { font-size: 0.7rem; color: #8a82a6; }
+    .level-card .star {
+      position: absolute;
+      top: -10px; right: -8px;
+      font-size: 1.3rem;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+    }
+
+    /* --- the board --- */
+    .board-wrap { display: flex; justify-content: center; margin: 1rem 0; }
+    .board {
+      display: inline-grid;
+      grid-template-columns: auto repeat(var(--n), var(--cell));
+      grid-template-rows: repeat(var(--n), var(--cell)) auto;
+      gap: 3px;
+      background: #efeaff;
+      padding: 8px;
+      border-radius: 16px;
+      box-shadow: inset 0 2px 10px rgba(43, 36, 64, 0.12);
+      touch-action: manipulation;
+    }
+    .cell {
+      width: var(--cell);
+      height: var(--cell);
+      font-size: calc(var(--cell) * 0.74);
+      line-height: 1;
+      padding: 0;
+      border: none;
+      cursor: pointer;
+      border-radius: 7px;
+      background: #fbfaff;
+      box-shadow: inset 0 0 0 1px #ded6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font);
+      user-select: none;
+      transition: background 0.1s ease;
+    }
+    .cell .ghost { opacity: 0.22; filter: grayscale(0.2); }
+    .cell.filled { background: #fff; box-shadow: inset 0 0 0 1px #cdbfff; }
+    .cell.cursor { box-shadow: inset 0 0 0 3px var(--purple); }
+    .cell.target-pulse { animation: tpulse 0.9s ease-in-out 2; }
+    .cell.shake { animation: cshake 0.35s ease; }
+    .cell.pop .blk { animation: cpop 0.3s ease; display: inline-block; }
+    .cell.dug { background: #efe6da; box-shadow: inset 0 0 0 1px #d8c7a8; }
+
+    @keyframes cpop {
+      0% { transform: scale(0.2); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    @keyframes cshake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    @keyframes tpulse {
+      0%,100% { box-shadow: inset 0 0 0 1px #ded6ff; }
+      50% { box-shadow: inset 0 0 0 3px var(--yellow), 0 0 12px var(--yellow); }
+    }
+
+    .axis {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--purple);
+      font-size: calc(var(--cell) * 0.42);
+      min-width: 1.3rem;
+    }
+    .board.nonums .axis { opacity: 0; }
+    .board.nonums .axis.lit { opacity: 1; color: #e09100; }
+    .axis.lit { color: #e09100; transform: scale(1.25); transition: transform 0.15s ease; }
+    .corner { font-size: calc(var(--cell) * 0.4); display:flex; align-items:flex-end; justify-content:flex-end; color:#b9aee6; padding-right:2px;}
+
+    /* --- instruction / hud --- */
+    .instruction {
+      font-size: 1.15rem;
+      font-weight: bold;
+      min-height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .instruction .coord {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.1rem 0.6rem;
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+    }
+    .instruction .blk { font-size: 1.7rem; }
+
+    .progress {
+      height: 14px;
+      background: #e7e0ff;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.6rem auto;
+      max-width: 22rem;
+    }
+    .progress > i {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--green), var(--blue));
+      transition: width 0.25s ease;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+    .pill {
+      font-family: var(--font);
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--purple);
+      box-shadow: 0 4px 12px rgba(43,36,64,0.12);
+    }
+    .pill.on { background: var(--green); color: #fff; }
+
+    .say {
+      min-height: 1.4rem;
+      color: var(--purple);
+      font-weight: bold;
+      margin: 0.4rem 0;
+    }
+
+    /* --- palette (free build) --- */
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+    }
+    .swatch {
+      cursor: pointer;
+      border: 3px solid transparent;
+      border-radius: 12px;
+      background: #fff;
+      font-size: 1.8rem;
+      width: 3rem; height: 3rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.1);
+    }
+    .swatch.sel { border-color: var(--purple); transform: scale(1.08); }
+
+    /* --- win banner --- */
+    .win-banner {
+      margin: 1rem auto;
+      padding: 1.25rem;
+      border-radius: 20px;
+      background: linear-gradient(120deg, #fff7d6, #ffe9f1);
+      box-shadow: 0 10px 26px rgba(43,36,64,0.14);
+      max-width: 24rem;
+    }
+    .win-banner h2 { margin: 0.2rem 0; }
+    .row-btns { display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; margin-top: 0.6rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .cell.pop .blk, .cell.shake, .cell.target-pulse { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <a class="back-link" href="../../">← Back to the Arcade</a>
+
+  <header class="hero" style="padding-top: 0.5rem;">
+    <h1 class="title">⛏️ Block Coordinates</h1>
+    <p class="subtitle">Build like Minecraft — by reading the grid!</p>
+  </header>
+
+  <main class="game-stage">
+    <div id="app"></div>
+    <p id="say" class="say" aria-live="polite"></p>
+  </main>
+
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
