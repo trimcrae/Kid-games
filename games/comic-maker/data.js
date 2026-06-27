@@ -44,6 +44,26 @@ const STICKERS = [
   }
 ];
 
+/* Comic "sound" word-art — tap one to drop a chunky SFX word you can
+   re-type, spin and resize. Each has its own bright colour. */
+const SFX = [
+  { w: "POW!",    c: "#ff3b3b" },
+  { w: "BAM!",    c: "#ff8c1a" },
+  { w: "ZAP!",    c: "#ffcf1a" },
+  { w: "BOOM!",   c: "#8a5cff" },
+  { w: "WHAM!",   c: "#2aa7ff" },
+  { w: "POP!",    c: "#ff5db1" },
+  { w: "ZOOM!",   c: "#27c46b" },
+  { w: "CRASH!",  c: "#e23b3b" },
+  { w: "KAPOW!",  c: "#b14cff" },
+  { w: "SPLASH!", c: "#1d9bf0" },
+  { w: "HAHA!",   c: "#ff5db1" },
+  { w: "ZZZ…",    c: "#27c46b" },
+  { w: "YUM!",    c: "#ff8c1a" },
+  { w: "TA-DA!",  c: "#ffcf1a" },
+  { w: "OH NO!",  c: "#e23b3b" }
+];
+
 const SCENES = [
   { key: "sky",     name: "Sky",     css: "linear-gradient(#aee3ff, #e9f8ff)" },
   { key: "sunset",  name: "Sunset",  css: "linear-gradient(#ffd16e, #ff7eb3)" },
