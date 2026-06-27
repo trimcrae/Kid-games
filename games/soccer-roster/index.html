@@ -55,7 +55,7 @@
       padding: 0.4rem 0.55rem;
     }
     .player-row.away { opacity: 0.5; }
-    .pname { flex: 1; min-width: 0; font-weight: bold; font-size: 0.96rem; line-height: 1.15; }
+    .pname { flex: 1; min-width: 0; font-weight: bold; font-size: 0.96rem; line-height: 1.15; overflow-wrap: anywhere; }
     .chip {
       font: inherit; font-size: 0.78rem; font-weight: bold; cursor: pointer;
       border: 2px solid transparent; border-radius: 999px;
@@ -163,7 +163,7 @@
     .chip.absent  { background: #e9e6e2; color: #1f1a14; border-color: #dcd7d1; }
     /* fixed widths so cycling ✓/★/— (or Here/Away) never shifts the layout */
     .chip.present, .chip.absent { min-width: 4rem; text-align: center; justify-content: center; }
-    .chip.gk-yes, .chip.gk-must, .chip.gk-no { min-width: 5.45rem; text-align: center; justify-content: center; }
+    .chip.gk-yes, .chip.gk-must, .chip.gk-no { min-width: 8.1rem; text-align: center; justify-content: center; }
 
     /* period cards */
     .pcard { border-color: #f4791f; }
@@ -265,7 +265,7 @@
       <h2>👧 The team</h2>
       <p class="hint">
         Tap <b>Here / Away</b> to mark who showed up today.
-        Tap the goalie chip to cycle: <b>✓</b> can play goalie → <b>★</b> must play goalie → <b>—</b> never.
+        Tap the goalie chip to cycle it: <b>Can be goalie</b> → <b>Must be goalie</b> → <b>Never goalie</b>.
       </p>
       <div class="team-list" id="teamList"></div>
       <div class="add-row">
@@ -293,6 +293,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=9"></script>
+  <script src="roster.js?v=10"></script>
 </body>
 </html>

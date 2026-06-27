@@ -194,11 +194,11 @@
       // kept underneath and returns when she's marked Here again).
       var st = g.present ? g.gk : "no";
       var cls = st === "must" ? "gk-must" : st === "yes" ? "gk-yes" : "gk-no";
-      var label = st === "must" ? "Goalie ★" : st === "yes" ? "Goalie ✓" : "Goalie —";
+      var label = st === "must" ? "Must be goalie" : st === "yes" ? "Can be goalie" : "Never goalie";
       gk.className = "chip " + cls;
       gk.textContent = label;
       gk.title = g.present
-        ? "Tap to cycle: can play goalie ✓ → must play goalie ★ → never —"
+        ? "Tap to cycle: Can be goalie → Must be goalie → Never goalie"
         : "Away today — not available as goalie";
       gk.disabled = !g.present;
       gk.onclick = function () {
@@ -253,9 +253,9 @@
 
     // ---- only flag real problems (no "all good" reassurance clutter) ----
     var warns = [];
-    if (noGoalie) warns.push("No goalie picked — tap a girl’s goalie chip until it shows ✓.");
+    if (noGoalie) warns.push("No goalie picked — set at least one girl to “Can be goalie”.");
     if (shortHanded) warns.push("Only " + n + " here — not enough for 1 goalie + " + FIELD + ", so some spots are open.");
-    if (mustMissed.length) warns.push((mustMissed.length === 1 ? mustMissed[0].name + " is" : mustMissed.map(function (g) { return g.name; }).join(", ") + " are") + " set to ★ must-goalie but there aren’t enough periods to fit everyone.");
+    if (mustMissed.length) warns.push((mustMissed.length === 1 ? mustMissed[0].name + " is" : mustMissed.map(function (g) { return g.name; }).join(", ") + " are") + " set to “Must be goalie”, but there aren’t enough periods to fit everyone.");
     if (maxP - minP > 1) warns.push("Playing time is a little uneven (" + minP + "–" + maxP + ") — try Shuffle again.");
     if (!noGoalie && goalieRepeat && !forcedRepeat) warns.push("A girl plays goalie twice — try Shuffle again.");
     if (warns.length) {
