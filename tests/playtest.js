@@ -338,6 +338,63 @@ const GAMES = {
     return `traced "${w.word}"`;
   },
 
+  async "Soccer Roster Maker"(page, g, d) {
+    await page.goto(`${BASE}/games/soccer-roster/`, { waitUntil: "networkidle" });
+    // start from a clean slate so a previous device's saved state can't interfere
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: "networkidle" });
+
+    if (await page.locator(".player-row").count() < 7) throw new Error("team roster did not render");
+
+    // try each period count and verify the invariants in the grid
+    for (const p of [2, 4, 8]) {
+      await page.locator(`.period-btn[data-p="${p}"]`).click();
+      await page.waitForTimeout(120);
+      await page.locator("#generateBtn").click();
+      await page.waitForTimeout(150);
+
+      const cards = await page.locator(".pcard").count();
+      if (cards !== p) throw new Error(`expected ${p} period cards, got ${cards}`);
+
+      // pull the grid: every present row's roles + per-period column counts
+      const data = await page.evaluate((periods) => {
+        const rows = Array.from(document.querySelectorAll("table.gridtbl tbody tr"))
+          .filter((tr) => !tr.classList.contains("totals") && !tr.classList.contains("away"));
+        const plays = [];
+        const colG = new Array(periods).fill(0);
+        const colF = new Array(periods).fill(0);
+        let goalieRepeat = false;
+        rows.forEach((tr) => {
+          const cells = tr.querySelectorAll("td");
+          let g = 0;
+          for (let i = 0; i < periods; i++) {
+            const cls = cells[i + 1].className;
+            if (cls === "g") { colG[i]++; g++; }
+            else if (cls === "f") { colF[i]++; }
+          }
+          if (g >= 2) goalieRepeat = true;
+          plays.push(Number(cells[periods + 1].textContent));
+        });
+        return { plays, colG, colF, goalieRepeat };
+      }, p);
+
+      data.colG.forEach((c, i) => { if (c !== 1) throw new Error(`period ${i + 1} has ${c} goalies (want 1)`); });
+      data.colF.forEach((c, i) => { if (c !== 6) throw new Error(`period ${i + 1} has ${c} field players (want 6)`); });
+      const min = Math.min(...data.plays), max = Math.max(...data.plays);
+      if (max - min > 1) throw new Error(`uneven playing time at ${p} periods (${min}–${max})`);
+      // 13 present girls with >=8 eligible goalies should never double up
+      if (data.goalieRepeat) throw new Error(`goalie repeated at ${p} periods with plenty of eligible goalies`);
+    }
+
+    // mark one girl away and confirm she drops out of the grid
+    await page.locator(".player-row .chip.present").first().click();
+    await page.waitForTimeout(120);
+    const awayRows = await page.locator("table.gridtbl tbody tr.away").count();
+    if (awayRows < 1) throw new Error("an away player was not greyed out in the grid");
+
+    return "2/4/8 periods: 1 goalie + 6 field each, even time, no goalie repeats";
+  },
+
   async "Crossword"(page, g, d) {
     await page.goto(`${BASE}/games/crossword/`, { waitUntil: "networkidle" });
     if (await page.locator(".puz-card").count() < 1) throw new Error("no crosswords in the picker");

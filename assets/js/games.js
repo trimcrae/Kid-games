@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Soccer Roster Maker",
+    emoji: "⚽",
+    blurb: "Coach tool for Shannon — fair soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
+    url:   "games/soccer-roster/",
+    ages:  "Grown-ups",
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Crossword",
     emoji: "✏️",
     blurb: "Themed mini crosswords — Minecraft, Bluey, Frozen, taekwondo & more. Read a clue, fill the grid! Spelling & vocabulary.",
