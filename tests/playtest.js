@@ -369,18 +369,20 @@ const GAMES = {
         const colG = new Array(periods).fill(0);
         const colF = new Array(periods).fill(0);
         let goalieRepeat = false;
+        let maxConsecSit = 0;
         rows.forEach((tr) => {
           const cells = tr.querySelectorAll("td");
-          let g = 0;
+          let g = 0, sit = 0, run = 0;
           for (let i = 0; i < periods; i++) {
             const cls = cells[i + 1].className;
-            if (cls === "g") { colG[i]++; g++; }
-            else if (cls === "f") { colF[i]++; }
+            if (cls === "g") { colG[i]++; g++; run = 0; }
+            else if (cls === "f") { colF[i]++; run = 0; }
+            else { run++; if (run > maxConsecSit) maxConsecSit = run; }
           }
           if (g >= 2) goalieRepeat = true;
           plays.push(Number(cells[periods + 1].textContent));
         });
-        return { plays, colG, colF, goalieRepeat };
+        return { plays, colG, colF, goalieRepeat, maxConsecSit };
       }, p);
 
       data.colG.forEach((c, i) => { if (c !== 1) throw new Error(`period ${i + 1} has ${c} goalies (want 1)`); });
@@ -389,15 +391,28 @@ const GAMES = {
       if (max - min > 1) throw new Error(`uneven playing time at ${p} periods (${min}–${max})`);
       // 13 present girls with >=8 eligible goalies should never double up
       if (data.goalieRepeat) throw new Error(`goalie repeated at ${p} periods with plenty of eligible goalies`);
+      // with 13 girls nobody should ever rest two periods back-to-back
+      if (data.maxConsecSit > 1) throw new Error(`a girl rests ${data.maxConsecSit} periods in a row at ${p} periods (should be spaced out)`);
     }
 
-    // mark one girl away and confirm she drops out of the grid
+    // editing the setup should clear the old roster (no stale/unrequested roster)
     await page.locator(".player-row .chip.present").first().click();
     await page.waitForTimeout(120);
-    const awayRows = await page.locator("table.gridtbl tbody tr.away").count();
-    if (awayRows < 1) throw new Error("an away player was not greyed out in the grid");
+    if (await page.locator("table.gridtbl").count() !== 0) throw new Error("changing setup did not clear the previous roster");
+    if (await page.locator(".empty-note").count() < 1) throw new Error("no prompt shown after a setup change");
 
-    return "2/4/8 periods: 1 goalie + 6 field each, even time, no goalie repeats";
+    // re-make and confirm the away player is dropped (greyed) in the grid
+    await page.locator("#generateBtn").click();
+    await page.waitForTimeout(150);
+    if (await page.locator("table.gridtbl tbody tr.away").count() < 1) throw new Error("an away player was not greyed out in the grid");
+
+    // on first load nothing should be generated until the coach asks
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.locator(".pcard").count() !== 0) throw new Error("a roster was generated before Make roster was pressed");
+    if (await page.locator(".empty-note").count() < 1) throw new Error("no setup prompt on first load");
+
+    return "no auto-generate; setup edits clear roster; 2/4/8 periods even with no goalie repeats";
   },
 
   async "Crossword"(page, g, d) {

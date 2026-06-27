@@ -89,7 +89,9 @@
 
     var stat = {};
     order.forEach(function (g) {
-      stat[g.name] = { plays: 0, goalie: 0, satLast: false, roles: [] };
+      // satStreak = how many periods in a row this girl has just sat out,
+      // so we can pull her back on before her rest clumps up.
+      stat[g.name] = { plays: 0, goalie: 0, satStreak: 0, roles: [] };
     });
 
     var lineups = [];
@@ -100,8 +102,12 @@
       if (elig.length) {
         var minG = Math.min.apply(null, elig.map(function (g) { return stat[g.name].goalie; }));
         var gPool = elig.filter(function (g) { return stat[g.name].goalie === minG; });
-        // among those who've been goalie least, take whoever has played least
-        gPool.sort(function (a, b) { return stat[a.name].plays - stat[b.name].plays; });
+        gPool.sort(function (a, b) {
+          var sa = stat[a.name], sb = stat[b.name];
+          if (sa.plays !== sb.plays) return sa.plays - sb.plays;          // fewest playing time first
+          if (sa.satStreak !== sb.satStreak) return sb.satStreak - sa.satStreak; // resting longest -> back on
+          return 0;
+        });
         goalie = gPool[0];
       }
 
@@ -109,9 +115,9 @@
       var fieldPool = order.filter(function (g) { return g !== goalie; });
       fieldPool.sort(function (a, b) {
         var sa = stat[a.name], sb = stat[b.name];
-        if (sa.plays !== sb.plays) return sa.plays - sb.plays;        // least playing time first
-        if (sa.satLast !== sb.satLast) return sa.satLast ? -1 : 1;    // sat last period? you're up
-        return 0;                                                     // else keep random order
+        if (sa.plays !== sb.plays) return sa.plays - sb.plays;          // least playing time first
+        if (sa.satStreak !== sb.satStreak) return sb.satStreak - sa.satStreak; // sitting longest? you're up (no clumps)
+        return 0;                                                       // else keep random order
       });
       var field = fieldPool.slice(0, Math.min(FIELD, fieldPool.length));
 
@@ -128,9 +134,9 @@
       var sitting = [];
       order.forEach(function (g) {
         if (playing[g.name]) {
-          stat[g.name].satLast = false;
+          stat[g.name].satStreak = 0;
         } else {
-          stat[g.name].satLast = true;
+          stat[g.name].satStreak++;
           if (stat[g.name].roles[p] === undefined) stat[g.name].roles[p] = "-";
           sitting.push(g.name);
         }
@@ -176,13 +182,13 @@
       pres.className = "chip " + (g.present ? "present" : "absent");
       pres.textContent = g.present ? "Here" : "Away";
       pres.title = "Tap to mark here / away today";
-      pres.onclick = function () { g.present = !g.present; save(); renderTeam(); regenerate(false); };
+      pres.onclick = function () { g.present = !g.present; save(); renderTeam(); settingsChanged(); };
 
       var gk = document.createElement("button");
       gk.className = "chip " + (g.goalie ? "gk-on" : "gk-off");
       gk.textContent = g.goalie ? "Goalie ✓" : "Goalie —";
       gk.title = "Can this girl play goalie?";
-      gk.onclick = function () { g.goalie = !g.goalie; save(); renderTeam(); regenerate(false); };
+      gk.onclick = function () { g.goalie = !g.goalie; save(); renderTeam(); settingsChanged(); };
 
       var x = document.createElement("button");
       x.className = "chip-x";
@@ -190,7 +196,7 @@
       x.title = "Remove from team";
       x.onclick = function () {
         if (confirm("Remove " + g.name + " from the team?")) {
-          state.team.splice(i, 1); save(); renderTeam(); regenerate(false);
+          state.team.splice(i, 1); save(); renderTeam(); settingsChanged();
         }
       };
 
@@ -226,46 +232,19 @@
 
     var html = "";
 
-    // ---- printable header ----
-    var head = state.teamName || "Roster";
-    var sub = [];
-    if (state.opponent) sub.push("vs " + state.opponent);
-    if (state.gameDate) sub.push(formatDate(state.gameDate));
-    sub.push(state.periods + (state.periods === 2 ? " halves" : state.periods === 4 ? " quarters" : " periods"));
-    sub.push(n + " here" + (n < state.team.length ? ", " + (state.team.length - n) + " away" : ""));
-
-    html += '<div class="panel">';
-    html += '<div class="roster-head"><h2>' + esc(head) + "</h2><p>" + esc(sub.join("  •  ")) + "</p></div>";
-
-    // ---- verification checks ----
-    html += '<div class="checks">';
-    html += check(true, "No girl is listed twice in the same period.", "Each period has 1 goalie + " + FIELD + " different field players.");
-
-    if (shortHanded) {
-      html += check(false, "Only " + n + " girls here — not enough for a full " + ON_FIELD + " (1 goalie + " + FIELD + ").",
-        "Some field spots will be empty. They'll play short-handed.");
+    // ---- only flag real problems (no "all good" reassurance clutter) ----
+    var warns = [];
+    if (noGoalie) warns.push("No goalie picked — tap “Goalie ✓” on at least one girl.");
+    if (shortHanded) warns.push("Only " + n + " here — not enough for 1 goalie + " + FIELD + ", so some spots are open.");
+    if (maxP - minP > 1) warns.push("Playing time is a little uneven (" + minP + "–" + maxP + ") — try Shuffle again.");
+    if (!noGoalie && goalieRepeat && !forcedRepeat) warns.push("A girl plays goalie twice — try Shuffle again.");
+    if (warns.length) {
+      html += '<div class="panel warn-panel">';
+      warns.forEach(function (w) {
+        html += '<div class="check warn"><span class="mark">⚠️</span><span>' + esc(w) + "</span></div>";
+      });
+      html += "</div>";
     }
-
-    if (maxP - minP <= 1) {
-      html += check(true, "Playing time is even.",
-        "Everyone plays " + (minP === maxP ? (minP + " period" + (minP === 1 ? "" : "s")) : (minP + " or " + maxP + " periods")) + " out of " + state.periods + ".");
-    } else {
-      html += check(false, "Playing time is a little uneven (" + minP + "–" + maxP + " periods).",
-        "Try Shuffle again for a more even split.");
-    }
-
-    if (noGoalie) {
-      html += check(false, "No goalie picked!", "Tap “Goalie ✓” on at least one girl above.");
-    } else if (!goalieRepeat) {
-      html += check(true, "No girl plays goalie twice.", state.periods + " periods, " + eligCount + " eligible goalies.");
-    } else if (forcedRepeat) {
-      html += check(true, "Some girls play goalie twice — can't be helped.",
-        "Only " + eligCount + " girl" + (eligCount === 1 ? "" : "s") + " can play goalie for " + state.periods + " periods, so it's spread as evenly as possible.");
-    } else {
-      html += check(false, "A girl plays goalie twice.", "Tap Shuffle again — there are enough goalies to avoid it.");
-    }
-    html += "</div>"; // checks
-    html += "</div>"; // panel
 
     // ---- period cards ----
     html += '<div class="panel"><div class="periods-grid">';
@@ -330,51 +309,50 @@
     out.innerHTML = html;
   }
 
-  function check(ok, title, detail) {
-    return '<div class="check ' + (ok ? "ok" : "warn") + '">' +
-      '<span class="mark">' + (ok ? "✓" : "⚠️") + "</span>" +
-      "<span><b>" + esc(title) + "</b>" + (detail ? " " + esc(detail) : "") + "</span></div>";
-  }
-
-  function formatDate(iso) {
-    // iso = YYYY-MM-DD -> friendly, avoiding timezone shifts
-    var parts = iso.split("-");
-    if (parts.length !== 3) return iso;
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return months[Number(parts[1]) - 1] + " " + Number(parts[2]) + ", " + parts[0];
-  }
-
   /* ===========================================================
      Glue
+     -----------------------------------------------------------
+     The roster is ONLY built when "Make roster" / "Shuffle" is
+     pressed. Any change to the setup (who's here, goalies,
+     periods, the team) clears the roster so nothing stale or
+     unrequested is ever on screen.
      =========================================================== */
-  function regenerate(newSeed) {
+  var hasRoster = false;
+
+  // Empty state: a clear "your move" prompt instead of a surprise roster.
+  function showPrompt() {
+    hasRoster = false;
+    document.getElementById("output").innerHTML =
+      '<div class="panel empty-note">Pick who\'s <b>Here</b> and who can play <b>Goalie</b> above, then tap <b>⚽ Make roster</b>.</div>';
+  }
+
+  // Called after any setup edit — drop the old roster so it must be re-made.
+  function settingsChanged() {
+    if (hasRoster) {
+      document.getElementById("output").innerHTML =
+        '<div class="panel empty-note">Setup changed — tap <b>⚽ Make roster</b> to build the line-up.</div>';
+      hasRoster = false;
+    }
+  }
+
+  function makeRoster(newSeed) {
     if (newSeed) state.seed = (state.seed + 1) | 0;
-    var anyPresent = state.team.some(function (g) { return g.present; });
-    if (!anyPresent) {
+    if (!state.team.some(function (g) { return g.present; })) {
       document.getElementById("output").innerHTML =
         '<div class="panel empty-note">Nobody is marked “Here” yet — tap a player to add them to today\'s game.</div>';
-      state.lastRoster = null; save();
+      hasRoster = false; save();
       return;
     }
-    var r = buildRoster(state.team, state.periods, state.seed);
-    renderRoster(r);
+    renderRoster(buildRoster(state.team, state.periods, state.seed));
+    hasRoster = true;
     save();
   }
 
   function init() {
-    // restore details inputs
-    document.getElementById("teamName").value = state.teamName || "";
-    document.getElementById("opponent").value = state.opponent || "";
-    document.getElementById("gameDate").value = state.gameDate || "";
-
-    document.getElementById("teamName").oninput = function () { state.teamName = this.value; save(); refreshHeaderOnly(); };
-    document.getElementById("opponent").oninput = function () { state.opponent = this.value; save(); refreshHeaderOnly(); };
-    document.getElementById("gameDate").oninput = function () { state.gameDate = this.value; save(); refreshHeaderOnly(); };
-
     document.querySelectorAll(".period-btn").forEach(function (b) {
       b.onclick = function () {
         state.periods = Number(b.dataset.p);
-        renderPeriodButtons(); save(); regenerate(false);
+        renderPeriodButtons(); save(); settingsChanged();
       };
     });
 
@@ -383,25 +361,19 @@
       if (e.key === "Enter") addPlayer();
     });
 
-    document.getElementById("generateBtn").onclick = function () { regenerate(false); scrollToOutput(); };
-    document.getElementById("shuffleBtn").onclick = function () { regenerate(true); scrollToOutput(); };
+    document.getElementById("generateBtn").onclick = function () { makeRoster(false); scrollToOutput(); };
+    document.getElementById("shuffleBtn").onclick = function () { makeRoster(true); scrollToOutput(); };
     document.getElementById("printBtn").onclick = function () { window.print(); };
     document.getElementById("resetBtn").onclick = function () {
       if (confirm("Reset the whole team back to the original roster?")) {
         state.team = DEFAULT_TEAM.map(function (g) { return Object.assign({}, g); });
-        save(); renderTeam(); regenerate(false);
+        save(); renderTeam(); showPrompt();
       }
     };
 
     renderPeriodButtons();
     renderTeam();
-    regenerate(false);
-  }
-
-  // Update only the header text when details change, without re-rolling the roster.
-  function refreshHeaderOnly() {
-    var r = buildRoster(state.team, state.periods, state.seed);
-    if (state.team.some(function (g) { return g.present; })) renderRoster(r);
+    showPrompt();
   }
 
   function addPlayer() {
@@ -410,7 +382,7 @@
     if (!name) return;
     state.team.push({ name: name, present: true, goalie: true });
     input.value = "";
-    save(); renderTeam(); regenerate(false);
+    save(); renderTeam(); settingsChanged();
   }
 
   function scrollToOutput() {

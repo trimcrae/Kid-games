@@ -139,7 +139,7 @@
 
       /* drop everything except the quarter line-ups */
       .bg-blobs, .back-link, .no-print, .footer, .hero,
-      .checks, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
+      .checks, .warn-panel, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
 
       /* strip panel chrome — just the content */
       .wrap { max-width: none; padding: 0; }
@@ -178,21 +178,6 @@
   <div class="wrap">
 
     <!-- ====== CONTROLS ====== -->
-    <section class="panel no-print">
-      <h2>📋 Game details</h2>
-      <div class="details">
-        <label>Team
-          <input id="teamName" type="text" placeholder="Gu8 McRae - Orange" />
-        </label>
-        <label>Opponent
-          <input id="opponent" type="text" placeholder="e.g. Blue Thunder" />
-        </label>
-        <label>Date
-          <input id="gameDate" type="date" />
-        </label>
-      </div>
-    </section>
-
     <section class="panel no-print">
       <h2>⏱️ How many periods?</h2>
       <p class="hint">1 goalie + 6 field players each period.</p>
