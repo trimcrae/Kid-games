@@ -350,6 +350,7 @@ const GAMES = {
     await page.reload({ waitUntil: "networkidle" });
 
     if (await page.locator(".player-row").count() < 7) throw new Error("team roster did not render");
+    if (await page.locator('.period-btn[data-p="8"].active').count() !== 1) throw new Error("8 periods should be selected by default on load");
 
     // try each period count and verify the invariants in the grid
     for (const p of [2, 4, 8]) {

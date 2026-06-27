@@ -35,7 +35,7 @@
       if (raw) {
         var s = JSON.parse(raw);
         if (s && s.team && s.team.length) {
-          s.periods = s.periods || 4;
+          s.periods = 8;            // always open on 8 periods
           s.seed = s.seed || 1;
           return s;
         }
@@ -43,11 +43,8 @@
     } catch (e) { /* ignore */ }
     return {
       team: DEFAULT_TEAM.map(function (g) { return Object.assign({}, g); }),
-      periods: 4,
+      periods: 8,
       seed: 1,
-      teamName: "Gu8 McRae - Orange",
-      opponent: "",
-      gameDate: "",
       lastRoster: null
     };
   }
