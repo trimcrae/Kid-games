@@ -329,8 +329,8 @@
     markDoneClues();
     if (isComplete()) { winGame(); return; }
     if (filled === 0) flash("Type some answers, then press Check! ✏️", "var(--purple)");
-    else if (wrong === 0) flash("Everything so far is right — keep going! 👍", "var(--green)");
-    else flash(wrong === 1 ? "1 letter to fix (pink box) 🩷" : wrong + " letters to fix (pink boxes) 🩷", "var(--pink)");
+    else if (wrong === 0) { flash("Everything so far is right — keep going! 👍", "var(--green)"); window.SFX && SFX.good(); }
+    else { flash(wrong === 1 ? "1 letter to fix (pink box) 🩷" : wrong + " letters to fix (pink boxes) 🩷", "var(--pink)"); window.SFX && SFX.nope(); }
   }
 
   function doReveal() {
@@ -383,6 +383,7 @@
     el.grid.querySelectorAll(".xcell").forEach((w) => { w.classList.remove("bad"); w.classList.add("good"); });
     flash("🏆 You solved the " + puzzle.name + " crossword! Awesome!", "var(--green)");
     sparkleBurst();
+    window.Confetti && Confetti.burst({ count: 100 });
     if (window.SFX) SFX.win();
     renderPuzzles();
   }
