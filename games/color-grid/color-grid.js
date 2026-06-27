@@ -8,10 +8,18 @@
    =========================================================== */
 
 (function () {
-  var STORAGE_KEY = "coryColorGrid.v1";
   var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   var COLOR_KEYS = Object.keys(COLORS);
 
+  // Each kid gets their own saved grid.
+  var KIDS = [
+    { id: "jeannie", name: "Jeannie", emoji: "📚", color: "#ff6fa5" },
+    { id: "cory",    name: "Cory",    emoji: "🟦", color: "#2b8cff" },
+    { id: "ellie",   name: "Ellie",   emoji: "👑", color: "#9b3fc4" }
+  ];
+  var CURRENT_KID_KEY = "mcrae.currentKid";
+
+  var kidRow = document.getElementById("kid-row");
   var colorRow = document.getElementById("color-row");
   var form = document.getElementById("add-form");
   var input = document.getElementById("word-input");
@@ -22,21 +30,54 @@
   var starterBtn = document.getElementById("starter");
   var clearBtn = document.getElementById("clear");
 
+  var currentKid = localStorage.getItem(CURRENT_KID_KEY) || "cory";
+  if (!KIDS.some(function (k) { return k.id === currentKid; })) currentKid = "cory";
+
   // grid data: { "C|green": ["Creeper", "Cactus"], ... }
   var grid = load();
   var activeColor = COLOR_KEYS[0];
 
-  /* ---------- storage ---------- */
+  /* ---------- storage (namespaced per kid) ---------- */
+  function storageKey() { return "colorGrid.v1:" + currentKid; }
   function load() {
     try {
-      var raw = localStorage.getItem(STORAGE_KEY);
+      var raw = localStorage.getItem(storageKey());
+      // one-time migration of Cory's old un-namespaced grid
+      if (!raw && currentKid === "cory") {
+        var legacy = localStorage.getItem("coryColorGrid.v1");
+        if (legacy) { localStorage.setItem(storageKey(), legacy); raw = legacy; }
+      }
       return raw ? JSON.parse(raw) : {};
     } catch (e) { return {}; }
   }
   function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(grid)); } catch (e) {}
+    try { localStorage.setItem(storageKey(), JSON.stringify(grid)); } catch (e) {}
   }
   function keyFor(letter, color) { return letter + "|" + color; }
+
+  /* ---------- build the kid picker ---------- */
+  KIDS.forEach(function (kid) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "kid-pick";
+    btn.style.setProperty("--kc", kid.color);
+    btn.innerHTML = '<span aria-hidden="true">' + kid.emoji + "</span> " + kid.name;
+    btn.dataset.kid = kid.id;
+    btn.addEventListener("click", function () { setKid(kid.id); });
+    kidRow.appendChild(btn);
+  });
+
+  function setKid(id) {
+    currentKid = id;
+    localStorage.setItem(CURRENT_KID_KEY, id);
+    [].forEach.call(kidRow.children, function (b) {
+      b.classList.toggle("selected", b.dataset.kid === id);
+    });
+    grid = load();
+    renderAll();
+    var kid = KIDS.filter(function (k) { return k.id === id; })[0];
+    flashHint(kid.name + "'s grid — type away! ✨", false);
+  }
 
   /* ---------- build the colour picker ---------- */
   COLOR_KEYS.forEach(function (key) {
@@ -227,4 +268,7 @@
   buildGrid();
   renderAll();
   setColor(activeColor);
+  [].forEach.call(kidRow.children, function (b) {
+    b.classList.toggle("selected", b.dataset.kid === currentKid);
+  });
 })();

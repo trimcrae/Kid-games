@@ -17,6 +17,35 @@
       max-width: 38rem;
     }
 
+    /* kid picker */
+    .kid-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+    }
+    .kid-pick {
+      font-family: var(--font);
+      font-weight: bold;
+      font-size: 1.05rem;
+      border: 3px solid var(--kc, #ccc);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      transition: transform 0.12s ease;
+    }
+    .kid-pick:hover { transform: translateY(-2px); }
+    .kid-pick.selected {
+      background: var(--kc, #ccc);
+      color: #fff;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
+    }
+
     /* colour picker */
     .color-row {
       display: flex;
@@ -191,9 +220,11 @@
 
   <div class="builder-wrap">
     <p class="how">
-      Pick a <b>colour</b>, type any word that's that colour, and press <b>Add</b>.
-      It jumps into the grid in the row for its first letter! ✨
+      Whose grid is this? Tap your name, then pick a <b>colour</b>, type any word
+      that's that colour, and press <b>Add</b> — it jumps into the row for its first letter! ✨
     </p>
+
+    <div class="kid-row" id="kid-row" aria-label="Whose grid?"></div>
 
     <div class="color-row" id="color-row" aria-label="Pick a colour"></div>
 
