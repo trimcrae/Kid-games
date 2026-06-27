@@ -227,6 +227,55 @@ const THEMES = [
       { answer: "FORM", clue: "A set pattern of moves you practice (a 'poomsae')." },
     ],
   },
+  {
+    name: "Pokémon Party", emoji: "⚡", blurb: "Catch and battle your favourites!",
+    words: [
+      { answer: "PIKACHU", clue: "The yellow electric mouse Pokémon." },
+      { answer: "EEVEE", clue: "A fluffy Pokémon that can evolve many ways." },
+      { answer: "CHARIZARD", clue: "A big orange fire-and-flying dragon Pokémon." },
+      { answer: "SNORLAX", clue: "A huge Pokémon that loves to sleep." },
+      { answer: "POKEBALL", clue: "The red-and-white ball you catch Pokémon in." },
+      { answer: "TRAINER", clue: "A person who catches and battles Pokémon." },
+      { answer: "BULBASAUR", clue: "A grass Pokémon with a plant bulb on its back." },
+    ],
+  },
+  {
+    name: "Gabby's Dollhouse", emoji: "🐱", blurb: "Welcome to the kitty house!",
+    words: [
+      { answer: "GABBY", clue: "The girl who shrinks down to visit the dollhouse." },
+      { answer: "PANDY", clue: "___ Paws, the cuddly panda-cat." },
+      { answer: "MERCAT", clue: "The half-mermaid, half-cat of the bathroom." },
+      { answer: "CATNIP", clue: "DJ ___, the music-loving green cat." },
+      { answer: "KITTY", clue: "A baby cat." },
+      { answer: "CARLITA", clue: "Gabby's toy car that's also a cat!" },
+    ],
+  },
+  {
+    name: "Outer Space", emoji: "🚀", blurb: "Blast off to the stars!",
+    words: [
+      { answer: "PLANET", clue: "Earth, Mars and Jupiter are each one." },
+      { answer: "ROCKET", clue: "A ship that blasts off into space." },
+      { answer: "COMET", clue: "An icy space ball with a glowing tail." },
+      { answer: "SATURN", clue: "The planet famous for its rings." },
+      { answer: "GALAXY", clue: "A huge swirl of millions of stars." },
+      { answer: "ORBIT", clue: "The path a planet or moon travels around." },
+      { answer: "ASTRONAUT", clue: "A person who travels into space." },
+    ],
+  },
+  {
+    name: "Soccer Stars", emoji: "⚽", blurb: "Kick, pass and score!",
+    words: [
+      { answer: "GOAL", clue: "What you score when the ball goes in the net." },
+      { answer: "KICK", clue: "How you move the ball with your foot." },
+      { answer: "TEAM", clue: "The group of players you play with." },
+      { answer: "FIELD", clue: "The grassy place where you play." },
+      { answer: "SCORE", clue: "The number of goals each team has." },
+      { answer: "COACH", clue: "The grown-up who teaches the team." },
+      { answer: "STRIKER", clue: "The player whose job is to score goals." },
+      { answer: "BALL", clue: "The round thing you kick around the field." },
+      { answer: "PASS", clue: "To kick the ball to a teammate." },
+    ],
+  },
 ];
 
 const out = THEMES.map(compile);

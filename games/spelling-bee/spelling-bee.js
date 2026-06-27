@@ -78,6 +78,42 @@
         "rouse", "thee", "rest", "test", "tester", "torte", "stretch",
       ],
     },
+    {
+      name: "In the Garden",
+      emoji: "🌻",
+      letters: ["a", "g", "r", "d", "e", "n", "s"],
+      words: [
+        "gardens", "garden", "danger", "dangers", "dare", "dares",
+        "dear", "dears", "drag", "drags", "earn", "earns", "grade",
+        "grades", "grand", "grands", "near", "nears", "range", "ranges",
+        "read", "reads", "sand", "sane", "sear", "snare", "anger",
+        "angers", "sedan", "area", "grades", "sander", "darn", "darns",
+      ],
+    },
+    {
+      name: "Birthday Party",
+      emoji: "🎉",
+      letters: ["t", "p", "a", "r", "i", "e", "s"],
+      words: [
+        "parties", "part", "parts", "past", "paste", "pirate", "pirates",
+        "rate", "rates", "tear", "tears", "tire", "tires", "tart",
+        "taste", "taper", "tapers", "trip", "trips", "trap", "traps",
+        "treat", "stir", "strip", "stripe", "stripes", "spit", "spite",
+        "star", "start", "taps", "tips", "pita", "pitas", "trait",
+      ],
+    },
+    {
+      name: "Monster Mash",
+      emoji: "👹",
+      letters: ["s", "m", "o", "n", "t", "e", "r"],
+      words: [
+        "monster", "monsters", "most", "nest", "nests", "rest", "rests",
+        "rose", "roses", "sent", "snore", "snores", "some", "sore",
+        "sores", "sort", "sorts", "stem", "stems", "stern", "stone",
+        "stones", "store", "stores", "storm", "storms", "toes", "tons",
+        "moms", "most", "noses", "tester", "rents", "stress",
+      ],
+    },
   ];
 
   /* ---------- saved progress (per hive) ---------- */
@@ -317,8 +353,8 @@
     renderEntry();
     renderFound();
     updateHud();
-    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); speak("Pangram!"); }
-    else { flash("Nice! +" + pts + " 🍯", "var(--green)"); }
+    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); speak("Pangram!"); if (window.SFX) SFX.win(); }
+    else { flash("Nice! +" + pts + " 🍯", "var(--green)"); if (window.SFX) SFX.good(); }
   }
 
   /* ---------- keyboard ---------- */

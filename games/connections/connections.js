@@ -79,6 +79,36 @@
         { name: "Royal things",    color: "purple", items: ["Crown", "Castle", "Throne", "Wand"] },
       ],
     },
+    {
+      name: "Game On",
+      emoji: "⚽",
+      groups: [
+        { name: "Soccer words",  color: "yellow", items: ["Goal", "Pass", "Team", "Net"] },
+        { name: "Outer space",   color: "green",  items: ["Planet", "Rocket", "Comet", "Moon"] },
+        { name: "Taekwondo",     color: "blue",   items: ["Belt", "Punch", "Block", "Bow"] },
+        { name: "Body parts",    color: "purple", items: ["Arm", "Leg", "Hand", "Foot"] },
+      ],
+    },
+    {
+      name: "Snack Attack",
+      emoji: "🍦",
+      groups: [
+        { name: "Ice cream flavours", color: "yellow", items: ["Vanilla", "Chocolate", "Strawberry", "Mint"] },
+        { name: "Breakfast foods",    color: "green",  items: ["Pancake", "Waffle", "Cereal", "Toast"] },
+        { name: "Pizza toppings",     color: "blue",   items: ["Cheese", "Pepperoni", "Mushroom", "Olive"] },
+        { name: "Cold drinks",        color: "purple", items: ["Juice", "Milk", "Water", "Soda"] },
+      ],
+    },
+    {
+      name: "Story Stars",
+      emoji: "📚",
+      groups: [
+        { name: "Calvin and Hobbes", color: "yellow", items: ["Calvin", "Hobbes", "Susie", "Moe"] },
+        { name: "Wimpy Kid",         color: "green",  items: ["Greg", "Rowley", "Manny", "Rodrick"] },
+        { name: "Gabby's Dollhouse", color: "blue",   items: ["Gabby", "Pandy", "MerCat", "Catnip"] },
+        { name: "Pokémon",           color: "purple", items: ["Pikachu", "Eevee", "Snorlax", "Charizard"] },
+      ],
+    },
   ];
 
   const MAX_MISTAKES = 4;
@@ -223,6 +253,7 @@
       if (n > best) best = n;
     });
     mistakes += 1;
+    if (window.SFX) SFX.nope();
     // shake the selected tiles
     [...el.board.children].forEach((b) => {
       if (selected.indexOf(b.dataset.item) !== -1) {
@@ -243,6 +274,7 @@
     tiles = tiles.filter((it) => g.items.indexOf(it) === -1);
     selected = [];
     flash("Yes! " + g.name + " 🎉", "var(--green)");
+    if (window.SFX) SFX.good();
     setTimeout(() => {
       renderSolved();
       renderBoard();
@@ -256,6 +288,7 @@
     saved["p" + pi] = won ? "won" : "lost";
     save();
     if (won) {
+      if (window.SFX) SFX.win();
       flash("🏆 You found all four groups! Amazing!", "var(--green)");
       el.lives.textContent = "Solved with " + (MAX_MISTAKES - mistakes) + " guesses to spare!";
     } else {

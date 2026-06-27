@@ -318,7 +318,12 @@ const GAMES = {
     // the first row should now be coloured (each cell has a status class)
     const coloured = await page.locator(".grid .row").first().locator(".cell.correct, .cell.present, .cell.absent").count();
     if (coloured !== 5) throw new Error(`guessed row not fully scored (got ${coloured}/5)`);
-    return "guess scored with colour clues";
+    // Easy mode switches to 4-letter words
+    await page.locator("#easy-btn").click();
+    await page.waitForTimeout(150);
+    const easyCells = await page.locator(".grid .row").first().locator(".cell").count();
+    if (easyCells !== 4) throw new Error(`Easy mode should show 4 cells per row (got ${easyCells})`);
+    return "guess scored with colour clues; easy mode works";
   },
 
   async "Word Strands"(page, g, d) {

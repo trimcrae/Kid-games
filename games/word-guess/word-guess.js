@@ -18,7 +18,7 @@
 (function () {
   "use strict";
 
-  const LEN = 6 - 1; // 5 letters
+  let LEN = 5;       // letters per word — 5 (Normal) or 4 (Easy)
   const TRIES = 6;
 
   /* secret words + a gentle hint for each */
@@ -96,26 +96,75 @@
     "worms", "yummy",
   ];
 
-  /* allowed = every answer + every extra (5-letter, deduped) */
-  const ALLOWED = new Set();
-  ANSWERS.forEach((a) => { if (a.word.length === LEN) ALLOWED.add(a.word); });
-  EXTRA_GUESSES.forEach((w) => { if (w.length === LEN) ALLOWED.add(w); });
+  /* ---- Easy mode: 4-letter words ---- */
+  const ANSWERS4 = [
+    { word: "frog", emoji: "🐸", hint: "A green animal that says 'ribbit'" },
+    { word: "fish", emoji: "🐟", hint: "It swims and breathes underwater" },
+    { word: "star", emoji: "⭐", hint: "A twinkly light in the night sky" },
+    { word: "moon", emoji: "🌙", hint: "It glows in the sky at night" },
+    { word: "cake", emoji: "🍰", hint: "A sweet treat with candles on birthdays" },
+    { word: "bear", emoji: "🐻", hint: "A big furry animal that loves honey" },
+    { word: "duck", emoji: "🦆", hint: "A bird that says 'quack'" },
+    { word: "tree", emoji: "🌳", hint: "It has leaves, branches and a trunk" },
+    { word: "snow", emoji: "❄️", hint: "Cold white fluff that falls in winter" },
+    { word: "ball", emoji: "⚽", hint: "You kick or throw this round toy" },
+    { word: "king", emoji: "🤴", hint: "A queen's royal partner" },
+    { word: "lion", emoji: "🦁", hint: "The big cat that's king of the jungle" },
+    { word: "milk", emoji: "🥛", hint: "A white drink cows give us" },
+    { word: "rain", emoji: "🌧️", hint: "Water that falls from clouds" },
+    { word: "boat", emoji: "⛵", hint: "It floats and carries you on water" },
+    { word: "bird", emoji: "🐦", hint: "An animal with feathers that can fly" },
+    { word: "swan", emoji: "🦢", hint: "A graceful white water bird" },
+    { word: "kite", emoji: "🪁", hint: "You fly this on a windy day" },
+    { word: "drum", emoji: "🥁", hint: "You bang it to make a beat" },
+    { word: "gold", emoji: "🪙", hint: "Shiny treasure pirates love" },
+    { word: "wolf", emoji: "🐺", hint: "A wild animal like a big grey dog" },
+    { word: "ship", emoji: "🚢", hint: "A very big boat" },
+  ];
+  const EXTRA4 = [
+    "bake", "bell", "blue", "book", "calm", "camp", "card", "cave", "city",
+    "club", "coat", "cold", "cool", "corn", "cube", "dark", "deer", "desk",
+    "dive", "doll", "door", "down", "drop", "easy", "farm", "fast", "feet",
+    "film", "fire", "flag", "foot", "frog", "game", "gate", "gift", "girl",
+    "goat", "good", "grow", "hand", "hare", "hill", "home", "hope", "hour",
+    "jump", "kind", "lake", "lamp", "land", "leaf", "left", "lime", "love",
+    "mask", "maze", "mint", "mole", "nest", "nice", "nose", "note", "palm",
+    "park", "pear", "pink", "play", "plum", "pony", "pool", "rain", "rice",
+    "ring", "road", "rock", "rose", "sand", "seal", "seed", "ship", "shoe",
+    "sing", "sled", "slow", "song", "soft", "swan", "swim", "tail", "team",
+    "toad", "town", "toys", "warm", "wave", "wind", "wing", "wolf", "yard",
+    "zoom",
+  ];
+
+  /* allowed guess sets, keyed by word length */
+  function buildAllowed(len, answers, extra) {
+    const s = new Set();
+    answers.forEach((a) => { if (a.word.length === len) s.add(a.word); });
+    extra.forEach((w) => { if (w.length === len) s.add(w); });
+    return s;
+  }
+  const ALLOWED5 = buildAllowed(5, ANSWERS, EXTRA_GUESSES);
+  const ALLOWED4 = buildAllowed(4, ANSWERS4, EXTRA4);
+  function answersFor() { return (LEN === 4 ? ANSWERS4 : ANSWERS).filter((a) => a.word.length === LEN); }
+  function allowedFor() { return LEN === 4 ? ALLOWED4 : ALLOWED5; }
 
   /* ---------- saved stats ---------- */
   const SAVE_KEY = "wordGuess.v1";
   function load() {
     try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === "object") return s; }
     catch (e) {}
-    return { streak: 0, wins: 0, lastIdx: -1 };
+    return { streak: 0, wins: 0, last: { 4: -1, 5: -1 } };
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(stats)); } catch (e) {} }
   const stats = load();
+  if (!stats.last || typeof stats.last !== "object") stats.last = { 4: -1, 5: -1 };
 
   /* ---------- refs ---------- */
   const $ = (id) => document.getElementById(id);
   const el = {
     streak: $("streak"), wins: $("wins"), hint: $("hint"), feedback: $("feedback"),
     grid: $("grid"), kb: $("kb"), hintBtn: $("hint-btn"), newBtn: $("new-btn"),
+    easyBtn: $("easy-btn"), normalBtn: $("normal-btn"),
   };
 
   /* ---------- live state ---------- */
@@ -126,10 +175,11 @@
   const keyState = {};   // letter -> best status
 
   function pickAnswer() {
-    let i = Math.floor(Math.random() * ANSWERS.length);
-    if (ANSWERS.length > 1 && i === stats.lastIdx) i = (i + 1) % ANSWERS.length;
-    stats.lastIdx = i; save();
-    return ANSWERS[i];
+    const pool = answersFor();
+    let i = Math.floor(Math.random() * pool.length);
+    if (pool.length > 1 && i === stats.last[LEN]) i = (i + 1) % pool.length;
+    stats.last[LEN] = i; save();
+    return pool[i];
   }
 
   function buildGrid() {
@@ -138,6 +188,7 @@
       const rowEl = document.createElement("div");
       rowEl.className = "row";
       rowEl.dataset.row = r;
+      rowEl.style.gridTemplateColumns = "repeat(" + LEN + ", 1fr)";
       for (let c = 0; c < LEN; c++) {
         const cell = document.createElement("div");
         cell.className = "cell";
@@ -200,7 +251,7 @@
 
   function submit() {
     if (guess.length < LEN) { flash("Need " + LEN + " letters!", "var(--pink)"); badRow(); return; }
-    if (!ALLOWED.has(guess)) { flash("Hmm, not a word I know — try another! 🤔", "var(--pink)"); badRow(); return; }
+    if (!allowedFor().has(guess)) { flash("Hmm, not a word I know — try another! 🤔", "var(--pink)"); badRow(); return; }
 
     const target = answer.word;
     const result = scoreGuess(guess, target);
@@ -263,15 +314,25 @@
     flash("🎉 You got it in " + (row + 1) + "! The word was " + answer.word.toUpperCase(), "var(--green)");
     el.hint.textContent = answer.emoji + " " + answer.word.toUpperCase();
     sparkleBurst();
+    if (window.SFX) SFX.win();
   }
   function lose() {
     over = true;
     stats.streak = 0; save();
     updateHud();
     flash("Out of tries — the word was " + answer.word.toUpperCase() + " " + answer.emoji + ". Try a new one!", "var(--pink)");
+    if (window.SFX) SFX.nope();
   }
 
   function updateHud() { el.streak.textContent = stats.streak; el.wins.textContent = stats.wins; }
+
+  function setMode(len) {
+    if (LEN === len) { newGame(); return; }
+    LEN = len;
+    el.easyBtn.classList.toggle("on", LEN === 4);
+    el.normalBtn.classList.toggle("on", LEN === 5);
+    newGame();
+  }
 
   function newGame() {
     answer = pickAnswer();
@@ -298,7 +359,10 @@
     el.hint.textContent = answer.emoji + "  " + answer.hint;
   });
   el.newBtn.addEventListener("click", newGame);
+  el.easyBtn.addEventListener("click", () => setMode(4));
+  el.normalBtn.addEventListener("click", () => setMode(5));
 
   /* ---------- go ---------- */
+  el.normalBtn.classList.add("on");
   newGame();
 })();

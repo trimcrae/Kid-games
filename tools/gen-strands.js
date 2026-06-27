@@ -7,6 +7,11 @@
 function build(width, words) {
   const letters = words.map(w => w.word.toUpperCase()).join("");
   const total = letters.length;
+  if (!width) {
+    // auto-pick a width that divides the total, preferring 5, then 6, 7, 4
+    for (const w of [5, 6, 7, 4]) { if (total % w === 0) { width = w; break; } }
+    if (!width) throw new Error(`no good width for total ${total}: ${words.map(w => w.word)}`);
+  }
   if (total % width !== 0) throw new Error(`total ${total} not divisible by width ${width} for ${words.map(w=>w.word)}`);
   const height = total / width;
 
@@ -89,6 +94,46 @@ const PUZZLES = [
       { word: "HEELERS", spangram: true },
       { word: "BANDIT" }, { word: "CHILLI" }, { word: "MUFFIN" },
       { word: "BLUEY" }, { word: "BINGO" },
+    ],
+  },
+  {
+    name: "Gotta Catch 'Em", emoji: "⚡", clue: "Pokémon to catch and train.",
+    words: [
+      { word: "POKEMON", spangram: true },
+      { word: "PIKACHU" }, { word: "BULBASAUR" }, { word: "EEVEE" },
+      { word: "SNORLAX" },
+    ],
+  },
+  {
+    name: "Gabby's Cats", emoji: "🐱", clue: "Kitties from Gabby's Dollhouse.",
+    words: [
+      { word: "GABBY", spangram: true },
+      { word: "PANDY" }, { word: "CAKEY" }, { word: "KITTY" },
+      { word: "PURRS" }, { word: "MEOWS" },
+    ],
+  },
+  {
+    name: "Sweet Treats", emoji: "🍩", clue: "Yummy desserts and snacks.",
+    words: [
+      { word: "SWEETS", spangram: true },
+      { word: "DONUT" }, { word: "CANDY" }, { word: "JELLY" },
+      { word: "FUDGE" }, { word: "CAKE" },
+    ],
+  },
+  {
+    name: "Blast Off!", emoji: "🚀", clue: "Things you'd find in outer space.",
+    words: [
+      { word: "SPACE", spangram: true },
+      { word: "PLANET" }, { word: "ROCKET" }, { word: "COMET" },
+      { word: "MOON" }, { word: "STAR" },
+    ],
+  },
+  {
+    name: "Taekwondo!", emoji: "🥋", clue: "Kicks, belts and respect.",
+    words: [
+      { word: "TAEKWONDO", spangram: true },
+      { word: "KICK" }, { word: "PUNCH" }, { word: "BELT" },
+      { word: "BLOCK" }, { word: "BOW" },
     ],
   },
 ];
