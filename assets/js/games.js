@@ -80,14 +80,15 @@ const GAMES = [
     ready: true
   },
 
-  // ---- Coming soon: ideas tailored to each kid ----
   {
     title: "Word Wizard",
     emoji: "📚",
-    blurb: "Spell trickier words and grow your vocabulary — for Jeannie!",
-    url:   "#",
+    blurb: "Read a clue, then spell the magic word from a bank of letters — vocabulary & spelling for big readers. For Jeannie!",
+    url:   "games/word-wizard/",
     ages:  "7+",
     color: "#ff5d8f",
-    ready: false
+    ready: true
   }
+
+  // ---- Coming soon: add new ideas here with ready: false ----
 ];

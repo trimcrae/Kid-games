@@ -225,6 +225,29 @@ const GAMES = {
     return "stickers, bubbles, drag, pages and undo all work";
   },
 
+  async "Word Wizard"(page, g, d) {
+    await page.goto(`${BASE}/games/word-wizard/`, { waitUntil: "networkidle" });
+    if (await page.locator(".level-card").count() < 1) throw new Error("no spellbooks (levels) rendered");
+    const before = parseInt(await page.locator("#stars").textContent(), 10);
+    // open the first (always-unlocked) spellbook
+    await page.locator(".level-card").first().click();
+    await page.waitForTimeout(250);
+    if (await page.locator("#play:not(.hidden)").count() < 1) throw new Error("play screen did not open");
+    // read the target word and tap its letters in order
+    const word = await page.locator("#slots").getAttribute("data-word");
+    if (!word) throw new Error("no target word exposed on the slots");
+    for (const ch of word.split("")) {
+      const btn = page.locator(`.letter:not(:disabled)[data-letter="${ch}"]`).first();
+      if (await btn.count() === 0) throw new Error(`no letter button for "${ch}"`);
+      await btn.click();
+      await page.waitForTimeout(60);
+    }
+    await page.waitForTimeout(500);
+    const after = parseInt(await page.locator("#stars").textContent(), 10);
+    if (after <= before) throw new Error("star count did not increase after spelling the word");
+    return `spelled "${word}"; stars ${before}→${after}`;
+  },
+
   async "Math Mob Run"(page, g, d) {
     await page.goto(`${BASE}/games/math-mob/`, { waitUntil: "networkidle" });
     await page.waitForTimeout(200);
