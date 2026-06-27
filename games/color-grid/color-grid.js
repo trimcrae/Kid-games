@@ -1,162 +1,230 @@
 /* ===========================================================
-   Color Grid Quest
+   Color Grid Quest — BUILD-YOUR-OWN grid
    -----------------------------------------------------------
-   Each round shows a colour + a letter. Pick the word that is
-   BOTH that colour AND starts with that letter, and the block
-   gets placed in your wall. The two wrong choices each match
-   only ONE thing (right colour / wrong letter, or right letter
-   / wrong colour) so you have to check both — real grid logic!
+   Cory picks a colour, types any word he likes, and it drops
+   into the grid automatically in the row for its first letter.
+   Everything he types is saved in the browser so his grid is
+   still there next time he comes back.
    =========================================================== */
 
 (function () {
-  var GOAL = 12; // blocks to build to win
+  var STORAGE_KEY = "coryColorGrid.v1";
+  var LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+  var COLOR_KEYS = Object.keys(COLORS);
 
-  var promptBlock = document.getElementById("prompt-block");
-  var promptText = document.getElementById("prompt-text");
-  var choicesEl = document.getElementById("choices");
-  var wallEl = document.getElementById("wall");
-  var placedEl = document.getElementById("placed");
-  var goalEl = document.getElementById("goal");
-  var streakEl = document.getElementById("streak");
-  var overlay = document.getElementById("overlay");
-  var overlayTitle = document.getElementById("overlay-title");
-  var overlayText = document.getElementById("overlay-text");
-  var startBtn = document.getElementById("start-btn");
+  var colorRow = document.getElementById("color-row");
+  var form = document.getElementById("add-form");
+  var input = document.getElementById("word-input");
+  var hint = document.getElementById("hint");
+  var countEl = document.getElementById("count");
+  var gridBody = document.getElementById("grid-body");
+  var gridHead = document.getElementById("grid-head");
+  var starterBtn = document.getElementById("starter");
+  var clearBtn = document.getElementById("clear");
 
-  var placed = 0;
-  var streak = 0;
-  var bestStreak = 0;
-  var current = null;
-  var lastWord = "";
-  var locked = false;
+  // grid data: { "C|green": ["Creeper", "Cactus"], ... }
+  var grid = load();
+  var activeColor = COLOR_KEYS[0];
 
-  goalEl.textContent = String(GOAL);
+  /* ---------- storage ---------- */
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(grid)); } catch (e) {}
+  }
+  function keyFor(letter, color) { return letter + "|" + color; }
 
-  function rand(n) { return Math.floor(Math.random() * n); }
-  function pick(arr) { return arr[rand(arr.length)]; }
-  function shuffle(arr) {
-    var a = arr.slice();
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = rand(i + 1);
-      var t = a[i]; a[i] = a[j]; a[j] = t;
-    }
-    return a;
+  /* ---------- build the colour picker ---------- */
+  COLOR_KEYS.forEach(function (key) {
+    var c = COLORS[key];
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "color-pick";
+    btn.style.background = c.hex;
+    btn.style.color = c.dark ? "#2b2440" : "#fff";
+    btn.textContent = c.name;
+    btn.setAttribute("aria-label", "Use the colour " + c.name);
+    btn.addEventListener("click", function () { setColor(key); });
+    btn.dataset.key = key;
+    colorRow.appendChild(btn);
+  });
+
+  function setColor(key) {
+    activeColor = key;
+    var c = COLORS[key];
+    [].forEach.call(colorRow.children, function (b) {
+      b.classList.toggle("selected", b.dataset.key === key);
+    });
+    // tint the input so he can see which colour he's adding
+    input.style.borderColor = c.hex;
+    input.style.background = c.hex + "22";
+    input.focus();
   }
 
-  function newRound() {
-    locked = false;
-    choicesEl.classList.remove("waiting");
-
-    // Pick a fresh correct answer (not the same word twice in a row).
-    var correct;
-    do { correct = pick(ENTRIES); } while (correct.w === lastWord);
-    lastWord = correct.w;
-    current = correct;
-
-    var color = COLORS[correct.c];
-
-    // Distractor 1: SAME letter, DIFFERENT colour (tests colour).
-    var sameLetter = ENTRIES.filter(function (e) {
-      return e.l === correct.l && e.c !== correct.c;
+  /* ---------- build the grid table ---------- */
+  function buildGrid() {
+    // header: corner + colour columns
+    var headRow = document.createElement("tr");
+    headRow.appendChild(cell("th", "", "corner"));
+    COLOR_KEYS.forEach(function (key) {
+      var c = COLORS[key];
+      var th = cell("th", c.name, "col-head");
+      th.style.background = c.hex;
+      th.style.color = c.dark ? "#2b2440" : "#fff";
+      headRow.appendChild(th);
     });
-    // Distractor 2: SAME colour, DIFFERENT letter (tests letter).
-    var sameColor = ENTRIES.filter(function (e) {
-      return e.c === correct.c && e.l !== correct.l && e.w !== correct.w;
-    });
+    gridHead.appendChild(headRow);
 
-    var choices = [correct];
-    if (sameLetter.length) choices.push(pick(sameLetter));
-    if (sameColor.length) choices.push(pick(sameColor));
-
-    // Top up to 3 choices with any other word if needed.
-    while (choices.length < 3) {
-      var extra = pick(ENTRIES);
-      var dup = choices.some(function (c) { return c.w === extra.w; });
-      if (!dup) choices.push(extra);
-    }
-    choices = shuffle(choices);
-
-    // Render the prompt.
-    promptBlock.style.background = color.hex;
-    promptBlock.style.color = color.dark ? "#2b2440" : "#fff";
-    promptBlock.textContent = correct.l;
-    promptText.innerHTML =
-      "Find the <b style='color:" + color.hex + "'>" + color.name +
-      "</b> thing that starts with <b>" + correct.l + "</b>";
-
-    // Render choices.
-    choicesEl.innerHTML = "";
-    choices.forEach(function (choice) {
-      var btn = document.createElement("button");
-      btn.className = "choice";
-      btn.innerHTML =
-        '<span class="choice-emoji" aria-hidden="true">' + (choice.e || "🎲") + "</span>" +
-        "<span class=\"choice-word\">" + choice.w + "</span>";
-      btn.addEventListener("click", function () { handleChoice(choice, btn); });
-      choicesEl.appendChild(btn);
+    // one row per letter
+    LETTERS.forEach(function (letter) {
+      var tr = document.createElement("tr");
+      tr.appendChild(cell("th", letter, "row-head"));
+      COLOR_KEYS.forEach(function (key) {
+        var td = document.createElement("td");
+        td.className = "cell";
+        td.id = "c-" + letter + "-" + key;
+        tr.appendChild(td);
+      });
+      gridBody.appendChild(tr);
     });
   }
 
-  function handleChoice(choice, btn) {
-    if (locked) return;
+  function cell(tag, text, cls) {
+    var el = document.createElement(tag);
+    el.className = cls;
+    el.textContent = text;
+    return el;
+  }
 
-    if (choice.w === current.w) {
-      // Correct! Lock, place the block, advance.
-      locked = true;
-      choicesEl.classList.add("waiting");
-      btn.classList.add("correct");
-      streak += 1;
-      if (streak > bestStreak) bestStreak = streak;
-      streakEl.textContent = String(streak);
+  /* ---------- render words into a cell ---------- */
+  function renderCell(letter, color) {
+    var td = document.getElementById("c-" + letter + "-" + color);
+    if (!td) return;
+    td.innerHTML = "";
+    var words = grid[keyFor(letter, color)] || [];
+    words.forEach(function (word, i) {
+      var chip = document.createElement("span");
+      chip.className = "chip";
+      var c = COLORS[color];
+      chip.style.background = c.hex;
+      chip.style.color = c.dark ? "#2b2440" : "#fff";
+      chip.innerHTML = "<span>" + escapeHtml(word) + "</span>" +
+        '<button class="chip-x" aria-label="Remove ' + escapeHtml(word) + '">×</button>';
+      chip.querySelector(".chip-x").addEventListener("click", function () {
+        removeWord(letter, color, i);
+      });
+      td.appendChild(chip);
+    });
+  }
 
-      placeBlock(current);
-      placed += 1;
-      placedEl.textContent = String(placed);
+  function renderAll() {
+    LETTERS.forEach(function (letter) {
+      COLOR_KEYS.forEach(function (key) { renderCell(letter, key); });
+    });
+    updateCount();
+  }
 
-      if (placed >= GOAL) {
-        setTimeout(winGame, 650);
-      } else {
-        setTimeout(newRound, 650);
-      }
-    } else {
-      // Gentle "not quite" — wobble, reset streak, let them try again.
-      btn.classList.add("wrong");
-      streak = 0;
-      streakEl.textContent = "0";
-      setTimeout(function () { btn.classList.remove("wrong"); }, 450);
+  function updateCount() {
+    var total = 0;
+    Object.keys(grid).forEach(function (k) { total += grid[k].length; });
+    countEl.textContent = String(total);
+  }
+
+  /* ---------- add / remove ---------- */
+  function addWord(raw) {
+    var word = raw.trim().replace(/\s+/g, " ");
+    if (!word) return;
+
+    var first = word.toUpperCase().match(/[A-Z]/);
+    if (!first) {
+      flashHint("Try a word that starts with a letter! 🙂", true);
+      shake();
+      return;
     }
+    var letter = first[0];
+    var key = keyFor(letter, activeColor);
+    if (!grid[key]) grid[key] = [];
+
+    // avoid exact duplicates in the same cell
+    var exists = grid[key].some(function (w) {
+      return w.toLowerCase() === word.toLowerCase();
+    });
+    if (!exists) grid[key].push(word);
+
+    save();
+    renderCell(letter, activeColor);
+    updateCount();
+
+    var td = document.getElementById("c-" + letter + "-" + activeColor);
+    td.classList.remove("flash");
+    void td.offsetWidth; // restart animation
+    td.classList.add("flash");
+    td.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+
+    flashHint('"' + word + '" goes in row ' + letter + "! ✨", false);
+    input.value = "";
+    input.focus();
   }
 
-  function placeBlock(entry) {
-    var color = COLORS[entry.c];
-    var block = document.createElement("div");
-    block.className = "wall-block";
-    block.style.background = color.hex;
-    block.style.color = color.dark ? "#2b2440" : "#fff";
-    block.title = entry.w;
-    block.innerHTML = "<span aria-hidden=\"true\">" + (entry.e || entry.l) + "</span>";
-    wallEl.appendChild(block);
+  function removeWord(letter, color, index) {
+    var key = keyFor(letter, color);
+    if (!grid[key]) return;
+    grid[key].splice(index, 1);
+    if (grid[key].length === 0) delete grid[key];
+    save();
+    renderCell(letter, color);
+    updateCount();
   }
 
-  function winGame() {
-    overlayTitle.textContent = "You built it! 🏆";
-    overlayText.textContent =
-      "You placed all " + GOAL + " blocks! Best streak: " + bestStreak + " in a row. 🔥";
-    startBtn.textContent = "Build Again ▶";
-    overlay.classList.remove("hidden");
+  /* ---------- helpers ---------- */
+  function flashHint(msg, isError) {
+    hint.textContent = msg;
+    hint.style.color = isError ? "#e23b3b" : "#7a52d6";
+  }
+  function shake() {
+    input.classList.remove("shake");
+    void input.offsetWidth;
+    input.classList.add("shake");
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  function startGame() {
-    placed = 0;
-    streak = 0;
-    bestStreak = 0;
-    lastWord = "";
-    placedEl.textContent = "0";
-    streakEl.textContent = "0";
-    wallEl.innerHTML = "";
-    overlay.classList.add("hidden");
-    newRound();
-  }
+  /* ---------- starter words & clear ---------- */
+  starterBtn.addEventListener("click", function () {
+    if (typeof ENTRIES === "undefined") return;
+    ENTRIES.forEach(function (e) {
+      var key = keyFor(e.l, e.c);
+      if (!grid[key]) grid[key] = [];
+      var exists = grid[key].some(function (w) {
+        return w.toLowerCase() === e.w.toLowerCase();
+      });
+      if (!exists) grid[key].push(e.w);
+    });
+    save();
+    renderAll();
+    flashHint("Loaded some starter words — add your own too! ✨", false);
+  });
 
-  startBtn.addEventListener("click", startGame);
+  clearBtn.addEventListener("click", function () {
+    if (!window.confirm("Clear the whole grid? This can't be undone.")) return;
+    grid = {};
+    save();
+    renderAll();
+    flashHint("Fresh grid — start typing! ✨", false);
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    addWord(input.value);
+  });
+
+  /* ---------- go ---------- */
+  buildGrid();
+  renderAll();
+  setColor(activeColor);
 })();

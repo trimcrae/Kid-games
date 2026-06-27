@@ -31,11 +31,11 @@ const GAMES = [
   },
 
   {
-    title: "Color Grid Quest",
+    title: "Color Grid Builder",
     emoji: "🌈",
-    blurb: "Match colours + letters to build a block wall — Cory's grid idea!",
+    blurb: "Type your own colour words and watch them fill the grid — Cory's idea!",
     url:   "games/color-grid/",
-    ages:  "6+",
+    ages:  "5+",
     color: "#9b3fc4",
     ready: true
   },
