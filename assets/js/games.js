@@ -41,6 +41,16 @@ const GAMES = [
   },
 
   {
+    title: "Princess Dress-Up",
+    emoji: "👑",
+    blurb: "Find letters & numbers to dress a princess — letters, numbers & lots of sparkle! For Ellie!",
+    url:   "games/princess-dressup/",
+    ages:  "3+",
+    color: "#9b3fc4",
+    ready: true
+  },
+
+  {
     title: "Comic Maker",
     emoji: "💥",
     blurb: "Make your own graphic novel — panels, characters, talk bubbles & captions! For Jeannie!",
@@ -78,15 +88,6 @@ const GAMES = [
     url:   "#",
     ages:  "7+",
     color: "#ff5d8f",
-    ready: false
-  },
-  {
-    title: "Princess ABCs",
-    emoji: "👑",
-    blurb: "Sparkly letters, colours and counting — for Ellie!",
-    url:   "#",
-    ages:  "3+",
-    color: "#ffd166",
     ready: false
   }
 ];
