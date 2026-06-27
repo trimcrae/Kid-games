@@ -352,11 +352,14 @@ const GAMES = {
     if (await page.locator(".player-row").count() < 7) throw new Error("team roster did not render");
     if (await page.locator('.period-btn[data-p="8"].active').count() !== 1) throw new Error("8 periods should be selected by default on load");
 
-    // goalie eligibility resets to all-eligible on every load
-    await page.locator(".player-row .chip.gk-on").first().click();   // turn one off
-    await page.waitForTimeout(80);
+    // goalie state resets to all "can play" (✓) on every load
+    await page.locator(".player-row .chip.gk-yes").first().click();   // ✓ -> ★
+    await page.waitForTimeout(40);
+    await page.locator(".player-row .chip.gk-must").first().click();  // ★ -> —
+    await page.waitForTimeout(60);
     await page.reload({ waitUntil: "networkidle" });
-    if (await page.locator(".player-row .chip.gk-off").count() !== 0) throw new Error("all girls should be goalie-eligible after a reload");
+    if (await page.locator(".player-row .chip.gk-must").count() !== 0 || await page.locator(".player-row .chip.gk-no").count() !== 0)
+      throw new Error("all girls should reset to goalie-eligible (✓) after a reload");
 
     // button starts as "Make roster", becomes "Shuffle" once a roster exists
     if (!/Make roster/.test(await page.locator("#generateBtn").textContent())) throw new Error("button should say Make roster before any roster");
@@ -456,7 +459,25 @@ const GAMES = {
     await page.waitForTimeout(150);
     if (await page.locator("#printFab").isDisabled()) throw new Error("Print button should be enabled once a roster exists");
 
-    return "no auto-generate; setup edits clear roster; print builds first; 2/4/8 even, no repeats";
+    // "must goalie": a girl cycled to ★ must be assigned goalie at least once
+    await page.evaluate(() => localStorage.clear());
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator(".player-row .chip.gk-yes").first().click();  // ✓ -> ★ must
+    if (await page.locator(".player-row .chip.gk-must").count() < 1) throw new Error("goalie chip did not reach the ★ must state");
+    const mustName = (await page.locator(".player-row").first().locator(".pname").textContent()).trim();
+    await page.locator('.period-btn[data-p="2"]').click();
+    await page.locator("#generateBtn").click();
+    await page.waitForTimeout(150);
+    const mustGk = await page.evaluate((name) => {
+      const tr = Array.from(document.querySelectorAll("table.gridtbl tbody tr"))
+        .find((r) => { const c = r.querySelector("td.name"); return c && c.textContent.trim() === name; });
+      if (!tr) return -1;
+      const tds = tr.querySelectorAll("td");
+      return Number(tds[tds.length - 1].textContent) || 0;
+    }, mustName);
+    if (mustGk < 1) throw new Error(`${mustName} was set to ★ must-goalie but never played goalie`);
+
+    return "no auto-generate; must-goalie honored; print builds first; 2/4/8 even, no repeats";
   },
 
   async "Crossword"(page, g, d) {

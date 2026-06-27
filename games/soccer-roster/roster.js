@@ -24,7 +24,8 @@
     "Evelyn", "Jeannie", "Julia",
     "Kinsley", "Logan", "Olivia",
     "Savannah"
-  ].map(function (n) { return { name: n, present: true, goalie: true }; });
+  ].map(function (n) { return { name: n, present: true, gk: "yes" }; });
+  // gk: "yes" = can play goalie, "must" = has to play goalie, "no" = never goalie
 
   // ---- state ----
   var state = load();
@@ -37,7 +38,8 @@
         if (s && s.team && s.team.length) {
           s.periods = 8;            // always open on 8 periods
           s.seed = s.seed || 1;
-          s.team.forEach(function (g) { g.goalie = true; }); // everyone goalie-eligible on load
+          // everyone goalie-eligible on load (also migrates the old goalie:true/false field)
+          s.team.forEach(function (g) { g.gk = "yes"; delete g.goalie; });
           return s;
         }
       }
@@ -95,11 +97,15 @@
     var lineups = [];
     for (var p = 0; p < periods; p++) {
       // --- pick the goalie ---
+      // "must" girls who haven't been in goal yet get first dibs on the slot,
+      // so everyone marked ★ is guaranteed a turn before the normal rotation.
       var goalie = null;
-      var elig = order.filter(function (g) { return g.goalie; });
-      if (elig.length) {
-        var minG = Math.min.apply(null, elig.map(function (g) { return stat[g.name].goalie; }));
-        var gPool = elig.filter(function (g) { return stat[g.name].goalie === minG; });
+      var mustPending = order.filter(function (g) { return g.gk === "must" && stat[g.name].goalie === 0; });
+      var pool = mustPending.length ? mustPending
+        : order.filter(function (g) { return g.gk !== "no"; });   // anyone eligible (✓ or ★)
+      if (pool.length) {
+        var minG = Math.min.apply(null, pool.map(function (g) { return stat[g.name].goalie; }));
+        var gPool = pool.filter(function (g) { return stat[g.name].goalie === minG; });
         gPool.sort(function (a, b) {
           var sa = stat[a.name], sb = stat[b.name];
           if (sa.plays !== sb.plays) return sa.plays - sb.plays;          // fewest playing time first
@@ -183,16 +189,22 @@
       pres.onclick = function () { g.present = !g.present; save(); renderTeam(); settingsChanged(); };
 
       var gk = document.createElement("button");
-      // while a girl is Away, show the goalie chip in its "no" state (her real
-      // setting is kept underneath and returns when she's marked Here again)
-      var goalieOn = g.present && g.goalie;
-      gk.className = "chip " + (goalieOn ? "gk-on" : "gk-off");
-      gk.textContent = goalieOn ? "Goalie ✓" : "Goalie —";
-      gk.title = g.present ? "Can this girl play goalie?" : "Away today — not available as goalie";
+      // Three states: ✓ can play goalie, ★ must play goalie, — never goalie.
+      // While a girl is Away the chip shows the "—" state (her real setting is
+      // kept underneath and returns when she's marked Here again).
+      var st = g.present ? g.gk : "no";
+      var cls = st === "must" ? "gk-must" : st === "yes" ? "gk-yes" : "gk-no";
+      var label = st === "must" ? "Goalie ★" : st === "yes" ? "Goalie ✓" : "Goalie —";
+      gk.className = "chip " + cls;
+      gk.textContent = label;
+      gk.title = g.present
+        ? "Tap to cycle: can play goalie ✓ → must play goalie ★ → never —"
+        : "Away today — not available as goalie";
       gk.disabled = !g.present;
       gk.onclick = function () {
         if (!g.present) return;
-        g.goalie = !g.goalie; save(); renderTeam(); settingsChanged();
+        g.gk = g.gk === "yes" ? "must" : g.gk === "must" ? "no" : "yes";
+        save(); renderTeam(); settingsChanged();
       };
 
       var x = document.createElement("button");
@@ -229,18 +241,21 @@
     // ---- compute verification facts ----
     var plays = present.map(function (g) { return r.stat[g.name].plays; });
     var minP = Math.min.apply(null, plays), maxP = Math.max.apply(null, plays);
-    var eligCount = present.filter(function (g) { return g.goalie; }).length;
+    var eligCount = present.filter(function (g) { return g.gk !== "no"; }).length;
     var goalieRepeat = present.some(function (g) { return r.stat[g.name].goalie >= 2; });
     var forcedRepeat = state.periods > eligCount;
     var shortHanded = n < ON_FIELD;
     var noGoalie = eligCount === 0;
+    // girls marked "must" goalie who didn't get a goalie slot (too few periods)
+    var mustMissed = present.filter(function (g) { return g.gk === "must" && r.stat[g.name].goalie === 0; });
 
     var html = "";
 
     // ---- only flag real problems (no "all good" reassurance clutter) ----
     var warns = [];
-    if (noGoalie) warns.push("No goalie picked — tap “Goalie ✓” on at least one girl.");
+    if (noGoalie) warns.push("No goalie picked — tap a girl’s goalie chip until it shows ✓.");
     if (shortHanded) warns.push("Only " + n + " here — not enough for 1 goalie + " + FIELD + ", so some spots are open.");
+    if (mustMissed.length) warns.push((mustMissed.length === 1 ? mustMissed[0].name + " is" : mustMissed.map(function (g) { return g.name; }).join(", ") + " are") + " set to ★ must-goalie but there aren’t enough periods to fit everyone.");
     if (maxP - minP > 1) warns.push("Playing time is a little uneven (" + minP + "–" + maxP + ") — try Shuffle again.");
     if (!noGoalie && goalieRepeat && !forcedRepeat) warns.push("A girl plays goalie twice — try Shuffle again.");
     if (warns.length) {
@@ -389,8 +404,9 @@
       if (e.key === "Enter") addPlayer();
     });
 
-    // one button: each tap builds a fresh fair line-up (no separate "shuffle")
-    on("generateBtn", function () { makeRoster(true); scrollToOutput(); });
+    // one button: each tap builds a fresh fair line-up (no separate "shuffle").
+    // No auto-scroll — the roster updates in place without jumping the page.
+    on("generateBtn", function () { makeRoster(true); });
     on("printFab", function () {
       if (!hasRoster) return;   // disabled until a roster exists
       window.print();
@@ -407,14 +423,9 @@
     var input = document.getElementById("newName");
     var name = input.value.trim();
     if (!name) return;
-    state.team.push({ name: name, present: true, goalie: true });
+    state.team.push({ name: name, present: true, gk: "yes" });
     input.value = "";
     save(); renderTeam(); settingsChanged();
-  }
-
-  function scrollToOutput() {
-    var out = document.getElementById("output");
-    if (out && out.firstChild) out.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   if (document.readyState === "loading") {

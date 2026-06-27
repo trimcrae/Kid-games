@@ -63,8 +63,10 @@
     }
     .chip.present { background: #eafff2; color: #1d9d5a; border-color: #b6f0cf; }
     .chip.absent  { background: #ffecec; color: #c0392b; border-color: #ffc9c9; }
-    .chip.gk-on   { background: #fff6da; color: #b8860b; border-color: #ffe49b; }
-    .chip.gk-off  { background: #f0edf7; color: #8a82a6; border-color: #e3ddf5; }
+    /* three goalie states: ✓ can (outline), ★ must (black fill), — never (grey) */
+    .chip.gk-yes  { background: #fff; color: #1f1a14; border-color: #1f1a14; }
+    .chip.gk-must { background: #1f1a14; color: #fff; border-color: #1f1a14; }
+    .chip.gk-no   { background: #e9e6e2; color: #8a8278; border-color: #dcd7d1; }
     .chip:disabled { cursor: default; }
     .chip-x { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 1rem; padding: 0 0.2rem; }
 
@@ -156,13 +158,12 @@
 
     .period-btn.active { border-color: #f4791f; background: #fff3e6; }
 
-    /* status chips: Here = orange fill, Away = grey, Goalie ✓ = black fill */
+    /* status chips: Here = orange fill, Away = grey */
     .chip.present { background: #f4791f; color: #1f1a14; border-color: #f4791f; }
     .chip.absent  { background: #e9e6e2; color: #1f1a14; border-color: #dcd7d1; }
-    .chip.gk-on   { background: #1f1a14; color: #fff; border-color: #1f1a14; }
-    /* fixed widths so toggling ✓/— (or Here/Away) never shifts the layout */
+    /* fixed widths so cycling ✓/★/— (or Here/Away) never shifts the layout */
     .chip.present, .chip.absent { min-width: 4rem; text-align: center; justify-content: center; }
-    .chip.gk-on, .chip.gk-off  { min-width: 5.45rem; text-align: center; justify-content: center; }
+    .chip.gk-yes, .chip.gk-must, .chip.gk-no { min-width: 5.45rem; text-align: center; justify-content: center; }
 
     /* period cards */
     .pcard { border-color: #f4791f; }
@@ -264,7 +265,7 @@
       <h2>👧 The team</h2>
       <p class="hint">
         Tap <b>Here / Away</b> to mark who showed up today.
-        Tap <b>Goalie ✓ / —</b> to choose who can play goalie.
+        Tap the goalie chip to cycle: <b>✓</b> can play goalie → <b>★</b> must play goalie → <b>—</b> never.
       </p>
       <div class="team-list" id="teamList"></div>
       <div class="add-row">
@@ -292,6 +293,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=8"></script>
+  <script src="roster.js?v=9"></script>
 </body>
 </html>
