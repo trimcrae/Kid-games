@@ -1,4 +1,4 @@
-# 🎮 The Crae Family Arcade
+# 🎮 The McRae Family Arcade
 
 A little collection of **educational** browser games made for our kids — built to run
 for free on **GitHub Pages**, playable on any phone, tablet, or computer. No installs,
@@ -68,8 +68,13 @@ That's it — every future push to `main` redeploys automatically.
 
 ## 🧒 Made for
 
-Three precocious kids (ages 8, 7 & 3) — designed with big tap targets, bright colours,
-and games that work with a finger, a mouse, or a trackpad.
+- **Jeannie** (7) — loves reading, reads at ~4th-grade level → word & vocabulary games
+- **Cory** (6) — loves math, grids & Minecraft, ~4th-grade math → number, logic & grid games
+- **Ellie** (3) — loves dresses & princesses → bright letter/colour/counting games
+- **Kieran** — the baby 👶 (here for the snuggles)
+
+Designed with big tap targets, bright colours, and games that work with a finger,
+a mouse, or a trackpad.
 
 ## 🛠️ Running locally (optional)
 

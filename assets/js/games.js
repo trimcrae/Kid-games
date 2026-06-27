@@ -30,31 +30,31 @@ const GAMES = [
     ready: true
   },
 
-  // ---- Coming soon: ideas we'll build together ----
+  // ---- Coming soon: ideas tailored to each kid ----
   {
-    title: "Letter Hunt",
-    emoji: "🔤",
-    blurb: "Spot letters and learn their sounds — early reading fun.",
+    title: "Word Wizard",
+    emoji: "📚",
+    blurb: "Spell trickier words and grow your vocabulary — for Jeannie!",
     url:   "#",
-    ages:  "3+",
+    ages:  "7+",
     color: "#ff5d8f",
     ready: false
   },
   {
-    title: "Quick Math",
-    emoji: "➕",
-    blurb: "Speedy adding and subtracting for sharp little minds.",
+    title: "Grid Quest",
+    emoji: "🟩",
+    blurb: "Math and grid puzzles with a Minecraft vibe — for Cory!",
     url:   "#",
-    ages:  "7+",
+    ages:  "6+",
     color: "#3ddc84",
     ready: false
   },
   {
-    title: "World Explorer",
-    emoji: "🌍",
-    blurb: "Match flags and countries and learn some geography.",
+    title: "Princess ABCs",
+    emoji: "👑",
+    blurb: "Sparkly letters, colours and counting — for Ellie!",
     url:   "#",
-    ages:  "8+",
+    ages:  "3+",
     color: "#ffd166",
     ready: false
   }
