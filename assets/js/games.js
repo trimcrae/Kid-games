@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Money Machine",
+    emoji: "💰",
+    blurb: "Watch your money grow itself with compound interest! Pick a bank, add savings & see what you could buy — like If You Made a Million. For Cory!",
+    url:   "games/money-machine/",
+    ages:  "6+",
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Pumpkin Pies Roster",
     emoji: "🥧",
     blurb: "Coach tool for Shannon — fair Pumpkin Pies soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
