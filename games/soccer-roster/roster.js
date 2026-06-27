@@ -13,17 +13,17 @@
 (function () {
   "use strict";
 
-  var STORE_KEY = "soccerRoster.v2";
+  var STORE_KEY = "soccerRoster.v3";
   var FIELD = 6;            // field players per period
   var ON_FIELD = FIELD + 1; // + goalie
 
   // The Gu8 McRae - Orange roster (from the team list).
   var DEFAULT_TEAM = [
-    "Addison K", "Addison M", "Braelynn Newman",
-    "Brooklyn Welch", "Charlotte Sharpe", "Emilia Ayzenberg",
-    "Evelyn Mueller", "Jeannette McRae", "Julia Moden",
-    "Kinsley Trosinski", "Logan Burger", "Olivia Bishop",
-    "Savannah Istas"
+    "Addison K", "Addison M", "Braelynn",
+    "Brooklyn", "Charlotte", "Emilia",
+    "Evelyn", "Jeannie", "Julia",
+    "Kinsley", "Logan", "Olivia",
+    "Savannah"
   ].map(function (n) { return { name: n, present: true, goalie: true }; });
 
   // ---- state ----
