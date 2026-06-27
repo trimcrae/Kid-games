@@ -48,9 +48,9 @@
   // ---- Difficulty modes -----------------------------------------------
   // Same game, three brains: gentle for the littles, spicy for the bigs.
   const MODES = {
-    easy:   { label: "🌱 Easy",   sub: "add & double", speed: 200, smax: 270, barrier: 0.20, bossBase: 4, bossK: 0.04 },
-    medium: { label: "⭐ Medium", sub: "add & times",  speed: 240, smax: 380, barrier: 0.30, bossBase: 6, bossK: 0.07 },
-    hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 280, smax: 470, barrier: 0.36, bossBase: 9, bossK: 0.10 },
+    easy:   { label: "🌱 Easy",   sub: "add & double", speed: 120, smax: 175, barrier: 0.20, bossBase: 4, bossK: 0.04 },
+    medium: { label: "⭐ Medium", sub: "add & times",  speed: 150, smax: 235, barrier: 0.30, bossBase: 6, bossK: 0.07 },
+    hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 185, smax: 300, barrier: 0.36, bossBase: 9, bossK: 0.10 },
   };
   const mode = () => MODES[save.mode] || MODES.medium;
 
@@ -239,6 +239,7 @@
   let combo = 0, bestComboThisRun = 0;
   let worldScroll = 0;         // for scrolling speed-chevrons
   let shake = 0;               // screen-shake magnitude
+  let labelScale = 1;          // little pop on the crew counter when it changes
   let nextBossDist = 220;      // distance of the next number wall
   let bossPending = false;
 
@@ -365,6 +366,7 @@
     }
   }
   function addShake(m) { if (!reduceMotion) shake = Math.max(shake, m); }
+  function popLabel(m) { labelScale = Math.max(labelScale, m || 1.35); }
 
   // ---- Start / end ----------------------------------------------------
   function startRun() {
@@ -377,7 +379,7 @@
     shieldsLeft = upgLevel("shield");
     speed = mode().speed;
     rows = []; coins = []; floaters = []; particles = [];
-    spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0;
+    spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0; labelScale = 1;
     keyDir = 0; combo = 0; bestComboThisRun = 0;
     nextBossDist = 220; bossPending = false;
     state = "playing";
@@ -441,9 +443,10 @@
 
   function update(dt) {
     const M = mode();
-    speed = M.speed + Math.min(dist * 0.9, M.smax - M.speed);
+    // Gentle ramp: eases in over the first ~250 m instead of spiking early.
+    speed = M.speed + Math.min(dist * 0.42, M.smax - M.speed);
     const dy = speed * dt;
-    dist += dy / 26;
+    dist += dy / 20;
     worldScroll += dy;
 
     if (dist >= nextBossDist) bossPending = true;
@@ -453,7 +456,7 @@
     crewX = clamp(crewX, mobRadius() + 6, W - mobRadius() - 6);
 
     spawnAccum += dy;
-    const rowGap = clamp(H * 0.95 - dist * 0.4, H * 0.55, H * 1.1);
+    const rowGap = clamp(H * 0.95 - dist * 0.25, H * 0.62, H * 1.1);
     if (spawnAccum >= rowGap) { spawnAccum = 0; spawnRow(); }
 
     coinAccum += dy;
@@ -482,6 +485,7 @@
         if (Math.hypot(c.x - crewX, c.y - py) < pull) {
           c.got = true; runCoins++; sfx.coin();
           addFloater(c.x, c.y, "🪙", "#c98a00");
+          burst(c.x, c.y, "#ffd166", 7, 150);
         }
       }
     }
@@ -505,6 +509,7 @@
 
     shake *= Math.pow(0.0025, dt);   // smooth decay toward 0
     if (shake < 0.3) shake = 0;
+    labelScale += (1 - labelScale) * Math.min(1, dt * 9);   // ease back to 1
 
     bestCrewThisRun = Math.max(bestCrewThisRun, crew);
     syncHud();
@@ -520,6 +525,7 @@
     crew = clamp(chosen.apply(crew), 0, MAX_CREW);
 
     const delta = crew - before;
+    popLabel(delta >= 0 ? 1.4 : 1.2);
     addFloater(crewX, playerY() - 30, (delta >= 0 ? "+" : "") + delta,
                delta >= 0 ? "#2bb673" : "#ff4d6d");
     burst(crewX, playerY() - 24, chosen.color, 10, 200);
@@ -545,6 +551,7 @@
     const before = crew;
     if (side === row.correctSide) {
       crew = clamp(Math.round(crew * 1.3) + 5, 0, MAX_CREW);
+      popLabel(1.5);
       combo++;
       save.stats.quizCorrect++;
       const bonus = Math.min(combo, 6);
@@ -556,6 +563,7 @@
       burst(crewX, playerY() - 24, "#2bb673", 14, 240);
     } else {
       crew = Math.max(0, Math.round(crew * 0.7));
+      popLabel(1.2);
       combo = 0; setCombo(0);
       sfx.bad();
       addFloater(crewX, playerY() - 30, "Oops!", "#ff4d6d", true);
@@ -577,6 +585,7 @@
     }
     const before = crew;
     crew = Math.max(0, Math.ceil(crew * 0.6) - 1);
+    popLabel(1.25);
     combo = 0; setCombo(0);
     addFloater(crewX, playerY() - 30, "-" + (before - crew), "#ff4d6d", true);
     burst(crewX, playerY() - 24, "#ff4d6d", 18, 300);
@@ -590,6 +599,7 @@
     if (crew > row.need) {
       crew = crew - row.need;          // punch through, lose its strength
       save.stats.walls++;
+      popLabel(1.5);
       buzz(60);
       runCoins += 12 + Math.round(row.need / 2);
       addFloater(W / 2, playerY() - 36, "SMASH! 🏆", "#2bb673", true);
@@ -611,24 +621,101 @@
     return clamp(14 + Math.sqrt(Math.max(1, crew)) * 3.4, 16, W * 0.32);
   }
 
+  const FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
+
   function render() {
     ctx.save();
     if (shake > 0) ctx.translate(rand(-shake, shake), rand(-shake, shake));
 
     const py = playerY();
-    ctx.clearRect(-20, -20, W + 40, H + 40);
 
-    // Track + grassy strip
-    ctx.fillStyle = "#cdeffd";
-    ctx.fillRect(-20, -20, W + 40, H + 40);
-    ctx.fillStyle = "#8fd6a6";
-    ctx.fillRect(-20, py + mobRadius() + 8, W + 40, H);
-
-    // Scrolling speed chevrons in each lane (sense of motion)
+    drawBackground(py);
     drawChevrons();
+    drawLaneDivider();
+    drawCoins();
 
-    // Lane divider
-    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    for (const row of rows) {
+      if (row.kind === "gate") drawGate(row);
+      else if (row.kind === "barrier") drawBarrier(row);
+      else if (row.kind === "quiz") drawQuiz(row);
+      else drawBoss(row);
+    }
+
+    drawParticles();
+    drawMob();
+    drawFloaters();
+
+    ctx.restore();
+  }
+
+  // Soft sky-to-track gradient, grassy verges and scrolling ground bands that
+  // sell the sense of speed without any artwork files.
+  function drawBackground(py) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, "#dff4ff");
+    g.addColorStop(0.55, "#c7ecff");
+    g.addColorStop(1, "#b6e4ff");
+    ctx.fillStyle = g;
+    ctx.fillRect(-20, -20, W + 40, H + 40);
+
+    // Faint scrolling road tiles for motion.
+    const band = 130;
+    const off = worldScroll % (band * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.05)";
+    for (let y = off - band * 2; y < H + band; y += band * 2) {
+      ctx.fillRect(-20, y, W + 40, band);
+    }
+
+    // Grassy verges with scrolling tufts down each edge.
+    const vw = Math.max(10, W * 0.05);
+    const gg = ctx.createLinearGradient(0, 0, vw, 0);
+    gg.addColorStop(0, "#7ccb8f");
+    gg.addColorStop(1, "#a3e1b3");
+    ctx.fillStyle = gg;
+    ctx.fillRect(-20, -20, vw + 20, H + 40);
+    ctx.save();
+    ctx.translate(W, 0); ctx.scale(-1, 1);
+    ctx.fillStyle = gg;
+    ctx.fillRect(-20, -20, vw + 20, H + 40);
+    ctx.restore();
+
+    const tuft = 50;
+    const to = worldScroll % tuft;
+    ctx.fillStyle = "rgba(34,120,60,0.22)";
+    for (let y = to - tuft; y < H; y += tuft) {
+      ctx.fillRect(-20, y, vw + 20, 9);
+      ctx.fillRect(W - vw, y, vw + 20, 9);
+    }
+
+    // A warm finish-strip of ground where the mob runs, so they read as
+    // standing on something solid.
+    const R = mobRadius();
+    const fg = ctx.createLinearGradient(0, py - R, 0, H);
+    fg.addColorStop(0, "rgba(255,255,255,0)");
+    fg.addColorStop(1, "rgba(120,200,255,0.22)");
+    ctx.fillStyle = fg;
+    ctx.fillRect(-20, py - R, W + 40, H - (py - R) + 20);
+  }
+
+  function drawChevrons() {
+    const spacing = 84;
+    const off = worldScroll % spacing;
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    for (const cx of [W * 0.25, W * 0.75]) {
+      for (let y = off - spacing; y < H; y += spacing) {
+        const a = clamp(0.10 + 0.22 * (1 - Math.abs(y / H - 0.45) * 1.6), 0.05, 0.32);
+        ctx.strokeStyle = `rgba(255,255,255,${a})`;
+        ctx.beginPath();
+        ctx.moveTo(cx - 18, y); ctx.lineTo(cx, y + 16); ctx.lineTo(cx + 18, y);
+        ctx.stroke();
+      }
+    }
+    ctx.lineCap = "butt";
+  }
+
+  function drawLaneDivider() {
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
     ctx.lineWidth = 4;
     ctx.setLineDash([18, 16]);
     ctx.lineDashOffset = -(worldScroll % 34);
@@ -637,83 +724,102 @@
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.lineDashOffset = 0;
+  }
 
-    // Coins
+  // Spinning, shiny coins.
+  function drawCoins() {
     for (const c of coins) {
       if (c.got) continue;
+      const spin = Math.abs(Math.cos(now * 4 + c.x * 0.05));
+      const wsc = 0.22 + spin * 0.78;     // squash for the spin
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.scale(wsc, 1);
+      const rg = ctx.createRadialGradient(-c.r * 0.35, -c.r * 0.35, 1, 0, 0, c.r);
+      rg.addColorStop(0, "#fff1bf");
+      rg.addColorStop(0.6, "#ffd166");
+      rg.addColorStop(1, "#eaa92c");
       ctx.beginPath();
-      ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
-      ctx.fillStyle = "#ffd166"; ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = "#e0a92e"; ctx.stroke();
+      ctx.arc(0, 0, c.r, 0, Math.PI * 2);
+      ctx.fillStyle = rg; ctx.fill();
+      ctx.lineWidth = 2.5; ctx.strokeStyle = "#d49a1f"; ctx.stroke();
       ctx.fillStyle = "#b7860b";
       ctx.font = "bold 12px " + FONT;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText("$", c.x, c.y + 1);
+      ctx.fillText("$", 0, 1);
+      ctx.restore();
+      // Glint stays unscaled so it always catches the eye.
+      ctx.globalAlpha = 0.7 * spin;
+      ctx.beginPath();
+      ctx.arc(c.x - c.r * 0.3 * wsc, c.y - c.r * 0.35, c.r * 0.22, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff"; ctx.fill();
+      ctx.globalAlpha = 1;
     }
-
-    // Rows
-    for (const row of rows) {
-      if (row.kind === "gate") drawGate(row);
-      else if (row.kind === "barrier") drawBarrier(row);
-      else if (row.kind === "quiz") drawQuiz(row);
-      else drawBoss(row);
-    }
-
-    // Particles (under the mob number, over the track)
-    for (const p of particles) {
-      ctx.globalAlpha = clamp(p.life * 1.5, 0, 1);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
-    }
-    ctx.globalAlpha = 1;
-
-    drawMob();
-
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    for (const f of floaters) {
-      ctx.globalAlpha = clamp(f.life, 0, 1);
-      ctx.fillStyle = f.color;
-      ctx.font = "bold " + (f.big ? 26 : 20) + "px " + FONT;
-      ctx.fillText(f.text, f.x, f.y);
-    }
-    ctx.globalAlpha = 1;
-
-    ctx.restore();
   }
 
-  const FONT = '"Trebuchet MS", "Segoe UI", system-ui, sans-serif';
-
-  function drawChevrons() {
-    const spacing = 90;
-    const off = worldScroll % spacing;
-    ctx.strokeStyle = "rgba(255,255,255,0.35)";
-    ctx.lineWidth = 5;
-    for (const cx of [W * 0.25, W * 0.75]) {
-      for (let y = off - spacing; y < H; y += spacing) {
-        ctx.beginPath();
-        ctx.moveTo(cx - 16, y); ctx.lineTo(cx, y + 14); ctx.lineTo(cx + 16, y);
-        ctx.stroke();
-      }
+  function drawParticles() {
+    for (const p of particles) {
+      ctx.globalAlpha = clamp(p.life * 1.6, 0, 1);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color; ctx.fill();
     }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawFloaters() {
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for (const f of floaters) {
+      const appear = clamp((1 - f.life) / 0.12, 0, 1);   // quick pop-in
+      const sc = 0.55 + appear * 0.45;
+      ctx.globalAlpha = clamp(f.life * 1.3, 0, 1);
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.scale(sc, sc);
+      ctx.font = "bold " + (f.big ? 28 : 21) + "px " + FONT;
+      ctx.lineWidth = 4; ctx.lineJoin = "round";
+      ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.strokeText(f.text, 0, 0);
+      ctx.fillStyle = f.color;
+      ctx.fillText(f.text, 0, 0);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
   }
 
   function drawGate(row) {
     const y = row.y, h = bandH;
+    const onRight = crewX >= W / 2;
     const halves = [
-      { x: 0, w: W / 2, op: row.ops[0] },
-      { x: W / 2, w: W / 2, op: row.ops[1] },
+      { x: 0, w: W / 2, op: row.ops[0], side: "L" },
+      { x: W / 2, w: W / 2, op: row.ops[1], side: "R" },
     ];
     for (const half of halves) {
-      ctx.fillStyle = hexA(half.op.color, 0.78);
+      const col = half.op.color;
+      const active = (half.side === "R") === onRight;
+      const g = ctx.createLinearGradient(0, y, 0, y + h);
+      g.addColorStop(0, hexA(col, 0.92));
+      g.addColorStop(1, hexA(col, 0.62));
+      ctx.fillStyle = g;
       ctx.fillRect(half.x, y, half.w, h);
-      ctx.fillStyle = hexA(half.op.color, 1);
-      ctx.fillRect(half.x, y, half.w, 6);
+      // bright neon lip on top
+      ctx.fillStyle = hexA(col, 1);
+      ctx.fillRect(half.x, y, half.w, 5);
+      // breathing highlight on the lane you're aimed at
+      if (active) {
+        ctx.globalAlpha = 0.16 + 0.10 * Math.sin(now * 6);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(half.x, y, half.w, h);
+        ctx.globalAlpha = 1;
+      }
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 30px " + FONT;
+      ctx.font = "bold 32px " + FONT;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(0,0,0,0.28)"; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
       ctx.fillText(half.op.label, half.x + half.w / 2, y + h / 2 + 2);
+      ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     }
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
     ctx.fillRect(W / 2 - 3, y - 4, 6, h + 8);
   }
 
@@ -721,8 +827,14 @@
     const y = row.y, h = bandH;
     const x = row.side === "L" ? 0 : W / 2;
     const w = W / 2;
-    ctx.fillStyle = hexA("#ff4d6d", 0.9);
+    const g = ctx.createLinearGradient(0, y, 0, y + h);
+    g.addColorStop(0, hexA("#ff6b85", 0.95));
+    g.addColorStop(1, hexA("#e23355", 0.95));
+    ctx.fillStyle = g;
     ctx.fillRect(x, y, w, h);
+    // hazard stripes
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
     ctx.fillStyle = "rgba(255,255,255,0.85)";
     for (let i = -h; i < w; i += 26) {
       ctx.beginPath();
@@ -730,25 +842,45 @@
       ctx.lineTo(x + i + 12 + h, y + h); ctx.lineTo(x + i + h, y + h);
       ctx.closePath(); ctx.fill();
     }
+    ctx.restore();
+    // pulsing danger glow on the rim
+    ctx.globalAlpha = 0.35 + 0.25 * Math.sin(now * 8);
     ctx.fillStyle = "#fff";
-    ctx.font = "bold 26px " + FONT;
+    ctx.fillRect(x, y, w, 4);
+    ctx.fillRect(x, y + h - 4, w, 4);
+    ctx.globalAlpha = 1;
+    ctx.font = "bold 28px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.shadowColor = "rgba(0,0,0,0.3)"; ctx.shadowBlur = 4;
     ctx.fillText("⛔", x + w / 2, y + h / 2 + 1);
+    ctx.shadowBlur = 0;
   }
 
   function drawQuiz(row) {
     const y = row.y, h = bandH;
     // Both halves the same teal — colour must not give away the answer.
     const col = "#0fa3a3";
-    [[0, row.left], [W / 2, row.right]].forEach(([x, val]) => {
-      ctx.fillStyle = hexA(col, 0.82);
+    const onRight = crewX >= W / 2;
+    [[0, row.left, "L"], [W / 2, row.right, "R"]].forEach(([x, val, side]) => {
+      const g = ctx.createLinearGradient(0, y, 0, y + h);
+      g.addColorStop(0, hexA(col, 0.92));
+      g.addColorStop(1, hexA(col, 0.66));
+      ctx.fillStyle = g;
       ctx.fillRect(x, y, W / 2, h);
       ctx.fillStyle = hexA(col, 1);
-      ctx.fillRect(x, y, W / 2, 6);
+      ctx.fillRect(x, y, W / 2, 5);
+      if ((side === "R") === onRight) {
+        ctx.globalAlpha = 0.14 + 0.10 * Math.sin(now * 6);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(x, y, W / 2, h);
+        ctx.globalAlpha = 1;
+      }
       ctx.fillStyle = "#fff";
-      ctx.font = "bold 30px " + FONT;
+      ctx.font = "bold 32px " + FONT;
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.shadowColor = "rgba(0,0,0,0.28)"; ctx.shadowBlur = 4; ctx.shadowOffsetY = 2;
       ctx.fillText(val, x + W / 4, y + h / 2 + 2);
+      ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
     });
     ctx.fillStyle = "#fff";
     ctx.fillRect(W / 2 - 3, y - 4, 6, h + 8);
@@ -781,53 +913,109 @@
       ctx.beginPath(); ctx.moveTo(bx, y); ctx.lineTo(bx, y + h); ctx.stroke();
     }
     ctx.beginPath(); ctx.moveTo(0, y + h / 2); ctx.lineTo(W, y + h / 2); ctx.stroke();
-    // Required number — beat it to smash through
+    // Required number — beat it to smash through. Glows green once you can.
     const big = crew > row.need;
-    ctx.fillStyle = big ? "#8fffb0" : "#ff9db0";
+    ctx.save();
     ctx.font = "bold 34px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    if (big) {
+      ctx.shadowColor = "rgba(120,255,170,0.9)";
+      ctx.shadowBlur = 14 + 6 * Math.sin(now * 7);
+      ctx.fillStyle = "#aaffc4";
+    } else {
+      ctx.shadowColor = "rgba(0,0,0,0.4)";
+      ctx.shadowBlur = 5;
+      ctx.fillStyle = "#ff9db0";
+    }
     ctx.fillText("⚔️ " + row.need, W / 2, y + h / 2 + 1);
+    ctx.restore();
   }
 
   function drawMob() {
     const py = playerY();
     const R = mobRadius();
     const show = Math.min(crew, 28);
+
+    // One soft shadow for the whole crowd.
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = "#1d2740";
+    ctx.beginPath();
+    ctx.ellipse(crewX, py + R * 0.5 + 8, R + 8, R * 0.42 + 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Build the crowd, then draw back-to-front so nearer runners overlap.
+    const guys = [];
     for (let i = 0; i < show; i++) {
       const ang = i * 2.399963;
       const rad = (i === 0) ? 0 : R * Math.sqrt(i / show);
-      const gx = crewX + Math.cos(ang) * rad;
-      const gy = py + Math.sin(ang) * rad * 0.55;
-      drawRunner(gx, gy, i);
+      guys.push({
+        x: crewX + Math.cos(ang) * rad,
+        y: py + Math.sin(ang) * rad * 0.55,
+        i,
+      });
     }
+    guys.sort((a, b) => a.y - b.y);
+    for (const g of guys) drawRunner(g.x, g.y, g.i);
+
+    // Crew counter, popping when it changes.
+    ctx.save();
+    ctx.translate(crewX, py - R - 16);
+    ctx.scale(labelScale, labelScale);
     ctx.fillStyle = "#2b2440";
     ctx.font = "bold 26px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-    ctx.lineWidth = 5; ctx.strokeStyle = "rgba(255,255,255,0.95)";
+    ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(255,255,255,0.95)";
     const label = currentSkin().ico + " " + crew;
-    ctx.strokeText(label, crewX, py - R - 14);
-    ctx.fillText(label, crewX, py - R - 14);
+    ctx.strokeText(label, 0, 0);
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
   }
 
   function drawRunner(x, y, i) {
-    // a little runner with a gentle running bob, drawn in the chosen skin
+    // A little runner with a full running cycle — bouncing body plus swinging
+    // arms and legs — drawn in the chosen skin.
     const sk = currentSkin();
-    const bob = Math.sin(now * 12 + i * 1.3) * 1.6;
-    y += bob;
-    ctx.fillStyle = sk.body;
+    const phase = now * 11 + i * 1.7;
+    const bob = Math.abs(Math.sin(phase)) * 2.3;   // springy up-down
+    const swing = Math.sin(phase) * 3.4;           // limb swing
+    y -= bob;
+
     if (sk.blocky) {
-      ctx.fillRect(x - 4, y - 4, 8, 13);          // square body
+      // Blocky buddies: square limbs that piston up and down.
+      ctx.fillStyle = sk.body;
+      ctx.fillRect(x - 4 + swing * 0.4, y + 3, 3, 6 - Math.abs(swing) * 0.4);
+      ctx.fillRect(x + 1 - swing * 0.4, y + 3, 3, 6 - Math.abs(swing) * 0.4);
+      ctx.fillRect(x - 4, y - 4, 8, 9);            // body
       ctx.fillStyle = sk.head;
-      ctx.fillRect(x - 4.5, y - 13, 9, 8);        // square head
-    } else {
-      ctx.beginPath();
-      ctx.roundRect(x - 4, y - 4, 8, 13, 3);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(x, y - 9, 4.6, 0, Math.PI * 2);
-      ctx.fillStyle = sk.head;
-      ctx.fill();
+      ctx.fillRect(x - 4.5, y - 12, 9, 8);         // head
+      return;
     }
+
+    // Legs.
+    ctx.strokeStyle = sk.body;
+    ctx.lineWidth = 2.6; ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x, y + 3); ctx.lineTo(x - 2.4 + swing * 0.6, y + 9);
+    ctx.moveTo(x, y + 3); ctx.lineTo(x + 2.4 - swing * 0.6, y + 9);
+    ctx.stroke();
+    // Arms.
+    ctx.beginPath();
+    ctx.moveTo(x, y - 1); ctx.lineTo(x - 3.2 - swing * 0.5, y + 3);
+    ctx.moveTo(x, y - 1); ctx.lineTo(x + 3.2 + swing * 0.5, y + 3);
+    ctx.stroke();
+    // Body.
+    ctx.fillStyle = sk.body;
+    ctx.beginPath();
+    ctx.roundRect(x - 3.6, y - 4, 7.2, 9, 3);
+    ctx.fill();
+    // Head.
+    ctx.beginPath();
+    ctx.arc(x, y - 8, 4.3, 0, Math.PI * 2);
+    ctx.fillStyle = sk.head;
+    ctx.fill();
+    ctx.lineCap = "butt";
   }
 
   if (!CanvasRenderingContext2D.prototype.roundRect) {
