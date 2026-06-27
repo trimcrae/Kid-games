@@ -109,6 +109,46 @@
         { name: "Pokémon",           color: "purple", items: ["Pikachu", "Eevee", "Snorlax", "Charizard"] },
       ],
     },
+    {
+      name: "Wild Things",
+      emoji: "🦁",
+      groups: [
+        { name: "Jungle animals", color: "yellow", items: ["Lion", "Tiger", "Monkey", "Zebra"] },
+        { name: "Pets",           color: "green",  items: ["Dog", "Cat", "Hamster", "Goldfish"] },
+        { name: "Birds",          color: "blue",   items: ["Robin", "Eagle", "Owl", "Parrot"] },
+        { name: "Bugs",           color: "purple", items: ["Ant", "Bee", "Spider", "Ladybug"] },
+      ],
+    },
+    {
+      name: "Minecraft Master",
+      emoji: "⛏️",
+      groups: [
+        { name: "Tools",       color: "yellow", items: ["Pickaxe", "Axe", "Shovel", "Hoe"] },
+        { name: "Ores",        color: "green",  items: ["Diamond", "Gold", "Iron", "Coal"] },
+        { name: "Biomes",      color: "blue",   items: ["Desert", "Jungle", "Taiga", "Swamp"] },
+        { name: "Scary mobs",  color: "purple", items: ["Witch", "Ghast", "Blaze", "Phantom"] },
+      ],
+    },
+    {
+      name: "Weather Wonders",
+      emoji: "🌦️",
+      groups: [
+        { name: "Seasons",    color: "yellow", items: ["Spring", "Summer", "Fall", "Winter"] },
+        { name: "Weather",    color: "green",  items: ["Rain", "Snow", "Fog", "Thunder"] },
+        { name: "Winter fun", color: "blue",   items: ["Sled", "Snowman", "Skating", "Mittens"] },
+        { name: "Beach day",  color: "purple", items: ["Sand", "Wave", "Shell", "Towel"] },
+      ],
+    },
+    {
+      name: "Things That Go",
+      emoji: "🚗",
+      groups: [
+        { name: "On the road",  color: "yellow", items: ["Car", "Truck", "Bus", "Bike"] },
+        { name: "In the sky",   color: "green",  items: ["Plane", "Rocket", "Helicopter", "Balloon"] },
+        { name: "On the water", color: "blue",   items: ["Boat", "Canoe", "Ship", "Raft"] },
+        { name: "On a track",   color: "purple", items: ["Train", "Tram", "Subway", "Trolley"] },
+      ],
+    },
   ];
 
   const MAX_MISTAKES = 4;

@@ -276,6 +276,30 @@ const THEMES = [
       { answer: "PASS", clue: "To kick the ball to a teammate." },
     ],
   },
+  {
+    name: "Dinosaur Dig", emoji: "🦕", blurb: "Stomp back to the age of dinos!",
+    words: [
+      { answer: "RAPTOR", clue: "A fast, clever hunting dinosaur." },
+      { answer: "FOSSIL", clue: "Old bones that turned to stone." },
+      { answer: "STEGOSAURUS", clue: "A dino with plates on its back and a spiky tail." },
+      { answer: "ROAR", clue: "The big loud sound a dinosaur makes." },
+      { answer: "BONES", clue: "What scientists dig up to learn about dinos." },
+      { answer: "EGG", clue: "A baby dinosaur hatches out of this." },
+      { answer: "REX", clue: "Tyrannosaurus ___, the giant meat-eater." },
+    ],
+  },
+  {
+    name: "Yummy Food", emoji: "🍕", blurb: "Snacks and treats we love!",
+    words: [
+      { answer: "PIZZA", clue: "A round, cheesy slice with toppings." },
+      { answer: "APPLE", clue: "A crunchy red or green fruit." },
+      { answer: "COOKIE", clue: "A sweet treat that's great with milk." },
+      { answer: "TACO", clue: "A folded shell stuffed with yummy fillings." },
+      { answer: "BANANA", clue: "A long yellow fruit monkeys love." },
+      { answer: "JUICE", clue: "A sweet drink squeezed from fruit." },
+      { answer: "BREAD", clue: "You toast it or make a sandwich with it." },
+    ],
+  },
 ];
 
 const out = THEMES.map(compile);

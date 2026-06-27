@@ -82,6 +82,45 @@
         { word: "adventure",clue: "An exciting journey full of surprises.",         pic: "🗺️" },
       ],
     },
+    {
+      name: "Space Spells",
+      emoji: "🚀",
+      color: "#6a5cff",
+      words: [
+        { word: "comet",    clue: "A ball of ice and dust with a glowing tail.",     pic: "☄️" },
+        { word: "planet",   clue: "A big round world that circles a star.",          pic: "🪐" },
+        { word: "rocket",   clue: "What blasts off to fly into space.",              pic: "🚀" },
+        { word: "galaxy",   clue: "A huge group of millions of stars.",              pic: "🌌" },
+        { word: "gravity",  clue: "The pull that keeps your feet on the ground.",    pic: "🍎" },
+        { word: "astronaut",clue: "A person who travels into outer space.",          pic: "👩‍🚀" },
+      ],
+    },
+    {
+      name: "Ocean Spells",
+      emoji: "🌊",
+      color: "#1ec8c8",
+      words: [
+        { word: "coral",    clue: "Colourful rock-like homes for sea creatures.",    pic: "🪸" },
+        { word: "dolphin",  clue: "A smart, friendly animal that leaps from waves.", pic: "🐬" },
+        { word: "octopus",  clue: "A sea animal with eight wiggly arms.",            pic: "🐙" },
+        { word: "treasure", clue: "Gold and jewels a pirate hides away.",            pic: "💰" },
+        { word: "current",  clue: "Water that flows and moves in the sea.",          pic: "🌊" },
+        { word: "jellyfish",clue: "A see-through sea animal that can sting.",        pic: "🪼" },
+      ],
+    },
+    {
+      name: "Master Spells",
+      emoji: "🏆",
+      color: "#ff8c42",
+      words: [
+        { word: "whisper",   clue: "To talk very, very quietly.",                    pic: "🤫" },
+        { word: "ancient",   clue: "Very, very old — from long, long ago.",          pic: "🏛️" },
+        { word: "creature",  clue: "Any living animal or being.",                    pic: "🦕" },
+        { word: "enormous",  clue: "Super huge — even bigger than big!",             pic: "🐘" },
+        { word: "delicious", clue: "Tasting really, really yummy.",                  pic: "🍰" },
+        { word: "imagine",   clue: "To picture something fun in your mind.",         pic: "💭" },
+      ],
+    },
   ];
 
   /* ---------- saved progress ---------- */
