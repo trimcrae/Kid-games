@@ -207,24 +207,13 @@
         save(); renderTeam(); settingsChanged();
       };
 
-      var x = document.createElement("button");
-      x.className = "chip-x";
-      x.textContent = "✕";
-      x.title = "Remove from team";
-      x.onclick = function () {
-        if (confirm("Remove " + g.name + " from the team?")) {
-          state.team.splice(i, 1); save(); renderTeam(); settingsChanged();
-        }
-      };
-
       var controls = document.createElement("div");
       controls.className = "player-controls";
       controls.appendChild(pres);
       controls.appendChild(gk);
-      controls.appendChild(x);
 
       row.appendChild(name);      // name on its own line
-      row.appendChild(controls);  // Here / goalie / remove below it
+      row.appendChild(controls);  // Here / goalie below it
       list.appendChild(row);
     });
   }
@@ -402,12 +391,6 @@
       };
     });
 
-    on("addBtn", addPlayer);
-    var newName = document.getElementById("newName");
-    if (newName) newName.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") addPlayer();
-    });
-
     // one button: each tap builds a fresh fair line-up (no separate "shuffle").
     // No auto-scroll — the roster updates in place without jumping the page.
     on("generateBtn", function () { makeRoster(true); });
@@ -421,15 +404,6 @@
         save(); renderTeam(); showPrompt();
       }
     });
-  }
-
-  function addPlayer() {
-    var input = document.getElementById("newName");
-    var name = input.value.trim();
-    if (!name) return;
-    state.team.push({ name: name, present: true, gk: "yes" });
-    input.value = "";
-    save(); renderTeam(); settingsChanged();
   }
 
   if (document.readyState === "loading") {

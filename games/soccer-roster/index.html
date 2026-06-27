@@ -57,7 +57,6 @@
     .player-row.away { opacity: 0.5; }
     .pname { font-weight: bold; font-size: 0.98rem; line-height: 1.2; }
     .player-controls { display: flex; align-items: center; gap: 0.5rem; }
-    .player-controls .chip-x { margin-left: auto; }
     .chip {
       font: inherit; font-size: 0.78rem; font-weight: bold; cursor: pointer;
       border: 2px solid transparent; border-radius: 999px;
@@ -70,11 +69,6 @@
     .chip.gk-must { background: #1f1a14; color: #fff; border-color: #1f1a14; }
     .chip.gk-no   { background: #e9e6e2; color: #8a8278; border-color: #dcd7d1; }
     .chip:disabled { cursor: default; }
-    .chip-x { background: none; border: none; cursor: pointer; color: #c0392b; font-size: 1rem; padding: 0 0.2rem; }
-
-    .add-row { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
-    .add-row input { flex: 1; font: inherit; padding: 0.55rem 0.7rem; border: 2px solid #e3ddf5; border-radius: 12px; }
-    .add-row input:focus { outline: none; border-color: var(--purple); }
 
     .btn {
       font: inherit; font-weight: bold; cursor: pointer; border: none;
@@ -270,10 +264,6 @@
         Tap the goalie chip to cycle it: <b>Can be goalie</b> → <b>Must be goalie</b> → <b>Never goalie</b>.
       </p>
       <div class="team-list" id="teamList"></div>
-      <div class="add-row">
-        <input id="newName" type="text" placeholder="Add a player…" />
-        <button class="btn green" id="addBtn">Add</button>
-      </div>
     </section>
 
     <section class="panel no-print">
@@ -295,6 +285,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=11"></script>
+  <script src="roster.js?v=12"></script>
 </body>
 </html>
