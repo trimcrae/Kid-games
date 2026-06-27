@@ -412,7 +412,12 @@ const GAMES = {
     if (await page.locator(".pcard").count() !== 0) throw new Error("a roster was generated before Make roster was pressed");
     if (await page.locator(".empty-note").count() < 1) throw new Error("no setup prompt on first load");
 
-    return "no auto-generate; setup edits clear roster; 2/4/8 periods even with no goalie repeats";
+    // Print with no roster should build one (never print the empty prompt)
+    await page.locator("#printBtn").click();
+    await page.waitForTimeout(150);
+    if (await page.locator(".pcard").count() < 1) throw new Error("Print did not build a roster when none existed");
+
+    return "no auto-generate; setup edits clear roster; print builds first; 2/4/8 even, no repeats";
   },
 
   async "Crossword"(page, g, d) {

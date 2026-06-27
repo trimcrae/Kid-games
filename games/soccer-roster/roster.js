@@ -363,7 +363,11 @@
 
     document.getElementById("generateBtn").onclick = function () { makeRoster(false); scrollToOutput(); };
     document.getElementById("shuffleBtn").onclick = function () { makeRoster(true); scrollToOutput(); };
-    document.getElementById("printBtn").onclick = function () { window.print(); };
+    document.getElementById("printBtn").onclick = function () {
+      // never print the empty prompt — make the roster first, let her review, then print
+      if (!hasRoster) { makeRoster(false); scrollToOutput(); return; }
+      window.print();
+    };
     document.getElementById("resetBtn").onclick = function () {
       if (confirm("Reset the whole team back to the original roster?")) {
         state.team = DEFAULT_TEAM.map(function (g) { return Object.assign({}, g); });
