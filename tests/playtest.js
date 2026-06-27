@@ -426,6 +426,13 @@ const GAMES = {
       if (inches > 9.3) throw new Error(`print for ${p} periods is ${inches.toFixed(2)}in tall — won't fit one page (budget 9.3in)`);
     }
 
+    // Guard the Safari "blank 2nd page" bug: in print, the body must NOT keep a
+    // full-viewport min-height (100vh = whole page > usable area, so it spills).
+    await page.emulateMedia({ media: "print" });
+    const bodyMinH = await page.evaluate(() => parseFloat(getComputedStyle(document.body).minHeight) || 0);
+    await page.emulateMedia({ media: "screen" });
+    if (bodyMinH > 200) throw new Error(`body keeps a ${bodyMinH}px min-height in print — Safari will add a blank page`);
+
     // editing the setup should clear the old roster (no stale/unrequested roster)
     await page.locator(".player-row .chip.present").first().click();
     await page.waitForTimeout(120);

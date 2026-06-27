@@ -190,7 +190,7 @@
     .print-fab:active { transform: scale(0.94); }
     .print-fab:disabled { background: #d9d3cc; color: #9a9289; box-shadow: none; cursor: default; }
     .print-fab:disabled:active { transform: none; }
-    @media (max-width: 480px) {
+    @media screen and (max-width: 480px) {
       /* leave room above the fixed button so it never hides the last card */
       #output { padding-bottom: 5rem; }
     }
@@ -199,16 +199,20 @@
        Normal portrait flow in 2 columns. No rotation/overflow, so it is
        physically guaranteed to stay on a single page on every device. */
     @media print {
-      @page { size: portrait; margin: 0.35in; }
-      html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000; }
+      @page { size: portrait; margin: 0.3in; }
+      html, body { margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; background: #fff !important; color: #000; }
 
       /* drop everything except the quarter line-ups */
       .bg-blobs, .back-link, .no-print, .footer, .hero,
       .checks, .warn-panel, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
 
+      /* zero ALL trailing space so Safari can't conjure a blank 2nd page */
       .wrap { margin: 0 !important; padding: 0 !important; max-width: none !important; }
-      .print-area { padding: 0 !important; }
+      .print-area { margin: 0 !important; padding: 0 !important; }
+      #output { padding: 0 !important; margin: 0 !important; }
       .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+      .periods-grid { margin: 0 !important; break-after: avoid; page-break-after: avoid; }
+      .pcard:last-child { margin-bottom: 0 !important; }
 
       /* team name at the top of the sheet */
       .print-title { display: block; font-weight: bold; font-size: 1rem; line-height: 1.2; color: #000; margin: 0 0 0.2rem; }
@@ -288,6 +292,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=7"></script>
+  <script src="roster.js?v=8"></script>
 </body>
 </html>
