@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Choose Your Own Adventure",
+    emoji: "🗺️",
+    blurb: "Branching read-aloud story-books with pictures & voice — YOU pick what happens! Colours, counting, logic, vocabulary & nature. For everyone!",
+    url:   "games/adventure/",
+    ages:  "3+",
+    color: "#8a5cff",
+    ready: true
+  },
+
+  {
     title: "Money Machine",
     emoji: "💰",
     blurb: "Watch your money grow itself with compound interest! Pick a bank, add savings & see what you could buy — like If You Made a Million. For Cory!",
