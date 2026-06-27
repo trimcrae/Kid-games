@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Mad Libs",
+    emoji: "📝",
+    blurb: "Give silly words — a noun, a verb, a goofy adjective — then watch them fill a story you've never seen and hear it read aloud! Parts of speech & grammar. For everyone!",
+    url:   "games/mad-libs/",
+    ages:  "6+",
+    color: "#ffd166",
+    ready: true
+  },
+
+  {
     title: "Choose Your Own Adventure",
     emoji: "🗺️",
     blurb: "Branching read-aloud story-books with pictures & voice — YOU pick what happens! Colours, counting, logic, vocabulary & nature. For everyone!",
