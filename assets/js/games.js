@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Block Coordinates",
+    emoji: "⛏️",
+    blurb: "Build pixel-art scenes the Minecraft way! Read (X, Y) coordinates to place blocks on the grid — learn the coordinate plane. For Cory!",
+    url:   "games/block-coordinates/",
+    ages:  "6+",
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Choose Your Own Adventure",
     emoji: "🗺️",
     blurb: "Branching read-aloud story-books with pictures & voice — YOU pick what happens! Colours, counting, logic, vocabulary & nature. For everyone!",
