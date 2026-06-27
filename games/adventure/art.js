@@ -583,16 +583,332 @@
   }
 
   /* =========================================================
+     EXTRA BACKGROUNDS (for the big stories)
+     ========================================================= */
+  function snowBg(o) {
+    o = o || {}; const u = uid();
+    let s = `<defs><linearGradient id="sn${u}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bfe3ff"/><stop offset="100%" stop-color="#eef9ff"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#sn${u})"/>` + cloud(310, 46, .7) + cloud(120, 40, .5);
+    s += `<path d="M0 220 Q 110 196 230 218 T 400 210 V300 H0Z" fill="#dceefc"/>
+          <path d="M0 248 Q 120 228 250 250 T 400 244 V300 H0Z" fill="#fff"/>
+          <g transform="translate(58 232)"><rect x="-5" y="-8" width="10" height="20" fill="#8a5a33"/>
+          <path d="M0 -54 l22 30 h-44Z" fill="#bfe3d0"/><path d="M0 -40 l26 34 h-52Z" fill="#d6f0e3"/></g>`;
+    [[40,60],[120,90],[200,50],[300,100],[350,70],[260,140],[80,150]].forEach(p =>
+      s += `<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#fff" opacity=".85"/>`);
+    return s;
+  }
+  function plainsBg(o) {
+    let s = skyDay({ hills: false });
+    s += `<rect y="210" width="400" height="90" fill="#86d562"/>
+          <path d="M0 214 Q 200 196 400 214 V300 H0Z" fill="#6cc24a"/>`;
+    for (let x = 22; x < 400; x += 46)
+      s += `<path d="M${x} 272 q3 -16 0 -22 M${x+5} 272 q1 -14 4 -20 M${x-5} 272 q-1 -14 -4 -20" stroke="#4ea63a" stroke-width="2" fill="none"/>`;
+    return s;
+  }
+  function oceanBg(o) {
+    const u = uid();
+    return `<defs><linearGradient id="ob${u}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9fdcff"/><stop offset="45%" stop-color="#d8f3ff"/>
+      <stop offset="46%" stop-color="#3a9bd6"/><stop offset="100%" stop-color="#1d6ba6"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#ob${u})"/>` + cloud(300, 50, .8) + cloud(90, 40, .6) +
+      `<path d="M0 150 Q 60 142 120 150 T 240 150 T 360 150 T 480 150" stroke="#bfeaff" stroke-width="3" fill="none" opacity=".5"/>
+       <path d="M0 178 Q 60 170 120 178 T 240 178 T 360 178" stroke="#bfeaff" stroke-width="3" fill="none" opacity=".4"/>`;
+  }
+  function skyHighBg(o) {
+    const u = uid();
+    let s = `<defs><linearGradient id="sh${u}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7cc6ff"/><stop offset="100%" stop-color="#cdeeff"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#sh${u})"/>`;
+    s += cloud(80, 80, 1) + cloud(320, 60, .9) + cloud(200, 180, 1.1) + cloud(60, 230, .7) + cloud(340, 215, .8);
+    s += `<g transform="translate(200 235)"><path d="M-60 0 q60 -26 120 0 q-20 40 -60 46 q-40 -6 -60 -46Z" fill="#8a5a33"/>
+          <ellipse cx="0" cy="-2" rx="60" ry="14" fill="#7ed957"/></g>`;
+    return s;
+  }
+  function dungeonBg(o) {
+    let s = `<rect width="400" height="300" fill="#2a2730"/>`;
+    for (let ry = 0; ry < 300; ry += 30)
+      for (let cx = 0; cx < 420; cx += 50) {
+        const off = (ry / 30) % 2 ? 25 : 0;
+        s += `<rect x="${cx - off}" y="${ry}" width="48" height="28" rx="3" fill="#3a3744" stroke="#22202a" stroke-width="2"/>`;
+      }
+    s += torch(58, 150) + torch(342, 150) + `<rect y="262" width="400" height="38" fill="#22202a"/>`;
+    return s;
+  }
+  function swampBg(o) {
+    const u = uid();
+    let s = `<defs><linearGradient id="sw${u}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a9c72"/><stop offset="100%" stop-color="#4a5a3a"/></linearGradient></defs>
+      <rect width="400" height="300" fill="url(#sw${u})"/>
+      <path d="M0 240 Q 100 226 200 240 T 400 238 V300 H0Z" fill="#3a4a2e"/>
+      <ellipse cx="130" cy="272" rx="90" ry="14" fill="#2f3a26" opacity=".7"/>`;
+    s += tree(58, 252, 1, "#3a6b3a") + tree(332, 244, 1.1, "#2f5a2f");
+    return s;
+  }
+  function beachBg(o) {
+    let s = skyDay({ hills: false });
+    s += `<path d="M0 150 H400 V230 H0Z" fill="#4fc3f7"/>
+          <path d="M0 150 Q 100 160 200 150 T 400 150 V162 H0Z" fill="#7fd4ff"/>
+          <path d="M0 222 Q 120 206 240 222 T 400 218 V300 H0Z" fill="#f0dca0"/>
+          <path d="M0 246 L400 242 V300 H0Z" fill="#e6cf90"/>`;
+    return s;
+  }
+  function desertBg(o) {
+    let s = skyDay({ hills: false, clouds: false, top: "#ffd28a", bot: "#ffe9c2" });
+    s += `<path d="M0 230 Q 110 200 230 226 T 400 220 V300 H0Z" fill="#e8b86a"/>
+          <path d="M0 256 Q 120 234 250 258 T 400 252 V300 H0Z" fill="#d89a4a"/>
+          <g transform="translate(330 232)"><rect x="-5" y="-30" width="10" height="40" rx="4" fill="#3a8a4a"/>
+          <rect x="-20" y="-18" width="10" height="6" rx="3" fill="#3a8a4a"/><rect x="-20" y="-30" width="6" height="14" rx="3" fill="#3a8a4a"/>
+          <rect x="10" y="-22" width="12" height="6" rx="3" fill="#3a8a4a"/><rect x="16" y="-34" width="6" height="16" rx="3" fill="#3a8a4a"/></g>`;
+    return s;
+  }
+  function mountainBg(o) {
+    let s = skyDay({ hills: false });
+    s += `<path d="M0 250 L90 110 L150 200 L220 90 L300 210 L400 130 V300 H0Z" fill="#9aa7c4"/>
+          <path d="M70 138 l20 -28 l20 30 l-20 8Z" fill="#fff"/><path d="M200 118 l20 -28 l22 36 l-22 8Z" fill="#fff"/>
+          <path d="M0 252 Q 200 232 400 252 V300 H0Z" fill="#7e8aa6"/>`;
+    return s;
+  }
+  function lavaCaveBg(o) {
+    const u = uid();
+    let s = cave(o || {});
+    s += `<defs><linearGradient id="lv${u}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a1f"/><stop offset="100%" stop-color="#c43a1f"/></linearGradient></defs>
+      <path d="M0 272 Q 100 260 200 272 T 400 270 V300 H0Z" fill="url(#lv${u})"/>
+      <circle cx="120" cy="282" r="4" fill="#ffd166" opacity=".8"/><circle cx="300" cy="286" r="3" fill="#ffd166" opacity=".8"/>`;
+    return s;
+  }
+
+  /* =========================================================
+     EXTRA PROPS & CHARACTERS
+     ========================================================= */
+  function chest(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <rect x="-22" y="-6" width="44" height="24" rx="3" fill="#8a5a33"/>
+      <path d="M-22 -6 q22 -18 44 0Z" fill="#a06a3a"/><rect x="-22" y="2" width="44" height="6" fill="#6b4423"/>
+      <rect x="-4" y="-2" width="8" height="12" rx="2" fill="#ffd166"/><circle cx="0" cy="2" r="2" fill="#8a5a33"/></g>`;
+  }
+  function key(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})" fill="#ffd166">
+      <circle cx="-8" cy="0" r="7"/><circle cx="-8" cy="0" r="3" fill="none" stroke="#c79a2e" stroke-width="2"/>
+      <rect x="-2" y="-2.5" width="20" height="5" rx="2"/><rect x="14" y="2" width="4" height="6"/><rect x="8" y="2" width="4" height="6"/></g>`;
+  }
+  function scroll(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <rect x="-16" y="-18" width="32" height="36" rx="2" fill="#f3e6c4"/>
+      <rect x="-16" y="-18" width="32" height="4" fill="#d9c79a"/><rect x="-16" y="14" width="32" height="4" fill="#d9c79a"/>
+      <path d="M-10 -8 h20 M-10 -2 h20 M-10 4 h14" stroke="#b09a66" stroke-width="1.6"/></g>`;
+  }
+  function sign(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <rect x="-3" y="0" width="6" height="24" fill="#6b4423"/>
+      <rect x="-22" y="-22" width="44" height="22" rx="3" fill="#a06a3a" stroke="#6b4423" stroke-width="2"/>
+      <path d="M-14 -14 h28 M-14 -8 h20" stroke="#6b4423" stroke-width="2"/></g>`;
+  }
+  function crystal(o) {
+    const c = o.color || "#a368d8";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M0 -22 l8 12 l-8 14 l-8 -14Z" fill="${c}"/>
+      <path d="M-12 -6 l6 -8 l4 18Z" fill="${shade(c,-15)}"/><path d="M12 -8 l-6 -6 l-2 16Z" fill="${shade(c,18)}"/></g>`;
+  }
+  function anvil(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})" fill="#4a4a55">
+      <path d="M-18 -10 h36 v6 l-8 4 h-6 v6 h-4 v-6 h-6 l-8 -4Z"/>
+      <rect x="-8" y="6" width="16" height="6"/><rect x="-12" y="12" width="24" height="6" rx="2"/></g>`;
+  }
+  function coral(o) {
+    const c = o.color || "#ff7eb6";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M0 0 q-4 -20 -12 -24 M0 0 q4 -22 12 -26 M0 0 q0 -26 0 -30" stroke="${c}" stroke-width="6" fill="none" stroke-linecap="round"/></g>`;
+  }
+  function ship(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M-40 0 h80 l-12 22 h-56Z" fill="#6b4423"/><rect x="-42" y="-4" width="84" height="6" rx="3" fill="#8a5a33"/>
+      <rect x="-2" y="-58" width="4" height="58" fill="#5a3a22"/>
+      <path d="M2 -54 q26 6 24 22 l-24 4Z" fill="#f3e6c4"/><path d="M-2 -50 q-22 6 -20 18 l20 4Z" fill="#e8dcc0"/>
+      <path d="M2 -58 l16 4 l-16 4Z" fill="#e8584f"/></g>`;
+  }
+  function bookGlow(o) {
+    const c = o.color || "#ffd166";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <circle cx="0" cy="0" r="26" fill="${c}" opacity=".25"/>
+      <path d="M-16 -16 h14 v32 h-14Z" fill="${c}"/><path d="M2 -16 h14 v32 h-14Z" fill="${shade(c,-12)}"/>
+      <rect x="-2" y="-16" width="4" height="32" fill="#fff" opacity=".5"/>
+      <path d="M-12 -10 h8 M-12 -4 h8 M6 -10 h8 M6 -4 h8" stroke="#fff" stroke-width="1.4" opacity=".6"/></g>`;
+  }
+  function portal(o) {
+    const c = o.color || "#a368d8", u = uid();
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <defs><radialGradient id="po${u}"><stop offset="0%" stop-color="#fff"/>
+      <stop offset="40%" stop-color="${shade(c,20)}"/><stop offset="100%" stop-color="${shade(c,-30)}"/></radialGradient></defs>
+      <ellipse cx="0" cy="0" rx="34" ry="48" fill="url(#po${u})"/>
+      <ellipse cx="0" cy="0" rx="34" ry="48" fill="none" stroke="${shade(c,30)}" stroke-width="4"/>
+      <ellipse cx="-6" cy="-8" rx="14" ry="22" fill="#fff" opacity=".25"/></g>`;
+  }
+  function sword(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M0 -28 l5 5 v26 h-10 v-26Z" fill="#cfd8e3"/>
+      <rect x="-10" y="3" width="20" height="5" rx="2" fill="#8a5a33"/><rect x="-3" y="8" width="6" height="12" rx="2" fill="#6b4423"/></g>`;
+  }
+  function shield(o) {
+    const c = o.color || "#e8584f";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M0 -22 q16 -6 20 2 q0 26 -20 40 q-20 -14 -20 -40 q4 -8 20 -2Z" fill="${c}"/>
+      <path d="M0 -16 v44 M-16 -4 h32" stroke="#fff" stroke-width="3" opacity=".8"/></g>`;
+  }
+  function sheep(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <ellipse cx="0" cy="14" rx="22" ry="5" fill="#000" opacity=".12"/>
+      <circle cx="-10" cy="0" r="10" fill="#f2f2f2"/><circle cx="6" cy="-4" r="11" fill="#f2f2f2"/>
+      <circle cx="10" cy="6" r="10" fill="#f2f2f2"/><circle cx="-6" cy="8" r="10" fill="#f2f2f2"/><circle cx="4" cy="2" r="12" fill="#fafafa"/>
+      <circle cx="16" cy="-2" r="7" fill="#33323a"/><rect x="14" y="3" width="3" height="8" fill="#33323a"/><rect x="20" y="3" width="3" height="8" fill="#33323a"/>
+      <circle cx="18" cy="-4" r="1.4" fill="#fff"/></g>`;
+  }
+  function dolphin(o) {
+    const c = o.color || "#6fb7d9";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M-30 0 q10 -20 40 -18 q14 0 22 -8 q-2 12 -12 16 q8 6 10 16 q-14 -8 -22 -6 q-26 4 -38 0Z" fill="${c}"/>
+      <path d="M-2 -14 q8 -10 16 -8 q-4 8 -10 10Z" fill="${shade(c,-12)}"/>
+      <circle cx="20" cy="-6" r="2" fill="#2b2440"/><path d="M-30 0 q-8 -4 -12 -2 q4 6 12 6Z" fill="${shade(c,10)}"/></g>`;
+  }
+  function dino(o) {
+    const c = o.color || "#7ec850";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <ellipse cx="0" cy="18" rx="30" ry="6" fill="#000" opacity=".12"/>
+      <ellipse cx="0" cy="0" rx="26" ry="16" fill="${c}"/>
+      <path d="M18 -6 q14 -28 26 -30 q6 0 4 8 q-10 4 -16 26Z" fill="${c}"/>
+      <circle cx="44" cy="-30" r="8" fill="${c}"/><circle cx="46" cy="-32" r="1.6" fill="#2b2440"/>
+      <path d="M-22 0 q-18 -2 -24 6 q10 2 24 2Z" fill="${c}"/>
+      <rect x="-14" y="12" width="6" height="12" rx="3" fill="${shade(c,-10)}"/><rect x="6" y="12" width="6" height="12" rx="3" fill="${shade(c,-10)}"/></g>`;
+  }
+  function snowman(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <circle cx="0" cy="10" r="16" fill="#fff"/><circle cx="0" cy="-12" r="11" fill="#fff"/>
+      <circle cx="-4" cy="-14" r="1.6" fill="#2b2440"/><circle cx="4" cy="-14" r="1.6" fill="#2b2440"/>
+      <path d="M0 -12 l8 2 l-8 2Z" fill="#ff8f1f"/><circle cx="0" cy="2" r="1.6" fill="#2b2440"/><circle cx="0" cy="10" r="1.6" fill="#2b2440"/>
+      <rect x="-12" y="-26" width="24" height="4" fill="#e8584f"/><rect x="-7" y="-40" width="14" height="16" fill="#33323a"/></g>`;
+  }
+  function bird(o) {
+    const c = o.color || "#ffd166";
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <ellipse cx="0" cy="0" rx="12" ry="9" fill="${c}"/><circle cx="9" cy="-3" r="6" fill="${c}"/>
+      <path d="M14 -3 l6 -1 l-6 3Z" fill="#ff8f1f"/><circle cx="10" cy="-4" r="1.4" fill="#2b2440"/>
+      <path d="M-2 0 q-10 -4 -14 2 q8 4 14 0Z" fill="${shade(c,-12)}"/></g>`;
+  }
+  function crab(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <ellipse cx="0" cy="0" rx="16" ry="11" fill="#e8584f"/>
+      <circle cx="-6" cy="-8" r="2" fill="#2b2440"/><circle cx="6" cy="-8" r="2" fill="#2b2440"/>
+      <path d="M-16 0 q-10 -4 -10 -10 q6 2 8 6 M16 0 q10 -4 10 -10 q-6 2 -8 6" stroke="#e8584f" stroke-width="4" fill="none"/>
+      <path d="M-14 6 l-8 4 M-12 9 l-8 6 M14 6 l8 4 M12 9 l8 6" stroke="#e8584f" stroke-width="3"/></g>`;
+  }
+  function ghost(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M0 -22 q-20 0 -20 22 v18 l5 -6 l5 6 l5 -6 l5 6 l5 -6 v-18 q0 -22 -20 -22Z" fill="#eef4ff" opacity=".92"/>
+      <circle cx="-6" cy="-6" r="3" fill="#2b2440"/><circle cx="6" cy="-6" r="3" fill="#2b2440"/>
+      <path d="M-4 4 q4 4 8 0" stroke="#7a90b5" stroke-width="2" fill="none"/></g>`;
+  }
+  function knight(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">` +
+      boy({ x: 0, y: 0, shirt: o.shirt || "#9fb3c9", pants: "#5a6473" }) +
+      `<path d="M-13 -60 a13 13 0 0 1 26 0 v3 h-26Z" fill="#c2ccd6"/><rect x="-3" y="-66" width="6" height="10" fill="#9aa6b3"/>
+       <path d="M-9 -54 h18 v3 h-18Z" fill="#8a96a3"/>
+       <ellipse cx="-24" cy="-24" rx="7" ry="10" fill="#e8584f"/><path d="M-24 -32 v16 M-30 -24 h12" stroke="#fff" stroke-width="2"/></g>`;
+  }
+  function wizard(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">` +
+      boy({ x: 0, y: 0, shirt: o.shirt || "#5e3bb0", pants: "#3a2566" }) +
+      `<path d="M0 -90 l16 26 h-32Z" fill="${o.hat || "#4a2d8a"}"/><circle cx="0" cy="-90" r="3" fill="#ffd166"/>
+       <path d="M-4 -72 l1 -4 l1 4 l4 1 l-4 1 l-1 4 l-1 -4 l-4 -1Z" fill="#ffd166"/>
+       <rect x="20" y="-44" width="4" height="54" rx="2" fill="#8a5a33"/><circle cx="22" cy="-46" r="9" fill="#7fd4ff" opacity=".3"/><circle cx="22" cy="-46" r="6" fill="#7fd4ff"/></g>`;
+  }
+  function pirate(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">` +
+      boy({ x: 0, y: 0, shirt: o.shirt || "#c0392b", pants: "#3a2718" }) +
+      `<path d="M-16 -64 q16 -9 32 0 q-5 -9 -16 -9 q-11 0 -16 9Z" fill="#2b2440"/><circle cx="0" cy="-69" r="2.4" fill="#fff"/>
+       <path d="M-10 -58 h8 l-1 5 h-7Z" fill="#2b2440"/></g>`;
+  }
+  function villager(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">` +
+      boy({ x: 0, y: 0, shirt: o.shirt || "#7a6b4a", pants: "#5a4a33" }) +
+      `<ellipse cx="2" cy="-52" rx="4" ry="6" fill="#d9a066"/></g>`;
+  }
+
+  function beacon(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <rect x="-4" y="-150" width="8" height="150" fill="#bff0ff" opacity=".45"/>
+      <rect x="-9" y="-40" width="18" height="40" fill="#7fd4ff" opacity=".55"/>
+      <rect x="-16" y="-6" width="32" height="22" fill="#9fb3c9"/><rect x="-16" y="-6" width="32" height="6" fill="#cfe3f0"/>
+      <rect x="-16" y="-6" width="32" height="22" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1.5"/>
+      <circle cx="0" cy="-4" r="6" fill="#eafdff"/></g>`;
+  }
+  function mountainProp(o) {
+    return `<g transform="translate(${o.x} ${o.y}) scale(${o.scale || 1})">
+      <path d="M-44 0 L0 -56 L44 0Z" fill="#9aa7c4"/><path d="M-15 -19 l15 -21 l15 21 l-15 8Z" fill="#fff"/></g>`;
+  }
+
+  /* =========================================================
+     SCENE COMPOSER — build a picture from a data descriptor:
+       { bg:"forest", bgOpts:{}, props:[ ["boy",{x,y,scale}], ... ], extra:"<svg…>" }
+     This lets the long stories be authored as pure data.
+     ========================================================= */
+  const BG = {
+    day: skyDay, sunset: skySunset, night: o => night(o || {}), forest, cave,
+    lavacave: lavaCaveBg, sea, ocean: oceanBg, beach: beachBg, space, library,
+    meadow, snow: snowBg, plains: plainsBg, sky: skyHighBg, dungeon: dungeonBg,
+    swamp: swampBg, desert: desertBg, mountain: mountainBg,
+    grassblocks: o => skyDay({ clouds: !(o && o.clouds === false) }) + grassBlocks((o && o.y) || 190)
+  };
+  const ACTOR = {
+    princess, boy, baby, dragon, puppy, fox, fish, mermaid, owl, alien, fizzer,
+    knight, wizard, pirate, villager, ghost, sheep, dolphin, dino, snowman, bird, crab,
+    rocket, chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon,
+    mountain: mountainProp,
+    bigDragon: o => dragon(Object.assign({}, o, { scale: (o.scale || 1) * 1.7 })),
+    planet: o => planet(o.x, o.y, o.r || 30, o.color || "#e8584f", o.ring),
+    tree: o => tree(o.x, o.y, o.scale, o.color),
+    mushroom: o => mushroom(o.x, o.y, o.color),
+    flower: o => flower(o.x, o.y, o.color),
+    castle: o => castle(o.x, o.y, o.scale),
+    cloud: o => cloud(o.x, o.y, o.scale),
+    diamond: o => diamond(o.x, o.y, o.scale),
+    pickaxe: o => pickaxe(o.x, o.y, o.scale),
+    torch: o => torch(o.x, o.y),
+    gem: o => gem(o.x, o.y, o.scale, o.color),
+    campfire: o => campfire(o.x, o.y, o.scale),
+    tent: o => tent(o.x, o.y, o.scale, o.color),
+    smore: o => smore(o.x, o.y, o.scale),
+    block: o => block(o.x, o.y, o.size || 30, o.top || "#7ed957", o.side || "#8a5a33"),
+    star: o => `<g transform="translate(${o.x} ${o.y})">${star(0, 0, o.size || 14)}</g>`
+  };
+  function scene(d) {
+    d = d || {};
+    const bg = BG[d.bg] || skyDay;
+    let s = bg(d.bgOpts || {});
+    (d.props || []).forEach(p => {
+      const f = ACTOR[p[0]];
+      if (f) { try { s += f(p[1] || {}); } catch (e) {} }
+    });
+    if (d.extra) s += d.extra;
+    return s;
+  }
+  // names exposed so the validator/tools can check authored scenes
+  scene.backgrounds = Object.keys(BG);
+  scene.actors = Object.keys(ACTOR);
+
+  /* =========================================================
      EXPORT
      ========================================================= */
   window.ART = {
-    uid, shade,
+    uid, shade, scene,
     skyDay, skySunset, night, forest, cave, sea, space, library, meadow,
+    snowBg, plainsBg, oceanBg, skyHighBg, dungeonBg, swampBg, beachBg, desertBg, mountainBg, lavaCaveBg,
     cloud, star, tree, mushroom, flower, seaweed, castle,
-    princess, boy, baby,
-    dragon, puppy, fox, fish, mermaid, owl,
+    princess, boy, baby, knight, wizard, pirate, villager, ghost,
+    dragon, puppy, fox, fish, mermaid, owl, sheep, dolphin, dino, snowman, bird, crab,
     rocket, planet, alien,
     block, grassBlocks, diamond, pickaxe, torch, fizzer,
-    tent, campfire, smore, gem
+    tent, campfire, smore, gem,
+    chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon, mountainProp
   };
 })();

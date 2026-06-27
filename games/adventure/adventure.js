@@ -148,8 +148,11 @@
     const node = current.nodes[id];
     if (!node) return;
 
-    // picture (with a gentle page-turn animation)
-    artEl.innerHTML = wrapSvg(node.art());
+    // picture (with a gentle page-turn animation).
+    // a node may carry an art() function OR a `scene` data descriptor.
+    const inner = typeof node.art === "function" ? node.art()
+                : node.scene ? ART.scene(node.scene) : "";
+    artEl.innerHTML = wrapSvg(inner);
     artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
 
     textEl.textContent = node.text;

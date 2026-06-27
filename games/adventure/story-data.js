@@ -1,31 +1,17 @@
 /* ===========================================================
-   Choose Your Own Adventure — STORY DATA
+   Choose Your Own Adventure — SHORT STORIES
    -----------------------------------------------------------
-   Each story is a little "map" of nodes. The engine shows a
-   node's picture + words, reads them aloud, then shows the
-   CHOICE buttons. Tapping a choice jumps to another node.
+   The quick, gentle tales for the littlest readers. The two big
+   epics (Block World & The Whispering Library) live in
+   stories-long.js, which appends itself to window.STORIES.
 
-   A node with no `choices` is an ENDING (shows ⭐ The End).
-   Every path leads somewhere happy.
-
-   story = {
-     id, title, emoji, color, ages, who, teaches, blurb,
-     cover: ()=>svg,          // picture for the library card
-     start: "node-id",
-     nodes: {
-       id: {
-         art: ()=>svg,        // the scene (viewBox 0 0 400 300)
-         text: "what happens",
-         choices: [ {label, to}, ... ]   // omit on endings
-         end: "Ending name"   // optional, only on endings
-       }
-     }
-   }
+   Node format (this file uses inline art() functions):
+     { art: ()=>svg, text, choices:[{label,to}] }   // a page
+     { art: ()=>svg, text, end:"Ending name" }       // an ending
    =========================================================== */
 (function () {
   "use strict";
   const A = window.ART;
-  const svg = inner => inner; // identity — the engine wraps in <svg>
 
   /* =======================================================
      1) ELLIE & THE RAINBOW DRAGON  (3+, colours & counting)
@@ -85,10 +71,15 @@
         ]
       },
       blue: {
-        art: () => A.sea({}) /*placeholder*/ ,
-        text: "",
-        // overwritten below
-        choices: []
+        art: () => A.meadow() +
+          A.dragon({ x: 220, y: 200, scale: 1.05, color: "#5aa9ff" }) +
+          A.princess({ x: 90, y: 235, scale: 1, dress: "#ff5d8f" }) +
+          A.flower(150, 252, "#4a8fe0") + A.flower(185, 258, "#4a8fe0") + A.flower(120, 258, "#4a8fe0"),
+        text: "They find a bush of blueberries. Count them: one… two… three! Munch munch — the dragon's tail turns deep BLUE! What colour next?",
+        choices: [
+          { label: "🍌 Yellow bananas", to: "yellow" },
+          { label: "🍎 Red apples", to: "red" }
+        ]
       },
       yellow: {
         art: () => A.meadow() +
@@ -124,265 +115,9 @@
       }
     }
   };
-  // fill the blue branch (kept here so the apples/berries read symmetrically)
-  rainbow.nodes.blue = {
-    art: () => A.meadow() +
-      A.dragon({ x: 220, y: 200, scale: 1.05, color: "#5aa9ff" }) +
-      A.princess({ x: 90, y: 235, scale: 1, dress: "#ff5d8f" }) +
-      A.flower(150, 252, "#4a8fe0") + A.flower(185, 258, "#4a8fe0") + A.flower(120, 258, "#4a8fe0"),
-    text: "They find a bush of blueberries. Count them: one… two… three! Munch munch — the dragon's tail turns deep BLUE! What colour next?",
-    choices: [
-      { label: "🍌 Yellow bananas", to: "yellow" },
-      { label: "🍎 Red apples", to: "red" }
-    ]
-  };
 
   /* =======================================================
-     2) BLOCK WORLD: THE DIAMOND QUEST (6+, logic & counting)
-     ======================================================= */
-  const blockworld = {
-    id: "blockworld",
-    title: "Block World: Diamond Quest",
-    emoji: "⛏️",
-    color: "#5cb85c",
-    ages: "6+",
-    who: "Cory",
-    teaches: "planning, counting & logic",
-    blurb: "Mine, build and explore a blocky world — Cory style!",
-    cover: () => A.skyDay({ hills: false }) + A.grassBlocks(180) +
-      A.boy({ x: 120, y: 175, scale: 1.1, shirt: "#4a8fe0" }) +
-      A.diamond(300, 140, 1.6) + A.pickaxe(300, 200, 1.2),
-    start: "spawn",
-    nodes: {
-      spawn: {
-        art: () => A.skyDay({}) + A.grassBlocks(190) +
-          A.tree(330, 190, 1, "#2f9e57") +
-          A.boy({ x: 110, y: 188, scale: 1.1, shirt: "#4a8fe0" }),
-        text: "A new blocky world! The sun is up but night comes fast. Cory needs tools and a safe place. What's the smart first move?",
-        choices: [
-          { label: "🌳 Chop a tree for wood", to: "wood" },
-          { label: "⛏️ Dig straight down", to: "dig" }
-        ]
-      },
-      wood: {
-        art: () => A.skyDay({}) + A.grassBlocks(190) +
-          A.block(60, 120, 30, "#a06a3a", "#7a4a28") + A.block(90, 120, 30, "#a06a3a", "#7a4a28") +
-          A.block(75, 150, 30, "#a06a3a", "#7a4a28") + A.block(105, 150, 30, "#a06a3a", "#7a4a28") +
-          A.boy({ x: 230, y: 188, scale: 1.1, shirt: "#4a8fe0" }),
-        text: "Chop chop! Cory collects 4 wood blocks and makes a crafting table. With wood you can craft a tool. Which one?",
-        choices: [
-          { label: "⛏️ Craft a pickaxe (to mine)", to: "pick" },
-          { label: "🗡️ Craft a sword (to be brave)", to: "sword" }
-        ]
-      },
-      dig: {
-        art: () => A.cave({}) +
-          A.boy({ x: 130, y: 210, scale: 1.05, shirt: "#4a8fe0", mood: "surprised" }) +
-          A.fizzer({ x: 290, y: 180, scale: 1 }) + A.torch(60, 150),
-        text: "Whee — DOWN Cory goes! (Top miner tip: never dig straight down for real!) He lands in a cave… and a green Fizzer goes \"hisssss!\" — but it just wants to play.",
-        choices: [
-          { label: "🧱 Place blocks to make stairs out", to: "stairs" },
-          { label: "🏃 Explore deeper into the cave", to: "deeper" }
-        ]
-      },
-      pick: {
-        art: () => A.cave({}) +
-          A.boy({ x: 120, y: 210, scale: 1.05, shirt: "#4a8fe0" }) + A.pickaxe(160, 180, 1) +
-          `<path d="M250 120 q30 60 0 130 h60 v-130Z" fill="#ff7a3c" opacity=".9"/>` +
-          A.diamond(320, 200, 1.3) + A.torch(70, 150),
-        text: "Cory mines into the hill and finds a cave. Sparkly DIAMONDS glow on the far side — but a river of orange lava is in the way! He has exactly 3 blocks.",
-        choices: [
-          { label: "🧱 Build a 3-block bridge over the lava", to: "bridge" },
-          { label: "⛏️ Dig a tunnel around the lava", to: "around" }
-        ]
-      },
-      sword: {
-        art: () => A.night({ ground: false }) + A.grassBlocks(200) +
-          A.boy({ x: 110, y: 196, scale: 1.05, shirt: "#4a8fe0" }) +
-          A.fizzer({ x: 290, y: 188, scale: 1.05 }),
-        text: "Night falls and a Fizzer wobbles closer. Cory grips his new sword — but the Fizzer looks more lonely than scary. What should he do?",
-        choices: [
-          { label: "🤫 Sneak away quietly", to: "sneak" },
-          { label: "🧱 Build a wall and wait for morning", to: "wall" }
-        ]
-      },
-      bridge: {
-        art: () => A.cave({}) +
-          A.block(170, 200, 30, "#9a9a9a", "#6a6a6a") + A.block(200, 200, 30, "#9a9a9a", "#6a6a6a") + A.block(230, 200, 30, "#9a9a9a", "#6a6a6a") +
-          A.boy({ x: 110, y: 210, scale: 1, shirt: "#4a8fe0" }) +
-          A.diamond(320, 200, 1.4),
-        text: "One, two, three blocks — the bridge fits perfectly across the lava! Cory taps the diamonds: 1, 2, 3, 4, 5! Five diamonds, just enough for amazing gear.",
-        choices: [{ label: "💎 Carry the diamonds home", to: "diamondEnd" }]
-      },
-      around: {
-        art: () => A.cave({}) +
-          A.boy({ x: 130, y: 210, scale: 1, shirt: "#4a8fe0" }) +
-          A.torch(80, 160) + A.torch(300, 150) + A.diamond(320, 205, 1.3),
-        text: "Careful and clever, Cory tunnels around the lava and places torches so it stays bright. Slow and safe wins — he reaches the diamonds with no trouble at all!",
-        choices: [{ label: "💎 Carry the diamonds home", to: "diamondEnd" }]
-      },
-      stairs: {
-        art: () => A.cave({}) +
-          A.block(150, 210, 30, "#a06a3a", "#7a4a28") + A.block(180, 180, 30, "#a06a3a", "#7a4a28") + A.block(210, 150, 30, "#a06a3a", "#7a4a28") +
-          A.boy({ x: 120, y: 215, scale: 1, shirt: "#4a8fe0" }),
-        text: "Step by step, Cory builds a staircase of blocks back up to the daylight. Smart thinking gets you out of any hole!",
-        choices: [{ label: "🏠 Build a cosy house up top", to: "houseEnd" }]
-      },
-      deeper: {
-        art: () => A.cave({}) +
-          A.mushroom(60, 220, "#5aa9ff") + A.mushroom(330, 230, "#a368d8") +
-          A.boy({ x: 150, y: 215, scale: 1, shirt: "#4a8fe0" }) +
-          A.puppy({ x: 250, y: 215, scale: .9, color: "#9a9a9a" }) + A.torch(90, 160),
-        text: "Deeper down, glowing mushrooms light a secret room — and a shivering little wolf is lost in the dark! Cory shares a bone he crafted from bones.",
-        choices: [{ label: "🐺 Tame the wolf as a friend", to: "wolfEnd" }]
-      },
-      sneak: {
-        art: () => A.skyDay({}) + A.grassBlocks(200) +
-          A.castle(320, 200, .42) +
-          A.boy({ x: 120, y: 196, scale: 1, shirt: "#4a8fe0" }),
-        text: "Tip-toe… tip-toe… Cory slips away safe. At dawn he spots a friendly village and trades his wood for fresh bread and a shiny map. Adventure ahead!",
-        end: "Village Explorer"
-      },
-      wall: {
-        art: () => A.skySunset({}) + A.grassBlocks(200) +
-          `<g>${A.block(250, 140, 30, "#9a9a9a", "#6a6a6a")}${A.block(250, 170, 30, "#9a9a9a", "#6a6a6a")}${A.block(280, 140, 30, "#9a9a9a", "#6a6a6a")}${A.block(280, 170, 30, "#9a9a9a", "#6a6a6a")}</g>` +
-          A.boy({ x: 130, y: 196, scale: 1, shirt: "#4a8fe0" }) +
-          A.fizzer({ x: 320, y: 188, scale: .9 }),
-        text: "Cory stacks a sturdy wall and waits cosily till sunrise. The Fizzer waits too — and by morning they're buddies! Being safe AND kind: that's a real pro move.",
-        end: "Fizzer's Friend"
-      },
-      diamondEnd: {
-        art: () => A.skyDay({}) + A.grassBlocks(200) +
-          A.boy({ x: 130, y: 196, scale: 1.05, shirt: "#4a8fe0" }) +
-          A.diamond(250, 150, 1.2) + A.diamond(285, 160, 1.2) + A.diamond(310, 140, 1.2) +
-          A.diamond(265, 185, 1.2) + A.diamond(300, 185, 1.2),
-        text: "Back in the sunshine with FIVE sparkling diamonds! Cory crafts a diamond pickaxe, a shield, and the coolest blocky castle in the whole world. Quest complete! 💎",
-        end: "Diamond Champion"
-      },
-      houseEnd: {
-        art: () => A.skySunset({}) + A.grassBlocks(200) +
-          `<g>${A.block(230, 130, 36, "#c98a4a", "#a06a3a")}${A.block(266, 130, 36, "#c98a4a", "#a06a3a")}${A.block(302, 130, 36, "#c98a4a", "#a06a3a")}${A.block(230, 166, 36, "#c98a4a", "#a06a3a")}${A.block(302, 166, 36, "#c98a4a", "#a06a3a")}<rect x="266" y="166" width="36" height="36" fill="#5a3a22"/><path d="M224 130 l60 -28 l60 28Z" fill="#e8584f"/></g>` +
-          A.boy({ x: 120, y: 196, scale: 1, shirt: "#4a8fe0" }) + A.torch(190, 175),
-        text: "Cory builds a warm little house with a torch by the door. Safe, snug, and ready for tomorrow's adventure. Home sweet blocky home! 🏠",
-        end: "Master Builder"
-      },
-      wolfEnd: {
-        art: () => A.skyDay({}) + A.grassBlocks(200) +
-          A.boy({ x: 120, y: 196, scale: 1.05, shirt: "#4a8fe0" }) +
-          A.puppy({ x: 220, y: 205, scale: 1, color: "#cfcfcf" }),
-        text: "The wolf wags its tail — a loyal friend forever! Together they head up to the surface to explore Block World side by side. Best buddies! 🐺",
-        end: "Wolf Tamer"
-      }
-    }
-  };
-
-  /* =======================================================
-     3) THE WHISPERING LIBRARY (7+, vocabulary & spelling)
-     ======================================================= */
-  const libraryStory = {
-    id: "library",
-    title: "The Whispering Library",
-    emoji: "📚",
-    color: "#a368d8",
-    ages: "7+",
-    who: "Jeannie",
-    teaches: "vocabulary, spelling & reasoning",
-    blurb: "Solve the mystery of the books that vanish each night!",
-    cover: () => A.library({}) +
-      A.princess({ x: 200, y: 250, scale: 1.05, dress: "#a368d8", hair: "#3a2a1a" }) +
-      `<text x="200" y="40" font-size="26" text-anchor="middle" fill="#ffd166">🔍</text>`,
-    start: "case",
-    nodes: {
-      case: {
-        art: () => A.library({}) +
-          A.princess({ x: 120, y: 255, scale: 1.05, dress: "#a368d8", hair: "#3a2a1a" }) +
-          `<rect x="250" y="150" width="110" height="58" rx="4" fill="#1a1008"/>`,
-        text: "Every morning, books VANISH from the old library — gone without a trace. Detective Jeannie takes the case. (To vanish means to disappear completely.) A trail of glowing letters drifts in the air.",
-        choices: [
-          { label: "🔦 Follow the glowing letters", to: "trail" },
-          { label: "🦉 Ask Professor Hoot the owl", to: "hoot" }
-        ]
-      },
-      trail: {
-        art: () => A.library({}) +
-          `<g font-size="30" font-weight="bold" fill="#ffe066" text-anchor="middle">
-            <text x="90" y="130">S</text><text x="140" y="120">E</text><text x="190" y="135">C</text>
-            <text x="240" y="118">R</text><text x="290" y="132">?</text><text x="340" y="122">T</text></g>` +
-          A.princess({ x: 130, y: 258, scale: .95, dress: "#a368d8", hair: "#3a2a1a" }),
-        text: "The letters spell a word with one missing: S · E · C · R · _ · T. Jeannie whispers it aloud. Which letter completes the word SECRET?",
-        choices: [
-          { label: "Letter A", to: "trailWrong" },
-          { label: "Letter E", to: "door" },
-          { label: "Letter I", to: "trailWrong" }
-        ]
-      },
-      trailWrong: {
-        art: () => A.library({}) +
-          A.princess({ x: 180, y: 258, scale: 1, dress: "#a368d8", hair: "#3a2a1a", mood: "surprised" }),
-        text: "Hmm, that doesn't sound right. Say it slowly: SEC-R-E-T. The missing letter makes the 'eh' sound. Try once more!",
-        choices: [{ label: "↩️ Look at the letters again", to: "trail" }]
-      },
-      hoot: {
-        art: () => A.library({}) +
-          A.owl({ x: 290, y: 150, scale: 1.5 }) +
-          A.princess({ x: 110, y: 258, scale: .95, dress: "#a368d8", hair: "#3a2a1a" }),
-        text: "\"Whooo took the books?\" hoots the wise owl. \"The thief is NOCTURNAL — that means awake at night while we sleep. Search the dark Reading Nook behind the velvet curtain.\"",
-        choices: [{ label: "🚪 Open the hidden door", to: "door" }]
-      },
-      door: {
-        art: () => `<rect width="400" height="300" fill="#1c130a"/>` +
-          `<rect x="150" y="60" width="120" height="200" rx="8" fill="#3a2718" stroke="#6b4a2f" stroke-width="4"/>
-           <circle cx="250" cy="160" r="6" fill="#ffd166"/>
-           <path d="M170 70 q40 -16 80 0 v6 q-40 -14 -80 0Z" fill="#ffe066" opacity=".5"/>` +
-          A.princess({ x: 90, y: 250, scale: .95, dress: "#a368d8", hair: "#3a2a1a" }),
-        text: "Behind the curtain, a tiny golden door glows. Jeannie peeks inside — and gasps! A small creature in a pointy hat sits reading by candlelight, surrounded by ALL the missing books.",
-        choices: [
-          { label: "👋 Say hello, kindly", to: "hello" },
-          { label: "📖 Read a story aloud to it", to: "readAloud" }
-        ]
-      },
-      hello: {
-        art: () => A.library({}) +
-          A.princess({ x: 110, y: 255, scale: 1, dress: "#a368d8", hair: "#3a2a1a" }) +
-          `<g transform="translate(280 210)"><ellipse cx="0" cy="6" rx="20" ry="22" fill="#6fb86f"/>
-            <path d="M-16 -14 l16 -26 l16 26Z" fill="#a368d8"/><circle cx="-6" cy="2" r="2.4" fill="#2b2440"/>
-            <circle cx="6" cy="2" r="2.4" fill="#2b2440"/><path d="M-5 10 q5 4 10 0" stroke="#2b6e3a" stroke-width="2" fill="none"/></g>`,
-        text: "\"I'm the Tome Gnome,\" it squeaks shyly. \"I don't STEAL the books — I just love them SO much I read them all night and tidy them back by dawn. I'm sorry I worried everyone.\"",
-        choices: [
-          { label: "🌙 Start a night-time Story Club", to: "clubEnd" },
-          { label: "📚 Make the gnome the Night Librarian", to: "libEnd" }
-        ]
-      },
-      readAloud: {
-        art: () => A.library({}) +
-          A.princess({ x: 130, y: 255, scale: 1, dress: "#a368d8", hair: "#3a2a1a" }) +
-          `<rect x="150" y="240" width="40" height="28" rx="3" fill="#ffd166" transform="rotate(-8 170 254)"/>`,
-        text: "Jeannie opens a book and reads in her warmest voice. The shy creature creeps closer, eyes shining. \"Nobody ever read TO me before,\" it whispers happily. A new friendship begins.",
-        choices: [{ label: "🌙 Start a night-time Story Club", to: "clubEnd" }]
-      },
-      clubEnd: {
-        art: () => A.night({ ground: false }) +
-          A.library({}).replace('fill="#3a2718"', 'fill="#2a1b3a"') +
-          A.princess({ x: 110, y: 255, scale: 1, dress: "#a368d8", hair: "#3a2a1a" }) +
-          A.boy({ x: 200, y: 255, scale: .9, shirt: "#4a8fe0" }) +
-          A.princess({ x: 290, y: 258, scale: .8, dress: "#ff5d8f" }),
-        text: "Mystery solved! Now every night the library hums with cocoa and stories. Jeannie, the Tome Gnome, and friends read together until the moon goes down. Case closed — and everyone's a reader! 🌙📖",
-        end: "Story Club Founder"
-      },
-      libEnd: {
-        art: () => A.library({}) +
-          A.princess({ x: 120, y: 255, scale: 1, dress: "#a368d8", hair: "#3a2a1a" }) +
-          `<g transform="translate(280 215)"><ellipse cx="0" cy="6" rx="20" ry="22" fill="#6fb86f"/>
-            <path d="M-16 -14 l16 -26 l16 26Z" fill="#ffd166"/><circle cx="-6" cy="2" r="2.4" fill="#2b2440"/>
-            <circle cx="6" cy="2" r="2.4" fill="#2b2440"/></g>`,
-        text: "With a tiny badge and a lantern, the Tome Gnome becomes the world's first NIGHT LIBRARIAN — guarding and loving the books while the town sleeps. Jeannie made a friend and solved the case. Brilliant detective work! 🔍",
-        end: "Master Detective"
-      }
-    }
-  };
-
-  /* =======================================================
-     4) THE GREAT FAMILY CAMPOUT (all ages, togetherness)
+     2) THE GREAT FAMILY CAMPOUT (all ages, togetherness)
      ======================================================= */
   const campout = {
     id: "campout",
@@ -410,7 +145,7 @@
         ]
       },
       explore: {
-        art: () => A.forest().replace('#bff0d8', '#2a3a4a').replace('#e9fff2', '#1a2430') +
+        art: () => A.forest().replace(/#bff0d8/g, '#2a3a4a').replace(/#e9fff2/g, '#1a2430') +
           A.princess({ x: 90, y: 250, scale: .85, dress: "#ff5d8f" }) +
           A.boy({ x: 150, y: 252, scale: .85, shirt: "#3ddc84" }) +
           A.puppy({ x: 290, y: 250, scale: .9 }) +
@@ -433,7 +168,7 @@
         ]
       },
       follow: {
-        art: () => A.forest().replace('#bff0d8', '#2a3a4a').replace('#e9fff2', '#1a2430') +
+        art: () => A.forest().replace(/#bff0d8/g, '#2a3a4a').replace(/#e9fff2/g, '#1a2430') +
           A.fox({ x: 270, y: 245, scale: 1 }) +
           A.puppy({ x: 200, y: 250, scale: .85 }) +
           A.princess({ x: 90, y: 252, scale: .8, dress: "#ff5d8f" }),
@@ -489,7 +224,7 @@
   };
 
   /* =======================================================
-     5) PIZZA PLANET RESCUE (all ages, silly counting & space)
+     3) PIZZA PLANET RESCUE (all ages, silly counting & space)
      ======================================================= */
   const pizza = {
     id: "pizza",
@@ -594,6 +329,6 @@
     }
   };
 
-  /* ---- export the library, ordered for the picker ---- */
-  window.STORIES = [rainbow, campout, pizza, blockworld, libraryStory];
+  /* ---- register the short stories (long ones append later) ---- */
+  window.STORIES = [rainbow, campout, pizza];
 })();
