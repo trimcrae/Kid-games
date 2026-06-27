@@ -21,6 +21,16 @@
 
 const GAMES = [
   {
+    title: "Spooky Princess Stories",
+    emoji: "👻",
+    blurb: "Friendly-spooky read-aloud storybooks starring Ellie & her siblings — tap the pictures to play! For Ellie!",
+    url:   "games/spooky-stories/",
+    ages:  "3+",
+    color: "#8a5cff",
+    ready: true
+  },
+
+  {
     title: "Comic Maker",
     emoji: "💥",
     blurb: "Make your own graphic novel — panels, characters, talk bubbles & captions! For Jeannie!",
