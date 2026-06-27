@@ -1,0 +1,189 @@
+/* ===========================================================
+   The Crae Family Arcade — shared landing-page styles
+   =========================================================== */
+
+:root {
+  --pink:   #ff5d8f;
+  --purple: #8a5cff;
+  --blue:   #38b6ff;
+  --green:  #3ddc84;
+  --yellow: #ffd166;
+  --ink:    #2b2440;
+  --paper:  #fff;
+  --font: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  color: var(--ink);
+  background: linear-gradient(160deg, #fef6ff 0%, #eafaff 50%, #f3fff4 100%);
+  overflow-x: hidden;
+}
+
+/* --- Floating background blobs --- */
+.bg-blobs {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.5;
+  animation: float 14s ease-in-out infinite;
+}
+.blob-1 { width: 320px; height: 320px; background: var(--pink);   top: -60px;  left: -60px; }
+.blob-2 { width: 280px; height: 280px; background: var(--blue);   bottom: -80px; right: -40px; animation-delay: -4s; }
+.blob-3 { width: 240px; height: 240px; background: var(--yellow); top: 40%;   left: 60%;   animation-delay: -8s; }
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(20px, -30px) scale(1.08); }
+}
+
+/* --- Hero --- */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem 1.5rem;
+}
+.title {
+  font-size: clamp(2rem, 6vw, 4rem);
+  margin: 0;
+  line-height: 1.1;
+  background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 4px 18px rgba(138, 92, 255, 0.18);
+}
+.title-emoji {
+  display: inline-block;
+  animation: wiggle 2.5s ease-in-out infinite;
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg); }
+}
+.subtitle {
+  font-size: clamp(1rem, 3vw, 1.4rem);
+  color: var(--purple);
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+/* --- Game grid --- */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 1rem auto 3rem;
+  padding: 0 1.25rem;
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--paper);
+  border-radius: 24px;
+  padding: 1.75rem 1.25rem;
+  box-shadow: 0 10px 30px rgba(43, 36, 64, 0.12);
+  border: 4px solid transparent;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  position: relative;
+}
+.game-card:hover,
+.game-card:focus-visible {
+  transform: translateY(-8px) rotate(-1deg);
+  box-shadow: 0 18px 40px rgba(43, 36, 64, 0.22);
+  border-color: var(--accent, var(--purple));
+  outline: none;
+}
+.game-card .emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.12));
+}
+.game-card h2 {
+  font-size: 1.35rem;
+  margin: 0 0 0.35rem;
+}
+.game-card p {
+  font-size: 0.95rem;
+  margin: 0;
+  color: #6a6385;
+}
+.game-card .age-badge {
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+  background: var(--accent, var(--purple));
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}
+
+/* "Coming soon" cards */
+.game-card.soon {
+  opacity: 0.75;
+  cursor: default;
+  border-style: dashed;
+  border-color: #cdbfff;
+  background: rgba(255, 255, 255, 0.6);
+}
+.game-card.soon:hover {
+  transform: none;
+  box-shadow: 0 10px 30px rgba(43, 36, 64, 0.12);
+}
+
+/* --- Footer --- */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: #8a82a6;
+  font-size: 0.95rem;
+}
+
+/* ===========================================================
+   Reusable bits for individual game pages
+   =========================================================== */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 1.25rem;
+  padding: 0.6rem 1.1rem;
+  background: var(--paper);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--purple);
+  font-weight: bold;
+  box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
+  transition: transform 0.15s ease;
+}
+.back-link:hover { transform: translateX(-4px); }
+
+.game-stage {
+  max-width: 720px;
+  margin: 0 auto 3rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blob, .title-emoji { animation: none; }
+  * { scroll-behavior: auto; }
+}
