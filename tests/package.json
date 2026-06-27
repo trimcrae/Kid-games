@@ -1,0 +1,12 @@
+{
+  "name": "kid-games-playtests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated play-testing for the McRae Family Arcade (Desktop / iPad / iPhone).",
+  "scripts": {
+    "test": "node playtest.js"
+  },
+  "dependencies": {
+    "playwright-core": "^1.40.0"
+  }
+}
