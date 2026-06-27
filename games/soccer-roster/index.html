@@ -188,6 +188,8 @@
     }
     .print-fab span { line-height: 1; }
     .print-fab:active { transform: scale(0.94); }
+    .print-fab:disabled { background: #d9d3cc; color: #9a9289; box-shadow: none; cursor: default; }
+    .print-fab:disabled:active { transform: none; }
     @media (max-width: 480px) {
       /* leave room above the fixed button so it never hides the last card */
       #output { padding-bottom: 5rem; }
@@ -207,15 +209,15 @@
       .bg-blobs, .back-link, .no-print, .footer, .hero,
       .checks, .warn-panel, .grid-panel, .pcard .sit, .gk-emoji { display: none !important; }
 
-      /* rotate an 11in × 8.5in (landscape) block onto the portrait Letter page */
-      .wrap {
-        position: absolute; top: 0; left: 0;
-        transform-origin: top left;
-        transform: translateX(8.5in) rotate(90deg);
-        width: 11in; height: 8.5in;
-        box-sizing: border-box;
-        padding: 0.4in; margin: 0; max-width: none;
-        overflow: hidden;
+      /* page-sized container that CLIPS — guarantees a single page */
+      .wrap { position: relative; width: 8.5in; height: 11in; overflow: hidden; margin: 0; padding: 0; max-width: none; }
+      /* the landscape roster, a touch smaller than the page, centered + rotated */
+      .print-area {
+        position: absolute; left: 50%; top: 50%;
+        width: 10.6in; height: 8.0in;
+        transform-origin: center center;
+        transform: translate(-50%, -50%) rotate(90deg);
+        box-sizing: border-box; padding: 0.25in; overflow: hidden;
       }
       .panel { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
 
@@ -248,6 +250,7 @@
   </header>
 
   <div class="wrap">
+   <div class="print-area">
 
     <!-- shows only on the printed page -->
     <div class="print-title">Pumpkin Pies</div>
@@ -287,13 +290,14 @@
     <!-- ====== OUTPUT ====== -->
     <div id="output"></div>
 
+   </div>
   </div>
 
   <footer class="footer no-print">Made with ⚽ for the McRae Family Arcade</footer>
 
   <!-- always-visible floating Print button -->
-  <button class="print-fab no-print" id="printFab" aria-label="Print roster">🖨️<span>Print</span></button>
+  <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=3"></script>
+  <script src="roster.js?v=5"></script>
 </body>
 </html>

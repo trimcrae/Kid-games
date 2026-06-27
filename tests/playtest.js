@@ -352,6 +352,12 @@ const GAMES = {
     if (await page.locator(".player-row").count() < 7) throw new Error("team roster did not render");
     if (await page.locator('.period-btn[data-p="8"].active').count() !== 1) throw new Error("8 periods should be selected by default on load");
 
+    // goalie eligibility resets to all-eligible on every load
+    await page.locator(".player-row .chip.gk-on").first().click();   // turn one off
+    await page.waitForTimeout(80);
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.locator(".player-row .chip.gk-off").count() !== 0) throw new Error("all girls should be goalie-eligible after a reload");
+
     // button starts as "Make roster", becomes "Shuffle" once a roster exists
     if (!/Make roster/.test(await page.locator("#generateBtn").textContent())) throw new Error("button should say Make roster before any roster");
     await page.locator("#generateBtn").click();
@@ -424,10 +430,11 @@ const GAMES = {
     if (await page.locator(".pcard").count() !== 0) throw new Error("a roster was generated before Make roster was pressed");
     if (await page.locator(".empty-note").count() < 1) throw new Error("no setup prompt on first load");
 
-    // floating Print button with no roster should build one (never print the empty prompt)
-    await page.locator("#printFab").click();
+    // floating Print button is disabled until a roster exists
+    if (!(await page.locator("#printFab").isDisabled())) throw new Error("Print button should be disabled before a roster is made");
+    await page.locator("#generateBtn").click();
     await page.waitForTimeout(150);
-    if (await page.locator(".pcard").count() < 1) throw new Error("Print did not build a roster when none existed");
+    if (await page.locator("#printFab").isDisabled()) throw new Error("Print button should be enabled once a roster exists");
 
     return "no auto-generate; setup edits clear roster; print builds first; 2/4/8 even, no repeats";
   },

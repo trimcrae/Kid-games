@@ -37,6 +37,7 @@
         if (s && s.team && s.team.length) {
           s.periods = 8;            // always open on 8 periods
           s.seed = s.seed || 1;
+          s.team.forEach(function (g) { g.goalie = true; }); // everyone goalie-eligible on load
           return s;
         }
       }
@@ -324,10 +325,13 @@
   var hasRoster = false;
 
   // Button reads "Make roster" until one exists, then becomes "Shuffle".
+  // The Print button is disabled until there's a roster to print.
   function setHasRoster(v) {
     hasRoster = v;
     var btn = document.getElementById("generateBtn");
     if (btn) btn.textContent = v ? "🔀 Shuffle" : "⚽ Make roster";
+    var fab = document.getElementById("printFab");
+    if (fab) fab.disabled = !v;
   }
 
   // Empty state: a clear "your move" prompt instead of a surprise roster.
@@ -388,8 +392,7 @@
     // one button: each tap builds a fresh fair line-up (no separate "shuffle")
     on("generateBtn", function () { makeRoster(true); scrollToOutput(); });
     on("printFab", function () {
-      // never print the empty prompt — make the roster first, let her review, then print
-      if (!hasRoster) { makeRoster(true); scrollToOutput(); return; }
+      if (!hasRoster) return;   // disabled until a roster exists
       window.print();
     });
     on("resetBtn", function () {
