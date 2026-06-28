@@ -25,6 +25,7 @@
     coins: 0,
     bestDist: 0,
     bestCrew: 0,
+    bestLevel: 1,
     muted: false,
     mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
@@ -47,10 +48,19 @@
 
   // ---- Difficulty modes -----------------------------------------------
   // Same game, three brains: gentle for the littles, spicy for the bigs.
+  // Speed is a single constant per mode now — it never ramps up. The challenge
+  // comes from the math and the brick-wall finale at the end of each level, not
+  // from the track getting faster.
+  //   levelBase/levelStep — metres to the finish line (grows each level)
+  //   wallBase/wallStep   — how strong the finale's brick walls are (and how
+  //                         much each one grows per level)
   const MODES = {
-    easy:   { label: "🌱 Easy",   sub: "add & double", speed: 120, smax: 175, barrier: 0.20, bossBase: 4, bossK: 0.04 },
-    medium: { label: "⭐ Medium", sub: "add & times",  speed: 150, smax: 235, barrier: 0.30, bossBase: 6, bossK: 0.07 },
-    hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 185, smax: 300, barrier: 0.36, bossBase: 9, bossK: 0.10 },
+    easy:   { label: "🌱 Easy",   sub: "add & double", speed: 135, barrier: 0.18,
+              levelBase: 300, levelStep: 70,  wallBase: 7,  wallStep: 4 },
+    medium: { label: "⭐ Medium", sub: "add & times",  speed: 155, barrier: 0.28,
+              levelBase: 360, levelStep: 90,  wallBase: 11, wallStep: 7 },
+    hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 180, barrier: 0.34,
+              levelBase: 420, levelStep: 110, wallBase: 16, wallStep: 10 },
   };
   const mode = () => MODES[save.mode] || MODES.medium;
 
@@ -116,7 +126,8 @@
     { id: "run500",  ico: "🏃", name: "Marathoner",       desc: "Run 500 m in one go.",          ok: s => s.bestDist >= 500 },
     { id: "mob100",  ico: "👥", name: "Big Crowd",        desc: "Grow a mob of 100.",            ok: s => s.bestCrew >= 100 },
     { id: "mob1000", ico: "🌊", name: "Huge Crowd",       desc: "Grow a mob of 1,000!",          ok: s => s.bestCrew >= 1000 },
-    { id: "walls10", ico: "⚔️", name: "Wall Breaker",     desc: "Smash 10 number walls.",        ok: s => s.walls >= 10 },
+    { id: "walls10", ico: "🧱", name: "Wall Breaker",     desc: "Smash 10 brick walls.",         ok: s => s.walls >= 10 },
+    { id: "level5",  ico: "🏰", name: "Level Five",        desc: "Reach Level 5.",                ok: s => s.bestLevel >= 5 },
     { id: "quiz25",  ico: "🧠", name: "Quiz Whiz",        desc: "Answer 25 quiz gates right.",   ok: s => s.quizCorrect >= 25 },
     { id: "combo6",  ico: "🔥", name: "On Fire",          desc: "Reach a 6× streak.",            ok: s => s.bestCombo >= 6 },
     { id: "spend5",  ico: "🛒", name: "Big Spender",      desc: "Buy 5 upgrades.",               ok: s => s.upgradesBought >= 5 },
@@ -124,7 +135,9 @@
   ];
 
   function statsSnapshot() {
-    return Object.assign({ bestDist: save.bestDist, bestCrew: save.bestCrew }, save.stats);
+    return Object.assign(
+      { bestDist: save.bestDist, bestCrew: save.bestCrew, bestLevel: save.bestLevel || 1 },
+      save.stats);
   }
   // Returns the achievement defs newly unlocked by the current stats.
   function checkAchievements() {
@@ -148,6 +161,7 @@
   const crewEl   = $("crew");
   const runCoinsEl = $("run-coins");
   const distEl   = $("dist");
+  const levelEl  = $("level");
   const comboPill = $("combo-pill");
   const comboEl   = $("combo");
   const muteBtn   = $("mute-btn");
@@ -167,6 +181,7 @@
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    buildScenery();
   }
   window.addEventListener("resize", resize);
 
@@ -232,16 +247,29 @@
   let bestCrewThisRun = 1;
   let shieldsLeft = 0;
   let speed = 0;
-  let rows = [], coins = [], floaters = [], particles = [];
+  let rows = [], coins = [], floaters = [], particles = [], bricks = [];
   let spawnAccum = 0, coinAccum = 0;
   let keyDir = 0;
   let lastT = 0, now = 0;
   let combo = 0, bestComboThisRun = 0;
   let worldScroll = 0;         // for scrolling speed-chevrons
   let shake = 0;               // screen-shake magnitude
+  let flash = 0;               // white impact-flash magnitude (0..1)
   let labelScale = 1;          // little pop on the crew counter when it changes
-  let nextBossDist = 220;      // distance of the next number wall
-  let bossPending = false;
+  let mobSquash = 1;           // squash/stretch on the whole mob when crew jumps
+
+  // Levels & the brick-wall finale.
+  let level = 1;
+  let levelTarget = 400;       // metres to the finish line for this level
+  let phase = "run";           // run | finale | clear
+  let phaseT = 0;              // timer for timed phase transitions (seconds)
+  let wallsSmashedThisRun = 0;
+  let finaleTotal = 0, finaleSmashed = 0, finaleSpawned = 0;
+  let finaleGap = 0;           // spawn spacing accumulator for finale walls
+  let banner = null;           // { text, sub, life, color } big centre banner
+
+  // Parallax scenery (built once at boot, scrolls at fractions of run speed).
+  let hills = [], clouds = [];
 
   const playerY = () => H * 0.80;
   const bandH = 64;
@@ -327,16 +355,10 @@
     };
   }
 
+  // During the run we only ever spawn the mob-growers: math gates, quiz gates,
+  // and the occasional barrier to dodge. The brick walls live in the finale.
   function spawnRow() {
-    // A number wall is due?
     const M = mode();
-    if (bossPending) {
-      bossPending = false;
-      const need = Math.max(3, Math.round(M.bossBase + dist * M.bossK));
-      rows.push({ kind: "boss", y: -bandH, need, done: false });
-      nextBossDist = dist + rand(200, 280);
-      return;
-    }
     const barrierChance = dist < 80 ? 0 : M.barrier;
     if (Math.random() < barrierChance) {
       const side = Math.random() < 0.5 ? "L" : "R";
@@ -346,6 +368,19 @@
     } else {
       rows.push({ kind: "gate", y: -bandH, ops: makeGatePair(), done: false });
     }
+  }
+
+  // How strong the i-th brick wall of this level's gauntlet is. Walls escalate
+  // within the gauntlet and get tougher every level, so you must keep building a
+  // bigger mob to keep advancing.
+  function wallNeed(i) {
+    const M = mode();
+    const base = M.wallBase + (level - 1) * M.wallStep;
+    return Math.max(3, Math.round(base * (1 + i * 0.55)));
+  }
+  function levelTargetFor(lv) {
+    const M = mode();
+    return M.levelBase + (lv - 1) * M.levelStep;
   }
 
   function spawnCoin() {
@@ -378,10 +413,14 @@
     dist = 0; runCoins = 0; bestCrewThisRun = crew;
     shieldsLeft = upgLevel("shield");
     speed = mode().speed;
-    rows = []; coins = []; floaters = []; particles = [];
-    spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0; labelScale = 1;
+    rows = []; coins = []; floaters = []; particles = []; bricks = [];
+    spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0; flash = 0;
+    labelScale = 1; mobSquash = 1;
     keyDir = 0; combo = 0; bestComboThisRun = 0;
-    nextBossDist = 220; bossPending = false;
+    level = 1; levelTarget = levelTargetFor(1); phase = "run"; phaseT = 0;
+    wallsSmashedThisRun = 0; finaleTotal = 0; finaleSmashed = 0;
+    finaleSpawned = 0; finaleGap = 0;
+    banner = { text: "Level 1", sub: "", life: 1.6, color: "#8a5cff" };
     state = "playing";
     hide(menu); hide(shopScreen); hide(gameover);
     hud.style.display = "flex";
@@ -401,8 +440,10 @@
     const distR = Math.round(dist);
     const newBestDist = distR > save.bestDist;
     const newBestCrew = bestCrewThisRun > save.bestCrew;
+    const newBestLevel = level > (save.bestLevel || 1);
     if (newBestDist) save.bestDist = distR;
     if (newBestCrew) save.bestCrew = bestCrewThisRun;
+    if (newBestLevel) save.bestLevel = level;
 
     // Lifetime stats for badges.
     save.stats.runs++;
@@ -411,7 +452,8 @@
     const freshBadges = checkAchievements();
     persist();
 
-    $("go-dist").textContent = distR;
+    $("go-level").textContent = level;
+    $("go-walls").textContent = wallsSmashedThisRun;
     $("go-crew").textContent = bestCrewThisRun;
     $("go-coins").textContent = earned;
     const badgeBox = $("go-badges");
@@ -422,9 +464,9 @@
       d.textContent = `🏅 New badge: ${a.ico} ${a.name}!`;
       badgeBox.appendChild(d);
     }
-    $("go-title").textContent = newBestDist ? "New record! 🏆" : "Run finished! 🏁";
+    $("go-title").textContent = newBestLevel ? "New record! 🏆" : "Run finished! 🏁";
     $("go-best").textContent =
-      `Best: ${save.bestDist} m • biggest mob 🏃 ${save.bestCrew}` +
+      `Best: Level ${save.bestLevel} • biggest mob 🏃 ${save.bestCrew}` +
       (earned !== runCoins ? "  (coin boost on!)" : "");
     show(gameover);
   }
@@ -443,25 +485,49 @@
 
   function update(dt) {
     const M = mode();
-    // Gentle ramp: eases in over the first ~250 m instead of spiking early.
-    speed = M.speed + Math.min(dist * 0.42, M.smax - M.speed);
+    speed = M.speed;                 // constant — the track never speeds up
     const dy = speed * dt;
-    dist += dy / 20;
     worldScroll += dy;
 
-    if (dist >= nextBossDist) bossPending = true;
+    // Eye-candy timers that tick in every phase.
+    if (banner) { banner.life -= dt; if (banner.life <= 0) banner = null; }
+    flash *= Math.pow(0.015, dt); if (flash < 0.01) flash = 0;
+    mobSquash += (1 - mobSquash) * Math.min(1, dt * 10);
 
+    // Steering (harmless in the finale, where walls span the whole track).
     if (keyDir !== 0) targetX = clamp(targetX + keyDir * 620 * dt, 0, W);
     crewX += (targetX - crewX) * Math.min(1, dt * 12);
     crewX = clamp(crewX, mobRadius() + 6, W - mobRadius() - 6);
 
-    spawnAccum += dy;
-    const rowGap = clamp(H * 0.95 - dist * 0.25, H * 0.62, H * 1.1);
-    if (spawnAccum >= rowGap) { spawnAccum = 0; spawnRow(); }
+    // ---- phase machine ----
+    if (phase === "run") {
+      dist += dy / 20;
+      if (dist >= levelTarget) {
+        enterFinale();
+      } else {
+        spawnAccum += dy;
+        if (spawnAccum >= H * 0.9) { spawnAccum = 0; spawnRow(); }
+        coinAccum += dy;
+        if (coinAccum >= H * 0.16) { coinAccum = 0; spawnCoin(); }
+      }
+    } else if (phase === "finale") {
+      finaleGap += dy;
+      if (finaleSpawned < finaleTotal && finaleGap >= bandH * 3.4) {
+        finaleGap = 0;
+        rows.push({ kind: "wall", y: -bandH - 12, need: wallNeed(finaleSpawned),
+                    idx: finaleSpawned, done: false });
+        finaleSpawned++;
+      }
+      // Gauntlet beaten once every wall has spawned and smashed away.
+      if (finaleSpawned >= finaleTotal && !rows.some(r => r.kind === "wall")) {
+        enterClear();
+      }
+    } else if (phase === "clear") {
+      phaseT -= dt;
+      if (phaseT <= 0) startNextLevel();
+    }
 
-    coinAccum += dy;
-    if (coinAccum >= H * 0.16) { coinAccum = 0; spawnCoin(); }
-
+    // ---- move rows & resolve contacts ----
     const py = playerY();
     for (const row of rows) {
       row.y += dy;
@@ -470,10 +536,11 @@
         if (row.kind === "gate") applyGate(row);
         else if (row.kind === "barrier") applyBarrier(row);
         else if (row.kind === "quiz") applyQuiz(row);
-        else applyBoss(row);
+        else if (row.kind === "wall") applyWall(row);
+        // "finish" rows are cosmetic — they just scroll by.
       }
     }
-    rows = rows.filter(r => r.y < H + bandH * 2);
+    rows = rows.filter(r => !r.dead && r.y < H + bandH * 3);
 
     const pull = mobRadius() + 26 + upgLevel("magnet") * 26;
     for (const c of coins) {
@@ -504,6 +571,15 @@
     }
     particles = particles.filter(p => p.life > 0);
 
+    // Brick debris from smashed walls — tumbling chunks with gravity & bounce.
+    const ground = py + mobRadius() * 0.5 + 6;
+    for (const b of bricks) {
+      b.x += b.vx * dt; b.y += b.vy * dt; b.vy += 900 * dt;
+      b.rot += b.vr * dt; b.life -= dt;
+      if (b.y > ground && b.vy > 0) { b.y = ground; b.vy *= -0.42; b.vx *= 0.6; b.vr *= 0.6; }
+    }
+    bricks = bricks.filter(b => b.life > 0);
+
     for (const f of floaters) { f.y -= 40 * dt; f.life -= dt * 1.1; }
     floaters = floaters.filter(f => f.life > 0);
 
@@ -514,7 +590,79 @@
     bestCrewThisRun = Math.max(bestCrewThisRun, crew);
     syncHud();
 
-    if (crew <= 0) { crew = 0; syncHud(); endRun(); }
+    if (crew <= 0 && state === "playing") { crew = 0; syncHud(); endRun(); }
+  }
+
+  // ---- Level / finale flow --------------------------------------------
+  function enterFinale() {
+    phase = "finale";
+    finaleTotal = Math.min(8, 3 + level);
+    finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
+    rows = [];   // clear leftover gates/quizzes/barriers — the finish line wipes the track
+    rows.push({ kind: "finish", y: -bandH - 4, done: true });
+    banner = { text: "FINAL WALLS! 🧱", sub: "smash through!", life: 1.6, color: "#ff7a3d" };
+    addShake(4);
+  }
+
+  function applyWall(row) {
+    const py = playerY();
+    const before = crew;
+    if (crew > row.need) {
+      crew = clamp(crew - row.need, 0, MAX_CREW);
+      finaleSmashed++; wallsSmashedThisRun++; save.stats.walls++;
+      const reward = Math.min(40, 6 + row.need);   // capped — no runaway score
+      runCoins += reward;
+      smashWall(row, true);
+      addFloater(W / 2, py - 38, "SMASH! 🧱", "#2bb673", true);
+      addFloater(W / 2, py - 70, "+" + reward + "🪙", "#c98a00");
+      popLabel(1.5); mobSquash = 1.45; addShake(9);
+      flash = Math.max(flash, 0.45); buzz(50); sfx.bossWin();
+    } else {
+      crew = 0;
+      smashWall(row, false);
+      addFloater(W / 2, py - 38, "Wall held! Needed " + (row.need + 1), "#ff4d6d", true);
+      addShake(16); flash = Math.max(flash, 0.7); buzz(120);
+    }
+    row.dead = true;     // the intact wall vanishes into flying bricks
+  }
+
+  // Burst a wall into tumbling brick chunks + a dust cloud.
+  function smashWall(row, success) {
+    const y = playerY() - 6;
+    const n = reduceMotion ? 14 : 42;
+    const palette = success
+      ? ["#b5572f", "#9c4a28", "#c46a3d", "#8a4022", "#a85433"]
+      : ["#6f6385", "#574d6b", "#7c7090"];
+    for (let i = 0; i < n; i++) {
+      bricks.push({
+        x: rand(W * 0.04, W * 0.96), y: y + rand(-bandH * 0.6, 12),
+        vx: rand(-300, 300), vy: rand(-420, -90),
+        rot: rand(0, Math.PI * 2), vr: rand(-14, 14),
+        life: rand(0.7, 1.4), w: rand(9, 18), h: rand(7, 12),
+        color: pick(palette),
+      });
+    }
+    burst(W / 2, y, "rgba(150,120,95,0.55)", reduceMotion ? 8 : 24, 280);
+  }
+
+  function enterClear() {
+    phase = "clear"; phaseT = 1.8;
+    banner = { text: "Level " + level + " cleared! 🎉",
+               sub: "crew lives on: 🏃 " + crew, life: 1.8, color: "#2bb673" };
+    flash = Math.max(flash, 0.35); addShake(6);
+    burst(W / 2, playerY() - 30, "#ffd166", reduceMotion ? 10 : 26, 320);
+    sfx.bossWin();
+  }
+
+  function startNextLevel() {
+    level++;
+    if (level > (save.bestLevel || 1)) { save.bestLevel = level; persist(); }
+    levelTarget = levelTargetFor(level);
+    dist = 0; phase = "run"; phaseT = 0;
+    spawnAccum = 0; coinAccum = 0;
+    rows = []; coins = [];
+    finaleTotal = 0; finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
+    banner = { text: "Level " + level, sub: "tougher walls ahead", life: 1.5, color: "#8a5cff" };
   }
 
   function applyGate(row) {
@@ -522,10 +670,11 @@
     const chosen = onRight ? row.ops[1] : row.ops[0];
     const other  = onRight ? row.ops[0] : row.ops[1];
     const before = crew;
-    crew = clamp(chosen.apply(crew), 0, MAX_CREW);
+    crew = clamp(chosen.apply(crew) || 0, 0, MAX_CREW);   // || 0 guards NaN
 
     const delta = crew - before;
     popLabel(delta >= 0 ? 1.4 : 1.2);
+    mobSquash = delta >= 0 ? 1.35 : 0.78;
     addFloater(crewX, playerY() - 30, (delta >= 0 ? "+" : "") + delta,
                delta >= 0 ? "#2bb673" : "#ff4d6d");
     burst(crewX, playerY() - 24, chosen.color, 10, 200);
@@ -551,7 +700,7 @@
     const before = crew;
     if (side === row.correctSide) {
       crew = clamp(Math.round(crew * 1.3) + 5, 0, MAX_CREW);
-      popLabel(1.5);
+      popLabel(1.5); mobSquash = 1.4;
       combo++;
       save.stats.quizCorrect++;
       const bonus = Math.min(combo, 6);
@@ -563,7 +712,7 @@
       burst(crewX, playerY() - 24, "#2bb673", 14, 240);
     } else {
       crew = Math.max(0, Math.round(crew * 0.7));
-      popLabel(1.2);
+      popLabel(1.2); mobSquash = 0.78;
       combo = 0; setCombo(0);
       sfx.bad();
       addFloater(crewX, playerY() - 30, "Oops!", "#ff4d6d", true);
@@ -585,35 +734,13 @@
     }
     const before = crew;
     crew = Math.max(0, Math.ceil(crew * 0.6) - 1);
-    popLabel(1.25);
+    popLabel(1.25); mobSquash = 0.7;
     combo = 0; setCombo(0);
     addFloater(crewX, playerY() - 30, "-" + (before - crew), "#ff4d6d", true);
     burst(crewX, playerY() - 24, "#ff4d6d", 18, 300);
     addShake(10);
     buzz(40);
     sfx.barrier();
-  }
-
-  function applyBoss(row) {
-    const before = crew;
-    if (crew > row.need) {
-      crew = crew - row.need;          // punch through, lose its strength
-      save.stats.walls++;
-      popLabel(1.5);
-      buzz(60);
-      runCoins += 12 + Math.round(row.need / 2);
-      addFloater(W / 2, playerY() - 36, "SMASH! 🏆", "#2bb673", true);
-      addFloater(W / 2, playerY() - 64, "+" + (12 + Math.round(row.need / 2)) + "🪙", "#c98a00");
-      burst(W / 2, playerY() - 24, "#ffd166", 30, 360);
-      burst(W / 2, playerY() - 24, "#2bb673", 20, 320);
-      addShake(8);
-      sfx.bossWin();
-    } else {
-      crew = 0;                        // wall was too strong → run ends
-      addFloater(W / 2, playerY() - 36, "Need more than " + row.need + "!", "#ff4d6d", true);
-      burst(W / 2, playerY() - 24, "#ff4d6d", 26, 320);
-      addShake(14);
-    }
   }
 
   // ---- Rendering ------------------------------------------------------
@@ -638,63 +765,135 @@
       if (row.kind === "gate") drawGate(row);
       else if (row.kind === "barrier") drawBarrier(row);
       else if (row.kind === "quiz") drawQuiz(row);
-      else drawBoss(row);
+      else if (row.kind === "wall") drawWall(row);
+      else if (row.kind === "finish") drawFinish(row);
     }
 
     drawParticles();
     drawMob();
+    drawBricks();
     drawFloaters();
 
-    ctx.restore();
+    ctx.restore();   // brick debris + flash + vignette + banner sit above shake
+
+    drawVignette();
+    if (flash > 0) {
+      ctx.fillStyle = "rgba(255,255,255," + clamp(flash, 0, 0.85) + ")";
+      ctx.fillRect(0, 0, W, H);
+    }
+    drawBanner();
   }
 
-  // Soft sky-to-track gradient, grassy verges and scrolling ground bands that
-  // sell the sense of speed without any artwork files.
+  // Roadside scenery + cloud shadows, scattered once so they loop seamlessly.
+  // `sceneSpan` is how tall the looping band is; objects wrap within it.
+  let sceneSpan = 0, trees = [], cloudShadows = [];
+  function buildScenery() {
+    sceneSpan = Math.max(600, H * 2);
+    trees = [];
+    const vw = Math.max(12, W * 0.07);
+    const treeKinds = ["#5bbf6a", "#4aa85b", "#6fd07e", "#3f9e52"];
+    for (let s = 0; s < 2; s++) {                 // left & right verge
+      const n = Math.max(6, Math.round(sceneSpan / 120));
+      for (let i = 0; i < n; i++) {
+        trees.push({
+          side: s,
+          x: (s === 0 ? rand(2, vw - 6) : W - rand(2, vw - 6)),
+          y: rand(0, sceneSpan),
+          r: rand(9, 17),
+          c: pick(treeKinds),
+          flower: Math.random() < 0.4,
+        });
+      }
+    }
+    cloudShadows = [];
+    for (let i = 0; i < 4; i++) {
+      cloudShadows.push({ x: rand(0, W), y: rand(0, sceneSpan), r: rand(70, 140) });
+    }
+  }
+
+  // Bright field, cool running track down the middle, grassy verges with trees,
+  // scrolling tiles for speed and a soft drifting cloud shadow for life.
   function drawBackground(py) {
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, "#dff4ff");
-    g.addColorStop(0.55, "#c7ecff");
-    g.addColorStop(1, "#b6e4ff");
-    ctx.fillStyle = g;
+    // Grass field underneath everything.
+    const grass = ctx.createLinearGradient(0, 0, 0, H);
+    grass.addColorStop(0, "#8ed79b");
+    grass.addColorStop(1, "#71c684");
+    ctx.fillStyle = grass;
     ctx.fillRect(-20, -20, W + 40, H + 40);
+
+    // The running track.
+    const vw = Math.max(12, W * 0.07);
+    const road = ctx.createLinearGradient(0, 0, 0, H);
+    road.addColorStop(0, "#cdecfb");
+    road.addColorStop(0.5, "#bbe4fa");
+    road.addColorStop(1, "#a9dcf7");
+    ctx.fillStyle = road;
+    ctx.fillRect(vw, -20, W - vw * 2, H + 40);
+    // Soft inner shadow where the track meets the grass (adds depth).
+    const edge = ctx.createLinearGradient(vw, 0, vw + 16, 0);
+    edge.addColorStop(0, "rgba(40,90,120,0.18)");
+    edge.addColorStop(1, "rgba(40,90,120,0)");
+    ctx.fillStyle = edge; ctx.fillRect(vw, -20, 16, H + 40);
+    ctx.save(); ctx.translate(W, 0); ctx.scale(-1, 1);
+    ctx.fillStyle = edge; ctx.fillRect(vw, -20, 16, H + 40);
+    ctx.restore();
 
     // Faint scrolling road tiles for motion.
     const band = 130;
     const off = worldScroll % (band * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.05)";
+    ctx.fillStyle = "rgba(255,255,255,0.06)";
     for (let y = off - band * 2; y < H + band; y += band * 2) {
-      ctx.fillRect(-20, y, W + 40, band);
+      ctx.fillRect(vw, y, W - vw * 2, band);
     }
 
-    // Grassy verges with scrolling tufts down each edge.
-    const vw = Math.max(10, W * 0.05);
-    const gg = ctx.createLinearGradient(0, 0, vw, 0);
-    gg.addColorStop(0, "#7ccb8f");
-    gg.addColorStop(1, "#a3e1b3");
-    ctx.fillStyle = gg;
-    ctx.fillRect(-20, -20, vw + 20, H + 40);
-    ctx.save();
-    ctx.translate(W, 0); ctx.scale(-1, 1);
-    ctx.fillStyle = gg;
-    ctx.fillRect(-20, -20, vw + 20, H + 40);
-    ctx.restore();
-
-    const tuft = 50;
-    const to = worldScroll % tuft;
-    ctx.fillStyle = "rgba(34,120,60,0.22)";
-    for (let y = to - tuft; y < H; y += tuft) {
-      ctx.fillRect(-20, y, vw + 20, 9);
-      ctx.fillRect(W - vw, y, vw + 20, 9);
+    // Drifting cloud shadows over the whole field (very soft).
+    if (sceneSpan) {
+      for (const cl of cloudShadows) {
+        const yy = ((cl.y + worldScroll * 0.35) % sceneSpan) - cl.r;
+        const rg = ctx.createRadialGradient(cl.x, yy, 1, cl.x, yy, cl.r);
+        rg.addColorStop(0, "rgba(60,90,110,0.06)");
+        rg.addColorStop(1, "rgba(60,90,110,0)");
+        ctx.fillStyle = rg;
+        ctx.beginPath(); ctx.arc(cl.x, yy, cl.r, 0, Math.PI * 2); ctx.fill();
+      }
     }
 
-    // A warm finish-strip of ground where the mob runs, so they read as
-    // standing on something solid.
+    // Roadside trees & flowers, scrolling with the track and looping.
+    if (sceneSpan) {
+      for (const t of trees) {
+        const yy = ((t.y + worldScroll) % sceneSpan) - 30;
+        if (yy < -30 || yy > H + 30) continue;
+        // shadow
+        ctx.fillStyle = "rgba(30,70,40,0.18)";
+        ctx.beginPath(); ctx.ellipse(t.x + 2, yy + t.r * 0.5, t.r, t.r * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+        // canopy with a little shading
+        const cg = ctx.createRadialGradient(t.x - t.r * 0.3, yy - t.r * 0.3, 1, t.x, yy, t.r);
+        cg.addColorStop(0, "#c7f0cf"); cg.addColorStop(0.5, t.c); cg.addColorStop(1, "#2f8244");
+        ctx.fillStyle = cg;
+        ctx.beginPath(); ctx.arc(t.x, yy, t.r, 0, Math.PI * 2); ctx.fill();
+        if (t.flower) {
+          ctx.fillStyle = "#ffd5e6";
+          ctx.beginPath(); ctx.arc(t.x + t.r * 0.4, yy - t.r * 0.4, 2.4, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+    }
+
+    // Warm ground glow where the mob runs so they read as standing on something.
     const R = mobRadius();
     const fg = ctx.createLinearGradient(0, py - R, 0, H);
     fg.addColorStop(0, "rgba(255,255,255,0)");
     fg.addColorStop(1, "rgba(120,200,255,0.22)");
     ctx.fillStyle = fg;
-    ctx.fillRect(-20, py - R, W + 40, H - (py - R) + 20);
+    ctx.fillRect(vw, py - R, W - vw * 2, H - (py - R) + 20);
+  }
+
+  // Soft dark corners for a polished, focused frame (screen-space).
+  function drawVignette() {
+    const rg = ctx.createRadialGradient(W / 2, H * 0.52, H * 0.34, W / 2, H * 0.52, H * 0.78);
+    rg.addColorStop(0, "rgba(0,0,0,0)");
+    rg.addColorStop(1, "rgba(20,16,40,0.26)");
+    ctx.fillStyle = rg;
+    ctx.fillRect(0, 0, W, H);
   }
 
   function drawChevrons() {
@@ -758,12 +957,15 @@
   }
 
   function drawParticles() {
+    // Additive blending makes sparks and dust glow like real light.
+    ctx.globalCompositeOperation = "lighter";
     for (const p of particles) {
       ctx.globalAlpha = clamp(p.life * 1.6, 0, 1);
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
       ctx.fillStyle = p.color; ctx.fill();
     }
+    ctx.globalCompositeOperation = "source-over";
     ctx.globalAlpha = 1;
   }
 
@@ -898,52 +1100,164 @@
     ctx.fillText(text, W / 2, by + 17);
   }
 
-  function drawBoss(row) {
-    const y = row.y, h = bandH + 10;
-    // Dark stone wall across the whole track
+  // A real masonry brick wall spanning the track. Cracks deepen as it nears the
+  // mob; it glows green once your crew is big enough to smash it.
+  function drawWall(row) {
+    const h = bandH + 18, y = row.y;
+    const can = crew > row.need;
+    const near = clamp((row.y + h) / playerY(), 0, 1);   // 0 far → 1 at the mob
+
+    // Brick body.
     const grad = ctx.createLinearGradient(0, y, 0, y + h);
-    grad.addColorStop(0, "#5b4b8a");
-    grad.addColorStop(1, "#2b2440");
+    grad.addColorStop(0, "#c2693c");
+    grad.addColorStop(1, "#9c4a28");
     ctx.fillStyle = grad;
     ctx.fillRect(0, y, W, h);
-    // brick lines
-    ctx.strokeStyle = "rgba(255,255,255,0.18)";
-    ctx.lineWidth = 2;
-    for (let bx = 0; bx < W; bx += 46) {
-      ctx.beginPath(); ctx.moveTo(bx, y); ctx.lineTo(bx, y + h); ctx.stroke();
+
+    // Mortar courses + offset bricks.
+    const bh = h / 3, bw = 46;
+    ctx.lineWidth = 3; ctx.strokeStyle = "rgba(60,30,18,0.55)";
+    for (let r = 0; r < 3; r++) {
+      const ry = y + r * bh;
+      ctx.beginPath(); ctx.moveTo(0, ry); ctx.lineTo(W, ry); ctx.stroke();
+      const shift = (r % 2) * (bw / 2);
+      for (let bx = -bw + shift; bx < W; bx += bw) {
+        ctx.beginPath(); ctx.moveTo(bx, ry); ctx.lineTo(bx, ry + bh); ctx.stroke();
+        // brick highlight
+        ctx.fillStyle = "rgba(255,255,255,0.10)";
+        ctx.fillRect(bx + 2, ry + 2, bw - 5, 3);
+      }
     }
-    ctx.beginPath(); ctx.moveTo(0, y + h / 2); ctx.lineTo(W, y + h / 2); ctx.stroke();
-    // Required number — beat it to smash through. Glows green once you can.
-    const big = crew > row.need;
+    ctx.beginPath(); ctx.moveTo(0, y + h); ctx.lineTo(W, y + h); ctx.stroke();
+    // top lip
+    ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect(0, y, W, 3);
+
+    // Stress cracks that grow as the wall approaches (jagged lightning lines).
+    if (near > 0.45) {
+      ctx.save();
+      ctx.globalAlpha = clamp((near - 0.45) * 1.8, 0, 0.8);
+      ctx.strokeStyle = "rgba(20,10,6,0.85)"; ctx.lineWidth = 2;
+      for (let k = 0; k < 3; k++) {
+        const sx = W * (0.25 + k * 0.25);
+        ctx.beginPath(); ctx.moveTo(sx, y);
+        let cx = sx;
+        for (let yy = y; yy < y + h; yy += 9) {
+          cx += (((k * 7 + (yy | 0)) % 5) - 2) * 3;
+          ctx.lineTo(cx, yy);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // Number plate — glows green when you can break through.
     ctx.save();
     ctx.font = "bold 34px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    if (big) {
-      ctx.shadowColor = "rgba(120,255,170,0.9)";
-      ctx.shadowBlur = 14 + 6 * Math.sin(now * 7);
-      ctx.fillStyle = "#aaffc4";
+    if (can) {
+      ctx.shadowColor = "rgba(120,255,170,0.95)";
+      ctx.shadowBlur = 16 + 7 * Math.sin(now * 7);
+      ctx.fillStyle = "#d7ffe5";
     } else {
-      ctx.shadowColor = "rgba(0,0,0,0.4)";
+      ctx.shadowColor = "rgba(0,0,0,0.45)";
       ctx.shadowBlur = 5;
-      ctx.fillStyle = "#ff9db0";
+      ctx.fillStyle = "#ffe0e6";
     }
-    ctx.fillText("⚔️ " + row.need, W / 2, y + h / 2 + 1);
+    ctx.lineWidth = 5; ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(40,20,12,0.7)";
+    ctx.strokeText("🧱 " + row.need, W / 2, y + h / 2 + 1);
+    ctx.fillText("🧱 " + row.need, W / 2, y + h / 2 + 1);
     ctx.restore();
+  }
+
+  // Black-and-white checkered finish line that streams in before the walls.
+  function drawFinish(row) {
+    const h = 26, y = row.y, sq = 13;
+    for (let r = 0; r < 2; r++) {
+      for (let x = 0, i = 0; x < W; x += sq, i++) {
+        ctx.fillStyle = ((i + r) % 2) ? "#2b2440" : "#fff";
+        ctx.fillRect(x, y + r * sq, sq, sq);
+      }
+    }
+    ctx.fillStyle = "rgba(0,0,0,0.12)"; ctx.fillRect(0, y + h, W, 4);
+  }
+
+  // Tumbling brick chunks from a smashed wall.
+  function drawBricks() {
+    for (const b of bricks) {
+      ctx.save();
+      ctx.globalAlpha = clamp(b.life * 1.4, 0, 1);
+      ctx.translate(b.x, b.y);
+      ctx.rotate(b.rot);
+      ctx.fillStyle = b.color;
+      ctx.fillRect(-b.w / 2, -b.h / 2, b.w, b.h);
+      ctx.fillStyle = "rgba(255,255,255,0.18)";
+      ctx.fillRect(-b.w / 2, -b.h / 2, b.w, 2);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Big celebratory / status banner across the centre (screen-space).
+  function drawBanner() {
+    if (!banner) return;
+    const a = clamp(banner.life * 1.5, 0, 1) * clamp((1.8 - banner.life) * 4, 0, 1);
+    const pop = 0.85 + clamp((1.8 - banner.life) * 3, 0, 0.15);
+    ctx.save();
+    ctx.globalAlpha = a;
+    ctx.translate(W / 2, H * 0.34);
+    ctx.scale(pop, pop);
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = "bold 36px " + FONT;
+    ctx.lineWidth = 7; ctx.lineJoin = "round";
+    ctx.strokeStyle = "rgba(255,255,255,0.95)";
+    ctx.strokeText(banner.text, 0, 0);
+    ctx.fillStyle = banner.color;
+    ctx.fillText(banner.text, 0, 0);
+    if (banner.sub) {
+      ctx.font = "bold 18px " + FONT;
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "rgba(255,255,255,0.95)";
+      ctx.strokeText(banner.sub, 0, 30);
+      ctx.fillStyle = "#3a3358";
+      ctx.fillText(banner.sub, 0, 30);
+    }
+    ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   function drawMob() {
     const py = playerY();
     const R = mobRadius();
-    const show = Math.min(crew, 28);
+    const show = Math.min(crew, 40);   // a fuller-looking crowd
+
+    // Speed streaks trailing the mob to sell the constant pace.
+    if (!reduceMotion) {
+      const so = (worldScroll * 1.5) % 40;
+      ctx.strokeStyle = "rgba(255,255,255,0.22)"; ctx.lineWidth = 2;
+      for (let k = -2; k <= 2; k++) {
+        const sx = crewX + k * (R * 0.5);
+        const sy = py + R + 6 + ((k + 2) * 11 + so) % 40;
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx, sy + 13); ctx.stroke();
+      }
+    }
 
     // One soft shadow for the whole crowd.
     ctx.save();
-    ctx.globalAlpha = 0.18;
+    ctx.globalAlpha = 0.2;
     ctx.fillStyle = "#1d2740";
     ctx.beginPath();
     ctx.ellipse(crewX, py + R * 0.5 + 8, R + 8, R * 0.42 + 5, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
+
+    // Squash/stretch the whole crowd when the count jumps or drops.
+    const sy = clamp(mobSquash, 0.6, 1.6);
+    const sx = 1 / Math.sqrt(sy);
+    ctx.save();
+    ctx.translate(crewX, py);
+    ctx.scale(sx, sy);
+    ctx.translate(-crewX, -py);
 
     // Build the crowd, then draw back-to-front so nearer runners overlap.
     const guys = [];
@@ -958,6 +1272,7 @@
     }
     guys.sort((a, b) => a.y - b.y);
     for (const g of guys) drawRunner(g.x, g.y, g.i);
+    ctx.restore();
 
     // Crew counter, popping when it changes.
     ctx.save();
@@ -973,48 +1288,70 @@
     ctx.restore();
   }
 
+  // Tiny per-runner shading helper: lighten/darken a #rrggbb hex by amt (-1..1).
+  function shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const f = c => clamp(Math.round(c + 255 * amt), 0, 255);
+    return `rgb(${f((n >> 16) & 255)},${f((n >> 8) & 255)},${f(n & 255)})`;
+  }
+
   function drawRunner(x, y, i) {
     // A little runner with a full running cycle — bouncing body plus swinging
-    // arms and legs — drawn in the chosen skin.
+    // arms and legs — drawn in the chosen skin, with soft shading and a touch
+    // of per-runner variation so the crowd reads as individuals.
     const sk = currentSkin();
+    const vary = ((i * 2654435761) % 100) / 100;   // stable pseudo-random 0..1
+    const sc = 0.86 + vary * 0.3;                  // slight size variation
     const phase = now * 11 + i * 1.7;
     const bob = Math.abs(Math.sin(phase)) * 2.3;   // springy up-down
     const swing = Math.sin(phase) * 3.4;           // limb swing
     y -= bob;
+    const body = shade(sk.body, (vary - 0.5) * 0.12);
+
+    // Soft contact shadow under each runner for depth.
+    ctx.globalAlpha = 0.16;
+    ctx.fillStyle = "#16203a";
+    ctx.beginPath(); ctx.ellipse(x, y + 9, 4.6 * sc, 1.8 * sc, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
 
     if (sk.blocky) {
       // Blocky buddies: square limbs that piston up and down.
-      ctx.fillStyle = sk.body;
-      ctx.fillRect(x - 4 + swing * 0.4, y + 3, 3, 6 - Math.abs(swing) * 0.4);
-      ctx.fillRect(x + 1 - swing * 0.4, y + 3, 3, 6 - Math.abs(swing) * 0.4);
-      ctx.fillRect(x - 4, y - 4, 8, 9);            // body
+      ctx.fillStyle = shade(body, -0.08);
+      ctx.fillRect(x - 4 * sc + swing * 0.4, y + 3, 3 * sc, 6 - Math.abs(swing) * 0.4);
+      ctx.fillRect(x + 1 * sc - swing * 0.4, y + 3, 3 * sc, 6 - Math.abs(swing) * 0.4);
+      const bg = ctx.createLinearGradient(x - 4, y - 4, x + 4, y + 5);
+      bg.addColorStop(0, shade(body, 0.12)); bg.addColorStop(1, shade(body, -0.1));
+      ctx.fillStyle = bg;
+      ctx.fillRect(x - 4 * sc, y - 4, 8 * sc, 9);  // body
       ctx.fillStyle = sk.head;
-      ctx.fillRect(x - 4.5, y - 12, 9, 8);         // head
+      ctx.fillRect(x - 4.5 * sc, y - 12, 9 * sc, 8); // head
       return;
     }
 
     // Legs.
-    ctx.strokeStyle = sk.body;
-    ctx.lineWidth = 2.6; ctx.lineCap = "round";
+    ctx.strokeStyle = shade(body, -0.08);
+    ctx.lineWidth = 2.6 * sc; ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(x, y + 3); ctx.lineTo(x - 2.4 + swing * 0.6, y + 9);
     ctx.moveTo(x, y + 3); ctx.lineTo(x + 2.4 - swing * 0.6, y + 9);
     ctx.stroke();
     // Arms.
+    ctx.strokeStyle = body;
     ctx.beginPath();
     ctx.moveTo(x, y - 1); ctx.lineTo(x - 3.2 - swing * 0.5, y + 3);
     ctx.moveTo(x, y - 1); ctx.lineTo(x + 3.2 + swing * 0.5, y + 3);
     ctx.stroke();
-    // Body.
-    ctx.fillStyle = sk.body;
-    ctx.beginPath();
-    ctx.roundRect(x - 3.6, y - 4, 7.2, 9, 3);
-    ctx.fill();
-    // Head.
-    ctx.beginPath();
-    ctx.arc(x, y - 8, 4.3, 0, Math.PI * 2);
-    ctx.fillStyle = sk.head;
-    ctx.fill();
+    // Body — shaded torso with a subtle outline.
+    const bg = ctx.createLinearGradient(x - 4, y - 4, x + 4, y + 5);
+    bg.addColorStop(0, shade(body, 0.14)); bg.addColorStop(1, shade(body, -0.12));
+    ctx.fillStyle = bg;
+    ctx.beginPath(); ctx.roundRect(x - 3.6 * sc, y - 4, 7.2 * sc, 9, 3); ctx.fill();
+    // Head with a tiny highlight.
+    ctx.beginPath(); ctx.arc(x, y - 8, 4.3 * sc, 0, Math.PI * 2);
+    ctx.fillStyle = sk.head; ctx.fill();
+    ctx.globalAlpha = 0.5; ctx.fillStyle = "#fff";
+    ctx.beginPath(); ctx.arc(x - 1.3 * sc, y - 9.2, 1.3 * sc, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
     ctx.lineCap = "butt";
   }
 
@@ -1040,7 +1377,13 @@
   function syncHud() {
     crewEl.textContent = crew;
     runCoinsEl.textContent = runCoins;
-    distEl.textContent = Math.round(dist);
+    levelEl.textContent = level;
+    if (phase === "run") {
+      const left = Math.max(0, Math.ceil(levelTarget - dist));
+      distEl.textContent = left + "m";
+    } else {
+      distEl.textContent = "🧱";    // in the wall finale
+    }
   }
   function setCombo(n) {
     comboEl.textContent = n;
