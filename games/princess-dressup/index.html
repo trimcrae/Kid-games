@@ -34,63 +34,29 @@
       text-align: center;
     }
 
-    /* ---------- the princess ---------- */
+    /* ---------- the princess (pixel-art layers) ---------- */
     .princess {
       position: relative;
-      width: 240px;
-      height: 300px;
-      margin: 0.5rem auto 1rem;
+      margin: 0.25rem auto 0.75rem;
+      width: min(270px, 82vw);
+      aspect-ratio: 165 / 218;   /* matches the sprite grid */
     }
-    .hair {
-      position: absolute; top: 36px; left: 50%; transform: translateX(-50%);
-      width: 108px; height: 130px;
-      background: #6b3e16;
-      border-radius: 54px 54px 40px 40px;
-      z-index: 2;
+    .princess canvas {
+      position: absolute; inset: 0;
+      width: 100% !important; height: 100% !important;
+      image-rendering: pixelated;
     }
-    .head {
-      position: absolute; top: 48px; left: 50%; transform: translateX(-50%);
-      width: 74px; height: 74px; border-radius: 50%;
-      background: #ffd9b3; z-index: 3;
-    }
-    .eye { position: absolute; top: 30px; width: 9px; height: 9px; border-radius: 50%; background: #4a3327; }
-    .eye.left { left: 19px; } .eye.right { right: 19px; }
-    .cheek { position: absolute; top: 42px; width: 12px; height: 8px; border-radius: 50%; background: #ffb3c1; opacity: 0.8; }
-    .cheek.left { left: 10px; } .cheek.right { right: 10px; }
-    .smile {
-      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
-      width: 26px; height: 13px; border-bottom: 3px solid #c0392b; border-radius: 0 0 26px 26px;
-    }
-    .dress {
-      position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
-      width: 0; height: 0;
-      border-left: 56px solid transparent;
-      border-right: 56px solid transparent;
-      border-bottom: 168px solid var(--dress, #ff6fa5);
-      z-index: 1;
-      transition: border-bottom-color 0.4s ease;
-    }
+    .princess-base { z-index: 1; }
 
-    /* accessories — hidden until earned */
+    /* outfit pieces — each a full-frame sprite layer, hidden until earned */
     .acc {
-      position: absolute;
-      opacity: 0;
-      transform: scale(0.3);
+      position: absolute; inset: 0; z-index: 2;
+      opacity: 0; transform: scale(0.3);
       transition: opacity 0.4s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
-      z-index: 5;
       pointer-events: none;
     }
     .acc.on { opacity: 1; transform: scale(1); }
-    .acc.crown   { top: 6px;  left: 50%; margin-left: -27px; font-size: 54px; z-index: 4; }
-    .acc.flower  { top: 58px; left: 50%; margin-left: 26px;  font-size: 30px; }
-    .acc.necklace{ top: 112px; left: 50%; margin-left: -14px; font-size: 26px; }
-    .acc.wand    { top: 150px; right: 14px; font-size: 44px; }
-    .acc.wand.on { transform: scale(1) rotate(22deg); }
-    .acc.shoes   { bottom: -6px; left: 50%; margin-left: -28px; font-size: 30px; letter-spacing: 6px; }
-    .acc.sparkle { font-size: 34px; }
-    .acc.s1 { top: 20px; left: 14px; }
-    .acc.s2 { top: 90px; right: 6px; }
-    .acc.s3 { bottom: 40px; left: 6px; }
+    .acc[data-slot="wand"].on { transform: scale(1) rotate(7deg); }
 
     /* ---------- prompt ---------- */
     .prompt {
@@ -173,23 +139,7 @@
       <button class="mute-btn" id="mute" aria-label="Turn sound on or off">🔊</button>
     </div>
 
-    <div class="princess" id="princess" aria-hidden="true">
-      <div class="hair"></div>
-      <div class="head">
-        <span class="eye left"></span><span class="eye right"></span>
-        <span class="cheek left"></span><span class="cheek right"></span>
-        <span class="smile"></span>
-      </div>
-      <div class="dress" id="dress"></div>
-      <span class="acc crown"    data-slot="crown">👑</span>
-      <span class="acc flower"   data-slot="flower">🌸</span>
-      <span class="acc necklace" data-slot="necklace">💎</span>
-      <span class="acc wand"     data-slot="wand">🪄</span>
-      <span class="acc shoes"    data-slot="shoes">👠👠</span>
-      <span class="acc sparkle s1" data-slot="sparkle">✨</span>
-      <span class="acc sparkle s2" data-slot="sparkle">✨</span>
-      <span class="acc sparkle s3" data-slot="sparkle">✨</span>
-    </div>
+    <div class="princess" id="princess" aria-hidden="true"><!-- pixel-art sprite built by princess-art.js --></div>
 
     <div class="prompt">
       <span class="prompt-label" id="prompt-label">Tap the matching one!</span>
@@ -209,6 +159,8 @@
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
   <script src="../../assets/js/voice.js"></script>
+  <script src="../../assets/js/pixelart.js"></script>
+  <script src="princess-art.js"></script>
   <script src="princess.js"></script>
 </body>
 </html>

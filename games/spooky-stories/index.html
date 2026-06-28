@@ -33,6 +33,7 @@
     .story-card .cover { font-size: 4rem; line-height: 1;
       filter: drop-shadow(0 4px 6px rgba(0,0,0,.35)); }
     .story-card .cover-svg { width: 100%; max-width: 230px; height: 130px; display:block; margin: 0 auto .3rem; }
+    .story-card .cover-svg .cover-img { width: 100%; height: 130px; object-fit: cover; display:block; border-radius: 12px; }
     .story-card h2 { margin: .4rem 0 .15rem; font-size: 1.2rem; }
     .story-card p  { margin: 0; font-size: .85rem; opacity: .85; }
     .story-card .done-star {
@@ -54,6 +55,7 @@
       width: 100%; border-radius: 20px; display: block;
       background: #120a2a; aspect-ratio: 4 / 3;
     }
+    .page-art .scene-img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 20px; }
     .page-art.turning { animation: pageTurn .45s ease; }
     @keyframes pageTurn {
       0%   { transform: perspective(900px) rotateY(0); opacity: 1; }

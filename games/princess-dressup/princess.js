@@ -137,7 +137,9 @@
     [].forEach.call(princessEl.querySelectorAll(".acc"), function (el) {
       el.classList.remove("on");
     });
-    dressEl.style.setProperty("--dress", pick(DRESS_COLORS));
+    var dressColor = pick(DRESS_COLORS);
+    if (dressEl) dressEl.style.setProperty("--dress", dressColor);
+    if (window.PrincessArt) PrincessArt.setDress(dressColor);
     overlay.classList.add("hidden");
     newRound();
   }
@@ -155,5 +157,7 @@
   });
 
   // set an initial dress colour so she looks pretty on the start screen
-  dressEl.style.setProperty("--dress", pick(DRESS_COLORS));
+  var initColor = pick(DRESS_COLORS);
+  if (dressEl) dressEl.style.setProperty("--dress", initColor);
+  if (window.PrincessArt) PrincessArt.setDress(initColor);
 })();
