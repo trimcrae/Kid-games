@@ -549,7 +549,20 @@
          <p>${story.pages.length - 1} pages • Tap to read</p>`;
       card.addEventListener("click", () => openStory(story));
       grid.appendChild(card);
+      useCoverImage(card, story);
     });
+  }
+
+  // Prefer a generated painterly cover (art/<id>-cover.png) if present,
+  // swapping it in on load; otherwise the built-in SVG cover stays.
+  function useCoverImage(card, story) {
+    const cov = card.querySelector(".cover-svg");
+    if (!cov) return;
+    const img = new Image();
+    img.className = "cover-img";
+    img.alt = "";
+    img.onload = function () { cov.innerHTML = ""; cov.appendChild(img); };
+    img.src = "art/" + story.id + "-cover.png";
   }
 
   // ---- Open / render a story ----
@@ -575,8 +588,12 @@
   function renderPage(animate) {
     const p = current.pages[page];
 
-    // art
-    artEl.innerHTML = p.art();
+    // art — a page may carry a generated image (img) or an art() function
+    if (p.img) {
+      artEl.innerHTML = '<img class="scene-img" src="' + p.img + '" alt="" onerror="this.style.display=\'none\'">';
+    } else {
+      artEl.innerHTML = p.art();
+    }
     if (animate) {
       artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
     }

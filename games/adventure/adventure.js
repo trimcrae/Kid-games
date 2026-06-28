@@ -94,7 +94,20 @@
          <p class="endcount">${found}/${total} endings found</p>`;
       card.addEventListener("click", () => { try { ac(); } catch (e) {} openStory(story); });
       grid.appendChild(card);
+      useCoverImage(card, story);
     });
+  }
+
+  // Prefer a generated painterly cover (art/<id>-cover.png) if one exists,
+  // swapping it in once it loads; otherwise the built-in SVG cover stays.
+  function useCoverImage(card, story) {
+    const cov = card.querySelector(".cover");
+    if (!cov) return;
+    const img = new Image();
+    img.className = "cover-img";
+    img.alt = "";
+    img.onload = function () { cov.innerHTML = ""; cov.appendChild(img); };
+    img.src = "art/" + story.id + "-cover.png";
   }
 
   /* ---- Open a story ---- */
@@ -117,9 +130,14 @@
 
     // picture (with a gentle page-turn animation).
     // a node may carry an art() function OR a `scene` data descriptor.
-    const inner = typeof node.art === "function" ? node.art()
-                : node.scene ? ART.scene(node.scene) : "";
-    artEl.innerHTML = wrapSvg(inner);
+    // a node may carry a generated image (img), an art() function, or a scene
+    if (node.img) {
+      artEl.innerHTML = '<img class="scene-img" src="' + node.img + '" alt="" onerror="this.style.display=\'none\'">';
+    } else {
+      const inner = typeof node.art === "function" ? node.art()
+                  : node.scene ? ART.scene(node.scene) : "";
+      artEl.innerHTML = wrapSvg(inner);
+    }
     artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
 
     textEl.textContent = node.text;

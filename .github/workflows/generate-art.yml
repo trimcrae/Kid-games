@@ -1,0 +1,54 @@
+name: Generate story art
+
+# Generates the painterly story-game art from prompts in
+# assets/art/art-manifest.json and commits the PNGs back to the repo.
+# GitHub's runners have open internet, so they can reach the free
+# Pollinations image API (which sandboxed dev environments cannot).
+#
+# Run it from the Actions tab ("Run workflow"), or it runs automatically
+# when the manifest changes. Existing images are skipped, so it only
+# generates what's new unless you tick "force".
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Regenerate images that already exist"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "assets/art/art-manifest.json"
+      - "tools/fetch-art.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-art-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  art:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate art
+        run: node tools/fetch-art.mjs ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
+
+      - name: Commit generated art
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A "games" "assets/art"
+          if git diff --cached --quiet; then
+            echo "No new art to commit."
+          else
+            git commit -m "Add generated story art [skip ci]"
+            git push
+          fi
