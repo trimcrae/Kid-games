@@ -206,13 +206,7 @@
   }
 
   function speak(text) {
-    try {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.85; u.pitch = 1.15;
-      window.speechSynthesis.speak(u);
-    } catch (e) {}
+    if (window.Speech) Speech.speak(text);
   }
 
   function sparkleBurst() {

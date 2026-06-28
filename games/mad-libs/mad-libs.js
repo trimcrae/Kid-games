@@ -57,14 +57,7 @@
   }
 
   function speak(text) {
-    try {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.9;
-      u.pitch = 1.1;
-      window.speechSynthesis.speak(u);
-    } catch (e) { /* speech not available — fine */ }
+    if (window.Speech) Speech.speak(text);
   }
 
   // ---------------- PICKER ----------------
@@ -92,7 +85,7 @@
     story = s;
     answers = [];
     step = 0;
-    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+    if (window.Speech) Speech.cancel();
     show("entry");
     renderStep();
   }
@@ -179,7 +172,7 @@
   });
 
   el.pickBtn.addEventListener("click", function () {
-    try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) {}
+    if (window.Speech) Speech.cancel();
     buildPicker();
     show("picker");
   });
