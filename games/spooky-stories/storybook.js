@@ -495,29 +495,12 @@
   /* -----------------------------------------------------------
      4. Read-aloud (Web Speech API)
      ----------------------------------------------------------- */
-  const synth = window.speechSynthesis || null;
-  let voice = null;
-  function pickVoice() {
-    if (!synth) return;
-    const vs = synth.getVoices();
-    // Prefer a friendly English voice; fall back to anything English.
-    voice = vs.find(v => /female|samantha|karen|zira|google uk english female/i.test(v.name) && /en/i.test(v.lang))
-         || vs.find(v => /en[-_]?US/i.test(v.lang))
-         || vs.find(v => /^en/i.test(v.lang)) || vs[0] || null;
-  }
-  if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
-
+  // The pre-rendered Piper narration (below) is the primary voice; this is
+  // the shared Web Speech fallback used when a clip is missing.
   function speak(text) {
-    if (!synth) return;
-    synth.cancel();
-    const clean = text.replace(/[💜🎃🦇🌟✨]/g, "").trim();
-    if (!clean) return;
-    const u = new SpeechSynthesisUtterance(clean);
-    if (voice) u.voice = voice;
-    u.rate = 0.9; u.pitch = 1.15; u.volume = 1;
-    synth.speak(u);
+    if (window.Speech) Speech.speak(text, { pitch: 1.15 });
   }
-  function stopSpeak() { if (synth) synth.cancel(); }
+  function stopSpeak() { if (window.Speech) Speech.cancel(); }
 
   /* -----------------------------------------------------------
      4b. Narration — play the pre-rendered neural-voice clips

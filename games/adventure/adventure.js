@@ -43,33 +43,15 @@
   /* -----------------------------------------------------------
      Voice (Web Speech API) — reads each page out loud
      ----------------------------------------------------------- */
-  const synth = window.speechSynthesis || null;
-  let voice = null;
-  function pickVoice() {
-    if (!synth) return;
-    const vs = synth.getVoices();
-    voice = vs.find(v => /female|samantha|karen|zira|google uk english female|tessa/i.test(v.name) && /en/i.test(v.lang))
-         || vs.find(v => /en[-_]?US/i.test(v.lang))
-         || vs.find(v => /^en/i.test(v.lang)) || vs[0] || null;
-  }
-  if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
-
   let voiceOn = (function () {
     try { return localStorage.getItem("adv-voice") !== "off"; } catch (e) { return true; }
   })();
 
   function speak(text) {
-    if (!synth || !voiceOn) return;
-    synth.cancel();
-    const clean = String(text).replace(/[\u{1F000}-\u{1FAFF}☀-➿←-⇿⬀-⯿️·]/gu, " ")
-      .replace(/\s+/g, " ").trim();
-    if (!clean) return;
-    const u = new SpeechSynthesisUtterance(clean);
-    if (voice) u.voice = voice;
-    u.rate = 0.95; u.pitch = 1.1; u.volume = 1;
-    synth.speak(u);
+    if (!voiceOn) return;
+    if (window.Speech) Speech.speak(text, { rate: 0.95 });
   }
-  function stopSpeak() { if (synth) synth.cancel(); }
+  function stopSpeak() { if (window.Speech) Speech.cancel(); }
 
   /* -----------------------------------------------------------
      Saved progress — which endings each kid has discovered

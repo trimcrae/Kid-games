@@ -52,14 +52,7 @@
 
   function speak(text) {
     if (muted) return;
-    try {
-      if (!("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(text);
-      u.rate = 0.9;
-      u.pitch = 1.2;
-      window.speechSynthesis.speak(u);
-    } catch (e) { /* no speech available — game still works */ }
+    if (window.Speech) Speech.speak(text);
   }
 
   function isLetter(ch) { return /[A-Z]/.test(ch); }
@@ -152,7 +145,7 @@
     muted = !muted;
     localStorage.setItem(MUTE_KEY, muted ? "1" : "0");
     muteBtn.textContent = muted ? "🔇" : "🔊";
-    if (muted && "speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+    if (muted && window.Speech) Speech.cancel();
   });
 
   startBtn.addEventListener("click", function () {
