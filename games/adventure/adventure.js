@@ -124,17 +124,6 @@
          <p class="endcount">${found}/${total} endings found</p>`;
       card.addEventListener("click", () => { try { ac(); } catch (e) {} openStory(story); });
       grid.appendChild(card);
-      pixelateInto(card.querySelector(".cover"), wrapSvg(story.cover()));
-    });
-  }
-
-  // Render a scene/cover SVG as crisp pixel art into `el` (the SVG is already
-  // shown as an instant fallback; this swaps in the pixelated canvas on load).
-  function pixelateInto(el, fullSvg) {
-    if (!el || !window.Pixelate) return;
-    Pixelate.toPixelCanvas(fullSvg, {
-      vw: 400, vh: 300, block: 2,
-      onready: function (canvas) { el.innerHTML = ""; el.appendChild(canvas); }
     });
   }
 
@@ -169,9 +158,7 @@
     } else {
       const inner = typeof node.art === "function" ? node.art()
                   : node.scene ? ART.scene(node.scene) : "";
-      const full = wrapSvg(inner);
-      artEl.innerHTML = full;            // crisp SVG shown instantly…
-      pixelateInto(artEl, full);         // …then swapped for pixel art
+      artEl.innerHTML = wrapSvg(inner);  // art is now native pixel art
     }
     artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
 
