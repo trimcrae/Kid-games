@@ -17,7 +17,7 @@ missing, the game stays silent — there is no robotic fallback.
 | `word-wizard` | 49 | each spelling word + "You did it!" |
 | `spelling-bee` | 1 | "Pangram!" |
 | `spooky-stories` | — | has its **own** generator at `games/spooky-stories/audio/build_audio.py` |
-| `adventure` | 0 | intentionally silent — ~460 long paragraphs (~50 MB) and its audience already reads |
+| `adventure` | 28 | only Ellie's pre-reader stories (rainbow, campout, pizza). The 6+/7+ epics for Cory & Jeannie stay silent — they'd be ~50 MB and those kids read. |
 | `mad-libs` | 0 | dynamic (kids' own words) — no voice by design |
 
 ## Regenerating the clips

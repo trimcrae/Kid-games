@@ -63,12 +63,42 @@
   const choicesEl= document.getElementById("choices");
   const titleEl  = document.getElementById("reader-title");
   const homeBtn  = document.getElementById("home-btn");
+  const readBtn  = document.getElementById("read-btn");
+  const voiceBtn = document.getElementById("voice-btn");
   const backBtn  = document.getElementById("back-btn");
   const endBadge = document.getElementById("end-badge");
 
   let current = null;   // current story
   let nodeId = null;    // current node id
   let history = [];      // stack of visited node ids (for ◀)
+
+  /* -----------------------------------------------------------
+     Voice — Ellie can't read yet, so HER stories (the pre-reader
+     ones) read each page aloud using the pre-rendered neural clips
+     in audio/<storyId>-<nodeId>.mp3. The 6+/7+ epics for the older
+     readers have no audio and stay silent (they read those).
+     ----------------------------------------------------------- */
+  let voiceOn = (function () {
+    try { return localStorage.getItem("adv-voice") !== "off"; } catch (e) { return true; }
+  })();
+  let voiceAvailable = false;   // does the CURRENT story have narration?
+
+  // Pre-reader stories (age 5 and under, or "all ages") are narrated.
+  function storyHasVoice(st) {
+    if (!st) return false;
+    const m = String(st.ages || "").match(/(\d+)/);
+    return !m || parseInt(m[1], 10) <= 5;
+  }
+  function narrate(storyId, nid) {
+    if (!voiceOn || !voiceAvailable) return;
+    if (window.Voice) Voice.play("audio/" + storyId + "-" + nid + ".mp3");
+  }
+  function stopSpeak() { if (window.Voice) Voice.stop(); }
+  function updateVoiceBtn() {
+    voiceBtn.textContent = voiceOn ? "🔊" : "🔇";
+    voiceBtn.setAttribute("aria-label", voiceOn ? "Voice on — tap to mute" : "Voice off — tap to turn on");
+    voiceBtn.classList.toggle("muted", !voiceOn);
+  }
 
   function wrapSvg(inner) {
     return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" width="100%" height="100%" role="img" aria-label="story picture">${inner}</svg>`;
@@ -101,6 +131,11 @@
   function openStory(story) {
     current = story;
     history = [];
+    // Only Ellie's pre-reader stories get the voice controls.
+    voiceAvailable = storyHasVoice(story);
+    voiceBtn.style.display = voiceAvailable ? "" : "none";
+    readBtn.style.display  = voiceAvailable ? "" : "none";
+    updateVoiceBtn();
     titleEl.textContent = story.title;
     library.style.display = "none";
     reader.classList.add("active");
@@ -143,6 +178,8 @@
       }));
     }
 
+    // Ellie's stories read each new page aloud.
+    narrate(current.id, nodeId);
   }
 
   function addBtn(label, fn, kind) {
@@ -169,6 +206,7 @@
   }
 
   function goHome() {
+    stopSpeak();
     reader.classList.remove("active");
     library.style.display = "block";
     current = null; nodeId = null; history = [];
@@ -179,6 +217,14 @@
   /* ---- wire up controls ---- */
   homeBtn.addEventListener("click", goHome);
   backBtn.addEventListener("click", goBack);
+  readBtn.addEventListener("click", () => { if (current && nodeId) { voiceOn = true; updateVoiceBtn(); narrate(current.id, nodeId); } });
+  voiceBtn.addEventListener("click", () => {
+    voiceOn = !voiceOn;
+    try { localStorage.setItem("adv-voice", voiceOn ? "on" : "off"); } catch (e) {}
+    updateVoiceBtn();
+    if (!voiceOn) stopSpeak();
+    else if (current && nodeId) narrate(current.id, nodeId);
+  });
 
   // keyboard: left arrow = back
   document.addEventListener("keydown", e => {

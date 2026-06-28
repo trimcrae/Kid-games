@@ -119,7 +119,8 @@
   <main class="adv-wrap">
     <!-- LIBRARY -->
     <section id="library">
-      <p class="adv-intro">Pick a story, then YOU choose what happens next! 🌟</p>
+      <p class="adv-intro">Pick a story, then YOU choose what happens next! 🌟<br>
+        <span style="font-size:.85em;font-weight:normal;color:#6a6385">Ellie's stories read themselves out loud — tap 🔊 to mute.</span></p>
       <div id="story-grid" class="story-grid"></div>
     </section>
 
@@ -128,6 +129,7 @@
       <div class="reader-top">
         <button class="round-btn" id="home-btn" aria-label="Back to all stories">🏠</button>
         <h2 class="reader-title" id="reader-title">Story</h2>
+        <button class="round-btn" id="voice-btn" aria-label="Toggle voice">🔊</button>
       </div>
 
       <div class="book">
@@ -137,11 +139,13 @@
         <div id="choices" class="choices"></div>
         <div class="reader-bottom">
           <button class="round-btn" id="back-btn" aria-label="Go back one choice" style="background:var(--blue);box-shadow:0 5px 0 #2a86bd,0 8px 14px rgba(0,0,0,.18)">◀</button>
+          <button class="round-btn" id="read-btn" aria-label="Read this page again">🔁🔊</button>
         </div>
       </div>
     </section>
   </main>
 
+  <script src="../../assets/js/voice.js"></script>
   <script src="art.js"></script>
   <script src="story-data.js"></script>
   <script src="stories-long.js"></script>

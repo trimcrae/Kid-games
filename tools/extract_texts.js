@@ -52,11 +52,24 @@ add("word-wizard", "you-did-it", "You did it!");
 /* ---- Spelling Bee ----------------------------------------- */
 add("spelling-bee", "pangram", "Pangram!");
 
-/* ---- Adventure: intentionally NOT narrated -----------------
-   The branching stories run to ~460 long paragraphs (~50 MB of
-   audio). Adventure is for the older, reading kids, so it has no
-   voice — they read it. (If that ever changes, walk
-   window.STORIES[*].nodes[*].text here, keyed <storyId>-<nodeId>.) */
+/* ---- Adventure: narrate only the pre-reader stories ---------
+   Ellie can't read yet, so her stories (age 5 and under, or "all
+   ages") read aloud. The big 6+/7+ epics for the older readers
+   (~50 MB of audio) stay silent — they read those. */
+global.window = {};
+require(path.join(ROOT, "games/adventure/story-data.js"));
+require(path.join(ROOT, "games/adventure/stories-long.js"));
+function preReader(st) {
+  const m = String(st.ages || "").match(/(\d+)/);
+  return !m || parseInt(m[1], 10) <= 5;
+}
+(global.window.STORIES || []).filter(preReader).forEach(st => {
+  const nodes = st.nodes || {};
+  Object.keys(nodes).forEach(nodeId => {
+    const node = nodes[nodeId];
+    if (node && typeof node.text === "string") add("adventure", st.id + "-" + nodeId, node.text);
+  });
+});
 
 process.stdout.write(JSON.stringify(out, null, 0));
 process.stderr.write("manifest: " + out.length + " clips across " +
