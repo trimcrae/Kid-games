@@ -1,0 +1,6 @@
+# Audio-build artifacts — regenerate with tools/build_audio.py.
+# Only the small generated .mp3 clips (in each game's audio/ folder)
+# are committed; the voice model and intermediates are not.
+/manifest.json
+/tools/voices/
+*.wav

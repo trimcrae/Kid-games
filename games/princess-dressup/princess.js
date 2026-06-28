@@ -50,9 +50,10 @@
     return a;
   }
 
-  function speak(text) {
+  // Play a pre-rendered neural-voice clip from this game's audio/ folder.
+  function playClip(name) {
     if (muted) return;
-    if (window.Speech) Speech.speak(text);
+    if (window.Voice) Voice.play("audio/" + name + ".mp3");
   }
 
   function isLetter(ch) { return /[A-Z]/.test(ch); }
@@ -79,7 +80,7 @@
     var kind = isLetter(target) ? "letter" : "number";
     promptLabel.textContent = "Find the " + kind + ":";
     targetEl.textContent = target;
-    speak("Can you find the " + kind + " " + target + "?");
+    playClip("find-" + kind + "-" + target.toLowerCase());
 
     choicesEl.innerHTML = "";
     choices.forEach(function (ch) {
@@ -101,12 +102,12 @@
       window.SFX && SFX.good();
       revealSlot(SLOTS[slotIndex]);
       slotIndex += 1;
-      speak(pick(PRAISE) + " " + target + "!");
+      playClip("praise-" + rand(PRAISE.length));
       setTimeout(newRound, 900);
     } else {
       btn.classList.add("wrong");
       window.SFX && SFX.nope();
-      speak("Try again!");
+      playClip("try-again");
       setTimeout(function () { btn.classList.remove("wrong"); }, 500);
     }
   }
@@ -127,7 +128,7 @@
     overlay.classList.remove("hidden");
     window.SFX && SFX.win();
     window.Confetti && Confetti.burst({ count: 110 });
-    speak("Beautiful! Your princess is all dressed up!");
+    playClip("beautiful");
   }
 
   function resetPrincess() {
@@ -145,7 +146,7 @@
     muted = !muted;
     localStorage.setItem(MUTE_KEY, muted ? "1" : "0");
     muteBtn.textContent = muted ? "🔇" : "🔊";
-    if (muted && window.Speech) Speech.cancel();
+    if (muted && window.Voice) Voice.stop();
   });
 
   startBtn.addEventListener("click", function () {

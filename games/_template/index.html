@@ -25,8 +25,11 @@
     <!-- Your game's HTML goes here -->
   </main>
 
-  <!-- For read-aloud, include the shared voice (warm, friendly, consistent
-       across every game) and call Speech.speak("…") / Speech.cancel(): -->
+  <!-- For read-aloud: only fully PRE-WRITTEN text gets a voice. Pre-render
+       the lines with tools/build_audio.py (warm Piper voice) into this
+       game's audio/ folder, include the shared player below, and call
+       Voice.play("audio/<clip>.mp3"). Dynamic text gets no voice — the kids
+       read it. -->
   <!-- <script src="../../assets/js/voice.js"></script> -->
 
   <!-- Put game logic in game.js (create it next to this file) -->

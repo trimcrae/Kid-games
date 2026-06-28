@@ -493,36 +493,22 @@
   function playSound(name) { (SOUNDS[name] || SOUNDS.chime)(); }
 
   /* -----------------------------------------------------------
-     4. Read-aloud (Web Speech API)
-     ----------------------------------------------------------- */
-  // The pre-rendered Piper narration (below) is the primary voice; this is
-  // the shared Web Speech fallback used when a clip is missing.
-  function speak(text) {
-    if (window.Speech) Speech.speak(text, { pitch: 1.15 });
-  }
-  function stopSpeak() { if (window.Speech) Speech.cancel(); }
-
-  /* -----------------------------------------------------------
-     4b. Narration — play the pre-rendered neural-voice clips
-     (warm Piper "lessac" voice, in /audio/<storyId>-<page>.m4a),
-     and gracefully fall back to the device's Web Speech voice if
-     a clip is missing or can't be played.
+     4. Narration — play the pre-rendered neural-voice clips
+     (warm Piper "lessac" voice, in audio/<storyId>-<page>.mp3).
+     No robotic fallback: if a clip is missing, the page is silent
+     and the words stay on screen for the kids to read.
      ----------------------------------------------------------- */
   const narrator = new Audio();
   narrator.preload = "auto";
 
-  function narrate(storyId, pageIndex, text) {
+  function narrate(storyId, pageIndex) {
     stopNarration();
-    // If audio can't load or play, fall back to the speech synth voice.
-    narrator.onerror = () => speak(text);
     narrator.src = "audio/" + storyId + "-" + pageIndex + ".mp3";
     const pr = narrator.play();
-    if (pr && pr.catch) pr.catch(() => speak(text));
+    if (pr && pr.catch) pr.catch(() => {}); // missing clip — stay silent
   }
   function stopNarration() {
     try { narrator.pause(); } catch (e) {}
-    narrator.onerror = null;
-    stopSpeak();
   }
 
   /* -----------------------------------------------------------
@@ -626,7 +612,7 @@
     }
 
     // read this page aloud automatically (pre-rendered voice + fallback)
-    narrate(current.id, page, p.text);
+    narrate(current.id, page);
   }
 
   function wireTaps() {
@@ -701,7 +687,7 @@
   nextBtn.addEventListener("click", nextPage);
   prevBtn.addEventListener("click", prevPage);
   homeBtn.addEventListener("click", goHome);
-  readBtn.addEventListener("click", () => { if (current) narrate(current.id, page, current.pages[page].text); });
+  readBtn.addEventListener("click", () => { if (current) narrate(current.id, page); });
 
   // keyboard niceties (arrows / space)
   document.addEventListener("keydown", e => {

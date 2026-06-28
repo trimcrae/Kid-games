@@ -205,10 +205,6 @@
     el.play.classList.toggle("hidden", section !== "play");
   }
 
-  function speak(text) {
-    if (window.Speech) Speech.speak(text);
-  }
-
   function sparkleBurst() {
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const emojis = ["✨", "🍯", "🌟", "🐝"];
@@ -347,7 +343,7 @@
     renderEntry();
     renderFound();
     updateHud();
-    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); speak("Pangram!"); if (window.SFX) SFX.win(); window.Confetti && Confetti.burst({ count: 110 }); }
+    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); if (window.Voice) Voice.play("audio/pangram.mp3"); if (window.SFX) SFX.win(); window.Confetti && Confetti.burst({ count: 110 }); }
     else { flash("Nice! +" + pts + " 🍯", "var(--green)"); if (window.SFX) SFX.good(); }
   }
 

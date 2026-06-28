@@ -41,19 +41,6 @@
   };
 
   /* -----------------------------------------------------------
-     Voice (Web Speech API) — reads each page out loud
-     ----------------------------------------------------------- */
-  let voiceOn = (function () {
-    try { return localStorage.getItem("adv-voice") !== "off"; } catch (e) { return true; }
-  })();
-
-  function speak(text) {
-    if (!voiceOn) return;
-    if (window.Speech) Speech.speak(text, { rate: 0.95 });
-  }
-  function stopSpeak() { if (window.Speech) Speech.cancel(); }
-
-  /* -----------------------------------------------------------
      Saved progress — which endings each kid has discovered
      ----------------------------------------------------------- */
   const STORE = "adv-progress";
@@ -76,8 +63,6 @@
   const choicesEl= document.getElementById("choices");
   const titleEl  = document.getElementById("reader-title");
   const homeBtn  = document.getElementById("home-btn");
-  const readBtn  = document.getElementById("read-btn");
-  const voiceBtn = document.getElementById("voice-btn");
   const backBtn  = document.getElementById("back-btn");
   const endBadge = document.getElementById("end-badge");
 
@@ -158,8 +143,6 @@
       }));
     }
 
-    // read the new page aloud
-    speak(node.text);
   }
 
   function addBtn(label, fn, kind) {
@@ -186,7 +169,6 @@
   }
 
   function goHome() {
-    stopSpeak();
     reader.classList.remove("active");
     library.style.display = "block";
     current = null; nodeId = null; history = [];
@@ -194,23 +176,9 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function updateVoiceBtn() {
-    voiceBtn.textContent = voiceOn ? "🔊" : "🔇";
-    voiceBtn.setAttribute("aria-label", voiceOn ? "Voice on — tap to mute" : "Voice off — tap to turn on");
-    voiceBtn.classList.toggle("muted", !voiceOn);
-  }
-
   /* ---- wire up controls ---- */
   homeBtn.addEventListener("click", goHome);
   backBtn.addEventListener("click", goBack);
-  readBtn.addEventListener("click", () => { if (current && nodeId) { voiceOn = true; updateVoiceBtn(); speak(current.nodes[nodeId].text); } });
-  voiceBtn.addEventListener("click", () => {
-    voiceOn = !voiceOn;
-    try { localStorage.setItem("adv-voice", voiceOn ? "on" : "off"); } catch (e) {}
-    updateVoiceBtn();
-    if (!voiceOn) stopSpeak();
-    else if (current && nodeId) speak(current.nodes[nodeId].text);
-  });
 
   // keyboard: left arrow = back
   document.addEventListener("keydown", e => {
@@ -218,6 +186,5 @@
     if (e.key === "ArrowLeft") goBack();
   });
 
-  updateVoiceBtn();
   buildLibrary();
 })();

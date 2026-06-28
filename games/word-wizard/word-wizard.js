@@ -189,8 +189,9 @@
     el.win.classList.toggle("hidden", section !== "win");
   }
 
-  function speak(text) {
-    if (window.Speech) Speech.speak(text);
+  // Play a pre-rendered neural-voice clip from this game's audio/ folder.
+  function playClip(name) {
+    if (window.Voice) Voice.play("audio/" + name + ".mp3");
   }
 
   function sparkleBurst() {
@@ -341,7 +342,7 @@
     el.feedback.textContent = firstTime ? "✨ New word learned! ✨" : "✅ Spelled it!";
     sparkleBurst();
     window.SFX && SFX.good();
-    speak(current.word);
+    playClip("word-" + current.word);
     setTimeout(nextWord, 1300);
   }
 
@@ -372,7 +373,7 @@
     show("win");
     window.SFX && SFX.win();
     window.Confetti && Confetti.burst({ count: 120 });
-    speak("You did it!");
+    playClip("you-did-it");
   }
 
   /* ---------- keyboard support (for big kids who like typing) ---------- */
@@ -392,7 +393,7 @@
 
   /* ---------- wire up buttons ---------- */
   el.clear.addEventListener("click", clearAll);
-  el.hear.addEventListener("click", () => speak(current ? current.word : ""));
+  el.hear.addEventListener("click", () => { if (current) playClip("word-" + current.word); });
   el.skip.addEventListener("click", () => { if (!locked) nextWord(); });
   el.quit.addEventListener("click", () => { renderLevels(); show("levels"); });
   el.winMenu.addEventListener("click", () => { renderLevels(); show("levels"); });

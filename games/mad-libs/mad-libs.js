@@ -45,7 +45,6 @@
     reveal:     document.getElementById("reveal"),
     storyTitle: document.getElementById("storyTitle"),
     storyText:  document.getElementById("storyText"),
-    readBtn:    document.getElementById("readBtn"),
     againBtn:   document.getElementById("againBtn"),
     pickBtn:    document.getElementById("pickBtn")
   };
@@ -54,10 +53,6 @@
     el.picker.classList.toggle("hidden", section !== "picker");
     el.entry.classList.toggle("hidden", section !== "entry");
     el.reveal.classList.toggle("hidden", section !== "reveal");
-  }
-
-  function speak(text) {
-    if (window.Speech) Speech.speak(text);
   }
 
   // ---------------- PICKER ----------------
@@ -85,7 +80,6 @@
     story = s;
     answers = [];
     step = 0;
-    if (window.Speech) Speech.cancel();
     show("entry");
     renderStep();
   }
@@ -159,20 +153,13 @@
 
     window.SFX && SFX.win();
     window.Confetti && Confetti.burst({ count: 70 });
-
-    speak(story.title + ". " + fillTemplate(false));
   }
-
-  el.readBtn.addEventListener("click", function () {
-    speak(story.title + ". " + fillTemplate(false));
-  });
 
   el.againBtn.addEventListener("click", function () {
     startStory(story);   // same story, fresh words
   });
 
   el.pickBtn.addEventListener("click", function () {
-    if (window.Speech) Speech.cancel();
     buildPicker();
     show("picker");
   });
