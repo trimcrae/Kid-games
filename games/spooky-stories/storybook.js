@@ -549,20 +549,18 @@
          <p>${story.pages.length - 1} pages • Tap to read</p>`;
       card.addEventListener("click", () => openStory(story));
       grid.appendChild(card);
-      useCoverImage(card, story);
+      pixelateInto(card.querySelector(".cover-svg"), story.cover());
     });
   }
 
-  // Prefer a generated painterly cover (art/<id>-cover.png) if present,
-  // swapping it in on load; otherwise the built-in SVG cover stays.
-  function useCoverImage(card, story) {
-    const cov = card.querySelector(".cover-svg");
-    if (!cov) return;
-    const img = new Image();
-    img.className = "cover-img";
-    img.alt = "";
-    img.onload = function () { cov.innerHTML = ""; cov.appendChild(img); };
-    img.src = "art/" + story.id + "-cover.png";
+  // Render a scene/cover SVG as crisp pixel art into `el` (SVG already shown as
+  // an instant fallback; this swaps in the pixelated canvas once it's drawn).
+  function pixelateInto(el, fullSvg) {
+    if (!el || !window.Pixelate) return;
+    Pixelate.toPixelCanvas(fullSvg, {
+      vw: 400, vh: 300, block: 4,
+      onready: function (canvas) { el.innerHTML = ""; el.appendChild(canvas); }
+    });
   }
 
   // ---- Open / render a story ----
@@ -588,11 +586,14 @@
   function renderPage(animate) {
     const p = current.pages[page];
 
-    // art — a page may carry a generated image (img) or an art() function
+    // art — a page may carry a generated image (img) or an art() function;
+    // the SVG shows instantly, then gets swapped for pixel art.
     if (p.img) {
       artEl.innerHTML = '<img class="scene-img" src="' + p.img + '" alt="" onerror="this.style.display=\'none\'">';
     } else {
-      artEl.innerHTML = p.art();
+      var full = p.art();
+      artEl.innerHTML = full;
+      pixelateInto(artEl, full);
     }
     if (animate) {
       artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");

@@ -26,6 +26,7 @@
     .story-card .cover { display:block; width: 100%; height: 150px; }
     .story-card .cover svg { display:block; }
     .story-card .cover .cover-img { display:block; width:100%; height:150px; object-fit:cover; }
+    .story-card .cover canvas { display:block; width:100%; height:150px; object-fit:cover; image-rendering:pixelated; }
     .story-card h2 { margin: .6rem .6rem .1rem; font-size: 1.15rem; line-height: 1.15; }
     .story-card .who  { margin: 0 .6rem; font-size: .82rem; opacity: .9; font-weight: bold; }
     .story-card .teach{ margin: .35rem .7rem 0; font-size: .85rem; opacity: .92; }
@@ -56,6 +57,7 @@
       background: #120a2a; display: block; line-height: 0;
     }
     .scene-art .scene-img { display:block; width:100%; height:100%; object-fit:cover; }
+    .scene-art canvas { display:block; width:100%; height:100%; image-rendering:pixelated; }
     .scene-art.turning { animation: pageTurn .5s ease; }
     @keyframes pageTurn {
       0%   { transform: perspective(900px) rotateY(0); opacity: 1; }
@@ -148,6 +150,7 @@
   </main>
 
   <script src="../../assets/js/voice.js"></script>
+  <script src="../../assets/js/pixelate.js"></script>
   <script src="art.js"></script>
   <script src="story-data.js"></script>
   <script src="stories-long.js"></script>

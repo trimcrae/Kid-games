@@ -124,20 +124,18 @@
          <p class="endcount">${found}/${total} endings found</p>`;
       card.addEventListener("click", () => { try { ac(); } catch (e) {} openStory(story); });
       grid.appendChild(card);
-      useCoverImage(card, story);
+      pixelateInto(card.querySelector(".cover"), wrapSvg(story.cover()));
     });
   }
 
-  // Prefer a generated painterly cover (art/<id>-cover.png) if one exists,
-  // swapping it in once it loads; otherwise the built-in SVG cover stays.
-  function useCoverImage(card, story) {
-    const cov = card.querySelector(".cover");
-    if (!cov) return;
-    const img = new Image();
-    img.className = "cover-img";
-    img.alt = "";
-    img.onload = function () { cov.innerHTML = ""; cov.appendChild(img); };
-    img.src = "art/" + story.id + "-cover.png";
+  // Render a scene/cover SVG as crisp pixel art into `el` (the SVG is already
+  // shown as an instant fallback; this swaps in the pixelated canvas on load).
+  function pixelateInto(el, fullSvg) {
+    if (!el || !window.Pixelate) return;
+    Pixelate.toPixelCanvas(fullSvg, {
+      vw: 400, vh: 300, block: 4,
+      onready: function (canvas) { el.innerHTML = ""; el.appendChild(canvas); }
+    });
   }
 
   /* ---- Open a story ---- */
@@ -171,7 +169,9 @@
     } else {
       const inner = typeof node.art === "function" ? node.art()
                   : node.scene ? ART.scene(node.scene) : "";
-      artEl.innerHTML = wrapSvg(inner);
+      const full = wrapSvg(inner);
+      artEl.innerHTML = full;            // crisp SVG shown instantly…
+      pixelateInto(artEl, full);         // …then swapped for pixel art
     }
     artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
 
