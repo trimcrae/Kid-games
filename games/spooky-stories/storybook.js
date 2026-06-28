@@ -24,185 +24,228 @@
   // SVGs that coexist in the page (covers + the live reader scene).
   let UID = 0;
 
-  // A deep-night background with optional moon + stars + ground.
+  // A deep-night background with optional moon + stars + ground (pixel art).
+  const MOON = [
+    "...mMMMm...",
+    ".mMMMMMMMm.",
+    "mMMMMMMcMMm",
+    "MMMMMMMMMMM",
+    "MMcMMMMMMMM",
+    "MMMMMMMMMMM",
+    "MMMMMMMcMMM",
+    "mMMMMMMMMMm",
+    ".mMMMMMMMm.",
+    "...mMMMm..."
+  ];
   function nightBg(opts) {
     opts = opts || {};
-    const u = "u" + (UID++);
     const stars = opts.stars !== false;
     const moon = opts.moon !== false;
-    let s = `
-      <defs>
-        <radialGradient id="sky${u}" cx="50%" cy="30%" r="90%">
-          <stop offset="0%" stop-color="#3b2a78"/>
-          <stop offset="60%" stop-color="#241a52"/>
-          <stop offset="100%" stop-color="#140d2e"/>
-        </radialGradient>
-        <radialGradient id="moon${u}" cx="40%" cy="40%" r="70%">
-          <stop offset="0%" stop-color="#fff6c7"/>
-          <stop offset="100%" stop-color="#ffd95e"/>
-        </radialGradient>
-      </defs>
-      <rect width="400" height="300" fill="url(#sky${u})"/>`;
-    if (moon) {
-      const mx = opts.moonX || 320, my = opts.moonY || 64, mr = opts.moonR || 38;
-      s += `<circle cx="${mx}" cy="${my}" r="${mr + 10}" fill="#ffe98a" opacity="0.18"/>
-            <circle class="tap hint-bob" data-sound="chime" cx="${mx}" cy="${my}" r="${mr}" fill="url(#moon${u})"/>
-            <circle cx="${mx - 12}" cy="${my - 8}" r="5" fill="#f4c84a" opacity=".5"/>
-            <circle cx="${mx + 10}" cy="${my + 6}" r="7" fill="#f4c84a" opacity=".45"/>
-            <circle cx="${mx + 4}" cy="${my - 14}" r="3.5" fill="#f4c84a" opacity=".5"/>`;
-    }
+    // sky as a few flat bands (pixel art doesn't fade)
+    let s = PX.rect(0, 0, 400, 300, "#241a52") +
+            PX.rect(0, 0, 400, 90, "#1d164a") +
+            PX.rect(0, 200, 400, 100, "#2a1f5e");
     if (stars) {
       const pts = [[40,40],[90,80],[150,30],[210,60],[60,130],[260,40],[110,150],[300,120],[30,90],[190,110]];
       pts.forEach((p, i) => { s += star(p[0], p[1], i % 2 ? 6 : 8, i); });
     }
+    if (moon) {
+      const mx = opts.moonX || 320, my = opts.moonY || 64;
+      s += '<circle cx="' + mx + '" cy="' + my + '" r="42" fill="#ffe98a" opacity="0.16"/>' +
+           '<g class="tap hint-bob" data-sound="chime">' +
+           PX.sprite(MOON, { M: "#ffe07a", m: "#f4c84a", c: "#f0bb38" }, { u: 7, cx: mx, cy: my }) +
+           '</g>';
+    }
     if (opts.ground !== false) {
-      s += `<path d="M0 250 Q 100 230 200 248 T 400 244 V300 H0 Z" fill="#1b1140"/>
-            <path d="M0 262 Q 120 248 240 262 T 400 258 V300 H0 Z" fill="#241854"/>`;
+      // jagged pixel hills
+      s += PX.rect(0, 252, 400, 48, "#1b1140");
+      for (let gx = 0; gx < 400; gx += 16) s += PX.rect(gx, 244 + ((gx / 16) % 2 ? 8 : 0), 16, 12, "#1b1140");
+      s += PX.rect(0, 268, 400, 32, "#241854");
     }
     return s;
   }
 
   function star(x, y, size, i) {
-    const r = size / 2;
-    return `<g transform="translate(${x} ${y})"><path class="tap" data-sound="twinkle"
-      d="M0 ${-r} L ${r*0.3} ${-r*0.3} L ${r} 0 L ${r*0.3} ${r*0.3} L 0 ${r} L ${-r*0.3} ${r*0.3} L ${-r} 0 L ${-r*0.3} ${-r*0.3} Z"
-      fill="#fff3b0" opacity="0.95"/></g>`;
+    const u = size > 7 ? 3 : 2, c = "#fff3b0";
+    return '<g transform="translate(' + x + ' ' + y + ')"><g class="tap" data-sound="twinkle">' +
+      PX.rect(-u / 2, -u * 1.5, u, u * 3, c) + PX.rect(-u * 1.5, -u / 2, u * 3, u, c) +
+      '</g></g>';
   }
 
-  // A storybook castle silhouette with glowing windows.
+  // A storybook castle silhouette with glowing windows (pixel art).
   function castle(x, y, scale) {
     scale = scale || 1;
-    return `<g transform="translate(${x} ${y}) scale(${scale})">
-      <g fill="#3a2a6b">
-        <rect x="-70" y="-70" width="140" height="80"/>
-        <rect x="-90" y="-90" width="32" height="100"/>
-        <rect x="58" y="-90" width="32" height="100"/>
-        <rect x="-18" y="-110" width="36" height="120"/>
-        <path d="M-90 -90 l16 -22 l16 22 Z"/>
-        <path d="M58 -90 l16 -22 l16 22 Z"/>
-        <path d="M-18 -110 l18 -24 l18 24 Z"/>
-      </g>
-      <g fill="#ffd166">
-        <rect x="-80" y="-70" width="12" height="16" rx="2"/>
-        <rect x="68" y="-70" width="12" height="16" rx="2"/>
-        <rect x="-7" y="-92" width="14" height="18" rx="3"/>
-        <rect x="-46" y="-44" width="14" height="20" rx="3"/>
-        <rect x="32" y="-44" width="14" height="20" rx="3"/>
-      </g>
-      <path d="M-12 10 v-30 a12 12 0 0 1 24 0 v30 Z" fill="#241854"/>
-      <g fill="#ffadcf"><circle cx="-74" cy="-112" r="3"/><circle cx="74" cy="-112" r="3"/><circle cx="0" cy="-136" r="3"/></g>
-    </g>`;
+    const W = "#3a2a6b", L = "#4a3a80", Y = "#ffd166", D = "#241854", k = "#ffadcf";
+    const R = PX.rect;
+    let s = "";
+    // keep + side towers + tall center tower
+    s += R(-64, -44, 128, 56, W) + R(-64, -44, 128, 4, L);
+    s += R(-88, -64, 28, 76, W) + R(-88, -64, 28, 4, L);
+    s += R(60, -64, 28, 76, W) + R(60, -64, 28, 4, L);
+    s += R(-16, -96, 32, 108, W) + R(-16, -96, 32, 4, L);
+    // merlons (battlements)
+    [-88, -76, 60, 72].forEach(c => { s += R(c, -72, 8, 8, W); });
+    s += R(-16, -104, 8, 8, W) + R(-2, -104, 8, 8, W) + R(8, -104, 8, 8, W);
+    // pink toppers
+    [-2].forEach(c => { s += R(c, -112, 4, 8, k); });
+    s += R(-86, -80, 4, 8, k) + R(70, -80, 4, 8, k);
+    // glowing windows
+    [[-82, -52], [68, -52], [-6, -88], [-44, -28], [32, -28]].forEach(p => { s += R(p[0], p[1], 10, 14, Y); });
+    // door
+    s += R(-10, -20, 20, 32, D) + R(-10, -20, 20, 3, L);
+    return `<g transform="translate(${x} ${y}) scale(${scale})">${s}</g>`;
   }
 
-  // A friendly princess / sibling. dress + head + crown.
+  // A friendly princess / sibling — pixel art. dress + head + crown.
   function kid(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
     const dress = o.dress || "#b266e0";
-    const dress2 = o.dress2 || shade(dress, -18);
+    const dress2 = o.dress2 || shade(dress, -20);
+    const dressL = shade(dress, 22);
     const hair = o.hair || "#5a3a22";
     const skin = o.skin || "#ffd9b8";
     const crown = o.crown !== false;
     const sound = o.sound || "giggle";
-    let extra = o.extra || "";
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="${sound}">
-      <ellipse cx="0" cy="6" rx="30" ry="7" fill="#000" opacity="0.18"/>
-      <!-- dress -->
-      <path d="M0 -44 C 18 -40 26 -10 30 4 Q 0 12 -30 4 C -26 -10 -18 -40 0 -44 Z" fill="${dress}"/>
-      <path d="M0 -44 C 10 -40 14 -10 0 4 Q 0 12 0 4 Z" fill="${dress2}" opacity=".4"/>
-      <!-- arms -->
-      <circle cx="-26" cy="-22" r="6" fill="${skin}"/>
-      <circle cx="26" cy="-22" r="6" fill="${skin}"/>
-      <!-- head -->
-      <circle cx="0" cy="-58" r="15" fill="${skin}"/>
-      <path d="M-15 -60 a15 15 0 0 1 30 0 q -15 -16 -30 0 Z" fill="${hair}"/>
-      <path d="M-15 -58 q -6 16 -2 26 q -8 -4 -8 -20 Z" fill="${hair}"/>
-      <path d="M15 -58 q 6 16 2 26 q 8 -4 8 -20 Z" fill="${hair}"/>
-      <circle cx="-5.5" cy="-58" r="2.1" fill="#2b2440"/>
-      <circle cx="5.5" cy="-58" r="2.1" fill="#2b2440"/>
-      <circle cx="-8.5" cy="-52" r="2.4" fill="#ff9ec2" opacity=".7"/>
-      <circle cx="8.5" cy="-52" r="2.4" fill="#ff9ec2" opacity=".7"/>
-      <path d="M-5 -50 q 5 5 10 0" stroke="#b5466e" stroke-width="2" fill="none" stroke-linecap="round"/>
-      ${crown ? `<path d="M-11 -70 l0 -8 l5 5 l6 -8 l6 8 l5 -5 l0 8 Z" fill="#ffdd55" stroke="#e0b020" stroke-width="1"/>
-        <circle cx="0" cy="-80" r="2" fill="#ff5d8f"/>` : ""}
-      ${extra}
-    </g></g>`;
+    const pal = { D: dress, d: dress2, L: dressL, H: hair, S: skin, E: "#2b2440",
+                  P: "#ff9ec2", M: "#b5466e", Y: "#ffdd55", k: "#ff5d8f", a: skin };
+    const rows = [
+      crown ? "...Y.k.Y..." : "...........",
+      crown ? "...YYYYY..." : "...........",
+      "...HHHHH...",
+      "..HHHHHHH..",
+      ".HHSSSSSHH.",
+      ".HSSSSSSSH.",
+      ".HSEsSsESH.",
+      ".HSSSSSSSH.",
+      ".HSPSMSPSH.",
+      "..SSSSSSS..",
+      "....SSS....",
+      "...LDDDL...",
+      "a..DDdDD..a",
+      "a.DDDdDDD.a",
+      ".LDDDdDDDL.",
+      ".DDDDdDDDD.",
+      "DDDDDdDDDDD",
+      "DDDDddDDDDD",
+      "LDDDDdDDDDL"
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="${sound}">` +
+      PX.rect(-26, 6, 52, 5, "rgba(0,0,0,0.18)") +
+      PX.sprite(rows, pal, { u: 4.2, cx: 0, bottom: 10 }) +
+      `${o.extra || ""}</g></g>`;
   }
 
-  // Friendly ghost (white, giggly).
+  // Friendly ghost (white, giggly) — pixel art.
   function ghost(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="giggle">
-      <ellipse cx="0" cy="40" rx="26" ry="7" fill="#000" opacity="0.12"/>
-      <path d="M-30 6 a30 36 0 0 1 60 0 L30 34 q -7 -10 -15 0 q -8 10 -15 0 q -7 -10 -15 0 q -8 10 -15 0 Z"
-        fill="#fdfdff" stroke="#d8d2ff" stroke-width="2"/>
-      <circle cx="-10" cy="0" r="4.2" fill="#2b2440"/>
-      <circle cx="10" cy="0" r="4.2" fill="#2b2440"/>
-      <circle cx="-9" cy="-1.4" r="1.4" fill="#fff"/>
-      <circle cx="11" cy="-1.4" r="1.4" fill="#fff"/>
-      <ellipse cx="0" cy="10" rx="6" ry="7" fill="#7a5ad0"/>
-      <circle cx="-17" cy="8" r="4" fill="#ffb3d1" opacity=".7"/>
-      <circle cx="17" cy="8" r="4" fill="#ffb3d1" opacity=".7"/>
-    </g></g>`;
+    const pal = { W: "#fdfdff", O: "#d8d2ff", E: "#2b2440", H: "#ffffff", M: "#7a5ad0", P: "#ffb3d1" };
+    const rows = [
+      "...OOOO...",
+      ".OOWWWWOO.",
+      "OWWWWWWWWO",
+      "OWWWWWWWWO",
+      "OWEEWWEEWO",
+      "OWEHWWEHWO",
+      "OWWWWWWWWO",
+      "OPWWMMWWPO",
+      "OWWWMMWWWO",
+      "OWWWWWWWWO",
+      "OWWWWWWWWO",
+      "OWWOOWWOWO",
+      "W.WW..WW.W"
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="giggle">` +
+      PX.rect(-22, 36, 44, 5, "rgba(0,0,0,0.12)") +
+      PX.sprite(rows, pal, { u: 5, cx: 0, bottom: 38 }) +
+      `</g></g>`;
   }
 
-  // A little black cat with green eyes.
+  // A little black cat with green eyes — pixel art.
   function cat(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="meow">
-      <ellipse cx="0" cy="20" rx="22" ry="6" fill="#000" opacity="0.18"/>
-      <path d="M-24 18 q -10 -4 -8 -16 q 4 6 10 6 Z" fill="#2a2440"/>
-      <ellipse cx="0" cy="6" rx="20" ry="15" fill="#2a2440"/>
-      <circle cx="0" cy="-14" r="13" fill="#2a2440"/>
-      <path d="M-12 -22 l-4 -12 l12 6 Z" fill="#2a2440"/>
-      <path d="M12 -22 l4 -12 l-12 6 Z" fill="#2a2440"/>
-      <ellipse cx="-5" cy="-14" rx="2.6" ry="3.6" fill="#9bff9b"/>
-      <ellipse cx="5" cy="-14" rx="2.6" ry="3.6" fill="#9bff9b"/>
-      <path d="M-2 -8 l2 2 l2 -2 Z" fill="#ff9ec2"/>
-    </g></g>`;
+    const pal = { K: "#2a2440", G: "#9bff9b", N: "#ff9ec2", k: "#3a3158" };
+    const rows = [
+      "K.K....K.K",
+      "KKK....KKK",
+      ".KKKKKKKK.",
+      ".KGKKKKGK.",
+      ".KGKKKKGK.",
+      ".KKKNNKKK.",
+      ".KKKKKKKK.",
+      "..KKKKKK.K",
+      ".KKKKKKKKK",
+      "KKKKKKKK.K",
+      "KKKKKKKKKK",
+      ".KKKKKK..K"
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="meow">` +
+      PX.rect(-22, 20, 44, 5, "rgba(0,0,0,0.18)") +
+      PX.sprite(rows, pal, { u: 4.4, cx: 0, bottom: 22 }) +
+      `</g></g>`;
   }
 
   // A small friendly bat. baby = smaller, big eyes.
+  // A small friendly bat — pixel art.
   function bat(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
     const col = o.color || "#7a5ad0";
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="squeak">
-      <path d="M0 0 q -22 -16 -38 -8 q 12 -2 14 8 q -10 0 -10 10 q 16 -8 30 0 Z" fill="${col}"/>
-      <path d="M0 0 q 22 -16 38 -8 q -12 -2 -14 8 q 10 0 10 10 q -16 -8 -30 0 Z" fill="${col}"/>
-      <circle cx="0" cy="2" r="12" fill="${shade(col,-12)}"/>
-      <path d="M-8 -8 l-3 -7 l7 3 Z" fill="${shade(col,-12)}"/>
-      <path d="M8 -8 l3 -7 l-7 3 Z" fill="${shade(col,-12)}"/>
-      <circle cx="-4.5" cy="0" r="3.4" fill="#fff"/>
-      <circle cx="4.5" cy="0" r="3.4" fill="#fff"/>
-      <circle cx="-4.5" cy="0.6" r="1.7" fill="#2b2440"/>
-      <circle cx="4.5" cy="0.6" r="1.7" fill="#2b2440"/>
-      <path d="M-3 7 q 3 3 6 0" stroke="#2b2440" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    </g></g>`;
+    const pal = { B: col, b: shade(col, -14), W: "#ffffff", E: "#2b2440", M: "#2b2440" };
+    const rows = [
+      "BB.b..b.BB",
+      "BBBbbbbBBB",
+      "BBBBbbBBBB",
+      ".BbWEEWbB.",
+      "..bbMMbb..",
+      "...b..b..."
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="squeak">` +
+      PX.sprite(rows, pal, { u: 4.4, cx: 0, cy: 0 }) +
+      `</g></g>`;
   }
 
   // A glowing jack-o-lantern (smiley, not scary).
+  // A glowing jack-o-lantern (smiley, not scary) — pixel art.
   function pumpkin(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="boing">
-      <ellipse cx="0" cy="26" rx="26" ry="6" fill="#000" opacity="0.18"/>
-      <ellipse cx="0" cy="6" rx="30" ry="24" fill="#ff8c2e"/>
-      <ellipse cx="-12" cy="6" rx="11" ry="24" fill="#ff7a14" opacity=".6"/>
-      <ellipse cx="12" cy="6" rx="11" ry="24" fill="#ff7a14" opacity=".6"/>
-      <rect x="-3" y="-26" width="6" height="12" rx="2" fill="#5a8a2e"/>
-      <path d="M-14 -2 l8 6 l-8 0 Z" fill="#fff3b0"/>
-      <path d="M14 -2 l-8 6 l8 0 Z" fill="#fff3b0"/>
-      <path d="M-12 12 q 12 12 24 0 q -12 4 -24 0 Z" fill="#fff3b0"/>
-    </g></g>`;
+    const pal = { O: "#ff8c2e", o: "#ff7a14", G: "#5a8a2e", g: "#6fa83a", F: "#fff3b0" };
+    const rows = [
+      "....Gg....",
+      "....GG....",
+      "..OOOOOO..",
+      ".OoOOOOoO.",
+      "OoOOOOOOoO",
+      "OFFOOOOFFO",
+      "OoFOOOOFoO",
+      "OOOOOOOOOO",
+      "OoFFFFFFoO",
+      "OoOFOFOFoO",
+      ".OoOOOOoO.",
+      "..OOOOOO.."
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="boing">` +
+      PX.rect(-26, 26, 52, 5, "rgba(0,0,0,0.18)") +
+      PX.sprite(rows, pal, { u: 5, cx: 0, bottom: 28 }) +
+      `</g></g>`;
   }
 
-  // A pointy (friendly) witch hat — used as a costume accessory.
+  // A pointy (friendly) witch hat — pixel art, costume accessory.
   function witchHat(x, y, sc, col) {
     sc = sc || 1; col = col || "#5b3a93";
-    return `<g transform="translate(${x} ${y}) scale(${sc})">
-      <ellipse cx="0" cy="2" rx="26" ry="6" fill="${col}"/>
-      <path d="M-16 0 q 2 -34 16 -44 q 4 24 14 44 Z" fill="${shade(col,10)}"/>
-      <rect x="-16" y="-6" width="32" height="7" rx="3" fill="#ffd166"/>
-      <circle cx="0" cy="-3" r="3" fill="#ff5d8f"/>
-    </g>`;
+    const pal = { C: col, c: shade(col, 14), B: "#ffd166", k: "#ff5d8f" };
+    const rows = [
+      "....Cc....",
+      "....CC....",
+      "...CCCc...",
+      "...CCCc...",
+      "..CCCCCc..",
+      "..CkCCCc..",
+      ".CCCCCCCc.",
+      ".BBBBBBBB.",
+      "CCCCCCCCCC"
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      PX.sprite(rows, pal, { u: 4.4, cx: 0, bottom: 6 }) +
+      `</g>`;
   }
 
   // lighten/darken a hex colour
@@ -435,21 +478,24 @@
   ];
 
   // a tiny baby in a pumpkin costume
+  // A baby in a pumpkin costume (face peeking out) — pixel art.
   function babyPumpkin(x, y, sc) {
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="giggle">
-      <ellipse cx="0" cy="22" rx="22" ry="5" fill="#000" opacity="0.18"/>
-      <ellipse cx="0" cy="2" rx="24" ry="20" fill="#ff8c2e"/>
-      <ellipse cx="-10" cy="2" rx="9" ry="20" fill="#ff7a14" opacity=".6"/>
-      <ellipse cx="10" cy="2" rx="9" ry="20" fill="#ff7a14" opacity=".6"/>
-      <rect x="-3" y="-22" width="6" height="9" rx="2" fill="#5a8a2e"/>
-      <circle cx="0" cy="-6" r="13" fill="#ffd9b8"/>
-      <path d="M-13 -8 a13 13 0 0 1 26 0 q -13 -12 -26 0 Z" fill="#ff8c2e"/>
-      <circle cx="-5" cy="-6" r="1.9" fill="#2b2440"/>
-      <circle cx="5" cy="-6" r="1.9" fill="#2b2440"/>
-      <circle cx="-8" cy="-1" r="2" fill="#ff9ec2" opacity=".7"/>
-      <circle cx="8" cy="-1" r="2" fill="#ff9ec2" opacity=".7"/>
-      <path d="M-3 0 q 3 3 6 0" stroke="#b5466e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    </g></g>`;
+    const pal = { O: "#ff8c2e", o: "#ff7a14", G: "#5a8a2e", S: "#ffd9b8", E: "#2b2440", P: "#ff9ec2" };
+    const rows = [
+      "....GG....",
+      "..OOOOOO..",
+      ".OoOSSOoO.",
+      "OoOSSSSOoO",
+      "OOSSEESSOO",
+      "OOSPSSPSOO",
+      "OoSSSSSSoO",
+      ".OoOSSOoO.",
+      "..OOOOOO.."
+    ];
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="giggle">` +
+      PX.rect(-22, 22, 44, 5, "rgba(0,0,0,0.18)") +
+      PX.sprite(rows, pal, { u: 5, cx: 0, bottom: 24 }) +
+      `</g></g>`;
   }
 
   // "The End" celebration scene
@@ -549,17 +595,6 @@
          <p>${story.pages.length - 1} pages • Tap to read</p>`;
       card.addEventListener("click", () => openStory(story));
       grid.appendChild(card);
-      pixelateInto(card.querySelector(".cover-svg"), story.cover());
-    });
-  }
-
-  // Render a scene/cover SVG as crisp pixel art into `el` (SVG already shown as
-  // an instant fallback; this swaps in the pixelated canvas once it's drawn).
-  function pixelateInto(el, fullSvg) {
-    if (!el || !window.Pixelate) return;
-    Pixelate.toPixelCanvas(fullSvg, {
-      vw: 400, vh: 300, block: 2,
-      onready: function (canvas) { el.innerHTML = ""; el.appendChild(canvas); }
     });
   }
 
@@ -586,14 +621,12 @@
   function renderPage(animate) {
     const p = current.pages[page];
 
-    // art — a page may carry a generated image (img) or an art() function;
-    // the SVG shows instantly, then gets swapped for pixel art.
+    // art — a page may carry a generated image (img) or an art() function
+    // (the art is now hand-authored pixel art, drawn directly).
     if (p.img) {
       artEl.innerHTML = '<img class="scene-img" src="' + p.img + '" alt="" onerror="this.style.display=\'none\'">';
     } else {
-      var full = p.art();
-      artEl.innerHTML = full;
-      pixelateInto(artEl, full);
+      artEl.innerHTML = p.art();
     }
     if (animate) {
       artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
