@@ -26,6 +26,7 @@
     bestDist: 0,
     bestCrew: 0,
     bestLevel: 1,
+    level: 1,
     muted: false,
     mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
@@ -52,15 +53,18 @@
   // comes from the math and the brick-wall finale at the end of each level, not
   // from the track getting faster.
   //   levelBase/levelStep — metres to the finish line (grows each level)
-  //   wallBase/wallStep   — how strong the finale's brick walls are (and how
-  //                         much each one grows per level)
+  //   wallBase  — size of the FIRST brick wall in the finale gauntlet. Each
+  //               later wall grows ~1.6x (WALL_GROWTH), so the gauntlet ramps up
+  //               into the thousands — a real test for even a huge mob.
+  //   levelScale — how much tougher the whole gauntlet gets each level.
+  const WALL_GROWTH = 1.6;
   const MODES = {
     easy:   { label: "🌱 Easy",   sub: "add & double", speed: 135, barrier: 0.18,
-              levelBase: 300, levelStep: 70,  wallBase: 7,  wallStep: 4 },
+              levelBase: 300, levelStep: 70,  wallBase: 4,  levelScale: 1.6 },
     medium: { label: "⭐ Medium", sub: "add & times",  speed: 155, barrier: 0.28,
-              levelBase: 360, levelStep: 90,  wallBase: 11, wallStep: 7 },
+              levelBase: 360, levelStep: 90,  wallBase: 5,  levelScale: 1.7 },
     hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 180, barrier: 0.34,
-              levelBase: 420, levelStep: 110, wallBase: 16, wallStep: 10 },
+              levelBase: 420, levelStep: 110, wallBase: 8,  levelScale: 1.8 },
   };
   const mode = () => MODES[save.mode] || MODES.medium;
 
@@ -264,6 +268,7 @@
   let phase = "run";           // run | finale | clear
   let phaseT = 0;              // timer for timed phase transitions (seconds)
   let wallsSmashedThisRun = 0;
+  let levelCleared = false;    // did the run end by clearing the whole gauntlet?
   let finaleTotal = 0, finaleSmashed = 0, finaleSpawned = 0;
   let finaleGap = 0;           // spawn spacing accumulator for finale walls
   let banner = null;           // { text, sub, life, color } big centre banner
@@ -370,13 +375,25 @@
     }
   }
 
-  // How strong the i-th brick wall of this level's gauntlet is. Walls escalate
-  // within the gauntlet and get tougher every level, so you must keep building a
-  // bigger mob to keep advancing.
+  // How strong the i-th brick wall of this level's gauntlet is. Walls start
+  // small and grow ~1.6x each step, so the gauntlet ramps from a handful up into
+  // the thousands — your whole mob gets eaten and you see how far you get. The
+  // whole gauntlet also scales up each level.
   function wallNeed(i) {
     const M = mode();
-    const base = M.wallBase + (level - 1) * M.wallStep;
-    return Math.max(3, Math.round(base * (1 + i * 0.55)));
+    const base = M.wallBase * Math.pow(M.levelScale, level - 1);
+    return Math.max(3, Math.round(base * Math.pow(WALL_GROWTH, i)));
+  }
+  // How many walls in this level's gauntlet. ~15 on level 1 (so the values ramp
+  // from a handful up to a few thousand and the total — around 9–10k — eats a
+  // huge mob yet can still be fully cleared by a strong one). A couple more each
+  // level. Never spawn a wall bigger than the max crew, since it could never
+  // break (that naturally caps how deep the levels can go).
+  function gauntletCount() {
+    const want = Math.min(22, 15 + (level - 1));
+    let n = 0;
+    while (n < want && wallNeed(n) <= MAX_CREW) n++;
+    return Math.max(6, n);
   }
   function levelTargetFor(lv) {
     const M = mode();
@@ -417,10 +434,11 @@
     spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0; flash = 0;
     labelScale = 1; mobSquash = 1;
     keyDir = 0; combo = 0; bestComboThisRun = 0;
-    level = 1; levelTarget = levelTargetFor(1); phase = "run"; phaseT = 0;
-    wallsSmashedThisRun = 0; finaleTotal = 0; finaleSmashed = 0;
-    finaleSpawned = 0; finaleGap = 0;
-    banner = { text: "Level 1", sub: "", life: 1.6, color: "#8a5cff" };
+    level = save.level || 1;
+    levelTarget = levelTargetFor(level); phase = "run"; phaseT = 0;
+    wallsSmashedThisRun = 0; levelCleared = false;
+    finaleTotal = 0; finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
+    banner = { text: "Level " + level, sub: "", life: 1.6, color: "#8a5cff" };
     state = "playing";
     hide(menu); hide(shopScreen); hide(gameover);
     hud.style.display = "flex";
@@ -433,17 +451,20 @@
   function endRun() {
     state = "over";
     hud.style.display = "none";
-    sfx.lose();
+    levelCleared ? sfx.bossWin() : sfx.lose();
 
-    const earned = Math.round(runCoins * (1 + upgLevel("coin") * 0.25));
+    // Clearing the whole gauntlet beats the level: bonus coins + advance so the
+    // NEXT run (started from the menu) is the next, tougher level.
+    const clearBonus = levelCleared ? 25 + level * 15 : 0;
+    const earned = Math.round((runCoins + clearBonus) * (1 + upgLevel("coin") * 0.25));
     save.coins += earned;
     const distR = Math.round(dist);
-    const newBestDist = distR > save.bestDist;
-    const newBestCrew = bestCrewThisRun > save.bestCrew;
-    const newBestLevel = level > (save.bestLevel || 1);
-    if (newBestDist) save.bestDist = distR;
-    if (newBestCrew) save.bestCrew = bestCrewThisRun;
-    if (newBestLevel) save.bestLevel = level;
+    if (distR > save.bestDist) save.bestDist = distR;
+    if (bestCrewThisRun > save.bestCrew) save.bestCrew = bestCrewThisRun;
+    if (levelCleared) save.level = level + 1;          // unlock the next level
+    const reached = levelCleared ? level + 1 : level;  // "best level reached"
+    const newBestLevel = reached > (save.bestLevel || 1);
+    if (newBestLevel) save.bestLevel = reached;
 
     // Lifetime stats for badges.
     save.stats.runs++;
@@ -464,10 +485,12 @@
       d.textContent = `🏅 New badge: ${a.ico} ${a.name}!`;
       badgeBox.appendChild(d);
     }
-    $("go-title").textContent = newBestLevel ? "New record! 🏆" : "Run finished! 🏁";
+    $("go-title").textContent = levelCleared
+      ? "Level " + level + " cleared! 🎉"
+      : (newBestLevel ? "New record! 🏆" : "Run finished! 🏁");
     $("go-best").textContent =
-      `Best: Level ${save.bestLevel} • biggest mob 🏃 ${save.bestCrew}` +
-      (earned !== runCoins ? "  (coin boost on!)" : "");
+      `Best: Level ${save.bestLevel} • biggest mob ${save.bestCrew}` +
+      (earned !== runCoins ? "  (bonus coins!)" : "");
     show(gameover);
   }
 
@@ -512,7 +535,7 @@
       }
     } else if (phase === "finale") {
       finaleGap += dy;
-      if (finaleSpawned < finaleTotal && finaleGap >= bandH * 3.4) {
+      if (finaleSpawned < finaleTotal && finaleGap >= bandH * 2.2) {
         finaleGap = 0;
         rows.push({ kind: "wall", y: -bandH - 12, need: wallNeed(finaleSpawned),
                     idx: finaleSpawned, done: false });
@@ -524,7 +547,7 @@
       }
     } else if (phase === "clear") {
       phaseT -= dt;
-      if (phaseT <= 0) startNextLevel();
+      if (phaseT <= 0) { endRun(); return; }
     }
 
     // ---- move rows & resolve contacts ----
@@ -596,11 +619,11 @@
   // ---- Level / finale flow --------------------------------------------
   function enterFinale() {
     phase = "finale";
-    finaleTotal = Math.min(8, 3 + level);
+    finaleTotal = gauntletCount();   // long, steeply-ramping gauntlet
     finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
     rows = [];   // clear leftover gates/quizzes/barriers — the finish line wipes the track
     rows.push({ kind: "finish", y: -bandH - 4, done: true });
-    banner = { text: "FINAL WALLS! 🧱", sub: "smash through!", life: 1.6, color: "#ff7a3d" };
+    banner = { text: "FINAL WALLS! 🧱", sub: "smash as far as you can!", life: 1.6, color: "#ff7a3d" };
     addShake(4);
   }
 
@@ -645,24 +668,18 @@
     burst(W / 2, y, "rgba(150,120,95,0.55)", reduceMotion ? 8 : 24, 280);
   }
 
+  // Smashed every wall in the gauntlet — the level is beaten. We DON'T leap
+  // straight into the next level; we celebrate, then end the run so the player
+  // lands back on the menu (bank coins, buy upgrades) and starts the next level
+  // fresh when they're ready.
   function enterClear() {
-    phase = "clear"; phaseT = 1.8;
+    phase = "clear"; phaseT = 2.0;
+    levelCleared = true;
     banner = { text: "Level " + level + " cleared! 🎉",
-               sub: "crew lives on: 🏃 " + crew, life: 1.8, color: "#2bb673" };
-    flash = Math.max(flash, 0.35); addShake(6);
-    burst(W / 2, playerY() - 30, "#ffd166", reduceMotion ? 10 : 26, 320);
+               sub: "back to base to upgrade", life: 2.0, color: "#2bb673" };
+    flash = Math.max(flash, 0.4); addShake(8);
+    burst(W / 2, playerY() - 30, "#ffd166", reduceMotion ? 12 : 34, 360);
     sfx.bossWin();
-  }
-
-  function startNextLevel() {
-    level++;
-    if (level > (save.bestLevel || 1)) { save.bestLevel = level; persist(); }
-    levelTarget = levelTargetFor(level);
-    dist = 0; phase = "run"; phaseT = 0;
-    spawnAccum = 0; coinAccum = 0;
-    rows = []; coins = [];
-    finaleTotal = 0; finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
-    banner = { text: "Level " + level, sub: "tougher walls ahead", life: 1.5, color: "#8a5cff" };
   }
 
   function applyGate(row) {
@@ -1282,7 +1299,7 @@
     ctx.font = "bold 26px " + FONT;
     ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
     ctx.lineWidth = 5; ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(255,255,255,0.95)";
-    const label = currentSkin().ico + " " + crew;
+    const label = "" + crew;
     ctx.strokeText(label, 0, 0);
     ctx.fillText(label, 0, 0);
     ctx.restore();
@@ -1436,8 +1453,9 @@
 
   function refreshMenu() {
     $("bank").textContent = save.coins;
+    const lv = save.level || 1;
     $("best-line").textContent = save.bestDist
-      ? `Best run: ${save.bestDist} m • biggest mob 🏃 ${save.bestCrew}`
+      ? `Now on Level ${lv} • best Level ${save.bestLevel || 1} • biggest mob ${save.bestCrew}`
       : "Your first run awaits!";
     renderModes();
   }
