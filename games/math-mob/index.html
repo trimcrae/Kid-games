@@ -275,16 +275,18 @@
     <div class="hud" id="hud" style="display:none">
       <div class="pill crew">🏃 <span id="crew">1</span></div>
       <div class="pill combo" id="combo-pill">🔥 <span id="combo">0</span></div>
+      <div class="pill">🏰 <span id="level">1</span></div>
       <div class="pill">🪙 <span id="run-coins">0</span></div>
-      <div class="pill">📏 <span id="dist">0</span>m</div>
+      <div class="pill">🏁 <span id="dist">0m</span></div>
     </div>
 
     <!-- Start menu + shop -->
     <div class="overlay" id="menu">
       <h2>🏃 Math Mob Run</h2>
       <p>Swipe (or use ← →) to steer your crew through the gate that makes the
-         <b>biggest</b> mob. Answer ❓ quiz gates, dodge red barriers, smash
-         through ⚔️ number walls, and build a 🔥 streak for bonus coins. 🧠</p>
+         <b>biggest</b> mob. Answer ❓ quiz gates and build a 🔥 streak, then at
+         each level's finish line <b>smash through 🧱 brick walls</b> — every
+         wall eats part of your crew, so grow it big! See how far you get. 🧠</p>
       <div class="coinbar">🪙 <span id="bank">0</span> coins</div>
       <div class="modes" id="modes"></div>
       <button class="btn" id="play-btn">Play ▶</button>
@@ -322,7 +324,8 @@
     <!-- Game over -->
     <div class="overlay hidden" id="gameover">
       <h2 id="go-title">Run finished! 🏁</h2>
-      <p class="big">You ran <span id="go-dist">0</span> m</p>
+      <p class="big">Reached Level <span id="go-level">1</span></p>
+      <p>🧱 Smashed <span id="go-walls">0</span> brick walls</p>
       <p>Biggest mob: 🏃 <span id="go-crew">0</span></p>
       <p>🪙 <span id="go-coins">0</span> coins collected</p>
       <div id="go-badges"></div>
