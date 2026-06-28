@@ -133,7 +133,7 @@
   function pixelateInto(el, fullSvg) {
     if (!el || !window.Pixelate) return;
     Pixelate.toPixelCanvas(fullSvg, {
-      vw: 400, vh: 300, block: 4,
+      vw: 400, vh: 300, block: 2,
       onready: function (canvas) { el.innerHTML = ""; el.appendChild(canvas); }
     });
   }
