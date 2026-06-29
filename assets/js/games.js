@@ -173,7 +173,7 @@ const GAMES = [
   {
     title: "Color Grid Builder",
     emoji: "🌈",
-    blurb: "Type your own colour words and watch them fill the grid — Cory's idea!",
+    blurb: "Type your own colour words and watch them fill the grid by their start, middle, or end letter — Cory's idea!",
     url:   "games/color-grid/",
     ages:  "5+",
     color: "#9b3fc4",

@@ -46,6 +46,73 @@
       box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
     }
 
+    /* variant picker (start / middle / end) */
+    .variant-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .variant-pick {
+      font-family: var(--font);
+      font-weight: bold;
+      font-size: 1rem;
+      border: 3px solid var(--purple);
+      background: #fff;
+      color: var(--purple);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      transition: transform 0.12s ease;
+    }
+    .variant-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.8; }
+    .variant-pick:hover { transform: translateY(-2px); }
+    .variant-pick.selected {
+      background: var(--purple);
+      color: #fff;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
+    }
+    .variant-pick.selected small { opacity: 0.9; }
+
+    /* "which letter?" chooser for the middle variant */
+    #chooser {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      max-width: 34rem;
+      margin: 0 auto 0.6rem;
+      padding: 0.7rem 0.9rem;
+      background: #faf6ff;
+      border: 3px dashed var(--purple);
+      border-radius: 16px;
+    }
+    .chooser-label { font-weight: bold; color: var(--purple); text-align: center; }
+    .chooser-letters { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
+    .letter-pick {
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: 1.4rem;
+      width: 2.6rem;
+      height: 2.6rem;
+      border: 3px solid var(--purple);
+      background: #fff;
+      color: var(--purple);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .letter-pick:hover { transform: translateY(-2px) scale(1.06); }
+    .letter-pick.edge {
+      border-color: #ddd;
+      color: #bbb;
+      background: #f3f3f6;
+      cursor: default;
+    }
+
     /* colour picker */
     .color-row {
       display: flex;
@@ -219,12 +286,11 @@
   </header>
 
   <div class="builder-wrap">
-    <p class="how">
-      Whose grid is this? Tap your name, then pick a <b>colour</b>, type any word
-      that's that colour, and press <b>Add</b> — it jumps into the row for its first letter! ✨
-    </p>
+    <p class="how" id="how"></p>
 
     <div class="kid-row" id="kid-row" aria-label="Whose grid?"></div>
+
+    <div class="variant-row" id="variant-row" aria-label="Which letter counts?"></div>
 
     <div class="color-row" id="color-row" aria-label="Pick a colour"></div>
 
@@ -232,6 +298,9 @@
       <input id="word-input" type="text" placeholder="Type a word…" aria-label="Type a word" />
       <button class="btn" type="submit">Add ＋</button>
     </form>
+
+    <div id="chooser" aria-live="polite"></div>
+
     <div class="hint" id="hint"></div>
 
     <div class="stats">

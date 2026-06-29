@@ -19,11 +19,23 @@
   ];
   var CURRENT_KID_KEY = "mcrae.currentKid";
 
+  // Three ways to file a word: by its first letter, a middle letter, or its
+  // last letter. Each variant keeps its OWN grid so the lists don't mix.
+  var VARIANTS = [
+    { id: "start",  label: "Start", emoji: "🏁", desc: "first letter" },
+    { id: "middle", label: "Middle", emoji: "🎯", desc: "a middle letter" },
+    { id: "end",    label: "End",   emoji: "🔚", desc: "last letter" }
+  ];
+  var VARIANT_KEY = "colorGrid.variant";
+
   var kidRow = document.getElementById("kid-row");
+  var variantRow = document.getElementById("variant-row");
   var colorRow = document.getElementById("color-row");
   var form = document.getElementById("add-form");
   var input = document.getElementById("word-input");
   var hint = document.getElementById("hint");
+  var howEl = document.getElementById("how");
+  var chooser = document.getElementById("chooser");
   var countEl = document.getElementById("count");
   var gridBody = document.getElementById("grid-body");
   var gridHead = document.getElementById("grid-head");
@@ -33,17 +45,24 @@
   var currentKid = localStorage.getItem(CURRENT_KID_KEY) || "cory";
   if (!KIDS.some(function (k) { return k.id === currentKid; })) currentKid = "cory";
 
+  var activeVariant = localStorage.getItem(VARIANT_KEY) || "start";
+  if (!VARIANTS.some(function (v) { return v.id === activeVariant; })) activeVariant = "start";
+
   // grid data: { "C|green": ["Creeper", "Cactus"], ... }
   var grid = load();
   var activeColor = COLOR_KEYS[0];
 
-  /* ---------- storage (namespaced per kid) ---------- */
-  function storageKey() { return "colorGrid.v1:" + currentKid; }
+  /* ---------- storage (namespaced per kid + variant) ---------- */
+  function storageKey() {
+    var base = "colorGrid.v1:" + currentKid;
+    // "start" keeps the original key so existing grids carry over.
+    return activeVariant === "start" ? base : base + ":" + activeVariant;
+  }
   function load() {
     try {
       var raw = localStorage.getItem(storageKey());
-      // one-time migration of Cory's old un-namespaced grid
-      if (!raw && currentKid === "cory") {
+      // one-time migration of Cory's old un-namespaced grid (start variant only)
+      if (!raw && activeVariant === "start" && currentKid === "cory") {
         var legacy = localStorage.getItem("coryColorGrid.v1");
         if (legacy) { localStorage.setItem(storageKey(), legacy); raw = legacy; }
       }
@@ -73,10 +92,47 @@
     [].forEach.call(kidRow.children, function (b) {
       b.classList.toggle("selected", b.dataset.kid === id);
     });
+    hideChooser();
     grid = load();
     renderAll();
     var kid = KIDS.filter(function (k) { return k.id === id; })[0];
     flashHint(kid.name + "'s grid — type away! ✨", false);
+  }
+
+  /* ---------- build the variant picker ---------- */
+  VARIANTS.forEach(function (v) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "variant-pick";
+    btn.innerHTML = '<span aria-hidden="true">' + v.emoji + "</span> " + v.label +
+      "<small>" + v.desc + "</small>";
+    btn.dataset.variant = v.id;
+    btn.setAttribute("aria-label", v.label + " — file each word by its " + v.desc);
+    btn.addEventListener("click", function () { setVariant(v.id); });
+    variantRow.appendChild(btn);
+  });
+
+  function setVariant(id) {
+    activeVariant = id;
+    localStorage.setItem(VARIANT_KEY, id);
+    [].forEach.call(variantRow.children, function (b) {
+      b.classList.toggle("selected", b.dataset.variant === id);
+    });
+    hideChooser();
+    grid = load();
+    renderAll();
+    updateHow();
+  }
+
+  function updateHow() {
+    var v = VARIANTS.filter(function (x) { return x.id === activeVariant; })[0];
+    var where = v.id === "start" ? "the row for its <b>first</b> letter"
+      : v.id === "end" ? "the row for its <b>last</b> letter"
+      : "a row you pick for one of its <b>middle</b> letters";
+    howEl.innerHTML =
+      "Tap your name and a <b>variant</b> (Start, Middle or End), then pick a " +
+      "<b>colour</b>, type any word that's that colour, and press <b>Add</b> — " +
+      "it lands in " + where + "! ✨";
   }
 
   /* ---------- build the colour picker ---------- */
@@ -180,14 +236,30 @@
     var word = raw.trim().replace(/\s+/g, " ");
     if (!word) return;
 
-    var first = word.toUpperCase().match(/[A-Z]/);
-    if (!first) {
-      flashHint("Try a word that starts with a letter! 🙂", true);
+    var letters = word.toUpperCase().match(/[A-Z]/g);
+    if (!letters || !letters.length) {
+      flashHint("Try a word with some letters in it! 🙂", true);
       shake();
       window.SFX && SFX.nope();
       return;
     }
-    var letter = first[0];
+
+    if (activeVariant === "start") {
+      placeWord(word, letters[0]);
+    } else if (activeVariant === "end") {
+      placeWord(word, letters[letters.length - 1]);
+    } else {
+      // middle: for short words the middle is obvious; longer ones need a pick.
+      if (letters.length <= 3) {
+        placeWord(word, letters[Math.floor(letters.length / 2)]);
+      } else {
+        showChooser(word, letters);
+      }
+    }
+  }
+
+  // File `word` into the row for `letter` in the active colour.
+  function placeWord(word, letter) {
     var key = keyFor(letter, activeColor);
     if (!grid[key]) grid[key] = [];
 
@@ -207,10 +279,51 @@
     td.classList.add("flash");
     td.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
 
-    flashHint('"' + word + '" goes in row ' + letter + "! ✨", false);
+    var how = activeVariant === "end" ? "ends in " + letter + " →"
+      : activeVariant === "middle" ? "counts as " + letter + " →"
+      : "goes in";
+    flashHint('"' + word + '" ' + how + " row " + letter + "! ✨", false);
     window.SFX && SFX.good();
     input.value = "";
     input.focus();
+  }
+
+  /* ---------- middle-variant "which letter?" chooser ---------- */
+  function showChooser(word, letters) {
+    chooser.innerHTML = "";
+    var label = document.createElement("div");
+    label.className = "chooser-label";
+    label.textContent = 'Which middle letter should "' + word + '" count as?';
+    chooser.appendChild(label);
+
+    var row = document.createElement("div");
+    row.className = "chooser-letters";
+    letters.forEach(function (ch, idx) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "letter-pick";
+      b.textContent = ch;
+      if (idx === 0 || idx === letters.length - 1) {
+        // first & last aren't "middle" — show them, but greyed out
+        b.classList.add("edge");
+        b.disabled = true;
+      } else {
+        b.setAttribute("aria-label", "File " + word + " in row " + ch);
+        b.addEventListener("click", function () {
+          hideChooser();
+          placeWord(word, ch);
+        });
+      }
+      row.appendChild(b);
+    });
+    chooser.appendChild(row);
+    chooser.style.display = "flex";
+    flashHint("Tap a middle letter to file it. 👆", false);
+  }
+
+  function hideChooser() {
+    chooser.style.display = "none";
+    chooser.innerHTML = "";
   }
 
   function removeWord(letter, color, index) {
@@ -238,10 +351,20 @@
   }
 
   /* ---------- starter words & clear ---------- */
+  // Which letter a starter word lands in depends on the active variant.
+  function starterLetter(word, fallbackFirst) {
+    var letters = word.toUpperCase().match(/[A-Z]/g);
+    if (!letters || !letters.length) return fallbackFirst;
+    if (activeVariant === "end") return letters[letters.length - 1];
+    if (activeVariant === "middle") return letters[Math.floor(letters.length / 2)];
+    return letters[0];
+  }
+
   starterBtn.addEventListener("click", function () {
     if (typeof ENTRIES === "undefined") return;
     ENTRIES.forEach(function (e) {
-      var key = keyFor(e.l, e.c);
+      var letter = starterLetter(e.w, e.l);
+      var key = keyFor(letter, e.c);
       if (!grid[key]) grid[key] = [];
       var exists = grid[key].some(function (w) {
         return w.toLowerCase() === e.w.toLowerCase();
@@ -255,6 +378,7 @@
 
   clearBtn.addEventListener("click", function () {
     if (!window.confirm("Clear the whole grid? This can't be undone.")) return;
+    hideChooser();
     grid = {};
     save();
     renderAll();
@@ -270,7 +394,11 @@
   buildGrid();
   renderAll();
   setColor(activeColor);
+  updateHow();
   [].forEach.call(kidRow.children, function (b) {
     b.classList.toggle("selected", b.dataset.kid === currentKid);
+  });
+  [].forEach.call(variantRow.children, function (b) {
+    b.classList.toggle("selected", b.dataset.variant === activeVariant);
   });
 })();
