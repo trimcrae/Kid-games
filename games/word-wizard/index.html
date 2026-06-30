@@ -73,7 +73,9 @@
       border-color: var(--accent, var(--purple));
       outline: none;
     }
-    .level-card .lv-emoji { font-size: 2.8rem; line-height: 1; }
+    .level-card .lv-emoji { width: 3.4rem; height: 3.4rem; line-height: 1; display: block; }
+    .level-card .lv-emoji svg { width: 100%; height: 100%; display: block; }
+    .level-card .lv-lock { font-size: 2.8rem; }
     .level-card h3 { margin: 0; font-size: 1.15rem; }
     .level-card .lv-progress { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
     .level-card.locked { opacity: 0.55; cursor: default; }
@@ -90,7 +92,8 @@
       padding: 1.5rem 1.25rem;
       box-shadow: 0 12px 30px rgba(43, 36, 64, 0.14);
     }
-    .clue-emoji { font-size: 4rem; line-height: 1; }
+    .clue-emoji { width: 6rem; height: 6rem; margin: 0 auto; line-height: 1; }
+    .clue-emoji svg { width: 100%; height: 100%; display: block; }
     .clue-text { font-size: 1.25rem; margin: 0.5rem 0 0; color: var(--ink); }
 
     /* letter slots */
@@ -167,6 +170,8 @@
     /* win screen */
     #win { text-align: center; }
     #win .big { font-size: 4.5rem; line-height: 1; }
+    #win .big { width: 7rem; height: 7rem; margin: 0 auto; }
+    #win .big svg { width: 100%; height: 100%; display: block; }
     #win h2 { color: var(--purple); font-size: 2rem; margin: 0.5rem 0; }
 
     /* sparkles on a correct answer */
@@ -236,7 +241,7 @@
 
     <!-- LEVEL COMPLETE -->
     <section id="win" class="hidden">
-      <div class="big">🏆</div>
+      <div class="big" id="win-big" aria-hidden="true">🏆</div>
       <h2 id="win-title">Spellbook mastered!</h2>
       <p id="win-text" style="font-size:1.2rem;color:#6a6385;"></p>
       <div class="controls">
@@ -250,6 +255,8 @@
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
   <script src="../../assets/js/voice.js"></script>
+  <script src="../../assets/js/pixelsvg.js"></script>
+  <script src="word-art.js"></script>
   <script src="word-wizard.js"></script>
 </body>
 </html>
