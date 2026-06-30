@@ -64,6 +64,16 @@ const SFX = [
   { w: "OH NO!",  c: "#e23b3b" }
 ];
 
+/* Paint colours for the Draw tools — tap one to start drawing.
+   The first colour is the default brush colour. */
+const PAINT_COLORS = [
+  "#222222", "#7a7a7a", "#ffffff",
+  "#e23b3b", "#ff8c1a", "#ffcf1a",
+  "#27c46b", "#2aa7ff", "#1d4ed8",
+  "#8a5cff", "#ff5db1", "#7a4a1f",
+  "#ffd6a5", "#9bf6ff", "#caffbf"
+];
+
 const SCENES = [
   { key: "sky",     name: "Sky",     css: "linear-gradient(#aee3ff, #e9f8ff)" },
   { key: "sunset",  name: "Sunset",  css: "linear-gradient(#ffd16e, #ff7eb3)" },

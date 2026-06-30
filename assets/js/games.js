@@ -153,7 +153,7 @@ const GAMES = [
   {
     title: "Comic Maker",
     emoji: "💥",
-    blurb: "Make your own graphic novel — panels, characters, talk bubbles & captions! For Jeannie!",
+    blurb: "Draw your own graphic novel — paint right in the panels, then add bubbles & captions! For Jeannie!",
     url:   "games/comic-maker/",
     ages:  "6+",
     color: "#ff5d8f",
