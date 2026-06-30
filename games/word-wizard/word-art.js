@@ -52,22 +52,22 @@ window.WordArt = (function () {
     /* ===== Animal Spells ===== */
     leopard: function () { return svg([
       "................",
-      ".......kk.......",
-      "......kyyk......",
-      ".....kyyyyk.....",
-      "....kyk..kyk....",
+      "...k........k...",
+      "..kok......kok..",
+      "..koyk....kyok..",
       "...kyyyyyyyyk...",
-      "..kyKyyyyyyKyk..",
-      "..kybkyyyykbyk..",
       "..kyyyyyyyyyyk..",
-      "..kyyykmmkyyyk..",
-      "..kyKyymmyyKyk..",
+      ".kyNyyyyyyyyNyk.",
+      ".kybbyyyyyybbyk.",
+      ".kyyyyyyyyyyyyk.",
+      ".kyNyywwwwyyNyk.",
+      ".kyyyyymmyyyyyk.",
+      "..kyyNyyyyNyyk..",
       "...kyyyyyyyyk...",
-      "....kyKyyKyk....",
-      ".....kyyyyk.....",
-      "......kkkk......",
+      "....kyyyyyyk....",
+      ".....kkkkkk.....",
       "................",
-    ], { K: "#7d5230" }); },
+    ], { N: "#5b3a1c", w: "#fff8e6" }); },
 
     penguin: function () { return svg([
       "......kkkk......",
@@ -89,21 +89,21 @@ window.WordArt = (function () {
     ], {}); },
 
     squirrel: function () { return svg([
-      "..........nn....",
-      ".........nNNn...",
-      "...nn...nNnnNn..",
-      "..nNNn..nNnnNn..",
-      "..nNkn..nNnnN...",
-      "..nNNnnnNNnN....",
-      "...nNNNNNNN.....",
-      "...nNkwNNNn.....",
-      "...nNNwNNNn.....",
-      "...nNNNNNNn.....",
-      "..nNNNNNNNNn....",
-      "..nNN....NNn....",
-      "..nNn....nNn....",
-      "..nNn....nNn....",
-      "..nn......nn....",
+      "................",
+      "..........nNNn..",
+      ".........nNNNNn.",
+      "........nNN..NNn",
+      "...kk...nN...nNn",
+      "..knnk..nN...nNn",
+      "..knwk.nN...nNn.",
+      "..knnnnnN..nNn..",
+      "..knnnNNN.nNn...",
+      "..nnnnNNNnNn....",
+      ".nNnnNNNNNn.....",
+      ".nNNNNNNNn......",
+      ".nNNNNNNn.......",
+      ".nNN.NNn........",
+      ".nn...nn........",
       "................",
     ], {}); },
 
@@ -128,38 +128,38 @@ window.WordArt = (function () {
 
     elephant: function () { return svg([
       "................",
-      "...AAAAAAAA.....",
-      "..AaaaaaaaaA....",
-      ".AaaaaaaaaaaAA..",
-      ".AaakaaaakaaaA..",
-      ".AaawaaaawaaaA..",
+      ".AA........AA...",
+      "AaaaA....AaaaaA.",
+      "AaaaaA..AaaaaaA.",
+      "AaaaaaAAAAaaaaA.",
+      "AaaaaaaaaaaaaaA.",
+      "AaakaaaaaaakaaA.",
+      "AaaaaaaaaaaaaaA.",
       ".AaaaaaaaaaaaA..",
-      "AAaaaaaaaaaaaA..",
-      "Aaaaaaaaaaa.....",
-      "Aaaaaaaaaaa.....",
-      ".AaaaaAaaaaA.A..",
-      ".Aaa.AaaA.AaA...",
-      ".Aaa.AaaA.AaA...",
-      ".AAa.AAaA.AAA...",
-      "..A...AA........",
+      ".AaaaaAAaaaaaA..",
+      "..AaaaAAaaaaA...",
+      "...aaaAAaaaa....",
+      "......AAa.......",
+      ".ww...aAA..ww...",
+      "......aAa.......",
       "................",
     ], {}); },
 
     hedgehog: function () { return svg([
       "................",
-      "....k.k.k.k.....",
-      "...kNkNkNkNk....",
-      "..kNNNNNNNNNk...",
-      ".kNkNkNkNkNkNk..",
-      ".kNNNNNNNNNNNk..",
-      "kNkNkNkNkNkNNNk.",
-      "kNNNNNNNNNNnnnk.",
-      "kNkNkNkNNNnnwnk.",
-      ".kNNNNNNnnnnknk.",   // face + nose k
-      ".kkNNNnnnnnkk...",
-      "...kkknnnnk.....",
-      "....k.k.k.k.....",
-      "................",
+      "....k.k.k.......",
+      "...kNkNkNk......",
+      "..kNkNkNkNk.....",
+      "..kNNNNNNNNk....",
+      ".kNkNkNkNNNk....",
+      ".kNNNNNNNNnnk...",
+      "kNkNkNkNNnnnnk..",
+      "kNNNNNNnnnwnnk..",   // face + eye w
+      "kNkNkNnnnnnknk..",   // nose k
+      ".kNNNnnnnnkkk...",
+      ".kkNnnnnnnk.....",
+      "...knnnnnk......",
+      "...k.kk.k.......",   // feet
       "................",
       "................",
     ], {}); },
@@ -282,22 +282,22 @@ window.WordArt = (function () {
     /* ===== Castle Spells ===== */
     dragon: function () { return svg([
       "................",
-      ".kk......ggg....",
-      ".kgk....gGGGg...",
-      ".kggk..gGkwGg...",   // eye
-      ".kgggkgGGGGGgff.",   // fire
-      "..kgggGGGGGg.ff.",
-      "...kgGGGGGGg.f..",
-      "..gGGGGGGGGg....",
-      ".gGGGgggGGGg....",
-      "gGGGg...gGGGg...",
-      "gGGg.....gGGg...",
-      ".gg.......gGg...",
-      "...........gGg..",
-      "....kk......gg..",
-      "...k..k.........",
+      "...k...k...k....",   // horn tips
+      "..kgk.kgk.kgk...",   // spikes
+      "..kggkkggkkggk..",
+      ".kgggggggggggk..",   // head top
+      ".kgggggggggggk..",
+      ".kggwkgggggggk..",   // eye w
+      ".kgggggggg.ff...",   // mouth opens, fire
+      ".kgggggggGfOf...",
+      ".kggggggGk.ff...",   // lower jaw
+      ".kgggggGk.......",
+      "..kggggk........",
+      "..kgggk.........",
+      "...kgk..........",   // neck
+      "...kk...........",
       "................",
-    ], {}); },
+    ], { f: "#ff6a00", O: "#ffd166" }); },
 
     castle: function () { return svg([
       "k.k..k.k..k.k...",
@@ -339,20 +339,20 @@ window.WordArt = (function () {
 
     knight: function () { return svg([
       "......rr........",
-      ".....rr.........",
-      "....aaaaa.......",
-      "...aaaaaaa......",
-      "..aakaaakaa.....",   // visor slits
-      "..aaaaaaaaa.....",
-      "..aakkkkkaa.....",
-      "...aaaaaaa......",
-      "....aaaaa.......",
-      "...aaaaaaa......",
-      "..aaaaaaaaa.....",
-      "..aaa.a.aaa.....",
-      "..aaa.a.aaa.....",
-      "...aa...aa......",
-      "...AA...AA......",
+      ".....rrr........",
+      "....rraaar......",
+      "...aaaaaaaa.....",
+      "..aaaaaaaaaa....",
+      "..aaaaaaaaaa....",
+      "..akkkkkkkka....",   // visor slit
+      "..aaaaaaaaaa....",
+      "..aaaaaaaaaa....",
+      "..aakkaakkaa....",   // breathing holes
+      "..aaaaaaaaaa....",
+      "..aaaaaaaaaa....",
+      "...aaaaaaaa.....",
+      "....aAAAAa......",
+      "....AAAAAA......",
       "................",
     ], {}); },
 
@@ -416,22 +416,22 @@ window.WordArt = (function () {
 
     planet: function () { return svg([
       "................",
-      "......bbbb......",
-      "....bbBBBBbb....",
-      "...bBBbBBBBBb...",
-      "...bBBBBBbBBb...",
-      "..bBBBBBBBBBBb..",
-      "yybBBBBBBBBBbyy.",   // ring
-      ".yyybBBBBBbyyy..",
-      "yyy.bBBBBBb.yyy.",
-      "....bBBBBBBb....",
-      "...bBBBbBBBBb...",
-      "...bBBBBBBbBb...",
-      "....bbBBBBbb....",
-      "......bbbb......",
+      ".......bBBb.....",
+      ".....bBBBBBBb...",
+      "....bBBBBBBBBb..",
+      "...bBBBBBBBBBb..",
+      "yy.bBBBBBBBBBb.y",   // ring tips behind
+      ".yybBBBBBBBBbyy.",
+      "...yyyyyyyyyy...",   // ring crosses in front
+      "...bBBBBBBBBBb..",
+      "...bBBBBBBBBBb..",
+      "....bBBBBBBBb...",
+      ".....bBBBBBb....",
+      ".......bb.......",
       "................",
       "................",
-    ], {}); },
+      "................",
+    ], { y: "#ffd166" }); },
 
     rocket: function () { return svg([
       "......ww........",
@@ -512,22 +512,22 @@ window.WordArt = (function () {
     /* ===== Ocean Spells ===== */
     dolphin: function () { return svg([
       "................",
-      "....bb..........",
-      "...bBBb.........",
-      "..bBBBBbbb......",
-      "..bBBBBBBBbb....",
-      "bbbBBBBBBBBBbb..",
-      ".bBBwBBBBBBBBbb.",   // eye
-      ".bBkBBBBBBBBBBb.",
-      ".bBBBBBBBBBBBb..",
-      "..bBBBBBBBBb....",
-      "...wbBBBBBb.....",
-      "..wwwbBBBb......",
-      ".wwww.bbb.......",
-      "..ww............",
+      "................",
+      "......bb........",   // dorsal fin
+      ".....bbbb.......",
+      "...bbbbbbb......",
+      "..bbbbbbbbb...bb",   // back + top tail fluke
+      ".bbbbbbbbbbb.bbb",
+      "bbwbbbbbbbbbbbbb",   // snout + eye + tail stalk
+      ".bbbbbbbbbbb.bbb",
+      "..bbbbbbbbb...bb",   // belly + bottom tail fluke
+      "...bbbbbbb......",
+      ".....bbbb.......",
       "................",
       "................",
-    ], {}); },
+      "................",
+      "................",
+    ], { b: "#3d8be0" }); },
 
     octopus: function () { return svg([
       ".....pppp.......",
@@ -549,22 +549,22 @@ window.WordArt = (function () {
     ], {}); },
 
     seahorse: function () { return svg([
-      ".....yyy........",
-      "....yYYYy.kk....",   // crest
-      "...yYkwYYy.k....",   // eye
-      "...yYYffYy......",   // snout f
+      "....kkk.........",   // crest
+      "...yyyyy........",
+      "..yYkYYYy.......",   // eye
+      ".ffYYYYYy.......",   // snout f
+      "..yYYYYy........",
       "...yYYYy........",
-      "....yYYy........",
-      ".....yYYy.......",
+      "....yYYYy.......",
+      ".....yYYYy......",
       "......yYYy......",
       ".....yYYy.......",
       "....yYYy........",
       "...yYYy.........",
-      "...yYYy.........",
-      "....yYYy........",
-      ".....yYYy.......",
-      "......yYy.......",
-      ".......yy.......",
+      "...yYYYy........",
+      "....yYYy........",   // curled tail
+      ".....yYy........",
+      "......y.........",
     ], { y: "#ffb347", Y: "#e6932a", f: "#ff7bc5" }); },
 
     anchor: function () { return svg([
@@ -780,38 +780,38 @@ window.WordArt = (function () {
 
     violin: function () { return svg([
       "......kk........",
-      ".....kwwk.......",   // scroll
+      ".....kwwk.......",   // scroll + pegbox
       ".....kkkk.......",
       "......nn........",
       "......nn........",   // neck
-      "......nn........",
+      ".....nNNn.......",   // upper bout
       "....nNNNNn......",
       "...nNNkkNNn.....",   // f-holes
-      "..nNNkNNkNNn....",
-      "..nNkNNNNkNn....",
-      "..nNNNNNNNNn....",
-      "..nNkNNNNkNn....",
+      "....nNkkNn......",   // waist
+      "....nNkkNn......",
       "...nNNkkNNn.....",
-      "....nNNNNn......",
-      ".....nnnn.......",
+      "..nNNNNNNNNn....",   // lower bout
+      "..nNNNNNNNNn....",
+      "...nNNNNNNn.....",
+      "....nnnnnn......",
       "................",
     ], {}); },
 
     drum: function () { return svg([
-      "....k......k....",   // sticks
+      "..k..........k..",   // crossed sticks
+      "...k........k...",
+      "....k......k....",
       ".....k....k.....",
-      "......k..k......",
-      "..wwwwwwwwww....",
-      ".wWWWWWWWWWWw...",
-      ".wWWWWWWWWWWw...",
-      "rwbwrwbwrwbwr...",   // zigzag
-      "rrbbrrbbrrbbr...",
-      ".bbbbbbbbbbbb...",
-      ".rrrrrrrrrrrr...",
-      ".bbbbbbbbbbbb...",
-      ".rrrrrrrrrrrr...",
-      ".aaaaaaaaaaaa...",
-      "..aWWWWWWWWa....",
+      "...wwwwwwwwww...",   // drumhead
+      "..wWWWWWWWWWWw..",
+      "..wWWWWWWWWWWw..",
+      "..aaaaaaaaaaaa..",   // silver rim
+      "..akakakakakaa..",   // tension rods
+      "..arrrrrrrrra...",   // red stripe
+      "..arrrrrrrrra...",
+      "..akakakakakaa..",
+      "..aaaaaaaaaaaa..",
+      "...wwwwwwwwww...",
       "................",
       "................",
     ], { r: "#ff5b5b" }); },
