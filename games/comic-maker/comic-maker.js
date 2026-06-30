@@ -11,9 +11,11 @@
    Data model (saved as JSON in localStorage):
      book  = { title, pages:[ page ] }
      page  = { layout, panels:[ panel ] }
-     panel = { scene, items:[ item ] }
+     panel = { scene, draw, items:[ item ] }
      item  = { id, type, x, y, size, rot, flip, tail, color, text, z }
    Positions x/y are PERCENT of the panel (centre of the item).
+   `draw` is a PNG data-URL of the freehand drawing on that panel
+   (the MS-Paint-style layer that sits under the stickers).
    =========================================================== */
 
 (function () {
@@ -53,6 +55,12 @@
   var coKey = null, coTime = 0;     // history coalescing
   var editingSession = false;       // text-edit history guard
 
+  /* ---------- drawing tool state ---------- */
+  var drawMode  = true;             // tab "draw" => draw on the panel; other tabs => move items
+  var tool      = "brush";          // brush | eraser | fill
+  var penColor  = PAINT_COLORS[0];  // current brush / fill colour
+  var penSize   = 12;               // brush / eraser width in panel pixels
+
   /* ---------- storage ---------- */
   function load() {
     try {
@@ -62,13 +70,17 @@
     return newBook();
   }
   function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(book)); } catch (e) {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(book));
+    } catch (e) {
+      flash("⚠️ Out of room! Print/Save your comic, then start a new book.");
+    }
   }
   function newBook() { return { title: "My Comic", pages: [ newPage("4") ] }; }
   function newPage(layout) {
     var n = PANELS_FOR[layout] || 4;
     var panels = [];
-    for (var i = 0; i < n; i++) panels.push({ scene: "sky", items: [] });
+    for (var i = 0; i < n; i++) panels.push({ scene: "sky", draw: null, items: [] });
     return { layout: layout, panels: panels };
   }
   function nextId() { return "i" + (seq++); }
@@ -168,17 +180,84 @@
     scenePad.appendChild(b);
   });
 
+  /* ---------- build draw-tool controls ---------- */
+  var colorPad   = document.getElementById("color-pad");
+  var toolRow    = document.getElementById("tool-row");
+  var sizeRow    = document.getElementById("size-row");
+  var customColor = document.getElementById("custom-color");
+
+  PAINT_COLORS.forEach(function (col, idx) {
+    var b = document.createElement("button");
+    b.className = "color-btn" + (idx === 0 ? " on" : "");
+    b.style.background = col;
+    b.dataset.color = col;
+    b.setAttribute("aria-label", "Draw with this colour");
+    b.addEventListener("click", function () { pickColor(col); });
+    colorPad.appendChild(b);
+  });
+
+  function pickColor(col) {
+    penColor = col;
+    if (tool !== "brush" && tool !== "fill") setTool("brush");  // grabbing a colour means painting
+    [].forEach.call(colorPad.children, function (c) {
+      c.classList.toggle("on", c.dataset.color === col);
+    });
+  }
+
+  function setTool(t) {
+    tool = t;
+    [].forEach.call(toolRow.children, function (c) { c.classList.toggle("on", c.dataset.tool === t); });
+    if (t === "eraser") flash("Eraser ready — wipe back to the background 🧽");
+    else if (t === "fill") flash("Fill ready — tap an area to flood it 🪣");
+  }
+  toolRow.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-tool]");
+    if (b) setTool(b.dataset.tool);
+  });
+  sizeRow.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-size]");
+    if (!b) return;
+    penSize = parseInt(b.dataset.size, 10) || 12;
+    [].forEach.call(sizeRow.children, function (c) { c.classList.toggle("on", c === b); });
+  });
+  customColor.addEventListener("input", function () {
+    penColor = customColor.value;
+    if (tool !== "brush" && tool !== "fill") setTool("brush");
+    [].forEach.call(colorPad.children, function (c) { c.classList.remove("on"); });
+  });
+  document.getElementById("draw-clear").addEventListener("click", function () {
+    var pan = panel();
+    if (!pan.draw) { flash("Nothing drawn here yet 🙂"); return; }
+    if (!confirm("Erase the drawing in this panel? (Stickers stay.)")) return;
+    pushHistory();
+    pan.draw = null;
+    save(); renderPage();
+    flash("Drawing cleared ✏️");
+  });
+
   /* ---------- tabs ---------- */
   var tabs = document.querySelectorAll(".tab");
   [].forEach.call(tabs, function (t) {
     t.addEventListener("click", function () {
       var name = t.dataset.tab;
       [].forEach.call(tabs, function (x) { x.classList.toggle("on", x === t); });
-      ["stickers", "words", "sounds", "scenes", "page", "book"].forEach(function (n) {
+      ["draw", "stickers", "words", "sounds", "scenes", "page", "book"].forEach(function (n) {
         document.getElementById("tray-" + n).classList.toggle("hide", n !== name);
       });
+      setDrawMode(name === "draw");
     });
   });
+
+  // Draw tab => paint on the panel; any other tab => move/place items.
+  function setDrawMode(on) {
+    drawMode = on;
+    pageEl.classList.toggle("drawing", on);
+    if (on) {
+      selItemId = null;
+      refreshSelection();
+      flash("Pick a colour and draw right on the panel! ✏️");
+    }
+  }
 
   /* ---------- build the floating item control bar ---------- */
   var BAR_BUTTONS = [
@@ -224,21 +303,36 @@
   /* ---------- render the comic page ---------- */
   function renderPage() {
     var p = page();
-    pageEl.className = "page l-" + p.layout;
+    pageEl.className = "page l-" + p.layout + (drawMode ? " drawing" : "");
     pageEl.innerHTML = "";
     if (selPanel >= p.panels.length) selPanel = 0;
 
+    var canvases = [];
     p.panels.forEach(function (pan, pi) {
       var pe = document.createElement("div");
-      pe.className = "panel" + (pi === selPanel ? " sel" : "") + (pan.items.length ? "" : " empty");
+      var empty = !pan.items.length && !pan.draw;
+      pe.className = "panel" + (pi === selPanel ? " sel" : "") + (empty ? " empty" : "");
       pe.style.background = (SCENE_MAP[pan.scene] || SCENE_MAP.sky).css;
       pe.dataset.index = pi;
       pe.addEventListener("pointerdown", function (ev) {
         if (ev.target === pe) { selPanel = pi; selItemId = null; refreshSelection(); }
       });
+
+      // drawing layer — sits under the stickers/bubbles
+      var canvas = document.createElement("canvas");
+      canvas.className = "draw-canvas";
+      pe.appendChild(canvas);
+      canvases.push({ canvas: canvas, pan: pan, pi: pi });
+
       pan.items.slice().sort(function (a, b) { return (a.z || 0) - (b.z || 0); })
         .forEach(function (it) { pe.appendChild(buildItem(it, pi)); });
       pageEl.appendChild(pe);
+    });
+
+    // size every canvas to its panel (now that they're laid out) and wire drawing
+    canvases.forEach(function (c) {
+      fitCanvas(c.canvas, c.pan);
+      attachDrawing(c.canvas, c.pi, c.pan);
     });
 
     updatePageNav();
@@ -364,6 +458,145 @@
     el.addEventListener("pointercancel", onUp);
   }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  /* ===========================================================
+     DRAWING — the MS-Paint-style freehand layer
+     =========================================================== */
+
+  // Match the canvas backing store to the panel's on-screen size,
+  // then redraw whatever was saved (stretched to fit the new size).
+  function fitCanvas(canvas, pan) {
+    var w = Math.max(1, Math.round(canvas.clientWidth));
+    var h = Math.max(1, Math.round(canvas.clientHeight));
+    canvas.width = w;
+    canvas.height = h;
+    if (pan.draw) {
+      var ctx = canvas.getContext("2d");
+      var img = new Image();
+      img.onload = function () { ctx.clearRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h); };
+      img.src = pan.draw;
+    }
+  }
+
+  function hexToRgb(hex) {
+    var h = String(hex).replace("#", "");
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var n = parseInt(h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  function strokeStyleFor(ctx) {
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = penSize;
+    if (tool === "eraser") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.strokeStyle = "rgba(0,0,0,1)";
+      ctx.fillStyle = "rgba(0,0,0,1)";
+    } else {
+      ctx.globalCompositeOperation = "source-over";
+      ctx.strokeStyle = penColor;
+      ctx.fillStyle = penColor;
+    }
+  }
+
+  function drawDot(ctx, x, y) {
+    strokeStyleFor(ctx);
+    ctx.beginPath();
+    ctx.arc(x, y, Math.max(0.5, penSize / 2), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  function drawSeg(ctx, x0, y0, x1, y1) {
+    strokeStyleFor(ctx);
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    ctx.globalCompositeOperation = "source-over";
+  }
+
+  // Flood fill (bucket) with a little colour tolerance.
+  function floodFill(ctx, sx, sy, rgb) {
+    var w = ctx.canvas.width, h = ctx.canvas.height;
+    if (sx < 0 || sy < 0 || sx >= w || sy >= h) return;
+    var img = ctx.getImageData(0, 0, w, h);
+    var d = img.data;
+    function at(x, y) { return (y * w + x) * 4; }
+    var s = at(sx, sy);
+    var tr = d[s], tg = d[s + 1], tb = d[s + 2], ta = d[s + 3];
+    var fr = rgb.r, fg = rgb.g, fb = rgb.b;
+    if (tr === fr && tg === fg && tb === fb && ta === 255) return; // already that colour
+    var tol = 48;
+    function match(i) {
+      return Math.abs(d[i] - tr) <= tol && Math.abs(d[i + 1] - tg) <= tol &&
+             Math.abs(d[i + 2] - tb) <= tol && Math.abs(d[i + 3] - ta) <= tol;
+    }
+    var stack = [sx, sy];
+    while (stack.length) {
+      var y = stack.pop(), x = stack.pop();
+      if (x < 0 || y < 0 || x >= w || y >= h) continue;
+      var i = at(x, y);
+      if (!match(i)) continue;
+      d[i] = fr; d[i + 1] = fg; d[i + 2] = fb; d[i + 3] = 255;
+      stack.push(x + 1, y, x - 1, y, x, y + 1, x, y - 1);
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  function attachDrawing(canvas, pi, pan) {
+    var ctx = canvas.getContext("2d");
+    var painting = false, lastX = 0, lastY = 0;
+
+    function pos(e) {
+      var r = canvas.getBoundingClientRect();
+      return {
+        x: (e.clientX - r.left) * (canvas.width / r.width),
+        y: (e.clientY - r.top) * (canvas.height / r.height)
+      };
+    }
+    function commit() {
+      pan.draw = canvas.toDataURL("image/png");
+      save();
+      var pe = canvas.parentNode;
+      if (pe) pe.classList.remove("empty");
+    }
+
+    canvas.addEventListener("pointerdown", function (e) {
+      if (!drawMode) return;
+      e.preventDefault();
+      selPanel = pi; selItemId = null; refreshSelection();
+      var p = pos(e);
+      if (tool === "fill") {
+        pushHistory();
+        floodFill(ctx, Math.round(p.x), Math.round(p.y), hexToRgb(penColor));
+        commit();
+        flash("Filled! 🪣");
+        return;
+      }
+      pushHistory();
+      painting = true;
+      lastX = p.x; lastY = p.y;
+      drawDot(ctx, p.x, p.y);
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    canvas.addEventListener("pointermove", function (e) {
+      if (!painting) return;
+      var p = pos(e);
+      drawSeg(ctx, lastX, lastY, p.x, p.y);
+      lastX = p.x; lastY = p.y;
+    });
+
+    function end() {
+      if (!painting) return;
+      painting = false;
+      commit();
+    }
+    canvas.addEventListener("pointerup", end);
+    canvas.addEventListener("pointercancel", end);
+  }
 
   /* ---------- item actions (from the floating bar) ---------- */
   function itemAction(act) {
@@ -502,10 +735,11 @@
     save(); goPage(Math.max(0, curPage - 1));
   });
   document.getElementById("clear-panel").addEventListener("click", function () {
-    if (!panel().items.length) { flash("This panel is already empty 🙂"); return; }
-    if (!confirm("Clear everything in the selected panel?")) return;
+    var pan = panel();
+    if (!pan.items.length && !pan.draw) { flash("This panel is already empty 🙂"); return; }
+    if (!confirm("Clear everything in the selected panel? (Drawing + stickers)")) return;
     pushHistory();
-    panel().items = []; selItemId = null;
+    pan.items = []; pan.draw = null; selItemId = null;
     save(); renderPage();
   });
 
@@ -520,7 +754,7 @@
     pushHistory();
     var want = PANELS_FOR[layout];
     var panels = p.panels.slice(0, want);
-    while (panels.length < want) panels.push({ scene: "sky", items: [] });
+    while (panels.length < want) panels.push({ scene: "sky", draw: null, items: [] });
     p.layout = layout; p.panels = panels;
     if (selPanel >= want) selPanel = 0;
     save(); renderPage();
@@ -674,6 +908,13 @@
     });
     seq = max + 1;
   })();
+
+  /* ---------- keep canvases sized to the page on resize ---------- */
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderPage, 200);
+  });
 
   /* ---------- go! ---------- */
   renderPage();

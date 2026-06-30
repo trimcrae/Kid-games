@@ -67,12 +67,22 @@
     }
     .panel.sel { box-shadow: inset 0 0 0 4px var(--yellow), inset 0 0 0 7px var(--purple); }
     .panel.empty::after {
-      content: "Tap a sticker ✨";
-      position: absolute; inset: 0;
+      content: "Tap here to draw ✏️";
+      position: absolute; inset: 0; z-index: 2;
       display: flex; align-items: center; justify-content: center;
       color: rgba(43,36,64,0.35); font-weight: bold;
       font-size: 4.5cqmin; pointer-events: none; text-align: center;
     }
+
+    /* ---- the freehand drawing layer (MS-Paint style) ---- */
+    .draw-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 1; touch-action: none;
+      pointer-events: none;           /* off in "move" mode */
+    }
+    .page.drawing .draw-canvas { pointer-events: auto; cursor: crosshair; }
+    .page.drawing .item { pointer-events: none; }   /* stickers/bubbles step aside while drawing */
 
     /* ---- items inside a panel ---- */
     .item {
@@ -211,6 +221,18 @@
     }
     .sticker-btn:hover { border-color: var(--purple); transform: scale(1.08); }
 
+    /* ---- draw-tool buttons & colour swatches ---- */
+    .tool-btn.on, .size-btn.on {
+      background: var(--purple); color: #fff; border-color: var(--purple);
+    }
+    .color-btn {
+      width: 2.4rem; height: 2.4rem; border-radius: 50%;
+      border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      cursor: pointer; padding: 0;
+    }
+    .color-btn:hover { transform: scale(1.1); }
+    .color-btn.on { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple); }
+
     .cat-row { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; margin-bottom: 0.6rem; }
     .cat {
       font-family: var(--font); font-size: 0.9rem; font-weight: bold;
@@ -290,8 +312,8 @@
 
   <div class="maker">
     <p class="how">
-      Make your own <b>graphic novel</b>! Pick a panel, drop in characters &amp; sound words,
-      add <b>talk bubbles</b> and a <b>story caption</b>, then turn the page to keep the story going. ✨
+      <b>Draw</b> your own graphic novel! Pick a colour and draw right inside a panel — like a paint program,
+      but with comic <b>panels, pages &amp; speech bubbles</b> ready to go. Add stickers &amp; sound words too. ✨
     </p>
 
     <h2 class="book-title" id="book-title" contenteditable="true" spellcheck="false"
@@ -303,7 +325,7 @@
     </div>
 
     <div class="stage">
-      <div class="page l-4" id="page" aria-label="Comic page"></div>
+      <div class="page l-4 drawing" id="page" aria-label="Comic page"></div>
     </div>
 
     <!-- controls for whatever sticker / bubble is selected -->
@@ -317,20 +339,45 @@
       <button class="nav-arrow" id="next-page" aria-label="Next page">▶</button>
     </div>
 
-    <div class="hint" id="hint">Tap a panel, then tap a sticker to begin! 👇</div>
+    <div class="hint" id="hint">Pick a colour below and draw right on the panel! ✏️</div>
 
     <div class="toolbox">
       <div class="tabs">
-        <button class="tab on" data-tab="stickers">🧸 Stickers</button>
+        <button class="tab on" data-tab="draw">✏️ Draw</button>
+        <button class="tab" data-tab="stickers">🧸 Stickers</button>
         <button class="tab" data-tab="words">💬 Words</button>
         <button class="tab" data-tab="sounds">💥 Sounds</button>
-        <button class="tab" data-tab="scenes">🎨 Scenes</button>
+        <button class="tab" data-tab="scenes">🎨 Paper</button>
         <button class="tab" data-tab="page">📄 Page</button>
         <button class="tab" data-tab="book">📚 Book</button>
       </div>
 
+      <!-- Draw (freehand, MS-Paint style) -->
+      <div class="tray" id="tray-draw">
+        <p class="tray-label">Pick a colour and draw right on the panel! Use a 1- or 2-panel page for more room. ✏️</p>
+        <div class="btn-row" id="tool-row" style="margin-bottom:0.6rem;">
+          <button class="ghost-btn tool-btn on" data-tool="brush">✏️ Brush</button>
+          <button class="ghost-btn tool-btn" data-tool="eraser">🧽 Eraser</button>
+          <button class="ghost-btn tool-btn" data-tool="fill">🪣 Fill</button>
+        </div>
+        <div class="btn-row" id="size-row" style="margin-bottom:0.7rem;">
+          <button class="ghost-btn size-btn" data-size="5">• Thin</button>
+          <button class="ghost-btn size-btn on" data-size="12">● Medium</button>
+          <button class="ghost-btn size-btn" data-size="26">⬤ Thick</button>
+          <button class="ghost-btn size-btn" data-size="46">⬤ Huge</button>
+        </div>
+        <div class="pad" id="color-pad"></div>
+        <div class="btn-row" style="margin-top:0.7rem;">
+          <label class="ghost-btn" style="display:inline-flex; align-items:center; gap:0.4rem;">🎨 More colours
+            <input type="color" id="custom-color" value="#8a5cff"
+                   style="width:2rem; height:1.6rem; border:none; background:none; padding:0; cursor:pointer;" />
+          </label>
+          <button class="ghost-btn" id="draw-clear">🧹 Clear drawing</button>
+        </div>
+      </div>
+
       <!-- Stickers -->
-      <div class="tray" id="tray-stickers">
+      <div class="tray hide" id="tray-stickers">
         <div class="cat-row" id="cat-row"></div>
         <div class="pad" id="sticker-pad"></div>
       </div>
