@@ -61,6 +61,14 @@
   var penColor  = PAINT_COLORS[0];  // current brush / fill colour
   var penSize   = 12;               // brush / eraser width in panel pixels
 
+  /* ---------- save-to-file state ---------- */
+  var supportsFS = (typeof window.showSaveFilePicker === "function") &&
+                   (typeof window.showOpenFilePicker === "function");
+  var fileHandle = null;            // FileSystemFileHandle (Chromium browsers)
+  var fileBound  = false;           // we hold read/write permission this session
+  var fileName   = "";
+  var fileSaveTimer = null;
+
   /* ---------- storage ---------- */
   function load() {
     try {
@@ -73,8 +81,12 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(book));
     } catch (e) {
-      flash("⚠️ Out of room! Print/Save your comic, then start a new book.");
+      // Browser store is full (~5 MB). If we're saving to a real file, that's fine.
+      if (!fileBound) {
+        flash("⚠️ Out of room! Use 💾 Save to computer (in the 📚 Book tab) to keep big comics.");
+      }
     }
+    scheduleFileSave();
   }
   function newBook() { return { title: "My Comic", pages: [ newPage("4") ] }; }
   function newPage(layout) {
@@ -793,6 +805,7 @@
   /* ---------- example & new book ---------- */
   document.getElementById("new-book").addEventListener("click", function () {
     if (!confirm("Start a brand new book? Your current one will be erased.")) return;
+    unbindFile();        // a new book gets its own file, don't overwrite the old one
     pushHistory();
     book = newBook(); seq = 1; save();
     titleEl.textContent = book.title; goPage(0);
@@ -800,6 +813,7 @@
   });
   document.getElementById("example").addEventListener("click", function () {
     if (!confirm("Load an example comic? This replaces your current book.")) return;
+    unbindFile();        // don't let the example overwrite a comic she saved to a file
     pushHistory();
     book = exampleBook(); save();
     titleEl.textContent = book.title; goPage(0);
@@ -844,6 +858,243 @@
       }]
     };
   }
+
+  /* ===========================================================
+     SAVE TO THE COMPUTER  (File System Access API + fallback)
+     -----------------------------------------------------------
+     Save the whole comic — drawings and all — to a real file on
+     the computer, with NO ~5 MB browser limit, and keep editing
+     that same file straight from the web page. In Chrome/Edge the
+     page holds a handle to the file and writes straight to it;
+     other browsers fall back to download + re-upload.
+     =========================================================== */
+  var saveFileBtn = document.getElementById("save-file");
+  var openFileBtn = document.getElementById("open-file");
+  var resumeBtn   = document.getElementById("resume-file");
+  var fileStatus  = document.getElementById("file-status");
+  var openInput   = document.getElementById("open-file-input");
+
+  function setStatus(msg, cls) {
+    fileStatus.textContent = msg || "";
+    fileStatus.className = "file-status" + (cls ? " " + cls : "");
+  }
+  function defaultStatus() {
+    if (fileBound) {
+      setStatus("Editing “" + fileName + "” — every change saves to this file. 💾", "saved");
+    } else if (supportsFS) {
+      setStatus("Tip: 💾 Save to computer to keep big comics (no size limit) and edit them again later.");
+    } else {
+      setStatus("Tip: 💾 Save to computer downloads a comic file you can re-open here anytime.");
+    }
+  }
+  function suggestedName() {
+    var t = (book.title || "My Comic").replace(/[\\/:*?"<>|]+/g, " ").trim() || "My Comic";
+    return t + ".comic.json";
+  }
+  function serialize() { return JSON.stringify(book); }
+
+  /* ---- tiny IndexedDB store, just to remember the file handle ---- */
+  function idb(run) {
+    return new Promise(function (resolve, reject) {
+      var open = indexedDB.open("comicMakerFiles", 1);
+      open.onupgradeneeded = function () { open.result.createObjectStore("kv"); };
+      open.onerror = function () { reject(open.error); };
+      open.onsuccess = function () {
+        try { run(open.result, resolve, reject); } catch (e) { reject(e); }
+      };
+    });
+  }
+  function idbSet(key, val) {
+    return idb(function (db, resolve, reject) {
+      var tx = db.transaction("kv", "readwrite");
+      tx.objectStore("kv").put(val, key);
+      tx.oncomplete = function () { resolve(); };
+      tx.onerror = function () { reject(tx.error); };
+    });
+  }
+  function idbGet(key) {
+    return idb(function (db, resolve, reject) {
+      var tx = db.transaction("kv", "readonly");
+      var rq = tx.objectStore("kv").get(key);
+      rq.onsuccess = function () { resolve(rq.result); };
+      rq.onerror = function () { reject(rq.error); };
+    });
+  }
+  function idbDel(key) {
+    return idb(function (db, resolve, reject) {
+      var tx = db.transaction("kv", "readwrite");
+      tx.objectStore("kv").delete(key);
+      tx.oncomplete = function () { resolve(); };
+      tx.onerror = function () { reject(tx.error); };
+    });
+  }
+
+  function writeToHandle() {
+    return fileHandle.createWritable().then(function (w) {
+      return w.write(new Blob([serialize()], { type: "application/json" }))
+              .then(function () { return w.close(); });
+    });
+  }
+
+  // Debounced auto-save to the bound file — this is what beats the ~5 MB cap.
+  function scheduleFileSave() {
+    if (!fileBound || !fileHandle) return;
+    if (fileSaveTimer) clearTimeout(fileSaveTimer);
+    fileSaveTimer = setTimeout(function () {
+      writeToHandle().then(function () {
+        setStatus("Saved to “" + fileName + "” ✓", "saved");
+      }).catch(function () {
+        fileBound = false;
+        setStatus("⚠️ Lost access to the file — tap 💾 Save to computer again.", "warn");
+      });
+    }, 1000);
+  }
+
+  function loadBookText(text) {
+    var obj = JSON.parse(text);
+    if (!obj || !Array.isArray(obj.pages) || !obj.pages.length) {
+      throw new Error("That doesn't look like a comic file.");
+    }
+    pushHistory();
+    book = obj;
+    curPage = 0; selPanel = 0; selItemId = null;
+    primeSeq();
+    titleEl.textContent = book.title || "My Comic";
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(book)); } catch (e) {}
+    renderPage();
+  }
+
+  function unbindFile() {
+    fileHandle = null; fileBound = false; fileName = "";
+    if (fileSaveTimer) { clearTimeout(fileSaveTimer); fileSaveTimer = null; }
+    hideResume();
+    if (window.indexedDB) idbDel("handle")["catch"](function () {});
+    defaultStatus();
+  }
+
+  /* ---- Save ---- */
+  function doSave() {
+    if (!supportsFS) { downloadFallback(); return; }
+    var picker = fileHandle
+      ? Promise.resolve(fileHandle)
+      : window.showSaveFilePicker({
+          suggestedName: suggestedName(),
+          types: [{ description: "Comic book", accept: { "application/json": [".json"] } }]
+        });
+    picker.then(function (h) {
+      fileHandle = h; fileName = h.name; fileBound = true;
+      return idbSet("handle", h)["catch"](function () {}).then(writeToHandle);
+    }).then(function () {
+      hideResume();
+      setStatus("Saved to “" + fileName + "” — every change now saves to this file. 💾", "saved");
+      flash("Saved to your computer! 💾");
+    })["catch"](function (e) {
+      if (e && e.name === "AbortError") return;
+      setStatus("Couldn't save: " + (e && e.message ? e.message : e), "warn");
+    });
+  }
+
+  /* ---- Open ---- */
+  function doOpen() {
+    if (!supportsFS) { openInput.click(); return; }
+    window.showOpenFilePicker({
+      types: [{ description: "Comic book", accept: { "application/json": [".json"] } }],
+      multiple: false
+    }).then(function (handles) {
+      var h = handles[0];
+      fileHandle = h; fileName = h.name;
+      return idbSet("handle", h)["catch"](function () {}).then(function () { return h.getFile(); });
+    }).then(function (file) {
+      return file.text();
+    }).then(function (text) {
+      loadBookText(text);
+      fileBound = true;
+      hideResume();
+      setStatus("Editing “" + fileName + "” — every change saves to this file. 💾", "saved");
+      flash("Opened " + fileName + " — keep drawing! ✏️");
+    })["catch"](function (e) {
+      if (e && e.name === "AbortError") return;
+      setStatus("Couldn't open: " + (e && e.message ? e.message : e), "warn");
+    });
+  }
+
+  /* ---- Fallbacks for browsers without the File System Access API ---- */
+  function downloadFallback() {
+    var blob = new Blob([serialize()], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = suggestedName();
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    setStatus("Downloaded your comic. Re-open it here with 📂 Open from computer.", "saved");
+    flash("Saved a comic file to your downloads! 💾");
+  }
+  openInput.addEventListener("change", function () {
+    var f = openInput.files && openInput.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        loadBookText(String(reader.result));
+        fileName = f.name;
+        setStatus("Opened “" + f.name + "”. Use 💾 Save to computer to keep your edits.", "saved");
+        flash("Opened " + f.name + "! ✏️");
+      } catch (e) {
+        setStatus("Couldn't open that file: " + e.message, "warn");
+      }
+    };
+    reader.readAsText(f);
+    openInput.value = "";
+  });
+
+  /* ---- Resume editing a remembered file after a page reload ---- */
+  function hideResume() { resumeBtn.style.display = "none"; resumeBtn.classList.add("hide"); }
+  function showResume() { resumeBtn.style.display = "inline-block"; resumeBtn.classList.remove("hide"); }
+
+  function bindStoredHandle(h, readNow) {
+    fileHandle = h; fileName = h.name; fileBound = true;
+    hideResume();
+    function done() {
+      setStatus("Editing “" + fileName + "” — every change saves to this file. 💾", "saved");
+      flash("Back to “" + fileName + "” — keep going! ✏️");
+    }
+    if (readNow) {
+      h.getFile().then(function (f) { return f.text(); })
+        .then(function (t) { loadBookText(t); done(); })
+        ["catch"](function () { defaultStatus(); });
+    } else { done(); }
+  }
+
+  function restoreHandle() {
+    if (!supportsFS || !window.indexedDB) { defaultStatus(); return; }
+    idbGet("handle").then(function (h) {
+      if (!h) { defaultStatus(); return; }
+      fileHandle = h; fileName = h.name;
+      var q = h.queryPermission ? h.queryPermission({ mode: "readwrite" }) : Promise.resolve("prompt");
+      Promise.resolve(q).then(function (perm) {
+        if (perm === "granted") {
+          bindStoredHandle(h, true);
+        } else {
+          showResume();
+          setStatus("You have a saved comic “" + fileName + "”. Tap “Keep editing” to continue. 📂");
+        }
+      });
+    })["catch"](function () { defaultStatus(); });
+  }
+
+  resumeBtn.addEventListener("click", function () {
+    if (!fileHandle) return;
+    var req = fileHandle.requestPermission
+      ? fileHandle.requestPermission({ mode: "readwrite" })
+      : Promise.resolve("granted");
+    Promise.resolve(req).then(function (perm) {
+      if (perm === "granted") bindStoredHandle(fileHandle, true);
+      else setStatus("Couldn't get permission to the file. Try 📂 Open from computer.", "warn");
+    });
+  });
+
+  saveFileBtn.addEventListener("click", doSave);
+  openFileBtn.addEventListener("click", doOpen);
 
   /* ---------- keyboard helpers ---------- */
   document.addEventListener("keydown", function (e) {
@@ -896,7 +1147,7 @@
   }
 
   /* ---------- keep id counter ahead of saved ids ---------- */
-  (function primeSeq() {
+  function primeSeq() {
     var max = 0;
     book.pages.forEach(function (p) {
       p.panels.forEach(function (pan) {
@@ -907,7 +1158,8 @@
       });
     });
     seq = max + 1;
-  })();
+  }
+  primeSeq();
 
   /* ---------- keep canvases sized to the page on resize ---------- */
   var resizeTimer = null;
@@ -919,4 +1171,5 @@
   /* ---------- go! ---------- */
   renderPage();
   updateUndoButtons();
+  restoreHandle();
 })();

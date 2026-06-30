@@ -286,6 +286,15 @@
     .hint { text-align: center; min-height: 1.3rem; font-weight: bold; color: #7a52d6; margin-top: 0.3rem; }
     .tray-label { text-align: center; color: #6a6385; font-size: 0.9rem; margin: 0 0 0.5rem; }
 
+    .file-status {
+      text-align: center; color: #6a6385; font-size: 0.88rem;
+      margin: 0.55rem auto 0.2rem; max-width: 34rem; min-height: 1.1rem;
+    }
+    .file-status.saved { color: #1f9d57; font-weight: bold; }
+    .file-status.warn  { color: #c0392b; font-weight: bold; }
+    .resume-btn { background: #fff7d6; border-color: #e6c200; color: #8a6d00; }
+    .resume-btn:hover { background: #ffefae; }
+
     /* ---- printing: only the comic ---- */
     @media print {
       body { background: #fff; }
@@ -424,6 +433,15 @@
       <!-- Book -->
       <div class="tray hide" id="tray-book">
         <div class="btn-row">
+          <button class="big-btn" id="save-file">💾 Save to computer</button>
+          <button class="big-btn" id="open-file">📂 Open from computer</button>
+        </div>
+        <button class="ghost-btn resume-btn hide" id="resume-file" style="margin:0.6rem auto 0; display:none;">
+          📂 Keep editing your saved comic
+        </button>
+        <p class="file-status" id="file-status"></p>
+
+        <div class="btn-row" style="margin-top:0.4rem;">
           <button class="big-btn" id="add-page">➕ New page</button>
           <button class="big-btn" id="print">🖨️ Print / Save PDF</button>
         </div>
@@ -432,6 +450,8 @@
           <button class="ghost-btn" id="example">✨ Show an example</button>
           <button class="ghost-btn" id="new-book">📕 Start a new book</button>
         </div>
+        <!-- fallback file input for browsers without the File System Access API -->
+        <input type="file" id="open-file-input" accept=".json,application/json" style="display:none;" />
       </div>
     </div>
   </div>
