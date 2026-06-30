@@ -108,23 +108,23 @@ window.WordArt = (function () {
     ], {}); },
 
     flamingo: function () { return svg([
-      "..........mmm...",
-      ".........mMMMm..",
-      ".........mMkMm..",
-      "..........MMfm..",   // beak f
-      ".........mMM....",
-      "........mMm.....",
+      "........mmmm....",
+      ".......mMMMMm...",
+      ".......mMkMMm...",   // eye
+      ".......mMMMmk...",   // beak tip
+      "........MMkk....",   // beak bends down
       ".......mMm......",
-      "......mMm.......",
+      "......mMm.......",   // S-curved neck
       ".....mMm........",
-      ".....mMm........",
-      ".....mMm........",
-      ".....mMm........",
-      "....mmMmm.......",
-      ".....kk.kk......",
-      ".....k...k......",
-      ".....k...k......",
-    ], {}); },
+      "....mMMm........",
+      "..mMMMMMm.......",
+      ".mMMMMMMMm......",   // plump body
+      ".mMMMMMMMMm.....",
+      ".mMMMMMMMm......",
+      "..mMMMMm........",
+      "...k.kk.........",   // one leg down, one tucked up
+      "..kk............",
+    ], { m: "#ff8fc8", M: "#ec5ba6" }); },
 
     elephant: function () { return svg([
       "................",
@@ -665,19 +665,19 @@ window.WordArt = (function () {
 
     spider: function () { return svg([
       "................",
-      "k...........k...",
-      ".k.........k....",
-      "..k.kkkk..k.....",   // legs + body
-      ".k.kwkkwk.k.....",   // eyes
-      "k.kkkkkkkk.k....",
-      ".k.kkkkkk.k.....",
-      "..k.kkkk.k......",
-      ".k........k.....",
-      "k..........k....",
-      "................",
-      ".......k........",
-      "......k.........",
-      ".....k..........",
+      "..k........k....",
+      "...k......k.....",   // upper legs
+      "....k....k......",
+      ".k...kkkk...k...",
+      "..k.kkkkkk.k....",
+      "...kkwkkwkkk....",   // body + eyes
+      "....kkkkkk......",
+      "...kkkkkkkk.....",
+      "..k.kkkkkk.k....",
+      ".k...kkkk...k...",   // lower legs
+      "....k....k......",
+      "...k......k.....",
+      "..k........k....",
       "................",
       "................",
     ], {}); },
