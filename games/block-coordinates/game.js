@@ -293,13 +293,20 @@
 
   /* ---------------- keyboard cursor (accessibility) ---------------- */
   let kbCursor = null;
-  function enableCursor(n, ctx, tap) { kbCursor = { x: 1, y: 1, n, ctx, tap }; paintCursor(); }
+  // The cursor stays hidden (active:false) until the player actually presses a
+  // key — otherwise mouse/touch players see a stray yellow box and a tinted
+  // row+column at (1,1) that look like random mis-coloured squares.
+  function enableCursor(n, ctx, tap) { kbCursor = { x: 1, y: 1, n, ctx, tap, active: false }; }
   function disableCursor() {
-    if (kbCursor) kbCursor.ctx.trace(kbCursor.x, kbCursor.y, false);
+    if (kbCursor && kbCursor.active) {
+      kbCursor.ctx.trace(kbCursor.x, kbCursor.y, false);
+      const c = kbCursor.ctx.cellMap[kbCursor.x + "," + kbCursor.y];
+      if (c) c.classList.remove("cursor");
+    }
     kbCursor = null;
   }
   function paintCursor(prev) {
-    if (!kbCursor) return;
+    if (!kbCursor || !kbCursor.active) return;
     Object.values(kbCursor.ctx.cellMap).forEach((c) => c.classList.remove("cursor"));
     if (prev) kbCursor.ctx.trace(prev.x, prev.y, false);
     kbCursor.ctx.trace(kbCursor.x, kbCursor.y, true);
@@ -308,8 +315,18 @@
   }
   document.addEventListener("keydown", (e) => {
     if (!kbCursor) return;
-    const prev = { x: kbCursor.x, y: kbCursor.y };
     const k = e.key;
+    const nav = k === "ArrowRight" || k === "ArrowLeft" || k === "ArrowUp" || k === "ArrowDown";
+    const act = k === "Enter" || k === " ";
+    if (!nav && !act) return;
+    // First key reveals the cursor where it already sits — no jump, no surprise.
+    if (!kbCursor.active) {
+      kbCursor.active = true;
+      paintCursor();
+      e.preventDefault();
+      return;
+    }
+    const prev = { x: kbCursor.x, y: kbCursor.y };
     if (k === "ArrowRight") kbCursor.x = Math.min(kbCursor.n, kbCursor.x + 1);
     else if (k === "ArrowLeft") kbCursor.x = Math.max(1, kbCursor.x - 1);
     else if (k === "ArrowUp") kbCursor.y = Math.min(kbCursor.n, kbCursor.y + 1);
