@@ -13,112 +13,115 @@
   "use strict";
 
   /* ---------- the spellbooks (levels) ----------
-     Each word has a clue (definition) and a picture emoji so the
-     game teaches MEANING as well as spelling. Tuned for a strong
-     ~2nd–4th-grade reader, getting trickier book by book. */
+     Each word has a clue (definition); its picture is hand-authored
+     pixel art drawn by WordArt.draw(word) (word-art.js). The game
+     teaches MEANING as well as spelling. Tuned UP for a strong
+     ~4th-grade reader — longer words, silent letters and double
+     letters — getting trickier book by book. The `icon` is the word
+     whose pixel art represents the whole spellbook on the cover. */
   const LEVELS = [
     {
       name: "Animal Spells",
-      emoji: "🦊",
+      icon: "leopard",
       color: "#3ddc84",
       words: [
-        { word: "fox",    clue: "A clever orange animal with a bushy tail.",        pic: "🦊" },
-        { word: "frog",   clue: "A green hopper that says 'ribbit'.",               pic: "🐸" },
-        { word: "tiger",  clue: "A big striped cat from the jungle.",               pic: "🐯" },
-        { word: "whale",  clue: "The giant gentle animal of the deep sea.",         pic: "🐳" },
-        { word: "panda",  clue: "A black-and-white bear that loves bamboo.",        pic: "🐼" },
-        { word: "snake",  clue: "A long animal with no legs that slithers.",        pic: "🐍" },
+        { word: "leopard",  clue: "A big spotted wild cat that can climb trees." },
+        { word: "penguin",  clue: "A black-and-white bird that swims but can't fly." },
+        { word: "squirrel", clue: "A bushy-tailed animal that buries acorns." },
+        { word: "flamingo", clue: "A tall pink bird that stands on one leg." },
+        { word: "elephant", clue: "The largest land animal, with a long trunk." },
+        { word: "hedgehog", clue: "A small animal covered in sharp prickly spines." },
       ],
     },
     {
       name: "Nature Spells",
-      emoji: "🌈",
+      icon: "volcano",
       color: "#38b6ff",
       words: [
-        { word: "river",   clue: "Water that flows along the land to the sea.",     pic: "🏞️" },
-        { word: "cloud",   clue: "A fluffy white shape floating in the sky.",       pic: "☁️" },
-        { word: "flower",  clue: "A pretty bloom that grows on a plant.",           pic: "🌸" },
-        { word: "thunder", clue: "The loud rumble you hear in a storm.",            pic: "⛈️" },
-        { word: "rainbow", clue: "An arch of colours after the rain.",              pic: "🌈" },
-        { word: "mountain",clue: "A very tall hill made of rock.",                  pic: "⛰️" },
+        { word: "volcano",   clue: "A mountain that can erupt with hot melted rock." },
+        { word: "iceberg",   clue: "A giant floating mountain of ice in the sea." },
+        { word: "tornado",   clue: "A spinning funnel of wind that touches the ground." },
+        { word: "waterfall", clue: "Water that tumbles down over the edge of a cliff." },
+        { word: "glacier",   clue: "A slow-moving river of ancient, frozen ice." },
+        { word: "canyon",    clue: "A deep valley carved out by a river over time." },
       ],
     },
     {
-      name: "Feeling Spells",
-      emoji: "😊",
-      color: "#ff5d8f",
-      words: [
-        { word: "brave",   clue: "Not afraid, even when things are scary.",         pic: "🦁" },
-        { word: "kind",    clue: "Friendly and caring to other people.",            pic: "💗" },
-        { word: "curious", clue: "Wanting to learn or know more about things.",     pic: "🔍" },
-        { word: "joyful",  clue: "Feeling very, very happy.",                       pic: "😄" },
-        { word: "gentle",  clue: "Soft and careful, never rough.",                  pic: "🕊️" },
-        { word: "clever",  clue: "Quick at learning and solving problems.",         pic: "💡" },
-      ],
-    },
-    {
-      name: "Wizard Spells",
-      emoji: "🪄",
+      name: "Castle Spells",
+      icon: "dragon",
       color: "#8a5cff",
       words: [
-        { word: "magic",   clue: "Amazing powers that seem impossible.",           pic: "✨" },
-        { word: "potion",  clue: "A magic drink mixed in a bubbling pot.",          pic: "🧪" },
-        { word: "dragon",  clue: "A huge winged beast that breathes fire.",         pic: "🐉" },
-        { word: "castle",  clue: "A giant stone home for a king or queen.",         pic: "🏰" },
-        { word: "wizard",  clue: "A person who can do real magic.",                 pic: "🧙" },
-        { word: "sparkle", clue: "To shine with tiny bright flashes of light.",     pic: "🌟" },
-      ],
-    },
-    {
-      name: "Tricky Spells",
-      emoji: "🧠",
-      color: "#ffd166",
-      words: [
-        { word: "friend",   clue: "Someone you like and play with.",               pic: "🧑‍🤝‍🧑" },
-        { word: "because",  clue: "The word that gives a reason: 'I smiled ___…'",  pic: "💬" },
-        { word: "beautiful",clue: "Very, very pretty to look at.",                  pic: "🌺" },
-        { word: "favorite", clue: "The one you like the most of all.",             pic: "⭐" },
-        { word: "different",clue: "Not the same as something else.",                pic: "🔀" },
-        { word: "adventure",clue: "An exciting journey full of surprises.",         pic: "🗺️" },
+        { word: "dragon",  clue: "A huge winged beast that breathes fire." },
+        { word: "castle",  clue: "A giant stone fortress for a king or queen." },
+        { word: "wizard",  clue: "A person who casts spells and does real magic." },
+        { word: "knight",  clue: "A warrior in armour who serves the king." },
+        { word: "shield",  clue: "What a knight holds up to block an attack." },
+        { word: "goblet",  clue: "A fancy cup for drinking at a royal feast." },
       ],
     },
     {
       name: "Space Spells",
-      emoji: "🚀",
+      icon: "rocket",
       color: "#6a5cff",
       words: [
-        { word: "comet",    clue: "A ball of ice and dust with a glowing tail.",     pic: "☄️" },
-        { word: "planet",   clue: "A big round world that circles a star.",          pic: "🪐" },
-        { word: "rocket",   clue: "What blasts off to fly into space.",              pic: "🚀" },
-        { word: "galaxy",   clue: "A huge group of millions of stars.",              pic: "🌌" },
-        { word: "gravity",  clue: "The pull that keeps your feet on the ground.",    pic: "🍎" },
-        { word: "astronaut",clue: "A person who travels into outer space.",          pic: "👩‍🚀" },
+        { word: "comet",     clue: "A ball of ice and dust with a glowing tail." },
+        { word: "planet",    clue: "A big round world that orbits around a star." },
+        { word: "rocket",    clue: "A machine that blasts off to fly into space." },
+        { word: "galaxy",    clue: "A huge swirl of billions of stars." },
+        { word: "asteroid",  clue: "A rocky lump that tumbles through space." },
+        { word: "telescope", clue: "A tube you look through to see far-off stars." },
       ],
     },
     {
       name: "Ocean Spells",
-      emoji: "🌊",
+      icon: "dolphin",
       color: "#1ec8c8",
       words: [
-        { word: "coral",    clue: "Colourful rock-like homes for sea creatures.",    pic: "🪸" },
-        { word: "dolphin",  clue: "A smart, friendly animal that leaps from waves.", pic: "🐬" },
-        { word: "octopus",  clue: "A sea animal with eight wiggly arms.",            pic: "🐙" },
-        { word: "treasure", clue: "Gold and jewels a pirate hides away.",            pic: "💰" },
-        { word: "current",  clue: "Water that flows and moves in the sea.",          pic: "🌊" },
-        { word: "jellyfish",clue: "A see-through sea animal that can sting.",        pic: "🪼" },
+        { word: "dolphin",    clue: "A smart sea mammal that leaps from the waves." },
+        { word: "octopus",    clue: "A sea creature with eight wiggly arms." },
+        { word: "seahorse",   clue: "A tiny curly fish with a horse-shaped head." },
+        { word: "anchor",     clue: "A heavy hook that holds a ship in place." },
+        { word: "jellyfish",  clue: "A see-through sea animal that can sting." },
+        { word: "lighthouse", clue: "A tall tower that shines a light to guide ships." },
+      ],
+    },
+    {
+      name: "Garden Spells",
+      icon: "ladybug",
+      color: "#ff5d8f",
+      words: [
+        { word: "ladybug",     clue: "A little red beetle dotted with black spots." },
+        { word: "beetle",      clue: "An insect with a hard, shiny shell on its back." },
+        { word: "spider",      clue: "An eight-legged creature that spins silky webs." },
+        { word: "caterpillar", clue: "A wriggly bug that turns into a butterfly." },
+        { word: "dragonfly",   clue: "A fast insect with four see-through wings." },
+        { word: "mushroom",    clue: "A little umbrella-shaped fungus on the ground." },
+      ],
+    },
+    {
+      name: "Music Spells",
+      icon: "guitar",
+      color: "#ff8c42",
+      words: [
+        { word: "trumpet", clue: "A brass horn you blow to play loud, bright notes." },
+        { word: "guitar",  clue: "An instrument with strings that you strum." },
+        { word: "violin",  clue: "A small wooden instrument played with a bow." },
+        { word: "drum",    clue: "You hit it with sticks to keep the beat." },
+        { word: "piano",   clue: "A big instrument with black and white keys." },
+        { word: "harp",    clue: "A tall instrument with strings you pluck." },
       ],
     },
     {
       name: "Master Spells",
-      emoji: "🏆",
-      color: "#ff8c42",
+      icon: "treasure",
+      color: "#ffd166",
       words: [
-        { word: "whisper",   clue: "To talk very, very quietly.",                    pic: "🤫" },
-        { word: "ancient",   clue: "Very, very old — from long, long ago.",          pic: "🏛️" },
-        { word: "creature",  clue: "Any living animal or being.",                    pic: "🦕" },
-        { word: "enormous",  clue: "Super huge — even bigger than big!",             pic: "🐘" },
-        { word: "delicious", clue: "Tasting really, really yummy.",                  pic: "🍰" },
-        { word: "imagine",   clue: "To picture something fun in your mind.",         pic: "💭" },
+        { word: "treasure",  clue: "Gold and jewels that a pirate hides away." },
+        { word: "compass",   clue: "A tool with a needle that always points north." },
+        { word: "pyramid",   clue: "A giant pointed stone tomb built in Egypt." },
+        { word: "dinosaur",  clue: "A giant reptile that lived long, long ago." },
+        { word: "umbrella",  clue: "What you hold over your head to stay dry." },
+        { word: "butterfly", clue: "An insect with big, colourful, fluttering wings." },
       ],
     },
   ];
@@ -155,7 +158,7 @@
     clueEmoji: $("clue-emoji"), clueText: $("clue-text"),
     slots: $("slots"), bank: $("bank"),
     hear: $("hear-btn"), clear: $("clear-btn"), skip: $("skip-btn"), quit: $("quit-btn"),
-    win: $("win"), winTitle: $("win-title"), winText: $("win-text"),
+    win: $("win"), winBig: $("win-big"), winTitle: $("win-title"), winText: $("win-text"),
     winNext: $("win-next"), winMenu: $("win-menu"),
   };
 
@@ -221,7 +224,8 @@
       card.style.setProperty("--accent", lv.color);
       const learnedHere = lv.words.filter((w) => state.mastered[w.word]).length;
       card.innerHTML =
-        '<span class="lv-emoji" aria-hidden="true">' + (unlocked ? lv.emoji : "🔒") + "</span>" +
+        '<span class="lv-emoji" aria-hidden="true">' +
+          (unlocked ? WordArt.draw(lv.icon) : '<span class="lv-lock">🔒</span>') + "</span>" +
         "<h3>" + lv.name + "</h3>" +
         '<span class="lv-progress">' +
           (unlocked ? (learnedHere + " / " + lv.words.length + (done ? " ✓" : "")) : "Locked") +
@@ -252,7 +256,7 @@
     locked = false;
     el.feedback.textContent = "";
     el.feedback.style.color = "var(--green)";
-    el.clueEmoji.textContent = current.pic || "✨";
+    el.clueEmoji.innerHTML = WordArt.draw(current.word);
     el.clueText.textContent = current.clue;
 
     // slots — one per letter, tagged with the answer so the game (and tests) can check
@@ -364,7 +368,8 @@
     }
     renderLevels();
     const lv = LEVELS[levelIndex];
-    el.winTitle.textContent = lv.emoji + " " + lv.name + " mastered!";
+    el.winBig.innerHTML = WordArt.draw(lv.icon);
+    el.winTitle.textContent = lv.name + " mastered!";
     const hasNext = levelIndex < LEVELS.length - 1;
     el.winText.textContent = hasNext
       ? "You learned " + lv.words.length + " words. A new spellbook is unlocked!"
