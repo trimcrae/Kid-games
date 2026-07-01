@@ -47,8 +47,11 @@
       chipRow.querySelectorAll(".kid-chip").forEach(function (c) {
         c.setAttribute("aria-pressed", String(c.dataset.kid === kid));
       });
+      var shown = 0;
       cards.forEach(function (e) {
-        e.card.classList.toggle("filtered-out", kid !== "all" && e.kids.indexOf(kid) === -1);
+        var hide = kid !== "all" && e.kids.indexOf(kid) === -1;
+        e.card.classList.toggle("filtered-out", hide);
+        e.card.style.animationDelay = hide ? "" : (shown++ * 40) + "ms";
       });
     }
 
@@ -68,5 +71,19 @@
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
+  }
+
+  /* --- offline support: one visit to the arcade caches it for car rides --- */
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").then(function (reg) {
+      // ask the worker to pre-cache every game for offline play
+      var urls = GAMES.filter(function (g) { return g.ready !== false && g.url && g.url !== "#"; })
+                      .map(function (g) { return g.url; });
+      var worker = reg.active || reg.waiting || reg.installing;
+      if (worker) worker.postMessage({ warm: urls });
+      navigator.serviceWorker.ready.then(function (r) {
+        if (r.active) r.active.postMessage({ warm: urls });
+      });
+    }).catch(function () { /* http or old browser — fine */ });
   }
 })();
