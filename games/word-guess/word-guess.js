@@ -136,15 +136,17 @@
     "zoom",
   ];
 
-  /* allowed guess sets, keyed by word length */
-  function buildAllowed(len, answers, extra) {
-    const s = new Set();
+  /* allowed guess sets, keyed by word length. The big DICT4/DICT5 lists
+     (dictionary.js) mean any real English word counts as a guess — no
+     more "not a word I know" for a perfectly good word. */
+  function buildAllowed(len, answers, extra, dict) {
+    const s = new Set(dict || []);
     answers.forEach((a) => { if (a.word.length === len) s.add(a.word); });
     extra.forEach((w) => { if (w.length === len) s.add(w); });
     return s;
   }
-  const ALLOWED5 = buildAllowed(5, ANSWERS, EXTRA_GUESSES);
-  const ALLOWED4 = buildAllowed(4, ANSWERS4, EXTRA4);
+  const ALLOWED5 = buildAllowed(5, ANSWERS, EXTRA_GUESSES, typeof DICT5 !== "undefined" ? DICT5 : null);
+  const ALLOWED4 = buildAllowed(4, ANSWERS4, EXTRA4, typeof DICT4 !== "undefined" ? DICT4 : null);
   function answersFor() { return (LEN === 4 ? ANSWERS4 : ANSWERS).filter((a) => a.word.length === LEN); }
   function allowedFor() { return LEN === 4 ? ALLOWED4 : ALLOWED5; }
 

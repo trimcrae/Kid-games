@@ -40,6 +40,7 @@
     title: $("puz-title"), clue: $("puz-clue"), progress: $("progress"), feedback: $("feedback"),
     boardWrap: $("board-wrap"), board: $("board"), lines: $("lines"),
     foundList: $("found-list"), clear: $("clear-btn"), hint: $("hint-btn"), quit: $("quit-btn"),
+    next: $("next-btn"),
   };
 
   /* ---- live state ---- */
@@ -90,6 +91,7 @@
     over = false;
     found = {};
     el.feedback.textContent = "";
+    el.next.classList.add("hidden");
     el.title.textContent = puzzle.emoji + " " + puzzle.name;
     el.clue.textContent = puzzle.clue;
     buildBoard();
@@ -247,7 +249,19 @@
     if (window.SFX) SFX.win();
     window.Confetti && Confetti.burst({ count: 100 });
     flash("🏆 You found every word! Great hunting!", "var(--green)");
+    const j = nextUnfinished();
+    el.next.textContent = j === -1 ? "🧶 All hunts" : "Next hunt ▶";
+    el.next.classList.remove("hidden");
     renderPuzzles();
+  }
+
+  // the next hunt that still has words to find, searching forward from here
+  function nextUnfinished() {
+    for (let k = 1; k <= PUZZLES.length; k++) {
+      const j = (pi + k) % PUZZLES.length;
+      if (foundSet(j).length < PUZZLES[j].words.length) return j;
+    }
+    return -1;
   }
 
   /* ---- draw the connecting lines (found words + current trace) ---- */
@@ -303,6 +317,11 @@
   el.clear.addEventListener("click", () => { sel = []; afterChange(); });
   el.hint.addEventListener("click", hint);
   el.quit.addEventListener("click", () => { renderPuzzles(); show("puzzles"); });
+  el.next.addEventListener("click", () => {
+    const j = nextUnfinished();
+    if (j === -1) { renderPuzzles(); show("puzzles"); }
+    else startPuzzle(j);
+  });
 
   /* ---- go ---- */
   renderPuzzles();

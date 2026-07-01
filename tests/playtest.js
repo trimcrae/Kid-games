@@ -380,6 +380,12 @@ const GAMES = {
     // the first row should now be coloured (each cell has a status class)
     const coloured = await page.locator(".grid .row").first().locator(".cell.correct, .cell.present, .cell.absent").count();
     if (coloured !== 5) throw new Error(`guessed row not fully scored (got ${coloured}/5)`);
+    // the big dictionary should accept any real word (regression: "crane" was rejected)
+    for (const ch of "crane".split("")) { await page.locator(`.key[data-key="${ch}"]`).first().click(); await page.waitForTimeout(20); }
+    await page.locator('.key[data-key="enter"]').click();
+    await page.waitForTimeout(300);
+    const rows2 = await page.locator(".grid .row:nth-child(2) .cell.correct, .grid .row:nth-child(2) .cell.present, .grid .row:nth-child(2) .cell.absent").count();
+    if (rows2 !== 5) throw new Error('"crane" was not accepted as a real word');
     // Easy mode switches to 4-letter words
     await page.locator("#easy-btn").click();
     await page.waitForTimeout(150);

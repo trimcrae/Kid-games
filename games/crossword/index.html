@@ -19,7 +19,7 @@
     .btn:hover { transform: scale(1.05); }
     .btn.ghost { background: var(--paper); color: var(--purple); box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
 
-    #puzzles.hidden, #play.hidden { display: none; }
+    #puzzles.hidden, #play.hidden, .btn.hidden { display: none; }
     .puz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1.1rem; max-width: 720px; margin: 0 auto; }
     .puz-card {
       display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
@@ -116,6 +116,7 @@
       </div>
 
       <div class="controls">
+        <button class="btn hidden" id="next-btn">Next puzzle ▶</button>
         <button class="btn" id="check-btn">✓ Check</button>
         <button class="btn ghost" id="reveal-btn">👀 Reveal</button>
         <button class="btn ghost" id="clear-btn">🧽 Clear</button>
