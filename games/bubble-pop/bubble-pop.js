@@ -1,11 +1,12 @@
 /* ===========================================================
    Number Bubble Pop — an educational counting / number-recognition
-   game. A target number is shown; pop the bubble with that number.
+   game. A target number (or letter, in ABC mode) is shown; pop the
+   bubble that matches it.
 
-   Three difficulty levels (1–5, 1–9, 1–20), a combo streak with
-   rising pitch, popping sounds, splash particles, a celebratory
-   end screen with confetti, and a per-level high score saved to
-   localStorage. Great for ages 3–8.
+   Four levels (1–5, 1–9, 1–20 and A–Z letters), a combo streak
+   with rising pitch, popping sounds, splash particles, a
+   celebratory end screen with confetti, and a per-level high
+   score saved to localStorage. Great for ages 3–8.
    =========================================================== */
 
 (function () {
@@ -13,6 +14,7 @@
   const scoreEl = document.getElementById("score");
   const timeEl = document.getElementById("time");
   const targetEl = document.getElementById("target");
+  const targetLabelEl = document.getElementById("target-label");
   const comboEl = document.getElementById("combo");
   const bestEl = document.getElementById("best");
   const bestLineEl = document.getElementById("best-line");
@@ -26,17 +28,19 @@
   const GAME_SECONDS = 45;
   const SAVE_KEY = "bubblePopBest";
 
+  const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const LEVELS = {
     easy: { max: 5, label: "Easy" },
     normal: { max: 9, label: "Normal" },
     hard: { max: 20, label: "Hard" },
+    abc: { label: "ABC", letters: true },
   };
 
   let level = "normal";
   let score = 0;
   let combo = 0;
   let timeLeft = GAME_SECONDS;
-  let target = 1;
+  let target = "1";
   let spawnTimer = null;
   let countdownTimer = null;
   let running = false;
@@ -58,15 +62,17 @@
     bestLineEl.textContent = b > 0 ? "🏆 Best on " + LEVELS[level].label + ": " + b : "";
   }
 
-  function maxNumber() { return LEVELS[level].max; }
+  function lettersMode() { return !!LEVELS[level].letters; }
 
-  function randomNumber() {
-    return 1 + Math.floor(Math.random() * maxNumber());
+  // A random symbol for this level: "1"–"20" on number levels, "A"–"Z" on ABC.
+  function randomSymbol() {
+    if (lettersMode()) return ABC[Math.floor(Math.random() * ABC.length)];
+    return String(1 + Math.floor(Math.random() * LEVELS[level].max));
   }
 
   function newTarget() {
-    target = randomNumber();
-    targetEl.textContent = String(target);
+    target = randomSymbol();
+    targetEl.textContent = target;
   }
 
   function setCombo(n) {
@@ -79,6 +85,14 @@
     }
   }
 
+  function refreshModeText() {
+    const thing = lettersMode() ? "letter" : "number";
+    targetLabelEl.textContent = "Pop the " + thing + ":";
+    overlayTitle.textContent = lettersMode() ? "Find the letters! 🔤" : "Find the numbers! 🔢";
+    overlayText.textContent =
+      "A " + thing + " appears at the top. Pop the bubble that matches it before time runs out!";
+  }
+
   /* ---- difficulty picker ---- */
   levelsEl.addEventListener("click", function (e) {
     const btn = e.target.closest(".level-btn");
@@ -87,6 +101,7 @@
     levelsEl.querySelectorAll(".level-btn").forEach(function (b) {
       b.setAttribute("aria-pressed", String(b === btn));
     });
+    refreshModeText();
     showBestLine();
   });
 
@@ -102,6 +117,8 @@
     newTarget();
 
     clearBubbles();
+    clearInterval(spawnTimer);      // a fast double-tap on Start must not
+    clearInterval(countdownTimer);  // leave a second pair of timers running
     spawnTimer = setInterval(spawnBubble, 600);
     countdownTimer = setInterval(tick, 1000);
   }
@@ -123,9 +140,10 @@
     const beat = score > prev;
     if (beat) { bests[level] = score; saveBests(bests); }
 
-    overlayTitle.textContent = beat && score > 0 ? "New best! 🏆" : "Great counting! 🎉";
+    overlayTitle.textContent = beat && score > 0 ? "New best! 🏆"
+      : lettersMode() ? "Great letter hunting! 🎉" : "Great counting! 🎉";
     overlayText.textContent =
-      "You found " + score + " number" + (score === 1 ? "" : "s") +
+      "You found " + score + " " + (lettersMode() ? "letter" : "number") + (score === 1 ? "" : "s") +
       " on " + LEVELS[level].label + "!";
     startBtn.textContent = "Play Again ▶";
     overlay.classList.remove("hidden");
@@ -158,12 +176,12 @@
   function spawnBubble() {
     if (!running) return;
     // Bias spawns so the current target appears often.
-    const number = Math.random() < 0.45 ? target : randomNumber();
+    const symbol = Math.random() < 0.45 ? target : randomSymbol();
 
     const bubble = document.createElement("button");
     bubble.className = "bubble";
-    bubble.textContent = String(number);
-    bubble.setAttribute("aria-label", "bubble number " + number);
+    bubble.textContent = symbol;
+    bubble.setAttribute("aria-label", "bubble " + (lettersMode() ? "letter " : "number ") + symbol);
 
     const size = 60 + Math.floor(Math.random() * 40); // 60–100px (room for two digits)
     const color = COLORS[Math.floor(Math.random() * COLORS.length)];
@@ -174,14 +192,14 @@
     bubble.style.width = size + "px";
     bubble.style.height = size + "px";
     bubble.style.left = left + "px";
-    bubble.style.fontSize = Math.round(size * (number > 9 ? 0.34 : 0.42)) + "px";
+    bubble.style.fontSize = Math.round(size * (symbol.length > 1 ? 0.34 : 0.42)) + "px";
     bubble.style.setProperty("--c", color);
     bubble.style.animationDuration = duration + "s";
 
     bubble.addEventListener("click", function () {
       if (bubble.classList.contains("pop") || !running) return;
 
-      if (number === target) {
+      if (symbol === target) {
         // combo bonus: +1 base, +1 extra for every 3 in a streak
         setCombo(combo + 1);
         const gained = 1 + Math.floor(combo / 3);

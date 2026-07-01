@@ -131,7 +131,23 @@ const GAMES = {
       await page.waitForTimeout(180);
     }
     if (!scored) throw new Error("score never increased when popping the right number");
-    return "bubbles spawn and scoring works";
+    // ABC mode: fresh page, switch level, and pop a matching letter
+    await page.goto(`${BASE}/games/bubble-pop/`, { waitUntil: "networkidle" });
+    await page.locator(".level-btn[data-level=abc]").click();
+    await page.click("#start-btn");
+    await page.waitForTimeout(900);
+    const t = await page.locator("#target").textContent();
+    if (!/^[A-Z]$/.test(t)) throw new Error(`ABC mode target is "${t}", not a letter`);
+    let popped = false;
+    for (let i = 0; i < 24 && !popped; i++) {
+      const t2 = await page.locator("#target").textContent();
+      const b = page.locator(".bubble", { hasText: new RegExp("^" + t2 + "$") }).first();
+      if (await b.count()) await b.dispatchEvent("click").catch(() => {});
+      popped = parseInt(await page.locator("#score").textContent(), 10) > 0;
+      await page.waitForTimeout(180);
+    }
+    if (!popped) throw new Error("score never increased when popping the right letter");
+    return "number and ABC letter modes both score";
   },
 
   async "Color Grid Builder"(page, g, d) {
@@ -190,9 +206,47 @@ const GAMES = {
     return "story opens, pages turn, and finishes";
   },
 
+  async "Mad Libs"(page, g, d) {
+    await page.goto(`${BASE}/games/mad-libs/`, { waitUntil: "networkidle" });
+    const cards = await page.locator(".ml-card").count();
+    if (cards < 6) throw new Error(`only ${cards} story cards rendered`);
+    await page.locator(".ml-card").last().click();
+    // answer every blank with a placeholder word
+    for (let i = 0; i < 30; i++) {
+      await page.fill("#wordInput", "banana");
+      await page.locator("#nextBtn").click();
+      await page.waitForTimeout(80);
+      if (await page.locator("#reveal:not(.hidden)").count()) break;
+    }
+    if (!(await page.locator("#reveal:not(.hidden)").count())) throw new Error("never reached the story reveal");
+    const text = await page.locator("#storyText").textContent();
+    if (!/banana/.test(text)) throw new Error("typed words were not woven into the story");
+    if (/\{\d+\}/.test(text)) throw new Error("un-filled {n} placeholder left in the story");
+    if (/____/.test(text)) throw new Error("a blank was never filled in");
+    // read-aloud button should be visible in Chromium (speechSynthesis exists)
+    if (!(await page.locator("#readBtn").isVisible())) throw new Error("Read-it-to-me button missing");
+    return `${cards} stories; played one through to the reveal`;
+  },
+
   async "Comic Maker"(page, g, d) {
     await page.goto(`${BASE}/games/comic-maker/`, { waitUntil: "networkidle" });
     await page.locator(".panel").first().click();
+    // draw a stroke with the default Draw tab's brush
+    const drew = await page.evaluate(() => {
+      const cv = document.querySelector(".panel canvas.draw-canvas, .panel canvas");
+      if (!cv) return false;
+      const r = cv.getBoundingClientRect();
+      const cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+      const pe = (type, x, y) => new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 1, clientX: x, clientY: y, button: 0, isPrimary: true });
+      cv.dispatchEvent(pe("pointerdown", cx, cy));
+      for (let i = 1; i <= 5; i++) cv.dispatchEvent(pe("pointermove", cx + 10 * i, cy + 6 * i));
+      cv.dispatchEvent(pe("pointerup", cx + 50, cy + 30));
+      const ctx = cv.getContext("2d");
+      return ctx.getImageData(0, 0, cv.width, cv.height).data.some((v, i) => i % 4 === 3 && v > 0);
+    });
+    if (!drew) throw new Error("drawing a brush stroke left the canvas blank");
+    // stickers now live behind their own tab (Draw is the default)
+    await page.locator(".tab[data-tab=stickers]").click();
     await page.locator(".sticker-btn").first().click();
     await page.waitForTimeout(150);
     if (await page.locator(".item").count() < 1) throw new Error("sticker was not added");
@@ -222,7 +276,7 @@ const GAMES = {
     if (await page.locator("#undo").isDisabled()) throw new Error("Undo stayed disabled after edits");
     await page.locator("#undo").click();
     await page.waitForTimeout(100);
-    return "stickers, bubbles, drag, pages and undo all work";
+    return "drawing, stickers, bubbles, drag, pages and undo all work";
   },
 
   async "Word Wizard"(page, g, d) {
@@ -511,7 +565,11 @@ const GAMES = {
 
   console.log(`\n🎮  Play-testing the McRae Family Arcade  (${BASE})\n`);
 
+  // Optional filter: `npm test -- comic` runs only games whose name matches.
+  const only = process.argv.slice(2).join(" ").toLowerCase();
+
   for (const [game, play] of Object.entries(GAMES)) {
+    if (only && !game.toLowerCase().includes(only)) continue;
     console.log(`▶ ${game}`);
     for (const [device, cfg] of Object.entries(DEVICES)) {
       const ctx = await browser.newContext(cfg);
@@ -536,7 +594,8 @@ const GAMES = {
   /* ---------- summary ---------- */
   console.log("\n──────────────────────────────────────────────");
   if (issues.length === 0) {
-    const checks = Object.keys(GAMES).length * Object.keys(DEVICES).length;
+    const gamesRun = Object.keys(GAMES).filter((g) => !only || g.toLowerCase().includes(only));
+    const checks = gamesRun.length * Object.keys(DEVICES).length;
     console.log(`✅  All ${checks} checks passed — every game works on Desktop, iPad and iPhone.`);
     process.exit(0);
   } else {
