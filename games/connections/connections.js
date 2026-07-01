@@ -169,6 +169,8 @@
     puzzles: $("puzzles"), puzGrid: $("puz-grid"), play: $("play"),
     solved: $("solved"), board: $("board"), lives: $("lives"), feedback: $("feedback"),
     shuffle: $("shuffle-btn"), deselect: $("deselect-btn"), submit: $("submit-btn"), quit: $("quit-btn"),
+    playControls: $("play-controls"), nextControls: $("next-controls"),
+    next: $("next-btn"), retry: $("retry-btn"),
   };
 
   /* ---------- live state ---------- */
@@ -222,6 +224,8 @@
     PUZZLES[i].groups.forEach((g) => g.items.forEach((it) => items.push(it)));
     tiles = shuffle(items);
     el.feedback.textContent = "";
+    el.playControls.classList.remove("hidden");
+    el.nextControls.classList.add("hidden");
     renderSolved();
     renderBoard();
     renderLives();
@@ -327,6 +331,12 @@
     el.submit.disabled = true;
     saved["p" + pi] = won ? "won" : "lost";
     save();
+    // swap the play buttons for "what next?" choices
+    el.playControls.classList.add("hidden");
+    el.nextControls.classList.remove("hidden");
+    el.retry.classList.toggle("hidden", won);
+    const more = nextUnsolved() !== -1;
+    el.next.textContent = more ? "Next puzzle ▶" : "🔗 All puzzles";
     if (won) {
       if (window.SFX) SFX.win();
       window.Confetti && Confetti.burst({ count: 100 });
@@ -344,7 +354,22 @@
     renderPuzzles();
   }
 
+  // the next puzzle the kid hasn't beaten yet, searching forward from here
+  function nextUnsolved() {
+    for (let k = 1; k <= PUZZLES.length; k++) {
+      const j = (pi + k) % PUZZLES.length;
+      if (saved["p" + j] !== "won") return j;
+    }
+    return -1;
+  }
+
   /* ---------- buttons ---------- */
+  el.next.addEventListener("click", () => {
+    const j = nextUnsolved();
+    if (j === -1) { renderPuzzles(); show("puzzles"); }
+    else startPuzzle(j);
+  });
+  el.retry.addEventListener("click", () => startPuzzle(pi));
   el.submit.addEventListener("click", submit);
   el.deselect.addEventListener("click", () => { if (!over) { selected = []; renderBoard(); } });
   el.shuffle.addEventListener("click", () => { if (!over) { tiles = shuffle(tiles); renderBoard(); } });

@@ -21,7 +21,7 @@
     .btn.ghost { background: var(--paper); color: var(--purple); box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
 
     /* puzzle picker */
-    #puzzles.hidden, #play.hidden { display: none; }
+    #puzzles.hidden, #play.hidden, .controls.hidden, .btn.hidden { display: none; }
     .puz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1.1rem; max-width: 720px; margin: 0 auto; }
     .puz-card {
       display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
@@ -99,10 +99,14 @@
       <div class="board" id="board"></div>
       <div class="lives" id="lives" aria-live="polite"></div>
       <p class="feedback" id="feedback" aria-live="polite"></p>
-      <div class="controls">
+      <div class="controls" id="play-controls">
         <button class="btn ghost" id="shuffle-btn">🔀 Shuffle</button>
         <button class="btn ghost" id="deselect-btn">Clear pick</button>
         <button class="btn" id="submit-btn">Check ✓</button>
+      </div>
+      <div class="controls hidden" id="next-controls">
+        <button class="btn" id="next-btn">Next puzzle ▶</button>
+        <button class="btn ghost" id="retry-btn">↻ Try this one again</button>
       </div>
       <div class="controls" style="margin-top:0.5rem;">
         <button class="btn ghost" id="quit-btn">🔗 All puzzles</button>

@@ -39,6 +39,7 @@
     title: $("puz-title"), feedback: $("feedback"), grid: $("xgrid"),
     across: $("across-clues"), down: $("down-clues"),
     check: $("check-btn"), reveal: $("reveal-btn"), clear: $("clear-btn"), quit: $("quit-btn"),
+    next: $("next-btn"),
   };
 
   /* ---------- live state ---------- */
@@ -89,6 +90,7 @@
     curDir = "across";
     curCell = null;
     el.feedback.textContent = "";
+    el.next.classList.add("hidden");
     el.title.textContent = puzzle.emoji + " " + puzzle.name;
 
     // map cells -> entries
@@ -385,7 +387,19 @@
     sparkleBurst();
     window.Confetti && Confetti.burst({ count: 100 });
     if (window.SFX) SFX.win();
+    const j = nextUnsolved();
+    el.next.textContent = j === -1 ? "✏️ All puzzles" : "Next puzzle ▶";
+    el.next.classList.remove("hidden");
     renderPuzzles();
+  }
+
+  // the next crossword the kid hasn't solved yet, searching forward from here
+  function nextUnsolved() {
+    for (let k = 1; k <= PUZZLES.length; k++) {
+      const j = (pi + k) % PUZZLES.length;
+      if (!slot(j).solved) return j;
+    }
+    return -1;
   }
 
   /* ---------- buttons ---------- */
@@ -393,6 +407,11 @@
   el.reveal.addEventListener("click", doReveal);
   el.clear.addEventListener("click", doClear);
   el.quit.addEventListener("click", () => { renderPuzzles(); show("puzzles"); });
+  el.next.addEventListener("click", () => {
+    const j = nextUnsolved();
+    if (j === -1) { renderPuzzles(); show("puzzles"); }
+    else startPuzzle(j);
+  });
 
   /* ---------- go ---------- */
   renderPuzzles();
