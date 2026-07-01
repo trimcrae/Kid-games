@@ -12,6 +12,7 @@
        blurb:  "Learn X by doing Y",// what it teaches, one sentence
        url:    "games/my-game/",    // folder with its index.html
        ages:   "7+",                // who it's good for
+       kids:   ["jeannie","cory"],  // whose "Who's playing?" tab shows it
        color:  "#38b6ff",           // card highlight colour
        ready:  true                 // false = "Coming soon" card
      }
@@ -26,6 +27,7 @@ const GAMES = [
     blurb: "Give silly words — a noun, a verb, a goofy adjective — then watch them fill a story you've never seen and hear it read aloud! Parts of speech & grammar. For everyone!",
     url:   "games/mad-libs/",
     ages:  "6+",
+    kids:  ["jeannie","cory"],
     color: "#ffd166",
     ready: true
   },
@@ -36,6 +38,7 @@ const GAMES = [
     blurb: "Build pixel-art scenes the Minecraft way! Read (X, Y) coordinates to place blocks on the grid — learn the coordinate plane. For Cory!",
     url:   "games/block-coordinates/",
     ages:  "6+",
+    kids:  ["cory"],
     color: "#3ddc84",
     ready: true
   },
@@ -46,6 +49,7 @@ const GAMES = [
     blurb: "Branching read-aloud story-books with pictures & voice — YOU pick what happens! Colours, counting, logic, vocabulary & nature. For everyone!",
     url:   "games/adventure/",
     ages:  "3+",
+    kids:  ["jeannie","cory","ellie"],
     color: "#8a5cff",
     ready: true
   },
@@ -56,6 +60,7 @@ const GAMES = [
     blurb: "Watch your money grow itself with compound interest! Pick a bank, add savings & see what you could buy — like If You Made a Million. For Cory!",
     url:   "games/money-machine/",
     ages:  "6+",
+    kids:  ["cory"],
     color: "#3ddc84",
     ready: true
   },
@@ -66,6 +71,7 @@ const GAMES = [
     blurb: "Coach tool for Shannon — fair Pumpkin Pies soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
     url:   "games/soccer-roster/",
     ages:  "Grown-ups",
+    kids:  [],
     color: "#f4791f",
     ready: true
   },
@@ -76,6 +82,7 @@ const GAMES = [
     blurb: "Themed mini crosswords — Minecraft, Bluey, Frozen, taekwondo & more. Read a clue, fill the grid! Spelling & vocabulary.",
     url:   "games/crossword/",
     ages:  "6+",
+    kids:  ["jeannie","cory"],
     color: "#ff5d8f",
     ready: true
   },
@@ -86,6 +93,7 @@ const GAMES = [
     blurb: "Trace the hidden theme words through a grid of letters — every letter belongs to a word! Find the golden spangram.",
     url:   "games/strands/",
     ages:  "6+",
+    kids:  ["jeannie","cory"],
     color: "#38b6ff",
     ready: true
   },
@@ -96,6 +104,7 @@ const GAMES = [
     blurb: "Make as many words as you can from a honeycomb of letters — every word uses the middle letter! Spelling & vocabulary.",
     url:   "games/spelling-bee/",
     ages:  "6+",
+    kids:  ["jeannie"],
     color: "#ffd166",
     ready: true
   },
@@ -106,6 +115,7 @@ const GAMES = [
     blurb: "Sort 16 cards into 4 secret groups of 4 — Pokémon, Bluey, books & more. Builds logic & categories!",
     url:   "games/connections/",
     ages:  "6+",
+    kids:  ["jeannie","cory"],
     color: "#8a5cff",
     ready: true
   },
@@ -116,6 +126,7 @@ const GAMES = [
     blurb: "Guess the secret 5-letter word in 6 tries, with colour clues and hints — a kid-friendly Wordle. Spelling & reasoning.",
     url:   "games/word-guess/",
     ages:  "6+",
+    kids:  ["jeannie","cory"],
     color: "#3ddc84",
     ready: true
   },
@@ -126,6 +137,7 @@ const GAMES = [
     blurb: "Steer your crew through +, −, ×, ÷ gates to grow the biggest mob, then smash through brick walls at each level's finish — mental math on the run, with upgrades that save!",
     url:   "games/math-mob/",
     ages:  "6+",
+    kids:  ["cory"],
     color: "#3ddc84",
     ready: true
   },
@@ -136,6 +148,7 @@ const GAMES = [
     blurb: "Friendly-spooky read-aloud storybooks starring Ellie & her siblings — tap the pictures to play! For Ellie!",
     url:   "games/spooky-stories/",
     ages:  "3+",
+    kids:  ["ellie"],
     color: "#8a5cff",
     ready: true
   },
@@ -146,6 +159,7 @@ const GAMES = [
     blurb: "Find letters & numbers to dress a princess — letters, numbers & lots of sparkle! For Ellie!",
     url:   "games/princess-dressup/",
     ages:  "3+",
+    kids:  ["ellie"],
     color: "#9b3fc4",
     ready: true
   },
@@ -156,6 +170,7 @@ const GAMES = [
     blurb: "Draw your own graphic novel — paint right in the panels, then add bubbles & captions! For Jeannie!",
     url:   "games/comic-maker/",
     ages:  "6+",
+    kids:  ["jeannie"],
     color: "#ff5d8f",
     ready: true
   },
@@ -166,6 +181,7 @@ const GAMES = [
     blurb: "Find and pop the matching number — or letter in ABC mode! Practice counting, number & letter recognition. For Ellie!",
     url:   "games/bubble-pop/",
     ages:  "3+",
+    kids:  ["ellie"],
     color: "#38b6ff",
     ready: true
   },
@@ -176,6 +192,7 @@ const GAMES = [
     blurb: "Type your own colour words and watch them fill the grid by their start, middle, or end letter — Cory's idea!",
     url:   "games/color-grid/",
     ages:  "5+",
+    kids:  ["cory","ellie"],
     color: "#9b3fc4",
     ready: true
   },
@@ -186,6 +203,7 @@ const GAMES = [
     blurb: "Read a clue, then spell the magic word from a bank of letters — vocabulary & spelling for big readers. For Jeannie!",
     url:   "games/word-wizard/",
     ages:  "7+",
+    kids:  ["jeannie"],
     color: "#ff5d8f",
     ready: true
   }

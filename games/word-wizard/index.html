@@ -80,6 +80,14 @@
     .level-card .lv-progress { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
     .level-card.locked { opacity: 0.55; cursor: default; }
     .level-card.done { border-color: var(--green); }
+    /* phones: two compact columns instead of one giant card per row */
+    @media (max-width: 520px) {
+      .level-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+      .level-card { padding: 0.9rem 0.5rem; border-radius: 18px; gap: 0.25rem; }
+      .level-card .lv-emoji { width: 2.6rem; height: 2.6rem; }
+      .level-card .lv-lock { font-size: 2.1rem; }
+      .level-card h3 { font-size: 1rem; }
+    }
 
     /* ---- play screen ---- */
     #play.hidden, #levels.hidden, #win.hidden { display: none; }

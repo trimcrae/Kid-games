@@ -30,6 +30,13 @@
     .puz-card h3 { margin: 0; font-size: 1.1rem; }
     .puz-card .pz-blurb { font-size: 0.82rem; color: #6a6385; }
     .puz-card.solved { border-color: var(--green); }
+    /* phones: two compact columns instead of one giant card per row */
+    @media (max-width: 520px) {
+      .puz-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+      .puz-card { padding: 0.9rem 0.5rem; border-radius: 18px; gap: 0.2rem; }
+      .puz-card .pz-emoji { font-size: 2.1rem; }
+      .puz-card h3 { font-size: 0.98rem; }
+    }
 
     .play-head { display:flex; align-items:center; justify-content:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.4rem; }
     .play-head h2 { margin:0; font-size:1.3rem; color:var(--purple); }

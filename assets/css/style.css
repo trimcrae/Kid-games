@@ -79,6 +79,36 @@ body {
   margin-top: 0.5rem;
 }
 
+/* --- "Who's playing?" filter chips --- */
+.kid-chips {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  margin: -0.25rem auto 0.25rem;
+}
+.kid-chip {
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--purple);
+  background: var(--paper);
+  border: 3px solid var(--purple);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
+  transition: transform 0.12s ease, background 0.12s ease, color 0.12s ease;
+  touch-action: manipulation;
+}
+.kid-chip:hover { transform: translateY(-2px); }
+.kid-chip[aria-pressed="true"] {
+  color: #fff;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  border-color: transparent;
+}
+
 /* --- Game grid --- */
 .game-grid {
   display: grid;
@@ -88,6 +118,8 @@ body {
   margin: 1rem auto 3rem;
   padding: 0 1.25rem;
 }
+
+.game-card.filtered-out { display: none; }
 
 .game-card {
   display: flex;
