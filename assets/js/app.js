@@ -31,9 +31,30 @@
       "<p>" + escapeHtml(game.blurb || "") + "</p>" +
       '<span class="age-badge">' + escapeHtml(ageText) + "</span>";
 
+    if (ready) {
+      card.addEventListener("click", function () {
+        try { localStorage.setItem("arcade.last", JSON.stringify({ title: game.title, url: game.url, emoji: game.emoji })); } catch (e) {}
+      });
+    }
+
     grid.appendChild(card);
     cards.push({ card: card, kids: game.kids || [] });
   });
+
+  /* --- "jump back in" — one tap back to the last game played --- */
+  try {
+    var last = JSON.parse(localStorage.getItem("arcade.last"));
+    var stillThere = last && GAMES.some(function (g) { return g.url === last.url && g.ready !== false; });
+    if (stillThere) {
+      var banner = document.createElement("a");
+      banner.className = "resume-banner";
+      banner.href = last.url;
+      banner.innerHTML = "▶ Jump back in: " +
+        '<span aria-hidden="true">' + escapeHtml(last.emoji || "🎲") + "</span> " +
+        "<b>" + escapeHtml(last.title) + "</b>";
+      grid.parentNode.insertBefore(banner, grid);
+    }
+  } catch (e) { /* no saved game — fine */ }
 
   /* --- "Who's playing?" filter — every game still shows on 🌈 Everybody --- */
   const chipRow = document.getElementById("kid-chips");
