@@ -46,7 +46,8 @@
     storyTitle: document.getElementById("storyTitle"),
     storyText:  document.getElementById("storyText"),
     againBtn:   document.getElementById("againBtn"),
-    pickBtn:    document.getElementById("pickBtn")
+    pickBtn:    document.getElementById("pickBtn"),
+    readBtn:    document.getElementById("readBtn")
   };
 
   function show(section) {
@@ -155,11 +156,38 @@
     window.Confetti && Confetti.burst({ count: 70 });
   }
 
+  // ---------------- READ ALOUD ----------------
+  // The story is full of the kid's own words, so there's no pre-recorded
+  // clip for it — we use the browser's speech voice instead. (The slightly
+  // robotic voice reading "flying socks" is half the fun.)
+  const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  if (!canSpeak) el.readBtn.classList.add("hidden");
+
+  function stopReading() {
+    if (canSpeak) window.speechSynthesis.cancel();
+    el.readBtn.textContent = "🔊 Read it to me";
+  }
+
+  function readAloud() {
+    if (!canSpeak || !story) return;
+    if (window.speechSynthesis.speaking) { stopReading(); return; }
+    const u = new SpeechSynthesisUtterance(story.title + ". " + fillTemplate(false));
+    u.rate = 0.95;
+    u.onend = stopReading;
+    u.onerror = stopReading;
+    el.readBtn.textContent = "⏹ Stop reading";
+    window.speechSynthesis.speak(u);
+  }
+
+  el.readBtn.addEventListener("click", readAloud);
+
   el.againBtn.addEventListener("click", function () {
+    stopReading();
     startStory(story);   // same story, fresh words
   });
 
   el.pickBtn.addEventListener("click", function () {
+    stopReading();
     buildPicker();
     show("picker");
   });

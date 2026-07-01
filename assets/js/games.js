@@ -163,7 +163,7 @@ const GAMES = [
   {
     title: "Number Bubble Pop",
     emoji: "🫧",
-    blurb: "Find and pop the matching number — practice counting & number recognition!",
+    blurb: "Find and pop the matching number — or letter in ABC mode! Practice counting, number & letter recognition. For Ellie!",
     url:   "games/bubble-pop/",
     ages:  "3+",
     color: "#38b6ff",
