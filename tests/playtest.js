@@ -113,7 +113,15 @@ const GAMES = {
     const playable = await page.locator("a.game-card").count();
     if (cards < 1) throw new Error("no game cards rendered on the landing page");
     if (playable < 1) throw new Error("no playable game links on the landing page");
-    return `${cards} cards, ${playable} playable`;
+    // "Who's playing?" filter: picking a kid narrows the grid, Everybody restores it
+    await page.locator('.kid-chip[data-kid="ellie"]').click();
+    await page.waitForTimeout(150);
+    const ellie = await page.locator(".game-card:visible").count();
+    if (ellie < 1 || ellie >= cards) throw new Error(`Ellie filter showed ${ellie} of ${cards} cards`);
+    await page.locator('.kid-chip[data-kid="all"]').click();
+    await page.waitForTimeout(150);
+    if (await page.locator(".game-card:visible").count() !== cards) throw new Error("Everybody chip did not restore all cards");
+    return `${cards} cards, ${playable} playable; kid filter works`;
   },
 
   async "Number Bubble Pop"(page, g, d) {
