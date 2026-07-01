@@ -118,6 +118,25 @@ body {
   border-color: transparent;
 }
 
+/* --- "jump back in" banner --- */
+.resume-banner {
+  display: block;
+  width: fit-content;
+  margin: 0.75rem auto 0;
+  padding: 0.55rem 1.3rem;
+  font-family: var(--font);
+  font-size: 1.05rem;
+  color: var(--ink);
+  text-decoration: none;
+  background: var(--paper);
+  border: 3px solid var(--green);
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(61, 220, 132, 0.25);
+  transition: transform 0.12s ease;
+}
+.resume-banner:hover { transform: translateY(-2px) scale(1.02); }
+.resume-banner b { color: var(--purple); }
+
 /* --- Game grid --- */
 .game-grid {
   display: grid;
