@@ -228,7 +228,8 @@
           (unlocked ? WordArt.draw(lv.icon) : '<span class="lv-lock">🔒</span>') + "</span>" +
         "<h3>" + lv.name + "</h3>" +
         '<span class="lv-progress">' +
-          (unlocked ? (learnedHere + " / " + lv.words.length + (done ? " ✓" : "")) : "Locked") +
+          (unlocked ? (learnedHere + " / " + lv.words.length + (done ? " ✓" : ""))
+                    : "Finish " + LEVELS[i - 1].name + " to open!") +
         "</span>";
       if (unlocked) {
         card.type = "button";

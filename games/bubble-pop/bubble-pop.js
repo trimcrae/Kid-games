@@ -70,9 +70,37 @@
     return String(1 + Math.floor(Math.random() * LEVELS[level].max));
   }
 
+  /* ---- helper voice: says each new target out loud, so pre-readers
+     (Ellie!) can play the letter and number games by ear ---- */
+  const VOICE_KEY = "bubblePopVoice";
+  const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  let voiceOn = true;
+  try { voiceOn = localStorage.getItem(VOICE_KEY) !== "0"; } catch (e) {}
+  const voiceBtn = document.getElementById("voice-btn");
+  function refreshVoiceBtn() { voiceBtn.textContent = voiceOn ? "🔊" : "🔇"; }
+  if (!canSpeak) voiceBtn.style.display = "none";
+  voiceBtn.addEventListener("click", function () {
+    voiceOn = !voiceOn;
+    try { localStorage.setItem(VOICE_KEY, voiceOn ? "1" : "0"); } catch (e) {}
+    if (!voiceOn && canSpeak) window.speechSynthesis.cancel();
+    refreshVoiceBtn();
+  });
+  refreshVoiceBtn();
+
+  function speakTarget() {
+    if (!canSpeak || !voiceOn || !running) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(
+      (lettersMode() ? "Pop the letter " : "Pop the number ") + target
+    );
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
+
   function newTarget() {
     target = randomSymbol();
     targetEl.textContent = target;
+    speakTarget();
   }
 
   function setCombo(n) {
@@ -133,6 +161,7 @@
     running = false;
     clearInterval(spawnTimer);
     clearInterval(countdownTimer);
+    if (canSpeak) window.speechSynthesis.cancel();
 
     // record + celebrate
     const bests = loadBests();
