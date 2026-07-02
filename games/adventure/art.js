@@ -1269,6 +1269,364 @@
   /* =========================================================
      SCENE COMPOSER (unchanged registry/API)
      ========================================================= */
+  /* =========================================================
+     STORY-SPECIFIC PROPS (added for text-accuracy pass)
+     ========================================================= */
+  // The Voider — Block World's gentle villain: a shadowy blocky wisp
+  function voider(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#3a2a5e"], [100, "#161022"]]);
+    const halo = rgrad([[0, "#7a4fd0", .35], [100, "#7a4fd0", 0]]);
+    let s = D(g.def + halo.def) + shadow(18, 44);
+    s += `<circle cx="0" cy="16" r="34" fill="url(#${halo.id})"><animate attributeName="opacity" values="1;.5;1" dur="2.6s" repeatCount="indefinite"/></circle>`;
+    s += `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="3.2s" repeatCount="indefinite"/>` +
+      `<path d="M-16 -4 Q-16 -20 0 -20 Q16 -20 16 -4 L16 22 L10 16 L5 24 L0 17 L-5 24 L-10 16 L-16 22Z" fill="url(#${g.id})"/>` +
+      `<rect x="-16" y="-14" width="32" height="6" rx="3" fill="#5e4390" opacity=".5"/>` +
+      `<rect x="-9" y="-8" width="6" height="7" rx="1.5" fill="#b48cff"><animate attributeName="opacity" values="1;.6;1" dur="2.2s" repeatCount="indefinite"/></rect>` +
+      `<rect x="3" y="-8" width="6" height="7" rx="1.5" fill="#b48cff"><animate attributeName="opacity" values="1;.6;1" dur="2.2s" begin=".4s" repeatCount="indefinite"/></rect>` +
+      `<path d="M-4 4 Q0 7 4 4" stroke="#b48cff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".9"/></g>`;
+    s += `<circle r="1.6" fill="#b48cff"><animateMotion path="M-20 8 q-6 -14 2 -26" dur="2.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".9;0" dur="2.8s" repeatCount="indefinite"/></circle>` +
+      `<circle r="1.2" fill="#8f6bd9"><animateMotion path="M20 4 q7 -12 -1 -24" dur="3.4s" begin="-1.2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3.4s" begin="-1.2s" repeatCount="indefinite"/></circle>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // Inkwell — the Library's ink-blob companion in a little glass pot
+  function inkwell(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const ink = lgrad([[0, "#4a5ce8"], [100, "#232a86"]]);
+    let s = D(ink.def) + shadow(15, 34);
+    s += `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="2.4s" repeatCount="indefinite"/>` +
+      // blob body + droplet curl
+      `<path d="M0 -14 Q3 -20 1 -23 Q7 -21 4 -13 Q13 -8 13 2 L-13 2 Q-13 -8 -4 -13 Q-8 -19 0 -14Z" fill="url(#${ink.id})"/>` +
+      `<circle cx="-4.5" cy="-6" r="2.6" fill="#fff"/><circle cx="4.5" cy="-6" r="2.6" fill="#fff"/>` +
+      `<circle cx="-4" cy="-5.6" r="1.4" fill="#12163f"/><circle cx="5" cy="-5.6" r="1.4" fill="#12163f"/>` +
+      `<circle cx="-3.6" cy="-6.2" r=".5" fill="#fff"/><circle cx="5.4" cy="-6.2" r=".5" fill="#fff"/>` +
+      `<path d="M-3 -1.5 Q0 1 3 -1.5" stroke="#c9d4ff" stroke-width="1.4" fill="none" stroke-linecap="round"/>` +
+      `<path d="M-9 -12 Q-6 -15 -3 -13" stroke="#8fa0ff" stroke-width="1.2" fill="none" opacity=".7"/></g>`;
+    // glass pot
+    s += `<path d="M-12 2 L12 2 L9 12 Q9 16 5 16 L-5 16 Q-9 16 -9 12Z" fill="#bfe0f2" opacity=".75"/>` +
+      `<rect x="-13" y="0" width="26" height="4" rx="2" fill="#9fc6de"/>` +
+      `<path d="M-8 5 L-6.5 12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc}) translate(0 18)">${s}</g>`;
+  }
+  // Beepo — a small round friendly robot
+  function robot(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const body = lgrad([[0, "#cfd8e8"], [100, "#93a3bd"]]);
+    let s = D(body.def) + shadow(16, 36);
+    s += `<line x1="0" y1="-12" x2="0" y2="-4" stroke="#7a8aa5" stroke-width="2.4"/>` +
+      `<circle cx="0" cy="-13" r="3" fill="#ff5d8f"><animate attributeName="opacity" values="1;.35;1" dur="1.3s" repeatCount="indefinite"/></circle>`;
+    s += `<rect x="-15" y="-4" width="30" height="24" rx="8" fill="url(#${body.id})"/>` +
+      `<rect x="-10" y="0" width="20" height="12" rx="4" fill="#1d2b45"/>` +
+      `<circle cx="-4.5" cy="6" r="2.2" fill="#6fe3ff"><animate attributeName="r" values="2.2;2.2;.7;2.2" keyTimes="0;.86;.92;1" dur="3.6s" repeatCount="indefinite"/></circle>` +
+      `<circle cx="4.5" cy="6" r="2.2" fill="#6fe3ff"><animate attributeName="r" values="2.2;2.2;.7;2.2" keyTimes="0;.86;.92;1" dur="3.6s" repeatCount="indefinite"/></circle>` +
+      `<path d="M-2.5 9.5 Q0 11 2.5 9.5" stroke="#6fe3ff" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+    s += `<rect x="-21" y="2" width="6" height="12" rx="3" fill="#93a3bd"/><rect x="15" y="2" width="6" height="12" rx="3" fill="#93a3bd"/>` +
+      `<rect x="-11" y="20" width="9" height="14" rx="4" fill="#7a8aa5"/><rect x="2" y="20" width="9" height="14" rx="4" fill="#7a8aa5"/>` +
+      `<circle cx="-11" cy="8" r="2" fill="#ffd166"/><circle cx="11" cy="8" r="2" fill="#ffd166"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // a celebration cake (o.candle=false to remove the candle)
+  function cake(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const spong = lgrad([[0, "#ffd9ec"], [100, "#ff9ecf"]]);
+    const fg = glowF(1.8);
+    let s = D(spong.def + fg.def) + shadow(24, 22);
+    s += `<rect x="-24" y="2" width="48" height="18" rx="4" fill="url(#${spong.id})"/>` +
+      `<rect x="-17" y="-12" width="34" height="15" rx="4" fill="#ff8fb8"/>` +
+      `<path d="M-24 2 Q-24 -2 -20 -2 L20 -2 Q24 -2 24 2 L24 6 Q20 11 16 6 Q12 12 7 6 Q3 12 -2 6 Q-6 12 -11 6 Q-15 12 -19 6 Q-22 10 -24 6Z" fill="#fff5fa"/>` +
+      `<path d="M-17 -12 Q-17 -15 -14 -15 L14 -15 Q17 -15 17 -12 L17 -9 Q13 -5 10 -9 Q6 -4 2 -9 Q-2 -4 -6 -9 Q-10 -4 -13 -9 Q-16 -6 -17 -9Z" fill="#fff5fa"/>` +
+      `<circle cx="-14" cy="12" r="1.7" fill="#ffd166"/><circle cx="-4" cy="14" r="1.7" fill="#6fd0ff"/><circle cx="6" cy="12" r="1.7" fill="#7ed957"/><circle cx="15" cy="14" r="1.7" fill="#b48cff"/>`;
+    if (o.candle !== false) {
+      s += `<rect x="-1.5" y="-26" width="3" height="11" rx="1.5" fill="#6fd0ff"/><path d="M-1.5 -22 h3" stroke="#fff" stroke-width="1" opacity=".7"/>` +
+        `<g filter="url(#${fg.id})"><path d="M0 -34 Q2.6 -30 1.6 -27.4 Q.9 -25.6 0 -25.6 Q-.9 -25.6 -1.6 -27.4 Q-2.6 -30 0 -34Z" fill="#ffb142"><animate attributeName="opacity" values="1;.7;1" dur=".9s" repeatCount="indefinite"/></path></g>`;
+    }
+    s += `<circle cx="0" cy="-17" r="3.4" fill="#e8384f"/><path d="M0 -19 Q3 -23 5 -21" stroke="#3bb36a" stroke-width="1.6" fill="none"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc}) translate(0 14)">${s}</g>`;
+  }
+  // blocky crafting table with a tool grid top
+  function craftingTable(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#c98a4a"], [100, "#8a5a33"]]);
+    let s = D(g.def) + shadow(22, 34);
+    s += `<rect x="-20" y="-6" width="40" height="40" rx="3" fill="url(#${g.id})"/>` +
+      // slanted table top with a 3x3 crafting grid
+      `<path d="M-20 -6 L-13 -16 L27 -16 L20 -6Z" fill="#e0a866"/>` +
+      `<path d="M20 -6 L27 -16 L27 -8 L20 2Z" fill="#8a5a33"/>` +
+      `<path d="M-15 -13.4 L23 -13.4 M-17 -10.8 L21.5 -10.8 M-8.5 -16 L-14.8 -6 M2.5 -16 L-3.8 -6 M13.5 -16 L7.2 -6" stroke="#a06a3a" stroke-width="1.3"/>` +
+      // hammer resting on top
+      `<g transform="translate(6 -19) rotate(-12)"><rect x="-1.2" y="0" width="2.4" height="11" rx="1.2" fill="#8a5a33"/><rect x="-5.5" y="-3" width="11" height="4.6" rx="2" fill="#9fb6cc"/></g>` +
+      // front: tool grid squares + saw marks
+      `<rect x="-14" y="10" width="12" height="10" rx="1.5" fill="#6b4423" opacity=".55"/>` +
+      `<rect x="2" y="10" width="12" height="10" rx="1.5" fill="#6b4423" opacity=".55"/>` +
+      `<path d="M-11 13 l6 4 M-5 13 l-6 4" stroke="#e0a866" stroke-width="1.4" stroke-linecap="round"/>` +
+      `<path d="M4 15 h8 M5 13 l1.5 2 M8 13 l1.5 2 M11 13 l1.5 2" stroke="#9fb6cc" stroke-width="1.2" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // minecart on a bit of rail (o.filled=true → gold ore inside)
+  function minecart(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#9fb6cc"], [100, "#5f7185"]]);
+    let s = D(g.def) + shadow(26, 26);
+    s += `<path d="M-30 22 h60 M-22 26 h44" stroke="#8a5a33" stroke-width="3" stroke-linecap="round"/>` +
+      `<path d="M-26 24 h52" stroke="#6e7f92" stroke-width="2.4"/>`;
+    if (o.filled !== false) s += `<circle cx="-8" cy="-8" r="5" fill="#ffd166"/><circle cx="3" cy="-10" r="6" fill="#ffc14d"/><circle cx="11" cy="-7" r="4.5" fill="#ffd166"/>`;
+    s += `<path d="M-24 -8 L-18 12 Q-17 16 -13 16 L13 16 Q17 16 18 12 L24 -8 Q24 -11 20 -11 L-20 -11 Q-24 -11 -24 -8Z" fill="url(#${g.id})"/>` +
+      `<rect x="-21" y="-6" width="42" height="4" rx="2" fill="#c3d2e0" opacity=".7"/>` +
+      `<circle cx="-11" cy="19" r="4.6" fill="#39424e"/><circle cx="11" cy="19" r="4.6" fill="#39424e"/>` +
+      `<circle cx="-11" cy="19" r="1.6" fill="#9fb6cc"/><circle cx="11" cy="19" r="1.6" fill="#9fb6cc"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // an arched storybook door (o.color; o.open=true shows glowing gap)
+  function door(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#8a5a33";
+    const g = lgrad([[0, shade(c, 18)], [100, shade(c, -12)]]);
+    const fg = glowF(2.4);
+    let s = D(g.def + fg.def) + shadow(20, 40);
+    s += `<path d="M-19 40 L-19 -8 Q-19 -30 0 -30 Q19 -30 19 -8 L19 40Z" fill="${shade(c, -32)}"/>`;
+    if (o.open) s += `<g filter="url(#${fg.id})"><path d="M-13 37 L-13 -7 Q-13 -25 0 -25 Q13 -25 13 -7 L13 37Z" fill="#ffe9a8"><animate attributeName="opacity" values="1;.8;1" dur="2.4s" repeatCount="indefinite"/></path></g>` +
+      `<path d="M-13 37 L-13 -7 Q-13 -25 0 -25 L0 37Z" fill="url(#${g.id})"/>`;
+    else s += `<path d="M-14 37 L-14 -7 Q-14 -25 0 -25 Q14 -25 14 -7 L14 37Z" fill="url(#${g.id})"/>` +
+      `<path d="M-14 -3 h28 M0 -25 V37 M-14 17 h28" stroke="${shade(c, -26)}" stroke-width="1.6" opacity=".7"/>` +
+      `<circle cx="6" cy="8" r="2.4" fill="#ffd166"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // a stack of chopped logs (o.count 1..6, default 3)
+  function logs(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, n = Math.max(1, Math.min(6, o.count || 3));
+    const ring = `<circle r="6.5" fill="#e0a866"/><circle r="4" fill="#c98a4a"/><circle r="1.6" fill="#a06a3a"/>`;
+    const bodyG = lgrad([[0, "#a06a3a"], [100, "#7a4c28"]], true);
+    let s = D(bodyG.def) + shadow(9 + n * 5, 12);
+    const pos = [[-8, 5], [8, 5], [0, -6], [-16, 5], [16, 5], [8, -6]].slice(0, n);
+    for (const [px, py] of pos) {
+      s += `<g transform="translate(${px} ${py})"><rect x="-6" y="-6.5" width="26" height="13" rx="6" fill="url(#${bodyG.id})"/>` +
+        `<path d="M0 -4 q10 -1.5 18 0" stroke="#6b4423" stroke-width="1" fill="none" opacity=".6"/><g>${ring}</g></g>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // a storybook — open on the ground, or standing if o.standing
+  function book(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#7a5cd6";
+    let s;
+    if (o.standing) {
+      const g = lgrad([[0, shade(c, 14)], [100, shade(c, -14)]]);
+      s = D(g.def) + shadow(14, 22) +
+        `<rect x="-12" y="-16" width="24" height="36" rx="2.5" fill="url(#${g.id})"/>` +
+        `<rect x="-12" y="-16" width="5" height="36" rx="2.5" fill="${shade(c, -28)}"/>` +
+        `<path d="M-2 -8 l3.5 2.6 3.5 -2.6 v9 l-3.5 -2.4 -3.5 2.4Z" fill="#ffd166"/>` +
+        `<path d="M-6 8 h12 M-6 12 h12" stroke="#fff" stroke-width="1.2" opacity=".55"/>`;
+    } else {
+      s = shadow(20, 12) +
+        `<path d="M0 -6 Q-11 -12 -22 -8 L-22 6 Q-11 2 0 8 Q11 2 22 6 L22 -8 Q11 -12 0 -6Z" fill="${c}"/>` +
+        `<path d="M0 -8 Q-10 -13 -20 -10 L-20 4 Q-10 1 0 6 Q10 1 20 4 L20 -10 Q10 -13 0 -8Z" fill="#fff8ec"/>` +
+        `<path d="M-15 -6 q7 -1.5 12 .5 M-15 -2 q7 -1.5 12 .5 M3 -5.5 q7 -2 12 -.5 M3 -1.5 q7 -2 12 -.5" stroke="#b9a98a" stroke-width="1.1" fill="none" stroke-linecap="round"/>` +
+        `<path d="M0 -8 L0 6" stroke="#d9c9a8" stroke-width="1.4"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // shy Nessie-style sea monster: head + neck and two humps above the waterline
+  function seaMonster(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#3fb8a8";
+    const g = lgrad([[0, shade(c, 18)], [100, shade(c, -14)]]);
+    let s = D(g.def);
+    s += `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="3.4s" repeatCount="indefinite"/>` +
+      // neck + head
+      `<path d="M-8 24 Q-14 2 -6 -14 Q-2 -22 6 -22 Q16 -22 16 -13 Q16 -8 10 -7 L4 -6 Q0 6 4 24Z" fill="url(#${g.id})"/>` +
+      `<circle cx="6" cy="-15" r="2.6" fill="#fff"/><circle cx="7" cy="-14.6" r="1.4" fill="#173a35"/>` +
+      `<circle cx="1" cy="-9" r="2.4" fill="#ff9db4" opacity=".55"/>` +
+      `<path d="M9 -9.5 Q12 -8.5 13.5 -10" stroke="#173a35" stroke-width="1.3" fill="none" stroke-linecap="round"/>` +
+      `<path d="M-2 -22 Q0 -27 3 -23 M4 -23 Q7 -28 9 -23" stroke="${shade(c, -22)}" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>`;
+    // humps
+    s += `<path d="M18 24 Q30 4 44 24Z" fill="url(#${g.id})"/><path d="M50 24 Q60 10 70 24Z" fill="url(#${g.id})"/>` +
+      `<path d="M-14 25 Q20 20 76 25 L76 28 L-14 28Z" fill="#fff" opacity=".25"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // scallop shell
+  function shell(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#ffb8cf";
+    const g = lgrad([[0, "#fff"], [100, c]]);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def) + shadow(9, 7) +
+      `<path d="M0 6 L-9 -4 Q-9 -10 0 -10 Q9 -10 9 -4Z" fill="url(#${g.id})"/>` +
+      `<path d="M0 6 L-6 -8 M0 6 L0 -10 M0 6 L6 -8" stroke="${shade(c, -18)}" stroke-width="1" opacity=".7"/>` +
+      `<path d="M-3.5 6 h7" stroke="${shade(c, -12)}" stroke-width="2.4" stroke-linecap="round"/></g>`;
+  }
+  // speckled dino egg (o.cracked for a zigzag crack)
+  function egg(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = rgrad([[0, "#fffdf2"], [100, "#e8ddb8"]], .38, .3);
+    let s = D(g.def) + shadow(10, 13) +
+      `<path d="M0 -14 Q10 -6 10 4 Q10 13 0 13 Q-10 13 -10 4 Q-10 -6 0 -14Z" fill="url(#${g.id})"/>` +
+      `<circle cx="-4" cy="-2" r="1.3" fill="#bfae7f"/><circle cx="4" cy="2" r="1.1" fill="#bfae7f"/><circle cx="0" cy="7" r="1.2" fill="#bfae7f"/><circle cx="3" cy="-6" r="1" fill="#bfae7f"/>`;
+    if (o.cracked) s += `<path d="M-6 0 L-2 3 L1 -1 L4 3" stroke="#a89468" stroke-width="1.3" fill="none" stroke-linejoin="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // glowing rideable space jelly
+  function spaceJelly(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#b48cff";
+    const g = rgrad([[0, "#e8dcff", .95], [70, c, .8], [100, c, .3]]);
+    const halo = rgrad([[0, c, .35], [100, c, 0]]);
+    let s = D(g.def + halo.def) +
+      `<circle cx="0" cy="0" r="30" fill="url(#${halo.id})"><animate attributeName="opacity" values="1;.55;1" dur="2.8s" repeatCount="indefinite"/></circle>`;
+    s += `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="3s" repeatCount="indefinite"/>` +
+      `<path d="M-16 2 Q-16 -16 0 -16 Q16 -16 16 2 Q8 5 0 5 Q-8 5 -16 2Z" fill="url(#${g.id})"/>` +
+      `<circle cx="-5" cy="-6" r="1.8" fill="#4a2a80"/><circle cx="5" cy="-6" r="1.8" fill="#4a2a80"/>` +
+      `<path d="M-2.5 -2 Q0 0 2.5 -2" stroke="#4a2a80" stroke-width="1.2" fill="none" stroke-linecap="round"/>` +
+      `<path d="M-11 4 Q-13 12 -10 18 M-4 5 Q-6 14 -2 20 M4 5 Q2 14 6 19 M11 4 Q13 12 10 17" stroke="${shade(c, 14)}" stroke-width="2" fill="none" stroke-linecap="round" opacity=".85"><animate attributeName="d" values="M-11 4 Q-13 12 -10 18 M-4 5 Q-6 14 -2 20 M4 5 Q2 14 6 19 M11 4 Q13 12 10 17;M-11 4 Q-9 12 -12 18 M-4 5 Q-2 14 -6 20 M4 5 Q6 14 2 19 M11 4 Q9 12 12 17;M-11 4 Q-13 12 -10 18 M-4 5 Q-6 14 -2 20 M4 5 Q2 14 6 19 M11 4 Q13 12 10 17" dur="2.6s" repeatCount="indefinite"/></path></g>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // Crumb the cyclops — a big friendly one-eyed baker
+  function cyclops(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#d9a066";
+    const g = lgrad([[0, shade(c, 12)], [100, shade(c, -10)]]);
+    let s = D(g.def) + shadow(20, 52);
+    // body + apron
+    s += `<path d="M-17 18 Q-19 46 -13 50 L13 50 Q19 46 17 18Z" fill="url(#${g.id})"/>` +
+      `<path d="M-11 24 L11 24 L9 48 L-9 48Z" fill="#fff" opacity=".85"/>` +
+      `<path d="M-11 24 Q0 28 11 24" stroke="#d9d9e8" stroke-width="1.4" fill="none"/>`;
+    // head
+    s += `<circle cx="0" cy="2" r="20" fill="url(#${g.id})"/>` +
+      `<circle cx="0" cy="-2" r="7.5" fill="#fff"/><circle cx="0" cy="-1" r="4" fill="#5a76c9"/><circle cx="1.4" cy="-2.4" r="1.4" fill="#fff"/>` +
+      `<path d="M-14 -14 Q0 -24 14 -14" stroke="${shade(c, -24)}" stroke-width="3" fill="none" stroke-linecap="round"/>` +
+      `<path d="M-6 9 Q0 14 6 9" stroke="#7a4c28" stroke-width="2" fill="none" stroke-linecap="round"/>` +
+      `<circle cx="-11" cy="7" r="3.5" fill="#ff9db4" opacity=".5"/><circle cx="11" cy="7" r="3.5" fill="#ff9db4" opacity=".5"/>` +
+      `<path d="M-4 -20 L0 -26 L4 -20" fill="${shade(c, -18)}"/>`;
+    // arms
+    s += `<path d="M-17 24 Q-26 30 -24 40" stroke="${shade(c, -6)}" stroke-width="7" fill="none" stroke-linecap="round"/>` +
+      `<path d="M17 24 Q26 30 24 40" stroke="${shade(c, -6)}" stroke-width="7" fill="none" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // tea party set: pot + two cups on a little cloth
+  function teacups(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#8fd0e8";
+    let s = shadow(24, 12) +
+      `<ellipse cx="0" cy="8" rx="26" ry="7" fill="#fff" opacity=".9"/>` +
+      // teapot
+      `<path d="M-6 4 Q-13 4 -13 -3 Q-13 -10 -6 -10 L2 -10 Q9 -10 9 -3 Q9 4 2 4Z" fill="${c}"/>` +
+      `<path d="M9 -6 Q14 -6 13 -1 Q12 2 9 1" fill="none" stroke="${shade(c, -18)}" stroke-width="2.4"/>` +
+      `<path d="M-13 -5 Q-18 -8 -16 -12" stroke="${shade(c, -18)}" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
+      `<circle cx="-2" cy="-11.5" r="2" fill="${shade(c, -18)}"/><circle cx="-2" cy="-4" r="2.4" fill="#fff" opacity=".55"/>` +
+      // cups
+      `<path d="M-24 6 Q-24 1 -19 1 Q-14 1 -14 6 Q-14 9 -19 9 Q-24 9 -24 6Z" fill="#ffb8cf"/>` +
+      `<path d="M16 6 Q16 1 21 1 Q26 1 26 6 Q26 9 21 9 Q16 9 16 6Z" fill="#ffe28a"/>` +
+      `<path d="M-19 -1 q1 -3 0 -5 M21 -1 q1 -3 0 -5" stroke="#c9c9d9" stroke-width="1.2" fill="none" opacity=".8"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // dark storm cloud with rain + a little lightning bolt
+  function stormcloud(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#8a93ad"], [100, "#5a6378"]]);
+    let s = D(g.def) +
+      `<g><animateTransform attributeName="transform" type="translate" values="0 0;6 0;0 0;-6 0;0 0" dur="7s" repeatCount="indefinite"/>` +
+      `<path d="M-24 6 Q-34 6 -34 -3 Q-34 -12 -24 -11 Q-22 -20 -10 -19 Q-4 -26 6 -22 Q18 -24 20 -13 Q30 -12 29 -3 Q29 6 18 6Z" fill="url(#${g.id})"/>` +
+      `<path d="M2 8 L-4 18 L1 18 L-3 28" stroke="#ffd166" stroke-width="2.6" fill="none" stroke-linejoin="round" stroke-linecap="round"><animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;.62;.68;.78;1" dur="3.2s" repeatCount="indefinite"/></path>` +
+      `<g stroke="#9fc6de" stroke-width="1.8" stroke-linecap="round"><path d="M-20 10 l-3 8"><animate attributeName="opacity" values="1;.2;1" dur="1.1s" repeatCount="indefinite"/></path><path d="M-9 11 l-3 8"><animate attributeName="opacity" values=".3;1;.3" dur="1.3s" repeatCount="indefinite"/></path><path d="M12 11 l-3 8"><animate attributeName="opacity" values="1;.25;1" dur=".9s" repeatCount="indefinite"/></path><path d="M22 9 l-3 8"><animate attributeName="opacity" values=".4;1;.4" dur="1.2s" repeatCount="indefinite"/></path></g></g>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // rain overlay across a region (defaults to the whole frame)
+  function rain(o) {
+    o = o || {};
+    const w = o.w || 400, h = o.h || 210, x = o.x || 0, y = o.y || 0;
+    let drops = "";
+    for (let i = 0; i < 26; i++) {
+      const dx = (i * 53) % w, dy = (i * 97) % h, dur = 0.9 + (i % 5) * 0.14;
+      drops += `<path d="M${dx} ${dy} l-4 11" stroke="#bcd8ea" stroke-width="1.6" stroke-linecap="round" opacity=".55"><animate attributeName="opacity" values=".55;.15;.55" dur="${dur}s" repeatCount="indefinite"/></path>`;
+    }
+    return `<g transform="translate(${x} ${y})">${drops}</g>`;
+  }
+  // ancient stone gate: two pillars + lintel with glowing runes
+  function stoneGate(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#b5b5c2"], [100, "#7c7c8c"]]);
+    const fg = glowF(1.8);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def + fg.def) + shadow(34, 46) +
+      `<rect x="-32" y="-26" width="13" height="72" rx="3" fill="url(#${g.id})"/>` +
+      `<rect x="19" y="-26" width="13" height="72" rx="3" fill="url(#${g.id})"/>` +
+      `<rect x="-38" y="-38" width="76" height="15" rx="4" fill="#a5a5b5"/>` +
+      `<path d="M-32 -6 h13 M19 12 h13" stroke="#8f8f9f" stroke-width="1.6"/>` +
+      `<g fill="#8fd0ff" filter="url(#${fg.id})"><circle cx="-13" cy="-30.5" r="2"/><circle cx="0" cy="-30.5" r="2"/><circle cx="13" cy="-30.5" r="2"/><animate attributeName="opacity" values="1;.45;1" dur="2.6s" repeatCount="indefinite"/></g></g>`;
+  }
+  // twisty treehouse slide, chute from top-left down to the ground
+  function slide(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#5aa9ff";
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + shadow(26, 44) +
+      `<path d="M-28 -34 Q6 -30 2 -6 Q0 12 24 16 L24 26 Q-8 22 -8 -2 Q-6 -22 -30 -24Z" fill="${c}"/>` +
+      `<path d="M-28 -30 Q4 -26 0 -4 Q-1 14 24 19" stroke="#fff" stroke-width="2" fill="none" opacity=".5"/>` +
+      `<rect x="-31" y="-36" width="8" height="80" rx="3" fill="#8a5a33"/>` +
+      `<rect x="18" y="26" width="12" height="18" rx="3" fill="#8a5a33"/></g>`;
+  }
+  // classic three-tower sandcastle with a little flag
+  function sandcastle(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#f2d9a0"], [100, "#d9b878"]]);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def) + shadow(28, 26) +
+      `<rect x="-16" y="-6" width="32" height="32" rx="2" fill="url(#${g.id})"/>` +
+      `<rect x="-30" y="2" width="15" height="24" rx="2" fill="#e0c288"/>` +
+      `<rect x="15" y="2" width="15" height="24" rx="2" fill="#e0c288"/>` +
+      `<path d="M-30 2 h3 v-4 h3 v4 h3 v-4 h3 v4 h3 M15 2 h3 v-4 h3 v4 h3 v-4 h3 v4 h3" fill="#e0c288"/>` +
+      `<path d="M-16 -6 h4 v-5 h4 v5 h4 v-5 h4 v5 h4 v-5 h4 v5 h4" fill="url(#${g.id})"/>` +
+      `<path d="M0 -11 V-24 M0 -24 Q8 -21 0 -17" stroke="#e8584f" stroke-width="2" fill="none"/>` +
+      `<path d="M-4 26 Q-4 14 0 14 Q4 14 4 26Z" fill="#a5824f"/>` +
+      `<circle cx="-22" cy="10" r="1.6" fill="#fff" opacity=".8"/><circle cx="22" cy="12" r="1.6" fill="#ffb8cf" opacity=".9"/></g>`;
+  }
+  // wooden ladder (o.h = height in px, default 60)
+  function ladder(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, h = o.h || 60;
+    let rungs = "";
+    for (let ry = -h + 8; ry < -2; ry += 11) rungs += `<path d="M-7 ${ry} h14" stroke="#a06a3a" stroke-width="3" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<path d="M-9 0 V${-h} M9 0 V${-h}" stroke="#8a5a33" stroke-width="4" stroke-linecap="round"/>${rungs}</g>`;
+  }
+  // golden harp (alias: lyre)
+  function harp(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#ffe28a"], [100, "#d99a26"]]);
+    let strings = "";
+    for (let i = 0; i < 6; i++) {
+      const sx = -12 + i * 4.2;
+      strings += `<line x1="${sx}" y1="${-30 + i * 2.4}" x2="${sx}" y2="14" stroke="#fff" stroke-width="1" opacity=".85"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def) + shadow(14, 20) +
+      `<path d="M-16 16 Q-20 16 -19 11 L-15 -26 Q-14 -34 -6 -33 Q6 -32 12 -24 Q18 -17 17 -6 L16 11 Q17 16 12 16 L8 16 L10 -6 Q11 -15 5 -21 Q0 -26 -8 -26 L-11 11 Q-11 16 -16 16Z" fill="url(#${g.id})"/>` +
+      `${strings}<rect x="-19" y="14" width="38" height="6" rx="3" fill="url(#${g.id})"/>` +
+      `<circle cx="-14" cy="-30" r="3" fill="#ffd166"/></g>` ;
+  }
+  // the Cloud Glider — hang-glider wing with fluffy cloud styling
+  function glider(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#8fd0ff";
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="-3;3;-3" dur="3.2s" repeatCount="indefinite"/>` +
+      `<path d="M-40 2 Q-19 -20 0 -17 Q19 -20 40 2 Q19 -8 0 -6 Q-19 -8 -40 2Z" fill="#fff" stroke="${shade(c, -22)}" stroke-width="2.2" stroke-linejoin="round"/>` +
+      `<path d="M-40 2 Q-19 -16 0 -13 M40 2 Q19 -16 0 -13 M0 -17 L0 -6" stroke="${c}" stroke-width="2.2" fill="none"/>` +
+      `<circle cx="-24" cy="-8" r="4.6" fill="${c}" opacity=".5"/><circle cx="24" cy="-8" r="4.6" fill="${c}" opacity=".5"/><circle cx="0" cy="-13" r="5" fill="${c}" opacity=".5"/>` +
+      `<path d="M-9 -8 L0 7 L9 -8" stroke="#5f7185" stroke-width="2" fill="none"/>` +
+      `<path d="M-4 7 h8" stroke="#8a5a33" stroke-width="3.4" stroke-linecap="round"/></g></g>`;
+  }
+  // thorny briar hedge band (o.w = width, roses optional via o.roses)
+  function briars(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, w = o.w || 120;
+    let s = `<path d="M0 0 Q${w * .2} -22 ${w * .45} -8 Q${w * .6} -26 ${w * .8} -10 Q${w * .9} -18 ${w} 0 L${w} 14 L0 14Z" fill="#3f8a52"/>`;
+    s += `<path d="M${w * .1} -4 Q${w * .3} -18 ${w * .5} -6 Q${w * .7} -20 ${w * .9} -6" stroke="#2c5e3a" stroke-width="2.6" fill="none"/>` +
+      `<path d="M0 0 Q${w * .2} -22 ${w * .45} -8 Q${w * .6} -26 ${w * .8} -10 Q${w * .9} -18 ${w} 0" stroke="#5cb56e" stroke-width="2" fill="none" opacity=".8"/>`;
+    for (let i = 0; i < Math.floor(w / 16); i++) {
+      const tx = 8 + i * 16, ty = -4 - ((i * 37) % 12);
+      s += `<path d="M${tx} ${ty} l3 -5 l2 6Z" fill="#2c5e3a"/>`;
+    }
+    if (o.roses) for (let i = 0; i < Math.floor(w / 40); i++) {
+      const rx2 = 20 + i * 40;
+      s += `<circle cx="${rx2}" cy="${-10 - ((i * 23) % 8)}" r="3.4" fill="#e8587a"/><circle cx="${rx2}" cy="${-10 - ((i * 23) % 8)}" r="1.5" fill="#ffb8cf"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // chopping axe, styled like the pickaxe
+  function axe(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#c3d2e0"], [100, "#8fa3b8"]]);
+    return `<g transform="translate(${x} ${y}) scale(${sc}) rotate(20)">` + D(g.def) +
+      `<rect x="-2.4" y="-16" width="4.8" height="34" rx="2.4" fill="#8a5a33"/>` +
+      `<path d="M-2 -16 Q-16 -15 -17 -4 Q-10 -8 -2 -7 Z" fill="url(#${g.id})"/>` +
+      `<path d="M-17 -4 Q-17.6 -8 -16.6 -11" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/></g>`;
+  }
+
   const BG = {
     day: skyDay, sunset: skySunset, night: o => night(o || {}), forest, cave,
     lavacave: lavaCaveBg, sea, ocean: oceanBg, beach: beachBg, space, library,
@@ -1281,6 +1639,11 @@
     knight, wizard, pirate, villager, ghost, sheep, dolphin, dino, snowman, bird, crab,
     rocket, chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon,
     mountain: mountainProp,
+    voider, inkwell, robot, beepo: robot, cake, craftingTable, crafting: craftingTable,
+    minecart, cart: minecart, door, logs, log: logs, woodpile: logs, book,
+    seaMonster, shell, egg, spaceJelly, cyclops, teacups, stormcloud, rain,
+    stoneGate, gate: stoneGate, slide, sandcastle, ladder, harp, lyre: harp,
+    glider, briars, axe,
     bigDragon: o => dragon(Object.assign({}, o, { scale: (o.scale || 1) * 1.7 })),
     planet: o => planet(o.x, o.y, o.r || 30, o.color || "#e8584f", o.ring),
     tree: o => tree(o.x, o.y, o.scale, o.color),
@@ -1319,6 +1682,9 @@
     rocket, planet, alien,
     block, grassBlocks, diamond, pickaxe, torch, fizzer,
     tent, campfire, smore, gem,
-    chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon, mountainProp
+    chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon, mountainProp,
+    voider, inkwell, robot, cake, craftingTable, minecart, door, logs, book,
+    seaMonster, shell, egg, spaceJelly, cyclops, teacups, stormcloud, rain,
+    stoneGate, slide, sandcastle, ladder, harp, glider, briars, axe
   };
 })();
