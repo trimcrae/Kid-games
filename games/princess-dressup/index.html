@@ -36,17 +36,17 @@
       text-align: center;
     }
 
-    /* ---------- the princess (pixel-art layers) ---------- */
+    /* ---------- the princess (vector SVG layers) ---------- */
     .princess {
       position: relative;
       margin: 0.25rem auto 0.75rem;
       width: min(270px, 82vw);
-      aspect-ratio: 165 / 218;   /* matches the sprite grid */
+      aspect-ratio: 165 / 218;   /* matches the art's viewBox */
     }
-    .princess canvas {
+    .princess svg {
       position: absolute; inset: 0;
       width: 100% !important; height: 100% !important;
-      image-rendering: pixelated;
+      overflow: visible;
     }
     .princess-base { z-index: 1; }
 
@@ -141,7 +141,7 @@
       <button class="mute-btn" id="mute" aria-label="Turn sound on or off">🔊</button>
     </div>
 
-    <div class="princess" id="princess" aria-hidden="true"><!-- pixel-art sprite built by princess-art.js --></div>
+    <div class="princess" id="princess" aria-hidden="true"><!-- vector art built by princess-art.js --></div>
 
     <div class="prompt">
       <span class="prompt-label" id="prompt-label">Tap the matching one!</span>
@@ -161,7 +161,6 @@
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
   <script src="../../assets/js/voice.js"></script>
-  <script src="../../assets/js/pixelart.js"></script>
   <script src="princess-art.js"></script>
   <script src="princess.js"></script>
 </body>
