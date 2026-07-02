@@ -1269,6 +1269,161 @@
   /* =========================================================
      SCENE COMPOSER (unchanged registry/API)
      ========================================================= */
+  /* =========================================================
+     STORY-SPECIFIC PROPS (added for text-accuracy pass)
+     ========================================================= */
+  // The Voider — Block World's gentle villain: a shadowy blocky wisp
+  function voider(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#3a2a5e"], [100, "#161022"]]);
+    const halo = rgrad([[0, "#7a4fd0", .35], [100, "#7a4fd0", 0]]);
+    let s = D(g.def + halo.def) + shadow(18, 44);
+    s += `<circle cx="0" cy="16" r="34" fill="url(#${halo.id})"><animate attributeName="opacity" values="1;.5;1" dur="2.6s" repeatCount="indefinite"/></circle>`;
+    s += `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -5;0 0" dur="3.2s" repeatCount="indefinite"/>` +
+      `<path d="M-16 -4 Q-16 -20 0 -20 Q16 -20 16 -4 L16 22 L10 16 L5 24 L0 17 L-5 24 L-10 16 L-16 22Z" fill="url(#${g.id})"/>` +
+      `<rect x="-16" y="-14" width="32" height="6" rx="3" fill="#5e4390" opacity=".5"/>` +
+      `<rect x="-9" y="-8" width="6" height="7" rx="1.5" fill="#b48cff"><animate attributeName="opacity" values="1;.6;1" dur="2.2s" repeatCount="indefinite"/></rect>` +
+      `<rect x="3" y="-8" width="6" height="7" rx="1.5" fill="#b48cff"><animate attributeName="opacity" values="1;.6;1" dur="2.2s" begin=".4s" repeatCount="indefinite"/></rect>` +
+      `<path d="M-4 4 Q0 7 4 4" stroke="#b48cff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".9"/></g>`;
+    s += `<circle r="1.6" fill="#b48cff"><animateMotion path="M-20 8 q-6 -14 2 -26" dur="2.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".9;0" dur="2.8s" repeatCount="indefinite"/></circle>` +
+      `<circle r="1.2" fill="#8f6bd9"><animateMotion path="M20 4 q7 -12 -1 -24" dur="3.4s" begin="-1.2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3.4s" begin="-1.2s" repeatCount="indefinite"/></circle>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // Inkwell — the Library's ink-blob companion in a little glass pot
+  function inkwell(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const ink = lgrad([[0, "#4a5ce8"], [100, "#232a86"]]);
+    let s = D(ink.def) + shadow(15, 34);
+    s += `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -3;0 0" dur="2.4s" repeatCount="indefinite"/>` +
+      // blob body + droplet curl
+      `<path d="M0 -14 Q3 -20 1 -23 Q7 -21 4 -13 Q13 -8 13 2 L-13 2 Q-13 -8 -4 -13 Q-8 -19 0 -14Z" fill="url(#${ink.id})"/>` +
+      `<circle cx="-4.5" cy="-6" r="2.6" fill="#fff"/><circle cx="4.5" cy="-6" r="2.6" fill="#fff"/>` +
+      `<circle cx="-4" cy="-5.6" r="1.4" fill="#12163f"/><circle cx="5" cy="-5.6" r="1.4" fill="#12163f"/>` +
+      `<circle cx="-3.6" cy="-6.2" r=".5" fill="#fff"/><circle cx="5.4" cy="-6.2" r=".5" fill="#fff"/>` +
+      `<path d="M-3 -1.5 Q0 1 3 -1.5" stroke="#c9d4ff" stroke-width="1.4" fill="none" stroke-linecap="round"/>` +
+      `<path d="M-9 -12 Q-6 -15 -3 -13" stroke="#8fa0ff" stroke-width="1.2" fill="none" opacity=".7"/></g>`;
+    // glass pot
+    s += `<path d="M-12 2 L12 2 L9 12 Q9 16 5 16 L-5 16 Q-9 16 -9 12Z" fill="#bfe0f2" opacity=".75"/>` +
+      `<rect x="-13" y="0" width="26" height="4" rx="2" fill="#9fc6de"/>` +
+      `<path d="M-8 5 L-6.5 12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc}) translate(0 18)">${s}</g>`;
+  }
+  // Beepo — a small round friendly robot
+  function robot(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const body = lgrad([[0, "#cfd8e8"], [100, "#93a3bd"]]);
+    let s = D(body.def) + shadow(16, 36);
+    s += `<line x1="0" y1="-12" x2="0" y2="-4" stroke="#7a8aa5" stroke-width="2.4"/>` +
+      `<circle cx="0" cy="-13" r="3" fill="#ff5d8f"><animate attributeName="opacity" values="1;.35;1" dur="1.3s" repeatCount="indefinite"/></circle>`;
+    s += `<rect x="-15" y="-4" width="30" height="24" rx="8" fill="url(#${body.id})"/>` +
+      `<rect x="-10" y="0" width="20" height="12" rx="4" fill="#1d2b45"/>` +
+      `<circle cx="-4.5" cy="6" r="2.2" fill="#6fe3ff"><animate attributeName="r" values="2.2;2.2;.7;2.2" keyTimes="0;.86;.92;1" dur="3.6s" repeatCount="indefinite"/></circle>` +
+      `<circle cx="4.5" cy="6" r="2.2" fill="#6fe3ff"><animate attributeName="r" values="2.2;2.2;.7;2.2" keyTimes="0;.86;.92;1" dur="3.6s" repeatCount="indefinite"/></circle>` +
+      `<path d="M-2.5 9.5 Q0 11 2.5 9.5" stroke="#6fe3ff" stroke-width="1.2" fill="none" stroke-linecap="round"/>`;
+    s += `<rect x="-21" y="2" width="6" height="12" rx="3" fill="#93a3bd"/><rect x="15" y="2" width="6" height="12" rx="3" fill="#93a3bd"/>` +
+      `<rect x="-11" y="20" width="9" height="14" rx="4" fill="#7a8aa5"/><rect x="2" y="20" width="9" height="14" rx="4" fill="#7a8aa5"/>` +
+      `<circle cx="-11" cy="8" r="2" fill="#ffd166"/><circle cx="11" cy="8" r="2" fill="#ffd166"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // a celebration cake (o.candle=false to remove the candle)
+  function cake(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const spong = lgrad([[0, "#ffd9ec"], [100, "#ff9ecf"]]);
+    const fg = glowF(1.8);
+    let s = D(spong.def + fg.def) + shadow(24, 22);
+    s += `<rect x="-24" y="2" width="48" height="18" rx="4" fill="url(#${spong.id})"/>` +
+      `<rect x="-17" y="-12" width="34" height="15" rx="4" fill="#ff8fb8"/>` +
+      `<path d="M-24 2 Q-24 -2 -20 -2 L20 -2 Q24 -2 24 2 L24 6 Q20 11 16 6 Q12 12 7 6 Q3 12 -2 6 Q-6 12 -11 6 Q-15 12 -19 6 Q-22 10 -24 6Z" fill="#fff5fa"/>` +
+      `<path d="M-17 -12 Q-17 -15 -14 -15 L14 -15 Q17 -15 17 -12 L17 -9 Q13 -5 10 -9 Q6 -4 2 -9 Q-2 -4 -6 -9 Q-10 -4 -13 -9 Q-16 -6 -17 -9Z" fill="#fff5fa"/>` +
+      `<circle cx="-14" cy="12" r="1.7" fill="#ffd166"/><circle cx="-4" cy="14" r="1.7" fill="#6fd0ff"/><circle cx="6" cy="12" r="1.7" fill="#7ed957"/><circle cx="15" cy="14" r="1.7" fill="#b48cff"/>`;
+    if (o.candle !== false) {
+      s += `<rect x="-1.5" y="-26" width="3" height="11" rx="1.5" fill="#6fd0ff"/><path d="M-1.5 -22 h3" stroke="#fff" stroke-width="1" opacity=".7"/>` +
+        `<g filter="url(#${fg.id})"><path d="M0 -34 Q2.6 -30 1.6 -27.4 Q.9 -25.6 0 -25.6 Q-.9 -25.6 -1.6 -27.4 Q-2.6 -30 0 -34Z" fill="#ffb142"><animate attributeName="opacity" values="1;.7;1" dur=".9s" repeatCount="indefinite"/></path></g>`;
+    }
+    s += `<circle cx="0" cy="-17" r="3.4" fill="#e8384f"/><path d="M0 -19 Q3 -23 5 -21" stroke="#3bb36a" stroke-width="1.6" fill="none"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc}) translate(0 14)">${s}</g>`;
+  }
+  // blocky crafting table with a tool grid top
+  function craftingTable(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#c98a4a"], [100, "#8a5a33"]]);
+    let s = D(g.def) + shadow(22, 34);
+    s += `<rect x="-20" y="-6" width="40" height="40" rx="3" fill="url(#${g.id})"/>` +
+      // slanted table top with a 3x3 crafting grid
+      `<path d="M-20 -6 L-13 -16 L27 -16 L20 -6Z" fill="#e0a866"/>` +
+      `<path d="M20 -6 L27 -16 L27 -8 L20 2Z" fill="#8a5a33"/>` +
+      `<path d="M-15 -13.4 L23 -13.4 M-17 -10.8 L21.5 -10.8 M-8.5 -16 L-14.8 -6 M2.5 -16 L-3.8 -6 M13.5 -16 L7.2 -6" stroke="#a06a3a" stroke-width="1.3"/>` +
+      // hammer resting on top
+      `<g transform="translate(6 -19) rotate(-12)"><rect x="-1.2" y="0" width="2.4" height="11" rx="1.2" fill="#8a5a33"/><rect x="-5.5" y="-3" width="11" height="4.6" rx="2" fill="#9fb6cc"/></g>` +
+      // front: tool grid squares + saw marks
+      `<rect x="-14" y="10" width="12" height="10" rx="1.5" fill="#6b4423" opacity=".55"/>` +
+      `<rect x="2" y="10" width="12" height="10" rx="1.5" fill="#6b4423" opacity=".55"/>` +
+      `<path d="M-11 13 l6 4 M-5 13 l-6 4" stroke="#e0a866" stroke-width="1.4" stroke-linecap="round"/>` +
+      `<path d="M4 15 h8 M5 13 l1.5 2 M8 13 l1.5 2 M11 13 l1.5 2" stroke="#9fb6cc" stroke-width="1.2" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // minecart on a bit of rail (o.filled=true → gold ore inside)
+  function minecart(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#9fb6cc"], [100, "#5f7185"]]);
+    let s = D(g.def) + shadow(26, 26);
+    s += `<path d="M-30 22 h60 M-22 26 h44" stroke="#8a5a33" stroke-width="3" stroke-linecap="round"/>` +
+      `<path d="M-26 24 h52" stroke="#6e7f92" stroke-width="2.4"/>`;
+    if (o.filled !== false) s += `<circle cx="-8" cy="-8" r="5" fill="#ffd166"/><circle cx="3" cy="-10" r="6" fill="#ffc14d"/><circle cx="11" cy="-7" r="4.5" fill="#ffd166"/>`;
+    s += `<path d="M-24 -8 L-18 12 Q-17 16 -13 16 L13 16 Q17 16 18 12 L24 -8 Q24 -11 20 -11 L-20 -11 Q-24 -11 -24 -8Z" fill="url(#${g.id})"/>` +
+      `<rect x="-21" y="-6" width="42" height="4" rx="2" fill="#c3d2e0" opacity=".7"/>` +
+      `<circle cx="-11" cy="19" r="4.6" fill="#39424e"/><circle cx="11" cy="19" r="4.6" fill="#39424e"/>` +
+      `<circle cx="-11" cy="19" r="1.6" fill="#9fb6cc"/><circle cx="11" cy="19" r="1.6" fill="#9fb6cc"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // an arched storybook door (o.color; o.open=true shows glowing gap)
+  function door(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#8a5a33";
+    const g = lgrad([[0, shade(c, 18)], [100, shade(c, -12)]]);
+    const fg = glowF(2.4);
+    let s = D(g.def + fg.def) + shadow(20, 40);
+    s += `<path d="M-19 40 L-19 -8 Q-19 -30 0 -30 Q19 -30 19 -8 L19 40Z" fill="${shade(c, -32)}"/>`;
+    if (o.open) s += `<g filter="url(#${fg.id})"><path d="M-13 37 L-13 -7 Q-13 -25 0 -25 Q13 -25 13 -7 L13 37Z" fill="#ffe9a8"><animate attributeName="opacity" values="1;.8;1" dur="2.4s" repeatCount="indefinite"/></path></g>` +
+      `<path d="M-13 37 L-13 -7 Q-13 -25 0 -25 L0 37Z" fill="url(#${g.id})"/>`;
+    else s += `<path d="M-14 37 L-14 -7 Q-14 -25 0 -25 Q14 -25 14 -7 L14 37Z" fill="url(#${g.id})"/>` +
+      `<path d="M-14 -3 h28 M0 -25 V37 M-14 17 h28" stroke="${shade(c, -26)}" stroke-width="1.6" opacity=".7"/>` +
+      `<circle cx="6" cy="8" r="2.4" fill="#ffd166"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // a stack of chopped logs (o.count 1..6, default 3)
+  function logs(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, n = Math.max(1, Math.min(6, o.count || 3));
+    const ring = `<circle r="6.5" fill="#e0a866"/><circle r="4" fill="#c98a4a"/><circle r="1.6" fill="#a06a3a"/>`;
+    const bodyG = lgrad([[0, "#a06a3a"], [100, "#7a4c28"]], true);
+    let s = D(bodyG.def) + shadow(9 + n * 5, 12);
+    const pos = [[-8, 5], [8, 5], [0, -6], [-16, 5], [16, 5], [8, -6]].slice(0, n);
+    for (const [px, py] of pos) {
+      s += `<g transform="translate(${px} ${py})"><rect x="-6" y="-6.5" width="26" height="13" rx="6" fill="url(#${bodyG.id})"/>` +
+        `<path d="M0 -4 q10 -1.5 18 0" stroke="#6b4423" stroke-width="1" fill="none" opacity=".6"/><g>${ring}</g></g>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+  // a storybook — open on the ground, or standing if o.standing
+  function book(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#7a5cd6";
+    let s;
+    if (o.standing) {
+      const g = lgrad([[0, shade(c, 14)], [100, shade(c, -14)]]);
+      s = D(g.def) + shadow(14, 22) +
+        `<rect x="-12" y="-16" width="24" height="36" rx="2.5" fill="url(#${g.id})"/>` +
+        `<rect x="-12" y="-16" width="5" height="36" rx="2.5" fill="${shade(c, -28)}"/>` +
+        `<path d="M-2 -8 l3.5 2.6 3.5 -2.6 v9 l-3.5 -2.4 -3.5 2.4Z" fill="#ffd166"/>` +
+        `<path d="M-6 8 h12 M-6 12 h12" stroke="#fff" stroke-width="1.2" opacity=".55"/>`;
+    } else {
+      s = shadow(20, 12) +
+        `<path d="M0 -6 Q-11 -12 -22 -8 L-22 6 Q-11 2 0 8 Q11 2 22 6 L22 -8 Q11 -12 0 -6Z" fill="${c}"/>` +
+        `<path d="M0 -8 Q-10 -13 -20 -10 L-20 4 Q-10 1 0 6 Q10 1 20 4 L20 -10 Q10 -13 0 -8Z" fill="#fff8ec"/>` +
+        `<path d="M-15 -6 q7 -1.5 12 .5 M-15 -2 q7 -1.5 12 .5 M3 -5.5 q7 -2 12 -.5 M3 -1.5 q7 -2 12 -.5" stroke="#b9a98a" stroke-width="1.1" fill="none" stroke-linecap="round"/>` +
+        `<path d="M0 -8 L0 6" stroke="#d9c9a8" stroke-width="1.4"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
   const BG = {
     day: skyDay, sunset: skySunset, night: o => night(o || {}), forest, cave,
     lavacave: lavaCaveBg, sea, ocean: oceanBg, beach: beachBg, space, library,
@@ -1281,6 +1436,8 @@
     knight, wizard, pirate, villager, ghost, sheep, dolphin, dino, snowman, bird, crab,
     rocket, chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon,
     mountain: mountainProp,
+    voider, inkwell, robot, beepo: robot, cake, craftingTable, crafting: craftingTable,
+    minecart, cart: minecart, door, logs, log: logs, woodpile: logs, book,
     bigDragon: o => dragon(Object.assign({}, o, { scale: (o.scale || 1) * 1.7 })),
     planet: o => planet(o.x, o.y, o.r || 30, o.color || "#e8584f", o.ring),
     tree: o => tree(o.x, o.y, o.scale, o.color),
@@ -1319,6 +1476,7 @@
     rocket, planet, alien,
     block, grassBlocks, diamond, pickaxe, torch, fizzer,
     tent, campfire, smore, gem,
-    chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon, mountainProp
+    chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon, mountainProp,
+    voider, inkwell, robot, cake, craftingTable, minecart, door, logs, book
   };
 })();
