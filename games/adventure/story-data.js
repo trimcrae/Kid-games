@@ -25,13 +25,13 @@
     who: "Ellie",
     teaches: "colours, counting & kindness",
     blurb: "Help a little grey dragon find all its colours!",
-    cover: () => A.skyDay({ hills: true }) + A.castle(320, 150, .55) +
+    cover: () => A.skyDay({ hills: true }) + A.castle(320, 208, .55) +
       A.dragon({ x: 140, y: 150, scale: 1.3, color: "#b06ad9" }) +
       A.princess({ x: 70, y: 230, scale: 1, dress: "#ff5d8f" }),
     start: "meet",
     nodes: {
       meet: {
-        art: () => A.meadow() + A.castle(330, 150, .5) +
+        art: () => A.meadow() + A.castle(330, 216, .5) +
           A.dragon({ x: 250, y: 200, scale: 1, color: "#b9b9c4", mood: "sad" }) +
           A.princess({ x: 90, y: 235, scale: 1.05, dress: "#ff5d8f" }),
         text: "Princess Ellie skips through the meadow. A little dragon sits all alone — and it is grey all over! It looks sad.",
