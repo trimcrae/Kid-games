@@ -133,6 +133,11 @@
     return best;
   }
 
+  function sharedParents(a, b) {
+    const pa = P()[a].parents.filter(alive);
+    return P()[b].parents.filter(alive).filter((x) => pa.indexOf(x) !== -1).length;
+  }
+
   function byG(g, boy, girl, plain) { return g === "m" ? boy : g === "f" ? girl : plain; }
   function greats(n) { let s = ""; for (let i = 0; i < n; i++) s += "Great-"; return s; }
 
@@ -164,9 +169,28 @@
     if (me === other) return "You!";
     const b = bloodPath(me, other);
     const g = P()[other].gender;
-    if (b) return bloodLabel(b.u, b.d, g);
+    if (b) {
+      // Siblings who share one parent and each have a different other
+      // parent are half-siblings. (One known parent each = plain siblings.)
+      if (b.u === 1 && b.d === 1 && sharedParents(me, other) === 1 &&
+          P()[me].parents.filter(alive).length === 2 &&
+          P()[other].parents.filter(alive).length === 2) {
+        return byG(g, "Half-brother", "Half-sister", "Half-sibling");
+      }
+      return bloodLabel(b.u, b.d, g);
+    }
 
     if (P()[me].partners.indexOf(other) !== -1) return byG(g, "Husband", "Wife", "Partner");
+
+    // Step-sibling: one of their parents is partnered with one of mine.
+    const myPars = P()[me].parents.filter(alive);
+    const otherPars = P()[other].parents.filter(alive);
+    for (let s = 0; s < otherPars.length; s++) {
+      const sp = P()[otherPars[s]].partners;
+      for (let t = 0; t < myPars.length; t++) {
+        if (sp.indexOf(myPars[t]) !== -1) return byG(g, "Stepbrother", "Stepsister", "Step-sibling");
+      }
+    }
 
     // Married into my side: `other` is the partner of a blood relative of mine.
     for (let i = 0; i < P()[other].partners.length; i++) {
@@ -203,6 +227,30 @@
      Rows = generations. Partners sit together in a "unit".
      A few barycenter sweeps pull children under their parents. */
 
+  // Walk the partner links as a chain (ex — person — new partner) so every
+  // couple ends up side by side and heart lines never cross another card.
+  function orderUnit(members) {
+    if (members.length < 3) return members;
+    const inUnit = {};
+    members.forEach((m) => { inUnit[m] = true; });
+    const deg = {};
+    members.forEach((m) => { deg[m] = P()[m].partners.filter((o) => inUnit[o]).length; });
+    let start = members[0];
+    members.forEach((m) => { if (deg[m] < deg[start]) start = m; });
+    const placed = {};
+    const out = [];
+    let cur = start;
+    while (cur) {
+      out.push(cur);
+      placed[cur] = true;
+      cur = P()[cur].partners
+        .filter((o) => inUnit[o] && !placed[o])
+        .sort((a, b) => deg[a] - deg[b])[0];
+    }
+    members.forEach((m) => { if (!placed[m]) out.push(m); });
+    return out;
+  }
+
   function computeLayout() {
     const ids = state.order.filter(alive);
     if (!ids.length) return { pos: {}, rows: [], width: 200, height: 200 };
@@ -232,7 +280,7 @@
           });
         }
         const unit = {
-          members: members,
+          members: orderUnit(members),
           w: members.length * CW + (members.length - 1) * PGAP,
           x: 0, row: rowIdx
         };
@@ -341,13 +389,23 @@
         if (done[key]) return;
         done[key] = true;
         if (pos[a].y !== pos[b].y) return;
-        const y = pos[a].y + CH * 0.45;
-        const L = Math.min(pos[a].x, pos[b].x) + CW;
-        const R = Math.max(pos[a].x, pos[b].x);
-        const mid = (L + R) / 2;
-        out += '<line x1="' + L + '" y1="' + y + '" x2="' + R + '" y2="' + y +
-               '" stroke="#ff5d8f" stroke-width="4" stroke-linecap="round"/>';
-        out += '<text x="' + mid + '" y="' + (y + 6) + '" text-anchor="middle" font-size="16">❤️</text>';
+        if (Math.abs(pos[a].x - pos[b].x) <= CW + PGAP + 2) {
+          // side-by-side couple: straight line with a heart
+          const y = pos[a].y + CH * 0.45;
+          const L = Math.min(pos[a].x, pos[b].x) + CW;
+          const R = Math.max(pos[a].x, pos[b].x);
+          const mid = (L + R) / 2;
+          out += '<line x1="' + L + '" y1="' + y + '" x2="' + R + '" y2="' + y +
+                 '" stroke="#ff5d8f" stroke-width="4" stroke-linecap="round"/>';
+          out += '<text x="' + mid + '" y="' + (y + 6) + '" text-anchor="middle" font-size="16">❤️</text>';
+        } else {
+          // other cards sit between them: arc the line over the top
+          const xa = cx(a, pos), xb = cx(b, pos);
+          const yTop = pos[a].y - 4;
+          out += '<path d="M ' + xa + ' ' + yTop + ' Q ' + ((xa + xb) / 2) + ' ' + (yTop - 34) +
+                 ' ' + xb + ' ' + yTop + '" fill="none" stroke="#ff5d8f" stroke-width="4" stroke-linecap="round"/>';
+          out += '<text x="' + ((xa + xb) / 2) + '" y="' + (yTop - 14) + '" text-anchor="middle" font-size="16">❤️</text>';
+        }
       });
     });
 
@@ -363,22 +421,25 @@
     Object.keys(fams).forEach((key) => {
       const fam = fams[key];
       const pars = fam.pars;
-      let ax, ay;
       const couple = pars.length === 2 && pos[pars[0]].y === pos[pars[1]].y &&
                      Math.abs(pos[pars[0]].x - pos[pars[1]].x) <= CW + PGAP + 2;
-      if (couple) { // drop from the heart line between the couple
-        ax = (cx(pars[0], pos) + cx(pars[1], pos)) / 2;
-        ay = pos[pars[0]].y + CH * 0.45;
-      } else {
-        ax = pars.reduce((a, p) => a + cx(p, pos), 0) / pars.length;
-        ay = Math.max.apply(null, pars.map((p) => pos[p].y)) + CH;
-      }
-      const busY = ay + (couple ? CH * 0.55 : 0) + VGAP * 0.45 + (famIdx % 4) * 7;
+      const parBottom = Math.max.apply(null, pars.map((p) => pos[p].y)) + CH;
+      const busY = parBottom + VGAP * 0.45 + (famIdx % 4) * 7;
       famIdx++;
       const col = genColor(P()[fam.kids[0]].gen);
-      out += '<line x1="' + ax + '" y1="' + ay + '" x2="' + ax + '" y2="' + busY +
-             '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>';
-      let minBX = ax, maxBX = ax;
+      // drops from the parents down to the bus
+      let drops;
+      if (couple) { // one drop from the heart line between the couple
+        drops = [{ x: (cx(pars[0], pos) + cx(pars[1], pos)) / 2, y: pos[pars[0]].y + CH * 0.45 }];
+      } else {      // separated parents: connect each one to the shared bus
+        drops = pars.map((p) => ({ x: cx(p, pos), y: pos[p].y + CH }));
+      }
+      let minBX = Infinity, maxBX = -Infinity;
+      drops.forEach((d) => {
+        minBX = Math.min(minBX, d.x); maxBX = Math.max(maxBX, d.x);
+        out += '<line x1="' + d.x + '" y1="' + d.y + '" x2="' + d.x + '" y2="' + busY +
+               '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>';
+      });
       fam.kids.forEach((k) => {
         const kx = cx(k, pos);
         minBX = Math.min(minBX, kx); maxBX = Math.max(maxBX, kx);
@@ -496,13 +557,15 @@
   }
 
   /* --- add/edit form --- */
-  let form = null; // {mode, id, gender, emoji, otherParent}
+  let form = null; // {mode, id, gender, emoji, otherParent, together}
 
   const nameInput = document.getElementById("name-input");
   const genderRow = document.getElementById("gender-row");
   const emojiGrid = document.getElementById("emoji-grid");
   const otherParentField = document.getElementById("other-parent-field");
   const otherParentRow = document.getElementById("other-parent-row");
+  const togetherField = document.getElementById("together-field");
+  const togetherRow = document.getElementById("together-row");
 
   emojiGrid.innerHTML = FACES.map((f) =>
     '<button class="chip" data-e="' + f + '">' + f + "</button>").join("");
@@ -541,6 +604,13 @@
     markSel(otherParentRow, "data-p", form.otherParent);
   });
 
+  togetherRow.addEventListener("click", (e) => {
+    const c = e.target.closest(".chip");
+    if (!c || !form) return;
+    form.together = c.getAttribute("data-t");
+    markSel(togetherRow, "data-t", form.together);
+  });
+
   function openForm(cfg) {
     const who = P()[cfg.id];
     const titles = {
@@ -557,21 +627,42 @@
       gender: cfg.mode === "edit" ? who.gender : "",
       emoji: cfg.mode === "edit" ? who.emoji : "🧑",
       pickedFace: cfg.mode === "edit",
-      otherParent: ""
+      otherParent: "", together: "yes"
     };
     nameInput.value = cfg.mode === "edit" ? who.name : "";
     markSel(genderRow, "data-g", form.gender);
     markSel(emojiGrid, "data-e", form.emoji);
 
-    // Adding a child: if this person has partners, ask who the other parent is.
-    const partners = who.partners.filter(alive);
-    if (cfg.mode === "child" && partners.length) {
-      otherParentField.hidden = false;
-      otherParentRow.innerHTML = partners.map((pid) =>
-        '<button class="chip" data-p="' + pid + '">' + P()[pid].emoji + " " + esc(P()[pid].name) + "</button>"
-      ).join("") + '<button class="chip" data-p="">Just ' + esc(who.name) + "</button>";
-      form.otherParent = partners[0];
-      markSel(otherParentRow, "data-p", form.otherParent);
+    // Adding a second parent: ask if they're still with the first one, so
+    // split-up parents don't get married to each other automatically.
+    const existingPar = who.parents.filter(alive);
+    if (cfg.mode === "parent" && existingPar.length === 1) {
+      togetherField.hidden = false;
+      document.getElementById("together-label").textContent =
+        "Together with " + P()[existingPar[0]].name + "?";
+      markSel(togetherRow, "data-t", form.together);
+    } else {
+      togetherField.hidden = true;
+    }
+
+    // Adding a child: ask who the other parent is — a partner, or anyone
+    // else in the same generation who isn't a blood relative (an ex, say).
+    if (cfg.mode === "child") {
+      const partners = who.partners.filter(alive);
+      const exes = state.order.filter(alive).filter((o) =>
+        o !== cfg.id && P()[o].gen === who.gen &&
+        partners.indexOf(o) === -1 && !bloodPath(cfg.id, o));
+      const options = partners.concat(exes);
+      if (options.length) {
+        otherParentField.hidden = false;
+        otherParentRow.innerHTML = options.map((pid) =>
+          '<button class="chip" data-p="' + pid + '">' + P()[pid].emoji + " " + esc(P()[pid].name) + "</button>"
+        ).join("") + '<button class="chip" data-p="">Just ' + esc(who.name) + "</button>";
+        form.otherParent = partners.length ? partners[0] : "";
+        markSel(otherParentRow, "data-p", form.otherParent);
+      } else {
+        otherParentField.hidden = true;
+      }
     } else {
       otherParentField.hidden = true;
     }
@@ -590,13 +681,14 @@
       who.name = name; who.gender = form.gender; who.emoji = form.emoji;
     } else if (form.mode === "parent") {
       const existing = who.parents.filter(alive);
+      const together = existing.length === 1 && form.together !== "no";
       const newP = addPerson({
         name: name, gender: form.gender, emoji: form.emoji,
         gen: who.gen - 1, parents: [],
-        partners: existing.length === 1 ? [existing[0]] : []
+        partners: together ? [existing[0]] : []
       });
-      // The new parent also claims this person's full siblings (same single parent).
-      if (existing.length === 1) {
+      if (together) {
+        // The new parent also claims this person's full siblings (same single parent).
         state.order.forEach((k) => {
           const kid = P()[k];
           if (kid.parents.indexOf(existing[0]) !== -1 && kid.parents.filter(alive).length < 2 &&
