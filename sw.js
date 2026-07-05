@@ -11,7 +11,7 @@
      • One versioned cache — bump VERSION to flush everything.
    =========================================================== */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = "arcade-" + VERSION;
 
 const CORE = [
