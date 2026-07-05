@@ -87,6 +87,11 @@
     return id;
   }
 
+  function splitUp(a, b) {
+    P()[a].partners = P()[a].partners.filter((x) => x !== b);
+    P()[b].partners = P()[b].partners.filter((x) => x !== a);
+  }
+
   function removePerson(id) {
     delete state.people[id];
     state.order = state.order.filter((x) => x !== id);
@@ -532,6 +537,18 @@
       act("🧓 Add " + p.name + "'s mom or dad", () => { closeAll(); openForm({ mode: "parent", id: id }); });
     }
     act("❤️ Add " + p.name + "'s partner", () => { closeAll(); openForm({ mode: "partner", id: id }); });
+    p.partners.filter(alive).forEach((pt) => {
+      act("💔 Split up from " + P()[pt].name, () => {
+        closeAll();
+        askConfirm("Split up " + p.name + " and " + P()[pt].name + "?",
+          "They both stay on the tree and stay mom or dad to their kids — they just won't be partners any more.",
+          () => {
+            splitUp(id, pt);
+            persist(); render();
+            window.SFX && SFX.nope();
+          });
+      });
+    });
     act("👶 Add " + p.name + "'s child", () => { closeAll(); openForm({ mode: "child", id: id }); });
     if (p.parents.filter(alive).length) {
       act("🧒 Add a brother or sister", () => { closeAll(); openForm({ mode: "sibling", id: id }); });
