@@ -3,15 +3,16 @@
    (car rides!) once it has been visited.
 
    Strategy, deliberately boring and safe:
-     • Pages (navigations): network FIRST, so a deploy always
-       shows up on the next online visit; cached copy only when
-       offline.
-     • Everything else (css/js/images/audio): serve from cache,
-       refresh the cache in the background (stale-while-revalidate).
+     • Pages, scripts and styles: network FIRST (revalidated), so
+       a page and the code it loads always come from the same
+       deploy — a stale script against a fresh page can crash a
+       game. Cached copies are only used when offline.
+     • Big stuff (images/audio): serve from cache, refresh the
+       cache in the background (stale-while-revalidate).
      • One versioned cache — bump VERSION to flush everything.
    =========================================================== */
 
-const VERSION = "v2";
+const VERSION = "v3";
 const CACHE = "arcade-" + VERSION;
 
 const CORE = [
@@ -73,17 +74,38 @@ function warmPage(cache, url) {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
-  if (new URL(req.url).origin !== self.location.origin) return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
 
   if (req.mode === "navigate") {
     e.respondWith(
       fetch(req)
         .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy));
+          }
           return res;
         })
         .catch(() => caches.match(req).then((r) => r || caches.match("./")))
+    );
+    return;
+  }
+
+  // Scripts and styles: network first with revalidation ("no-cache"
+  // still allows a 304, so it stays cheap), cache only as the
+  // offline fallback. Keeps the code in lockstep with the page.
+  if (/\.(?:js|css)$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(req.url, { cache: "no-cache" })
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
     return;
   }
