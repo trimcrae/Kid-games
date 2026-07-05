@@ -22,6 +22,17 @@
 
 const GAMES = [
   {
+    title: "Life Lab",
+    emoji: "🦠",
+    blurb: "Conway's Game of Life! Paint cells that live or die by counting their neighbours — stamp gliders & factories, then invent your own rules in the Rule Lab. Counting, logic & patterns. For Cory!",
+    url:   "games/game-of-life/",
+    ages:  "6+",
+    kids:  ["cory"],
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Mad Libs",
     emoji: "📝",
     blurb: "Give silly words — a noun, a verb, a goofy adjective — then watch them fill a story you've never seen and hear it read aloud! Parts of speech & grammar. For everyone!",
