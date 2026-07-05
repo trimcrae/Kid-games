@@ -533,10 +533,23 @@
     }
 
     act("✏️ Change name or face", () => { closeAll(); openForm({ mode: "edit", id: id }); });
-    if (p.parents.filter(alive).length < 2) {
-      act("🧓 Add " + p.name + "'s mom or dad", () => { closeAll(); openForm({ mode: "parent", id: id }); });
+    const pars = p.parents.filter(alive);
+    if (pars.length === 0) {
+      act("🧓 Add " + p.name + "'s mom or dad", () => { closeAll(); openForm({ mode: "parent", id: id, together: "no" }); });
+    } else if (pars.length === 1) {
+      const first = P()[pars[0]];
+      // One partner at a time: "together" is only possible if the first
+      // parent isn't already with someone else.
+      if (!first.partners.filter(alive).length) {
+        act("❤️ Add " + p.name + "'s other parent (with " + first.name + ")",
+          () => { closeAll(); openForm({ mode: "parent", id: id, together: "yes" }); });
+      }
+      act("💔 Add " + p.name + "'s other parent (not with " + first.name + ")",
+        () => { closeAll(); openForm({ mode: "parent", id: id, together: "no" }); });
     }
-    act("❤️ Add " + p.name + "'s partner", () => { closeAll(); openForm({ mode: "partner", id: id }); });
+    if (!p.partners.filter(alive).length) {
+      act("❤️ Add " + p.name + "'s partner", () => { closeAll(); openForm({ mode: "partner", id: id }); });
+    }
     p.partners.filter(alive).forEach((pt) => {
       act("💔 Split up from " + P()[pt].name, () => {
         closeAll();
@@ -581,8 +594,6 @@
   const emojiGrid = document.getElementById("emoji-grid");
   const otherParentField = document.getElementById("other-parent-field");
   const otherParentRow = document.getElementById("other-parent-row");
-  const togetherField = document.getElementById("together-field");
-  const togetherRow = document.getElementById("together-row");
 
   emojiGrid.innerHTML = FACES.map((f) =>
     '<button class="chip" data-e="' + f + '">' + f + "</button>").join("");
@@ -621,12 +632,6 @@
     markSel(otherParentRow, "data-p", form.otherParent);
   });
 
-  togetherRow.addEventListener("click", (e) => {
-    const c = e.target.closest(".chip");
-    if (!c || !form) return;
-    form.together = c.getAttribute("data-t");
-    markSel(togetherRow, "data-t", form.together);
-  });
 
   function openForm(cfg) {
     const who = P()[cfg.id];
@@ -644,23 +649,11 @@
       gender: cfg.mode === "edit" ? who.gender : "",
       emoji: cfg.mode === "edit" ? who.emoji : "🧑",
       pickedFace: cfg.mode === "edit",
-      otherParent: "", together: "yes"
+      otherParent: "", together: cfg.together || "no"
     };
     nameInput.value = cfg.mode === "edit" ? who.name : "";
     markSel(genderRow, "data-g", form.gender);
     markSel(emojiGrid, "data-e", form.emoji);
-
-    // Adding a second parent: ask if they're still with the first one, so
-    // split-up parents don't get married to each other automatically.
-    const existingPar = who.parents.filter(alive);
-    if (cfg.mode === "parent" && existingPar.length === 1) {
-      togetherField.hidden = false;
-      document.getElementById("together-label").textContent =
-        "Together with " + P()[existingPar[0]].name + "?";
-      markSel(togetherRow, "data-t", form.together);
-    } else {
-      togetherField.hidden = true;
-    }
 
     // Adding a child: ask who the other parent is — a partner, or anyone
     // else in the same generation who isn't a blood relative (an ex, say).
@@ -698,7 +691,7 @@
       who.name = name; who.gender = form.gender; who.emoji = form.emoji;
     } else if (form.mode === "parent") {
       const existing = who.parents.filter(alive);
-      const together = existing.length === 1 && form.together !== "no";
+      const together = existing.length === 1 && form.together === "yes";
       const newP = addPerson({
         name: name, gender: form.gender, emoji: form.emoji,
         gen: who.gen - 1, parents: [],
