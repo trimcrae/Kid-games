@@ -21,8 +21,9 @@
   const KEY = "family-tree.v1";
 
   /* ---------- layout constants (px) ---------- */
-  const CW = 112;          // card width
-  const CH = 128;          // card height
+  let CW = 112;            // card width  — cards shrink on small screens,
+  let CH = 128;            // card height — see applyCardSize() below
+
   const PGAP = 16;         // gap between partners inside a couple
   const UGAP = 44;         // gap between family units in a row
   const VGAP = 96;         // vertical gap between generations
@@ -799,6 +800,19 @@
         window.Confetti && Confetti.burst({ count: 40 });
       });
   });
+
+  // The @media rule in index.html shrinks cards to 96×118 on small
+  // screens — keep the layout maths in sync or the partner lines and
+  // hearts miss the cards.
+  const smallScreen = window.matchMedia("(max-width: 480px)");
+  function applyCardSize() {
+    CW = smallScreen.matches ? 96 : 112;
+    CH = smallScreen.matches ? 118 : 128;
+  }
+  const onScreenChange = () => { applyCardSize(); render(); };
+  if (smallScreen.addEventListener) smallScreen.addEventListener("change", onScreenChange);
+  else if (smallScreen.addListener) smallScreen.addListener(onScreenChange);
+  applyCardSize();
 
   render();
   centerView();
