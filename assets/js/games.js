@@ -22,6 +22,17 @@
 
 const GAMES = [
   {
+    title: "Family Tree",
+    emoji: "🌳",
+    blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever — and learn words like nephew, great-grandma & 2nd cousin. One shared tree for everyone!",
+    url:   "games/family-tree/",
+    ages:  "3+",
+    kids:  ["jeannie","cory","ellie"],
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Life Lab",
     emoji: "🦠",
     blurb: "Conway's Game of Life! Paint cells that live or die by counting their neighbours — stamp gliders & factories, then invent your own rules in the Rule Lab. Counting, logic & patterns. For Cory!",

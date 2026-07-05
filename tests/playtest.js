@@ -124,6 +124,31 @@ const GAMES = {
     return `${cards} cards, ${playable} playable; kid filter works`;
   },
 
+  async "Family Tree"(page, g, d) {
+    await page.goto(`${BASE}/games/family-tree/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("family-tree.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.locator("#canvas .person").count() !== 6) throw new Error("seed family should be 6 people");
+    // add a grandparent through Tristan's action sheet
+    await page.locator('#canvas .person', { hasText: "Tristan" }).click();
+    await page.locator("#action-list .ft-btn", { hasText: "mom or dad" }).click();
+    await page.fill("#name-input", "Grandma");
+    await page.locator('#gender-row [data-g="f"]').click();
+    await page.click("#form-save");
+    await page.waitForTimeout(250);
+    if (await page.locator("#canvas .person").count() !== 7) throw new Error("adding a grandparent did not add a card");
+    // relationship vocabulary: as Jeannie, the new person is "Grandma"
+    await page.selectOption("#me-select", { label: "Jeannie" });
+    await page.waitForTimeout(150);
+    const rel = (await page.locator('#canvas .person', { hasText: "Grandma" }).locator(".rel").textContent()).trim();
+    if (rel !== "Grandma") throw new Error(`grandparent labelled "${rel}", expected "Grandma"`);
+    // the shared tree persists across a reload
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.locator("#canvas .person").count() !== 7) throw new Error("tree did not persist after reload");
+    await page.evaluate(() => localStorage.removeItem("family-tree.v1"));
+    return "grandparent added, labelled Grandma for Jeannie, tree persists";
+  },
+
   async "Number Bubble Pop"(page, g, d) {
     await page.goto(`${BASE}/games/bubble-pop/`, { waitUntil: "networkidle" });
     await page.click("#start-btn");
