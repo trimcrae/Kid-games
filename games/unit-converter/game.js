@@ -148,8 +148,9 @@
     },
     {
       key: "time", label: "⏱️ Time", base: "second",
-      fact: "There are 86,400 seconds in a day and ~31.5 million in a year! A blink takes ~0.1 s. A <b>fortnight</b> is two weeks, and a <b>millennium</b> is a thousand years. ⏳",
+      fact: "Time spans a <b>huge</b> range too! The <b>Planck time</b> (~5.4 × 10⁻⁴⁴ s) is the shortest moment physics can describe — light crosses a single proton in longer than that. Up top, a <b>millennium</b> is a thousand years. A blink takes ~0.1 s; a day is 86,400 s. ⏳",
       units: [
+        { n: "Planck time", sym: "tP",   sys: "mix", factor: 5.391247e-44 },
         { n: "Nanosecond",  sym: "ns",   sys: "si",  factor: 1e-9 },
         { n: "Microsecond", sym: "µs",   sys: "si",  factor: 1e-6 },
         { n: "Millisecond", sym: "ms",   sys: "si",  factor: 0.001 },
