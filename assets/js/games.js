@@ -22,6 +22,28 @@
 
 const GAMES = [
   {
+    title: "Rock Detective",
+    emoji: "🪨",
+    blurb: "Found a cool rock? Tap the clues you see & feel to identify it like a real geologist, browse the illustrated rock book, or take the naming quiz — igneous, sedimentary, metamorphic & minerals. For Jeannie & Cory!",
+    url:   "games/rock-detective/",
+    ages:  "6+",
+    kids:  ["jeannie","cory"],
+    color: "#a97c50",
+    ready: true
+  },
+
+  {
+    title: "Unit Converter",
+    emoji: "📏",
+    blurb: "Type a number and see it in EVERY other unit at once — length, weight, temperature, volume, speed & more, across SI, imperial & mixed units. Learn how measurements connect. For Cory!",
+    url:   "games/unit-converter/",
+    ages:  "6+",
+    kids:  ["cory"],
+    color: "#38b6ff",
+    ready: true
+  },
+
+  {
     title: "Family Tree",
     emoji: "🌳",
     blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever — and learn words like nephew, great-grandma & 2nd cousin. One shared tree for everyone!",
