@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📏 Unit Converter</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📏</text></svg>" />
+  <meta name="theme-color" content="#38b6ff" />
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    body { overflow-x: hidden; }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem; max-width: 860px; margin: 0 auto; padding: 0.4rem 0.75rem 0;
+    }
+    .topbar .game-name { font-size: 1.2rem; font-weight: bold; color: var(--blue); }
+
+    .wrap { max-width: 860px; margin: 0 auto 2rem; padding: 0.4rem 0.8rem 0; }
+
+    /* --- Category chips --- */
+    .cats {
+      display: flex; flex-wrap: wrap; gap: 0.4rem;
+      margin: 0.4rem 0 0.7rem;
+    }
+    .cat {
+      border: none; cursor: pointer; font-family: var(--font);
+      font-weight: bold; font-size: 0.92rem;
+      padding: 0.5rem 0.75rem; border-radius: 14px;
+      background: #fff; color: var(--ink);
+      box-shadow: 0 3px 10px rgba(43, 36, 64, 0.1);
+      transition: transform 0.1s ease, background 0.15s ease, color 0.15s ease;
+    }
+    .cat:hover { transform: translateY(-2px); }
+    .cat.active { background: var(--blue); color: #fff; box-shadow: 0 5px 16px rgba(56,182,255,0.45); }
+
+    /* --- Input card --- */
+    .input-card {
+      background: linear-gradient(160deg, #0e3b57, #14507a);
+      border-radius: 20px; padding: 0.9rem 1rem 1rem;
+      box-shadow: 0 12px 34px rgba(14, 59, 87, 0.32); color: #eaf6ff;
+    }
+    .input-title { font-size: 0.85rem; font-weight: bold; letter-spacing: 0.05em; opacity: 0.85; }
+    .input-row { display: flex; gap: 0.5rem; margin-top: 0.45rem; flex-wrap: wrap; }
+    .input-row input[type="number"] {
+      flex: 2 1 140px; min-width: 0; font-family: "Courier New", monospace;
+      font-size: 1.7rem; font-weight: bold; padding: 0.4rem 0.7rem;
+      border: none; border-radius: 14px; background: #eaf6ff; color: #0e3b57;
+    }
+    .input-row select {
+      flex: 3 1 180px; min-width: 0; font-family: var(--font);
+      font-size: 1.05rem; font-weight: bold; padding: 0.5rem 0.6rem;
+      border: none; border-radius: 14px; background: #fff; color: var(--ink);
+      cursor: pointer;
+    }
+    .quick { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+    .quick button {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 0.82rem; padding: 0.32rem 0.6rem; border-radius: 11px;
+      background: rgba(255,255,255,0.16); color: #eaf6ff; transition: background 0.15s ease;
+    }
+    .quick button:hover { background: rgba(255,255,255,0.3); }
+
+    /* --- Results table --- */
+    .results {
+      background: var(--paper); border-radius: 18px; margin-top: 0.8rem;
+      box-shadow: 0 6px 18px rgba(43, 36, 64, 0.1); overflow: hidden;
+    }
+    .res-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 0.7rem 0.9rem 0.3rem;
+    }
+    .res-head h3 { margin: 0; font-size: 1rem; color: var(--ink); }
+    .res-head .hint { font-size: 0.78rem; color: #8a84a0; }
+    .row {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+      padding: 0.5rem 0.9rem; border-top: 1px solid #f0eef8; cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    .row:hover { background: #f6fbff; }
+    .row.active { background: #e7f6ff; }
+    .row .u-name { font-weight: bold; font-size: 0.95rem; }
+    .row .u-name .u-sym { color: #8a84a0; font-weight: normal; font-size: 0.82rem; margin-left: 0.3rem; }
+    .row .u-name .u-full { display: block; font-weight: normal; font-size: 0.74rem; color: #a7a3b8; }
+    .row .u-val {
+      font-family: "Courier New", monospace; font-weight: bold; font-size: 1.15rem;
+      color: var(--blue); text-align: right; white-space: nowrap;
+    }
+    .row.active .u-val { color: #1a8fd6; }
+
+    /* --- Fun fact --- */
+    .fact {
+      background: #fff7e6; border-radius: 16px; padding: 0.7rem 1rem;
+      margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.45;
+      border-left: 6px solid var(--yellow);
+    }
+    .fact b { color: #b8791f; }
+
+    .lesson {
+      background: #eef6ff; border-radius: 16px; padding: 0.6rem 1rem;
+      margin-top: 0.8rem; font-size: 0.9rem; line-height: 1.45;
+    }
+    .lesson summary { cursor: pointer; font-weight: bold; color: var(--blue); font-size: 1rem; }
+    .lesson p { margin: 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span>
+  </div>
+
+  <div class="topbar">
+    <a class="back-link" href="../../">← Back to the Arcade</a>
+    <span class="game-name">📏 Unit Converter</span>
+  </div>
+
+  <div class="wrap">
+    <div class="cats" id="cats"></div>
+
+    <div class="input-card">
+      <div class="input-title" id="inputTitle">CONVERT LENGTH</div>
+      <div class="input-row">
+        <input type="number" id="value" value="1" inputmode="decimal" />
+        <select id="fromUnit"></select>
+      </div>
+      <div class="quick" id="quick"></div>
+    </div>
+
+    <div class="results">
+      <div class="res-head">
+        <h3 id="resHead">= in every other unit</h3>
+        <span class="hint">tap a row to convert from it</span>
+      </div>
+      <div id="rows"></div>
+    </div>
+
+    <div class="fact" id="fact"></div>
+
+    <details class="lesson">
+      <summary>🧠 How does converting units work?</summary>
+      <p>Every measurement can be written in <b>lots of different units</b>. 3 feet, 1 yard,
+        and 0.9144 metres are all the <i>same length</i> — just different rulers!</p>
+      <p>The trick: turn your number into one <b>base unit</b> first (like metres), then turn
+        that base amount into whatever unit you want. This tool does it for <i>every</i> unit at
+        once so you can see them all line up. 🔢</p>
+      <p><b>SI</b> units (metres, kilograms, litres) are used by most of the world and by all
+        scientists. <b>Imperial</b> units (feet, pounds, gallons) are used in the USA. Being able
+        to switch between them is a superpower! 💪</p>
+    </details>
+  </div>
+
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🔍 Rock Detective</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪨</text></svg>" />
+  <meta name="theme-color" content="#a97c50" />
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    body { overflow-x: hidden; }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem; max-width: 900px; margin: 0 auto; padding: 0.4rem 0.75rem 0;
+    }
+    .topbar .game-name { font-size: 1.2rem; font-weight: bold; color: #a97c50; }
+
+    .wrap { max-width: 900px; margin: 0 auto 2rem; padding: 0.4rem 0.8rem 0; }
+
+    /* --- Mode tabs --- */
+    .tabs { display: flex; gap: 0.4rem; margin: 0.4rem 0 0.8rem; }
+    .tab {
+      flex: 1; border: none; cursor: pointer; font-family: var(--font);
+      font-weight: bold; font-size: 1rem; padding: 0.6rem 0.4rem;
+      border-radius: 14px; background: #fff; color: var(--ink);
+      box-shadow: 0 3px 10px rgba(43, 36, 64, 0.1);
+      transition: transform 0.1s ease, background 0.15s ease, color 0.15s ease;
+    }
+    .tab:hover { transform: translateY(-2px); }
+    .tab.active { background: #a97c50; color: #fff; box-shadow: 0 5px 16px rgba(169,124,80,0.45); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* --- Detective clues --- */
+    .clue-intro { font-size: 0.95rem; color: #6a6385; margin: 0 0 0.6rem; }
+    .clues { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .clue {
+      border: 3px solid #efe7dc; background: #fff; cursor: pointer;
+      font-family: var(--font); font-weight: bold; font-size: 0.88rem;
+      padding: 0.4rem 0.7rem; border-radius: 13px; color: var(--ink);
+      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    .clue:hover { transform: translateY(-2px); }
+    .clue.on { border-color: #a97c50; background: #fbf1e4; box-shadow: 0 4px 12px rgba(169,124,80,0.25); }
+    .clue-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+      margin: 0.7rem 0 0.4rem;
+    }
+    .clue-count { font-weight: bold; color: #a97c50; }
+    .reset-clues {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 12px;
+      background: #efe7dc; color: #7a5a34;
+    }
+
+    /* --- Rock grid --- */
+    .rock-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.7rem; margin-top: 0.5rem;
+    }
+    .rock-card {
+      background: var(--paper); border-radius: 16px; overflow: hidden;
+      box-shadow: 0 5px 16px rgba(43, 36, 64, 0.1); cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+      display: flex; flex-direction: column;
+    }
+    .rock-card:hover { transform: translateY(-3px); box-shadow: 0 9px 22px rgba(43,36,64,0.16); }
+    .rock-card.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
+    .rock-card svg { width: 100%; height: 96px; display: block; background: #f4efe8; }
+    .rock-body { padding: 0.5rem 0.6rem 0.7rem; }
+    .rock-name { font-weight: bold; font-size: 1rem; }
+    .rock-badge {
+      display: inline-block; font-size: 0.66rem; font-weight: bold; color: #fff;
+      padding: 0.12rem 0.45rem; border-radius: 20px; margin-top: 0.2rem;
+    }
+    .b-Igneous     { background: #e8603c; }
+    .b-Sedimentary { background: #d9a441; }
+    .b-Metamorphic { background: #6f8f4e; }
+    .b-Mineral     { background: #7a6bd8; }
+    .rock-fact { font-size: 0.8rem; color: #6a6385; line-height: 1.35; margin-top: 0.35rem; }
+    .rock-more { font-size: 0.8rem; color: #4a4463; line-height: 1.4; margin-top: 0.4rem; display: none; }
+    .rock-card.open .rock-more { display: block; }
+    .rock-more b { color: #a97c50; }
+
+    .empty-note {
+      grid-column: 1 / -1; text-align: center; color: #a7a3b8;
+      font-weight: bold; padding: 1.4rem 0;
+    }
+
+    /* --- Quiz --- */
+    .quiz-card {
+      background: var(--paper); border-radius: 20px; padding: 1rem;
+      box-shadow: 0 8px 22px rgba(43, 36, 64, 0.12); text-align: center;
+    }
+    .quiz-card svg { width: 220px; max-width: 80%; height: 150px; background: #f4efe8; border-radius: 14px; }
+    .quiz-q { font-size: 1.15rem; font-weight: bold; margin: 0.7rem 0 0.2rem; }
+    .quiz-hint { font-size: 0.9rem; color: #6a6385; min-height: 1.3em; }
+    .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.8rem; }
+    .quiz-opt {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 1rem; padding: 0.8rem 0.4rem; border-radius: 14px;
+      background: #fbf1e4; color: #5a4326;
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+    .quiz-opt:hover { transform: translateY(-2px); }
+    .quiz-opt.right { background: var(--green); color: #fff; }
+    .quiz-opt.wrong { background: var(--pink); color: #fff; }
+    .quiz-opt:disabled { cursor: default; }
+    .quiz-feedback { margin-top: 0.7rem; font-weight: bold; min-height: 1.4em; font-size: 1rem; }
+    .quiz-score { margin-top: 0.4rem; color: #6a6385; font-weight: bold; }
+    .next-btn {
+      margin-top: 0.7rem; border: none; cursor: pointer; font-family: var(--font);
+      font-weight: bold; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 14px;
+      background: #a97c50; color: #fff; box-shadow: 0 5px 14px rgba(169,124,80,0.4);
+    }
+
+    .lesson {
+      background: #f6f1e8; border-radius: 16px; padding: 0.6rem 1rem;
+      margin-top: 0.9rem; font-size: 0.9rem; line-height: 1.45;
+    }
+    .lesson summary { cursor: pointer; font-weight: bold; color: #a97c50; font-size: 1rem; }
+    .lesson p { margin: 0.5rem 0; }
+    .lesson b { color: #7a5a34; }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span><span class="blob blob-2"></span><span class="blob blob-3"></span>
+  </div>
+
+  <div class="topbar">
+    <a class="back-link" href="../../">← Back to the Arcade</a>
+    <span class="game-name">🪨 Rock Detective</span>
+  </div>
+
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab active" data-panel="detective">🔍 Detective</button>
+      <button class="tab" data-panel="book">📚 Rock Book</button>
+      <button class="tab" data-panel="quiz">🎯 Quiz</button>
+    </div>
+
+    <!-- DETECTIVE -->
+    <div class="panel active" id="detective">
+      <p class="clue-intro">Found a rock? Tap the clues you can see and feel — like a real geologist using a
+        <b>dichotomous key</b> — and watch the suspects narrow down! 🕵️</p>
+      <div class="clues" id="clues"></div>
+      <div class="clue-bar">
+        <span class="clue-count" id="clueCount"></span>
+        <button class="reset-clues" id="resetClues">↺ Clear clues</button>
+      </div>
+      <div class="rock-grid" id="detectiveGrid"></div>
+    </div>
+
+    <!-- ROCK BOOK -->
+    <div class="panel" id="book">
+      <p class="clue-intro">Every rock in the collection — tap a card to learn its secrets. There are three big
+        rock families plus some star minerals. 💎</p>
+      <div class="rock-grid" id="bookGrid"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="panel" id="quiz">
+      <div class="quiz-card">
+        <svg id="quizSvg" viewBox="0 0 120 100"></svg>
+        <div class="quiz-q">What rock is this?</div>
+        <div class="quiz-hint" id="quizHint"></div>
+        <div class="quiz-opts" id="quizOpts"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <div class="quiz-score" id="quizScore"></div>
+        <button class="next-btn" id="nextQuiz" style="display:none;">Next rock →</button>
+      </div>
+    </div>
+
+    <details class="lesson">
+      <summary>🧠 The three rock families & the rock cycle</summary>
+      <p><b>Igneous</b> rocks form when hot melted rock (magma or lava) cools and hardens —
+        like granite and basalt. 🌋</p>
+      <p><b>Sedimentary</b> rocks form when bits of sand, mud, or shells pile up in layers and
+        get squished together over ages — like sandstone and limestone. They often hold fossils! 🐚</p>
+      <p><b>Metamorphic</b> rocks are other rocks that got <i>changed</i> by heat and pressure deep
+        underground — limestone becomes marble, shale becomes slate. 🔥</p>
+      <p>In the <b>rock cycle</b>, rocks slowly turn into each other over millions of years —
+        melting, wearing down, and squishing round and round forever. ♻️</p>
+    </details>
+  </div>
+
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
