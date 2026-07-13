@@ -45,6 +45,31 @@
     }
     .clue:hover { transform: translateY(-2px); }
     .clue.on { border-color: #a97c50; background: #fbf1e4; box-shadow: 0 4px 12px rgba(169,124,80,0.25); }
+    .clue.off { opacity: 0.32; filter: grayscale(0.6); pointer-events: none; }
+    .clue .n {
+      display: inline-block; min-width: 1.3em; margin-left: 0.35rem;
+      font-size: 0.72rem; color: #fff; background: #c9a97e;
+      border-radius: 999px; padding: 0.05rem 0.35rem; vertical-align: 1px;
+    }
+    .clue.on .n { background: #a97c50; }
+
+    /* --- Case solved banner --- */
+    .solved {
+      display: flex; align-items: center; gap: 0.8rem;
+      background: linear-gradient(135deg, #2bc46f, #3ddc84);
+      color: #fff; border-radius: 18px; padding: 0.7rem 1rem;
+      margin: 0.6rem 0 0.2rem; box-shadow: 0 8px 22px rgba(43,196,111,0.35);
+      animation: solvedPop 0.35s ease;
+    }
+    .solved .s-emoji { font-size: 2rem; }
+    .solved .s-title { font-weight: bold; font-size: 1.1rem; }
+    .solved .s-sub { font-size: 0.88rem; opacity: 0.95; }
+    @keyframes solvedPop {
+      0% { transform: scale(0.85); opacity: 0; }
+      70% { transform: scale(1.04); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) { .solved { animation: none; } }
     .clue-bar {
       display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
       margin: 0.7rem 0 0.4rem;
@@ -96,6 +121,19 @@
       box-shadow: 0 8px 22px rgba(43, 36, 64, 0.12); text-align: center;
     }
     .quiz-card svg { width: 220px; max-width: 80%; height: 150px; background: #f4efe8; border-radius: 14px; }
+    .quiz-top {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.85rem; font-weight: bold; color: #8a6a45; margin-bottom: 0.5rem;
+    }
+    .quiz-progress {
+      height: 10px; background: #efe7dc; border-radius: 999px;
+      overflow: hidden; margin: 0 0 0.7rem;
+    }
+    .quiz-bar {
+      height: 100%; width: 0; border-radius: 999px;
+      background: linear-gradient(90deg, #a97c50, #d9a441);
+      transition: width 0.3s ease;
+    }
     .quiz-q { font-size: 1.15rem; font-weight: bold; margin: 0.7rem 0 0.2rem; }
     .quiz-hint { font-size: 0.9rem; color: #6a6385; min-height: 1.3em; }
     .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.8rem; }
@@ -116,6 +154,24 @@
       font-weight: bold; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 14px;
       background: #a97c50; color: #fff; box-shadow: 0 5px 14px rgba(169,124,80,0.4);
     }
+
+    /* --- Round over --- */
+    .round-end { text-align: center; padding: 0.6rem 0 0.2rem; }
+    .round-stars { font-size: 2.6rem; letter-spacing: 0.12em; margin: 0.3rem 0; }
+    .round-big { font-size: 1.4rem; font-weight: bold; }
+    .round-msg { color: #6a6385; font-weight: bold; margin: 0.3rem 0 0.1rem; }
+    .round-best { color: #a97c50; font-weight: bold; font-size: 0.95rem; }
+
+    /* --- Book filter chips --- */
+    .book-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.3rem; }
+    .bfilter {
+      border: 3px solid #efe7dc; background: #fff; cursor: pointer;
+      font-family: var(--font); font-weight: bold; font-size: 0.85rem;
+      padding: 0.35rem 0.7rem; border-radius: 13px; color: var(--ink);
+      transition: transform 0.1s ease, border-color 0.15s ease;
+    }
+    .bfilter:hover { transform: translateY(-2px); }
+    .bfilter.on { border-color: #a97c50; background: #fbf1e4; }
 
     .lesson {
       background: #f6f1e8; border-radius: 16px; padding: 0.6rem 1rem;
@@ -149,8 +205,15 @@
         <b>dichotomous key</b> — and watch the suspects narrow down! 🕵️</p>
       <div class="clues" id="clues"></div>
       <div class="clue-bar">
-        <span class="clue-count" id="clueCount"></span>
+        <span class="clue-count" id="clueCount" role="status"></span>
         <button class="reset-clues" id="resetClues">↺ Clear clues</button>
+      </div>
+      <div class="solved" id="solvedBanner" hidden>
+        <span class="s-emoji">🎉</span>
+        <span>
+          <span class="s-title" id="solvedTitle">Case solved!</span><br>
+          <span class="s-sub" id="solvedSub"></span>
+        </span>
       </div>
       <div class="rock-grid" id="detectiveGrid"></div>
     </div>
@@ -159,19 +222,34 @@
     <div class="panel" id="book">
       <p class="clue-intro">Every rock in the collection — tap a card to learn its secrets. There are three big
         rock families plus some star minerals. 💎</p>
+      <div class="book-filters" id="bookFilters" role="group" aria-label="Filter by rock family"></div>
       <div class="rock-grid" id="bookGrid"></div>
     </div>
 
     <!-- QUIZ -->
     <div class="panel" id="quiz">
       <div class="quiz-card">
-        <svg id="quizSvg" viewBox="0 0 120 100"></svg>
-        <div class="quiz-q">What rock is this?</div>
-        <div class="quiz-hint" id="quizHint"></div>
-        <div class="quiz-opts" id="quizOpts"></div>
-        <div class="quiz-feedback" id="quizFeedback"></div>
-        <div class="quiz-score" id="quizScore"></div>
-        <button class="next-btn" id="nextQuiz" style="display:none;">Next rock →</button>
+        <div id="quizPlay">
+          <div class="quiz-top">
+            <span id="quizProgressText">Rock 1 of 10</span>
+            <span id="quizRoundScore">⭐ 0 right</span>
+          </div>
+          <div class="quiz-progress" aria-hidden="true"><div class="quiz-bar" id="quizBar"></div></div>
+          <svg id="quizSvg" viewBox="0 0 120 100" role="img" aria-label="Mystery rock picture"></svg>
+          <div class="quiz-q">What rock is this?</div>
+          <div class="quiz-hint" id="quizHint"></div>
+          <div class="quiz-opts" id="quizOpts"></div>
+          <div class="quiz-feedback" id="quizFeedback" role="status"></div>
+          <button class="next-btn" id="nextQuiz" style="display:none;">Next rock →</button>
+        </div>
+        <div id="quizEnd" class="round-end" hidden>
+          <div class="round-big">Round over!</div>
+          <div class="round-stars" id="roundStars"></div>
+          <div class="round-big" id="roundScore"></div>
+          <div class="round-msg" id="roundMsg"></div>
+          <div class="round-best" id="roundBest"></div>
+          <button class="next-btn" id="againQuiz">🔁 Play again</button>
+        </div>
       </div>
     </div>
 

@@ -268,29 +268,78 @@
     return el;
   }
 
-  // ---- Rock Book: all rocks -------------------------------------------
+  // ---- Rock Book: all rocks, filterable by family ----------------------
+  let bookFilter = "All";
+
+  function buildBookFilters() {
+    const families = ["All", "Igneous", "Sedimentary", "Metamorphic", "Mineral"];
+    const box = $("bookFilters");
+    box.innerHTML = "";
+    families.forEach(f => {
+      const b = document.createElement("button");
+      b.className = "bfilter" + (f === bookFilter ? " on" : "");
+      const n = f === "All" ? ROCKS.length : ROCKS.filter(r => r.type === f).length;
+      b.textContent = f + " (" + n + ")";
+      b.setAttribute("aria-pressed", String(f === bookFilter));
+      b.onclick = () => {
+        bookFilter = f;
+        box.querySelectorAll(".bfilter").forEach(el => {
+          el.classList.toggle("on", el === b);
+          el.setAttribute("aria-pressed", String(el === b));
+        });
+        window.SFX && SFX.good && SFX.good();
+        buildBook();
+      };
+      box.appendChild(b);
+    });
+  }
+
   function buildBook() {
     const grid = $("bookGrid");
     grid.innerHTML = "";
-    ROCKS.forEach(rk => grid.appendChild(rockCard(rk)));
+    ROCKS.filter(rk => bookFilter === "All" || rk.type === bookFilter)
+      .forEach(rk => grid.appendChild(rockCard(rk)));
   }
 
   // ---- Detective: clue chips + live filter ----------------------------
   const active = new Set();
+
+  function matchCount(clueSet) {
+    return ROCKS.filter(rk => [...clueSet].every(k => rk.tags.includes(k))).length;
+  }
+
   function buildClues() {
     const box = $("clues");
     box.innerHTML = "";
     CLUES.forEach(c => {
       const b = document.createElement("button");
       b.className = "clue";
-      b.textContent = c.label;
+      b.dataset.key = c.key;
+      b.innerHTML = c.label + '<span class="n"></span>';
+      b.setAttribute("aria-pressed", "false");
       b.onclick = () => {
-        if (active.has(c.key)) { active.delete(c.key); b.classList.remove("on"); }
-        else { active.add(c.key); b.classList.add("on"); }
+        if (active.has(c.key)) { active.delete(c.key); }
+        else { active.add(c.key); }
+        b.setAttribute("aria-pressed", String(active.has(c.key)));
         window.SFX && SFX.good && SFX.good();
         filterDetective();
       };
       box.appendChild(b);
+    });
+  }
+
+  // Each chip shows how many suspects would remain if you tapped it,
+  // and chips that would leave zero suspects fade out of reach.
+  function refreshClueChips() {
+    document.querySelectorAll("#clues .clue").forEach(b => {
+      const key = b.dataset.key;
+      const on = active.has(key);
+      b.classList.toggle("on", on);
+      const withIt = new Set(active);
+      withIt.add(key);
+      const n = matchCount(withIt);
+      b.querySelector(".n").textContent = n;
+      b.classList.toggle("off", !on && n === 0);
     });
   }
 
@@ -304,14 +353,16 @@
     });
   }
 
+  let lastMatches = ROCKS.length;
+
   function filterDetective() {
     const grid = $("detectiveGrid");
-    let matches = 0;
+    let matches = 0, theOne = null;
     ROCKS.forEach(rk => {
       const card = grid.querySelector('[data-name="' + rk.name + '"]');
       const ok = [...active].every(k => rk.tags.includes(k));
       card.classList.toggle("dim", !ok);
-      if (ok) matches++;
+      if (ok) { matches++; theOne = rk; }
     });
     // remove any old empty note
     const old = grid.querySelector(".empty-note");
@@ -326,27 +377,75 @@
     $("clueCount").textContent = n === 0
       ? "Showing all " + ROCKS.length + " rocks"
       : matches + " suspect" + (matches === 1 ? "" : "s") + " match " + n + " clue" + (n === 1 ? "" : "s");
-    if (matches === 1 && n > 0) window.Confetti && Confetti.burst && Confetti.burst({ count: 40 });
+
+    // Case solved! (celebrate only at the moment the last suspect remains)
+    const solved = matches === 1 && n > 0;
+    $("solvedBanner").hidden = !solved;
+    if (solved) {
+      $("solvedTitle").textContent = "Case solved: it's " + theOne.name + "!";
+      $("solvedSub").textContent = theOne.type + " — " + theOne.fact;
+      if (lastMatches !== 1) {
+        window.Confetti && Confetti.burst && Confetti.burst({ count: 50 });
+        window.SFX && SFX.win && SFX.win();
+      }
+    }
+    lastMatches = matches;
+    refreshClueChips();
   }
 
   $("resetClues").onclick = () => {
     active.clear();
-    document.querySelectorAll(".clue.on").forEach(b => b.classList.remove("on"));
+    document.querySelectorAll(".clue.on").forEach(b => {
+      b.classList.remove("on");
+      b.setAttribute("aria-pressed", "false");
+    });
     filterDetective();
   };
 
-  // ---- Quiz -----------------------------------------------------------
+  // ---- Quiz: rounds of 10, stars, best score ---------------------------
   const QKEY = "rockDetectiveQuiz";
-  let score = 0, asked = 0, current = null, answered = false;
-  try { const s = JSON.parse(localStorage.getItem(QKEY) || "{}"); score = s.score || 0; asked = s.asked || 0; } catch (e) {}
+  const ROUND_LEN = 10;
+  let best = 0, current = null, answered = false;
+  let roundScore = 0, qNum = 0, streak = 0;
+  let deck = [];
+  try {
+    const s = JSON.parse(localStorage.getItem(QKEY) || "{}");
+    best = s.best || 0;
+    // pre-rounds save files stored a lifetime score — count a perfect-looking
+    // old score as nothing rather than inventing a fake best
+  } catch (e) {}
+
+  function saveQuiz() {
+    try { localStorage.setItem(QKEY, JSON.stringify({ best: best })); } catch (e) {}
+  }
 
   function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
+  // Draw rocks without repeats: shuffle the whole collection into a deck
+  // and deal from the top, reshuffling when it runs out.
+  function drawRock() {
+    if (!deck.length) {
+      deck = shuffle(ROCKS);
+      if (current && deck[deck.length - 1].name === current.name && deck.length > 1) {
+        deck.unshift(deck.pop()); // never the same rock twice in a row
+      }
+    }
+    return deck.pop();
+  }
+
+  function newRound() {
+    roundScore = 0; qNum = 0; streak = 0;
+    $("quizEnd").hidden = true;
+    $("quizPlay").style.display = "";
+    newQuiz();
+  }
+
   function newQuiz() {
     answered = false;
+    qNum++;
     $("nextQuiz").style.display = "none";
     $("quizFeedback").textContent = "";
-    current = ROCKS[Math.floor(Math.random() * ROCKS.length)];
+    current = drawRock();
     $("quizSvg").innerHTML = rockSvg(current);
     $("quizHint").innerHTML = "Hint: it's a <b>" + current.type + "</b> — " + current.fact;
 
@@ -361,38 +460,77 @@
       b.onclick = () => answerQuiz(b, o);
       box.appendChild(b);
     });
-    updateScore();
+    updateQuizTop();
   }
 
   function answerQuiz(btn, opt) {
     if (answered) return;
     answered = true;
-    asked++;
     const buttons = $("quizOpts").querySelectorAll(".quiz-opt");
     buttons.forEach(b => { b.disabled = true; if (b.textContent === current.name) b.classList.add("right"); });
     if (opt.name === current.name) {
-      score++;
+      roundScore++;
+      streak++;
       btn.classList.add("right");
       $("quizFeedback").style.color = "var(--green)";
-      $("quizFeedback").textContent = "✅ Yes! " + current.name + "!";
-      window.SFX && SFX.win && SFX.win();
-      window.Confetti && Confetti.burst && Confetti.burst();
+      $("quizFeedback").textContent = streak >= 3
+        ? "✅ " + current.name + "! That's " + streak + " in a row! 🔥"
+        : "✅ Yes! " + current.name + "!";
+      window.SFX && SFX.streak && SFX.streak(streak);
+      window.Confetti && Confetti.burst && Confetti.burst({ count: 24 });
     } else {
+      streak = 0;
       btn.classList.add("wrong");
       $("quizFeedback").style.color = "var(--pink)";
       $("quizFeedback").textContent = "❌ That was " + opt.name + ". This is " + current.name + ".";
       window.SFX && SFX.nope && SFX.nope();
     }
-    updateScore();
-    try { localStorage.setItem(QKEY, JSON.stringify({ score: score, asked: asked })); } catch (e) {}
+    updateQuizTop();
+    $("nextQuiz").textContent = qNum >= ROUND_LEN ? "See your score →" : "Next rock →";
     $("nextQuiz").style.display = "inline-block";
   }
 
-  function updateScore() {
-    $("quizScore").textContent = "🏆 Score: " + score + " / " + asked;
+  function updateQuizTop() {
+    $("quizProgressText").textContent = "Rock " + Math.min(qNum, ROUND_LEN) + " of " + ROUND_LEN;
+    $("quizRoundScore").textContent = "⭐ " + roundScore + " right";
+    const done = answered ? qNum : qNum - 1;
+    $("quizBar").style.width = (done / ROUND_LEN * 100) + "%";
   }
 
-  $("nextQuiz").onclick = newQuiz;
+  function endRound() {
+    const stars = roundScore >= 9 ? 3 : roundScore >= 7 ? 2 : roundScore >= 5 ? 1 : 0;
+    $("roundStars").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
+    $("roundScore").textContent = roundScore + " / " + ROUND_LEN;
+    $("roundMsg").textContent =
+      stars === 3 ? "You're a real geologist! 🥇" :
+      stars === 2 ? "Fantastic rock hunting! 🥈" :
+      stars === 1 ? "Nice digging — keep exploring! ⛏️" :
+      "Every geologist starts somewhere — try the Rock Book! 📚";
+    const isBest = roundScore > best;
+    if (isBest) { best = roundScore; saveQuiz(); }
+    $("roundBest").textContent = isBest
+      ? "🏆 New best score!"
+      : (best > 0 ? "🏆 Your best: " + best + " / " + ROUND_LEN : "");
+    $("quizPlay").style.display = "none";
+    $("quizEnd").hidden = false;
+    if (stars >= 2) {
+      window.SFX && SFX.win && SFX.win();
+      window.Confetti && Confetti.burst && Confetti.burst({ count: 40 + stars * 30 });
+    }
+  }
+
+  $("nextQuiz").onclick = () => { qNum >= ROUND_LEN ? endRound() : newQuiz(); };
+  $("againQuiz").onclick = () => { window.SFX && SFX.good && SFX.good(); newRound(); };
+
+  // Big kids can answer with the 1–4 keys.
+  window.addEventListener("keydown", (e) => {
+    if (!$("quiz").classList.contains("active") || answered) return;
+    const k = Number(e.key);
+    if (k >= 1 && k <= 4) {
+      const b = $("quizOpts").querySelectorAll(".quiz-opt")[k - 1];
+      if (b) b.click();
+    }
+  });
 
   // ---- Tabs -----------------------------------------------------------
   document.querySelectorAll(".tab").forEach(tab => {
@@ -402,7 +540,7 @@
       tab.classList.add("active");
       const panel = $(tab.dataset.panel);
       panel.classList.add("active");
-      if (tab.dataset.panel === "quiz" && !current) newQuiz();
+      if (tab.dataset.panel === "quiz" && !current) newRound();
       window.SFX && SFX.good && SFX.good();
     };
   });
@@ -411,5 +549,6 @@
   buildClues();
   buildDetectiveGrid();
   filterDetective();
+  buildBookFilters();
   buildBook();
 })();

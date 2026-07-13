@@ -88,6 +88,16 @@
       color: var(--blue); text-align: right; white-space: nowrap;
     }
     .row.active .u-val { color: #1a8fd6; }
+    .row .u-val sup, .res-head sup { font-size: 0.68em; }
+
+    /* --- "How big is that?" comparison --- */
+    .compare {
+      background: #eefaf1; border-radius: 16px; padding: 0.7rem 1rem;
+      margin-top: 0.8rem; font-size: 1rem; line-height: 1.45;
+      border-left: 6px solid var(--green);
+    }
+    .compare b { color: #1f9d57; }
+    .compare sup { font-size: 0.7em; }
 
     /* --- Fun fact --- */
     .fact {
@@ -134,6 +144,8 @@
       </div>
       <div id="rows"></div>
     </div>
+
+    <div class="compare" id="compare"></div>
 
     <div class="fact" id="fact"></div>
 

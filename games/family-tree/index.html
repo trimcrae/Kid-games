@@ -81,6 +81,12 @@
     }
     .person .rel:empty { display: none; }
     .person.is-me { outline: 4px solid var(--yellow); outline-offset: 2px; }
+    .person.flash { animation: personFlash 1.6s ease; }
+    @keyframes personFlash {
+      0%, 100% { box-shadow: 0 4px 0 rgba(43,36,64,0.12); }
+      25%, 55% { box-shadow: 0 0 0 9px rgba(255,209,102,0.9); }
+    }
+    @media (prefers-reduced-motion: reduce) { .person.flash { animation: none; } }
     .person .you-star {
       position: absolute; top: -12px; right: -10px; font-size: 1.3rem;
       filter: drop-shadow(0 2px 2px rgba(43,36,64,0.3));
@@ -124,6 +130,21 @@
     .sheet-btns { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
     .sheet-btns .ft-btn { flex: 1; text-align: center; border-radius: 16px; }
     .ft-btn.primary { background: var(--green); border-color: #23b368; color: #063; }
+
+    /* ---------- undo snackbar ---------- */
+    .snackbar {
+      position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
+      z-index: 60; display: flex; align-items: center; gap: 0.7rem;
+      background: var(--ink); color: #fff; font-weight: 700;
+      border-radius: 999px; padding: 0.5rem 0.6rem 0.5rem 1.1rem;
+      box-shadow: 0 10px 30px rgba(43,36,64,0.4);
+      animation: snackUp 0.25s ease;
+      max-width: min(92vw, 30rem);
+    }
+    .snackbar[hidden] { display: none; }
+    .snackbar #snack-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .snackbar .ft-btn { border-color: var(--yellow); background: var(--yellow); flex-shrink: 0; }
+    @keyframes snackUp { from { transform: translate(-50%, 20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 
     @media (max-width: 480px) {
       .person { width: 96px; height: 118px; }
@@ -220,6 +241,12 @@
         <button class="ft-btn danger" id="confirm-yes">Yes</button>
       </div>
     </div>
+  </div>
+
+  <!-- undo snackbar -->
+  <div class="snackbar" id="snackbar" hidden>
+    <span id="snack-text"></span>
+    <button class="ft-btn" id="snack-undo">↩️ Undo</button>
   </div>
 
   <script src="../../assets/js/sfx.js"></script>
