@@ -249,6 +249,134 @@
     }
   ];
 
+  // ---- "How big is that?" — everyday things to compare against --------
+  // Each anchor is {v: size in the category's base unit, one, many, e}.
+  // mode "count" reads "about 3 school buses"; mode "times" reads
+  // "about 3× as much as a cheetah".
+  const COMPARES = {
+    length: { mode: "count", anchors: [
+      { v: 1e-10,      one: "an atom",              many: "atoms in a row",        e: "⚛️" },
+      { v: 7e-5,       one: "the width of a hair",  many: "hair-widths",           e: "💇" },
+      { v: 0.0096,     one: "a LEGO brick",         many: "LEGO bricks",           e: "🧱" },
+      { v: 0.19,       one: "a banana",             many: "bananas",               e: "🍌" },
+      { v: 1.2,        one: "a 6-year-old kid",     many: "kids stacked up",       e: "🧒" },
+      { v: 11,         one: "a school bus",         many: "school buses",          e: "🚌" },
+      { v: 100,        one: "a soccer field",       many: "soccer fields",         e: "⚽" },
+      { v: 8849,       one: "Mount Everest",        many: "Mount Everests",        e: "🏔️" },
+      { v: 4.0075e7,   one: "once around the Earth", many: "laps around the Earth", e: "🌍" },
+      { v: 3.844e8,    one: "the trip to the Moon", many: "trips to the Moon",     e: "🌙" },
+      { v: 1.496e11,   one: "the trip to the Sun",  many: "trips to the Sun",      e: "☀️" },
+      { v: 9.4607e15,  one: "a light-year",         many: "light-years",           e: "✨" }
+    ]},
+    mass: { mode: "count", anchors: [
+      { v: 2.5e-6,   one: "a mosquito",       many: "mosquitoes",       e: "🦟" },
+      { v: 0.0025,   one: "a LEGO brick",     many: "LEGO bricks",      e: "🧱" },
+      { v: 0.2,      one: "an apple",         many: "apples",           e: "🍎" },
+      { v: 4.5,      one: "a pet cat",        many: "pet cats",         e: "🐱" },
+      { v: 45,       one: "a big dog",        many: "big dogs",         e: "🐕" },
+      { v: 1500,     one: "a car",            many: "cars",             e: "🚗" },
+      { v: 6000,     one: "an elephant",      many: "elephants",        e: "🐘" },
+      { v: 140000,   one: "a blue whale",     many: "blue whales",      e: "🐋" },
+      { v: 5.2e7,    one: "the Titanic",      many: "Titanics",         e: "🚢" },
+      { v: 5.972e24, one: "planet Earth",     many: "planet Earths",    e: "🌍" }
+    ]},
+    volume: { mode: "count", anchors: [
+      { v: 5e-5,   one: "a drop of water",           many: "drops of water",           e: "💧" },
+      { v: 0.005,  one: "a teaspoon",                many: "teaspoons",                e: "🥄" },
+      { v: 0.355,  one: "a soda can",                many: "soda cans",                e: "🥤" },
+      { v: 2,      one: "a big soda bottle",         many: "big soda bottles",         e: "🍾" },
+      { v: 150,    one: "a bathtub",                 many: "bathtubs",                 e: "🛁" },
+      { v: 50000,  one: "a backyard pool",           many: "backyard pools",           e: "🏖️" },
+      { v: 2.5e6,  one: "an Olympic swimming pool",  many: "Olympic swimming pools",   e: "🏊" }
+    ]},
+    area: { mode: "count", anchors: [
+      { v: 5e-4,    one: "a postage stamp",   many: "postage stamps",   e: "📮" },
+      { v: 0.0625,  one: "a sheet of paper",  many: "sheets of paper",  e: "📄" },
+      { v: 2,       one: "a door",            many: "doors",            e: "🚪" },
+      { v: 261,     one: "a tennis court",    many: "tennis courts",    e: "🎾" },
+      { v: 7140,    one: "a soccer field",    many: "soccer fields",    e: "⚽" },
+      { v: 3.41e6,  one: "Central Park",      many: "Central Parks",    e: "🌳" },
+      { v: 5.1e14,  one: "the whole surface of the Earth", many: "whole Earth surfaces", e: "🌍" }
+    ]},
+    speed: { mode: "times", anchors: [
+      { v: 0.0013,       one: "a snail",               e: "🐌" },
+      { v: 1.4,          one: "walking speed",         e: "🚶" },
+      { v: 10,           one: "the fastest sprinter",  e: "🏃" },
+      { v: 30,           one: "a cheetah",             e: "🐆" },
+      { v: 250,          one: "a jet plane",           e: "✈️" },
+      { v: 343,          one: "the speed of sound",    e: "🔊" },
+      { v: 7660,         one: "the Space Station",     e: "🛰️" },
+      { v: 2.99792458e8, one: "the speed of light",    e: "💡" }
+    ]},
+    time: { mode: "count", anchors: [
+      { v: 0.1,      one: "a blink",                many: "blinks",                e: "👁️" },
+      { v: 1,        one: "a heartbeat",            many: "heartbeats",            e: "💓" },
+      { v: 120,      one: "a tooth-brushing",       many: "tooth-brushings",       e: "🪥" },
+      { v: 7200,     one: "a movie",                many: "movies",                e: "🎬" },
+      { v: 86400,    one: "a whole day",            many: "whole days",            e: "🌞" },
+      { v: 3.156e7,  one: "a year",                 many: "years",                 e: "🎂" },
+      { v: 2.5e9,    one: "a whole human lifetime", many: "human lifetimes",       e: "👵" },
+      { v: 4.35e17,  one: "the age of the universe", many: "ages of the universe", e: "🌌" }
+    ]},
+    energy: { mode: "count", anchors: [
+      { v: 1e-4,    one: "a flea's jump",             many: "flea jumps",              e: "🤸" },
+      { v: 1,       one: "lifting an apple up high",  many: "apple-lifts",             e: "🍎" },
+      { v: 4.4e5,   one: "a banana of food energy",   many: "bananas of food energy",  e: "🍌" },
+      { v: 2.3e6,   one: "a chocolate bar",           many: "chocolate bars",          e: "🍫" },
+      { v: 1.32e8,  one: "a gallon of gasoline",      many: "gallons of gasoline",     e: "⛽" },
+      { v: 5e9,     one: "a lightning bolt",          many: "lightning bolts",         e: "⚡" }
+    ]},
+    power: { mode: "count", anchors: [
+      { v: 0.5,   one: "a night-light",           many: "night-lights",           e: "🌙" },
+      { v: 18,    one: "a phone charger",         many: "phone chargers",         e: "🔌" },
+      { v: 100,   one: "a person pedaling hard",  many: "people pedaling hard",   e: "🚴" },
+      { v: 746,   one: "a horse",                 many: "horses",                 e: "🐴" },
+      { v: 75000, one: "a car engine",            many: "car engines",            e: "🚗" },
+      { v: 3e6,   one: "a wind turbine",          many: "wind turbines",          e: "🌬️" },
+      { v: 1e9,   one: "a big power station",     many: "big power stations",     e: "🏭" }
+    ]},
+    pressure: { mode: "times", anchors: [
+      { v: 0.8,     one: "a sheet of paper resting on your hand", e: "📄" },
+      { v: 101325,  one: "the air pushing on you right now",      e: "🌬️" },
+      { v: 220000,  one: "the air inside a car tyre",             e: "🚗" },
+      { v: 1.1e8,   one: "the bottom of the deepest ocean",       e: "🌊" },
+      { v: 3.6e11,  one: "the centre of the Earth",               e: "🌍" }
+    ]},
+    data: { mode: "count", anchors: [
+      { v: 1,     one: "a single letter",   many: "letters",          e: "🔤" },
+      { v: 140,   one: "a text message",    many: "text messages",    e: "💬" },
+      { v: 3e6,   one: "a photo",           many: "photos",           e: "📸" },
+      { v: 4e6,   one: "a song",            many: "songs",            e: "🎵" },
+      { v: 4e9,   one: "a movie",           many: "movies",           e: "🎬" },
+      { v: 7e10,  one: "a big video game",  many: "big video games",  e: "🎮" }
+    ]},
+    angle: { mode: "count", anchors: [
+      { v: 6,    one: "a minute tick on a clock", many: "minute ticks on a clock", e: "🕐" },
+      { v: 45,   one: "a pizza slice",            many: "pizza slices",            e: "🍕" },
+      { v: 90,   one: "a right angle",            many: "right angles",            e: "📐" },
+      { v: 360,  one: "a full spin",              many: "full spins",              e: "🌀" }
+    ]}
+  };
+
+  // Temperature gets weather words instead of ratios (base = °C).
+  const TEMP_BANDS = [
+    [-200, "❄️ Almost absolute zero — nothing in the universe is much colder!"],
+    [-90,  "🧪 Cold enough to turn air into a liquid!"],
+    [-40,  "🥶 Colder than the South Pole in winter!"],
+    [-18,  "🧊 Colder than the inside of your freezer!"],
+    [0,    "⛄ Below freezing — snowman weather!"],
+    [12,   "🧥 Chilly — grab a jacket!"],
+    [22,   "🙂 Cool and comfy."],
+    [30,   "😎 Perfect play-outside warm!"],
+    [42,   "🥵 Hot summer day — find some shade!"],
+    [60,   "🏜️ Hotter than the hottest desert on Earth!"],
+    [100,  "♨️ Hot-tub to boiling water — careful!"],
+    [250,  "🍕 Oven temperatures — pizza territory!"],
+    [1200, "🌋 Glowing hot — molten lava is about 1,100°C!"],
+    [6000, "🔥 Hotter than lava — metals melt and boil!"],
+    [Infinity, "☀️ Hotter than the surface of the Sun (about 5,500°C)!"]
+  ];
+
   // ---- Convert helpers -------------------------------------------------
   function toBase(unit, v)  { return unit.to   ? unit.to(v)   : v * unit.factor; }
   function fromBase(unit, b){ return unit.from ? unit.from(b) : b / unit.factor; }
@@ -272,6 +400,66 @@
       s = (neg ? "-" : "") + parts.join(".");
     }
     return s;
+  }
+
+  // Same as fmt, but renders huge/tiny numbers as a proper "× 10ⁿ"
+  // instead of computer e-notation. Returns HTML.
+  function fmtHTML(x) {
+    if (!isFinite(x)) return "—";
+    if (x === 0) return "0";
+    const a = Math.abs(x);
+    if (a >= 1e15 || a < 1e-6) {
+      const [m, e] = x.toExponential(4).split("e");
+      return Number(m) + " × 10<sup>" + Number(e) + "</sup>";
+    }
+    return fmt(x);
+  }
+
+  // Build the "That's about 3 school buses! 🚌" line.
+  function compareLine(catKey, baseVal) {
+    if (catKey === "temp") {
+      const band = TEMP_BANDS.find(b => baseVal <= b[0]);
+      return band ? band[1] : "";
+    }
+    const cmp = COMPARES[catKey];
+    if (!cmp || !(baseVal > 0)) return "";
+    // nearest anchor on the log scale
+    let bestA = cmp.anchors[0], bestD = Infinity;
+    cmp.anchors.forEach(an => {
+      const d = Math.abs(Math.log10(baseVal / an.v));
+      if (d < bestD) { bestD = d; bestA = an; }
+    });
+    const r = baseVal / bestA.v;
+    const times = cmp.mode === "times";
+
+    function amount(n) {
+      if (n < 10) {
+        const s = (Math.round(n * 10) / 10).toString();
+        return s.replace(/\.0$/, "");
+      }
+      return fmtHTML(Math.round(n));
+    }
+
+    let phrase;
+    if (r >= 0.95) {
+      const n = amount(r);
+      if (n === "1") {
+        phrase = times ? "the same as <b>" + bestA.one + "</b>" : "<b>" + bestA.one + "</b>";
+      } else if (times) {
+        phrase = "<b>" + n + "× as much as " + bestA.one + "</b>";
+      } else {
+        phrase = "<b>" + n + " " + bestA.many + "</b>";
+      }
+    } else {
+      const f = 1 / r;
+      if (Math.round(f) <= 1) { // e.g. 0.85× — close enough to call it one
+        phrase = times ? "the same as <b>" + bestA.one + "</b>" : "<b>" + bestA.one + "</b>";
+      } else {
+        const fs = f <= 20 ? String(Math.round(f)) : "(" + amount(f) + ")";
+        phrase = "<b>1⁄" + fs + " of " + bestA.one + "</b>";
+      }
+    }
+    return "🤔 That's about " + phrase + " " + bestA.e;
   }
 
   // ---- State + DOM -----------------------------------------------------
@@ -306,7 +494,7 @@
       b.textContent = c.label;
       b.onclick = () => {
         if (c === cat) return;
-        cat = c; fromIdx = 0;
+        cat = c; fromIdx = baseUnitIndex(c);
         window.SFX && SFX.good && SFX.good();
         renderAll();
       };
@@ -327,10 +515,25 @@
     sel.onchange = () => { fromIdx = +sel.value; render(); };
   }
 
+  // Start each category on its everyday base unit (metre, kilogram, …)
+  // instead of the very first (often extreme) unit in the list.
+  function baseUnitIndex(c) {
+    const i = c.units.findIndex(u => u.factor === 1 || (u.to && u.to(1) === 1));
+    return i === -1 ? 0 : i;
+  }
+
+  // Quick-tap numbers that make sense for each category.
+  const QUICKS = {
+    temp:  [0, 32, 37, 98.6, 100, -40],
+    time:  [1, 30, 60, 90, 3600],
+    data:  [1, 8, 512, 1024, 2048],
+    angle: [30, 45, 90, 180, 360]
+  };
+
   function buildQuick() {
     const q = $("quick");
     q.innerHTML = "";
-    [1, 2, 5, 10, 100, 0.5].forEach(v => {
+    (QUICKS[cat.key] || [1, 2, 5, 10, 100, 0.5]).forEach(v => {
       const b = document.createElement("button");
       b.textContent = v;
       b.onclick = () => { $("value").value = v; render(); };
@@ -345,7 +548,7 @@
     const baseVal = toBase(from, val);
 
     $("inputTitle").textContent = "CONVERT " + cat.label.replace(/^\S+\s/, "").toUpperCase();
-    $("resHead").innerHTML = fmt(val) + " " + from.sym + " &nbsp;=";
+    $("resHead").innerHTML = fmtHTML(val) + " " + from.sym + " &nbsp;=";
 
     const rows = $("rows");
     rows.innerHTML = "";
@@ -356,7 +559,7 @@
       row.innerHTML =
         '<span class="u-name">' + u.sym +
           '<span class="u-full">' + u.n + '</span></span>' +
-        '<span class="u-val">' + fmt(out) + '</span>';
+        '<span class="u-val">' + fmtHTML(out) + '</span>';
       row.onclick = () => {
         // "convert from this unit instead": keep the shown number, switch source
         fromIdx = i;
@@ -367,6 +570,10 @@
       };
       rows.appendChild(row);
     });
+
+    const cmp = compareLine(cat.key, baseVal);
+    $("compare").innerHTML = cmp;
+    $("compare").style.display = cmp ? "" : "none";
 
     $("fact").innerHTML = "💡 " + cat.fact;
     saveState();
@@ -380,7 +587,6 @@
   }
 
   loadState();
-  buildQuick();
   $("value").addEventListener("input", render);
   renderAll();
 })();

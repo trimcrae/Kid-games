@@ -66,6 +66,16 @@
       touch-action: none;
       cursor: crosshair;
     }
+    .world-msg {
+      text-align: center;
+      color: #cfc8ff;
+      font-weight: bold;
+      font-size: 1rem;
+      padding: 0.45rem 0.5rem 0.1rem;
+      animation: msgIn 0.4s ease;
+    }
+    .world-msg[hidden] { display: none; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
     /* ---- big control buttons ---- */
     .controls {
@@ -249,6 +259,7 @@
         <span class="stat-pill">🟢 Alive <b id="popCount">0</b></span>
       </div>
       <canvas id="world" aria-label="Game of Life world — tap or drag to paint cells"></canvas>
+      <p class="world-msg" id="worldMsg" hidden>🌙 The world went quiet… stamp a creature or press 🎲 Random!</p>
     </div>
 
     <!-- Main controls -->
@@ -272,7 +283,8 @@
     <!-- Brushes / patterns -->
     <section class="panel">
       <h2>🖌️ Stamp Shop</h2>
-      <p class="hint">Pick a brush, then tap the world! The pencil draws one cell at a time — the others stamp famous creatures.</p>
+      <p class="hint">Pick a brush, then tap the world! The pencil draws one cell at a time — the others stamp famous creatures.
+        Use <b>↻ Turn</b> to aim gliders and spaceships in a different direction.</p>
       <div id="brushRow" class="chip-row" role="group" aria-label="Drawing brushes"></div>
     </section>
 

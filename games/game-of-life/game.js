@@ -100,6 +100,7 @@
     playing: false,
     generation: 0,
     brush: "pencil",
+    rot: 0,           // stamp rotation, quarter turns clockwise
   };
   state.birth[3] = true;
   state.survive[2] = state.survive[3] = true;
@@ -212,9 +213,14 @@
     return p;
   }
 
+  const worldMsg = $("worldMsg");
+
   function updateStats() {
     genCountEl.textContent = state.generation;
-    popCountEl.textContent = population();
+    const p = population();
+    popCountEl.textContent = p;
+    // A gentle nudge when every last cell has died out.
+    worldMsg.hidden = !(p === 0 && state.generation > 0);
   }
 
   /* ---------- painting & stamping ---------- */
@@ -224,6 +230,25 @@
     state.cells[i] = v;
     state.age[i] = v ? 1 : 0;
     if (v) state.colorIdx[i] = 0;
+  }
+
+  function rotate90(pat) {
+    const h = pat.length, w = pat[0].length;
+    const out = [];
+    for (let x = 0; x < w; x++) {
+      let row = "";
+      for (let y = h - 1; y >= 0; y--) row += pat[y][x];
+      out.push(row);
+    }
+    return out;
+  }
+
+  // The active brush's pattern, turned by the current rotation.
+  function brushPattern() {
+    let pat = PATTERNS.find((p) => p.key === state.brush).cells;
+    if (!pat) return null;
+    for (let i = 0; i < state.rot % 4; i++) pat = rotate90(pat);
+    return pat;
   }
 
   function stampPattern(pat, cx, cy) {
@@ -381,7 +406,7 @@
 
     // ghost preview of the selected stamp under the pointer
     if (hoverCell && state.brush !== "pencil") {
-      const pat = PATTERNS.find((p) => p.key === state.brush).cells;
+      const pat = brushPattern();
       const h = pat.length, w = pat[0].length;
       let ox = hoverCell.x - Math.floor(w / 2);
       let oy = hoverCell.y - Math.floor(h / 2);
@@ -432,15 +457,15 @@
     ev.preventDefault();
     const c = cellFromEvent(ev);
     if (!c) return;
-    canvas.setPointerCapture(ev.pointerId);
+    try { canvas.setPointerCapture(ev.pointerId); } catch (e) { /* synthetic pointer */ }
     if (state.brush === "pencil") {
       painting = true;
       paintValue = state.cells[c.y * state.cols + c.x] ? 0 : 1;
       setCell(c.x, c.y, paintValue);
       lastPaint = c;
+      window.SFX && SFX.pop && SFX.pop();
     } else {
-      const pat = PATTERNS.find((p) => p.key === state.brush).cells;
-      stampPattern(pat, c.x, c.y);
+      stampPattern(brushPattern(), c.x, c.y);
       window.SFX && SFX.good && SFX.good();
     }
     updateStats();
@@ -522,14 +547,30 @@
     const b = document.createElement("button");
     b.className = "chip";
     b.textContent = p.name;
+    b.dataset.brush = p.key;
     b.setAttribute("aria-pressed", String(p.key === state.brush));
     b.addEventListener("click", () => {
       state.brush = p.key;
-      brushRow.querySelectorAll(".chip").forEach((el) => el.setAttribute("aria-pressed", "false"));
+      brushRow.querySelectorAll(".chip[data-brush]").forEach((el) => el.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true");
+      rotateChip.disabled = p.key === "pencil";
+      rotateChip.style.opacity = rotateChip.disabled ? 0.45 : 1;
     });
     brushRow.appendChild(b);
   });
+
+  // Turn the stamp a quarter turn — aim gliders wherever you like!
+  const rotateChip = document.createElement("button");
+  rotateChip.className = "chip";
+  rotateChip.textContent = "↻ Turn";
+  rotateChip.setAttribute("aria-label", "Rotate the stamp a quarter turn");
+  rotateChip.disabled = state.brush === "pencil";
+  rotateChip.style.opacity = rotateChip.disabled ? 0.45 : 1;
+  rotateChip.addEventListener("click", () => {
+    state.rot = (state.rot + 1) % 4;
+    window.SFX && SFX.pop && SFX.pop();
+  });
+  brushRow.appendChild(rotateChip);
 
   /* ---------- rule lab ---------- */
   const birthRow = $("birthRow");

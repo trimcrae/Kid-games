@@ -68,7 +68,13 @@
   }
 
   let state = load();
+
+  const ZOOM_KEY = "family-tree.zoom";
   let zoom = 1;
+  try {
+    const z = parseFloat(localStorage.getItem(ZOOM_KEY));
+    if (z >= 0.4 && z <= 1.5) zoom = z;
+  } catch (e) { /* fine */ }
 
   const P = () => state.people;
   const alive = (id) => !!state.people[id];
@@ -483,6 +489,7 @@
       if (!at) return;
       const btn = document.createElement("button");
       btn.className = "person" + (id === state.me ? " is-me" : "");
+      btn.dataset.id = id;
       btn.style.left = at.x + "px";
       btn.style.top = at.y + "px";
       btn.style.borderColor = genColor(p.gen);
@@ -509,6 +516,53 @@
   function centerView() {
     viewport.scrollLeft = Math.max(0, (sizer.offsetWidth - viewport.clientWidth) / 2);
   }
+
+  // Scroll to a person's card and give it a friendly golden pulse.
+  function spotlight(id) {
+    const el = canvas.querySelector('.person[data-id="' + id + '"]');
+    if (!el) return;
+    const x = sizer.offsetLeft + (parseFloat(el.style.left) + CW / 2) * zoom;
+    const y = (parseFloat(el.style.top) + CH / 2) * zoom;
+    try {
+      viewport.scrollTo({
+        left: x - viewport.clientWidth / 2,
+        top: y - viewport.clientHeight / 2,
+        behavior: "smooth"
+      });
+    } catch (e) {
+      viewport.scrollLeft = x - viewport.clientWidth / 2;
+      viewport.scrollTop = y - viewport.clientHeight / 2;
+    }
+    el.classList.add("flash");
+    setTimeout(() => el.classList.remove("flash"), 1700);
+  }
+
+  /* ---------- undo (one step, for the scary buttons) ---------- */
+
+  const snackbar = document.getElementById("snackbar");
+  const snackText = document.getElementById("snack-text");
+  let undoSnap = null, undoTimer = null;
+
+  function showUndo(msg, snap) {
+    undoSnap = snap;
+    snackText.textContent = msg;
+    snackbar.hidden = false;
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(hideUndo, 8000);
+  }
+  function hideUndo() {
+    snackbar.hidden = true;
+    undoSnap = null;
+    clearTimeout(undoTimer);
+  }
+  document.getElementById("snack-undo").addEventListener("click", () => {
+    if (!undoSnap) return hideUndo();
+    try { state = JSON.parse(undoSnap); } catch (e) { return hideUndo(); }
+    hideUndo();
+    persist();
+    render();
+    window.SFX && SFX.good();
+  });
 
   /* ---------- modals ---------- */
 
@@ -557,8 +611,10 @@
         askConfirm("Split up " + p.name + " and " + P()[pt].name + "?",
           "They both stay on the tree and stay mom or dad to their kids — they just won't be partners any more.",
           () => {
+            const snap = JSON.stringify(state);
             splitUp(id, pt);
             persist(); render();
+            showUndo("💔 " + p.name + " and " + P()[pt].name + " split up", snap);
             window.SFX && SFX.nope();
           });
       });
@@ -576,8 +632,10 @@
         askConfirm("Remove " + p.name + "?",
           "They will be taken off the family tree.",
           () => {
+            const snap = JSON.stringify(state);
             removePerson(id);
             persist(); render();
+            showUndo("🗑 Removed " + p.name, snap);
             window.SFX && SFX.nope();
           });
       });
@@ -687,6 +745,7 @@
     const name = nameInput.value.trim();
     if (!name) { nameInput.focus(); return; }
     const who = P()[form.id];
+    let focusId = form.id; // the card to scroll to afterwards
 
     if (form.mode === "edit") {
       who.name = name; who.gender = form.gender; who.emoji = form.emoji;
@@ -710,20 +769,21 @@
       } else {
         who.parents.push(newP);
       }
+      focusId = newP;
     } else if (form.mode === "partner") {
-      addPerson({
+      focusId = addPerson({
         name: name, gender: form.gender, emoji: form.emoji,
         gen: who.gen, parents: [], partners: [form.id]
       });
     } else if (form.mode === "child") {
       const parents = [form.id];
       if (form.otherParent && alive(form.otherParent)) parents.push(form.otherParent);
-      addPerson({
+      focusId = addPerson({
         name: name, gender: form.gender, emoji: form.emoji,
         gen: who.gen + 1, parents: parents, partners: []
       });
     } else if (form.mode === "sibling") {
-      addPerson({
+      focusId = addPerson({
         name: name, gender: form.gender, emoji: form.emoji,
         gen: who.gen, parents: who.parents.filter(alive).slice(), partners: []
       });
@@ -732,6 +792,7 @@
     persist();
     closeAll();
     render();
+    spotlight(focusId);
     if (form.mode === "edit") {
       window.SFX && SFX.good();
     } else {
@@ -780,23 +841,36 @@
     if (state.me) { window.SFX && SFX.good(); }
   });
 
-  document.getElementById("zoom-in").addEventListener("click", () => {
-    zoom = Math.min(1.5, Math.round((zoom + 0.15) * 100) / 100);
+  function setZoom(z) {
+    zoom = Math.min(1.5, Math.max(0.4, Math.round(z * 100) / 100));
+    try { localStorage.setItem(ZOOM_KEY, String(zoom)); } catch (e) { /* fine */ }
     render();
-  });
-  document.getElementById("zoom-out").addEventListener("click", () => {
-    zoom = Math.max(0.4, Math.round((zoom - 0.15) * 100) / 100);
-    render();
+  }
+  document.getElementById("zoom-in").addEventListener("click", () => setZoom(zoom + 0.15));
+  document.getElementById("zoom-out").addEventListener("click", () => setZoom(zoom - 0.15));
+
+  // Ctrl + mouse wheel (or trackpad pinch) zooms the tree too.
+  viewport.addEventListener("wheel", (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault();
+    setZoom(zoom + (e.deltaY < 0 ? 0.1 : -0.1));
+  }, { passive: false });
+
+  // Escape backs out of any open sheet.
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { form = null; closeAll(); }
   });
 
   document.getElementById("reset-btn").addEventListener("click", () => {
     askConfirm("Start the tree over?",
       "Everyone you added will be removed and the tree goes back to just our family.",
       () => {
+        const snap = JSON.stringify(state);
         state = seed();
         persist();
         render();
         centerView();
+        showUndo("🔄 Started the tree over", snap);
         window.Confetti && Confetti.burst({ count: 40 });
       });
   });
