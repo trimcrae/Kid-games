@@ -243,13 +243,11 @@
   muteBtn.onclick = toggleMute;
 
   // ---- Game state -----------------------------------------------------
-  const MAX_CREW = 99999;
-  // A finale is only fair if a maxed-out mob can clear EVERY wall. Clearing the
-  // whole gauntlet needs a starting crew GREATER than the SUM of all the walls'
-  // needs — each smash subtracts that wall's need from your crew — so the total,
-  // not just any single wall, must stay under the crew cap. Leave some headroom
-  // so a strong (but not perfectly maxed) mob can still finish.
-  const CLEAR_BUDGET = Math.floor(MAX_CREW * 0.85);
+  // No crew cap — your mob can grow as big as your maths can make it. The old
+  // fixed ceiling meant the walls (which ramp per level) eventually needed more
+  // crew than the mob could ever reach, so the finale became impossible to fully
+  // clear. Instead the finale is now sized to the mob you ACTUALLY bring into it
+  // (see buildGauntlet), so a strong crew can always smash every brick.
   let state = "menu";          // menu | playing | over
   let crew = 1;
   let crewX = 0, targetX = 0;
@@ -276,6 +274,7 @@
   let wallsSmashedThisRun = 0;
   let levelCleared = false;    // did the run end by clearing the whole gauntlet?
   let finaleTotal = 0, finaleSmashed = 0, finaleSpawned = 0;
+  let finaleNeeds = [];        // per-wall crew requirements for this finale
   let finaleGap = 0;           // spawn spacing accumulator for finale walls
   let banner = null;           // { text, sub, life, color } big centre banner
 
@@ -381,36 +380,36 @@
     }
   }
 
-  // How strong the i-th brick wall of this level's gauntlet is. Walls start
-  // small and grow ~1.6x each step, so the gauntlet ramps from a handful up into
-  // the thousands — your whole mob gets eaten and you see how far you get. The
-  // whole gauntlet also scales up each level.
-  function wallNeed(i) {
-    const M = mode();
-    const base = M.wallBase * Math.pow(M.levelScale, level - 1);
-    // Never let a single wall grow past what a maxed mob could ever break.
-    return clamp(Math.round(base * Math.pow(WALL_GROWTH, i)), 3, CLEAR_BUDGET);
-  }
-  // How many walls in this level's gauntlet. ~15 on level 1 (so the values ramp
-  // from a handful up to a few thousand and the total — around 9–10k — eats a
-  // huge mob yet can still be fully cleared by a strong one). A couple more each
-  // level. We keep adding walls only while the RUNNING TOTAL stays clearable by
-  // a maxed mob. (The old code only checked each wall against the cap, so the
-  // walls ramped past any mob's max size and the finale became impossible to
-  // fully clear even on a perfect run.) Higher levels therefore get fewer, but
-  // beefier, walls — the gauntlet always stays winnable, which naturally caps
-  // how deep the levels can go. Always keep at least one wall so a finale never
-  // auto-clears with nothing to smash.
-  function gauntletCount() {
-    const want = Math.min(22, 15 + (level - 1));
-    let n = 0, total = 0;
-    while (n < want) {
-      const need = wallNeed(n);
-      if (total + need > CLEAR_BUDGET) break;
-      total += need;
-      n++;
+  // Build this finale's brick walls, sized to the mob you ARRIVE with. Walls
+  // start small and grow ~1.6x each step for a satisfying ramp, and the whole
+  // gauntlet is tuned to consume a chunk of your crew — a comfortable bite on
+  // early levels, a real nail-biter later — but its TOTAL is always kept just
+  // under your crew, so a strong mob can smash every last brick. Because the
+  // walls scale to your actual mob rather than a fixed ceiling, there's no
+  // "max number" the bricks can hide behind: grow a bigger crew, get bigger
+  // (still-breakable) walls.
+  function buildGauntlet(startCrew, lv) {
+    const ratio = WALL_GROWTH;
+    const want = Math.min(22, 15 + (lv - 1));
+    // Never make more walls than the mob can possibly break (each wall needs at
+    // least 1 crew), so tiny mobs still get a clearable gauntlet.
+    const n = Math.max(1, Math.min(want, startCrew - 1));
+    // Fraction of the mob the whole gauntlet should eat: gentle early, up to a
+    // squeaker later, but always leaving a sliver so every wall can fall.
+    const frac = Math.min(0.9, 0.6 + (lv - 1) * 0.03);
+    const target = Math.max(1, Math.min(startCrew * frac, startCrew - 1));
+    // Geometric ramp whose terms sum to ~target.
+    const base = target * (ratio - 1) / (Math.pow(ratio, n) - 1);
+    const needs = [];
+    for (let i = 0; i < n; i++) needs.push(Math.max(1, Math.round(base * Math.pow(ratio, i))));
+    // Rounding can nudge the sum up; trim from the biggest (last) walls until
+    // the whole gauntlet is guaranteed clearable (total strictly below crew).
+    let excess = needs.reduce((a, b) => a + b, 0) - (startCrew - 1);
+    for (let i = needs.length - 1; i >= 0 && excess > 0; i--) {
+      const cut = Math.min(needs[i] - 1, excess);
+      needs[i] -= cut; excess -= cut;
     }
-    return Math.max(1, n);
+    return needs;
   }
   function levelTargetFor(lv) {
     const M = mode();
@@ -554,7 +553,7 @@
       finaleGap += dy;
       if (finaleSpawned < finaleTotal && finaleGap >= bandH * 2.2) {
         finaleGap = 0;
-        rows.push({ kind: "wall", y: -bandH - 12, need: wallNeed(finaleSpawned),
+        rows.push({ kind: "wall", y: -bandH - 12, need: finaleNeeds[finaleSpawned],
                     idx: finaleSpawned, done: false });
         finaleSpawned++;
       }
@@ -636,7 +635,8 @@
   // ---- Level / finale flow --------------------------------------------
   function enterFinale() {
     phase = "finale";
-    finaleTotal = gauntletCount();   // long, steeply-ramping gauntlet
+    finaleNeeds = buildGauntlet(crew, level);   // walls sized to the mob you built
+    finaleTotal = finaleNeeds.length;
     finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
     rows = [];   // clear leftover gates/quizzes/barriers — the finish line wipes the track
     rows.push({ kind: "finish", y: -bandH - 4, done: true });
@@ -648,7 +648,7 @@
     const py = playerY();
     const before = crew;
     if (crew > row.need) {
-      crew = clamp(crew - row.need, 0, MAX_CREW);
+      crew = Math.max(0, crew - row.need);
       finaleSmashed++; wallsSmashedThisRun++; save.stats.walls++;
       const reward = Math.min(40, 6 + row.need);   // capped — no runaway score
       runCoins += reward;
@@ -704,7 +704,7 @@
     const chosen = onRight ? row.ops[1] : row.ops[0];
     const other  = onRight ? row.ops[0] : row.ops[1];
     const before = crew;
-    crew = clamp(chosen.apply(crew) || 0, 0, MAX_CREW);   // || 0 guards NaN
+    crew = Math.max(0, chosen.apply(crew) || 0);   // || 0 guards NaN
 
     const delta = crew - before;
     popLabel(delta >= 0 ? 1.4 : 1.2);
@@ -733,7 +733,7 @@
     const side = crewX >= W / 2 ? "R" : "L";
     const before = crew;
     if (side === row.correctSide) {
-      crew = clamp(Math.round(crew * 1.3) + 5, 0, MAX_CREW);
+      crew = Math.round(crew * 1.3) + 5;
       popLabel(1.5); mobSquash = 1.4;
       combo++;
       save.stats.quizCorrect++;
