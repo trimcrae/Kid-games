@@ -244,6 +244,12 @@
 
   // ---- Game state -----------------------------------------------------
   const MAX_CREW = 99999;
+  // A finale is only fair if a maxed-out mob can clear EVERY wall. Clearing the
+  // whole gauntlet needs a starting crew GREATER than the SUM of all the walls'
+  // needs — each smash subtracts that wall's need from your crew — so the total,
+  // not just any single wall, must stay under the crew cap. Leave some headroom
+  // so a strong (but not perfectly maxed) mob can still finish.
+  const CLEAR_BUDGET = Math.floor(MAX_CREW * 0.85);
   let state = "menu";          // menu | playing | over
   let crew = 1;
   let crewX = 0, targetX = 0;
@@ -382,18 +388,29 @@
   function wallNeed(i) {
     const M = mode();
     const base = M.wallBase * Math.pow(M.levelScale, level - 1);
-    return Math.max(3, Math.round(base * Math.pow(WALL_GROWTH, i)));
+    // Never let a single wall grow past what a maxed mob could ever break.
+    return clamp(Math.round(base * Math.pow(WALL_GROWTH, i)), 3, CLEAR_BUDGET);
   }
   // How many walls in this level's gauntlet. ~15 on level 1 (so the values ramp
   // from a handful up to a few thousand and the total — around 9–10k — eats a
   // huge mob yet can still be fully cleared by a strong one). A couple more each
-  // level. Never spawn a wall bigger than the max crew, since it could never
-  // break (that naturally caps how deep the levels can go).
+  // level. We keep adding walls only while the RUNNING TOTAL stays clearable by
+  // a maxed mob. (The old code only checked each wall against the cap, so the
+  // walls ramped past any mob's max size and the finale became impossible to
+  // fully clear even on a perfect run.) Higher levels therefore get fewer, but
+  // beefier, walls — the gauntlet always stays winnable, which naturally caps
+  // how deep the levels can go. Always keep at least one wall so a finale never
+  // auto-clears with nothing to smash.
   function gauntletCount() {
     const want = Math.min(22, 15 + (level - 1));
-    let n = 0;
-    while (n < want && wallNeed(n) <= MAX_CREW) n++;
-    return Math.max(6, n);
+    let n = 0, total = 0;
+    while (n < want) {
+      const need = wallNeed(n);
+      if (total + need > CLEAR_BUDGET) break;
+      total += need;
+      n++;
+    }
+    return Math.max(1, n);
   }
   function levelTargetFor(lv) {
     const M = mode();
