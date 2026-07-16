@@ -59,6 +59,23 @@ dependencies, no logins.
 - **Ellie** (3) — loves dresses & princesses → bright letter/colour/counting.
 - **Kieran** — the baby 👶.
 
+## Generating assets that need the internet (audio & art)
+
+The sandboxed dev environment's outbound proxy blocks most hosts (HuggingFace,
+GitHub asset CDNs, image APIs, etc.), so assets that must be fetched or
+model-generated **can't be produced in the sandbox**. **GitHub Actions runners
+have open internet, so let the pipelines do it.** Commit the source change
+(story text, art manifest, …) and push; a workflow renders the asset and
+commits it back:
+
+- **Story narration** → `.github/workflows/build-audio.yml` runs Piper
+  (`en_US-lessac-medium`) over the `text:` strings and commits the `.mp3`s.
+- **Story art** → `.github/workflows/generate-art.yml` fetches painterly PNGs.
+
+Both trigger automatically when their source changes and can be run by hand from
+the Actions tab. So: don't fight the sandbox proxy for these — push and let the
+pipeline (which can reach the internet) generate and commit the asset.
+
 ## Verify before you finish
 
 Serve locally and click through the change (a headless browser check is great):
