@@ -1,0 +1,58 @@
+name: Build story narration audio
+
+# Pre-renders the read-aloud narration for the Spooky Princess Stories with
+# Piper (neural TTS) and commits the .mp3 clips back to the repo.
+# GitHub's runners have open internet, so they can download the Piper voice
+# model from HuggingFace (which sandboxed dev environments cannot reach).
+#
+# Run it from the Actions tab ("Run workflow"), or it runs automatically when
+# the story text or the build script changes. build_audio.py (re)renders every
+# page of every story, so any story missing audio gets it here.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "games/spooky-stories/storybook.js"
+      - "games/spooky-stories/audio/build_audio.py"
+      - ".github/workflows/build-audio.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-audio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Piper + ffmpeg
+        run: pip install piper-tts imageio-ffmpeg
+
+      - name: Download the voice (en_US-lessac-medium)
+        working-directory: games/spooky-stories/audio
+        run: python3 -m piper.download_voices --download-dir ./voices en_US-lessac-medium
+
+      - name: Render narration
+        working-directory: games/spooky-stories/audio
+        run: python3 build_audio.py
+
+      - name: Commit narration audio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "games/spooky-stories/audio"
+          if git diff --cached --quiet; then
+            echo "No audio changes to commit."
+          else
+            git commit -m "Render story narration audio [skip ci]"
+            git push
+          fi

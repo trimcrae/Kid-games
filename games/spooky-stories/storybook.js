@@ -164,6 +164,7 @@
     const dress = o.dress || "#b266e0";
     const dress2 = o.dress2 || shade(dress, -30);
     const dressL = shade(dress, 32);
+    const pants = o.pants || shade(dress, -46);
     const hair = o.hair || "#5a3a22";
     const hairL = shade(hair, 26);
     const skin = o.skin || "#ffd9b8";
@@ -183,12 +184,21 @@
           `<path d="M -15 -50 C -18 -40 -17 -31 -12 -26 C -12 -34 -13 -43 -12 -50 Z" fill="${hair}"/>` +
           `<path d="M 15 -50 C 18 -40 17 -31 12 -26 C 12 -34 13 -43 12 -50 Z" fill="${hair}"/>`) +
       `<rect x="-3" y="-37" width="6" height="7" fill="${skin}"/>` +
-      // flowing dress + soft centre panel + sparkles
-      `<path d="M -6 -32 L 6 -32 C 11 -24 16 -14 21 -2 C 25 5 25 9 21 10 Q 0 15 -21 10 C -25 9 -25 5 -21 -2 C -16 -14 -11 -24 -6 -32 Z" fill="url(#${dg})"/>` +
-      `<path d="M -3 -30 C -6 -16 -8 -2 -9 9 Q 0 12 9 9 C 8 -2 6 -16 3 -30 Z" fill="${dressL}" opacity="0.45"/>` +
-      `<circle cx="-11" cy="0" r="1" fill="#fff" opacity="0.8"/>` +
-      `<circle cx="12" cy="-6" r="1" fill="#fff" opacity="0.7"/>` +
-      `<circle cx="4" cy="6" r="1" fill="#fff" opacity="0.75"/>` +
+      (o.boy
+        // a boy's outfit: shirt/tunic, two trouser legs and little shoes
+        ? `<rect x="-9" y="-10" width="7.6" height="19" rx="3" fill="${pants}"/>` +
+          `<rect x="1.4" y="-10" width="7.6" height="19" rx="3" fill="${pants}"/>` +
+          `<ellipse cx="-5.2" cy="9.6" rx="5.4" ry="2.8" fill="#39304a"/>` +
+          `<ellipse cx="5.2" cy="9.6" rx="5.4" ry="2.8" fill="#39304a"/>` +
+          `<path d="M -11 -30 C -6 -33 6 -33 11 -30 C 12.5 -21 12.5 -12 11 -5 Q 0 -1.5 -11 -5 C -12.5 -12 -12.5 -21 -11 -30 Z" fill="url(#${dg})"/>` +
+          `<path d="M -4.5 -31 L 0 -26.5 L 4.5 -31" fill="none" stroke="${dressL}" stroke-width="1.5" stroke-linecap="round"/>` +
+          `<circle cx="0" cy="-14" r="1" fill="#fff" opacity="0.7"/>`
+        // a flowing dress + soft centre panel + sparkles
+        : `<path d="M -6 -32 L 6 -32 C 11 -24 16 -14 21 -2 C 25 5 25 9 21 10 Q 0 15 -21 10 C -25 9 -25 5 -21 -2 C -16 -14 -11 -24 -6 -32 Z" fill="url(#${dg})"/>` +
+          `<path d="M -3 -30 C -6 -16 -8 -2 -9 9 Q 0 12 9 9 C 8 -2 6 -16 3 -30 Z" fill="${dressL}" opacity="0.45"/>` +
+          `<circle cx="-11" cy="0" r="1" fill="#fff" opacity="0.8"/>` +
+          `<circle cx="12" cy="-6" r="1" fill="#fff" opacity="0.7"/>` +
+          `<circle cx="4" cy="6" r="1" fill="#fff" opacity="0.75"/>`) +
       // arms
       `<path d="M -7 -27 Q -16 -20 -20 -9" stroke="${skin}" stroke-width="5" stroke-linecap="round" fill="none"/>` +
       `<path d="M 7 -27 Q 16 -20 20 -9" stroke="${skin}" stroke-width="5" stroke-linecap="round" fill="none"/>` +
@@ -370,6 +380,176 @@
   const ELLIE  = { dress: "#b266e0", hair: "#6b4a2a" };
   const JEANNIE = { dress: "#ff5d8f", hair: "#8a5a30" };
   const CORY   = { dress: "#3ddc84", hair: "#4a3320", crown: false, boy: true };
+
+  /* -----------------------------------------------------------
+     1b. Daytime toolkit — sunny/sunset skies and storybook
+     friends for the not-so-spooky princess tales: a glowing sun,
+     drifting clouds, a rainbow, little flowers, a rainbow-maned
+     unicorn, a friendly dragon and a sleepy smiling star.
+     Same 0 0 400 300 coordinate space as the night art.
+     ----------------------------------------------------------- */
+
+  // A fluffy cloud that drifts gently sideways.
+  function cloud(x, y, sc) {
+    sc = sc || 1;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<g><animateTransform attributeName="transform" type="translate" values="0 0; 14 0; 0 0" dur="20s" repeatCount="indefinite"/>` +
+      `<ellipse cx="0" cy="0" rx="26" ry="16" fill="#ffffff"/>` +
+      `<ellipse cx="-20" cy="6" rx="18" ry="12" fill="#ffffff"/>` +
+      `<ellipse cx="20" cy="6" rx="18" ry="12" fill="#ffffff"/>` +
+      `<ellipse cx="0" cy="9" rx="30" ry="10" fill="#eef6ff"/>` +
+      `</g></g>`;
+  }
+
+  // A little five-petal flower on a green stem.
+  function flower(x, y, sc, col) {
+    sc = sc || 1; col = col || "#ff5d8f";
+    let petals = "";
+    for (let i = 0; i < 5; i++) {
+      const a = (72 * i - 90) * Math.PI / 180;
+      petals += `<ellipse cx="${(Math.cos(a) * 4.4).toFixed(1)}" cy="${(Math.sin(a) * 4.4).toFixed(1)}" rx="3.4" ry="2.6" fill="${col}"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<line x1="0" y1="0" x2="0" y2="12" stroke="#3f9a3a" stroke-width="2" stroke-linecap="round"/>` +
+      `<g class="tap" data-sound="twinkle">${petals}<circle cx="0" cy="0" r="2.6" fill="#ffd166"/></g></g>`;
+  }
+
+  // A soft arcing rainbow.
+  function rainbow(x, y, sc) {
+    sc = sc || 1;
+    const cols = ["#ff5d6c", "#ff9f43", "#ffd166", "#4bd07b", "#4aa3ff", "#9b6bff"];
+    let s = "";
+    cols.forEach((c, i) => {
+      const r = 74 - i * 9;
+      s += `<path d="M ${-r} 0 A ${r} ${r} 0 0 1 ${r} 0" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/>`;
+    });
+    return `<g transform="translate(${x} ${y}) scale(${sc})" opacity="0.92">${s}</g>`;
+  }
+
+  // A bright daytime (or golden sunset) sky with a glowing sun,
+  // drifting clouds and green rolling hills dotted with flowers.
+  function dayBg(opts) {
+    opts = opts || {};
+    const sunset = !!opts.sunset;
+    const sky = uid("day"), grass = uid("grass"), sunG = uid("sunG"), sglow = uid("sglow");
+    let s =
+      `<defs>` +
+      `<linearGradient id="${sky}" x1="0" y1="0" x2="0" y2="1">` +
+      (sunset
+        ? `<stop offset="0" stop-color="#ffcf8a"/><stop offset="0.5" stop-color="#ff9e86"/><stop offset="1" stop-color="#ffc7ad"/>`
+        : `<stop offset="0" stop-color="#7ec8ff"/><stop offset="0.6" stop-color="#c2e8ff"/><stop offset="1" stop-color="#ecf8ff"/>`) +
+      `</linearGradient>` +
+      `<linearGradient id="${grass}" x1="0" y1="0" x2="0" y2="1">` +
+      `<stop offset="0" stop-color="#8ed86a"/><stop offset="1" stop-color="#54a846"/></linearGradient>` +
+      `<radialGradient id="${sunG}" cx="0.5" cy="0.5" r="0.5">` +
+      `<stop offset="0" stop-color="#fff7cf"/><stop offset="0.7" stop-color="#ffe27a"/><stop offset="1" stop-color="#ffca3a"/></radialGradient>` +
+      glowFilter(sglow, 4) +
+      `</defs>` +
+      `<rect x="0" y="0" width="400" height="300" fill="url(#${sky})"/>`;
+    if (opts.sun !== false) {
+      const sx = opts.sunX || 320, sy = opts.sunY || 66, sr = opts.sunR || 30;
+      s += `<g class="tap hint-bob" data-sound="chime">`;
+      for (let i = 0; i < 12; i++) {
+        const a = (Math.PI * 2 * i) / 12;
+        s += `<line x1="${(sx + Math.cos(a) * (sr + 6)).toFixed(1)}" y1="${(sy + Math.sin(a) * (sr + 6)).toFixed(1)}" ` +
+          `x2="${(sx + Math.cos(a) * (sr + 18)).toFixed(1)}" y2="${(sy + Math.sin(a) * (sr + 18)).toFixed(1)}" ` +
+          `stroke="#ffd84a" stroke-width="3" stroke-linecap="round" opacity="0.8"/>`;
+      }
+      s += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="url(#${sunG})" filter="url(#${sglow})"/></g>`;
+    }
+    s += cloud(96, 66, 1) + cloud(258, 104, 0.72);
+    s += `<path d="M0 250 C 80 225 150 245 230 232 C 300 221 350 238 400 228 L400 300 L0 300 Z" fill="#6fc25a"/>` +
+      `<path d="M0 278 C 90 262 170 276 250 268 C 320 262 360 274 400 268 L400 300 L0 300 Z" fill="url(#${grass})"/>`;
+    if (opts.flowers !== false) {
+      s += flower(58, 284, 1, "#ff5d8f") + flower(150, 291, 0.9, "#ffd166") +
+        flower(300, 286, 1, "#b266e0") + flower(360, 293, 0.85, "#ff8ec9");
+    }
+    return s;
+  }
+
+  // A white unicorn with a rainbow mane, spiral horn and a shy smile.
+  function unicorn(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const body = "#ffffff", shadow = "#eae4ff";
+    const mane = uid("mane");
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="neigh">` +
+      `<defs><linearGradient id="${mane}" x1="0" y1="0" x2="0" y2="1">` +
+      `<stop offset="0" stop-color="#ff8ec9"/><stop offset="0.5" stop-color="#b98cff"/><stop offset="1" stop-color="#8ad0ff"/></linearGradient></defs>` +
+      `<ellipse cx="0" cy="23" rx="24" ry="4.5" fill="#000" opacity="0.2"/>` +
+      `<rect x="-14" y="6" width="6" height="17" rx="3" fill="${shadow}"/>` +
+      `<rect x="9" y="6" width="6" height="17" rx="3" fill="${shadow}"/>` +
+      `<rect x="-6" y="8" width="6" height="15" rx="3" fill="${body}"/>` +
+      `<rect x="2" y="8" width="6" height="15" rx="3" fill="${body}"/>` +
+      `<path d="M -20 -2 C -34 2 -34 18 -24 22 C -30 14 -28 6 -18 6 Z" fill="url(#${mane})"/>` +
+      `<ellipse cx="-2" cy="0" rx="22" ry="15" fill="${body}"/>` +
+      `<path d="M 12 -6 C 18 -18 24 -24 30 -26 C 34 -22 33 -14 28 -8 C 24 -3 18 0 12 2 Z" fill="${body}"/>` +
+      `<ellipse cx="30" cy="-24" rx="9.5" ry="7.5" fill="${body}"/>` +
+      `<path d="M 33 -30 L 40 -47 L 36.5 -29 Z" fill="#ffd166"/>` +
+      `<path d="M 34.5 -33 L 38 -40 M 33.5 -30 L 37 -36" stroke="#e8a92e" stroke-width="1"/>` +
+      `<path d="M 24 -30 L 26 -38 L 30.5 -31 Z" fill="${body}"/>` +
+      `<path d="M 20 -22 C 12 -20 10 -8 12 2 C 16 -6 20 -10 24 -12 C 20 -16 20 -20 26 -24 C 24 -24 22 -23 20 -22 Z" fill="url(#${mane})"/>` +
+      `<circle cx="31" cy="-24" r="2" fill="#2b2440"/>` +
+      `<circle cx="31.6" cy="-24.6" r="0.6" fill="#fff"/>` +
+      `<circle cx="26" cy="-19" r="2.2" fill="#ffb3d1" opacity="0.6"/>` +
+      `<path d="M 34.5 -18.5 Q 37.5 -17.5 39 -19.5" stroke="#b5466e" stroke-width="1" fill="none" stroke-linecap="round"/>` +
+      `<circle cx="37.6" cy="-21.5" r="0.8" fill="#8f86b8"/>` +
+      `</g></g>`;
+  }
+
+  // A friendly little dragon: round belly, flappy wing, tiny smile,
+  // and a gentle puff of "smoke" (never any fire).
+  function dragon(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const col = o.color || "#5ec46a", belly = "#d8f4b2", dark = shade(col, -30);
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="roar">` +
+      `<ellipse cx="0" cy="24" rx="26" ry="4.5" fill="#000" opacity="0.2"/>` +
+      `<path d="M -18 10 C -34 14 -36 -2 -28 -6 C -30 6 -22 8 -14 6 Z" fill="${col}"/>` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="-6 -4 -6;7 -4 -6;-6 -4 -6" dur="2.4s" repeatCount="indefinite"/>` +
+      `<path d="M -6 -6 C -18 -26 -30 -26 -34 -18 C -26 -18 -24 -12 -26 -6 C -18 -10 -12 -8 -8 -2 Z" fill="${dark}"/></g>` +
+      `<rect x="-11" y="10" width="7" height="14" rx="3" fill="${dark}"/>` +
+      `<rect x="4" y="10" width="7" height="14" rx="3" fill="${dark}"/>` +
+      `<ellipse cx="0" cy="4" rx="22" ry="17" fill="${col}"/>` +
+      `<ellipse cx="0" cy="8" rx="12" ry="11" fill="${belly}"/>` +
+      `<path d="M -8 -12 L -4 -20 L 0 -12 Z M 2 -13 L 6 -22 L 10 -13 Z" fill="${dark}"/>` +
+      `<path d="M 14 -6 C 20 -18 30 -22 36 -18 C 32 -14 32 -8 26 -4 C 22 -1 18 0 14 0 Z" fill="${col}"/>` +
+      `<ellipse cx="34" cy="-18" rx="11" ry="9" fill="${col}"/>` +
+      `<ellipse cx="42" cy="-14" rx="6" ry="5" fill="${col}"/>` +
+      `<circle cx="45" cy="-15" r="1" fill="${dark}"/>` +
+      `<path d="M 38 -11 Q 43 -8 47 -12" stroke="${dark}" stroke-width="1.2" fill="none" stroke-linecap="round"/>` +
+      `<path d="M 30 -26 L 33 -34 L 36 -26 Z" fill="${belly}"/>` +
+      `<circle cx="33" cy="-20" r="2.6" fill="#fff"/>` +
+      `<circle cx="34" cy="-20" r="1.4" fill="#2b2440"/>` +
+      `<circle cx="34.5" cy="-20.6" r="0.5" fill="#fff"/>` +
+      `<circle cx="27" cy="-13" r="2.2" fill="#ff9ec2" opacity="0.5"/>` +
+      `<circle cx="53" cy="-15" r="2" fill="#fff" opacity="0.5"><animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite"/></circle>` +
+      `</g></g>`;
+  }
+
+  // A smiling five-point star with sleepy blinking eyes and a soft glow.
+  function starChar(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const col = o.color || "#ffe36e", edge = "#ffc23a";
+    const g = uid("starc");
+    let pts = "";
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? 22 : 9;
+      const a = (Math.PI * i) / 5 - Math.PI / 2;
+      pts += `${(Math.cos(a) * r).toFixed(1)},${(Math.sin(a) * r).toFixed(1)} `;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="twinkle">` +
+      `<defs>${glowFilter(g, 3)}</defs>` +
+      `<polygon points="${pts.trim()}" fill="${col}" stroke="${edge}" stroke-width="1.5" filter="url(#${g})"/>` +
+      `<ellipse cx="-5" cy="-2" rx="2.1" ry="2.6" fill="#2b2440">` +
+      `<animate attributeName="ry" values="2.6;2.6;0.4;2.6" keyTimes="0;0.9;0.94;1" dur="4.8s" repeatCount="indefinite"/></ellipse>` +
+      `<ellipse cx="5" cy="-2" rx="2.1" ry="2.6" fill="#2b2440">` +
+      `<animate attributeName="ry" values="2.6;2.6;0.4;2.6" keyTimes="0;0.9;0.94;1" dur="4.8s" repeatCount="indefinite"/></ellipse>` +
+      `<circle cx="-4.3" cy="-2.7" r="0.7" fill="#fff"/>` +
+      `<circle cx="5.7" cy="-2.7" r="0.7" fill="#fff"/>` +
+      `<circle cx="-8" cy="3" r="2.4" fill="#ff9ec2" opacity="0.6"/>` +
+      `<circle cx="8" cy="3" r="2.4" fill="#ff9ec2" opacity="0.6"/>` +
+      `<path d="M -4 3 Q 0 6.5 4 3" stroke="#b5466e" stroke-width="1.5" fill="none" stroke-linecap="round"/>` +
+      `</g></g>`;
+  }
 
   /* -----------------------------------------------------------
      2. The stories
@@ -577,6 +757,185 @@
         },
         { end: true, text: "The End. 💜", art: () => endArt("#5a3fb0", [ghost({x:200,y:150,scale:1.4})]) }
       ]
+    },
+
+    {
+      id: "rainbow-unicorn",
+      title: "Princess Ellie & the Rainbow Unicorn",
+      color: "#c86fd6",
+      cover: () => svg(dayBg({sunX:70}) + rainbow(300, 150, 0.7) +
+        unicorn({x:150,y:210,scale:1.5})),
+      pages: [
+        {
+          text: "One sunny morning, Princess Ellie skipped through the meadow picking flowers.",
+          art: () => svg(dayBg({sunX:330}) +
+            kid(Object.assign({x:200, y:250, scale:1.7}, ELLIE)) +
+            flower(90, 250, 1.4, "#ff5d8f") + flower(320, 255, 1.3, "#ffd166"))
+        },
+        {
+          text: "Behind a grassy hill, something SPARKLED. It was a unicorn with a rainbow mane!",
+          art: () => svg(dayBg({sunX:70}) + rainbow(300, 140, 0.6) +
+            unicorn({x:190, y:235, scale:1.9}))
+        },
+        {
+          text: "“Hello!” said Ellie softly. The shy unicorn was named Sparkle.",
+          art: () => svg(dayBg({sunX:330}) +
+            kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)) +
+            unicorn({x:270, y:245, scale:1.4}))
+        },
+        {
+          text: "Sparkle knelt down low. Up, up, up — Ellie climbed onto her soft back!",
+          art: () => svg(dayBg({sunX:60}) +
+            unicorn({x:180, y:250, scale:2}) +
+            kid(Object.assign({x:196, y:205, scale:0.9}, ELLIE)))
+        },
+        {
+          text: "They galloped over a rainbow, high above the fluffy white clouds. Wheee!",
+          art: () => svg(dayBg({sunX:330, sunY:56}) + rainbow(200, 120, 1) +
+            cloud(80, 210, 1.1) + cloud(320, 220, 0.9) +
+            unicorn({x:200, y:190, scale:1.4}))
+        },
+        {
+          text: "Back home for tea, Sparkle promised to visit every single sunny day. Yay!",
+          art: () => svg(dayBg({sunset:true, sunX:70}) +
+            kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)) +
+            unicorn({x:275, y:245, scale:1.4}))
+        },
+        { end: true, text: "The End. 🦄", art: () => endArtDay([unicorn({x:200,y:180,scale:1.9})]) }
+      ]
+    },
+
+    {
+      id: "dancing-dragon",
+      title: "The Dragon Who Loved to Dance",
+      color: "#3ea856",
+      cover: () => svg(dayBg({sunX:60}) + castle(310,250,0.55) +
+        dragon({x:150,y:220,scale:1.6})),
+      pages: [
+        {
+          text: "High on a green hill stood a happy castle, where a princess loved to dance.",
+          art: () => svg(dayBg({sunX:330}) + castle(200, 250, 1))
+        },
+        {
+          text: "One morning a friendly green dragon peeked over the garden wall. Hello!",
+          art: () => svg(dayBg({sunX:70}) +
+            dragon({x:210, y:235, scale:2}))
+        },
+        {
+          text: "“I want to dance too,” said the dragon, “but my feet are much too BIG!”",
+          art: () => svg(dayBg({sunX:330}) +
+            dragon({x:200, y:245, scale:2.2}))
+        },
+        {
+          text: "Princess Jeannie showed him how. Stomp, stomp, TWIRL! “You can do it!”",
+          art: () => svg(dayBg({sunX:60}) +
+            kid(Object.assign({x:120, y:250, scale:1.4, crown:false}, JEANNIE)) +
+            dragon({x:270, y:240, scale:1.5}))
+        },
+        {
+          text: "Soon everyone danced — Ellie, Cory, and the dragon spun round and round.",
+          art: () => svg(dayBg({sunX:330}) +
+            kid(Object.assign({x:100, y:252, scale:1.2}, ELLIE)) +
+            kid(Object.assign({x:200, y:252, scale:1.2}, CORY)) +
+            dragon({x:300, y:245, scale:1.3}))
+        },
+        {
+          text: "The dragon danced so happily that bright little flowers grew where he stepped!",
+          art: () => svg(dayBg({sunX:70}) +
+            dragon({x:180, y:245, scale:1.6}) +
+            flower(80, 255, 1.4, "#ff5d8f") + flower(300, 258, 1.3, "#b266e0") +
+            flower(340, 248, 1.1, "#ffd166"))
+        },
+        { end: true, text: "The End. 🐉", art: () => endArtDay([dragon({x:200,y:175,scale:1.9})]) }
+      ]
+    },
+
+    {
+      id: "sleepy-star",
+      title: "The Little Star Who Wanted to Sleep",
+      color: "#3a4fb0",
+      cover: () => svg(nightBg({moonX:300}) + starChar({x:150,y:150,scale:1.6})),
+      pages: [
+        {
+          text: "When the sky grew dark, all the little stars twinkled awake — all but one.",
+          art: () => svg(nightBg({moonX:330}) +
+            starChar({x:200, y:150, scale:1.7}))
+        },
+        {
+          text: "“I'm so sleepy,” yawned the littlest star, “but the sky is far too bright to nap.”",
+          art: () => svg(nightBg({moon:false}) +
+            starChar({x:200, y:150, scale:2}))
+        },
+        {
+          text: "The kind moon smiled. “I will help you, little one,” she whispered warmly.",
+          art: () => svg(nightBg({moonX:120, moonY:80, moonR:44}) +
+            starChar({x:270, y:170, scale:1.4}))
+        },
+        {
+          text: "One by one, the stars tucked a soft, cozy cloud around their sleepy friend.",
+          art: () => svg(nightBg({moonX:330}) +
+            cloud(120, 180, 1.2) + cloud(300, 200, 1) +
+            starChar({x:200, y:150, scale:1.5}))
+        },
+        {
+          text: "The little star closed her eyes and floated off into the coziest dream.",
+          art: () => svg(nightBg({moonX:200, moonY:70, moonR:46}) +
+            cloud(150, 210, 1.1) +
+            starChar({x:210, y:150, scale:1.6}))
+        },
+        {
+          text: "Goodnight, little star. Goodnight, moon. Goodnight, you too. Sweet dreams.",
+          art: () => svg(nightBg({moonX:300, moonY:64, moonR:40}) +
+            starChar({x:150, y:150, scale:1}) + starChar({x:250, y:200, scale:0.7, color:"#fff3b0"}))
+        },
+        { end: true, text: "The End. ⭐", art: () => endArt("#3a4fb0", [starChar({x:200,y:150,scale:1.8})]) }
+      ]
+    },
+
+    {
+      id: "boo-birthday",
+      title: "Boo the Ghost's Spooky Birthday",
+      color: "#7a3fb0",
+      cover: () => svg(nightBg({moonX:300}) + castle(310,250,0.5) +
+        ghost({x:150,y:150,scale:1.3}) + pumpkin({x:255,y:235,scale:1.1})),
+      pages: [
+        {
+          text: "Guess what? Tonight is Boo the ghost's birthday, and the castle is ready to party!",
+          art: () => svg(nightBg({moonX:330}) + castle(200, 252, 1) +
+            pumpkin({x:80, y:255, scale:1}) + pumpkin({x:320, y:258, scale:0.9}))
+        },
+        {
+          text: "Princess Ellie hung purple streamers while Midnight the cat chased a balloon.",
+          art: () => svg(nightBg({moonX:70}) +
+            kid(Object.assign({x:130, y:245, scale:1.3}, ELLIE)) +
+            cat({x:270, y:248, scale:1.4}))
+        },
+        {
+          text: "The little bats flew in with a big cake lit by flickering pumpkin candles. Yum!",
+          art: () => svg(nightBg({moonX:330}) +
+            bat({x:90, y:90, scale:1}) + bat({x:300, y:80, scale:0.8, color:"#9a7ae0"}) +
+            pumpkin({x:200, y:245, scale:1.3}))
+        },
+        {
+          text: "“Surprise!” Everyone popped out. Boo giggled so hard he did a loop-the-loop!",
+          art: () => svg(nightBg({moon:false}) +
+            ghost({x:200, y:150, scale:1.9}))
+        },
+        {
+          text: "They sang the spooky birthday song, and Boo blew out every candle. Whoosh!",
+          art: () => svg(nightBg({moonX:320}) +
+            kid(Object.assign({x:110, y:245, scale:1.1}, ELLIE)) +
+            ghost({x:210, y:150, scale:1.2}) +
+            pumpkin({x:305, y:250, scale:0.9}))
+        },
+        {
+          text: "“Best. Birthday. EVER!” said Boo, hugging all his friends goodnight. 💜",
+          art: () => svg(nightBg({moonX:200, moonY:72, moonR:44}) + castle(330,255,0.45) +
+            kid(Object.assign({x:120, y:250, scale:1.1}, ELLIE)) +
+            ghost({x:250, y:150, scale:1.1}))
+        },
+        { end: true, text: "The End. 🎂", art: () => endArt("#7a3fb0", [ghost({x:200,y:150,scale:1.4}), pumpkin({x:280,y:210,scale:0.8})]) }
+      ]
     }
   ];
 
@@ -610,12 +969,21 @@
       `</g></g>`;
   }
 
-  // "The End" celebration scene
+  // "The End" celebration scene (night version)
   function endArt(color, characters) {
     return svg(nightBg({moonX:330, moonY:60}) +
       characters.join("") +
       `<text x="200" y="250" text-anchor="middle" font-size="34" font-weight="bold"
         fill="#fff3b0" font-family="Trebuchet MS, sans-serif">🌟 Yay! 🌟</text>`);
+  }
+
+  // "The End" celebration scene (sunny daytime version)
+  function endArtDay(characters) {
+    return svg(dayBg({sunX:70, sunY:56}) + rainbow(200, 120, 0.9) +
+      characters.join("") +
+      `<text x="200" y="255" text-anchor="middle" font-size="34" font-weight="bold"
+        fill="#ffffff" stroke="#ff8ec9" stroke-width="0.7"
+        font-family="Trebuchet MS, sans-serif">🌟 Yay! 🌟</text>`);
   }
 
   /* -----------------------------------------------------------
@@ -645,6 +1013,8 @@
     meow:    () => { tone(620,.25,"sawtooth",0,.1); tone(500,.3,"sawtooth",.12,.1); },
     squeak:  () => { tone(1400,.1,"square",0,.08); tone(1800,.1,"square",.09,.07); },
     boing:   () => { tone(300,.18,"sine"); tone(520,.22,"sine",.1,.12); },
+    neigh:   () => { tone(392,.14,"sawtooth",0,.09); tone(523,.12,"sawtooth",.1,.09); tone(440,.18,"sawtooth",.2,.08); },
+    roar:    () => { tone(150,.3,"sawtooth",0,.11); tone(120,.34,"sawtooth",.12,.09); tone(200,.2,"sine",.05,.06); },
     page:    () => { tone(520,.12,"triangle",0,.08); tone(700,.12,"triangle",.06,.07); },
     yay:     () => { [523,659,784,1047].forEach((f,i)=>tone(f,.3,"triangle",i*0.12,.14)); }
   };

@@ -15,8 +15,14 @@ ever fails to load.)
 
 ## Regenerating after editing story text
 
-The clips are generated straight from the `text:` strings in `../storybook.js`,
-so if you change a story's words, re-render its audio:
+**Easiest: let CI do it.** Pushing a change to `../storybook.js` triggers
+`.github/workflows/build-audio.yml`, which runs the steps below on a GitHub
+runner (open internet — it can download the voice, which the sandbox can't) and
+commits the refreshed `.mp3`s back. You can also run it by hand from the
+Actions tab.
+
+To render them locally instead — the clips are generated straight from the
+`text:` strings in `../storybook.js`, so if you change a story's words:
 
 ```bash
 pip install piper-tts imageio-ffmpeg
