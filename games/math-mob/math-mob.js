@@ -24,13 +24,14 @@
   const defaultSave = () => ({
     coins: 0,
     bestDist: 0,
-    bestCrew: 0,
+    bestCrew: 0,        // biggest mob at any moment during a run (peak)
+    bestEndCrew: 0,     // biggest mob you FINISHED a run with (high score)
     bestLevel: 1,
     level: 1,
     muted: false,
     mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
-    stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0 },
+    stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0, expertBestDist: 0 },
     ach: [],
     skin: "classic",
     skinsOwned: ["classic"],
@@ -58,6 +59,9 @@
   //               into the thousands — a real test for even a huge mob.
   //   levelScale — how much tougher the whole gauntlet gets each level.
   const WALL_GROWTH = 1.6;
+  // Safety ceiling so exponent gates (x²) can't blow the crew count up to
+  // Infinity/NaN — the mob can still get gloriously huge, just not un-printable.
+  const MAX_CREW = 9999999;
   const MODES = {
     easy:   { label: "🌱 Easy",   sub: "add & double", speed: 135, barrier: 0.18,
               levelBase: 300, levelStep: 70,  wallBase: 4,  levelScale: 1.6 },
@@ -65,6 +69,8 @@
               levelBase: 360, levelStep: 90,  wallBase: 5,  levelScale: 1.7 },
     hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 180, barrier: 0.34,
               levelBase: 420, levelStep: 110, wallBase: 8,  levelScale: 1.8 },
+    expert: { label: "🚀 Expert", sub: "x² & √ roots", speed: 205, barrier: 0.38,
+              levelBase: 480, levelStep: 130, wallBase: 12, levelScale: 1.9 },
   };
   const mode = () => MODES[save.mode] || MODES.medium;
 
@@ -97,23 +103,23 @@
   // ---- Upgrade definitions --------------------------------------------
   const UPGRADES = [
     {
-      key: "crew", ico: "👥", name: "Starting Crew", max: 8,
+      key: "crew", ico: "👥", name: "Starting Crew", max: 25,
       desc: l => `Begin each run with ${1 + l} ${1 + l === 1 ? "runner" : "runners"}.`,
       cost: l => 40 + l * 35,
     },
     {
-      key: "coin", ico: "🪙", name: "Coin Boost", max: 6,
+      key: "coin", ico: "🪙", name: "Coin Boost", max: 20,
       desc: l => `Earn ${Math.round((1 + l * 0.25) * 100)}% coins.`,
       cost: l => 60 + l * 45,
     },
     {
-      key: "shield", ico: "🛡️", name: "Shield", max: 3,
+      key: "shield", ico: "🛡️", name: "Shield", max: 12,
       desc: l => l === 0 ? "Shrug off one barrier hit per run."
                          : `Shrug off ${l} barrier hit${l === 1 ? "" : "s"} per run.`,
       cost: l => 90 + l * 70,
     },
     {
-      key: "magnet", ico: "🧲", name: "Coin Magnet", max: 5,
+      key: "magnet", ico: "🧲", name: "Coin Magnet", max: 15,
       desc: l => l === 0 ? "Pull in nearby coins as you run."
                          : `Pull in coins from much farther away (Lv ${l}).`,
       cost: l => 55 + l * 40,
@@ -136,6 +142,7 @@
     { id: "combo6",  ico: "🔥", name: "On Fire",          desc: "Reach a 6× streak.",            ok: s => s.bestCombo >= 6 },
     { id: "spend5",  ico: "🛒", name: "Big Spender",      desc: "Buy 5 upgrades.",               ok: s => s.upgradesBought >= 5 },
     { id: "hard200", ico: "💪", name: "Hard Mode Hero",   desc: "Run 200 m on Hard.",            ok: s => s.hardBestDist >= 200 },
+    { id: "expert200", ico: "🚀", name: "Rocket Scientist", desc: "Run 200 m on Expert (x² & √).", ok: s => s.expertBestDist >= 200 },
   ];
 
   function statsSnapshot() {
@@ -290,15 +297,23 @@
   const pick  = arr => arr[(Math.random() * arr.length) | 0];
 
   function makeOp(type, val) {
-    const COL = { add: "#2e9bd6", mul: "#8a5cff", sub: "#ff7a3d", div: "#ff4d6d" };
+    const COL = { add: "#2e9bd6", mul: "#8a5cff", sub: "#ff7a3d", div: "#ff4d6d",
+                  pow: "#e8477e", root: "#12b5a5" };
     const SY  = { add: "+", mul: "×", sub: "−", div: "÷" };
+    let label;
+    if (type === "pow")       label = val === 2 ? "x²" : val === 3 ? "x³" : "x^" + val;
+    else if (type === "root") label = "√";                 // square root
+    else                      label = SY[type] + val;
     return {
-      type, val, color: COL[type], label: SY[type] + val,
+      type, val, color: COL[type], label,
       apply(n) {
-        if (type === "add") return n + val;
-        if (type === "mul") return n * val;
-        if (type === "sub") return Math.max(0, n - val);
-        return Math.floor(n / val);
+        if (type === "add")  return n + val;
+        if (type === "mul")  return n * val;
+        if (type === "sub")  return Math.max(0, n - val);
+        if (type === "div")  return Math.floor(n / val);
+        if (type === "pow")  return Math.min(MAX_CREW, Math.pow(n, val));   // exponent
+        if (type === "root") return Math.floor(Math.sqrt(n));               // shrinks!
+        return n;
       },
     };
   }
@@ -316,6 +331,16 @@
       else if (r < 0.6)  { a = makeOp("mul", pick([3, 4])); b = makeOp("div", pick([2, 3])); }
       else if (r < 0.8)  { a = makeOp("add", pick([20, 30, 40])); b = makeOp("sub", pick([5, 8, 12])); }
       else               { a = makeOp("mul", pick([2, 3])); b = makeOp("mul", pick([4, 5])); }
+    } else if (save.mode === "expert") {
+      // Toughest of all — exponents and square roots on top of the four ops.
+      // x² rewards a big crew; √ (square root) SHRINKS you, so it's usually a
+      // trap to steer around — the sneaky lesson that roots make numbers smaller.
+      if (r < 0.26)      { a = makeOp("pow", 2);                b = makeOp("add", pick([25, 40, 60, 80])); }   // square vs big add
+      else if (r < 0.46) { a = makeOp("pow", 2);                b = makeOp("mul", pick([3, 4, 5])); }          // square vs times
+      else if (r < 0.64) { a = makeOp("root", 2);               b = makeOp("add", pick([15, 20, 30, 40])); }   // √ trap vs add
+      else if (r < 0.80) { a = makeOp("mul", pick([4, 5, 6]));  b = makeOp("root", 2); }                        // grow vs √ trap
+      else if (r < 0.92) { a = makeOp("mul", pick([2, 3]));     b = makeOp("mul", pick([4, 5])); }
+      else               { a = makeOp("add", pick([40, 50, 60])); b = makeOp("sub", pick([8, 12, 15])); }
     } else {
       // Medium — ramps a little with distance.
       const tier = dist < 200 ? 1 : 2;
@@ -340,6 +365,18 @@
     do { w = pick(cands); } while (w < 0 || w === c);
     return w;
   }
+  // Build a quiz row from an arbitrary question string + its answer (lets the
+  // expert mode ask things like "7²" or "√49" that aren't a plain "a op b").
+  function quizFrom(qText, res) {
+    const wrong = makeWrong(res);
+    const leftCorrect = Math.random() < 0.5;
+    return {
+      qText, answer: res,
+      left: leftCorrect ? res : wrong,
+      right: leftCorrect ? wrong : res,
+      correctSide: leftCorrect ? "L" : "R",
+    };
+  }
   function makeQuiz() {
     let aN, bN, res, sym;
     const r = Math.random();
@@ -350,19 +387,20 @@
       if (r < 0.55)     { aN = rint(2, 12); bN = rint(2, 12); res = aN * bN; sym = "×"; }
       else if (r < 0.8) { bN = rint(2, 9); res = rint(2, 9); aN = bN * res; sym = "÷"; } // aN÷bN
       else              { aN = rint(15, 40); bN = rint(8, 25); res = aN + bN; sym = "+"; }
+    } else if (save.mode === "expert") {
+      // Exponents & square roots front and centre, plus some ×/÷ to keep it spicy.
+      if (r < 0.4) {                                    // squares:  n² = ?
+        const nn = rint(2, 15); return quizFrom(nn + "²", nn * nn);
+      } else if (r < 0.72) {                            // square roots:  √(n²) = ?
+        const nn = rint(2, 15); return quizFrom("√" + (nn * nn), nn);
+      } else if (r < 0.88) { aN = rint(3, 12); bN = rint(3, 12); res = aN * bN; sym = "×"; }
+      else               { bN = rint(2, 9); res = rint(2, 12); aN = bN * res; sym = "÷"; } // aN÷bN
     } else {
       if (r < 0.4)      { aN = rint(5, 25); bN = rint(4, 18); res = aN + bN; sym = "+"; }
       else if (r < 0.7) { aN = rint(2, 5); bN = rint(2, 5); res = aN * bN; sym = "×"; }
       else              { aN = rint(10, 30); bN = rint(1, aN - 1); res = aN - bN; sym = "−"; }
     }
-    const wrong = makeWrong(res);
-    const leftCorrect = Math.random() < 0.5;
-    return {
-      qText: `${aN} ${sym} ${bN}`, answer: res,
-      left: leftCorrect ? res : wrong,
-      right: leftCorrect ? wrong : res,
-      correctSide: leftCorrect ? "L" : "R",
-    };
+    return quizFrom(`${aN} ${sym} ${bN}`, res);
   }
 
   // During the run we only ever spawn the mob-growers: math gates, quiz gates,
@@ -477,6 +515,11 @@
     const distR = Math.round(dist);
     if (distR > save.bestDist) save.bestDist = distR;
     if (bestCrewThisRun > save.bestCrew) save.bestCrew = bestCrewThisRun;
+    // High score: the mob you FINISHED with (0 on a wipeout). Distinct from the
+    // peak-mob stat above — this rewards ending big, not just spiking big.
+    const endCrew = crew;
+    const newEndRecord = endCrew > (save.bestEndCrew || 0);
+    if (newEndRecord) save.bestEndCrew = endCrew;
     if (levelCleared) save.level = level + 1;          // unlock the next level
     const reached = levelCleared ? level + 1 : level;  // "best level reached"
     const newBestLevel = reached > (save.bestLevel || 1);
@@ -486,12 +529,17 @@
     save.stats.runs++;
     save.stats.bestCombo = Math.max(save.stats.bestCombo, bestComboThisRun);
     if (save.mode === "hard") save.stats.hardBestDist = Math.max(save.stats.hardBestDist, distR);
+    if (save.mode === "expert") save.stats.expertBestDist = Math.max(save.stats.expertBestDist, distR);
     const freshBadges = checkAchievements();
     persist();
 
     $("go-level").textContent = level;
     $("go-walls").textContent = wallsSmashedThisRun;
     $("go-crew").textContent = bestCrewThisRun;
+    $("go-end").textContent = endCrew;
+    $("go-endmob").innerHTML = newEndRecord
+      ? `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> — 🏆 new high score!`
+      : `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> <span class="hint">(best ever ${save.bestEndCrew})</span>`;
     $("go-coins").textContent = earned;
     const badgeBox = $("go-badges");
     badgeBox.innerHTML = "";
@@ -704,7 +752,7 @@
     const chosen = onRight ? row.ops[1] : row.ops[0];
     const other  = onRight ? row.ops[0] : row.ops[1];
     const before = crew;
-    crew = Math.max(0, chosen.apply(crew) || 0);   // || 0 guards NaN
+    crew = clamp(chosen.apply(crew) || 0, 0, MAX_CREW);   // || 0 guards NaN, cap guards x² runaway
 
     const delta = crew - before;
     popLabel(delta >= 0 ? 1.4 : 1.2);
@@ -733,7 +781,7 @@
     const side = crewX >= W / 2 ? "R" : "L";
     const before = crew;
     if (side === row.correctSide) {
-      crew = Math.round(crew * 1.3) + 5;
+      crew = Math.min(MAX_CREW, Math.round(crew * 1.3) + 5);
       popLabel(1.5); mobSquash = 1.4;
       combo++;
       save.stats.quizCorrect++;
@@ -1472,7 +1520,8 @@
     $("bank").textContent = save.coins;
     const lv = save.level || 1;
     $("best-line").textContent = save.bestDist
-      ? `Now on Level ${lv} • best Level ${save.bestLevel || 1} • biggest mob ${save.bestCrew}`
+      ? `Now on Level ${lv} • best Level ${save.bestLevel || 1} • biggest mob ${save.bestCrew}` +
+        ` • 🏆 top finish ${save.bestEndCrew || 0}`
       : "Your first run awaits!";
     renderModes();
   }
@@ -1480,7 +1529,7 @@
   function renderModes() {
     const wrap = $("modes");
     wrap.innerHTML = "";
-    for (const key of ["easy", "medium", "hard"]) {
+    for (const key of ["easy", "medium", "hard", "expert"]) {
       const m = MODES[key];
       const btn = document.createElement("button");
       btn.className = "mode-btn" + (save.mode === key ? " sel" : "");
