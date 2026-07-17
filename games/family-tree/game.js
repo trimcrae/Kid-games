@@ -114,6 +114,20 @@
     return state.order.filter((x) => P()[x].parents.indexOf(id) !== -1);
   }
 
+  // Former partners: people this person had a child with but isn't
+  // currently partnered to (an ex they co-parent with). We infer them
+  // from the kids' parents lists, since splitting up drops the partner
+  // link but co-parenthood stays recorded on the children.
+  function coParents(id) {
+    const seen = {};
+    childrenOf(id).forEach((c) => {
+      P()[c].parents.filter(alive).forEach((par) => {
+        if (par !== id) seen[par] = true;
+      });
+    });
+    return Object.keys(seen);
+  }
+
   /* ---------- relationship words (the teaching part) ---------- */
 
   // Map of ancestorId -> how many generations up from `id`.
@@ -714,13 +728,13 @@
     markSel(genderRow, "data-g", form.gender);
     markSel(emojiGrid, "data-e", form.emoji);
 
-    // Adding a child: ask who the other parent is — a partner, or anyone
-    // else in the same generation who isn't a blood relative (an ex, say).
+    // Adding a child: ask who the other parent is — only a current
+    // partner, or a former partner they already co-parent a child with
+    // (an ex). No one else in the generation is a valid other parent.
     if (cfg.mode === "child") {
       const partners = who.partners.filter(alive);
-      const exes = state.order.filter(alive).filter((o) =>
-        o !== cfg.id && P()[o].gen === who.gen &&
-        partners.indexOf(o) === -1 && !bloodPath(cfg.id, o));
+      const exes = coParents(cfg.id).filter((o) =>
+        partners.indexOf(o) === -1);
       const options = partners.concat(exes);
       if (options.length) {
         otherParentField.hidden = false;
