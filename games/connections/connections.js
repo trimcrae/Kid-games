@@ -149,6 +149,126 @@
         { name: "On a track",   color: "purple", items: ["Train", "Tram", "Subway", "Trolley"] },
       ],
     },
+    {
+      name: "Dino Days",
+      emoji: "🦕",
+      groups: [
+        { name: "Dinosaurs",    color: "yellow", items: ["T-Rex", "Stego", "Raptor", "Bronto"] },
+        { name: "Prehistoric",  color: "green",  items: ["Fossil", "Amber", "Bones", "Egg"] },
+        { name: "Big & scary",  color: "blue",   items: ["Roar", "Teeth", "Claws", "Tail"] },
+        { name: "Ways to move", color: "purple", items: ["Stomp", "Chomp", "Swim", "Fly"] },
+      ],
+    },
+    {
+      name: "Rhyme Time",
+      emoji: "🎵",
+      groups: [
+        { name: "Rhymes with CAT", color: "yellow", items: ["Hat", "Bat", "Mat", "Rat"] },
+        { name: "Rhymes with DOG", color: "green",  items: ["Log", "Frog", "Hog", "Fog"] },
+        { name: "Rhymes with BEE", color: "blue",   items: ["Tree", "Key", "Sea", "Knee"] },
+        { name: "Rhymes with CAKE",color: "purple", items: ["Lake", "Snake", "Rake", "Bake"] },
+      ],
+    },
+    {
+      name: "Body & Face",
+      emoji: "🙂",
+      groups: [
+        { name: "On your face",  color: "yellow", items: ["Nose", "Eye", "Ear", "Mouth"] },
+        { name: "On your hand",  color: "green",  items: ["Thumb", "Palm", "Knuckle", "Nail"] },
+        { name: "Bendy joints",  color: "blue",   items: ["Elbow", "Knee", "Wrist", "Ankle"] },
+        { name: "Inside you",    color: "purple", items: ["Heart", "Brain", "Lungs", "Bones"] },
+      ],
+    },
+    {
+      name: "Around the House",
+      emoji: "🏠",
+      groups: [
+        { name: "In the kitchen",  color: "yellow", items: ["Fork", "Spoon", "Plate", "Cup"] },
+        { name: "In the bedroom",  color: "green",  items: ["Bed", "Pillow", "Lamp", "Blanket"] },
+        { name: "In the bathroom", color: "blue",   items: ["Soap", "Towel", "Brush", "Sink"] },
+        { name: "Rooms",           color: "purple", items: ["Garage", "Attic", "Hallway", "Closet"] },
+      ],
+    },
+    {
+      name: "Sweet Treats",
+      emoji: "🍭",
+      groups: [
+        { name: "Candy",        color: "yellow", items: ["Lollipop", "Gummy", "Chocolate", "Taffy"] },
+        { name: "Baked goodies",color: "green",  items: ["Cookie", "Cupcake", "Brownie", "Muffin"] },
+        { name: "Cold desserts",color: "blue",   items: ["Popsicle", "Sundae", "Sorbet", "Gelato"] },
+        { name: "Tastes",       color: "purple", items: ["Sweet", "Sour", "Salty", "Bitter"] },
+      ],
+    },
+    {
+      name: "Super Heroes",
+      emoji: "🦸",
+      groups: [
+        { name: "Superpowers", color: "yellow", items: ["Flying", "Strength", "Speed", "Invisible"] },
+        { name: "Hero gear",   color: "blue",   items: ["Cape", "Mask", "Shield", "Belt"] },
+        { name: "Bad guys",    color: "green",  items: ["Villain", "Robot", "Alien", "Monster"] },
+        { name: "Save the day",color: "purple", items: ["Rescue", "Fight", "Protect", "Win"] },
+      ],
+    },
+    {
+      name: "Garden Grow",
+      emoji: "🌻",
+      groups: [
+        { name: "Flowers",     color: "yellow", items: ["Rose", "Tulip", "Daisy", "Lily"] },
+        { name: "Veggies",     color: "green",  items: ["Carrot", "Pea", "Corn", "Bean"] },
+        { name: "In the dirt", color: "blue",   items: ["Seed", "Root", "Worm", "Bug"] },
+        { name: "Garden tools",color: "purple", items: ["Rake", "Hose", "Shovel", "Gloves"] },
+      ],
+    },
+    {
+      name: "Music Makers",
+      emoji: "🎸",
+      groups: [
+        { name: "String instruments", color: "yellow", items: ["Guitar", "Violin", "Harp", "Cello"] },
+        { name: "You blow them",      color: "green",  items: ["Flute", "Trumpet", "Tuba", "Whistle"] },
+        { name: "You hit them",       color: "blue",   items: ["Drum", "Cymbal", "Bell", "Xylophone"] },
+        { name: "Music words",        color: "purple", items: ["Note", "Beat", "Song", "Tune"] },
+      ],
+    },
+    {
+      name: "Opposites",
+      emoji: "↔️",
+      groups: [
+        { name: "Size words",  color: "yellow", items: ["Big", "Small", "Tall", "Short"] },
+        { name: "Feeling hot & cold", color: "green", items: ["Hot", "Cold", "Warm", "Cool"] },
+        { name: "Fast or slow",color: "blue",   items: ["Fast", "Slow", "Quick", "Lazy"] },
+        { name: "Up & down",   color: "purple", items: ["Up", "Down", "High", "Low"] },
+      ],
+    },
+    {
+      name: "Job Squad",
+      emoji: "👩‍🚒",
+      groups: [
+        { name: "They help you", color: "yellow", items: ["Doctor", "Nurse", "Dentist", "Vet"] },
+        { name: "Keep us safe",  color: "green",  items: ["Police", "Firefighter", "Guard", "Lifeguard"] },
+        { name: "At school",     color: "blue",   items: ["Teacher", "Principal", "Coach", "Librarian"] },
+        { name: "They build & fix", color: "purple", items: ["Builder", "Plumber", "Farmer", "Chef"] },
+      ],
+    },
+    {
+      name: "Camping Trip",
+      emoji: "🏕️",
+      groups: [
+        { name: "Bring these",   color: "yellow", items: ["Tent", "Sleeping bag", "Flashlight", "Backpack"] },
+        { name: "By the fire",   color: "green",  items: ["Marshmallow", "Logs", "Sparks", "Smoke"] },
+        { name: "In the woods",  color: "blue",   items: ["Trail", "River", "Rock", "Deer"] },
+        { name: "Night sky",     color: "purple", items: ["Stars", "Moon", "Owl", "Bat"] },
+      ],
+    },
+    {
+      name: "Rainbow Colours",
+      emoji: "🌈",
+      groups: [
+        { name: "Warm colours",  color: "yellow", items: ["Red", "Orange", "Yellow", "Pink"] },
+        { name: "Cool colours",  color: "green",  items: ["Blue", "Green", "Purple", "Teal"] },
+        { name: "Shades of grey",color: "blue",   items: ["Black", "White", "Grey", "Silver"] },
+        { name: "Sparkly stuff", color: "purple", items: ["Gold", "Glitter", "Shine", "Gem"] },
+      ],
+    },
   ];
 
   const MAX_MISTAKES = 4;
