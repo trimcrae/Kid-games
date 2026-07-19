@@ -46,7 +46,7 @@ const GAMES = [
   {
     title: "Family Tree",
     emoji: "🌳",
-    blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever — and learn words like nephew, great-grandma & 2nd cousin. One shared tree for everyone!",
+    blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever — and learn words like nephew, great-grandma & 2nd cousin. One shared tree for everyone — and you can print it as a poster to hang up!",
     url:   "games/family-tree/",
     ages:  "3+",
     kids:  ["jeannie","cory","ellie"],
