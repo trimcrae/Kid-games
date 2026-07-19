@@ -151,6 +151,44 @@
       .person .face { font-size: 2rem; }
       .emoji-grid { grid-template-columns: repeat(6, 1fr); }
     }
+
+    /* ---------- print ----------
+       #print-area is filled by buildPrint() in game.js: the whole tree
+       re-laid out at full size, scaled to fit the paper, and split into
+       page-sized pieces (cut only between generations) for big families. */
+    #print-area { display: none; }
+    @media print {
+      body { background: #fff; }
+      body > :not(#print-area) { display: none !important; }
+      #print-area { display: block; }
+      #print-area * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+      .print-page { break-after: page; page-break-after: always; }
+      .print-page.last { break-after: auto; page-break-after: auto; }
+      .print-page.solo .print-clip { margin: 0 auto; }
+
+      .print-header { text-align: center; height: 74px; margin-bottom: 14px; }
+      .print-header h1 { margin: 0; font-size: 1.7rem; color: var(--ink); }
+      .print-header p { margin: 3px 0 0; font-weight: 700; color: #6b6383; font-size: 0.85rem; }
+
+      /* contain: strict stops the huge inner canvas's layout overflow from
+         reaching the page box — without it Chromium "shrink-to-fit"s every
+         sheet down to ~66% even though the overflow is clipped. */
+      .print-clip { position: relative; overflow: hidden; contain: strict; }
+      .print-canvas { position: absolute; transform-origin: 0 0; }
+      /* dashed edges show where the poster continues on another sheet */
+      .print-clip.cut-r { border-right: 2px dashed #b9b2d0; }
+      .print-clip.cut-l { border-left: 2px dashed #b9b2d0; }
+      .print-clip.cut-t { border-top: 2px dashed #b9b2d0; }
+      .print-clip.cut-b { border-bottom: 2px dashed #b9b2d0; }
+
+      .print-footer {
+        text-align: center; margin-top: 4px;
+        font-size: 0.7rem; font-weight: 700; color: #6b6383;
+      }
+
+      #print-area .person { box-shadow: none; transition: none; cursor: default; }
+    }
   </style>
 </head>
 <body>
@@ -175,6 +213,7 @@
         <button class="ft-btn" id="zoom-out" aria-label="Zoom out">➖</button>
         <button class="ft-btn" id="zoom-in" aria-label="Zoom in">➕</button>
       </span>
+      <button class="ft-btn" id="print-btn">🖨️ Print</button>
       <button class="ft-btn danger" id="reset-btn">🔄 Start over</button>
     </div>
 
@@ -188,8 +227,12 @@
 
     <p class="ft-hint">Tap anyone to add their mom, dad, partner, kids, brothers &amp; sisters —
     keep growing the tree forever! Pick who <strong>you</strong> are up top to learn the special
-    word for how each person is related to you. One tree for the whole family, saved on this device. 💾</p>
+    word for how each person is related to you. One tree for the whole family, saved on this device. 💾
+    Press 🖨️ <strong>Print</strong> to turn the tree into a poster you can hang up!</p>
   </main>
+
+  <!-- print-only layout, built by game.js just before printing -->
+  <div id="print-area"></div>
 
   <!-- action sheet: tap a person -->
   <div class="overlay" id="action-overlay" hidden>

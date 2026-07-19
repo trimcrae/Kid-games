@@ -402,7 +402,7 @@
 
   function cx(id, pos) { return pos[id].x + CW / 2; }
 
-  function drawEdges(layout) {
+  function edgeMarkup(layout) {
     const pos = layout.pos;
     let out = "";
 
@@ -476,9 +476,13 @@
              '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>';
     });
 
+    return out;
+  }
+
+  function drawEdges(layout) {
     svg.setAttribute("width", layout.width);
     svg.setAttribute("height", layout.height);
-    svg.innerHTML = out;
+    svg.innerHTML = edgeMarkup(layout);
   }
 
   function esc(s) {
@@ -874,6 +878,131 @@
   window.addEventListener("keydown", (e) => {
     if (e.key === "Escape") { form = null; closeAll(); }
   });
+
+  /* ---------- print ----------
+     Re-lay the tree out at full card size, scale it to fit the paper and
+     split it into page-sized pieces. Small trees fit one sheet; a huge
+     family becomes a multi-sheet poster, cut only in the gap between
+     generations (never through a card) with dashed tape-together edges. */
+
+  const printArea = document.getElementById("print-area");
+
+  // Conservative printable size in CSS px (fits US Letter and A4 at 10mm margins).
+  const PAGE = {
+    landscape: { w: 960, h: 680 },
+    portrait: { w: 720, h: 920 }
+  };
+  const HEADER_H = 92;      // title block on the first sheet
+  const FIT_MIN = 0.5;      // below this, one sheet wide is unreadably tiny…
+  const POSTER_SCALE = 0.75; // …so tile sheets at this comfy scale instead
+
+  function ensurePrintPageStyle() {
+    let el = document.getElementById("print-page-style");
+    if (!el) {
+      el = document.createElement("style");
+      el.id = "print-page-style";
+      document.head.appendChild(el);
+    }
+    return el;
+  }
+
+  function buildPrint() {
+    // Layout at full card size no matter what the screen is doing.
+    const ow = CW, oh = CH;
+    CW = 112; CH = 128;
+    const layout = computeLayout();
+
+    const cards = state.order.filter(alive).map((id) => {
+      const p = P()[id];
+      const at = layout.pos[id];
+      if (!at) return "";
+      const rel = state.me ? relationLabel(state.me, id) : "";
+      return '<div class="person' + (id === state.me ? " is-me" : "") +
+        '" style="left:' + at.x + "px;top:" + at.y + "px;border-color:" + genColor(p.gen) + '">' +
+        (id === state.me ? '<span class="you-star">⭐</span>' : "") +
+        '<span class="face">' + p.emoji + "</span>" +
+        '<span class="pname">' + esc(p.name) + "</span>" +
+        '<span class="rel"' + (rel ? ' style="background:' + genColor(p.gen) + '"' : "") + ">" +
+        esc(rel) + "</span></div>";
+    }).join("");
+
+    const treeHTML =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' + layout.width + '" height="' + layout.height +
+      '" style="position:absolute;top:0;left:0">' + edgeMarkup(layout) + "</svg>" + cards;
+
+    // Trees are usually wide, so lie the paper down when the tree is.
+    const landscape = layout.width >= layout.height;
+    const page = landscape ? PAGE.landscape : PAGE.portrait;
+    ensurePrintPageStyle().textContent =
+      "@page { size: " + (landscape ? "landscape" : "portrait") + "; margin: 10mm; }";
+
+    // Scale to fit one sheet wide, or tile sheets sideways for huge trees.
+    let scale = Math.min(1, page.w / layout.width);
+    let cols = 1;
+    if (scale < FIT_MIN) {
+      cols = Math.ceil(layout.width * POSTER_SCALE / page.w);
+      scale = Math.min(0.9, cols * page.w / layout.width); // grow into the last sheet
+    }
+
+    // Safe horizontal cut lines: late in the gap between generations, past
+    // the sibling bus lines (busY ≤ VGAP*0.45 + stagger below the parents)
+    // so only the vertical drops to the kids cross a sheet edge.
+    const cutPoints = layout.rows.slice(1).map((row) =>
+      MARGIN + row.idx * (CH + VGAP) - VGAP * 0.2
+    ).concat([layout.height]);
+
+    // Greedily group generations into page-height slices.
+    const groups = [];
+    let top = 0, k = 0;
+    while (top < layout.height - 1) {
+      const budget = (groups.length === 0 ? page.h - HEADER_H : page.h) / scale;
+      let end = top;
+      while (k < cutPoints.length && cutPoints[k] - top <= budget) { end = cutPoints[k]; k++; }
+      if (end === top) end = Math.min(layout.height, top + budget); // fallback: never loop
+      groups.push({ top: top, h: end - top });
+      top = end;
+    }
+
+    CW = ow; CH = oh;
+
+    const total = groups.length * cols;
+    const n = state.order.filter(alive).length;
+    let sub = n + " people strong · " +
+      new Date().toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+    if (total > 1) sub += " · ✂️ " + total + " sheets — tape them together to make a giant poster!";
+
+    let html = "";
+    let piece = 0;
+    groups.forEach((g, gi) => {
+      for (let c = 0; c < cols; c++) {
+        piece++;
+        const w = Math.min(page.w, Math.ceil(layout.width * scale) - c * page.w);
+        const clipCls = "print-clip" +
+          (c > 0 ? " cut-l" : "") + (c < cols - 1 ? " cut-r" : "") +
+          (gi > 0 ? " cut-t" : "") + (gi < groups.length - 1 ? " cut-b" : "");
+        html += '<div class="print-page' + (piece === total ? " last" : "") +
+          (total === 1 ? " solo" : "") + '">';
+        if (gi === 0 && c === 0) {
+          html += '<div class="print-header"><h1>🌳 Our Family Tree</h1><p>' + esc(sub) + "</p></div>";
+        }
+        html += '<div class="' + clipCls + '" style="width:' + w + "px;height:" + Math.ceil(g.h * scale) + 'px">' +
+          '<div class="print-canvas" style="width:' + layout.width + "px;height:" + layout.height +
+          "px;transform:scale(" + scale + ");left:" + (-c * page.w) + "px;top:" + (-g.top * scale) + 'px">' +
+          treeHTML + "</div></div>";
+        if (total > 1) html += '<div class="print-footer">🌳 Our Family Tree · sheet ' + piece + " of " + total + "</div>";
+        html += "</div>";
+      }
+    });
+    printArea.innerHTML = html;
+  }
+
+  document.getElementById("print-btn").addEventListener("click", () => {
+    buildPrint();
+    window.print();
+  });
+  // Ctrl/Cmd+P without the button still gets the nice layout.
+  window.addEventListener("beforeprint", buildPrint);
+  window.addEventListener("afterprint", () => { printArea.innerHTML = ""; });
 
   document.getElementById("reset-btn").addEventListener("click", () => {
     askConfirm("Start the tree over?",
