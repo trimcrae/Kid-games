@@ -82,6 +82,55 @@
       to { transform: scale(1.8); opacity: 0; }
     }
 
+    /* count-the-dots mode: bubbles full of countable dots */
+    .bubble.dot-bubble {
+      flex-wrap: wrap;
+      gap: 8%;
+      padding: 14%;
+      box-sizing: border-box;
+      align-content: center;
+    }
+    .bubble.dot-bubble .dot {
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      flex: 0 0 auto;
+    }
+
+    /* praise words that float up from a popped bubble */
+    .praise-float {
+      position: absolute;
+      transform: translate(-50%, 0);
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: var(--purple);
+      text-shadow: 0 2px 0 #fff, 0 3px 8px rgba(43,36,64,0.25);
+      pointer-events: none;
+      z-index: 6;
+      white-space: nowrap;
+      animation: praise-up 0.85s ease-out forwards;
+    }
+    .praise-float.big { font-size: 1.6rem; color: var(--pink); }
+    @keyframes praise-up {
+      0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
+      20%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+      100% { opacity: 0; transform: translate(-50%, -56px) scale(1); }
+    }
+
+    /* the clock turns urgent for the last 10 seconds */
+    .scoreboard span.time-low {
+      color: #e23b3b;
+      animation: time-pulse 1s ease infinite;
+      display: inline-block;
+    }
+    @keyframes time-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    .stars-line { margin: 0; font-size: 1.6rem; min-height: 1em; }
+
     /* little splash particles when a bubble pops */
     .splash {
       position: absolute;
@@ -178,7 +227,7 @@
     <h1 class="title">🫧 Number Bubble Pop</h1>
   </header>
 
-  <p style="text-align:center; font-size:1.5rem; font-weight:bold; color:var(--ink); margin:0 0 0.25rem;">
+  <p style="text-align:center; font-size:1.5rem; font-weight:bold; color:var(--ink); margin:0 0 0.25rem;" aria-live="polite">
     <span id="target-label">Pop the number:</span> <span id="target" style="color:var(--pink); font-size:2rem;">?</span>
   </p>
 
@@ -199,8 +248,10 @@
         <button class="level-btn" data-level="easy" aria-pressed="false">Easy<small>1–5</small></button>
         <button class="level-btn" data-level="normal" aria-pressed="true">Normal<small>1–9</small></button>
         <button class="level-btn" data-level="hard" aria-pressed="false">Hard<small>1–20</small></button>
+        <button class="level-btn" data-level="count" aria-pressed="false">Dots<small>count 1–5</small></button>
         <button class="level-btn" data-level="abc" aria-pressed="false">ABC<small>letters</small></button>
       </div>
+      <p class="stars-line" id="stars-line"></p>
       <p class="best-line" id="best-line"></p>
       <button class="btn" id="start-btn">Start Game ▶</button>
     </div>
