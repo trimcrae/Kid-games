@@ -76,6 +76,10 @@
       transition: opacity 0.15s ease, transform 0.15s ease;
     }
     .hud .combo.on { opacity: 1; transform: scale(1); }
+    .hud .combo.fever {
+      background: rgba(232, 162, 0, 0.95);
+      box-shadow: 0 0 14px rgba(255, 209, 102, 0.9);
+    }
 
     /* Sound toggle — always reachable in the corner */
     .mute-btn {
@@ -286,9 +290,10 @@
     <div class="overlay" id="menu">
       <h2>🏃 Math Mob Run</h2>
       <p>Swipe (or use ← →) to steer your crew through the gate that makes the
-         <b>biggest</b> mob. Answer ❓ quiz gates and build a 🔥 streak, then at
-         each level's finish line <b>smash through 🧱 brick walls</b> — every
-         wall eats part of your crew, so grow it big! See how far you get. 🧠</p>
+         <b>biggest</b> mob. Answer ❓ quiz gates and build a 🔥 streak — 5 in a
+         row starts 🌟 <b>COIN FEVER</b> (double coins)! At each level's finish
+         line <b>smash through 🧱 brick walls</b>, and every level runs through
+         a new land. See how far you get. 🧠</p>
       <div class="coinbar">🪙 <span id="bank">0</span> coins</div>
       <div class="modes" id="modes"></div>
       <button class="btn" id="play-btn">Play ▶</button>

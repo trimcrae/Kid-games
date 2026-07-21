@@ -39,6 +39,29 @@
   // Milestones to chase — gives the game a goal to play toward.
   const GOALS = [1000, 10000, 100000, 1000000, 1000000000];
 
+  // Challenge trophies — real compound-interest lessons dressed as quests.
+  // Each is checked after every year and stays won forever (localStorage).
+  const CHALLENGES = [
+    { id: "int1k",  emoji: "💸", name: "Free-Money Finder",
+      desc: "Earn $1,000 of interest in one machine.",
+      ok: (s) => s.interest >= 1000 },
+    { id: "beatpig", emoji: "🐷", name: "Beat the Piggy",
+      desc: "Earn MORE interest than all the money you put in.",
+      ok: (s) => s.year > 0 && s.interest > s.putIn },
+    { id: "nofeed", emoji: "🌱", name: "Money Gardener",
+      desc: "Grow your start money 10× without adding a penny.",
+      ok: (s) => s.add === 0 && s.year > 0 && s.balance >= s.start * 10 },
+    { id: "year30", emoji: "⏳", name: "Patience Pays",
+      desc: "Keep one machine running for 30 years.",
+      ok: (s) => s.year >= 30 },
+    { id: "mill50", emoji: "🚀", name: "Millionaire by 50",
+      desc: "Reach $1,000,000 by year 50.",
+      ok: (s) => s.balance >= 1000000 && s.year <= 50 },
+  ];
+  const TROPHY_KEY = "money-machine-trophies";
+  let trophies = {};
+  try { trophies = JSON.parse(localStorage.getItem(TROPHY_KEY)) || {}; } catch (e) {}
+
   const MAX_YEARS = 60;
 
   const $ = (id) => document.getElementById(id);
@@ -64,6 +87,8 @@
   let playTimer = null;
   let tweenRAF = null;
   let celebrated = {};     // which goals we've already partied for
+  let snowballed = false;  // did we celebrate the "snowball moment" yet?
+  let doublings = 0;       // how many times the money has doubled this machine
 
   // ---- Money formatting ----
   function money(n) {
@@ -135,6 +160,8 @@
     putIn = +startAmt.value;
     history = [{ year: 0, balance: balance, putIn: putIn }];
     celebrated = {};
+    snowballed = false;
+    doublings = 0;
 
     // clear chart
     const chart = $("chart");
@@ -147,7 +174,24 @@
     setTicker(balance, putIn);
     $("tickerYear").textContent = "Year 0 — press ▶ Next Year!";
     updateGoal(true);
+    updateDoubleLine();
     drawBuyShelf(balance);
+    drawTrophies();
+  }
+
+  // ---- Rule of 72 — "when does my money double?" ----
+  function updateDoubleLine() {
+    const el = $("doubleLine");
+    if (!el) return;
+    const rate = selectedPlace.rate;
+    if (rate <= 0) {
+      el.innerHTML = "🐷 At 0% your money <b>never doubles by itself</b> — try the bank!";
+    } else {
+      const yrs = Math.round(72 / (rate * 100));
+      el.innerHTML = "✨ Rule of 72: at " + selectedPlace.note.replace("!", "") +
+        " your money <b>doubles about every " + yrs + " years</b>" +
+        (doublings > 0 ? " — it has doubled <b>" + doublings + "×</b> already!" : "!");
+    }
   }
 
   // ---- Set the big ticker instantly ----
@@ -183,11 +227,30 @@
 
     const prevBal = balance;
     const prevPut = putIn;
+    const yearlyInterest = balance * selectedPlace.rate;
 
     balance = balance * (1 + selectedPlace.rate) + (+addAmt.value);
     putIn  += (+addAmt.value);
     year++;
     history.push({ year: year, balance: balance, putIn: putIn });
+
+    // 💥 Doubling moments: interest has made the pot 2×, 4×, 8×… what you put in.
+    while (balance >= putIn * Math.pow(2, doublings + 1)) {
+      doublings++;
+      flashGoal("💥 DOUBLED! Your pot is now " + Math.pow(2, doublings) +
+        "× the money you put in!");
+      window.SFX && SFX.coin();
+    }
+
+    // 🤯 The snowball moment: interest now adds more each year than YOU do.
+    if (!snowballed && +addAmt.value > 0 && yearlyInterest > +addAmt.value) {
+      snowballed = true;
+      flashGoal("🤯 Snowball! Interest now adds more each year than you do!");
+      coinRain();
+      window.SFX && SFX.win && SFX.win();
+    }
+
+    checkChallenges();
 
     // remove the empty placeholder on first real year
     const empty = $("chartEmpty");
@@ -199,6 +262,7 @@
     $("tickerYear").textContent = "Year " + year +
       "  •  " + selectedPlace.emoji + " " + selectedPlace.note + " a year";
     updateGoal(false);
+    updateDoubleLine();
     drawBuyShelf(balance);
 
     if (year >= MAX_YEARS) {
@@ -313,6 +377,50 @@
     });
   }
 
+  // ---- Challenge trophies ----
+  function checkChallenges() {
+    const snap = {
+      year: year,
+      balance: balance,
+      putIn: putIn,
+      interest: Math.max(0, balance - putIn),
+      start: +startAmt.value,
+      add: +addAmt.value,
+    };
+    let won = null;
+    CHALLENGES.forEach((c) => {
+      if (!trophies[c.id] && c.ok(snap)) {
+        trophies[c.id] = true;
+        won = c;
+      }
+    });
+    if (won) {
+      try { localStorage.setItem(TROPHY_KEY, JSON.stringify(trophies)); } catch (e) {}
+      flashGoal("🏆 Trophy won: " + won.emoji + " " + won.name + "!");
+      coinRain();
+      window.SFX && SFX.win && SFX.win();
+      window.Confetti && Confetti.burst({ count: 110 });
+      drawTrophies();
+    }
+  }
+
+  function drawTrophies() {
+    const grid = $("trophyGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    CHALLENGES.forEach((c) => {
+      const got = !!trophies[c.id];
+      const el = document.createElement("div");
+      el.className = "trophy " + (got ? "won" : "todo");
+      el.innerHTML =
+        '<span class="temoji">' + (got ? "🏆" : c.emoji) + "</span>" +
+        '<span class="tinfo"><b>' + c.name + "</b>" +
+        '<small>' + c.desc + "</small></span>" +
+        '<span class="tstate">' + (got ? "✓" : "···") + "</span>";
+      grid.appendChild(el);
+    });
+  }
+
   // ---- Coin rain celebration ----
   function coinRain() {
     const card = $("tickerCard");
@@ -349,7 +457,11 @@
   }
 
   // ---- Wire up buttons ----
-  nextBtn.addEventListener("click", () => { stopPlay(); advanceYear(); });
+  nextBtn.addEventListener("click", () => {
+    stopPlay();
+    window.SFX && SFX.pop && SFX.pop();
+    advanceYear();
+  });
   playBtn.addEventListener("click", togglePlay);
   resetBtn.addEventListener("click", reset);
 

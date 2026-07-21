@@ -102,6 +102,13 @@
       transition: width 0.5s ease;
     }
 
+    .double-line {
+      margin-top: 0.45rem;
+      font-size: 0.82rem;
+      color: #bfe0ff;
+    }
+    .double-line b { color: #ffe9a8; }
+
     .coin-rain {
       position: absolute;
       top: -30px;
@@ -288,6 +295,35 @@
       color: var(--green);
     }
 
+    /* --- Challenge trophies --- */
+    .trophy-card {
+      background: var(--paper);
+      border-radius: 18px;
+      padding: 0.7rem 0.9rem 0.9rem;
+      box-shadow: 0 6px 18px rgba(43, 36, 64, 0.1);
+      margin-top: 0.8rem;
+    }
+    .trophy-card h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--ink); }
+    .trophy-grid { display: grid; gap: 0.45rem; }
+    .trophy {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #fff;
+      border: 3px solid #f0eefc;
+      border-radius: 14px;
+      padding: 0.45rem 0.6rem;
+      text-align: left;
+    }
+    .trophy.won { border-color: var(--yellow); background: #fffaf0; }
+    .trophy.todo { opacity: 0.72; }
+    .trophy .temoji { font-size: 1.6rem; line-height: 1; }
+    .trophy .tinfo { flex: 1; min-width: 0; }
+    .trophy .tinfo b { display: block; font-size: 0.9rem; }
+    .trophy .tinfo small { color: #6a6385; font-size: 0.76rem; }
+    .trophy .tstate { font-weight: bold; color: var(--green); font-size: 1.05rem; }
+    .trophy.todo .tstate { color: #b9b3cc; }
+
     /* --- Lesson (collapsible to save space) --- */
     .lesson {
       background: #eef6ff;
@@ -333,6 +369,7 @@
         <span id="goalText">🎯 Next goal: $1,000</span>
         <span class="gbar"><span class="gfill" id="goalFill"></span></span>
       </div>
+      <div class="double-line" id="doubleLine"></div>
     </div>
 
     <!-- CHART (grows year by year) -->
@@ -374,6 +411,12 @@
     <div class="buy-card">
       <h3>🛒 What could you buy right now?</h3>
       <div class="buy-strip" id="buyGrid"></div>
+    </div>
+
+    <!-- CHALLENGE TROPHIES -->
+    <div class="trophy-card">
+      <h3>🏆 Money challenges</h3>
+      <div class="trophy-grid" id="trophyGrid"></div>
     </div>
 
     <!-- LESSON -->

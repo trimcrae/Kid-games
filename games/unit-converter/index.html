@@ -107,6 +107,54 @@
     }
     .fact b { color: #b8791f; }
 
+    /* --- "× n" relationship hints in the table --- */
+    .row .u-rel {
+      display: block; font-size: 0.72rem; font-weight: normal;
+      color: #35a06b; margin-top: 0.05rem;
+    }
+    .row .u-rel sup { font-size: 0.68em; }
+
+    /* --- Quiz mode --- */
+    .quiz-card {
+      background: linear-gradient(160deg, #4a2a7a, #6f47e0);
+      border-radius: 18px; padding: 0.8rem 1rem 1rem;
+      margin-top: 0.8rem; color: #f3edff;
+      box-shadow: 0 10px 28px rgba(111, 71, 224, 0.35);
+    }
+    .quiz-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 0.6rem; flex-wrap: wrap;
+    }
+    .quiz-head h3 { margin: 0; font-size: 1.05rem; }
+    .quiz-score { font-size: 0.85rem; font-weight: bold; color: #ffe9a8; }
+    .quiz-q {
+      font-size: 1.15rem; font-weight: bold; margin: 0.6rem 0 0.7rem;
+      line-height: 1.35;
+    }
+    .quiz-answers { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .quiz-answers button, .quiz-next, .quiz-start {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 1.1rem; padding: 0.75rem 1rem; border-radius: 14px;
+      background: #fff; color: #4a2a7a; flex: 1 1 28%;
+      min-width: 90px; min-height: 52px;
+      box-shadow: 0 5px 14px rgba(20, 10, 50, 0.25);
+      transition: transform 0.1s ease, background 0.15s ease;
+      touch-action: manipulation;
+    }
+    .quiz-answers button:active { transform: scale(0.95); }
+    .quiz-answers button:disabled { cursor: default; }
+    .quiz-answers button.right { background: var(--green); color: #fff; }
+    .quiz-answers button.wrong { background: #ff6b85; color: #fff; opacity: 0.9; }
+    .quiz-answers button.dim { opacity: 0.45; }
+    .quiz-start { flex: 0 1 auto; background: var(--yellow); color: #7a5400; }
+    .quiz-next { margin-top: 0.6rem; background: var(--yellow); color: #7a5400; flex: none; }
+    .quiz-feedback {
+      margin-top: 0.6rem; font-size: 0.92rem; line-height: 1.4;
+      background: rgba(255,255,255,0.14); border-radius: 12px; padding: 0.5rem 0.7rem;
+    }
+    .quiz-feedback b { color: #ffe9a8; }
+    .quiz-streak { font-size: 0.85rem; font-weight: bold; margin-top: 0.5rem; color: #d9ccff; }
+
     .lesson {
       background: #eef6ff; border-radius: 16px; padding: 0.6rem 1rem;
       margin-top: 0.8rem; font-size: 0.9rem; line-height: 1.45;
@@ -149,6 +197,16 @@
 
     <div class="fact" id="fact"></div>
 
+    <!-- QUIZ MODE -->
+    <div class="quiz-card">
+      <div class="quiz-head">
+        <h3>🎯 Unit Quiz</h3>
+        <span class="quiz-score">⭐ <span id="quizStars">0</span> stars
+          &nbsp;·&nbsp; 🔥 best streak <span id="quizBest">0</span></span>
+      </div>
+      <div id="quizBody"></div>
+    </div>
+
     <details class="lesson">
       <summary>🧠 How does converting units work?</summary>
       <p>Every measurement can be written in <b>lots of different units</b>. 3 feet, 1 yard,
@@ -163,6 +221,7 @@
   </div>
 
   <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

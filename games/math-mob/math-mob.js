@@ -31,7 +31,7 @@
     muted: false,
     mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
-    stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0, expertBestDist: 0 },
+    stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0, expertBestDist: 0, fevers: 0, coinsEarned: 0 },
     ach: [],
     skin: "classic",
     skinsOwned: ["classic"],
@@ -73,6 +73,28 @@
               levelBase: 480, levelStep: 130, wallBase: 12, levelScale: 1.9 },
   };
   const mode = () => MODES[save.mode] || MODES.medium;
+
+  // ---- Level themes ----------------------------------------------------
+  // Every level runs through a different land, cycling round the world tour.
+  // Purely visual (grass / track / tree palettes) — but it makes "one more
+  // level" feel like a real journey instead of the same green field forever.
+  const THEMES = [
+    { name: "Sunny Meadow",  e: "🌳", grass: ["#8ed79b", "#71c684"], road: ["#cdecfb", "#bbe4fa", "#a9dcf7"],
+      trees: ["#5bbf6a", "#4aa85b", "#6fd07e", "#3f9e52"], deco: "#ffd5e6" },
+    { name: "Sandy Desert",  e: "🌵", grass: ["#f0d99a", "#e2c37a"], road: ["#ffe8c4", "#f9ddb0", "#f2d29e"],
+      trees: ["#4f9e5c", "#3f8b4d", "#63b06f", "#377f44"], deco: "#ff8fa3" },
+    { name: "Frosty Peaks",  e: "❄️", grass: ["#e8f5fd", "#cfe7f6"], road: ["#f4fbff", "#e4f4fd", "#d3ecfb"],
+      trees: ["#3d7d63", "#2f6b52", "#4c8f72", "#28604a"], deco: "#ffffff" },
+    { name: "Lava Caverns",  e: "🌋", grass: ["#6b4a52", "#57383f"], road: ["#96524b", "#874842", "#783e38"],
+      trees: ["#9a5637", "#8a4a2f", "#763e26", "#68351f"], deco: "#ffb14d" },
+    { name: "Candy Kingdom", e: "🍭", grass: ["#ffd9ec", "#ffc2e0"], road: ["#fff2f8", "#ffe4f1", "#ffd7ea"],
+      trees: ["#ff8fc0", "#f477ae", "#ff9fca", "#e668a0"], deco: "#ffffff" },
+  ];
+  const theme = () => THEMES[((level || 1) - 1) % THEMES.length];
+
+  // Coin fever — hold a hot streak and every coin is worth double.
+  const FEVER_AT = 5;
+  const inFever = () => combo >= FEVER_AT;
 
   // Respect "reduce motion" (skip screen shake, fewer particles), and add
   // a gentle phone buzz on big moments.
@@ -143,6 +165,9 @@
     { id: "spend5",  ico: "🛒", name: "Big Spender",      desc: "Buy 5 upgrades.",               ok: s => s.upgradesBought >= 5 },
     { id: "hard200", ico: "💪", name: "Hard Mode Hero",   desc: "Run 200 m on Hard.",            ok: s => s.hardBestDist >= 200 },
     { id: "expert200", ico: "🚀", name: "Rocket Scientist", desc: "Run 200 m on Expert (x² & √).", ok: s => s.expertBestDist >= 200 },
+    { id: "level10", ico: "🗼", name: "World Tour",       desc: "Reach Level 10 and see every land.", ok: s => s.bestLevel >= 10 },
+    { id: "fever3",  ico: "🌟", name: "Fever Dream",      desc: "Start coin fever 3 times (5× streak).", ok: s => s.fevers >= 3 },
+    { id: "coins1k", ico: "💰", name: "Coin Collector",   desc: "Earn 1,000 coins in total.",    ok: s => s.coinsEarned >= 1000 },
   ];
 
   function statsSnapshot() {
@@ -239,6 +264,7 @@
     bad()   { tone(300, 0.22, "sawtooth", 0.3, 110); },
     barrier(){ noise(0.25, 0.5, 700); tone(150, 0.18, "square", 0.25, 80); },
     bossWin(){ [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.18, "square", 0.28, null, i * 0.07)); noise(0.4, 0.4, 1600); },
+    fever() { [660, 880, 1100, 1320].forEach((f, i) => tone(f, 0.09, "triangle", 0.26, null, i * 0.055)); },
     lose()  { tone(440, 0.6, "sawtooth", 0.35, 70); noise(0.5, 0.35, 500); },
   };
   function applyMuteUI() { muteBtn.textContent = save.muted ? "🔇" : "🔊"; }
@@ -458,6 +484,25 @@
     coins.push({ x: rand(W * 0.12, W * 0.88), y: -16, r: 11, got: false });
   }
 
+  // Sometimes a lone coin, sometimes a trail or an arc — steering through a
+  // whole line of coins feels great and rewards committing to a lane.
+  function spawnCoins() {
+    const r = Math.random();
+    if (r < 0.45) { spawnCoin(); return; }
+    const x = rand(W * 0.16, W * 0.84);
+    if (r < 0.8) {                       // straight trail down one lane
+      for (let i = 0; i < 4; i++) coins.push({ x, y: -16 - i * 34, r: 11, got: false });
+    } else {                             // gentle arc to swerve through
+      for (let i = 0; i < 5; i++) {
+        const t = i / 4;
+        coins.push({
+          x: clamp(x + Math.sin(t * Math.PI) * W * 0.18, W * 0.1, W * 0.9),
+          y: -16 - i * 30, r: 11, got: false,
+        });
+      }
+    }
+  }
+
   function addFloater(x, y, text, color, big) {
     floaters.push({ x, y, text, color, life: 1, big: !!big });
   }
@@ -478,6 +523,7 @@
   function startRun() {
     initAudio();
     if (actx && actx.state === "suspended") actx.resume();
+    level = save.level || 1;     // set first so the scenery builds in this level's theme
     resize();
     crew = 1 + upgLevel("crew");
     crewX = targetX = W / 2;
@@ -488,11 +534,11 @@
     spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0; flash = 0;
     labelScale = 1; mobSquash = 1;
     keyDir = 0; combo = 0; bestComboThisRun = 0;
-    level = save.level || 1;
     levelTarget = levelTargetFor(level); phase = "run"; phaseT = 0;
     wallsSmashedThisRun = 0; levelCleared = false;
     finaleTotal = 0; finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
-    banner = { text: "Level " + level, sub: "", life: 1.6, color: "#8a5cff" };
+    banner = { text: "Level " + level, sub: theme().e + " " + theme().name,
+               life: 2.0, color: "#8a5cff" };
     state = "playing";
     hide(menu); hide(shopScreen); hide(gameover);
     hud.style.display = "flex";
@@ -527,6 +573,7 @@
 
     // Lifetime stats for badges.
     save.stats.runs++;
+    save.stats.coinsEarned += earned;
     save.stats.bestCombo = Math.max(save.stats.bestCombo, bestComboThisRun);
     if (save.mode === "hard") save.stats.hardBestDist = Math.max(save.stats.hardBestDist, distR);
     if (save.mode === "expert") save.stats.expertBestDist = Math.max(save.stats.expertBestDist, distR);
@@ -595,7 +642,7 @@
         spawnAccum += dy;
         if (spawnAccum >= H * 0.9) { spawnAccum = 0; spawnRow(); }
         coinAccum += dy;
-        if (coinAccum >= H * 0.16) { coinAccum = 0; spawnCoin(); }
+        if (coinAccum >= H * 0.3) { coinAccum = 0; spawnCoins(); }
       }
     } else if (phase === "finale") {
       finaleGap += dy;
@@ -637,13 +684,24 @@
           c.x += clamp(crewX - c.x, -260 * dt, 260 * dt);
         }
         if (Math.hypot(c.x - crewX, c.y - py) < pull) {
-          c.got = true; runCoins++; sfx.coin();
-          addFloater(c.x, c.y, "🪙", "#c98a00");
+          c.got = true;
+          runCoins += inFever() ? 2 : 1;   // fever streak: every coin counts double
+          sfx.coin();
+          addFloater(c.x, c.y, inFever() ? "🪙×2" : "🪙", "#c98a00");
           burst(c.x, c.y, "#ffd166", 7, 150);
         }
       }
     }
     coins = coins.filter(c => !c.got && c.y < H + 30);
+
+    // Golden sparkles stream off the mob while coin fever is running.
+    if (inFever() && !reduceMotion && Math.random() < 0.5) {
+      particles.push({
+        x: crewX + rand(-mobRadius(), mobRadius()), y: py + rand(-8, mobRadius() * 0.5),
+        vx: rand(-30, 30), vy: rand(30, 90), life: rand(0.35, 0.7),
+        color: "#ffd166", size: rand(2, 5),
+      });
+    }
 
     // Dust kicked up by the running mob.
     if (Math.random() < 0.6) {
@@ -770,6 +828,7 @@
       sfx.good(combo);
       addFloater(crewX + 34, playerY() - 56,
                  (combo >= 2 ? combo + "x " : "") + "Smart! +" + bonus + "🪙", "#8a5cff");
+      maybeStartFever();
     } else if (mine < theirs) {
       if (combo >= 2) addFloater(crewX - 34, playerY() - 56, "streak lost", "#ff7a3d");
       combo = 0; setCombo(0);
@@ -792,6 +851,7 @@
       addFloater(crewX, playerY() - 30, "Correct! +" + (crew - before), "#2bb673", true);
       addFloater(crewX + 30, playerY() - 58, "+" + bonus + "🪙", "#c98a00");
       burst(crewX, playerY() - 24, "#2bb673", 14, 240);
+      maybeStartFever();
     } else {
       crew = Math.max(0, Math.round(crew * 0.7));
       popLabel(1.2); mobSquash = 0.78;
@@ -801,6 +861,17 @@
       addFloater(W / 2, playerY() - 60, row.qText + " = " + row.answer, "#6a6385");
       burst(crewX, playerY() - 24, "#ff4d6d", 12, 220);
     }
+  }
+
+  // Called after every combo bump — announce fever the moment the streak hits 5.
+  function maybeStartFever() {
+    if (combo !== FEVER_AT) return;
+    save.stats.fevers++;
+    addFloater(crewX, playerY() - 92, "🌟 COIN FEVER! 🪙×2", "#e8a200", true);
+    burst(crewX, playerY() - 40, "#ffd166", reduceMotion ? 8 : 22, 260);
+    popLabel(1.5);
+    buzz(30);
+    sfx.fever();
   }
 
   function applyBarrier(row) {
@@ -873,7 +944,7 @@
     sceneSpan = Math.max(600, H * 2);
     trees = [];
     const vw = Math.max(12, W * 0.07);
-    const treeKinds = ["#5bbf6a", "#4aa85b", "#6fd07e", "#3f9e52"];
+    const treeKinds = theme().trees;
     for (let s = 0; s < 2; s++) {                 // left & right verge
       const n = Math.max(6, Math.round(sceneSpan / 120));
       for (let i = 0; i < n; i++) {
@@ -896,19 +967,20 @@
   // Bright field, cool running track down the middle, grassy verges with trees,
   // scrolling tiles for speed and a soft drifting cloud shadow for life.
   function drawBackground(py) {
+    const T = theme();
     // Grass field underneath everything.
     const grass = ctx.createLinearGradient(0, 0, 0, H);
-    grass.addColorStop(0, "#8ed79b");
-    grass.addColorStop(1, "#71c684");
+    grass.addColorStop(0, T.grass[0]);
+    grass.addColorStop(1, T.grass[1]);
     ctx.fillStyle = grass;
     ctx.fillRect(-20, -20, W + 40, H + 40);
 
     // The running track.
     const vw = Math.max(12, W * 0.07);
     const road = ctx.createLinearGradient(0, 0, 0, H);
-    road.addColorStop(0, "#cdecfb");
-    road.addColorStop(0.5, "#bbe4fa");
-    road.addColorStop(1, "#a9dcf7");
+    road.addColorStop(0, T.road[0]);
+    road.addColorStop(0.5, T.road[1]);
+    road.addColorStop(1, T.road[2]);
     ctx.fillStyle = road;
     ctx.fillRect(vw, -20, W - vw * 2, H + 40);
     // Soft inner shadow where the track meets the grass (adds depth).
@@ -948,13 +1020,13 @@
         // shadow
         ctx.fillStyle = "rgba(30,70,40,0.18)";
         ctx.beginPath(); ctx.ellipse(t.x + 2, yy + t.r * 0.5, t.r, t.r * 0.5, 0, 0, Math.PI * 2); ctx.fill();
-        // canopy with a little shading
+        // canopy with a little shading (tinted to this level's theme)
         const cg = ctx.createRadialGradient(t.x - t.r * 0.3, yy - t.r * 0.3, 1, t.x, yy, t.r);
-        cg.addColorStop(0, "#c7f0cf"); cg.addColorStop(0.5, t.c); cg.addColorStop(1, "#2f8244");
+        cg.addColorStop(0, shade(t.c, 0.32)); cg.addColorStop(0.5, t.c); cg.addColorStop(1, shade(t.c, -0.24));
         ctx.fillStyle = cg;
         ctx.beginPath(); ctx.arc(t.x, yy, t.r, 0, Math.PI * 2); ctx.fill();
         if (t.flower) {
-          ctx.fillStyle = "#ffd5e6";
+          ctx.fillStyle = theme().deco;
           ctx.beginPath(); ctx.arc(t.x + t.r * 0.4, yy - t.r * 0.4, 2.4, 0, Math.PI * 2); ctx.fill();
         }
       }
@@ -1333,6 +1405,20 @@
     ctx.fill();
     ctx.restore();
 
+    // Coin fever: a pulsing golden halo around the whole mob.
+    if (inFever()) {
+      ctx.save();
+      ctx.globalAlpha = 0.45 + 0.2 * Math.sin(now * 7);
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "#ffd166";
+      ctx.shadowColor = "rgba(255,209,102,0.9)";
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.ellipse(crewX, py, R + 12, (R + 12) * 0.62, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
     // Squash/stretch the whole crowd when the count jumps or drops.
     const sy = clamp(mobSquash, 0.6, 1.6);
     const sx = 1 / Math.sqrt(sy);
@@ -1470,6 +1556,7 @@
   function setCombo(n) {
     comboEl.textContent = n;
     comboPill.classList.toggle("on", n >= 2);
+    comboPill.classList.toggle("fever", n >= FEVER_AT);
     if (n > bestComboThisRun) bestComboThisRun = n;
   }
 
