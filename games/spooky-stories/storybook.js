@@ -793,7 +793,8 @@
           text: "They galloped over a rainbow, high above the fluffy white clouds. Wheee!",
           art: () => svg(dayBg({sunX:330, sunY:56}) + rainbow(200, 120, 1) +
             cloud(80, 210, 1.1) + cloud(320, 220, 0.9) +
-            unicorn({x:200, y:190, scale:1.4}))
+            unicorn({x:200, y:190, scale:1.4}) +
+            kid(Object.assign({x:211, y:158, scale:0.63}, ELLIE)))
         },
         {
           text: "Back home for tea, Sparkle promised to visit every single sunny day. Yay!",

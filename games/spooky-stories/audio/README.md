@@ -25,7 +25,7 @@ To render them locally instead — the clips are generated straight from the
 `text:` strings in `../storybook.js`, so if you change a story's words:
 
 ```bash
-pip install piper-tts imageio-ffmpeg
+pip install piper-tts==1.5.0 imageio-ffmpeg
 # download the voice (≈61 MB) into ./voices/
 python3 -m piper.download_voices --download-dir ./voices en_US-lessac-medium
 # parse storybook.js, synthesize each line, and (re)write the .mp3s here:

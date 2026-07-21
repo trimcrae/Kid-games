@@ -35,7 +35,9 @@ jobs:
           python-version: "3.11"
 
       - name: Install Piper + ffmpeg
-        run: pip install piper-tts imageio-ffmpeg
+        # pinned: build_audio.py works around a piper-tts CLI bug (multi-sentence
+        # input renders static), so keep the version deterministic
+        run: pip install piper-tts==1.5.0 imageio-ffmpeg
 
       - name: Download the voice (en_US-lessac-medium)
         working-directory: games/spooky-stories/audio
