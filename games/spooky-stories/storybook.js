@@ -44,14 +44,19 @@
     const stars = opts.stars !== false;
     const moon = opts.moon !== false;
     const sky = uid("sky"), halo = uid("halo"), moonG = uid("moon"),
-          hill = uid("hill"), glow = uid("glow"), fog = uid("fog");
+          hill = uid("hill"), glow = uid("glow"), fog = uid("fog"),
+          horiz = uid("horiz");
     let s =
       `<defs>` +
       `<linearGradient id="${sky}" x1="0" y1="0" x2="0" y2="1">` +
-      `<stop offset="0" stop-color="#120a33"/>` +
-      `<stop offset="0.5" stop-color="#2a1b5e"/>` +
-      `<stop offset="0.85" stop-color="#55276e"/>` +
-      `<stop offset="1" stop-color="#63307a"/></linearGradient>` +
+      `<stop offset="0" stop-color="#0c0730"/>` +
+      `<stop offset="0.38" stop-color="#251458"/>` +
+      `<stop offset="0.68" stop-color="#452173"/>` +
+      `<stop offset="0.88" stop-color="#67308a"/>` +
+      `<stop offset="1" stop-color="#8a4498"/></linearGradient>` +
+      `<linearGradient id="${horiz}" x1="0" y1="0" x2="0" y2="1">` +
+      `<stop offset="0" stop-color="#ff9ecb" stop-opacity="0"/>` +
+      `<stop offset="1" stop-color="#ff9ecb" stop-opacity="0.20"/></linearGradient>` +
       `<radialGradient id="${halo}">` +
       `<stop offset="0" stop-color="#ffe98a" stop-opacity="0.5"/>` +
       `<stop offset="0.55" stop-color="#ffe98a" stop-opacity="0.16"/>` +
@@ -68,9 +73,17 @@
       `<stop offset="1" stop-color="#cfc0ff" stop-opacity="0"/></radialGradient>` +
       glowFilter(glow, 3) +
       `</defs>` +
-      `<rect x="0" y="0" width="400" height="300" fill="url(#${sky})"/>`;
+      `<rect x="0" y="0" width="400" height="300" fill="url(#${sky})"/>` +
+      // rosy dusk glow hugging the horizon
+      `<rect x="0" y="168" width="400" height="94" fill="url(#${horiz})"/>`;
     const mx = opts.moonX || 320, my = opts.moonY || 64, mr = opts.moonR || 32;
     if (stars) {
+      // faint stardust (tiny, static, cheap) behind the big sparkles
+      const dust = [[24,60],[70,24],[126,96],[168,52],[232,26],[248,96],[312,88],[356,110],[386,70],[140,132],[292,150],[52,148]];
+      dust.forEach((p, i) => {
+        if (moon && Math.hypot(p[0] - mx, p[1] - my) < mr + 8) return;
+        s += `<circle cx="${p[0]}" cy="${p[1]}" r="${i % 3 ? 0.8 : 1.2}" fill="#efe6ff" opacity="${i % 2 ? 0.5 : 0.75}"/>`;
+      });
       const pts = [[40,40],[90,80],[150,30],[210,60],[60,130],[260,40],[110,150],[300,120],[30,90],[190,110],[345,150],[370,40]];
       pts.forEach((p, i) => {
         // don't hide sparkles behind the moon
@@ -88,14 +101,33 @@
         `</g>`;
     }
     if (opts.ground !== false) {
-      // far hills (darker) and a nearer, softly lit hill
-      s += `<path d="M0 262 C 60 240 130 254 200 246 C 275 238 330 256 400 244 L400 300 L0 300 Z" fill="#1a0f3e"/>` +
+      // hazy distant ridge with a sleepy treeline, then the hills
+      s += `<path d="M0 252 C 45 236 90 244 140 238 C 200 231 250 242 305 234 C 345 229 375 238 400 232 L400 300 L0 300 Z" fill="#1c1048" opacity="0.85"/>` +
+        // little spruce silhouettes at the edges of the ridge
+        `<path d="M 22 250 L 30 222 L 38 250 Z M 26 240 L 30 226 L 34 240 Z" fill="#150b3d"/>` +
+        `<path d="M 46 254 L 52 234 L 58 254 Z" fill="#170d40"/>` +
+        `<path d="M 356 246 L 363 220 L 370 246 Z M 359 236 L 363 224 L 367 236 Z" fill="#150b3d"/>` +
+        `<path d="M 380 250 L 386 230 L 392 250 Z" fill="#170d40"/>` +
+        // far hills (darker) and a nearer, softly lit hill
+        `<path d="M0 262 C 60 240 130 254 200 246 C 275 238 330 256 400 244 L400 300 L0 300 Z" fill="#1a0f3e"/>` +
         `<path d="M0 280 C 70 262 150 276 235 268 C 305 262 355 274 400 266 L400 300 L0 300 Z" fill="url(#${hill})"/>` +
+        // moonlit crest lines on the near hill
+        `<path d="M 0 280 C 70 262 150 276 235 268" fill="none" stroke="#8f7ad0" stroke-width="1.4" opacity="0.35" stroke-linecap="round"/>` +
         // drifting fog
         `<ellipse cx="110" cy="272" rx="95" ry="14" fill="url(#${fog})">` +
         `<animateTransform attributeName="transform" type="translate" values="0 0; 40 -3; 0 0" dur="16s" repeatCount="indefinite"/></ellipse>` +
         `<ellipse cx="300" cy="286" rx="110" ry="15" fill="url(#${fog})">` +
         `<animateTransform attributeName="transform" type="translate" values="0 0; -45 2; 0 0" dur="21s" repeatCount="indefinite"/></ellipse>`;
+      // three sleepy fireflies drifting over the meadow
+      [[62, 240], [338, 232], [178, 224]].forEach((p, i) => {
+        s += `<g transform="translate(${p[0]} ${p[1]})">` +
+          `<animateTransform attributeName="transform" type="translate" additive="sum" ` +
+          `values="0 0; ${9 + i * 5} ${-7 - i * 3}; ${-6 - i * 2} 5; 0 0" dur="${11 + i * 4}s" repeatCount="indefinite"/>` +
+          `<circle r="3.4" fill="#ffe98a" opacity="0.18"/>` +
+          `<circle r="1.3" fill="#fff6c0">` +
+          `<animate attributeName="opacity" values="1;0.15;1" dur="${(2.3 + i * 0.8).toFixed(1)}s" begin="${(i * 0.9).toFixed(1)}s" repeatCount="indefinite"/>` +
+          `</circle></g>`;
+      });
     }
     return s;
   }
@@ -119,9 +151,11 @@
     let s =
       `<defs>` +
       `<linearGradient id="${wall}" x1="0" y1="0" x2="0" y2="1">` +
-      `<stop offset="0" stop-color="#4e3c8e"/><stop offset="1" stop-color="#2e2156"/></linearGradient>` +
+      `<stop offset="0" stop-color="#5a479e"/><stop offset="0.55" stop-color="#453479"/>` +
+      `<stop offset="1" stop-color="#2c2052"/></linearGradient>` +
       `<linearGradient id="${roof}" x1="0" y1="0" x2="0" y2="1">` +
-      `<stop offset="0" stop-color="#ff9ecb"/><stop offset="1" stop-color="#cf5490"/></linearGradient>` +
+      `<stop offset="0" stop-color="#ffb1d6"/><stop offset="0.6" stop-color="#f279af"/>` +
+      `<stop offset="1" stop-color="#c94f8c"/></linearGradient>` +
       `<radialGradient id="${win}" cx="0.5" cy="0.4" r="0.8">` +
       `<stop offset="0" stop-color="#fff6c4"/><stop offset="1" stop-color="#ffc94d"/></radialGradient>` +
       glowFilter(wg, 2.5) +
@@ -130,6 +164,8 @@
     [-76, 76].forEach(tx => {
       s += `<rect x="${tx - 14}" y="-64" width="28" height="76" rx="5" fill="url(#${wall})"/>` +
         `<path d="M ${tx - 17} -62 C ${tx - 11} -84 ${tx - 4} -98 ${tx} -106 C ${tx + 4} -98 ${tx + 11} -84 ${tx + 17} -62 Q ${tx} -70 ${tx - 17} -62 Z" fill="url(#${roof})"/>` +
+        // moonlit sheen down the left of each cone
+        `<path d="M ${tx - 9} -68 Q ${tx - 4} -87 ${tx - 1} -100" stroke="#ffd3e8" stroke-width="2.2" opacity="0.55" fill="none" stroke-linecap="round"/>` +
         `<line x1="${tx}" y1="-106" x2="${tx}" y2="-118" stroke="#e8e2ff" stroke-width="1.6"/>` +
         `<path d="M ${tx} -118 L ${tx + 11} -114.5 L ${tx} -111 Z" fill="#ff5d8f"/>`;
     });
@@ -140,7 +176,14 @@
     }
     // tall centre tower + cone + golden flag
     s += `<rect x="-17" y="-98" width="34" height="110" rx="5" fill="url(#${wall})"/>` +
+      // hints of stonework, barely-there
+      `<g fill="#cfc0ff" opacity="0.09">` +
+      `<rect x="-56" y="-38" width="11" height="5" rx="2"/><rect x="-40" y="-26" width="12" height="5" rx="2"/>` +
+      `<rect x="20" y="-40" width="12" height="5" rx="2"/><rect x="40" y="-22" width="11" height="5" rx="2"/>` +
+      `<rect x="-13" y="-70" width="10" height="5" rx="2"/><rect x="4" y="-56" width="10" height="5" rx="2"/>` +
+      `</g>` +
       `<path d="M -21 -96 C -14 -114 -6 -130 0 -140 C 6 -130 14 -114 21 -96 Q 0 -103 -21 -96 Z" fill="url(#${roof})"/>` +
+      `<path d="M -12 -102 Q -6 -120 -1 -133" stroke="#ffd3e8" stroke-width="2.2" opacity="0.55" fill="none" stroke-linecap="round"/>` +
       `<line x1="0" y1="-140" x2="0" y2="-152" stroke="#e8e2ff" stroke-width="1.6"/>` +
       `<path d="M 0 -152 L 12 -148 L 0 -144 Z" fill="#ffd166"/>`;
     // glowing windows (the tower one gently flickers)
@@ -150,9 +193,16 @@
         (i === 2 ? `<animate attributeName="opacity" values="1;0.72;1" dur="3.4s" repeatCount="indefinite"/>` : "") +
         `</rect>`;
     });
-    // arched door with a tiny golden knob
+    // party bunting strung between the two side towers
+    s += `<path d="M -62 -64 Q 0 -48 62 -64" fill="none" stroke="#e8e2ff" stroke-width="1.1" opacity="0.9"/>`;
+    const bunting = [[-37.2, -59.3, "#ff8ec9"], [-18.6, -56.7, "#ffd166"], [0, -56, "#8ad0ff"], [18.6, -56.7, "#b98cff"], [37.2, -59.3, "#ff8ec9"]];
+    bunting.forEach(f => {
+      s += `<path d="M ${f[0] - 3.6} ${f[1]} L ${f[0]} ${f[1] + 7} L ${f[0] + 3.6} ${f[1]} Z" fill="${f[2]}"/>`;
+    });
+    // arched door with a tiny golden knob + warm lamplight spill
     s += `<path d="M -12 12 L -12 -10 Q 0 -26 12 -10 L 12 12 Z" fill="#1c1038"/>` +
       `<path d="M -12 -10 Q 0 -26 12 -10" fill="none" stroke="#6b49b8" stroke-width="2"/>` +
+      `<path d="M -10 12 Q 0 -3 10 12 Z" fill="#ffca5f" opacity="0.14"/>` +
       `<circle cx="6" cy="-2" r="1.6" fill="#ffd166"/>`;
     return `<g transform="translate(${x} ${y}) scale(${scale})">${s}</g>`;
   }
@@ -192,16 +242,26 @@
           `<ellipse cx="5.2" cy="9.6" rx="5.4" ry="2.8" fill="#39304a"/>` +
           `<path d="M -11 -30 C -6 -33 6 -33 11 -30 C 12.5 -21 12.5 -12 11 -5 Q 0 -1.5 -11 -5 C -12.5 -12 -12.5 -21 -11 -30 Z" fill="url(#${dg})"/>` +
           `<path d="M -4.5 -31 L 0 -26.5 L 4.5 -31" fill="none" stroke="${dressL}" stroke-width="1.5" stroke-linecap="round"/>` +
-          `<circle cx="0" cy="-14" r="1" fill="#fff" opacity="0.7"/>`
-        // a flowing dress + soft centre panel + sparkles
+          `<rect x="-11" y="-8" width="22" height="3.4" rx="1.7" fill="${shade(dress, -52)}"/>` +
+          `<rect x="-2.2" y="-8.6" width="4.4" height="4.6" rx="1.1" fill="#ffd166"/>` +
+          `<circle cx="0" cy="-16" r="1" fill="#fff" opacity="0.7"/>`
+        // a flowing dress + soft centre panel + twinkly sparkles
         : `<path d="M -6 -32 L 6 -32 C 11 -24 16 -14 21 -2 C 25 5 25 9 21 10 Q 0 15 -21 10 C -25 9 -25 5 -21 -2 C -16 -14 -11 -24 -6 -32 Z" fill="url(#${dg})"/>` +
           `<path d="M -3 -30 C -6 -16 -8 -2 -9 9 Q 0 12 9 9 C 8 -2 6 -16 3 -30 Z" fill="${dressL}" opacity="0.45"/>` +
-          `<circle cx="-11" cy="0" r="1" fill="#fff" opacity="0.8"/>` +
-          `<circle cx="12" cy="-6" r="1" fill="#fff" opacity="0.7"/>` +
-          `<circle cx="4" cy="6" r="1" fill="#fff" opacity="0.75"/>`) +
-      // arms
+          // moonlit rim light down the skirt's right edge + scalloped hem
+          `<path d="M 8 -29 C 13 -21 17.5 -12 21 -2.5" stroke="#ffffff" stroke-width="1.3" opacity="0.4" fill="none" stroke-linecap="round"/>` +
+          `<path d="M -19 8.2 Q -9.5 12.4 0 12.6 Q 9.5 12.4 19 8.2" fill="none" stroke="${dressL}" stroke-width="1.4" opacity="0.65"/>` +
+          `<path d="M -9.4 0 Q -10.4 0.5 -11 1.6 Q -11.6 0.5 -12.6 0 Q -11.6 -0.5 -11 -1.6 Q -10.4 -0.5 -9.4 0 Z" fill="#fff" opacity="0.9"/>` +
+          `<path d="M 13.6 -6 Q 12.6 -5.5 12 -4.4 Q 11.4 -5.5 10.4 -6 Q 11.4 -6.5 12 -7.6 Q 12.6 -6.5 13.6 -6 Z" fill="#fff" opacity="0.85">` +
+          `<animate attributeName="opacity" values="0.85;0.25;0.85" dur="2.6s" repeatCount="indefinite"/></path>` +
+          `<path d="M 5.6 6 Q 4.6 6.5 4 7.6 Q 3.4 6.5 2.4 6 Q 3.4 5.5 4 4.4 Q 4.6 5.5 5.6 6 Z" fill="#fff" opacity="0.85"/>`) +
+      // arms with little hands, tucked under puffy sleeves
       `<path d="M -7 -27 Q -16 -20 -20 -9" stroke="${skin}" stroke-width="5" stroke-linecap="round" fill="none"/>` +
       `<path d="M 7 -27 Q 16 -20 20 -9" stroke="${skin}" stroke-width="5" stroke-linecap="round" fill="none"/>` +
+      `<circle cx="-20" cy="-9" r="3.1" fill="${skin}"/>` +
+      `<circle cx="20" cy="-9" r="3.1" fill="${skin}"/>` +
+      `<circle cx="-7.6" cy="-27.6" r="4" fill="${dressL}"/>` +
+      `<circle cx="7.6" cy="-27.6" r="4" fill="${dressL}"/>` +
       // face
       `<circle cx="0" cy="-46" r="13" fill="${skin}"/>` +
       `<path d="M -13 -48 C -12 -58 -6 -61 0 -61 C 6 -61 12 -58 13 -48 C 8 -53 4 -54.5 0 -54.5 C -4 -54.5 -8 -53 -13 -48 Z" fill="${hair}"/>` +
@@ -232,7 +292,7 @@
       `<stop offset="0" stop-color="#ffffff"/><stop offset="0.75" stop-color="#efeaff"/>` +
       `<stop offset="1" stop-color="#d8d2ff"/></linearGradient>` +
       glowFilter(gf, 4) + `</defs>` +
-      `<ellipse cx="0" cy="38" rx="20" ry="4" fill="#000" opacity="0.18"/>` +
+      `<ellipse cx="0" cy="34" rx="16" ry="3.4" fill="#000" opacity="0.12"/>` +
       `<path d="M -24 4 C -24 -16 -14 -28 0 -28 C 14 -28 24 -16 24 4 L 24 21 Q 19 31 13 23 Q 7 16 1 24 Q -4 32 -10 24 Q -15 17 -20 25 Q -23 29 -24 22 Z" fill="url(#${g1})" filter="url(#${gf})"/>` +
       // little waving arms
       `<path d="M -23 -6 Q -32 -9 -31 -16 Q -25 -14 -22 -10 Z" fill="#ffffff"/>` +
@@ -247,6 +307,9 @@
       `<circle cx="-13" cy="-1" r="2.6" fill="#ffb3d1" opacity="0.75"/>` +
       `<circle cx="13" cy="-1" r="2.6" fill="#ffb3d1" opacity="0.75"/>` +
       `<path d="M -4.5 -1.5 A 4.5 4.5 0 0 0 4.5 -1.5 Z" fill="#7a5ad0"/>` +
+      // a tiny twinkle drifting beside Boo
+      `<path d="M 24 -26 Q 22.8 -25.4 22 -24 Q 21.2 -25.4 20 -26 Q 21.2 -26.6 22 -28 Q 22.8 -26.6 24 -26 Z" fill="#fff" opacity="0.9">` +
+      `<animate attributeName="opacity" values="0.9;0.2;0.9" dur="2.8s" repeatCount="indefinite"/></path>` +
       `</g></g>`;
   }
 
@@ -264,6 +327,10 @@
       `<path d="M -7 21 C -8 10 -4 2 0 0 C 4 2 8 10 7 21 Z" fill="${k}"/>` +
       `<ellipse cx="-6" cy="20" rx="4" ry="2.6" fill="${k}"/>` +
       `<ellipse cx="6" cy="20" rx="4" ry="2.6" fill="${k}"/>` +
+      // pink collar with a tiny golden bell
+      `<path d="M -8.5 -6 Q 0 -2 8.5 -6" stroke="#ff5d8f" stroke-width="2.6" fill="none" stroke-linecap="round"/>` +
+      `<circle cx="0" cy="-2.4" r="1.9" fill="#ffd166"/>` +
+      `<circle cx="-0.5" cy="-3" r="0.5" fill="#fff7d9"/>` +
       // ears
       `<path d="M -11 -20 Q -15 -30 -13 -33 Q -7 -30 -4 -25 Z" fill="${K}"/>` +
       `<path d="M 11 -20 Q 15 -30 13 -33 Q 7 -30 4 -25 Z" fill="${K}"/>` +
@@ -305,10 +372,10 @@
       // big friendly eyes + smile
       `<circle cx="-3.4" cy="-5.5" r="3" fill="#fff"/>` +
       `<circle cx="3.4" cy="-5.5" r="3" fill="#fff"/>` +
-      `<circle cx="-2.8" cy="-5" r="1.5" fill="#2b2440"/>` +
-      `<circle cx="4" cy="-5" r="1.5" fill="#2b2440"/>` +
-      `<circle cx="-2.4" cy="-5.6" r="0.5" fill="#fff"/>` +
-      `<circle cx="4.4" cy="-5.6" r="0.5" fill="#fff"/>` +
+      `<circle cx="-3.2" cy="-4.9" r="1.5" fill="#2b2440"/>` +
+      `<circle cx="3.6" cy="-4.9" r="1.5" fill="#2b2440"/>` +
+      `<circle cx="-2.7" cy="-5.5" r="0.5" fill="#fff"/>` +
+      `<circle cx="4.1" cy="-5.5" r="0.5" fill="#fff"/>` +
       `<path d="M -2.5 0 Q 0 2.2 2.5 0" stroke="#2b2440" stroke-width="1.1" fill="none" stroke-linecap="round"/>` +
       `</g></g>`;
   }
@@ -414,6 +481,32 @@
       `<g class="tap" data-sound="twinkle">${petals}<circle cx="0" cy="0" r="2.6" fill="#ffd166"/></g></g>`;
   }
 
+  // A small fluttering butterfly (tappable, twinkle sound).
+  function butterfly(x, y, sc, col) {
+    sc = sc || 1; col = col || "#ff8ec9";
+    const lite = shade(col, 40);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<g><animateTransform attributeName="transform" type="translate" values="0 0; 7 -11; -5 -4; 0 0" dur="8s" repeatCount="indefinite"/>` +
+      `<g class="tap" data-sound="twinkle">` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="18 0 0;-22 0 0;18 0 0" dur="1.15s" repeatCount="indefinite"/>` +
+      `<ellipse cx="-5" cy="-3.5" rx="4.6" ry="6.2" fill="${col}"/>` +
+      `<ellipse cx="-4.2" cy="4" rx="3.2" ry="4" fill="${lite}"/></g>` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="-18 0 0;22 0 0;-18 0 0" dur="1.15s" repeatCount="indefinite"/>` +
+      `<ellipse cx="5" cy="-3.5" rx="4.6" ry="6.2" fill="${col}"/>` +
+      `<ellipse cx="4.2" cy="4" rx="3.2" ry="4" fill="${lite}"/></g>` +
+      `<ellipse cx="0" cy="0" rx="1.6" ry="6" fill="#5a4a6e"/>` +
+      `<path d="M -1 -5.5 Q -3.5 -9 -5.5 -10 M 1 -5.5 Q 3.5 -9 5.5 -10" stroke="#5a4a6e" stroke-width="0.9" fill="none" stroke-linecap="round"/>` +
+      `</g></g></g>`;
+  }
+
+  // A few little grass blades to dress the hilltops.
+  function tuft(x, y, sc) {
+    sc = sc || 1;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<path d="M -4 0 C -4.5 -4 -6 -7 -8 -9 M 0 0 C 0 -5 0 -8 0.5 -11 M 4 0 C 4.5 -4 6 -7 8 -9" ` +
+      `stroke="#47953d" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`;
+  }
+
   // A soft arcing rainbow.
   function rainbow(x, y, sc) {
     sc = sc || 1;
@@ -422,6 +515,12 @@
     cols.forEach((c, i) => {
       const r = 74 - i * 9;
       s += `<path d="M ${-r} 0 A ${r} ${r} 0 0 1 ${r} 0" fill="none" stroke="${c}" stroke-width="8" stroke-linecap="round"/>`;
+    });
+    // soft cloud puffs where the rainbow lands
+    [-74, 74].forEach(px => {
+      s += `<g><ellipse cx="${px}" cy="2" rx="15" ry="9.5" fill="#ffffff"/>` +
+        `<ellipse cx="${px - 11}" cy="6" rx="9.5" ry="6.5" fill="#ffffff"/>` +
+        `<ellipse cx="${px + 11}" cy="6" rx="9.5" ry="6.5" fill="#f0f6ff"/></g>`;
     });
     return `<g transform="translate(${x} ${y}) scale(${sc})" opacity="0.92">${s}</g>`;
   }
@@ -436,8 +535,10 @@
       `<defs>` +
       `<linearGradient id="${sky}" x1="0" y1="0" x2="0" y2="1">` +
       (sunset
-        ? `<stop offset="0" stop-color="#ffcf8a"/><stop offset="0.5" stop-color="#ff9e86"/><stop offset="1" stop-color="#ffc7ad"/>`
-        : `<stop offset="0" stop-color="#7ec8ff"/><stop offset="0.6" stop-color="#c2e8ff"/><stop offset="1" stop-color="#ecf8ff"/>`) +
+        ? `<stop offset="0" stop-color="#ffc27a"/><stop offset="0.42" stop-color="#ff9a7e"/>` +
+          `<stop offset="0.75" stop-color="#ffb595"/><stop offset="1" stop-color="#ffd9bd"/>`
+        : `<stop offset="0" stop-color="#5fb5f5"/><stop offset="0.45" stop-color="#a3daff"/>` +
+          `<stop offset="0.78" stop-color="#d8f0ff"/><stop offset="1" stop-color="#f4fbff"/>`) +
       `</linearGradient>` +
       `<linearGradient id="${grass}" x1="0" y1="0" x2="0" y2="1">` +
       `<stop offset="0" stop-color="#8ed86a"/><stop offset="1" stop-color="#54a846"/></linearGradient>` +
@@ -446,53 +547,101 @@
       glowFilter(sglow, 4) +
       `</defs>` +
       `<rect x="0" y="0" width="400" height="300" fill="url(#${sky})"/>`;
+    let sx = opts.sunX || 320;
     if (opts.sun !== false) {
-      const sx = opts.sunX || 320, sy = opts.sunY || 66, sr = opts.sunR || 30;
-      s += `<g class="tap hint-bob" data-sound="chime">`;
+      const sy = opts.sunY || 66, sr = opts.sunR || 30;
+      s += `<g class="tap hint-bob" data-sound="chime">` +
+        // rays turn ever so slowly, like a pinwheel
+        `<g><animateTransform attributeName="transform" type="rotate" values="0 ${sx} ${sy};360 ${sx} ${sy}" dur="90s" repeatCount="indefinite"/>`;
       for (let i = 0; i < 12; i++) {
         const a = (Math.PI * 2 * i) / 12;
         s += `<line x1="${(sx + Math.cos(a) * (sr + 6)).toFixed(1)}" y1="${(sy + Math.sin(a) * (sr + 6)).toFixed(1)}" ` +
           `x2="${(sx + Math.cos(a) * (sr + 18)).toFixed(1)}" y2="${(sy + Math.sin(a) * (sr + 18)).toFixed(1)}" ` +
           `stroke="#ffd84a" stroke-width="3" stroke-linecap="round" opacity="0.8"/>`;
       }
-      s += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="url(#${sunG})" filter="url(#${sglow})"/></g>`;
+      s += `</g><circle cx="${sx}" cy="${sy}" r="${sr}" fill="url(#${sunG})" filter="url(#${sglow})"/></g>`;
     }
     s += cloud(96, 66, 1) + cloud(258, 104, 0.72);
-    s += `<path d="M0 250 C 80 225 150 245 230 232 C 300 221 350 238 400 228 L400 300 L0 300 Z" fill="#6fc25a"/>` +
-      `<path d="M0 278 C 90 262 170 276 250 268 C 320 262 360 274 400 268 L400 300 L0 300 Z" fill="url(#${grass})"/>`;
+    // a couple of far-off birds on the sunless side of the sky
+    const bx = sx < 200 ? 282 : 44;
+    const bcol = sunset ? "#b06a58" : "#5b8fc0";
+    s += `<path d="M ${bx} 62 q 4.5 -4.5 8.5 0 q 4.5 -4.5 8.5 0" fill="none" stroke="${bcol}" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>` +
+      `<path d="M ${bx - 20} 76 q 3.5 -3.5 6.5 0 q 3.5 -3.5 6.5 0" fill="none" stroke="${bcol}" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>`;
+    // hazy far meadow, then the two green hills
+    s += `<path d="M0 240 C 70 222 150 234 230 224 C 300 216 350 232 400 222 L400 300 L0 300 Z" fill="${sunset ? "#e8a37f" : "#9fd9b4"}" opacity="0.6"/>` +
+      `<path d="M0 250 C 80 225 150 245 230 232 C 300 221 350 238 400 228 L400 300 L0 300 Z" fill="#6fc25a"/>` +
+      `<path d="M0 278 C 90 262 170 276 250 268 C 320 262 360 274 400 268 L400 300 L0 300 Z" fill="url(#${grass})"/>` +
+      // sunlit crest line + a few grass tufts
+      `<path d="M0 250 C 80 225 150 245 230 232" fill="none" stroke="#b8e88a" stroke-width="1.6" opacity="0.6" stroke-linecap="round"/>` +
+      tuft(34, 288, 1) + tuft(128, 283, 0.85) + tuft(252, 280, 0.9) + tuft(336, 287, 1.05);
+    if (sunset) {
+      // warm evening light washing over the meadow
+      s += `<rect x="0" y="218" width="400" height="82" fill="#ff8a5b" opacity="0.14"/>`;
+    }
     if (opts.flowers !== false) {
       s += flower(58, 284, 1, "#ff5d8f") + flower(150, 291, 0.9, "#ffd166") +
-        flower(300, 286, 1, "#b266e0") + flower(360, 293, 0.85, "#ff8ec9");
+        flower(300, 286, 1, "#b266e0") + flower(360, 293, 0.85, "#ff8ec9") +
+        butterfly(76, 262, 0.8, "#ff8ec9") + butterfly(344, 256, 0.62, "#b98cff");
     }
     return s;
   }
 
   // A white unicorn with a rainbow mane, spiral horn and a shy smile.
+  // Facing right; feet on the ground at y≈+22, back at y≈-12.
   function unicorn(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
-    const body = "#ffffff", shadow = "#eae4ff";
+    const body = "#ffffff", shadow = "#e9e2fa";
     const mane = uid("mane");
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="neigh">` +
+    return `<g transform="translate(${x} ${y}) scale(${o.flip ? -sc : sc} ${sc})"><g class="tap hint-bob" data-sound="neigh">` +
       `<defs><linearGradient id="${mane}" x1="0" y1="0" x2="0" y2="1">` +
       `<stop offset="0" stop-color="#ff8ec9"/><stop offset="0.5" stop-color="#b98cff"/><stop offset="1" stop-color="#8ad0ff"/></linearGradient></defs>` +
-      `<ellipse cx="0" cy="23" rx="24" ry="4.5" fill="#000" opacity="0.2"/>` +
-      `<rect x="-14" y="6" width="6" height="17" rx="3" fill="${shadow}"/>` +
-      `<rect x="9" y="6" width="6" height="17" rx="3" fill="${shadow}"/>` +
-      `<rect x="-6" y="8" width="6" height="15" rx="3" fill="${body}"/>` +
-      `<rect x="2" y="8" width="6" height="15" rx="3" fill="${body}"/>` +
-      `<path d="M -20 -2 C -34 2 -34 18 -24 22 C -30 14 -28 6 -18 6 Z" fill="url(#${mane})"/>` +
-      `<ellipse cx="-2" cy="0" rx="22" ry="15" fill="${body}"/>` +
-      `<path d="M 12 -6 C 18 -18 24 -24 30 -26 C 34 -22 33 -14 28 -8 C 24 -3 18 0 12 2 Z" fill="${body}"/>` +
-      `<ellipse cx="30" cy="-24" rx="9.5" ry="7.5" fill="${body}"/>` +
-      `<path d="M 33 -30 L 40 -47 L 36.5 -29 Z" fill="#ffd166"/>` +
-      `<path d="M 34.5 -33 L 38 -40 M 33.5 -30 L 37 -36" stroke="#e8a92e" stroke-width="1"/>` +
-      `<path d="M 24 -30 L 26 -38 L 30.5 -31 Z" fill="${body}"/>` +
-      `<path d="M 20 -22 C 12 -20 10 -8 12 2 C 16 -6 20 -10 24 -12 C 20 -16 20 -20 26 -24 C 24 -24 22 -23 20 -22 Z" fill="url(#${mane})"/>` +
-      `<circle cx="31" cy="-24" r="2" fill="#2b2440"/>` +
-      `<circle cx="31.6" cy="-24.6" r="0.6" fill="#fff"/>` +
-      `<circle cx="26" cy="-19" r="2.2" fill="#ffb3d1" opacity="0.6"/>` +
-      `<path d="M 34.5 -18.5 Q 37.5 -17.5 39 -19.5" stroke="#b5466e" stroke-width="1" fill="none" stroke-linecap="round"/>` +
-      `<circle cx="37.6" cy="-21.5" r="0.8" fill="#8f86b8"/>` +
+      `<ellipse cx="-1" cy="23" rx="25" ry="4.5" fill="#000" opacity="0.2"/>` +
+      // flowing tail, swept back with rainbow strands
+      `<path d="M -19 -4 C -28 -8 -36 -3 -36.5 6 C -36.8 12 -33 17.5 -27 19.5 C -30 14 -30.5 8.5 -28 3.5 C -26 -0.5 -22.5 -3 -19 -4 Z" fill="url(#${mane})"/>` +
+      `<path d="M -23 -3.5 C -30 -1 -33 6 -31 13" stroke="#ff8ec9" stroke-width="1.3" fill="none" opacity="0.8" stroke-linecap="round"/>` +
+      `<path d="M -21 -4.5 C -27 -2.5 -30 3 -29 9" stroke="#8ad0ff" stroke-width="1.1" fill="none" opacity="0.75" stroke-linecap="round"/>` +
+      // far-side legs (shaded) with hooves
+      `<rect x="-17" y="4" width="6.4" height="17" rx="3.2" fill="${shadow}"/>` +
+      `<rect x="8" y="4" width="6.4" height="17" rx="3.2" fill="${shadow}"/>` +
+      `<rect x="-17" y="17.6" width="6.4" height="4" rx="2" fill="#c8b9e6"/>` +
+      `<rect x="8" y="17.6" width="6.4" height="4" rx="2" fill="#c8b9e6"/>` +
+      // mane flowing down the back of the neck (behind the neck)
+      `<path d="M 18 -34 C 9 -30 4 -21 3.5 -11 C 3.3 -5 5.5 0.5 9 3.5" stroke="url(#${mane})" stroke-width="8" fill="none" stroke-linecap="round"/>` +
+      `<path d="M 16 -32 C 9 -27 6 -19 6.5 -9" stroke="#ff8ec9" stroke-width="1.4" fill="none" opacity="0.85" stroke-linecap="round"/>` +
+      `<path d="M 18.5 -30 C 12 -25 9.5 -18 9.5 -10" stroke="#8ad0ff" stroke-width="1.2" fill="none" opacity="0.8" stroke-linecap="round"/>` +
+      // arched neck up to the head
+      `<path d="M 10 -2 C 13 -10 17 -18 22 -24" stroke="${body}" stroke-width="13" fill="none" stroke-linecap="round"/>` +
+      // round rump-to-chest body + soft belly shading
+      `<ellipse cx="-2" cy="1" rx="21" ry="13.5" fill="${body}"/>` +
+      `<ellipse cx="-4" cy="10" rx="12" ry="3.6" fill="${shadow}" opacity="0.38"/>` +
+      // near-side legs with lilac hooves
+      `<rect x="-9" y="6" width="6.4" height="16" rx="3.2" fill="${body}"/>` +
+      `<rect x="13" y="6" width="6.4" height="16" rx="3.2" fill="${body}"/>` +
+      `<rect x="-9" y="18.2" width="6.4" height="3.8" rx="1.9" fill="#d8cdf0"/>` +
+      `<rect x="13" y="18.2" width="6.4" height="3.8" rx="1.9" fill="#d8cdf0"/>` +
+      // ear (behind the head crown)
+      `<path d="M 17.5 -32 Q 17 -39.5 20.5 -41.5 Q 23 -37 22 -32.5 Z" fill="${body}"/>` +
+      `<path d="M 19 -33.5 Q 19 -37.8 20.4 -39.4 Q 21.6 -36.6 21 -33.5 Z" fill="#ffd7e6"/>` +
+      // golden spiral horn on the forehead
+      `<path d="M 23.6 -34.5 L 27.8 -50 L 28 -33.8 Z" fill="#ffd166"/>` +
+      `<path d="M 24.8 -38.5 L 27.9 -40 M 25.6 -42 L 27.8 -43.3 M 26.4 -45.5 L 27.9 -46.4" stroke="#e8a92e" stroke-width="0.9" stroke-linecap="round"/>` +
+      // head with a proper little muzzle
+      `<circle cx="24" cy="-27" r="8.5" fill="${body}"/>` +
+      `<ellipse cx="31.5" cy="-23.8" rx="5.8" ry="4.6" fill="${body}"/>` +
+      `<ellipse cx="33" cy="-22.6" rx="3" ry="2.2" fill="#ffeef5"/>` +
+      `<circle cx="34.6" cy="-24.6" r="0.85" fill="#d9a7c7"/>` +
+      `<path d="M 30 -20.4 Q 32.8 -18.6 35.6 -20.2" stroke="#c76a8a" stroke-width="1.1" fill="none" stroke-linecap="round"/>` +
+      // forelock curl over the brow
+      `<path d="M 20.5 -35.5 Q 16.8 -32.5 17 -27.5" stroke="url(#${mane})" stroke-width="3.6" fill="none" stroke-linecap="round"/>` +
+      // gentle eye with lash + rosy cheek
+      `<circle cx="23.5" cy="-27.5" r="2.3" fill="#2b2440"/>` +
+      `<circle cx="24.2" cy="-28.3" r="0.75" fill="#fff"/>` +
+      `<path d="M 20.6 -30.2 Q 22.6 -31.4 24.8 -31" stroke="#2b2440" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.75"/>` +
+      `<circle cx="26.6" cy="-21.6" r="2" fill="#ffb3d1" opacity="0.6"/>` +
+      // fairy sparkles floating around Sparkle herself
+      `<path d="M -10 -14 Q -11.1 -13.4 -11.8 -12.2 Q -12.5 -13.4 -13.6 -14 Q -12.5 -14.6 -11.8 -15.8 Q -11.1 -14.6 -10 -14 Z" fill="#fff" opacity="0.9">` +
+      `<animate attributeName="opacity" values="0.9;0.25;0.9" dur="2.4s" repeatCount="indefinite"/></path>` +
+      `<path d="M 33.6 -38 Q 32.6 -37.5 32 -36.4 Q 31.4 -37.5 30.4 -38 Q 31.4 -38.5 32 -39.6 Q 32.6 -38.5 33.6 -38 Z" fill="#fff" opacity="0.8"/>` +
       `</g></g>`;
   }
 
@@ -501,7 +650,7 @@
   function dragon(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
     const col = o.color || "#5ec46a", belly = "#d8f4b2", dark = shade(col, -30);
-    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="roar">` +
+    return `<g transform="translate(${x} ${y}) scale(${o.flip ? -sc : sc} ${sc})"><g class="tap hint-bob" data-sound="roar">` +
       `<ellipse cx="0" cy="24" rx="26" ry="4.5" fill="#000" opacity="0.2"/>` +
       `<path d="M -18 10 C -34 14 -36 -2 -28 -6 C -30 6 -22 8 -14 6 Z" fill="${col}"/>` +
       `<g><animateTransform attributeName="transform" type="rotate" values="-6 -4 -6;7 -4 -6;-6 -4 -6" dur="2.4s" repeatCount="indefinite"/>` +
@@ -510,17 +659,26 @@
       `<rect x="4" y="10" width="7" height="14" rx="3" fill="${dark}"/>` +
       `<ellipse cx="0" cy="4" rx="22" ry="17" fill="${col}"/>` +
       `<ellipse cx="0" cy="8" rx="12" ry="11" fill="${belly}"/>` +
+      `<path d="M -8 3 Q 0 5.5 8 3 M -9 8.5 Q 0 11 9 8.5 M -7.5 14 Q 0 16 7.5 14" stroke="#b9d98e" stroke-width="1.1" fill="none" opacity="0.8" stroke-linecap="round"/>` +
+      `<path d="M -14 -8 Q -7 -13.5 1 -13.8" stroke="${shade(col, 32)}" stroke-width="2" fill="none" opacity="0.55" stroke-linecap="round"/>` +
       `<path d="M -8 -12 L -4 -20 L 0 -12 Z M 2 -13 L 6 -22 L 10 -13 Z" fill="${dark}"/>` +
       `<path d="M 14 -6 C 20 -18 30 -22 36 -18 C 32 -14 32 -8 26 -4 C 22 -1 18 0 14 0 Z" fill="${col}"/>` +
-      `<ellipse cx="34" cy="-18" rx="11" ry="9" fill="${col}"/>` +
-      `<ellipse cx="42" cy="-14" rx="6" ry="5" fill="${col}"/>` +
-      `<circle cx="45" cy="-15" r="1" fill="${dark}"/>` +
-      `<path d="M 38 -11 Q 43 -8 47 -12" stroke="${dark}" stroke-width="1.2" fill="none" stroke-linecap="round"/>` +
-      `<path d="M 30 -26 L 33 -34 L 36 -26 Z" fill="${belly}"/>` +
-      `<circle cx="33" cy="-20" r="2.6" fill="#fff"/>` +
-      `<circle cx="34" cy="-20" r="1.4" fill="#2b2440"/>` +
-      `<circle cx="34.5" cy="-20.6" r="0.5" fill="#fff"/>` +
-      `<circle cx="27" cy="-13" r="2.2" fill="#ff9ec2" opacity="0.5"/>` +
+      // round head + friendly rounded muzzle with two nostrils
+      `<circle cx="34" cy="-20" r="9" fill="${col}"/>` +
+      `<ellipse cx="42.5" cy="-16.5" rx="6" ry="4.6" fill="${col}"/>` +
+      `<ellipse cx="43.5" cy="-15" rx="3.4" ry="2.4" fill="${belly}" opacity="0.85"/>` +
+      `<ellipse cx="41.5" cy="-19.4" rx="0.85" ry="1.05" fill="${dark}" opacity="0.8"/>` +
+      `<ellipse cx="44.8" cy="-18.8" rx="0.85" ry="1.05" fill="${dark}" opacity="0.8"/>` +
+      `<path d="M 38 -13.6 Q 42.5 -10.8 47 -13.2" stroke="${dark}" stroke-width="1.3" fill="none" stroke-linecap="round"/>` +
+      // two soft cream horns
+      `<path d="M 28 -28.2 Q 27.4 -33.6 30 -35.4 Q 31.8 -31.4 30.8 -27.8 Z" fill="${belly}"/>` +
+      `<path d="M 34.8 -28.6 Q 35.4 -34 38 -34.8 Q 38.6 -30.6 36.8 -27.6 Z" fill="${belly}"/>` +
+      // big kind eye set forward, with a little brow
+      `<circle cx="31.5" cy="-23" r="3.2" fill="#fff"/>` +
+      `<circle cx="32.4" cy="-22.6" r="1.7" fill="#2b2440"/>` +
+      `<circle cx="33" cy="-23.3" r="0.6" fill="#fff"/>` +
+      `<path d="M 28.4 -27.2 Q 31.2 -28.6 34 -27.4" stroke="${dark}" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.6"/>` +
+      `<circle cx="28.6" cy="-16" r="2.2" fill="#f9a8c9" opacity="0.9"/>` +
       `<circle cx="53" cy="-15" r="2" fill="#fff" opacity="0.5"><animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite"/></circle>` +
       `</g></g>`;
   }
@@ -539,6 +697,7 @@
     return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap hint-bob" data-sound="twinkle">` +
       `<defs>${glowFilter(g, 3)}</defs>` +
       `<polygon points="${pts.trim()}" fill="${col}" stroke="${edge}" stroke-width="1.5" filter="url(#${g})"/>` +
+      `<polygon points="${pts.trim()}" transform="scale(0.62)" fill="${shade(col, 24)}" opacity="0.75"/>` +
       `<ellipse cx="-5" cy="-2" rx="2.1" ry="2.6" fill="#2b2440">` +
       `<animate attributeName="ry" values="2.6;2.6;0.4;2.6" keyTimes="0;0.9;0.94;1" dur="4.8s" repeatCount="indefinite"/></ellipse>` +
       `<ellipse cx="5" cy="-2" rx="2.1" ry="2.6" fill="#2b2440">` +
@@ -781,7 +940,7 @@
           text: "“Hello!” said Ellie softly. The shy unicorn was named Sparkle.",
           art: () => svg(dayBg({sunX:330}) +
             kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)) +
-            unicorn({x:270, y:245, scale:1.4}))
+            unicorn({x:270, y:245, scale:1.4, flip:true}))
         },
         {
           text: "Sparkle knelt down low. Up, up, up — Ellie climbed onto her soft back!",
@@ -793,14 +952,22 @@
           text: "They galloped over a rainbow, high above the fluffy white clouds. Wheee!",
           art: () => svg(dayBg({sunX:330, sunY:56}) + rainbow(200, 120, 1) +
             cloud(80, 210, 1.1) + cloud(320, 220, 0.9) +
+            // whoosh! wind streaks and a sparkle trail behind them
+            `<g stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5">` +
+            `<path d="M 112 172 q 20 -3 38 0"/><path d="M 98 190 q 24 -4 44 0"/><path d="M 118 206 q 18 -2 32 0"/>` +
+            `<animate attributeName="opacity" values="0.2;0.6;0.2" dur="1.8s" repeatCount="indefinite"/></g>` +
+            star(138, 168, 5, 0) + star(116, 198, 4, 3) + star(150, 218, 4, 6) +
             unicorn({x:200, y:190, scale:1.4}) +
-            kid(Object.assign({x:211, y:158, scale:0.63}, ELLIE)))
+            kid(Object.assign({x:211, y:167, scale:0.63,
+              extra: `<path d="M -13 -52 C -19 -55 -25 -55 -30 -51.5" stroke="#6b4a2a" stroke-width="4.6" fill="none" stroke-linecap="round"/>` +
+                `<path d="M -14 -46.5 C -20 -48.5 -25 -47.5 -28.5 -44.5" stroke="#6b4a2a" stroke-width="3.4" fill="none" stroke-linecap="round"/>`
+            }, ELLIE)))
         },
         {
           text: "Back home for tea, Sparkle promised to visit every single sunny day. Yay!",
           art: () => svg(dayBg({sunset:true, sunX:70}) +
             kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)) +
-            unicorn({x:275, y:245, scale:1.4}))
+            unicorn({x:275, y:245, scale:1.4, flip:true}))
         },
         { end: true, text: "The End. 🦄", art: () => endArtDay([unicorn({x:200,y:180,scale:1.9})]) }
       ]
@@ -831,14 +998,14 @@
           text: "Princess Jeannie showed him how. Stomp, stomp, TWIRL! “You can do it!”",
           art: () => svg(dayBg({sunX:60}) +
             kid(Object.assign({x:120, y:250, scale:1.4, crown:false}, JEANNIE)) +
-            dragon({x:270, y:240, scale:1.5}))
+            dragon({x:270, y:240, scale:1.5, flip:true}))
         },
         {
           text: "Soon everyone danced — Ellie, Cory, and the dragon spun round and round.",
           art: () => svg(dayBg({sunX:330}) +
             kid(Object.assign({x:100, y:252, scale:1.2}, ELLIE)) +
             kid(Object.assign({x:200, y:252, scale:1.2}, CORY)) +
-            dragon({x:300, y:245, scale:1.3}))
+            dragon({x:300, y:245, scale:1.3, flip:true}))
         },
         {
           text: "The dragon danced so happily that bright little flowers grew where he stepped!",
