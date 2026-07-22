@@ -38,6 +38,7 @@
         if (s && s.team && s.team.length) {
           s.periods = 8;            // always open on 8 periods
           s.seed = s.seed || 1;
+          s.game = s.game || { opp: "", date: "" };
           // everyone goalie-eligible on load (also migrates the old goalie:true/false field)
           s.team.forEach(function (g) { g.gk = "yes"; delete g.goalie; });
           return s;
@@ -48,6 +49,7 @@
       team: DEFAULT_TEAM.map(function (g) { return Object.assign({}, g); }),
       periods: 8,
       seed: 1,
+      game: { opp: "", date: "" },
       lastRoster: null
     };
   }
@@ -212,10 +214,39 @@
       controls.appendChild(pres);
       controls.appendChild(gk);
 
-      row.appendChild(name);      // name on its own line
+      var rm = document.createElement("button");
+      rm.className = "rm-btn";
+      rm.textContent = "✕";
+      rm.title = "Remove " + g.name + " from the team";
+      rm.setAttribute("aria-label", "Remove " + g.name);
+      rm.onclick = function () {
+        if (!confirm("Remove " + g.name + " from the team for good?\n(Use Away if she's just missing this game.)")) return;
+        state.team.splice(i, 1);
+        save(); renderTeam(); settingsChanged();
+      };
+
+      var top = document.createElement("div");
+      top.className = "row-top";
+      top.appendChild(name);
+      top.appendChild(rm);
+
+      row.appendChild(top);       // name + remove on the first line
       row.appendChild(controls);  // Here / goalie below it
       list.appendChild(row);
     });
+  }
+
+  function addPlayer() {
+    var input = document.getElementById("newPlayerInput");
+    if (!input) return;
+    var name = input.value.replace(/\s+/g, " ").trim();
+    if (!name) { input.focus(); return; }
+    var dupe = state.team.some(function (g) { return g.name.toLowerCase() === name.toLowerCase(); });
+    if (dupe) { alert(name + " is already on the team."); input.select(); return; }
+    state.team.push({ name: name, present: true, gk: "yes" });
+    input.value = "";
+    input.focus();
+    save(); renderTeam(); settingsChanged();
   }
 
   function renderPeriodButtons() {
@@ -243,6 +274,17 @@
     var mustMissed = present.filter(function (g) { return g.gk === "must" && r.stat[g.name].goalie === 0; });
 
     var html = "";
+
+    // ---- at-a-glance fairness summary ----
+    if (!noGoalie && !shortHanded) {
+      var playsTxt = minP === maxP ? String(minP) : minP + " or " + maxP;
+      var gkOrder = r.lineups.map(function (lu) { return lu.goalie; }).filter(Boolean);
+      html += '<div class="panel fair-note">' +
+        '<span class="fair-bit"><span class="mark">💚</span><span>Everyone here plays <b>' +
+        playsTxt + " of " + state.periods + '</b> periods</span></span>' +
+        '<span class="fair-bit"><span class="mark">🧤</span><span>Goalie order: <b>' +
+        esc(gkOrder.join(" → ")) + "</b></span></span></div>";
+    }
 
     // ---- only flag real problems (no "all good" reassurance clutter) ----
     var warns = [];
@@ -331,15 +373,77 @@
      unrequested is ever on screen.
      =========================================================== */
   var hasRoster = false;
+  var lastRoster = null;   // the roster on screen, for "Copy as text"
 
   // Button reads "Make roster" until one exists, then becomes "Shuffle".
-  // The Print button is disabled until there's a roster to print.
+  // Print / Copy are disabled until there's a roster to use.
   function setHasRoster(v) {
     hasRoster = v;
+    if (!v) lastRoster = null;
     var btn = document.getElementById("generateBtn");
     if (btn) btn.textContent = v ? "🔀 Shuffle" : "⚽ Make roster";
     var fab = document.getElementById("printFab");
     if (fab) fab.disabled = !v;
+    var copy = document.getElementById("copyBtn");
+    if (copy) copy.disabled = !v;
+  }
+
+  // "Pumpkin Pies vs Tigers — Sat, Oct 12" (game details are optional)
+  function gameLabel() {
+    var out = "Pumpkin Pies";
+    if (state.game && state.game.opp) out += " vs " + state.game.opp;
+    if (state.game && state.game.date) {
+      var d = new Date(state.game.date + "T12:00:00");
+      if (!isNaN(d.getTime())) {
+        out += " — " + d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+      }
+    }
+    return out;
+  }
+  function updatePrintTitle() {
+    var el = document.getElementById("printTitle");
+    if (el) el.textContent = gameLabel();
+  }
+
+  // Plain-text version of the line-ups, ready to paste in the team chat.
+  function rosterText(r) {
+    var lines = [gameLabel(), ""];
+    r.lineups.forEach(function (lu, i) {
+      lines.push(ordinal(i, state.periods) + " — Goalie: " + (lu.goalie || "(none)"));
+      lines.push("  On field: " + lu.field.join(", "));
+      if (lu.sitting.length) lines.push("  Resting: " + lu.sitting.join(", "));
+      lines.push("");
+    });
+    return lines.join("\n").trim() + "\n";
+  }
+
+  function copyRoster() {
+    if (!hasRoster || !lastRoster) return;
+    var text = rosterText(lastRoster);
+    var btn = document.getElementById("copyBtn");
+    function done(ok) {
+      if (!btn) return;
+      var old = "📋 Copy as text";
+      btn.textContent = ok ? "✅ Copied!" : "⚠️ Couldn't copy";
+      setTimeout(function () { btn.textContent = old; }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); },
+        function () { done(legacyCopy(text)); });
+    } else {
+      done(legacyCopy(text));
+    }
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { /* ignore */ }
+    document.body.removeChild(ta);
+    return ok;
   }
 
   // Empty state: a clear "your move" prompt instead of a surprise roster.
@@ -366,8 +470,10 @@
       setHasRoster(false); save();
       return;
     }
-    renderRoster(buildRoster(state.team, state.periods, state.seed));
+    var r = buildRoster(state.team, state.periods, state.seed);
+    renderRoster(r);
     setHasRoster(true);
+    lastRoster = r;
     save();
   }
 
@@ -398,12 +504,39 @@
       if (!hasRoster) return;   // disabled until a roster exists
       window.print();
     });
+    on("copyBtn", copyRoster);
     on("resetBtn", function () {
       if (confirm("Reset the whole team back to the original roster?")) {
         state.team = DEFAULT_TEAM.map(function (g) { return Object.assign({}, g); });
         save(); renderTeam(); showPrompt();
       }
     });
+
+    // team editor: add a player (button or Enter)
+    on("addPlayerBtn", addPlayer);
+    var newInput = document.getElementById("newPlayerInput");
+    if (newInput) {
+      newInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") { e.preventDefault(); addPlayer(); }
+      });
+    }
+
+    // game-day details feed the printout title (cosmetic — no roster reset)
+    var opp = document.getElementById("oppInput");
+    var date = document.getElementById("dateInput");
+    if (opp) {
+      opp.value = (state.game && state.game.opp) || "";
+      opp.addEventListener("input", function () {
+        state.game.opp = opp.value.trim(); save(); updatePrintTitle();
+      });
+    }
+    if (date) {
+      date.value = (state.game && state.game.date) || "";
+      date.addEventListener("input", function () {
+        state.game.date = date.value; save(); updatePrintTitle();
+      });
+    }
+    updatePrintTitle();
   }
 
   if (document.readyState === "loading") {

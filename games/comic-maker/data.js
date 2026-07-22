@@ -41,6 +41,16 @@ const STICKERS = [
     name: "Yummy",
     tab: "🍎",
     items: "🍎 🍌 🍓 🍇 🍉 🍑 🍒 🥕 🌽 🍞 🧀 🍕 🍔 🌭 🌮 🍟 🥨 🍩 🍪 🍰 🧁 🍦 🍭 🍫 🍿 🍯 🥤 ☕ 🧃 🍉"
+  },
+  {
+    name: "Faces",
+    tab: "😀",
+    items: "😀 😂 😍 😎 🤩 😴 😱 😭 🥺 😡 🤔 🙃 😜 🤗 😇 🤠 🥳 🤫 😬 🤢 🥶 🥵 😈 🤯 😳 🙄 😤 🤤"
+  },
+  {
+    name: "Sports",
+    tab: "⚽",
+    items: "⚽ 🏀 🏈 ⚾ 🎾 🏐 🏓 🏸 🥅 🥍 🏒 ⛸️ 🛼 🏊‍♀️ 🚴‍♀️ 🤸‍♀️ 🏆 🥇 🥈 🥉 🎯 🎳 🤺 🧗‍♀️ 🏄‍♀️ ⛷️ 🤾‍♀️ 🏇"
   }
 ];
 
@@ -61,7 +71,13 @@ const SFX = [
   { w: "ZZZ…",    c: "#27c46b" },
   { w: "YUM!",    c: "#ff8c1a" },
   { w: "TA-DA!",  c: "#ffcf1a" },
-  { w: "OH NO!",  c: "#e23b3b" }
+  { w: "OH NO!",  c: "#e23b3b" },
+  { w: "WHOOSH!", c: "#2aa7ff" },
+  { w: "CREAK…",  c: "#7a4a1f" },
+  { w: "DING!",   c: "#ffcf1a" },
+  { w: "GASP!",   c: "#b14cff" },
+  { w: "THUMP!",  c: "#8a5cff" },
+  { w: "YAY!",    c: "#27c46b" }
 ];
 
 /* Paint colours for the Draw tools — tap one to start drawing.
@@ -87,5 +103,8 @@ const SCENES = [
   { key: "snow",    name: "Snow",    css: "linear-gradient(#eef8ff, #cfe6f5)" },
   { key: "candy",   name: "Candy",   css: "linear-gradient(#ffd6f0, #fff0c7)" },
   { key: "rainbow", name: "Rainbow", css: "linear-gradient(120deg,#ffadad,#ffd6a5,#fdffb6,#caffbf,#9bf6ff,#bdb2ff)" },
+  { key: "beach",   name: "Beach",   css: "linear-gradient(#9fe0ff 55%, #ffe7a8 55%)" },
+  { key: "lava",    name: "Volcano", css: "linear-gradient(#5a2a2a, #ff5b1f)", dark: true },
+  { key: "meadow",  name: "Meadow",  css: "linear-gradient(#d6f6ff 55%, #8fd97a 55%)" },
   { key: "plain",   name: "Plain",   css: "#ffffff" }
 ];

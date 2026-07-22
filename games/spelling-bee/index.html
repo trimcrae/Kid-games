@@ -92,10 +92,13 @@
     .found-wrap h3 { color: #b8860b; margin: 0.5rem 0; font-size: 1.05rem; text-align: center; }
     .found-list { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
     .found-chip {
-      background: var(--paper); border-radius: 999px; padding: 0.3rem 0.8rem; font-weight: bold;
+      background: var(--paper); border: none; font-family: var(--font); color: var(--ink);
+      border-radius: 999px; padding: 0.3rem 0.8rem; font-weight: bold;
       text-transform: capitalize; box-shadow: 0 4px 10px rgba(43,36,64,0.1); font-size: 0.95rem;
     }
     .found-chip.pangram { background: var(--yellow); color: #fff; }
+    .found-chip.has-def { cursor: pointer; text-decoration: underline dotted #b8860b 2px; text-underline-offset: 3px; touch-action: manipulation; }
+    .deffy { min-height: 1.3rem; text-align: center; font-size: 1rem; font-weight: bold; color: var(--purple); margin: 0.4rem auto 0; max-width: 480px; }
 
     .sparkle { position: fixed; font-size: 1.5rem; pointer-events: none; animation: sparkle-up 0.9s ease-out forwards; z-index: 5; }
     @keyframes sparkle-up {
@@ -146,12 +149,14 @@
         <button class="btn" id="enter-btn">Enter ✓</button>
       </div>
       <div class="controls" style="margin-top:-0.4rem;">
+        <button class="btn ghost" id="hint-btn">💡 Hint</button>
         <button class="btn ghost" id="quit-btn">🐝 All hives</button>
       </div>
 
       <div class="found-wrap">
-        <h3>Words you found</h3>
+        <h3>Words you found <span style="font-weight:normal;color:#6a6385;font-size:0.85rem;">(tap a dotted word to see what it means)</span></h3>
         <div class="found-list" id="found-list"></div>
+        <p class="deffy" id="deffy" aria-live="polite"></p>
       </div>
     </section>
 

@@ -17,7 +17,7 @@
   "use strict";
 
   /* ---- puzzle data (generated; do not hand-edit paths) ---- */
-  const PUZZLES = [{"name":"Minecraft World","emoji":"🟩","clue":"Blocky adventures, mobs & loot!","width":6,"height":7,"grid":["MINECR","ERCTFA","EPERDI","ZDNOMA","OMBIES","OTDROW","RCHTNT"],"words":[{"word":"MINECRAFT","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[1,5],[1,4],[1,3]]},{"word":"CREEPER","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1],[2,2],[2,3]]},{"word":"DIAMOND","spangram":false,"path":[[2,4],[2,5],[3,5],[3,4],[3,3],[3,2],[3,1]]},{"word":"ZOMBIE","spangram":false,"path":[[3,0],[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"SWORD","spangram":false,"path":[[4,5],[5,5],[5,4],[5,3],[5,2]]},{"word":"TORCH","spangram":false,"path":[[5,1],[5,0],[6,0],[6,1],[6,2]]},{"word":"TNT","spangram":false,"path":[[6,3],[6,4],[6,5]]}]},{"name":"Frozen Friends","emoji":"❄️","clue":"The snowy kingdom of Arendelle.","width":5,"height":6,"grid":["FROZE","SIRKN","TOFFE","NAASL","NAOLA","NEVSF"],"words":[{"word":"FROZEN","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4]]},{"word":"KRISTOFF","spangram":false,"path":[[1,3],[1,2],[1,1],[1,0],[2,0],[2,1],[2,2],[2,3]]},{"word":"ELSA","spangram":false,"path":[[2,4],[3,4],[3,3],[3,2]]},{"word":"ANNA","spangram":false,"path":[[3,1],[3,0],[4,0],[4,1]]},{"word":"OLAF","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4]]},{"word":"SVEN","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Under the Sea","emoji":"🌊","clue":"Animals that swim in the ocean.","width":5,"height":7,"grid":["OCEAN","HPLOD","INOCT","WSUPO","HALES","TKRAH","URTLE"],"words":[{"word":"OCEAN","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4]]},{"word":"DOLPHIN","spangram":false,"path":[[1,4],[1,3],[1,2],[1,1],[1,0],[2,0],[2,1]]},{"word":"OCTOPUS","spangram":false,"path":[[2,2],[2,3],[2,4],[3,4],[3,3],[3,2],[3,1]]},{"word":"WHALE","spangram":false,"path":[[3,0],[4,0],[4,1],[4,2],[4,3]]},{"word":"SHARK","spangram":false,"path":[[4,4],[5,4],[5,3],[5,2],[5,1]]},{"word":"TURTLE","spangram":false,"path":[[5,0],[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"The Heeler Family","emoji":"🐶","clue":"Bluey's family and friends.","width":5,"height":7,"grid":["HEELE","NABSR","DITCH","MILLI","UFFIN","YEULB","BINGO"],"words":[{"word":"HEELERS","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3]]},{"word":"BANDIT","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1],[2,2]]},{"word":"CHILLI","spangram":false,"path":[[2,3],[2,4],[3,4],[3,3],[3,2],[3,1]]},{"word":"MUFFIN","spangram":false,"path":[[3,0],[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"BLUEY","spangram":false,"path":[[5,4],[5,3],[5,2],[5,1],[5,0]]},{"word":"BINGO","spangram":false,"path":[[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"Gotta Catch 'Em","emoji":"⚡","clue":"Pokémon to catch and train.","width":5,"height":7,"grid":["POKEM","KIPNO","ACHUB","SABLU","AUREE","NSEEV","ORLAX"],"words":[{"word":"POKEMON","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3]]},{"word":"PIKACHU","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1],[2,2],[2,3]]},{"word":"BULBASAUR","spangram":false,"path":[[2,4],[3,4],[3,3],[3,2],[3,1],[3,0],[4,0],[4,1],[4,2]]},{"word":"EEVEE","spangram":false,"path":[[4,3],[4,4],[5,4],[5,3],[5,2]]},{"word":"SNORLAX","spangram":false,"path":[[5,1],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"Gabby's Cats","emoji":"🐱","clue":"Kitties from Gabby's Dollhouse.","width":5,"height":6,"grid":["GABBY","YDNAP","CAKEY","YTTIK","PURRS","SWOEM"],"words":[{"word":"GABBY","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4]]},{"word":"PANDY","spangram":false,"path":[[1,4],[1,3],[1,2],[1,1],[1,0]]},{"word":"CAKEY","spangram":false,"path":[[2,0],[2,1],[2,2],[2,3],[2,4]]},{"word":"KITTY","spangram":false,"path":[[3,4],[3,3],[3,2],[3,1],[3,0]]},{"word":"PURRS","spangram":false,"path":[[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"MEOWS","spangram":false,"path":[[5,4],[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Sweet Treats","emoji":"🍩","clue":"Yummy desserts and snacks.","width":5,"height":6,"grid":["SWEET","UNODS","TCAND","LLEJY","YFUDG","EKACE"],"words":[{"word":"SWEETS","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4]]},{"word":"DONUT","spangram":false,"path":[[1,3],[1,2],[1,1],[1,0],[2,0]]},{"word":"CANDY","spangram":false,"path":[[2,1],[2,2],[2,3],[2,4],[3,4]]},{"word":"JELLY","spangram":false,"path":[[3,3],[3,2],[3,1],[3,0],[4,0]]},{"word":"FUDGE","spangram":false,"path":[[4,1],[4,2],[4,3],[4,4],[5,4]]},{"word":"CAKE","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Blast Off!","emoji":"🚀","clue":"Things you'd find in outer space.","width":5,"height":6,"grid":["SPACE","ENALP","TROCK","MOCTE","ETMOO","RATSN"],"words":[{"word":"SPACE","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4]]},{"word":"PLANET","spangram":false,"path":[[1,4],[1,3],[1,2],[1,1],[1,0],[2,0]]},{"word":"ROCKET","spangram":false,"path":[[2,1],[2,2],[2,3],[2,4],[3,4],[3,3]]},{"word":"COMET","spangram":false,"path":[[3,2],[3,1],[3,0],[4,0],[4,1]]},{"word":"MOON","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4]]},{"word":"STAR","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Taekwondo!","emoji":"🥋","clue":"Kicks, belts and respect.","width":5,"height":6,"grid":["TAEKW","KODNO","ICKPU","EBHCN","LTBLO","WOBKC"],"words":[{"word":"TAEKWONDO","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3],[1,2],[1,1]]},{"word":"KICK","spangram":false,"path":[[1,0],[2,0],[2,1],[2,2]]},{"word":"PUNCH","spangram":false,"path":[[2,3],[2,4],[3,4],[3,3],[3,2]]},{"word":"BELT","spangram":false,"path":[[3,1],[3,0],[4,0],[4,1]]},{"word":"BLOCK","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4],[5,3]]},{"word":"BOW","spangram":false,"path":[[5,2],[5,1],[5,0]]}]}];
+  const PUZZLES = [{"name":"Minecraft World","emoji":"🟩","clue":"Blocky adventures, mobs & loot!","width":6,"height":7,"grid":["MINECR","ERCTFA","EPERDI","ZDNOMA","OMBIES","OTDROW","RCHTNT"],"words":[{"word":"MINECRAFT","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[1,5],[1,4],[1,3]]},{"word":"CREEPER","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1],[2,2],[2,3]]},{"word":"DIAMOND","spangram":false,"path":[[2,4],[2,5],[3,5],[3,4],[3,3],[3,2],[3,1]]},{"word":"ZOMBIE","spangram":false,"path":[[3,0],[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"SWORD","spangram":false,"path":[[4,5],[5,5],[5,4],[5,3],[5,2]]},{"word":"TORCH","spangram":false,"path":[[5,1],[5,0],[6,0],[6,1],[6,2]]},{"word":"TNT","spangram":false,"path":[[6,3],[6,4],[6,5]]}]},{"name":"Frozen Friends","emoji":"❄️","clue":"The snowy kingdom of Arendelle.","width":5,"height":6,"grid":["FROZE","SIRKN","TOFFE","NAASL","NAOLA","NEVSF"],"words":[{"word":"FROZEN","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4]]},{"word":"KRISTOFF","spangram":false,"path":[[1,3],[1,2],[1,1],[1,0],[2,0],[2,1],[2,2],[2,3]]},{"word":"ELSA","spangram":false,"path":[[2,4],[3,4],[3,3],[3,2]]},{"word":"ANNA","spangram":false,"path":[[3,1],[3,0],[4,0],[4,1]]},{"word":"OLAF","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4]]},{"word":"SVEN","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Under the Sea","emoji":"🌊","clue":"Animals that swim in the ocean.","width":5,"height":7,"grid":["OCEAN","HPLOD","INOCT","WSUPO","HALES","TKRAH","URTLE"],"words":[{"word":"OCEAN","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4]]},{"word":"DOLPHIN","spangram":false,"path":[[1,4],[1,3],[1,2],[1,1],[1,0],[2,0],[2,1]]},{"word":"OCTOPUS","spangram":false,"path":[[2,2],[2,3],[2,4],[3,4],[3,3],[3,2],[3,1]]},{"word":"WHALE","spangram":false,"path":[[3,0],[4,0],[4,1],[4,2],[4,3]]},{"word":"SHARK","spangram":false,"path":[[4,4],[5,4],[5,3],[5,2],[5,1]]},{"word":"TURTLE","spangram":false,"path":[[5,0],[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"The Heeler Family","emoji":"🐶","clue":"Bluey's family and friends.","width":5,"height":7,"grid":["HEELE","NABSR","DITCH","MILLI","UFFIN","YEULB","BINGO"],"words":[{"word":"HEELERS","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3]]},{"word":"BANDIT","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1],[2,2]]},{"word":"CHILLI","spangram":false,"path":[[2,3],[2,4],[3,4],[3,3],[3,2],[3,1]]},{"word":"MUFFIN","spangram":false,"path":[[3,0],[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"BLUEY","spangram":false,"path":[[5,4],[5,3],[5,2],[5,1],[5,0]]},{"word":"BINGO","spangram":false,"path":[[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"Gotta Catch 'Em","emoji":"⚡","clue":"Pokémon to catch and train.","width":5,"height":7,"grid":["POKEM","KIPNO","ACHUB","SABLU","AUREE","NSEEV","ORLAX"],"words":[{"word":"POKEMON","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3]]},{"word":"PIKACHU","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1],[2,2],[2,3]]},{"word":"BULBASAUR","spangram":false,"path":[[2,4],[3,4],[3,3],[3,2],[3,1],[3,0],[4,0],[4,1],[4,2]]},{"word":"EEVEE","spangram":false,"path":[[4,3],[4,4],[5,4],[5,3],[5,2]]},{"word":"SNORLAX","spangram":false,"path":[[5,1],[5,0],[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"Gabby's Cats","emoji":"🐱","clue":"Kitties from Gabby's Dollhouse.","width":5,"height":6,"grid":["GABBY","YDNAP","CAKEY","YTTIK","PURRS","SWOEM"],"words":[{"word":"GABBY","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4]]},{"word":"PANDY","spangram":false,"path":[[1,4],[1,3],[1,2],[1,1],[1,0]]},{"word":"CAKEY","spangram":false,"path":[[2,0],[2,1],[2,2],[2,3],[2,4]]},{"word":"KITTY","spangram":false,"path":[[3,4],[3,3],[3,2],[3,1],[3,0]]},{"word":"PURRS","spangram":false,"path":[[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"MEOWS","spangram":false,"path":[[5,4],[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Sweet Treats","emoji":"🍩","clue":"Yummy desserts and snacks.","width":5,"height":6,"grid":["SWEET","UNODS","TCAND","LLEJY","YFUDG","EKACE"],"words":[{"word":"SWEETS","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4]]},{"word":"DONUT","spangram":false,"path":[[1,3],[1,2],[1,1],[1,0],[2,0]]},{"word":"CANDY","spangram":false,"path":[[2,1],[2,2],[2,3],[2,4],[3,4]]},{"word":"JELLY","spangram":false,"path":[[3,3],[3,2],[3,1],[3,0],[4,0]]},{"word":"FUDGE","spangram":false,"path":[[4,1],[4,2],[4,3],[4,4],[5,4]]},{"word":"CAKE","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Blast Off!","emoji":"🚀","clue":"Things you'd find in outer space.","width":5,"height":6,"grid":["SPACE","ENALP","TROCK","MOCTE","ETMOO","RATSN"],"words":[{"word":"SPACE","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4]]},{"word":"PLANET","spangram":false,"path":[[1,4],[1,3],[1,2],[1,1],[1,0],[2,0]]},{"word":"ROCKET","spangram":false,"path":[[2,1],[2,2],[2,3],[2,4],[3,4],[3,3]]},{"word":"COMET","spangram":false,"path":[[3,2],[3,1],[3,0],[4,0],[4,1]]},{"word":"MOON","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4]]},{"word":"STAR","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Taekwondo!","emoji":"🥋","clue":"Kicks, belts and respect.","width":5,"height":6,"grid":["TAEKW","KODNO","ICKPU","EBHCN","LTBLO","WOBKC"],"words":[{"word":"TAEKWONDO","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3],[1,2],[1,1]]},{"word":"KICK","spangram":false,"path":[[1,0],[2,0],[2,1],[2,2]]},{"word":"PUNCH","spangram":false,"path":[[2,3],[2,4],[3,4],[3,3],[3,2]]},{"word":"BELT","spangram":false,"path":[[3,1],[3,0],[4,0],[4,1]]},{"word":"BLOCK","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4],[5,3]]},{"word":"BOW","spangram":false,"path":[[5,2],[5,1],[5,0]]}]},{"name":"Princess Party","emoji":"👸","clue":"Everything a royal princess needs.","width":5,"height":7,"grid":["PRINC","RCSSE","OWNDR","ACSSE","STLET","PARAI","ALACE"],"words":[{"word":"PRINCESS","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3],[1,2]]},{"word":"CROWN","spangram":false,"path":[[1,1],[1,0],[2,0],[2,1],[2,2]]},{"word":"DRESS","spangram":false,"path":[[2,3],[2,4],[3,4],[3,3],[3,2]]},{"word":"CASTLE","spangram":false,"path":[[3,1],[3,0],[4,0],[4,1],[4,2],[4,3]]},{"word":"TIARA","spangram":false,"path":[[4,4],[5,4],[5,3],[5,2],[5,1]]},{"word":"PALACE","spangram":false,"path":[[5,0],[6,0],[6,1],[6,2],[6,3],[6,4]]}]},{"name":"Dino Dig","emoji":"🦖","clue":"Prehistoric giants and their bones.","width":6,"height":6,"grid":["DINOSA","XERTRU","RAPTOR","LISSOF","BONESR","GGERAO"],"words":[{"word":"DINOSAUR","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[1,5],[1,4]]},{"word":"TREX","spangram":false,"path":[[1,3],[1,2],[1,1],[1,0]]},{"word":"RAPTOR","spangram":false,"path":[[2,0],[2,1],[2,2],[2,3],[2,4],[2,5]]},{"word":"FOSSIL","spangram":false,"path":[[3,5],[3,4],[3,3],[3,2],[3,1],[3,0]]},{"word":"BONES","spangram":false,"path":[[4,0],[4,1],[4,2],[4,3],[4,4]]},{"word":"ROAR","spangram":false,"path":[[4,5],[5,5],[5,4],[5,3]]},{"word":"EGG","spangram":false,"path":[[5,2],[5,1],[5,0]]}]},{"name":"On the Farm","emoji":"🚜","clue":"Animals in the barnyard.","width":5,"height":7,"grid":["BARNY","OHDRA","RSESH","OGPEE","ATDUC","CGIPK","OWHEN"],"words":[{"word":"BARNYARD","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3],[1,2]]},{"word":"HORSE","spangram":false,"path":[[1,1],[1,0],[2,0],[2,1],[2,2]]},{"word":"SHEEP","spangram":false,"path":[[2,3],[2,4],[3,4],[3,3],[3,2]]},{"word":"GOAT","spangram":false,"path":[[3,1],[3,0],[4,0],[4,1]]},{"word":"DUCK","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4]]},{"word":"PIG","spangram":false,"path":[[5,3],[5,2],[5,1]]},{"word":"COW","spangram":false,"path":[[5,0],[6,0],[6,1]]},{"word":"HEN","spangram":false,"path":[[6,2],[6,3],[6,4]]}]},{"name":"Book Nook","emoji":"📚","clue":"Curl up with a good story.","width":5,"height":6,"grid":["READI","OTSGN","RYPAG","OOBSE","KSHER","TOLPO"],"words":[{"word":"READING","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3]]},{"word":"STORY","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0],[2,1]]},{"word":"PAGES","spangram":false,"path":[[2,2],[2,3],[2,4],[3,4],[3,3]]},{"word":"BOOKS","spangram":false,"path":[[3,2],[3,1],[3,0],[4,0],[4,1]]},{"word":"HERO","spangram":false,"path":[[4,2],[4,3],[4,4],[5,4]]},{"word":"PLOT","spangram":false,"path":[[5,3],[5,2],[5,1],[5,0]]}]},{"name":"Math Magic","emoji":"➗","clue":"Things you do in math class.","width":5,"height":5,"grid":["NUMBE","ULPSR","SMINU","NUOCS","TMATH"],"words":[{"word":"NUMBERS","spangram":true,"path":[[0,0],[0,1],[0,2],[0,3],[0,4],[1,4],[1,3]]},{"word":"PLUS","spangram":false,"path":[[1,2],[1,1],[1,0],[2,0]]},{"word":"MINUS","spangram":false,"path":[[2,1],[2,2],[2,3],[2,4],[3,4]]},{"word":"COUNT","spangram":false,"path":[[3,3],[3,2],[3,1],[3,0],[4,0]]},{"word":"MATH","spangram":false,"path":[[4,1],[4,2],[4,3],[4,4]]}]}];
 
   const PALETTE = ["#38b6ff", "#3ddc84", "#ff5d8f", "#8a5cff", "#ff9f1c", "#2bbf6e", "#e84393"];
   const SPAN_COLOR = "#f4b400";
@@ -51,6 +51,7 @@
   let found = {};          // word -> color
   let over = false;
   let dragging = false, moved = false;
+  let hintWord = null, hintStage = 0;   // two-stage hint (see hint())
 
   /* assign each word a colour for when it's found */
   function colorWords(p) {
@@ -90,6 +91,7 @@
     sel = [];
     over = false;
     found = {};
+    hintWord = null; hintStage = 0;
     el.feedback.textContent = "";
     el.next.classList.add("hidden");
     el.title.textContent = puzzle.emoji + " " + puzzle.name;
@@ -120,6 +122,7 @@
         b.className = "scell";
         b.textContent = puzzle.grid[r][c];
         b.dataset.r = r; b.dataset.c = c;
+        b.setAttribute("aria-label", "Letter " + puzzle.grid[r][c] + ", row " + (r + 1) + ", column " + (c + 1));
         b.addEventListener("pointerdown", (e) => { e.preventDefault(); pointerDown(r, c); });
         b.addEventListener("pointerenter", () => pointerEnter(r, c));
         cells[r][c] = b;
@@ -206,7 +209,12 @@
     drawLines();
     updateProgress();
     renderFoundList();
-    if (w.spangram) { flash("🌟 You found the spangram: " + w.word + "!", "var(--green)"); if (window.SFX) SFX.win(); }
+    if (hintWord === w) { hintWord = null; hintStage = 0; }   // hinted word solved
+    if (w.spangram) {
+      flash("🌟 SPANGRAM! " + w.word + " names the whole theme! 🌟", "var(--green)");
+      if (window.SFX) SFX.win();
+      window.Confetti && Confetti.burst({ count: 70 });
+    }
     else { flash("Nice! You found " + w.word + " 🎉", "var(--green)"); if (window.SFX) SFX.good(); }
     if (foundSet(pi).length >= puzzle.words.length) finish();
   }
@@ -298,19 +306,35 @@
   }
   window.addEventListener("resize", () => { if (puzzle && !el.play.classList.contains("hidden")) drawLines(); });
 
-  /* ---- hint: briefly glow an unfound word's letters ---- */
+  /* ---- two-stage hint, so it teaches instead of telling ----
+     1st press: name a word's length and glow just its FIRST letter.
+     2nd press (same word): glow the whole path. A new word is only
+     picked once the hinted one is found. */
+  function glowCells(coords, ms) {
+    coords.forEach(([r, c]) => {
+      const cell = cells[r][c];
+      const old = cell.style.boxShadow;
+      cell.style.boxShadow = "0 0 0 4px var(--yellow)";
+      setTimeout(() => { cell.style.boxShadow = old; }, ms);
+    });
+  }
   function hint() {
     if (over) return;
     const unfound = puzzle.words.filter((w) => !found[w.word]);
     if (!unfound.length) return;
-    const w = unfound[Math.floor(Math.random() * unfound.length)];
-    flash("💡 One word starts with " + w.word[0].toUpperCase() + " …", "var(--purple)");
-    w.path.forEach(([r, c]) => {
-      const cell = cells[r][c];
-      const old = cell.style.boxShadow;
-      cell.style.boxShadow = "0 0 0 4px var(--yellow)";
-      setTimeout(() => { cell.style.boxShadow = old; }, 1100);
-    });
+    if (!hintWord || found[hintWord.word]) {
+      hintWord = unfound[Math.floor(Math.random() * unfound.length)];
+      hintStage = 0;
+    }
+    const w = hintWord;
+    if (hintStage === 0) {
+      hintStage = 1;
+      flash("💡 A " + w.word.length + "-letter word starts at the glowing " + w.word[0].toUpperCase() + " …", "var(--purple)");
+      glowCells([w.path[0]], 1600);
+    } else {
+      flash("💡 Here's the whole word — trace it!", "var(--purple)");
+      glowCells(w.path, 1600);
+    }
   }
 
   /* ---- buttons ---- */

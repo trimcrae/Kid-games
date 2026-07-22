@@ -14,6 +14,28 @@
      number, name, exclamation, silly-word
    =========================================================== */
 
+/* Kid-friendly grammar hints, one per blank type. Shown while the
+   kid thinks of a word — this is where the "teaches parts of
+   speech" actually happens. */
+const MADLIB_HINTS = {
+  "adjective":   "An adjective is a describing word — it tells what something is like (fuzzy, giant, sparkly).",
+  "noun":        "A noun is a thing — a person, a place, or an object you could point at.",
+  "plural-noun": "Plural means MORE than one — it usually ends in -s (cats, rockets, pickles).",
+  "verb":        "A verb is a doing word — something you can act out (jump, wiggle, snore).",
+  "verb-ed":     "A doing word that ALREADY happened — most end in -ed (jumped, wiggled).",
+  "verb-ing":    "A doing word happening RIGHT NOW — it ends in -ing (jumping, wiggling).",
+  "adverb":      "An adverb tells HOW you do something — it usually ends in -ly (slowly, bravely).",
+  "body-part":   "Any part of you, from your head down to your toes.",
+  "animal":      "Any creature at all — real ones or ones from your imagination.",
+  "place":       "Anywhere you could go — near, far, or totally made up.",
+  "food":        "Anything yummy (or yucky!) that someone could eat.",
+  "color":       "Any colour of the rainbow — or invent a brand-new one.",
+  "number":      "Any number — teeny-tiny, super-huge, or in between.",
+  "name":        "A person's name — maybe someone in your family!",
+  "exclamation": "A word you SHOUT when you're surprised, like WOW or YIKES.",
+  "silly-word":  "Make one up! Any goofy sound counts (blorp, zizzlefish…)."
+};
+
 const MADLIBS = [
   {
     id: "lunch-disaster",
@@ -235,5 +257,99 @@ const MADLIBS = [
       "bumper cars had been replaced with bumper {4}, which spun {5} in circles. For a " +
       "snack we ate cotton candy that tasted exactly like {6}. \"{7}!\" we screamed on " +
       "every single ride — even the ones that never moved."
+  },
+
+  {
+    id: "superhero-neighbor",
+    title: "The Superhero Next Door",
+    emoji: "🦸",
+    color: "#ff5d8f",
+    blanks: [
+      { type: "name",        label: "a person's name",           example: "Riley" },
+      { type: "adjective",   label: "a silly adjective",         example: "sparkly" },
+      { type: "animal",      label: "an animal",                 example: "goldfish" },
+      { type: "verb",        label: "an action word",            example: "cartwheel" },
+      { type: "color",       label: "a color",                   example: "orange" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "pillows" },
+      { type: "body-part",   label: "a part of the body",        example: "pinky finger" },
+      { type: "exclamation", label: "something you shout",       example: "Hooray" }
+    ],
+    template:
+      "Not many people know it, but our neighbor {0} is secretly a superhero called " +
+      "Captain {1}! By day they quietly walk their pet {2}, but the second trouble " +
+      "strikes, they {3} into a {4} cape and zoom off to save the day. Yesterday they " +
+      "caught a whole truckload of falling {5} using only one {6}. \"{7}!\" cheered the " +
+      "entire street. Being a hero is hard work — but somebody's got to do it."
+  },
+
+  {
+    id: "undersea-sleepover",
+    title: "Sleepover Under the Sea",
+    emoji: "🐙",
+    color: "#38b6ff",
+    blanks: [
+      { type: "adjective",   label: "a silly adjective",         example: "bubbly" },
+      { type: "animal",      label: "an animal",                 example: "walrus" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "buttons" },
+      { type: "verb-ing",    label: "an action word ending in -ing", example: "twirling" },
+      { type: "food",        label: "a food",                    example: "pancake" },
+      { type: "number",      label: "a number",                  example: "14" },
+      { type: "body-part",   label: "a part of the body",        example: "ear" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "gently" }
+    ],
+    template:
+      "For my birthday I had a {0} sleepover at the bottom of the ocean. An octopus " +
+      "braided my hair with four arms at once while a {1} told spooky stories about " +
+      "dry land. We all wore pajamas covered in {2} and spent hours {3} with the " +
+      "dolphins. At midnight we snacked on {4}-flavored seaweed — I ate {5} whole " +
+      "bowls! I fell asleep with a starfish stuck to my {6}, snoring {7} into my " +
+      "bubble pillow. Best underwater birthday ever."
+  },
+
+  {
+    id: "cookie-bakeoff",
+    title: "The Great Cookie Bake-Off",
+    emoji: "🧁",
+    color: "#ffd166",
+    blanks: [
+      { type: "name",        label: "a person's name",           example: "Jo" },
+      { type: "food",        label: "a food",                    example: "pickle" },
+      { type: "number",      label: "a number",                  example: "83" },
+      { type: "verb-ed",     label: "an action word ending in -ed", example: "rattled" },
+      { type: "adjective",   label: "a silly adjective",         example: "gloopy" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "sprinkles" },
+      { type: "silly-word",  label: "a made-up silly word (the cookie's name)", example: "Snickerblob" },
+      { type: "exclamation", label: "something you shout",       example: "Delicious" }
+    ],
+    template:
+      "Welcome to the Great Cookie Bake-Off! Famous chef {0} stepped up with a secret " +
+      "recipe: {1} cookies with exactly {2} spoonfuls of sugar. The mixer {3} so hard " +
+      "that soon the whole kitchen was buried under {4} {5}. Chef {0} named the brand-new " +
+      "cookie the \"{6}\", and the judges took one bite and hollered \"{7}!\" They awarded " +
+      "it the gold medal — and then they ate the medal too, because it was also a cookie."
+  },
+
+  {
+    id: "homework-alive",
+    title: "My Homework Came Alive",
+    emoji: "📚",
+    color: "#8a5cff",
+    blanks: [
+      { type: "adjective",   label: "a silly adjective",         example: "grumpy" },
+      { type: "noun",        label: "a noun (a thing)",          example: "volcano" },
+      { type: "verb",        label: "an action word",            example: "tap-dance" },
+      { type: "place",       label: "a place",                   example: "the supermarket" },
+      { type: "animal",      label: "an animal",                 example: "poodle" },
+      { type: "verb-ing",    label: "an action word ending in -ing", example: "honking" },
+      { type: "number",      label: "a number",                  example: "17" },
+      { type: "exclamation", label: "something you shout",       example: "Impossible" }
+    ],
+    template:
+      "Teachers never believe me, but here is the honest truth: my {0} homework came " +
+      "ALIVE. My report about the {1} hopped right off my desk, learned to {2}, and " +
+      "chased me all the way to {3}. A passing {4} saw the whole thing and started " +
+      "{5} — which only made it worse. In the end it took {6} firefighters to catch my " +
+      "homework and staple it back together. \"{7}!\" gasped my teacher when I told her. " +
+      "Then she gave me an A+ for adventure."
   }
 ];

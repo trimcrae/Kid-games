@@ -249,11 +249,39 @@
 
   const $ = id => document.getElementById(id);
 
+  // ---- Collection log: rocks you've discovered ------------------------
+  // A rock counts as "found" when you solve a detective case on it or
+  // name it correctly in the quiz. Found rocks wear a ribbon in the book.
+  const FKEY = "rockDetectiveFound";
+  let found = new Set();
+  try { found = new Set(JSON.parse(localStorage.getItem(FKEY) || "[]")); } catch (e) {}
+
+  function markFound(name) {
+    if (found.has(name)) return;
+    found.add(name);
+    try { localStorage.setItem(FKEY, JSON.stringify([...found])); } catch (e) {}
+    document.querySelectorAll('.rock-card[data-rock="' + name + '"]')
+      .forEach(c => c.classList.add("found"));
+    updateBookProgress();
+  }
+
+  function updateBookProgress() {
+    const el = $("bookProgress");
+    if (!el) return;
+    el.textContent = found.size === 0
+      ? "🏅 Solve cases and ace the quiz to collect all " + ROCKS.length + " rocks!"
+      : found.size >= ROCKS.length
+        ? "🏆 Collection complete — you found all " + ROCKS.length + " rocks! You're a master geologist!"
+        : "🏅 Found " + found.size + " of " + ROCKS.length + " rocks — keep detecting & quizzing to collect them all!";
+  }
+
   // ---- Rock card element ----------------------------------------------
   function rockCard(rock) {
     const el = document.createElement("div");
-    el.className = "rock-card";
+    el.className = "rock-card" + (found.has(rock.name) ? " found" : "");
+    el.dataset.rock = rock.name;
     el.innerHTML =
+      '<span class="found-flag">✓ Found</span>' +
       '<svg viewBox="0 0 120 100" preserveAspectRatio="none">' + rockSvg(rock) + '</svg>' +
       '<div class="rock-body">' +
         '<div class="rock-name">' + rock.name + '</div>' +
@@ -388,6 +416,7 @@
         window.Confetti && Confetti.burst && Confetti.burst({ count: 50 });
         window.SFX && SFX.win && SFX.win();
       }
+      markFound(theOne.name);
     }
     lastMatches = matches;
     refreshClueChips();
@@ -447,6 +476,11 @@
     $("quizFeedback").textContent = "";
     current = drawRock();
     $("quizSvg").innerHTML = rockSvg(current);
+    const asks = [
+      "What rock is this?", "Who am I?", "Name this rock!",
+      "Which rock did the detective dig up?", "Can you identify this one?"
+    ];
+    if ($("quizQ")) $("quizQ").textContent = asks[(qNum - 1) % asks.length];
     $("quizHint").innerHTML = "Hint: it's a <b>" + current.type + "</b> — " + current.fact;
 
     const wrong = shuffle(ROCKS.filter(r => r.name !== current.name)).slice(0, 3);
@@ -478,6 +512,7 @@
         : "✅ Yes! " + current.name + "!";
       window.SFX && SFX.streak && SFX.streak(streak);
       window.Confetti && Confetti.burst && Confetti.burst({ count: 24 });
+      markFound(current.name);
     } else {
       streak = 0;
       btn.classList.add("wrong");
@@ -551,4 +586,5 @@
   filterDetective();
   buildBookFilters();
   buildBook();
+  updateBookProgress();
 })();

@@ -116,7 +116,24 @@
     .ml-ask .ml-example {
       font-size: 1.05rem;
       color: var(--purple);
-      margin: 0 0 1.2rem;
+      margin: 0 0 0.9rem;
+    }
+    .ml-ask .ml-hint {
+      font-size: 0.95rem;
+      color: #6a6385;
+      background: #f4effc;
+      border-radius: 14px;
+      padding: 0.55rem 0.9rem;
+      margin: 0 auto 1.2rem;
+      max-width: 420px;
+      line-height: 1.4;
+    }
+    .ml-input.shake { animation: ml-shake 0.35s ease; border-color: var(--pink); }
+    @keyframes ml-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-5px); }
     }
     .ml-input {
       font-family: var(--font);
@@ -161,6 +178,21 @@
       padding: 0 0.25em;
       border-radius: 6px;
     }
+    /* the word currently being read aloud lights up */
+    .ml-w { border-radius: 6px; transition: background 0.12s ease; }
+    .ml-w.speaking { background: #ffe9a8; box-shadow: 0 0 0 3px #ffe9a8; }
+
+    /* picker progress line */
+    .ml-count {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--purple);
+      margin: 0 0 1rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ml-input.shake { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -181,6 +213,7 @@
     <section id="picker">
       <p class="ml-intro">Pick a story. Give us silly words — but you can't see the
         story yet! Then read your goofy creation out loud. 🤪</p>
+      <p class="ml-count" id="playedCount"></p>
       <div id="cards" class="ml-cards"></div>
     </section>
 
@@ -191,6 +224,7 @@
       <div class="ml-ask">
         <p class="ml-label" id="askLabel">a silly adjective</p>
         <p class="ml-example" id="askExample">like “slimy”</p>
+        <p class="ml-hint" id="askHint"></p>
         <input class="ml-input" id="wordInput" type="text" autocomplete="off"
                autocapitalize="none" spellcheck="false" />
         <div class="ml-controls">

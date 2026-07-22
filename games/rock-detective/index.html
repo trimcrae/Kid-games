@@ -90,8 +90,15 @@
       background: var(--paper); border-radius: 16px; overflow: hidden;
       box-shadow: 0 5px 16px rgba(43, 36, 64, 0.1); cursor: pointer;
       transition: transform 0.12s ease, opacity 0.2s ease, box-shadow 0.15s ease;
-      display: flex; flex-direction: column;
+      display: flex; flex-direction: column; position: relative;
     }
+    /* collection log: a "found" ribbon appears once a rock is discovered */
+    .found-flag {
+      position: absolute; top: 6px; right: 6px; font-size: 0.68rem; font-weight: bold;
+      color: #fff; background: var(--green); border-radius: 999px; padding: 0.16rem 0.5rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22); display: none; pointer-events: none;
+    }
+    .rock-card.found .found-flag { display: inline-block; }
     .rock-card:hover { transform: translateY(-3px); box-shadow: 0 9px 22px rgba(43,36,64,0.16); }
     .rock-card.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
     .rock-card svg { width: 100%; height: 96px; display: block; background: #f4efe8; }
@@ -222,6 +229,7 @@
     <div class="panel" id="book">
       <p class="clue-intro">Every rock in the collection — tap a card to learn its secrets. There are three big
         rock families plus some star minerals. 💎</p>
+      <p class="clue-intro" id="bookProgress" role="status" style="font-weight:bold;"></p>
       <div class="book-filters" id="bookFilters" role="group" aria-label="Filter by rock family"></div>
       <div class="rock-grid" id="bookGrid"></div>
     </div>
@@ -236,7 +244,7 @@
           </div>
           <div class="quiz-progress" aria-hidden="true"><div class="quiz-bar" id="quizBar"></div></div>
           <svg id="quizSvg" viewBox="0 0 120 100" role="img" aria-label="Mystery rock picture"></svg>
-          <div class="quiz-q">What rock is this?</div>
+          <div class="quiz-q" id="quizQ">What rock is this?</div>
           <div class="quiz-hint" id="quizHint"></div>
           <div class="quiz-opts" id="quizOpts"></div>
           <div class="quiz-feedback" id="quizFeedback" role="status"></div>

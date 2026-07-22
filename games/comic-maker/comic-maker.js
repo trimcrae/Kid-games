@@ -221,6 +221,7 @@
     [].forEach.call(toolRow.children, function (c) { c.classList.toggle("on", c.dataset.tool === t); });
     if (t === "eraser") flash("Eraser ready — wipe back to the background 🧽");
     else if (t === "fill") flash("Fill ready — tap an area to flood it 🪣");
+    else if (t === "rainbow") flash("Rainbow brush! Every stroke changes colour 🌈");
   }
   toolRow.addEventListener("click", function (ev) {
     var b = ev.target.closest("[data-tool]");
@@ -497,6 +498,7 @@
     return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
   }
 
+  var rainbowHue = 0;               // 🌈 brush cycles through the whole rainbow
   function strokeStyleFor(ctx) {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -505,6 +507,12 @@
       ctx.globalCompositeOperation = "destination-out";
       ctx.strokeStyle = "rgba(0,0,0,1)";
       ctx.fillStyle = "rgba(0,0,0,1)";
+    } else if (tool === "rainbow") {
+      ctx.globalCompositeOperation = "source-over";
+      var c = "hsl(" + rainbowHue + ", 92%, 55%)";
+      rainbowHue = (rainbowHue + 4) % 360;
+      ctx.strokeStyle = c;
+      ctx.fillStyle = c;
     } else {
       ctx.globalCompositeOperation = "source-over";
       ctx.strokeStyle = penColor;
@@ -794,6 +802,238 @@
   titleEl.addEventListener("keydown", function (e) {
     if (e.key === "Enter") { e.preventDefault(); titleEl.blur(); }
   });
+
+  /* ===========================================================
+     EXPORT AS PICTURE — paint the whole page onto one big canvas
+     -----------------------------------------------------------
+     Re-draws every panel (scene, freehand drawing, stickers,
+     bubbles & sound words) at high resolution and downloads a
+     PNG Jeannie can share, text to Grandma, or use as wallpaper.
+     =========================================================== */
+  var EXPORT_W = 1240;                       // page width in px (3:4 page)
+  var EXPORT_SCALE = EXPORT_W / 620;         // vs the on-screen 620px page
+
+  // Panel rectangles for each layout, mirroring the CSS grid.
+  function panelRects(layout, W, H) {
+    var pad = 14 * EXPORT_SCALE, gap = 12 * EXPORT_SCALE;
+    var iw = W - 2 * pad, ih = H - 2 * pad;
+    var halfW = (iw - gap) / 2, halfH = (ih - gap) / 2;
+    var x0 = pad, y0 = pad, x1 = pad + halfW + gap, y1 = pad + halfH + gap;
+    if (layout === "1")  return [{ x: x0, y: y0, w: iw, h: ih }];
+    if (layout === "2v") return [{ x: x0, y: y0, w: halfW, h: ih }, { x: x1, y: y0, w: halfW, h: ih }];
+    if (layout === "2h") return [{ x: x0, y: y0, w: iw, h: halfH }, { x: x0, y: y1, w: iw, h: halfH }];
+    if (layout === "3")  return [
+      { x: x0, y: y0, w: iw, h: halfH },
+      { x: x0, y: y1, w: halfW, h: halfH }, { x: x1, y: y1, w: halfW, h: halfH }
+    ];
+    return [ // "4"
+      { x: x0, y: y0, w: halfW, h: halfH }, { x: x1, y: y0, w: halfW, h: halfH },
+      { x: x0, y: y1, w: halfW, h: halfH }, { x: x1, y: y1, w: halfW, h: halfH }
+    ];
+  }
+
+  function roundRectPath(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  // Turn a scene's CSS ("linear-gradient(#a, #b 55%)" or "#fff") into a fill.
+  function sceneFill(ctx, css, rect) {
+    var m = String(css).match(/#[0-9a-fA-F]{3,8}(\s+\d+%)?/g);
+    if (!m || !m.length) return "#ffffff";
+    if (m.length === 1 && css.indexOf("gradient") === -1) return m[0].trim();
+    var grad = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
+    m.forEach(function (stop, i) {
+      var parts = stop.trim().split(/\s+/);
+      var at = parts[1] ? parseFloat(parts[1]) / 100 : (m.length === 1 ? 0 : i / (m.length - 1));
+      try { grad.addColorStop(Math.min(1, Math.max(0, at)), parts[0]); } catch (e) {}
+    });
+    return grad;
+  }
+
+  function loadImg(src) {
+    return new Promise(function (resolve) {
+      if (!src) return resolve(null);
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { resolve(null); };
+      img.src = src;
+    });
+  }
+
+  function wrapText(ctx, text, maxW) {
+    var words = String(text || "").split(/\s+/).filter(Boolean);
+    if (!words.length) return [""];
+    var lines = [], line = words[0];
+    for (var i = 1; i < words.length; i++) {
+      var probe = line + " " + words[i];
+      if (ctx.measureText(probe).width <= maxW) line = probe;
+      else { lines.push(line); line = words[i]; }
+    }
+    lines.push(line);
+    return lines;
+  }
+
+  // The shout burst uses the same star polygon as the CSS clip-path.
+  var BURST_PTS = [[50,0],[61,18],[82,12],[76,33],[98,38],[80,50],[98,62],[76,67],[82,88],[61,82],[50,100],[39,82],[18,88],[24,67],[2,62],[20,50],[2,38],[24,33],[18,12],[39,18]];
+  function drawBurst(ctx, w, h, grow, color) {
+    ctx.beginPath();
+    BURST_PTS.forEach(function (pt, i) {
+      var x = (pt[0] / 100) * (w + 2 * grow) - w / 2 - grow;
+      var y = (pt[1] / 100) * (h + 2 * grow) - h / 2 - grow;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  var BODY_FONT = null;
+  function bodyFont() {
+    if (!BODY_FONT) {
+      BODY_FONT = getComputedStyle(document.body).fontFamily || "sans-serif";
+    }
+    return BODY_FONT;
+  }
+
+  function drawExportItem(ctx, it, rect) {
+    var cq = Math.min(rect.w, rect.h) / 100;      // = 1cqmin of this panel
+    var cx = rect.x + (it.x / 100) * rect.w;
+    var cy = rect.y + (it.y / 100) * rect.h;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate((it.rot || 0) * Math.PI / 180);
+
+    if (it.type === "sticker") {
+      if (it.flip) ctx.scale(-1, 1);
+      ctx.font = ((it.size || 16) * cq) + "px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(it.text || "", 0, 0);
+    } else if (it.type === "sfx") {
+      var fs = (it.size || 10) * cq;
+      ctx.font = "italic 900 " + fs + "px " + bodyFont();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 1.4 * cq;
+      ctx.strokeStyle = "#1c1830";
+      ctx.strokeText(it.text || "", 0, 0);
+      ctx.fillStyle = it.color || "#ff3b3b";
+      ctx.fillText(it.text || "", 0, 0);
+    } else {
+      // speech / thought / shout / caption boxes
+      var fSize = (it.size || 6) * cq;
+      ctx.font = "700 " + fSize + "px " + bodyFont();
+      var lines = wrapText(ctx, it.text, 56 * cq);
+      var lineH = fSize * 1.15;
+      var textW = 0;
+      lines.forEach(function (l) { textW = Math.max(textW, ctx.measureText(l).width); });
+      var padX = (it.type === "shout" ? 4.4 : 3.2) * cq;
+      var padY = (it.type === "shout" ? 3.6 : 2.4) * cq;
+      var bw = textW + 2 * padX, bh = lines.length * lineH + 2 * padY;
+      var border = 0.6 * cq;
+
+      if (it.type === "shout") {
+        drawBurst(ctx, bw, bh, 1.4 * cq, "#ffce3a");
+        drawBurst(ctx, bw, bh, -0.4 * cq, "#ffffff");
+        ctx.fillStyle = "#1c1830";
+      } else if (it.type === "caption") {
+        ctx.lineWidth = 0.5 * cq;
+        ctx.strokeStyle = "#d8b94a";
+        ctx.fillStyle = "#fff3c4";
+        roundRectPath(ctx, -bw / 2, -bh / 2, bw, bh, 2 * cq);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#5a4a00";
+      } else {
+        // speech & thought share a white box; the tail differs
+        var tail = it.tail || "bl";
+        var tx = (tail === "bl" || tail === "tl") ? -bw * 0.34 : bw * 0.34;
+        var ty = (tail === "tl" || tail === "tr") ? -bh / 2 : bh / 2;
+        var dir = ty > 0 ? 1 : -1;
+        ctx.lineWidth = border;
+        ctx.strokeStyle = "#1c1830";
+        ctx.fillStyle = "#ffffff";
+        roundRectPath(ctx, -bw / 2, -bh / 2, bw, bh, (it.type === "thought" ? 8 : 4) * cq);
+        ctx.fill(); ctx.stroke();
+        if (it.type === "speech") {
+          ctx.beginPath();
+          ctx.moveTo(tx - 1.8 * cq, ty);
+          ctx.lineTo(tx + 1.8 * cq, ty);
+          ctx.lineTo(tx, ty + dir * 3.4 * cq);
+          ctx.closePath();
+          ctx.fill(); ctx.stroke();
+          // hide the border line behind the tail mouth
+          ctx.fillRect(tx - 1.6 * cq, ty - border, 3.2 * cq, 2 * border);
+        } else {
+          [2.6, 4.8].forEach(function (off, i) {
+            ctx.beginPath();
+            ctx.arc(tx - i * 1.6 * cq, ty + dir * off * cq, (1.6 - i * 0.5) * cq, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+          });
+        }
+        ctx.fillStyle = "#1c1830";
+      }
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      lines.forEach(function (l, i) {
+        ctx.fillText(l, 0, (i - (lines.length - 1) / 2) * lineH);
+      });
+    }
+    ctx.restore();
+  }
+
+  function drawExportPanel(ctx, rect, pan) {
+    return loadImg(pan.draw).then(function (img) {
+      ctx.save();
+      roundRectPath(ctx, rect.x, rect.y, rect.w, rect.h, 10 * EXPORT_SCALE);
+      ctx.clip();
+      ctx.fillStyle = sceneFill(ctx, (SCENE_MAP[pan.scene] || SCENE_MAP.sky).css, rect);
+      ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      if (img) ctx.drawImage(img, rect.x, rect.y, rect.w, rect.h);
+      pan.items.slice().sort(function (a, b) { return (a.z || 0) - (b.z || 0); })
+        .forEach(function (it) { drawExportItem(ctx, it, rect); });
+      ctx.restore();
+      // panel border on top
+      roundRectPath(ctx, rect.x, rect.y, rect.w, rect.h, 10 * EXPORT_SCALE);
+      ctx.strokeStyle = "#2b2440";
+      ctx.lineWidth = 3 * EXPORT_SCALE;
+      ctx.stroke();
+    });
+  }
+
+  function exportPagePNG() {
+    var W = EXPORT_W, H = Math.round(W * 4 / 3);
+    var cvs = document.createElement("canvas");
+    cvs.width = W; cvs.height = H;
+    var ctx = cvs.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, W, H);
+    var p = page();
+    var rects = panelRects(p.layout, W, H);
+    var work = Promise.resolve();
+    p.panels.forEach(function (pan, i) {
+      work = work.then(function () { return drawExportPanel(ctx, rects[i], pan); });
+    });
+    work.then(function () {
+      var name = (book.title || "My Comic").replace(/[\\/:*?"<>|]+/g, " ").trim() || "My Comic";
+      var a = document.createElement("a");
+      a.download = name + " - page " + (curPage + 1) + ".png";
+      a.href = cvs.toDataURL("image/png");
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      flash("Picture saved — share your comic! 🖼️");
+    })["catch"](function () {
+      flash("Hmm, couldn't make the picture. Try again? 🤔");
+    });
+  }
+  document.getElementById("export-png").addEventListener("click", exportPagePNG);
 
   /* ---------- print ---------- */
   document.getElementById("print").addEventListener("click", function () {

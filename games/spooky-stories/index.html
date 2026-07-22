@@ -45,6 +45,35 @@
     }
     @keyframes twinkle { 0%,100%{transform:scale(1);opacity:.85} 50%{transform:scale(1.25);opacity:1} }
 
+    /* Sticker shelf — one shiny sticker for every finished story */
+    .sticker-shelf {
+      background: linear-gradient(160deg, #3a2566, #241747);
+      border: 3px solid #6b49b8; border-radius: 22px;
+      padding: .8rem .9rem .9rem; margin: 0 0 1.25rem;
+      text-align: center; box-shadow: 0 10px 24px rgba(20,12,45,.3);
+    }
+    .sticker-shelf .shelf-title {
+      color: var(--yellow); font-weight: bold; margin: 0 0 .5rem;
+      font-size: clamp(.95rem, 3.2vw, 1.1rem);
+    }
+    .sticker-shelf .shelf-row {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem;
+    }
+    .sticker-shelf .slot {
+      width: 2.6rem; height: 2.6rem; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; background: rgba(255,255,255,.08);
+      border: 2px dashed rgba(255,255,255,.25);
+    }
+    .sticker-shelf .slot.earned {
+      background: radial-gradient(circle at 35% 30%, #ffe98a, #f2a93b);
+      border: 2px solid #ffd166; box-shadow: 0 0 12px rgba(255,209,102,.5);
+      animation: sticker-pop .5s ease;
+    }
+    @keyframes sticker-pop { 0%{transform:scale(.3)} 70%{transform:scale(1.2)} 100%{transform:scale(1)} }
+    .sticker-shelf .shelf-msg { color: #d9c8ff; font-size: .85rem; margin: .5rem 0 0; }
+    .sticker-shelf .shelf-msg.all-done { color: var(--yellow); font-weight: bold; animation: twinkle 2s ease-in-out infinite; }
+
     /* Reader */
     .reader { display: none; }
     .reader.active { display: block; }
@@ -145,6 +174,7 @@
     <!-- LIBRARY -->
     <section id="library">
       <p class="sb-intro">Pick a story, princess! Tap a book to read together. 💜</p>
+      <div class="sticker-shelf" id="sticker-shelf" aria-label="Your sticker collection"></div>
       <div id="story-grid" class="story-grid"></div>
     </section>
 
@@ -167,6 +197,7 @@
 
       <div class="controls">
         <button class="big-btn pink" id="prev-btn">◀ Back</button>
+        <button class="big-btn blue" id="again-btn" style="display:none">🔁 Read again</button>
         <button class="big-btn" id="next-btn">Turn the page ▶</button>
       </div>
     </section>

@@ -71,7 +71,7 @@
   /* ---------------- save / load ---------------- */
   const KEY = "block-coordinates.v2";
   const defaults = () => ({
-    done: {}, numbersOn: true, treasureBest: null, free: null,
+    done: {}, numbersOn: true, treasureBest: null, quadBest: null, free: null,
   });
   function load() {
     try {
@@ -103,6 +103,11 @@
       art: ["GGGGGG", "GKKGKK", "GKKGKK", "GGKKGG", "GKKKKG", "GGGGGG"],
     },
     {
+      id: "mushroom", name: "Mushroom", emoji: "🍄", size: 6,
+      legend: { R: "red", W: "white" },
+      art: [".RRRR.", "RWRRWR", "RRRRRR", "..WW..", "..WW..", "..WW.."],
+    },
+    {
       id: "house", name: "House", emoji: "🏠", size: 8,
       legend: { R: "red", O: "planks", B: "water", D: "log" },
       art: [
@@ -119,6 +124,14 @@
       ],
     },
     {
+      id: "pickaxe", name: "Pickaxe", emoji: "⛏️", size: 8,
+      legend: { D: "diamond", W: "log" },
+      art: [
+        "DDDDDDDD", "D..WW..D", "...WW...", "...WW...",
+        "...WW...", "...WW...", "...WW...", "...WW...",
+      ],
+    },
+    {
       id: "diamond", name: "Diamond", emoji: "💎", size: 10,
       legend: { B: "diamond", S: "white" },
       art: [
@@ -132,6 +145,22 @@
       art: [
         "....PP....", "...PYYP...", "..PPYYPP..", "...PPPP...", "....GG....",
         "...GGGG...", "....GG....", "....GG....", "....GG....", "WWWWWWWWWW",
+      ],
+    },
+    {
+      id: "rocket", name: "Rocket", emoji: "🚀", size: 10,
+      legend: { W: "white", B: "water", R: "red", Y: "gold" },
+      art: [
+        "....WW....", "...WWWW...", "...WBBW...", "...WBBW...", "...WWWW...",
+        "...WWWW...", "..RWWWWR..", ".RRWWWWRR.", ".R.YYYY.R.", "...Y..Y...",
+      ],
+    },
+    {
+      id: "castle", name: "Castle", emoji: "🏰", size: 10,
+      legend: { S: "stone", C: "cobble", D: "log", G: "grass", R: "red" },
+      art: [
+        "R........R", "SS......SS", "SS.S..S.SS", "SSSSSSSSSS", "SS.SSSS.SS",
+        "SSSSSSSSSS", "CCC.DD.CCC", "CCCCDDCCCC", "CCCCDDCCCC", "GGGGGGGGGG",
       ],
     },
   ];
@@ -234,8 +263,13 @@
     }
   }
 
-  /* ---------------- shared board widget ---------------- */
-  function makeBoard(n, onTap) {
+  /* ---------------- shared board widget ----------------
+     lo is the lowest coordinate (default 1). Pass a negative lo
+     to get a four-quadrant board: the x=0 / y=0 lines are tinted
+     so kids can SEE the axes cross at the origin. */
+  function makeBoard(n, onTap, lo) {
+    lo = lo === undefined ? 1 : lo;
+    const hi = lo + n - 1;
     const board = document.createElement("div");
     board.className = "board";
     board.style.setProperty("--n", n);
@@ -244,15 +278,18 @@
     const cellMap = {}, xLabels = {}, yLabels = {};
 
     for (let r = 0; r < n; r++) {
-      const y = n - r;
+      const y = hi - r;
       const yl = document.createElement("div");
       yl.className = "axis y"; yl.textContent = y; yLabels[y] = yl;
+      if (y === 0) yl.classList.add("zero");
       board.appendChild(yl);
-      for (let x = 1; x <= n; x++) {
+      for (let x = lo; x <= hi; x++) {
         const cell = document.createElement("button");
         cell.type = "button";
         cell.className = "cell";
         cell.dataset.x = x; cell.dataset.y = y;
+        if (lo < 1 && (x === 0 || y === 0)) cell.classList.add("zl");
+        if (lo < 1 && x === 0 && y === 0) cell.classList.add("origin");
         cell.setAttribute("aria-label", `column ${x}, row ${y}`);
         cell.addEventListener("click", () => onTap(x, y, cell));
         cell.addEventListener("mouseenter", () => trace(x, y, true));
@@ -264,9 +301,10 @@
     const corner = document.createElement("div");
     corner.className = "corner"; corner.textContent = "y/x";
     board.appendChild(corner);
-    for (let x = 1; x <= n; x++) {
+    for (let x = lo; x <= hi; x++) {
       const xl = document.createElement("div");
       xl.className = "axis x"; xl.textContent = x; xLabels[x] = xl;
+      if (x === 0) xl.classList.add("zero");
       board.appendChild(xl);
     }
 
@@ -281,14 +319,14 @@
     }
     // highlight the whole row & column — "count across, then up"
     function trace(x, y, on) {
-      for (let i = 1; i <= n; i++) {
+      for (let i = lo; i <= hi; i++) {
         const a = cellMap[x + "," + i], b = cellMap[i + "," + y];
         if (a) a.classList.toggle("trace", on);
         if (b) b.classList.toggle("trace", on);
       }
       litAxis(x, y, on);
     }
-    return { board, cellMap, xLabels, yLabels, size, litAxis, trace };
+    return { board, cellMap, xLabels, yLabels, size, litAxis, trace, lo, hi };
   }
 
   /* ---------------- keyboard cursor (accessibility) ---------------- */
@@ -296,7 +334,9 @@
   // The cursor stays hidden (active:false) until the player actually presses a
   // key — otherwise mouse/touch players see a stray yellow box and a tinted
   // row+column at (1,1) that look like random mis-coloured squares.
-  function enableCursor(n, ctx, tap) { kbCursor = { x: 1, y: 1, n, ctx, tap, active: false }; }
+  function enableCursor(n, ctx, tap) {
+    kbCursor = { x: ctx.lo, y: ctx.lo, lo: ctx.lo, hi: ctx.hi, ctx, tap, active: false };
+  }
   function disableCursor() {
     if (kbCursor && kbCursor.active) {
       kbCursor.ctx.trace(kbCursor.x, kbCursor.y, false);
@@ -327,10 +367,10 @@
       return;
     }
     const prev = { x: kbCursor.x, y: kbCursor.y };
-    if (k === "ArrowRight") kbCursor.x = Math.min(kbCursor.n, kbCursor.x + 1);
-    else if (k === "ArrowLeft") kbCursor.x = Math.max(1, kbCursor.x - 1);
-    else if (k === "ArrowUp") kbCursor.y = Math.min(kbCursor.n, kbCursor.y + 1);
-    else if (k === "ArrowDown") kbCursor.y = Math.max(1, kbCursor.y - 1);
+    if (k === "ArrowRight") kbCursor.x = Math.min(kbCursor.hi, kbCursor.x + 1);
+    else if (k === "ArrowLeft") kbCursor.x = Math.max(kbCursor.lo, kbCursor.x - 1);
+    else if (k === "ArrowUp") kbCursor.y = Math.min(kbCursor.hi, kbCursor.y + 1);
+    else if (k === "ArrowDown") kbCursor.y = Math.max(kbCursor.lo, kbCursor.y - 1);
     else if (k === "Enter" || k === " ") {
       const cell = kbCursor.ctx.cellMap[kbCursor.x + "," + kbCursor.y];
       if (cell) kbCursor.tap(kbCursor.x, kbCursor.y, cell);
@@ -352,22 +392,32 @@
   /* ---------- menu ---------- */
   function renderMenu() {
     clearScreen();
+    const stars = LEVELS.filter((l) => save.done[l.id]).length;
+    const allDone = stars === LEVELS.length;
+    const tBest = save.treasureBest === null ? "" : ` · best: ${save.treasureBest} wrong`;
+    const qBest = save.quadBest === null ? "" : ` · best: ${save.quadBest} wrong`;
     const wrap = document.createElement("div");
     wrap.innerHTML = `
       <p class="intro">
         Read the grid like Minecraft! Every block has a spot:
         <b>(X, Y)</b> means count <b>across →</b> then <b>up ↑</b>
         from the bottom-left corner. Build pictures, dig for treasure,
-        or make whatever you like.
+        or brave the four quadrants where numbers go <b>negative</b>!
       </p>
+      ${allDone ? `<p class="intro" style="color:var(--green);font-weight:bold">
+        🏆 MASTER BUILDER — every blueprint complete! 🏆</p>` : ""}
       <div class="mode-grid">
         <button class="mode-btn" id="m-build" style="--accent:var(--green)">
           <span class="big">🏗️</span><span class="name">Build</span>
-          <span class="desc">Follow the blueprint to make a picture</span>
+          <span class="desc">Follow the blueprint — ⭐ ${stars}/${LEVELS.length} built</span>
         </button>
         <button class="mode-btn" id="m-treasure" style="--accent:var(--blue)">
           <span class="big">💎</span><span class="name">Treasure Dig</span>
-          <span class="desc">Read the clue, dig the right spot</span>
+          <span class="desc">Read the clue, dig the right spot${tBest}</span>
+        </button>
+        <button class="mode-btn" id="m-quad" style="--accent:var(--yellow)">
+          <span class="big">🧭</span><span class="name">Quadrant Quest</span>
+          <span class="desc">Negative numbers! Dig around (0, 0)${qBest}</span>
         </button>
         <button class="mode-btn" id="m-free" style="--accent:var(--purple)">
           <span class="big">🧱</span><span class="name">Free Build</span>
@@ -376,7 +426,8 @@
       </div>`;
     app.appendChild(wrap);
     $("m-build").onclick = renderLevelPicker;
-    $("m-treasure").onclick = startTreasure;
+    $("m-treasure").onclick = () => startTreasure(false);
+    $("m-quad").onclick = () => startTreasure(true);
     $("m-free").onclick = startFree;
   }
 
@@ -539,14 +590,26 @@
     }
   }
 
-  /* ---------- treasure dig ---------- */
-  function startTreasure() {
+  /* ---------- treasure dig (and Quadrant Quest) ----------
+     quad=false: the classic 1..8 grid.
+     quad=true:  a 9×9 world from -4 to 4 with (0,0) in the middle —
+     negative X means count LEFT, negative Y means count DOWN. */
+  function startTreasure(quad) {
     clearScreen();
-    const n = 8, TARGETS = 5;
+    const n = quad ? 9 : 8, lo = quad ? -4 : 1;
+    const TARGETS = quad ? 6 : 5;
     const spots = [], used = {};
+    if (quad) {
+      // one treasure in every quadrant, so all four sign combos get practised
+      [[1, 1], [-1, 1], [-1, -1], [1, -1]].forEach(([sx, sy]) => {
+        const x = sx * (1 + Math.floor(Math.random() * 4));
+        const y = sy * (1 + Math.floor(Math.random() * 4));
+        used[x + "," + y] = true; spots.push({ x, y });
+      });
+    }
     while (spots.length < TARGETS) {
-      const x = 1 + Math.floor(Math.random() * n);
-      const y = 1 + Math.floor(Math.random() * n);
+      const x = lo + Math.floor(Math.random() * n);
+      const y = lo + Math.floor(Math.random() * n);
       const key = x + "," + y;
       if (!used[key]) { used[key] = true; spots.push({ x, y }); }
     }
@@ -558,10 +621,18 @@
       <button class="pill ${save.numbersOn ? "on" : ""}" id="t-nums">Numbers: ${save.numbersOn ? "On" : "Off"}</button>`;
     app.appendChild(hud);
 
+    if (quad) {
+      const tip = document.createElement("p");
+      tip.className = "intro"; tip.style.margin = "0.3rem auto 0.4rem";
+      tip.innerHTML = "🧭 This world has a middle! <b>(0, 0)</b> is the <b>origin</b>. " +
+        "Negative X? Count <b>← left</b>. Negative Y? Count <b>↓ down</b>.";
+      app.appendChild(tip);
+    }
+
     const instr = document.createElement("div");
     instr.className = "instruction"; app.appendChild(instr);
 
-    const ctx = makeBoard(n, onTap);
+    const ctx = makeBoard(n, onTap, lo);
     boardCtx = ctx;
     const bw = document.createElement("div");
     bw.className = "board-wrap"; bw.appendChild(ctx.board);
@@ -573,6 +644,10 @@
     $("t-nums").onclick = () => toggleNums(ctx, $("t-nums"));
     showClue();
 
+    function dirHint(s) {
+      const xs = s.x < 0 ? "left ←" : "across →", ys = s.y < 0 ? "down ↓" : "up ↑";
+      return `Count ${xs} to ${s.x}, then ${ys} to ${s.y}`;
+    }
     function showClue() {
       if (idx >= spots.length) return done();
       const s = spots[idx];
@@ -590,27 +665,27 @@
         cell.classList.add("dug"); shake(cell); Sound.dig(); wrong++;
         ctx.litAxis(s.x, s.y, true);
         setTimeout(() => ctx.litAxis(s.x, s.y, false), 1500);
-        say(`Just dirt! Count across to ${s.x}, then up to ${s.y}.`);
+        say(`Just dirt! ${dirHint(s)}.`);
       }
     }
     function done() {
       instr.innerHTML = `All ${TARGETS} treasures found! 💎✨`;
-      const best = save.treasureBest;
-      if (best === null || wrong < best) { save.treasureBest = wrong; persist(); }
-      sfx("win"); sparkle("💎"); window.Confetti && Confetti.burst({ count: 100 }); disableCursor();
+      const bestKey = quad ? "quadBest" : "treasureBest";
+      if (save[bestKey] === null || wrong < save[bestKey]) { save[bestKey] = wrong; persist(); }
+      sfx("win"); sparkle(quad ? "🧭" : "💎"); window.Confetti && Confetti.burst({ count: 100 }); disableCursor();
       const banner = document.createElement("div");
       banner.className = "win-banner";
       banner.innerHTML = `
-        <div style="font-size:2.6rem">💎</div>
-        <h2>Treasure found!</h2>
+        <div style="font-size:2.6rem">${quad ? "🧭" : "💎"}</div>
+        <h2>${quad ? "Quadrant Quest complete!" : "Treasure found!"}</h2>
         <p>${wrong === 0 ? "Perfect dig — no wrong holes! 🌟" : "Wrong digs: " + wrong}</p>
-        <p style="color:#6a6385">Best ever: ${save.treasureBest} wrong digs</p>
+        <p style="color:#6a6385">Best ever: ${save[bestKey]} wrong digs</p>
         <div class="row-btns">
           <button class="pill on" id="t-again">Dig again</button>
           <button class="pill" id="t-menu">Modes</button>
         </div>`;
       app.appendChild(banner);
-      $("t-again").onclick = startTreasure;
+      $("t-again").onclick = () => startTreasure(quad);
       $("t-menu").onclick = renderMenu;
     }
   }

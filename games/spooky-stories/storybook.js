@@ -718,6 +718,7 @@
   const STORIES = [
     {
       id: "giggly-ghost",
+      sticker: "👻",
       title: "Ellie & the Giggly Ghost",
       color: "#6a3fb0",
       cover: () => svg(nightBg({moonX:300}) + castle(200, 250, 1) + ghost({x:120,y:150,scale:1})),
@@ -755,6 +756,7 @@
 
     {
       id: "costume-party",
+      sticker: "🎭",
       title: "The Midnight Costume Party",
       color: "#b8410f",
       cover: () => svg(nightBg({moonX:60}) + castle(310,255,0.55) +
@@ -801,6 +803,7 @@
 
     {
       id: "lost-bat",
+      sticker: "🦇",
       title: "Ellie & the Lost Little Bat",
       color: "#3a5fb0",
       cover: () => svg(nightBg({moonX:300}) +
@@ -841,6 +844,7 @@
 
     {
       id: "pumpkin-smile",
+      sticker: "🎃",
       title: "The Pumpkin Who Lost Its Smile",
       color: "#c25a14",
       cover: () => svg(nightBg({moonX:300}) + castle(320,255,0.5) +
@@ -882,6 +886,7 @@
 
     {
       id: "castle-sleepover",
+      sticker: "🏰",
       title: "The Cozy Castle Sleepover",
       color: "#5a3fb0",
       cover: () => svg(nightBg({moonX:300}) + castle(200,250,1) +
@@ -920,6 +925,7 @@
 
     {
       id: "rainbow-unicorn",
+      sticker: "🦄",
       title: "Princess Ellie & the Rainbow Unicorn",
       color: "#c86fd6",
       cover: () => svg(dayBg({sunX:70}) + rainbow(300, 150, 0.7) +
@@ -975,6 +981,7 @@
 
     {
       id: "dancing-dragon",
+      sticker: "🐉",
       title: "The Dragon Who Loved to Dance",
       color: "#3ea856",
       cover: () => svg(dayBg({sunX:60}) + castle(310,250,0.55) +
@@ -1020,6 +1027,7 @@
 
     {
       id: "sleepy-star",
+      sticker: "⭐",
       title: "The Little Star Who Wanted to Sleep",
       color: "#3a4fb0",
       cover: () => svg(nightBg({moonX:300}) + starChar({x:150,y:150,scale:1.6})),
@@ -1062,6 +1070,7 @@
 
     {
       id: "boo-birthday",
+      sticker: "🎂",
       title: "Boo the Ghost's Spooky Birthday",
       color: "#7a3fb0",
       cover: () => svg(nightBg({moonX:300}) + castle(310,250,0.5) +
@@ -1103,6 +1112,117 @@
             ghost({x:250, y:150, scale:1.1}))
         },
         { end: true, text: "The End. 🎂", art: () => endArt("#7a3fb0", [ghost({x:200,y:150,scale:1.4}), pumpkin({x:280,y:210,scale:0.8})]) }
+      ]
+    },
+
+    {
+      id: "rainbow-dress",
+      sticker: "🌈",
+      title: "Ellie's Rainbow Dress",
+      color: "#c2497f",
+      cover: () => svg(dayBg({sunX:320}) + rainbow(90, 150, 0.55) +
+        kid(Object.assign({x:230,y:240,scale:1.5}, ELLIE, {dress:"#b98cff"}))),
+      pages: [
+        {
+          text: "Today was the royal picnic, and Princess Ellie could not choose a dress to wear.",
+          art: () => svg(dayBg({sunX:330}) + castle(320, 250, 0.55) +
+            kid(Object.assign({x:150, y:245, scale:1.5}, ELLIE)))
+        },
+        {
+          text: "First she twirled in a PINK dress, pink as the roses in the castle garden.",
+          art: () => svg(dayBg({sunX:70}) +
+            kid(Object.assign({x:200, y:240, scale:1.6}, ELLIE, {dress:"#ff5d8f"})) +
+            flower(90, 250, 1.5, "#ff5d8f") + flower(320, 255, 1.3, "#ff8ec9"))
+        },
+        {
+          text: "Next she tried a YELLOW dress, bright and warm like her friend the sun.",
+          art: () => svg(dayBg({sunX:310, sunY:70, sunR:36}) +
+            kid(Object.assign({x:170, y:240, scale:1.6}, ELLIE, {dress:"#ffd166"})))
+        },
+        {
+          text: "Then a BLUE dress, blue as the summer sky where the little birds sing.",
+          art: () => svg(dayBg({sunX:70}) + cloud(280, 90, 0.9) +
+            kid(Object.assign({x:180, y:240, scale:1.6}, ELLIE, {dress:"#4aa3ff"})))
+        },
+        {
+          text: "And a GREEN dress, green as the grassy hill where her dragon friend dances.",
+          art: () => svg(dayBg({sunX:330}) +
+            kid(Object.assign({x:130, y:245, scale:1.4}, ELLIE, {dress:"#3ddc84"})) +
+            dragon({x:280, y:240, scale:1.4, flip:true}))
+        },
+        {
+          text: "Then Sparkle the unicorn trotted up, carrying a dress with EVERY colour on it!",
+          art: () => svg(dayBg({sunX:60}) + rainbow(300, 130, 0.5) +
+            kid(Object.assign({x:120, y:245, scale:1.3}, ELLIE)) +
+            unicorn({x:270, y:240, scale:1.5, flip:true}))
+        },
+        {
+          text: "Ellie twirled to the picnic in her rainbow dress. Pink, yellow, blue, green — hooray!",
+          art: () => svg(dayBg({sunset:true, sunX:70}) + rainbow(200, 120, 0.9) +
+            kid(Object.assign({x:200, y:240, scale:1.5}, ELLIE, {dress:"#b98cff"})) +
+            kid(Object.assign({x:90, y:250, scale:1.1, crown:false}, JEANNIE)) +
+            kid(Object.assign({x:315, y:250, scale:1.1}, CORY)))
+        },
+        { end: true, text: "The End. 🌈", art: () => endArtDay([
+            kid(Object.assign({x:170,y:200,scale:1.5}, ELLIE, {dress:"#b98cff"})),
+            unicorn({x:290, y:200, scale:1.2, flip:true})]) }
+      ]
+    },
+
+    {
+      id: "hide-and-seek",
+      sticker: "🐱",
+      title: "Midnight's Moonlit Hide-and-Seek",
+      color: "#2e7d5b",
+      cover: () => svg(nightBg({moonX:300}) + castle(320,255,0.5) +
+        cat({x:150,y:225,scale:1.6}) + pumpkin({x:260,y:245,scale:0.9})),
+      pages: [
+        {
+          text: "One quiet night, Midnight the cat meowed: “Let's all play hide-and-seek!”",
+          art: () => svg(nightBg({moonX:330}) + castle(320, 252, 0.5) +
+            cat({x:170, y:235, scale:1.7}))
+        },
+        {
+          text: "Princess Ellie hid her eyes and counted. One… two… three! “Ready or not, here I come!”",
+          art: () => svg(nightBg({moonX:70}) + castle(320, 252, 0.5) +
+            kid(Object.assign({x:150, y:240, scale:1.5}, ELLIE)))
+        },
+        {
+          text: "Ellie peeked behind a glowing pumpkin — and found Boo the giggly ghost! One friend found.",
+          art: () => svg(nightBg({moonX:330}) +
+            pumpkin({x:150, y:240, scale:1.4}) + ghost({x:270, y:160, scale:1.2}))
+        },
+        {
+          text: "She looked up at the twinkly sky — and spotted the little bat by the moon! Two friends found.",
+          art: () => svg(nightBg({moonX:220, moonY:80, moonR:40}) +
+            bat({x:150, y:120, scale:1.2}) +
+            kid(Object.assign({x:120, y:245, scale:1.2}, ELLIE)))
+        },
+        {
+          text: "She tip-toed to the pumpkin patch — and there was baby Kieran, giggling! Three friends found.",
+          art: () => svg(nightBg({moonX:70}) +
+            pumpkin({x:90, y:250, scale:0.9}) + pumpkin({x:310, y:255, scale:0.8}) +
+            babyPumpkin(210, 225, 1.2))
+        },
+        {
+          text: "But where, oh where, was Midnight? Ellie looked high and low, low and high…",
+          art: () => svg(nightBg({moon:false}) + castle(280, 250, 0.7) +
+            kid(Object.assign({x:110, y:245, scale:1.4}, ELLIE)))
+        },
+        {
+          text: "A-ha! A swishy tail peeked out by the castle door. “Found you, Midnight!” Four friends found!",
+          art: () => svg(nightBg({moonX:330}) + castle(250, 250, 0.8) +
+            cat({x:280, y:255, scale:1.1}) +
+            kid(Object.assign({x:120, y:245, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "One, two, three, four! Everyone found, everyone giggling. Midnight purred: “Best game ever.”",
+          art: () => svg(nightBg({moonX:200, moonY:70, moonR:42}) +
+            ghost({x:90, y:150, scale:0.8}) + bat({x:310, y:100, scale:0.8, color:"#9a7ae0"}) +
+            cat({x:250, y:248, scale:1.2}) +
+            kid(Object.assign({x:140, y:245, scale:1.2}, ELLIE)))
+        },
+        { end: true, text: "The End. 🐱", art: () => endArt("#2e7d5b", [cat({x:200,y:200,scale:1.7}), ghost({x:290,y:150,scale:0.8})]) }
       ]
     }
   ];
@@ -1220,19 +1340,53 @@
   const hintEl = document.getElementById("tap-hint");
   const prevBtn = document.getElementById("prev-btn");
   const nextBtn = document.getElementById("next-btn");
+  const againBtn = document.getElementById("again-btn");
   const homeBtn = document.getElementById("home-btn");
   const readBtn = document.getElementById("read-btn");
+  const shelfEl = document.getElementById("sticker-shelf");
 
   const STORE_KEY = "spooky-stories-done";
   function loadDone() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } }
   function saveDone(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {} }
 
+  // remember the exact page a story was left on, so bedtime can
+  // pick up right where it stopped
+  const RESUME_KEY = "spooky-stories-resume";
+  function loadResume() { try { return JSON.parse(localStorage.getItem(RESUME_KEY)); } catch (e) { return null; } }
+  function saveResume(r) {
+    try {
+      if (r) localStorage.setItem(RESUME_KEY, JSON.stringify(r));
+      else localStorage.removeItem(RESUME_KEY);
+    } catch (e) {}
+  }
+
   let current = null;   // current story object
   let page = 0;
+
+  // ---- Sticker shelf: one shiny sticker per finished story ----
+  function buildShelf() {
+    if (!shelfEl) return;
+    const done = loadDone();
+    const earned = STORIES.filter(s => done[s.id]).length;
+    let slots = "";
+    STORIES.forEach(s => {
+      slots += done[s.id]
+        ? `<span class="slot earned" title="${s.title}">${s.sticker || "⭐"}</span>`
+        : `<span class="slot" title="A sticker is waiting in “${s.title}”">✩</span>`;
+    });
+    const allDone = earned === STORIES.length;
+    shelfEl.innerHTML =
+      `<p class="shelf-title">🌟 My Sticker Shelf 🌟</p>` +
+      `<div class="shelf-row">${slots}</div>` +
+      (allDone
+        ? `<p class="shelf-msg all-done">🏆 WOW! You collected EVERY sticker! 🏆</p>`
+        : `<p class="shelf-msg">${earned} of ${STORIES.length} stickers — finish a story to earn one!</p>`);
+  }
 
   // ---- Library ----
   function buildLibrary() {
     const done = loadDone();
+    buildShelf();
     grid.innerHTML = "";
     STORIES.forEach(story => {
       const card = document.createElement("button");
@@ -1252,6 +1406,11 @@
   function openStory(story) {
     current = story;
     page = 0;
+    // pick up where this story was left off (never on the end page)
+    const r = loadResume();
+    if (r && r.id === story.id && r.page > 0 && r.page < story.pages.length - 1) {
+      page = r.page;
+    }
     titleEl.textContent = story.title;
     library.style.display = "none";
     reader.classList.add("active");
@@ -1295,21 +1454,34 @@
 
     // hint only when there are tappable things
     const hasTaps = artEl.querySelector(".tap");
-    hintEl.style.visibility = hasTaps ? "visible" : "hidden";
+    hintEl.style.visibility = (hasTaps || p.end) ? "visible" : "hidden";
     hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : "✨ Tap the picture to play! ✨";
 
     // buttons
     prevBtn.disabled = page === 0;
     nextBtn.textContent = p.end ? "📚 More stories" : "Turn the page ▶";
+    againBtn.style.display = p.end ? "" : "none";
 
     // hook up tappable art
     wireTaps();
 
-    // celebrate + remember finished stories
+    // celebrate + award the story's sticker + remember progress
     if (p.end) {
-      const done = loadDone(); done[current.id] = true; saveDone(done);
+      const done = loadDone();
+      const wasNew = !done[current.id];
+      done[current.id] = true; saveDone(done);
+      saveResume(null);   // finished — start fresh next time
+      const allDone = STORIES.every(s => done[s.id]);
+      hintEl.textContent = wasNew
+        ? (allDone
+          ? "🏆 You earned the LAST sticker — your shelf is FULL! 🏆"
+          : `🎉 You earned a ${current.sticker || "⭐"} sticker! 🎉`)
+        : `🎉 Hooray! You read it again! ${current.sticker || "⭐"} 🎉`;
       playSound("yay");
       confetti();
+      if (wasNew && allDone) { confetti(); setTimeout(confetti, 700); }
+    } else {
+      saveResume({ id: current.id, page: page });
     }
 
     // read this page aloud automatically (pre-rendered voice + fallback)
@@ -1387,6 +1559,12 @@
   // ---- wire up controls ----
   nextBtn.addEventListener("click", nextPage);
   prevBtn.addEventListener("click", prevPage);
+  againBtn.addEventListener("click", () => {
+    if (!current) return;
+    page = 0;
+    playSound("page");
+    renderPage(true);
+  });
   homeBtn.addEventListener("click", goHome);
   readBtn.addEventListener("click", () => { if (current) narrate(current.id, page); });
 

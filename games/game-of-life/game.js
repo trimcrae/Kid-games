@@ -21,6 +21,17 @@
   /* Patterns are drawn with O = alive. Stamped centred on the tap. */
   const PATTERNS = [
     { key: "pencil", name: "✏️ Pencil", cells: null },
+    { key: "block", name: "🧊 Block", cells: [
+      "OO",
+      "OO",
+    ]},
+    { key: "blinker", name: "💡 Blinker", cells: [
+      "OOO",
+    ]},
+    { key: "toad", name: "🐸 Toad", cells: [
+      ".OOO",
+      "OOO.",
+    ]},
     { key: "glider", name: "🚀 Glider", cells: [
       ".O.",
       "..O",
@@ -75,6 +86,25 @@
     ]},
   ];
 
+  /* Discovery badges — earned automatically when the world does
+     something scientifically interesting. Saved with the world. */
+  const BADGES = [
+    { key: "still",    emoji: "🗿", name: "Still Life",
+      desc: "Find a shape that NEVER changes — it just sits there, perfectly balanced. (Psst: try the 🧊 Block, then press Play.)" },
+    { key: "osc",      emoji: "🔁", name: "Oscillator",
+      desc: "Find a shape that flips back and forth forever. The 💡 Blinker and 🐸 Toad are famous ones." },
+    { key: "boom",     emoji: "🎆", name: "Population Boom",
+      desc: "Get 1,000 cells alive at the same moment. A big world and 🎲 Random help!" },
+    { key: "marathon", emoji: "🏃", name: "Marathon",
+      desc: "Keep one world running all the way to generation 500." },
+    { key: "quiet",    emoji: "🌙", name: "The Big Quiet",
+      desc: "Watch a living world fade away until zero cells are left." },
+    { key: "wizard",   emoji: "🧙", name: "Rule Wizard",
+      desc: "Invent your OWN rule in the Rule Lab — one that isn't a famous recipe." },
+    { key: "stamps",   emoji: "📚", name: "Stamp Collector",
+      desc: "Stamp every creature in the Stamp Shop at least once." },
+  ];
+
   const PRESETS = [
     { key: "classic",  name: "🟢 Classic Life",  b: [3],          s: [2, 3] },
     { key: "highlife", name: "✨ HighLife",      b: [3, 6],       s: [2, 3] },
@@ -101,6 +131,8 @@
     generation: 0,
     brush: "pencil",
     rot: 0,           // stamp rotation, quarter turns clockwise
+    badges: {},       // discovery badges earned (key -> true)
+    stampsUsed: {},   // stamp brushes tried at least once
   };
   state.birth[3] = true;
   state.survive[2] = state.survive[3] = true;
@@ -193,17 +225,42 @@
         next[i] = cells[i] ? (survive[n] ? 1 : 0) : (birth[n] ? 1 : 0);
       }
     }
-    // commit + bookkeeping
+    // commit + bookkeeping (and fingerprint the world for discoveries)
+    let pop = 0, h = 2166136261;
     for (let i = 0; i < cells.length; i++) {
       if (next[i]) {
         age[i] = cells[i] ? Math.min(age[i] + 1, 60000) : 1;
         colorIdx[i] = colorIndexForAge(age[i]);
+        pop++;
+        h ^= i; h = Math.imul(h, 16777619);
       } else {
         age[i] = 0;
       }
       cells[i] = next[i];
     }
     state.generation++;
+    checkDiscoveries(pop, h);
+  }
+
+  /* ---------- discovery detection ----------
+     Compare the world's fingerprint with the last two generations:
+     unchanged ⇒ still life, same-as-2-ago ⇒ period-2 oscillator. */
+  let hash1 = null, hash2 = null, hadLife = false;
+  function forgetHistory() { hash1 = null; hash2 = null; }
+
+  function checkDiscoveries(pop, h) {
+    if (pop > 0) {
+      hadLife = true;
+      if (hash1 !== null && h === hash1) award("still");
+      else if (hash2 !== null && h === hash2 && h !== hash1) award("osc");
+      if (pop >= 1000) award("boom");
+      if (state.generation >= 500) award("marathon");
+    } else if (hadLife) {
+      hadLife = false;
+      award("quiet");
+    }
+    hash2 = hash1;
+    hash1 = h;
   }
 
   function population() {
@@ -230,6 +287,7 @@
     state.cells[i] = v;
     state.age[i] = v ? 1 : 0;
     if (v) state.colorIdx[i] = 0;
+    forgetHistory(); // hand-edits reset the still-life/oscillator watch
   }
 
   function rotate90(pat) {
@@ -273,12 +331,15 @@
       if (v) colorIdx[i] = 0;
     }
     state.generation = 0;
+    forgetHistory();
   }
 
   function clearWorld() {
     state.cells.fill(0);
     state.age.fill(0);
     state.generation = 0;
+    forgetHistory();
+    hadLife = false;
   }
 
   /* First visit: a glider factory already at work, plus a pulsar —
@@ -466,6 +527,8 @@
       window.SFX && SFX.pop && SFX.pop();
     } else {
       stampPattern(brushPattern(), c.x, c.y);
+      state.stampsUsed[state.brush] = true;
+      if (PATTERNS.every((p) => p.key === "pencil" || state.stampsUsed[p.key])) award("stamps");
       window.SFX && SFX.good && SFX.good();
     }
     updateStats();
@@ -586,6 +649,12 @@
         arr[n] = !arr[n];
         b.setAttribute("aria-pressed", String(arr[n]));
         refreshRuleUI();
+        // Rule Wizard: a hand-made rule that isn't one of the famous recipes
+        const rs = ruleString();
+        if (state.birth.some(Boolean) && state.survive.some(Boolean) &&
+            !PRESETS.some((p) => "B" + p.b.join("") + "/S" + p.s.join("") === rs)) {
+          award("wizard");
+        }
         scheduleSave();
       });
       row.appendChild(b);
@@ -657,6 +726,44 @@
       el.setAttribute("aria-pressed", String(el.dataset.size === state.sizeKey)));
   }
 
+  /* ---------- discovery badges UI ---------- */
+  const badgeGrid = $("badgeGrid");
+  const badgeCount = $("badgeCount");
+  const toastEl = $("toast");
+  let toastTimer = null;
+
+  BADGES.forEach((b) => {
+    const el = document.createElement("div");
+    el.className = "badge";
+    el.dataset.key = b.key;
+    el.innerHTML =
+      '<span class="b-emoji">' + b.emoji + "</span>" +
+      '<span><span class="b-name">' + b.name + "</span>" +
+      '<br><span class="b-desc">' + b.desc + "</span></span>";
+    badgeGrid.appendChild(el);
+  });
+
+  function refreshBadges() {
+    badgeGrid.querySelectorAll(".badge").forEach((el) =>
+      el.classList.toggle("earned", !!state.badges[el.dataset.key]));
+    const n = BADGES.filter((b) => state.badges[b.key]).length;
+    badgeCount.textContent = "— " + n + " of " + BADGES.length + " earned";
+  }
+
+  function award(key) {
+    if (state.badges[key]) return;
+    state.badges[key] = true;
+    const b = BADGES.find((x) => x.key === key);
+    toastEl.textContent = "🏅 Discovery! " + b.emoji + " " + b.name;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3400);
+    window.SFX && SFX.win && SFX.win();
+    window.Confetti && Confetti.burst && Confetti.burst({ count: 70 });
+    refreshBadges();
+    scheduleSave();
+  }
+
   /* ---------- save / load ---------- */
   let saveTimer = null;
   function scheduleSave() {
@@ -676,6 +783,8 @@
         wrap: state.wrap,
         speed: state.speed,
         generation: state.generation,
+        badges: state.badges,
+        stampsUsed: state.stampsUsed,
       }));
     } catch (e) { /* storage full or blocked — no problem */ }
   }
@@ -701,6 +810,8 @@
       state.wrap = d.wrap !== false;
       state.speed = Math.min(30, Math.max(1, Number(d.speed) || 10));
       state.generation = Number(d.generation) || 0;
+      if (d.badges && typeof d.badges === "object") state.badges = Object.assign({}, d.badges);
+      if (d.stampsUsed && typeof d.stampsUsed === "object") state.stampsUsed = Object.assign({}, d.stampsUsed);
       return true;
     } catch (e) {
       return false;
@@ -722,6 +833,7 @@
   wrapToggle.checked = state.wrap;
   refreshRuleUI();
   refreshSizeUI();
+  refreshBadges();
   resizeCanvas();
   updateStats();
   setPlaying(true);

@@ -92,7 +92,7 @@
     }
 
     /* ---- play screen ---- */
-    #play.hidden, #levels.hidden, #win.hidden { display: none; }
+    #play.hidden, #levels.hidden, #win.hidden, #dict.hidden { display: none; }
 
     .clue-card {
       max-width: 520px;
@@ -166,6 +166,14 @@
     .letter:hover:not(:disabled) { transform: translateY(-3px); }
     .letter:active { transform: scale(0.9); }
     .letter:disabled { opacity: 0.25; cursor: default; }
+    .letter.glow {
+      animation: letter-glow 0.8s ease 2;
+      box-shadow: 0 0 0 4px var(--yellow), 0 6px 18px rgba(255, 209, 102, 0.8);
+    }
+    @keyframes letter-glow {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-6px) scale(1.15); }
+    }
 
     .controls { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
 
@@ -176,6 +184,25 @@
       color: var(--green);
       margin: 0 0 0.75rem;
     }
+
+    /* "My Words" dictionary */
+    .dict-list { display: flex; flex-direction: column; gap: 0.6rem; max-width: 560px; margin: 0 auto 1rem; }
+    .dict-card {
+      display: flex; align-items: center; gap: 0.8rem; text-align: left;
+      background: var(--paper); border-left: 8px solid var(--accent, var(--purple));
+      border-radius: 16px; padding: 0.6rem 0.8rem;
+      box-shadow: 0 8px 20px rgba(43, 36, 64, 0.1);
+    }
+    .dict-art { flex: 0 0 auto; width: 3rem; height: 3rem; }
+    .dict-art svg { width: 100%; height: 100%; display: block; }
+    .dict-body { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+    .dict-word { font-size: 1.15rem; color: var(--purple); text-transform: capitalize; }
+    .dict-clue { font-size: 0.92rem; color: #6a6385; }
+    .dict-hear {
+      flex: 0 0 auto; width: 2.8rem; height: 2.8rem; border: none; border-radius: 50%;
+      background: #f0e9ff; font-size: 1.2rem; cursor: pointer; touch-action: manipulation;
+    }
+    .dict-hear:active { transform: scale(0.9); }
 
     /* win screen */
     #win { text-align: center; }
@@ -197,7 +224,7 @@
       100% { opacity: 0; transform: translateY(-90px) scale(1.4) rotate(40deg); }
     }
     @media (prefers-reduced-motion: reduce) {
-      .slots.wrong, .sparkle { animation: none; }
+      .slots.wrong, .sparkle, .letter.glow { animation: none; }
       .sparkle { display: none; }
     }
   </style>
@@ -227,6 +254,18 @@
     <section id="levels">
       <p style="font-weight:bold;color:var(--purple);font-size:1.2rem;margin-top:0;">Pick a spellbook:</p>
       <div class="level-grid" id="level-grid"></div>
+      <div class="controls" style="margin-top:1.1rem;">
+        <button class="btn ghost" id="dict-btn">📖 My Words</button>
+      </div>
+    </section>
+
+    <!-- MY WORDS (dictionary of mastered words) -->
+    <section id="dict" class="hidden">
+      <p style="font-weight:bold;color:var(--purple);font-size:1.2rem;margin-top:0;">Every word you've learned — tap 🔊 to hear it!</p>
+      <div class="dict-list" id="dict-list"></div>
+      <div class="controls">
+        <button class="btn" id="dict-back">📚 Back to spellbooks</button>
+      </div>
     </section>
 
     <!-- PLAY -->
@@ -243,6 +282,7 @@
 
       <div class="controls">
         <button class="btn ghost" id="hear-btn">🔊 Hear it</button>
+        <button class="btn ghost" id="hint-btn">💡 Hint</button>
         <button class="btn ghost" id="clear-btn">⌫ Clear</button>
         <button class="btn ghost" id="skip-btn">Skip ⏭</button>
         <button class="btn ghost" id="quit-btn">📚 Spellbooks</button>
