@@ -215,6 +215,55 @@
       cursor: pointer;
     }
 
+    /* ---- discovery badges ---- */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.6rem;
+    }
+    .badge {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+      border: 3px solid #d9d2f5;
+      border-radius: 16px;
+      padding: 0.6rem 0.7rem;
+      background: #f4f1ff;
+      opacity: 0.78;
+    }
+    .badge .b-emoji { font-size: 1.7rem; line-height: 1.2; filter: grayscale(1); opacity: 0.5; }
+    .badge .b-name { font-weight: bold; }
+    .badge .b-desc { font-size: 0.82rem; color: #6b6389; line-height: 1.35; }
+    .badge.earned {
+      background: linear-gradient(135deg, #fff7d6, #e8ffe9);
+      border-color: var(--green);
+      opacity: 1;
+    }
+    .badge.earned .b-emoji { filter: none; opacity: 1; }
+    .badge.earned .b-name::after { content: " ✓"; color: var(--green); }
+
+    /* ---- discovery toast ---- */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1.2rem;
+      transform: translateX(-50%) translateY(160%);
+      background: linear-gradient(135deg, #2bc46f, #3ddc84);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1.05rem;
+      padding: 0.8rem 1.3rem;
+      border-radius: 999px;
+      box-shadow: 0 10px 30px rgba(43, 196, 111, 0.45);
+      z-index: 80;
+      transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+      pointer-events: none;
+      max-width: 92vw;
+      text-align: center;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    @media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
+
     /* ---- how it works ---- */
     details.howto {
       background: var(--paper);
@@ -308,6 +357,13 @@
       <p style="margin:0.7rem 0 0;">Your rule: <span id="ruleString" class="rule-string">B3/S23</span></p>
     </section>
 
+    <!-- Discovery badges -->
+    <section class="panel">
+      <h2>🏅 Discoveries <span id="badgeCount" style="font-weight:normal;font-size:0.95rem;color:#6b6389"></span></h2>
+      <p class="hint">Real scientists hunt for these! Make each one happen in your world and the badge is yours — the game is always watching. 🔬</p>
+      <div id="badgeGrid" class="badge-grid"></div>
+    </section>
+
     <!-- Options -->
     <section class="panel">
       <h2>⚙️ World Settings</h2>
@@ -335,12 +391,16 @@
         <li>💤 With fewer than 2 it gets lonely, with more than 3 it gets too crowded — either way it disappears.</li>
         <li>🚀 Try stamping a <b>Glider</b> and watch it fly, or the <b>Glider Factory</b> to build a spaceship machine!</li>
         <li>🧪 Then visit the Rule Lab and change the numbers — can you invent a rule that makes mazes? Coral? Total chaos?</li>
+        <li>🏅 Some shapes never change (<b>still lifes</b>), some flip back and forth forever (<b>oscillators</b>) — find them and earn Discovery badges!</li>
       </ul>
     </details>
 
   </main>
 
+  <div id="toast" role="status" aria-live="polite"></div>
+
   <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

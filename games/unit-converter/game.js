@@ -556,9 +556,18 @@
       const row = document.createElement("div");
       row.className = "row" + (i === fromIdx ? " active" : "");
       const out = fromBase(u, baseVal);
+      // The maths relationship: how do you turn a "from" number into this row?
+      // (Only for linear units — temperature needs a formula, not a factor.)
+      let rel = "";
+      if (i !== fromIdx && from.factor && u.factor) {
+        const k = from.factor / u.factor;
+        rel = k >= 1
+          ? '<span class="u-rel">× ' + fmtHTML(Number(k.toPrecision(6))) + "</span>"
+          : '<span class="u-rel">÷ ' + fmtHTML(Number((1 / k).toPrecision(6))) + "</span>";
+      }
       row.innerHTML =
         '<span class="u-name">' + u.sym +
-          '<span class="u-full">' + u.n + '</span></span>' +
+          '<span class="u-full">' + u.n + '</span>' + rel + '</span>' +
         '<span class="u-val">' + fmtHTML(out) + '</span>';
       row.onclick = () => {
         // "convert from this unit instead": keep the shown number, switch source
@@ -584,6 +593,162 @@
     buildFromSelect();
     buildQuick();
     render();
+    quizIdle();
+  }
+
+  // ---- 🎯 Quiz mode ----------------------------------------------------
+  // "About how many cm make 1 foot?" — estimation questions built from the
+  // very units on screen, so the table doubles as the study sheet. Stars and
+  // best streak stick around in localStorage.
+  const QUIZ_KEY = "unitConverter-quiz";
+  let quiz = { stars: 0, best: 0 };
+  try { quiz = Object.assign(quiz, JSON.parse(localStorage.getItem(QUIZ_KEY)) || {}); } catch (e) {}
+  let quizStreak = 0;
+  let lastQuizText = "";
+
+  function saveQuiz() {
+    try { localStorage.setItem(QUIZ_KEY, JSON.stringify({ stars: quiz.stars, best: quiz.best })); } catch (e) {}
+  }
+  function syncQuizScore() {
+    $("quizStars").textContent = quiz.stars;
+    $("quizBest").textContent = quiz.best;
+  }
+
+  // Temperature can't be a "× n" question — use famous anchor facts instead.
+  const TEMP_QUIZ = [
+    { text: "Water freezes at 0 °C. What is that in °F?", answer: 32, wrongs: [0, 100],
+      explain: "°F = °C × 9⁄5 + 32, so 0 °C → 0 × 9⁄5 + 32 = <b>32 °F</b>." },
+    { text: "Water boils at 100 °C. What is that in °F?", answer: 212, wrongs: [100, 180],
+      explain: "°F = °C × 9⁄5 + 32, so 100 °C → 180 + 32 = <b>212 °F</b>." },
+    { text: "Your body is about 37 °C. What is that in °F?", answer: 98.6, wrongs: [37, 73.4],
+      explain: "°F = °C × 9⁄5 + 32, so 37 °C → 66.6 + 32 = <b>98.6 °F</b>." },
+    { text: "A hot summer day is 95 °F. About what is that in °C?", answer: 35, wrongs: [95, 63],
+      explain: "°C = (°F − 32) × 5⁄9, so (95 − 32) × 5⁄9 = <b>35 °C</b>." },
+    { text: "0 °C in Kelvin is about…", answer: 273, wrongs: [0, 100],
+      explain: "Kelvin starts at absolute zero: K = °C + 273.15, so 0 °C ≈ <b>273 K</b>." },
+  ];
+
+  function makeQuizQ() {
+    if (cat.key === "temp") {
+      let q, tries = 0;
+      do { q = TEMP_QUIZ[(Math.random() * TEMP_QUIZ.length) | 0]; }
+      while (q.text === lastQuizText && ++tries < 10);
+      return { text: q.text, answer: q.answer, wrongs: q.wrongs.slice(), explain: q.explain };
+    }
+    // Pick two linear units whose ratio makes a kid-sized number.
+    for (let tries = 0; tries < 80; tries++) {
+      const A = cat.units[(Math.random() * cat.units.length) | 0];
+      const B = cat.units[(Math.random() * cat.units.length) | 0];
+      if (A === B || !A.factor || !B.factor) continue;
+      const k = A.factor / B.factor;
+      if (k < 2 || k > 5000) continue;
+      const ans = k >= 20 ? Math.round(k) : Number(k.toPrecision(3));
+      const text = "About how many " + B.sym + " make 1 " + A.n.toLowerCase() + " (" + A.sym + ")?";
+      if (text === lastQuizText && tries < 60) continue;
+      return {
+        text: text,
+        answer: ans,
+        wrongs: [],
+        explain: "1 " + A.sym + " = " + fmt(k) + " " + B.sym +
+          " — to turn <b>" + A.sym + "</b> into <b>" + B.sym +
+          "</b> you <b>multiply by " + fmt(k) + "</b> (and divide to go back).",
+      };
+    }
+    return null; // no sensible pair in this category
+  }
+
+  // Distractors that FEEL plausible: double, half, or a place-value slip.
+  function quizChoices(q) {
+    const opts = [q.answer];
+    const cands = q.wrongs.length ? q.wrongs.slice() : [
+      q.answer * 2, Math.max(1, Math.round(q.answer / 2 * 10) / 10),
+      q.answer * 10, Math.round(q.answer / 10 * 10) / 10,
+      q.answer + 10,
+    ];
+    while (opts.length < 3 && cands.length) {
+      const c = cands.splice((Math.random() * cands.length) | 0, 1)[0];
+      if (c >= 0 && !opts.some(o => fmt(o) === fmt(c))) opts.push(c);
+    }
+    while (opts.length < 3) opts.push(q.answer + opts.length * 7);
+    // shuffle
+    for (let i = opts.length - 1; i > 0; i--) {
+      const j = (Math.random() * (i + 1)) | 0;
+      const t = opts[i]; opts[i] = opts[j]; opts[j] = t;
+    }
+    return opts;
+  }
+
+  function quizIdle() {
+    syncQuizScore();
+    const body = $("quizBody");
+    body.innerHTML =
+      '<div class="quiz-q">Think you know your ' +
+      cat.label.replace(/^\S+\s/, "").toLowerCase() +
+      " units? Prove it! 🧠</div>";
+    const btn = document.createElement("button");
+    btn.className = "quiz-start";
+    btn.textContent = "🎯 Quiz me!";
+    btn.onclick = askQuizQ;
+    body.appendChild(btn);
+  }
+
+  function askQuizQ() {
+    const q = makeQuizQ();
+    if (!q) { quizIdle(); return; }
+    lastQuizText = q.text;
+    const body = $("quizBody");
+    body.innerHTML = '<div class="quiz-q">' + q.text + "</div>";
+    const wrap = document.createElement("div");
+    wrap.className = "quiz-answers";
+    const opts = quizChoices(q);
+    opts.forEach((v) => {
+      const b = document.createElement("button");
+      b.textContent = fmt(v);
+      b.onclick = () => answerQuiz(q, v, b, wrap);
+      wrap.appendChild(b);
+    });
+    body.appendChild(wrap);
+    const streak = document.createElement("div");
+    streak.className = "quiz-streak";
+    streak.textContent = quizStreak >= 2 ? "🔥 Streak: " + quizStreak : "";
+    body.appendChild(streak);
+  }
+
+  function answerQuiz(q, picked, btn, wrap) {
+    const right = fmt(picked) === fmt(q.answer);
+    [...wrap.children].forEach((b) => {
+      b.disabled = true;
+      if (b.textContent === fmt(q.answer)) b.classList.add("right");
+      else b.classList.add(b === btn ? "wrong" : "dim");
+    });
+    const body = $("quizBody");
+    const fb = document.createElement("div");
+    fb.className = "quiz-feedback";
+    if (right) {
+      quiz.stars++;
+      quizStreak++;
+      if (quizStreak > quiz.best) quiz.best = quizStreak;
+      saveQuiz();
+      syncQuizScore();
+      window.SFX && SFX.good && SFX.good();
+      let cheer = "✅ <b>Yes!</b> ";
+      if (quizStreak > 0 && quizStreak % 5 === 0) {
+        cheer = "🎉 <b>" + quizStreak + " in a row!</b> ";
+        window.SFX && SFX.win && SFX.win();
+        window.Confetti && Confetti.burst({ count: 90 });
+      }
+      fb.innerHTML = cheer + q.explain;
+    } else {
+      quizStreak = 0;
+      window.SFX && SFX.nope && SFX.nope();
+      fb.innerHTML = "❌ Not quite — it's <b>" + fmt(q.answer) + "</b>. " + q.explain;
+    }
+    body.appendChild(fb);
+    const next = document.createElement("button");
+    next.className = "quiz-next";
+    next.textContent = "Next question ▶";
+    next.onclick = askQuizQ;
+    body.appendChild(next);
   }
 
   loadState();

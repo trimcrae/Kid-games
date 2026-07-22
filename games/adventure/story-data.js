@@ -398,6 +398,138 @@
     }
   };
 
+  /* =======================================================
+     4) THE MERMAID'S LOST SONG (3+, listening, music & counting)
+     ======================================================= */
+  const mermaid = {
+    id: "mermaid",
+    title: "The Mermaid's Lost Song",
+    emoji: "🧜‍♀️",
+    color: "#38b6ff",
+    ages: "3+",
+    who: "Ellie & Jeannie",
+    teaches: "listening, music & counting",
+    blurb: "A little mermaid lost her song — follow the sounds of the sea to find it!",
+    cover: () => A.beachBg({}) + A.mermaid({ x: 265, y: 205, scale: 2.2 }) +
+      A.princess({ x: 100, y: 215, scale: .95, dress: "#b06ad9" }) +
+      A.shell({ x: 175, y: 222, scale: 1.4 }),
+    start: "shore",
+    nodes: {
+      shore: {
+        art: () => A.beachBg({}) +
+          A.princess({ x: 95, y: 218, scale: 1, dress: "#b06ad9" }) +
+          A.mermaid({ x: 270, y: 200, scale: 2 }) +
+          A.shell({ x: 180, y: 226, scale: 1.2 }) + A.crab({ x: 330, y: 262, scale: .8 }),
+        text: "At the seaside, Princess Ellie hears a tiny sniffle. A little mermaid has lost her SONG, and the whole sea is too quiet without it! Where should they listen first?",
+        choices: [
+          { label: "🐚 Listen inside the big shell", to: "shell" },
+          { label: "🐬 Ask the friendly dolphin", to: "dolphin" }
+        ]
+      },
+      shell: {
+        art: () => A.beachBg({}) +
+          A.princess({ x: 130, y: 218, scale: 1, dress: "#b06ad9" }) +
+          A.shell({ x: 205, y: 220, scale: 2.4 }) + A.crab({ x: 300, y: 248, scale: 1.1 }),
+        text: "Ellie holds the big pink shell to her ear. Ssshhh… listen… a teeny tiny \"la-la-laaa\" is echoing far away! A crab scuttles up and clicks: \"That echo came from the coral garden!\"",
+        choices: [
+          { label: "🪸 Swim to the coral garden", to: "coral" },
+          { label: "🦀 Follow the crab's secret shortcut", to: "crabpath" }
+        ]
+      },
+      dolphin: {
+        art: () => A.oceanBg({}) +
+          A.dolphin({ x: 150, y: 195, scale: 1.8 }) +
+          A.mermaid({ x: 290, y: 195, scale: 1.7 }),
+        text: "\"Click-click-wheee!\" sings the dolphin. Dolphins really do talk in clicks and whistles! \"I heard a song-bubble float by. It bobbed away toward the deep blue water.\"",
+        choices: [
+          { label: "🫧 Chase the song-bubble", to: "bubble" },
+          { label: "🪸 Search the coral garden instead", to: "coral" }
+        ]
+      },
+      coral: {
+        art: () => A.sea({}) +
+          A.coral({ x: 90, y: 290, scale: 1.6, color: "#ff7eb6" }) +
+          A.coral({ x: 200, y: 292, scale: 1.4, color: "#ffd166" }) +
+          A.coral({ x: 310, y: 290, scale: 1.5, color: "#b06ad9" }) +
+          A.fish({ x: 150, y: 210, scale: 1 }) + A.fish({ x: 260, y: 175, scale: .8, color: "#5aa9ff" }),
+        text: "Down in the coral garden, stripy fish are humming along to… something! Count the corals with me: one, two, THREE. The humming is loudest by the pink one.",
+        choices: [
+          { label: "👂 Listen at the pink coral", to: "found" },
+          { label: "🐟 Ask the stripy fish for help", to: "fishhelp" }
+        ]
+      },
+      crabpath: {
+        art: () => A.beachBg({}) +
+          A.sandcastle({ x: 210, y: 250, scale: 1.3 }) +
+          A.crab({ x: 130, y: 262, scale: 1.1 }) +
+          A.princess({ x: 70, y: 222, scale: .95, dress: "#b06ad9" }),
+        text: "The crab's shortcut goes right through a tiny sandcastle town! Tip-toe, tip-toe — careful not to squish the towers. On the far side, music sparkles on the waves like sunshine.",
+        choices: [{ label: "🎶 Follow the sparkling music", to: "found" }]
+      },
+      bubble: {
+        art: () => A.oceanBg({}) +
+          `<circle cx="210" cy="120" r="26" fill="#dff6ff" opacity=".45" stroke="#fff" stroke-width="2"/>` +
+          `<text x="210" y="128" font-size="20" text-anchor="middle">🎵</text>` +
+          `<text x="150" y="98" font-size="13" text-anchor="middle" opacity=".8">🎵</text>` +
+          `<text x="268" y="90" font-size="13" text-anchor="middle" opacity=".8">🎶</text>` +
+          A.dolphin({ x: 110, y: 190, scale: 1.4 }),
+        text: "There it is — the shiny song-bubble, bobbing over the waves! POP! Out spill silvery notes: \"la-laaa!\" They line up in the water like little fish and swim off, singing all the way.",
+        choices: [{ label: "🎵 Follow the singing notes", to: "found" }]
+      },
+      fishhelp: {
+        art: () => A.sea({}) +
+          A.fish({ x: 130, y: 180, scale: 1.2 }) + A.fish({ x: 230, y: 150, scale: 1, color: "#5aa9ff" }) +
+          A.fish({ x: 300, y: 205, scale: .9, color: "#9be15d" }) +
+          `<circle cx="180" cy="120" r="5" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".8"/>` +
+          `<circle cx="205" cy="100" r="7" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".7"/>`,
+        text: "\"Blub-blub!\" The stripy fish puff up their cheeks and blow bubble-drums — BOOM, boom, BOOM! The whole reef starts to wiggle and dance along to the beat.",
+        choices: [
+          { label: "🥁 March with the bubble-drum band", to: "bandEnd" },
+          { label: "👂 Keep listening for the lost song", to: "found" }
+        ]
+      },
+      found: {
+        art: () => A.sea({}) +
+          A.mermaid({ x: 250, y: 190, scale: 2 }) +
+          A.harp({ x: 120, y: 230, scale: 1.3 }) +
+          `<path d="M150 120 Q170 100 195 112 Q220 124 245 108" stroke="#fff" stroke-width="2.4" fill="none" opacity=".8" stroke-linecap="round"/>` +
+          `<text x="160" y="112" font-size="15" text-anchor="middle">🎵</text>` +
+          `<text x="235" y="100" font-size="15" text-anchor="middle">🎶</text>`,
+        text: "THERE it is! Tangled in the seaweed sits the mermaid's song, shimmering like a ribbon of stars. Ellie gently sets it free, and it swirls straight back into the mermaid's heart. She beams!",
+        choices: [
+          { label: "🎤 Sing it together, nice and loud", to: "singEnd" },
+          { label: "🎪 Throw a big under-sea concert", to: "concertEnd" }
+        ]
+      },
+      singEnd: {
+        art: () => A.skySunset({}) +
+          A.mermaid({ x: 260, y: 235, scale: 2 }) +
+          A.princess({ x: 120, y: 250, scale: 1.05, dress: "#b06ad9" }) +
+          `<text x="190" y="140" font-size="18" text-anchor="middle">🎵</text>` +
+          `<text x="235" y="115" font-size="15" text-anchor="middle">🎶</text>`,
+        text: "The mermaid and Ellie sing to the setting sun, and the whole sea hums along — whales down low, dolphins up high, crabs clicking the beat. A song you SHARE is the sweetest song of all. 🎶",
+        end: "The Sunset Duet"
+      },
+      concertEnd: {
+        art: () => A.sea({}) +
+          A.mermaid({ x: 200, y: 170, scale: 1.8 }) + A.harp({ x: 120, y: 220, scale: 1.1 }) +
+          A.dolphin({ x: 310, y: 170, scale: 1.1 }) + A.crab({ x: 290, y: 265, scale: .9 }) +
+          A.fish({ x: 80, y: 150, scale: .9 }),
+        text: "The mermaid strums her golden harp and EVERYONE gets a part: dolphins whistle, fish blub, and the crab keeps time with his claws. It's the first-ever Under-the-Sea Concert — and Ellie conducts!",
+        end: "Star of the Sea Concert"
+      },
+      bandEnd: {
+        art: () => A.sea({}) +
+          A.fish({ x: 120, y: 170, scale: 1.1 }) + A.fish({ x: 200, y: 190, scale: .95, color: "#5aa9ff" }) +
+          A.fish({ x: 275, y: 165, scale: .9, color: "#9be15d" }) + A.crab({ x: 200, y: 268, scale: 1 }) +
+          `<circle cx="160" cy="120" r="6" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".8"/>` +
+          `<circle cx="240" cy="105" r="8" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".7"/>`,
+        text: "BOOM, boom, BOOM! The bubble-drum band marches around the reef all afternoon, and the little mermaid laughs so hard she finds a brand-new song — a giggly one! Music can be found anywhere. 🥁",
+        end: "The Bubble-Drum Band"
+      }
+    }
+  };
+
   /* ---- register the short stories (long ones append later) ---- */
-  window.STORIES = [rainbow, campout, pizza];
+  window.STORIES = [rainbow, campout, pizza, mermaid];
 })();

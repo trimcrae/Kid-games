@@ -47,6 +47,17 @@
   function loadProg() { try { return JSON.parse(localStorage.getItem(STORE)) || {}; } catch (e) { return {}; } }
   function saveProg(p) { try { localStorage.setItem(STORE, JSON.stringify(p)); } catch (e) {} }
 
+  // …and where the kids left off mid-story (so a closed tablet lid
+  // never loses their place).
+  const RESUME = "adv-resume";
+  function loadResume() { try { return JSON.parse(localStorage.getItem(RESUME)); } catch (e) { return null; } }
+  function saveResume(r) {
+    try {
+      if (r) localStorage.setItem(RESUME, JSON.stringify(r));
+      else localStorage.removeItem(RESUME);
+    } catch (e) {}
+  }
+
   // count how many ending-nodes a story has (nodes with no choices)
   function endingCount(story) {
     return Object.keys(story.nodes).filter(k => !story.nodes[k].choices).length;
@@ -108,27 +119,55 @@
   function buildLibrary() {
     const prog = loadProg();
     grid.innerHTML = "";
+
+    // "Keep reading" banner — jump straight back to where they left off
+    const slot = document.getElementById("resume-slot");
+    if (slot) {
+      slot.innerHTML = "";
+      const r = loadResume();
+      const st = r && STORIES.find(s => s.id === r.storyId);
+      if (st && st.nodes[r.nodeId] && r.nodeId !== st.start) {
+        const b = document.createElement("button");
+        b.className = "resume-btn";
+        b.innerHTML = `▶ Keep reading: <b>${st.emoji} ${st.title}</b>`;
+        b.addEventListener("click", () => { try { ac(); } catch (e) {} openStory(st, r.nodeId); });
+        slot.appendChild(b);
+      }
+    }
+
+    let foundAll = 0, totalAll = 0;
     STORIES.forEach(story => {
       const found = (prog[story.id] && prog[story.id].length) || 0;
       const total = endingCount(story);
+      foundAll += found; totalAll += total;
       const card = document.createElement("button");
       card.className = "story-card";
       card.style.background = `linear-gradient(160deg, ${ART.shade(story.color, 22)}, ${ART.shade(story.color, -42)})`;
+      const badge = found >= total ? "🏆" : found ? "⭐" : "";
       card.innerHTML =
-        `${found ? `<span class="done-star" aria-hidden="true">⭐</span>` : ""}
+        `${badge ? `<span class="done-star" aria-hidden="true">${badge}</span>` : ""}
          <span class="cover">${wrapSvg(story.cover())}</span>
          <h2>${story.emoji} ${story.title}</h2>
          <p class="who">For ${story.who} • ${story.ages}</p>
          <p class="teach">${story.blurb}</p>
          <p class="learn">Learns: ${story.teaches}</p>
-         <p class="endcount">${found}/${total} endings found</p>`;
+         <p class="endcount">${found >= total ? "🏆 ALL " + total + " endings found!" : found + "/" + total + " endings found"}</p>`;
       card.addEventListener("click", () => { try { ac(); } catch (e) {} openStory(story); });
       grid.appendChild(card);
     });
+
+    const totals = document.getElementById("total-progress");
+    if (totals) {
+      totals.textContent = foundAll >= totalAll
+        ? `🏆 Amazing! You've discovered ALL ${totalAll} endings in every adventure!`
+        : foundAll > 0
+          ? `⭐ ${foundAll} of ${totalAll} endings discovered so far — keep exploring!`
+          : `${totalAll} different endings are hiding in these stories. Every choice matters!`;
+    }
   }
 
   /* ---- Open a story ---- */
-  function openStory(story) {
+  function openStory(story, startNode) {
     current = story;
     history = [];
     // Only Ellie's pre-reader stories get the voice controls.
@@ -140,7 +179,7 @@
     library.style.display = "none";
     reader.classList.add("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    goTo(story.start, false);
+    goTo(startNode && story.nodes[startNode] ? startNode : story.start, false);
   }
 
   /* ---- Render a node ---- */
@@ -170,13 +209,22 @@
     choicesEl.innerHTML = "";
 
     if (isEnding) {
-      endBadge.textContent = "⭐ The End — " + (node.end || "A Happy Ending") + " ⭐";
-      recordEnding(current.id, id);
+      const isNew = recordEnding(current.id, id);
+      const prog = loadProg();
+      const gotAll = (prog[current.id] || []).length >= endingCount(current);
+      endBadge.textContent = isNew
+        ? (gotAll
+          ? "🏆 NEW ending — " + (node.end || "A Happy Ending") + " — that's ALL of them! 🏆"
+          : "🎉 NEW ending found — " + (node.end || "A Happy Ending") + "! 🎉")
+        : "⭐ The End — " + (node.end || "A Happy Ending") + " ⭐";
       SFX.yay();
+      if (isNew && window.Confetti) Confetti.burst({ count: gotAll ? 160 : 80 });
+      saveResume(null);  // story finished — nothing to resume
       addBtn("🔁 Read this story again", () => openStory(current), "pink");
       addBtn("📖 Back to all stories", () => goHome(), "blue");
     } else {
       SFX.page();
+      saveResume({ storyId: current.id, nodeId: id });
       node.choices.forEach(ch => addBtn(ch.label, () => {
         SFX.choose();
         goTo(ch.to, true);
@@ -195,12 +243,15 @@
     choicesEl.appendChild(b);
   }
 
+  // Remember a discovered ending; returns true when it's a NEW one.
   function recordEnding(storyId, endId) {
     const prog = loadProg();
     const set = new Set(prog[storyId] || []);
+    const isNew = !set.has(endId);
     set.add(endId);
     prog[storyId] = Array.from(set);
     saveProg(prog);
+    return isNew;
   }
 
   function goBack() {

@@ -34,11 +34,13 @@
   const el = {
     picker:     document.getElementById("picker"),
     cards:      document.getElementById("cards"),
+    playedCount:document.getElementById("playedCount"),
     entry:      document.getElementById("entry"),
     progress:   document.getElementById("progress"),
     barFill:    document.getElementById("barFill"),
     askLabel:   document.getElementById("askLabel"),
     askExample: document.getElementById("askExample"),
+    askHint:    document.getElementById("askHint"),
     wordInput:  document.getElementById("wordInput"),
     backBtn:    document.getElementById("backBtn"),
     nextBtn:    document.getElementById("nextBtn"),
@@ -57,8 +59,20 @@
   }
 
   // ---------------- PICKER ----------------
+  function countPlayed() {
+    return MADLIBS.filter(function (s) { return state.completed[s.id]; }).length;
+  }
+
   function buildPicker() {
     el.cards.innerHTML = "";
+    const played = countPlayed();
+    if (el.playedCount) {
+      el.playedCount.textContent = played >= MADLIBS.length
+        ? "🏆 You've made ALL " + MADLIBS.length + " silly stories — you're a Mad Libs master!"
+        : played > 0
+          ? "You've made " + played + " of " + MADLIBS.length + " silly stories. Keep going!"
+          : MADLIBS.length + " silly stories are waiting for your words!";
+    }
     MADLIBS.forEach(function (s) {
       const card = document.createElement("button");
       card.className = "ml-card";
@@ -92,6 +106,10 @@
     el.barFill.style.width = Math.round((step / total) * 100) + "%";
     el.askLabel.textContent = blank.label;
     el.askExample.textContent = blank.example ? "like “" + blank.example + "”" : "";
+    // the mini grammar lesson for this word type
+    const hint = (typeof MADLIB_HINTS !== "undefined" && MADLIB_HINTS[blank.type]) || "";
+    el.askHint.textContent = hint;
+    el.askHint.style.display = hint ? "" : "none";
     el.wordInput.value = answers[step] || "";
     el.backBtn.disabled = step === 0;
     el.nextBtn.textContent = step === total - 1 ? "See my story! ✨" : "Next →";
@@ -100,7 +118,15 @@
 
   function commitAndNext() {
     const word = el.wordInput.value.trim();
-    if (!word) { el.wordInput.focus(); return; }   // need a word to move on
+    if (!word) {
+      // a friendly nudge: wobble the box instead of silently ignoring the tap
+      window.SFX && SFX.nope();
+      el.wordInput.classList.remove("shake");
+      void el.wordInput.offsetWidth;
+      el.wordInput.classList.add("shake");
+      el.wordInput.focus();
+      return;
+    }
     answers[step] = word;
     window.SFX && SFX.good();   // a happy chime for each silly word
     if (step < story.blanks.length - 1) {
@@ -147,13 +173,65 @@
   function reveal() {
     el.storyTitle.textContent = story.emoji + " " + story.title;
     el.storyText.innerHTML = fillTemplate(true);
+    wrapWordsForHighlight();
     show("reveal");
 
+    const wasNew = !state.completed[story.id];
     state.completed[story.id] = true;
     save();
 
     window.SFX && SFX.win();
-    window.Confetti && Confetti.burst({ count: 70 });
+    // finishing the very last story earns an extra-big shower
+    const finishedAll = MADLIBS.every(function (s) { return state.completed[s.id]; });
+    window.Confetti && Confetti.burst({ count: wasNew && finishedAll ? 180 : 70 });
+  }
+
+  // Wrap every word of the revealed story in a span (keeping the pink
+  // .ml-fill highlights intact) and remember each word's character
+  // offset in the plain story text, so read-aloud can light words up.
+  let wordSpans = [];   // [{ start, el }] in reading order
+
+  function wrapWordsForHighlight() {
+    wordSpans = [];
+    const walker = document.createTreeWalker(el.storyText, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    let offset = 0;
+    nodes.forEach(function (node) {
+      const text = node.nodeValue;
+      const frag = document.createDocumentFragment();
+      const re = /\S+/g;
+      let m, last = 0;
+      while ((m = re.exec(text)) !== null) {
+        if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+        const sp = document.createElement("span");
+        sp.className = "ml-w";
+        sp.textContent = m[0];
+        frag.appendChild(sp);
+        wordSpans.push({ start: offset + m.index, el: sp });
+        last = m.index + m[0].length;
+      }
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+      offset += text.length;
+    });
+  }
+
+  function clearHighlight() {
+    wordSpans.forEach(function (w) { w.el.classList.remove("speaking"); });
+  }
+
+  function highlightAt(charIndex) {
+    // the utterance starts with "<title>. " before the story text
+    const idx = charIndex - (story.title.length + 2);
+    if (idx < 0) return;
+    let cur = null;
+    for (let i = 0; i < wordSpans.length; i++) {
+      if (wordSpans[i].start <= idx) cur = wordSpans[i];
+      else break;
+    }
+    clearHighlight();
+    if (cur) cur.el.classList.add("speaking");
   }
 
   // ---------------- READ ALOUD ----------------
@@ -165,6 +243,7 @@
 
   function stopReading() {
     if (canSpeak) window.speechSynthesis.cancel();
+    clearHighlight();
     el.readBtn.textContent = "🔊 Read it to me";
   }
 
@@ -175,6 +254,10 @@
     u.rate = 0.95;
     u.onend = stopReading;
     u.onerror = stopReading;
+    // karaoke-style: light up each word as the voice reaches it
+    u.onboundary = function (e) {
+      if (typeof e.charIndex === "number") highlightAt(e.charIndex);
+    };
     el.readBtn.textContent = "⏹ Stop reading";
     window.speechSynthesis.speak(u);
   }

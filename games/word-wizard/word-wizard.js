@@ -158,8 +158,10 @@
     clueEmoji: $("clue-emoji"), clueText: $("clue-text"),
     slots: $("slots"), bank: $("bank"),
     hear: $("hear-btn"), clear: $("clear-btn"), skip: $("skip-btn"), quit: $("quit-btn"),
+    hint: $("hint-btn"),
     win: $("win"), winBig: $("win-big"), winTitle: $("win-title"), winText: $("win-text"),
     winNext: $("win-next"), winMenu: $("win-menu"),
+    dict: $("dict"), dictList: $("dict-list"), dictBtn: $("dict-btn"), dictBack: $("dict-back"),
   };
 
   /* ---------- live play state ---------- */
@@ -168,6 +170,7 @@
   let current = null;     // the current word object
   let typed = [];         // array of {char, btn} placed in slots
   let locked = false;     // true while showing success / transitioning
+  let clean = true;       // no wrong tries and no hints yet on this word → bonus star
 
   /* ---------- helpers ---------- */
   function countMastered() { return Object.keys(state.mastered).length; }
@@ -190,6 +193,7 @@
     el.levels.classList.toggle("hidden", section !== "levels");
     el.play.classList.toggle("hidden", section !== "play");
     el.win.classList.toggle("hidden", section !== "win");
+    if (el.dict) el.dict.classList.toggle("hidden", section !== "dict");
   }
 
   // Play a pre-rendered neural-voice clip from this game's audio/ folder.
@@ -237,6 +241,42 @@
       }
       el.levelGrid.appendChild(card);
     });
+    if (el.dictBtn) {
+      const n = countMastered();
+      el.dictBtn.textContent = "📖 My Words (" + n + ")";
+      el.dictBtn.disabled = n === 0;
+    }
+  }
+
+  /* ---------- "My Words" — a little dictionary of every mastered word ----------
+     The vocabulary payoff: look back at each word you've learned, re-read
+     its meaning and hear it said out loud. */
+  function renderDict() {
+    el.dictList.innerHTML = "";
+    LEVELS.forEach((lv) => {
+      lv.words.forEach((w) => {
+        if (!state.mastered[w.word]) return;
+        const row = document.createElement("div");
+        row.className = "dict-card";
+        row.style.setProperty("--accent", lv.color);
+        const art = document.createElement("span");
+        art.className = "dict-art";
+        art.setAttribute("aria-hidden", "true");
+        art.innerHTML = WordArt.draw(w.word);
+        const body = document.createElement("span");
+        body.className = "dict-body";
+        body.innerHTML = '<b class="dict-word">' + w.word + "</b>" +
+          '<span class="dict-clue">' + w.clue + "</span>";
+        const hear = document.createElement("button");
+        hear.className = "dict-hear";
+        hear.type = "button";
+        hear.textContent = "🔊";
+        hear.setAttribute("aria-label", "Hear the word " + w.word);
+        hear.addEventListener("click", () => playClip("word-" + w.word));
+        row.appendChild(art); row.appendChild(body); row.appendChild(hear);
+        el.dictList.appendChild(row);
+      });
+    });
   }
 
   /* ---------- play a level ---------- */
@@ -255,6 +295,7 @@
     current = lv.words[wordIndex];
     typed = [];
     locked = false;
+    clean = true;
     el.feedback.textContent = "";
     el.feedback.style.color = "var(--green)";
     el.clueEmoji.innerHTML = WordArt.draw(current.word);
@@ -326,12 +367,46 @@
     const guess = typed.map((t) => t.char).join("");
     if (guess === current.word) {
       win();
-    } else {
-      el.slots.classList.add("wrong");
-      el.feedback.style.color = "var(--pink)";
-      el.feedback.textContent = "Not quite — try again! 💪";
-      setTimeout(() => { clearAll(); el.feedback.textContent = ""; }, 800);
+      return;
     }
+    // teach, don't just wipe: keep the letters that ARE right (from the
+    // start of the word) and only hand back the wrong ones
+    clean = false;
+    let ok = 0;
+    while (ok < guess.length && guess[ok] === current.word[ok]) ok++;
+    el.slots.classList.add("wrong");
+    el.feedback.style.color = "var(--pink)";
+    el.feedback.textContent = ok === 0
+      ? "Not quite — sound it out and try again! 💪"
+      : "The first " + (ok === 1 ? "letter is" : ok + " letters are") + " right — keep going! 💪";
+    setTimeout(() => {
+      el.slots.classList.remove("wrong");
+      while (typed.length > ok) removeLast();
+    }, 800);
+  }
+
+  /* a hint that teaches: make the NEXT correct letter glow in the bank —
+     Jeannie still has to tap it (and any wrong letters go back first) */
+  function giveHint() {
+    if (locked || !current) return;
+    clean = false;
+    const guess = typed.map((t) => t.char).join("");
+    let ok = 0;
+    while (ok < guess.length && guess[ok] === current.word[ok]) ok++;
+    el.slots.classList.remove("wrong");
+    while (typed.length > ok) removeLast();
+    if (typed.length >= current.word.length) return;
+    const need = current.word[typed.length];
+    const btns = el.bank.querySelectorAll(".letter:not(:disabled)");
+    for (const b of btns) {
+      if (b.dataset.letter === need) {
+        b.classList.remove("glow"); void b.offsetWidth; b.classList.add("glow");
+        setTimeout(() => b.classList.remove("glow"), 1600);
+        break;
+      }
+    }
+    el.feedback.style.color = "var(--blue)";
+    el.feedback.textContent = "💡 The glowing letter comes next!";
   }
 
   function win() {
@@ -340,11 +415,14 @@
     for (let k = 0; k < slots.length; k++) slots[k].classList.add("good");
     const firstTime = !state.mastered[current.word];
     if (firstTime) state.mastered[current.word] = true;
-    state.stars += 1;
+    const earned = clean ? 2 : 1;   // bonus star for a perfect first try
+    state.stars += earned;
     save();
     updateHud();
     el.feedback.style.color = "var(--green)";
-    el.feedback.textContent = firstTime ? "✨ New word learned! ✨" : "✅ Spelled it!";
+    el.feedback.textContent = clean
+      ? (firstTime ? "✨ New word learned — first try! +2 ⭐" : "🌟 First try! +2 ⭐")
+      : (firstTime ? "✨ New word learned! ✨" : "✅ Spelled it!");
     sparkleBurst();
     window.SFX && SFX.good();
     playClip("word-" + current.word);
@@ -400,6 +478,9 @@
   /* ---------- wire up buttons ---------- */
   el.clear.addEventListener("click", clearAll);
   el.hear.addEventListener("click", () => { if (current) playClip("word-" + current.word); });
+  if (el.hint) el.hint.addEventListener("click", giveHint);
+  if (el.dictBtn) el.dictBtn.addEventListener("click", () => { renderDict(); show("dict"); });
+  if (el.dictBack) el.dictBack.addEventListener("click", () => { renderLevels(); show("levels"); });
   el.skip.addEventListener("click", () => { if (!locked) nextWord(); });
   el.quit.addEventListener("click", () => { renderLevels(); show("levels"); });
   el.winMenu.addEventListener("click", () => { renderLevels(); show("levels"); });

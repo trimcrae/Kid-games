@@ -43,6 +43,21 @@
     }
     @keyframes twinkle { 0%,100%{transform:scale(1);opacity:.85} 50%{transform:scale(1.25);opacity:1} }
 
+    /* overall endings progress + "keep reading" banner */
+    .total-progress {
+      text-align: center; font-weight: bold; color: var(--purple);
+      font-size: clamp(.9rem, 3vw, 1.05rem); margin: 0 0 1rem;
+    }
+    .resume-btn {
+      display: block; margin: 0 auto 1.1rem; border: none; cursor: pointer;
+      font-family: inherit; font-size: clamp(.95rem, 3.4vw, 1.15rem); color: #fff;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      border-radius: 999px; padding: .8rem 1.5rem; max-width: 100%;
+      box-shadow: 0 8px 20px rgba(138,92,255,.35);
+      transition: transform .12s ease; -webkit-tap-highlight-color: transparent;
+    }
+    .resume-btn:hover, .resume-btn:focus-visible { transform: scale(1.04); outline: none; }
+
     /* ---- Reader ---- */
     .reader { display: none; }
     .reader.active { display: block; }
@@ -127,6 +142,8 @@
     <section id="library">
       <p class="adv-intro">Pick a story, then YOU choose what happens next! 🌟<br>
         <span style="font-size:.85em;font-weight:normal;color:#6a6385">Ellie's stories read themselves out loud — tap 🔊 to mute.</span></p>
+      <p class="total-progress" id="total-progress"></p>
+      <div id="resume-slot"></div>
       <div id="story-grid" class="story-grid"></div>
     </section>
 
@@ -152,6 +169,7 @@
   </main>
 
   <script src="../../assets/js/voice.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
   <script src="art.js"></script>
   <script src="story-data.js"></script>
   <script src="stories-long.js"></script>

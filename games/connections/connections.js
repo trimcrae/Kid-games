@@ -269,11 +269,33 @@
         { name: "Sparkly stuff", color: "purple", items: ["Gold", "Glitter", "Shine", "Gem"] },
       ],
     },
+    {
+      name: "Pokémon Types",
+      emoji: "⚡",
+      groups: [
+        { name: "Fire types",     color: "yellow", items: ["Charmander", "Vulpix", "Ponyta", "Flareon"] },
+        { name: "Water types",    color: "green",  items: ["Squirtle", "Psyduck", "Lapras", "Magikarp"] },
+        { name: "Electric types", color: "blue",   items: ["Pikachu", "Raichu", "Jolteon", "Zapdos"] },
+        { name: "Grass types",    color: "purple", items: ["Bulbasaur", "Oddish", "Leafeon", "Tangela"] },
+      ],
+    },
+    {
+      name: "Bluey & Friends",
+      emoji: "🐾",
+      groups: [
+        { name: "Heeler family",    color: "yellow", items: ["Bluey", "Bingo", "Bandit", "Chilli"] },
+        { name: "Cousins & family", color: "green",  items: ["Muffin", "Socks", "Stripe", "Frisky"] },
+        { name: "Bluey's friends",  color: "blue",   items: ["Honey", "Mackenzie", "Rusty", "Indy"] },
+        { name: "Games they play",  color: "purple", items: ["Keepy Uppy", "Grannies", "Shadowlands", "Sleepytime"] },
+      ],
+    },
   ];
 
   const MAX_MISTAKES = 4;
 
-  /* ---------- saved progress (per puzzle): "won" | "lost" | undefined ---------- */
+  /* ---------- saved progress ----------
+     saved["p"+i] : "won" | "lost" | undefined   (kept from v1 saves)
+     saved["m"+i] : best (fewest) mistakes on a win — 0 means a Perfect! */
   const SAVE_KEY = "connections.v1";
   function load() {
     try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === "object") return s; }
@@ -289,6 +311,7 @@
     puzzles: $("puzzles"), puzGrid: $("puz-grid"), play: $("play"),
     solved: $("solved"), board: $("board"), lives: $("lives"), feedback: $("feedback"),
     shuffle: $("shuffle-btn"), deselect: $("deselect-btn"), submit: $("submit-btn"), quit: $("quit-btn"),
+    hint: $("hint-btn"), progress: $("puz-progress"),
     playControls: $("play-controls"), nextControls: $("next-controls"),
     next: $("next-btn"), retry: $("retry-btn"),
   };
@@ -300,6 +323,8 @@
   let solvedGroups = []; // group objects already found
   let mistakes = 0;
   let over = false;
+  let tried = [];        // combos already guessed this round (so repeats are free)
+  let hintsUsed = 0;     // hints revealed this round (group-name clues)
 
   function shuffle(arr) {
     const a = arr.slice();
@@ -317,20 +342,30 @@
   /* ---------- picker ---------- */
   function renderPuzzles() {
     el.puzGrid.innerHTML = "";
+    let wins = 0;
     PUZZLES.forEach((p, i) => {
       const status = saved["p" + i];
+      if (status === "won") wins++;
+      const perfect = status === "won" && saved["m" + i] === 0;
       const card = document.createElement("button");
       card.type = "button";
-      card.className = "puz-card" + (status === "won" ? " solved" : "");
+      card.className = "puz-card" + (status === "won" ? " solved" : "") + (perfect ? " perfect" : "");
       card.innerHTML =
         '<span class="pz-emoji" aria-hidden="true">' + p.emoji + "</span>" +
         "<h3>" + p.name + "</h3>" +
         '<span class="pz-progress">' +
-          (status === "won" ? "Solved ✓" : status === "lost" ? "Try again!" : "16 cards") +
+          (perfect ? "⭐ Perfect!" : status === "won" ? "Solved ✓" : status === "lost" ? "Try again!" : "16 cards") +
         "</span>";
       card.addEventListener("click", () => startPuzzle(i));
       el.puzGrid.appendChild(card);
     });
+    if (el.progress) {
+      el.progress.textContent = wins === 0
+        ? "Pick a puzzle:"
+        : wins === PUZZLES.length
+          ? "🏆 All " + PUZZLES.length + " puzzles solved — wow!"
+          : "Solved " + wins + " of " + PUZZLES.length + " — pick a puzzle:";
+    }
   }
 
   /* ---------- play ---------- */
@@ -340,6 +375,9 @@
     solvedGroups = [];
     mistakes = 0;
     over = false;
+    tried = [];
+    hintsUsed = 0;
+    if (el.hint) { el.hint.disabled = false; el.hint.textContent = "💡 Hint"; }
     const items = [];
     PUZZLES[i].groups.forEach((g) => g.items.forEach((it) => items.push(it)));
     tiles = shuffle(items);
@@ -374,6 +412,7 @@
       b.className = "tile" + (selected.indexOf(item) !== -1 ? " selected" : "");
       b.textContent = item;
       b.dataset.item = item;
+      b.setAttribute("aria-pressed", selected.indexOf(item) !== -1 ? "true" : "false");
       b.addEventListener("click", () => toggle(item, b));
       el.board.appendChild(b);
     });
@@ -390,15 +429,27 @@
   function toggle(item, btn) {
     if (over) return;
     const idx = selected.indexOf(item);
-    if (idx !== -1) { selected.splice(idx, 1); btn.classList.remove("selected"); }
+    if (idx !== -1) { selected.splice(idx, 1); btn.classList.remove("selected"); btn.setAttribute("aria-pressed", "false"); }
     else {
       if (selected.length >= 4) return;
-      selected.push(item); btn.classList.add("selected");
+      selected.push(item); btn.classList.add("selected"); btn.setAttribute("aria-pressed", "true");
     }
     el.submit.disabled = selected.length !== 4;
   }
 
   function flash(msg, color) { el.feedback.style.color = color; el.feedback.textContent = msg; }
+
+  /* A hint that teaches: reveal the NAME of one still-hidden group (never
+     the cards), so the kid still does the sorting themselves. */
+  function giveHint() {
+    if (over) return;
+    const hidden = PUZZLES[pi].groups.filter((g) => solvedGroups.indexOf(g) === -1);
+    if (hintsUsed >= hidden.length) return;
+    const names = hidden.slice(0, hintsUsed + 1).map((g) => "“" + g.name + "”");
+    hintsUsed += 1;
+    flash("🕵️ Look for: " + names.join(" and ") + " — which four cards fit?", "var(--blue)");
+    if (hintsUsed >= hidden.length) { el.hint.disabled = true; el.hint.textContent = "💡 No more hints"; }
+  }
 
   function submit() {
     if (over || selected.length !== 4) return;
@@ -410,6 +461,13 @@
       solveGroup(g);
       return;
     }
+    // already-guessed combos are free — no guess lost, just a reminder
+    const combo = selected.slice().sort().join("|");
+    if (tried.indexOf(combo) !== -1) {
+      flash("You already tried those four — no guess used! 🔁", "var(--purple)");
+      return;
+    }
+    tried.push(combo);
     // not a group — is it "one away" (3 share a group)?
     let best = 0;
     PUZZLES[pi].groups.forEach((grp) => {
@@ -450,6 +508,7 @@
     over = true;
     el.submit.disabled = true;
     saved["p" + pi] = won ? "won" : "lost";
+    if (won && (typeof saved["m" + pi] !== "number" || mistakes < saved["m" + pi])) saved["m" + pi] = mistakes;
     save();
     // swap the play buttons for "what next?" choices
     el.playControls.classList.add("hidden");
@@ -459,9 +518,12 @@
     el.next.textContent = more ? "Next puzzle ▶" : "🔗 All puzzles";
     if (won) {
       if (window.SFX) SFX.win();
-      window.Confetti && Confetti.burst({ count: 100 });
-      flash("🏆 You found all four groups! Amazing!", "var(--green)");
-      el.lives.textContent = "Solved with " + (MAX_MISTAKES - mistakes) + " guesses to spare!";
+      const perfect = mistakes === 0;
+      window.Confetti && Confetti.burst({ count: perfect ? 180 : 100 });
+      flash(perfect ? "⭐ PERFECT — no wrong guesses at all! ⭐" : "🏆 You found all four groups! Amazing!", "var(--green)");
+      el.lives.textContent = perfect
+        ? "A perfect star for this puzzle! ⭐"
+        : "Solved with " + (MAX_MISTAKES - mistakes) + (MAX_MISTAKES - mistakes === 1 ? " guess" : " guesses") + " to spare!";
     } else {
       // reveal every remaining group
       const found = new Set(solvedGroups);
@@ -493,6 +555,7 @@
   el.submit.addEventListener("click", submit);
   el.deselect.addEventListener("click", () => { if (!over) { selected = []; renderBoard(); } });
   el.shuffle.addEventListener("click", () => { if (!over) { tiles = shuffle(tiles); renderBoard(); } });
+  if (el.hint) el.hint.addEventListener("click", giveHint);
   el.quit.addEventListener("click", () => { renderPuzzles(); show("puzzles"); });
 
   /* ---------- go ---------- */

@@ -28,6 +28,14 @@
   ];
   var VARIANT_KEY = "colorGrid.variant";
 
+  // emoji lookup so starter words (and re-typed favourites) show a picture
+  var EMOJI = {};
+  if (typeof ENTRIES !== "undefined") {
+    ENTRIES.forEach(function (e) { if (e.e) EMOJI[e.w.toLowerCase()] = e.e; });
+  }
+
+  var MILESTONES = [10, 25, 50, 100, 150, 200];
+
   var kidRow = document.getElementById("kid-row");
   var variantRow = document.getElementById("variant-row");
   var colorRow = document.getElementById("color-row");
@@ -41,6 +49,11 @@
   var gridHead = document.getElementById("grid-head");
   var starterBtn = document.getElementById("starter");
   var clearBtn = document.getElementById("clear");
+  var questEl = document.getElementById("quest");
+  var questTextEl = document.getElementById("quest-text");
+  var questHintBtn = document.getElementById("quest-hint");
+  var questNewBtn = document.getElementById("quest-new");
+  var starsEl = document.getElementById("stars");
 
   var currentKid = localStorage.getItem(CURRENT_KID_KEY) || "cory";
   if (!KIDS.some(function (k) { return k.id === currentKid; })) currentKid = "cory";
@@ -74,6 +87,17 @@
   }
   function keyFor(letter, color) { return letter + "|" + color; }
 
+  /* ---------- quest stars (per kid) ---------- */
+  function starsKey() { return "colorGrid.stars:" + currentKid; }
+  function loadStars() {
+    try { return parseInt(localStorage.getItem(starsKey()), 10) || 0; } catch (e) { return 0; }
+  }
+  function addStar() {
+    try { localStorage.setItem(starsKey(), String(loadStars() + 1)); } catch (e) {}
+    renderStars();
+  }
+  function renderStars() { starsEl.textContent = String(loadStars()); }
+
   /* ---------- build the kid picker ---------- */
   KIDS.forEach(function (kid) {
     var btn = document.createElement("button");
@@ -95,6 +119,8 @@
     hideChooser();
     grid = load();
     renderAll();
+    renderStars();
+    initQuest();
     var kid = KIDS.filter(function (k) { return k.id === id; })[0];
     flashHint(kid.name + "'s grid — type away! ✨", false);
   }
@@ -121,6 +147,7 @@
     hideChooser();
     grid = load();
     renderAll();
+    initQuest();
     updateHow();
   }
 
@@ -209,7 +236,9 @@
       var c = COLORS[color];
       chip.style.background = c.hex;
       chip.style.color = c.dark ? "#2b2440" : "#fff";
-      chip.innerHTML = "<span>" + escapeHtml(word) + "</span>" +
+      var emoji = EMOJI[word.toLowerCase()];
+      chip.innerHTML = (emoji ? '<span aria-hidden="true">' + emoji + "</span>" : "") +
+        "<span>" + escapeHtml(word) + "</span>" +
         '<button class="chip-x" aria-label="Remove ' + escapeHtml(word) + '">×</button>';
       chip.querySelector(".chip-x").addEventListener("click", function () {
         removeWord(letter, color, i);
@@ -229,7 +258,116 @@
     var total = 0;
     Object.keys(grid).forEach(function (k) { total += grid[k].length; });
     countEl.textContent = String(total);
+    return total;
   }
+
+  /* ---------- word quests ----------
+     A little challenge: "add a Green word to row B!" Quests are only
+     drawn from (letter, colour) pairs that the starter list proves have
+     an answer, and only for cells that are still empty. Completing one
+     earns a star (saved per kid). */
+  var quest = null;
+
+  function questKey() { return "colorGrid.quest:" + currentKid + ":" + activeVariant; }
+
+  // every (letter,colour) pair that ENTRIES can answer under this variant
+  function questPairs() {
+    var byKey = {};
+    if (typeof ENTRIES !== "undefined") {
+      ENTRIES.forEach(function (e) {
+        var letter = starterLetter(e.w, e.l);
+        var k = keyFor(letter, e.c);
+        (byKey[k] = byKey[k] || []).push(e);
+      });
+    }
+    return byKey;
+  }
+
+  // prefer cells that are still empty; once the grid is well fed, any
+  // provable (letter, colour) pair works — "add ANOTHER word to…"
+  function questCandidates() {
+    var byKey = questPairs();
+    var empty = [], all = [];
+    Object.keys(byKey).forEach(function (k) {
+      var bits = k.split("|");
+      var cand = { letter: bits[0], color: bits[1] };
+      all.push(cand);
+      if (!grid[k] || !grid[k].length) empty.push(cand);
+    });
+    return empty.length ? empty : all;
+  }
+
+  function newQuest() {
+    var cands = questCandidates();
+    if (!cands.length) {
+      quest = null;
+      try { localStorage.removeItem(questKey()); } catch (e) {}
+      renderQuest();
+      return;
+    }
+    var q = cands[Math.floor(Math.random() * cands.length)];
+    quest = { letter: q.letter, color: q.color };
+    try { localStorage.setItem(questKey(), JSON.stringify(quest)); } catch (e) {}
+    renderQuest();
+  }
+
+  // reload the saved quest (or roll a fresh one) for this kid + variant
+  function initQuest() {
+    quest = null;
+    try {
+      var raw = localStorage.getItem(questKey());
+      if (raw) quest = JSON.parse(raw);
+    } catch (e) { quest = null; }
+    if (quest && !COLORS[quest.color]) quest = null;
+    if (quest) renderQuest();
+    else newQuest();
+  }
+
+  function renderQuest() {
+    questEl.classList.remove("done");
+    if (!quest) {
+      questTextEl.innerHTML = "🏆 Wow — you've filled every quest square! Free play time!";
+      questHintBtn.style.display = "none";
+      questNewBtn.style.display = "none";
+      return;
+    }
+    questHintBtn.style.display = "";
+    questNewBtn.style.display = "";
+    var c = COLORS[quest.color];
+    var another = (grid[keyFor(quest.letter, quest.color)] || []).length ? "another" : "a";
+    questTextEl.innerHTML = "⭐ Quest: add " + another + ' <b class="qcolor" style="background:' + c.hex +
+      ";color:" + (c.dark ? "#2b2440" : "#fff") + '">' + c.name + "</b> word to row <b>" +
+      quest.letter + "</b>!";
+  }
+
+  function questComplete() {
+    addStar();
+    questEl.classList.add("done");
+    questTextEl.innerHTML = "🌟 Quest complete! You earned a star!";
+    questHintBtn.style.display = "none";
+    window.SFX && SFX.win();
+    window.Confetti && Confetti.burst({ count: 70 });
+    setTimeout(newQuest, 1800);
+  }
+
+  questHintBtn.addEventListener("click", function () {
+    if (!quest) return;
+    var key = keyFor(quest.letter, quest.color);
+    var answers = questPairs()[key] || [];
+    // suggest a word that isn't already in the square
+    var inCell = (grid[key] || []).map(function (w) { return w.toLowerCase(); });
+    var fresh = answers.filter(function (a) { return inCell.indexOf(a.w.toLowerCase()) === -1; });
+    var list = fresh.length ? fresh : answers;
+    if (!list.length) return;
+    var a = list[Math.floor(Math.random() * list.length)];
+    flashHint('Psst… how about "' + a.w + '"? ' + (a.e || "💡"), false);
+    input.focus();
+  });
+
+  questNewBtn.addEventListener("click", function () {
+    newQuest();
+    flashHint("New quest! 🔄", false);
+  });
 
   /* ---------- add / remove ---------- */
   function addWord(raw) {
@@ -271,7 +409,7 @@
 
     save();
     renderCell(letter, activeColor);
-    updateCount();
+    var total = updateCount();
 
     var td = document.getElementById("c-" + letter + "-" + activeColor);
     td.classList.remove("flash");
@@ -286,6 +424,16 @@
     window.SFX && SFX.good();
     input.value = "";
     input.focus();
+
+    // did that finish the quest? (any NEW word in the quest square counts)
+    if (!exists && quest && quest.letter === letter && quest.color === activeColor) {
+      questComplete();
+    } else if (!exists && MILESTONES.indexOf(total) !== -1) {
+      // grid-size milestone party
+      flashHint("🎉 " + total + " words in the grid — amazing!", false);
+      window.SFX && SFX.win();
+      window.Confetti && Confetti.burst({ count: 60 });
+    }
   }
 
   /* ---------- middle-variant "which letter?" chooser ---------- */
@@ -334,6 +482,7 @@
     save();
     renderCell(letter, color);
     updateCount();
+    window.SFX && SFX.pop();
   }
 
   /* ---------- helpers ---------- */
@@ -373,6 +522,7 @@
     });
     save();
     renderAll();
+    initQuest(); // the starter words may have filled the quest square
     flashHint("Loaded some starter words — add your own too! ✨", false);
   });
 
@@ -382,6 +532,7 @@
     grid = {};
     save();
     renderAll();
+    newQuest();
     flashHint("Fresh grid — start typing! ✨", false);
   });
 
@@ -393,8 +544,13 @@
   /* ---------- go ---------- */
   buildGrid();
   renderAll();
+  renderStars();
+  initQuest();
   setColor(activeColor);
   updateHow();
+  if (updateCount() === 0) {
+    flashHint("Your grid is empty — pick a colour and type your first word! 🎨", false);
+  }
   [].forEach.call(kidRow.children, function (b) {
     b.classList.toggle("selected", b.dataset.kid === currentKid);
   });

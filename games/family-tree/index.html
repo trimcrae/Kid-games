@@ -93,6 +93,29 @@
     }
 
     .ft-hint { text-align: center; color: #6b6383; font-weight: 600; margin: 0.8rem auto 0; max-width: 40rem; }
+    .ft-stats { text-align: center; color: #6b6383; font-weight: 800; font-size: 0.85rem; margin: 0 auto 0.5rem; }
+
+    /* ---------- family-words quiz bar ---------- */
+    .quiz-bar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 0.6rem; max-width: 40rem;
+      margin: 0 auto 0.7rem; padding: 0.55rem 0.9rem;
+      background: var(--purple); color: #fff; font-weight: 800;
+      border-radius: 18px; box-shadow: 0 6px 0 rgba(43,36,64,0.18);
+      text-align: center;
+    }
+    .quiz-bar[hidden] { display: none; }
+    .quiz-bar .quiz-score {
+      background: var(--yellow); color: var(--ink);
+      border-radius: 999px; padding: 0.15rem 0.7rem; font-size: 0.85rem;
+    }
+    .quiz-bar .ft-btn { min-height: 36px; padding: 0.25rem 0.7rem; border-color: #fff; }
+    .person.quiz-wrong { animation: quizWrong 0.4s ease; }
+    @keyframes quizWrong {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-7px); }
+      75% { transform: translateX(7px); }
+    }
 
     /* ---------- modals ---------- */
     .overlay {
@@ -109,6 +132,11 @@
     }
     .sheet h2 { margin: 0 0 0.8rem; font-size: 1.25rem; text-align: center; }
     .sheet .sub { text-align: center; margin: -0.5rem 0 0.8rem; color: #6b6383; font-weight: 600; }
+    .sheet .sub.fact {
+      background: #fff6d8; border: 2px dashed var(--yellow); border-radius: 14px;
+      padding: 0.5rem 0.7rem; font-size: 0.88rem; color: #6b5a1e;
+    }
+    .sheet .sub.fact[hidden] { display: none; }
     .action-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .action-list .ft-btn { width: 100%; text-align: left; border-radius: 16px; font-size: 1rem; }
 
@@ -213,9 +241,19 @@
         <button class="ft-btn" id="zoom-out" aria-label="Zoom out">➖</button>
         <button class="ft-btn" id="zoom-in" aria-label="Zoom in">➕</button>
       </span>
+      <button class="ft-btn" id="quiz-btn">🎯 Quiz me!</button>
       <button class="ft-btn" id="print-btn">🖨️ Print</button>
       <button class="ft-btn danger" id="reset-btn">🔄 Start over</button>
     </div>
+
+    <!-- family-words quiz: "tap your Grandma!" -->
+    <div class="quiz-bar" id="quiz-bar" hidden>
+      <span id="quiz-q"></span>
+      <span class="quiz-score" id="quiz-score" hidden></span>
+      <button class="ft-btn" id="quiz-stop">✖ Stop</button>
+    </div>
+
+    <p class="ft-stats" id="tree-stats"></p>
 
     <div id="viewport">
       <div id="sizer">
@@ -227,8 +265,9 @@
 
     <p class="ft-hint">Tap anyone to add their mom, dad, partner, kids, brothers &amp; sisters —
     keep growing the tree forever! Pick who <strong>you</strong> are up top to learn the special
-    word for how each person is related to you. One tree for the whole family, saved on this device. 💾
-    Press 🖨️ <strong>Print</strong> to turn the tree into a poster you can hang up!</p>
+    word for how each person is related to you (tap a card for a 💡 fun fact about the word!).
+    Try 🎯 <strong>Quiz me!</strong> to play "find your grandma". One tree for the whole family,
+    saved on this device. 💾 Press 🖨️ <strong>Print</strong> to turn the tree into a poster you can hang up!</p>
   </main>
 
   <!-- print-only layout, built by game.js just before printing -->
@@ -239,6 +278,7 @@
     <div class="sheet" role="dialog" aria-modal="true">
       <h2 id="action-title"></h2>
       <p class="sub" id="action-sub"></p>
+      <p class="sub fact" id="action-fact" hidden></p>
       <div class="action-list" id="action-list"></div>
     </div>
   </div>

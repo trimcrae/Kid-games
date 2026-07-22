@@ -137,6 +137,12 @@
     .cell.trace { background: rgba(255, 220, 120, 0.18); }
     .cell.target-pulse { animation: tpulse 0.7s ease-in-out 3; z-index: 4; }
     .cell.shake { animation: cshake 0.32s ease; }
+    /* quadrant mode: tint the x=0 / y=0 lines so the axes show */
+    .cell.zl { background: rgba(138, 92, 255, 0.26); }
+    .cell.zl:hover { background: rgba(160, 122, 255, 0.38); }
+    .cell.origin { box-shadow: inset 0 0 0 2px rgba(255, 217, 138, 0.65); }
+    .cell.zl.trace { background: rgba(255, 220, 120, 0.3); }
+    .axis.zero { color: #9fd0ff; }
     .cell.dug::before {
       content: "";
       position: absolute; inset: 0;

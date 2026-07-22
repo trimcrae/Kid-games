@@ -103,6 +103,69 @@
     .gem.wrong { animation: wobble 0.45s ease; }
     @keyframes wobble { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-9px) rotate(-4deg);} 75%{transform:translateX(9px) rotate(4deg);} }
 
+    /* after two misses the right gem softly glows to help little fingers */
+    .gem.hint { animation: hint-glow 0.9s ease infinite; }
+    @keyframes hint-glow {
+      0%, 100% { box-shadow: inset 0 -6px 0 rgba(0,0,0,0.15), 0 8px 18px rgba(43,36,64,0.2); transform: scale(1); }
+      50% { box-shadow: inset 0 -6px 0 rgba(0,0,0,0.15), 0 0 0 8px #ffd23f88, 0 8px 22px rgba(43,36,64,0.25); transform: scale(1.08); }
+    }
+
+    /* outfit progress: one little icon per piece, lit up when earned */
+    .outfit-progress {
+      display: flex;
+      justify-content: center;
+      gap: 0.45rem;
+      margin: 0 0 0.35rem;
+    }
+    .op-item {
+      width: 46px; height: 46px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.45rem;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      opacity: 0.35;
+      filter: grayscale(1);
+      transition: opacity 0.3s ease, filter 0.3s ease, transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .op-item.done {
+      opacity: 1;
+      filter: none;
+      background: #fff5d6;
+      transform: scale(1.12);
+    }
+
+    /* praise word that pops up over the princess */
+    .praise-pop {
+      position: absolute;
+      left: 50%; top: 34%;
+      transform: translate(-50%, 0);
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: 2rem;
+      color: var(--pink);
+      text-shadow: 0 2px 0 #fff, 0 4px 12px rgba(43,36,64,0.3);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 6;
+      animation: praise-rise 0.9s ease-out forwards;
+    }
+    @keyframes praise-rise {
+      0%   { opacity: 0; transform: translate(-50%, 14px) scale(0.5); }
+      25%  { opacity: 1; transform: translate(-50%, 0) scale(1.15); }
+      100% { opacity: 0; transform: translate(-50%, -50px) scale(1); }
+    }
+
+    /* a gentle nudge on the target if she's been thinking a while */
+    #target-char.wiggle { animation: char-wiggle 0.7s ease; }
+    @keyframes char-wiggle {
+      0%, 100% { transform: rotate(0); }
+      25% { transform: rotate(-8deg) scale(1.15); }
+      75% { transform: rotate(8deg) scale(1.15); }
+    }
+
+    .overlay-stars { margin: 0; font-size: 1.5rem; color: var(--purple); font-weight: bold; min-height: 1em; }
+
     /* overlay */
     .overlay {
       position: fixed; inset: 0; z-index: 20;
@@ -141,9 +204,11 @@
       <button class="mute-btn" id="mute" aria-label="Turn sound on or off">🔊</button>
     </div>
 
+    <div class="outfit-progress" id="progress" aria-label="Outfit pieces earned"></div>
+
     <div class="princess" id="princess" aria-hidden="true"><!-- vector art built by princess-art.js --></div>
 
-    <div class="prompt">
+    <div class="prompt" aria-live="polite">
       <span class="prompt-label" id="prompt-label">Tap the matching one!</span>
       <span id="target-char">?</span>
     </div>
@@ -155,6 +220,7 @@
     <div class="big">👸✨</div>
     <h2 id="overlay-title">Let's dress a princess!</h2>
     <p id="overlay-text">Find the letters and numbers to give her a crown, a wand, and more!</p>
+    <p class="overlay-stars" id="overlay-stars"></p>
     <button class="btn" id="start-btn">Start ▶</button>
   </div>
 

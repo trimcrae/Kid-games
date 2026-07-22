@@ -29,7 +29,8 @@
       letters: ["o", "d", "l", "p", "h", "i", "n"],
       words: [
         "dolphin", "hold", "hood", "hoop", "idol", "lion", "loin",
-        "loop", "plod", "polo", "pond", "pool", "hippo",
+        "loop", "plod", "polo", "pond", "pool", "hippo", "doll",
+        "onion", "plop",
       ],
     },
     {
@@ -41,7 +42,9 @@
         "pant", "pants", "paper", "parent", "part", "parts", "past",
         "paste", "pasta", "pear", "pears", "rant", "rants", "rate",
         "rates", "tear", "tears", "treat", "treats", "spare", "spear",
-        "star", "stare", "start", "snare", "raters", "eaten", "paste",
+        "star", "stare", "start", "snare", "eaten", "ants", "snap",
+        "snaps", "trap", "traps", "strap", "straps", "eats", "east",
+        "seat", "seats", "peas", "tarts", "arena", "papa", "nana",
       ],
     },
     {
@@ -52,7 +55,9 @@
         "cartons", "actor", "actors", "carrot", "carrots", "cart",
         "carts", "cats", "coast", "coat", "coats", "cost", "oats",
         "rats", "roast", "rots", "sort", "start", "taco", "tacos",
-        "tart", "toast", "tons", "torn", "carton", "ascot",
+        "tart", "toast", "tons", "torn", "carton", "ascot", "cotton",
+        "cannot", "tractor", "cartoon", "cartoons", "toss", "roost",
+        "costs",
       ],
     },
     {
@@ -60,9 +65,9 @@
       emoji: "🌈",
       letters: ["n", "r", "a", "i", "b", "o", "w"],
       words: [
-        "rainbow", "rain", "brain", "bran", "barn", "born", "born",
-        "iron", "wain", "warn", "worn", "brown", "robin", "ration",
-        "bairn", "noir", "rabbi", "broil", "rainbow", "brawn",
+        "rainbow", "rain", "brain", "bran", "barn", "born",
+        "iron", "warn", "worn", "brown", "robin", "ration",
+        "brawn", "narrow", "banana", "onion", "bonbon",
       ],
     },
     {
@@ -70,12 +75,13 @@
       emoji: "🌳",
       letters: ["e", "t", "h", "o", "u", "s", "r"],
       words: [
-        "treehouse", "house", "horse", "shore", "store", "sherbet",
-        "those", "three", "threes", "tree", "trees", "hero", "heroes",
-        "here", "hose", "rose", "rote", "rust", "ruse", "rush", "ether",
-        "other", "others", "shoe", "shore", "shorter", "sort", "sore",
-        "tore", "true", "truest", "user", "shout", "south", "route",
-        "rouse", "thee", "rest", "test", "tester", "torte", "stretch",
+        "treehouse", "house", "houses", "horse", "horses", "shore",
+        "store", "stores", "those", "three", "threes", "tree", "trees",
+        "hero", "heroes", "here", "hose", "rose", "roses", "rote",
+        "ruse", "other", "others", "shoe", "shoes", "shorter", "sore",
+        "tore", "true", "truest", "user", "users", "route", "routes",
+        "rouse", "rest", "test", "tester", "torte", "otters", "roster",
+        "rooster", "roosters", "soothe", "teeth", "restore",
       ],
     },
     {
@@ -83,11 +89,14 @@
       emoji: "🌻",
       letters: ["a", "g", "r", "d", "e", "n", "s"],
       words: [
-        "gardens", "garden", "danger", "dangers", "dare", "dares",
-        "dear", "dears", "drag", "drags", "earn", "earns", "grade",
-        "grades", "grand", "grands", "near", "nears", "range", "ranges",
-        "read", "reads", "sand", "sane", "sear", "snare", "anger",
-        "angers", "sedan", "area", "grades", "sander", "darn", "darns",
+        "gardens", "garden", "gardener", "danger", "dangers", "dare",
+        "dares", "dear", "dears", "drag", "drags", "earn", "earns",
+        "grade", "grades", "grand", "grands", "near", "nears", "range",
+        "ranges", "read", "reads", "sand", "sane", "sear", "snare",
+        "anger", "angers", "sedan", "sedans", "area", "sander", "darn",
+        "darns", "errand", "errands", "grass", "garage", "eager",
+        "agree", "agrees", "gander", "ages", "rage", "rages", "sage",
+        "sages", "snag", "snags", "seas",
       ],
     },
     {
@@ -100,6 +109,9 @@
         "taste", "taper", "tapers", "trip", "trips", "trap", "traps",
         "treat", "stir", "strip", "stripe", "stripes", "spit", "spite",
         "star", "start", "taps", "tips", "pita", "pitas", "trait",
+        "artist", "artists", "stairs", "tiara", "tiaras", "pastries",
+        "sister", "sisters", "tarts", "pets", "rats", "eats", "east",
+        "test", "tests",
       ],
     },
     {
@@ -111,10 +123,138 @@
         "rose", "roses", "sent", "snore", "snores", "some", "sore",
         "sores", "sort", "sorts", "stem", "stems", "stern", "stone",
         "stones", "store", "stores", "storm", "storms", "toes", "tons",
-        "moms", "most", "noses", "tester", "rents", "stress",
+        "moms", "noses", "tester", "rents", "stress", "snort", "snorts",
+        "monsoon", "sonnet", "roost", "roosts",
+      ],
+    },
+    {
+      name: "Unicorn Magic",
+      emoji: "🦄",
+      letters: ["n", "u", "i", "c", "o", "r", "s"],
+      words: [
+        "unicorns", "unicorn", "corn", "corns", "coin", "coins", "icon",
+        "icons", "iron", "irons", "scorn", "sonic", "cousin", "cousins",
+        "onion", "onions", "union", "unions", "noun", "nouns", "ruin",
+        "ruins",
+      ],
+    },
+    {
+      name: "Camping Trip",
+      emoji: "🏕️",
+      letters: ["a", "c", "m", "p", "i", "n", "g"],
+      words: [
+        "camping", "campaign", "camp", "main", "gain", "pain", "again",
+        "panic", "magic", "manic", "mania", "magma", "mama", "papa",
+        "gang", "pang", "gaping", "aging", "napping", "mapping",
+      ],
+    },
+    {
+      name: "Royal Kingdom",
+      emoji: "👑",
+      letters: ["o", "k", "i", "n", "g", "d", "m"],
+      words: [
+        "kingdom", "komodo", "domino", "dingo", "indigo", "doing",
+        "oink", "good", "mood", "moon", "noon", "doom", "gong", "monk",
+        "kiddo", "onion",
+      ],
+    },
+    {
+      name: "Helping Hands",
+      emoji: "🤝",
+      letters: ["e", "h", "l", "p", "i", "n", "g"],
+      words: [
+        "helping", "helpline", "help", "heel", "peel", "pile", "pine",
+        "line", "nine", "glee", "genie", "engine", "linen", "hinge",
       ],
     },
   ];
+
+  /* ---------- kid-friendly meanings for the trickier words ----------
+     Shown when a word is found and when a found-chip is tapped, so the
+     game teaches vocabulary, not just letter-juggling. Plurals fall
+     back to the singular automatically. */
+  const DEFS = {
+    loin: "a cut of meat from an animal's side",
+    idol: "someone lots of people look up to",
+    plod: "to walk slowly with heavy steps",
+    plop: "the sound of something dropping into water",
+    polo: "a ball game played while riding horses",
+    bran: "the healthy outside part of grain",
+    brawn: "big strong muscles",
+    ration: "a fixed share of food, like on a long voyage",
+    robin: "a little bird with a red-orange chest",
+    narrow: "thin — not wide at all",
+    bonbon: "a small fancy candy",
+    ascot: "a fancy scarf tied at the neck",
+    carton: "a cardboard box for food or drink",
+    torte: "a fancy layered cake",
+    rote: "learning something by repeating it over and over",
+    ruse: "a clever trick",
+    rouse: "to wake someone up",
+    roster: "a list of everyone on a team",
+    rooster: "a boy chicken who crows at sunrise",
+    roost: "the spot where birds sit and sleep",
+    soothe: "to gently calm someone down",
+    restore: "to fix something back to how it was",
+    sedan: "a family car with four doors",
+    snare: "a trap for catching animals",
+    gander: "a boy goose",
+    errand: "a little job or trip, like picking up milk",
+    eager: "excited and ready to go",
+    sander: "a tool that makes wood smooth",
+    sage: "a very wise person — also a tasty herb",
+    snag: "to catch or grab something quickly",
+    rage: "very, very big anger",
+    arena: "a big place where games and shows happen",
+    stern: "serious and strict",
+    spite: "wanting to bother someone on purpose",
+    pita: "a flat round pocket bread",
+    trait: "one special thing about a person",
+    taper: "to get thinner at one end",
+    artist: "a person who makes art",
+    pastries: "sweet baked treats, like croissants",
+    scorn: "to look down on something as not good enough",
+    sonic: "about sound — speedy as sound itself",
+    cousin: "your aunt or uncle's kid",
+    union: "joining together as one team",
+    noun: "a word that names a person, place or thing",
+    ruin: "to wreck or spoil something",
+    icon: "a small picture that stands for something",
+    campaign: "a big plan to win something",
+    panic: "sudden scary worry",
+    manic: "wildly, jumpily excited",
+    mania: "a crazy-big excitement for something",
+    magma: "hot melted rock under a volcano",
+    gaping: "wide, wide open",
+    aging: "getting older",
+    komodo: "the biggest lizard in the world",
+    indigo: "a deep blue-purple colour",
+    dingo: "a wild dog from Australia",
+    domino: "a dotted tile for stacking and toppling games",
+    monk: "a quiet man who lives a simple, prayerful life",
+    kiddo: "a friendly nickname for a kid",
+    monsoon: "a season of giant rain storms",
+    snort: "a loud breath out your nose, like a piggy",
+    sonnet: "a little poem with exactly 14 lines",
+    linen: "light cloth made from a plant",
+    hinge: "the metal joint that lets a door swing",
+    genie: "a magical wish-granter from a lamp",
+    glee: "big bubbly happiness",
+    engine: "the machine part that makes things go",
+    helpline: "a phone number you call to get help",
+    heel: "the back part of your foot",
+    peel: "to take the skin off a fruit",
+    tractor: "a strong farm machine that pulls things",
+    cotton: "a fluffy plant we make T-shirts from",
+    onion: "a veggie that makes you cry when you cut it",
+    tiara: "a small sparkly crown for a princess",
+    stress: "the squeezed feeling when there's too much to do",
+  };
+  function defFor(w) {
+    if (DEFS[w]) return DEFS[w];
+    if (w.length > 4 && w.slice(-1) === "s" && DEFS[w.slice(0, -1)]) return DEFS[w.slice(0, -1)];
+    return null;
+  }
 
   /* ---------- saved progress (per hive) ---------- */
   const SAVE_KEY = "spellingBee.v1";
@@ -170,6 +310,15 @@
     for (const [t, l] of RANKS) if (frac >= t) label = l;
     return label;
   }
+  /* how many points until the next rank (null when at the top) */
+  function nextRankFor(p, score) {
+    const m = maxScore(p) || 1;
+    for (const [t, l] of RANKS) {
+      const need = Math.ceil(t * m);
+      if (score < need) return { label: l, pts: need - score };
+    }
+    return null;
+  }
 
   /* ---------- element refs ---------- */
   const $ = (id) => document.getElementById(id);
@@ -178,7 +327,8 @@
     score: $("score"), wordcount: $("wordcount"), rank: $("rank"),
     feedback: $("feedback"), entry: $("entry"), hive: $("hive"),
     del: $("delete-btn"), shuffle: $("shuffle-btn"), enter: $("enter-btn"),
-    quit: $("quit-btn"), foundList: $("found-list"),
+    quit: $("quit-btn"), foundList: $("found-list"), hintBtn: $("hint-btn"),
+    deffy: $("deffy"),
   };
 
   let pi = 0;           // current puzzle index
@@ -250,6 +400,7 @@
     renderFound();
     updateHud();
     el.feedback.textContent = "";
+    el.deffy.textContent = "";
     el.play.dataset.sample = PUZZLES[pi].valid[0] || ""; // play-test hook
     show("play");
   }
@@ -269,6 +420,7 @@
     b.type = "button";
     b.className = "cell " + posClass + (isCenter ? " center" : "");
     b.dataset.letter = letter;
+    b.setAttribute("aria-label", "Letter " + letter.toUpperCase() + (isCenter ? " (golden centre letter)" : ""));
     b.innerHTML = '<span class="hex">' + letter + "</span>";
     b.addEventListener("click", () => addLetter(letter));
     return b;
@@ -289,18 +441,24 @@
     const prog = progressFor(pi);
     el.score.textContent = prog.score;
     el.wordcount.textContent = prog.found.length;
-    el.rank.textContent = rankFor(PUZZLES[pi], prog.score);
+    const next = nextRankFor(PUZZLES[pi], prog.score);
+    el.rank.textContent = rankFor(PUZZLES[pi], prog.score) +
+      (next ? " · " + next.pts + " pts to " + next.label : "");
   }
 
   function renderFound() {
     const prog = progressFor(pi);
-    const p = PUZZLES[pi];
     el.foundList.innerHTML = "";
-    // newest first
+    // newest first; chips with a meaning are tappable
     prog.found.slice().reverse().forEach((w) => {
-      const chip = document.createElement("span");
-      chip.className = "found-chip" + (new Set(w).size === 7 ? " pangram" : "");
+      const def = defFor(w);
+      const chip = document.createElement(def ? "button" : "span");
+      if (def) chip.type = "button";
+      chip.className = "found-chip" + (new Set(w).size === 7 ? " pangram" : "") + (def ? " has-def" : "");
       chip.textContent = w;
+      if (def) chip.addEventListener("click", () => {
+        el.deffy.textContent = "📖 " + w.toUpperCase() + " — " + def;
+      });
       el.foundList.appendChild(chip);
     });
   }
@@ -343,8 +501,30 @@
     renderEntry();
     renderFound();
     updateHud();
-    if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); if (window.Voice) Voice.play("audio/pangram.mp3"); if (window.SFX) SFX.win(); window.Confetti && Confetti.burst({ count: 110 }); }
+    // teach the word if we know what it means
+    const def = defFor(w);
+    el.deffy.textContent = def ? "📖 " + w.toUpperCase() + " — " + def : "";
+    const complete = prog.found.length >= p.valid.length;
+    if (complete) {
+      flash("🏆 HIVE COMPLETE! You found every single word! 🏆", "var(--green)");
+      sparkleBurst();
+      if (window.SFX) SFX.win();
+      window.Confetti && Confetti.burst({ count: 150 });
+    } else if (pangram) { flash("🌟 PANGRAM! +" + pts + " 🌟", "var(--green)"); sparkleBurst(); if (window.Voice) Voice.play("audio/pangram.mp3"); if (window.SFX) SFX.win(); window.Confetti && Confetti.burst({ count: 110 }); }
     else { flash("Nice! +" + pts + " 🍯", "var(--green)"); if (window.SFX) SFX.good(); }
+  }
+
+  /* ---------- hint: point at one missing word without spoiling it ---------- */
+  function giveHint() {
+    const p = PUZZLES[pi];
+    const prog = progressFor(pi);
+    const missing = p.valid.filter((w) => prog.found.indexOf(w) === -1);
+    if (!missing.length) { flash("You've found them all! 🏆", "var(--green)"); return; }
+    const w = missing[Math.floor(Math.random() * missing.length)];
+    const peek = w.slice(0, w.length >= 6 ? 2 : 1).toUpperCase();
+    const def = defFor(w);
+    flash("💡 " + w.length + " letters, starts with “" + peek + "”", "var(--purple)");
+    el.deffy.textContent = def ? "📖 It means: " + def : "";
   }
 
   /* ---------- keyboard ---------- */
@@ -362,6 +542,7 @@
   el.del.addEventListener("click", deleteLetter);
   el.enter.addEventListener("click", submit);
   el.shuffle.addEventListener("click", () => { outerOrder = shuffle(outerOrder); renderHive(); });
+  el.hintBtn.addEventListener("click", giveHint);
   el.quit.addEventListener("click", () => { renderPuzzles(); show("puzzles"); });
 
   /* ---------- go ---------- */

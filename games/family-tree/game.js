@@ -249,6 +249,59 @@
     return "Family ❤️";
   }
 
+  /* ---------- kinship fun facts (explain the tricky words) ---------- */
+
+  function generationsWord(n) {
+    return n + " generation" + (n === 1 ? "" : "s");
+  }
+
+  function explainLabel(label) {
+    const s = label.toLowerCase();
+    const greatsCount = (s.match(/great-/g) || []).length;
+
+    if (s === "you!") return "";
+    if (s.indexOf("half-") === 0) return "Half siblings share ONE parent — same mom or same dad, but not both.";
+    if (s.indexOf("step-grand") === 0) return "They married your grandparent, so they became your step-grandparent.";
+    if (s === "stepmom" || s === "stepdad" || s === "step-parent") return "A step-parent is married to your mom or dad.";
+    if (s === "stepbrother" || s === "stepsister" || s === "step-sibling") return "Step-siblings became family when their parents got together — you don't share a parent.";
+    if (s === "stepson" || s === "stepdaughter" || s === "stepchild") return "Your partner's child — family through your partner.";
+    if (s.indexOf("-in-law") !== -1) return "“In-law” means they joined your family by marriage.";
+    if (s.indexOf("(married in)") !== -1) return "They married into your family — that's why they're your aunt or uncle!";
+    if (s === "family by marriage" || s === "my partner's family") return "Not related by blood — connected through a marriage in the family.";
+
+    if (/^(great-)*grand(ma|pa|parent)$/.test(s)) {
+      if (greatsCount === 0) return "Your mom or dad's mom or dad — " + generationsWord(2) + " above you!";
+      return "Your " + (greatsCount === 1 ? "grandparent's parent" : "grandparent's grandparent (or even higher)") +
+             " — " + generationsWord(greatsCount + 2) + " above you!";
+    }
+    if (/^(great-)*grand(son|daughter|child)$/.test(s)) {
+      if (greatsCount === 0) return "Your child's child — " + generationsWord(2) + " below you!";
+      return "Your grandchild's " + (greatsCount === 1 ? "child" : "grandchild (or lower)") +
+             " — " + generationsWord(greatsCount + 2) + " below you!";
+    }
+    if (/^(great-)*(nephew|niece)/.test(s)) {
+      if (greatsCount === 0) return "Your brother or sister's child. That makes YOU their aunt or uncle!";
+      return "Your niece or nephew's child — one more generation down each “great-”.";
+    }
+    if (/^(great-)*(uncle|aunt)/.test(s)) {
+      if (greatsCount === 0) return "Your mom or dad's brother or sister. You are their niece or nephew!";
+      return "Your grandparent's brother or sister — one more generation up each “great-”.";
+    }
+    if (s.indexOf("cousin") !== -1) {
+      let fact = "";
+      if (s.indexOf("1st cousin") === 0) fact = "1st cousins share a grandparent — your parents are siblings!";
+      else if (s.indexOf("2nd cousin") === 0) fact = "2nd cousins share a great-grandparent — your parents are 1st cousins!";
+      else if (s.indexOf("3rd cousin") === 0) fact = "3rd cousins share a great-great-grandparent!";
+      else fact = "Far-away cousins still share one ancestor, way up the tree!";
+      if (s.indexOf("once removed") !== -1) fact += " “Once removed” means you're 1 generation apart.";
+      else if (s.indexOf("twice removed") !== -1) fact += " “Twice removed” means you're 2 generations apart.";
+      else if (s.indexOf("removed") !== -1) fact += " “Removed” counts how many generations apart you are.";
+      return fact;
+    }
+    if (s === "brother" || s === "sister" || s === "sibling") return "You share the same parents.";
+    return "";
+  }
+
   /* ---------- layout ----------
      Rows = generations. Partners sit together in a "unit".
      A few barycenter sweeps pull children under their parents. */
@@ -518,7 +571,7 @@
         '<span class="pname">' + esc(p.name) + "</span>" +
         '<span class="rel"' + (rel ? ' style="background:' + genColor(p.gen) + '"' : "") + ">" +
         esc(rel) + "</span>";
-      btn.addEventListener("click", () => openActions(id));
+      btn.addEventListener("click", () => { if (quiz.on) quizGuess(id); else openActions(id); });
       canvas.appendChild(btn);
     });
 
@@ -529,6 +582,12 @@
               esc(P()[id].name) + "</option>";
     });
     meSelect.innerHTML = opts;
+
+    // little stats line: how big has the tree grown?
+    const n = state.order.filter(alive).length;
+    const genCount = layout.rows.length;
+    document.getElementById("tree-stats").textContent =
+      "🌳 " + n + " people across " + generationsWord(genCount);
   }
 
   function centerView() {
@@ -594,6 +653,10 @@
     const rel = state.me && state.me !== id ? relationLabel(state.me, id) : "";
     document.getElementById("action-sub").textContent =
       rel ? "Your " + rel.toLowerCase() : (state.me === id ? "That's you! ⭐" : "");
+    const factEl = document.getElementById("action-fact");
+    const fact = rel ? explainLabel(rel) : "";
+    factEl.textContent = fact ? "💡 " + fact : "";
+    factEl.hidden = !fact;
 
     const list = document.getElementById("action-list");
     list.innerHTML = "";
@@ -835,6 +898,104 @@
     confirmOverlay.hidden = true;
   }
 
+  /* ---------- family-words quiz ----------
+     "Tap your Grandma!" — the tree itself is the game board. Uses the
+     same relationship labels the cards show, so the kids practise the
+     kinship words they just learnt. Any person with a matching label
+     counts (two sisters are both a right answer for "Sister"). */
+
+  const quiz = { on: false, label: "", streak: 0 };
+  const quizBar = document.getElementById("quiz-bar");
+  const quizQ = document.getElementById("quiz-q");
+  const quizScore = document.getElementById("quiz-score");
+
+  function quizCandidates() {
+    if (!state.me || !alive(state.me)) return [];
+    return state.order.filter(alive).filter((id) => {
+      if (id === state.me) return false;
+      const l = relationLabel(state.me, id);
+      return l && l !== "Family ❤️";
+    });
+  }
+
+  function showQuizScore() {
+    quizScore.hidden = quiz.streak === 0;
+    quizScore.textContent = "⭐ " + quiz.streak + " in a row";
+  }
+
+  function nextQuizQuestion() {
+    const pool = quizCandidates();
+    if (!pool.length) {
+      quizQ.textContent = "Add more family to the tree first, then quiz me again! 🌳";
+      quiz.label = "";
+      return;
+    }
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    quiz.label = relationLabel(state.me, pick);
+    quizQ.innerHTML = "Find your <u>" + esc(quiz.label.toLowerCase()) + "</u> — tap them!";
+    showQuizScore();
+  }
+
+  function startQuiz() {
+    if (!state.me || !alive(state.me)) {
+      quizBar.hidden = false;
+      quiz.on = false;
+      quizQ.textContent = "First pick who YOU are up top ⭐ — then I can quiz you!";
+      quizScore.hidden = true;
+      meSelect.focus();
+      return;
+    }
+    quiz.on = true;
+    quiz.streak = 0;
+    quizBar.hidden = false;
+    nextQuizQuestion();
+    window.SFX && SFX.good();
+  }
+
+  function stopQuiz() {
+    quiz.on = false;
+    quiz.label = "";
+    quizBar.hidden = true;
+  }
+
+  function quizGuess(id) {
+    if (!quiz.label) { stopQuiz(); return; }
+    const el = canvas.querySelector('.person[data-id="' + id + '"]');
+    const label = relationLabel(state.me, id);
+    if (label === quiz.label) {
+      quiz.streak++;
+      if (el) {
+        el.classList.add("flash");
+        setTimeout(() => el.classList.remove("flash"), 1400);
+      }
+      const fact = explainLabel(label);
+      quizQ.textContent = "Yes! " + P()[id].name + " is your " + label.toLowerCase() + "! 🎉" +
+        (fact ? " " + fact : "");
+      showQuizScore();
+      if (quiz.streak % 5 === 0) {
+        window.SFX && SFX.win();
+        window.Confetti && Confetti.burst({ count: 80 });
+      } else {
+        window.SFX && SFX.good();
+        window.Confetti && Confetti.burst({ count: 25 });
+      }
+      setTimeout(() => { if (quiz.on) nextQuizQuestion(); }, 1900);
+    } else {
+      quiz.streak = 0;
+      showQuizScore();
+      if (el) {
+        el.classList.add("quiz-wrong");
+        setTimeout(() => el.classList.remove("quiz-wrong"), 500);
+      }
+      quizQ.innerHTML = "Not quite — that's your <b>" + esc(label.toLowerCase() || "family") +
+        "</b>. Find your <u>" + esc(quiz.label.toLowerCase()) + "</u>!";
+      window.SFX && SFX.nope();
+    }
+  }
+
+  document.getElementById("quiz-btn").addEventListener("click", startQuiz);
+  document.getElementById("quiz-stop").addEventListener("click", stopQuiz);
+
   /* ---------- wire up ---------- */
 
   document.getElementById("form-save").addEventListener("click", saveForm);
@@ -856,6 +1017,9 @@
     state.me = meSelect.value || null;
     persist();
     render();
+    if (quiz.on || !quizBar.hidden) {
+      if (state.me) startQuiz(); else stopQuiz();  // re-ask for the new "me"
+    }
     if (state.me) { window.SFX && SFX.good(); }
   });
 
@@ -1010,6 +1174,7 @@
       () => {
         const snap = JSON.stringify(state);
         state = seed();
+        stopQuiz();
         persist();
         render();
         centerView();

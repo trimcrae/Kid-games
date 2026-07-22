@@ -25,7 +25,6 @@
   const ANSWERS = [
     { word: "apple", emoji: "🍎", hint: "A crunchy red or green fruit" },
     { word: "happy", emoji: "😊", hint: "How you feel on your birthday" },
-    { word: "tiger", emoji: "🐯", hint: "A big striped jungle cat" },
     { word: "water", emoji: "💧", hint: "You drink it when you're thirsty" },
     { word: "candy", emoji: "🍬", hint: "A sweet treat on Halloween" },
     { word: "cloud", emoji: "☁️", hint: "A fluffy white thing in the sky" },
@@ -59,6 +58,66 @@
     { word: "smile", emoji: "🙂", hint: "What your mouth does when happy" },
     { word: "story", emoji: "📖", hint: "A tale in a book" },
     { word: "beach", emoji: "🏖️", hint: "Sandy place by the sea" },
+    { word: "horse", emoji: "🐴", hint: "An animal you can ride that neighs" },
+    { word: "house", emoji: "🏠", hint: "The building a family lives in" },
+    { word: "light", emoji: "💡", hint: "It helps you see in the dark" },
+    { word: "night", emoji: "🌃", hint: "When the sky is dark and stars come out" },
+    { word: "party", emoji: "🥳", hint: "A fun celebration with friends" },
+    { word: "piano", emoji: "🎹", hint: "A big instrument with black and white keys" },
+    { word: "whale", emoji: "🐋", hint: "The biggest animal in the whole ocean" },
+    { word: "shark", emoji: "🦈", hint: "A big fish with lots and lots of teeth" },
+    { word: "snail", emoji: "🐌", hint: "A slow animal that carries its own house" },
+    { word: "spoon", emoji: "🥄", hint: "You eat soup and cereal with it" },
+    { word: "sugar", emoji: "🍭", hint: "It makes treats taste sweet" },
+    { word: "seven", emoji: "7️⃣", hint: "The number that comes after six" },
+    { word: "eight", emoji: "8️⃣", hint: "The number that comes after seven" },
+    { word: "green", emoji: "💚", hint: "The colour of grass" },
+    { word: "white", emoji: "🤍", hint: "The colour of snow" },
+    { word: "brown", emoji: "🤎", hint: "The colour of chocolate" },
+    { word: "flute", emoji: "🎶", hint: "A skinny instrument you blow into" },
+    { word: "tulip", emoji: "🌷", hint: "A cup-shaped spring flower" },
+    { word: "daisy", emoji: "🌼", hint: "A white flower with a yellow middle" },
+    { word: "peach", emoji: "🍑", hint: "A fuzzy sweet fruit" },
+    { word: "berry", emoji: "🫐", hint: "A tiny sweet fruit" },
+    { word: "melon", emoji: "🍈", hint: "A big round juicy fruit" },
+    { word: "salad", emoji: "🥗", hint: "A bowl of crunchy healthy veggies" },
+    { word: "toast", emoji: "🍞", hint: "Warm crunchy bread for breakfast" },
+    { word: "honey", emoji: "🍯", hint: "The sweet sticky food bees make" },
+    { word: "lunch", emoji: "🥪", hint: "The meal you eat in the middle of the day" },
+    { word: "tooth", emoji: "🦷", hint: "You brush it every morning and night" },
+    { word: "smart", emoji: "🧠", hint: "Really good at figuring things out" },
+    { word: "quiet", emoji: "🤫", hint: "Making no noise at all — shhh!" },
+    { word: "storm", emoji: "⛈️", hint: "Rain, wind and thunder all together" },
+    { word: "sunny", emoji: "☀️", hint: "When the sky is full of sunshine" },
+    { word: "windy", emoji: "🍃", hint: "Weather that blows your hat off" },
+    { word: "earth", emoji: "🌍", hint: "The planet we all live on" },
+    { word: "field", emoji: "🌾", hint: "A big open grassy space" },
+    { word: "river", emoji: "🏞️", hint: "Water that flows all the way to the sea" },
+    { word: "stone", emoji: "🪨", hint: "A small hard rock" },
+    { word: "torch", emoji: "🔦", hint: "A light you carry — Minecraft has them!" },
+    { word: "wheel", emoji: "🛞", hint: "A round thing that helps cars roll" },
+    { word: "clock", emoji: "🕐", hint: "It tells you what time it is" },
+    { word: "scarf", emoji: "🧣", hint: "You wrap it round your neck when it's cold" },
+    { word: "glove", emoji: "🧤", hint: "It keeps one hand warm" },
+    { word: "shoes", emoji: "👟", hint: "You wear them on your feet" },
+    { word: "skate", emoji: "⛸️", hint: "Gliding along on ice or wheels" },
+    { word: "climb", emoji: "🧗", hint: "Going up a tree or a wall" },
+    { word: "paint", emoji: "🎨", hint: "You brush colours onto paper with it" },
+    { word: "camel", emoji: "🐫", hint: "A desert animal with humps" },
+    { word: "hippo", emoji: "🦛", hint: "A big river animal with a huge mouth" },
+    { word: "llama", emoji: "🦙", hint: "A fluffy animal that might spit at you" },
+    { word: "otter", emoji: "🦦", hint: "A playful swimmer that floats on its back" },
+    { word: "moose", emoji: "🫎", hint: "A huge deer with big flat antlers" },
+    { word: "goose", emoji: "🪿", hint: "A big bird that honks" },
+    { word: "chick", emoji: "🐤", hint: "A fluffy baby chicken" },
+    { word: "witch", emoji: "🧙", hint: "She rides a broom and casts spells" },
+    { word: "giant", emoji: "🏔️", hint: "A huge, huge person from fairy tales" },
+    { word: "brick", emoji: "🧱", hint: "Builders stack these to make walls" },
+    { word: "truck", emoji: "🚚", hint: "A big vehicle that carries heavy things" },
+    { word: "plane", emoji: "✈️", hint: "It flies people through the sky" },
+    { word: "money", emoji: "💰", hint: "You use it to buy things" },
+    { word: "penny", emoji: "🪙", hint: "A tiny coin" },
+    { word: "spell", emoji: "🪄", hint: "The magic words a wizard says" },
   ];
 
   /* extra real words kids are allowed to TYPE as a guess
@@ -120,6 +179,34 @@
     { word: "gold", emoji: "🪙", hint: "Shiny treasure pirates love" },
     { word: "wolf", emoji: "🐺", hint: "A wild animal like a big grey dog" },
     { word: "ship", emoji: "🚢", hint: "A very big boat" },
+    { word: "crab", emoji: "🦀", hint: "A beach animal that walks sideways" },
+    { word: "deer", emoji: "🦌", hint: "A gentle forest animal with antlers" },
+    { word: "goat", emoji: "🐐", hint: "A farm animal that tries to eat everything" },
+    { word: "lamb", emoji: "🐑", hint: "A baby sheep" },
+    { word: "pony", emoji: "🐴", hint: "A small horse just the right size for kids" },
+    { word: "seal", emoji: "🦭", hint: "A whiskery sea animal that claps" },
+    { word: "toad", emoji: "🐸", hint: "A bumpy cousin of the frog" },
+    { word: "nest", emoji: "🪺", hint: "The home a bird builds" },
+    { word: "leaf", emoji: "🍁", hint: "It grows on a tree and falls in autumn" },
+    { word: "rose", emoji: "🌹", hint: "A beautiful flower with thorny stems" },
+    { word: "corn", emoji: "🌽", hint: "A yellow veggie that grows on a cob" },
+    { word: "pear", emoji: "🍐", hint: "A green fruit shaped like a teardrop" },
+    { word: "rice", emoji: "🍚", hint: "Tiny white grains you eat with dinner" },
+    { word: "soup", emoji: "🍲", hint: "A hot meal you eat with a spoon" },
+    { word: "bell", emoji: "🔔", hint: "It rings ding-dong!" },
+    { word: "door", emoji: "🚪", hint: "You knock on it before you come in" },
+    { word: "lamp", emoji: "🛋️", hint: "A little light for your bedroom" },
+    { word: "sock", emoji: "🧦", hint: "You wear it inside your shoe" },
+    { word: "coat", emoji: "🧥", hint: "You put it on when it's cold outside" },
+    { word: "ring", emoji: "💍", hint: "Shiny jewellery for your finger" },
+    { word: "song", emoji: "🎵", hint: "Music with words you can sing" },
+    { word: "park", emoji: "🛝", hint: "A place with swings and slides" },
+    { word: "farm", emoji: "🚜", hint: "Where crops grow and animals live" },
+    { word: "maze", emoji: "🌀", hint: "A twisty puzzle path you can get lost in" },
+    { word: "hero", emoji: "🦸", hint: "Someone brave who saves the day" },
+    { word: "swim", emoji: "🏊", hint: "Moving through water with your arms and legs" },
+    { word: "sled", emoji: "🛷", hint: "You ride it down a snowy hill" },
+    { word: "tent", emoji: "⛺", hint: "A cloth house for camping" },
   ];
   const EXTRA4 = [
     "bake", "bell", "blue", "book", "calm", "camp", "card", "cave", "city",
@@ -155,16 +242,21 @@
   function load() {
     try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === "object") return s; }
     catch (e) {}
-    return { streak: 0, wins: 0, last: { 4: -1, 5: -1 } };
+    return { streak: 0, wins: 0, best: 0, played: 0, last: { 4: -1, 5: -1 } };
   }
   function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(stats)); } catch (e) {} }
   const stats = load();
   if (!stats.last || typeof stats.last !== "object") stats.last = { 4: -1, 5: -1 };
+  if (typeof stats.best !== "number") stats.best = stats.streak || 0;
+  if (typeof stats.played !== "number") stats.played = 0;
+  // "bag" of unused answer indices per length, so words don't repeat
+  // until the kids have seen every one.
+  if (!stats.bag || typeof stats.bag !== "object") stats.bag = {};
 
   /* ---------- refs ---------- */
   const $ = (id) => document.getElementById(id);
   const el = {
-    streak: $("streak"), wins: $("wins"), hint: $("hint"), feedback: $("feedback"),
+    streak: $("streak"), wins: $("wins"), best: $("best"), hint: $("hint"), feedback: $("feedback"),
     grid: $("grid"), kb: $("kb"), hintBtn: $("hint-btn"), newBtn: $("new-btn"),
     easyBtn: $("easy-btn"), normalBtn: $("normal-btn"),
   };
@@ -174,12 +266,25 @@
   let row = 0;
   let guess = "";
   let over = false;
+  let hintStage = 0;     // 0 = none yet, 1 = category shown, 2 = first letter too
   const keyState = {};   // letter -> best status
 
+  /* draw from a shuffled bag of indices so every word gets a turn
+     before any repeats — much more variety than pure random. */
   function pickAnswer() {
     const pool = answersFor();
-    let i = Math.floor(Math.random() * pool.length);
-    if (pool.length > 1 && i === stats.last[LEN]) i = (i + 1) % pool.length;
+    let bag = stats.bag[LEN];
+    if (!Array.isArray(bag) || bag.length === 0 || bag.some((i) => !(i >= 0 && i < pool.length))) {
+      bag = pool.map((_, i) => i);
+      for (let k = bag.length - 1; k > 0; k--) {
+        const j = Math.floor(Math.random() * (k + 1));
+        [bag[k], bag[j]] = [bag[j], bag[k]];
+      }
+      // don't serve the same word twice in a row across a refill
+      if (bag.length > 1 && bag[0] === stats.last[LEN]) [bag[0], bag[1]] = [bag[1], bag[0]];
+      stats.bag[LEN] = bag;
+    }
+    const i = bag.shift();
     stats.last[LEN] = i; save();
     return pool[i];
   }
@@ -218,6 +323,7 @@
     b.className = "key" + (wide ? " wide" : "");
     b.textContent = label;
     b.dataset.key = key;
+    b.setAttribute("aria-label", key === "enter" ? "Enter guess" : key === "back" ? "Delete letter" : "Letter " + label.toUpperCase());
     b.addEventListener("click", () => handleKey(key));
     return b;
   }
@@ -260,6 +366,7 @@
     const cells = rowCells(row);
     for (let c = 0; c < LEN; c++) {
       const cell = cells[c];
+      cell.style.animationDelay = (c * 70) + "ms";   // little flip cascade
       cell.classList.add("flip", result[c]);
       const letter = guess[c];
       // upgrade keyboard colour (correct > present > absent)
@@ -309,25 +416,38 @@
     }
   }
 
+  /* end-of-game vocab moment: always show what the word means */
+  function showMeaning() {
+    el.hint.textContent = answer.emoji + " " + answer.word.toUpperCase() + " — " + answer.hint;
+  }
+
+  const CHEERS = ["🤯 WOW! First try!", "🌟 Amazing — in 2!", "🎉 You got it in 3!", "🎉 You got it in 4!", "😄 Got it in 5!", "😅 Phew — just in time!"];
   function win() {
     over = true;
-    stats.wins += 1; stats.streak += 1; save();
+    stats.wins += 1; stats.streak += 1; stats.played += 1;
+    if (stats.streak > stats.best) stats.best = stats.streak;
+    save();
     updateHud();
-    flash("🎉 You got it in " + (row + 1) + "! The word was " + answer.word.toUpperCase(), "var(--green)");
-    el.hint.textContent = answer.emoji + " " + answer.word.toUpperCase();
+    flash(CHEERS[Math.min(row, CHEERS.length - 1)], "var(--green)");
+    showMeaning();
     sparkleBurst();
     if (window.SFX) SFX.win();
     window.Confetti && Confetti.burst({ count: 100 });
   }
   function lose() {
     over = true;
-    stats.streak = 0; save();
+    stats.streak = 0; stats.played += 1; save();
     updateHud();
-    flash("Out of tries — the word was " + answer.word.toUpperCase() + " " + answer.emoji + ". Try a new one!", "var(--pink)");
+    flash("Out of tries — the word was " + answer.word.toUpperCase() + ". Try a new one!", "var(--pink)");
+    showMeaning();
     if (window.SFX) SFX.nope();
   }
 
-  function updateHud() { el.streak.textContent = stats.streak; el.wins.textContent = stats.wins; }
+  function updateHud() {
+    el.streak.textContent = stats.streak;
+    el.wins.textContent = stats.wins;
+    if (el.best) el.best.textContent = stats.best;
+  }
 
   function setMode(len) {
     if (LEN === len) { newGame(); return; }
@@ -339,10 +459,11 @@
 
   function newGame() {
     answer = pickAnswer();
-    row = 0; guess = ""; over = false;
+    row = 0; guess = ""; over = false; hintStage = 0;
     for (const k in keyState) delete keyState[k];
     el.feedback.textContent = "";
     el.hint.textContent = "";
+    el.hintBtn.textContent = "💡 Hint";
     buildGrid();
     buildKeyboard();
     updateHud();
@@ -356,10 +477,24 @@
     if (k.length === 1 && k >= "a" && k <= "z") handleKey(k);
   });
 
-  /* ---------- buttons ---------- */
+  /* ---------- buttons ----------
+     Hint is two-stage so it never gives the whole word away at once:
+     1st press = the category clue, 2nd press = the first letter too. */
   el.hintBtn.addEventListener("click", () => {
-    if (!answer) return;
-    el.hint.textContent = answer.emoji + "  " + answer.hint;
+    if (!answer || over) return;
+    if (hintStage === 0) {
+      hintStage = 1;
+      el.hint.textContent = answer.emoji + "  " + answer.hint;
+      el.hintBtn.textContent = "💡 More hint";
+    } else if (hintStage === 1) {
+      hintStage = 2;
+      el.hint.textContent = answer.emoji + "  " + answer.hint +
+        " — it starts with “" + answer.word[0].toUpperCase() + "”";
+      el.hintBtn.textContent = "💡 Hint";
+    } else {
+      el.hint.textContent = answer.emoji + "  " + answer.hint +
+        " — it starts with “" + answer.word[0].toUpperCase() + "”";
+    }
   });
   el.newBtn.addEventListener("click", newGame);
   el.easyBtn.addEventListener("click", () => setMode(4));

@@ -35,7 +35,7 @@ const GAMES = [
   {
     title: "Unit Converter",
     emoji: "📏",
-    blurb: "Type a number and see it in EVERY other unit at once — length, weight, temperature, volume, speed & more, across SI, imperial & mixed units. Learn how measurements connect. For Cory!",
+    blurb: "Type a number and see it in EVERY other unit at once — with the × and ÷ maths shown for each — then win quiz stars guessing things like how many cm make a foot. For Cory!",
     url:   "games/unit-converter/",
     ages:  "6+",
     kids:  ["cory"],
@@ -101,7 +101,7 @@ const GAMES = [
   {
     title: "Money Machine",
     emoji: "💰",
-    blurb: "Watch your money grow itself with compound interest! Pick a bank, add savings & see what you could buy — like If You Made a Million. For Cory!",
+    blurb: "Watch your money grow itself with compound interest! Pick a bank, add savings, chase challenge trophies & learn the Rule of 72 — like If You Made a Million. For Cory!",
     url:   "games/money-machine/",
     ages:  "6+",
     kids:  ["cory"],
@@ -178,7 +178,7 @@ const GAMES = [
   {
     title: "Math Mob Run",
     emoji: "🏃",
-    blurb: "Steer your crew through +, −, ×, ÷ gates to grow the biggest mob, then smash through brick walls at each level's finish — mental math on the run, with upgrades that save!",
+    blurb: "Steer your crew through +, −, ×, ÷ gates across five lands, hit answer streaks to spark COIN FEVER, and smash the brick wall at every finish — mental math on the run, with upgrades & badges that save!",
     url:   "games/math-mob/",
     ages:  "6+",
     kids:  ["cory"],
@@ -222,7 +222,7 @@ const GAMES = [
   {
     title: "Number Bubble Pop",
     emoji: "🫧",
-    blurb: "Find and pop the matching number — or letter in ABC mode! Practice counting, number & letter recognition. For Ellie!",
+    blurb: "Find and pop the matching number — or letter in ABC mode, or count the dots in Dots mode! Practice counting, number & letter recognition. For Ellie!",
     url:   "games/bubble-pop/",
     ages:  "3+",
     kids:  ["ellie"],

@@ -34,6 +34,8 @@
     .puz-card h3 { margin: 0; font-size: 1.1rem; }
     .puz-card .pz-progress { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
     .puz-card.solved { border-color: var(--green); }
+    .puz-card.perfect { border-color: var(--yellow); }
+    .puz-card.perfect .pz-progress { color: #c99400; }
     /* phones: two compact columns instead of one giant card per row */
     @media (max-width: 520px) {
       .puz-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
@@ -46,7 +48,10 @@
     .solved-row {
       border-radius: 16px; padding: 0.6rem; margin: 0 auto 0.5rem; max-width: 560px;
       color: #fff; box-shadow: 0 6px 16px rgba(43,36,64,0.18);
+      animation: row-in 0.35s ease;
     }
+    @keyframes row-in { 0%{transform:scale(0.85);opacity:0;} 60%{transform:scale(1.04);} 100%{transform:scale(1);opacity:1;} }
+    @media (prefers-reduced-motion: reduce) { .solved-row, .tile.wrong, .tile.pop { animation: none; } }
     .solved-row .grp-name { font-weight: bold; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.03em; }
     .solved-row .grp-items { font-size: 0.95rem; margin-top: 0.15rem; }
 
@@ -89,7 +94,7 @@
 
     <!-- PUZZLE PICKER -->
     <section id="puzzles">
-      <p style="font-weight:bold;color:var(--purple);font-size:1.2rem;margin-top:0;">Pick a puzzle:</p>
+      <p style="font-weight:bold;color:var(--purple);font-size:1.2rem;margin-top:0;" id="puz-progress">Pick a puzzle:</p>
       <div class="puz-grid" id="puz-grid"></div>
     </section>
 
@@ -102,6 +107,7 @@
       <div class="controls" id="play-controls">
         <button class="btn ghost" id="shuffle-btn">🔀 Shuffle</button>
         <button class="btn ghost" id="deselect-btn">Clear pick</button>
+        <button class="btn ghost" id="hint-btn">💡 Hint</button>
         <button class="btn" id="submit-btn">Check ✓</button>
       </div>
       <div class="controls hidden" id="next-controls">
