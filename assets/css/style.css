@@ -77,6 +77,17 @@ body {
   display: inline-block;
   animation: wiggle 2.5s ease-in-out infinite;
 }
+/* Emoji inside a title must keep their OWN colours: the title paints a
+   gradient clipped to its text, which otherwise turns every emoji into a
+   flat purple block. Wrap a title emoji in <span class="emo">🎹</span>. */
+.title-emoji,
+.title .emo {
+  -webkit-text-fill-color: initial;
+  color: var(--ink);
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+}
 @keyframes wiggle {
   0%, 100% { transform: rotate(-8deg); }
   50%      { transform: rotate(8deg); }

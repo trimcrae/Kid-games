@@ -22,6 +22,28 @@
 
 const GAMES = [
   {
+    title: "Music Lab",
+    emoji: "🎹",
+    blurb: "A real piano you can play! Learn the note names, echo tunes back by ear, play whole songs as the next key glows, read notes on the staff — and record a tune of your own. For everyone!",
+    url:   "games/music-lab/",
+    ages:  "3+",
+    kids:  ["jeannie","cory","ellie"],
+    color: "#8a5cff",
+    ready: true
+  },
+
+  {
+    title: "World Trek",
+    emoji: "🌍",
+    blurb: "Tap the seven continents & five oceans on a pixel world map, hunt down all 50 states on the puzzle map, learn their capitals — and read a true fact about every single place. For Jeannie & Cory!",
+    url:   "games/world-trek/",
+    ages:  "5+",
+    kids:  ["jeannie","cory"],
+    color: "#3ddc84",
+    ready: true
+  },
+
+  {
     title: "Rock Detective",
     emoji: "🪨",
     blurb: "Found a cool rock? Tap the clues you see & feel to identify it like a real geologist, browse the illustrated rock book, or take the naming quiz — igneous, sedimentary, metamorphic & minerals. For Jeannie & Cory!",

@@ -573,6 +573,142 @@ const GAMES = {
     return "no auto-generate; must-goalie honored; print builds first; 2/4/8 even, no repeats";
   },
 
+  async "Music Lab"(page, g, d) {
+    await page.goto(`${BASE}/games/music-lab/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("music-lab.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+    // the whole keyboard is there: 10 white keys + 7 black
+    if (await page.locator(".key.white").count() !== 10) throw new Error("expected 10 white keys");
+    if (await page.locator(".key.black").count() !== 7) throw new Error("expected 7 black keys");
+    // Free Play: pressing a key names the note
+    await page.locator('.key[data-note="E4"]').click();
+    if ((await page.locator("#big-note").textContent()).trim() !== "E") throw new Error("pressing E4 did not show the note name E");
+
+    // Songs: the glowing key walks all the way through a tune
+    await page.locator('.mode-btn[data-mode="songs"]').click();
+    const songs = await page.locator(".song-btn").count();
+    if (songs < 5) throw new Error(`only ${songs} songs in the list`);
+    await page.locator(".song-btn").first().click();
+    await page.waitForTimeout(200);
+    if (await page.locator(".key.hint").count() !== 1) throw new Error("no key glowed for the first note");
+    let notes = 0;
+    for (let i = 0; i < 60; i++) {
+      const hint = page.locator(".key.hint");
+      if (!(await hint.count())) break;
+      await hint.first().click();
+      notes++;
+      await page.waitForTimeout(40);
+    }
+    if (notes < 10) throw new Error(`song stopped after ${notes} notes`);
+    if (!/You played/.test(await page.locator("#prompt-title").textContent())) throw new Error("finishing the song was not celebrated");
+    // and a finished song is remembered
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator('.mode-btn[data-mode="songs"]').click();
+    if (await page.locator(".song-btn .done").count() < 1) throw new Error("finished song was not saved");
+
+    // Find the Note: the asked letter scores when its key is pressed
+    await page.locator('.mode-btn[data-mode="names"]').click();
+    await page.waitForTimeout(100);
+    await page.locator("#prompt-actions .btn", { hasText: "Show me" }).click();
+    await page.locator(".key.hint").click();
+    await page.waitForTimeout(150);
+    if (!/Right: 1 \/ 1/.test(await page.locator("#scorebar").textContent())) throw new Error("correct note was not scored");
+
+    // Read Music: a note is drawn on the staff and the key answers it
+    await page.locator('.mode-btn[data-mode="staff"]').click();
+    await page.waitForTimeout(100);
+    if (await page.locator("#staff ellipse").count() !== 1) throw new Error("no note head drawn on the staff");
+    if (await page.locator("#staff line.staff-line").count() !== 5) throw new Error("staff should have 5 lines");
+    await page.locator("#prompt-actions .btn", { hasText: "Show me" }).click();
+    await page.locator(".key.hint").click();
+    await page.waitForTimeout(150);
+    if (!/Right: 1 \/ 1/.test(await page.locator("#scorebar").textContent())) throw new Error("staff note was not scored");
+
+    // Echo: the piano plays a sequence, then it's the kid's turn
+    await page.locator('.mode-btn[data-mode="echo"]').click();
+    await page.locator("#prompt-actions .btn", { hasText: "Start" }).click();
+    await page.waitForTimeout(2600);
+    if (!/Your turn/.test(await page.locator("#prompt-text").textContent())) throw new Error("Echo never handed over to the player");
+    return `${songs} songs; played one right through (${notes} notes); all five modes work`;
+  },
+
+  async "World Trek"(page, g, d) {
+    await page.goto(`${BASE}/games/world-trek/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("world-trek.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+    // both maps are built: the pixel world and all 50 states
+    const cells = await page.locator(".wcell").count();
+    if (cells !== 48 * 22) throw new Error(`world map has ${cells} squares, expected ${48 * 22}`);
+    if (await page.locator(".scell[data-s]").count() !== 50) throw new Error("the states map should have all 50 states");
+    // every state has a name, a capital, a region and a fact
+    const bad = await page.evaluate(() => Object.keys(STATES).filter((k) => {
+      const s = STATES[k];
+      return !(s && s.length === 4 && s[0] && s[1] && REGIONS[s[2]] && s[3]);
+    }));
+    if (bad.length) throw new Error("states missing data: " + bad.join(", "));
+
+    // Continents: tapping the asked continent scores
+    const askedCode = () => page.evaluate(() => {
+      const t = document.getElementById("prompt-title").textContent.replace(/^Tap\s+/, "");
+      return Object.keys(PLACES).find((k) => t.indexOf(PLACES[k].name) === 0) || null;
+    });
+    let code = await askedCode();
+    if (!code) throw new Error("no continent was asked for");
+    await page.locator(`.wcell[data-k="${code}"]`).first().click();
+    await page.waitForTimeout(200);
+    if (!/Right: 1 \/ 1/.test(await page.locator("#scorebar").textContent())) throw new Error("tapping the right continent did not score");
+    if (await page.locator("#info:not(.hidden)").count() < 1) throw new Error("no fact shown after a correct continent");
+
+    // Oceans use the same map
+    await page.locator('.mode-btn[data-mode="oceans"]').click();
+    await page.waitForTimeout(150);
+    code = await askedCode();
+    if (!code) throw new Error("no ocean was asked for");
+    await page.locator(`.wcell[data-k="${code}"]`).first().click();
+    await page.waitForTimeout(200);
+    if (!/Right: 1 \/ 1/.test(await page.locator("#scorebar").textContent())) throw new Error("tapping the right ocean did not score");
+
+    // Find a State
+    await page.locator('.mode-btn[data-mode="states"]').click();
+    await page.waitForTimeout(150);
+    let want = await page.evaluate(() => {
+      const t = document.getElementById("prompt-title").textContent.replace(/^Find\s+/, "").replace(/!$/, "").trim();
+      return Object.keys(STATES).find((k) => STATES[k][0] === t) || null;
+    });
+    if (!want) throw new Error("no state was asked for");
+    await page.locator(`.scell[data-s="${want}"]`).click();
+    await page.waitForTimeout(200);
+    if (!/Right: 1 \/ 1/.test(await page.locator("#scorebar").textContent())) throw new Error("tapping the right state did not score");
+    if (!/States found: 1 \/ 50/.test(await page.locator("#scorebar").textContent())) throw new Error("found state was not counted");
+
+    // Capitals — a wrong tap must still teach that state's capital
+    await page.locator('.mode-btn[data-mode="capitals"]').click();
+    await page.waitForTimeout(150);
+    const pair = await page.evaluate(() => {
+      const cap = document.getElementById("prompt-title").textContent.replace(/ is the capital of….*$/, "").trim();
+      const right = Object.keys(STATES).find((k) => STATES[k][1] === cap);
+      const wrong = Object.keys(STATES).find((k) => k !== right);
+      return { cap, right, wrong };
+    });
+    if (!pair.right) throw new Error("capital question did not name a real capital");
+    await page.locator(`.scell[data-s="${pair.wrong}"]`).click();
+    await page.waitForTimeout(150);
+    if (!/its capital is/.test(await page.locator("#prompt-text").textContent())) throw new Error("a wrong tap should teach the capital of what was tapped");
+    await page.locator(`.scell[data-s="${pair.right}"]`).click();
+    await page.waitForTimeout(200);
+    if (!/Right: 1 \/ 1/.test(await page.locator("#scorebar").textContent())) throw new Error("the right state for a capital did not score");
+
+    // Atlas: labels appear and tapping anything reads it out
+    await page.locator('.mode-btn[data-mode="atlas"]').click();
+    await page.waitForTimeout(150);
+    if (await page.locator("#world-labels b").count() !== 7) throw new Error("expected 7 continent labels in the Atlas");
+    await page.locator('.scell[data-s="TX"]').click();
+    await page.waitForTimeout(150);
+    if (!/Texas/.test(await page.locator("#info-name").textContent())) throw new Error("Atlas did not open Texas");
+    if (!/Austin/.test(await page.locator("#info-sub").textContent())) throw new Error("Texas card is missing its capital");
+    return `${cells} world squares, 50 states; continents, oceans, states, capitals & atlas all work`;
+  },
+
   async "Crossword"(page, g, d) {
     await page.goto(`${BASE}/games/crossword/`, { waitUntil: "networkidle" });
     if (await page.locator(".puz-card").count() < 1) throw new Error("no crosswords in the picker");
