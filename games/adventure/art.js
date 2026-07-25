@@ -150,17 +150,22 @@
   }
 
   function forest(o) {
-    // NOTE: the exact hexes #e9fff2 / #bff0d8 are recoloured by some
-    // stories (string replace) to turn this scene into a night forest.
-    let s = skyFill([[0, "#e9fff2"], [100, "#bff0d8"]]);
-    // dreamy distant canopy
-    s += hillP("M0 190 Q30 150 70 172 Q100 138 140 166 Q180 132 220 162 Q260 136 300 168 Q340 144 400 176 V300 H0Z", "#bff0d8");
-    s += hillP("M0 190 Q30 150 70 172 Q100 138 140 166 Q180 132 220 162 Q260 136 300 168 Q340 144 400 176 V300 H0Z", "#4a9e6e", ".38");
-    s += hillP("M0 212 Q50 186 110 202 Q170 216 230 198 Q300 182 400 206 V300 H0Z", "#3f8f60", ".42");
-    const gg = lgrad([[0, "#b8e694"], [100, "#8fce6a"]]);
+    // A proper sunlit-woodland sky. (The old version faded to #bff0d8 and
+    // then drew the far canopy in that same colour, so the background had
+    // no depth at all and every forest scene looked washed out.)
+    let s = skyFill([[0, "#8fd0f0"], [46, "#c8ecf6"], [100, "#e8f7e2"]]);
+    // three receding canopy bands, each darker than the last -> real depth
+    s += hillP("M0 190 Q30 150 70 172 Q100 138 140 166 Q180 132 220 162 Q260 136 300 168 Q340 144 400 176 V300 H0Z", "#9ed6b4");
+    s += hillP("M0 202 Q40 168 84 186 Q126 200 168 178 Q212 156 258 182 Q306 206 400 186 V300 H0Z", "#6bbb8e");
+    s += hillP("M0 212 Q50 186 110 202 Q170 216 230 198 Q300 182 400 206 V300 H0Z", "#3f8f60", ".55");
+    const gg = lgrad([[0, "#a8de84"], [100, "#6ebd4a"]]);
     s += D(gg.def) + hillP("M0 216 Q100 198 200 212 Q300 226 400 206 V300 H0Z", `url(#${gg.id})`);
+    s += `<path d="M0 216 Q100 198 200 212 Q300 226 400 206" stroke="#c8f0a0" stroke-width="3.5" fill="none" opacity=".55"/>`;
+    // a couple of pines in the mix so "pine woods" scenes read correctly
+    s += pine(196, 214, 0.72, "#2c7d5c") + pine(370, 210, 0.62, "#2f8862");
     s += tree(60, 214, 1.15, "#2f9e57") + tree(330, 208, 1.3, "#268a4c") + tree(150, 202, 0.8, "#3bb36a") + tree(250, 204, 0.9, "#2f9e57");
-    s += mushroom(110, 256) + mushroom(300, 260, "#ffd166");
+    // mushrooms sit clear of x≈70-130, where the stories stand their heroes
+    s += mushroom(178, 258) + mushroom(300, 260, "#ffd166");
     s += sparkle(190, 120, 2.6, "#ffffff", 3.4, -1.2) + sparkle(90, 96, 2.2, "#ffffff", 2.8, -0.3);
     return s;
   }
@@ -170,10 +175,10 @@
     // smooth stalactites
     s += `<path d="M0 0 H400 V10 Q382 12 374 40 Q366 12 344 12 Q332 14 326 52 Q318 14 292 12 Q274 12 266 34 Q258 12 232 10 Q214 12 206 62 Q198 12 168 12 Q150 12 144 38 Q136 12 108 12 Q92 12 86 48 Q78 12 52 10 Q34 12 28 30 Q20 10 0 10Z" fill="#241a3a"/>`;
     // faint glowing crystals on the walls
-    const g = glowF(2.5);
-    s += D(g.def) + `<g filter="url(#${g.id})">` +
-      `<path d="M28 236 l5 -18 l5 18 Z" fill="#8f7ae0" opacity=".85"/>` +
-      `<path d="M372 226 l4 -15 l4 15 Z" fill="#6fd8d0" opacity=".8"/></g>`;
+    // Proper little faceted crystals. These used to be flat 10px triangles,
+    // which read as stray specks of colour on the cave wall.
+    s += `<g opacity=".9">` + crystal({ x: 30, y: 234, scale: .62, color: "#8f7ae0" }) +
+      crystal({ x: 374, y: 226, scale: .55, color: "#6fd8d0" }) + `</g>`;
     s += sparkle(33, 214, 2.4, "#cabbff", 3, -0.8) + sparkle(376, 208, 2, "#aef2ec", 2.4, -1.5);
     s += hillP("M0 254 Q60 240 120 252 Q200 264 280 250 Q340 242 400 254 V300 H0Z", "#251b38");
     s += hillP("M0 278 Q120 268 240 278 Q330 284 400 276 V300 H0Z", "#1e1630");
@@ -252,13 +257,27 @@
     s += `<path d="M0 214 Q100 194 200 208 Q300 222 400 202" stroke="#c3ef8e" stroke-width="4" fill="none" opacity=".6"/>`;
     [[40,250,"#ff5d8f"],[110,266,"#ffd166"],[200,254,"#8a5cff"],[280,268,"#ff5d8f"],[350,250,"#ff8fc0"]]
       .forEach(f => s += flower(f[0], f[1], f[2]));
-    // a butterfly bobbing over the flowers
-    s += `<g><g>
-      <ellipse cx="-3.4" cy="0" rx="3.4" ry="4.6" fill="#ff8fc0"><animate attributeName="rx" values="3.4;1.8;3.4" dur=".8s" repeatCount="indefinite"/></ellipse>
-      <ellipse cx="3.4" cy="0" rx="3.4" ry="4.6" fill="#ff5d8f"><animate attributeName="rx" values="3.4;1.8;3.4" dur=".8s" repeatCount="indefinite"/></ellipse>
-      <rect x="-1" y="-4.5" width="2" height="9" rx="1" fill="#2b2440"/></g>
-      <animateMotion path="M150 210 q40 -26 90 -8 q40 16 -20 26 q-60 6 -70 -18" dur="13s" repeatCount="indefinite"/></g>`;
+    s += butterfly("M150 208 q40 -26 90 -8 q40 16 -20 26 q-60 6 -70 -18", 13);
     return s;
+  }
+
+  /* A proper little butterfly: four rounded wings, antennae, and a flap
+     driven by a horizontal squash (never collapses into a bar the way an
+     animated `rx` does, which used to make it read as a glitchy stripe). */
+  function butterfly(path, dur, col) {
+    const c = col || "#ff5d8f", lite = shade(c, 42);
+    const wing = side =>
+      `<g transform="scale(${side} 1)">` +
+      `<path d="M0 -1.5 Q3 -9 8.5 -7.5 Q11.5 -4 7.5 -0.8 Q3.5 0.4 0 -1.5Z" fill="${lite}"/>` +
+      `<path d="M0 0.8 Q3.5 1.2 7 4 Q8.5 7.5 4.5 7.6 Q1 6.4 0 1.6Z" fill="${c}"/>` +
+      `<circle cx="5.6" cy="-4.4" r="1.25" fill="#fff" opacity=".75"/></g>`;
+    return `<g><g>` +
+      `<g>${wing(-1)}${wing(1)}` +
+      `<animateTransform attributeName="transform" type="scale" values="1 1;.35 1;1 1" dur=".7s" repeatCount="indefinite"/></g>` +
+      `<path d="M-1.2 -5.4 Q-3 -8.4 -4.6 -9.4 M1.2 -5.4 Q3 -8.4 4.6 -9.4" stroke="#2b2440" stroke-width=".7" fill="none" stroke-linecap="round"/>` +
+      `<ellipse cy="0" rx="1.15" ry="5" fill="#2b2440"/>` +
+      `<circle cy="-5.2" r="1.5" fill="#3b3252"/>` +
+      `</g><animateMotion path="${path}" dur="${dur}s" repeatCount="indefinite"/></g>`;
   }
 
   function snowBg(o) {
@@ -267,7 +286,7 @@
     s += hillP("M0 232 Q80 206 170 226 Q280 246 400 218 V300 H0Z", "#dceefc");
     s += hillP("M0 258 Q120 236 230 254 Q330 268 400 250 V300 H0Z", "#ffffff");
     s += `<path d="M0 258 Q120 236 230 254 Q330 268 400 250" stroke="#b9d9f2" stroke-width="2.5" fill="none" opacity=".8"/>`;
-    s += pine(58, 250, 1, "#5a8f78") + pine(348, 244, 0.8, "#6a9f86");
+    s += pine(58, 250, 1, "#5a8f78", true) + pine(348, 244, 0.8, "#6a9f86", true);
     // falling snow
     for (let i = 0; i < 7; i++) {
       const x = 30 + i * 55, d = 6 + (i % 3) * 2.4;
@@ -278,11 +297,15 @@
   }
 
   // a snowy conifer used by the snow scene
-  function pine(x, y, sc, col) {
+  // A conifer. `snow` adds the white-dusted crown — it is opt-in now, because
+  // the cap used to be unconditional and made every summer / night-forest
+  // pine look like a snow-covered Christmas tree.
+  function pine(x, y, sc, col, snow) {
+    const c = col || "#4a8a6a";
     return `<g transform="translate(${x} ${y}) scale(${sc || 1})">` + shadow(20, 2) +
       `<rect x="-3.5" y="-12" width="7" height="14" rx="3" fill="#7a5a3a"/>` +
-      `<path d="M0 -62 Q4 -50 14 -40 L5 -40 Q10 -30 20 -22 L8 -22 Q14 -12 24 -6 L-24 -6 Q-14 -12 -8 -22 L-20 -22 Q-10 -30 -5 -40 L-14 -40 Q-4 -50 0 -62Z" fill="${col || "#4a8a6a"}"/>` +
-      `<path d="M0 -62 Q4 -50 14 -40 L5 -40 Q7 -36 10 -32 L-10 -32 Q-7 -36 -5 -40 L-14 -40 Q-4 -50 0 -62Z" fill="#fff" opacity=".85"/></g>`;
+      `<path d="M0 -62 Q4 -50 14 -40 L5 -40 Q10 -30 20 -22 L8 -22 Q14 -12 24 -6 L-24 -6 Q-14 -12 -8 -22 L-20 -22 Q-10 -30 -5 -40 L-14 -40 Q-4 -50 0 -62Z" fill="${c}"/>` +
+      `<path d="M0 -62 Q4 -50 14 -40 L5 -40 Q7 -36 10 -32 L-10 -32 Q-7 -36 -5 -40 L-14 -40 Q-4 -50 0 -62Z" fill="${snow ? "#ffffff" : shade(c, 20)}" opacity="${snow ? ".85" : ".55"}"/></g>`;
   }
 
   function plainsBg(o) {
@@ -332,7 +355,14 @@
       }
     const vg = rgrad([[0, "#000", 0], [100, "#000", .34]]);
     s += D(vg.def) + `<rect x="0" y="0" width="400" height="300" fill="url(#${vg.id})"/>`;
-    s += torch(58, 150) + torch(342, 150);
+    // Ambient wall glow only — no torch sprites here. The stories place their
+    // own torches (very often at x≈40 and x≈330-360), and the background pair
+    // that used to live at 58/342 landed right on top of them, so scenes came
+    // out with pairs of half-overlapping torches that read as a glitch.
+    const wg = rgrad([[0, "#ffb142", .3], [100, "#ffb142", 0]]);
+    s += D(wg.def) +
+      `<ellipse cx="58" cy="150" rx="52" ry="62" fill="url(#${wg.id})"><animate attributeName="opacity" values="1;.72;1" dur="3.4s" repeatCount="indefinite"/></ellipse>` +
+      `<ellipse cx="342" cy="150" rx="52" ry="62" fill="url(#${wg.id})"><animate attributeName="opacity" values=".8;1;.8" dur="4.1s" repeatCount="indefinite"/></ellipse>`;
     s += `<rect x="0" y="266" width="400" height="34" fill="#1d1b23"/>` +
       `<path d="M0 266 Q100 262 200 266 Q300 270 400 266" stroke="#4a4656" stroke-width="2.4" fill="none"/>`;
     return s;
@@ -367,9 +397,52 @@
     s += `<path d="M0 232 Q80 218 180 228 Q290 238 400 222" stroke="#fff" stroke-width="5" fill="none" opacity=".8" stroke-linecap="round">
       <animateTransform attributeName="transform" type="translate" values="0 0;0 6;0 0" dur="5.5s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values=".8;.3;.8" dur="5.5s" repeatCount="indefinite"/></path>`;
-    s += `<circle cx="330" cy="262" r="4" fill="#ffb6c8"/><path d="M326 262 a4 4 0 0 1 8 0Z" fill="#ff8fa8"/>` +
+    // a couple of little shells on the sand. (The old pink one was a bare
+    // 4px circle, which read as a stray dot of colour rather than a shell.)
+    s += `<g transform="translate(330 264)">` +
+      `<path d="M-7 3 Q-7 -8 0 -8 Q7 -8 7 3 Q0 5.5 -7 3Z" fill="#ffc9d8"/>` +
+      `<path d="M-4.6 3.4 Q-4 -5 -1.6 -7.4 M0 4 Q0 -5.5 0 -7.9 M4.6 3.4 Q4 -5 1.6 -7.4" stroke="#ef8fa8" stroke-width="1" fill="none"/>` +
+      `<ellipse cy="3.6" rx="7" ry="1.6" fill="#e07a95" opacity=".5"/></g>` +
       `<path d="M84 274 q4 -8 8 0 q-4 6 -8 0" fill="#e8d8b0" stroke="#c9b384" stroke-width="1"/>`;
     return s;
+  }
+
+  // Sunset over the OPEN SEA. The stories kept using skySunset (which is
+  // dry purple hills) for their sunset sea scenes, so dolphins, coral and
+  // boats ended up sitting on land.
+  function sunsetSeaBg(o) {
+    let s = skyFill([[0, "#2a1550"], [26, "#6a2f6e"], [52, "#c2537a"], [76, "#ff9160"], [100, "#ffd08a"]]);
+    s += glowDisc(206, 158, 26, "#fff4d2", "#ffcf6b");
+    s += `<g opacity=".45">` + cloud(96, 66, 0.7, "#ffb6a0") + cloud(320, 44, 0.9, "#e78bb0") + `</g>`;
+    s += sparkle(48, 30, 4, "#ffe9c9", 3.2, -1) + sparkle(244, 24, 3, "#ffe9c9", 2.6, -0.4);
+    // the water, warmed by the low sun
+    const w = lgrad([[0, "#e8935f"], [26, "#a85f86"], [100, "#3a2a63"]]);
+    s += D(w.def) + `<rect x="0" y="182" width="400" height="118" fill="url(#${w.id})"/>`;
+    // glittering horizon line + the sun's reflected path
+    s += `<path d="M0 182 H400" stroke="#ffd6a0" stroke-width="2.4" opacity=".8"/>`;
+    const rf = lgrad([[0, "#ffd08a", .55], [100, "#ffd08a", 0]]);
+    s += D(rf.def) + `<path d="M188 182 L224 182 L252 300 L160 300Z" fill="url(#${rf.id})"/>`;
+    [[68, 210], [300, 202], [140, 244], [330, 258], [206, 272]].forEach((p, i) =>
+      s += `<path d="M${p[0] - 20} ${p[1]} Q${p[0]} ${p[1] - 6} ${p[0] + 20} ${p[1]}" stroke="#ffd6b0" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".4">
+        <animate attributeName="opacity" values=".18;.5;.18" dur="${3.4 + i}s" repeatCount="indefinite"/></path>`);
+    return s;
+  }
+
+  // A vector music note (o.beam=true for the two-stem eighth-note pair).
+  // Several stories were dropping literal 🎵 / 🎶 emoji glyphs into the SVG,
+  // which broke the smooth vector look and rendered in the device emoji font.
+  function note(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#2b2440";
+    let s = `<ellipse cx="-5" cy="8" rx="5.4" ry="4.2" fill="${c}" transform="rotate(-18 -5 8)"/>` +
+      `<rect x="-0.6" y="-14" width="2.6" height="22" rx="1.2" fill="${c}"/>`;
+    if (o.beam) {
+      s += `<ellipse cx="11" cy="4" rx="5.4" ry="4.2" fill="${c}" transform="rotate(-18 11 4)"/>` +
+        `<rect x="15.4" y="-18" width="2.6" height="22" rx="1.2" fill="${c}"/>` +
+        `<path d="M-0.6 -14 Q8 -19 18 -18 L18 -13 Q8 -14 2 -10Z" fill="${c}"/>`;
+    } else {
+      s += `<path d="M2 -14 Q10 -12 11 -5 Q7 -10 2 -9Z" fill="${c}"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
   }
 
   function desertBg(o) {
@@ -643,28 +716,35 @@
     const col = o.color || "#7ed957", belly = shade(col, 32), dk = shade(col, -18);
     const sad = o.mood === "sad";
     const bg2 = lgrad([[0, shade(col, 14)], [100, shade(col, -8)]]);
-    let s = D(bg2.def) + shadow(26, 22);
+    // o.rainbow paints the dragon in all seven colours at once — the rainbow
+    // story ends with "the dragon shines like a RAINBOW", so a single flat
+    // hue there told the wrong story.
+    const rbow = o.rainbow
+      ? lgrad([[0, "#ff5d8f"], [18, "#ff8f43"], [36, "#ffd166"], [54, "#7ed957"], [72, "#4ad6c8"], [88, "#5aa9ff"], [100, "#b06ad9"]], true)
+      : null;
+    const skin = rbow ? `url(#${rbow.id})` : col;
+    let s = D(bg2.def + (rbow ? rbow.def : "")) + shadow(26, 22);
     // tail
-    s += `<path d="M-16 8 Q-30 12 -29 -2" stroke="${col}" stroke-width="6.5" fill="none" stroke-linecap="round"/>` +
+    s += `<path d="M-16 8 Q-30 12 -29 -2" stroke="${rbow ? "#b06ad9" : col}" stroke-width="6.5" fill="none" stroke-linecap="round"/>` +
       `<path d="M-29 -2 L-33 -9 L-25 -8Z" fill="${dk}"/>`;
     // far wing (gently flapping)
     s += `<g transform="translate(-4 -4)"><path d="M0 0 Q-16 -20 2 -16 Q-2 -8 0 0Z" fill="${dk}" opacity=".8">
       <animateTransform attributeName="transform" type="rotate" values="0;-8;0" dur="1.8s" repeatCount="indefinite"/></path></g>`;
     // body + belly
-    s += `<ellipse cx="-2" cy="8" rx="19" ry="13.5" fill="url(#${bg2.id})"/>` +
-      `<path d="M-12 14 Q-2 20 9 13 Q10 4 -1 2 Q-11 3 -12 14Z" fill="${belly}"/>` +
+    s += `<ellipse cx="-2" cy="8" rx="19" ry="13.5" fill="${rbow ? skin : `url(#${bg2.id})`}"/>` +
+      `<path d="M-12 14 Q-2 20 9 13 Q10 4 -1 2 Q-11 3 -12 14Z" fill="${rbow ? "#fff6d8" : belly}"/>` +
       `<path d="M-9 8 h14 M-8 12 h12" stroke="${shade(belly, -14)}" stroke-width="1.3" opacity=".6"/>`;
     // legs
-    s += `<rect x="-12" y="15" width="7" height="8" rx="3.2" fill="${col}"/>` +
-      `<rect x="3" y="15" width="7" height="8" rx="3.2" fill="${col}"/>`;
+    s += `<rect x="-12" y="15" width="7" height="8" rx="3.2" fill="${skin}"/>` +
+      `<rect x="3" y="15" width="7" height="8" rx="3.2" fill="${skin}"/>`;
     // back spikes
     s += `<path d="M-14 -2 Q-13 -8 -9 -7 Q-9 -3 -11 -1Z M-6 -5 Q-5 -11 -1 -10 Q-1 -6 -3 -4Z" fill="${dk}"/>`;
     // near wing
-    s += `<g transform="translate(-1 -3)"><path d="M0 0 Q-13 -22 6 -17 Q1 -8 0 0Z" fill="${belly}">
+    s += `<g transform="translate(-1 -3)"><path d="M0 0 Q-13 -22 6 -17 Q1 -8 0 0Z" fill="${rbow ? "#ffd166" : belly}">
       <animateTransform attributeName="transform" type="rotate" values="0;-10;0" dur="1.8s" begin="-.2s" repeatCount="indefinite"/></path></g>`;
     // head
-    s += `<circle cx="12" cy="-11" r="11.5" fill="${col}"/>` +
-      `<ellipse cx="20" cy="-7" rx="7" ry="5.4" fill="${belly}"/>` +
+    s += `<circle cx="12" cy="-11" r="11.5" fill="${skin}"/>` +
+      `<ellipse cx="20" cy="-7" rx="7" ry="5.4" fill="${rbow ? "#fff6d8" : belly}"/>` +
       `<circle cx="22.5" cy="-9" r="1" fill="${dk}"/><circle cx="19" cy="-9" r="1" fill="${dk}"/>`;
     // horns
     s += `<path d="M6 -20 Q5 -26 9 -27 Q10 -22 9 -19.5Z M13 -21.5 Q13.5 -27.5 17.5 -27 Q17 -22 15.5 -20Z" fill="${belly}"/>`;
@@ -990,12 +1070,17 @@
   /* =========================================================
      BLOCK WORLD PROPS (kept proudly blocky — but smooth & lit)
      ========================================================= */
+  // One world-block. Drawn full-bleed (no 1px inset) so tiled rows never
+  // show bright gaps of sky between blocks — the seam is a soft dark edge
+  // instead, the way a stacked-block world should look.
   function block(x, y, s, top, side) {
     const g = lgrad([[0, shade(side, 8)], [100, shade(side, -14)]]);
+    const r = s * 0.1;
     return `<g transform="translate(${x} ${y})">` + D(g.def) +
-      `<rect x="1" y="1" width="${s - 2}" height="${s - 2}" rx="${s * 0.14}" fill="url(#${g.id})"/>` +
-      `<path d="M${1 + s * 0.14} 1 H${s - 1 - s * 0.14} Q${s - 1} 1 ${s - 1} ${1 + s * 0.14} V${s * 0.3} Q${s * 0.5} ${s * 0.38} 1 ${s * 0.3} V${1 + s * 0.14} Q1 1 ${1 + s * 0.14} 1Z" fill="${top}"/>` +
-      `<path d="M${s * 0.12} ${s * 0.12} H${s * 0.6}" stroke="${shade(top, 30)}" stroke-width="${s * 0.06}" stroke-linecap="round" opacity=".8"/></g>`;
+      `<rect x="0" y="0" width="${s}" height="${s}" rx="${r}" fill="url(#${g.id})"/>` +
+      `<path d="M${r} 0 H${s - r} Q${s} 0 ${s} ${r} V${s * 0.3} Q${s * 0.5} ${s * 0.38} 0 ${s * 0.3} V${r} Q0 0 ${r} 0Z" fill="${top}"/>` +
+      `<path d="M${s * 0.12} ${s * 0.12} H${s * 0.6}" stroke="${shade(top, 30)}" stroke-width="${s * 0.06}" stroke-linecap="round" opacity=".8"/>` +
+      `<rect x="0" y="0" width="${s}" height="${s}" rx="${r}" fill="none" stroke="${shade(side, -30)}" stroke-width=".8" opacity=".45"/></g>`;
   }
   function grassBlocks(y) {
     let s = "";
@@ -1012,14 +1097,19 @@
       `<path d="M-1 -3 L0 9 L-8.5 -3Z" fill="#2fb0a9" opacity=".8"/></g>` +
       sparkle(4.5, -6.5, 2.6, "#ffffff", 2, -0.5) + `</g>`;
   }
+  // A pickaxe you can actually recognise: chunky twin-point steel head with
+  // a shaded underside, not the hairline arc it used to be (which read as a
+  // stray white scribble at story scale).
   function pickaxe(x, y, sc) {
     sc = sc || 1;
-    const g = lgrad([[0, "#cfe0ef"], [100, "#8fa3b9"]]);
+    const g = lgrad([[0, "#e3edf7"], [100, "#7d92aa"]]);
     return `<g transform="translate(${x} ${y}) scale(${sc}) rotate(-20)">` + D(g.def) +
-      `<rect x="-2.4" y="-4" width="4.8" height="36" rx="2.2" fill="#8a5a33"/>` +
-      `<rect x="-1.2" y="-2" width="1.6" height="30" rx="0.8" fill="#a06a3a"/>` +
-      `<path d="M-21 -8 Q0 -22 21 -8 Q19 -12 14 -14 Q0 -19 -14 -14 Q-19 -12 -21 -8Z" fill="url(#${g.id})"/>` +
-      `<path d="M-18 -10 Q0 -20 18 -10" stroke="#eaf2f8" stroke-width="1.6" fill="none" opacity=".8"/></g>`;
+      `<rect x="-2.6" y="-6" width="5.2" height="38" rx="2.4" fill="#8a5a33"/>` +
+      `<rect x="-1.2" y="-4" width="1.6" height="32" rx="0.8" fill="#a97b46"/>` +
+      `<path d="M-22 -7 Q-14 -19 0 -20 Q14 -19 22 -7 Q16 -9 11 -14 Q5 -16 0 -16 Q-5 -16 -11 -14 Q-16 -9 -22 -7Z" fill="url(#${g.id})"/>` +
+      `<path d="M-22 -7 Q-14 -19 0 -20 Q14 -19 22 -7 Q14 -12 0 -12.5 Q-14 -12 -22 -7Z" fill="#b7c8da"/>` +
+      `<path d="M-6.5 -17.5 H6.5 Q8 -13 6.5 -8 H-6.5 Q-8 -13 -6.5 -17.5Z" fill="#9fb3c8"/>` +
+      `<path d="M-17 -11 Q-9 -17 0 -17.6" stroke="#fbfdff" stroke-width="1.7" fill="none" opacity=".85" stroke-linecap="round"/></g>`;
   }
   function torch(x, y) {
     const fg = glowF(2.6), halo = rgrad([[0, "#ffb142", .4], [100, "#ffb142", 0]]);
@@ -1151,14 +1241,17 @@
   function crystal(o) {
     const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#a368d8";
     const g = glowF(2.2);
+    // Chunkier facets than the original: the old crystal was so narrow that
+    // at the small scales the stories use it it read as a stray triangle.
     return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def) +
       `<g filter="url(#${g.id})">` +
-      `<path d="M-7.5 10 L-9.5 -2 L-6 -7 L-3 1 L-3.5 10Z" fill="${shade(c, -16)}"/>` +
-      `<path d="M0 -13 L5 -4 L4 10 L-4 10 L-5 -4Z" fill="${c}"/>` +
-      `<path d="M0 -13 L5 -4 L1.5 -2 Z" fill="${shade(c, 30)}"/>` +
-      `<path d="M6.5 10 L9 0 L6 -4 L3.5 3 L4 10Z" fill="${shade(c, 14)}"/></g>` +
-      `<path d="M-1.5 -8 L-1 6" stroke="#fff" stroke-width="1.3" opacity=".55" stroke-linecap="round"/>` +
-      sparkle(3, -8, 2.4, "#fff", 2.6, -1.1) + `</g>`;
+      `<path d="M-11 10 L-14 -3 L-8.5 -10 L-4 0 L-5 10Z" fill="${shade(c, -16)}"/>` +
+      `<path d="M10 10 L13.5 -1 L8 -8 L3.5 2 L4.5 10Z" fill="${shade(c, 14)}"/>` +
+      `<path d="M0 -17 L7.5 -5 L6 10 L-6 10 L-7.5 -5Z" fill="${c}"/>` +
+      `<path d="M0 -17 L7.5 -5 L1.8 -2.5 Z" fill="${shade(c, 34)}"/>` +
+      `<path d="M0 -17 L-7.5 -5 L-1.8 -2.5 Z" fill="${shade(c, -8)}"/></g>` +
+      `<path d="M-2 -11 L-1.4 7" stroke="#fff" stroke-width="1.5" opacity=".55" stroke-linecap="round"/>` +
+      sparkle(4.5, -11, 2.8, "#fff", 2.6, -1.1) + `</g>`;
   }
   function anvil(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
@@ -1216,13 +1309,18 @@
     const g = rgrad([[0, shade(c, 55), .95], [55, c, .85], [100, shade(c, -30), .9]]);
     const gl = glowF(3);
     return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def + gl.def) +
-      `<ellipse rx="30" ry="47" fill="${shade(c, -38)}" opacity=".6"/>` +
-      `<ellipse rx="26" ry="43" fill="url(#${g.id})" filter="url(#${gl.id})"/>` +
-      `<ellipse rx="19" ry="34" fill="none" stroke="${shade(c, 45)}" stroke-width="2.4" stroke-dasharray="14 10" opacity=".9">
-        <animate attributeName="stroke-dashoffset" values="0;48" dur="3s" repeatCount="indefinite"/></ellipse>` +
-      `<ellipse rx="11" ry="22" fill="none" stroke="#fff" stroke-width="1.8" stroke-dasharray="8 12" opacity=".8">
-        <animate attributeName="stroke-dashoffset" values="40;0" dur="2.4s" repeatCount="indefinite"/></ellipse>` +
-      sparkle(-14, -26, 3, "#e9d5ff", 1.9, -0.3) + sparkle(15, 18, 2.6, "#fff", 2.3, -1.2) +
+      // A stone-ringed doorway with a spiral vortex inside. The old version
+      // was a plain dashed ellipse, which read as a glowing purple egg
+      // sitting on the bookshelf rather than a way through.
+      `<ellipse rx="33" ry="50" fill="${shade(c, -45)}" opacity=".55"/>` +
+      `<ellipse rx="28" ry="45" fill="none" stroke="${shade(c, -22)}" stroke-width="7"/>` +
+      `<ellipse rx="28" ry="45" fill="none" stroke="${shade(c, 30)}" stroke-width="2" opacity=".7"/>` +
+      `<ellipse rx="24.5" ry="41.5" fill="url(#${g.id})" filter="url(#${gl.id})"/>` +
+      `<g><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="7s" repeatCount="indefinite"/>` +
+      `<path d="M0 -34 Q16 -18 12 0 Q9 16 0 25 Q-11 15 -13 0 Q-15 -19 0 -34Z" fill="none" stroke="${shade(c, 55)}" stroke-width="2.6" opacity=".85" stroke-linecap="round"/>` +
+      `<path d="M0 -20 Q9 -9 7 3 Q5 12 0 15 Q-6 9 -7 2 Q-8 -10 0 -20Z" fill="none" stroke="#fff" stroke-width="1.8" opacity=".75" stroke-linecap="round"/></g>` +
+      `<ellipse rx="6" ry="9" fill="#fff" opacity=".55"><animate attributeName="opacity" values=".55;.2;.55" dur="2.2s" repeatCount="indefinite"/></ellipse>` +
+      sparkle(-16, -28, 3, "#e9d5ff", 1.9, -0.3) + sparkle(17, 20, 2.6, "#fff", 2.3, -1.2) +
       `</g>`;
   }
   function sword(o) {
@@ -1348,18 +1446,24 @@
     const x = o.x, y = o.y, sc = o.scale || 1;
     const g = lgrad([[0, "#c98a4a"], [100, "#8a5a33"]]);
     let s = D(g.def) + shadow(22, 34);
-    s += `<rect x="-20" y="-6" width="40" height="40" rx="3" fill="url(#${g.id})"/>` +
-      // slanted table top with a 3x3 crafting grid
-      `<path d="M-20 -6 L-13 -16 L27 -16 L20 -6Z" fill="#e0a866"/>` +
-      `<path d="M20 -6 L27 -16 L27 -8 L20 2Z" fill="#8a5a33"/>` +
-      `<path d="M-15 -13.4 L23 -13.4 M-17 -10.8 L21.5 -10.8 M-8.5 -16 L-14.8 -6 M2.5 -16 L-3.8 -6 M13.5 -16 L7.2 -6" stroke="#a06a3a" stroke-width="1.3"/>` +
-      // hammer resting on top
-      `<g transform="translate(6 -19) rotate(-12)"><rect x="-1.2" y="0" width="2.4" height="11" rx="1.2" fill="#8a5a33"/><rect x="-5.5" y="-3" width="11" height="4.6" rx="2" fill="#9fb6cc"/></g>` +
-      // front: tool grid squares + saw marks
-      `<rect x="-14" y="10" width="12" height="10" rx="1.5" fill="#6b4423" opacity=".55"/>` +
-      `<rect x="2" y="10" width="12" height="10" rx="1.5" fill="#6b4423" opacity=".55"/>` +
-      `<path d="M-11 13 l6 4 M-5 13 l-6 4" stroke="#e0a866" stroke-width="1.4" stroke-linecap="round"/>` +
-      `<path d="M4 15 h8 M5 13 l1.5 2 M8 13 l1.5 2 M11 13 l1.5 2" stroke="#9fb6cc" stroke-width="1.2" stroke-linecap="round"/>`;
+    // Legible 3×3 crafting grid on the front + four stout legs. The old
+    // version was a plain slab with two faint squares, which at story scale
+    // read as a brown paper sack rather than a workbench.
+    s += `<rect x="-21" y="-8" width="42" height="34" rx="3" fill="url(#${g.id})"/>` +
+      // slanted top surface
+      `<path d="M-21 -8 L-14 -17 L28 -17 L21 -8Z" fill="#e0a866"/>` +
+      `<path d="M21 -8 L28 -17 L28 -10 L21 -1Z" fill="#7d5230"/>` +
+      `<path d="M-17 -12.5 L24.5 -12.5 M-9.5 -17 L-16.5 -8 M3 -17 L-4 -8 M15 -17 L8 -8" stroke="#b07a44" stroke-width="1.2"/>`;
+    // the 3×3 grid of tool slots
+    for (let r = 0; r < 3; r++)
+      for (let c2 = 0; c2 < 3; c2++)
+        s += `<rect x="${-17 + c2 * 12}" y="${-4 + r * 9.5}" width="10" height="7.5" rx="1.4" fill="#5f3d1f" opacity=".62"/>` +
+          `<rect x="${-17 + c2 * 12}" y="${-4 + r * 9.5}" width="10" height="7.5" rx="1.4" fill="none" stroke="#e0a866" stroke-width=".7" opacity=".5"/>`;
+    // a hammer and a plank laid on the top
+    s += `<g transform="translate(6 -20) rotate(-12)"><rect x="-1.3" y="0" width="2.6" height="11" rx="1.3" fill="#8a5a33"/><rect x="-6" y="-3.4" width="12" height="5" rx="2" fill="#9fb6cc"/></g>` +
+      `<rect x="-13" y="-21" width="15" height="3.6" rx="1.4" fill="#c98a4a" transform="rotate(-8 -6 -19)"/>` +
+      // legs
+      `<rect x="-20" y="26" width="6" height="7" rx="1.6" fill="#6b4423"/><rect x="14" y="26" width="6" height="7" rx="1.6" fill="#6b4423"/>`;
     return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
   }
   // minecart on a bit of rail (o.filled=true → gold ore inside)
@@ -1505,10 +1609,21 @@
       `<path d="M9 -6 Q14 -6 13 -1 Q12 2 9 1" fill="none" stroke="${shade(c, -18)}" stroke-width="2.4"/>` +
       `<path d="M-13 -5 Q-18 -8 -16 -12" stroke="${shade(c, -18)}" stroke-width="2.4" fill="none" stroke-linecap="round"/>` +
       `<circle cx="-2" cy="-11.5" r="2" fill="${shade(c, -18)}"/><circle cx="-2" cy="-4" r="2.4" fill="#fff" opacity=".55"/>` +
-      // cups
-      `<path d="M-24 6 Q-24 1 -19 1 Q-14 1 -14 6 Q-14 9 -19 9 Q-24 9 -24 6Z" fill="#ffb8cf"/>` +
-      `<path d="M16 6 Q16 1 21 1 Q26 1 26 6 Q26 9 21 9 Q16 9 16 6Z" fill="#ffe28a"/>` +
-      `<path d="M-19 -1 q1 -3 0 -5 M21 -1 q1 -3 0 -5" stroke="#c9c9d9" stroke-width="1.2" fill="none" opacity=".8"/>`;
+      // cups — proper little teacups on saucers, with handles and a stacked
+      // pair behind, so a "hoard made entirely of teacups" actually reads as
+      // teacups rather than a pale smudge on the grass
+      `<g>` +
+      [[-24, "#ffb8cf", "#e88fb0"], [-8, "#cfe8ff", "#8fbde0"], [22, "#ffe28a", "#d9b640"]]
+        .map(([cx, fill, dk]) =>
+          `<ellipse cx="${cx}" cy="8.4" rx="8" ry="2.6" fill="#fff"/>` +
+          `<ellipse cx="${cx}" cy="8" rx="8" ry="2.2" fill="${dk}" opacity=".45"/>` +
+          `<path d="M${cx - 5.6} 1 H${cx + 5.6} Q${cx + 5} 7.4 ${cx} 7.4 Q${cx - 5} 7.4 ${cx - 5.6} 1Z" fill="${fill}"/>` +
+          `<ellipse cx="${cx}" cy="1" rx="5.6" ry="1.7" fill="#fff" opacity=".9"/>` +
+          `<path d="M${cx + 5.6} 2 Q${cx + 9.4} 2.4 ${cx + 8} 5.4" stroke="${dk}" stroke-width="1.5" fill="none"/>`).join("") +
+      // one balanced on top of the pot, because it is a HOARD
+      `<path d="M-2.6 -14.6 H8.6 Q8 -9 3 -9 Q-2 -9 -2.6 -14.6Z" fill="#d8c0ff"/>` +
+      `<ellipse cx="3" cy="-14.6" rx="5.6" ry="1.7" fill="#fff" opacity=".9"/>` +
+      `<path d="M8.6 -13.6 Q12.4 -13.2 11 -10.2" stroke="#a98fd8" stroke-width="1.5" fill="none"/></g>`;
     return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
   }
   // dark storm cloud with rain + a little lightning bolt
@@ -1618,20 +1733,357 @@
     return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
   }
   // chopping axe, styled like the pickaxe
+  // A broad-bladed felling axe — the old one was a bare stick with a sliver
+  // of grey that barely registered as a tool.
   function axe(o) {
     const x = o.x, y = o.y, sc = o.scale || 1;
-    const g = lgrad([[0, "#c3d2e0"], [100, "#8fa3b8"]]);
+    const g = lgrad([[0, "#e0eaf4"], [100, "#7f94ab"]]);
     return `<g transform="translate(${x} ${y}) scale(${sc}) rotate(20)">` + D(g.def) +
-      `<rect x="-2.4" y="-16" width="4.8" height="34" rx="2.4" fill="#8a5a33"/>` +
-      `<path d="M-2 -16 Q-16 -15 -17 -4 Q-10 -8 -2 -7 Z" fill="url(#${g.id})"/>` +
-      `<path d="M-17 -4 Q-17.6 -8 -16.6 -11" stroke="#fff" stroke-width="1.2" fill="none" opacity=".7"/></g>`;
+      `<rect x="-2.6" y="-18" width="5.2" height="38" rx="2.4" fill="#8a5a33"/>` +
+      `<rect x="-1.2" y="-16" width="1.6" height="32" rx="0.8" fill="#a97b46"/>` +
+      `<path d="M-1 -19 Q-13 -19 -19 -10 Q-22 -4 -18 0 Q-10 -2 -1 -3Z" fill="url(#${g.id})"/>` +
+      `<path d="M-19 -10 Q-22 -4 -18 0 Q-15 -1 -12 -1.6 Q-15.5 -5 -14.5 -11Z" fill="#c9d8e6"/>` +
+      `<path d="M-1 -19 Q-13 -19 -19 -10" stroke="#fbfdff" stroke-width="1.5" fill="none" opacity=".8" stroke-linecap="round"/>` +
+      `<rect x="-3.4" y="-20" width="6.8" height="4" rx="1.6" fill="#6f594a"/></g>`;
+  }
+
+  /* =========================================================
+     PROPS ADDED IN THE ART-QUALITY PASS
+     Each of these exists because the narration named something the
+     picture had no way to draw (a pumpkin, a roof, a fence, a
+     shooting star…) and the story was reaching for a coloured box.
+     ========================================================= */
+
+  // A ribbed jack-o'-lantern-less pumpkin with a curly stem.
+  // o.scale 1 ≈ 44 wide. Replaces the plain orange blocks the village
+  // chapter was using for "the biggest pumpkin in the world".
+  function pumpkin(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = rgrad([[0, "#ffb454"], [70, "#f2802a"], [100, "#d2601c"]], 0.34, 0.3);
+    let s = D(g.def) + shadow(23, 15);
+    s += `<ellipse cy="-3" rx="22" ry="18" fill="url(#${g.id})"/>` +
+      `<path d="M-15 -16 Q-19 -3 -15 10" stroke="#d2601c" stroke-width="1.7" fill="none" opacity=".65"/>` +
+      `<path d="M-6 -19 Q-9 -3 -6 13" stroke="#d2601c" stroke-width="1.7" fill="none" opacity=".55"/>` +
+      `<path d="M6 -19 Q9 -3 6 13" stroke="#d2601c" stroke-width="1.7" fill="none" opacity=".55"/>` +
+      `<path d="M15 -16 Q19 -3 15 10" stroke="#d2601c" stroke-width="1.7" fill="none" opacity=".65"/>` +
+      `<ellipse cx="-9" cy="-11" rx="6" ry="4" fill="#fff" opacity=".22"/>` +
+      `<rect x="-2.4" y="-27" width="4.8" height="9" rx="2" fill="#4f8a3a"/>` +
+      `<path d="M2 -25 Q9 -28 8 -33 Q7 -37 3 -35" stroke="#4f8a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A blocky cottage that actually has a ROOF — the village/forest stories
+  // were stacking three bare planks and calling it a cosy house.
+  // o.big=true for a two-storey version, o.torch=false to drop the lamp.
+  function cottage(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, big = !!o.big;
+    const h = big ? 46 : 34, w = big ? 58 : 46;
+    const wall = lgrad([[0, "#d99a58"], [100, "#a9703c"]]);
+    const rf = lgrad([[0, "#e8584f"], [100, "#a8352f"]]);
+    let s = D(wall.def + rf.def) + shadow(w * 0.62, 4);
+    s += `<rect x="${-w / 2}" y="${-h}" width="${w}" height="${h}" rx="3" fill="url(#${wall.id})"/>`;
+    // plank lines
+    for (let i = 1; i < (big ? 4 : 3); i++)
+      s += `<path d="M${-w / 2 + 2} ${-h + (h / (big ? 4 : 3)) * i} H${w / 2 - 2}" stroke="#8a5a33" stroke-width="1.1" opacity=".55"/>`;
+    // roof with a small overhang + ridge highlight
+    s += `<path d="M${-w / 2 - 7} ${-h} L0 ${-h - 20} L${w / 2 + 7} ${-h} Z" fill="url(#${rf.id})"/>` +
+      `<path d="M${-w / 2 - 7} ${-h} L0 ${-h - 20} L${-2} ${-h} Z" fill="#f27a72" opacity=".55"/>` +
+      `<path d="M${-w / 2 - 7} ${-h} H${w / 2 + 7}" stroke="#8a2f2a" stroke-width="2" opacity=".6"/>`;
+    // door + window
+    s += `<path d="M-7 0 V-15 Q-7 -19 0 -19 Q7 -19 7 -15 V0Z" fill="#6b4423"/>` +
+      `<circle cx="4" cy="-9" r="1.5" fill="#ffd166"/>` +
+      `<rect x="${big ? 12 : 11}" y="${-h + 8}" width="12" height="11" rx="2" fill="#ffd166"/>` +
+      `<path d="M${big ? 18 : 17} ${-h + 8} v11 M${big ? 12 : 11} ${-h + 13.5} h12" stroke="#a9703c" stroke-width="1.1"/>`;
+    // flower box under the window
+    s += `<rect x="${big ? 11 : 10}" y="${-h + 19}" width="14" height="4.5" rx="1.6" fill="#8a5a33"/>` +
+      `<circle cx="${big ? 15 : 14}" cy="${-h + 18}" r="2" fill="#ff5d8f"/><circle cx="${big ? 21 : 20}" cy="${-h + 18}" r="2" fill="#ffd166"/>`;
+    if (o.torch !== false) s += torch(-w / 2 - 4, -20);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A run of paddock fence. o.w = total width (default 90).
+  function fence(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, w = o.w || 90;
+    let s = "";
+    for (let px = 0; px <= w; px += 22)
+      s += `<rect x="${px - 2.6}" y="-22" width="5.2" height="24" rx="2" fill="#a9703c"/>` +
+        `<rect x="${px - 1.2}" y="-20" width="1.6" height="20" rx=".8" fill="#c98a4a"/>`;
+    s += `<rect x="-3" y="-18" width="${w + 6}" height="4" rx="2" fill="#c98a4a"/>` +
+      `<rect x="-3" y="-9" width="${w + 6}" height="4" rx="2" fill="#c98a4a"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A round, lustrous pearl (the treasure chapter was counting its "pearls"
+  // with the pointy gem sprite).
+  function pearl(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, gold = !!o.gold;
+    const base = gold ? "#ffd98a" : "#f4f7ff", edge = gold ? "#d8a13c" : "#b9c6e0";
+    const g = rgrad([[0, "#fff"], [58, base], [100, edge]], 0.32, 0.28);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def) + shadow(7, 8) +
+      `<circle r="7.5" fill="url(#${g.id})"/>` +
+      `<circle cx="-2.4" cy="-2.8" r="2.2" fill="#fff" opacity=".85"/>` +
+      `<path d="M-5.6 3.4 Q0 7 5.6 3.4" stroke="#fff" stroke-width="1.1" fill="none" opacity=".45"/></g>`;
+  }
+
+  // A shooting star: bright head with a tapered, fading tail. o.angle in
+  // degrees (default heading down-right).
+  function shootingStar(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, len = o.len || 90;
+    const g = lgrad([[0, "#fff3b0", 0], [55, "#fff3b0", .5], [100, "#ffffff", .95]], true);
+    const gl = glowF(3.2);
+    return `<g transform="translate(${x} ${y}) scale(${sc}) rotate(${o.angle == null ? 28 : o.angle})">` + D(g.def + gl.def) +
+      `<path d="M${-len} 0 Q${-len * .5} -3.6 0 -5 L0 5 Q${-len * .5} 3.6 ${-len} 0Z" fill="url(#${g.id})"/>` +
+      `<g filter="url(#${gl.id})"><circle r="5" fill="#fffdf2"/><circle r="2.4" fill="#fff"/></g>` +
+      sparkle(-len * 0.42, -1, 3, "#fff3b0", 1.8, -0.4) +
+      `<animate attributeName="opacity" values="1;.75;1" dur="2.4s" repeatCount="indefinite"/></g>`;
+  }
+
+  // A soft flashlight cone: warm, gradient-faded, rounded at the far end.
+  // (The camp-out scene drew a flat grey triangle whose vertical far edge
+  // showed up as a hard rectangular block of haze.)
+  function flashlight(o) {
+    const x = o.x, y = o.y, len = o.len || 150, spread = o.spread || 26;
+    const dir = o.dir === "left" ? -1 : 1;
+    const g = lgrad([[0, "#fff0c0", .55], [70, "#ffe9a8", .22], [100, "#ffe9a8", 0]], true);
+    const halo = rgrad([[0, "#ffe9a8", .34], [100, "#ffe9a8", 0]]);
+    return `<g transform="translate(${x} ${y}) scale(${dir} 1)">` + D(g.def + halo.def) +
+      `<path d="M0 -5 Q${len * .6} ${-spread * .8} ${len} ${-spread} Q${len + 12} 0 ${len} ${spread} Q${len * .6} ${spread * .8} 0 5Z" fill="url(#${g.id})"/>` +
+      `<ellipse cx="${len * .86}" cy="0" rx="${spread * 1.5}" ry="${spread * 1.25}" fill="url(#${halo.id})"/>` +
+      `<rect x="-4" y="-4" width="12" height="8" rx="3" fill="#8a8f9a"/>` +
+      `<rect x="6" y="-3" width="3" height="6" rx="1.4" fill="#ffe9a8"/></g>`;
+  }
+
+  // A SUNKEN ship: listing to one side, tattered sails, weed and bubbles.
+  // The stories were re-using the proud upright `ship` sprite for "the
+  // sunken ship", so the wreck looked like a boat parked on the seabed.
+  function wreck(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const hg = lgrad([[0, "#6f4a2c"], [100, "#402713"]]);
+    let s = D(hg.def) + `<ellipse cy="16" rx="46" ry="7" fill="#000" opacity=".2"/>`;
+    s += `<g transform="rotate(-13)">` +
+      // broken mast
+      `<rect x="-1.8" y="-44" width="3.6" height="46" rx="1.8" fill="#4a3018"/>` +
+      `<path d="M-1.8 -44 l-4 -9 l7 3Z" fill="#4a3018"/>` +
+      // ragged sail
+      `<path d="M3 -40 Q19 -33 21 -22 L12 -22 L14 -16 L3 -22Z" fill="#cbbd9c" opacity=".8"/>` +
+      // hull with a hole stove in the side
+      `<path d="M-40 -4 L40 -4 Q37 12 25 17 L-25 17 Q-37 12 -40 -4Z" fill="url(#${hg.id})"/>` +
+      `<path d="M-40 -4 L40 -4 L39 0 L-39 0Z" fill="#7d5230"/>` +
+      `<path d="M4 2 Q14 -1 20 4 Q14 12 4 9Z" fill="#1b2b3a"/>` +
+      `<path d="M-34 6 L-6 6" stroke="#2f1c0c" stroke-width="1.4" opacity=".7"/>` +
+      `<circle cx="-20" cy="7" r="2.4" fill="#3d5a70" stroke="#2f1c0c" stroke-width="1"/>` +
+      `<circle cx="-8" cy="8" r="2.4" fill="#3d5a70" stroke="#2f1c0c" stroke-width="1"/></g>`;
+    // weed growing over the hull + a couple of escaping bubbles
+    s += `<path d="M-24 12 q-5 -10 1 -17 M-14 14 q4 -9 -1 -16" stroke="#2f9e57" stroke-width="3" fill="none" stroke-linecap="round" opacity=".85"/>` +
+      `<circle r="2.4" fill="#dff6ff" opacity=".7"><animateMotion path="M14 -6 q4 -26 -2 -46" dur="4.2s" repeatCount="indefinite"/></circle>` +
+      `<circle r="1.6" fill="#dff6ff" opacity=".6"><animateMotion path="M22 -2 q6 -22 0 -40" dur="5.4s" begin="-2s" repeatCount="indefinite"/></circle>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // The Fairy Godmother: small, twinkly, silver-haired, star-dust in her hair
+  // and a wand. The fairy-tale chapter was casting her with the `wizard`
+  // sprite — a tall figure in a dark pointed hat, which is the Oracle/Keeper
+  // look and read nothing like the words describe.
+  function godmother(o) {
+    const x = o.x, y = o.y, sc = (o.scale || 1) * 0.86;   // "small and twinkly"
+    const gownC = o.gown || "#7fd7e8";
+    const gown = lgrad([[0, shade(gownC, 26)], [100, shade(gownC, -14)]]);
+    const gl = glowF(2.2);
+    let s = D(gown.def + gl.def) + shadow(15, 26);
+    // gown
+    s += `<path d="M-16 26 Q-13 4 -8 -2 L8 -2 Q13 4 16 26 Q0 30 -16 26Z" fill="url(#${gown.id})"/>` +
+      `<path d="M-9 26 Q0 29 9 26 Q7 6 4 -1 L-4 -1 Q-7 6 -9 26Z" fill="${shade(gownC, 40)}" opacity=".55"/>` +
+      // little lace collar + arms
+      `<path d="M-9 -2 Q0 3 9 -2 Q0 -6 -9 -2Z" fill="#fff" opacity=".85"/>` +
+      `<path d="M-9 -1 Q-16 4 -15 13" stroke="#f6d9bf" stroke-width="4.4" fill="none" stroke-linecap="round"/>` +
+      `<path d="M9 -1 Q17 3 18 11" stroke="#f6d9bf" stroke-width="4.4" fill="none" stroke-linecap="round"/>`;
+    // silver hair in a bun, with star-dust caught in it
+    s += `<path d="M-12 -14 Q-12 -30 0 -30 Q12 -30 12 -14 Q12 -8 8 -7 L-8 -7 Q-12 -8 -12 -14Z" fill="#e4e7f2"/>` +
+      `<circle cx="0" cy="-33" r="6.5" fill="#eff1f8"/>` +
+      `<circle cx="0" cy="-18" r="11" fill="#f9e0c8"/>` +
+      eye(-4, -19, 1.9) + eye(4, -19, 1.9) + smile(-13.5, 3.4, "#c8577e", 1.4) +
+      cheeks(7, -14.5, 2.4);
+    s += sparkle(-9, -31, 2.6, "#fff8d0", 2.1, -0.4) + sparkle(9, -28, 2.2, "#dff6ff", 2.6, -1.2) +
+      sparkle(0, -40, 2, "#fff8d0", 1.8, -0.8);
+    // spectacles, because she is quite old and quite kind
+    s += `<g fill="none" stroke="#c8b06a" stroke-width="1"><circle cx="-4" cy="-19" r="4"/><circle cx="4" cy="-19" r="4"/><path d="M0 -19 h0"/></g>`;
+    // wand with a glowing star
+    s += `<path d="M18 11 L28 -8" stroke="#d9c48a" stroke-width="2.2" stroke-linecap="round"/>` +
+      `<g filter="url(#${gl.id})">${star(29, -11, 11)}</g>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // Sir Reginald Pigeon. The stories were drawing him with the round yellow
+  // `bird` sprite recoloured grey, which just read as a grey blob.
+  function pigeon(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const bodyC = o.color || "#8c9bb0";
+    const g = lgrad([[0, shade(bodyC, 26)], [100, shade(bodyC, -16)]]);
+    let s = D(g.def) + shadow(11, 12) + `<g>${bob(2, 2.6)}`;
+    // fanned tail
+    s += `<path d="M-9 0 L-24 -6 L-23 1 L-25 6 L-9 6Z" fill="${shade(bodyC, -22)}"/>` +
+      `<path d="M-9 1 L-22 -3 M-9 3 L-23 3" stroke="${shade(bodyC, -34)}" stroke-width=".8"/>`;
+    // plump body + neck + small head (pigeon proportions)
+    s += `<ellipse cx="-1" cy="1" rx="12" ry="9.5" fill="url(#${g.id})"/>` +
+      `<path d="M4 -3 Q7 -12 12 -13 Q16 -12 15 -6 Q13 -1 8 1Z" fill="${shade(bodyC, 14)}"/>` +
+      `<circle cx="12.5" cy="-12" r="6.2" fill="${shade(bodyC, 20)}"/>` +
+      // the iridescent neck patch pigeons are known for
+      `<path d="M7 -6 Q11 -9 14 -6 Q11 -2 7 -6Z" fill="#5fd0b0" opacity=".8"/>` +
+      // wing
+      `<path d="M-6 -3 Q1 -9 8 -4 Q2 4 -7 3Z" fill="${shade(bodyC, -10)}">
+        <animateTransform attributeName="transform" type="rotate" values="0 -6 -3;-14 -6 -3;0 -6 -3" dur="2.4s" repeatCount="indefinite"/></path>` +
+      `<path d="M-5 0 Q1 -3 6 -1" stroke="${shade(bodyC, -30)}" stroke-width=".9" fill="none"/>`;
+    // beak with its pale cere, eye, and two little feet
+    s += `<path d="M18 -12.5 L24 -11 L18 -9.4Z" fill="#e8a45f"/>` +
+      `<ellipse cx="17.6" cy="-13.6" rx="2" ry="1.4" fill="#f2e6dc"/>` +
+      eye(13.5, -13, 1.6, "#d94f4f") +
+      `<path d="M-3 10 v4 M3 10 v4" stroke="#e8734f" stroke-width="1.6" stroke-linecap="round"/>` +
+      `<path d="M-5.6 14 h5 M0.4 14 h5" stroke="#e8734f" stroke-width="1.4" stroke-linecap="round"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g></g>`;
+  }
+
+  // A blocky lighthouse with a lit lantern room. The sea chapter was stacking
+  // grey blocks and putting a torch on top, which read as a candle.
+  function lighthouse(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const gl = glowF(3.4);
+    const beam = lgrad([[0, "#ffe9a8", .5], [100, "#ffe9a8", 0]], true);
+    let s = D(gl.def + beam.def) + shadow(26, 4);
+    // rock base
+    s += `<path d="M-30 2 Q-18 -8 0 -8 Q18 -8 30 2 Q0 8 -30 2Z" fill="#6e7683"/>`;
+    // tower, with the classic red bands
+    s += `<path d="M-15 -2 L-9 -74 H9 L15 -2Z" fill="#f4f7fb"/>` +
+      `<path d="M-13.4 -20 H13.4 L12.6 -32 H-12.6Z" fill="#e8584f"/>` +
+      `<path d="M-10.6 -50 H10.6 L9.9 -62 H-9.9Z" fill="#e8584f"/>` +
+      `<path d="M-9 -74 L-6 -74 L-12 -2 L-15 -2Z" fill="#dfe6ef" opacity=".9"/>`;
+    // gallery + lantern room + roof
+    s += `<rect x="-13" y="-80" width="26" height="6" rx="2" fill="#5f6a78"/>` +
+      `<rect x="-8.5" y="-95" width="17" height="15" rx="2" fill="#ffd166" filter="url(#${gl.id})"/>` +
+      `<rect x="-8.5" y="-95" width="17" height="15" rx="2" fill="none" stroke="#5f6a78" stroke-width="1.6"/>` +
+      `<path d="M-11 -95 L0 -104 L11 -95Z" fill="#e8584f"/>` +
+      `<rect x="-1.2" y="-110" width="2.4" height="7" rx="1.2" fill="#5f6a78"/>`;
+    // sweeping beam
+    s += `<path d="M8 -91 L74 -104 L74 -74 L8 -83Z" fill="url(#${beam.id})">
+      <animate attributeName="opacity" values=".2;1;.2" dur="3.6s" repeatCount="indefinite"/></path>` +
+      `<path d="M-8 -91 L-74 -104 L-74 -74 L-8 -83Z" fill="url(#${beam.id})" transform="scale(-1 1)" transform-origin="0 -87">
+      <animate attributeName="opacity" values="1;.2;1" dur="3.6s" repeatCount="indefinite"/></path>`;
+    // door
+    s += `<path d="M-4.6 -2 V-14 Q-4.6 -17 0 -17 Q4.6 -17 4.6 -14 V-2Z" fill="#6b4423"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A stone wishing well with a little shingle roof and a bucket on a rope.
+  function well(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const st = lgrad([[0, "#b3bac2"], [100, "#7c848d"]]);
+    const rf = lgrad([[0, "#c98a4a"], [100, "#8a5a33"]]);
+    let s = D(st.def + rf.def) + shadow(24, 6);
+    // stone drum, with a course of blocks
+    s += `<path d="M-20 2 L-18 -22 H18 L20 2 Q0 7 -20 2Z" fill="url(#${st.id})"/>` +
+      `<ellipse cy="-22" rx="18" ry="5" fill="#5f6670"/><ellipse cy="-22" rx="13" ry="3.4" fill="#20303f"/>` +
+      `<path d="M-19 -14 H19 M-19.6 -7 H19.6" stroke="#6f767f" stroke-width="1.2" opacity=".8"/>` +
+      `<path d="M-8 -22 v20 M6 -22 v20" stroke="#6f767f" stroke-width="1.2" opacity=".6"/>`;
+    // posts + roof
+    s += `<rect x="-17" y="-52" width="4" height="30" rx="1.6" fill="#8a5a33"/>` +
+      `<rect x="13" y="-52" width="4" height="30" rx="1.6" fill="#8a5a33"/>` +
+      `<path d="M-26 -50 L0 -66 L26 -50 Z" fill="url(#${rf.id})"/>` +
+      `<path d="M-26 -50 H26" stroke="#6b4423" stroke-width="2"/>`;
+    // rope + bucket
+    s += `<path d="M0 -50 v12" stroke="#e0d0a8" stroke-width="1.4"/>` +
+      `<path d="M-5 -38 h10 l-1.6 9 h-6.8Z" fill="#a9703c"/>` +
+      `<path d="M-5 -38 h10" stroke="#7d5230" stroke-width="1.6"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A stack of gold coins.
+  function coins(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, n = o.count || 6;
+    let s = shadow(16, 4);
+    for (let i = 0; i < n; i++) {
+      const cx = ((i % 3) - 1) * 11, cy = -3 - Math.floor(i / 3) * 5;
+      s += `<ellipse cx="${cx}" cy="${cy}" rx="7" ry="3.4" fill="#d8a13c"/>` +
+        `<ellipse cx="${cx}" cy="${cy - 1.4}" rx="7" ry="3.4" fill="#ffd98a"/>` +
+        `<ellipse cx="${cx}" cy="${cy - 1.4}" rx="3.4" ry="1.6" fill="#e8b451" opacity=".7"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A leafy fern frond cluster.
+  function fern(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1, c = o.color || "#3f9e52";
+    let s = "";
+    [[-1, -16], [1, 14], [-1, 6], [1, -4], [0, 0]].forEach(([sx, rot], i) => {
+      s += `<g transform="rotate(${rot}) scale(${sx} 1)">` +
+        `<path d="M0 0 Q4 -18 2 -34" stroke="${shade(c, -14)}" stroke-width="2" fill="none"/>`;
+      for (let k = 0; k < 6; k++) {
+        const ly = -5 - k * 5, lw = 11 - k * 1.4;
+        s += `<path d="M${1 + k * 0.4} ${ly} q${lw * .6} -3 ${lw} -5 q-${lw * .4} 5 -${lw * .9} 6Z" fill="${shade(c, k % 2 ? 10 : -6)}"/>`;
+      }
+      s += `</g>`;
+    });
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A stretch of roller-coaster track: rails on sleepers over a hill, with an
+  // optional loop. The redstone chapter narrates a coaster at length but had
+  // no track art at all, so it was drawing a green cylinder on bare grass.
+  function coaster(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const rail = "#9fb0c2", tie = "#8a5a33";
+    const hill = "M-90 0 Q-60 0 -44 -34 Q-28 -66 0 -66 Q28 -66 44 -34 Q60 0 90 0";
+    let s = `<path d="${hill}" stroke="${tie}" stroke-width="9" fill="none" stroke-linecap="round" opacity=".85"/>` +
+      `<path d="${hill}" stroke="${rail}" stroke-width="3.4" fill="none" stroke-linecap="round"/>` +
+      `<path d="${hill}" stroke="#dfe8f2" stroke-width="1.2" fill="none" opacity=".7" transform="translate(0 -4)"/>`;
+    // support posts down to the ground
+    [-62, -30, 0, 30, 62].forEach(px => {
+      const py = px === 0 ? -66 : (Math.abs(px) === 30 ? -60 : -22);
+      s += `<rect x="${px - 2}" y="${py}" width="4" height="${-py}" rx="1.6" fill="${tie}"/>`;
+    });
+    if (o.loop !== false)
+      s += `<circle cx="0" cy="-96" r="30" fill="none" stroke="${tie}" stroke-width="8" opacity=".85"/>` +
+        `<circle cx="0" cy="-96" r="30" fill="none" stroke="${rail}" stroke-width="3"/>`;
+    if (o.cart !== false)
+      s += `<g transform="translate(-44 -34)"><path d="M-11 -8 H11 L9 4 H-9Z" fill="#e8584f"/>` +
+        `<path d="M-11 -8 H11 L10.4 -5 H-10.4Z" fill="#ff8a80"/>` +
+        `<circle cx="-6" cy="6" r="3" fill="#3d3d48"/><circle cx="6" cy="6" r="3" fill="#3d3d48"/></g>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
+  }
+
+  // A ship's anchor on its chain.
+  function anchor(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const g = lgrad([[0, "#9fb0c2"], [100, "#5d6e80"]]);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` + D(g.def) +
+      `<path d="M0 -46 v10" stroke="#7d8e9e" stroke-width="2.4" stroke-dasharray="5 3"/>` +
+      `<circle cy="-32" r="5" fill="none" stroke="url(#${g.id})" stroke-width="3"/>` +
+      `<rect x="-1.9" y="-28" width="3.8" height="38" rx="1.8" fill="url(#${g.id})"/>` +
+      `<rect x="-11" y="-24" width="22" height="3.4" rx="1.6" fill="url(#${g.id})"/>` +
+      `<path d="M-15 -2 Q-15 12 0 13 Q15 12 15 -2 Q11 8 0 8.6 Q-11 8 -15 -2Z" fill="url(#${g.id})"/>` +
+      `<path d="M-19 -4 l4 -4 l4 5Z M19 -4 l-4 -4 l-4 5Z" fill="#6d7e90"/></g>`;
+  }
+
+  // A palm tree, for the tropical islands the sea chapters keep visiting
+  // with a temperate round-canopy tree.
+  function palm(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const fr = lgrad([[0, "#5ec46a"], [100, "#2f8a4a"]]);
+    let s = D(fr.def) + shadow(16, 3);
+    s += `<path d="M-4 0 Q-7 -22 -1 -44 L5 -43 Q0 -22 3 0Z" fill="#a9703c"/>` +
+      `<path d="M-3 -10 h6 M-4 -22 h6 M-3 -33 h6" stroke="#8a5a33" stroke-width="1.2" opacity=".7"/>`;
+    [[-1, 0], [1, 0], [-1, 22], [1, 22], [-1, -24], [1, -24]].forEach(([sx, rot]) => {
+      s += `<g transform="translate(2 -44) rotate(${rot}) scale(${sx} 1)">` +
+        `<path d="M0 0 Q14 -10 30 -6 Q16 0 6 6 Q2 5 0 0Z" fill="url(#${fr.id})"/>` +
+        `<path d="M0 -1 Q14 -9 29 -6" stroke="#2c7d43" stroke-width="1.2" fill="none" opacity=".7"/></g>`;
+    });
+    s += `<circle cx="-4" cy="-40" r="3.4" fill="#8a5a33"/><circle cx="6" cy="-39" r="3.2" fill="#75492a"/>`;
+    return `<g transform="translate(${x} ${y}) scale(${sc})">${s}</g>`;
   }
 
   const BG = {
     day: skyDay, sunset: skySunset, night: o => night(o || {}), forest, cave,
     lavacave: lavaCaveBg, sea, ocean: oceanBg, beach: beachBg, space, library,
     meadow, snow: snowBg, plains: plainsBg, sky: skyHighBg, dungeon: dungeonBg,
-    swamp: swampBg, desert: desertBg, mountain: mountainBg,
+    swamp: swampBg, desert: desertBg, mountain: mountainBg, sunsetsea: sunsetSeaBg,
     grassblocks: o => skyDay({ clouds: !(o && o.clouds === false) }) + grassBlocks((o && o.y) || 190)
   };
   const ACTOR = {
@@ -1644,6 +2096,8 @@
     seaMonster, shell, egg, spaceJelly, cyclops, teacups, stormcloud, rain,
     stoneGate, gate: stoneGate, slide, sandcastle, ladder, harp, lyre: harp,
     glider, briars, axe,
+    pumpkin, cottage, house: cottage, fence, pearl, shootingStar, flashlight, palm, note, wreck, anchor, well, coins, fern, coaster, godmother, pigeon, lighthouse,
+    pine: o => pine(o.x, o.y, o.scale, o.color, o.snow),
     bigDragon: o => dragon(Object.assign({}, o, { scale: (o.scale || 1) * 1.7 })),
     planet: o => planet(o.x, o.y, o.r || 30, o.color || "#e8584f", o.ring),
     tree: o => tree(o.x, o.y, o.scale, o.color),
@@ -1675,7 +2129,7 @@
   window.ART = {
     uid, shade, scene,
     skyDay, skySunset, night, forest, cave, sea, space, library, meadow,
-    snowBg, plainsBg, oceanBg, skyHighBg, dungeonBg, swampBg, beachBg, desertBg, mountainBg, lavaCaveBg,
+    snowBg, plainsBg, oceanBg, skyHighBg, dungeonBg, swampBg, beachBg, desertBg, mountainBg, lavaCaveBg, sunsetSeaBg,
     cloud, star, tree, mushroom, flower, seaweed, castle,
     princess, boy, baby, knight, wizard, pirate, villager, ghost,
     dragon, puppy, fox, fish, mermaid, owl, sheep, dolphin, dino, snowman, bird, crab,
@@ -1685,6 +2139,7 @@
     chest, key, scroll, sign, crystal, anvil, coral, ship, bookGlow, portal, sword, shield, beacon, mountainProp,
     voider, inkwell, robot, cake, craftingTable, minecart, door, logs, book,
     seaMonster, shell, egg, spaceJelly, cyclops, teacups, stormcloud, rain,
-    stoneGate, slide, sandcastle, ladder, harp, glider, briars, axe
+    stoneGate, slide, sandcastle, ladder, harp, glider, briars, axe,
+    butterfly, pine, pumpkin, cottage, fence, pearl, shootingStar, flashlight, palm, note, wreck, anchor, well, coins, fern, coaster, godmother, pigeon, lighthouse
   };
 })();
