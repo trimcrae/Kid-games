@@ -154,6 +154,13 @@ function compile(theme) {
   return norm;
 }
 
+/* ---------------------------------------------------------------
+   Keep this list in sync with the game's data, and ALWAYS ADD NEW
+   THEMES AT THE END: each game saves a kid's progress by puzzle
+   INDEX, so re-ordering (or re-generating an existing puzzle into
+   a different grid) would attach their progress to the wrong
+   puzzle. Appending is always safe.
+   --------------------------------------------------------------- */
 const THEMES = [
   {
     name: "Minecraft Mash", emoji: "🟩", blurb: "Blocks, mobs and tools!",
@@ -298,6 +305,119 @@ const THEMES = [
       { answer: "BANANA", clue: "A long yellow fruit monkeys love." },
       { answer: "JUICE", clue: "A sweet drink squeezed from fruit." },
       { answer: "BREAD", clue: "You toast it or make a sandwich with it." },
+    ],
+  },
+  {
+    name: "Princess Party", emoji: "👑", blurb: "Crowns, castles and royal magic!",
+    words: [
+      { answer: "PRINCESS", clue: "A royal daughter of a king and queen." },
+      { answer: "CROWN", clue: "The sparkly gold circle a queen wears on her head." },
+      { answer: "WAND", clue: "A fairy godmother waves this to make magic." },
+      { answer: "CASTLE", clue: "The giant stone home where royals live." },
+      { answer: "TIARA", clue: "A small jewelled half-crown for fancy parties." },
+      { answer: "BALL", clue: "A big fancy royal dance party." },
+      { answer: "DRESS", clue: "A twirly thing to wear to the ball." },
+      { answer: "ROYAL", clue: "A word that means 'belonging to a king or queen'." },
+    ],
+  },
+  {
+    name: "Number Land", emoji: "🔢", blurb: "Spell the math words!",
+    words: [
+      { answer: "PLUS", clue: "The + sign means to add, or '___'." },
+      { answer: "HUNDRED", clue: "Ten groups of ten make one ___." },
+      { answer: "MINUS", clue: "The − sign means to take away, or '___'." },
+      { answer: "SEVEN", clue: "How many days are in one week." },
+      { answer: "TWELVE", clue: "The number after eleven — a dozen!" },
+      { answer: "DOUBLE", clue: "To make twice as many — 4 becomes 8!" },
+      { answer: "EQUAL", clue: "What the = sign means: the same amount." },
+      { answer: "ZERO", clue: "The number that means 'nothing at all'." },
+    ],
+  },
+  {
+    name: "Under the Sea", emoji: "🌊", blurb: "Dive down with the sea creatures!",
+    words: [
+      { answer: "SEAWEED", clue: "The green, slippery plant that grows in the ocean." },
+      { answer: "SHARK", clue: "A big fish with lots and lots of teeth." },
+      { answer: "DOLPHIN", clue: "A smart, friendly sea animal that leaps and clicks." },
+      { answer: "WAVE", clue: "It rolls across the ocean and crashes on the sand." },
+      { answer: "WHALE", clue: "The biggest animal in the whole ocean." },
+      { answer: "CORAL", clue: "A colourful underwater reef is made of this." },
+      { answer: "CRAB", clue: "A sideways-walking animal with two pinchy claws." },
+      { answer: "SHELL", clue: "You find these on the beach — some hide hermit crabs." },
+    ],
+  },
+  {
+    name: "Weather Watch", emoji: "🌦️", blurb: "Sun, storms and rainbows!",
+    words: [
+      { answer: "STORM", clue: "Wild weather with wind, rain and thunder." },
+      { answer: "THUNDER", clue: "The big rumbling BOOM after lightning." },
+      { answer: "RAINBOW", clue: "The coloured arc in the sky after rain and sun." },
+      { answer: "FROST", clue: "The sparkly ice that covers grass on cold mornings." },
+      { answer: "SUNNY", clue: "A bright day with no clouds is this." },
+      { answer: "CLOUD", clue: "A white fluffy thing floating in the sky." },
+      { answer: "WINDY", clue: "The kind of day that's perfect for flying a kite." },
+    ],
+  },
+  {
+    name: "Music Makers", emoji: "🎹", blurb: "Notes, beats and instruments!",
+    words: [
+      { answer: "PIANO", clue: "Black and white keys you press to make notes." },
+      { answer: "DRUM", clue: "You hit this one with sticks to keep the beat." },
+      { answer: "NOTE", clue: "One single sound in a song — A, B or C!" },
+      { answer: "SONG", clue: "Words and a tune you can sing." },
+      { answer: "GUITAR", clue: "You strum its six strings." },
+      { answer: "SHARP", clue: "The ♯ sign makes a note one step higher — a '___'." },
+      { answer: "TRUMPET", clue: "A shiny brass horn you blow." },
+      { answer: "BEAT", clue: "The steady pulse you clap along to." },
+    ],
+  },
+  {
+    name: "Around the World", emoji: "🌍", blurb: "Continents, oceans and maps!",
+    words: [
+      { answer: "AFRICA", clue: "The continent with the Sahara Desert and lions." },
+      { answer: "OCEAN", clue: "A huge body of salty water — there are five." },
+      { answer: "ISLAND", clue: "Land with water all the way around it." },
+      { answer: "EUROPE", clue: "The continent with castles and the Alps." },
+      { answer: "DESERT", clue: "A very dry place with hardly any rain." },
+      { answer: "RIVER", clue: "Water that flows all the way to the sea." },
+      { answer: "MAP", clue: "A picture of a place from above." },
+      { answer: "ASIA", clue: "The biggest continent of them all." },
+    ],
+  },
+  {
+    name: "Rock Hunter", emoji: "🪨", blurb: "Geology words for rock detectives!",
+    words: [
+      { answer: "CRYSTAL", clue: "A mineral that grew in a shape with flat, shiny sides." },
+      { answer: "GEODE", clue: "A plain-looking rock that's full of crystals inside." },
+      { answer: "LAVA", clue: "Melted rock that pours out of a volcano." },
+      { answer: "QUARTZ", clue: "A very common mineral, often clear or milky white." },
+      { answer: "FOSSIL", clue: "The shape of an old plant or animal left in stone." },
+      { answer: "MINERAL", clue: "The natural stuff rocks are made of." },
+      { answer: "SAND", clue: "Zillions of tiny bits of worn-down rock." },
+    ],
+  },
+  {
+    name: "My Amazing Body", emoji: "🫀", blurb: "The parts that keep you going!",
+    words: [
+      { answer: "HEART", clue: "The muscle that pumps your blood all day and night." },
+      { answer: "BRAIN", clue: "The thinking part inside your head." },
+      { answer: "LUNGS", clue: "The two air bags you breathe with." },
+      { answer: "BONES", clue: "The hard parts that hold you up — you have 206!" },
+      { answer: "MUSCLE", clue: "You flex this to lift and move." },
+      { answer: "TEETH", clue: "You chew with these and brush them twice a day." },
+      { answer: "ELBOW", clue: "The bendy joint in the middle of your arm." },
+    ],
+  },
+  {
+    name: "Bug Hunt", emoji: "🐛", blurb: "Creepy crawlies in the garden!",
+    words: [
+      { answer: "SPIDER", clue: "Eight legs and a sticky web." },
+      { answer: "BEETLE", clue: "A bug with a hard shiny shell on its back." },
+      { answer: "ANT", clue: "A tiny bug that marches in a line to your picnic." },
+      { answer: "LADYBUG", clue: "A little red beetle with black spots." },
+      { answer: "WINGS", clue: "Bees and butterflies fly with these." },
+      { answer: "MOTH", clue: "A night-time flutterer drawn to a light." },
+      { answer: "WEB", clue: "The sticky trap a spider spins." },
     ],
   },
 ];

@@ -25,7 +25,10 @@ For **every game** (and the landing page), at **each of the three sizes**:
   - **Connections** — picking a correct group of four locks it in
   - **Word Guess** — a guess is scored with green/yellow/grey colour clues
   - **Word Strands** — tracing a theme word's path registers it as found
-  - **Crossword** — filling every cell with the answer solves the puzzle
+  - **Crossword** — every puzzle opens with a real grid and clues, and filling
+    every cell with the answer solves it
+  - **Word Strands** — every hunt's grid is fully lettered (catches bad
+    generator output before the kids find it)
   - **Music Lab** — a song plays through key-by-key and is remembered, and
     Free Play, Echo, Find the Note & Read Music all score
   - **World Trek** — the world map and all 50 states build, continents,

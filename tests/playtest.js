@@ -456,6 +456,27 @@ const GAMES = {
     return "guess scored with colour clues; easy mode works";
   },
 
+  async "Word Strands — every hunt"(page, g, d) {
+    await page.goto(`${BASE}/games/strands/`, { waitUntil: "networkidle" });
+    const hunts = await page.locator(".puz-card").count();
+    if (hunts < 1) throw new Error("no word hunts in the picker");
+    // Open every hunt: the grid must be completely filled with letters and
+    // the theme-word count must match — catches bad tools/gen-strands.js data.
+    for (let i = 0; i < hunts; i++) {
+      await page.locator(".puz-card").nth(i).click();
+      await page.waitForTimeout(60);
+      const bad = await page.evaluate(() => {
+        const cells = Array.from(document.querySelectorAll("#board .scell"));
+        return cells.length ? cells.filter((c) => !/^[A-Z]$/.test((c.textContent || "").trim())).length : -1;
+      });
+      if (bad === -1) throw new Error(`hunt ${i + 1} of ${hunts} rendered no letter grid`);
+      if (bad > 0) throw new Error(`hunt ${i + 1} of ${hunts} has ${bad} empty squares`);
+      await page.locator("#quit-btn").click();
+      await page.waitForTimeout(40);
+    }
+    return `${hunts} hunts, every grid fully lettered`;
+  },
+
   async "Word Strands"(page, g, d) {
     await page.goto(`${BASE}/games/strands/`, { waitUntil: "networkidle" });
     if (await page.locator(".puz-card").count() < 1) throw new Error("no word hunts in the picker");
@@ -748,7 +769,22 @@ const GAMES = {
 
   async "Crossword"(page, g, d) {
     await page.goto(`${BASE}/games/crossword/`, { waitUntil: "networkidle" });
-    if (await page.locator(".puz-card").count() < 1) throw new Error("no crosswords in the picker");
+    const puzzles = await page.locator(".puz-card").count();
+    if (puzzles < 1) throw new Error("no crosswords in the picker");
+    // every puzzle (not just the first) must open with a real grid and clues —
+    // this is what catches a bad grid coming out of tools/gen-crossword.js
+    for (let i = 0; i < puzzles; i++) {
+      await page.locator(".puz-card").nth(i).click();
+      await page.waitForTimeout(60);
+      const cells = await page.locator(".xinput").count();
+      const clues = await page.locator(".clue-li").count();
+      if (cells < 8 || clues < 4) throw new Error(`puzzle ${i + 1} of ${puzzles} opened with ${cells} cells and ${clues} clues`);
+      // and every clue's answer must actually fit the grid it was numbered into
+      const badSol = await page.evaluate(() => Array.from(document.querySelectorAll(".xinput")).filter((i) => !/^[A-Z]$/.test(i.dataset.sol || "")).length);
+      if (badSol) throw new Error(`puzzle ${i + 1} has ${badSol} cells with no solution letter`);
+      await page.locator("#quit-btn").click();
+      await page.waitForTimeout(40);
+    }
     await page.locator(".puz-card").first().click();
     await page.waitForTimeout(200);
     const inputs = page.locator(".xinput");
@@ -763,7 +799,7 @@ const GAMES = {
     }
     await page.waitForTimeout(200);
     if (!/solved/i.test(await page.locator("#feedback").textContent())) throw new Error("filled grid was not detected as solved");
-    return `filled ${n} cells; puzzle solved`;
+    return `${puzzles} puzzles all open cleanly; filled ${n} cells; puzzle solved`;
   },
 };
 

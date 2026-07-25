@@ -59,6 +59,13 @@ function build(width, words) {
   return { width, height, grid: grid.map(row => row.join("")), words: out };
 }
 
+/* ---------------------------------------------------------------
+   Keep this list in sync with the game's data, and ALWAYS ADD NEW
+   THEMES AT THE END: each game saves a kid's progress by puzzle
+   INDEX, so re-ordering (or re-generating an existing puzzle into
+   a different grid) would attach their progress to the wrong
+   puzzle. Appending is always safe.
+   --------------------------------------------------------------- */
 const PUZZLES = [
   {
     name: "Minecraft World", emoji: "🟩", width: 6,
@@ -134,6 +141,76 @@ const PUZZLES = [
       { word: "TAEKWONDO", spangram: true },
       { word: "KICK" }, { word: "PUNCH" }, { word: "BELT" },
       { word: "BLOCK" }, { word: "BOW" },
+    ],
+  },
+  {
+    name: "Princess Party", emoji: "👑", width: 5, clue: "Crowns, castles and royal magic.",
+    words: [
+      { word: "PRINCESS", spangram: true },
+      { word: "CROWN" }, { word: "DRESS" }, { word: "CASTLE" },
+      { word: "TIARA" }, { word: "PALACE" },
+    ],
+  },
+  {
+    name: "Dino Dig", emoji: "🦕", width: 6, clue: "Giants from long, long ago.",
+    words: [
+      { word: "DINOSAUR", spangram: true },
+      { word: "TREX" }, { word: "RAPTOR" }, { word: "FOSSIL" },
+      { word: "BONES" }, { word: "ROAR" }, { word: "EGG" },
+    ],
+  },
+  {
+    name: "On the Farm", emoji: "🐄", width: 5, clue: "Animals you'd meet at a farm.",
+    words: [
+      { word: "BARNYARD", spangram: true },
+      { word: "HORSE" }, { word: "SHEEP" }, { word: "GOAT" },
+      { word: "DUCK" }, { word: "PIG" }, { word: "COW" }, { word: "HEN" },
+    ],
+  },
+  {
+    name: "Book Nook", emoji: "📖", width: 5, clue: "Everything about reading.",
+    words: [
+      { word: "READING", spangram: true },
+      { word: "STORY" }, { word: "PAGES" }, { word: "BOOKS" },
+      { word: "HERO" }, { word: "PLOT" },
+    ],
+  },
+  {
+    name: "Math Magic", emoji: "🔢", width: 5, clue: "Numbers and what you do with them.",
+    words: [
+      { word: "NUMBERS", spangram: true },
+      { word: "PLUS" }, { word: "MINUS" }, { word: "COUNT" }, { word: "MATH" },
+    ],
+  },
+  {
+    name: "Music Lab", emoji: "🎹", width: 5, clue: "Instruments and the sounds they make.",
+    words: [
+      { word: "MUSIC", spangram: true },
+      { word: "PIANO" }, { word: "DRUMS" }, { word: "NOTES" },
+      { word: "FLUTE" }, { word: "SONGS" }, { word: "BEATS" },
+    ],
+  },
+  {
+    name: "Seven Continents", emoji: "🌍", width: 5, clue: "The big pieces of land on Earth.",
+    words: [
+      { word: "CONTINENT", spangram: true },
+      { word: "AFRICA" }, { word: "EUROPE" }, { word: "ASIA" }, { word: "OCEAN" },
+    ],
+  },
+  {
+    name: "Fifty States", emoji: "🗺️", width: 5, clue: "States of the USA.",
+    words: [
+      { word: "STATES", spangram: true },
+      { word: "ALASKA" }, { word: "FLORIDA" }, { word: "TEXAS" },
+      { word: "NEVADA" }, { word: "IDAHO" },
+    ],
+  },
+  {
+    name: "My Body", emoji: "🫀", width: 6, clue: "Parts of you, inside and out.",
+    words: [
+      { word: "MYBODY", spangram: true },
+      { word: "HEART" }, { word: "BRAIN" }, { word: "LUNGS" },
+      { word: "BONES" }, { word: "TEETH" }, { word: "ELBOW" },
     ],
   },
 ];
