@@ -565,8 +565,13 @@
     // a couple of far-off birds on the sunless side of the sky
     const bx = sx < 200 ? 282 : 44;
     const bcol = sunset ? "#b06a58" : "#5b8fc0";
-    s += `<path d="M ${bx} 62 q 4.5 -4.5 8.5 0 q 4.5 -4.5 8.5 0" fill="none" stroke="${bcol}" stroke-width="1.6" stroke-linecap="round" opacity="0.8"/>` +
-      `<path d="M ${bx - 20} 76 q 3.5 -3.5 6.5 0 q 3.5 -3.5 6.5 0" fill="none" stroke="${bcol}" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>`;
+    // Drawn a little bigger with a body between the wings, so they read as
+    // distant birds rather than as two dark specks of grit on the sky.
+    const farBird = (fx, fy, fs, op) =>
+      `<g transform="translate(${fx} ${fy}) scale(${fs})" fill="none" stroke="${bcol}" stroke-width="1.9" stroke-linecap="round" opacity="${op}">` +
+      `<path d="M-11 0 q5.5 -6.5 11 -1"/><path d="M0 -1 q5.5 -5.5 11 1"/>` +
+      `<path d="M-1 0 q1 1.6 2 0" stroke-width="2.6"/></g>`;
+    s += farBird(bx + 9, 62, 1.15, 0.85) + farBird(bx - 14, 78, 0.9, 0.7);
     // hazy far meadow, then the two green hills
     s += `<path d="M0 240 C 70 222 150 234 230 224 C 300 216 350 232 400 222 L400 300 L0 300 Z" fill="${sunset ? "#e8a37f" : "#9fd9b4"}" opacity="0.6"/>` +
       `<path d="M0 250 C 80 225 150 245 230 232 C 300 221 350 238 400 228 L400 300 L0 300 Z" fill="#6fc25a"/>` +
