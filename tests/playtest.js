@@ -121,7 +121,44 @@ const GAMES = {
     await page.locator('.kid-chip[data-kid="all"]').click();
     await page.waitForTimeout(150);
     if (await page.locator(".game-card:visible").count() !== cards) throw new Error("Everybody chip did not restore all cards");
-    return `${cards} cards, ${playable} playable; kid filter works`;
+    // every kid has at least one game, baby included
+    for (const kid of ["jeannie", "cory", "ellie", "kieran"]) {
+      await page.locator(`.kid-chip[data-kid="${kid}"]`).click();
+      await page.waitForTimeout(120);
+      if (await page.locator(".game-card:visible").count() < 1) throw new Error(`${kid} has no games`);
+    }
+    await page.locator('.kid-chip[data-kid="all"]').click();
+    // "🎲 Surprise me!" lands on a real game page
+    await page.locator("#lucky").click();
+    await page.waitForURL(/games\/.+/, { timeout: 5000 });
+    if (await page.locator("a.back-link").count() < 1) throw new Error("Surprise me did not land on a game page");
+    return `${cards} cards, ${playable} playable; kid filter + Surprise me work`;
+  },
+
+  async "Baby Taps"(page, g, d) {
+    await page.goto(`${BASE}/games/baby-taps/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("baby-taps.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.locator("#pit .thing").count() !== 6) throw new Error("the pit should start with 6 things");
+    // targets must stay baby-sized (big) on every screen
+    const box = await page.locator("#pit .thing").first().boundingBox();
+    if (!box || box.width < 90) throw new Error(`tap targets too small for a baby: ${box && Math.round(box.width)}px`);
+    // a tap pops it, names it, counts it, and the pit refills
+    const word = await page.locator("#pit .thing").first().getAttribute("data-word");
+    await page.locator("#pit .thing").first().click();
+    await page.waitForTimeout(600);
+    const shown = (await page.locator("#word").textContent()).toLowerCase();
+    if (!shown.includes(word.split(" ")[0])) throw new Error(`popped "${word}" but the word line says "${shown}"`);
+    if (!/1 pop\b/.test(await page.locator("#count").textContent())) throw new Error("the pop was not counted");
+    if (await page.locator("#pit .thing").count() !== 6) throw new Error("the pit did not refill after a pop");
+    // Animals mode swaps every thing for an animal
+    await page.locator('.mode-btn[data-mode="animals"]').click();
+    await page.waitForTimeout(300);
+    if (await page.locator('#pit .thing[data-kind="animal"]').count() !== 6) throw new Error("Animals mode should be all animals");
+    // the count survives a reload
+    await page.reload({ waitUntil: "networkidle" });
+    if (!/1 pop\b/.test(await page.locator("#count").textContent())) throw new Error("pops did not persist");
+    return `6 giant things (${Math.round(box.width)}px), popped "${word}", animals mode + saving work`;
   },
 
   async "Family Tree"(page, g, d) {

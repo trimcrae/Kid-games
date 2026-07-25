@@ -22,12 +22,23 @@
 
 const GAMES = [
   {
+    title: "Baby Taps",
+    emoji: "👶",
+    blurb: "Kieran's game! Giant shapes and animals to bash — every tap pops, sparkles, plays a note and says the word out loud. Colours, shapes, animal sounds & first words. Nothing to lose, nothing to get wrong.",
+    url:   "games/baby-taps/",
+    ages:  "Babies",
+    kids:  ["kieran","ellie"],
+    color: "#ffd166",
+    ready: true
+  },
+
+  {
     title: "Music Lab",
     emoji: "🎹",
     blurb: "A real piano you can play! Learn the note names, echo tunes back by ear, play whole songs as the next key glows, read notes on the staff — and record a tune of your own. For everyone!",
     url:   "games/music-lab/",
     ages:  "3+",
-    kids:  ["jeannie","cory","ellie"],
+    kids:  ["jeannie","cory","ellie","kieran"],
     color: "#8a5cff",
     ready: true
   },

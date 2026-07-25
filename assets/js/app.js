@@ -87,6 +87,20 @@
     applyKid();
   }
 
+  /* --- "🎲 Surprise me!" — jump into a random game that's showing --- */
+  const lucky = document.getElementById("lucky");
+  if (lucky) {
+    lucky.addEventListener("click", function () {
+      var showing = cards.filter(function (e) {
+        return !e.card.classList.contains("filtered-out") && e.card.tagName === "A";
+      });
+      if (!showing.length) return;
+      var pick = showing[Math.floor(Math.random() * showing.length)].card;
+      pick.click();                       // remembers it as "last played" too
+      window.location.href = pick.href;
+    });
+  }
+
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, "&amp;")

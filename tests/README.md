@@ -30,6 +30,10 @@ For **every game** (and the landing page), at **each of the three sizes**:
     Free Play, Echo, Find the Note & Read Music all score
   - **World Trek** — the world map and all 50 states build, continents,
     oceans, states & capitals score, and the Atlas reads a place out
+  - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
+    pops & names a thing, the pit refills, and the count is saved
+  - **Landing page** — the kid filter (every kid, baby included, has games)
+    and the 🎲 Surprise me button, which must land on a real game
 
 ## How to run it
 
