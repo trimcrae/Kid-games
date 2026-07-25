@@ -129,6 +129,25 @@ body {
   border-color: transparent;
 }
 
+/* --- "Surprise me!" — one tap into a random game --- */
+.lucky-row { text-align: center; margin: 0.5rem 0 0; }
+.lucky-btn {
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(90deg, var(--yellow), var(--pink));
+  border: none;
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255, 93, 143, 0.3);
+  transition: transform 0.12s ease;
+  touch-action: manipulation;
+}
+.lucky-btn:hover { transform: translateY(-2px) scale(1.03); }
+.lucky-btn:active { transform: scale(0.97); }
+
 /* --- "jump back in" banner --- */
 .resume-banner {
   display: block;
