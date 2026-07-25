@@ -26,6 +26,10 @@ For **every game** (and the landing page), at **each of the three sizes**:
   - **Word Guess** — a guess is scored with green/yellow/grey colour clues
   - **Word Strands** — tracing a theme word's path registers it as found
   - **Crossword** — filling every cell with the answer solves the puzzle
+  - **Music Lab** — a song plays through key-by-key and is remembered, and
+    Free Play, Echo, Find the Note & Read Music all score
+  - **World Trek** — the world map and all 50 states build, continents,
+    oceans, states & capitals score, and the Atlas reads a place out
 
 ## How to run it
 

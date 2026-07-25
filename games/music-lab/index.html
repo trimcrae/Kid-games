@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎹 Music Lab</title>
+  <meta name="description" content="A real playable piano — learn note names, echo back tunes by ear, play nursery songs and read notes on the staff." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎹</text></svg>" />
+  <meta name="theme-color" content="#8a5cff" />
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    /* ---------- mode picker ---------- */
+    .modes {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0 0.75rem;
+      margin: 0 auto 0.75rem;
+      max-width: 700px;
+    }
+    .mode-btn {
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--purple);
+      background: var(--paper);
+      border: 3px solid var(--blue);
+      border-radius: 16px;
+      padding: 0.45rem 0.8rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.12s ease;
+    }
+    .mode-btn:hover { transform: translateY(-2px); }
+    .mode-btn[aria-pressed="true"] {
+      color: #fff;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+      border-color: var(--purple);
+    }
+
+    /* ---------- the shared "what to do now" strip ---------- */
+    .stage {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 0 0.75rem;
+    }
+    .prompt-card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 22px;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 8px 22px rgba(43, 36, 64, 0.12);
+      text-align: center;
+      min-height: 5.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .prompt-card h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      color: var(--purple);
+    }
+    .prompt-card p { margin: 0; color: var(--ink); font-size: 1rem; }
+    .big-note {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--pink);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn {
+      font-family: var(--font);
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      border: none;
+      border-radius: 999px;
+      padding: 0.6rem 1.3rem;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(138, 92, 255, 0.28);
+      transition: transform 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn:hover { transform: scale(1.04); }
+    .btn.ghost {
+      color: var(--purple);
+      background: var(--paper);
+      border: 3px solid var(--purple);
+      box-shadow: 0 6px 14px rgba(43, 36, 64, 0.12);
+    }
+    .btn[disabled] { opacity: 0.45; cursor: default; transform: none; }
+
+    /* ---------- score strip ---------- */
+    .scorebar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-weight: bold;
+      color: var(--purple);
+      margin: 0.6rem 0 0.2rem;
+      font-size: 1.05rem;
+    }
+    .scorebar span { color: var(--pink); }
+
+    /* ---------- song list ---------- */
+    .song-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.6rem;
+      margin: 0.75rem 0 0;
+    }
+    .song-btn {
+      font-family: var(--font);
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--ink);
+      background: var(--paper);
+      border: 3px solid #e4dcff;
+      border-radius: 16px;
+      padding: 0.6rem 0.5rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+    .song-btn:hover { transform: translateY(-2px); }
+    .song-btn[aria-pressed="true"] { border-color: var(--purple); }
+    .song-btn small { display: block; font-weight: normal; color: #6a6385; font-size: 0.78rem; }
+    .song-btn .done { color: var(--yellow); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+    /* ---------- note-letter track for songs ---------- */
+    .track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.28rem;
+      justify-content: center;
+      margin: 0.4rem 0 0;
+    }
+    .track .tn {
+      min-width: 1.85rem;
+      padding: 0.15rem 0.25rem;
+      border-radius: 8px;
+      background: #efeaff;
+      color: #6a6385;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .track .tn.done { background: var(--green); color: #fff; }
+    .track .tn.now {
+      background: var(--pink);
+      color: #fff;
+      animation: tn-pulse 0.9s ease-in-out infinite;
+    }
+    @keyframes tn-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.18); }
+    }
+    .track .tn.bar { background: transparent; min-width: 0.5rem; }
+
+    /* ---------- the piano ---------- */
+    .piano-wrap {
+      max-width: 700px;
+      margin: 0.6rem auto 0.9rem;
+      padding: 0;
+    }
+    .piano {
+      position: relative;
+      display: flex;
+      height: 190px;
+      border-radius: 0 0 18px 18px;
+      background: #2b2440;
+      padding: 8px 8px 0;
+      box-shadow: 0 14px 30px rgba(43, 36, 64, 0.3);
+      touch-action: manipulation;
+    }
+    @media (max-width: 430px) {
+      .piano { height: 158px; }
+      .mode-btn { font-size: 0.92rem; padding: 0.4rem 0.6rem; }
+      .prompt-card { padding: 0.7rem 0.6rem; }
+    }
+
+    .key {
+      font-family: var(--font);
+      border: none;
+      cursor: pointer;
+      touch-action: manipulation;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 0.5rem;
+      font-weight: 900;
+    }
+    .key.white {
+      flex: 1 1 0;
+      min-width: 0;
+      margin: 0 1px;
+      background: linear-gradient(#fff, #f1ecff);
+      border-radius: 0 0 10px 10px;
+      box-shadow: inset 0 -6px 0 rgba(43, 36, 64, 0.08);
+      font-size: 1rem;
+      color: #6a6385;
+    }
+    .key.black {
+      position: absolute;
+      top: 8px;
+      width: 7.2%;
+      height: 60%;
+      transform: translateX(-50%);
+      background: linear-gradient(#4b4270, #2b2440);
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35);
+      color: #cdbfff;
+      font-size: 0.7rem;
+      z-index: 2;
+    }
+    .key.hide-label { color: transparent; }
+    .key.white:active, .key.white.down { background: linear-gradient(#ffe9f2, #ffc9dd); transform: translateY(2px); }
+    .key.black:active, .key.black.down { background: linear-gradient(#a06bff, #6f3ddb); }
+
+    /* a key the game is asking for */
+    .key.hint {
+      animation: key-hint 1s ease-in-out infinite;
+      box-shadow: 0 0 0 4px var(--yellow) inset;
+    }
+    @keyframes key-hint {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.25); }
+    }
+    .key.good { background: linear-gradient(#b6ffd4, #3ddc84) !important; }
+    .key.bad  { background: linear-gradient(#ffc9c9, #ff7a7a) !important; }
+
+    /* ---------- staff (Read Music mode) ---------- */
+    #staff { width: 100%; max-width: 340px; height: 130px; }
+    .staff-line { stroke: #6a6385; stroke-width: 2; }
+    .staff-note { fill: var(--pink); }
+    .staff-ledger { stroke: #6a6385; stroke-width: 2; }
+
+    /* ---------- little helpers ---------- */
+    .hint-line { margin: 0.5rem 0 0; color: #6a6385; font-size: 0.9rem; text-align: center; }
+    .stars { font-size: 1.4rem; min-height: 1.4rem; margin: 0.3rem 0 0; }
+    .toggle-row { justify-content: center; margin-top: 0.5rem; }
+    .toggle {
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--purple);
+      background: var(--paper);
+      border: 2px solid #cdbfff;
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .toggle[aria-pressed="true"] { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <a class="back-link" href="../../">← Back to the Arcade</a>
+
+  <header class="hero" style="padding-top: 0.25rem; padding-bottom: 0.5rem;">
+    <h1 class="title" style="font-size: clamp(1.8rem, 5vw, 3rem);"><span class="emo">🎹</span> Music Lab</h1>
+  </header>
+
+  <nav class="modes" id="modes" aria-label="Pick a way to play">
+    <button class="mode-btn" data-mode="free"  aria-pressed="true">🎹 Play</button>
+    <button class="mode-btn" data-mode="songs" aria-pressed="false">🎵 Songs</button>
+    <button class="mode-btn" data-mode="echo"  aria-pressed="false">👂 Echo</button>
+    <button class="mode-btn" data-mode="names" aria-pressed="false">🔤 Find&nbsp;a&nbsp;Note</button>
+    <button class="mode-btn" data-mode="staff" aria-pressed="false">🎼 Read&nbsp;Music</button>
+  </nav>
+
+  <main class="stage">
+    <div class="prompt-card" id="prompt" aria-live="polite">
+      <h2 id="prompt-title">Play the piano! 🎶</h2>
+      <p id="prompt-text">Tap any key to hear it. The letter on the key is its note name.</p>
+      <svg id="staff" class="hidden" viewBox="0 0 340 130" role="img" aria-label="A note on the music staff"></svg>
+      <div class="big-note hidden" id="big-note"></div>
+      <div class="row" id="prompt-actions"></div>
+      <div class="track hidden" id="track" aria-hidden="true"></div>
+    </div>
+
+    <div class="scorebar" id="scorebar"></div>
+    <p class="stars" id="stars"></p>
+
+    <!-- the piano sits right under the prompt so both fit on a phone screen -->
+    <div class="piano-wrap">
+      <div class="piano" id="piano"></div>
+    </div>
+
+    <!-- Songs mode: pick a tune -->
+    <div class="song-list hidden" id="song-list"></div>
+
+    <div class="row toggle-row">
+      <button class="toggle" id="labels-toggle" aria-pressed="true">🔤 Note names on keys</button>
+    </div>
+    <p class="hint-line" id="hint-line">On a computer you can also play with your keyboard: A S D F G H J K L ;</p>
+  </main>
+
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
+  <script src="songs.js"></script>
+  <script src="music-lab.js"></script>
+</body>
+</html>
