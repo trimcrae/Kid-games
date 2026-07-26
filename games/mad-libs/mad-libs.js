@@ -241,6 +241,19 @@
   const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
   if (!canSpeak) el.readBtn.classList.add("hidden");
 
+  // Voices spell out an all-caps word ("RED" becomes "R-E-D"), so a word a kid
+  // typed in shouty caps gets lowercased before it's spoken (still capitalised
+  // if it starts a sentence). Same length either way, so the karaoke highlight
+  // below still lines up with the words on screen.
+  function speakable(t) {
+    return t.replace(/\b[A-Z][A-Z']*[A-Z]\b/g, function (w, i) {
+      const before = t.slice(0, i).replace(/[\s"'([]+$/, "");
+      const low = w.toLowerCase();
+      if (!before || ".!?".indexOf(before.slice(-1)) >= 0) return low[0].toUpperCase() + low.slice(1);
+      return low;
+    });
+  }
+
   function stopReading() {
     if (canSpeak) window.speechSynthesis.cancel();
     clearHighlight();
@@ -250,7 +263,7 @@
   function readAloud() {
     if (!canSpeak || !story) return;
     if (window.speechSynthesis.speaking) { stopReading(); return; }
-    const u = new SpeechSynthesisUtterance(story.title + ". " + fillTemplate(false));
+    const u = new SpeechSynthesisUtterance(speakable(story.title + ". " + fillTemplate(false)));
     u.rate = 0.95;
     u.onend = stopReading;
     u.onerror = stopReading;

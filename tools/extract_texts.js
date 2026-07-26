@@ -19,14 +19,27 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..");
 const out = [];
 
+// Words a game SHOUTS for emphasis: espeak (Piper's phonemizer) reads an
+// all-caps word letter by letter, so "RED" comes out "R-E-D". Lowercase them
+// for the narrator, but keep a capital where the word starts a sentence.
+// Only 2+ letter words, so "Can you find the letter A?" keeps its A.
+function softenCaps(t) {
+  return t.replace(/\b[A-Z][A-Z']*[A-Z]\b/g, function (w, i) {
+    const before = t.slice(0, i).replace(/[\s"'([]+$/, ""); // quotes don't count
+    const low = w.toLowerCase();
+    if (!before || ".!?".indexOf(before.slice(-1)) >= 0) return low[0].toUpperCase() + low.slice(1);
+    return low;
+  });
+}
+
 // Strip emoji & tidy punctuation so the TTS reads cleanly
 // (mirrors games/spooky-stories/audio/build_audio.py).
 function clean(t) {
-  return String(t)
+  const tidy = String(t)
     .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}✨⭐❤️‍]/gu, "")
     .replace(/[“”]/g, '"').replace(/[‘’]/g, "'")
-    .replace(/—/g, ", ").replace(/…/g, "...")
-    .replace(/\s+/g, " ").replace(/ ,/g, ",").trim();
+    .replace(/—/g, ", ").replace(/…/g, "...");
+  return softenCaps(tidy).replace(/\s+/g, " ").replace(/ ,/g, ",").trim();
 }
 function add(game, file, text) {
   const t = clean(text);

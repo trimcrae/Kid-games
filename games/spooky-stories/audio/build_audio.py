@@ -42,12 +42,28 @@ for m in re.finditer(r'\b(id|text):\s*"((?:[^"\\]|\\.)*)"', src):
     elif cur is not None:
         cur["texts"].append(val)
 
+# Words the page SHOUTS for emphasis. espeak (Piper's phonemizer) reads an
+# all-caps word out letter by letter — "RED" comes out "R-E-D" — so the
+# narrator gets them lowercased. Only 2+ letter words, so a lone "A" or "I"
+# (a letter that really is meant to be said as a letter) is left alone.
+CAPS_WORD = re.compile(r"\b[A-Z][A-Z']*[A-Z]\b")
+
+def soften_caps(t):
+    def lower_one(m):
+        w = m.group(0).lower()
+        before = t[:m.start()].rstrip(' "\'([')  # quotes/brackets don't count
+        if not before or before[-1] in '.!?':    # still starts a sentence
+            return w[0].upper() + w[1:]
+        return w
+    return CAPS_WORD.sub(lower_one, t)
+
 def clean(t):
     # strip decorative emojis, normalise curly quotes/dashes for clear TTS
     t = re.sub(r'[\U0001F300-\U0001FAFF✨⭐❤️]', '', t)
     t = (t.replace('“', '"').replace('”', '"')
            .replace('’', "'").replace('‘', "'")
            .replace('—', ', ').replace('…', '...'))
+    t = soften_caps(t)
     return re.sub(r'\s+', ' ', t.replace(' , ', ', ')).strip()
 
 # A "sentence" ends at ./!/? (runs allowed, e.g. "...") plus any closing quote.
