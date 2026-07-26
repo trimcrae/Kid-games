@@ -12,7 +12,7 @@
      • One versioned cache — bump VERSION to flush everything.
    =========================================================== */
 
-const VERSION = "v5";
+const VERSION = "v6";   // v6: flush the old narration clips (see below)
 const CACHE = "arcade-" + VERSION;
 
 const CORE = [
