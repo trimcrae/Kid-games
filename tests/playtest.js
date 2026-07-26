@@ -254,6 +254,56 @@ const GAMES = {
     return `${on} outfit piece(s) revealed`;
   },
 
+  /* Ellie can't read, so her stories MUST talk. This walks every pre-reader
+     story to an ending and checks each page's clip really loads — a missing
+     .mp3 fails silently in the game (the shared player stays quiet), so
+     without this check a story can lose its voice unnoticed. */
+  async "Choose Your Own Adventure"(page, g, d) {
+    const clips = [];   // [status, file] for every narration clip requested
+    page.on("response", (r) => {
+      if (/\/games\/adventure\/audio\/.+\.mp3$/.test(r.url())) clips.push([r.status(), r.url().split("/").pop()]);
+    });
+    await page.goto(`${BASE}/games/adventure/`, { waitUntil: "networkidle" });
+    const cards = page.locator("#story-grid .story-card");
+    const total = await cards.count();
+    if (total < 4) throw new Error(`only ${total} story cards in the library`);
+
+    // the pre-reader stories are the narrated ones: "All ages" or age <= 5
+    const preReader = [];
+    for (let i = 0; i < total; i++) {
+      const who = await cards.nth(i).locator(".who").textContent();
+      const m = who.match(/(\d+)\s*\+/);
+      if (!m || Number(m[1]) <= 5) preReader.push(i);
+    }
+    if (!preReader.length) throw new Error("no pre-reader stories found in the library");
+
+    let pages = 0;
+    for (const i of preReader) {
+      const before = clips.length;
+      await page.locator("#story-grid .story-card").nth(i).click();
+      await page.waitForTimeout(350);
+      if (!(await page.locator("#reader.reader").isVisible())) throw new Error("reader did not open");
+      // keep taking the first choice until the story ends
+      for (let step = 0; step < 14; step++) {
+        const choices = page.locator("#choices .choice-btn");
+        if (!(await choices.count())) break;
+        pages++;
+        await choices.first().click();
+        await page.waitForTimeout(300);
+      }
+      if (clips.length === before) {
+        const title = await page.locator("#reader-title").textContent();
+        throw new Error(`pre-reader story "${title.trim()}" played no narration at all`);
+      }
+      await page.locator("#home-btn").click();
+      await page.waitForTimeout(250);
+    }
+
+    const missing = clips.filter(([s]) => s !== 200).map(([s, f]) => `${f} (${s})`);
+    if (missing.length) throw new Error(`narration clip(s) missing: ${[...new Set(missing)].join(", ")}`);
+    return `${total} stories; narrated ${preReader.length} to the end, ${clips.length} clips played`;
+  },
+
   async "Spooky Princess Stories"(page, g, d) {
     await page.goto(`${BASE}/games/spooky-stories/`, { waitUntil: "networkidle" });
     if (await page.locator(".story-card").count() < 1) throw new Error("no story cards in the library");
