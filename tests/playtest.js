@@ -238,6 +238,31 @@ const GAMES = {
     return `${total} words after add + starter; chip removal works`;
   },
 
+  async "Number Grid Builder"(page, g, d) {
+    await page.goto(`${BASE}/games/number-grid/`, { waitUntil: "networkidle" });
+    // guess 4 but type a 5-letter word — it must still land in column 5
+    await page.locator(".num-pick[data-num='4']").click();
+    await page.fill("#word-input", "Candy");
+    await page.locator("#add-form button[type=submit]").click();
+    await page.waitForTimeout(250);
+    if (await page.locator("#c-C-5 .chip").count() < 1) throw new Error("5-letter word did not land in column 5");
+    if (await page.locator("#c-C-4 .chip").count() > 0) throw new Error("word landed in the guessed column, not the true one");
+    if (!/=\s*5 letters/.test(await page.locator("#countout").textContent())) throw new Error("letters were not counted out");
+    // now a correct guess should score a point
+    await page.locator(".num-pick[data-num='3']").click();
+    await page.fill("#word-input", "Bat");
+    await page.locator("#add-form button[type=submit]").click();
+    await page.waitForTimeout(250);
+    if (parseInt(await page.locator("#score").textContent(), 10) < 1) throw new Error("correct guess did not score");
+    await page.locator("#starter").click();
+    await page.waitForTimeout(250);
+    const total = parseInt(await page.locator("#count").textContent(), 10);
+    if (total < 3) throw new Error("starter words did not load");
+    await page.locator(".chip-x").first().click();
+    await page.waitForTimeout(150);
+    return `${total} words; wrong guess still filed correctly; chip removal works`;
+  },
+
   async "Princess Dress-Up"(page, g, d) {
     await page.goto(`${BASE}/games/princess-dressup/`, { waitUntil: "networkidle" });
     await page.click("#start-btn");
