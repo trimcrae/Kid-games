@@ -224,7 +224,7 @@
     var use = letters.slice(0, Math.max(0, FINISH - side.laid));
     side.words.push(word);
     side.laid += use.length;
-    var ms = WBStage.addPlanks(who, use);
+    var ms = WBStage.addPlanks(who, use, word);
     renderHud();
     return ms;
   }

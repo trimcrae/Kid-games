@@ -50,7 +50,8 @@ window.WBStage = (function () {
     you: { planks: [], at: 0, target: 0, moving: false },
     bot: { planks: [], at: 0, target: 0, moving: false },
     camZ: -CAM_BACK,
-    shake: 0
+    shake: 0,
+    labels: []      // the word you just answered, floating over its planks
   };
 
   /* ---------- setup ---------- */
@@ -93,6 +94,7 @@ window.WBStage = (function () {
     world.you = { planks: [], at: 0, target: 0, moving: false };
     world.bot = { planks: [], at: 0, target: 0, moving: false };
     world.camZ = -CAM_BACK;
+    world.labels = [];
     world.done = false;
   }
 
@@ -102,12 +104,20 @@ window.WBStage = (function () {
   // Drop a word's letters in front of somebody. They appear one at a
   // time (that's `bornAt`), which the draw loop turns into a little
   // slam-down animation.
-  function addPlanks(who, letters) {
+  function addPlanks(who, letters, word) {
     var side = world[who];
     var t = clock;
     var step = reduced ? 0 : 0.07;
+    var from = side.planks.length;
     for (var i = 0; i < letters.length; i++) {
       side.planks.push({ ch: letters[i], bornAt: t + i * step });
+    }
+    if (word) {
+      world.labels.push({
+        text: String(word).toUpperCase(), who: who,
+        z: (from + letters.length / 2) * GAP,
+        bornAt: t, life: 2.6
+      });
     }
     return (letters.length * step + (reduced ? 0 : 0.3)) * 1000;
   }
@@ -161,6 +171,7 @@ window.WBStage = (function () {
     drawCanyon();
     drawIsland();
     drawBridges();
+    drawLabels();
     ctx.restore();
   }
 
@@ -248,6 +259,31 @@ window.WBStage = (function () {
     order.forEach(drawWalker);
   }
 
+  // The word itself, floating over the planks it just built and rising
+  // away — so the letters underfoot join up into something readable.
+  function drawLabels() {
+    world.labels = world.labels.filter(function (l) { return clock - l.bornAt < l.life; });
+    world.labels.forEach(function (l) {
+      var age = clock - l.bornAt;
+      var t = age / l.life;
+      var p = project(l.who === "you" ? -LANE_X : LANE_X, 26 + age * 9, l.z);
+      if (p.d < 16 || p.d > FAR) return;
+      var size = Math.max(11, Math.min(34, 42 * p.s));
+      ctx.save();
+      ctx.globalAlpha = t < 0.7 ? 1 : (1 - t) / 0.3;
+      ctx.font = "900 " + Math.round(size) + "px 'Trebuchet MS', system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = Math.max(3, size * 0.34);
+      ctx.strokeStyle = "#241c33";
+      ctx.strokeText(l.text, p.x, p.y);
+      ctx.fillStyle = l.who === "you" ? "#ffe9a8" : "#dfe9f2";
+      ctx.fillText(l.text, p.x, p.y);
+      ctx.restore();
+    });
+  }
+
   function drawPlank(who, i) {
     var side = world[who];
     var p = side.planks[i];
@@ -277,15 +313,32 @@ window.WBStage = (function () {
   // The letter is painted ON the plank, so it gets squashed exactly as
   // much as the plank is — that's what sells it as lying flat.
   function drawLetter(ch, cx, top, w, h) {
+    var size = Math.round(Math.min(w * 0.46, 72));
+    // Squashed to lie on the plank, but only so far — past about half and
+    // the letters stop being readable, which matters more than the illusion.
+    var squash = Math.max(0.52, Math.min(1, (h * 2.4) / w));
+
     ctx.save();
-    ctx.translate(cx, top + h * 0.55);
-    ctx.scale(1, Math.max(0.25, Math.min(1, (h * 2.1) / w)));
-    ctx.font = "900 " + Math.round(Math.min(w * 0.36, 64)) + "px 'Trebuchet MS', system-ui, sans-serif";
+    ctx.translate(cx, top + h * 0.5);
+    ctx.scale(1, squash);
+    ctx.font = "900 " + size + "px 'Trebuchet MS', system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(43,36,64,0.35)";
-    ctx.fillText(ch, 0, 1);
-    ctx.fillStyle = "#fff6e2";
+
+    // A dark plaque under the letter, so it reads the same on pale
+    // planks (ice, candy, gold) as it does on wood.
+    var pw = size * 0.78, ph = size * 0.88, r = size * 0.2;
+    ctx.fillStyle = "rgba(28,22,42,0.26)";
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-pw / 2, -ph / 2, pw, ph, r);
+    else ctx.rect(-pw / 2, -ph / 2, pw, ph);
+    ctx.fill();
+
+    ctx.lineJoin = "round";
+    ctx.lineWidth = Math.max(2, size * 0.16);
+    ctx.strokeStyle = "#241c33";
+    ctx.strokeText(ch, 0, 0);
+    ctx.fillStyle = "#fffdf5";
     ctx.fillText(ch, 0, 0);
     ctx.restore();
   }
