@@ -122,6 +122,11 @@
     return String(word || "").toLowerCase().replace(/[^a-z]/g, "");
   }
 
+  // "a banana" / "the moon" — kids say the article out loud, so type it too.
+  function stripArticle(text) {
+    return String(text || "").trim().replace(/^(a|an|the)\s+/i, "");
+  }
+
   var ANSWERS = WB_QUESTIONS.map(function (q) {
     var set = {};
     q.ok.forEach(function (w) { set[norm(w)] = w; });
@@ -129,16 +134,66 @@
     return set;
   });
 
-  // Accepts the word, a plural of it, or the singular of it.
+  // Every answer the game knows, anywhere — so a real word typed into the
+  // wrong category gets told what it IS, instead of "I don't know that".
+  var ELSEWHERE = {};
+  WB_QUESTIONS.forEach(function (q, i) {
+    Object.keys(ANSWERS[i]).forEach(function (k) {
+      if (ELSEWHERE[k] === undefined) ELSEWHERE[k] = i;
+    });
+  });
+
+  // How many single-letter edits apart are these two words? (Stops
+  // counting once it passes `max`, so it stays cheap.) Kids spell
+  // ELEFANT and TRYCEROTOPS, and those should still count.
+  function within(a, b, max) {
+    if (a === b) return true;
+    var la = a.length, lb = b.length;
+    if (Math.abs(la - lb) > max) return false;
+    var prev = [], cur = [], i, j;
+    for (j = 0; j <= lb; j++) prev[j] = j;
+    for (i = 1; i <= la; i++) {
+      cur[0] = i;
+      var best = cur[0];
+      for (j = 1; j <= lb; j++) {
+        cur[j] = Math.min(
+          prev[j] + 1,                                        // drop a letter
+          cur[j - 1] + 1,                                     // add one
+          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)       // swap one
+        );
+        if (cur[j] < best) best = cur[j];
+      }
+      if (best > max) return false;
+      prev = cur.slice();
+    }
+    return prev[lb] <= max;
+  }
+
+  /* Does this count? Returns { key, fuzzy } or null. Forgiving on purpose:
+     a kid who names a real answer must never be turned away. */
   function accepted(qIndex, typed) {
-    var n = norm(typed);
+    var n = norm(stripArticle(typed));
     if (!n) return null;
     var set = ANSWERS[qIndex];
+
     var tries = [n, n + "s", n + "es"];
     if (/s$/.test(n)) tries.push(n.slice(0, -1));
     if (/es$/.test(n)) tries.push(n.slice(0, -2));
     if (/ies$/.test(n)) tries.push(n.slice(0, -3) + "y");
-    for (var i = 0; i < tries.length; i++) if (set[tries[i]]) return tries[i];
+    if (/ves$/.test(n)) tries.push(n.slice(0, -3) + "f", n.slice(0, -3) + "fe");
+    for (var i = 0; i < tries.length; i++) {
+      if (set[tries[i]]) return { key: tries[i], fuzzy: false };
+    }
+
+    // Still no? Forgive spelling slips — one on a middling word, two on a
+    // long one, since the long ones are exactly where kids come unstuck.
+    var slack = n.length >= 7 ? 2 : n.length >= 5 ? 1 : 0;
+    if (slack) {
+      var keys = Object.keys(set);
+      for (var k = 0; k < keys.length; k++) {
+        if (within(n, keys[k], slack)) return { key: keys[k], fuzzy: true };
+      }
+    }
     return null;
   }
 
@@ -330,7 +385,8 @@
       '<div id="answer-area"></div>' +
       '<p class="feedback" id="feedback"></p>' +
       '<p class="race-line">' +
-      (race.botSaid ? "Last round the bot said <b>" + race.botSaid.toUpperCase() + "</b> — " : "") +
+      (race.spellNote ? "That one is spelled <b>" + race.spellNote.toUpperCase() + "</b> — " : "") +
+      (race.botSaid ? "the bot said <b>" + race.botSaid.toUpperCase() + "</b> — " : "") +
       "bot: " + race.bot.laid + " planks &nbsp;•&nbsp; you: " + race.you.laid + " planks</p>";
 
     var area = document.getElementById("answer-area");
@@ -415,19 +471,33 @@
 
   function tryAnswer(text) {
     if (race.over || race.answered) return;
-    var hit = accepted(race.q, text);
-    if (!hit) {
-      say('Hmm, I don\'t know "' + String(text).trim() + '" for that one — try another!');
+    var m = accepted(race.q, text);
+    if (!m) {
+      say(whyNot(text));
       window.SFX && SFX.nope && SFX.nope();
       return;
     }
-    if (race.used["you:" + hit]) {
+    if (race.used["you:" + m.key]) {
       say("You already used that one this race — think of a new one!");
       window.SFX && SFX.nope && SFX.nope();
       return;
     }
-    race.used["you:" + hit] = true;
-    resolveRound(ANSWERS[race.q][hit]);
+    race.used["you:" + m.key] = true;
+    var word = ANSWERS[race.q][m.key];
+    // A fixed-up spelling is worth showing, gently, on the next prompt.
+    race.spellNote = m.fuzzy ? word : null;
+    resolveRound(word);
+  }
+
+  // A real word in the wrong category deserves better than "I don't know".
+  function whyNot(text) {
+    var typed = String(text).trim().toUpperCase();
+    var other = ELSEWHERE[norm(stripArticle(text))];
+    if (other !== undefined && other !== race.q) {
+      return "<b>" + typed + "</b> is a good word — but that's not " +
+             WB_QUESTIONS[race.q].q.replace(/^Name /, "").replace(/^an? /, "a ") + ". Try again!";
+    }
+    return 'Hmm, I don\'t know "' + typed + '" for that one — try another!';
   }
 
   function say(html) {
@@ -578,6 +648,9 @@
     shopEl.classList.toggle("open");
     if (shopEl.classList.contains("open")) shopEl.scrollIntoView({ block: "nearest" });
   });
+
+  // The play-test checks answer coverage in bulk through this.
+  window.WBCheck = function (qIndex, text) { return accepted(qIndex, text); };
 
   WBStage.init(stageCanvas);
   renderPickers();

@@ -37,3 +37,22 @@ into `tools/voices/` (gitignored); only the small `.mp3` clips are committed.
 
 > Note: huggingface (Piper's default voice host) may be blocked; the script
 > fetches the identical lessac model from a GitHub release mirror instead.
+
+## `build-word-lists.mjs` — Word Bridge's answer lists
+
+Tops up `games/word-bridge/data.js` from reference data (WordNet's "is a
+kind of" tree, `world-countries`, `minecraft-data`, and a frequency-graded
+English list) so the game never turns down a real answer. Hand-written
+answers are always kept — the script only ever adds.
+
+```bash
+mkdir -p /tmp/wb && cd /tmp/wb && npm init -y
+npm i wordnet-db world-countries minecraft-data wordlist-english
+cd /path/to/repo && NODE_PATH=/tmp/wb/node_modules node tools/build-word-lists.mjs
+```
+
+Those four packages are author-time only; the game itself still ships as
+plain files with no dependencies. If you ever see a kid's real answer
+rejected, add the word to `EXTRA` in the script (or straight into
+`data.js`) and re-run — the play-test has a coverage check that guards it.
+

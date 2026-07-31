@@ -536,6 +536,79 @@ const GAMES = {
     await page.evaluate(() => localStorage.removeItem("wordBridge.v1"));
     await page.reload({ waitUntil: "networkidle" });
 
+    // COVERAGE: plenty of categories, generous lists, and every one of
+    // these must be accepted — a real answer turned away is the one thing
+    // guaranteed to make a kid quit.
+    const bank = await page.evaluate(() => {
+      const n = WB_QUESTIONS.map((q) => q.ok.length);
+      return {
+        cats: WB_QUESTIONS.length,
+        thinnest: Math.min.apply(null, n),
+        total: n.reduce((a, b) => a + b, 0),
+        dupes: WB_QUESTIONS.map((q) => q.q).filter((q, i, a) => a.indexOf(q) !== i).length,
+        tap: WB_QUESTIONS.filter((q) => (q.pics || []).length >= 3).length,
+      };
+    });
+    if (bank.cats < 60) throw new Error(`only ${bank.cats} categories — races would repeat`);
+    if (bank.thinnest < 15) throw new Error(`a category has only ${bank.thinnest} answers`);
+    if (bank.dupes) throw new Error(`${bank.dupes} duplicate categories`);
+    if (bank.tap < 15) throw new Error(`only ${bank.tap} categories work in Tap mode`);
+
+    const misses = await page.evaluate(() => {
+      const want = [
+        ["ocean", "jellyfish"], ["ocean", "seahorse"], ["ocean", "hermit crab"], ["ocean", "manta ray"],
+        ["fruit", "a banana"], ["fruit", "kiwi"], ["fruit", "pomegranite"], ["fruit", "lychee"],
+        ["vegetable", "courgette"], ["vegetable", "brussel sprouts"], ["vegetable", "aubergine"],
+        ["kitchen", "toaster"], ["kitchen", "chopping board"], ["kitchen", "colander"],
+        ["four legs", "guinea pig"], ["four legs", "wolves"], ["four legs", "elefant"],
+        ["mammal", "platypus"], ["mammal", "hedgehog"],
+        ["fly", "hot air balloon"], ["fly", "dragonfly"], ["fly", "hummingbird"],
+        ["colour", "gray"], ["colour", "grey"], ["colour", "turquoise"], ["colour", "burgundy"],
+        ["dinosaur", "T-Rex"], ["dinosaur", "trycerotops"], ["dinosaur", "brachiosaurus"],
+        ["dessert", "ice creams"], ["dessert", "cheesecake"], ["dessert", "profiterole"],
+        ["wear", "flip flops"], ["wear", "wellies"], ["wear", "dungarees"],
+        ["Minecraft", "enderman"], ["Minecraft", "axolotl"], ["Minecraft", "wither skeleton"],
+        ["weather", "thunderstorm"], ["weather", "drizzle"],
+        ["job", "firefighter"], ["job", "vet"], ["job", "palaeontologist"],
+        ["space", "black hole"], ["space", "constellation"],
+        ["country", "new zealand"], ["country", "madagascar"], ["country", "philippines"],
+        ["state", "west virginia"], ["state", "massachusets"],
+        ["bird", "woodpecker"], ["bird", "kingfisher"], ["bird", "flamingo"],
+        ["insect", "praying mantis"], ["insect", "caterpillar"],
+        ["toy", "playdough"], ["toy", "skateboard"],
+        ["superhero", "spider man"], ["superhero", "black panther"],
+        ["feeling", "embarrassed"], ["feeling", "jealous"],
+        ["camping", "sleeping bag"], ["camping", "marshmallows"],
+        ["wheels", "wheelbarrow"], ["round", "ferris wheel"], ["you can read", "comic book"],
+        ["instrument", "saxophone"], ["instrument", "ukulele"], ["instrument", "xylophone"],
+        ["flower", "sunflower"], ["flower", "daffodil"], ["tree", "weeping willow"],
+        ["fish", "clownfish"], ["fish", "swordfish"], ["reptile", "chameleon"],
+        ["tool", "screwdriver"], ["gem", "amethyst"], ["language", "portuguese"],
+        ["body part", "shoulder"], ["body part", "eyebrow"], ["sport", "gymnastics"],
+        ["bread", "sourdough"], ["bread", "rye"], ["snack", "popcorn"],
+        ["drink", "lemonade"], ["drink", "hot chocolate"], ["bathroom", "toothpaste"],
+        ["classroom", "whiteboard"], ["park", "monkey bars"], ["beach", "sandcastle"],
+        ["farm animal", "rooster"], ["zoo", "orangutan"], ["pet", "bearded dragon"],
+        ["princess", "cinderella"], ["princess", "rapunzel"], ["planet", "jupiter"],
+        ["travel", "helicopter"], ["travel", "submarine"], ["bedroom", "wardrobe"],
+        ["jungle", "orangutan"], ["cold", "polar bear"], ["baby animal", "duckling"],
+        ["pizza", "pepperoni"], ["ice cream", "mint chocolate chip"], ["sandwich", "peanut butter"],
+        ["birthday", "pinata"], ["holiday", "halloween"], ["season", "autumn"],
+        ["breakfast", "scrambled eggs"], ["forest", "toadstool"], ["machine", "excavator"],
+      ];
+      const out = [];
+      want.forEach(([needle, answer]) => {
+        const i = WB_QUESTIONS.findIndex((q) => q.q.toLowerCase().includes(needle.toLowerCase()));
+        if (i < 0) { out.push(`no category matching "${needle}"`); return; }
+        if (!window.WBCheck(i, answer)) out.push(`"${answer}" rejected by "${WB_QUESTIONS[i].q}"`);
+      });
+      // …and obvious nonsense must still be refused
+      if (window.WBCheck(0, "zzzqqq")) out.push("nonsense was accepted");
+      if (window.WBCheck(0, "qwertyuiop")) out.push("keyboard mashing was accepted");
+      return out;
+    });
+    if (misses.length) throw new Error(`${misses.length} coverage gaps: ` + misses.slice(0, 4).join("; "));
+
     // the hand-drawn sprite sheet must bake into real pixels
     const art = await page.evaluate(() => {
       const h = WBSprites.get("hero.jeannie.walk"), p = WBSprites.get("plank.wood");
@@ -627,7 +700,7 @@ const GAMES = {
     await page.locator('.tap[data-ok="1"]').first().click();
     await page.waitForFunction(() => WBStage.world.you.planks.length > 0, null, { timeout: 10000 });
 
-    return `${won ? "won" : "lost"} a ${rounds}-word race, ${letters}-letter word = ${letters} planks, shop + tap mode work`;
+    return `${bank.cats} categories / ${bank.total} answers all accepted; ${won ? "won" : "lost"} a ${rounds}-word race, ${letters}-letter word = ${letters} planks, shop + tap mode work`;
   },
 
   async "Word Strands — every hunt"(page, g, d) {
