@@ -25,6 +25,11 @@ For **every game** (and the landing page), at **each of the three sizes**:
   - **Connections** — picking a correct group of four locks it in
   - **Word Guess** — a guess is scored with green/yellow/grey colour clues
   - **Word Strands** — tracing a theme word's path registers it as found
+  - **Word Bridge** — the hand-drawn sprite sheet bakes, nonsense answers are
+    refused, a real answer lays one plank per letter and walks the character
+    forward, a whole race runs to the island (and takes a proper handful of
+    answers) and pays coins, the shop changes the bridge skin, and Tap mode
+    works for the pre-readers
   - **Crossword** — every puzzle opens with a real grid and clues, and filling
     every cell with the answer solves it
   - **Word Strands** — every hunt's grid is fully lettered (catches bad
