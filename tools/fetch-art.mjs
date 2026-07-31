@@ -33,7 +33,10 @@ const exists = (p) => access(p).then(() => true).catch(() => false);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function buildUrl(entry, styleSuffix) {
-  const prompt = (entry.prompt + (styleSuffix || "")).trim();
+  // Storybook art shares the manifest's styleSuffix; game sprites carry
+  // their own `style` (flat game art, keyed background) instead.
+  const style = entry.style != null ? entry.style : (styleSuffix || "");
+  const prompt = (entry.prompt + style).trim();
   const params = new URLSearchParams({
     width: String(entry.width || 512),
     height: String(entry.height || 512),
