@@ -22,6 +22,17 @@
 
 const GAMES = [
   {
+    title: "Number Grid Builder",
+    emoji: "🔢",
+    blurb: "Like the Color Grid, but with NUMBERS! Guess how many letters your word has, then watch the game count them out — C-A-N-D-Y = 5 — and drop it in the right row and column. Counting, spelling & word length. For Cory & Jeannie!",
+    url:   "games/number-grid/",
+    ages:  "5+",
+    kids:  ["cory","jeannie","ellie"],
+    color: "#2b8cff",
+    ready: true
+  },
+
+  {
     title: "Baby Taps",
     emoji: "👶",
     blurb: "Kieran's game! Giant shapes and animals to bash — every tap pops, sparkles, plays a note and says the word out loud. Colours, shapes, animal sounds & first words. Nothing to lose, nothing to get wrong.",
