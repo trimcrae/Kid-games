@@ -531,6 +531,105 @@ const GAMES = {
     return "guess scored with colour clues; easy mode works";
   },
 
+  async "Word Bridge"(page, g, d) {
+    await page.goto(`${BASE}/games/word-bridge/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("wordBridge.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+
+    // the hand-drawn sprite sheet must bake into real pixels
+    const art = await page.evaluate(() => {
+      const h = WBSprites.get("hero.jeannie.walk"), p = WBSprites.get("plank.wood");
+      return { frames: h.length, heroW: h[0].width, plankW: p.width };
+    });
+    if (art.frames < 3 || art.heroW < 8 || art.plankW < 8) throw new Error("sprites did not bake");
+
+    // the prompt arrives as a modal
+    if (await page.locator("#modal[hidden]").count()) throw new Error("no prompt modal on the first round");
+
+    // a word the game doesn't know must be refused — and lay no planks
+    await page.locator("#answer-input").fill("zzzqqq");
+    await page.locator("#answer-form button[type=submit]").click();
+    await page.waitForTimeout(150);
+    if (!/don't know/i.test(await page.locator("#feedback").textContent())) throw new Error("nonsense was not refused");
+    if (await page.evaluate(() => WBStage.world.you.planks.length) !== 0) throw new Error("nonsense laid planks");
+
+    // a real answer lays exactly one plank per letter, and the walker moves
+    const first = await page.evaluate(() => WB_QUESTIONS[+document.getElementById("modal-card").dataset.q].ok[0]);
+    const letters = first.replace(/[^a-zA-Z]/g, "").length;
+    await page.locator("#answer-input").fill(first);
+    await page.locator("#answer-form button[type=submit]").click();
+    await page.waitForFunction((n) => WBStage.world.you.planks.length >= n, letters, { timeout: 10000 });
+    const planks = await page.evaluate(() => WBStage.world.you.planks.length);
+    if (planks !== letters) throw new Error(`"${first}" (${letters} letters) laid ${planks} planks`);
+    await page.waitForTimeout(1200);
+    const walked = await page.evaluate(() => WBStage.at("you"));
+    if (!(walked > 0)) throw new Error("the character never walked forward");
+
+    // Race to the island. Wait for a round we haven't answered yet — "a
+    // modal is open" isn't enough, since the card re-renders between rounds.
+    let seen = -1;
+    const ready = () => page.waitForFunction((prev) => {
+      if (document.getElementById("again-btn")) return true;
+      const card = document.getElementById("modal-card");
+      return !document.getElementById("modal").hidden &&
+             !!document.getElementById("answer-input") &&
+             Number(card.dataset.round) !== prev;
+    }, seen, { timeout: 40000 });
+    let rounds = 0;
+    for (let round = 0; round < 30; round++) {
+      await ready();
+      if (await page.locator("#again-btn").count()) break;
+      seen = await page.evaluate(() => Number(document.getElementById("modal-card").dataset.round));
+      // Answer the way a kid would — a normal 5-9 letter word, not the
+      // longest one in the list — so this also checks the crossing takes
+      // a proper handful of answers.
+      const word = await page.evaluate(() => {
+        const ok = WB_QUESTIONS[+document.getElementById("modal-card").dataset.q].ok;
+        const mid = ok.filter((w) => { const n = w.replace(/[^a-z]/gi, "").length; return n >= 5 && n <= 9; });
+        return (mid.length ? mid : ok)[0];
+      });
+      await page.locator("#answer-input").fill(word);
+      await page.locator("#answer-form button[type=submit]").click();
+      rounds++;
+      await page.waitForTimeout(120);
+    }
+    if (!(await page.locator("#again-btn").count())) {
+      const st = await page.evaluate(() => ({ you: WBStage.world.you.planks.length, bot: WBStage.world.bot.planks.length }));
+      throw new Error(`the race never reached the island (you ${st.you}, bot ${st.bot} of 60 after ${rounds} answers)`);
+    }
+    // a crossing should take a good handful of words, not two or three
+    if (rounds < 6) throw new Error(`the canyon was crossed in only ${rounds} answers`);
+    const won = /reached the island first/.test(await page.locator("#modal-card").textContent());
+
+    // coins were paid, and everything survives a reload
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("wordBridge.v1")));
+    if (!saved || !saved.jeannie || saved.jeannie.races < 1) throw new Error("the race was not saved");
+    if (!(saved.jeannie.coins > 0)) throw new Error("no coins were earned");
+
+    // the shop sells a skin once there are enough coins
+    await page.evaluate(() => {
+      const s = JSON.parse(localStorage.getItem("wordBridge.v1"));
+      s.jeannie.coins = 999;
+      localStorage.setItem("wordBridge.v1", JSON.stringify(s));
+    });
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator("#shop-btn").click();
+    await page.locator('.skin-card[data-skin="candy"]').click();
+    await page.waitForTimeout(150);
+    if (await page.evaluate(() => WBStage.world.skin) !== "candy")
+      throw new Error("buying a skin did not change the bridge");
+
+    // Tap mode: pictures instead of typing, for the pre-readers
+    await page.locator('.pick[data-opt="tap"]').click();
+    await page.waitForTimeout(300);
+    const taps = await page.locator(".tap").count();
+    if (taps < 3) throw new Error(`tap mode showed ${taps} pictures`);
+    await page.locator('.tap[data-ok="1"]').first().click();
+    await page.waitForFunction(() => WBStage.world.you.planks.length > 0, null, { timeout: 10000 });
+
+    return `${won ? "won" : "lost"} a ${rounds}-word race, ${letters}-letter word = ${letters} planks, shop + tap mode work`;
+  },
+
   async "Word Strands — every hunt"(page, g, d) {
     await page.goto(`${BASE}/games/strands/`, { waitUntil: "networkidle" });
     const hunts = await page.locator(".puz-card").count();

@@ -22,6 +22,17 @@
 
 const GAMES = [
   {
+    title: "Word Bridge",
+    emoji: "🌉",
+    blurb: "Our own Word Bridge! \"Name an animal that lives in the ocean\" — every LETTER of your answer becomes a plank, so JELLYFISH gets you twice as far as CRAB. Race the bot across the canyon and spend your coins on bridge skins. Vocabulary, spelling & word length. Little ones tap pictures instead of typing.",
+    url:   "games/word-bridge/",
+    ages:  "3+",
+    kids:  ["jeannie","cory","ellie"],
+    color: "#ff9f45",
+    ready: true
+  },
+
+  {
     title: "Number Grid Builder",
     emoji: "🔢",
     blurb: "Like the Color Grid, but with NUMBERS! Guess how many letters your word has, then watch the game count them out — C-A-N-D-Y = 5 — and drop it in the right row and column. Counting, spelling & word length. For Cory & Jeannie!",

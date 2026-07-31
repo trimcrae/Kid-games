@@ -1,0 +1,345 @@
+/* ===========================================================
+   Word Bridge — THE STAGE (renderer + game loop)
+   -----------------------------------------------------------
+   A small 2D engine for one job: look down a plank bridge that
+   runs away from you into a canyon, and walk along it.
+
+   How it works, in the usual game way:
+
+     • one <canvas>, one requestAnimationFrame loop, drawn back
+       to front every frame (sky → canyon → island → planks →
+       characters);
+     • a camera at (0, camY, camZ) with a focal length, so a
+       world point (x, y, z) projects to
+             s  = f / (z - camZ)
+             sx = W/2 + x*s        sy = horizon + (camY - y)*s
+       which is what makes the bridge narrow towards the island
+       and the planks bunch up in the distance;
+     • sprites from sprites.js blitted with smoothing off, so
+       the pixel art stays crisp at any size;
+     • characters tween between planks and cycle their walk
+       frames while they move.
+
+   The game logic (word-bridge.js) never draws anything — it
+   just tells the stage "these planks now exist" and "walk to
+   plank 12", and the stage animates it.
+   =========================================================== */
+window.WBStage = (function () {
+  "use strict";
+
+  var GAP = 26;          // world units between plank centres
+  var PLANK_LEN = 17;    // how deep one plank is
+  var PLANK_W = 30;      // half-width of one bridge
+  var LANE_X = 58;       // how far each lane sits from the middle
+  var HERO_H = 34;       // character height in world units
+  var CAM_BACK = 165;    // how far the camera trails the walker
+  var CAM_Y = 72;        // camera height above the planks
+  var FOCAL = 150;       // recomputed from the canvas width in resize(), so a
+                         // phone gets the same framing as a laptop, just smaller
+  var FAR = 1000;        // don't bother drawing past this depth
+
+  var canvas, ctx, W = 0, H = 0, dpr = 1, horizon = 0;
+  var raf = null, last = 0, clock = 0;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // everything the stage knows how to draw
+  var world = {
+    finish: 60,
+    skin: "wood",
+    hero: "jeannie",
+    you: { planks: [], at: 0, target: 0, moving: false },
+    bot: { planks: [], at: 0, target: 0, moving: false },
+    camZ: -CAM_BACK,
+    shake: 0
+  };
+
+  /* ---------- setup ---------- */
+  function init(el) {
+    canvas = el;
+    ctx = canvas.getContext("2d");
+    resize();
+    window.addEventListener("resize", resize);
+    if (!raf) { last = 0; raf = requestAnimationFrame(frame); }
+  }
+
+  function resize() {
+    if (!canvas) return;
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    var box = canvas.getBoundingClientRect();
+    W = Math.max(200, Math.round(box.width));
+    H = Math.max(140, Math.round(box.height));
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    horizon = Math.round(H * 0.42);
+    FOCAL = Math.max(70, W * 0.21);
+  }
+
+  /* ---------- the camera projection ---------- */
+  function project(x, y, z) {
+    var d = z - world.camZ;
+    if (d < 14) d = 14;
+    var s = FOCAL / d;
+    return { x: W / 2 + x * s, y: horizon + (CAM_Y - y) * s, s: s, d: d };
+  }
+
+  /* ---------- what the game tells us ---------- */
+  function reset(opts) {
+    opts = opts || {};
+    world.finish = opts.finish || 60;
+    world.skin = opts.skin || "wood";
+    world.hero = opts.hero || "jeannie";
+    world.you = { planks: [], at: 0, target: 0, moving: false };
+    world.bot = { planks: [], at: 0, target: 0, moving: false };
+    world.camZ = -CAM_BACK;
+    world.done = false;
+  }
+
+  function setSkin(id) { world.skin = id; }
+  function setHero(id) { world.hero = id; }
+
+  // Drop a word's letters in front of somebody. They appear one at a
+  // time (that's `bornAt`), which the draw loop turns into a little
+  // slam-down animation.
+  function addPlanks(who, letters) {
+    var side = world[who];
+    var t = clock;
+    var step = reduced ? 0 : 0.07;
+    for (var i = 0; i < letters.length; i++) {
+      side.planks.push({ ch: letters[i], bornAt: t + i * step });
+    }
+    return (letters.length * step + (reduced ? 0 : 0.3)) * 1000;
+  }
+
+  // Walk to the end of what's been built.
+  function walk(who) {
+    var side = world[who];
+    side.target = Math.max(0, side.planks.length - 1);
+    side.moving = side.target > side.at;
+    return Math.abs(side.target - side.at) * 90 + 300;
+  }
+
+  function count(who) { return world[who].planks.length; }
+
+  /* ---------- the loop ---------- */
+  function frame(now) {
+    raf = requestAnimationFrame(frame);
+    if (!last) last = now;
+    var dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    clock += dt;
+    update(dt);
+    draw();
+  }
+
+  function update(dt) {
+    ["you", "bot"].forEach(function (who) {
+      var side = world[who];
+      if (side.at < side.target) {
+        // planks per second — a brisk but readable walking pace
+        side.at = Math.min(side.target, side.at + dt * 7);
+        side.moving = true;
+      } else {
+        side.moving = false;
+      }
+    });
+    // camera eases along behind you
+    var want = world.you.at * GAP - CAM_BACK;
+    world.camZ += (want - world.camZ) * Math.min(1, dt * 3.4);
+    if (world.shake > 0) world.shake = Math.max(0, world.shake - dt * 2);
+  }
+
+  /* ---------- drawing ---------- */
+  function draw() {
+    if (!ctx) return;
+    ctx.save();
+    if (world.shake > 0) {
+      ctx.translate(Math.sin(clock * 60) * world.shake * 3, 0);
+    }
+    drawSky();
+    drawCanyon();
+    drawIsland();
+    drawBridges();
+    ctx.restore();
+  }
+
+  function drawSky() {
+    var g = ctx.createLinearGradient(0, 0, 0, horizon + 30);
+    g.addColorStop(0, "#5fc6f5");
+    g.addColorStop(0.55, "#a9e4ff");
+    g.addColorStop(1, "#ffe6bd");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, horizon + 30);
+
+    // sun
+    ctx.fillStyle = "#fff3c4";
+    ctx.beginPath();
+    ctx.arc(W * 0.74, horizon * 0.42, Math.max(14, H * 0.06), 0, 6.284);
+    ctx.fill();
+
+    // clouds drift very slowly with the camera (parallax)
+    var cloud = WBSprites.get("cloud");
+    var drift = (world.camZ * 0.06) % (W + 120);
+    [[0.12, 0.28, 3], [0.52, 0.18, 2.2], [0.82, 0.34, 2.6]].forEach(function (c, i) {
+      var x = ((c[0] * W - drift) % (W + 120) + W + 120) % (W + 120) - 60;
+      blit(cloud, x, horizon * c[1], c[2] * (H / 260), 0.9);
+    });
+  }
+
+  function drawCanyon() {
+    // far ridge, near ridge, then the gorge itself — three flat layers
+    // of colour that read as depth without costing anything.
+    layerRidge(horizon + 2, "#8fb7c9", 0.5, 34);
+    layerRidge(horizon + 14, "#6d9bb4", 0.9, 26);
+
+    var g = ctx.createLinearGradient(0, horizon + 10, 0, H);
+    g.addColorStop(0, "#4a7f9c");
+    g.addColorStop(0.45, "#2b5f7e");
+    g.addColorStop(1, "#123449");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, horizon + 10, W, H - horizon - 10);
+
+    // ripples: closer together near the horizon, so the water has depth
+    ctx.fillStyle = "#ffffff";
+    for (var i = 1; i <= 9; i++) {
+      var t = i / 9;
+      var y = horizon + 14 + t * t * (H - horizon) * 0.95;
+      ctx.globalAlpha = 0.05 + t * 0.06;
+      ctx.fillRect(0, y + Math.sin(clock * 0.6 + i) * 1.5, W, 1 + t * 2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // A jagged skyline drawn from a repeatable sawtooth — same shape
+  // every frame, so it never shimmers.
+  function layerRidge(baseY, colour, parallax, height) {
+    var shift = (world.camZ * parallax * 0.25) % 160;
+    ctx.fillStyle = colour;
+    ctx.beginPath();
+    ctx.moveTo(0, baseY + 40);
+    for (var x = -160; x <= W + 160; x += 40) {
+      var k = Math.abs(((x + shift) / 40) % 4 - 2);      // 0..2 sawtooth
+      ctx.lineTo(x, baseY - k * (height / 2));
+    }
+    ctx.lineTo(W + 160, baseY + 40);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawIsland() {
+    var img = WBSprites.get("island");
+    var z = world.finish * GAP + 40;
+    var p = project(0, 0, z);
+    if (p.s <= 0) return;
+    var scale = (p.s * 260) / img.pxW;
+    blit(img, p.x - (img.pxW * scale) / 2, p.y - img.pxH * scale, scale, 1);
+  }
+
+  function drawBridges() {
+    // furthest planks first so nearer ones overlap them correctly
+    var maxLen = Math.max(world.you.planks.length, world.bot.planks.length);
+    for (var i = maxLen - 1; i >= 0; i--) {
+      drawPlank("bot", i);
+      drawPlank("you", i);
+    }
+    // the walkers, nearest last
+    var order = world.bot.at > world.you.at ? ["bot", "you"] : ["you", "bot"];
+    order.forEach(drawWalker);
+  }
+
+  function drawPlank(who, i) {
+    var side = world[who];
+    var p = side.planks[i];
+    if (!p) return;
+    var z = i * GAP;
+    var near = project(0, 0, z);
+    var far = project(0, 0, z + PLANK_LEN);
+    if (near.d < 16 || near.d > FAR || near.y < horizon - 4) return;
+
+    // slam-down: a new plank falls the last little bit into place
+    var age = clock - p.bornAt;
+    if (age < 0) return;
+    var drop = age < 0.3 ? (1 - age / 0.3) : 0;
+    var lift = drop * drop * 40 * near.s;
+    var alpha = age < 0.12 ? age / 0.12 : 1;
+
+    var laneX = who === "you" ? -LANE_X : LANE_X;
+    var cx = W / 2 + laneX * near.s;
+    var w = PLANK_W * 2 * near.s;
+    var h = Math.max(2, near.y - far.y);
+    var img = WBSprites.get("plank." + (who === "you" ? world.skin : "wood"));
+
+    blit(img, cx - w / 2, near.y - h - lift, null, alpha, w, h + h * 0.5);
+    if (w > 22) drawLetter(p.ch, cx, near.y - h - lift, w, h);
+  }
+
+  // The letter is painted ON the plank, so it gets squashed exactly as
+  // much as the plank is — that's what sells it as lying flat.
+  function drawLetter(ch, cx, top, w, h) {
+    ctx.save();
+    ctx.translate(cx, top + h * 0.55);
+    ctx.scale(1, Math.max(0.25, Math.min(1, (h * 2.1) / w)));
+    ctx.font = "900 " + Math.round(Math.min(w * 0.36, 64)) + "px 'Trebuchet MS', system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(43,36,64,0.35)";
+    ctx.fillText(ch, 0, 1);
+    ctx.fillStyle = "#fff6e2";
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+  }
+
+  function drawWalker(who) {
+    var side = world[who];
+    var frames = who === "you"
+      ? WBSprites.get("hero." + world.hero + ".walk")
+      : WBSprites.get("bot.walk");
+    var z = side.at * GAP + PLANK_LEN * 0.5;
+    var p = project(who === "you" ? -LANE_X : LANE_X, 0, z);
+    if (p.d < 16) return;
+    var scale = (HERO_H * p.s) / frames[0].pxH;
+    var w = frames[0].pxW * scale;
+    var h = frames[0].pxH * scale;
+    if (h < 6) return;
+
+    // walk cycle: stride, pass, stride, pass
+    var order = [0, 1, 2, 1];
+    var f = side.moving ? order[Math.floor(clock * 9) % 4] % frames.length : 1 % frames.length;
+    var bob = side.moving ? Math.abs(Math.sin(clock * 9)) * h * 0.06 : 0;
+
+    // a soft shadow so they read as standing ON the plank
+    ctx.globalAlpha = 0.25;
+    ctx.fillStyle = "#0d2233";
+    ctx.beginPath();
+    ctx.ellipse(p.x, p.y, w * 0.34, Math.max(1.5, h * 0.07), 0, 0, 6.284);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    blit(frames[f], p.x - w / 2, p.y - h - bob, scale, 1);
+  }
+
+  /* ---------- blit a baked sprite ---------- */
+  function blit(img, x, y, scale, alpha, forceW, forceH) {
+    if (!img) return;
+    var w = forceW != null ? forceW : img.pxW * scale;
+    var h = forceH != null ? forceH : img.pxH * scale;
+    if (!(w > 0) || !(h > 0)) return;
+    if (alpha != null && alpha < 1) ctx.globalAlpha = alpha;
+    ctx.drawImage(img, Math.round(x), Math.round(y), Math.round(w), Math.round(h));
+    if (alpha != null && alpha < 1) ctx.globalAlpha = 1;
+  }
+
+  return {
+    init: init,
+    reset: reset,
+    setSkin: setSkin,
+    setHero: setHero,
+    addPlanks: addPlanks,
+    walk: walk,
+    count: count,
+    at: function (who) { return world[who].at; },
+    bump: function () { world.shake = 1; },
+    world: world
+  };
+})();
