@@ -27,18 +27,28 @@
 window.WBStage = (function () {
   "use strict";
 
-  var GAP = 26;          // world units between plank centres
-  var PLANK_LEN = 17;    // how deep one plank is
-  var PLANK_W = 30;      // half-width of one bridge
-  var LANE_X = 58;       // how far each lane sits from the middle
-  var HERO_H = 34;       // character height in world units
-  var CAM_BACK = 165;    // how far the camera trails the walker
-  var CAM_Y = 72;        // camera height above the planks
+  /* The camera is PITCHED down at the bridge rather than just parked up
+     high. That matters for one reason: the letters are painted on the top
+     face of each plank, so if that face lands on screen as a thin sliver
+     the letters can't be read. Tilting the view keeps the faces close to
+     square over a long stretch of the bridge, instead of only right under
+     the camera — so you get readable letters AND a bridge that runs off
+     into the distance. */
+  var PITCH = 27 * Math.PI / 180;
+  var SIN = Math.sin(PITCH), COS = Math.cos(PITCH);
+
+  var GAP = 30;          // world units between plank centres
+  var PLANK_LEN = 25;    // how deep one plank is
+  var PLANK_W = 26;      // half-width of one bridge
+  var LANE_X = 62;       // how far each lane sits from the middle
+  var HERO_H = 40;       // character height in world units
+  var CAM_BACK = 128;    // how far the camera trails the walker
+  var CAM_Y = 50;        // camera height above the planks
   var FOCAL = 150;       // recomputed from the canvas width in resize(), so a
                          // phone gets the same framing as a laptop, just smaller
   var FAR = 1000;        // don't bother drawing past this depth
 
-  var canvas, ctx, W = 0, H = 0, dpr = 1, horizon = 0;
+  var canvas, ctx, W = 0, H = 0, dpr = 1, horizon = 0, axis = 0;
   var raf = null, last = 0, clock = 0;
   var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -73,16 +83,24 @@ window.WBStage = (function () {
     canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.imageSmoothingEnabled = false;
-    horizon = Math.round(H * 0.42);
     FOCAL = Math.max(70, W * 0.21);
+    horizon = Math.round(H * 0.24);              // where the ground vanishes
+    axis = Math.round(horizon + FOCAL * Math.tan(PITCH));
   }
 
-  /* ---------- the camera projection ---------- */
+  /* ---------- the camera projection ----------
+     Standard pinhole camera, pitched down by PITCH: rotate the point into
+     camera space, then divide by depth. `axis` is where the camera's own
+     axis lands on screen; the ground's vanishing point (the horizon) sits
+     FOCAL*tan(PITCH) above it, which is what resize() works backwards from. */
   function project(x, y, z) {
-    var d = z - world.camZ;
-    if (d < 14) d = 14;
-    var s = FOCAL / d;
-    return { x: W / 2 + x * s, y: horizon + (CAM_Y - y) * s, s: s, d: d };
+    var dz = z - world.camZ;          // distance ahead of the camera
+    var dy = y - CAM_Y;               // height relative to the camera
+    var zc = dz * COS - dy * SIN;     // depth into the screen
+    if (zc < 12) zc = 12;
+    var yc = dz * SIN + dy * COS;     // up, in camera space
+    var s = FOCAL / zc;
+    return { x: W / 2 + x * s, y: axis - yc * s, s: s, d: zc };
   }
 
   /* ---------- what the game tells us ---------- */
@@ -186,7 +204,7 @@ window.WBStage = (function () {
     // sun
     ctx.fillStyle = "#fff3c4";
     ctx.beginPath();
-    ctx.arc(W * 0.74, horizon * 0.42, Math.max(14, H * 0.06), 0, 6.284);
+    ctx.arc(W * 0.76, horizon * 0.45, Math.max(12, H * 0.05), 0, 6.284);
     ctx.fill();
 
     // clouds drift very slowly with the camera (parallax)
@@ -201,8 +219,8 @@ window.WBStage = (function () {
   function drawCanyon() {
     // far ridge, near ridge, then the gorge itself — three flat layers
     // of colour that read as depth without costing anything.
-    layerRidge(horizon + 2, "#8fb7c9", 0.5, 34);
-    layerRidge(horizon + 14, "#6d9bb4", 0.9, 26);
+    layerRidge(horizon + 2, "#8fb7c9", 0.5, 26);
+    layerRidge(horizon + 11, "#6d9bb4", 0.9, 20);
 
     var g = ctx.createLinearGradient(0, horizon + 10, 0, H);
     g.addColorStop(0, "#4a7f9c");
@@ -313,14 +331,12 @@ window.WBStage = (function () {
   // The letter is painted ON the plank, so it gets squashed exactly as
   // much as the plank is — that's what sells it as lying flat.
   function drawLetter(ch, cx, top, w, h) {
-    var size = Math.round(Math.min(w * 0.46, 72));
-    // Squashed to lie on the plank, but only so far — past about half and
-    // the letters stop being readable, which matters more than the illusion.
-    var squash = Math.max(0.52, Math.min(1, (h * 2.4) / w));
+    // No squashing: the plank face is tall enough to hold a real letter.
+    var size = Math.round(Math.min(w * 0.52, h * 0.92, 74));
+    if (size < 7) return;
 
     ctx.save();
     ctx.translate(cx, top + h * 0.5);
-    ctx.scale(1, squash);
     ctx.font = "900 " + size + "px 'Trebuchet MS', system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
