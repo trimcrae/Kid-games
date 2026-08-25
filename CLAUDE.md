@@ -58,6 +58,9 @@ dependencies, no logins.
   logic & grid games.
 - **Ellie** (3) — loves dresses & princesses → bright letter/colour/counting.
 - **Kieran** — the baby 👶.
+- **Shannon** — mum 👩. She plays too: give grown-ups a real difficulty
+  tier where a game has levels (see Craepets), and tag her in `kids:`
+  on anything an adult would actually open.
 
 ## Generating assets that need the internet (audio & art)
 

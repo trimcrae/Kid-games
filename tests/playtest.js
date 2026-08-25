@@ -122,7 +122,7 @@ const GAMES = {
     await page.waitForTimeout(150);
     if (await page.locator(".game-card:visible").count() !== cards) throw new Error("Everybody chip did not restore all cards");
     // every kid has at least one game, baby included
-    for (const kid of ["jeannie", "cory", "ellie", "kieran"]) {
+    for (const kid of ["jeannie", "cory", "ellie", "kieran", "shannon"]) {
       await page.locator(`.kid-chip[data-kid="${kid}"]`).click();
       await page.waitForTimeout(120);
       if (await page.locator(".game-card:visible").count() < 1) throw new Error(`${kid} has no games`);
@@ -1012,6 +1012,199 @@ const GAMES = {
     if (!/Texas/.test(await page.locator("#info-name").textContent())) throw new Error("Atlas did not open Texas");
     if (!/Austin/.test(await page.locator("#info-sub").textContent())) throw new Error("Texas card is missing its capital");
     return `${cells} world squares, 50 states; continents, oceans, states, capitals & atlas all work`;
+  },
+
+  async "Craepets"(page, g, d) {
+    await page.goto(`${BASE}/games/craepets/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => Object.keys(localStorage)
+      .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
+    await page.reload({ waitUntil: "networkidle" });
+
+    // every creature bakes from its pixel grid, in every paint colour
+    const art = await page.evaluate(() => {
+      const bad = [];
+      CPPets.SPECIES.forEach((sp) => CPPets.COLOURS.forEach((c) => {
+        const cv = CPPets.sprite(sp.id, c.id, "idle", 4);
+        if (!cv || cv.width < 32 || cv.height < 32) bad.push(sp.id + "/" + c.id);
+      }));
+      return { bad, n: CPPets.SPECIES.length * CPPets.COLOURS.length };
+    });
+    if (art.bad.length) throw new Error(`sprites failed to bake: ${art.bad.slice(0, 3).join(", ")}`);
+
+    // adopt: pick a creature, a colour and a name
+    if (await page.locator(".adopt").count() !== 7) throw new Error("expected 7 creatures to adopt");
+    await page.locator('[data-sp="zibbit"]').click();
+    await page.locator('[data-col="sky"]').click();
+    await page.fill("#pet-name", "Wobble");
+    await page.locator("#do-adopt").click();
+    await page.waitForSelector("#pet-canvas");
+    if (!(await page.locator(".petname").textContent()).includes("Wobble")) throw new Error("the pet was not named");
+
+    // a run of right answers at the Berry Farm pays coins and ripens berries
+    const answerAt = async (place, n) => {
+      await page.locator(`[data-go="${place}"]`).click();
+      await page.waitForSelector(".choice");
+      for (let i = 0; i < n; i++) {
+        const idx = await page.evaluate(() => Craepets.correctIndex());
+        if (idx < 0) throw new Error(`no question at the ${place}`);
+        await page.locator(`[data-pick="${idx}"]`).click();
+        await page.waitForSelector(".teach");
+        const t = (await page.locator(".teach").textContent()).trim();
+        if (!/^Yes!/.test(t)) throw new Error(`a right answer was marked wrong at the ${place}`);
+        if (i < n - 1) {
+          await page.locator("[data-next]").click();
+          await page.waitForSelector(".choice:not([disabled])");
+        }
+      }
+    };
+    const coins0 = await page.evaluate(() => Craepets.state().coins);
+    await answerAt("farm", 4);
+    if (await page.evaluate(() => Craepets.state().coins) <= coins0) throw new Error("learning did not pay");
+    if (await page.locator(".plot.full").count() < 1) throw new Error("no berries ripened");
+
+    // the Well asks about words, the Pool about the world
+    await answerAt("well", 2);
+    await answerAt("pool", 2);
+    const subj = await page.evaluate(() => Craepets.state().stats.bySubject);
+    if (!subj.math || !subj.word || !subj.wonder) throw new Error(`places asked the wrong subjects: ${JSON.stringify(subj)}`);
+
+    // a miss explains itself instead of punishing
+    await page.locator("[data-next]").click();
+    await page.waitForSelector(".choice:not([disabled])");
+    const right = await page.evaluate(() => Craepets.correctIndex());
+    const n = await page.locator(".choice").count();
+    await page.locator(`[data-pick="${(right + 1) % n}"]`).click();
+    await page.waitForSelector(".teach");
+    if (!/answer is/.test(await page.locator(".teach").textContent())) throw new Error("a miss gave no explanation");
+    if (await page.locator(".choice.right").count() !== 1) throw new Error("a miss did not show the right answer");
+
+    // the market makes you work out your change, then hands the item over
+    await page.evaluate(() => Craepets.grant(400));
+    await page.locator('[data-go="market"]').click();
+    const before = await page.evaluate(() => Craepets.state().coins);
+    await page.locator("[data-buy]:not([disabled])").first().click();
+    await page.waitForSelector("[data-change]");
+    await page.locator('[data-change="0"]').click();
+    await page.waitForTimeout(150);
+    const afterBuy = await page.evaluate(() => Craepets.state());
+    if (afterBuy.coins >= before) throw new Error("the market did not charge for the item");
+
+    // feeding, playing and washing all move the right need
+    await page.locator('[data-go="nest"]').click();
+    await page.evaluate(() => { Craepets.state().pet.hunger = 30; });
+    await page.locator('[data-do="feed"]').click();
+    await page.waitForSelector(".sheet [data-use]");
+    await page.locator("[data-use]").first().click();
+    await page.waitForTimeout(200);
+    if (await page.evaluate(() => Craepets.state().pet.hunger) <= 30) throw new Error("feeding did not fill the pet up");
+    await page.locator('[data-do="play"]').click();
+    await page.locator('[data-use="romp"]').click();
+    await page.waitForTimeout(150);
+    await page.locator('[data-do="wash"]').click();
+    await page.locator('[data-use="rinse"]').click();
+    await page.waitForTimeout(150);
+    const today = await page.evaluate(() => Craepets.state().today);
+    if (!today.play || !today.wash) throw new Error("playing and washing were not tracked");
+
+    // a whole arena duel, answered correctly, is a win
+    await page.locator('[data-go="arena"]').click();
+    await page.locator('[data-fight="pip"]').click();
+    await page.waitForSelector(".fighters");
+    for (let i = 0; i < 30; i++) {
+      if (await page.evaluate(() => { const b = Craepets.battle(); return b && b.over; })) break;
+      const idx = await page.evaluate(() => Craepets.correctIndex());
+      if (idx < 0) break;
+      await page.locator(`[data-pick="${idx}"]`).click();
+      await page.waitForTimeout(90);
+      if (await page.locator("[data-next]").count()) await page.locator("[data-next]").click();
+      await page.waitForTimeout(90);
+    }
+    if (await page.evaluate(() => { const b = Craepets.battle(); return b && b.over; }) !== "win") {
+      throw new Error("a duel answered correctly did not end in a win");
+    }
+    await page.locator("[data-leave]").click();
+
+    // three daily quests and a daily gift
+    await page.locator('[data-go="quests"]').click();
+    if (await page.locator(".quest").count() !== 3) throw new Error("expected 3 daily quests");
+    await page.locator("[data-gift]").click();
+    await page.waitForSelector(".sheet");
+    await page.locator("[data-close]").click();
+
+    // a paint brush is not a bag item — owning the colour IS the item,
+    // so buying one has to hand the pet straight to the Rainbow Pool
+    await page.evaluate(() => Craepets.grant(2000));
+    await page.locator('[data-go="market"]').click();
+    const brush = page.locator('[data-buy^="brush:"]:not([disabled])').first();
+    if (await brush.count()) {
+      const wasColour = await page.evaluate(() => Craepets.state().pet.colour);
+      await brush.click();
+      await page.waitForSelector("[data-change]");
+      await page.locator('[data-change="0"]').click();
+      await page.waitForSelector('[data-use^="brush:"]');
+      await page.locator('[data-use^="brush:"]').click();
+      await page.waitForTimeout(200);
+      if (await page.evaluate(() => Craepets.state().pet.colour) === wasColour) {
+        throw new Error("a bought paint brush did not repaint the pet");
+      }
+    }
+    // and every colour you own can be re-applied for free from the bag
+    await page.locator('[data-go="bag"]').click();
+    await page.locator('[data-paint="berry"]').click();
+    await page.waitForTimeout(200);
+    if (await page.evaluate(() => Craepets.state().pet.colour) !== "berry") {
+      throw new Error("repainting from the bag did nothing");
+    }
+
+    // the trophy case lists the whole family, each with their own pet
+    await page.locator('[data-go="case"]').click();
+    if (await page.locator(".trophy:not(.locked)").count() < 1) throw new Error("no trophies earned");
+    if (await page.locator(".fam").count() !== 6) throw new Error("the family board should list every profile");
+
+    // Shannon gets her own save, at the grown-up level
+    await page.locator("[data-swap]").click();
+    await page.locator('[data-who="shannon"]').click();
+    await page.waitForTimeout(200);
+    if (!(await page.locator("#do-adopt").count())) throw new Error("Shannon did not get her own valley");
+    if (await page.evaluate(() => Craepets.state().tier) !== "grown") throw new Error("Shannon's level should be grown-up");
+    await page.locator('[data-sp="flarn"]').click();
+    await page.fill("#pet-name", "Sable");
+    await page.locator("#do-adopt").click();
+    await page.waitForSelector("#pet-canvas");
+    await page.locator('[data-go="well"]').click();
+    await page.waitForSelector(".choice");
+    if (await page.evaluate(() => Craepets.session().q.tier) !== "grown") throw new Error("Shannon got a child's question");
+    if (await page.locator(".choice").count() !== 4) throw new Error("the grown-up level should offer 4 choices");
+
+    // ...and Cory's pet is exactly where he left it
+    await page.locator("[data-swap]").click();
+    await page.locator('[data-who="cory"]').click();
+    await page.waitForTimeout(200);
+    const cory = await page.evaluate(() => Craepets.state());
+    if (!cory.pet || cory.pet.name !== "Wobble") throw new Error("switching profiles lost Cory's pet");
+
+    // Kieran's level cannot be lost: two choices, and a miss just waits
+    await page.locator("[data-swap]").click();
+    await page.locator('[data-who="kieran"]').click();
+    await page.waitForTimeout(200);
+    await page.locator('[data-sp="blorb"]').click();
+    await page.locator("[data-name]").first().click();
+    await page.locator("#do-adopt").click();
+    await page.waitForSelector("#pet-canvas");
+    await page.locator('[data-go="farm"]').click();
+    await page.waitForSelector(".choice");
+    if (await page.locator(".choice").count() !== 2) throw new Error("the tiny level should offer 2 big choices");
+    const kIdx = await page.evaluate(() => Craepets.correctIndex());
+    await page.locator(`[data-pick="${(kIdx + 1) % 2}"]`).click();
+    await page.waitForTimeout(250);
+    if (await page.locator(".teach").count()) throw new Error("a miss at the tiny level should just wait, not score");
+    if (await page.evaluate(() => Craepets.state().stats.wrong) !== 0) throw new Error("a tiny miss was counted wrong");
+
+    await page.evaluate(() => Object.keys(localStorage)
+      .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
+    return `${art.n} sprites bake; farm/well/pool pay for maths, words & world; ` +
+      "market asks for change; feed/play/wash; a duel won; paint brushes " +
+      "repaint; quests, trophies, and separate saves for Shannon, Cory & Kieran";
   },
 
   async "Crossword"(page, g, d) {

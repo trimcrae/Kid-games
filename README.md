@@ -25,6 +25,7 @@ no logins.
 │       └── app.js          ← builds the cards (you won't need to touch this)
 ├── games/
 │   ├── _template/          ← copy this folder to start a new game
+│   ├── craepets/           ← adopt & raise a learning pet 🥚
 │   ├── bubble-pop/         ← our first game 🫧
 │   ├── crossword/          ← themed mini crosswords ✏️
 │   ├── strands/            ← trace hidden theme words 🧶
@@ -34,6 +35,15 @@ no logins.
 └── tools/                  ← offline puzzle generators (Node) for
                               crossword & strands — run, then paste output
 ```
+
+> **🥚 Craepets** is the big one: a virtual-pet world where the whole
+> economy runs on learning. You adopt a pixel creature, then every coin
+> you spend on its food, toys, books and paint brushes was earned by
+> answering a question — maths at the Berry Farm, words at the Word Well,
+> science and geography at the Rainbow Pool, and any of the three in the
+> Quiz Arena. It has **five learning levels** (Tiny → Grown-up) so the
+> toddler and the grown-ups can play the same game, and **every person on
+> the device gets their own pet, coins and trophy case**.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times
@@ -85,6 +95,8 @@ That's it — every future push to `main` redeploys automatically.
 - **Cory** (6) — loves math, grids & Minecraft, ~4th-grade math → number, logic & grid games
 - **Ellie** (3) — loves dresses & princesses → bright letter/colour/counting games
 - **Kieran** — the baby 👶 (here for the snuggles)
+- **Shannon** — mum 👩, and a player in her own right: the grown-up level
+  in Craepets is real vocabulary, mental maths and general knowledge
 
 Designed with big tap targets, bright colours, and games that work with a finger,
 a mouse, or a trackpad.
