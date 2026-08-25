@@ -22,12 +22,23 @@
 
 const GAMES = [
   {
+    title: "Craepets",
+    emoji: "🥚",
+    blurb: "Adopt a pixel creature and raise it! Feed it, play with it, paint it, battle in the Quiz Arena — but every single coin in the valley is earned by LEARNING. Maths at the Berry Farm, words at the Word Well, science & geography at the Rainbow Pool, all set to your own level. Five levels from toddler to grown-up, and everyone in the family gets their own pet.",
+    url:   "games/craepets/",
+    ages:  "2+",
+    kids:  ["jeannie","cory","ellie","kieran","shannon"],
+    color: "#5ec6a8",
+    ready: true
+  },
+
+  {
     title: "Word Bridge",
     emoji: "🌉",
     blurb: "Our own Word Bridge! \"Name an animal that lives in the ocean\" — every LETTER of your answer becomes a plank, so JELLYFISH gets you twice as far as CRAB. Race the bot across the canyon and spend your coins on bridge skins. Vocabulary, spelling & word length. Little ones tap pictures instead of typing.",
     url:   "games/word-bridge/",
     ages:  "3+",
-    kids:  ["jeannie","cory","ellie"],
+    kids:  ["jeannie","cory","ellie","shannon"],
     color: "#ff9f45",
     ready: true
   },
@@ -60,7 +71,7 @@ const GAMES = [
     blurb: "A real piano you can play! Learn the note names, echo tunes back by ear, play whole songs as the next key glows, read notes on the staff — and record a tune of your own. For everyone!",
     url:   "games/music-lab/",
     ages:  "3+",
-    kids:  ["jeannie","cory","ellie","kieran"],
+    kids:  ["jeannie","cory","ellie","kieran","shannon"],
     color: "#8a5cff",
     ready: true
   },
@@ -71,7 +82,7 @@ const GAMES = [
     blurb: "Tap the seven continents & five oceans on a pixel world map, hunt down all 50 states on the puzzle map, learn their capitals — and read a true fact about every single place. For Jeannie & Cory!",
     url:   "games/world-trek/",
     ages:  "5+",
-    kids:  ["jeannie","cory"],
+    kids:  ["jeannie","cory","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -104,7 +115,7 @@ const GAMES = [
     blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever — and learn words like nephew, great-grandma & 2nd cousin. One shared tree for everyone — and you can print it as a poster to hang up!",
     url:   "games/family-tree/",
     ages:  "3+",
-    kids:  ["jeannie","cory","ellie"],
+    kids:  ["jeannie","cory","ellie","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -115,7 +126,7 @@ const GAMES = [
     blurb: "Conway's Game of Life! Paint cells that live or die by counting their neighbours — stamp gliders & factories, then invent your own rules in the Rule Lab. Counting, logic & patterns. For Cory!",
     url:   "games/game-of-life/",
     ages:  "6+",
-    kids:  ["cory"],
+    kids:  ["cory","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -126,7 +137,7 @@ const GAMES = [
     blurb: "Give silly words — a noun, a verb, a goofy adjective — then watch them fill a story you've never seen and hear it read aloud! Parts of speech & grammar. For everyone!",
     url:   "games/mad-libs/",
     ages:  "6+",
-    kids:  ["jeannie","cory"],
+    kids:  ["jeannie","cory","shannon"],
     color: "#ffd166",
     ready: true
   },
@@ -170,7 +181,7 @@ const GAMES = [
     blurb: "Coach tool for Shannon — fair Pumpkin Pies soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
     url:   "games/soccer-roster/",
     ages:  "Grown-ups",
-    kids:  [],
+    kids:  ["shannon"],
     color: "#f4791f",
     ready: true
   },
@@ -181,7 +192,7 @@ const GAMES = [
     blurb: "Themed mini crosswords — Minecraft, Bluey, Frozen, taekwondo & more. Read a clue, fill the grid! Spelling & vocabulary.",
     url:   "games/crossword/",
     ages:  "6+",
-    kids:  ["jeannie","cory"],
+    kids:  ["jeannie","cory","shannon"],
     color: "#ff5d8f",
     ready: true
   },
@@ -192,7 +203,7 @@ const GAMES = [
     blurb: "Trace the hidden theme words through a grid of letters — every letter belongs to a word! Find the golden spangram.",
     url:   "games/strands/",
     ages:  "6+",
-    kids:  ["jeannie","cory"],
+    kids:  ["jeannie","cory","shannon"],
     color: "#38b6ff",
     ready: true
   },
@@ -203,7 +214,7 @@ const GAMES = [
     blurb: "Make as many words as you can from a honeycomb of letters — every word uses the middle letter! Spelling & vocabulary.",
     url:   "games/spelling-bee/",
     ages:  "6+",
-    kids:  ["jeannie"],
+    kids:  ["jeannie","shannon"],
     color: "#ffd166",
     ready: true
   },
@@ -214,7 +225,7 @@ const GAMES = [
     blurb: "Sort 16 cards into 4 secret groups of 4 — Pokémon, Bluey, books & more. Builds logic & categories!",
     url:   "games/connections/",
     ages:  "6+",
-    kids:  ["jeannie","cory"],
+    kids:  ["jeannie","cory","shannon"],
     color: "#8a5cff",
     ready: true
   },
@@ -225,7 +236,7 @@ const GAMES = [
     blurb: "Guess the secret 5-letter word in 6 tries, with colour clues and hints — a kid-friendly Wordle. Spelling & reasoning.",
     url:   "games/word-guess/",
     ages:  "6+",
-    kids:  ["jeannie","cory"],
+    kids:  ["jeannie","cory","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -269,7 +280,7 @@ const GAMES = [
     blurb: "Draw your own graphic novel — paint right in the panels, then add bubbles & captions! For Jeannie!",
     url:   "games/comic-maker/",
     ages:  "6+",
-    kids:  ["jeannie"],
+    kids:  ["jeannie","shannon"],
     color: "#ff5d8f",
     ready: true
   },
