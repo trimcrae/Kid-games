@@ -1,0 +1,30 @@
+name: probe-aixiv-api
+on:
+  workflow_dispatch:
+  push:
+    paths: ['.github/workflows/probe-aixiv-api.yml']
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: aiXiv docs — is there a submission API?
+        run: |
+          set +e
+          curl -sSL --max-time 30 https://aixiv.science/docs -o docs.html
+          echo "bytes=$(wc -c < docs.html)"
+          echo "--- headings / endpoints:"
+          grep -oiE '<h[1-4][^>]*>[^<]{3,90}</h[1-4]>' docs.html | sed 's/<[^>]*>//g' | head -40
+          echo "--- API paths mentioned:"
+          grep -oE '(POST|GET|PUT) +/[A-Za-z0-9/_{}.-]+' docs.html | sort -u | head -30
+          echo "--- url-ish strings:"
+          grep -oE 'https://[a-z.]*aixiv[A-Za-z0-9./_-]*' docs.html | sort -u | head -20
+          echo "--- mcp/api/token keywords in context:"
+          grep -ioE '.{0,70}(api key|api_key|mcp|bearer|token|submit).{0,70}' docs.html | head -25
+      - name: Common API surface guesses
+        run: |
+          set +e
+          for u in https://aixiv.science/api/v1 https://aixiv.science/api/docs https://aixiv.science/openapi.json \
+                   https://aixiv.science/mcp https://aixiv.science/aisc2026/submit https://aixiv.science/submit; do
+            printf "%-45s " "$u"
+            curl -sSL -o /dev/null -w "http=%{http_code} final=%{url_effective}\n" --max-time 20 "$u"
+          done
