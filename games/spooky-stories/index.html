@@ -212,7 +212,9 @@
     .big-btn.blue:active { box-shadow: 0 2px 0 #2a86bd, 0 4px 10px rgba(0,0,0,.25); }
 
     .reader-top { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.6rem; }
-    .reader-title { color: var(--yellow); font-size: clamp(1.1rem,3.6vw,1.5rem); margin: 0; }
+    /* dark ink, not the book-yellow: this heading sits on the pale page
+       background, where yellow-on-pink was far too faint to read. */
+    .reader-title { color: var(--ink); font-size: clamp(1.1rem,3.6vw,1.5rem); margin: 0; }
 
     /* tappable characters in the art */
     .tap { cursor: pointer; transform-box: fill-box; transform-origin: center; }

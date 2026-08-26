@@ -106,7 +106,9 @@
   var sampleEl    = document.getElementById("target-sample");
   var choicesEl   = document.getElementById("choices");
   var starsEl     = document.getElementById("stars");
-  var muteBtn     = document.getElementById("mute");
+  // the same switch on the play screen AND inside the overlay, so the
+  // sound can always be turned off no matter which screen she is on
+  var muteBtns    = [document.getElementById("mute"), document.getElementById("mute-2")];
   var wardrobeBtn = document.getElementById("wardrobe-btn");
   var overlay     = document.getElementById("overlay");
   var overlayEmoji= document.getElementById("overlay-emoji");
@@ -648,13 +650,23 @@
   }
 
   /* ---------- buttons ---------- */
-  muteBtn.addEventListener("click", function () {
-    muted = !muted;
-    try { localStorage.setItem(MUTE_KEY, muted ? "1" : "0"); } catch (e) {}
-    muteBtn.textContent = muted ? "🔇" : "🔊";
-    muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
-    if (muted && window.Voice) Voice.stop();
-    else playClip(currentClip);
+  function paintMute() {
+    muteBtns.forEach(function (b) {
+      if (!b) return;
+      b.textContent = muted ? "🔇" : "🔊";
+      b.setAttribute("aria-pressed", muted ? "true" : "false");
+    });
+  }
+  muteBtns.forEach(function (b) {
+    if (!b) return;
+    b.addEventListener("click", function () {
+      muted = !muted;
+      try { localStorage.setItem(MUTE_KEY, muted ? "1" : "0"); } catch (e) {}
+      paintMute();
+      if (muted && window.Voice) Voice.stop();
+      else if (!overlay.classList.contains("hidden")) sfx("pop");
+      else playClip(currentClip);
+    });
   });
 
   wardrobeBtn.addEventListener("click", function () {
@@ -666,8 +678,7 @@
 
   /* ---------- boot ---------- */
   starsEl.textContent = String(stars);
-  muteBtn.textContent = muted ? "🔇" : "🔊";
-  muteBtn.setAttribute("aria-pressed", muted ? "true" : "false");
+  paintMute();
   applyScene();
   if (window.PrincessArt) PrincessArt.setDress(GOWNS[gownIdx].hex);
   buildProgress();

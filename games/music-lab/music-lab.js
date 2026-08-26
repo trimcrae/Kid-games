@@ -816,7 +816,7 @@
 
     function scores() {
       setScore("Round: <span>" + Math.max(round, 1) + "</span> &nbsp; Notes: <span>" +
-        (seq.length || 2) + "</span> &nbsp; Best: <span>" + (best() + 1) + "</span>");
+        (seq.length || 2) + "</span> &nbsp; Best: <span>" + (best() ? best() + 1 : 0) + "</span>");
       el.stars.innerHTML = best()
         ? '<span class="lbl">Best on this level:</span> ' + (best() + 1) + " notes in a row"
         : '<span class="lbl">' + echoLevel().blurb + "</span>";
@@ -1071,6 +1071,8 @@
     function scores() {
       setScore("Right: <span>" + right + " / " + asked + "</span> &nbsp; Stars: <span>" + save.staffStars + "</span>" +
         (racing ? " &nbsp; ⏱ <span>" + secondsLeft + "s</span>" : ""));
+      el.stars.innerHTML = '<span class="lbl">⭐ ' + save.staffStars + " notes read</span>" +
+        (save.staffSpeedBest ? " — speed record " + save.staffSpeedBest : "");
     }
 
     function drawChips() {
@@ -1163,8 +1165,6 @@
     };
 
     ask();
-    el.stars.innerHTML = '<span class="lbl">⭐ ' + save.staffStars + " notes read</span>" +
-      (save.staffSpeedBest ? " — speed record " + save.staffSpeedBest : "");
   }
 
   /* ---------------- 🎸 Chords ---------------- */
