@@ -173,6 +173,11 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
+    /* Centred when it fits, scrollable from the TOP when it doesn't — plain
+       `justify-content:center` clips the first rows out of reach on a phone. */
+    .overlay { justify-content: flex-start; }
+    .overlay > :first-child { margin-top: auto; }
+    .overlay > :last-child { margin-bottom: auto; }
     .overlay.hidden { display: none; }
     .overlay h2 { font-size: 1.8rem; margin: 0; color: var(--purple); }
     .overlay p  { margin: 0.2rem 0; color: var(--ink); max-width: 30rem; }
@@ -384,6 +389,15 @@
       clip: rect(0 0 0 0); white-space: nowrap; border: 0;
     }
 
+    @media (max-width: 430px) {
+      .overlay { gap: 0.55rem; padding: 0.9rem 0.7rem; }
+      .overlay h2 { font-size: 1.5rem; }
+      .overlay p { font-size: 0.95rem; }
+      /* two neat rows of two rather than a lopsided 3 + 1 */
+      .mode-btn { min-width: 7.7rem; }
+      .btn { font-size: 1.12rem; padding: 0.7rem 1.6rem; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.001ms !important;
@@ -425,11 +439,10 @@
     <!-- Start menu + shop -->
     <div class="overlay" id="menu">
       <h2>🏃 Math Mob Run</h2>
-      <p>Swipe (or use ← →) to steer your crew through the gate that makes the
-         <b>biggest</b> mob. Answer ❓ quiz gates and build a 🔥 streak — 5 in a
-         row starts 🌟 <b>COIN FEVER</b> (double coins)! At each level's finish
-         line <b>smash through 🧱 brick walls</b>, and every level runs through
-         a new land. 🧠</p>
+      <p>Swipe (or ← →) into the gate that makes the <b>biggest</b> mob.
+         Answer ❓ quiz gates to build a 🔥 streak — 5 in a row starts
+         🌟 <b>COIN FEVER</b>. Every level ends in a wall of 🧱 bricks:
+         only a big enough mob smashes through. 🧠</p>
       <div class="coinbar">🪙 <span id="bank">0</span> coins</div>
       <div class="modes" id="modes" role="group" aria-label="Difficulty"></div>
       <div class="lvlpick">

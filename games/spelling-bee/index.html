@@ -162,9 +162,9 @@
     }
     .found-chip.pangram { background: #f5b800; color: #fff; }
     .found-chip.dormant { opacity: 0.5; }
-    .found-chip.has-def { cursor: pointer; text-decoration: underline dotted #8a6d00 2px; text-underline-offset: 3px; touch-action: manipulation; min-height: 36px; }
+    .found-chip.has-def { cursor: pointer; text-decoration: underline dotted #8a6d00 2px; text-underline-offset: 3px; touch-action: manipulation; min-height: 40px; padding: 0.5rem 0.9rem; }
     .found-chip.has-def:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
-    .deffy { min-height: 1.3rem; text-align: center; font-size: 1rem; font-weight: bold; color: var(--purple); margin: 0.5rem auto 1rem; max-width: 480px; }
+    .deffy { min-height: 1.3rem; text-align: center; font-size: 1.02rem; font-weight: bold; color: var(--purple); margin: 0 auto 0.9rem; max-width: 480px; line-height: 1.4; }
 
     .sparkle { position: fixed; font-size: 1.5rem; pointer-events: none; animation: sparkle-up 0.9s ease-out forwards; z-index: 5; }
     @keyframes sparkle-up {
@@ -217,7 +217,7 @@
       <div class="rank" id="rank" aria-live="polite">Start spelling!</div>
       <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
 
-      <div class="entry" id="entry" aria-live="polite" aria-label="The word you are building"><span class="ghosttext">type or tap letters…</span></div>
+      <div class="entry" id="entry" aria-label="The word you are building"><span class="ghosttext">type or tap letters…</span></div>
 
       <div class="hive" id="hive" role="group" aria-label="Honeycomb of letters"></div>
 
@@ -231,6 +231,8 @@
         <button class="btn ghost" id="quit-btn" aria-label="Back to all the hives">🐝 All hives</button>
       </div>
 
+      <p class="deffy" id="deffy" aria-live="polite"></p>
+
       <details class="chart" id="chart">
         <summary>📊 Word chart — what's still out there</summary>
         <div class="chart-body" id="chart-body"></div>
@@ -240,7 +242,6 @@
         <h3>Words you found <span id="found-count"></span>
           <span style="font-weight:normal;color:#565073;font-size:0.85rem;">(tap a dotted word to see what it means)</span></h3>
         <div class="found-list" id="found-list"></div>
-        <p class="deffy" id="deffy" aria-live="polite"></p>
       </div>
     </section>
 

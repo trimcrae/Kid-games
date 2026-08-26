@@ -199,6 +199,30 @@
     }
 
     /* ---------- the states puzzle map ---------- */
+    /* Eleven columns on a 390px phone can only ever be ~32px squares,
+       so there's a zoom that scrolls sideways and gives small fingers
+       proper 48px targets. It remembers which you chose. */
+    .states-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+    .states-scroll.zoom #states { min-width: 560px; }
+    .zoom-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0.35rem;
+    }
+    .zoom-btn {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--purple);
+      background: var(--paper);
+      border: 2px solid var(--purple);
+      border-radius: 999px;
+      padding: 0.3rem 0.75rem;
+      min-height: 36px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .zoom-btn[aria-pressed="true"] { color: #fff; background: var(--purple); }
     #states {
       display: grid;
       grid-template-columns: repeat(11, 1fr);
@@ -327,6 +351,7 @@
       font-size: 0.92rem;
       color: #4d4470;
       line-height: 1.5;
+      white-space: pre-line;
     }
     .info .why {
       margin-top: 0.45rem;
@@ -476,7 +501,12 @@
     </div>
 
     <div class="map-card hidden" id="states-card">
-      <div id="states" role="group" aria-label="A puzzle map of the 50 states — use the arrow keys to move around it"></div>
+      <div class="zoom-row">
+        <button class="zoom-btn" id="zoom-btn" type="button" aria-pressed="false">🔍 Bigger squares</button>
+      </div>
+      <div class="states-scroll" id="states-scroll">
+        <div id="states" role="group" aria-label="A puzzle map of the 50 states — use the arrow keys to move around it"></div>
+      </div>
       <div class="legend" id="states-legend"></div>
     </div>
 

@@ -812,18 +812,29 @@
     (pan || panel()).items.forEach(function (o) { if ((o.z || 0) > m) m = o.z || 0; });
     return m;
   }
+  // Fan new items out a little so a second one never lands exactly on the first.
+  function stagger(pan, base, step) {
+    var n = pan.items.length % 6;
+    return clamp(base + n * step, 8, 90);
+  }
   function addSticker(emoji) {
     pushHistory();
-    panel().items.push({ id: nextId(), type: "sticker", text: emoji, x: 50, y: 55, size: 18, rot: 0, flip: false, z: topZ() + 1 });
+    var pan = panel();
+    pan.items.push({ id: nextId(), type: "sticker", text: emoji,
+      x: stagger(pan, 42, 6), y: stagger(pan, 52, 5),
+      size: 18, rot: 0, flip: false, z: topZ() + 1 });
     save(); renderPage(); selectLastItem();
     flash("Drag it where you want! ✋");
   }
   var DEFAULT_TEXT = { speech: "Hi!", thought: "Hmm…", shout: "WOW!", caption: "And then…" };
   function addBubble(type) {
     pushHistory();
-    panel().items.push({
+    var pan = panel();
+    var caps = pan.items.filter(function (o) { return o.type === "caption"; }).length;
+    pan.items.push({
       id: nextId(), type: type, text: DEFAULT_TEXT[type] || "…",
-      x: type === "caption" ? 50 : 38, y: type === "caption" ? 12 : 28,
+      x: type === "caption" ? 50 : stagger(pan, 34, 5),
+      y: type === "caption" ? Math.min(84, 12 + caps * 12) : stagger(pan, 26, 4),
       size: type === "caption" ? 5 : 6, tail: "bl", z: topZ() + 1
     });
     save(); renderPage(); selectLastItem();
@@ -831,7 +842,9 @@
   }
   function addSfx(word, color) {
     pushHistory();
-    panel().items.push({ id: nextId(), type: "sfx", text: word, color: color, x: 52, y: 46, size: 11, rot: -8, z: topZ() + 1 });
+    var pan = panel();
+    pan.items.push({ id: nextId(), type: "sfx", text: word, color: color,
+      x: stagger(pan, 48, 5), y: stagger(pan, 44, 5), size: 11, rot: -8, z: topZ() + 1 });
     save(); renderPage(); selectLastItem();
     flash("BOOM! Drag, spin or re-type it 💥");
   }
@@ -1645,11 +1658,14 @@
   function addCaptionTo(panelIdx, text) {
     var pan = page().panels[panelIdx];
     if (!pan) return;
-    var top = 0;
-    pan.items.forEach(function (o) { if ((o.z || 0) > top) top = o.z || 0; });
+    var top = 0, caps = 0;
+    pan.items.forEach(function (o) {
+      if ((o.z || 0) > top) top = o.z || 0;
+      if (o.type === "caption") caps++;
+    });
     pan.items.push({
       id: nextId(), type: "caption", text: text,
-      x: 50, y: 12, size: 4.2, rot: 0, flip: false, tail: "bl", z: top + 1
+      x: 50, y: Math.min(84, 12 + caps * 12), size: 4.2, rot: 0, flip: false, tail: "bl", z: top + 1
     });
   }
 

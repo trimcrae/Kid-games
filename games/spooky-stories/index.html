@@ -39,10 +39,6 @@
     .story-card .cover-svg canvas { width: 100%; height: 130px; object-fit: cover; display:block; border-radius: 12px; image-rendering: pixelated; }
     .story-card h2 { margin: .4rem 0 .15rem; font-size: 1.2rem; }
     .story-card p  { margin: 0; font-size: .85rem; opacity: .85; }
-    .story-card .done-star {
-      position: absolute; top: 10px; right: 12px; font-size: 1.5rem;
-      animation: twinkle 2s ease-in-out infinite;
-    }
     @keyframes twinkle { 0%,100%{transform:scale(1);opacity:.85} 50%{transform:scale(1.25);opacity:1} }
 
     /* Sticker shelf — one shiny sticker for every finished story */
@@ -179,7 +175,11 @@
     .quiz .q-progress { color: #d9c8ff; font-size: .85rem; margin: 0 0 .4rem; }
     .quiz-done { color: var(--yellow); font-weight: bold; font-size: 1.15rem; margin: .2rem 0 0; }
 
-    .story-card .badges { position: absolute; top: 10px; right: 12px; font-size: 1.4rem; line-height: 1; }
+    /* ⭐ = story finished, 🧠 = all its questions answered */
+    .story-card .badges {
+      position: absolute; top: 10px; right: 12px; font-size: 1.4rem; line-height: 1;
+      animation: twinkle 2s ease-in-out infinite;
+    }
     .story-card .bookmark {
       display: block; margin: .35rem auto 0; background: rgba(0,0,0,.28);
       border-radius: 999px; padding: .2rem .7rem; font-size: .82rem; color: #ffe9a8;
@@ -240,7 +240,7 @@
     .tap-hint { text-align:center; color:#d9c8ff; font-size:.9rem; margin:.2rem 0 0; min-height:1.1em; }
 
     @media (prefers-reduced-motion: reduce) {
-      .page-art.turning, .wiggle, .hint-bob, .spark, .story-card .done-star,
+      .page-art.turning, .wiggle, .hint-bob, .spark, .story-card .badges,
       .sticker-shelf .slot.earned, .word-card, .quiz .qa.wrong { animation: none; }
       .page-text .w { transition: none; }
     }
@@ -307,7 +307,7 @@
           <p class="q-ask" id="quiz-ask"></p>
           <div class="q-choices" id="quiz-choices"></div>
           <p class="q-feedback" id="quiz-feedback" aria-live="polite"></p>
-          <p class="quiz-done" id="quiz-done" hidden></p>
+          <p class="quiz-done" id="quiz-done" aria-live="polite" hidden></p>
         </div>
       </div>
 

@@ -36,7 +36,7 @@
      signal: every group also carries a shape glyph and its name. */
   const COLORS = {
     yellow: { bg: "#e69f00", ink: "#2b2440", shape: "●", label: "orange circle" },
-    green:  { bg: "#009e73", ink: "#ffffff", shape: "▲", label: "green triangle" },
+    green:  { bg: "#00785e", ink: "#ffffff", shape: "▲", label: "green triangle" },
     blue:   { bg: "#0072b2", ink: "#ffffff", shape: "■", label: "blue square" },
     purple: { bg: "#cc79a7", ink: "#2b2440", shape: "★", label: "pink star" },
   };
@@ -1074,7 +1074,7 @@
     tiles = tiles.filter((it) => g.items.indexOf(it) === -1);
     selected = [];
     if (revealed && g.items.indexOf(revealed) !== -1) revealed = null;
-    flash("Yes! " + g.name + " — " + g.why, "var(--green)");
+    flash("Yes! " + g.name + " 🎉", "var(--green)");
     if (window.SFX) SFX.good();
     updateHintBtn();
     persist();
@@ -1167,6 +1167,8 @@
     if (el.play.classList.contains("hidden")) return;
     if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
     const k = e.key.toLowerCase();
+    // a focused button handles its own Enter — don't fire twice
+    if (k === "enter" && e.target && e.target.tagName === "BUTTON" && e.target.classList.contains("btn")) return;
     if (k === "enter" && selected.length === 4 && !over) { e.preventDefault(); submit(); }
     else if (k === "s" && !over) { e.preventDefault(); doShuffle(); }
     else if (k === "c" && !over) { e.preventDefault(); clearPick(); }
@@ -1181,7 +1183,8 @@
     tiles = shuffle(tiles);
     renderBoard();
     persist();
-    const again = focused && el.board.querySelector('[data-item="' + CSS.escape(focused) + '"]');
+    const safe = window.CSS && CSS.escape ? CSS.escape(focused || "") : String(focused || "").replace(/"/g, '\\"');
+    const again = focused && el.board.querySelector('[data-item="' + safe + '"]');
     if (again) { [...el.board.children].forEach((b) => (b.tabIndex = -1)); again.tabIndex = 0; again.focus(); }
     flash("Shuffled! Same cards, new places. 🔀", "var(--purple)");
   }

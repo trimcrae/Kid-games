@@ -1871,6 +1871,7 @@
     nextBtn.textContent = p.end ? "📚 More stories" : "Turn the page ▶";
     endActions.hidden = !p.end;
     againBtn.style.display = p.end ? "" : "none";
+    quizBtn.textContent = "🧠 Story questions";
     quizBtn.style.display = (p.end && QUIZ_BY_ID[current.id]) ? "" : "none";
 
     // hook up tappable art
@@ -2024,6 +2025,9 @@
       ? "🧠 You answered every question — a thinking-cap badge is yours!"
       : "🧠 All correct again — you really know this story!";
     quizDoneEl.hidden = false;
+    // let them have another go straight away
+    quizBtn.textContent = "🧠 Ask me again";
+    quizBtn.style.display = "";
     playSound("yay");
     confetti();
   }

@@ -57,6 +57,8 @@
     worldLegend: document.getElementById("world-legend"),
     states: document.getElementById("states"),
     statesCard: document.getElementById("states-card"),
+    statesScroll: document.getElementById("states-scroll"),
+    zoomBtn: document.getElementById("zoom-btn"),
     statesLegend: document.getElementById("states-legend"),
     info: document.getElementById("info"),
     infoFlag: document.getElementById("info-flag"),
@@ -75,7 +77,7 @@
      ========================================================= */
   const DEFAULTS = {
     stars: 0, seenPlaces: {}, seenStates: {}, seenCountries: {},
-    bestStreak: 0, diff: "easy", expertWins: 0
+    bestStreak: 0, diff: "easy", expertWins: 0, zoom: false
   };
   let save = Object.assign({}, DEFAULTS);
   try {
@@ -269,6 +271,13 @@
       b.innerHTML = '<i style="background:' + REGIONS[name].color + '"></i>' + REGIONS[name].emoji + " " + name;
       el.statesLegend.appendChild(b);
     });
+  }
+
+  /* ---------------- zoom (bigger tap targets) ---------------- */
+  function applyZoom() {
+    el.statesScroll.classList.toggle("zoom", !!save.zoom);
+    el.zoomBtn.setAttribute("aria-pressed", String(!!save.zoom));
+    el.zoomBtn.textContent = save.zoom ? "🔍 Fit the whole map" : "🔍 Bigger squares";
   }
 
   /* ---------------- difficulty ---------------- */
@@ -869,7 +878,7 @@
           countryCard(k);
           if (window.SFX) SFX.pop();
           tally();
-        });
+        }, k);
       });
     }
 
@@ -986,6 +995,13 @@
   buildWorld();
   buildStates();
   applyDifficulty();
+  applyZoom();
+
+  el.zoomBtn.addEventListener("click", function () {
+    save.zoom = !save.zoom;
+    persist();
+    applyZoom();
+  });
 
   el.world.addEventListener("click", function (e) {
     const k = e.target && e.target.dataset && e.target.dataset.k;

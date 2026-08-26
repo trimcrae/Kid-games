@@ -175,7 +175,7 @@
         "torments", "restroom", "restrooms", "senor", "sensor",
         "sensors",
       ],
-      little: ["son", "set", "sot"],
+      little: ["son", "set"],
     },
     {
       name: "Unicorn Magic",
@@ -757,10 +757,17 @@
     updateHud();
     el.feedback.textContent = "";
     el.deffy.textContent = "";
+    updateSample();
     show("play");
-    // play-test / debug hook: a word that has NOT been found yet
-    const left = activeWords(PUZZLES[pi]).filter((w) => progressFor(pi).found.indexOf(w) === -1);
-    el.play.dataset.sample = left[0] || activeWords(PUZZLES[pi])[0] || "";
+  }
+
+  /* play-test / debug hook: always names a word that has NOT been found
+     yet, so the smoke test still works on a hive with saved progress. */
+  function updateSample() {
+    const foundSet = new Set(progressFor(pi).found);
+    const words = activeWords(PUZZLES[pi]);
+    const left = words.filter((w) => !foundSet.has(w));
+    el.play.dataset.sample = left[0] || words[0] || "";
   }
 
   function renderHive() {
@@ -922,11 +929,12 @@
     const prog = progressFor(pi);
     const active = activeWords(p);
     if (w.length === 0) return;
-    if (w.length < LITTLE_LEN) { flash("Too short — 4 letters or more! ✋", "var(--pink)"); shakeEntry(); return; }
     if (w.length === LITTLE_LEN && !littleOn()) {
       flash("3 letters! Turn on 🐣 Little Bee mode to use those.", "var(--pink)"); shakeEntry(); return;
     }
-    if (w.length < MIN_LEN && !littleOn()) { flash("Too short — 4 letters or more! ✋", "var(--pink)"); shakeEntry(); return; }
+    if (w.length < (littleOn() ? LITTLE_LEN : MIN_LEN)) {
+      flash("Too short — " + (littleOn() ? 3 : 4) + " letters or more! ✋", "var(--pink)"); shakeEntry(); return;
+    }
     if (w.indexOf(p.letters[0]) === -1) { flash("Must use the golden letter 🟡", "var(--pink)"); shakeEntry(); return; }
     if (![...w].every((ch) => p.letters.indexOf(ch) !== -1)) { flash("Only use the hive letters!", "var(--pink)"); shakeEntry(); clearEntry(); return; }
     if (prog.found.indexOf(w) !== -1) { flash("Already found that one! 🙂", "#8a6d00"); clearEntry(); return; }
@@ -942,6 +950,7 @@
     clearEntry();
     renderFound();
     updateHud();
+    updateSample();
     // teach the word if we know what it means
     const def = defFor(w);
     el.deffy.textContent = def ? "📖 " + w.toUpperCase() + " — " + def : "";

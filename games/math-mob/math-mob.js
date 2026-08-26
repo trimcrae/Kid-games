@@ -663,7 +663,7 @@
     if (Math.random() < barrierChance) {
       const side = Math.random() < 0.5 ? "L" : "R";
       rows.push({ kind: "barrier", y: -bandH, side, done: false });
-    } else if (dist > 60 && Math.random() < 0.25) {
+    } else if (dist > 40 && Math.random() < 0.38) {
       rows.push(Object.assign({ kind: "quiz", y: -bandH, done: false }, makeQuiz()));
     } else {
       rows.push({ kind: "gate", y: -bandH, ops: makeGatePair(), done: false });
@@ -872,11 +872,18 @@
     renderReview();
     const badgeBox = $("go-badges");
     badgeBox.innerHTML = "";
-    for (const a of freshBadges) {
+    // Show at most three so a bumper haul doesn't push the buttons off-screen.
+    for (const a of freshBadges.slice(0, 3)) {
       const d = document.createElement("div");
       d.className = "new-badge";
       d.textContent = `🏅 New badge: ${a.ico} ${a.name}!`;
       badgeBox.appendChild(d);
+    }
+    if (freshBadges.length > 3) {
+      const more = document.createElement("div");
+      more.className = "new-badge";
+      more.textContent = `🏅 …and ${freshBadges.length - 3} more — see 🏅 Badges!`;
+      badgeBox.appendChild(more);
     }
     $("go-title").textContent = levelCleared
       ? "Level " + level + " cleared! 🎉"
@@ -955,7 +962,7 @@
         enterFinale();
       } else {
         spawnAccum += dy;
-        if (spawnAccum >= H * 0.9) { spawnAccum = 0; spawnRow(); }
+        if (spawnAccum >= H * 0.78) { spawnAccum = 0; spawnRow(); }
         coinAccum += dy;
         if (coinAccum >= H * 0.3) { coinAccum = 0; spawnCoins(); }
       }

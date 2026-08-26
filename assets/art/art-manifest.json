@@ -3,6 +3,12 @@
   "styleSuffix": ", soft painterly digital illustration, children's storybook art, warm gentle lighting, cute, no text, no words",
   "images": [
     {
+      "id": "mermaid-cover",
+      "prompt": "a friendly cartoon mermaid with a golden harp singing on a coral reef, dolphins and colourful fish, sunbeams through clear blue water",
+      "width": 512, "height": 384, "seed": 11006,
+      "out": "games/adventure/art/mermaid-cover.png"
+    },
+    {
       "id": "rainbow-cover",
       "prompt": "a cute friendly baby dragon and a little princess girl in a sunny flower meadow with a big rainbow and a castle",
       "width": 512, "height": 384, "seed": 11001,

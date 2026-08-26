@@ -58,6 +58,7 @@
     PUZZLES.forEach((p, i) => { t += foundSet(i).length; if (foundSet(i).length >= p.words.length) saved.cleared[i] = 1; });
     saved.totalFound = t;
   }
+  save();   // persist the defaults/migration so a v1 save is upgraded once
 
   function isDone(i) { return foundSet(i).length >= PUZZLES[i].words.length; }
   function everDone(i) { return !!saved.cleared[i] || isDone(i); }
