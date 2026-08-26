@@ -134,6 +134,19 @@ D.LOOKALIKES.forEach(set => {
 ROCKS.forEach(r => ok(D.LOOKALIKES.some(s => s.names.indexOf(r.name) >= 0),
   "[" + r.name + "] appears in at least one look-alike set (so the Lab can use it)"));
 
+/* ---------- 6b. the Lab is always winnable by testing ---------- */
+// Inside a look-alike set, no two specimens may answer EVERY bench test the
+// same way — otherwise the player could run all 11 tests and still be guessing.
+D.LOOKALIKES.forEach(set => {
+  for (let i = 0; i < set.names.length; i++) {
+    for (let j = i + 1; j < set.names.length; j++) {
+      const a = D.BY_NAME[set.names[i]], b = D.BY_NAME[set.names[j]];
+      const differs = D.LAB_TESTS.some(t => D.runTest(a, t.key) !== D.runTest(b, t.key));
+      ok(differs, "in '" + set.title + "', some bench test tells " + a.name + " from " + b.name);
+    }
+  }
+});
+
 /* ---------- 7. quiz questions: exactly one correct answer ---------- */
 let rngState = 12345;
 const rng = () => { rngState = (rngState * 1103515245 + 12345) % 2147483648; return rngState / 2147483648; };

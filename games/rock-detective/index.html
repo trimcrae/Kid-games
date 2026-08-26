@@ -46,6 +46,11 @@
     .clue-group > summary::before { content: "▾ "; font-size: 0.8em; }
     .clue-group:not([open]) > summary::before { content: "▸ "; }
     .clue-group .g-help { font-size: 0.8rem; color: #6a6385; margin: 0 0 0.35rem 0.9rem; }
+    .clue-group .g-count {
+      font-size: 0.7rem; color: #fff; background: #8a5f36; border-radius: 999px;
+      padding: 0.1rem 0.5rem; vertical-align: 0.12em;
+    }
+    .clue-group .g-count[hidden] { display: none; }
     .clues { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .clue {
       display: inline-flex; align-items: center; gap: 0.3rem; min-height: 44px;
@@ -116,7 +121,7 @@
     }
     .rock-card.found .found-flag { display: inline-block; }
     .rock-card:hover { transform: translateY(-3px); box-shadow: 0 9px 22px rgba(43,36,64,0.16); }
-    .rock-card.dim { opacity: 0.2; filter: grayscale(0.7); }
+    .rock-card.dim { opacity: 0.2; filter: grayscale(0.7); pointer-events: none; }
     .rock-card svg { width: 100%; height: 96px; display: block; background: #f4efe8; }
     .rock-body { padding: 0.5rem 0.6rem 0.7rem; }
     .rock-name { font-weight: bold; font-size: 1rem; }
@@ -219,6 +224,8 @@
     .quiz-opt.wrong { background: #d63864; color: #fff; }
     .quiz-opt:disabled { cursor: default; }
     .quiz-feedback { margin-top: 0.7rem; font-weight: bold; min-height: 1.4em; font-size: 1rem; }
+    .key-hint { display: none; font-size: 0.78rem; color: #8a84a0; margin: 0.5rem 0 0; }
+    @media (hover: hover) and (pointer: fine) { .key-hint { display: block; } }
     .why {
       background: #fdf8ee; border-left: 5px solid #c79a3f; border-radius: 10px;
       text-align: left; padding: 0.6rem 0.8rem; margin-top: 0.6rem;
@@ -335,10 +342,12 @@
         <div class="notebook" id="labNotebook" role="status" aria-live="polite"></div>
         <div class="lab-actions">
           <button class="next-btn" id="labNameIt">🔎 I know what it is!</button>
-          <button class="next-btn ghost" id="labNew">🧪 New specimen</button>
         </div>
         <div class="lab-opts" id="labOpts"></div>
         <div class="why" id="labWhy" hidden></div>
+        <div class="lab-actions">
+          <button class="next-btn ghost" id="labNew">🧪 New specimen</button>
+        </div>
         <div class="lab-stats" id="labStats"></div>
       </div>
     </div>
@@ -369,6 +378,7 @@
           <div class="quiz-q" id="quizQ">What rock is this?</div>
           <div class="quiz-hint" id="quizHint"></div>
           <div class="quiz-opts" id="quizOpts"></div>
+          <p class="key-hint" id="keyHint"></p>
           <div class="quiz-feedback" id="quizFeedback" role="status"></div>
           <div class="why" id="quizWhy" hidden></div>
           <button class="next-btn" id="nextQuiz" style="display:none;">Next rock →</button>

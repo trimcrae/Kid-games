@@ -45,7 +45,8 @@
         { key: "l-glass", label: "🪞 Glassy" },
         { key: "l-metal", label: "🔩 Metallic" },
         { key: "l-dull",  label: "🥔 Dull / earthy" },
-        { key: "l-pearl", label: "🐚 Pearly / silky" }
+        { key: "l-pearl", label: "🐚 Pearly / silky" },
+        { key: "l-wax",   label: "🍯 Waxy / resinous" }
       ]
     },
     {
@@ -296,7 +297,7 @@
       c1: "#4f4a44", c2: "#2e2b27", mohs: 7,
       streak: null, lustre: "Waxy to glassy",
       breaks: "Conchoidal — curved, sharp flakes, like obsidian",
-      k: ["g-none", "l-glass", "c-dark", "h5", "s-rock", "t-sharp"],
+      k: ["g-none", "l-wax", "c-dark", "h5", "s-rock", "t-sharp"],
       fact: "Dark, waxy, very hard rock that chips into sharp curved flakes.",
       forms: "Silica from sponges and other sea creatures re-formed into hard nodules inside chalk and limestone.",
       more: "It's made of quartz crystals far too small to see, so it is quartz-hard (7). Stone-age people made <b>tools and fire sparks</b> from it. 🔥"
@@ -395,7 +396,7 @@
       c1: "#f7e04a", c2: "#c9a91a", mohs: 2,
       streak: "Pale yellow", lustre: "Resinous, like hard honey",
       breaks: "Brittle — crumbles easily",
-      k: ["g-big", "l-glass", "c-bright", "h1", "s-yellow", "t-smell"],
+      k: ["g-big", "l-wax", "c-bright", "h1", "s-yellow", "t-smell"],
       fact: "Blazing yellow crystals that smell like rotten eggs.",
       forms: "Grows straight out of volcanic gas around hot vents and craters.",
       more: "It's one of the few minerals that is a <b>single element</b> (just S). Warm it in your hand and the smell gets stronger. 🌋"
@@ -602,7 +603,7 @@
     "Calcite|Quartz": "Drop vinegar on it: calcite <b>fizzes</b>, quartz does nothing. And a copper coin scratches calcite (3), while quartz (7) scratches steel.",
     "Hematite|Magnetite": "Streak test! Both look silvery-black, but hematite's powder is <b>red-brown</b> and magnetite's is black. A magnet also sticks to magnetite.",
     "Halite|Quartz": "Halite is soft (2½) and breaks into perfect cubes; quartz is hard (7) and fractures in curves. Halite also dissolves in water.",
-    "Obsidian|Flint": "Both chip into curved sharp flakes, but flint is harder (7 — it scratches glass easily) and waxy, while obsidian is bright volcanic glass (5½).",
+    "Obsidian|Flint": "Both chip into curved sharp flakes. Flint has a <b>waxy</b> shine and is harder (7 — it scratches glass easily); obsidian is <b>bright glassy</b> and softer (5½).",
     "Mica|Talc": "Both are soft and pale. Talc feels <b>soapy</b> and is the softest mineral (1); mica peels into springy see-through sheets (2½).",
     "Gneiss|Granite": "Granite is evenly speckled with no pattern. Gneiss has been squeezed until the minerals lined up into wavy <b>light and dark stripes</b>.",
     "Coal|Obsidian": "Obsidian is glassy, hard (5½) and razor-sharp when it breaks. Coal is dull, soft (a fingernail marks it) and very light for its size."

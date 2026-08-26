@@ -21,6 +21,9 @@
   var ROCKS = D.ROCKS, GROUPS = D.GROUPS, FAMILY = D.FAMILY;
 
   var $ = function (id) { return document.getElementById(id); };
+  // A Set is NOT array-like, so Array.prototype.slice.call(set) quietly returns []
+  // — which is exactly how every bit of saved progress used to vanish.
+  var setArr = function (set) { var a = []; set.forEach(function (v) { a.push(v); }); return a; };
   var sfx = function (n, a) { if (window.SFX && SFX[n]) { try { SFX[n](a); } catch (e) {} } };
   var pop = function (o) { if (window.Confetti && Confetti.burst) { try { Confetti.burst(o); } catch (e) {} } };
 
@@ -191,16 +194,18 @@
   function markFound(name) {
     if (!name || found.has(name)) return;
     found.add(name);
-    try { localStorage.setItem(FKEY, JSON.stringify(Array.prototype.slice.call(found))); } catch (e) {}
+    try { localStorage.setItem(FKEY, JSON.stringify(setArr(found))); } catch (e) {}
     var cards = document.querySelectorAll('.rock-card[data-rock="' + name + '"]');
     for (var i = 0; i < cards.length; i++) cards[i].classList.add("found");
     updateBookProgress();
   }
 
+  var celebrated = found.size >= ROCKS.length;
   function updateBookProgress() {
     var el = $("bookProgress");
     if (!el) return;
     var n = found.size, t = ROCKS.length;
+    if (n >= t && !celebrated) { celebrated = true; pop({ count: 160 }); sfx("win"); }
     el.textContent = n === 0
       ? "🏅 Crack cases, ace the lab and win the quiz to collect all " + t + " specimens!"
       : n >= t
@@ -277,7 +282,12 @@
       d.className = "clue-group";
       if (gi < 4) d.open = true;
       var sum = document.createElement("summary");
-      sum.textContent = g.title;
+      sum.appendChild(document.createTextNode(g.title + " "));
+      var badge = document.createElement("span");
+      badge.className = "g-count";
+      badge.dataset.group = g.id;
+      badge.hidden = true;
+      sum.appendChild(badge);
       d.appendChild(sum);
       var help = document.createElement("p");
       help.className = "g-help";
@@ -313,9 +323,24 @@
       active.add(key);
     }
     sfx("good");
-    save.clues = Array.prototype.slice.call(active);
+    save.clues = setArr(active);
     persist();
     filterDetective();
+  }
+
+  // Show "2 on" next to a group title so clues hiding in a folded-up
+  // group are still obvious — especially after a reload.
+  function refreshGroupBadges() {
+    GROUPS.forEach(function (g) {
+      var n = 0;
+      g.clues.forEach(function (c) { if (active.has(c.key)) n++; });
+      var el = document.querySelector('.g-count[data-group="' + g.id + '"]');
+      if (!el) return;
+      el.textContent = n + " on";
+      el.hidden = n === 0;
+      var det = el.closest ? el.closest("details") : null;
+      if (n > 0 && det && !det.open) det.open = true;
+    });
   }
 
   function refreshClueChips() {
@@ -387,6 +412,7 @@
     }
     lastMatches = matches;
     refreshClueChips();
+    refreshGroupBadges();
   }
 
   $("resetClues").addEventListener("click", function () {
@@ -409,12 +435,14 @@
     labStage = "test";
     $("labSvg").innerHTML = rockSvg(target);
     $("labTitle").textContent = "Mystery specimen #" + (save.labSolved + 1);
-    $("labSub").textContent = "It's one of the " + set.title.toLowerCase() + " (" + names.length + " suspects). Test it!";
+    $("labSub").textContent = "🗂️ " + set.title + " — " + names.length + " suspects. Test it!";
     $("labSvg").setAttribute("aria-label", "Mystery specimen from the group: " + set.title);
     labSet = names;
     $("labOpts").innerHTML = "";
     $("labWhy").hidden = true;
     $("labNameIt").style.display = "";
+    $("labNew").classList.add("ghost");
+    $("labNew").textContent = "🧪 New specimen";
     renderLabTests();
     renderNotebook();
     renderLabStats();
@@ -489,7 +517,7 @@
     if (rk.name === labRock.name) {
       btn.classList.add("right");
       save.labSolved++;
-      if (!save.labBest || labUsed.length < save.labBest) save.labBest = Math.max(1, labUsed.length);
+      if (labUsed.length && (!save.labBest || labUsed.length < save.labBest)) save.labBest = labUsed.length;
       persist();
       markFound(labRock.name);
       pop({ count: 40 });
@@ -505,6 +533,10 @@
         D.explainDiff(rk, labRock);
     }
     renderLabStats();
+    var nb = $("labNew");
+    nb.classList.remove("ghost");
+    nb.textContent = "🧪 Next specimen →";
+    nb.focus();
   }
 
   $("labNameIt").addEventListener("click", labNameIt);
@@ -656,6 +688,10 @@
       b.addEventListener("click", function () { answerQuiz(b, o); });
       box.appendChild(b);
     });
+    var keys = [];
+    for (var ki = 1; ki <= q.options.length; ki++) keys.push("<b>" + ki + "</b>");
+    $("keyHint").innerHTML = "⌨️ Big kids: press " + keys.slice(0, -1).join(", ") +
+      " or " + keys[keys.length - 1] + " to answer.";
     updateQuizTop();
     save.round = { tier: tier, qNum: qNum, roundScore: roundScore };
     persist();
@@ -679,10 +715,13 @@
         : "✅ Yes! " + q.answerText;
       sfx("streak", streak);
       pop({ count: 24 });
+      // On a "which one formed like this?" question the forms text IS the
+      // question, so show the specimen's headline fact instead of repeating it.
+      var shown = q.rock || q.answerRock;
       why.hidden = false;
-      why.innerHTML = q.rock
-        ? "<b>" + q.rock.name + "</b> — " + q.rock.forms
-        : (q.answerRock ? "<b>" + q.answerRock.name + "</b> — " + q.answerRock.forms : "");
+      why.innerHTML = shown
+        ? "<b>" + shown.name + "</b> — " + (q.kind === "forms" ? shown.fact : shown.forms)
+        : "";
       if (why.innerHTML === "") why.hidden = true;
     } else {
       streak = 0;
@@ -693,9 +732,9 @@
       why.hidden = false;
       why.innerHTML = "🔍 <b>Why?</b> " + (q.explainFor(opt) || "");
     }
-    if (opt.correct || true) {
+    if (opt.correct) {
       var got = q.answerRock || q.rock;
-      if (opt.correct && got) markFound(got.name);
+      if (got) markFound(got.name);
     }
     updateQuizTop();
     save.round = { tier: tier, qNum: qNum, roundScore: roundScore };
