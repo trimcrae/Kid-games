@@ -715,7 +715,10 @@
   }
   function label(id, n) {
     var p = piece(id);
-    if (n == null) return p.name + ", " + (p.value < 100 ? p.value + " cents" : dollarText(p.value));
+    if (n == null) {
+      return p.name + ", " +
+        (p.value === 1 ? "1 cent" : p.value < 100 ? p.value + " cents" : dollarText(p.value));
+    }
     return n + " " + plural(p, n);
   }
 
