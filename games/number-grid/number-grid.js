@@ -14,8 +14,9 @@
      ⚡ Quick Count   the game supplies the words. Level 1 is
                      count-only (no typing, so Ellie can play),
                      level 2 compares two words (longer? how many
-                     more?), level 3 is the grown-up tier — big
-                     words plus difference and total questions.
+                     more?), level 3 is the grown-up tier — big words,
+                     difference and total sums, and exact counts with
+                     no "10+" button to hide behind.
      📊 Stats        what the finished grid says: mode (most common
                      length), mean, longest word, squares filled,
                      and a bar chart of the whole column.
@@ -69,10 +70,12 @@
     { id: "grown",   label: "Grown-up", emoji: "🧠", desc: "big words & maths" }
   ];
   // Which question kinds each level rotates through.
+  // "longer" is a one-look question, so it belongs to the two younger tiers:
+  // the grown-up rotation is nothing but counting and arithmetic.
   var LEVEL_KINDS = {
     count:   ["count", "count", "count"],
     compare: ["longer", "count", "diff", "shorter", "diff", "count"],
-    grown:   ["diff", "total", "count", "diff", "longer", "total"]
+    grown:   ["diff", "total", "count", "diff", "total", "count"]
   };
 
   var ALL_PACK = { id: "all", label: "Everything", emoji: "🌈" };
@@ -166,15 +169,57 @@
     try { localStorage.setItem(key, value); } catch (e) {}
   }
 
-  /* ---------- counting letters ---------- */
-  // Only A–Z counts, so "Spider-Man" is 9 and "X-ray" is 4.
-  function lettersOf(word) { return String(word).toUpperCase().match(/[A-Z]/g) || []; }
-  function lenOf(word) { return lettersOf(word).length; }
+  /* ---------- counting letters ----------
+     Only letters count, so spaces, dashes, apostrophes and digits are free:
+     "Spider-Man" is 9 and "X-ray" is 4.
+
+     An accented letter is still a letter — "Café" is FOUR, not three — so
+     each character is folded down to its plain A–Z twin before we count it
+     (and before we pick which row it belongs to: "Élan" files under E).
+     We keep the character the kid actually typed for the count-out, so the
+     strip reads C¹ A² F³ É⁴ = 4 letters. */
+  var FOLD_EXTRA = { "Ø": "O", "Ł": "L", "Đ": "D", "Ð": "D" };
+  var CAN_NORMALIZE = typeof "".normalize === "function";
+  var foldCache = {};
+
+  function foldChar(ch) {
+    if (foldCache[ch] !== undefined) return foldCache[ch];
+    var up = ch.toUpperCase();
+    var out = "";
+    if (/^[A-Z]$/.test(up)) {
+      out = up;
+    } else if (FOLD_EXTRA[up]) {
+      out = FOLD_EXTRA[up];
+    } else if (CAN_NORMALIZE) {
+      try {
+        var bare = up.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        if (/^[A-Z]$/.test(bare)) out = bare;
+      } catch (e) { out = ""; }
+    }
+    foldCache[ch] = out;
+    return out;
+  }
+
+  // [{ show: "É", fold: "E" }, …] — one entry per real letter, in order.
+  function letterPairs(word) {
+    var s = String(word), out = [];
+    for (var i = 0; i < s.length; i++) {
+      var f = foldChar(s.charAt(i));
+      if (f) out.push({ show: s.charAt(i).toUpperCase(), fold: f });
+    }
+    return out;
+  }
+  function lettersOf(word) {
+    return letterPairs(word).map(function (p) { return p.fold; });
+  }
+  function lenOf(word) { return letterPairs(word).length; }
   // Which column a word lives in (everything long piles into the last one).
   function columnFor(n) { return Math.min(n, MAXLEN); }
   function labelFor(num) { return BY_NUM[num] ? BY_NUM[num].label : String(num); }
   // "C-A-N-D-Y" — the way we say it out loud
-  function spellOut(word) { return lettersOf(word).join("-"); }
+  function spellOut(word) {
+    return letterPairs(word).map(function (p) { return p.show; }).join("-");
+  }
   function numberWord(n) { return NUMBER_WORDS[n] || String(n); }
   function plural(n) { return n === 1 ? "letter" : "letters"; }
 
@@ -385,6 +430,7 @@
     activeLevel = id;
     writeKey("numberGrid.level:" + currentKid, id);
     markPressed(levelRow, "level", id);
+    kindIndex = 0;   // start the new tier at the head of its rotation
     newQuizQuestion();
   }
 
@@ -561,17 +607,17 @@
   var lastCountoutMs = 0;
 
   function countRow(word, delayStart, step) {
-    var letters = lettersOf(word);
+    var letters = letterPairs(word);
     var l = BY_NUM[columnFor(letters.length)] || BY_NUM[MAXLEN];
     var row = document.createElement("div");
     row.className = "co-row";
-    letters.forEach(function (ch, i) {
+    letters.forEach(function (p, i) {
       var span = document.createElement("span");
       span.className = "co-letter";
       span.style.setProperty("--cc", l.hex);
       span.style.color = l.dark ? "#2b2440" : "#fff";
       span.style.animationDelay = ((delayStart + i) * step) + "s";
-      span.innerHTML = escapeHtml(ch) + "<b>" + (i + 1) + "</b>";
+      span.innerHTML = escapeHtml(p.show) + "<b>" + (i + 1) + "</b>";
       row.appendChild(span);
     });
     var total = document.createElement("span");
@@ -761,6 +807,8 @@
   function addWord(raw) {
     var word = String(raw).trim().replace(/\s+/g, " ").slice(0, 40);
     if (!word) {
+      // the last word's count-out must not sit under a brand-new attempt
+      hideCountout();
       flashHint("Type a word first! 🙂", true);
       shake();
       return;
@@ -768,6 +816,7 @@
 
     var letters = lettersOf(word);
     if (!letters.length) {
+      hideCountout();
       flashHint("Try a word with some letters in it! 🙂", true);
       shake();
       window.SFX && SFX.nope();
@@ -883,6 +932,7 @@
 
   /* ---------- middle-variant "which letter?" chooser ---------- */
   function showChooser(word, letters) {
+    hideCountout();   // that strip counts the PREVIOUS word — clear it first
     chooser.innerHTML = "";
     var label = document.createElement("div");
     label.className = "chooser-label";
@@ -992,6 +1042,30 @@
     return k;
   }
 
+  // "How many letters?" — but the shape depends on the tier.
+  // For the little ones it's the nine coloured column buttons, so a right
+  // answer is also a lesson about where the word lives. For a grown-up the
+  // "10+" button gives away every long word, so Shannon is asked for the
+  // EXACT number instead: PTERODACTYL is 11, not "10 or more".
+  function countQuestion(e) {
+    if (!e) return null;
+    var len = lenOf(e.w);
+    if (activeLevel !== "grown") {
+      return { kind: "count", words: [e.w], emoji: e.e, answer: columnFor(len) };
+    }
+    return {
+      kind: "number",
+      words: [e.w],
+      emoji: e.e,
+      answer: len,
+      ask: "Exactly how many letters? (no “10+” to hide behind)",
+      bigWord: e.w,
+      why: function () {
+        return "<b>" + escapeHtml(spellOut(e.w)) + "</b> is <b>" + len + "</b> " + plural(len) + ".";
+      }
+    };
+  }
+
   function makeQuestion() {
     var pool = quizPool();
     if (pool.length < 2) return null;
@@ -999,14 +1073,11 @@
 
     if (kind === "count") {
       var e = pick(pool);
-      return { kind: "count", words: [e.w], emoji: e.e, answer: columnFor(lenOf(e.w)) };
+      return countQuestion(e);
     }
 
-    var pair = pickPair(pool, activeLevel === "grown" ? 3 : 1);
-    if (!pair) {
-      var f = pick(pool);
-      return { kind: "count", words: [f.w], emoji: f.e, answer: columnFor(lenOf(f.w)) };
-    }
+    var pair = pickPair(pool, activeLevel === "grown" ? 4 : 1);
+    if (!pair) return countQuestion(pick(pool));
     var longW = pair[0].w, shortW = pair[1].w;
     var lLong = lenOf(longW), lShort = lenOf(shortW);
 
@@ -1049,13 +1120,22 @@
     };
   }
 
-  // four plausible answers around the right one
-  function numberOptions(answer) {
+  // Four plausible answers around the right one.
+  // The old version always took +1, −1, +2 in that fixed order, which made
+  // the answer the second-smallest of the four EVERY time — a tell a sharp
+  // six-year-old picks up in about four questions. Draw the distractors at
+  // random instead, so the answer can land anywhere in the sorted run.
+  function numberOptions(answer, reach) {
+    var span = reach || 3;
+    var candidates = [];
+    for (var d = 1; d <= span; d++) {
+      if (answer - d >= 1) candidates.push(answer - d);
+      candidates.push(answer + d);
+    }
+    shuffle(candidates);
     var opts = [answer];
-    var spread = [1, -1, 2, -2, 3, -3, 4];
-    for (var i = 0; i < spread.length && opts.length < 4; i++) {
-      var v = answer + spread[i];
-      if (v >= 0 && opts.indexOf(v) === -1) opts.push(v);
+    for (var i = 0; i < candidates.length && opts.length < 4; i++) {
+      if (opts.indexOf(candidates[i]) === -1) opts.push(candidates[i]);
     }
     return shuffle(opts);
   }
@@ -1120,9 +1200,17 @@
     } else {
       ask.innerHTML = quizQ.ask;
       qcard.appendChild(ask);
+      if (quizQ.bigWord) {
+        // a word you must actually count deserves to be big and spaced out
+        var bw = document.createElement("div");
+        bw.className = "qword";
+        bw.textContent = (quizQ.emoji ? quizQ.emoji + " " : "") + quizQ.bigWord.toUpperCase();
+        bw.style.marginBottom = "0.6rem";
+        qcard.appendChild(bw);
+      }
       var opts = document.createElement("div");
       opts.className = "qopts";
-      numberOptions(quizQ.answer).forEach(function (v) {
+      numberOptions(quizQ.answer, activeLevel === "grown" ? 4 : 3).forEach(function (v) {
         var b = document.createElement("button");
         b.type = "button";
         b.className = "qopt";
@@ -1382,6 +1470,10 @@
 
   /* ---------- tabs ---------- */
   function setTab(id) {
+    // A right answer in Quick Count schedules an auto-advance. If you hop to
+    // Build before it fires it used to wipe the count-out of the word you had
+    // just typed — the count-out strip is shared by every tab. Cancel it.
+    if (id !== "quiz" && quizTimer) { clearTimeout(quizTimer); quizTimer = null; }
     activeTab = id;
     writeKey("numberGrid.tab", id);
     TABS.forEach(function (t) {
