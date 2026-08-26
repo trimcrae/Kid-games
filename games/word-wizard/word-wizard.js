@@ -601,7 +601,9 @@
         hear.type = "button";
         hear.textContent = "🔊";
         hear.setAttribute("aria-label", "Hear the word " + w.word);
-        hear.addEventListener("click", () => playClip("word-" + w.word));
+        hear.disabled = !hasClip(w.word);
+        hear.title = hear.disabled ? "Narration coming soon" : "Hear it";
+        hear.addEventListener("click", () => sayWord(w.word));
 
         row.appendChild(a); row.appendChild(body); row.appendChild(hear);
         el.dictList.appendChild(row);
@@ -718,6 +720,7 @@
       el.bank.appendChild(b);
     });
     el.skip.disabled = false;
+    el.hear.disabled = !hasClip(current.word);
   }
 
   /* screen-reader friendly read-out of what's in the slots so far */
@@ -870,7 +873,7 @@
       ? (firstTime ? "✨ New word learned — first try! +2 ⭐" : "🌟 First try! +2 ⭐")
       : (firstTime ? "✨ New word learned! +1 ⭐" : "✅ Spelled it! +1 ⭐");
     sparkleBurst();
-    playClip("word-" + current.word);
+    sayWord(current.word);
     later(showStudy, REDUCED ? 300 : 700);
   }
 
@@ -889,6 +892,7 @@
     el.studyTip.textContent = "💡 " + current.tip;
     const last = qPos >= queue.length - 1;
     el.studyNext.textContent = last ? "Finish spellbook ▶" : "Next word ▶";
+    el.studyHear.hidden = !hasClip(current.word);
     el.study.hidden = false;
     try { el.studyNext.focus({ preventScroll: true }); } catch (e) { el.studyNext.focus(); }
   }
@@ -995,12 +999,12 @@
 
   /* ---------- wire up buttons ---------- */
   el.clear.addEventListener("click", clearAll);
-  el.hear.addEventListener("click", () => { if (current) playClip("word-" + current.word); });
+  el.hear.addEventListener("click", () => { if (current) sayWord(current.word); });
   el.hint.addEventListener("click", giveHint);
   el.skip.addEventListener("click", skipWord);
   el.quit.addEventListener("click", toLevels);
   el.studyNext.addEventListener("click", nextWord);
-  el.studyHear.addEventListener("click", () => { if (current) playClip("word-" + current.word); });
+  el.studyHear.addEventListener("click", () => { if (current) sayWord(current.word); });
   el.dictBtn.addEventListener("click", () => { renderDict(); show("dict"); });
   el.dictBack.addEventListener("click", toLevels);
   el.dictPractise.addEventListener("click", startReview);

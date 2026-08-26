@@ -13,71 +13,112 @@
     .btn {
       font-family: var(--font); font-size: 1.15rem; font-weight: bold; color: #fff;
       background: linear-gradient(90deg, var(--yellow), #ffb84d);
-      border: none; border-radius: 999px; padding: 0.7rem 1.6rem; cursor: pointer;
+      border: none; border-radius: 999px; padding: 0.75rem 1.6rem; cursor: pointer;
       box-shadow: 0 8px 20px rgba(255, 184, 77, 0.4);
       transition: transform 0.15s ease; touch-action: manipulation;
+      min-height: 48px;
     }
     .btn:hover { transform: scale(1.05); }
     .btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
-    .btn.ghost { background: var(--paper); color: #b8860b; box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
+    .btn.ghost { background: var(--paper); color: #8a6d00; box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
+    .btn:focus-visible { outline: 4px solid var(--purple); outline-offset: 3px; }
 
     .bee-bar {
-      display: flex; justify-content: center; gap: 1.5rem; font-size: 1.2rem; font-weight: bold;
-      color: #b8860b; margin-bottom: 0.5rem; flex-wrap: wrap;
+      display: flex; justify-content: center; gap: 1.2rem; font-size: 1.1rem; font-weight: bold;
+      color: #8a6d00; margin-bottom: 0.4rem; flex-wrap: wrap;
     }
     .bee-bar span { color: var(--pink); }
 
-    /* puzzle picker */
+    /* ---------- puzzle picker ---------- */
     #puzzles.hidden, #play.hidden { display: none; }
-    .puz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px,1fr)); gap: 1.1rem; max-width: 720px; margin: 0 auto; }
+    .picker-head { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; margin-bottom: 0.9rem; }
+    .picker-head p { margin: 0; font-weight: bold; color: #8a6d00; font-size: 1.2rem; }
+    .totals { font-size: 0.95rem; color: #6a6385; font-weight: bold; }
+    .streak { font-size: 1rem; color: var(--pink); font-weight: bold; min-height: 1.2rem; }
+
+    .little-toggle {
+      font-family: var(--font); font-size: 1rem; font-weight: bold; cursor: pointer;
+      border: 3px solid var(--purple); background: var(--paper); color: var(--purple);
+      border-radius: 999px; padding: 0.55rem 1.1rem; min-height: 46px;
+      touch-action: manipulation; transition: background 0.15s ease, color 0.15s ease;
+    }
+    .little-toggle.on { background: var(--purple); color: #fff; }
+    .little-toggle:focus-visible { outline: 4px solid var(--pink); outline-offset: 3px; }
+
+    .puz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1.1rem; max-width: 780px; margin: 0 auto; }
     .puz-card {
-      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
       background: var(--paper); border: 4px solid transparent; border-radius: 22px;
-      padding: 1.3rem 1rem; cursor: pointer; box-shadow: 0 10px 26px rgba(43,36,64,0.12);
+      padding: 1.3rem 1rem 1rem; cursor: pointer; box-shadow: 0 10px 26px rgba(43,36,64,0.12);
       transition: transform 0.15s ease, border-color 0.15s ease; font-family: var(--font); color: var(--ink);
     }
     .puz-card:hover, .puz-card:focus-visible { transform: translateY(-6px); border-color: var(--yellow); outline: none; }
-    .puz-card .pz-emoji { font-size: 2.6rem; }
+    .puz-card:focus-visible { border-color: var(--purple); }
+    .puz-card .pz-emoji { font-size: 2.6rem; line-height: 1; }
     .puz-card h3 { margin: 0; font-size: 1.1rem; }
-    .puz-card .pz-progress { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
+    .puz-card .pz-progress { font-size: 0.85rem; color: #565073; font-weight: bold; }
     .puz-card.done { border-color: var(--green); }
+    .puz-card.daily { border-color: var(--pink); }
+    .pz-daily {
+      position: absolute; top: -0.85rem; left: 50%; transform: translateX(-50%);
+      background: var(--pink); color: #fff; font-size: 0.72rem; font-weight: bold;
+      border-radius: 999px; padding: 0.2rem 0.6rem; white-space: nowrap;
+    }
+    .pz-tier { font-size: 0.75rem; font-weight: bold; border-radius: 999px; padding: 0.1rem 0.55rem; }
+    .pz-tier.t1 { background: #e2f8ea; color: #17794a; }
+    .pz-tier.t2 { background: #fff2cf; color: #8a6d00; }
+    .pz-tier.t3 { background: #ffe1ea; color: #b3204b; }
+    .pz-tier.t4 { background: #ece4ff; color: #5a32c4; }
+    .pz-bar { display: block; width: 100%; height: 7px; border-radius: 999px; background: #ece8f6; overflow: hidden; }
+    .pz-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--yellow), var(--green)); border-radius: 999px; }
     /* phones: two compact columns instead of one giant card per row */
     @media (max-width: 520px) {
-      .puz-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
-      .puz-card { padding: 0.9rem 0.5rem; border-radius: 18px; gap: 0.2rem; }
+      .puz-grid { grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+      .puz-card { padding: 1.1rem 0.5rem 0.8rem; border-radius: 18px; gap: 0.2rem; }
       .puz-card .pz-emoji { font-size: 2.1rem; }
-      .puz-card h3 { font-size: 0.98rem; }
+      .puz-card h3 { font-size: 0.95rem; }
+      .little-toggle { font-size: 0.9rem; }
     }
 
-    /* the rank / progress */
-    .rank { font-size: 1.3rem; font-weight: bold; color: #b8860b; min-height: 1.6rem; margin: 0.25rem 0; }
+    /* ---------- the rank ladder ---------- */
+    .hive-name { font-size: 1.1rem; font-weight: bold; color: var(--purple); margin: 0 0 0.2rem; }
+    .rank { font-size: 1.2rem; font-weight: bold; color: #8a6d00; min-height: 1.6rem; margin: 0.2rem 0; }
+    .ladder-wrap { max-width: 420px; margin: 0 auto 0.4rem; }
+    .ladder-track { height: 12px; border-radius: 999px; background: #ece8f6; overflow: hidden; }
+    .ladder-track i { display: block; height: 100%; background: linear-gradient(90deg, var(--yellow), var(--pink), var(--purple)); transition: width 0.3s ease; }
+    .ladder { display: flex; justify-content: space-between; margin-top: 0.3rem; }
+    .ladder .rung { width: 12px; height: 12px; border-radius: 50%; background: #ded8ee; }
+    .ladder .rung.lit { background: var(--purple); }
+    @media (prefers-reduced-motion: reduce) { .ladder-track i { transition: none; } }
 
-    /* the word you're building */
+    /* ---------- the word you're building ---------- */
     .entry {
       min-height: 2.4rem; font-size: 2rem; font-weight: bold; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--ink); margin: 0.25rem 0 0.5rem;
+      text-transform: uppercase; color: var(--ink); margin: 0.25rem 0 0.4rem;
     }
-    .entry .center { color: var(--yellow); }
-    .entry .ghosttext { color: #c7c0d8; }
+    .entry .center { color: #d99b00; }
+    .entry .ghosttext { color: #6f6890; font-size: 1.1rem; letter-spacing: normal; text-transform: none; }
 
-    .feedback { min-height: 1.5rem; font-size: 1.15rem; font-weight: bold; color: var(--green); margin: 0 0 0.5rem; }
+    .feedback { min-height: 1.5rem; font-size: 1.1rem; font-weight: bold; color: var(--green); margin: 0 0 0.4rem; }
 
-    /* honeycomb */
-    .hive { width: 280px; max-width: 90vw; margin: 0.5rem auto 1rem; position: relative; aspect-ratio: 1 / 1; }
+    /* ---------- honeycomb ---------- */
+    .hive { width: 290px; max-width: 88vw; margin: 0.4rem auto 1rem; position: relative; aspect-ratio: 1 / 1; }
     .cell {
       position: absolute; width: 33.3%; height: 38%; left: 33.3%; top: 31%;
       border: none; background: none; padding: 0; cursor: pointer; font-family: var(--font);
-      touch-action: manipulation;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     }
     .hex {
       width: 100%; height: 100%;
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
       display: flex; align-items: center; justify-content: center;
-      background: #e9e3f7; color: var(--ink); font-size: 1.9rem; font-weight: bold; text-transform: uppercase;
+      background: #e4ddf5; color: var(--ink); font-size: 1.9rem; font-weight: bold; text-transform: uppercase;
       transition: transform 0.08s ease, background 0.15s ease;
     }
-    .cell.center .hex { background: var(--yellow); color: #fff; }
+    .cell.center .hex { background: #f5b800; color: #fff; }
     .cell:active .hex { transform: scale(0.9); }
+    .cell.tapped .hex { transform: scale(0.85); background: var(--purple); color: #fff; }
+    .cell:focus-visible .hex { outline: 4px solid var(--purple); outline-offset: -4px; }
     /* six outer positions around the centre */
     .cell.p0 { transform: translate(0, -86%); }
     .cell.p1 { transform: translate(86%, -43%); }
@@ -85,20 +126,45 @@
     .cell.p3 { transform: translate(0, 86%); }
     .cell.p4 { transform: translate(-86%, 43%); }
     .cell.p5 { transform: translate(-86%, -43%); }
+    @media (prefers-reduced-motion: reduce) {
+      .cell:active .hex, .cell.tapped .hex { transform: none; }
+      .puz-card:hover, .puz-card:focus-visible, .btn:hover { transform: none; }
+    }
 
-    .controls { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .controls { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
 
+    /* ---------- word chart ---------- */
+    .chart { max-width: 520px; margin: 0 auto 1rem; text-align: left; background: var(--paper);
+      border-radius: 18px; box-shadow: 0 8px 20px rgba(43,36,64,0.1); overflow: hidden; }
+    .chart > summary {
+      cursor: pointer; list-style: none; padding: 0.75rem 1rem; font-weight: bold; color: var(--purple);
+      font-size: 1rem; min-height: 44px; display: flex; align-items: center; touch-action: manipulation;
+    }
+    .chart > summary::-webkit-details-marker { display: none; }
+    .chart > summary::before { content: "▸ "; margin-right: 0.35rem; }
+    .chart[open] > summary::before { content: "▾ "; }
+    .chart-body { padding: 0 1rem 0.9rem; }
+    .chart-row { margin: 0.35rem 0; font-size: 0.95rem; color: var(--ink); line-height: 2; }
+    .chart-row b { color: #8a6d00; margin-right: 0.3rem; }
+    .chart-chip { display: inline-block; background: #f2eefc; color: #4b3d78; border-radius: 999px;
+      padding: 0.2rem 0.6rem; margin: 0 0.25rem 0.25rem 0; font-weight: bold; font-size: 0.88rem; }
+    .chart-none { margin: 0.3rem 0; font-weight: bold; color: var(--green); }
+
+    /* ---------- found words ---------- */
     .found-wrap { max-width: 520px; margin: 0 auto; text-align: left; }
-    .found-wrap h3 { color: #b8860b; margin: 0.5rem 0; font-size: 1.05rem; text-align: center; }
+    .found-wrap h3 { color: #8a6d00; margin: 0.5rem 0; font-size: 1.05rem; text-align: center; }
     .found-list { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; }
+    .found-empty { color: #565073; font-weight: bold; font-size: 0.95rem; }
     .found-chip {
       background: var(--paper); border: none; font-family: var(--font); color: var(--ink);
-      border-radius: 999px; padding: 0.3rem 0.8rem; font-weight: bold;
+      border-radius: 999px; padding: 0.35rem 0.85rem; font-weight: bold;
       text-transform: capitalize; box-shadow: 0 4px 10px rgba(43,36,64,0.1); font-size: 0.95rem;
     }
-    .found-chip.pangram { background: var(--yellow); color: #fff; }
-    .found-chip.has-def { cursor: pointer; text-decoration: underline dotted #b8860b 2px; text-underline-offset: 3px; touch-action: manipulation; }
-    .deffy { min-height: 1.3rem; text-align: center; font-size: 1rem; font-weight: bold; color: var(--purple); margin: 0.4rem auto 0; max-width: 480px; }
+    .found-chip.pangram { background: #f5b800; color: #fff; }
+    .found-chip.dormant { opacity: 0.5; }
+    .found-chip.has-def { cursor: pointer; text-decoration: underline dotted #8a6d00 2px; text-underline-offset: 3px; touch-action: manipulation; min-height: 36px; }
+    .found-chip.has-def:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
+    .deffy { min-height: 1.3rem; text-align: center; font-size: 1rem; font-weight: bold; color: var(--purple); margin: 0.5rem auto 1rem; max-width: 480px; }
 
     .sparkle { position: fixed; font-size: 1.5rem; pointer-events: none; animation: sparkle-up 0.9s ease-out forwards; z-index: 5; }
     @keyframes sparkle-up {
@@ -122,39 +188,57 @@
     <p class="subtitle">Make words from the honeycomb — every word uses the middle letter!</p>
   </header>
 
-  <main class="game-stage" style="max-width: 760px;">
+  <main class="game-stage" style="max-width: 780px;">
 
     <!-- PUZZLE PICKER -->
     <section id="puzzles">
-      <p style="font-weight:bold;color:#b8860b;font-size:1.2rem;margin-top:0;">Pick a hive:</p>
+      <div class="picker-head">
+        <p>Pick a hive:</p>
+        <span class="streak" id="streak" aria-live="polite"></span>
+        <button type="button" class="little-toggle" id="little-toggle" aria-pressed="false">🐣 Little Bee mode</button>
+        <span class="totals" id="totals"></span>
+      </div>
       <div class="puz-grid" id="puz-grid"></div>
     </section>
 
     <!-- PLAY -->
     <section id="play" class="hidden">
+      <p class="hive-name" id="hive-name"></p>
       <div class="bee-bar">
         <div>🍯 Score: <span id="score">0</span></div>
         <div>📝 Words: <span id="wordcount">0</span></div>
+        <div>🌟 Pangrams: <span id="pangrams">0</span></div>
+      </div>
+
+      <div class="ladder-wrap">
+        <div class="ladder-track"><i id="ladder-fill" style="width:0%"></i></div>
+        <div class="ladder" id="ladder" role="img" aria-label="Rank ladder"></div>
       </div>
       <div class="rank" id="rank" aria-live="polite">Start spelling!</div>
-      <p class="feedback" id="feedback" aria-live="polite"></p>
+      <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
 
-      <div class="entry" id="entry"><span class="ghosttext">type or tap letters…</span></div>
+      <div class="entry" id="entry" aria-live="polite" aria-label="The word you are building"><span class="ghosttext">type or tap letters…</span></div>
 
-      <div class="hive" id="hive"></div>
+      <div class="hive" id="hive" role="group" aria-label="Honeycomb of letters"></div>
 
       <div class="controls">
-        <button class="btn ghost" id="delete-btn">⌫ Delete</button>
-        <button class="btn ghost" id="shuffle-btn">🔀 Shuffle</button>
-        <button class="btn" id="enter-btn">Enter ✓</button>
+        <button class="btn ghost" id="delete-btn" aria-label="Delete the last letter">⌫ Delete</button>
+        <button class="btn ghost" id="shuffle-btn" aria-label="Shuffle the outside letters">🔀 Shuffle</button>
+        <button class="btn" id="enter-btn" aria-label="Enter this word">Enter ✓</button>
       </div>
-      <div class="controls" style="margin-top:-0.4rem;">
-        <button class="btn ghost" id="hint-btn">💡 Hint</button>
-        <button class="btn ghost" id="quit-btn">🐝 All hives</button>
+      <div class="controls">
+        <button class="btn ghost" id="hint-btn" aria-label="Get a hint about a word you have not found">💡 Hint</button>
+        <button class="btn ghost" id="quit-btn" aria-label="Back to all the hives">🐝 All hives</button>
       </div>
 
+      <details class="chart" id="chart">
+        <summary>📊 Word chart — what's still out there</summary>
+        <div class="chart-body" id="chart-body"></div>
+      </details>
+
       <div class="found-wrap">
-        <h3>Words you found <span style="font-weight:normal;color:#6a6385;font-size:0.85rem;">(tap a dotted word to see what it means)</span></h3>
+        <h3>Words you found <span id="found-count"></span>
+          <span style="font-weight:normal;color:#565073;font-size:0.85rem;">(tap a dotted word to see what it means)</span></h3>
         <div class="found-list" id="found-list"></div>
         <p class="deffy" id="deffy" aria-live="polite"></p>
       </div>

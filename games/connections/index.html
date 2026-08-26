@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🔗 Connections</title>
-  <meta name="description" content="Sort 16 cards into 4 secret groups of 4 — a kid-friendly Connections that builds logic & vocabulary." />
+  <meta name="description" content="Sort 16 cards into 4 secret groups of 4 — a kid-friendly Connections with five difficulty levels that builds logic, vocabulary and science." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>" />
   <meta name="theme-color" content="#8a5cff" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
@@ -15,67 +15,128 @@
       background: linear-gradient(90deg, var(--purple), var(--blue));
       border: none; border-radius: 999px; padding: 0.7rem 1.5rem; cursor: pointer;
       box-shadow: 0 8px 20px rgba(138,92,255,0.3); transition: transform 0.15s ease; touch-action: manipulation;
+      min-height: 48px;
     }
     .btn:hover:not(:disabled) { transform: scale(1.05); }
     .btn:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
-    .btn.ghost { background: var(--paper); color: var(--purple); box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
+    .btn.ghost { background: var(--paper); color: #5b34c9; box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
+    .btn:focus-visible, .puz-card:focus-visible, .tile:focus-visible, .tier-chip:focus-visible {
+      outline: 4px solid #2b2440; outline-offset: 3px;
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
 
     /* puzzle picker */
-    #puzzles.hidden, #play.hidden, .controls.hidden, .btn.hidden { display: none; }
+    #puzzles.hidden, #play.hidden, .controls.hidden, .btn.hidden, #daily-bar.hidden, #resume-bar.hidden { display: none; }
     .puz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1.1rem; max-width: 720px; margin: 0 auto; }
     .puz-card {
       display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
       background: var(--paper); border: 4px solid transparent; border-radius: 22px;
-      padding: 1.3rem 1rem; cursor: pointer; box-shadow: 0 10px 26px rgba(43,36,64,0.12);
+      padding: 1.2rem 0.9rem; cursor: pointer; box-shadow: 0 10px 26px rgba(43,36,64,0.12);
       transition: transform 0.15s ease, border-color 0.15s ease; font-family: var(--font); color: var(--ink); text-align: center;
+      min-height: 150px; justify-content: center;
     }
     .puz-card:hover, .puz-card:focus-visible { transform: translateY(-6px); border-color: var(--purple); outline: none; }
-    .puz-card .pz-emoji { font-size: 2.6rem; }
-    .puz-card h3 { margin: 0; font-size: 1.1rem; }
-    .puz-card .pz-progress { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
-    .puz-card.solved { border-color: var(--green); }
-    .puz-card.perfect { border-color: var(--yellow); }
-    .puz-card.perfect .pz-progress { color: #c99400; }
-    /* phones: two compact columns instead of one giant card per row */
-    @media (max-width: 520px) {
-      .puz-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
-      .puz-card { padding: 0.9rem 0.5rem; border-radius: 18px; gap: 0.2rem; }
-      .puz-card .pz-emoji { font-size: 2.1rem; }
-      .puz-card h3 { font-size: 0.98rem; }
+    .puz-card:focus-visible { outline: 4px solid #2b2440; outline-offset: 3px; }
+    .puz-card .pz-emoji { font-size: 2.4rem; line-height: 1; }
+    .puz-card h3 { margin: 0; font-size: 1.05rem; }
+    .puz-card .pz-progress { font-size: 0.85rem; color: #565073; font-weight: bold; }
+    .puz-card.solved { border-color: #009e73; }
+    .puz-card.perfect { border-color: #e69f00; }
+    .puz-card.perfect .pz-progress { color: #8a6100; }
+    .puz-card.today { box-shadow: 0 0 0 4px rgba(138,92,255,0.35), 0 10px 26px rgba(43,36,64,0.12); }
+    .pz-today { font-size: 0.72rem; font-weight: bold; color: #5b34c9; text-transform: uppercase; letter-spacing: 0.04em; }
+    .pz-tier {
+      font-size: 0.72rem; font-weight: bold; border-radius: 999px; padding: 0.12rem 0.55rem;
+      background: #efeaf9; color: #3c3358; white-space: nowrap;
     }
+    .pz-tier.tier-tot    { background: #ffe6f2; }
+    .pz-tier.tier-easy   { background: #dcf7ec; }
+    .pz-tier.tier-medium { background: #fdf0d5; }
+    .pz-tier.tier-tricky { background: #ffe2d6; }
+    .pz-tier.tier-expert { background: #e2e6ff; }
+
+    /* difficulty filter chips */
+    .tier-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: center; margin: 0 auto 1rem; max-width: 700px; }
+    .tier-chip {
+      font-family: var(--font); font-size: 0.95rem; font-weight: bold; color: #3c3358;
+      background: var(--paper); border: 3px solid transparent; border-radius: 999px;
+      padding: 0.5rem 0.9rem; min-height: 44px; cursor: pointer; box-shadow: 0 4px 12px rgba(43,36,64,0.1);
+      touch-action: manipulation;
+    }
+    .tier-chip small { color: #6a6385; font-weight: normal; }
+    .tier-chip.on { border-color: var(--purple); background: #f3edff; }
+    .tier-chip.on small { color: #5b34c9; }
+
+    #stats-line { font-weight: bold; color: #5b34c9; min-height: 1.2rem; margin: 0 0 0.8rem; font-size: 0.98rem; }
+    #daily-bar, #resume-bar { margin: 0 0 1rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
 
     /* solved group rows */
     .solved-row {
-      border-radius: 16px; padding: 0.6rem; margin: 0 auto 0.5rem; max-width: 560px;
-      color: #fff; box-shadow: 0 6px 16px rgba(43,36,64,0.18);
+      border-radius: 16px; padding: 0.65rem 0.8rem; margin: 0 auto 0.5rem; max-width: 560px;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.18);
       animation: row-in 0.35s ease;
     }
     @keyframes row-in { 0%{transform:scale(0.85);opacity:0;} 60%{transform:scale(1.04);} 100%{transform:scale(1);opacity:1;} }
-    @media (prefers-reduced-motion: reduce) { .solved-row, .tile.wrong, .tile.pop { animation: none; } }
     .solved-row .grp-name { font-weight: bold; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.03em; }
-    .solved-row .grp-items { font-size: 0.95rem; margin-top: 0.15rem; }
+    .solved-row .grp-shape { display: inline-block; margin-right: 0.4rem; font-size: 1.05rem; }
+    .solved-row .grp-items { font-size: 0.95rem; margin-top: 0.15rem; font-weight: bold; }
+    .solved-row .grp-why { font-size: 0.85rem; margin-top: 0.3rem; line-height: 1.3; opacity: 0.95; }
+
+    #puz-title { font-size: 1.25rem; font-weight: bold; color: #3c3358; margin: 0 0 0.7rem; display: flex; gap: 0.5rem; justify-content: center; align-items: center; flex-wrap: wrap; }
 
     /* the 4x4 board */
     .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; max-width: 560px; margin: 0 auto 1rem; }
     .tile {
-      aspect-ratio: 1 / 1; border: none; border-radius: 14px; background: #efeaf9; color: var(--ink);
+      aspect-ratio: 1 / 1; border: 3px solid transparent; border-radius: 14px; background: #efeaf9; color: var(--ink);
       font-family: var(--font); font-weight: bold; cursor: pointer; padding: 0.2rem;
-      display: flex; align-items: center; justify-content: center; text-align: center;
-      font-size: clamp(0.62rem, 2.4vw, 0.95rem); line-height: 1.05; word-break: break-word;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+      font-size: clamp(0.7rem, 2.7vw, 1rem); line-height: 1.08; overflow-wrap: anywhere; hyphens: auto;
       box-shadow: 0 4px 10px rgba(43,36,64,0.1); transition: transform 0.1s ease, background 0.12s ease;
       touch-action: manipulation;
     }
+    .tile.long { font-size: clamp(0.58rem, 2.15vw, 0.85rem); }
+    .tile .ic { font-size: 1.6rem; line-height: 1.1; }
+    .tile.has-ic .wd { font-size: 0.82em; }
     .tile:active { transform: scale(0.94); }
-    .tile.selected { background: var(--ink); color: #fff; transform: scale(0.96); }
+    .tile.selected { background: #2b2440; color: #fff; transform: scale(0.96); border-color: #ffd166; }
+    .tile.revealed { border-color: #0072b2; background: #dceeff; box-shadow: 0 0 0 4px rgba(0,114,178,0.25); }
     .tile.wrong { animation: shake 0.4s ease; }
     @keyframes shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-7px);} 60%{transform:translateX(7px);} }
     .tile.pop { animation: pop 0.3s ease; }
     @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.15);} 100%{transform:scale(1);} }
 
-    .lives { font-size: 1.2rem; font-weight: bold; color: var(--purple); margin: 0.25rem 0; min-height: 1.5rem; }
+    @media (prefers-reduced-motion: reduce) {
+      .solved-row, .tile.wrong, .tile.pop { animation: none; }
+      .btn, .puz-card, .tile { transition: none; }
+      .btn:hover:not(:disabled), .puz-card:hover { transform: none; }
+    }
+
+    .lives { font-size: 1.2rem; font-weight: bold; color: #5b34c9; margin: 0.25rem 0; min-height: 1.5rem; }
     .lives .dot { font-size: 1.3rem; }
-    .feedback { min-height: 1.5rem; font-size: 1.15rem; font-weight: bold; color: var(--green); margin: 0.25rem 0 0.5rem; }
+    .feedback { min-height: 2.6rem; font-size: 1.05rem; font-weight: bold; color: #0f8a5f; margin: 0.25rem auto 0.5rem; max-width: 560px; line-height: 1.25; }
     .controls { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; }
+    .keyhelp { font-size: 0.82rem; color: #565073; margin: 0.9rem 0 0; }
+    .how { max-width: 560px; margin: 1.2rem auto 0; text-align: left; background: var(--paper); border-radius: 16px; padding: 0.6rem 1rem; box-shadow: 0 6px 16px rgba(43,36,64,0.1); }
+    .how summary { font-weight: bold; color: #5b34c9; cursor: pointer; padding: 0.3rem 0; min-height: 32px; }
+    .how p, .how li { font-size: 0.92rem; line-height: 1.4; }
+
+    /* phones: two compact columns instead of one giant card per row */
+    @media (max-width: 560px) {
+      .puz-grid { grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+      .puz-card { padding: 0.9rem 0.4rem; border-radius: 18px; gap: 0.2rem; min-height: 132px; }
+      .puz-card .pz-emoji { font-size: 2rem; }
+      .puz-card h3 { font-size: 0.95rem; }
+      .puz-card .pz-progress { font-size: 0.78rem; }
+      .tier-chip { font-size: 0.85rem; padding: 0.45rem 0.7rem; }
+      .tier-chip small { display: none; }
+      .board { gap: 0.35rem; }
+      .tile { border-radius: 11px; }
+      .tile .ic { font-size: 1.25rem; }
+    }
   </style>
 </head>
 <body>
@@ -90,25 +151,48 @@
     <p class="subtitle">Find the 4 secret groups of 4. Tap four cards that go together!</p>
   </header>
 
-  <main class="game-stage" style="max-width: 760px;">
+  <main class="game-stage" style="max-width: 780px;">
 
     <!-- PUZZLE PICKER -->
     <section id="puzzles">
-      <p style="font-weight:bold;color:var(--purple);font-size:1.2rem;margin-top:0;" id="puz-progress">Pick a puzzle:</p>
+      <p id="stats-line" aria-live="polite"></p>
+      <div id="daily-bar">
+        <button class="btn" id="daily-btn"></button>
+      </div>
+      <div id="resume-bar" class="hidden">
+        <button class="btn ghost" id="resume-btn"></button>
+        <button class="btn ghost" id="resume-drop">✕ Start fresh</button>
+      </div>
+      <div class="tier-chips" id="tier-chips" role="group" aria-label="Choose a difficulty level"></div>
+      <p style="font-weight:bold;color:#5b34c9;font-size:1.15rem;margin-top:0;" id="puz-progress">Pick a puzzle:</p>
       <div class="puz-grid" id="puz-grid"></div>
+
+      <details class="how">
+        <summary>How do you play?</summary>
+        <p>Sixteen cards hide <strong>four secret groups of four</strong>. Tap four cards you
+        think belong together, then press <strong>Check ✓</strong>. Get it right and the group
+        locks in — and tells you <em>why</em> those four go together.</p>
+        <ul>
+          <li>Careful: some cards look like they fit two groups. Only one is right!</li>
+          <li>Stuck? <strong>💡 Hint</strong> tells you a group's name — it never costs a guess.</li>
+          <li>Trying the same four cards twice is free too.</li>
+          <li>Every level has a fair number of guesses: 🧸 Tiny gets 6, 🌱 Easy gets 5, the rest get 4.</li>
+        </ul>
+      </details>
     </section>
 
     <!-- PLAY -->
     <section id="play" class="hidden">
-      <div id="solved"></div>
-      <div class="board" id="board"></div>
+      <h2 id="puz-title"></h2>
+      <div id="solved" aria-live="polite"></div>
+      <div class="board" id="board" role="group" aria-label="Cards — pick four that go together"></div>
       <div class="lives" id="lives" aria-live="polite"></div>
       <p class="feedback" id="feedback" aria-live="polite"></p>
       <div class="controls" id="play-controls">
-        <button class="btn ghost" id="shuffle-btn">🔀 Shuffle</button>
-        <button class="btn ghost" id="deselect-btn">Clear pick</button>
-        <button class="btn ghost" id="hint-btn">💡 Hint</button>
-        <button class="btn" id="submit-btn">Check ✓</button>
+        <button class="btn ghost" id="shuffle-btn" aria-label="Shuffle the cards">🔀 Shuffle</button>
+        <button class="btn ghost" id="deselect-btn" aria-label="Clear the cards you picked">Clear pick</button>
+        <button class="btn ghost" id="hint-btn" aria-label="Give me a hint">💡 Hint</button>
+        <button class="btn" id="submit-btn" aria-label="Check my four cards">Check ✓</button>
       </div>
       <div class="controls hidden" id="next-controls">
         <button class="btn" id="next-btn">Next puzzle ▶</button>
@@ -117,6 +201,7 @@
       <div class="controls" style="margin-top:0.5rem;">
         <button class="btn ghost" id="quit-btn">🔗 All puzzles</button>
       </div>
+      <p class="keyhelp">Keyboard: arrow keys move · Space picks · Enter checks · S shuffles · C clears · H hints · Esc goes back</p>
     </section>
 
   </main>
