@@ -221,15 +221,17 @@
       b.className = "gloss-word" + (known.has(entry.w) ? " known" : "");
       b.textContent = part;
       b.setAttribute("aria-label", part + " — tap to hear what it means");
-      b.addEventListener("click", ev => { ev.stopPropagation(); showWord(entry); });
+      b.addEventListener("click", ev => { ev.stopPropagation(); showWord(entry, part); });
       el.appendChild(b);
     });
   }
 
-  function showWord(entry) {
+  // `tapped` is the exact word on the page, so a child who taps
+  // "grumbling" is never answered with a different headword.
+  function showWord(entry, tapped) {
     SFX.word();
     const isNew = bankWord(entry.w, false);
-    wordW.textContent = "📖 " + entry.w;
+    wordW.textContent = "📖 " + (tapped || entry.w);
     if (isNew) {
       const tag = document.createElement("span");
       tag.className = "wnew";
@@ -343,7 +345,10 @@
     hideShelf();
     // Only Ellie's pre-reader stories get the voice controls.
     voiceAvailable = storyHasVoice(story);
-    voiceBtn.style.display = voiceAvailable ? "" : "none";
+    // hidden but still holding its space, so the title stays centred
+    voiceBtn.style.visibility = voiceAvailable ? "" : "hidden";
+    voiceBtn.setAttribute("aria-hidden", voiceAvailable ? "false" : "true");
+    voiceBtn.tabIndex = voiceAvailable ? 0 : -1;
     readBtn.style.display  = voiceAvailable ? "" : "none";
     updateVoiceBtn();
     titleEl.textContent = story.title;

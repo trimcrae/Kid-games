@@ -441,10 +441,20 @@
     setTimeout(() => { if (t === token) fn(); }, ms);
   }
 
+  /* Words that have no narration clip in audio/ yet. tools/extract_texts.js
+     picks up every `word:` in this file, so the next run of the audio
+     pipeline renders these — once the .mp3s are committed, empty this set
+     and the 🔊 buttons light up on their own. Asking for a missing clip
+     would only 404 in the console, so we never ask. */
+  const NO_CLIP = new Set(GROWN.words.map((w) => w.word));
+  function hasClip(word) { return !NO_CLIP.has(word); }
+
   // Play a pre-rendered neural-voice clip from this game's audio/ folder.
-  // A word with no clip yet simply stays silent (voice.js handles that).
   function playClip(name) {
     if (window.Voice) Voice.play("audio/" + name + ".mp3");
+  }
+  function sayWord(word) {
+    if (hasClip(word)) playClip("word-" + word);
   }
 
   function art(word) {
