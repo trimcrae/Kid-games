@@ -1616,7 +1616,10 @@
     rafId = 0;
     if (!karaokeOn) { paintWord(-1); return; }
     if (narrator.paused || narrator.ended) { paintWord(-1); return; }
+    // light the first word straight away; once the clip reports its length we
+    // know where every word sits and the highlight starts walking along
     if (ensureTiming()) paintWord(wordAt(narrator.currentTime));
+    else if (wordSpans.length) paintWord(0);
     rafId = requestAnimationFrame(tickKaraoke);
   }
 

@@ -869,7 +869,7 @@
     $("go-end").textContent = endCrew;
     $("go-endmob").innerHTML = newEndRecord
       ? `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> — 🏆 new high score!`
-      : `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> <span class="hint">(best ever ${save.bestEndCrew})</span>`;
+      : `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> <span class="hint">(${mode().label} best ${P.bestEndCrew})</span>`;
     $("go-coins").textContent = earned;
     renderReview();
     const badgeBox = $("go-badges");

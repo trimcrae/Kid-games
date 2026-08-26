@@ -2,41 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>👶 Baby Taps</title>
-  <meta name="description" content="A first game for the littlest one — tap giant shapes and animals, hear their names, and watch them pop. Colours, shapes, animal sounds and first words." />
+  <meta name="description" content="A first game for the littlest one — tap giant shapes, animals, letters and numbers, hear their names, and watch them pop. Colours, shapes, animal sounds, letter sounds, counting and first words." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👶</text></svg>" />
   <meta name="theme-color" content="#ffd166" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="../../assets/css/style.css" />
   <style>
     /* Everything here is deliberately BIG and forgiving: no timer, no
-       score to lose, no small buttons, nothing that can go wrong. */
-    body { overflow: hidden; }
-
-    .word-line {
-      text-align: center;
-      font-size: clamp(2rem, 9vw, 3.4rem);
-      font-weight: 900;
-      color: var(--purple);
-      margin: 0.1rem 0 0.2rem;
-      min-height: 1.15em;
-      line-height: 1.15;
-      text-shadow: 0 3px 0 #fff, 0 6px 18px rgba(138, 92, 255, 0.2);
+       score to lose, no small buttons, nothing that can go wrong.
+       The page is a fixed-height flex column so the play pit always
+       fits the screen exactly — it can never spill off the bottom. */
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right)
+               env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
+    /* ---- the thin grown-up strip (small on purpose: babies miss it) ---- */
+    .grown-ups {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      padding: 0.35rem 0.4rem 0.15rem;
+    }
+    .mode-btn {
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: var(--purple);
+      background: var(--paper);
+      border: 3px solid var(--yellow);
+      border-radius: 14px;
+      padding: 0.22rem 0.55rem;
+      cursor: pointer;
+      touch-action: manipulation;
+      line-height: 1.25;
+    }
+    .mode-btn[aria-pressed="true"] {
+      color: #fff;
+      background: linear-gradient(90deg, var(--yellow), var(--pink));
+      border-color: var(--pink);
+    }
+    .tally {
+      font-weight: bold;
+      color: var(--pink);
+      font-size: 0.82rem;
+      padding: 0 0.25rem;
+      white-space: nowrap;
+    }
+    #found { color: var(--purple); }
+
+    /* ---- grown-up-only escape hatch: press and HOLD to leave ---- */
+    a.back-link {
+      position: relative;
+      overflow: hidden;
+      margin: 0;
+      padding: 0.22rem 0.6rem;
+      font-size: 0.82rem;
+      border: 3px solid var(--blue);
+      border-radius: 14px;
+      box-shadow: none;
+      touch-action: manipulation;
+      z-index: 1;
+    }
+    a.back-link:hover { transform: none; }
+    a.back-link .fill {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      opacity: 0.85;
+      z-index: -1;
+    }
+    a.back-link.holding .fill {
+      width: 100%;
+      transition: width 1.1s linear;
+    }
+    a.back-link.holding { color: #fff; }
+
+    /* ---- the big word ---- */
+    .word-line {
+      flex: 0 0 auto;
+      text-align: center;
+      font-size: clamp(1.5rem, 7vw, 3rem);
+      font-weight: 900;
+      color: var(--purple);
+      margin: 0.05rem 0.4rem 0.2rem;
+      min-height: 1.2em;
+      line-height: 1.2;
+      text-shadow: 0 3px 0 #fff, 0 6px 18px rgba(138, 92, 255, 0.2);
+      overflow: hidden;
+    }
+
+    /* ---- the play pit fills whatever is left ---- */
     #pit {
       position: relative;
-      height: 72vh;
-      min-height: 340px;
-      margin: 0 0.5rem;
+      flex: 1 1 auto;
+      min-height: 200px;
+      margin: 0 0.5rem 0.5rem;
       border-radius: 30px;
       background: rgba(255, 255, 255, 0.5);
       box-shadow: inset 0 0 0 5px rgba(255, 209, 102, 0.5);
       overflow: hidden;
-      touch-action: manipulation;
+      touch-action: none;
       -webkit-user-select: none;
       user-select: none;
+      -webkit-touch-callout: none;
+      cursor: pointer;
     }
 
     .thing {
@@ -45,17 +129,22 @@
       background: transparent;
       padding: 0;
       cursor: pointer;
-      touch-action: manipulation;
+      touch-action: none;
+      -webkit-touch-callout: none;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       animation: pop-in 0.35s ease backwards;
       will-change: transform;
+      color: var(--ink);
+      font-family: var(--font);
+      z-index: 1;          /* own stacking context, so the golden glow sits behind */
     }
     @keyframes pop-in {
       from { transform: scale(0.2); opacity: 0; }
     }
-    .thing:active { transform: scale(0.9); }
+    .thing:active, .thing.press { transform: scale(0.9); }
     .thing.gone {
       animation: pop-out 0.4s ease forwards;
       pointer-events: none;
@@ -63,8 +152,42 @@
     @keyframes pop-out {
       to { transform: scale(1.9) rotate(12deg); opacity: 0; }
     }
-    .thing .face { font-size: 4.6rem; line-height: 1; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.16)); }
+    .thing .face { line-height: 1; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.16)); }
     .thing svg { display: block; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18)); }
+
+    /* Letters and numbers sit on a big white plate so the thing a kid
+       AIMS at is exactly as big as the thing that can be tapped, and
+       the glyph always has proper contrast behind it. */
+    .thing.plate {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 26%;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.16),
+                  inset 0 0 0 5px var(--plate, var(--yellow));
+    }
+    .glyph {
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.01em;
+    }
+    .sub { line-height: 1; margin-top: 0.06em; }
+    .pips { display: flex; margin-top: 0.1em; flex-wrap: wrap;
+            justify-content: center; align-content: center; }
+    .pips i {
+      display: block;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
+    }
+
+    /* a rare golden one — a gentle surprise, never scary */
+    .thing.special::before {
+      content: "";
+      position: absolute;
+      inset: -8%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,209,102,0.75), rgba(255,209,102,0) 70%);
+      z-index: -1;
+    }
 
     /* Things breathe instead of drifting: a baby's aim is wobbly enough
        without a moving target, so the hit area never moves — only the glow. */
@@ -74,6 +197,17 @@
         0%, 100% { filter: drop-shadow(0 6px 8px rgba(0,0,0,0.16)); }
         50%      { filter: drop-shadow(0 10px 16px rgba(138, 92, 255, 0.45)); }
       }
+      .thing.special { animation: pop-in 0.35s ease backwards, sparkle-spin 2.6s ease-in-out infinite; }
+      @keyframes sparkle-spin {
+        0%, 100% { transform: rotate(-3deg); }
+        50%      { transform: rotate(3deg) scale(1.04); }
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .thing, .thing.bob, .thing.special { animation: none !important; }
+      .thing.gone { animation: fade-out 0.4s ease forwards !important; }
+      @keyframes fade-out { to { opacity: 0; } }
+      .spark { animation-duration: 0.5s !important; }
     }
 
     .spark {
@@ -81,43 +215,59 @@
       font-size: 1.8rem;
       pointer-events: none;
       animation: spark-up 0.7s ease-out forwards;
+      z-index: 3;
     }
     @keyframes spark-up {
       0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
       100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.4); }
     }
 
-    /* grown-up strip: mode + count, small on purpose so babies miss it */
-    .grown-ups {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin: 0.2rem 0 0.35rem;
-    }
-    .mode-btn {
-      font-family: var(--font);
-      font-size: 0.92rem;
-      font-weight: bold;
-      color: var(--purple);
-      background: var(--paper);
-      border: 3px solid var(--yellow);
-      border-radius: 14px;
-      padding: 0.3rem 0.7rem;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    .mode-btn[aria-pressed="true"] {
-      color: #fff;
-      background: linear-gradient(90deg, var(--yellow), var(--pink));
-      border-color: var(--pink);
-    }
-    .count {
-      font-weight: bold;
+    /* the cheer banner floats OVER the pit so it never steals the word line */
+    #cheer {
+      position: absolute;
+      left: 50%;
+      top: 12%;
+      transform: translateX(-50%);
+      font-size: clamp(1.6rem, 6vw, 2.6rem);
+      font-weight: 900;
       color: var(--pink);
-      font-size: 0.95rem;
-      padding: 0 0.4rem;
+      background: rgba(255,255,255,0.92);
+      border-radius: 999px;
+      padding: 0.25em 0.7em;
+      box-shadow: 0 8px 24px rgba(43,36,64,0.18);
+      pointer-events: none;
+      opacity: 0;
+      white-space: nowrap;
+      max-width: 94%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 4;
+    }
+    #cheer.show { animation: cheer-pop 2s ease forwards; }
+    @keyframes cheer-pop {
+      0%   { opacity: 0; transform: translateX(-50%) scale(0.6); }
+      15%  { opacity: 1; transform: translateX(-50%) scale(1.06); }
+      75%  { opacity: 1; transform: translateX(-50%) scale(1); }
+      100% { opacity: 0; transform: translateX(-50%) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #cheer.show { animation: cheer-fade 2s ease forwards; }
+      @keyframes cheer-fade { 0%,100% { opacity: 0 } 15%,75% { opacity: 1 } }
+    }
+
+    /* narrow phones: shrink the grown-up chrome so the pit keeps the room */
+    @media (max-width: 480px) {
+      .mode-btn, a.back-link { font-size: 0.72rem; padding: 0.16rem 0.42rem; border-width: 2px; }
+      .tally { font-size: 0.72rem; padding: 0 0.15rem; }
+      .grown-ups { gap: 0.22rem; padding: 0.3rem 0.3rem 0.1rem; }
+    }
+
+    /* short screens (phone on its side): squeeze the chrome, keep the pit */
+    @media (max-height: 560px) {
+      .word-line { font-size: clamp(1.1rem, 4.5vh, 1.8rem); margin-bottom: 0.05rem; }
+      .grown-ups { padding: 0.15rem 0.3rem 0.05rem; gap: 0.22rem; }
+      .mode-btn, a.back-link, .tally { font-size: 0.72rem; }
+      #pit { min-height: 150px; margin-bottom: 0.25rem; }
     }
   </style>
 </head>
@@ -128,19 +278,25 @@
     <span class="blob blob-3"></span>
   </div>
 
-  <a class="back-link" href="../../" style="margin: 0.5rem 0.75rem;">← Back to the Arcade</a>
-
-  <p class="word-line" id="word" aria-live="polite">Tap anything! 👶</p>
-
   <div class="grown-ups" id="grown-ups">
-    <button class="mode-btn" data-mode="shapes"  aria-pressed="true">🔵 Shapes &amp; Colours</button>
+    <a class="back-link" id="exit-link" href="../../"
+       aria-label="Press and hold to go back to the Arcade"
+       title="Grown-ups: press and hold to leave"><span class="fill" aria-hidden="true"></span>🔒 Hold to exit</a>
+    <button class="mode-btn" data-mode="shapes"  aria-pressed="true">🔵 Shapes</button>
     <button class="mode-btn" data-mode="animals" aria-pressed="false">🐮 Animals</button>
+    <button class="mode-btn" data-mode="letters" aria-pressed="false">🔤 Letters</button>
+    <button class="mode-btn" data-mode="numbers" aria-pressed="false">🔢 Numbers</button>
     <button class="mode-btn" data-mode="mix"     aria-pressed="false">🌈 Everything</button>
     <button class="mode-btn" id="voice-btn" aria-pressed="true" aria-label="Say the words out loud">🔊 Words</button>
-    <span class="count" id="count">0 pops</span>
+    <span class="tally" id="count">0 pops</span>
+    <span class="tally" id="found">🏅 0 found</span>
   </div>
 
-  <div id="pit"></div>
+  <p class="word-line" id="word" aria-live="polite" aria-atomic="true">Tap anything! 👶</p>
+
+  <div id="pit" role="group" aria-label="Tap the big shapes to pop them">
+    <div id="cheer" aria-hidden="true"></div>
+  </div>
 
   <script src="../../assets/js/confetti.js"></script>
   <script src="baby-taps.js"></script>

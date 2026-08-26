@@ -138,6 +138,7 @@
         const cell = document.createElement("span");
         cell.className = "wcell";
         cell.dataset.k = code;
+        cell.setAttribute("aria-hidden", "true");
         if (place) cell.dataset.kind = place.kind;
         cell.style.background = place ? place.color : "#cfe9ff";
         frag.appendChild(cell);
@@ -165,6 +166,7 @@
         if (d < bestD) { bestD = d; best = cell; }
       });
       best.el.tabIndex = 0;
+      best.el.removeAttribute("aria-hidden");
       best.el.setAttribute("role", "button");
       best.el.setAttribute("aria-label", PLACES[code].name);
     });
@@ -207,6 +209,7 @@
         if (code === "..") {
           const blank = document.createElement("span");
           blank.className = "scell blank";
+          blank.setAttribute("aria-hidden", "true");
           el.states.appendChild(blank);
           stateAt[r][c] = null;
           return;
@@ -880,6 +883,8 @@
       el.atlasCountries.innerHTML = "";
       if (!list.length) { show(el.atlasCountries, false); return; }
       show(el.atlasCountries, true);
+      el.atlasCountries.setAttribute("role", "group");
+      el.atlasCountries.setAttribute("aria-label", "Countries in " + PLACES[cont].name);
       list.forEach(function (k) {
         const html = (FLAGS[k]
           ? flagSvg(k, "mini")

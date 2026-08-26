@@ -52,7 +52,7 @@
     /* ---------- the scene she twirls in ---------- */
     .scene {
       position: relative;
-      width: min(320px, 88vw);
+      width: min(400px, 90vw);
       margin: 0 auto 0.5rem;
       border-radius: 26px;
       overflow: hidden;
@@ -111,7 +111,7 @@
     .princess {
       position: relative;
       margin: 0 auto;
-      height: min(300px, 40vh);
+      height: clamp(230px, 36vh, 400px);
       aspect-ratio: 165 / 218;   /* matches the art's viewBox */
       max-width: 100%;
     }
@@ -349,8 +349,8 @@
       .gem.correct, .gem.wrong, .gem.hint, .nudge, .swatch.shake,
       .praise-pop, .princess.twirl { animation: none; }
       .praise-pop { opacity: 1; }
-      .princess svg animate,
-      .princess svg animateTransform { display: none; }
+      /* (the SVG idle bob and twinkles are paused in princess-art.js —
+         CSS cannot switch SMIL off) */
     }
   </style>
 </head>

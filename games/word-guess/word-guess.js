@@ -1,304 +1,197 @@
 /* ===========================================================
    Word Guess — a kid-friendly version of Wordle.
    -----------------------------------------------------------
-   Guess the secret 5-letter word in 6 tries. After each guess:
-     🟩 green  = right letter, right spot
-     🟨 yellow = right letter, wrong spot
-     ⬜ grey   = letter not in the word
-   There's a 💡 Hint button (a category + emoji) so younger
-   readers don't get stuck. Streak & wins are saved.
+   Guess the secret word in 6 tries. After each guess every
+   letter is scored — and, because roughly 1 in 12 boys is
+   colour-blind, every tile carries a SHAPE as well as a colour:
 
-   Teaches: spelling, letter patterns and a little deduction.
+     🟩 ✔  green  = right letter, right spot
+     🟨 ↔  yellow = right letter, wrong spot
+     ⬜ ✖  grey   = letter not in the word
 
-   To ADD WORDS: drop entries in ANSWERS (the secret words, each
-   with a kid-friendly hint) and/or EXTRA_GUESSES (words kids are
-   allowed to *type* as a guess). Everything is 5 letters.
+   Four tiers (words.js) so the whole family gets words at their
+   own level, a Word of the Day for a reason to come back, a
+   "🔎 Detective" panel that teaches the deduction, and the
+   MEANING of the word the moment the round ends.
+
+   Teaches: spelling, letter patterns, vocabulary and deduction.
+
+   To ADD WORDS: edit words.js.
    =========================================================== */
 
 (function () {
   "use strict";
 
-  let LEN = 5;       // letters per word — 5 (Normal) or 4 (Easy)
   const TRIES = 6;
 
-  /* secret words + a gentle hint for each */
-  const ANSWERS = [
-    { word: "apple", emoji: "🍎", hint: "A crunchy red or green fruit" },
-    { word: "happy", emoji: "😊", hint: "How you feel on your birthday" },
-    { word: "water", emoji: "💧", hint: "You drink it when you're thirsty" },
-    { word: "candy", emoji: "🍬", hint: "A sweet treat on Halloween" },
-    { word: "cloud", emoji: "☁️", hint: "A fluffy white thing in the sky" },
-    { word: "dance", emoji: "💃", hint: "Moving your body to music" },
-    { word: "dream", emoji: "💤", hint: "A story in your head while you sleep" },
-    { word: "eagle", emoji: "🦅", hint: "A huge bird with sharp eyes" },
-    { word: "fairy", emoji: "🧚", hint: "A tiny magical creature with wings" },
-    { word: "grape", emoji: "🍇", hint: "A small round purple fruit" },
-    { word: "heart", emoji: "❤️", hint: "The shape that means love" },
-    { word: "juice", emoji: "🧃", hint: "A fruity drink in a box" },
-    { word: "lemon", emoji: "🍋", hint: "A sour yellow fruit" },
-    { word: "magic", emoji: "✨", hint: "Wizards and fairies use it" },
-    { word: "mouse", emoji: "🐭", hint: "A tiny animal that likes cheese" },
-    { word: "ocean", emoji: "🌊", hint: "The huge salty water with whales" },
-    { word: "panda", emoji: "🐼", hint: "A black-and-white bear that loves bamboo" },
-    { word: "queen", emoji: "👑", hint: "A king's royal partner" },
-    { word: "robot", emoji: "🤖", hint: "A machine that can move and beep" },
-    { word: "snake", emoji: "🐍", hint: "A long animal with no legs" },
-    { word: "train", emoji: "🚂", hint: "It runs on tracks: choo-choo!" },
-    { word: "zebra", emoji: "🦓", hint: "A striped animal like a horse" },
-    { word: "sword", emoji: "⚔️", hint: "A blade knights and Minecraft heroes use" },
-    { word: "crown", emoji: "👑", hint: "A queen wears it on her head" },
-    { word: "ghost", emoji: "👻", hint: "A friendly-spooky 'boo!' creature" },
-    { word: "pizza", emoji: "🍕", hint: "Cheesy round food with slices" },
-    { word: "puppy", emoji: "🐶", hint: "A baby dog" },
-    { word: "bunny", emoji: "🐰", hint: "A hoppy animal with long ears" },
-    { word: "sheep", emoji: "🐑", hint: "A farm animal that says 'baa'" },
-    { word: "koala", emoji: "🐨", hint: "A sleepy animal that hugs trees" },
-    { word: "plant", emoji: "🪴", hint: "It grows in soil and needs sun" },
-    { word: "music", emoji: "🎵", hint: "Songs you listen and dance to" },
-    { word: "smile", emoji: "🙂", hint: "What your mouth does when happy" },
-    { word: "story", emoji: "📖", hint: "A tale in a book" },
-    { word: "beach", emoji: "🏖️", hint: "Sandy place by the sea" },
-    { word: "horse", emoji: "🐴", hint: "An animal you can ride that neighs" },
-    { word: "house", emoji: "🏠", hint: "The building a family lives in" },
-    { word: "light", emoji: "💡", hint: "It helps you see in the dark" },
-    { word: "night", emoji: "🌃", hint: "When the sky is dark and stars come out" },
-    { word: "party", emoji: "🥳", hint: "A fun celebration with friends" },
-    { word: "piano", emoji: "🎹", hint: "A big instrument with black and white keys" },
-    { word: "whale", emoji: "🐋", hint: "The biggest animal in the whole ocean" },
-    { word: "shark", emoji: "🦈", hint: "A big fish with lots and lots of teeth" },
-    { word: "snail", emoji: "🐌", hint: "A slow animal that carries its own house" },
-    { word: "spoon", emoji: "🥄", hint: "You eat soup and cereal with it" },
-    { word: "sugar", emoji: "🍭", hint: "It makes treats taste sweet" },
-    { word: "seven", emoji: "7️⃣", hint: "The number that comes after six" },
-    { word: "eight", emoji: "8️⃣", hint: "The number that comes after seven" },
-    { word: "green", emoji: "💚", hint: "The colour of grass" },
-    { word: "white", emoji: "🤍", hint: "The colour of snow" },
-    { word: "brown", emoji: "🤎", hint: "The colour of chocolate" },
-    { word: "flute", emoji: "🎶", hint: "A skinny instrument you blow into" },
-    { word: "tulip", emoji: "🌷", hint: "A cup-shaped spring flower" },
-    { word: "daisy", emoji: "🌼", hint: "A white flower with a yellow middle" },
-    { word: "peach", emoji: "🍑", hint: "A fuzzy sweet fruit" },
-    { word: "berry", emoji: "🫐", hint: "A tiny sweet fruit" },
-    { word: "melon", emoji: "🍈", hint: "A big round juicy fruit" },
-    { word: "salad", emoji: "🥗", hint: "A bowl of crunchy healthy veggies" },
-    { word: "toast", emoji: "🍞", hint: "Warm crunchy bread for breakfast" },
-    { word: "honey", emoji: "🍯", hint: "The sweet sticky food bees make" },
-    { word: "lunch", emoji: "🥪", hint: "The meal you eat in the middle of the day" },
-    { word: "tooth", emoji: "🦷", hint: "You brush it every morning and night" },
-    { word: "smart", emoji: "🧠", hint: "Really good at figuring things out" },
-    { word: "quiet", emoji: "🤫", hint: "Making no noise at all — shhh!" },
-    { word: "storm", emoji: "⛈️", hint: "Rain, wind and thunder all together" },
-    { word: "sunny", emoji: "☀️", hint: "When the sky is full of sunshine" },
-    { word: "windy", emoji: "🍃", hint: "Weather that blows your hat off" },
-    { word: "earth", emoji: "🌍", hint: "The planet we all live on" },
-    { word: "field", emoji: "🌾", hint: "A big open grassy space" },
-    { word: "river", emoji: "🏞️", hint: "Water that flows all the way to the sea" },
-    { word: "stone", emoji: "🪨", hint: "A small hard rock" },
-    { word: "torch", emoji: "🔦", hint: "A light you carry — Minecraft has them!" },
-    { word: "wheel", emoji: "🛞", hint: "A round thing that helps cars roll" },
-    { word: "clock", emoji: "🕐", hint: "It tells you what time it is" },
-    { word: "scarf", emoji: "🧣", hint: "You wrap it round your neck when it's cold" },
-    { word: "glove", emoji: "🧤", hint: "It keeps one hand warm" },
-    { word: "shoes", emoji: "👟", hint: "You wear them on your feet" },
-    { word: "skate", emoji: "⛸️", hint: "Gliding along on ice or wheels" },
-    { word: "climb", emoji: "🧗", hint: "Going up a tree or a wall" },
-    { word: "paint", emoji: "🎨", hint: "You brush colours onto paper with it" },
-    { word: "camel", emoji: "🐫", hint: "A desert animal with humps" },
-    { word: "hippo", emoji: "🦛", hint: "A big river animal with a huge mouth" },
-    { word: "llama", emoji: "🦙", hint: "A fluffy animal that might spit at you" },
-    { word: "otter", emoji: "🦦", hint: "A playful swimmer that floats on its back" },
-    { word: "moose", emoji: "🫎", hint: "A huge deer with big flat antlers" },
-    { word: "goose", emoji: "🪿", hint: "A big bird that honks" },
-    { word: "chick", emoji: "🐤", hint: "A fluffy baby chicken" },
-    { word: "witch", emoji: "🧙", hint: "She rides a broom and casts spells" },
-    { word: "giant", emoji: "🏔️", hint: "A huge, huge person from fairy tales" },
-    { word: "brick", emoji: "🧱", hint: "Builders stack these to make walls" },
-    { word: "truck", emoji: "🚚", hint: "A big vehicle that carries heavy things" },
-    { word: "plane", emoji: "✈️", hint: "It flies people through the sky" },
-    { word: "money", emoji: "💰", hint: "You use it to buy things" },
-    { word: "penny", emoji: "🪙", hint: "A tiny coin" },
-    { word: "spell", emoji: "🪄", hint: "The magic words a wizard says" },
+  /* ---------- tiers ---------- */
+  const TIERS = [
+    { id: "easy",   len: 4, btn: "easy-btn",   name: "Easy",     pool: WG_EASY },
+    { id: "normal", len: 5, btn: "normal-btn", name: "Normal",   pool: WG_NORMAL },
+    { id: "tricky", len: 5, btn: "tricky-btn", name: "Big Kid",  pool: WG_TRICKY },
+    { id: "grown",  len: 5, btn: "grown-btn",  name: "Grown-up", pool: WG_GROWN },
   ];
+  const BY_ID = {};
+  TIERS.forEach(function (t) { BY_ID[t.id] = t; });
 
-  /* extra real words kids are allowed to TYPE as a guess
-     (they won't be the secret answer, but they're not "wrong word"). */
-  const EXTRA_GUESSES = [
-    "about", "above", "actor", "again", "alarm", "angel", "angry", "apron",
-    "arrow", "baker", "bakes", "bears", "bench", "berry", "bingo", "black",
-    "blame", "blank", "blast", "block", "blocks", "bloom", "board", "boats",
-    "bones", "books", "boots", "brain", "brave", "bread", "brick", "brush",
-    "bunny", "cabin", "cakes", "camel", "cards", "catch", "chair", "chalk",
-    "charm", "chase", "cheek", "chess", "chest", "chick", "chief", "child",
-    "chimp", "clean", "clear", "click", "climb", "clock", "color", "creek",
-    "crisp", "crumb", "daisy", "diary", "drink", "drums", "ducks", "earth",
-    "eight", "elbow", "every", "field", "fifty", "fight", "first", "flame",
-    "flash", "float", "floor", "flour", "flute", "found", "fries", "front",
-    "fruit", "funny", "games", "giant", "glass", "globe", "glove", "goats",
-    "grass", "great", "green", "happy", "hello", "hills", "hippo", "honey",
-    "horse", "house", "igloo", "jelly", "jolly", "jumbo", "kitty", "knife",
-    "lamps", "laugh", "learn", "light", "lions", "llama", "lucky", "lunch",
-    "mango", "maple", "march", "marry", "metal", "mixer", "money", "month",
-    "moose", "mouth", "mummy", "music", "night", "noise", "north", "olive",
-    "otter", "paint", "party", "peach", "pearl", "pedal", "penny", "phone",
-    "piano", "pilot", "pixel", "plane", "plums", "polar", "pouch", "power",
-    "press", "price", "pride", "prize", "proud", "quick", "quiet", "quilt",
-    "radio", "rainy", "ranch", "reach", "ready", "river", "roads", "rocks",
-    "round", "royal", "salad", "sandy", "scarf", "scout", "seeds", "shape",
-    "share", "shark", "sheet", "shell", "shine", "shirt", "shoes", "shore",
-    "sight", "skate", "slide", "slime", "small", "smart", "snack", "snail",
-    "sneak", "snowy", "socks", "solar", "space", "spark", "spell", "spend",
-    "spice", "spoon", "sport", "spray", "stamp", "stars", "start", "steam",
-    "stick", "stone", "stork", "storm", "straw", "stump", "sugar", "sunny",
-    "swing", "table", "teddy", "teeth", "thumb", "tiger", "toast", "today",
-    "tooth", "torch", "tower", "trees", "trick", "truck", "trunk", "tulip",
-    "twins", "uncle", "vivid", "watch", "whale", "wheel", "witch", "world",
-    "worms", "yummy",
-  ];
-
-  /* ---- Easy mode: 4-letter words ---- */
-  const ANSWERS4 = [
-    { word: "frog", emoji: "🐸", hint: "A green animal that says 'ribbit'" },
-    { word: "fish", emoji: "🐟", hint: "It swims and breathes underwater" },
-    { word: "star", emoji: "⭐", hint: "A twinkly light in the night sky" },
-    { word: "moon", emoji: "🌙", hint: "It glows in the sky at night" },
-    { word: "cake", emoji: "🍰", hint: "A sweet treat with candles on birthdays" },
-    { word: "bear", emoji: "🐻", hint: "A big furry animal that loves honey" },
-    { word: "duck", emoji: "🦆", hint: "A bird that says 'quack'" },
-    { word: "tree", emoji: "🌳", hint: "It has leaves, branches and a trunk" },
-    { word: "snow", emoji: "❄️", hint: "Cold white fluff that falls in winter" },
-    { word: "ball", emoji: "⚽", hint: "You kick or throw this round toy" },
-    { word: "king", emoji: "🤴", hint: "A queen's royal partner" },
-    { word: "lion", emoji: "🦁", hint: "The big cat that's king of the jungle" },
-    { word: "milk", emoji: "🥛", hint: "A white drink cows give us" },
-    { word: "rain", emoji: "🌧️", hint: "Water that falls from clouds" },
-    { word: "boat", emoji: "⛵", hint: "It floats and carries you on water" },
-    { word: "bird", emoji: "🐦", hint: "An animal with feathers that can fly" },
-    { word: "swan", emoji: "🦢", hint: "A graceful white water bird" },
-    { word: "kite", emoji: "🪁", hint: "You fly this on a windy day" },
-    { word: "drum", emoji: "🥁", hint: "You bang it to make a beat" },
-    { word: "gold", emoji: "🪙", hint: "Shiny treasure pirates love" },
-    { word: "wolf", emoji: "🐺", hint: "A wild animal like a big grey dog" },
-    { word: "ship", emoji: "🚢", hint: "A very big boat" },
-    { word: "crab", emoji: "🦀", hint: "A beach animal that walks sideways" },
-    { word: "deer", emoji: "🦌", hint: "A gentle forest animal with antlers" },
-    { word: "goat", emoji: "🐐", hint: "A farm animal that tries to eat everything" },
-    { word: "lamb", emoji: "🐑", hint: "A baby sheep" },
-    { word: "pony", emoji: "🐴", hint: "A small horse just the right size for kids" },
-    { word: "seal", emoji: "🦭", hint: "A whiskery sea animal that claps" },
-    { word: "toad", emoji: "🐸", hint: "A bumpy cousin of the frog" },
-    { word: "nest", emoji: "🪺", hint: "The home a bird builds" },
-    { word: "leaf", emoji: "🍁", hint: "It grows on a tree and falls in autumn" },
-    { word: "rose", emoji: "🌹", hint: "A beautiful flower with thorny stems" },
-    { word: "corn", emoji: "🌽", hint: "A yellow veggie that grows on a cob" },
-    { word: "pear", emoji: "🍐", hint: "A green fruit shaped like a teardrop" },
-    { word: "rice", emoji: "🍚", hint: "Tiny white grains you eat with dinner" },
-    { word: "soup", emoji: "🍲", hint: "A hot meal you eat with a spoon" },
-    { word: "bell", emoji: "🔔", hint: "It rings ding-dong!" },
-    { word: "door", emoji: "🚪", hint: "You knock on it before you come in" },
-    { word: "lamp", emoji: "🛋️", hint: "A little light for your bedroom" },
-    { word: "sock", emoji: "🧦", hint: "You wear it inside your shoe" },
-    { word: "coat", emoji: "🧥", hint: "You put it on when it's cold outside" },
-    { word: "ring", emoji: "💍", hint: "Shiny jewellery for your finger" },
-    { word: "song", emoji: "🎵", hint: "Music with words you can sing" },
-    { word: "park", emoji: "🛝", hint: "A place with swings and slides" },
-    { word: "farm", emoji: "🚜", hint: "Where crops grow and animals live" },
-    { word: "maze", emoji: "🌀", hint: "A twisty puzzle path you can get lost in" },
-    { word: "hero", emoji: "🦸", hint: "Someone brave who saves the day" },
-    { word: "swim", emoji: "🏊", hint: "Moving through water with your arms and legs" },
-    { word: "sled", emoji: "🛷", hint: "You ride it down a snowy hill" },
-    { word: "tent", emoji: "⛺", hint: "A cloth house for camping" },
-  ];
-  const EXTRA4 = [
-    "bake", "bell", "blue", "book", "calm", "camp", "card", "cave", "city",
-    "club", "coat", "cold", "cool", "corn", "cube", "dark", "deer", "desk",
-    "dive", "doll", "door", "down", "drop", "easy", "farm", "fast", "feet",
-    "film", "fire", "flag", "foot", "frog", "game", "gate", "gift", "girl",
-    "goat", "good", "grow", "hand", "hare", "hill", "home", "hope", "hour",
-    "jump", "kind", "lake", "lamp", "land", "leaf", "left", "lime", "love",
-    "mask", "maze", "mint", "mole", "nest", "nice", "nose", "note", "palm",
-    "park", "pear", "pink", "play", "plum", "pony", "pool", "rain", "rice",
-    "ring", "road", "rock", "rose", "sand", "seal", "seed", "ship", "shoe",
-    "sing", "sled", "slow", "song", "soft", "swan", "swim", "tail", "team",
-    "toad", "town", "toys", "warm", "wave", "wind", "wing", "wolf", "yard",
-    "zoom",
-  ];
-
-  /* allowed guess sets, keyed by word length. The big DICT4/DICT5 lists
-     (dictionary.js) mean any real English word counts as a guess — no
-     more "not a word I know" for a perfectly good word. */
-  function buildAllowed(len, answers, extra, dict) {
-    const s = new Set(dict || []);
-    answers.forEach((a) => { if (a.word.length === len) s.add(a.word); });
-    extra.forEach((w) => { if (w.length === len) s.add(w); });
+  /* Allowed guesses: the big DICT4/DICT5 lists (dictionary.js) plus every
+     answer from every tier plus the hand-written extras — so any real
+     English word a kid types counts as a guess. */
+  function dictArray(d) {
+    if (Array.isArray(d)) return d;
+    if (typeof d === "string") return d.split(" ");
+    return [];
+  }
+  function buildAllowed(len) {
+    const s = new Set(dictArray(len === 4 ? (typeof DICT4 !== "undefined" ? DICT4 : null)
+                                          : (typeof DICT5 !== "undefined" ? DICT5 : null)));
+    TIERS.forEach(function (t) {
+      if (t.len === len) t.pool.forEach(function (e) { s.add(e.word); });
+    });
+    (len === 4 ? WG_EXTRA4 : WG_EXTRA5).forEach(function (w) { if (w.length === len) s.add(w); });
     return s;
   }
-  const ALLOWED5 = buildAllowed(5, ANSWERS, EXTRA_GUESSES, typeof DICT5 !== "undefined" ? DICT5 : null);
-  const ALLOWED4 = buildAllowed(4, ANSWERS4, EXTRA4, typeof DICT4 !== "undefined" ? DICT4 : null);
-  function answersFor() { return (LEN === 4 ? ANSWERS4 : ANSWERS).filter((a) => a.word.length === LEN); }
-  function allowedFor() { return LEN === 4 ? ALLOWED4 : ALLOWED5; }
+  const ALLOWED = { 4: buildAllowed(4), 5: buildAllowed(5) };
 
-  /* ---------- saved stats ---------- */
-  const SAVE_KEY = "wordGuess.v1";
-  function load() {
-    try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === "object") return s; }
-    catch (e) {}
-    return { streak: 0, wins: 0, best: 0, played: 0, last: { 4: -1, 5: -1 } };
+  let tierId = "normal";
+  let daily = false;
+  let LEN = 5;
+
+  function tier() { return BY_ID[tierId] || BY_ID.normal; }
+  function poolFor() { return tier().pool; }
+  function allowedFor() { return ALLOWED[LEN] || ALLOWED[5]; }
+
+  /* ---------- saved stats (v1 → v2 migration, nothing gets orphaned) ---------- */
+  const KEY = "wordGuess.v2";
+  const OLD_KEY = "wordGuess.v1";
+
+  function blank() {
+    return {
+      v: 2,
+      streak: 0, best: 0, wins: 0, played: 0, losses: 0,
+      dist: [0, 0, 0, 0, 0, 0],          // wins in 1..6 guesses
+      bag: {}, last: {},                  // shuffled answer bag, per tier
+      tier: "normal", daily: false,
+      dailyStreak: 0, dailyBest: 0, dailyLast: "", dailyDone: {},
+      rounds: {},                         // in-progress board, per tier+mode
+    };
   }
-  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(stats)); } catch (e) {} }
+  function load() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+    if (!s || typeof s !== "object") {
+      s = blank();
+      let old = null;
+      try { old = JSON.parse(localStorage.getItem(OLD_KEY)); } catch (e) {}
+      if (old && typeof old === "object") {
+        // carry the old save forward so a streak the kids built is never lost
+        s.streak = Number(old.streak) || 0;
+        s.best = Number(old.best) || Number(old.streak) || 0;
+        s.wins = Number(old.wins) || 0;
+        s.played = Number(old.played) || 0;
+        s.losses = Math.max(0, s.played - s.wins);
+        if (old.bag && typeof old.bag === "object") {
+          if (Array.isArray(old.bag[4])) s.bag.easy = old.bag[4];
+          if (Array.isArray(old.bag[5])) s.bag.normal = old.bag[5];
+        }
+      }
+    }
+    // belt-and-braces normalising, so a half-written save can't soft-lock the game
+    const d = blank();
+    for (const k in d) if (!(k in s)) s[k] = d[k];
+    if (!Array.isArray(s.dist) || s.dist.length !== TRIES) s.dist = [0, 0, 0, 0, 0, 0];
+    s.dist = s.dist.map(function (n) { return Number(n) || 0; });
+    ["streak", "best", "wins", "played", "losses", "dailyStreak", "dailyBest"].forEach(function (k) {
+      s[k] = Math.max(0, Number(s[k]) || 0);
+    });
+    if (!s.bag || typeof s.bag !== "object") s.bag = {};
+    if (!s.last || typeof s.last !== "object") s.last = {};
+    if (!s.rounds || typeof s.rounds !== "object") s.rounds = {};
+    if (!s.dailyDone || typeof s.dailyDone !== "object") s.dailyDone = {};
+    if (!BY_ID[s.tier]) s.tier = "normal";
+    s.daily = !!s.daily;
+    s.v = 2;
+    return s;
+  }
   const stats = load();
-  if (!stats.last || typeof stats.last !== "object") stats.last = { 4: -1, 5: -1 };
-  if (typeof stats.best !== "number") stats.best = stats.streak || 0;
-  if (typeof stats.played !== "number") stats.played = 0;
-  // "bag" of unused answer indices per length, so words don't repeat
-  // until the kids have seen every one.
-  if (!stats.bag || typeof stats.bag !== "object") stats.bag = {};
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(stats)); } catch (e) {} }
 
   /* ---------- refs ---------- */
-  const $ = (id) => document.getElementById(id);
+  const $ = function (id) { return document.getElementById(id); };
   const el = {
-    streak: $("streak"), wins: $("wins"), best: $("best"), hint: $("hint"), feedback: $("feedback"),
+    streak: $("streak"), wins: $("wins"), best: $("best"),
+    hint: $("hint"), feedback: $("feedback"), coach: $("coach"),
     grid: $("grid"), kb: $("kb"), hintBtn: $("hint-btn"), newBtn: $("new-btn"),
-    easyBtn: $("easy-btn"), normalBtn: $("normal-btn"),
+    statsBtn: $("stats-btn"), statsPanel: $("stats-panel"), statsBody: $("stats-body"),
+    statsClose: $("stats-close"), practiceBtn: $("practice-btn"), dailyBtn: $("daily-btn"),
+    modeNote: $("mode-note"), live: $("live"),
   };
 
   /* ---------- live state ---------- */
-  let answer = null;     // current ANSWERS entry
+  let answer = null;
   let row = 0;
   let guess = "";
   let over = false;
-  let hintStage = 0;     // 0 = none yet, 1 = category shown, 2 = first letter too
-  const keyState = {};   // letter -> best status
+  let hintStage = 0;
+  let guesses = [];
+  const keyState = {};
 
-  /* draw from a shuffled bag of indices so every word gets a turn
-     before any repeats — much more variety than pure random. */
-  function pickAnswer() {
-    const pool = answersFor();
-    let bag = stats.bag[LEN];
-    if (!Array.isArray(bag) || bag.length === 0 || bag.some((i) => !(i >= 0 && i < pool.length))) {
-      bag = pool.map((_, i) => i);
+  const MARK = { correct: "✔", present: "↔", absent: "✖" };
+  const SAYS = {
+    correct: "right spot",
+    present: "in the word but the wrong spot",
+    absent: "not in the word",
+  };
+
+  /* ---------- picking the secret word ---------- */
+  function dayKey(d) {
+    d = d || new Date();
+    const p = function (n) { return n < 10 ? "0" + n : "" + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function hash(str) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h >>> 0;
+  }
+  function dailyIndex() { return hash(dayKey() + "|" + tierId + "|wordguess") % poolFor().length; }
+
+  /* practice draws from a shuffled bag, so every word gets a turn
+     before any of them repeats — much more variety than pure random. */
+  function pickPractice() {
+    const pool = poolFor();
+    let bag = stats.bag[tierId];
+    const bad = !Array.isArray(bag) || bag.length === 0 ||
+      bag.some(function (i) { return !(typeof i === "number" && i >= 0 && i < pool.length); });
+    if (bad) {
+      bag = pool.map(function (_, i) { return i; });
       for (let k = bag.length - 1; k > 0; k--) {
         const j = Math.floor(Math.random() * (k + 1));
-        [bag[k], bag[j]] = [bag[j], bag[k]];
+        const tmp = bag[k]; bag[k] = bag[j]; bag[j] = tmp;
       }
-      // don't serve the same word twice in a row across a refill
-      if (bag.length > 1 && bag[0] === stats.last[LEN]) [bag[0], bag[1]] = [bag[1], bag[0]];
-      stats.bag[LEN] = bag;
+      if (bag.length > 1 && bag[0] === stats.last[tierId]) { const t = bag[0]; bag[0] = bag[1]; bag[1] = t; }
+      stats.bag[tierId] = bag;
     }
     const i = bag.shift();
-    stats.last[LEN] = i; save();
+    stats.last[tierId] = i;
     return pool[i];
   }
 
+  /* ---------- board ---------- */
   function buildGrid() {
     el.grid.innerHTML = "";
+    el.grid.style.setProperty("--cols", LEN);
     for (let r = 0; r < TRIES; r++) {
       const rowEl = document.createElement("div");
       rowEl.className = "row";
       rowEl.dataset.row = r;
+      rowEl.setAttribute("role", "group");
+      rowEl.setAttribute("aria-label", "Guess " + (r + 1));
       rowEl.style.gridTemplateColumns = "repeat(" + LEN + ", 1fr)";
       for (let c = 0; c < LEN; c++) {
         const cell = document.createElement("div");
         cell.className = "cell";
+        cell.setAttribute("aria-label", "empty");
         rowEl.appendChild(cell);
       }
       el.grid.appendChild(rowEl);
@@ -308,11 +201,11 @@
   const KB_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
   function buildKeyboard() {
     el.kb.innerHTML = "";
-    KB_ROWS.forEach((line, idx) => {
+    KB_ROWS.forEach(function (line, idx) {
       const r = document.createElement("div");
       r.className = "kb-row";
       if (idx === 2) r.appendChild(makeKey("Enter", "enter", true));
-      [...line].forEach((c) => r.appendChild(makeKey(c, c, false)));
+      line.split("").forEach(function (c) { r.appendChild(makeKey(c, c, false)); });
       if (idx === 2) r.appendChild(makeKey("⌫", "back", true));
       el.kb.appendChild(r);
     });
@@ -323,83 +216,157 @@
     b.className = "key" + (wide ? " wide" : "");
     b.textContent = label;
     b.dataset.key = key;
-    b.setAttribute("aria-label", key === "enter" ? "Enter guess" : key === "back" ? "Delete letter" : "Letter " + label.toUpperCase());
-    b.addEventListener("click", () => handleKey(key));
+    b.setAttribute("aria-label",
+      key === "enter" ? "Enter guess" : key === "back" ? "Delete letter" : "Letter " + label.toUpperCase());
+    b.addEventListener("click", function () { b.blur(); handleKey(key); });
     return b;
   }
   function paintKeys() {
-    el.kb.querySelectorAll(".key").forEach((b) => {
-      const k = b.dataset.key;
-      if (k.length !== 1) return;
+    const keys = el.kb.querySelectorAll(".key");
+    for (let i = 0; i < keys.length; i++) {
+      const b = keys[i], k = b.dataset.key;
+      if (k.length !== 1) continue;
       b.classList.remove("correct", "present", "absent");
-      if (keyState[k]) b.classList.add(keyState[k]);
-    });
+      const st = keyState[k];
+      if (st) {
+        b.classList.add(st);
+        b.dataset.mark = MARK[st];
+        b.setAttribute("aria-label", "Letter " + k.toUpperCase() + ", " + SAYS[st]);
+      } else {
+        delete b.dataset.mark;
+        b.setAttribute("aria-label", "Letter " + k.toUpperCase());
+      }
+    }
   }
 
   function rowCells(r) { return el.grid.children[r].children; }
 
   function render() {
+    if (row >= TRIES) return;
     const cells = rowCells(row);
     for (let c = 0; c < LEN; c++) {
-      cells[c].textContent = guess[c] || "";
+      cells[c].textContent = guess[c] ? guess[c].toUpperCase() : "";
       cells[c].classList.toggle("filled", !!guess[c]);
+      cells[c].setAttribute("aria-label", guess[c] ? guess[c].toUpperCase() + ", not guessed yet" : "empty");
     }
   }
 
-  function flash(msg, color) { el.feedback.style.color = color; el.feedback.textContent = msg; }
-
-  function handleKey(key) {
-    if (over) return;
-    if (key === "enter") return submit();
-    if (key === "back") { guess = guess.slice(0, -1); render(); return; }
-    if (key.length === 1 && key >= "a" && key <= "z") {
-      if (guess.length < LEN) { guess += key; render(); }
-    }
+  function flash(msg, color) {
+    el.feedback.style.color = color || "var(--green)";
+    el.feedback.textContent = msg;
   }
+  function announce(msg) { if (el.live) el.live.textContent = msg; }
 
-  function submit() {
-    if (guess.length < LEN) { flash("Need " + LEN + " letters!", "var(--pink)"); badRow(); return; }
-    if (!allowedFor().has(guess)) { flash("Hmm, not a word I know — try another! 🤔", "var(--pink)"); badRow(); return; }
-
-    const target = answer.word;
-    const result = scoreGuess(guess, target);
-    const cells = rowCells(row);
-    for (let c = 0; c < LEN; c++) {
-      const cell = cells[c];
-      cell.style.animationDelay = (c * 70) + "ms";   // little flip cascade
-      cell.classList.add("flip", result[c]);
-      const letter = guess[c];
-      // upgrade keyboard colour (correct > present > absent)
-      const cur = keyState[letter];
-      if (result[c] === "correct" || (result[c] === "present" && cur !== "correct") ||
-          (result[c] === "absent" && !cur)) {
-        keyState[letter] = result[c];
-      }
-    }
-    paintKeys();
-
-    if (guess === target) { win(); return; }
-    row += 1;
-    guess = "";
-    if (row >= TRIES) { lose(); }
-  }
-
-  /* two-pass scoring so duplicate letters colour correctly */
+  /* ---------- scoring (two passes, so duplicate letters colour correctly) ----------
+     Guess SPEED against ERASE: the first E is yellow, the second E is green,
+     the third E must be GREY because ERASE only owns two Es. */
   function scoreGuess(g, target) {
-    const res = new Array(LEN).fill("absent");
+    const n = target.length;
+    const res = new Array(n).fill("absent");
     const counts = {};
-    for (const ch of target) counts[ch] = (counts[ch] || 0) + 1;
-    for (let c = 0; c < LEN; c++) if (g[c] === target[c]) { res[c] = "correct"; counts[g[c]]--; }
-    for (let c = 0; c < LEN; c++) {
+    for (let i = 0; i < n; i++) counts[target[i]] = (counts[target[i]] || 0) + 1;
+    for (let c = 0; c < n; c++) {
+      if (g[c] === target[c]) { res[c] = "correct"; counts[g[c]]--; }
+    }
+    for (let c = 0; c < n; c++) {
       if (res[c] === "correct") continue;
       if (counts[g[c]] > 0) { res[c] = "present"; counts[g[c]]--; }
     }
     return res;
   }
 
+  function paintRow(r, g, res, animate) {
+    const cells = rowCells(r);
+    for (let c = 0; c < g.length; c++) {
+      const cell = cells[c];
+      cell.textContent = g[c].toUpperCase();
+      cell.classList.remove("filled", "correct", "present", "absent", "flip");
+      cell.classList.add(res[c]);
+      cell.dataset.mark = MARK[res[c]];
+      cell.setAttribute("aria-label", g[c].toUpperCase() + ", " + SAYS[res[c]]);
+      if (animate) {
+        cell.style.animationDelay = (c * 70) + "ms";
+        void cell.offsetWidth;
+        cell.classList.add("flip");
+      }
+    }
+  }
+
+  function bumpKeys(g, res) {
+    for (let c = 0; c < g.length; c++) {
+      const letter = g[c], cur = keyState[letter], next = res[c];
+      // correct beats present beats absent — never downgrade a key
+      if (next === "correct" || (next === "present" && cur !== "correct") || (next === "absent" && !cur)) {
+        keyState[letter] = next;
+      }
+    }
+  }
+
   function badRow() {
-    const r = el.grid.children[row];
+    const r = el.grid.children[Math.min(row, TRIES - 1)];
+    if (!r) return;
     r.classList.remove("bad"); void r.offsetWidth; r.classList.add("bad");
+  }
+
+  /* ---------- the 🔎 detective panel: this is where the strategy is taught ---------- */
+  function fits(word) {
+    for (let i = 0; i < guesses.length; i++) {
+      const a = scoreGuess(guesses[i], word);
+      const b = scoreGuess(guesses[i], answer.word);
+      for (let c = 0; c < a.length; c++) if (a[c] !== b[c]) return false;
+    }
+    return true;
+  }
+  function candidates() {
+    return poolFor().filter(function (e) { return fits(e.word); });
+  }
+
+  function updateCoach() {
+    if (!el.coach) return;
+    if (!guesses.length) {
+      el.coach.innerHTML = '<span class="coach-tip">🔎 Tip: start with a word full of different letters — ' +
+        (LEN === 4 ? "like RAIN or SLOT." : "like CRANE or SLATE.") + " Every grey letter you find is progress!</span>";
+      return;
+    }
+    const known = new Array(LEN).fill("_");
+    const inWord = [], out = [];
+    guesses.forEach(function (g) {
+      const res = scoreGuess(g, answer.word);
+      for (let c = 0; c < LEN; c++) {
+        if (res[c] === "correct") known[c] = g[c].toUpperCase();
+        else if (res[c] === "present" && inWord.indexOf(g[c].toUpperCase()) < 0) inWord.push(g[c].toUpperCase());
+        else if (res[c] === "absent" && known.indexOf(g[c].toUpperCase()) < 0) {
+          if (out.indexOf(g[c].toUpperCase()) < 0) out.push(g[c].toUpperCase());
+        }
+      }
+    });
+    const stillIn = inWord.filter(function (L) { return known.indexOf(L) < 0; });
+    const left = candidates().length;
+    let html = '<span class="c-known">✔ ' + known.join(" ") + "</span>";
+    if (stillIn.length) html += '<span class="c-in">↔ somewhere: ' + stillIn.join(" ") + "</span>";
+    if (out.length) html += '<span class="c-out">✖ ruled out: ' + out.slice(0, 12).join(" ") + "</span>";
+    html += '<span class="c-left">🔎 ' + left + (left === 1 ? " word" : " words") + " still fit</span>";
+    el.coach.innerHTML = html;
+  }
+
+  /* ---------- feedback that says something useful ---------- */
+  function guessNote(res, tries) {
+    const g = res.filter(function (r) { return r === "correct"; }).length;
+    const y = res.filter(function (r) { return r === "present"; }).length;
+    const leftTries = TRIES - tries;
+    if (g === 0 && y === 0) {
+      return "No letters in there — but that rules out " + LEN + " letters. Real detective work! 🕵️";
+    }
+    if (g === 0) {
+      return y === 1 ? "One letter is in the word, just in the wrong spot — move it! 🔁"
+                     : y + " letters are in the word but in the wrong spots — shuffle them! 🔁";
+    }
+    let s = g === LEN - 1 ? "So close — " + g + " letters locked in! 🔥"
+          : g === 1 ? "1 letter is in exactly the right spot! ✔"
+          : g + " letters are in the right spots! ✔";
+    if (y) s += " Plus " + y + " more hiding somewhere else.";
+    if (leftTries === 1) s += " Last try — make it count!";
+    return s;
   }
 
   function sparkleBurst() {
@@ -412,95 +379,345 @@
       s.style.left = (cx + (Math.random() - 0.5) * 260) + "px";
       s.style.top = (cy + (Math.random() - 0.5) * 120) + "px";
       document.body.appendChild(s);
-      setTimeout(() => s.remove(), 900);
+      setTimeout(function () { s.remove(); }, 900);
     }
   }
 
-  /* end-of-game vocab moment: always show what the word means */
+  /* the vocabulary moment: every round ends by teaching the word */
   function showMeaning() {
-    el.hint.textContent = answer.emoji + " " + answer.word.toUpperCase() + " — " + answer.hint;
+    el.hint.innerHTML = '<b>' + answer.emoji + " " + answer.word.toUpperCase() + "</b> — " + answer.hint;
+    el.hint.classList.add("meaning");
   }
 
-  const CHEERS = ["🤯 WOW! First try!", "🌟 Amazing — in 2!", "🎉 You got it in 3!", "🎉 You got it in 4!", "😄 Got it in 5!", "😅 Phew — just in time!"];
+  /* ---------- input ---------- */
+  function inputLocked() { return over || !answer || el.statsPanel.classList.contains("open"); }
+
+  function handleKey(key) {
+    if (inputLocked()) return;
+    if (key === "enter") { submit(); return; }
+    if (key === "back") { guess = guess.slice(0, -1); render(); return; }
+    if (key.length === 1 && key >= "a" && key <= "z") {
+      if (guess.length < LEN) { guess += key; render(); }
+    }
+  }
+
+  function submit() {
+    if (guess.length < LEN) {
+      flash("Type all " + LEN + " letters first! ✏️", "var(--pink)"); badRow(); announce("Need " + LEN + " letters");
+      return;
+    }
+    if (!allowedFor().has(guess)) {
+      flash("Hmm, " + guess.toUpperCase() + " isn't a word I know — try another! 🤔", "var(--pink)");
+      badRow(); announce(guess + " is not in the word list");
+      if (window.SFX) SFX.nope();
+      return;
+    }
+    if (guesses.indexOf(guess) >= 0) {
+      flash("You already tried " + guess.toUpperCase() + " — try a different word! 🔁", "var(--pink)");
+      badRow(); announce("Already guessed " + guess);
+      return;
+    }
+
+    const g = guess;
+    const res = scoreGuess(g, answer.word);
+    paintRow(row, g, res, true);
+    bumpKeys(g, res);
+    paintKeys();
+    guesses.push(g);
+    guess = "";
+
+    const won = g === answer.word;
+    row += 1;
+    if (won) { win(); }
+    else if (row >= TRIES) { lose(); }
+    else {
+      flash(guessNote(res, row), "var(--purple)");
+      announce(g.split("").map(function (ch, i) { return ch.toUpperCase() + " " + SAYS[res[i]]; }).join(", "));
+      updateCoach();
+      if (window.SFX) { if (res.indexOf("correct") >= 0) SFX.good(); else SFX.pop(); }
+      saveRound();
+    }
+  }
+
+  /* ---------- end of round ---------- */
+  const CHEERS = ["🤯 WOW! First try!", "🌟 Amazing — in 2!", "🎉 You got it in 3!",
+                  "😄 You got it in 4!", "😊 Got it in 5!", "😅 Phew — just in time!"];
+
+  function recordResult(won, tries) {
+    stats.played += 1;
+    if (won) {
+      stats.wins += 1; stats.streak += 1;
+      if (stats.streak > stats.best) stats.best = stats.streak;
+      if (tries >= 1 && tries <= TRIES) stats.dist[tries - 1] += 1;
+    } else {
+      stats.losses += 1; stats.streak = 0;
+    }
+    if (daily) {
+      const today = dayKey();
+      stats.dailyDone[tierId + "|" + today] = { won: won, tries: tries };
+      if (won) {
+        const y = new Date(); y.setDate(y.getDate() - 1);
+        stats.dailyStreak = (stats.dailyLast === dayKey(y)) ? stats.dailyStreak + 1 : 1;
+        stats.dailyLast = today;
+        if (stats.dailyStreak > stats.dailyBest) stats.dailyBest = stats.dailyStreak;
+      } else {
+        stats.dailyStreak = 0;
+      }
+    }
+    save();
+  }
+
   function win() {
     over = true;
-    stats.wins += 1; stats.streak += 1; stats.played += 1;
-    if (stats.streak > stats.best) stats.best = stats.streak;
-    save();
+    recordResult(true, row);
+    saveRound();
     updateHud();
-    flash(CHEERS[Math.min(row, CHEERS.length - 1)], "var(--green)");
+    flash(CHEERS[Math.min(row - 1, CHEERS.length - 1)], "var(--green)");
     showMeaning();
+    endCoach(true);
+    announce("You win! The word was " + answer.word);
     sparkleBurst();
     if (window.SFX) SFX.win();
-    window.Confetti && Confetti.burst({ count: 100 });
+    if (window.Confetti) Confetti.burst({ count: 100 });
   }
   function lose() {
     over = true;
-    stats.streak = 0; stats.played += 1; save();
+    recordResult(false, 0);
+    saveRound();
     updateHud();
-    flash("Out of tries — the word was " + answer.word.toUpperCase() + ". Try a new one!", "var(--pink)");
+    flash("Out of tries — the word was " + answer.word.toUpperCase() + ". You'll get the next one! 💪", "var(--pink)");
     showMeaning();
+    endCoach(false);
+    announce("Out of tries. The word was " + answer.word);
     if (window.SFX) SFX.nope();
   }
 
+  function endCoach(won) {
+    if (!el.coach) return;
+    let html = '<span class="c-known">' + (won ? "✔ Solved in " + row + (row === 1 ? " guess" : " guesses") : "✖ Not this time") + "</span>";
+    // show the other words that ALSO fitted the clues — that's the lesson
+    const others = candidates().filter(function (e) { return e.word !== answer.word; });
+    if (!won && others.length) {
+      html += '<span class="c-in">These also fitted your clues: ' +
+        others.slice(0, 4).map(function (e) { return e.word.toUpperCase(); }).join(", ") + "</span>";
+    }
+    html += '<span class="c-left">' + (daily ? "🗓️ Come back tomorrow for a new Word of the Day!" : "🔄 Tap New word to keep going") + "</span>";
+    el.coach.innerHTML = html;
+  }
+
   function updateHud() {
-    el.streak.textContent = stats.streak;
+    el.streak.textContent = daily ? stats.dailyStreak : stats.streak;
+    el.best.textContent = daily ? stats.dailyBest : stats.best;
     el.wins.textContent = stats.wins;
-    if (el.best) el.best.textContent = stats.best;
+    const lbl = $("streak-label");
+    if (lbl) lbl.textContent = daily ? "Daily streak" : "Streak";
   }
 
-  function setMode(len) {
-    if (LEN === len) { newGame(); return; }
-    LEN = len;
-    el.easyBtn.classList.toggle("on", LEN === 4);
-    el.normalBtn.classList.toggle("on", LEN === 5);
-    newGame();
+  /* ---------- saving / restoring the board in progress ---------- */
+  function roundKey() { return tierId + "|" + (daily ? "d" : "p"); }
+  function saveRound() {
+    stats.rounds[roundKey()] = {
+      word: answer.word, guesses: guesses.slice(), over: over,
+      hintStage: hintStage, day: daily ? dayKey() : "",
+    };
+    stats.tier = tierId; stats.daily = daily;
+    save();
   }
 
-  function newGame() {
-    answer = pickAnswer();
-    row = 0; guess = ""; over = false; hintStage = 0;
+  function replay(list) {
+    for (let i = 0; i < list.length && i < TRIES; i++) {
+      const g = list[i];
+      const res = scoreGuess(g, answer.word);
+      paintRow(i, g, res, false);
+      bumpKeys(g, res);
+      guesses.push(g);
+    }
+    row = guesses.length;
+    paintKeys();
+  }
+
+  /* ---------- starting a round ---------- */
+  function startRound(force) {
+    const saved = stats.rounds[roundKey()];
+    let restored = false;
+
+    row = 0; guess = ""; over = false; hintStage = 0; guesses = [];
     for (const k in keyState) delete keyState[k];
+    el.hint.textContent = ""; el.hint.classList.remove("meaning");
     el.feedback.textContent = "";
-    el.hint.textContent = "";
     el.hintBtn.textContent = "💡 Hint";
+    el.hintBtn.disabled = false;
+
+    if (daily) {
+      answer = poolFor()[dailyIndex()];
+      if (!force && saved && saved.word === answer.word && saved.day === dayKey()) restored = true;
+    } else if (!force && saved && !saved.over && Array.isArray(saved.guesses) && saved.guesses.length) {
+      const found = poolFor().filter(function (e) { return e.word === saved.word; })[0];
+      if (found) { answer = found; restored = true; }
+      else answer = pickPractice();
+    } else {
+      answer = pickPractice();
+    }
+
+    LEN = tier().len;
     buildGrid();
     buildKeyboard();
+
+    if (restored && Array.isArray(saved.guesses)) {
+      replay(saved.guesses.filter(function (g) { return typeof g === "string" && g.length === LEN; }));
+      hintStage = Number(saved.hintStage) || 0;
+      if (hintStage > 0) showHint();
+      if (guesses.length && guesses[guesses.length - 1] === answer.word) { over = true; }
+      else if (row >= TRIES) { over = true; }
+      if (over) {
+        showMeaning();
+        endCoach(guesses[guesses.length - 1] === answer.word);
+        flash(guesses[guesses.length - 1] === answer.word
+          ? "You already solved this one! " + CHEERS[Math.min(row - 1, CHEERS.length - 1)]
+          : "This one's finished — the word was " + answer.word.toUpperCase() + ".",
+          guesses[guesses.length - 1] === answer.word ? "var(--green)" : "var(--pink)");
+      } else {
+        updateCoach();
+        flash("Welcome back — your guesses are right where you left them. 👋", "var(--purple)");
+      }
+    } else {
+      updateCoach();
+    }
+
+    if (daily && !over) {
+      const done = stats.dailyDone[tierId + "|" + dayKey()];
+      if (done && !restored) {
+        // played today on another device/before a save wipe — don't let them replay it
+        over = true;
+        showMeaning();
+        flash("You've already played today's Word of the Day. Come back tomorrow! 🗓️", "var(--purple)");
+        endCoach(!!done.won);
+      }
+    }
+    if (over) el.hintBtn.disabled = true;
+
     updateHud();
+    updateModeNote();
+    saveRound();
+  }
+
+  function updateModeNote() {
+    if (!el.modeNote) return;
+    el.modeNote.textContent = daily
+      ? "🗓️ Word of the Day — one " + tier().name + " puzzle, the same for everyone, new every morning."
+      : "♾️ Practice — as many " + tier().name + " words as you like.";
+  }
+
+  function setTier(id) {
+    if (!BY_ID[id]) return;
+    const same = id === tierId;
+    tierId = id;
+    LEN = tier().len;
+    TIERS.forEach(function (t) {
+      const b = $(t.btn);
+      if (b) { b.classList.toggle("on", t.id === tierId); b.setAttribute("aria-pressed", String(t.id === tierId)); }
+    });
+    startRound(same && !daily ? false : false);
+  }
+  function setDaily(on) {
+    daily = !!on;
+    el.dailyBtn.classList.toggle("on", daily);
+    el.practiceBtn.classList.toggle("on", !daily);
+    el.dailyBtn.setAttribute("aria-pressed", String(daily));
+    el.practiceBtn.setAttribute("aria-pressed", String(!daily));
+    startRound(false);
+  }
+
+  /* ---------- hint (two stages, so it never gives the word away at once) ---------- */
+  function showHint() {
+    let txt = answer.emoji + "  " + answer.hint;
+    if (hintStage >= 2) txt += " — it starts with “" + answer.word[0].toUpperCase() + "”";
+    el.hint.textContent = txt;
+    el.hint.classList.remove("meaning");
+    el.hintBtn.textContent = hintStage >= 2 ? "💡 Hint" : "💡 More hint";
+  }
+
+  /* ---------- stats panel ---------- */
+  function openStats() {
+    const played = stats.played, wins = stats.wins;
+    const pct = played ? Math.round((wins / played) * 100) : 0;
+    const max = Math.max.apply(null, stats.dist.concat([1]));
+    let bars = "";
+    for (let i = 0; i < TRIES; i++) {
+      const n = stats.dist[i];
+      const w = Math.max(6, Math.round((n / max) * 100));
+      bars += '<div class="bar-row"><span class="bar-n">' + (i + 1) + '</span>' +
+        '<span class="bar" style="width:' + w + '%">' + n + "</span></div>";
+    }
+    el.statsBody.innerHTML =
+      '<div class="stat-grid">' +
+        '<div><b>' + played + "</b><span>played</span></div>" +
+        '<div><b>' + pct + "%</b><span>win rate</span></div>" +
+        '<div><b>' + stats.streak + "</b><span>streak</span></div>" +
+        '<div><b>' + stats.best + "</b><span>best</span></div>" +
+      "</div>" +
+      "<h3>How many guesses it took</h3>" + bars +
+      '<p class="stat-daily">🗓️ Word of the Day streak: <b>' + stats.dailyStreak +
+        "</b> (best " + stats.dailyBest + ")</p>";
+    el.statsPanel.classList.add("open");
+    el.statsPanel.removeAttribute("hidden");
+    el.statsClose.focus();
+  }
+  function closeStats() {
+    el.statsPanel.classList.remove("open");
+    el.statsPanel.setAttribute("hidden", "");
+    el.statsBtn.focus();
   }
 
   /* ---------- physical keyboard ---------- */
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { handleKey("enter"); return; }
-    if (e.key === "Backspace") { handleKey("back"); return; }
+  document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;      // don't eat Ctrl+R, ⌘L, …
+    if (e.key === "Escape") {
+      if (el.statsPanel.classList.contains("open")) { e.preventDefault(); closeStats(); }
+      return;
+    }
+    if (el.statsPanel.classList.contains("open")) return;
+    // a focused button already handles Enter/Space itself — don't double-fire
+    const onButton = e.target && e.target.tagName === "BUTTON";
+    if (e.key === "Enter") { if (onButton) return; e.preventDefault(); handleKey("enter"); return; }
+    if (e.key === "Backspace") { e.preventDefault(); handleKey("back"); return; }
+    if (e.key.length !== 1) return;
     const k = e.key.toLowerCase();
-    if (k.length === 1 && k >= "a" && k <= "z") handleKey(k);
+    if (k >= "a" && k <= "z") { e.preventDefault(); handleKey(k); }
   });
 
-  /* ---------- buttons ----------
-     Hint is two-stage so it never gives the whole word away at once:
-     1st press = the category clue, 2nd press = the first letter too. */
-  el.hintBtn.addEventListener("click", () => {
+  /* ---------- buttons ---------- */
+  el.hintBtn.addEventListener("click", function () {
     if (!answer || over) return;
-    if (hintStage === 0) {
-      hintStage = 1;
-      el.hint.textContent = answer.emoji + "  " + answer.hint;
-      el.hintBtn.textContent = "💡 More hint";
-    } else if (hintStage === 1) {
-      hintStage = 2;
-      el.hint.textContent = answer.emoji + "  " + answer.hint +
-        " — it starts with “" + answer.word[0].toUpperCase() + "”";
-      el.hintBtn.textContent = "💡 Hint";
-    } else {
-      el.hint.textContent = answer.emoji + "  " + answer.hint +
-        " — it starts with “" + answer.word[0].toUpperCase() + "”";
-    }
+    if (hintStage < 2) hintStage += 1;
+    showHint();
+    saveRound();
   });
-  el.newBtn.addEventListener("click", newGame);
-  el.easyBtn.addEventListener("click", () => setMode(4));
-  el.normalBtn.addEventListener("click", () => setMode(5));
+  el.newBtn.addEventListener("click", function () {
+    if (daily) { setDaily(false); return; }   // the daily is once a day — send them to practice
+    startRound(true);
+  });
+  TIERS.forEach(function (t) {
+    const b = $(t.btn);
+    if (b) b.addEventListener("click", function () { b.blur(); setTier(t.id); });
+  });
+  el.practiceBtn.addEventListener("click", function () { el.practiceBtn.blur(); setDaily(false); });
+  el.dailyBtn.addEventListener("click", function () { el.dailyBtn.blur(); setDaily(true); });
+  el.statsBtn.addEventListener("click", function () { openStats(); });
+  el.statsClose.addEventListener("click", function () { closeStats(); });
+  el.statsPanel.addEventListener("click", function (e) { if (e.target === el.statsPanel) closeStats(); });
 
   /* ---------- go ---------- */
-  el.normalBtn.classList.add("on");
-  newGame();
+  tierId = BY_ID[stats.tier] ? stats.tier : "normal";
+  daily = !!stats.daily;
+  LEN = tier().len;
+  TIERS.forEach(function (t) {
+    const b = $(t.btn);
+    if (b) { b.classList.toggle("on", t.id === tierId); b.setAttribute("aria-pressed", String(t.id === tierId)); }
+  });
+  el.dailyBtn.classList.toggle("on", daily);
+  el.practiceBtn.classList.toggle("on", !daily);
+  el.dailyBtn.setAttribute("aria-pressed", String(daily));
+  el.practiceBtn.setAttribute("aria-pressed", String(!daily));
+  startRound(false);
 })();

@@ -28,10 +28,10 @@
     .who {
       font-family: var(--font); font-weight: bold; font-size: 0.95rem;
       border: 3px solid var(--wc, var(--purple)); background: #fff; color: var(--ink);
-      border-radius: 999px; padding: 0.3rem 0.8rem; cursor: pointer;
+      border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer; min-height: 44px;
       box-shadow: 0 4px 10px rgba(43,36,64,0.12);
       transition: transform 0.12s ease; touch-action: manipulation;
-      display: inline-flex; align-items: center; gap: 0.3rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
     }
     .who:hover { transform: translateY(-2px); }
     .who.on { background: var(--wc, var(--purple)); color: #fff; transform: translateY(-2px) scale(1.04); }
@@ -208,8 +208,8 @@
     /* the little 🔊 button that lives in the money bar */
     .mini {
       font-family: var(--font); font-size: 1rem; line-height: 1;
-      border: 2px solid #ece6ff; background: #fff; border-radius: 10px;
-      min-width: 34px; min-height: 30px; cursor: pointer; touch-action: manipulation;
+      border: 2px solid #ece6ff; background: #fff; border-radius: 12px;
+      min-width: 42px; min-height: 42px; cursor: pointer; touch-action: manipulation;
       padding: 0.15rem 0.35rem;
     }
     .mini[aria-pressed="true"] { background: var(--purple); border-color: var(--purple); }
@@ -254,7 +254,9 @@
     .ghost {
       font-family: var(--font); font-weight: bold; font-size: 0.9rem; color: var(--purple);
       background: #fff; border: 3px solid var(--purple); border-radius: 999px;
-      padding: 0.35rem 0.9rem; cursor: pointer; touch-action: manipulation;
+      padding: 0.35rem 0.95rem; cursor: pointer; touch-action: manipulation;
+      min-height: 44px; min-width: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
     }
     .ghost:hover { transform: translateY(-2px); }
     /* Small, but never smaller than a small finger: 40px is the floor. */

@@ -627,11 +627,10 @@
     if (window.PrincessArt) PrincessArt.setDress(GOWNS[gownIdx].hex);
     applyScene();
 
-    if (overlayMode === "wardrobe" && round) {
+    if (overlayMode === "wardrobe") {
       // straight back into the round she was already playing
       locked = false;
-      playClip(currentClip);
-      armIdleNudge();
+      if (round) { playClip(currentClip); armIdleNudge(); } else { newRound(); }
       return;
     }
     if (overlayMode === "resume") {

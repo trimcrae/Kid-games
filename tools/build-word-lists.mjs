@@ -108,6 +108,18 @@ const BLOCK = new Set([
   "slut","hooker","harlot","strumpet","concubine","mistress","seduction","fetish","pussy",
   "bitch","bastard","fanny","jugs","wanker","git","bloody","sod","bollix","minger",
   "suicide","murder","rape","abortionist","hangman","executioner","assassin",
+  /* Adult anatomy, slurs and weapons that WordNet drags in. Token-matched,
+     so only unambiguous words go here — "corn", "port", "zombie", "bitter"
+     and friends are alcohol in one category and perfectly innocent in
+     another, and are screened per-category in the game's data file. */
+  "anus","breast","buttock","buttocks","cervix","clit","clitoris","crotch","cunt",
+  "foreskin","genital","genitalia","genitals","glans","gonad","groin","hymen",
+  "labia","labium","loin","loins","ovary","penis","phallus","prat","pubes","pubic",
+  "pubis","putz","rectum","snatch","testicle","testis","titty","uterus","vagina",
+  "vaginalis","vulva","womb","eroticism","masochism","sadism",
+  "aquavit","bock","liquor","mescal","plonk","rotgut","vino",
+  "coon","eskimo","esquimau","golliwog","gypsy","hottentot","kaffir","negro","squaw","slave",
+  "bloodmobile","bomber","bombard","bombardment","gunboat","hearse","missile","torpedo","warship",
 ]);
 /* Words a child will absolutely type that the frequency list has never
    heard of. Anything caught by a coverage-test failure belongs here. */

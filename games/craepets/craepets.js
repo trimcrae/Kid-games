@@ -571,6 +571,12 @@
       }).join("") + "</div>" +
       '<p class="sub" style="margin:0.5rem 0 0;text-align:center">' +
         esc((D.TIERS.filter(function (x) { return x.id === t; })[0] || D.TIERS[2]).note) + "</p>" +
+      (canSpeak
+        ? '<p class="sub" style="margin:0.6rem 0 0;text-align:center">' +
+          (voiceWanted() ? "🔊 Questions are being read aloud" : "🔇 Questions are not read aloud") +
+          " — tap the speaker in the coin bar to change it. On a keyboard, " +
+          "<b>1</b>–<b>4</b> pick an answer and <b>Enter</b> moves on.</p>"
+        : "") +
     "</div>";
   }
 
@@ -657,6 +663,7 @@
     sess.q = pickQuestion(info.subject);
     sess.state = "ask";
     sess.chose = -1;
+    sess.misses = 0;
     announce(sess.q);
   }
 
@@ -678,7 +685,9 @@
   function announce(q) {
     if (!q) return;
     var extra = "";
-    if (q.big && q.big.text) extra = ". " + q.big.text;
+    // A sum or a letter reads fine out loud; a gapped word ("C_T") does
+    // not, and it is the thing the child is supposed to LOOK at anyway.
+    if (q.big && q.big.text && q.big.text.indexOf("_") === -1) extra = ". " + q.big.text;
     speak(q.q + extra);
   }
 
@@ -820,7 +829,9 @@
       bump("correct");
       var subj = Q.subject;
       S.stats.bySubject[subj] = (S.stats.bySubject[subj] || 0) + 1;
-      if (Q.fromReview && forget(Q.fromReview)) {
+      // Getting it right takes it out of the basket — whether it came
+      // BACK from the basket or just happened to turn up again.
+      if (forget(Q.fromReview || reviewKey(Q))) {
         S.stats.fixed = (S.stats.fixed || 0) + 1;
         bump("fixed");
         toast("🔁 Fixed it! That one is out of your review basket.");
@@ -1173,8 +1184,9 @@
     pendingBuy = { item: it, q: q, correct: "🪙 " + left };
     openSheet(sheet("🧾 " + esc(it.name) + " — 🪙 " + it.cost,
       '<div class="qcard"><p class="qprompt">' + esc(q.q) + "</p>" +
-      '<div class="choices">' + q.choices.map(function (c, i) {
-        return '<button class="choice" data-change="' + i + '">' + esc(c.t) + "</button>";
+      '<div class="choices" role="group" aria-label="Answers">' + q.choices.map(function (c, i) {
+        return '<button class="choice" data-change="' + i + '" aria-label="' + esc((i + 1) + ". " + c.t) + '">' +
+               '<span class="keycap" aria-hidden="true">' + (i + 1) + "</span>" + esc(c.t) + "</button>";
       }).join("") + "</div></div>"));
   }
 
@@ -1613,6 +1625,7 @@
     if (go) {
       var dest = go.dataset.go;
       if (dest !== view) {
+        hush();
         if (["farm", "well", "pool"].indexOf(dest) === -1) sess = null;
         if (dest !== "arena") battle = null;
         view = dest;
@@ -1735,6 +1748,9 @@
   function switchTo(id) {
     if (id === who) return;
     save();
+    hush();
+    moodLine.m = null;              // a new pet gets its own greeting
+    reviewGap = 0;
     who = id;
     try { localStorage.setItem(WHO_KEY, id); } catch (e) {}
     S = load(id);

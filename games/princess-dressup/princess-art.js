@@ -500,6 +500,16 @@ window.PrincessArt = (function () {
     container.appendChild(layer("sparkle", "sparkle1"));
     container.appendChild(layer("sparkle", "sparkle2"));
     container.appendChild(layer("sparkle", "sparkle3"));
+
+    // a child who asks for reduced motion gets a perfectly still princess —
+    // CSS can't reach SMIL, so pause the timeline on every layer instead
+    try {
+      if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        [].forEach.call(container.querySelectorAll("svg"), function (s) {
+          if (s.pauseAnimations) s.pauseAnimations();
+        });
+      }
+    } catch (e) { /* ignore */ }
   }
 
   return { build: build, setDress: setDress };

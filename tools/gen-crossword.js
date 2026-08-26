@@ -515,7 +515,7 @@ const THEMES = [
       { answer: "SERENE", clue: "Calm, peaceful and completely untroubled.", teach: "The noun is 'serenity', and a clear evening sky is where the word started." },
       { answer: "QUIRK", clue: "A small, odd habit that makes someone themselves.", teach: "Five letters starting QU. 'Quirky' is the adjective." },
       { answer: "TRIVIA", clue: "Small details of little importance — but great in a quiz.", teach: "Latin 'tri' + 'via' = three roads: gossip swapped where roads meet." },
-      { answer: "VERBOSE", clue: "Using far more words than are needed.", teach: "From Latin 'verbum', word — same family as verb and verbatim." },
+      { answer: "ASTUTE", clue: "Shrewd; quick to see what's really going on.", teach: "From Latin 'astus', craft or cunning. 'Astutely' is the adverb." },
       { answer: "NOVEL", clue: "New and unusual — or a book-length story.", teach: "Both meanings come from Latin 'novus', new." },
     ],
   },

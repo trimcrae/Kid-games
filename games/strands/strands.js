@@ -222,7 +222,7 @@
     if (!puzzle) return;
     const cols = puzzle.width, rows = puzzle.height;
     const maxW = Math.min(360, window.innerWidth - 26);
-    const byHeight = window.innerHeight * 0.56 * cols / rows;
+    const byHeight = window.innerHeight * 0.52 * cols / rows;
     let w = Math.min(maxW, byHeight);
     w = Math.max(w, Math.min(maxW, 40 * cols));
     el.boardWrap.style.width = Math.round(w) + "px";
@@ -315,14 +315,17 @@
       pointerEnter(+target.dataset.r, +target.dataset.c);
     }
   });
-  window.addEventListener("pointerup", release);
-  window.addEventListener("pointercancel", release);
+  window.addEventListener("pointerup", () => release(false));
+  // a cancelled pointer (a system gesture, a call coming in) is not a guess —
+  // drop the trace quietly instead of telling the kid they got it wrong
+  window.addEventListener("pointercancel", () => release(true));
 
-  function release() {
+  function release(cancelled) {
     if (!dragging) return;
     const wasDrag = moved;
     dragging = false; moved = false;
     if (over || !sel.length) return;
+    if (cancelled) { sel = []; afterChange(); return; }
     commit(wasDrag);
   }
 

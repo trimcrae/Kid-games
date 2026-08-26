@@ -3,6 +3,42 @@
   "styleSuffix": ", soft painterly digital illustration, children's storybook art, warm gentle lighting, cute, no text, no words",
   "images": [
     {
+      "id": "rainbow-unicorn-cover",
+      "prompt": "a cheerful little princess girl riding a friendly rainbow-maned unicorn through a sunny meadow of flowers under a rainbow",
+      "width": 512, "height": 384, "seed": 12006,
+      "out": "games/spooky-stories/art/rainbow-unicorn-cover.png"
+    },
+    {
+      "id": "dancing-dragon-cover",
+      "prompt": "a happy chubby cartoon dragon dancing on its back legs in a green valley, sparkles and musical notes around it",
+      "width": 512, "height": 384, "seed": 12007,
+      "out": "games/spooky-stories/art/dancing-dragon-cover.png"
+    },
+    {
+      "id": "sleepy-star-cover",
+      "prompt": "a cute sleepy yellow star wearing a nightcap, yawning among soft clouds in a deep blue night sky with a crescent moon",
+      "width": 512, "height": 384, "seed": 12008,
+      "out": "games/spooky-stories/art/sleepy-star-cover.png"
+    },
+    {
+      "id": "boo-birthday-cover",
+      "prompt": "a friendly smiling cartoon ghost at a birthday party with balloons, a cake with candles and paper bunting, cosy and not scary",
+      "width": 512, "height": 384, "seed": 12009,
+      "out": "games/spooky-stories/art/boo-birthday-cover.png"
+    },
+    {
+      "id": "rainbow-dress-cover",
+      "prompt": "a delighted little girl twirling in a flowing rainbow-coloured party dress in a bright room with ribbons",
+      "width": 512, "height": 384, "seed": 12010,
+      "out": "games/spooky-stories/art/rainbow-dress-cover.png"
+    },
+    {
+      "id": "hide-and-seek-cover",
+      "prompt": "a small friendly black cat playing hide and seek in a moonlit garden with fireflies and tall grass",
+      "width": 512, "height": 384, "seed": 12011,
+      "out": "games/spooky-stories/art/hide-and-seek-cover.png"
+    },
+    {
       "id": "mermaid-cover",
       "prompt": "a friendly cartoon mermaid with a golden harp singing on a coral reef, dolphins and colourful fish, sunbeams through clear blue water",
       "width": 512, "height": 384, "seed": 11006,

@@ -4,106 +4,217 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🫧 Number Bubble Pop</title>
-  <meta name="description" content="Pop the bubble that matches the number or letter — number & letter recognition for little ones, with four levels." />
+  <meta name="description" content="Pop bubbles to practise counting, subitising, number & letter recognition, adding, taking away, skip counting and doubles — nine levels from age 3 to grown-up." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫧</text></svg>" />
   <meta name="theme-color" content="#8a5cff" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="../../assets/css/style.css" />
   <style>
+    /* ---------- page chrome: keep it tight so the board is big ---------- */
+    .back-link { margin: 0.7rem 1rem 0.2rem; padding: 0.5rem 1rem; }
+    .hero { padding: 0.2rem 1rem 0.4rem; }
+    .title { font-size: clamp(1.55rem, 5vw, 3rem); }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    /* ---------- the prompt ---------- */
+    .prompt-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0.1rem 0.6rem 0.2rem;
+      font-size: clamp(1.05rem, 3.6vw, 1.4rem);
+      font-weight: bold;
+      color: var(--ink);
+      text-align: center;
+    }
+    #target {
+      color: var(--pink);
+      font-size: clamp(1.6rem, 6vw, 2.2rem);
+      line-height: 1.05;
+    }
+
+    /* count-out tally: one slot per bubble you still need */
+    .tally {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 0.1rem 0 0.2rem;
+    }
+    .tally[hidden] { display: none; }
+    .tally .slot {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 3px dashed var(--purple);
+      background: rgba(255,255,255,0.6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 900; color: #fff;
+    }
+    .tally .slot.head { border-style: solid; background: var(--blue); border-color: var(--blue); }
+    .tally .slot.filled { border-style: solid; background: var(--green); border-color: var(--green); }
+
+    /* the coach line explains a wrong tap instead of just buzzing */
+    .coach {
+      margin: 0 0.8rem 0.25rem;
+      min-height: 1.5em;
+      font-size: clamp(0.9rem, 3.2vw, 1.05rem);
+      font-weight: bold;
+      text-align: center;
+      color: var(--purple);
+    }
+    .coach.oops { color: #b4442f; }
+    .coach.yay { color: #1f9d55; }
+
+    /* ---------- scoreboard: one compact row, even at 390px ---------- */
     .scoreboard {
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 1.2rem;
-      font-size: 1.3rem;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0 0.5rem 0.4rem;
+    }
+    .scoreboard .stat {
+      font-size: clamp(0.95rem, 3.4vw, 1.15rem);
       font-weight: bold;
       color: var(--purple);
-      margin-bottom: 0.5rem;
+      background: var(--paper);
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      white-space: nowrap;
     }
-    .scoreboard span { color: var(--pink); }
+    .scoreboard .stat b { color: var(--pink); }
     .scoreboard .combo-chip {
       color: #fff;
       background: linear-gradient(90deg, var(--pink), var(--purple));
-      padding: 0 0.7rem;
-      border-radius: 999px;
       transition: transform 0.12s ease;
     }
-    .scoreboard .combo-chip.bump { transform: scale(1.25); }
+    .scoreboard .combo-chip b { color: #fff; }
+    .scoreboard .combo-chip.bump { transform: scale(1.22); }
     .scoreboard .combo-chip.zero { opacity: 0.45; }
+    #voice-btn {
+      font-family: var(--font);
+      font-size: 1.15rem;
+      line-height: 1;
+      border: none;
+      background: var(--paper);
+      border-radius: 999px;
+      min-width: 44px;
+      min-height: 34px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      touch-action: manipulation;
+    }
+    .stat.time-low { color: #fff; background: #e23b3b; animation: time-pulse 1s ease infinite; }
+    .stat.time-low b { color: #fff; }
+    @keyframes time-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
 
+    /* ---------- the board ---------- */
     #play-area {
       position: relative;
-      height: 60vh;
-      min-height: 380px;
-      margin: 0 1rem 2rem;
+      height: clamp(340px, 54vh, 560px);
+      margin: 0 0.75rem 1.5rem;
       border-radius: 28px;
       background: rgba(255, 255, 255, 0.55);
       box-shadow: inset 0 0 0 4px rgba(138, 92, 255, 0.15);
       overflow: hidden;
     }
 
+    /* ---------- bubbles ----------
+       The <button> is the mover (it rises + sways). Its inner .ball is the
+       visible bubble and owns the pop / wobble / hint animations, so those
+       can start and stop WITHOUT restarting the rise. */
     .bubble {
       position: absolute;
-      bottom: -120px;
-      border-radius: 50%;
-      cursor: pointer;
-      background: radial-gradient(circle at 30% 30%, #ffffff, var(--c, #38b6ff));
-      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-      animation: rise linear forwards;
+      bottom: var(--start-bottom, -90px);
+      padding: 0;
       border: none;
+      background: none;
+      cursor: pointer;
       touch-action: manipulation;
+      animation: rise linear forwards, sway ease-in-out infinite;
+      z-index: 2;
+    }
+    .ball {
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: relative;
+      background: radial-gradient(circle at 30% 26%, #ffffff 0%, var(--soft, #d2eeff) 62%, var(--c, #38b6ff) 135%);
+      box-shadow: inset 0 0 0 5px var(--c, #38b6ff), 0 6px 14px rgba(43,36,64,0.18);
       font-family: var(--font);
-      font-weight: bold;
-      color: #fff;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+      font-weight: 900;
+      color: #23193d;              /* dark ink on a pale bubble = high contrast */
+      text-shadow: 0 1px 0 rgba(255,255,255,0.8);
     }
-    .bubble:active { transform: scale(0.85); }
-
-    .bubble.wrong { animation: rise linear forwards, shake 0.35s ease; }
-    @keyframes shake {
-      0%, 100% { margin-left: 0; }
-      25% { margin-left: -8px; }
-      75% { margin-left: 8px; }
-    }
-
-    @keyframes rise {
-      from { transform: translateY(0); }
-      to   { transform: translateY(-78vh); }
-    }
-
-    .pop {
-      animation: pop 0.25s ease-out forwards !important;
+    .ball::after {                  /* glossy highlight */
+      content: "";
+      position: absolute;
+      left: 17%; top: 13%;
+      width: 26%; height: 17%;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      transform: rotate(-25deg);
       pointer-events: none;
     }
-    @keyframes pop {
-      to { transform: scale(1.8); opacity: 0; }
+    .bubble.gold .ball {
+      box-shadow: inset 0 0 0 5px #f0a500, 0 0 16px rgba(255,193,7,0.8), 0 6px 14px rgba(43,36,64,0.18);
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+    .bubble:focus-visible { outline: none; }
+    .bubble:focus-visible .ball { outline: 4px solid var(--ink); outline-offset: 4px; }
+
+    @keyframes rise { to { transform: translateY(calc(-1 * var(--rise, 600px))); } }
+    @keyframes sway {
+      0%, 100% { margin-left: calc(-1 * var(--sway, 7px)); }
+      50%      { margin-left: var(--sway, 7px); }
+    }
+    @keyframes shimmer { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
+
+    .bubble.hint .ball { animation: hint 0.9s ease-in-out infinite; }
+    @keyframes hint { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+    .bubble.wrong .ball { animation: wobble 0.4s ease; }
+    @keyframes wobble {
+      0%, 100% { transform: rotate(0deg); }
+      22% { transform: rotate(-10deg); }
+      66% { transform: rotate(10deg); }
     }
 
-    /* count-the-dots mode: bubbles full of countable dots */
-    .bubble.dot-bubble {
-      flex-wrap: wrap;
-      gap: 8%;
-      padding: 14%;
-      box-sizing: border-box;
-      align-content: center;
+    .bubble.pop { pointer-events: none; }
+    .bubble.pop .ball { animation: pop 0.3s ease-out forwards; }
+    @keyframes pop { to { transform: scale(1.9); opacity: 0; } }
+
+    /* dots mode: real dice patterns, so 5 can be SEEN without counting */
+    .ball.dots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      padding: 17%;
+      gap: 5%;
     }
-    .bubble.dot-bubble .dot {
+    .ball.dots .pip {
       border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      flex: 0 0 auto;
+      background: #23193d;
+      box-shadow: inset 0 -2px 3px rgba(255,255,255,0.25);
     }
 
-    /* praise words that float up from a popped bubble */
+    /* praise words floating up from a popped bubble */
     .praise-float {
       position: absolute;
       transform: translate(-50%, 0);
       font-family: var(--font);
       font-weight: 900;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--purple);
       text-shadow: 0 2px 0 #fff, 0 3px 8px rgba(43,36,64,0.25);
       pointer-events: none;
@@ -111,89 +222,71 @@
       white-space: nowrap;
       animation: praise-up 0.85s ease-out forwards;
     }
-    .praise-float.big { font-size: 1.6rem; color: var(--pink); }
+    .praise-float.big { font-size: 1.5rem; color: var(--pink); }
     @keyframes praise-up {
       0%   { opacity: 0; transform: translate(-50%, 10px) scale(0.6); }
       20%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
       100% { opacity: 0; transform: translate(-50%, -56px) scale(1); }
     }
 
-    /* the clock turns urgent for the last 10 seconds */
-    .scoreboard span.time-low {
-      color: #e23b3b;
-      animation: time-pulse 1s ease infinite;
-      display: inline-block;
-    }
-    @keyframes time-pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-    }
-
-    .stars-line { margin: 0; font-size: 1.6rem; min-height: 1em; }
-
-    /* little splash particles when a bubble pops */
     .splash {
       position: absolute;
-      width: 12px;
-      height: 12px;
+      width: 11px; height: 11px;
       border-radius: 50%;
       pointer-events: none;
-      will-change: transform, opacity;
+      z-index: 5;
       animation: splash-fly 0.5s ease-out forwards;
     }
     @keyframes splash-fly {
       to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
     }
 
-    .btn {
-      font-family: var(--font);
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #fff;
-      background: linear-gradient(90deg, var(--pink), var(--purple));
-      border: none;
-      border-radius: 999px;
-      padding: 0.8rem 2rem;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(138, 92, 255, 0.3);
-      transition: transform 0.15s ease;
-      touch-action: manipulation;
-    }
-    .btn:hover { transform: scale(1.05); }
-
+    /* ---------- start / end overlay ---------- */
     .start-overlay {
       position: absolute;
       inset: 0;
+      z-index: 10;                 /* must sit ABOVE any leftover bubbles */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.9rem;
-      background: rgba(255, 255, 255, 0.9);
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(2px);
       text-align: center;
-      padding: 1rem;
+      padding: 0.8rem;
+      overflow-y: auto;            /* never clip the Start button */
+      overscroll-behavior: contain;
     }
-    .start-overlay h2 { font-size: 2rem; margin: 0; color: var(--purple); }
-    .start-overlay p { margin: 0; max-width: 22rem; color: var(--ink); }
+    .start-overlay > * { flex: 0 0 auto; }
+    .start-overlay h2 { font-size: clamp(1.15rem, 4.4vw, 1.7rem); margin: 0; color: var(--purple); }
+    .start-overlay p { margin: 0; max-width: 24rem; font-size: clamp(0.85rem, 3vw, 1rem); color: var(--ink); }
     .start-overlay.hidden { display: none; }
 
-    /* difficulty picker */
-    .levels {
-      display: flex;
-      gap: 0.6rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .level-btn {
-      font-family: var(--font);
-      font-size: 1.05rem;
+    .lv-group { width: 100%; }
+    .lv-head {
+      display: block;
+      font-size: 0.75rem;
       font-weight: bold;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #6a6385;
+      margin-bottom: 0.25rem;
+    }
+    .levels { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+    .level-btn {
+      position: relative;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: bold;
+      line-height: 1.15;
       color: var(--purple);
       background: #fff;
       border: 3px solid var(--blue);
-      border-radius: 16px;
-      padding: 0.5rem 1rem;
+      border-radius: 14px;
+      padding: 0.3rem 0.6rem;
+      min-height: 44px;
+      min-width: 62px;
       cursor: pointer;
       touch-action: manipulation;
       transition: transform 0.12s ease;
@@ -204,13 +297,48 @@
       background: linear-gradient(90deg, var(--blue), var(--purple));
       border-color: var(--purple);
     }
-    .level-btn small { display: block; font-weight: normal; font-size: 0.8rem; opacity: 0.85; }
+    .level-btn small { display: block; font-weight: normal; font-size: 0.68rem; opacity: 0.9; }
+    .level-btn .chip-stars { display: block; font-size: 0.6rem; line-height: 1; height: 0.7rem; }
 
-    .best-line { font-weight: bold; color: var(--pink); }
+    .stars-line { margin: 0; font-size: 1.2rem; min-height: 1em; }
+    .best-line { margin: 0; font-weight: bold; font-size: 0.95rem; color: var(--pink); min-height: 1em; }
     .best-line.new { animation: best-pop 0.6s ease; }
-    @keyframes best-pop {
-      0%, 100% { transform: scale(1); }
-      40% { transform: scale(1.3); }
+    @keyframes best-pop { 0%,100% { transform: scale(1); } 40% { transform: scale(1.25); } }
+
+    .btn {
+      font-family: var(--font);
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      border: none;
+      border-radius: 999px;
+      padding: 0.7rem 1.9rem;
+      min-height: 48px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(138, 92, 255, 0.3);
+      transition: transform 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn:hover { transform: scale(1.04); }
+
+    .keys-hint { font-size: 0.72rem; color: #6a6385; margin: 0; }
+
+    /* ---------- calm mode for kids who prefer reduced motion ----------
+       Re-declaring the keyframes keeps every animation NAME the same, so the
+       JavaScript (which listens for the "rise" animation to end) is unchanged. */
+    @media (prefers-reduced-motion: reduce) {
+      @keyframes rise { 0% { opacity: 0; } 10% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes sway { 0%, 100% { margin-left: 0; } }
+      @keyframes pop  { to { opacity: 0; } }
+      @keyframes wobble { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+      @keyframes hint { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+      @keyframes shimmer { 0%, 100% { filter: none; } }
+      @keyframes praise-up { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+      @keyframes splash-fly { to { opacity: 0; } }
+      @keyframes time-pulse { 0%, 100% { transform: none; } }
+      @keyframes best-pop { 0%, 100% { transform: none; } }
+      .btn:hover, .level-btn:hover { transform: none; }
     }
   </style>
 </head>
@@ -223,37 +351,57 @@
 
   <a class="back-link" href="../../">← Back to the Arcade</a>
 
-  <header class="hero" style="padding-top: 0.5rem;">
+  <header class="hero">
     <h1 class="title"><span class="emo">🫧</span> Number Bubble Pop</h1>
   </header>
 
-  <p style="text-align:center; font-size:1.5rem; font-weight:bold; color:var(--ink); margin:0 0 0.25rem;" aria-live="polite">
-    <span id="target-label">Pop the number:</span> <span id="target" style="color:var(--pink); font-size:2rem;">?</span>
+  <p class="prompt-line" aria-live="polite">
+    <span id="target-label">Pop the number:</span>
+    <span id="target">?</span>
   </p>
 
+  <div class="tally" id="tally" hidden></div>
+
+  <p class="coach" id="coach" role="status" aria-live="polite"></p>
+
   <div class="scoreboard">
-    <div>Score: <span id="score">0</span></div>
-    <div>Time: <span id="time">45</span></div>
-    <div class="combo-chip zero" id="combo">🔥 0</div>
-    <div>Best: <span id="best">0</span></div>
-    <button id="voice-btn" aria-label="Turn the helper voice on or off"
-            style="font-family:var(--font); font-size:1.1rem; border:none; background:var(--paper); border-radius:999px; padding:0.1rem 0.7rem; cursor:pointer; box-shadow:0 4px 10px rgba(43,36,64,0.12);">🔊</button>
+    <div class="stat"><span aria-hidden="true">⭐</span> <span class="sr-only">Score </span><b id="score">0</b></div>
+    <div class="stat" id="time-stat"><span aria-hidden="true">⏱</span> <span class="sr-only">Seconds left </span><b id="time">45</b></div>
+    <div class="stat combo-chip zero" id="combo"><span aria-hidden="true">🔥</span> <span class="sr-only">Streak </span><b id="combo-n">0</b></div>
+    <div class="stat"><span aria-hidden="true">🏆</span> <span class="sr-only">Best </span><b id="best">0</b></div>
+    <button id="voice-btn" aria-label="Turn the helper voice on or off">🔊</button>
   </div>
 
-  <div id="play-area">
+  <div id="play-area" role="group" aria-label="Bubble play area">
     <div class="start-overlay" id="overlay">
       <h2 id="overlay-title">Find the numbers! 🔢</h2>
       <p id="overlay-text">A number appears at the top. Pop the bubble that matches it before time runs out!</p>
-      <div class="levels" id="levels">
-        <button class="level-btn" data-level="easy" aria-pressed="false">Easy<small>1–5</small></button>
-        <button class="level-btn" data-level="normal" aria-pressed="true">Normal<small>1–9</small></button>
-        <button class="level-btn" data-level="hard" aria-pressed="false">Hard<small>1–20</small></button>
-        <button class="level-btn" data-level="count" aria-pressed="false">Dots<small>count 1–5</small></button>
-        <button class="level-btn" data-level="abc" aria-pressed="false">ABC<small>letters</small></button>
+
+      <div class="lv-group">
+        <span class="lv-head">🐣 Little ones</span>
+        <div class="levels" id="levels">
+          <button class="level-btn" data-level="easy" aria-pressed="false">Easy<small>1–5</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="normal" aria-pressed="true">Normal<small>1–9</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="count" aria-pressed="false">Dots<small>how many?</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="popn" aria-pressed="false">Count Out<small>pop that many</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="abc" aria-pressed="false">ABC<small>letters</small><span class="chip-stars"></span></button>
+        </div>
       </div>
+
+      <div class="lv-group">
+        <span class="lv-head">🚀 Big kids</span>
+        <div class="levels" id="levels-big">
+          <button class="level-btn" data-level="hard" aria-pressed="false">Hard<small>1–20</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="add" aria-pressed="false">Add<small>3 + 4</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="sub" aria-pressed="false">Take Away<small>9 − 4</small><span class="chip-stars"></span></button>
+          <button class="level-btn" data-level="skip" aria-pressed="false">Skip &amp; Double<small>2s · 5s · 10s</small><span class="chip-stars"></span></button>
+        </div>
+      </div>
+
       <p class="stars-line" id="stars-line"></p>
       <p class="best-line" id="best-line"></p>
       <button class="btn" id="start-btn">Start Game ▶</button>
+      <p class="keys-hint">Tip: you can also type the answer on a keyboard.</p>
     </div>
   </div>
 

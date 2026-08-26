@@ -11,36 +11,55 @@
   <style>
     .builder-wrap { max-width: 960px; margin: 0 auto; padding: 0 0.75rem 3rem; }
 
+    [hidden] { display: none !important; }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
     .how {
       text-align: center;
-      color: #6a6385;
+      color: #574f70;
       font-size: 1.05rem;
       margin: 0 auto 1rem;
       max-width: 38rem;
     }
 
-    /* kid picker */
-    .kid-row {
+    /* everything tappable gets a clear focus ring */
+    button:focus-visible, input:focus-visible {
+      outline: 4px solid #2b2440;
+      outline-offset: 2px;
+    }
+
+    /* ---- shared pill-button look for the picker rows ---- */
+    .pick-row {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
+      gap: 0.5rem;
+      margin-bottom: 0.9rem;
     }
-    .kid-pick {
+
+    .kid-pick, .variant-pick, .mode-pick {
       font-family: var(--font);
       font-weight: bold;
+      border-radius: 999px;
+      cursor: pointer;
+      min-height: 46px;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      transition: transform 0.12s ease;
+    }
+    .kid-pick:hover, .variant-pick:hover, .mode-pick:hover { transform: translateY(-2px); }
+
+    .kid-pick {
       font-size: 1.05rem;
       border: 3px solid var(--kc, #ccc);
       background: #fff;
       color: var(--ink);
-      border-radius: 999px;
       padding: 0.45rem 1.1rem;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
-      transition: transform 0.12s ease;
     }
-    .kid-pick:hover { transform: translateY(-2px); }
     .kid-pick.selected {
       background: var(--kc, #ccc);
       color: #fff;
@@ -48,29 +67,31 @@
       box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
     }
 
-    /* variant picker (start / middle / end) */
-    .variant-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
+    /* how to play: build your own vs. Colour Detective quiz */
+    .mode-pick {
+      font-size: 1.05rem;
+      border: 3px solid #2b8cff;
+      background: #fff;
+      color: #1c5fb0;
+      padding: 0.45rem 1.1rem;
     }
+    .mode-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.85; }
+    .mode-pick.selected {
+      background: #2b8cff;
+      color: #fff;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
+    }
+
+    /* variant picker (start / middle / end) */
     .variant-pick {
-      font-family: var(--font);
-      font-weight: bold;
       font-size: 1rem;
       border: 3px solid var(--purple);
       background: #fff;
-      color: var(--purple);
-      border-radius: 999px;
+      color: #6a3ed6;
       padding: 0.4rem 1rem;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
-      transition: transform 0.12s ease;
     }
-    .variant-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.8; }
-    .variant-pick:hover { transform: translateY(-2px); }
+    .variant-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.85; }
     .variant-pick.selected {
       background: var(--purple);
       color: #fff;
@@ -92,17 +113,17 @@
       border: 3px dashed var(--purple);
       border-radius: 16px;
     }
-    .chooser-label { font-weight: bold; color: var(--purple); text-align: center; }
+    .chooser-label { font-weight: bold; color: #6a3ed6; text-align: center; }
     .chooser-letters { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
     .letter-pick {
       font-family: var(--font);
       font-weight: 900;
-      font-size: 1.4rem;
-      width: 2.6rem;
-      height: 2.6rem;
+      font-size: 1.5rem;
+      width: 3rem;
+      height: 3rem;
       border: 3px solid var(--purple);
       background: #fff;
-      color: var(--purple);
+      color: #6a3ed6;
       border-radius: 12px;
       cursor: pointer;
       transition: transform 0.12s ease;
@@ -110,26 +131,22 @@
     .letter-pick:hover { transform: translateY(-2px) scale(1.06); }
     .letter-pick.edge {
       border-color: #ddd;
-      color: #bbb;
+      color: #999;
       background: #f3f3f6;
       cursor: default;
     }
 
-    /* colour picker */
-    .color-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
+    /* colour picker — big tap targets, always labelled with the colour NAME
+       (never colour on its own, so colour-blind players are fine) */
+    .color-row { margin-bottom: 0.9rem; }
     .color-pick {
       font-family: var(--font);
       font-weight: bold;
-      font-size: 0.95rem;
+      font-size: 1rem;
       border: 3px solid transparent;
       border-radius: 999px;
-      padding: 0.4rem 0.9rem;
+      padding: 0.55rem 1rem;
+      min-height: 46px;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(43,36,64,0.15);
       transition: transform 0.12s ease;
@@ -140,6 +157,11 @@
       transform: translateY(-2px) scale(1.05);
       box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
     }
+    .color-pick .tick { font-size: 0.85rem; opacity: 0.95; }
+    .color-pick.dim { opacity: 0.3; cursor: default; }
+    .color-pick.wrongpick { animation: shake 0.4s ease; }
+    /* in Detective mode the colour bar IS the answer bar */
+    .color-row.answering .color-pick { box-shadow: 0 0 0 3px #fff, 0 6px 16px rgba(43,36,64,0.3); }
 
     /* add-a-word form */
     #add-form {
@@ -158,6 +180,7 @@
       border-radius: 16px;
       outline: none;
       min-width: 0;
+      color: var(--ink);
     }
     #word-input.shake { animation: shake 0.4s ease; }
     @keyframes shake {
@@ -174,6 +197,7 @@
       border: none;
       border-radius: 16px;
       padding: 0.7rem 1.25rem;
+      min-height: 48px;
       cursor: pointer;
       box-shadow: 0 8px 18px rgba(138,92,255,0.3);
       transition: transform 0.15s ease;
@@ -181,30 +205,83 @@
     }
     .btn:hover { transform: scale(1.04); }
 
-    .hint { text-align: center; min-height: 1.5rem; font-weight: bold; color: #7a52d6; margin-bottom: 0.5rem; }
+    .hint { text-align: center; min-height: 1.5rem; font-weight: bold; color: #6a3ed6; margin-bottom: 0.5rem; }
+
+    /* ---- the "why did it land there?" spell-out strip ----
+       F L A M I N G O  →  the deciding letter is lit up. */
+    #spellout {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.45rem;
+      max-width: 38rem;
+      margin: 0 auto 0.8rem;
+      padding: 0.6rem 0.8rem;
+      background: #fff;
+      border: 3px solid #e6dcff;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.1);
+    }
+    .so-letters { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.28rem; }
+    .so-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.9rem;
+      height: 2.3rem;
+      padding: 0 0.2rem;
+      font-weight: 900;
+      font-size: 1.2rem;
+      color: #6b6482;
+      background: #f2eeff;
+      border-radius: 10px;
+      opacity: 0;
+      animation: so-pop 0.28s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    .so-letter.gap { background: none; min-width: 0.5rem; }
+    .so-letter.pickme {
+      color: #fff;
+      background: var(--sc, #8a5cff);
+      box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--sc, #8a5cff);
+      transform-origin: center;
+    }
+    .so-letter.pickme.onlight { color: #2b2440; }
+    @keyframes so-pop {
+      0% { opacity: 0; transform: translateY(8px) scale(0.6); }
+      100% { opacity: 1; transform: none; }
+    }
+    .so-why { text-align: center; font-weight: bold; color: var(--ink); font-size: 1rem; line-height: 1.45; }
+    .so-why .swatch {
+      padding: 0 0.45rem;
+      border-radius: 8px;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
+    }
 
     .stats {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.6rem;
       align-items: center;
       justify-content: center;
       margin-bottom: 1rem;
       font-weight: bold;
-      color: var(--purple);
+      color: #6a3ed6;
     }
     .mini-btn {
       font-family: var(--font);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: bold;
       border: 2px solid #cdbfff;
       background: #fff;
-      color: var(--purple);
+      color: #6a3ed6;
       border-radius: 999px;
-      padding: 0.35rem 0.8rem;
+      padding: 0.5rem 0.9rem;
+      min-height: 44px;
       cursor: pointer;
     }
     .mini-btn:hover { background: #f3efff; }
+    .mini-btn.danger { border-color: #f3b0b0; color: #b32b2b; }
+    .mini-btn.armed { background: #ffe9e9; border-color: #e23b3b; color: #b32b2b; }
 
     /* word quest banner */
     .quest {
@@ -217,13 +294,13 @@
       margin: 0 auto 0.9rem;
       padding: 0.6rem 0.9rem;
       background: #fffbea;
-      border: 3px dashed var(--yellow);
+      border: 3px dashed #e0a800;
       border-radius: 16px;
       text-align: center;
     }
     .quest.done {
       background: #eaffef;
-      border-color: var(--green);
+      border-color: #1f9d43;
       animation: quest-pop 0.6s ease;
     }
     @keyframes quest-pop {
@@ -236,7 +313,43 @@
       border-radius: 8px;
       box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
     }
-    .quest-actions { display: flex; gap: 0.4rem; }
+    .quest-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
+
+    /* ---- Colour Detective ---- */
+    #detective {
+      max-width: 36rem;
+      margin: 0 auto 1rem;
+    }
+    .tier-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 0.7rem; }
+    .tier-pick {
+      font-family: var(--font);
+      font-weight: bold;
+      font-size: 0.95rem;
+      border: 3px solid #1f9d43;
+      background: #fff;
+      color: #157233;
+      border-radius: 999px;
+      padding: 0.45rem 0.95rem;
+      min-height: 44px;
+      cursor: pointer;
+    }
+    .tier-pick.selected { background: #1f9d43; color: #fff; }
+
+    .det-card {
+      text-align: center;
+      padding: 1rem 0.9rem;
+      background: #fff;
+      border: 4px solid #2b8cff;
+      border-radius: 20px;
+      box-shadow: 0 10px 24px rgba(43,36,64,0.14);
+    }
+    .det-emoji { font-size: 3.4rem; line-height: 1.1; }
+    .det-word { font-size: 1.9rem; font-weight: 900; color: var(--ink); word-break: break-word; }
+    .det-ask { font-size: 1.05rem; font-weight: bold; color: #1c5fb0; margin-top: 0.25rem; }
+    .det-card.right { border-color: #1f9d43; background: #f2fff5; }
+    .det-card.wrong { border-color: #e23b3b; }
+    .det-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.7rem; }
+    .det-score { text-align: center; font-weight: bold; color: #1c5fb0; margin-top: 0.6rem; }
 
     /* the grid */
     .grid-scroll {
@@ -255,36 +368,50 @@
     }
     .col-head {
       position: sticky; top: 0; z-index: 4;
-      font-size: 0.85rem; padding: 0.5rem 0.25rem;
-      min-width: 92px;
+      font-size: 0.85rem; padding: 0.4rem 0.25rem;
+      min-width: 96px;
+    }
+    .col-head .ccount {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: bold;
+      opacity: 0.9;
     }
     .row-head {
       position: sticky; left: 0; z-index: 3;
-      background: #faf8ff; color: var(--purple);
+      background: #faf8ff; color: #6a3ed6;
       font-size: 1.1rem; font-weight: 900;
       width: 40px; min-width: 40px; text-align: center;
     }
     .cell {
       vertical-align: top;
       padding: 4px;
-      min-width: 92px;
-      height: 44px;
+      min-width: 96px;
+      height: 46px;
     }
     .cell.flash { animation: flash 0.7s ease; }
     @keyframes flash {
       0% { background: #fff7c2; }
       100% { background: transparent; }
     }
+    .chip.bump { animation: bump 0.5s ease; }
+    @keyframes bump {
+      0%,100% { transform: none; }
+      30% { transform: scale(1.18) rotate(-3deg); }
+      65% { transform: scale(1.05) rotate(3deg); }
+    }
 
     .chip {
+      position: relative;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      font-size: 0.8rem;
+      gap: 4px;
+      font-size: 0.85rem;
       font-weight: bold;
-      border-radius: 8px;
-      padding: 2px 4px 2px 7px;
+      border-radius: 9px;
+      padding: 3px 4px 3px 8px;
       margin: 2px;
+      min-height: 30px;
       box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
       animation: drop-in 0.35s cubic-bezier(.34,1.56,.64,1);
     }
@@ -293,17 +420,43 @@
       100% { transform: scale(1); opacity: 1; }
     }
     .chip-x {
+      position: relative;
       border: none;
-      background: rgba(0,0,0,0.18);
+      background: rgba(0,0,0,0.22);
       color: inherit;
       border-radius: 50%;
-      width: 16px; height: 16px;
-      line-height: 14px;
-      font-size: 0.85rem;
+      width: 24px; height: 24px;
+      line-height: 22px;
+      font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
       padding: 0;
+      flex: 0 0 auto;
     }
-    .chip-x:hover { background: rgba(0,0,0,0.35); }
+    /* invisible 44px-ish hit area so little fingers can actually hit it */
+    .chip-x::after {
+      content: "";
+      position: absolute;
+      inset: -9px;
+    }
+    .chip-x:hover { background: rgba(0,0,0,0.4); }
+
+    @media (max-width: 430px) {
+      .det-word { font-size: 1.6rem; }
+      .det-emoji { font-size: 3rem; }
+      .how { font-size: 1rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .kid-pick, .variant-pick, .mode-pick, .color-pick, .btn, .letter-pick,
+      .chip, .cell, .quest, .so-letter, #word-input {
+        animation: none !important;
+        transition: none !important;
+      }
+      .kid-pick:hover, .variant-pick:hover, .mode-pick:hover,
+      .color-pick:hover, .btn:hover, .letter-pick:hover { transform: none; }
+      .so-letter { opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -319,46 +472,79 @@
     <h1 class="title"><span class="emo">🌈</span> Color Grid Builder</h1>
   </header>
 
-  <div class="builder-wrap">
+  <main class="builder-wrap">
     <p class="how" id="how"></p>
 
-    <div class="kid-row" id="kid-row" aria-label="Whose grid?"></div>
+    <h2 class="sr-only">Who is playing?</h2>
+    <div class="pick-row kid-row" id="kid-row" role="group" aria-label="Whose grid is this?"></div>
 
-    <div class="variant-row" id="variant-row" aria-label="Which letter counts?"></div>
+    <h2 class="sr-only">How to play</h2>
+    <div class="pick-row mode-row" id="mode-row" role="group" aria-label="How do you want to play?"></div>
 
-    <div class="color-row" id="color-row" aria-label="Pick a colour"></div>
+    <h2 class="sr-only">Which letter files the word?</h2>
+    <div class="pick-row variant-row" id="variant-row" role="group" aria-label="Which letter should file the word?"></div>
 
-    <div class="quest" id="quest" aria-live="polite">
-      <div class="quest-text" id="quest-text"></div>
-      <div class="quest-actions">
-        <button class="mini-btn" id="quest-hint" type="button">Hint 💡</button>
-        <button class="mini-btn" id="quest-new" type="button">New quest 🔄</button>
+    <h2 class="sr-only">Colours</h2>
+    <div class="pick-row color-row" id="color-row" role="group" aria-label="Colours"></div>
+
+    <section id="build-panel">
+      <h2 class="sr-only">Build your grid</h2>
+      <div class="quest" id="quest" aria-live="polite">
+        <div class="quest-text" id="quest-text"></div>
+        <div class="quest-actions">
+          <button class="mini-btn" id="quest-hint" type="button">Hint 💡</button>
+          <button class="mini-btn" id="quest-new" type="button">New quest 🔄</button>
+        </div>
       </div>
-    </div>
 
-    <form id="add-form" autocomplete="off">
-      <input id="word-input" type="text" placeholder="Type a word…" aria-label="Type a word" />
-      <button class="btn" type="submit">Add ＋</button>
-    </form>
+      <form id="add-form" autocomplete="off">
+        <input id="word-input" type="text" maxlength="30" placeholder="Type a word…" aria-label="Type a word that is the colour you picked" />
+        <button class="btn" type="submit">Add ＋</button>
+      </form>
 
-    <div id="chooser" aria-live="polite"></div>
+      <div id="chooser" aria-live="polite"></div>
+    </section>
 
-    <div class="hint" id="hint" aria-live="polite"></div>
+    <section id="detective" hidden>
+      <h2 class="sr-only">Colour Detective quiz</h2>
+      <div class="tier-row" id="tier-row" role="group" aria-label="Detective difficulty"></div>
+      <div class="det-card" id="det-card" aria-live="polite">
+        <div class="det-emoji" id="det-emoji" aria-hidden="true"></div>
+        <div class="det-word" id="det-word"></div>
+        <div class="det-ask" id="det-ask">What colour is it? Tap a colour above ↑</div>
+      </div>
+      <div class="det-actions">
+        <button class="mini-btn" id="det-tell" type="button">Tell me 💡</button>
+        <button class="mini-btn" id="det-skip" type="button">Another word ⏭️</button>
+      </div>
+      <div class="det-score" id="det-score"></div>
+    </section>
 
+    <div class="hint" id="hint" role="status" aria-live="polite"></div>
+
+    <div id="spellout" aria-live="polite"></div>
+
+    <h2 class="sr-only">Your grid</h2>
     <div class="stats">
       <span>Words in grid: <span id="count">0</span></span>
-      <span>Quest stars: <span id="stars">0</span> ⭐</span>
+      <span>Stars: <span id="stars">0</span> ⭐</span>
+      <span>Colours used: <span id="rainbow">0</span>/10 🌈</span>
       <button class="mini-btn" id="starter" type="button">Load starter words ✨</button>
-      <button class="mini-btn" id="clear" type="button">Clear grid 🗑️</button>
+      <button class="mini-btn" id="undo" type="button" hidden>Undo ↩️</button>
+      <button class="mini-btn" id="rowfilter" type="button">Hide empty rows 🔍</button>
+      <button class="mini-btn danger" id="clear" type="button">Clear grid 🗑️</button>
     </div>
 
     <div class="grid-scroll">
       <table>
+        <caption class="sr-only">
+          Word grid: one row for each letter A to Z, one column for each colour.
+        </caption>
         <thead id="grid-head"></thead>
         <tbody id="grid-body"></tbody>
       </table>
     </div>
-  </div>
+  </main>
 
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
