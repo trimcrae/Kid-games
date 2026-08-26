@@ -137,17 +137,79 @@
     table.gridtbl { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
     table.gridtbl th, table.gridtbl td { border: 1px solid #e3ddf5; padding: 0.4rem 0.5rem; text-align: center; }
     table.gridtbl th { background: #faf8ff; }
-    table.gridtbl td.name { text-align: left; font-weight: bold; white-space: nowrap; }
+    table.gridtbl .name { text-align: left; font-weight: bold; white-space: nowrap; }
     table.gridtbl td.g { background: #fff6da; color: #b8860b; font-weight: bold; }
     table.gridtbl td.f { background: #eafff2; color: #1d9d5a; font-weight: bold; }
     table.gridtbl td.s { color: #ccc; }
-    table.gridtbl tr.away td { opacity: 0.45; }
+    table.gridtbl td.x { color: #ccc; background: repeating-linear-gradient(-45deg, #fff, #fff 4px, #f6f1ea 4px, #f6f1ea 8px); }
+    .legend .lg-x { background: repeating-linear-gradient(-45deg, #fff, #fff 3px, #f0e7dc 3px, #f0e7dc 6px); color: #b9b2c6; }
+    table.gridtbl tr.away td, table.gridtbl tr.away th { opacity: 0.45; }
     table.gridtbl td.total { font-weight: bold; }
-    table.gridtbl tr.totals td { background: #faf8ff; font-weight: bold; }
+    table.gridtbl tr.totals td, table.gridtbl tr.totals th { background: #faf8ff; font-weight: bold; }
     .legend { font-size: 0.82rem; color: #6a6385; margin-top: 0.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
     .legend span b { padding: 0.05rem 0.35rem; border-radius: 6px; }
 
     .empty-note { text-align: center; color: #8a82a6; padding: 1.5rem; }
+
+    /* screen-reader-only text: the grid says "goalie"/"resting" out loud
+       without printing the word next to every emoji */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+    }
+
+    /* ---- squad summary + "everyone's here" ---- */
+    .squad-bar { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin: 0 0 0.7rem; }
+    .squad-count { font-size: 0.85rem; font-weight: bold; color: #6a6385; }
+    .btn.small { padding: 0.4rem 0.8rem; font-size: 0.85rem; box-shadow: inset 0 0 0 2px #f4791f; }
+
+    /* ---- late arrival picker ---- */
+    .late {
+      display: flex; align-items: center; gap: 0.3rem; margin-left: auto;
+      font-size: 0.72rem; font-weight: bold; color: #8a8278; white-space: nowrap;
+    }
+    .late select {
+      font: inherit; font-size: 0.75rem; font-weight: bold; color: var(--ink);
+      padding: 0.22rem 0.3rem; border: 2px solid #e3ddf5; border-radius: 9px;
+      background: #fff; max-width: 7.5rem;
+    }
+    .late.is-late { color: #c2660f; }
+    .late.is-late select { border-color: #f4791f; background: #fff3e6; }
+    .player-controls { flex-wrap: wrap; }
+
+    /* ---- warnings ---- */
+    .warn-panel { background: #fffaf0; border: 2px solid #ffd9a8; }
+    .warn-panel .check + .check { margin-top: 0.45rem; }
+
+    /* ---- open spots on a short-handed sheet ---- */
+    .pcard ol li.open { color: #b9b2c6; font-style: italic; }
+
+    /* ---- fair-share bars ---- */
+    .shares { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.35rem; }
+    .share {
+      display: grid; align-items: center; gap: 0.5rem;
+      grid-template-columns: minmax(5.5rem, 8rem) minmax(3rem, 1fr) auto auto auto auto;
+      font-size: 0.9rem;
+    }
+    .share .sh-name { font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .share .sh-bar { background: #f1ece6; border-radius: 999px; height: 0.7rem; overflow: hidden; }
+    .share .sh-bar i { display: block; height: 100%; background: #f4791f; border-radius: 999px; }
+    .share .sh-num { color: #6a6385; white-space: nowrap; }
+    .share .sh-tag { font-size: 0.72rem; color: #c2660f; font-weight: bold; }
+    .share.is-late .sh-bar i { background: #ffb571; }
+    .share .sh-frac { font-weight: bold; min-width: 2.2rem; text-align: center; }
+    .share .sh-min { color: #6a6385; white-space: nowrap; min-width: 3.6rem; text-align: right; }
+    .share .sh-gk { white-space: nowrap; }
+    @media screen and (max-width: 560px) {
+      /* on a phone the bar gets its own line so the numbers stay readable */
+      .share { grid-template-columns: 1fr auto auto auto; }
+      .share .sh-bar { grid-column: 1 / -1; order: 2; }
+      .share .sh-name { order: 0; }
+      .share .sh-num, .share .sh-frac, .share .sh-min, .share .sh-gk { order: 1; }
+    }
+
+    /* ---- totals line: paper only ---- */
+    .print-totals { display: none; }
 
     /* ---- fairness summary (the at-a-glance "is it fair?" line) ---- */
     .fair-note {
@@ -197,7 +259,7 @@
     table.gridtbl td.g { background: #fff3e6; color: #1f1a14; }
     table.gridtbl td.f { background: #fff; color: #1f1a14; }
 
-    .print-title { display: none; }  /* hidden on screen, shown when printing */
+    .print-title, .print-sub { display: none; }  /* hidden on screen, shown when printing */
 
     /* floating Print button — always visible, no scrolling needed */
     .print-fab {
@@ -238,7 +300,11 @@
       .pcard:last-child { margin-bottom: 0 !important; }
 
       /* team name at the top of the sheet */
-      .print-title { display: block; font-weight: bold; font-size: 1rem; line-height: 1.2; color: #000; margin: 0 0 0.2rem; }
+      .print-title { display: block; font-weight: bold; font-size: 1rem; line-height: 1.2; color: #000; margin: 0 0 0.05rem; }
+      .print-sub { display: block; font-size: 0.68rem; line-height: 1.2; color: #000; margin: 0 0 0.18rem; }
+
+      /* one compact line of totals so the paper sheet carries them too */
+      .print-totals { display: block; font-size: 0.6rem; line-height: 1.25; color: #000; margin: 0.14rem 0 0; }
 
       /* Explicit line-heights everywhere so Safari and Chrome render the SAME
          height (their default line-heights differ, which caused 2-page spill). */
@@ -271,6 +337,7 @@
 
     <!-- shows only on the printed page -->
     <div class="print-title" id="printTitle">Pumpkin Pies</div>
+    <div class="print-sub" id="printSub"></div>
 
     <!-- ====== CONTROLS ====== -->
     <section class="panel no-print">
@@ -282,12 +349,15 @@
         <label>Game date
           <input type="date" id="dateInput" />
         </label>
+        <label>Whole game (minutes)
+          <input type="number" id="minsInput" min="10" max="240" step="2" inputmode="numeric" />
+        </label>
       </div>
     </section>
 
     <section class="panel no-print">
       <h2>⏱️ How many periods?</h2>
-      <p class="hint">1 goalie + 6 field players each period.</p>
+      <p class="hint" id="periodHint">1 goalie + 6 field players each period.</p>
       <div class="periods" id="periodBtns">
         <button class="period-btn" data-p="2">2 <small>halves</small></button>
         <button class="period-btn" data-p="4">4 <small>quarters</small></button>
@@ -300,8 +370,13 @@
       <p class="hint">
         Tap <b>Here / Away</b> to mark who showed up today.
         Tap the goalie chip to cycle it: <b>Can be goalie</b> → <b>Must be goalie</b> → <b>Never goalie</b>.
+        If a girl is coming late, set <b>⏱ On from</b> to the first period she can play.
       </p>
-      <div class="team-list" id="teamList"></div>
+      <div class="squad-bar">
+        <span class="squad-count" id="squadCount"></span>
+        <button class="btn ghost small" id="allHereBtn">🙋 Everyone&rsquo;s here</button>
+      </div>
+      <div class="team-list" id="teamList" role="list"></div>
       <div class="add-row">
         <input type="text" id="newPlayerInput" maxlength="20" placeholder="Add a player…" autocomplete="off" />
         <button class="btn ghost" id="addPlayerBtn">➕ Add</button>
@@ -328,6 +403,6 @@
   <!-- always-visible floating Print button -->
   <button class="print-fab no-print" id="printFab" aria-label="Print roster" disabled>🖨️<span>Print</span></button>
 
-  <script src="roster.js?v=13"></script>
+  <script src="roster.js?v=14"></script>
 </body>
 </html>

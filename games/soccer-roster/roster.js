@@ -65,6 +65,20 @@
           // back on screen, in which case the buttons must match the sheet.
           s.saved = validSaved(s.saved);
           s.periods = s.saved ? s.saved.periods : 8;
+          // ...but if a line-up is coming back on screen, the chips have to
+          // match the sheet it was built from, or the next tap of Shuffle
+          // would quietly drop the ★s and late arrivals it was made with.
+          if (s.saved) {
+            var was = {};
+            s.saved.team.forEach(function (g) { was[String(g.name).toLowerCase()] = g; });
+            s.team.forEach(function (g) {
+              var old = was[g.name.toLowerCase()];
+              if (!old) return;
+              if (old.gk === "must" || old.gk === "no") g.gk = old.gk;
+              g.from = Math.max(0, Math.round(Number(old.from) || 0));
+              g.present = old.present !== false;
+            });
+          }
           return s;
         }
       }
@@ -127,10 +141,16 @@
      3. KEEPERS. Only now pick the goalies, and only from the girls
         already on the pitch — so keeping goal never costs anyone
         an extra period. It is solved as a proper matching, so if a
-        no-repeat rotation exists it is found, and every "★ must be
-        goalie" girl is placed first.
+        no-repeat rotation exists it is found. Every "★ must be
+        goalie" girl is placed first, over the periods she is HERE
+        for, preferring one she is already playing so that starring
+        a girl costs nobody a rest.
      4. Two repair passes even out anything the greedy missed and
-        break up any back-to-back rests.
+        break up back-to-back rests, swapping in pairs so the
+        playing-time totals never move.
+     Whatever the maths simply forbids — one lone keeper, more ★
+     girls than periods, six girls at kick-off — is reported by
+     rosterWarnings() in plain words instead of being papered over.
      =========================================================== */
 
   // Index of the first period this girl can play (late arrivals).
@@ -215,37 +235,47 @@
     }
   }
 
+  // How many times this girl sits out two periods running.
+  function rowClumps(row, periods) {
+    var c = 0;
+    for (var p = 1; p < periods; p++) if (row[p] === "-" && row[p - 1] === "-") c++;
+    return c;
+  }
+
   // Safety net 2: nobody should sit two periods running while someone else
-  // plays both. Swaps in pairs, so the playing-time totals never move.
+  // plays both. Every move is a straight pair swap — girl A takes girl B's
+  // place in one period and gives hers back in another — so the playing-time
+  // totals never budge, and a swap is only kept if it leaves FEWER clumped
+  // rests than before. That can only happen so many times, so it always stops.
   function spread(roles, periods, locked) {
-    var n = roles.length, i, j, p, q, hole;
-
-    function restsAt(x, at) { return at >= 0 && at < periods && roles[x][at] === "-"; }
-    // a girl seated so she can keep goal must not be moved back off again
-    function pinned(x, at) { return !!(locked && locked[x + ":" + at]); }
-    // moving j off at "at" must not leave her sitting twice in a row either
-    function safeOff(j, at) { return !restsAt(j, at - 1) && !restsAt(j, at + 1); }
-
-    for (i = 0; i < n; i++) {
-      for (p = 1; p < periods; p++) {
-        if (roles[i][p] !== "-" || roles[i][p - 1] !== "-") continue;
-        // try to put her on in either of the two periods she is sitting out
-        for (var t = 0; t < 2 && roles[i][p] === "-" && roles[i][p - 1] === "-"; t++) {
-          hole = t === 0 ? p : p - 1;
-          for (j = 0; j < n; j++) {
-            if (j === i || roles[j][hole] !== "F" || !safeOff(j, hole)) continue;
-            if (pinned(j, hole)) continue;
-            for (q = 0; q < periods; q++) {   // ...and swap back so totals hold
-              if (q === hole || roles[i][q] !== "F" || roles[j][q] !== "-") continue;
-              if (!safeOff(i, q) || pinned(i, q)) continue;
-              roles[i][hole] = "F"; roles[j][hole] = "-";
-              roles[j][q] = "F"; roles[i][q] = "-";
-              break;
+    var n = roles.length, guard = n * periods + 40;
+    function free(x, at) { return !(locked && locked[x + ":" + at]); }
+    while (guard-- > 0) {
+      var best = null, i, j, p, q, before, after;
+      for (i = 0; i < n; i++) {
+        if (!rowClumps(roles[i], periods)) continue;   // this row is already fine
+        for (j = 0; j < n; j++) {
+          if (j === i) continue;
+          for (p = 0; p < periods; p++) {
+            // i is resting in p and j is playing it...
+            if (roles[i][p] !== "-" || roles[j][p] !== "F" || !free(j, p)) continue;
+            for (q = 0; q < periods; q++) {
+              // ...and i is playing q while j rests, so they can trade
+              if (q === p || roles[i][q] !== "F" || roles[j][q] !== "-" || !free(i, q)) continue;
+              before = rowClumps(roles[i], periods) + rowClumps(roles[j], periods);
+              roles[i][p] = "F"; roles[j][p] = "-"; roles[j][q] = "F"; roles[i][q] = "-";
+              after = rowClumps(roles[i], periods) + rowClumps(roles[j], periods);
+              roles[i][p] = "-"; roles[j][p] = "F"; roles[j][q] = "-"; roles[i][q] = "F";
+              if (after < before && (!best || after - before < best.d)) {
+                best = { i: i, j: j, p: p, q: q, d: after - before };
+              }
             }
-            if (roles[i][hole] === "F") break;
           }
         }
       }
+      if (!best) break;
+      roles[best.i][best.p] = "F"; roles[best.j][best.p] = "-";
+      roles[best.j][best.q] = "F"; roles[best.i][best.q] = "-";
     }
   }
 
@@ -374,55 +404,86 @@
     balance(roles, played, target, periods, locked);
     spread(roles, periods, locked);
 
-    // ---- make sure every ★ must-be-goalie girl is on the pitch in a period
-    //      that can still be hers. Swaps come in pairs, so seating her costs
-    //      nobody any playing time. ----
+    // ---- ★ must-be-goalie girls ------------------------------------------
+    //  Decide WHICH period each ★ girl keeps before worrying about who is on
+    //  the pitch: the choice is made over every period she is here for, so a
+    //  girl who only turns up for the last quarter still gets the gloves and
+    //  the other ★ girls shuffle round her. Then she is seated for it — in a
+    //  pair swap where possible, so it costs nobody any playing time.
     var musts = elig.filter(function (ix) { return order[ix].gk === "must"; });
     if (musts.length) {
       var mCap = [];
       for (i = 0; i < n; i++) mCap.push(order[i].gk === "must" ? 1 : 0);
-      for (var pass = 0; pass <= musts.length; pass++) {
-        var mPool = [], mSlot = [], mUsed = {};
-        for (p = 0; p < periods; p++) {
-          mSlot.push(-1);
-          mPool.push(musts.filter(function (ix) { return roles[ix][p] === "F"; }));
-        }
-        matchKeepers(mPool, mCap, mSlot, mUsed, periods);
-        var stuck = musts.filter(function (ix) { return !mUsed[ix]; });
-        if (!stuck.length) break;
-        var m = stuck[0], seated = false, x, q;
-        for (p = 0; p < periods && !seated; p++) {
-          if (roles[m][p] !== "-" || mSlot[p] !== -1) continue;
-          for (x = 0; x < n && !seated; x++) {
-            if (roles[x][p] !== "F" || order[x].gk === "must") continue;
-            for (q = 0; q < periods; q++) {      // swap back, so the totals hold
-              if (q === p || roles[m][q] !== "F" || roles[x][q] !== "-") continue;
-              roles[m][p] = "F"; roles[x][p] = "-";
-              roles[x][q] = "F"; roles[m][q] = "-";
-              locked[m + ":" + p] = 1;
-              seated = true; break;
-            }
+      var mSlot = [], mUsed = {}, onPool = [], allPool = [];
+      for (p = 0; p < periods; p++) {
+        mSlot.push(-1);
+        onPool.push(musts.filter(function (ix) { return roles[ix][p] === "F"; }));
+        allPool.push(musts.filter(function (ix) { return roles[ix][p] !== "x"; }));
+      }
+      // first hand out the periods she is already playing — that needs no
+      // shuffling of anybody at all...
+      matchKeepers(onPool, mCap, mSlot, mUsed, periods);
+      // ...and only then look at the rest of the periods she is here for
+      if (musts.some(function (ix) { return !mUsed[ix]; })) {
+        matchKeepers(allPool, mCap, mSlot, mUsed, periods);
+      }
+
+      // would sitting girl x down in period "when" leave her resting twice running?
+      var clumpsIf = function (x, when) {
+        var c = 0;
+        if (when > 0 && roles[x][when - 1] === "-") c++;
+        if (when + 1 < periods && roles[x][when + 1] === "-") c++;
+        return c;
+      };
+      // put girl m on the pitch for period at, without unbalancing the sheet
+      var seatFor = function (m, at) {
+        var x, q, best = null, cost;
+        // best: a straight swap with someone who is off in a period m is on.
+        // Of all the swaps that work, take the one that clumps fewest rests.
+        for (x = 0; x < n; x++) {
+          if (x === m || roles[x][at] !== "F") continue;
+          if (order[x].gk === "must" || locked[x + ":" + at]) continue;
+          for (q = 0; q < periods; q++) {
+            if (q === at || roles[m][q] !== "F" || roles[x][q] !== "-") continue;
+            if (locked[m + ":" + q]) continue;
+            cost = clumpsIf(x, at) + clumpsIf(m, q);
+            if (!best || cost < best.cost) best = { x: x, q: q, cost: cost };
+            if (cost === 0) break;
           }
+          if (best && best.cost === 0) break;
+        }
+        if (best) {
+          roles[m][at] = "F"; roles[best.x][at] = "-";
+          roles[best.x][best.q] = "F"; roles[m][best.q] = "-";
+          locked[m + ":" + at] = 1;
+          return true;
         }
         // she never gets on at all (a huge squad, two halves): give her one
         // period from whoever has the most — still within one period of fair
-        for (p = 0; p < periods && !seated; p++) {
-          if (roles[m][p] !== "-" || mSlot[p] !== -1) continue;
-          var give = -1;
-          for (x = 0; x < n; x++) {
-            if (roles[x][p] !== "F" || order[x].gk === "must") continue;
-            if (played[x] <= played[m]) continue;
-            if (give < 0 || played[x] > played[give]) give = x;
+        var give = -1, giveCost = 9;
+        for (x = 0; x < n; x++) {
+          if (x === m || roles[x][at] !== "F") continue;
+          if (order[x].gk === "must" || locked[x + ":" + at]) continue;
+          if (played[x] <= played[m]) continue;
+          cost = clumpsIf(x, at);
+          if (give < 0 || cost < giveCost || (cost === giveCost && played[x] > played[give])) {
+            give = x; giveCost = cost;
           }
-          if (give < 0) continue;
-          roles[m][p] = "F"; roles[give][p] = "-";
-          played[m]++; played[give]--;
-          locked[m + ":" + p] = 1;
-          seated = true;
         }
-        if (!seated) break;   // genuinely impossible — the warning banner says so
-        spread(roles, periods, locked);   // tidy any rests that swap clumped up
+        if (give < 0) return false;   // genuinely impossible — the banner says so
+        roles[m][at] = "F"; roles[give][at] = "-";
+        played[m]++; played[give]--;
+        locked[m + ":" + at] = 1;
+        return true;
+      };
+
+      var movedAny = false;
+      for (p = 0; p < periods; p++) {
+        var m = mSlot[p];
+        if (m < 0 || roles[m][p] === "F") continue;
+        if (seatFor(m, p)) movedAny = true;
       }
+      if (movedAny) spread(roles, periods, locked);   // tidy rests the swaps clumped
     }
 
     // ---- keepers: always someone who is already playing that period ----
@@ -454,7 +515,6 @@
       }
       // greedy first (fewest turns, longest since her last), so it reads nicely
       var turns = {}, lastAt = {};
-      var musts = elig.filter(function (ix) { return order[ix].gk === "must"; });
       if (musts.length) {
         // ★ must-be-goalie girls are placed first and keep their slot
         var mustPool = onPitch.map(function (list) {
@@ -724,6 +784,122 @@
     }
   }
 
+  /* ===========================================================
+     Reading the finished sheet: what is fair, and what is simply
+     impossible. Kept DOM-free so the offline checker can assert on
+     it — a wrong line-up must never print as if it were right.
+     =========================================================== */
+
+  // The girls grouped by how much of the game they were here for, because
+  // that is the only fair way to compare a late arrival with everyone else.
+  function byAvailability(r) {
+    var groups = {};
+    r.present.forEach(function (g) {
+      var st = r.stat[g.name];
+      var key = st.avail;
+      if (!groups[key]) groups[key] = { avail: key, names: [], lo: Infinity, hi: -Infinity };
+      groups[key].names.push(g.name);
+      if (st.plays < groups[key].lo) groups[key].lo = st.plays;
+      if (st.plays > groups[key].hi) groups[key].hi = st.plays;
+    });
+    return Object.keys(groups)
+      .map(function (k) { return groups[k]; })
+      .sort(function (a, b) { return b.avail - a.avail; });
+  }
+
+  // "Goalie order: Ellie → Jeannie → …" — collapsed when it is the same girl
+  // all game, because eight arrows pointing at one name helps nobody.
+  function gkOrderBit(r) {
+    var order = r.lineups.map(function (lu) { return lu.goalie; }).filter(Boolean);
+    if (!order.length) return "";
+    var same = order.every(function (nm) { return nm === order[0]; });
+    var txt = same && order.length > 1
+      ? esc(order[0]) + " (every " + periodWord(r.periods) + ")"
+      : esc(order.join(" → "));
+    return '<span class="fair-bit"><span class="mark" aria-hidden="true">🧤</span>' +
+      "<span>Goalie order: <b>" + txt + "</b></span></span>";
+  }
+
+  function rosterFacts(r) {
+    var periods = r.periods, present = r.present, n = present.length, p;
+    var elig = present.filter(function (g) { return g.gk !== "no"; });
+    var hereAt = [], thinnest = n, thinnestAt = 0;
+    for (p = 0; p < periods; p++) {
+      var here = present.filter(function (g) { return r.stat[g.name].from <= p; }).length;
+      hereAt.push(here);
+      if (here < thinnest) { thinnest = here; thinnestAt = p; }
+    }
+    var slots = 0;
+    for (p = 0; p < periods; p++) slots += Math.min(hereAt[p], elig.length ? ON_FIELD : FIELD);
+    // the most anyone should ever play if the time were shared out perfectly
+    var fairMax = n ? Math.ceil(slots / n) : 0;
+    var groups = byAvailability(r);
+    return {
+      periods: periods, n: n, elig: elig, hereAt: hereAt, slots: slots, fairMax: fairMax,
+      thinnest: thinnest, thinnestAt: thinnestAt, groups: groups,
+      noGoalie: elig.length === 0,
+      shortHanded: n < ON_FIELD,
+      // too few keepers: they must be on the pitch more often than a fair share,
+      // so even playing time is arithmetically out of reach (shuffling can't help)
+      keeperStrain: elig.length > 0 && periods > elig.length * fairMax,
+      anyLate: present.some(function (g) { return r.stat[g.name].from > 0; }),
+      uneven: groups.some(function (grp) { return grp.hi - grp.lo > 1; }),
+      mustMissed: present.filter(function (g) {
+        return g.gk === "must" && r.stat[g.name].goalie === 0;
+      }),
+      goalieRepeat: present.some(function (g) { return r.stat[g.name].goalie >= 2; }),
+      forcedRepeat: periods > elig.length
+    };
+  }
+
+  function names(list) {
+    var ns = list.map(function (g) { return typeof g === "string" ? g : g.name; });
+    if (ns.length <= 1) return ns.join("");
+    return ns.slice(0, -1).join(", ") + " and " + ns[ns.length - 1];
+  }
+
+  // Every reason this sheet is not the perfect one, in plain words — and where
+  // the maths makes it impossible, WHY, so nobody shuffles forever chasing it.
+  function rosterWarnings(r) {
+    var f = rosterFacts(r), periods = r.periods, w = [];
+
+    if (f.noGoalie) {
+      w.push("No goalie picked — set at least one girl to “Can be goalie”.");
+    }
+    if (f.shortHanded) {
+      w.push("Only " + f.n + " here — not enough for 1 goalie + " + FIELD +
+        ", so some spots stay open. Shuffling can’t fill them.");
+    } else if (f.thinnest < ON_FIELD) {
+      w.push("Only " + f.thinnest + " girls are here for the " +
+        ordinal(f.thinnestAt, periods).toLowerCase() +
+        " — that " + periodWord(periods) + " has open spots until the rest arrive.");
+    }
+    if (f.mustMissed.length) {
+      var starred = r.present.filter(function (g) { return g.gk === "must"; }).length;
+      var why = starred > periods
+        ? "there are only " + periods + " " + periodWord(periods, true) + " to go round and " +
+          starred + " girls have the ★"
+        : "there isn’t a " + periodWord(periods) + " left that works for everyone";
+      w.push(names(f.mustMissed) + (f.mustMissed.length === 1 ? " is" : " are") +
+        " set to “Must be goalie” but never keep" + (f.mustMissed.length === 1 ? "s" : "") +
+        " goal — " + why + ". Shuffling can’t fix that.");
+    }
+    if (f.keeperStrain) {
+      var who = f.elig.length === 1
+        ? names(f.elig) + " is the only girl who can keep goal, so she has to be on the pitch every " + periodWord(periods)
+        : "only " + f.elig.length + " girls can keep goal, so they have to be on the pitch far more than the rest";
+      w.push(who + " — playing time can’t come out even. Set another girl to “Can be goalie” to even it up.");
+    } else if (f.uneven) {
+      var worst = f.groups.filter(function (g) { return g.hi - g.lo > 1; })[0];
+      w.push("Playing time is uneven (" + worst.lo + "–" + worst.hi + " " +
+        periodWord(periods, true) + ") — tap Shuffle for another mix.");
+    }
+    if (!f.noGoalie && f.goalieRepeat && !f.forcedRepeat) {
+      w.push("A girl plays goalie twice — tap Shuffle for another mix.");
+    }
+    return w;
+  }
+
   function renderRoster(r) {
     var out = document.getElementById("output");
     if (!out) return;
@@ -731,46 +907,44 @@
 
     var periods = r.periods;
     var present = r.present;
-    var n = present.length;
     var mins = gameMins();
-
-    // ---- verification facts ----
+    var f = rosterFacts(r);
     var plays = present.map(function (g) { return r.stat[g.name].plays; });
-    var minP = Math.min.apply(null, plays), maxP = Math.max.apply(null, plays);
-    var eligCount = present.filter(function (g) { return g.gk !== "no"; }).length;
-    var gkTurns = present.map(function (g) { return r.stat[g.name].goalie; });
-    var goalieRepeat = Math.max.apply(null, gkTurns) >= 2;
-    var forcedRepeat = periods > eligCount;
-    var shortHanded = n < ON_FIELD;
-    var noGoalie = eligCount === 0;
-    var anyLate = present.some(function (g) { return r.stat[g.name].from > 0; });
-    var mustMissed = present.filter(function (g) { return g.gk === "must" && r.stat[g.name].goalie === 0; });
-    var offTarget = present.filter(function (g) { return r.stat[g.name].plays !== r.stat[g.name].target; });
 
     var html = "";
 
     // ---- at-a-glance fairness summary ----
-    if (!noGoalie && !shortHanded) {
-      var playsTxt = minP === maxP ? String(minP) : minP + " or " + maxP;
-      var minsTxt = minP === maxP ? minutesFor(minP, periods) + " min"
-        : minutesFor(minP, periods) + "–" + minutesFor(maxP, periods) + " min";
-      var gkOrder = r.lineups.map(function (lu) { return lu.goalie; }).filter(Boolean);
-      html += '<div class="panel fair-note no-print">' +
-        '<span class="fair-bit"><span class="mark" aria-hidden="true">💚</span><span>Everyone here plays <b>' +
-        playsTxt + " of " + periods + "</b> " + periodWord(periods, true) +
-        " — about <b>" + minsTxt + '</b></span></span>' +
-        '<span class="fair-bit"><span class="mark" aria-hidden="true">🧤</span><span>Goalie order: <b>' +
-        esc(gkOrder.join(" → ")) + "</b></span></span></div>";
+    // Measured per availability group, so a girl who arrives at half time is
+    // compared with the half she was here for, not with the whole game.
+    if (!f.noGoalie && !f.shortHanded && !f.keeperStrain) {
+      var full = f.groups.filter(function (grp) { return grp.avail === periods; })[0];
+      var late = f.groups.filter(function (grp) { return grp.avail !== periods; });
+      var bits = [];
+      if (full) {
+        var playsTxt = full.lo === full.hi ? String(full.lo) : full.lo + " or " + full.hi;
+        var minsTxt = full.lo === full.hi ? minutesFor(full.lo, periods) + " min"
+          : minutesFor(full.lo, periods) + "–" + minutesFor(full.hi, periods) + " min";
+        bits.push("<span>" + (f.anyLate ? "Everyone here all game plays" : "Everyone here plays") +
+          " <b>" + playsTxt + " of " + periods + "</b> " + periodWord(periods, true) +
+          " — about <b>" + minsTxt + "</b></span>");
+      }
+      late.forEach(function (grp) {
+        var pt = grp.lo === grp.hi ? String(grp.lo) : grp.lo + " or " + grp.hi;
+        bits.push("<span>" + esc(names(grp.names)) + " play" + (grp.names.length === 1 ? "s" : "") +
+          " <b>" + pt + " of the " + grp.avail + "</b> " + periodWord(periods, true) +
+          (grp.names.length === 1 ? " she is" : " they are") + " here for</span>");
+      });
+      html += '<div class="panel fair-note no-print">';
+      bits.forEach(function (b) {
+        html += '<span class="fair-bit"><span class="mark" aria-hidden="true">💚</span>' + b + "</span>";
+      });
+      html += gkOrderBit(r) + "</div>";
+    } else if (!f.noGoalie) {
+      html += '<div class="panel fair-note no-print">' + gkOrderBit(r) + "</div>";
     }
 
     // ---- only flag real problems (no "all good" reassurance clutter) ----
-    var warns = [];
-    if (noGoalie) warns.push("No goalie picked — set at least one girl to “Can be goalie”.");
-    if (shortHanded) warns.push("Only " + n + " here — not enough for 1 goalie + " + FIELD + ", so some spots are open.");
-    if (mustMissed.length) warns.push((mustMissed.length === 1 ? mustMissed[0].name + " is" : mustMissed.map(function (g) { return g.name; }).join(", ") + " are") + " set to “Must be goalie”, but there aren’t enough " + periodWord(periods, true) + " to fit everyone.");
-    if (!anyLate && maxP - minP > 1) warns.push("Playing time is uneven (" + minP + "–" + maxP + ") — tap Shuffle for another mix.");
-    if (anyLate && offTarget.length) warns.push("Playing time could not be shared out exactly — tap Shuffle for another mix.");
-    if (!noGoalie && goalieRepeat && !forcedRepeat) warns.push("A girl plays goalie twice — tap Shuffle for another mix.");
+    var warns = rosterWarnings(r);
     if (warns.length) {
       html += '<div class="panel warn-panel no-print" role="alert">';
       warns.forEach(function (w) {
@@ -814,11 +988,17 @@
     html += '<ul class="shares">';
     present.slice().sort(function (a, b) { return byName(a.name, b.name); }).forEach(function (g) {
       var st = r.stat[g.name];
-      var pct = Math.round(100 * st.plays / periods);
-      html += '<li class="share"><span class="sh-name">' + esc(g.name) + "</span>" +
+      // a late arrival is measured against the periods she is here for, so her
+      // bar reads "her share of her game", not "her share of everyone's game"
+      var of = st.avail || periods;
+      var pct = of ? Math.round(100 * st.plays / of) : 0;
+      html += '<li class="share' + (of < periods ? " is-late" : "") + '"><span class="sh-name">' +
+        esc(g.name) + "</span>" +
         '<span class="sh-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span>' +
-        '<span class="sh-num">' + st.plays + " of " + periods + "</span>" +
-        '<span class="sh-frac">' + esc(fraction(st.plays, periods)) + "</span>" +
+        '<span class="sh-num">' + st.plays + " of " + of +
+        (of < periods ? ' <span class="sh-tag">from ' + esc(ordinal(st.from, periods)) + "</span>" : "") +
+        "</span>" +
+        '<span class="sh-frac">' + esc(st.plays >= of ? "all" : fraction(st.plays, of)) + "</span>" +
         '<span class="sh-min">' + minutesFor(st.plays, periods) + " min</span>" +
         (st.goalie ? '<span class="sh-gk" title="Goalie turns">🧤×' + st.goalie + "</span>" : "") +
         "</li>";
@@ -848,7 +1028,7 @@
         var role = st.roles[pp];
         if (role === "G") html += '<td class="g"><span aria-hidden="true">🧤</span><span class="sr-only">goalie</span></td>';
         else if (role === "F") html += '<td class="f"><span aria-hidden="true">●</span><span class="sr-only">on</span></td>';
-        else if (role === "x") html += '<td class="s"><span aria-hidden="true">·</span><span class="sr-only">not here yet</span></td>';
+        else if (role === "x") html += '<td class="x"><span aria-hidden="true">·</span><span class="sr-only">not here yet</span></td>';
         else html += '<td class="s"><span aria-hidden="true">·</span><span class="sr-only">resting</span></td>';
       }
       if (st) {
@@ -869,7 +1049,8 @@
     var totalPlayed = plays.reduce(function (a, b) { return a + b; }, 0);
     html += "<td>" + totalPlayed + "</td><td>" + periods + "</td></tr>";
     html += "</tfoot></table></div>";
-    html += '<div class="legend"><span><b class="lg-g">🧤</b> goalie</span><span><b class="lg-f">●</b> field</span><span><b class="lg-s">·</b> resting</span></div>';
+    html += '<div class="legend"><span><b class="lg-g">🧤</b> goalie</span><span><b class="lg-f">●</b> field</span><span><b class="lg-s">·</b> resting</span>' +
+      (f.anyLate ? '<span><b class="lg-x">·</b> not here yet</span>' : "") + "</div>";
     html += "</div>";
 
     out.innerHTML = html;
@@ -938,8 +1119,11 @@
     lines.push("Playing time:");
     r.present.slice().sort(function (a, b) { return byName(a.name, b.name); }).forEach(function (g) {
       var st = r.stat[g.name];
-      lines.push("  " + g.name + " — " + st.plays + " of " + periods + " " + periodWord(periods, true) +
-        " (" + minutesFor(st.plays, periods) + " min)" + (st.goalie ? ", goalie ×" + st.goalie : ""));
+      var of = st.avail || periods;
+      lines.push("  " + g.name + " — " + st.plays + " of " + of + " " + periodWord(periods, true) +
+        " (" + minutesFor(st.plays, periods) + " min)" +
+        (of < periods ? ", here from the " + ordinal(st.from, periods).toLowerCase() : "") +
+        (st.goalie ? ", goalie ×" + st.goalie : ""));
     });
     return lines.join("\n").trim() + "\n";
   }
@@ -1125,6 +1309,8 @@
   if (typeof window !== "undefined") {
     window.__rosterTestHook = {
       buildRoster: buildRoster,
+      rosterWarnings: rosterWarnings,
+      rosterFacts: rosterFacts,
       fraction: fraction,
       FIELD: FIELD,
       ON_FIELD: ON_FIELD
