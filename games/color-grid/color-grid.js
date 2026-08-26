@@ -166,8 +166,7 @@
       if (bits.length !== 2) return;
       if (LETTERS.indexOf(bits[0]) === -1 || !COLORS[bits[1]]) return;
       var list = data[k];
-      if (!Object.prototype.toString.call(list) === "[object Array]") return;
-      if (!list || typeof list.length !== "number") return;
+      if (Object.prototype.toString.call(list) !== "[object Array]") return;
       var words = [];
       for (var i = 0; i < list.length; i++) {
         var w = String(list[i]).trim().replace(/\s+/g, " ").slice(0, MAX_WORD);
@@ -629,7 +628,8 @@
     questHintBtn.hidden = false;
     questNewBtn.hidden = false;
     var c = COLORS[quest.color];
-    var another = (grid[keyFor(quest.letter, quest.color)] || []).length ? "another" : "a";
+    var another = (grid[keyFor(quest.letter, quest.color)] || []).length ? "another"
+      : (/^[AEIOU]/.test(c.name) ? "an" : "a");
     var extra = quest.min ? " with <b>" + quest.min + " or more letters</b>" : "";
     questTextEl.innerHTML = "⭐ Quest: add " + another + ' <b class="qcolor" style="background:' + c.hex +
       ";color:" + (c.dark ? "#2b2440" : "#fff") + '">' + c.name + "</b> word to row <b>" +
@@ -644,9 +644,7 @@
     window.SFX && SFX.win();
     window.Confetti && Confetti.burst({ count: 70 });
     clearTimeout(questTimer);
-    questTimer = setTimeout(function () {
-      if (activeMode === "build") newQuest();
-    }, 1800);
+    questTimer = setTimeout(newQuest, 1800);
   }
 
   questHintBtn.addEventListener("click", function () {
@@ -773,6 +771,8 @@
     input.value = "";
     if (activeMode === "build") { try { input.focus(); } catch (e) {} }
 
+    if (silent) return !already;
+
     if (!already && quest && quest.letter === letter && quest.color === color) {
       if (letters.length >= (quest.min || 0)) {
         questComplete();
@@ -804,7 +804,7 @@
         (i === pickPos ? " pickme" + (c.dark ? " onlight" : "") : "");
       span.style.setProperty("--sc", c.hex);
       span.style.animationDelay = Math.min(i * 0.07, 1.4) + "s";
-      span.textContent = ch === " " ? "␣" : ch;
+      span.textContent = /\s/.test(ch) ? "" : ch;
       strip.appendChild(span);
     });
     spellEl.appendChild(strip);
@@ -915,7 +915,8 @@
   function bestKey() { return "colorGrid.best:" + currentKid; }
 
   function activeTier() {
-    var t = readStr(tierKey(), currentKid === "ellie" ? "easy" : "easy");
+    var fallback = (currentKid === "jeannie" || currentKid === "shannon") ? "tricky" : "easy";
+    var t = readStr(tierKey(), fallback);
     return TIERS.some(function (x) { return x.id === t; }) ? t : "easy";
   }
 
@@ -1081,7 +1082,8 @@
     input.classList.add("shake");
   }
   function escapeHtml(s) {
-    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   function stopTimers() {
     clearTimeout(questTimer);

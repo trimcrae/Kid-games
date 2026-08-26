@@ -333,7 +333,7 @@
     b.setAttribute("aria-label", a.name + ", " + a.says);
     const span = document.createElement("span");
     span.className = "face";
-    span.style.fontSize = Math.round(d * 0.7) + "px";
+    span.style.fontSize = Math.round(d * 0.82) + "px";   // fill the target: babies aim at the picture
     span.textContent = a.face;
     b.appendChild(span);
   }
