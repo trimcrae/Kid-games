@@ -437,6 +437,10 @@
   // Build the "That's about 3 school buses! 🚌" line.
   function compareLine(catKey, baseVal) {
     if (catKey === "temp") {
+      if (baseVal < -273.15) {
+        return "🚫 That's colder than <b>absolute zero</b> (−273.15 °C = 0 K) — " +
+               "nothing in the universe can ever be that cold!";
+      }
       const band = TEMP_BANDS.find(b => baseVal <= b[0]);
       return band ? band[1] : "";
     }
@@ -797,16 +801,21 @@
 
   // A crossover question between the two systems.
   function crossQ(c) {
-    const n = pick([2, 3, 4, 5, 6, 8, 10, 12, 20]);
     const aToB = Math.random() < 0.5;
-    const exact = clean(aToB ? n * c.k : n / c.k);
+    const k = aToB ? c.k : 1 / c.k;
+    // Scale the starting number up until the answer is at least 2, so we
+    // never ask "how many ounces is 2 g?" (0.07 oz — a number no child can
+    // picture, and one where rounding to 1 dp throws the answer away).
+    let n = pick([2, 3, 4, 5, 6, 8, 10, 12, 20]);
+    while (n * k < 2) n *= 10;
+    const exact = clean(n * k);
     const dp = Math.abs(exact) >= 100 ? 0 : 1;
     const src = aToB ? c.a : c.b, dst = aToB ? c.b : c.a;
     const dstName = aToB ? c.bName : c.aName;
     return {
       text: "About how many " + dstName + " (" + dst + ") is " + n + " " + src + "?",
       sub: dp === 0 ? "round to the nearest whole number" : "round to 1 decimal place",
-      unit: dst, exact: exact, dp: dp, relTol: 0.008,
+      unit: dst, exact: exact, dp: dp, relTol: 0.005,
       hint: c.say + ". Going from <b>" + src + "</b> to <b>" + dst + "</b> means " +
             (aToB ? "<b>× " + fmt(c.k) + "</b>" : "<b>÷ " + fmt(c.k) + "</b>") + ".",
       work: n + " " + src + (aToB ? " × " : " ÷ ") + fmt(c.k) + " = " + fmt(clean(exact)) +
@@ -1090,13 +1099,23 @@
     }
   }
 
-  // Is the typed answer close enough? A correctly-rounded answer must pass.
+  // Is the typed answer close enough? A correctly-rounded answer must pass —
+  // but an answer that is simply WRONG must never squeak through.
   function grade(q, user) {
     if (!isFinite(user)) return "wrong";
-    const step = Math.pow(10, -(q.dp || 0));
-    // Half a step covers a correctly-rounded answer; the relative part
-    // forgives a kid who used a school-rounded factor (2.2 lb, 1.61 km, …).
-    const tol = step * 0.5 + Math.max(Math.abs(q.exact) * (q.relTol || 0), q.tolAbs || 0) + 1e-9;
+    const dp = q.dp || 0;
+    const step = Math.pow(10, -dp);
+    const scale = Math.max(Math.abs(q.exact), 1);
+    // Does this answer actually need rounding? "How many mm in 2 cm?" is
+    // exactly 20 — there is nothing to round, so only 20 is right. Half a
+    // step of slack is given ONLY when the true answer really does have to
+    // be rounded (5.08 cm asked to 1 dp, say).
+    const needsRounding = Math.abs(roundTo(q.exact, dp) - q.exact) > scale * 1e-12;
+    // The relative/absolute part forgives a kid who used a school-rounded
+    // factor (2.2 lb, 1.61 km, …) — it is only set on questions that say
+    // "about" or "round to …".
+    const tol = (needsRounding ? step * 0.5 : 0) +
+                Math.max(Math.abs(q.exact) * (q.relTol || 0), q.tolAbs || 0) + scale * 1e-9;
     if (Math.abs(user - q.exact) <= tol) return "right";
     if (q.trap != null && Math.abs(user - q.trap) <= Math.max(Math.abs(q.trap) * 0.01, tol)) return "trap";
     const ps = [10, 100, 1000, 0.1, 0.01, 0.001];
@@ -1106,14 +1125,19 @@
     return "wrong";
   }
 
-  function renderQuiz() {
-    syncQuizScore();
-    buildLevels();
+  function showLevelBlurb() {
     const L = LEVELS[quiz.level];
     const st = lvlStat(L.key);
     $("lvlBlurb").innerHTML = esc(L.emoji) + " <b>" + esc(L.name) + "</b> — " + L.blurb +
       " <br><span style=\"opacity:.8\">You've got <b>" + st.c + "</b> right here" +
+      (st.a ? " out of " + st.a + " tries" : "") +
       (medal(L.key) ? " " + medal(L.key) : "") + ".</span>";
+  }
+
+  function renderQuiz() {
+    syncQuizScore();
+    buildLevels();
+    showLevelBlurb();
     quizIdle();
   }
 
@@ -1214,7 +1238,10 @@
   function submitAnswer(raw) {
     const q = current;
     if (!q) return;
-    const txt = String(raw == null ? "" : raw).trim().replace(/,/g, "").replace(/^\+/, "");
+    // Tablet keyboards happily produce − (U+2212) and – (en dash); a child
+    // typing a below-zero temperature should not be punished for that.
+    const txt = String(raw == null ? "" : raw).trim()
+      .replace(/,/g, "").replace(/[\u2212\u2012-\u2015]/g, "-").replace(/^\+/, "");
     if (txt === "") {
       const inp = $("ansInput");
       if (inp) { inp.placeholder = "type a number!"; try { inp.focus(); } catch (e) {} }
@@ -1293,6 +1320,7 @@
     saveQuiz();
     syncQuizScore();
     buildLevels();
+    showLevelBlurb();
   }
 
   function buildLadder() {
@@ -1456,6 +1484,16 @@
   ];
   let htGuard = false;
 
+  // Split a length in cm into whole feet + inches, ROUNDING FIRST so we
+  // never print nonsense like "3 ft 12 in" when the inches round up to 12.
+  function ftIn(cm, dp) {
+    const totalIn = cm / 2.54;
+    let f = Math.floor(totalIn / 12);
+    let i = roundTo(totalIn - f * 12, dp);
+    if (i >= 12) { f += 1; i = 0; }
+    return { f: f, i: i };
+  }
+
   function renderHeight(from) {
     if (htGuard) return;
     htGuard = true;
@@ -1465,31 +1503,30 @@
         const ft = parseFloat($("htFt").value) || 0;
         const inch = parseFloat($("htIn").value) || 0;
         cm = (ft * 12 + inch) * 2.54;
-        $("htCm").value = Math.round(cm * 10) / 10;
+        $("htCm").value = roundTo(cm, 1);
       } else {
         cm = parseFloat($("htCm").value);
         if (!isFinite(cm) || cm < 0) cm = 0;
-        const totalIn = cm / 2.54;
-        const ft = Math.floor(totalIn / 12);
-        const inch = totalIn - ft * 12;
-        $("htFt").value = ft;
-        $("htIn").value = Math.round(inch * 10) / 10;
+        const p = ftIn(cm, 1);
+        $("htFt").value = p.f;
+        $("htIn").value = p.i;
       }
 
       const totalIn = cm / 2.54;
-      const ft = Math.floor(totalIn / 12);
-      const inch = Math.round((totalIn - ft * 12) * 10) / 10;
+      const p = ftIn(cm, 1);
+      const ft = p.f, inch = p.i;
+      const cmShown = roundTo(cm, 1);
       $("htOut").innerHTML =
-        "<b>" + fmt(Math.round(cm * 10) / 10) + " cm</b> = <b>" + fmt(Math.round(cm) / 100) + " m</b> = <b>" +
-        ft + " ft " + inch + " in</b> = <b>" + fmt(Math.round(totalIn * 10) / 10) + " inches</b>";
+        "<b>" + fmt(cmShown) + " cm</b> = <b>" + fmt(roundTo(cm / 100, 3)) + " m</b> = <b>" +
+        ft + " ft " + inch + " in</b> = <b>" + fmt(roundTo(totalIn, 1)) + " inches</b>";
 
       const list = HEIGHTS.concat([{ n: "You", cm: cm, e: "⭐", you: 1 }])
         .sort((a, b) => a.cm - b.cm);
       const max = Math.max(cm, 550) * 1.05 || 1;
       $("htBars").innerHTML = list.map(h => {
         const pc = Math.max(1, Math.min(100, (h.cm / max) * 100));
-        const ti = h.cm / 2.54;
-        const f = Math.floor(ti / 12), i2 = Math.round(ti - f * 12);
+        const p2 = ftIn(h.cm, 0);
+        const f = p2.f, i2 = p2.i;
         return '<div class="barrow' + (h.you ? " you" : "") + '">' +
           '<span class="lbl">' + h.e + " " + esc(h.n) + "</span>" +
           '<span class="track"><span class="fill" style="width:' + pc.toFixed(1) + '%"></span></span>' +
@@ -1499,11 +1536,11 @@
 
       $("htMethod").innerHTML =
         "<b>cm → inches:</b> divide by 2.54, because 1 inch = 2.54 cm. " +
-        "<code>" + fmt(Math.round(cm * 10) / 10) + " ÷ 2.54 = " + fmt(Math.round(totalIn * 10) / 10) + " in</code><br>" +
-        "<b>inches → feet:</b> divide by 12 and keep the remainder. " +
-        "<code>" + fmt(Math.round(totalIn * 10) / 10) + " ÷ 12 = " + ft + " remainder " + inch + "</code><br>" +
-        "<b>cm → m:</b> divide by 100. <code>" + fmt(Math.round(cm * 10) / 10) + " ÷ 100 = " +
-        fmt(Math.round(cm) / 100) + " m</code>";
+        "<code>" + fmt(cmShown) + " ÷ 2.54 ≈ " + fmt(roundTo(totalIn, 1)) + " in</code><br>" +
+        "<b>inches → feet:</b> divide by 12 and keep the remainder — 12 inches make a foot. " +
+        "<code>" + fmt(roundTo(totalIn, 1)) + " ÷ 12 = " + ft + " remainder " + inch + "</code><br>" +
+        "<b>cm → m:</b> divide by 100, because there are 100 cm in a metre. " +
+        "<code>" + fmt(cmShown) + " ÷ 100 = " + fmt(roundTo(cmShown / 100, 3)) + " m</code>";
       saveReal();
     } catch (e) {}
     htGuard = false;
@@ -1528,10 +1565,24 @@
     saveState();
   }
 
-  TABS.forEach(t => {
-    $(t[1]).addEventListener("click", () => {
+  TABS.forEach((t, i) => {
+    const btn = $(t[1]);
+    btn.addEventListener("click", () => {
       window.SFX && SFX.pop && SFX.pop();
       showTab(t[0]);
+    });
+    // Arrow keys move between tabs, the way a screen-reader user expects.
+    btn.addEventListener("keydown", e => {
+      let j = -1;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % TABS.length;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = (i + TABS.length - 1) % TABS.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = TABS.length - 1;
+      if (j < 0) return;
+      e.preventDefault();
+      window.SFX && SFX.pop && SFX.pop();
+      showTab(TABS[j][0]);
+      try { $(TABS[j][1]).focus(); } catch (err) {}
     });
   });
 
