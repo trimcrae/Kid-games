@@ -11,6 +11,7 @@
   "use strict";
 
   const STORE_KEY = "life-lab-v1";
+  const STAMP_MAX = 24;   // biggest square a saved stamp may cover
 
   const SIZES = {
     tiny:   { label: "🔎 Tiny",   cols: 24,  rows: 16 },
@@ -70,7 +71,9 @@
       "...O...",
       "OO..OOO",
     ], desc: "7 cells that grow for more than 5,000 generations. Turn wrap OFF and a big world ON to see it run properly." },
-    { key: "pulsar", name: "💫 Pulsar", cells: [
+    { key: "pulsar", name: "💫 Pulsar", kind: "Oscillator",
+      desc: "A big period-3 oscillator with beautiful symmetry — one of the most common oscillators you'll find in a random world.",
+      cells: [
       "..OOO...OOO..",
       ".............",
       "O....O.O....O",
@@ -90,7 +93,9 @@
       "OO.OOOO.OO",
       "..O....O..",
     ], desc: "The pentadecathlon — an oscillator with period 15. Count the beats: it takes 15 generations to look the same again." },
-    { key: "gun", name: "🏭 Glider Factory", kind: "Gun", cells: [
+    { key: "gun", name: "🏭 Glider Factory", kind: "Gun",
+      desc: "Gosper's glider gun: it pops out a brand new glider every 30 generations, forever. It proved that Life can grow without limit.",
+      cells: [
       "........................O...........",
       "......................O.O...........",
       "............OO......OO............OO",
@@ -102,11 +107,6 @@
       "............OO......................",
     ]},
   ];
-  PATTERNS.find((p) => p.key === "pulsar").kind = "Oscillator";
-  PATTERNS.find((p) => p.key === "pulsar").desc =
-    "A big period-3 oscillator with beautiful symmetry — one of the most common oscillators you'll find in a random world.";
-  PATTERNS.find((p) => p.key === "gun").desc =
-    "Gosper's glider gun: it pops out a brand new glider every 30 generations, forever. It proved that Life can grow without limit.";
 
   /* Discovery badges — earned automatically when the world does
      something scientifically interesting. Saved with the world. */
@@ -164,6 +164,7 @@
     inspected: {},    // squares looked at with the 🔍 tool (key "x,y")
     predStreak: 0,
     predBest: 0,
+    stampSeq: 0,      // ever-increasing, so two saved stamps never share a name
   };
   state.birth[3] = true;
   state.survive[2] = state.survive[3] = true;
@@ -175,6 +176,7 @@
   const genCountEl = $("genCount");
   const popCountEl = $("popCount");
   const playBtn = $("playBtn");
+  const backBtn = $("backBtn");
   const speedInput = $("speed");
   const speedLabel = $("speedLabel");
   const ruleStringEl = $("ruleString");
@@ -276,6 +278,7 @@
 
   function step() {
     const { cols, rows, cells, next, age, colorIdx, birth, survive, wrap } = state;
+    pushPast(cells);   // so ⏪ Back can wind this generation off again
     stepBoard(cells, cols, rows, birth, survive, wrap, next);
     // commit + bookkeeping (and fingerprint the world for discoveries)
     let pop = 0, h = 2166136261;
@@ -303,6 +306,50 @@
     if (popHist.length > POP_HIST_MAX) popHist.shift();
   }
   function resetPopHist() { popHist = []; }
+
+  /* ---------- ⏪ the rewind film ----------
+     Every generation the world leaves behind is kept for a while, so a
+     player can wind it back one step at a time and watch the same move
+     again slowly. Editing by hand wipes the film (see forgetPast), so
+     Back can never contradict what you just drew. */
+  const PAST_MAX = 150;
+  let past = [];
+  function pushPast(cells) {
+    past.push(cells.slice());
+    if (past.length > PAST_MAX) past.shift();
+  }
+  function forgetPast() { if (past.length) past.length = 0; }
+
+  function stepBack() {
+    if (!past.length) return false;
+    setPlaying(false);
+    const prev = past.pop();
+    const { cells, age, colorIdx } = state;
+    for (let i = 0; i < cells.length; i++) {
+      cells[i] = prev[i];
+      age[i] = prev[i] ? 1 : 0;
+      if (prev[i]) colorIdx[i] = 0;
+    }
+    state.generation = Math.max(0, state.generation - 1);
+    if (popHist.length > 1) popHist.pop();
+    forgetHistory();   // the still-life / oscillator watch restarts here
+    updateStats();
+    if (inspectCell) showInspect(inspectCell.x, inspectCell.y);
+    scheduleSave();
+    return true;
+  }
+
+  /* Grey the Back button out when there is nothing left to rewind. */
+  let backWasOn = null;
+  function refreshBackBtn() {
+    const on = past.length > 0;
+    if (on === backWasOn) return;
+    backWasOn = on;
+    backBtn.disabled = !on;
+    backBtn.title = on
+      ? "Go back one generation (" + PAST_MAX + " remembered at most)"
+      : "Nothing to rewind yet — press ⏭️ Step or ▶️ Play first";
+  }
 
   /* ---------- discovery detection ----------
      Compare the world's fingerprint with the last two generations:
@@ -335,6 +382,7 @@
   const worldMsg = $("worldMsg");
 
   function updateStats() {
+    refreshBackBtn();
     genCountEl.textContent = state.generation;
     const p = population();
     popCountEl.textContent = p;
@@ -352,6 +400,7 @@
     state.age[i] = v ? 1 : 0;
     if (v) state.colorIdx[i] = 0;
     forgetHistory(); // hand-edits reset the still-life/oscillator watch
+    forgetPast();    // …and Back must never undo a cell you just drew
   }
 
   function rotate90(pat) {
@@ -409,6 +458,7 @@
     }
     state.generation = 0;
     forgetHistory();
+    forgetPast();
     resetPopHist();
   }
 
@@ -417,6 +467,7 @@
     state.age.fill(0);
     state.generation = 0;
     forgetHistory();
+    forgetPast();
     resetPopHist();
     hadLife = false;
   }
@@ -771,6 +822,9 @@
 
   canvas.addEventListener("pointerdown", (ev) => {
     ev.preventDefault();
+    // preventDefault stops the browser focusing the canvas by itself, and
+    // the arrow-key controls we advertise need that focus — so take it here.
+    try { canvas.focus({ preventScroll: true }); } catch (e) { canvas.focus(); }
     const c = cellFromEvent(ev);
     if (!c) return;
     try { canvas.setPointerCapture(ev.pointerId); } catch (e) { /* synthetic pointer */ }
@@ -853,6 +907,7 @@
     }
     const k = ev.key.toLowerCase();
     if (k === "s") { ev.preventDefault(); doStep(); }
+    else if (k === "b") { ev.preventDefault(); doStepBack(); }
     else if (k === "p") { ev.preventDefault(); setPlaying(!state.playing); }
     else if (k === "escape") { state.cursor = null; canvas.blur(); }
   });
@@ -886,6 +941,16 @@
     scheduleSave();
   }
   $("stepBtn").addEventListener("click", doStep);
+
+  function doStepBack() {
+    if (stepBack()) {
+      window.SFX && SFX.pop && SFX.pop();
+    } else {
+      toast("⏪ Nothing to rewind yet — press ⏭️ Step or ▶️ Play first!");
+      window.SFX && SFX.nope && SFX.nope();
+    }
+  }
+  backBtn.addEventListener("click", doStepBack);
 
   $("randomBtn").addEventListener("click", () => {
     randomize();
@@ -981,15 +1046,18 @@
       }
     }
     if (maxX < 0) return null;
-    if (maxX - minX > 23) maxX = minX + 23;      // keep saved stamps sane
-    if (maxY - minY > 23) maxY = minY + 23;
+    // Keep saved stamps small enough that eight of them can never fill the
+    // browser's storage box: 24x24 is 25 short strings, about 600 bytes.
+    let clipped = false;
+    if (maxX - minX > STAMP_MAX - 1) { maxX = minX + STAMP_MAX - 1; clipped = true; }
+    if (maxY - minY > STAMP_MAX - 1) { maxY = minY + STAMP_MAX - 1; clipped = true; }
     const out = [];
     for (let y = minY; y <= maxY; y++) {
       let row = "";
       for (let x = minX; x <= maxX; x++) row += state.cells[y * state.cols + x] ? "O" : ".";
       out.push(row);
     }
-    return out;
+    return { cells: out, clipped: clipped };
   }
 
   function refreshMineRow() {
@@ -1016,19 +1084,25 @@
     save.id = "saveStampBtn";
     save.textContent = "💾 Save this world";
     save.addEventListener("click", () => {
-      const pat = boundingPattern();
-      if (!pat) {
+      const got = boundingPattern();
+      if (!got) {
         toast("😴 Nothing to save — draw some cells first!");
         window.SFX && SFX.nope && SFX.nope();
         return;
       }
-      if (state.myPatterns.length >= 8) state.myPatterns.shift();
-      const id = String(Date.now()).slice(-7);
-      state.myPatterns.push({ id: id, name: "⭐ Mine " + (state.myPatterns.length + 1), cells: pat });
+      const id = String(Date.now()).slice(-7) + "-" + (state.stampSeq + 1);
+      state.stampSeq = (state.stampSeq || 0) + 1;
+      state.myPatterns.push({ id: id, name: "⭐ Mine " + state.stampSeq, cells: got.cells });
+      const dropped = trimMyPatterns();   // never keep more than the cap
       refreshMineRow();
       selectBrush("my:" + id);
-      toast("💾 Saved! It's now a stamp you can use.");
+      toast(got.clipped
+        ? "💾 Saved! It was huge, so the stamp keeps a " + STAMP_MAX + "×" + STAMP_MAX + " corner of it."
+        : dropped
+          ? "💾 Saved! Only " + MAX_STAMPS + " stamps fit, so your oldest one made way."
+          : "💾 Saved! It's now a stamp you can use.");
       window.SFX && SFX.good && SFX.good();
+      saveNow();   // write it through now, so a full storage box says so at once
     });
     mineRow.appendChild(save);
   }
@@ -1112,6 +1186,12 @@
       if (key === state.sizeKey) return;
       state.sizeKey = key;
       allocate(SIZES[key].cols, SIZES[key].rows, true);
+      // the old fingerprints and the old rewind film belong to a grid that
+      // no longer exists — start both again on the new one
+      forgetHistory();
+      forgetPast();
+      resetPopHist();
+      pushPop(population());
       resizeCanvas();
       sizeRow.querySelectorAll(".chip").forEach((el) => el.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true");
@@ -1337,37 +1417,91 @@
     scheduleSave();
   });
 
-  /* ---------- save / load ---------- */
+  /* ---------- save / load ----------
+     Everything lives in ONE localStorage record, and the whole arcade
+     shares a single origin — so the box really can fill up. Three defences:
+       1. hard caps, so this game's record can never grow without limit;
+       2. if the browser still refuses, drop the world (much the biggest
+          field) and keep the badges, stamps, rule and best streak;
+       3. if even that fails, say so once, in words a child can read,
+          instead of failing silently. */
+  const MAX_STAMPS = 8;         // saved stamps kept, oldest thrown away first
+  const STAMP_BUDGET = 24000;   // …and a hard ceiling on their total size
   let saveTimer = null;
+  let storageComplained = false;
+
   function scheduleSave() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveNow, 500);
   }
 
-  function saveNow() {
-    try {
-      const live = [];
+  /* Enforce the caps. Returns true if anything had to be thrown away. */
+  function trimMyPatterns() {
+    let dropped = false;
+    if (state.myPatterns.length > MAX_STAMPS) {
+      state.myPatterns.splice(0, state.myPatterns.length - MAX_STAMPS);
+      dropped = true;
+    }
+    while (state.myPatterns.length > 1 &&
+           JSON.stringify(state.myPatterns).length > STAMP_BUDGET) {
+      state.myPatterns.shift();
+      dropped = true;
+    }
+    return dropped;
+  }
+
+  function saveRecord(includeWorld) {
+    const live = [];
+    if (includeWorld) {
       for (let i = 0; i < state.cells.length; i++) if (state.cells[i]) live.push(i);
-      localStorage.setItem(STORE_KEY, JSON.stringify({
-        sizeKey: state.sizeKey,
-        cols: state.cols,
-        rows: state.rows,
-        live,
-        birth: state.birth,
-        survive: state.survive,
-        wrap: state.wrap,
-        speed: state.speed,
-        generation: state.generation,
-        badges: state.badges,
-        stampsUsed: state.stampsUsed,
-        brush: state.brush,
-        rot: state.rot,
-        myPatterns: state.myPatterns,
-        inspected: state.inspected,
-        predStreak: state.predStreak,
-        predBest: state.predBest,
-      }));
-    } catch (e) { /* storage full or blocked — no problem */ }
+    }
+    return {
+      sizeKey: state.sizeKey,
+      cols: state.cols,
+      rows: state.rows,
+      live: live,
+      birth: state.birth,
+      survive: state.survive,
+      wrap: state.wrap,
+      speed: state.speed,
+      generation: includeWorld ? state.generation : 0,
+      badges: state.badges,
+      stampsUsed: state.stampsUsed,
+      brush: state.brush,
+      rot: state.rot,
+      myPatterns: state.myPatterns,
+      stampSeq: state.stampSeq,
+      inspected: state.inspected,
+      predStreak: state.predStreak,
+      predBest: state.predBest,
+    };
+  }
+
+  /* One friendly message per visit — never a wall of repeated toasts. */
+  function storageTrouble(msg) {
+    if (storageComplained) return;
+    storageComplained = true;
+    toast(msg);
+  }
+
+  function saveNow() {
+    trimMyPatterns();
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(saveRecord(true)));
+      storageComplained = false;
+      return true;
+    } catch (e) {
+      // The list of living cells is by far the biggest thing we store.
+      // Give it up so the badges, stamps and best streak still survive.
+      try {
+        localStorage.setItem(STORE_KEY, JSON.stringify(saveRecord(false)));
+        storageTrouble("💾 Your world is too big to save, so only your badges and stamps will come back.");
+        return true;
+      } catch (e2) {
+        storageTrouble("💾 This browser's memory box is full, so today can't be saved. Everything still works!");
+        return false;
+      }
+    }
   }
 
   function load() {
@@ -1404,9 +1538,13 @@
       if (Array.isArray(d.myPatterns)) {
         state.myPatterns = d.myPatterns.filter((m) =>
           m && typeof m.id === "string" && typeof m.name === "string" &&
-          Array.isArray(m.cells) && m.cells.length && m.cells.every((r) => typeof r === "string")
-        ).slice(0, 8);
+          Array.isArray(m.cells) && m.cells.length && m.cells.length <= STAMP_MAX &&
+          m.cells.every((r) => typeof r === "string" && r.length <= STAMP_MAX)
+        ).slice(-MAX_STAMPS);
+        trimMyPatterns();
       }
+      state.stampSeq = Math.max(state.myPatterns.length,
+        Math.min(99999, Math.max(0, Number(d.stampSeq) || 0)));
       state.rot = Math.max(0, Math.min(3, Number(d.rot) || 0));
       if (typeof d.brush === "string" &&
           (PATTERNS.some((p) => p.key === d.brush) ||

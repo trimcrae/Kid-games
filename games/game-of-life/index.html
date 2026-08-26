@@ -103,7 +103,15 @@
     .ctl-btn:active { transform: scale(0.96); }
     #playBtn  { background: linear-gradient(135deg, #2bc46f, #3ddc84); font-size: 1.25rem; padding: 0.8rem 2rem; }
     #playBtn.running { background: linear-gradient(135deg, #f4791f, #ffb347); }
+    #backBtn  { background: linear-gradient(135deg, #5c6bd6, #7f8ff0); }
     #stepBtn  { background: linear-gradient(135deg, #2a9df4, #38b6ff); }
+    .ctl-btn[disabled] {
+      filter: grayscale(0.85);
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+    .ctl-btn[disabled]:hover { transform: none; }
     #randomBtn{ background: linear-gradient(135deg, #7a4bf5, #a07bff); }
     #clearBtn { background: linear-gradient(135deg, #f0447c, #ff5d8f); }
 
@@ -496,6 +504,7 @@
     <!-- Main controls -->
     <div class="controls">
       <button id="playBtn"  class="ctl-btn">▶️ Play</button>
+      <button id="backBtn"  class="ctl-btn" disabled>⏪ Back</button>
       <button id="stepBtn"  class="ctl-btn">⏭️ Step</button>
       <button id="randomBtn" class="ctl-btn">🎲 Random</button>
       <button id="clearBtn" class="ctl-btn">🧹 Clear</button>
@@ -511,7 +520,8 @@
       Speed: <b id="speedLabel">10</b> generations per second
     </p>
     <p class="kbd-hint">⌨️ Keyboard: click the world, then <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> to move,
-      <kbd>Space</kbd> to flip a cell, <kbd>S</kbd> to step, <kbd>P</kbd> to play or pause.</p>
+      <kbd>Space</kbd> to flip a cell, <kbd>S</kbd> to step, <kbd>B</kbd> to go back a generation,
+      <kbd>P</kbd> to play or pause.</p>
 
     <!-- Brushes / patterns -->
     <section class="panel">
@@ -608,6 +618,8 @@
         <li>🧪 Then visit the Rule Lab and change the numbers — can you invent a rule that makes mazes? Coral? Total chaos?</li>
         <li>🔍 Not sure why a cell lived or died? Pick the <b>🔍 Inspect</b> tool and tap it — the game shows its
             neighbour count and reads the rule out to you.</li>
+        <li>⏪ Missed what happened? <b>Back</b> rewinds the world one generation at a time (up to 150 of them)
+            so you can watch the same move again — slowly.</li>
         <li>🔮 Ready for a real challenge? Try <b>Predict the Next Generation</b> — that's exactly what a computer does,
             one square at a time.</li>
         <li>🏅 Some shapes never change (<b>still lifes</b>), some flip back and forth forever (<b>oscillators</b>) — find them and earn Discovery badges!</li>
