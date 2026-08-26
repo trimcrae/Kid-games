@@ -24,7 +24,7 @@ const GAMES = [
   {
     title: "Craepets",
     emoji: "🥚",
-    blurb: "Adopt a pixel creature and raise it! Feed it, play with it, paint it, battle in the Quiz Arena — but every single coin in the valley is earned by LEARNING. Maths at the Berry Farm, words at the Word Well, science & geography at the Rainbow Pool, all set to your own level. Five levels from toddler to grown-up, and everyone in the family gets their own pet.",
+    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, questions you get wrong come back until you fix them, and everyone in the family gets their own pet.",
     url:   "games/craepets/",
     ages:  "2+",
     kids:  ["jeannie","cory","ellie","kieran","shannon"],
@@ -35,7 +35,7 @@ const GAMES = [
   {
     title: "Word Bridge",
     emoji: "🌉",
-    blurb: "Our own Word Bridge! \"Name an animal that lives in the ocean\" — every LETTER of your answer becomes a plank, so JELLYFISH gets you twice as far as CRAB. Race the bot across the canyon and spend your coins on bridge skins. Vocabulary, spelling & word length. Little ones tap pictures instead of typing.",
+    blurb: "Our own Word Bridge! \"Name an animal that lives in the ocean\" — every LETTER of your answer becomes a plank, so JELLYFISH gets you twice as far as CRAB. Race the bot across the canyon, build streaks and spend your coins on bridge skins. Get one wrong and it tells you why. Vocabulary, spelling & word length. Ellie taps pictures in 58 categories; Mum gets the Pro bot.",
     url:   "games/word-bridge/",
     ages:  "3+",
     kids:  ["jeannie","cory","ellie","shannon"],
@@ -57,7 +57,7 @@ const GAMES = [
   {
     title: "Baby Taps",
     emoji: "👶",
-    blurb: "Kieran's game! Giant shapes and animals to bash — every tap pops, sparkles, plays a note and says the word out loud. Colours, shapes, animal sounds & first words. Nothing to lose, nothing to get wrong.",
+    blurb: "Kieran's game! Giant shapes, animals, letters and numbers to bash — every tap pops, sparkles, plays a note and says the word out loud. Colours, shapes, animal sounds, letter sounds and counting to ten. Nothing to lose, nothing to get wrong, and grown-ups hold the corner button to leave.",
     url:   "games/baby-taps/",
     ages:  "Babies",
     kids:  ["kieran","ellie"],
@@ -68,7 +68,7 @@ const GAMES = [
   {
     title: "Music Lab",
     emoji: "🎹",
-    blurb: "A real piano you can play! Learn the note names, echo tunes back by ear, play whole songs as the next key glows, read notes on the staff — and record a tune of your own. For everyone!",
+    blurb: "A real piano you can play! Learn note names, sharps & flats, beats, scales and chords, echo tunes back by ear, play 18 whole songs as the next key glows, read notes on the staff — and record a tune of your own. For everyone!",
     url:   "games/music-lab/",
     ages:  "3+",
     kids:  ["jeannie","cory","ellie","kieran","shannon"],
@@ -79,7 +79,7 @@ const GAMES = [
   {
     title: "World Trek",
     emoji: "🌍",
-    blurb: "Tap the seven continents & five oceans on a pixel world map, hunt down all 50 states on the puzzle map, learn their capitals — and read a true fact about every single place. For Jeannie & Cory!",
+    blurb: "Tap the seven continents & five oceans on a pixel world map, hunt down all 50 states, learn capitals, name 34 hand-drawn flags, and play Which Is Bigger with real square miles — then fill your passport with stickers. Three tiers, up to a grown-up one with no letters and no colours.",
     url:   "games/world-trek/",
     ages:  "5+",
     kids:  ["jeannie","cory","shannon"],
@@ -112,7 +112,7 @@ const GAMES = [
   {
     title: "Family Tree",
     emoji: "🌳",
-    blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever — and learn words like nephew, great-grandma & 2nd cousin. One shared tree for everyone — and you can print it as a poster to hang up!",
+    blurb: "Grow our family tree! Start with Mom, Dad & the kids, then add grandparents, cousins & more forever. Tap anyone to see who's who around them, then play the levelled word quiz — from brother & sister up to great-aunt and 2nd cousin once removed — and collect a badge for every word you master. One shared tree for everyone, and you can print it as a poster!",
     url:   "games/family-tree/",
     ages:  "3+",
     kids:  ["jeannie","cory","ellie","shannon"],
@@ -134,7 +134,7 @@ const GAMES = [
   {
     title: "Mad Libs",
     emoji: "📝",
-    blurb: "Give silly words — a noun, a verb, a goofy adjective — then watch them fill a story you've never seen and hear it read aloud! Parts of speech & grammar. For everyone!",
+    blurb: "Give silly words — a noun, a verb, a goofy adjective — then watch them fill one of 22 stories you've never seen! The finished story is colour-coded so you can SEE the nouns, verbs and adverbs you picked, and it reads itself aloud. Tap-a-word bank for little ones. Parts of speech & grammar. For everyone!",
     url:   "games/mad-libs/",
     ages:  "6+",
     kids:  ["jeannie","cory","shannon"],
@@ -156,10 +156,10 @@ const GAMES = [
   {
     title: "Choose Your Own Adventure",
     emoji: "🗺️",
-    blurb: "Branching read-aloud story-books with pictures & voice — YOU pick what happens! Colours, counting, logic, vocabulary & nature. For everyone!",
+    blurb: "Branching read-aloud story-books with pictures & voice — YOU pick what happens! 39 endings to collect, and in the big stories you can tap any hard word to learn what it means, then take the Word Challenge. Colours, counting, logic, vocabulary & nature. For everyone!",
     url:   "games/adventure/",
     ages:  "3+",
-    kids:  ["jeannie","cory","ellie"],
+    kids: ["jeannie","cory","ellie","shannon"],
     color: "#8a5cff",
     ready: true
   },
@@ -167,10 +167,10 @@ const GAMES = [
   {
     title: "Money Machine",
     emoji: "💰",
-    blurb: "Watch your money grow itself with compound interest! Pick a bank, add savings, chase challenge trophies & learn the Rule of 72 — like If You Made a Million. For Cory!",
+    blurb: "Two money games in one! Coin School climbs from naming coins to counting piles, making an amount the fewest-coins way, giving change and shop word problems — plus a grown-up register for Mum. Then the Money Machine grows your savings with compound interest and the Rule of 72.",
     url:   "games/money-machine/",
-    ages:  "6+",
-    kids:  ["cory"],
+    ages: "3+",
+    kids: ["ellie","jeannie","cory","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -189,7 +189,7 @@ const GAMES = [
   {
     title: "Crossword",
     emoji: "✏️",
-    blurb: "Themed mini crosswords — Minecraft, Bluey, Frozen, taekwondo & more. Read a clue, fill the grid! Spelling & vocabulary.",
+    blurb: "28 themed mini crosswords — Minecraft, Bluey, silent letters, shapes & a real grown-up tier. Hints teach you the spelling rule before they give a letter.",
     url:   "games/crossword/",
     ages:  "6+",
     kids:  ["jeannie","cory","shannon"],
@@ -200,9 +200,9 @@ const GAMES = [
   {
     title: "Word Strands",
     emoji: "🧶",
-    blurb: "Trace the hidden theme words through a grid of letters — every letter belongs to a word! Find the golden spangram.",
+    blurb: "Trace the hidden theme words through a grid of letters — every letter belongs to a word! 27 hunts from rhymes to Greek myths, and each word tells you what it means.",
     url:   "games/strands/",
-    ages:  "6+",
+    ages: "5+",
     kids:  ["jeannie","cory","shannon"],
     color: "#38b6ff",
     ready: true
@@ -211,10 +211,10 @@ const GAMES = [
   {
     title: "Spelling Bee",
     emoji: "🐝",
-    blurb: "Make as many words as you can from a honeycomb of letters — every word uses the middle letter! Spelling & vocabulary.",
+    blurb: "Make words from a honeycomb of letters — 16 hives, easy to grown-up, with meanings for every tricky word. Spelling, vocabulary & word patterns.",
     url:   "games/spelling-bee/",
     ages:  "6+",
-    kids:  ["jeannie","shannon"],
+    kids: ["jeannie","cory","ellie","shannon"],
     color: "#ffd166",
     ready: true
   },
@@ -222,10 +222,10 @@ const GAMES = [
   {
     title: "Connections",
     emoji: "🔗",
-    blurb: "Sort 16 cards into 4 secret groups of 4 — Pokémon, Bluey, books & more. Builds logic & categories!",
+    blurb: "Sort 16 cards into 4 secret groups of 4 — 47 puzzles from picture cards for Ellie to a properly tricky grown-up set. Every group explains why it belongs. Logic, vocabulary & science!",
     url:   "games/connections/",
-    ages:  "6+",
-    kids:  ["jeannie","cory","shannon"],
+    ages: "3+",
+    kids: ["jeannie","cory","ellie","shannon"],
     color: "#8a5cff",
     ready: true
   },
@@ -233,10 +233,10 @@ const GAMES = [
   {
     title: "Word Guess",
     emoji: "🟩",
-    blurb: "Guess the secret 5-letter word in 6 tries, with colour clues and hints — a kid-friendly Wordle. Spelling & reasoning.",
+    blurb: "Guess the secret word in 6 tries with colour clues — four levels from 4-letter picture words to proper grown-up vocabulary, a Word of the Day, a detective panel that shows which letters are still possible, and the meaning of every word at the end. Spelling, vocabulary & reasoning.",
     url:   "games/word-guess/",
-    ages:  "6+",
-    kids:  ["jeannie","cory","shannon"],
+    ages: "3+",
+    kids: ["ellie","cory","jeannie","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -244,10 +244,10 @@ const GAMES = [
   {
     title: "Math Mob Run",
     emoji: "🏃",
-    blurb: "Steer your crew through +, −, ×, ÷ gates across five lands, hit answer streaks to spark COIN FEVER, and smash the brick wall at every finish — mental math on the run, with upgrades & badges that save!",
+    blurb: "Steer your crew through +, −, ×, ÷ gates across five lands, hit answer streaks to spark COIN FEVER, and smash the brick walls at every finish. Four real difficulty tiers — counting to 10 for the littles, times tables, two-step problems, and a grown-up round of squares, roots and percentages — and it shows you the working on every answer you miss.",
     url:   "games/math-mob/",
-    ages:  "6+",
-    kids:  ["cory"],
+    ages: "3+",
+    kids: ["cory","jeannie","ellie","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -255,10 +255,10 @@ const GAMES = [
   {
     title: "Spooky Princess Stories",
     emoji: "👻",
-    blurb: "Friendly-spooky read-aloud storybooks starring Ellie & her siblings — tap the pictures to play! For Ellie!",
+    blurb: "Friendly-spooky read-aloud storybooks starring Ellie & her siblings — the words light up as they're read, tap any word to hear it or learn what it means, then answer the story questions. For Ellie & Jeannie!",
     url:   "games/spooky-stories/",
     ages:  "3+",
-    kids:  ["ellie"],
+    kids: ["ellie","jeannie"],
     color: "#8a5cff",
     ready: true
   },
@@ -266,7 +266,7 @@ const GAMES = [
   {
     title: "Princess Dress-Up",
     emoji: "👑",
-    blurb: "Find letters & numbers to dress a princess — letters, numbers & lots of sparkle! For Ellie!",
+    blurb: "Letters, numbers, counting, colours & shapes — every right answer gives her a crown, a wand or a bouquet. Spoken prompts, so Ellie can play all on her own!",
     url:   "games/princess-dressup/",
     ages:  "3+",
     kids:  ["ellie"],
@@ -277,7 +277,7 @@ const GAMES = [
   {
     title: "Comic Maker",
     emoji: "💥",
-    blurb: "Draw your own graphic novel — paint right in the panels, then add bubbles & captions! For Jeannie!",
+    blurb: "Draw your own graphic novel — paint in the panels, add bubbles & captions, then use the Story coach for story sparks, beginning/middle/end starters, juicy words and a writing check. It'll even read your comic out loud! Teaches story structure, sentence writing & punctuation.",
     url:   "games/comic-maker/",
     ages:  "6+",
     kids:  ["jeannie","shannon"],
@@ -299,10 +299,10 @@ const GAMES = [
   {
     title: "Color Grid Builder",
     emoji: "🌈",
-    blurb: "Type your own colour words and watch them fill the grid by their start, middle, or end letter — Cory's idea!",
+    blurb: "Type words that ARE a colour and watch them file themselves by their start, middle or end letter — then flip to Colour Detective and guess the colour yourself. Cory's idea!",
     url:   "games/color-grid/",
-    ages:  "5+",
-    kids:  ["cory","ellie"],
+    ages: "4+",
+    kids: ["cory","ellie","jeannie","shannon"],
     color: "#9b3fc4",
     ready: true
   },
@@ -310,10 +310,10 @@ const GAMES = [
   {
     title: "Word Wizard",
     emoji: "📚",
-    blurb: "Read a clue, then spell the magic word from a bank of letters — vocabulary & spelling for big readers. For Jeannie!",
+    blurb: "Spell the magic word from its clue, then learn what it means, how to use it and the rule that makes it tricky — 56 words, streaks, ranks and a grown-up spellbook for Mum.",
     url:   "games/word-wizard/",
     ages:  "7+",
-    kids:  ["jeannie"],
+    kids: ["jeannie","shannon"],
     color: "#ff5d8f",
     ready: true
   }

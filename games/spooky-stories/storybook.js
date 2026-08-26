@@ -1384,7 +1384,9 @@
   // their hand-drawn SVG cover, so nothing ever 404s.
   const COVER_ART = {
     "giggly-ghost": 1, "costume-party": 1, "lost-bat": 1,
-    "pumpkin-smile": 1, "castle-sleepover": 1
+    "pumpkin-smile": 1, "castle-sleepover": 1,
+    "rainbow-unicorn": 1, "dancing-dragon": 1, "sleepy-star": 1,
+    "boo-birthday": 1, "rainbow-dress": 1, "hide-and-seek": 1
   };
 
   // A baby in a round pumpkin costume, little face peeking out.
