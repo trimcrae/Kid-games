@@ -18,7 +18,7 @@
 
    Every factor in here is the exact defined value where one
    exists (1 in = 0.0254 m exactly, 1 lb = 0.45359237 kg exactly,
-   1 mile = 5280 ft, …) — see check-factors.js.
+   1 mile = 5280 ft, 1 US gal = 231 in³, …).
    =========================================================== */
 (function () {
   "use strict";
@@ -1094,7 +1094,9 @@
   function grade(q, user) {
     if (!isFinite(user)) return "wrong";
     const step = Math.pow(10, -(q.dp || 0));
-    const tol = Math.max(step * 0.5, Math.abs(q.exact) * (q.relTol || 0), q.tolAbs || 0) + 1e-9;
+    // Half a step covers a correctly-rounded answer; the relative part
+    // forgives a kid who used a school-rounded factor (2.2 lb, 1.61 km, …).
+    const tol = step * 0.5 + Math.max(Math.abs(q.exact) * (q.relTol || 0), q.tolAbs || 0) + 1e-9;
     if (Math.abs(user - q.exact) <= tol) return "right";
     if (q.trap != null && Math.abs(user - q.trap) <= Math.max(Math.abs(q.trap) * 0.01, tol)) return "trap";
     const ps = [10, 100, 1000, 0.1, 0.01, 0.001];

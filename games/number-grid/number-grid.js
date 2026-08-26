@@ -555,7 +555,12 @@
 
   /* ---------- count the letters out on screen ----------
      T¹ I² G³ E⁴ R⁵  =  5 letters — the whole point of the game. */
-  function countRow(word, delayStart) {
+  // How long the last count-out takes to finish drawing itself, in ms.
+  // The Quick Count auto-advance waits for it so the explanation is never
+  // whisked away before a 15-letter word has finished counting.
+  var lastCountoutMs = 0;
+
+  function countRow(word, delayStart, step) {
     var letters = lettersOf(word);
     var l = BY_NUM[columnFor(letters.length)] || BY_NUM[MAXLEN];
     var row = document.createElement("div");
@@ -565,13 +570,13 @@
       span.className = "co-letter";
       span.style.setProperty("--cc", l.hex);
       span.style.color = l.dark ? "#2b2440" : "#fff";
-      span.style.animationDelay = ((delayStart + i) * 0.11) + "s";
+      span.style.animationDelay = ((delayStart + i) * step) + "s";
       span.innerHTML = escapeHtml(ch) + "<b>" + (i + 1) + "</b>";
       row.appendChild(span);
     });
     var total = document.createElement("span");
     total.className = "co-total";
-    total.style.animationDelay = ((delayStart + letters.length) * 0.11) + "s";
+    total.style.animationDelay = ((delayStart + letters.length) * step) + "s";
     total.textContent = "= " + letters.length + " " + plural(letters.length);
     row.appendChild(total);
     return { el: row, next: delayStart + letters.length + 1 };
@@ -581,20 +586,24 @@
   function showCountout(words, whyHtml, whyClass) {
     countoutEl.innerHTML = "";
     countoutEl.style.display = "flex";
+    // a long word must not crawl — spread the whole count over ~1.4s max
+    var steps = words.reduce(function (a, w) { return a + lenOf(w) + 1; }, 0);
+    var step = REDUCE ? 0 : Math.min(0.11, 1.4 / Math.max(steps, 1));
     var delay = 0;
     words.forEach(function (w) {
-      var r = countRow(w, delay);
+      var r = countRow(w, delay, step);
       delay = r.next;
       countoutEl.appendChild(r.el);
     });
     if (whyHtml) {
       var why = document.createElement("p");
       why.className = "co-why " + (whyClass || "");
-      why.style.animationDelay = (delay * 0.11) + "s";
+      why.style.animationDelay = (delay * step) + "s";
       why.style.margin = "0.2rem 0 0";
       why.innerHTML = whyHtml;
       countoutEl.appendChild(why);
     }
+    lastCountoutMs = Math.round(delay * step * 1000) + 350;
   }
   function hideCountout() {
     countoutEl.style.display = "none";
@@ -1200,7 +1209,8 @@
     next.addEventListener("click", newQuizQuestion);
     qcard.appendChild(next);
     next.focus();
-    if (right) quizTimer = setTimeout(newQuizQuestion, 2600);
+    // wait for the count-out to finish drawing before moving on
+    if (right) quizTimer = setTimeout(newQuizQuestion, Math.max(2600, lastCountoutMs + 1800));
   }
 
   quizSkipBtn.addEventListener("click", newQuizQuestion);
@@ -1373,6 +1383,7 @@
       t.panel.hidden = !on;
     });
     hideCountout();
+    flashHint("", false);          // don't leave the last tab's message hanging about
     if (id === "stats") renderStatsPanel();
     if (id === "quiz" && !quizQ) newQuizQuestion();
   }

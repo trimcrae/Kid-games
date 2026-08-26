@@ -580,7 +580,9 @@
     { title: "Grains & pebbles", names: ["Sandstone", "Quartzite", "Conglomerate", "Breccia"] },
     { title: "Super-soft minerals", names: ["Talc", "Gypsum", "Mica", "Graphite"] },
     { title: "Really hard gems", names: ["Quartz", "Topaz", "Corundum", "Diamond"] },
-    { title: "Light-as-air rocks", names: ["Pumice", "Coal", "Chalk", "Shale"] }
+    { title: "Light-as-air rocks", names: ["Pumice", "Coal", "Chalk", "Shale"] },
+    { title: "Bright colourful crystals", names: ["Fluorite", "Apatite", "Amethyst", "Sulfur", "Corundum"] },
+    { title: "What granite is made of", names: ["Quartz", "Feldspar", "Mica", "Granite"] }
   ];
 
   // ---------------------------------------------------------------

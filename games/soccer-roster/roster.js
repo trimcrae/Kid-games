@@ -114,21 +114,23 @@
   /* ===========================================================
      The roster algorithm — fair by construction, not by luck.
      -----------------------------------------------------------
-     1. GOALIES first. The whole keeper rotation is planned up
-        front: every "★ must be goalie" girl is given a slot she
-        can actually make, then the rest rotate by fewest turns,
-        so nobody keeps twice until everyone eligible has kept
-        once.
-     2. QUOTAS. Work out exactly how many periods each girl is
-        owed (they can only ever differ by one; a late arrival is
-        only counted for the periods she is here for).
-     3. LINE-UPS. Each period takes the girls who are owed the
-        most time — counting the goalie slots they are already
-        booked into, which is what stops a keeper picking up a
-        bonus period. Ties go to whoever has been sitting longest,
-        so rests never clump together.
-     4. A repair pass swaps players if anything is still off, so
-        the "everyone within one period" promise always holds.
+     1. QUOTAS. Work out up front exactly how many periods each
+        girl is owed. They can only ever differ by one, a late
+        arrival is only counted for the periods she is here for,
+        and a girl who will have to keep goal a lot (because
+        hardly anyone else can) is owed at least that much.
+     2. LINE-UPS. Fill each period with the girls who are furthest
+        behind their quota, measured against the chances they have
+        LEFT — so nobody runs out of periods to catch up in. A girl
+        who just came off goes back on first, which is what keeps
+        rests from clumping into "sat out twice in a row".
+     3. KEEPERS. Only now pick the goalies, and only from the girls
+        already on the pitch — so keeping goal never costs anyone
+        an extra period. It is solved as a proper matching, so if a
+        no-repeat rotation exists it is found, and every "★ must be
+        goalie" girl is placed first.
+     4. Two repair passes even out anything the greedy missed and
+        break up any back-to-back rests.
      =========================================================== */
 
   // Index of the first period this girl can play (late arrivals).
@@ -138,58 +140,8 @@
     return Math.min(f, periods - 1);   // she always gets at least the last period
   }
 
-  // Plan who keeps goal in every period, before anyone else is picked.
-  function planGoalies(order, first, periods) {
-    var plan = [], p, i;
-    for (p = 0; p < periods; p++) plan.push(null);
-
-    var elig = [];
-    order.forEach(function (g, ix) { if (g.gk !== "no") elig.push(ix); });
-    if (!elig.length) return plan;
-
-    var turns = {}, last = {};
-    elig.forEach(function (ix) { turns[ix] = 0; last[ix] = -99; });
-
-    // --- ★ must-be-goalie girls get a slot each, scarcest options first ---
-    var pending = elig.filter(function (ix) { return order[ix].gk === "must"; });
-    var guard = pending.length + 1;
-    while (pending.length && guard-- > 0) {
-      var pickWho = -1, pickOpts = null;
-      pending.forEach(function (ix) {
-        var opts = [];
-        for (var q = 0; q < periods; q++) if (plan[q] === null && first[ix] <= q) opts.push(q);
-        if (pickWho === -1 || opts.length < pickOpts.length) { pickWho = ix; pickOpts = opts; }
-      });
-      if (!pickOpts.length) break;     // no room left — the warning banner explains why
-      // spread the ★ keepers out: take the free period furthest from the others
-      var slot = pickOpts[0], bestGap = -1;
-      pickOpts.forEach(function (q) {
-        var gap = periods;
-        for (var r = 0; r < periods; r++) if (plan[r] !== null) gap = Math.min(gap, Math.abs(q - r));
-        if (gap > bestGap) { bestGap = gap; slot = q; }
-      });
-      plan[slot] = pickWho; turns[pickWho]++; last[pickWho] = slot;
-      pending = pending.filter(function (ix) { return ix !== pickWho; });
-    }
-
-    // --- everyone else rotates: fewest turns, then longest since her last ---
-    for (p = 0; p < periods; p++) {
-      if (plan[p] !== null) continue;
-      var pool = elig.filter(function (ix) { return first[ix] <= p; });
-      if (!pool.length) continue;      // nobody eligible has arrived yet
-      pool.sort(function (a, b) {
-        if (turns[a] !== turns[b]) return turns[a] - turns[b];
-        if (last[a] !== last[b]) return last[a] - last[b];
-        return a - b;                  // else this game's rotation order
-      });
-      plan[p] = pool[0];
-      turns[pool[0]]++; last[pool[0]] = p;
-    }
-    return plan;
-  }
-
   // How many periods each girl is owed, given who is here when.
-  function quotas(availCount, onCount, booked) {
+  function quotas(availCount, onCount, floors) {
     var n = availCount.length, i, t = [], frac = [];
     if (!n) return t;
     var slots = onCount.reduce(function (a, b) { return a + b; }, 0);
@@ -209,10 +161,10 @@
       var j = byFrac[k];
       if (t[j] < availCount[j]) { t[j]++; used++; }
     }
-    // nobody plays more than she is here for, or fewer than her booked goalie turns
+    // nobody plays more than she is here for, or less than her forced goalie duty
     for (i = 0; i < n; i++) {
+      if (t[i] < floors[i]) t[i] = floors[i];
       if (t[i] > availCount[i]) t[i] = availCount[i];
-      if (t[i] < booked[i]) t[i] = booked[i];
     }
     // ...then nudge back to the exact number of slots on offer
     var loops = n * 4 + 20;
@@ -229,7 +181,7 @@
         t[pick]++;
       } else {
         for (i = 0; i < n; i++) {
-          if (t[i] <= booked[i]) continue;
+          if (t[i] <= floors[i]) continue;
           if (pick < 0 || t[i] * availCount[pick] > t[pick] * availCount[i]) pick = i;
         }
         if (pick < 0) break;
@@ -239,21 +191,21 @@
     return t;
   }
 
-  // Safety net: swap a girl who ended up with too much time for one with too
-  // little. Goalie slots are never touched, so the keeper plan always survives.
+  // Safety net 1: swap a girl who ended up with too much time for one with
+  // too little, in a period where that swap is actually possible.
   function balance(roles, played, target, periods) {
     var n = played.length, guard = n * periods + 20;
     while (guard-- > 0) {
       var over = -1, under = -1, i;
       for (i = 0; i < n; i++) {
         if (played[i] > target[i] && (over < 0 || played[i] - target[i] > played[over] - target[over])) over = i;
-        if (played[i] < target[i] && (target[i] - played[i] > (under < 0 ? 0 : target[under] - played[under]))) under = i;
+        if (played[i] < target[i] && (under < 0 || target[i] - played[i] > target[under] - played[under])) under = i;
       }
       if (over < 0 || under < 0) break;
       var swapped = false;
       for (var p = 0; p < periods && !swapped; p++) {
-        if (roles[over][p] !== "F") continue;   // "G" is the planned keeper — leave it
-        if (roles[under][p] !== "-") continue;  // she has to be here and on the bench
+        if (roles[over][p] !== "F") continue;
+        if (roles[under][p] !== "-") continue;   // she has to be here and on the bench
         roles[over][p] = "-"; roles[under][p] = "F";
         played[over]--; played[under]++;
         swapped = true;
@@ -262,31 +214,57 @@
     }
   }
 
-  // Second safety net: nobody should sit two periods running while someone with
-  // the same amount of time is on twice. Swaps in pairs so the totals never move.
-  function spread(roles, played, periods) {
-    var n = played.length, i, j, p, q, guard = n * periods + 20;
+  // Safety net 2: nobody should sit two periods running while someone else
+  // plays both. Swaps in pairs, so the playing-time totals never move.
+  function spread(roles, periods) {
+    var n = roles.length, i, j, p, q, hole;
+
+    function restsAt(x, at) { return at >= 0 && at < periods && roles[x][at] === "-"; }
+    // moving j off at "at" must not leave her sitting twice in a row either
+    function safeOff(j, at) { return !restsAt(j, at - 1) && !restsAt(j, at + 1); }
+
     for (i = 0; i < n; i++) {
-      for (p = 1; p < periods && guard > 0; p++) {
+      for (p = 1; p < periods; p++) {
         if (roles[i][p] !== "-" || roles[i][p - 1] !== "-") continue;
-        for (j = 0; j < n; j++) {
-          if (j === i || roles[j][p] !== "F") continue;
-          if (roles[j][p - 1] === "-" || (p + 1 < periods && roles[j][p + 1] === "-")) continue;
-          // find a period to swap back in, so both totals stay the same
-          for (q = 0; q < periods; q++) {
-            if (q === p || roles[i][q] !== "F" || roles[j][q] !== "-") continue;
-            if (q > 0 && roles[j][q - 1] === "-") continue;
-            if (q + 1 < periods && roles[j][q + 1] === "-") continue;
-            if (q > 0 && roles[i][q - 1] === "-" && roles[i][q + 1] === "-") continue;
-            roles[i][p] = "F"; roles[j][p] = "-";
-            roles[j][q] = "F"; roles[i][q] = "-";
-            guard--;
-            break;
+        // try to put her on in either of the two periods she is sitting out
+        for (var t = 0; t < 2 && roles[i][p] === "-" && roles[i][p - 1] === "-"; t++) {
+          hole = t === 0 ? p : p - 1;
+          for (j = 0; j < n; j++) {
+            if (j === i || roles[j][hole] !== "F" || !safeOff(j, hole)) continue;
+            for (q = 0; q < periods; q++) {   // ...and swap back so totals hold
+              if (q === hole || roles[i][q] !== "F" || roles[j][q] !== "-") continue;
+              if (!safeOff(i, q)) continue;
+              roles[i][hole] = "F"; roles[j][hole] = "-";
+              roles[j][q] = "F"; roles[i][q] = "-";
+              break;
+            }
+            if (roles[i][hole] === "F") break;
           }
-          if (roles[i][p] === "F") break;
         }
       }
     }
+  }
+
+  // Give every period a keeper, chosen from the girls already on the pitch.
+  // Augmenting-path matching: if a legal rotation exists, this finds it.
+  function matchKeepers(pool, cap, slot, used, periods) {
+    function tryOne(p, seen) {
+      for (var k = 0; k < pool[p].length; k++) {
+        var i = pool[p][k];
+        if (seen[i]) continue;
+        seen[i] = true;
+        if ((used[i] || 0) < cap[i]) { slot[p] = i; used[i] = (used[i] || 0) + 1; return true; }
+        for (var q = 0; q < periods; q++) {          // ask whoever has it to move
+          if (slot[q] !== i) continue;
+          slot[q] = -1;
+          if (tryOne(q, seen)) { slot[p] = i; return true; }
+          slot[q] = i;
+        }
+      }
+      return false;
+    }
+    for (var p = 0; p < periods; p++) if (slot[p] === -1) tryOne(p, {});
+    return slot;
   }
 
   function buildRoster(team, periods, seed) {
@@ -295,77 +273,140 @@
     var rng = mulberry32(Number(seed) || 1);
     var order = shuffle(present.slice(), rng);   // this game's rotation order
     var n = order.length;
-    var i, p;
+    var i, p, k;
 
     var first = order.map(function (g) { return firstPeriod(g, periods); });
     var availCount = first.map(function (f) { return periods - f; });
-
-    var plan = planGoalies(order, first, periods);
+    var keeper = order.map(function (g) { return g.gk !== "no"; });
+    var elig = [];
+    for (i = 0; i < n; i++) if (keeper[i]) elig.push(i);
 
     // how many girls take the pitch each period (a short squad plays short)
     var onCount = [];
     for (p = 0; p < periods; p++) {
       var here = 0;
       for (i = 0; i < n; i++) if (first[i] <= p) here++;
-      onCount.push(Math.min(here, plan[p] === null ? FIELD : ON_FIELD));
+      onCount.push(Math.min(here, elig.length ? ON_FIELD : FIELD));
     }
 
-    var booked = [];
-    for (i = 0; i < n; i++) booked.push(0);
-    plan.forEach(function (ix) { if (ix !== null) booked[ix]++; });
+    // If only one or two girls will go in goal they are forced onto the pitch
+    // far more often than a fair share — the quota has to know that up front.
+    var floors = [], cap = [];
+    for (i = 0; i < n; i++) { floors.push(0); cap.push(0); }
+    if (elig.length) {
+      var per = Math.floor(periods / elig.length);
+      elig.forEach(function (ix) {
+        floors[ix] = Math.min(per, availCount[ix]);
+        cap[ix] = Math.ceil(periods / elig.length);
+      });
+    }
 
-    var target = quotas(availCount, onCount, booked);
+    var target = quotas(availCount, onCount, floors);
 
     // ---- fill the periods ----
-    var played = [], future = booked.slice(), rest = [], roles = [];
+    var played = [], rest = [], roles = [];
     for (i = 0; i < n; i++) { played.push(0); rest.push(0); roles.push([]); }
 
     for (p = 0; p < periods; p++) {
-      var keeper = plan[p];
-      var on = {};
-      if (keeper !== null) { on[keeper] = true; future[keeper]--; }
-
-      var cand = [];
-      for (i = 0; i < n; i++) if (first[i] <= p && i !== keeper) cand.push(i);
       var left = periods - p;
-      // For every girl still waiting: how many periods is she still owed, and
-      // how many chances are left to give them to her?
-      var owed = [], chance = [], tier = [];
+      var owed = [], tier = [];
       for (i = 0; i < n; i++) {
-        owed[i] = target[i] - played[i] - future[i];
-        chance[i] = Math.max(1, left - future[i]);
-        // 0 = has to play now or she'll run out of periods
+        owed[i] = target[i] - played[i];
+        // 0 = has to play now or she runs out of periods to catch up in
         // 1 = still owed time      2 = already had her full share
-        tier[i] = owed[i] >= chance[i] ? 0 : owed[i] > 0 ? 1 : 2;
+        tier[i] = owed[i] >= left ? 0 : owed[i] > 0 ? 1 : 2;
       }
+      var cand = [];
+      for (i = 0; i < n; i++) if (first[i] <= p) cand.push(i);
       cand.sort(function (a, b) {
         if (tier[a] !== tier[b]) return tier[a] - tier[b];
-        if (tier[a] === 0) {
-          var sa = owed[a] - chance[a], sb = owed[b] - chance[b];
-          if (sa !== sb) return sb - sa;                    // tightest squeeze first
-        } else if (tier[a] === 1) {
-          // she just came off? put her back on — that is what keeps rests from
-          // clumping into "sat out two periods in a row".
-          if (rest[a] !== rest[b]) return rest[b] - rest[a];
-        }
-        // then simply whoever is furthest behind: owed vs chances left
-        var cmp = owed[b] * chance[a] - owed[a] * chance[b];
-        if (cmp !== 0) return cmp;
+        // she just came off? put her back on — this is what spaces the rests
+        if (tier[a] === 1 && rest[a] !== rest[b]) return rest[b] - rest[a];
+        if (owed[a] !== owed[b]) return owed[b] - owed[a];
         if (rest[a] !== rest[b]) return rest[b] - rest[a];
-        return a - b;                                        // else rotation order
+        return a - b;                                // else rotation order
       });
-      var want = onCount[p] - (keeper !== null ? 1 : 0);
-      for (i = 0; i < want && i < cand.length; i++) on[cand[i]] = true;
 
+      for (i = 0; i < n; i++) roles[i][p] = first[i] > p ? "x" : "-";
+      for (k = 0; k < onCount[p] && k < cand.length; k++) roles[cand[k]][p] = "F";
       for (i = 0; i < n; i++) {
-        if (on[i]) { played[i]++; rest[i] = 0; roles[i][p] = (i === keeper) ? "G" : "F"; }
-        else if (first[i] > p) { roles[i][p] = "x"; }     // not here yet
-        else { rest[i]++; roles[i][p] = "-"; }
+        if (roles[i][p] === "F") { played[i]++; rest[i] = 0; }
+        else if (roles[i][p] === "-") rest[i]++;
       }
     }
 
     balance(roles, played, target, periods);
-    spread(roles, played, periods);
+    spread(roles, periods);
+
+    // ---- keepers: always someone who is already playing that period ----
+    var slot = [], used = {};
+    for (p = 0; p < periods; p++) slot.push(-1);
+    if (elig.length) {
+      var onPitch = [];
+      for (p = 0; p < periods; p++) {
+        // a period with nobody who can go in goal: bring the best keeper on for
+        // whoever has had the most time (rare — it needs almost no volunteers)
+        var any = elig.filter(function (ix) { return roles[ix][p] === "F"; });
+        if (!any.length) {
+          var inn = -1, out = -1;
+          elig.forEach(function (ix) {
+            if (roles[ix][p] !== "-") return;
+            if (inn < 0 || played[ix] < played[inn]) inn = ix;
+          });
+          for (i = 0; i < n; i++) {
+            if (roles[i][p] !== "F") continue;
+            if (out < 0 || played[i] > played[out]) out = i;
+          }
+          if (inn >= 0 && out >= 0) {
+            roles[inn][p] = "F"; roles[out][p] = "-";
+            played[inn]++; played[out]--;
+            any = [inn];
+          }
+        }
+        onPitch.push(any);
+      }
+      // greedy first (fewest turns, longest since her last), so it reads nicely
+      var turns = {}, lastAt = {};
+      var musts = elig.filter(function (ix) { return order[ix].gk === "must"; });
+      if (musts.length) {
+        // ★ must-be-goalie girls are placed first and keep their slot
+        var mustPool = onPitch.map(function (list) {
+          return list.filter(function (ix) { return order[ix].gk === "must"; });
+        });
+        var mustCap = [];
+        for (i = 0; i < n; i++) mustCap.push(order[i].gk === "must" ? 1 : 0);
+        matchKeepers(mustPool, mustCap, slot, used, periods);
+      }
+      for (p = 0; p < periods; p++) {
+        if (slot[p] !== -1) { turns[slot[p]] = (turns[slot[p]] || 0) + 1; lastAt[slot[p]] = p; }
+      }
+      for (p = 0; p < periods; p++) {
+        if (slot[p] !== -1) continue;
+        var pool = onPitch[p].filter(function (ix) { return (used[ix] || 0) < cap[ix]; });
+        if (!pool.length) continue;
+        pool.sort(function (a, b) {
+          var ta = turns[a] || 0, tb = turns[b] || 0;
+          if (ta !== tb) return ta - tb;                       // never twice before everyone once
+          var la = lastAt[a] === undefined ? -99 : lastAt[a];
+          var lb = lastAt[b] === undefined ? -99 : lastAt[b];
+          if (la !== lb) return la - lb;                       // longest since her last turn
+          return a - b;
+        });
+        slot[p] = pool[0];
+        used[pool[0]] = (used[pool[0]] || 0) + 1;
+        turns[pool[0]] = (turns[pool[0]] || 0) + 1;
+        lastAt[pool[0]] = p;
+      }
+      // anything the greedy could not fill gets solved properly, and only then
+      // do we allow a girl a second turn before everyone has had one
+      var tries = periods + 2;
+      while (tries-- > 0 && slot.indexOf(-1) !== -1) {
+        matchKeepers(onPitch, cap, slot, used, periods);
+        if (slot.indexOf(-1) === -1) break;
+        for (i = 0; i < n; i++) if (keeper[i]) cap[i]++;
+      }
+      for (p = 0; p < periods; p++) if (slot[p] !== -1) roles[slot[p]][p] = "G";
+    }
 
     // ---- read the finished grid back out ----
     var lineups = [], stat = {};
