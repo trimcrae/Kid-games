@@ -282,7 +282,7 @@
         };
       }
       const step = pick([2, 3, 5, 10]);
-      const start = step * randInt(1, 4);
+      const start = step * randInt(1, 8);
       const seq = [start, start + step, start + 2 * step];
       const ans = start + 3 * step;
       return {
@@ -351,13 +351,14 @@
       return String(c);
     }
 
-    // arithmetic levels: near misses you learn something from
+    // arithmetic levels: near misses you learn something from —
+    // including the classic slip of adding when you meant to take away.
     const n = parseInt(ans, 10);
     const opts = [n + 1, n - 1, n + 2, n - 2, n + 10, n - 10];
-    if (round.a != null && round.b != null) { opts.push(round.a + round.b + 1, Math.abs(round.a - round.b)); }
-    if (round.step) opts.push(n + round.step, n - round.step);
-    const good = opts.filter(function (x) { return x >= 0 && x <= 40 && x !== n; });
-    return String(good.length ? pick(good) : n + 3);
+    if (round.a != null && round.b != null) opts.push(round.a + round.b, Math.abs(round.a - round.b));
+    if (round.step) opts.push(n + round.step, n - round.step, n + 2 * round.step);
+    const good = opts.filter(function (x) { return x >= 0 && x <= 200 && x !== n; });
+    return String(good.length ? pick(good) : n + (round.step || 1));
   }
 
   /* ---------------- tally strip (count-out mode) ---------------- */

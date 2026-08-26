@@ -1236,8 +1236,9 @@
     var d = document.createElement("div");
     var text = String(big);
     d.className = "stat-card";
-    d.innerHTML = '<span class="big' + (text.length > 8 ? " long" : "") + '">' +
-      escapeHtml(text) + '</span><span class="cap">' + escapeHtml(cap) + "</span>";
+    var size = text.length > 12 ? " longer" : text.length > 8 ? " long" : "";
+    d.innerHTML = '<span class="big' + size + '">' + escapeHtml(text) +
+      '</span><span class="cap">' + escapeHtml(cap) + "</span>";
     return d;
   }
 
