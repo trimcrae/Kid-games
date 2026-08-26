@@ -328,20 +328,31 @@
       var cand = [];
       for (i = 0; i < n; i++) if (first[i] <= p && i !== keeper) cand.push(i);
       var left = periods - p;
+      // For every girl still waiting: how many periods is she still owed, and
+      // how many chances are left to give them to her?
+      var owed = [], chance = [], tier = [];
+      for (i = 0; i < n; i++) {
+        owed[i] = target[i] - played[i] - future[i];
+        chance[i] = Math.max(1, left - future[i]);
+        // 0 = has to play now or she'll run out of periods
+        // 1 = still owed time      2 = already had her full share
+        tier[i] = owed[i] >= chance[i] ? 0 : owed[i] > 0 ? 1 : 2;
+      }
       cand.sort(function (a, b) {
-        // "owed" = periods still due, minus the goalie slots already booked.
-        // Compare owed against the CHANCES each girl has left, so a girl who
-        // is running out of periods jumps ahead of one who can still catch up.
-        // (Straight "fewest plays first" is what used to hand a keeper a bonus
-        // period and clump other girls' rests together.)
-        var da = target[a] - played[a] - future[a], ca = left - future[a];
-        var db = target[b] - played[b] - future[b], cb = left - future[b];
-        if (ca < 1) ca = 1;
-        if (cb < 1) cb = 1;
-        var cmp = db * ca - da * cb;                       // da/ca vs db/cb, descending
+        if (tier[a] !== tier[b]) return tier[a] - tier[b];
+        if (tier[a] === 0) {
+          var sa = owed[a] - chance[a], sb = owed[b] - chance[b];
+          if (sa !== sb) return sb - sa;                    // tightest squeeze first
+        } else if (tier[a] === 1) {
+          // she just came off? put her back on — that is what keeps rests from
+          // clumping into "sat out two periods in a row".
+          if (rest[a] !== rest[b]) return rest[b] - rest[a];
+        }
+        // then simply whoever is furthest behind: owed vs chances left
+        var cmp = owed[b] * chance[a] - owed[a] * chance[b];
         if (cmp !== 0) return cmp;
-        if (rest[a] !== rest[b]) return rest[b] - rest[a]; // longest on the bench next
-        return a - b;                                      // else rotation order
+        if (rest[a] !== rest[b]) return rest[b] - rest[a];
+        return a - b;                                        // else rotation order
       });
       var want = onCount[p] - (keeper !== null ? 1 : 0);
       for (i = 0; i < want && i < cand.length; i++) on[cand[i]] = true;
