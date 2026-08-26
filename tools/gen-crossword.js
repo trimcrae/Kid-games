@@ -259,7 +259,7 @@ const THEMES = [
     name: "Pokémon Party", emoji: "⚡", blurb: "Catch and battle your favourites!", level: "tricky",
     words: [
       { answer: "PIKACHU", clue: "The yellow electric mouse Pokémon.", teach: "Seven letters. In Japanese, 'pika' is the sound of a sparkle and 'chu' is a mouse squeak." },
-      { answer: "EEVEE", clue: "A fluffy Pokémon that can evolve many ways.", teach: "Double E three times! To 'evolve' means to change into something new." },
+      { answer: "EEVEE", clue: "A fluffy Pokémon that can evolve many ways.", teach: "Two pairs of E's around a single V. To 'evolve' means to change into something new." },
       { answer: "CHARIZARD", clue: "A big orange fire-and-flying dragon Pokémon.", teach: "A blend of 'char' (to burn) and 'lizard'." },
       { answer: "SNORLAX", clue: "A huge Pokémon that loves to sleep.", teach: "From 'snore' plus 'relax' — the name tells you exactly what it does." },
       { answer: "POKEBALL", clue: "The red-and-white ball you catch Pokémon in.", teach: "A compound word: POKE + BALL." },
@@ -313,14 +313,14 @@ const THEMES = [
       { answer: "ROAR", clue: "The big loud sound a dinosaur makes.", teach: "Nobody actually knows what dinosaurs sounded like — scientists are still guessing." },
       { answer: "BONES", clue: "What scientists dig up to learn about dinos.", teach: "A scientist who digs up fossils is called a palaeontologist." },
       { answer: "EGG", clue: "A baby dinosaur hatches out of this.", teach: "Double G at the end. Real fossil dinosaur eggs have been found." },
-      { answer: "REX", clue: "Tyrannosaurus ___, the giant meat-eater.", teach: "'Rex' is Latin for 'king' — so T. rex means 'king tyrant lizard'." },
+      { answer: "REX", clue: "Tyrannosaurus ___, the giant meat-eater.", teach: "'Rex' is Latin for 'king' — so Tyrannosaurus rex means 'tyrant lizard king'." },
     ],
   },
   {
     name: "Yummy Food", emoji: "🍕", blurb: "Snacks and treats we love!", level: "easy",
     words: [
       { answer: "PIZZA", clue: "A round, cheesy slice with toppings.", teach: "Double Z in the middle — an Italian word, and Italy is where pizza comes from." },
-      { answer: "APPLE", clue: "A crunchy red or green fruit.", teach: "Double P. Apples float, because a fifth of an apple is air." },
+      { answer: "APPLE", clue: "A crunchy red or green fruit.", teach: "Double P. Apples float, because about a quarter of an apple is air." },
       { answer: "COOKIE", clue: "A sweet treat that's great with milk.", teach: "Double O then -IE, like 'rookie' and 'bookie'." },
       { answer: "TACO", clue: "A folded shell stuffed with yummy fillings.", teach: "A Spanish word from Mexico. Four letters, no double anything." },
       { answer: "BANANA", clue: "A long yellow fruit monkeys love.", teach: "Three A's! Bananas grow on giant plants, not trees." },
@@ -335,7 +335,7 @@ const THEMES = [
       { answer: "CROWN", clue: "The sparkly gold circle a queen wears on her head.", teach: "OW says 'ow!' here, like in 'down' and 'town'." },
       { answer: "WAND", clue: "A fairy godmother waves this to make magic.", teach: "The A sounds like the O in 'want' — W often bends the A that follows it." },
       { answer: "CASTLE", clue: "The giant stone home where royals live.", teach: "The T is silent! Same in 'listen', 'whistle' and 'thistle'." },
-      { answer: "TIARA", clue: "A small jewelled half-crown for fancy parties.", teach: "Say it 'tee-AR-uh'. It's a Greek word for a fancy headband." },
+      { answer: "TIARA", clue: "A small jewelled half-crown for fancy parties.", teach: "Say it 'tee-AR-uh'. English borrowed the word from Greek." },
       { answer: "BALL", clue: "A big fancy royal dance party.", teach: "Same spelling as a bouncy ball — one word, two very different meanings." },
       { answer: "DRESS", clue: "A twirly thing to wear to the ball.", teach: "Double S at the end, like 'press' and 'mess'." },
       { answer: "ROYAL", clue: "A word that means 'belonging to a king or queen'.", teach: "Roy-al. The '-AL' ending turns a thing into a describing word." },
@@ -446,7 +446,7 @@ const THEMES = [
   {
     name: "Colour Crayons", emoji: "🎨", blurb: "Name every colour in the box!", level: "easy",
     words: [
-      { answer: "PURPLE", clue: "Mix red and blue and you get this royal colour.", teach: "Six letters, and BOTH vowels are the same: P-U-R-P-L-E." },
+      { answer: "PURPLE", clue: "Mix red and blue and you get this royal colour.", teach: "Six letters, and the P shows up twice: P-U-R-P-L-E." },
       { answer: "ORANGE", clue: "A colour that is also a fruit.", teach: "Mix red and yellow to make it. Almost nothing rhymes with 'orange'!" },
       { answer: "YELLOW", clue: "The colour of the sun and a banana.", teach: "Double L in the middle, like 'pillow' and 'fellow'." },
       { answer: "GREEN", clue: "The colour of grass and leaves.", teach: "Double E. Mix blue and yellow to make it." },

@@ -329,23 +329,33 @@
       return;
     }
     const known = new Array(LEN).fill("_");
-    const inWord = [], out = [];
-    guesses.forEach(function (g) {
-      const res = scoreGuess(g, answer.word);
+    const scored = guesses.map(function (g) { return scoreGuess(g, answer.word); });
+
+    // pass 1: every letter we've proved is IN the word (green or yellow, anywhere)
+    const inWord = [];
+    scored.forEach(function (res, i) {
       for (let c = 0; c < LEN; c++) {
-        if (res[c] === "correct") known[c] = g[c].toUpperCase();
-        else if (res[c] === "present" && inWord.indexOf(g[c].toUpperCase()) < 0) inWord.push(g[c].toUpperCase());
-        else if (res[c] === "absent" && known.indexOf(g[c].toUpperCase()) < 0) {
-          if (out.indexOf(g[c].toUpperCase()) < 0) out.push(g[c].toUpperCase());
-        }
+        const L = guesses[i][c].toUpperCase();
+        if (res[c] === "correct") { known[c] = L; if (inWord.indexOf(L) < 0) inWord.push(L); }
+        else if (res[c] === "present" && inWord.indexOf(L) < 0) inWord.push(L);
       }
     });
+    // pass 2: a letter is only "ruled out" if it never showed up as green OR yellow.
+    // (Without this, the grey first E of EAGLE would wrongly rule out the green E.)
+    const out = [];
+    scored.forEach(function (res, i) {
+      for (let c = 0; c < LEN; c++) {
+        const L = guesses[i][c].toUpperCase();
+        if (res[c] === "absent" && inWord.indexOf(L) < 0 && out.indexOf(L) < 0) out.push(L);
+      }
+    });
+
     const stillIn = inWord.filter(function (L) { return known.indexOf(L) < 0; });
     const left = candidates().length;
     let html = '<span class="c-known">✔ ' + known.join(" ") + "</span>";
     if (stillIn.length) html += '<span class="c-in">↔ somewhere: ' + stillIn.join(" ") + "</span>";
-    if (out.length) html += '<span class="c-out">✖ ruled out: ' + out.slice(0, 12).join(" ") + "</span>";
-    html += '<span class="c-left">🔎 ' + left + (left === 1 ? " word" : " words") + " still fit</span>";
+    if (out.length) html += '<span class="c-out">✖ ruled out: ' + out.slice(0, 14).join(" ") + "</span>";
+    html += '<span class="c-left">🔎 ' + left + (left === 1 ? " word still fits" : " words still fit") + "</span>";
     el.coach.innerHTML = html;
   }
 

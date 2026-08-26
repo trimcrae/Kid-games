@@ -34,15 +34,17 @@
   const MODES = ["shapes", "animals", "letters", "numbers", "mix"];
 
   /* ---------------- what can appear ---------------- */
+  // `hex` is the big bright fill; `ink` is the darker version used for
+  // letters, numerals and dots so text always has readable contrast.
   const COLORS = [
-    { name: "red", hex: "#ff4d4d" },
-    { name: "orange", hex: "#ff9f1c" },
-    { name: "yellow", hex: "#f0b429" },
-    { name: "green", hex: "#2fc46f" },
-    { name: "blue", hex: "#38b6ff" },
-    { name: "purple", hex: "#8a5cff" },
-    { name: "pink", hex: "#ff5d8f" },
-    { name: "brown", hex: "#a2703f" }
+    { name: "red",    hex: "#ff4d4d", ink: "#d62b2b" },
+    { name: "orange", hex: "#ff9f1c", ink: "#c56a00" },
+    { name: "yellow", hex: "#f0b429", ink: "#a9760a" },
+    { name: "green",  hex: "#2fc46f", ink: "#17864a" },
+    { name: "blue",   hex: "#38b6ff", ink: "#0b6f9e" },
+    { name: "purple", hex: "#8a5cff", ink: "#6b3fd6" },
+    { name: "pink",   hex: "#ff5d8f", ink: "#d62f63" },
+    { name: "brown",  hex: "#a2703f", ink: "#7a4f24" }
   ];
 
   // Shapes are drawn as SVG so they stay crisp and huge.
@@ -350,7 +352,7 @@
     const g = document.createElement("span");
     g.className = "glyph";
     g.style.fontSize = Math.round(d * 0.4) + "px";
-    g.style.color = c.hex;
+    g.style.color = c.ink;
     g.textContent = big + L[0];
     const s = document.createElement("span");
     s.className = "sub";
@@ -376,7 +378,7 @@
     const g = document.createElement("span");
     g.className = "glyph";
     g.style.fontSize = Math.round(d * 0.4) + "px";
-    g.style.color = c.hex;
+    g.style.color = c.ink;
     g.textContent = String(n);
     b.appendChild(g);
     // the dots always come in rows of five, so 7 reads as 5 + 2 —
@@ -387,7 +389,7 @@
     pips.className = "pips";
     pips.style.width = (dot * 5 + gap * 5) + "px";
     pips.style.gap = gap + "px";
-    pips.style.color = c.hex;
+    pips.style.color = c.ink;
     for (let i = 0; i < n; i++) {
       const p = document.createElement("i");
       p.style.width = dot + "px";
