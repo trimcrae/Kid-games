@@ -10,6 +10,20 @@
   <link rel="stylesheet" href="../../assets/css/style.css" />
   <style>
     .maker { max-width: 1100px; margin: 0 auto; padding: 0 0.75rem 3rem; }
+    .col-left { min-width: 0; }
+
+    /* On a laptop/desktop the toolbox sits beside the page, so a kid never has
+       to scroll away from their comic to reach the stickers. */
+    @media (min-width: 1000px) {
+      .maker { max-width: 1220px; }
+      .work {
+        display: grid; grid-template-columns: minmax(0, 1fr) 430px;
+        gap: 1.4rem; align-items: start;
+      }
+      .work .toolbox { max-width: none; margin-top: 0; position: sticky; top: 0.6rem; }
+      .work .tray { max-height: calc(100vh - 8.5rem); overflow-y: auto; }
+      .work .tabs { justify-content: flex-start; }
+    }
 
     .how {
       text-align: center; color: #6a6385; font-size: 0.98rem;
@@ -18,6 +32,12 @@
     @media (max-height: 900px) and (min-width: 700px) {
       .hero .title { font-size: clamp(1.6rem, 4vw, 2.3rem); }
       .how { font-size: 0.92rem; }
+    }
+    @media (max-width: 560px) {
+      .hero { padding-top: 0.3rem !important; }
+      .hero .title { font-size: 1.7rem; }
+      .how { font-size: 0.92rem; margin-bottom: 0.35rem; }
+      .book-title { margin-bottom: 0.35rem; }
     }
 
     /* editable book title */
@@ -31,7 +51,10 @@
     .book-title:hover, .book-title:focus { border-color: #d8c9ff; background: rgba(255,255,255,0.55); }
 
     /* undo / redo bar */
-    .top-tools { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.6rem; }
+    .top-tools {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      align-items: center; gap: 0.5rem; margin-bottom: 0.6rem;
+    }
     .top-tools button {
       font-family: var(--font); font-size: 1rem; font-weight: bold;
       border: 2px solid #cdbfff; background: #fff; color: var(--purple);
@@ -43,7 +66,7 @@
     /* ---- the comic page ---- */
     .stage { display: flex; justify-content: center; }
     .page {
-      width: min(94vw, 620px, 56vh);
+      width: min(94vw, 620px, 62vh);
       aspect-ratio: 3 / 4;
       background: #fff;
       border-radius: 18px;
@@ -106,6 +129,7 @@
     }
     .item.flip .emoji { transform: scaleX(-1); }
     .item.sticker { cursor: grab; }
+    .item.dragging, .item.dragging .grip { cursor: grabbing; }
 
     .txt {
       font-size: calc(var(--sz, 6) * 1cqmin);
@@ -280,11 +304,16 @@
     .ghost-btn:hover { background: #f3efff; }
     .layout-btn.on { background: var(--purple); color: #fff; border-color: var(--purple); }
 
-    .page-nav { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 0.5rem 0 0.4rem; font-weight: bold; color: var(--purple); }
+    .page-nav {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-weight: bold; color: var(--purple);
+      background: #fff; border: 2px solid #cdbfff; border-radius: 999px;
+      padding: 0.15rem 0.5rem;
+    }
     .nav-arrow {
       font-family: var(--font); font-size: 1.3rem; font-weight: bold;
-      width: 2.6rem; height: 2.6rem; border-radius: 50%;
-      border: 2px solid #cdbfff; background: #fff; color: var(--purple); cursor: pointer;
+      width: 2.4rem; height: 2.4rem; border-radius: 50%;
+      border: 2px solid #cdbfff; background: #f7f3ff; color: var(--purple); cursor: pointer;
     }
     .nav-arrow:disabled { opacity: 0.35; cursor: default; }
     .nav-arrow:not(:disabled):hover { background: var(--purple); color: #fff; }
@@ -371,7 +400,9 @@
     @media print {
       body { background: #fff; }
       .bg-blobs, .back-link, .hero, .how, .top-tools, .toolbox, .page-nav,
+      .file-status, .shelf,
       .hint, .footer, .item-bar-wrap, .grip { display: none !important; }
+      .work { display: block !important; }
       .page { box-shadow: none; width: 100%; aspect-ratio: auto; height: 96vh; }
       .panel.sel { box-shadow: none; }
       .item.sel .content { outline: none; }
@@ -393,8 +424,8 @@
 
   <div class="maker">
     <p class="how">
-      <b>Draw</b> your own graphic novel! Pick a colour and draw right inside a panel — like a paint program,
-      but with comic <b>panels, pages &amp; speech bubbles</b> ready to go. Add stickers &amp; sound words — and tap <b>📖 Story</b> for ideas, sentence starters and a writing check. ✨
+      <b>Draw</b> your own graphic novel — panels, pages, stickers &amp; speech bubbles all ready to go.
+      Tap <b>📖 Story</b> for story ideas, sentence starters and a writing check. ✨
     </p>
 
     <h2 class="book-title" id="book-title" contenteditable="true" spellcheck="false"
@@ -403,9 +434,16 @@
     <div class="top-tools">
       <button id="undo" disabled>↶ Undo</button>
       <button id="redo" disabled>↷ Redo</button>
+      <span class="page-nav" role="group" aria-label="Comic pages">
+        <button class="nav-arrow" id="prev-page" aria-label="Previous page">◀</button>
+        <span id="page-label">Page 1 of 1</span>
+        <button class="nav-arrow" id="next-page" aria-label="Next page">▶</button>
+      </span>
     </div>
 
-    <div class="stage">
+    <div class="work">
+     <div class="col-left">
+      <div class="stage">
       <div class="page l-4 drawing" id="page" aria-label="Comic page"></div>
     </div>
 
@@ -414,15 +452,10 @@
       <div class="item-bar" id="item-bar" aria-label="Selected item controls"></div>
     </div>
 
-    <div class="page-nav">
-      <button class="nav-arrow" id="prev-page" aria-label="Previous page">◀</button>
-      <span id="page-label">Page 1 of 1</span>
-      <button class="nav-arrow" id="next-page" aria-label="Next page">▶</button>
-    </div>
+      <div class="hint" id="hint" role="status" aria-live="polite">Pick a colour below and draw right on the panel! ✏️</div>
+     </div>
 
-    <div class="hint" id="hint" role="status" aria-live="polite">Pick a colour below and draw right on the panel! ✏️</div>
-
-    <div class="toolbox">
+     <div class="toolbox">
       <div class="tabs">
         <button class="tab on" data-tab="draw">✏️ Draw</button>
         <button class="tab" data-tab="stickers">🧸 Stickers</button>
@@ -589,6 +622,7 @@
         <!-- fallback file input for browsers without the File System Access API -->
         <input type="file" id="open-file-input" accept=".json,application/json" style="display:none;" />
       </div>
+     </div>
     </div>
   </div>
 

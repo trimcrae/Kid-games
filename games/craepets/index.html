@@ -128,6 +128,7 @@
       border-radius: 999px; background: var(--pink); color: #fff;
       font-size: 0.68rem; line-height: 17px; padding: 0 4px;
     }
+    .nav button .dot.review { background: #ffb43d; }
 
     /* --- panels --- */
     .panel {
@@ -166,8 +167,47 @@
     .choice.right { background: #dcffe8; border-color: var(--green); animation: shake-yes 0.4s ease; }
     .choice.wrong { background: #ffe4e8; border-color: var(--pink); animation: shake-no 0.4s ease; }
     .choice:disabled { cursor: default; opacity: 0.95; }
+    /* After two misses at the Tiny level the right one starts to glow,
+       so a toddler is never stuck. */
+    .choice.hint { border-color: var(--green); box-shadow: 0 0 0 4px rgba(61,220,132,0.35); animation: nudge 1s ease infinite; }
+    @keyframes nudge { 50% { transform: translateY(-4px); } }
     @keyframes shake-yes { 50% { transform: scale(1.07); } }
     @keyframes shake-no { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+    /* The number that answers this choice from the keyboard. Only shown
+       where there probably IS a keyboard — it would only clutter a phone. */
+    .choice .keycap { display: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .choice { position: relative; }
+      .choice .keycap {
+        display: block; position: absolute; top: 5px; left: 7px;
+        font-size: 0.68rem; font-weight: bold; color: #a9a2c4;
+        border: 2px solid #ece6ff; border-radius: 6px; min-width: 17px; line-height: 15px;
+      }
+      .choice.right .keycap { color: #2f8f5b; border-color: #a9e9c4; }
+      .choice.wrong .keycap { color: #b3405a; border-color: #ffc2cd; }
+    }
+
+    /* "you have seen this one before" */
+    .second-look {
+      display: inline-block; margin: 0 auto 0.5rem; padding: 0.25rem 0.7rem;
+      background: #fff2dd; color: #94530b; border-radius: 999px;
+      font-size: 0.8rem; font-weight: bold;
+    }
+    .teach i { font-style: normal; display: block; margin-top: 0.35rem; color: #7a7196; }
+
+    /* the day-streak dots on the quest board */
+    .daydots { text-align: center; font-size: 1.05rem; letter-spacing: 0.08em; margin: 0.2rem 0 0.7rem; }
+    .daydots b { display: block; letter-spacing: normal; font-size: 0.9rem; color: var(--purple); margin-top: 0.2rem; }
+
+    /* the little 🔊 button that lives in the money bar */
+    .mini {
+      font-family: var(--font); font-size: 1rem; line-height: 1;
+      border: 2px solid #ece6ff; background: #fff; border-radius: 10px;
+      min-width: 34px; min-height: 30px; cursor: pointer; touch-action: manipulation;
+      padding: 0.15rem 0.35rem;
+    }
+    .mini[aria-pressed="true"] { background: var(--purple); border-color: var(--purple); }
 
     .teach {
       margin: 0.7rem 0 0; padding: 0.6rem 0.75rem; border-radius: 14px; font-size: 0.95rem;
@@ -212,7 +252,18 @@
       padding: 0.35rem 0.9rem; cursor: pointer; touch-action: manipulation;
     }
     .ghost:hover { transform: translateY(-2px); }
-    .ghost.small { font-size: 0.8rem; padding: 0.22rem 0.7rem; border-width: 2px; }
+    /* Small, but never smaller than a small finger: 40px is the floor. */
+    .ghost.small {
+      font-size: 0.85rem; padding: 0.3rem 0.85rem; border-width: 2px;
+      min-height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* A visible ring for anyone driving this with a keyboard. */
+    .who:focus-visible, .nav button:focus-visible, .choice:focus-visible, .item:focus-visible,
+    .act:focus-visible, .ghost:focus-visible, .sw:focus-visible, .adopt:focus-visible,
+    .mini:focus-visible, .scene:focus-visible {
+      outline: 4px solid #2b2440; outline-offset: 3px;
+    }
 
     /* --- adoption --- */
     .adopt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 0.55rem; }
@@ -321,16 +372,26 @@
     .settings-row { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
     .settings-row .ghost.on { background: var(--purple); color: #fff; }
 
-    /* On a small phone every pixel above the question counts. */
+    /* On a small phone every pixel above the question counts — but a
+       three-year-old's finger still needs something like 40px to land on,
+       so the nav gets shorter text, not a shorter button. */
     @media (max-width: 430px) {
-      .nav button { font-size: 0.82rem; padding: 0.28rem 0.5rem; border-width: 2px; }
+      .nav button {
+        font-size: 0.82rem; padding: 0.3rem 0.6rem; border-width: 2px;
+        min-height: 40px; display: inline-flex; align-items: center;
+      }
       .hero { padding: 0.15rem 1rem 0.2rem; }
       .back-link { margin: 0.5rem 0.75rem 0; padding: 0.45rem 0.9rem; }
       .topbar { padding: 0.3rem 0.7rem; }
+      .choice { min-height: 70px; }
+      .sw { width: 52px; height: 52px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .bubble, .floaty, .sheet, .sheet-back, .toast, .choice.right, .choice.wrong { animation: none; }
+      .bubble, .floaty, .sheet, .sheet-back, .toast, .choice.right, .choice.wrong,
+      .choice.hint { animation: none; }
+      .who:hover, .nav button:hover, .choice:hover:not(:disabled), .item:hover:not(:disabled),
+      .act:hover:not(:disabled), .ghost:hover, .sw:hover, .adopt:hover { transform: none; }
     }
   </style>
 </head>

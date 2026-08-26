@@ -85,9 +85,15 @@
       quests: [],
       claimed: {},
       today: {},
+      /* Questions you got wrong, waiting to come back around. */
+      review: [],
+      /* A half-filled berry patch should still be there tomorrow. */
+      harvest: { farm: [], well: [], pool: [] },
+      dayStreak: 0,
+      lastPlayDay: 0,
       stats: { correct: 0, wrong: 0, best: 0, streak: 0, farm: 0, well: 0, pool: 0,
                arena: 0, arenaWin: 0, feed: 0, play: 0, wash: 0, read: 0, buy: 0,
-               quests: 0, coinsEarned: 0, bySubject: {} },
+               quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {} },
       trophies: []
     };
   }
@@ -101,6 +107,14 @@
     var fresh = blankSave(profile);
     Object.keys(fresh).forEach(function (k) { if (s[k] === undefined || s[k] === null) s[k] = fresh[k]; });
     Object.keys(fresh.stats).forEach(function (k) { if (s.stats[k] === undefined) s.stats[k] = fresh.stats[k]; });
+    // A save written by an older build has no baskets and no review pile —
+    // normalise them here so nothing downstream has to keep checking.
+    if (!Array.isArray(s.review)) s.review = [];
+    if (!s.harvest || typeof s.harvest !== "object") s.harvest = { farm: [], well: [], pool: [] };
+    ["farm", "well", "pool"].forEach(function (p) {
+      if (!Array.isArray(s.harvest[p])) s.harvest[p] = [];
+      if (s.harvest[p].length > SLOTS) s.harvest[p] = s.harvest[p].slice(0, SLOTS);
+    });
     return s;
   }
 
@@ -133,16 +147,25 @@
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-  /* A new day: fresh quests, fresh daily counters, one free gift. */
+  /* A new day: fresh quests, fresh daily counters, one free gift —
+     and the day-streak, which is the real reason to come back tomorrow. */
   function rollDay() {
     var day = D.dayNumber();
-    if (S.day === day && S.quests && S.quests.length) return false;
-    S.day = day;
-    S.quests = D.questsFor().map(function (q) { return q.id; });
-    S.claimed = {};
-    S.today = {};
-    S.dailyGift = false;
-    return true;
+    var rolled = false;
+    if (S.day !== day || !S.quests || !S.quests.length) {
+      S.day = day;
+      S.quests = D.questsFor().map(function (q) { return q.id; });
+      S.claimed = {};
+      S.today = {};
+      S.dailyGift = false;
+      rolled = true;
+    }
+    if (S.lastPlayDay !== day) {
+      S.dayStreak = (S.lastPlayDay === day - 1) ? (S.dayStreak || 0) + 1 : 1;
+      S.lastPlayDay = day;
+      if (S.dayStreak > (S.stats.bestDayStreak || 0)) S.stats.bestDayStreak = S.dayStreak;
+    }
+    return rolled;
   }
 
   function quests() {
@@ -233,7 +256,11 @@
       arena3: st.arenaWin >= 3,
       shade: !!S.beatShade,
       reader: st.read >= 5,
-      questor: st.quests >= 10
+      questor: st.quests >= 10,
+      fixer: (st.fixed || 0) >= 25,
+      week: (st.bestDayStreak || 0) >= 7,
+      palette: S.colours.length >= P.COLOURS.length,
+      level20: level() >= 20
     };
     Object.keys(tests).forEach(function (id) {
       if (tests[id] && S.trophies.indexOf(id) === -1) { S.trophies.push(id); got.push(id); }
@@ -299,12 +326,17 @@
   function sceneHtml(place) {
     var pl = PLACES[place] || PLACES.nest;
     var deco = pl.deco.map(function (d) {
-      return '<span class="deco" style="left:' + d[1] + '%;bottom:' + d[2] + '%">' + d[0] + "</span>";
+      return '<span class="deco" aria-hidden="true" style="left:' + d[1] + '%;bottom:' + d[2] + '%">' + d[0] + "</span>";
     }).join("");
-    return '<div class="scene ' + place + (place === "nest" ? "" : " compact") + '" id="scene">' +
-      '<span class="place-tag">' + pl.tag + "</span>" + deco +
-      '<canvas id="pet-canvas"></canvas>' +
-      '<div id="bubble-slot"></div>' +
+    var label = S.pet
+      ? S.pet.name + ", a " + P.colour(S.pet.colour).name + " " + P.species(S.pet.species).name +
+        ", looking " + mood() + ", at " + pl.tag.replace(/^\S+\s/, "")
+      : "your Craepet";
+    return '<div class="scene ' + place + (place === "nest" ? "" : " compact") + '" id="scene" ' +
+      'role="button" tabindex="0" aria-label="' + esc(label) + '. Tap to say hello.">' +
+      '<span class="place-tag" aria-hidden="true">' + pl.tag + "</span>" + deco +
+      '<canvas id="pet-canvas" aria-hidden="true"></canvas>' +
+      '<div id="bubble-slot" role="status" aria-live="polite"></div>' +
     "</div>";
   }
 
@@ -339,6 +371,8 @@
     if (old && old.parentNode) old.parentNode.removeChild(old);
     var t = document.createElement("div");
     t.className = "toast";
+    t.setAttribute("role", "status");
+    t.setAttribute("aria-live", "polite");
     t.textContent = text;
     document.body.appendChild(t);
     clearTimeout(toastTimer);
@@ -397,11 +431,20 @@
 
   function topbarHtml() {
     var lv = level();
+    var on = voiceWanted();
+    var voiceBtn = canSpeak
+      ? '<button class="mini" data-voice="1" aria-pressed="' + on + '" ' +
+        'aria-label="' + (on ? "Reading questions aloud. Turn off." : "Read questions aloud") + '" ' +
+        'title="' + (on ? "Reading aloud is ON" : "Read questions aloud") + '">' +
+        (on ? "🔊" : "🔇") + "</button>"
+      : "";
     return '<div class="topbar">' +
       '<span class="coins" id="coin-count">🪙 ' + S.coins + "</span>" +
       '<span class="petname">' + esc(S.pet.name) + " " + moodFace() + "</span>" +
-      '<span class="lvl">Lv ' + lv + "</span>" +
-      '<span class="xp" title="' + xpInLevel() + '/50 to the next level"><i style="width:' + (xpInLevel() / 50 * 100) + '%"></i></span>' +
+      voiceBtn +
+      '<span class="lvl" aria-label="Level ' + lv + '">Lv ' + lv + "</span>" +
+      '<span class="xp" role="img" aria-label="' + xpInLevel() + ' of 50 experience to the next level" title="' +
+        xpInLevel() + '/50 to the next level"><i style="width:' + (xpInLevel() / 50 * 100) + '%"></i></span>' +
     "</div>";
   }
 
@@ -411,7 +454,8 @@
     return '<div class="needs">' + rows.map(function (r) {
       var v = Math.round(r[2]);
       var col = v > 60 ? "#3ddc84" : v > 33 ? "#ffd166" : "#ff5d8f";
-      return '<div class="need"><b>' + r[0] + "</b>" +
+      return '<div class="need" role="img" aria-label="' + r[1] + " " + v + ' out of 100">' +
+             "<b aria-hidden=\"true\">" + r[0] + "</b>" +
              '<span><i style="width:' + v + "%;background:" + col + '"></i></span>' +
              "<small>" + r[1] + "</small></div>";
     }).join("") + "</div>";
@@ -427,11 +471,14 @@
     var ready = quests().filter(function (q) {
       return !S.claimed[q.id] && (S.today[q.track] || 0) >= q.goal;
     }).length;
-    return '<div class="nav" id="nav">' + NAV.map(function (n) {
-      var dot = (n[0] === "quests" && ready) ? '<span class="dot">' + ready + "</span>" : "";
-      return '<button data-go="' + n[0] + '"' + (view === n[0] ? ' class="on"' : "") + ">" +
+    var due = S.review.filter(function (r) { return r.tier === tier(); }).length;
+    return '<nav class="nav" id="nav" aria-label="Where to go">' + NAV.map(function (n) {
+      var dot = "";
+      if (n[0] === "quests" && ready) dot = '<span class="dot">' + ready + "</span>";
+      if (n[0] === "nest" && due) dot = '<span class="dot review" title="' + due + ' to review">🔁</span>';
+      return '<button data-go="' + n[0] + '"' + (view === n[0] ? ' class="on" aria-current="page"' : "") + ">" +
              n[1] + " " + n[2] + dot + "</button>";
-    }).join("") + "</div>";
+    }).join("") + "</nav>";
   }
 
   function panelHtml() {
@@ -548,15 +595,88 @@
   };
   var SLOTS = 8;
 
+  /* =========================================================
+     THE REVIEW BASKET — the single biggest teaching change.
+     A question you got wrong is not gone: it goes in the basket
+     and comes back a few questions later, re-dealt so the answer
+     is somewhere new. Get it right and it leaves the basket for
+     good ("you fixed it"), which is what actually shifts a fact
+     from "saw it once" to "know it".
+     ========================================================= */
+  var REVIEW_MAX = 40;
+  var reviewGap = 0;              // questions still to go before a re-ask
+
+  function reviewKey(q) {
+    var right = q.choices[q.answer] || {};
+    return q.subject + "|" + q.q + "|" + (right.t || right.emoji || "");
+  }
+
+  function remember(q) {
+    if (!q || tier() === "tot") return;               // nothing is "wrong" for a toddler
+    var key = reviewKey(q);
+    for (var i = 0; i < S.review.length; i++) {
+      if (S.review[i].key === key) { S.review[i].misses++; return; }
+    }
+    var copy = null;
+    try { copy = JSON.parse(JSON.stringify(q)); } catch (e) { return; }
+    delete copy.fromReview;
+    S.review.push({ key: key, tier: tier(), subject: q.subject, misses: 1, q: copy });
+    while (S.review.length > REVIEW_MAX) S.review.shift();
+  }
+
+  function forget(key) {
+    for (var i = 0; i < S.review.length; i++) {
+      if (S.review[i].key === key) { S.review.splice(i, 1); return true; }
+    }
+    return false;
+  }
+
+  /* A question due for a second look, or null. Only ever offers one
+     asked at the level you are playing now. */
+  function dueReview(subject) {
+    if (reviewGap > 0 || !S.review.length) return null;
+    var t = tier();
+    var pool = S.review.filter(function (r) {
+      return r.tier === t && (!subject || r.subject === subject);
+    });
+    if (!pool.length) return null;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
   function startSession(place) {
-    sess = { place: place, right: 0, wrong: 0, plots: [], q: null, state: "ask" };
+    sess = { place: place, right: 0, wrong: 0, plots: S.harvest[place] || [], q: null, state: "ask" };
+    S.harvest[place] = sess.plots;
     nextQuestion();
   }
 
   function nextQuestion() {
     var info = PLACE_INFO[sess.place];
-    sess.q = D.ask(info.subject, tier());
+    sess.q = pickQuestion(info.subject);
     sess.state = "ask";
+    sess.chose = -1;
+    announce(sess.q);
+  }
+
+  /* One door for every question in the valley: roughly two in five come
+     out of the review basket when there is anything in it. */
+  function pickQuestion(subject) {
+    var again = Math.random() < 0.4 ? dueReview(subject) : null;
+    if (again) {
+      var q = D.reshuffle(again.q);
+      q.fromReview = again.key;
+      reviewGap = 3;
+      return q;
+    }
+    if (reviewGap > 0) reviewGap--;
+    return D.ask(subject, tier());
+  }
+
+  /* Read the question out for the players who can't read it yet. */
+  function announce(q) {
+    if (!q) return;
+    var extra = "";
+    if (q.big && q.big.text) extra = ". " + q.big.text;
+    speak(q.q + extra);
   }
 
   function placeHtml(place) {
@@ -570,6 +690,8 @@
       cells.push('<div class="plot ' + place + (i < sess.plots.length ? " full" : "") + '">' +
                  (i < sess.plots.length ? sess.plots[i] : info.empty) + "</div>");
     }
+    var basket = '<div class="plots" aria-label="' + sess.plots.length + " of " + SLOTS +
+                 ' filled" role="img">' + cells.join("") + "</div>";
 
     var extra = "";
     if (place === "pool") {
@@ -581,7 +703,7 @@
     return '<div class="panel">' +
       "<h2>" + info.title + "</h2>" +
       '<p class="sub">' + info.sub + "</p>" +
-      '<div class="plots">' + cells.join("") + "</div>" + extra +
+      basket + extra +
       quizHtml(sess) +
     "</div>";
   }
@@ -610,19 +732,36 @@
         if (i === Q.answer) mark = " right";
         else if (i === q.chose) mark = " wrong";
       }
+      // A choice made only of a picture still needs a name for a screen
+      // reader — and the number key that picks it.
+      var lab = (c.t || "") || (c.colour ? "this color" : "") || (c.emoji ? c.emoji : "choice " + (i + 1));
       return '<button class="choice' + mark + '" data-pick="' + i + '"' +
-             (q.state === "done" ? " disabled" : "") + ">" + inner + "</button>";
+             ' aria-label="' + esc((i + 1) + ". " + lab) + '"' +
+             (q.state === "done" ? " disabled" : "") + ">" +
+             '<span class="keycap" aria-hidden="true">' + (i + 1) + "</span>" + inner + "</button>";
     }).join("");
 
-    var streakLine = sess && sess.right > 1
-      ? "🔥 " + S.stats.streak + " in a row" : "";
+    var streakLine = S.stats.streak > 1 ? "🔥 " + S.stats.streak + " in a row" : "";
+
+    var badge = Q.fromReview
+      ? '<p class="second-look">🔁 Second look — you missed this one before</p>' : "";
 
     var after = "";
     if (q.state === "done") {
       var right = Q.choices[Q.answer];
       var rightLabel = right.t || right.emoji || "that one";
-      after = '<p class="teach"><b>' + (q.correct ? "Yes! " : "The answer is " + esc(rightLabel) + ". ") + "</b>" +
-              esc(Q.teach) + "</p>" +
+      var head, mine = "";
+      if (q.correct) {
+        head = Q.fromReview ? "Fixed it! 🔁 " : "Yes! ";
+      } else {
+        head = "The answer is " + esc(rightLabel) + ". ";
+        // Naming the choice the child actually made turns "nope" into a
+        // comparison, which is the bit that teaches.
+        var chosen = Q.choices[q.chose];
+        var chosenLabel = chosen && (chosen.t || chosen.emoji);
+        if (chosenLabel) mine = " <i>You picked " + esc(chosenLabel) + ".</i>";
+      }
+      after = '<p class="teach" role="status"><b>' + head + "</b>" + esc(Q.teach) + mine + "</p>" +
               '<p style="margin:0.7rem 0 0"><button class="act" data-next="1" style="--ac:var(--purple);width:100%">' +
               (q.correct ? "Keep going →" : "Try another →") + "</button></p>";
     }
@@ -633,10 +772,11 @@
       if (cut > 0) after = after.slice(0, cut);
     }
 
-    return '<div class="qcard">' +
+    return '<div class="qcard">' + badge +
       '<p class="qprompt">' + esc(Q.q) + "</p>" + big +
       '<p class="streak">' + streakLine + "</p>" +
-      '<div class="choices' + (oneCol ? " one-col" : "") + '">' + buttons + "</div>" +
+      '<div class="choices' + (oneCol ? " one-col" : "") + '" role="group" aria-label="Answers">' +
+        buttons + "</div>" +
       after +
     "</div>";
   }
@@ -649,16 +789,26 @@
     var correct = idx === Q.answer;
 
     // At the Tiny level nothing is ever wrong — a miss just waits.
+    // After two misses the right answer starts to glow, so a toddler is
+    // never stuck tapping the same wrong square forever.
     if (!correct && tier() === "tot") {
       sfx("nope");
       var btn = document.querySelector('[data-pick="' + idx + '"]');
       if (btn) { btn.classList.add("wrong"); setTimeout(function () { btn.classList.remove("wrong"); }, 400); }
+      holder.misses = (holder.misses || 0) + 1;
+      if (holder.misses >= 2) {
+        var hint = document.querySelector('[data-pick="' + Q.answer + '"]');
+        if (hint) hint.classList.add("hint");
+        say("This one!", 2200);
+        speak("Try this one");
+      }
       return;
     }
 
     holder.chose = idx;
     holder.correct = correct;
     holder.state = "done";
+    holder.misses = 0;
 
     if (correct) {
       S.stats.streak++;
@@ -667,10 +817,17 @@
       bump("correct");
       var subj = Q.subject;
       S.stats.bySubject[subj] = (S.stats.bySubject[subj] || 0) + 1;
-      sfx(S.stats.streak >= 3 ? "streak" : "good");
+      if (Q.fromReview && forget(Q.fromReview)) {
+        S.stats.fixed = (S.stats.fixed || 0) + 1;
+        bump("fixed");
+        toast("🔁 Fixed it! That one is out of your review basket.");
+        earn(5);
+      }
+      sfx(S.stats.streak >= 3 ? "streak" : "good", S.stats.streak);
     } else {
       S.stats.wrong++;
       S.stats.streak = 0;
+      remember(Q);
       sfx("nope");
     }
 
@@ -680,6 +837,9 @@
     checkTrophies();
     save();
     render();
+    // Say the explanation out loud too — for a pre-reader the teaching
+    // line is the only part that is worth anything.
+    speak((correct ? "Yes! " : "The answer is " + (Q.choices[Q.answer].t || "this one") + ". ") + Q.teach);
   }
 
   /* What the place pays out for a right answer. */
@@ -688,6 +848,9 @@
     if (!correct) { sess.wrong++; return; }
     sess.right++;
     bump(sess.place);
+    // "learn something in all three places" needs a count of the places
+    // that have seen work today, not another counter to keep in step.
+    S.today.subjects = ["farm", "well", "pool"].filter(function (p) { return (S.today[p] || 0) > 0; }).length;
 
     var coins = info.base + Math.min(6, S.stats.streak) + Math.floor(level() / 3);
     earn(coins);
@@ -714,7 +877,7 @@
     if (sess.plots.length >= SLOTS) {
       var bonus = 25 + level() * 3;
       earn(bonus);
-      sess.plots = [];
+      sess.plots.length = 0;                       // same array — the save holds it
       toast(info.full + " +" + bonus + " 🪙");
       sfx("win");
       try { window.Confetti && Confetti.burst({ count: 60 }); } catch (e) {}
@@ -734,14 +897,28 @@
   /* =========================================================
      THE NEST — feeding, playing, washing, resting.
      ========================================================= */
-  function nestHtml() {
+  /* The mood line should not reshuffle every time a bar ticks — it made
+     the nest feel jittery. It changes when the MOOD changes. */
+  var moodLine = { m: null, text: "" };
+  function nestLine() {
     var m = mood();
-    var line = D.MOODS[m][Math.floor(Math.random() * D.MOODS[m].length)];
+    if (moodLine.m !== m) {
+      moodLine.m = m;
+      moodLine.text = D.MOODS[m][Math.floor(Math.random() * D.MOODS[m].length)];
+    }
+    return moodLine.text;
+  }
+
+  function nestHtml() {
     var age = Math.max(0, Math.floor((Date.now() - (S.pet.born || Date.now())) / 86400000));
+    var streakBit = (S.dayStreak || 0) > 1
+      ? '<p class="sub" style="margin:0.8rem 0 0">📅 <b>' + S.dayStreak +
+        " days in a row!</b> Keep it going — the daily gift grows with the streak.</p>" : "";
     return '<div class="panel">' +
       "<h2>🏡 " + esc(S.pet.name) + "'s nest</h2>" +
-      '<p class="sub">' + esc(line) + " &nbsp;·&nbsp; " + esc(P.species(S.pet.species).name) +
-        ", " + esc(P.colour(S.pet.colour).name) + ", " + age + (age === 1 ? " day" : " days") + " old.</p>" +
+      '<p class="sub">' + esc(nestLine()) + " &nbsp;·&nbsp; " + esc(P.species(S.pet.species).name) +
+        ", " + esc(P.colour(S.pet.colour).name) + ", " + age + (age === 1 ? " day" : " days") + " old. " +
+        '<button class="ghost small" data-rename="1">✏️ Rename</button></p>' +
       '<div class="acts">' +
         '<button class="act" data-do="feed" style="--ac:#ff8f4d"><span class="em">🍽️</span>Feed</button>' +
         '<button class="act" data-do="play" style="--ac:#3ddc84"><span class="em">🎾</span>Play</button>' +
@@ -749,8 +926,39 @@
         '<button class="act" data-do="rest" style="--ac:#8a5cff"><span class="em">😴</span>Rest</button>' +
       "</div>" +
       '<p class="sub" style="margin:0.8rem 0 0">Coins come from the Farm, the Well, the Pool and the Arena — ' +
-        "every one of them pays you for learning something.</p>" +
-    "</div>" + levelPickerHtml();
+        "every one of them pays you for learning something.</p>" + streakBit +
+    "</div>" + reviewHtml() + levelPickerHtml();
+  }
+
+  /* The review basket, shown plainly: "here is what you are still
+     getting wrong, and here is where to go and fix it." */
+  function reviewHtml() {
+    var mine = S.review.filter(function (r) { return r.tier === tier(); });
+    if (!mine.length) {
+      return '<div class="panel"><h2>🔁 Review basket</h2>' +
+        '<p class="sub">Empty — nothing is waiting to be fixed. Anything you get wrong lands here ' +
+        "and comes back a few questions later so you get a second go at it.</p></div>";
+    }
+    var by = { math: 0, word: 0, wonder: 0 };
+    mine.forEach(function (r) { if (by[r.subject] !== undefined) by[r.subject]++; });
+    var names = { math: "🍓 Berry Farm", word: "📖 Word Well", wonder: "🌈 Rainbow Pool" };
+    var rows = Object.keys(by).filter(function (k) { return by[k]; }).map(function (k) {
+      return '<div class="stat"><b>' + by[k] + "</b><small>" + names[k] + "</small></div>";
+    }).join("");
+    return '<div class="panel"><h2>🔁 Review basket</h2>' +
+      '<p class="sub"><b>' + mine.length + "</b> question" + (mine.length === 1 ? "" : "s") +
+      " waiting for a second look. They come back on their own while you play — get one right and it " +
+      "leaves the basket for good. Fixed so far: <b>" + (S.stats.fixed || 0) + "</b>.</p>" +
+      '<div class="statgrid">' + rows + "</div></div>";
+  }
+
+  function renameSheet() {
+    return sheet("✏️ Rename your Craepet",
+      '<p class="sub">Everything else stays exactly the same — same creature, same level, same coins.</p>' +
+      '<div class="name-row"><input id="rename-input" maxlength="14" value="' + esc(S.pet.name) +
+      '" aria-label="New name"><button class="ghost" id="rename-dice" aria-label="Pick a random name">🎲</button></div>' +
+      '<p style="margin:0.8rem 0 0"><button class="act" id="rename-go" style="--ac:var(--green);width:100%">' +
+      '<span class="em">✅</span>Save the name</button></p>');
   }
 
   function feedSheet() {
@@ -1076,11 +1284,17 @@
     var r = null;
     for (var i = 0; i < D.RIVALS.length; i++) if (D.RIVALS[i].id === id) r = D.RIVALS[i];
     if (!r || level() < (GATE[id] || 1)) return;
-    battle = { rival: r, foeHp: r.hp, foeMax: r.hp, myHp: maxHp(), myMax: maxHp(), q: null, state: "ask", log: r.taunt };
-    battle.q = D.ask(r.subject === "mixed" ? ["math", "word", "wonder"][Math.floor(Math.random() * 3)] : r.subject, tier());
+    battle = { rival: r, foeHp: r.hp, foeMax: r.hp, myHp: maxHp(), myMax: maxHp(),
+               q: null, state: "ask", chose: -1, log: r.taunt };
+    battle.q = pickQuestion(battleSubject(r));
     bump("arena");
     view = "arena";
     render();
+    announce(battle.q);
+  }
+
+  function battleSubject(r) {
+    return r.subject === "mixed" ? ["math", "word", "wonder"][Math.floor(Math.random() * 3)] : r.subject;
   }
 
   function battleHtml() {
@@ -1101,12 +1315,11 @@
   }
 
   function nextBattleQuestion() {
-    var r = battle.rival;
-    var subj = r.subject === "mixed"
-      ? ["math", "word", "wonder"][Math.floor(Math.random() * 3)] : r.subject;
-    battle.q = D.ask(subj, tier());
+    battle.q = pickQuestion(battleSubject(battle.rival));
     battle.state = "ask";
     battle.chose = -1;
+    battle.misses = 0;
+    announce(battle.q);
   }
 
   function battleEndHtml() {
@@ -1171,9 +1384,14 @@
     }).join("");
 
     var gift = S.dailyGift
-      ? '<p class="sub">Today\'s gift is already collected. Come back tomorrow!</p>'
+      ? '<p class="sub">Today\'s gift is already collected. Come back tomorrow for 🪙 ' +
+        (20 + Math.min(7, (S.dayStreak || 1) + 1) * 10) + "!</p>"
       : '<p><button class="act" data-gift="1" style="--ac:var(--yellow);width:100%">' +
-        '<span class="em">🎁</span>Collect today\'s gift</button></p>';
+        '<span class="em">🎁</span>Collect today\'s gift (🪙 ' + giftCoins() + ")</button></p>";
+
+    var days = S.dayStreak || 1;
+    var dots = "";
+    for (var d = 1; d <= 7; d++) dots += (d <= ((days - 1) % 7) + 1 ? "🟢" : "⚪");
 
     return '<div class="panel">' +
       "<h2>📜 Today's quests</h2>" +
@@ -1181,7 +1399,11 @@
       rows +
     "</div>" +
     '<div class="panel"><h2>🎁 Daily gift</h2>' +
-      '<p class="sub">One free parcel a day, whether you have earned a coin or not.</p>' + gift +
+      '<p class="sub">One free parcel a day, whether you have earned a coin or not — and it gets bigger ' +
+      "every day you come back.</p>" +
+      '<p class="daydots" role="img" aria-label="' + days + ' days in a row">' + dots +
+        ' <b>' + days + " day" + (days === 1 ? "" : "s") + " in a row</b></p>" + gift +
+      '<p class="sub" style="margin-top:0.5rem">Seven days straight and the valley throws in a free paint brush.</p>' +
     "</div>";
   }
 
@@ -1204,18 +1426,35 @@
     }
   }
 
+  /* The gift grows with the day-streak — coming back tomorrow is worth
+     more than coming back next week, which is exactly the point. */
+  function giftCoins() { return 20 + Math.min(7, S.dayStreak || 1) * 10; }
+
   function dailyGift() {
     if (S.dailyGift) return;
     S.dailyGift = true;
-    var coins = 20 + Math.floor(Math.random() * 20);
+    var coins = giftCoins();
     earn(coins);
     var food = D.FOODS[Math.floor(Math.random() * D.FOODS.length)];
     addItem(food.id);
+    // A week straight earns a paint brush on top.
+    var extra = "";
+    if ((S.dayStreak || 0) % 7 === 0) {
+      var locked = P.COLOURS.filter(function (c) { return S.colours.indexOf(c.id) === -1; });
+      if (locked.length) {
+        var c = locked[Math.floor(Math.random() * locked.length)];
+        S.colours.push(c.id);
+        extra = '<p class="sub"><b>Seven days in a row!</b> Here is a 🖌️ ' + esc(c.name) + " brush too.</p>";
+      }
+    }
     checkTrophies();
     save();
     render();
     openSheet(sheet("🎁 Today's gift",
       '<p class="sub" style="font-size:1.05rem">🪙 ' + coins + " coins and " + food.emoji + " " + esc(food.name) + "!</p>" +
+      extra +
+      '<p class="sub">📅 That is <b>' + (S.dayStreak || 1) + "</b> day" + ((S.dayStreak || 1) === 1 ? "" : "s") +
+        " in a row. Tomorrow's gift is 🪙 " + (20 + Math.min(7, (S.dayStreak || 1) + 1) * 10) + ".</p>" +
       '<p class="teach"><b>Did you know? </b>' + esc(D.fact(tier())) + "</p>"));
     sfx("coin");
   }
@@ -1235,7 +1474,9 @@
       ["🔥", st.best, "best streak"],
       ["🪙", st.coinsEarned, "coins earned"],
       ["🏅", st.arenaWin, "arena wins"],
-      ["📚", st.read, "books read"]
+      ["📚", st.read, "books read"],
+      ["🔁", st.fixed || 0, "put right"],
+      ["📅", st.bestDayStreak || 0, "best day run"]
     ].map(function (s) {
       return '<div class="stat"><b>' + s[0] + " " + s[1] + "</b><small>" + s[2] + "</small></div>";
     }).join("") + subjects.map(function (s) {
@@ -1275,11 +1516,19 @@
       '<button class="ghost close" data-close="1">Close</button>' +
     "</div></div>";
   }
+  var sheetReturn = null;   // where the keyboard was before the sheet opened
+
   function openSheet(html) {
+    var had = !!$("#sheet-back");
+    if (!had) sheetReturn = document.activeElement;
     dropSheet();
     var wrap = document.createElement("div");
     wrap.innerHTML = html;
     document.body.appendChild(wrap.firstChild);
+    // Put the keyboard inside the dialog so tabbing doesn't wander off
+    // behind it, and so Escape has something obvious to return from.
+    var first = document.querySelector(".sheet input, .sheet button");
+    if (first && first.focus) { try { first.focus(); } catch (e) {} }
   }
   /* Take the sheet off the page WITHOUT forgetting what it was asking —
      the shopkeeper's change question replaces its own sheet mid-purchase. */
@@ -1291,6 +1540,10 @@
   function closeSheet() {
     dropSheet();
     pendingBuy = null;
+    if (sheetReturn && sheetReturn.focus && document.contains(sheetReturn)) {
+      try { sheetReturn.focus(); } catch (e) {}
+    }
+    sheetReturn = null;
   }
 
   /* =========================================================
@@ -1299,6 +1552,17 @@
   function onClick(ev) {
     var t = ev.target;
     if (!t || !t.closest) return;
+
+    // read-aloud on/off
+    if (t.closest("[data-voice]")) {
+      voiceOn = !voiceWanted();
+      try { localStorage.setItem(VOICE_KEY, voiceOn ? "1" : "0"); } catch (e) {}
+      hush();
+      sfx("pop");
+      render();
+      if (voiceOn) speak("I will read the questions out loud.");
+      return;
+    }
 
     // who's playing
     if (t.closest("[data-swap]")) { sfx("pop"); return openSheet(whoSheet()); }
@@ -1368,6 +1632,26 @@
     var doBtn = t.closest("[data-do]");
     if (doBtn) return doAction(doBtn.dataset.do);
 
+    if (t.closest("[data-rename]")) { sfx("pop"); return openSheet(renameSheet()); }
+    if (t.closest("#rename-dice")) {
+      var rf = $("#rename-input");
+      if (rf) rf.value = D.PET_NAMES[Math.floor(Math.random() * D.PET_NAMES.length)];
+      sfx("pop");
+      return;
+    }
+    if (t.closest("#rename-go")) {
+      var nf = $("#rename-input");
+      var newName = ((nf ? nf.value : "") || "").trim().slice(0, 14);
+      if (!newName) { toast("Give your Craepet a name first!"); return; }
+      S.pet.name = newName;
+      save();
+      closeSheet();
+      render();
+      say("I'm " + newName + " now!", 3000);
+      sfx("win");
+      return;
+    }
+
     var buy = t.closest("[data-buy]");
     if (buy) return tryBuy(buy.dataset.buy);
 
@@ -1398,6 +1682,50 @@
       say(D.MOODS[m][Math.floor(Math.random() * D.MOODS[m].length)]);
       sfx("pop");
       save();
+    }
+  }
+
+  /* =========================================================
+     THE KEYBOARD — Jeannie and Shannon both play on a laptop, and
+     answering with 1/2/3/4 and Enter is far faster than aiming a
+     trackpad at a button. Escape always backs out of a sheet.
+     ========================================================= */
+  function onKey(ev) {
+    if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+    var el = document.activeElement;
+    var typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
+
+    if (ev.key === "Escape") {
+      hush();
+      if ($("#sheet-back")) { ev.preventDefault(); closeSheet(); }
+      return;
+    }
+
+    if (typing) {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        var go = $("#rename-go") || $("#do-adopt");
+        if (go) go.click();
+      }
+      return;
+    }
+
+    // 1-9 pick an answer (or the shopkeeper's change), wherever one is showing
+    if (/^[1-9]$/.test(ev.key)) {
+      var n = Number(ev.key) - 1;
+      var pick = document.querySelector('[data-change="' + n + '"]') ||
+                 document.querySelector('[data-pick="' + n + '"]:not([disabled])');
+      if (pick) { ev.preventDefault(); pick.click(); }
+      return;
+    }
+
+    if (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar") {
+      // The scene is a div acting as a button, so it needs the key itself.
+      if (el && el.id === "scene") { ev.preventDefault(); el.click(); return; }
+      // Only take over when nothing focusable is waiting for the key itself.
+      if (el && el !== document.body && el.tagName === "BUTTON") return;
+      var next = document.querySelector("[data-next]");
+      if (next) { ev.preventDefault(); next.click(); }
     }
   }
 
@@ -1434,6 +1762,7 @@
     if (tag) tag.textContent = D.profile(who).hello;
 
     document.addEventListener("click", onClick, false);
+    document.addEventListener("keydown", onKey, false);
     window.addEventListener("resize", function () { anim.measure = true; });
     window.addEventListener("beforeunload", save);
     document.addEventListener("visibilitychange", function () {
@@ -1475,6 +1804,9 @@
       var h = battle && !battle.over ? battle : sess;
       return h && h.q ? h.q.answer : -1;
     },
+    changeIndex: function () { return pendingBuy ? pendingBuy.q.answer : -1; },
+    review: function () { return S.review; },
+    _nextQuestion: function () { if (sess) { nextQuestion(); render(); } },
     grant: function (n) { S.coins += n; save(); render(); }
   };
 })();

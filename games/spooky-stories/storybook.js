@@ -1232,6 +1232,161 @@
     }
   ];
 
+
+  /* -----------------------------------------------------------
+     2b. Vocabulary — the "big words" worth stopping on.
+     VOCAB[storyId][pageIndex] = { word: "what it means" }
+     A word listed here gets a soft yellow underline in the text;
+     tapping it shows a kid-sized meaning AND replays the
+     storyteller from that word. Meanings are written for a 6–7
+     year old (Jeannie & Cory), read aloud for Ellie.
+     Keys must be lower-case and match a word that really is on
+     that page (matching ignores punctuation and capitals).
+     ----------------------------------------------------------- */
+  const VOCAB = {
+    "giggly-ghost": {
+      0: { sparkly: "covered in tiny lights that shine and shimmer" },
+      1: { teeny: "very, very small" },
+      3: { twirled: "spun round and round on the spot" }
+    },
+    "costume-party": {
+      0: { costume: "clothes you put on to look like somebody else" },
+      1: { pointy: "narrow and sharp at the top, like a triangle" },
+      2: { brave: "willing to do something even when it feels scary" },
+      4: { bobbed: "moved up and down, the way an apple floats in water" }
+    },
+    "lost-bat": {
+      0: { squeak: "a tiny, high, squeaky sound" },
+      2: { worry: "to feel afraid that something bad might happen" },
+      3: { twinkly: "shining on and off, like little stars" }
+    },
+    "pumpkin-smile": {
+      0: { crisp: "cool and fresh, the way autumn air feels", patch: "a piece of ground where one kind of plant grows" },
+      2: { sniffled: "sniffed a little, the way you do before you cry" },
+      4: { moonset: "when the moon goes down, the way the sun sets" }
+    },
+    "castle-sleepover": {
+      0: { cozy: "warm, soft and snug" },
+      2: { marshmallows: "soft, squishy white sweets you toast on a fire" },
+      4: { drifted: "floated away slowly and gently" }
+    },
+    "rainbow-unicorn": {
+      0: { meadow: "a wide field full of grass and wild flowers" },
+      2: { shy: "quiet and a bit nervous around somebody new" },
+      4: { galloped: "ran fast, the way a horse runs" }
+    },
+    "dancing-dragon": {
+      1: { peeked: "took a quick little look over or around something" },
+      3: { twirl: "one quick spin all the way round" },
+      5: { happily: "in a way that shows you feel glad" }
+    },
+    "sleepy-star": {
+      0: { twinkled: "shone on and off, like a tiny light blinking" },
+      2: { whispered: "spoke in a very soft, quiet voice" },
+      3: { tucked: "folded something snugly around you to keep you warm" }
+    },
+    "boo-birthday": {
+      1: { streamers: "long ribbons of paper hung up to make a party pretty" },
+      2: { flickering: "a light that keeps dancing and jumping about" },
+      3: { surprise: "something lovely you did not know was coming" }
+    },
+    "rainbow-dress": {
+      0: { royal: "belonging to a king or a queen" },
+      5: { trotted: "walked along with quick, bouncy steps" }
+    },
+    "hide-and-seek": {
+      4: { "tip-toed": "walked very quietly on the very tips of your toes" },
+      6: { swishy: "swinging quickly from side to side" }
+    }
+  };
+
+  /* -----------------------------------------------------------
+     2c. Story questions — a little "did you listen?" quiz that
+     opens from the last page. Two questions per story, each with
+     three picture answers. THE FIRST CHOICE IS THE RIGHT ONE —
+     the reader shuffles them before showing them.
+
+     `ask:` strings are narrated too: audio/build_audio.py renders
+     them to audio/<storyId>-q<n>.mp3 on the CI runner. Until that
+     has run, the questions are simply shown without a voice.
+     ----------------------------------------------------------- */
+  const QUIZZES = [
+    { id: "giggly-ghost", qs: [
+      { ask: "Who did Princess Ellie meet at her castle?",
+        choices: [["👻","A giggly little ghost"], ["🐉","A big green dragon"], ["🦄","A rainbow unicorn"]] },
+      { ask: "What did Ellie and Boo do all around the castle?",
+        choices: [["💃","They danced and twirled"], ["😴","They went straight to sleep"], ["🏊","They went for a swim"]] }
+    ]},
+    { id: "costume-party", qs: [
+      { ask: "What was big sister Jeannie dressed up as?",
+        choices: [["🧙","A friendly witch"], ["🐱","A black cat"], ["👻","A floating ghost"]] },
+      { ask: "Who was dressed up as a tiny pumpkin?",
+        choices: [["👶","Baby Kieran"], ["🛡️","Cory the knight"], ["👸","Princess Ellie"]] }
+    ]},
+    { id: "lost-bat", qs: [
+      { ask: "Why was the baby bat so sad?",
+        choices: [["😢","She was lost and could not find her mama"], ["🍪","She had eaten all her cookies"], ["😴","It was past her bedtime"]] },
+      { ask: "Who came along to help Ellie search?",
+        choices: [["🐱","Midnight the cat"], ["🐉","A dancing dragon"], ["⭐","A sleepy little star"]] }
+    ]},
+    { id: "pumpkin-smile", qs: [
+      { ask: "What had the little pumpkin lost?",
+        choices: [["😀","Its smile"], ["🎩","Its hat"], ["🌱","Its green stem"]] },
+      { ask: "How did Princess Ellie help the little pumpkin?",
+        choices: [["✨","She drew a big grin with her wand"], ["🍰","She baked it a cake"], ["🎵","She sang it a song"]] }
+    ]},
+    { id: "castle-sleepover", qs: [
+      { ask: "What did Cory build at the sleepover?",
+        choices: [["🛏️","The tallest pillow fort ever"], ["🏰","A castle out of sand"], ["🚀","A rocket ship"]] },
+      { ask: "What did Boo the ghost bring along to share?",
+        choices: [["🍡","Marshmallows"], ["🍕","Pizza"], ["🎈","Balloons"]] }
+    ]},
+    { id: "rainbow-unicorn", qs: [
+      { ask: "What was the shy unicorn's name?",
+        choices: [["✨","Sparkle"], ["🌙","Moonbeam"], ["🌸","Rosie"]] },
+      { ask: "Where did Ellie and the unicorn gallop together?",
+        choices: [["🌈","Over a rainbow, above the clouds"], ["🌊","Under the deep blue sea"], ["🕳️","Down into a dark cave"]] }
+    ]},
+    { id: "dancing-dragon", qs: [
+      { ask: "What did the friendly dragon really want to do?",
+        choices: [["💃","Learn to dance"], ["🍞","Bake some bread"], ["😴","Have a long nap"]] },
+      { ask: "What grew on the ground where the dragon stepped?",
+        choices: [["🌷","Bright little flowers"], ["❄️","Cold snowballs"], ["🪨","Big grey rocks"]] }
+    ]},
+    { id: "sleepy-star", qs: [
+      { ask: "What did the littlest star want more than anything?",
+        choices: [["😴","A cozy nap"], ["🍪","A midnight cookie"], ["🎈","A shiny balloon"]] },
+      { ask: "What did the other stars tuck around their sleepy friend?",
+        choices: [["☁️","A soft, cozy cloud"], ["🧣","A stripy scarf"], ["🍃","A pile of leaves"]] }
+    ]},
+    { id: "boo-birthday", qs: [
+      { ask: "Whose birthday were they all celebrating?",
+        choices: [["👻","Boo the giggly ghost"], ["🐱","Midnight the cat"], ["👸","Princess Ellie"]] },
+      { ask: "Who carried the birthday cake into the castle?",
+        choices: [["🦇","The little bats"], ["🐉","The green dragon"], ["🦄","Sparkle the unicorn"]] }
+    ]},
+    { id: "rainbow-dress", qs: [
+      { ask: "Which dress did Ellie finally wear to the picnic?",
+        choices: [["🌈","The rainbow dress"], ["💛","The yellow dress"], ["💙","The blue dress"]] },
+      { ask: "Who brought Ellie the dress with every colour on it?",
+        choices: [["🦄","Sparkle the unicorn"], ["🐉","The dancing dragon"], ["👻","Boo the ghost"]] }
+    ]},
+    { id: "hide-and-seek", qs: [
+      { ask: "How many friends did Ellie find altogether?",
+        choices: [["4️⃣","Four friends"], ["2️⃣","Two friends"], ["6️⃣","Six friends"]] },
+      { ask: "Who was the very last friend to be found?",
+        choices: [["🐱","Midnight the cat"], ["👻","Boo the ghost"], ["🦇","The little bat"]] }
+    ]}
+  ];
+
+  // Painterly cover pictures that the art pipeline has already rendered
+  // (games/spooky-stories/art/<id>-cover.png). Stories not listed here keep
+  // their hand-drawn SVG cover, so nothing ever 404s.
+  const COVER_ART = {
+    "giggly-ghost": 1, "costume-party": 1, "lost-bat": 1,
+    "pumpkin-smile": 1, "castle-sleepover": 1
+  };
+
   // A baby in a round pumpkin costume, little face peeking out.
   function babyPumpkin(x, y, sc) {
     const pg = uid("bpump");
@@ -1314,22 +1469,155 @@
   function playSound(name) { (SOUNDS[name] || SOUNDS.chime)(); }
 
   /* -----------------------------------------------------------
-     4. Narration — play the pre-rendered neural-voice clips
-     (warm Piper "lessac" voice, in audio/<storyId>-<page>.mp3).
-     No robotic fallback: if a clip is missing, the page is silent
-     and the words stay on screen for the kids to read.
+     4. Narration — the pre-rendered neural-voice clips
+     (warm Piper "lessac" voice, in audio/<storyId>-<page>.mp3),
+     plus word-by-word highlighting timed to that voice so a new
+     reader can follow along with their eyes while they listen.
      ----------------------------------------------------------- */
+
+  // audio/manifest.js (written by audio/build_audio.py) lists the clips that
+  // actually exist and how long the voice spends on each sentence. Checking it
+  // first means we never request an mp3 the audio pipeline has not rendered
+  // yet: brand-new story text is simply silent, with no failed requests.
+  const CLIPS = window.SPOOKY_NARRATION || null;
+  function clipTiming(name) {
+    if (!CLIPS) return [];   // no manifest at all — be optimistic and try
+    return Object.prototype.hasOwnProperty.call(CLIPS, name) ? (CLIPS[name] || []) : null;
+  }
+  function hasClip(name) { return clipTiming(name) !== null; }
+
   const narrator = new Audio();
   narrator.preload = "auto";
 
-  function narrate(storyId, pageIndex) {
-    stopNarration();
-    narrator.src = "audio/" + storyId + "-" + pageIndex + ".mp3";
+  let currentClip = "";      // the clip loaded into the <audio> right now
+  let karaokeOn = false;     // highlight page words while this clip plays?
+
+  // Play clip `name` from `fromTime` seconds. Returns false when there is no
+  // such clip (the page then just stays quiet and the words stay on screen).
+  function narrate(name, fromTime, karaoke) {
+    if (!hasClip(name)) { stopNarration(); return false; }
+    karaokeOn = !!karaoke;
+    if (currentClip !== name) {
+      try { narrator.pause(); } catch (e) {}
+      narrator.src = "audio/" + name + ".mp3";
+      currentClip = name;
+    }
+    try { narrator.currentTime = fromTime || 0; } catch (e) { /* metadata not in yet */ }
     const pr = narrator.play();
-    if (pr && pr.catch) pr.catch(() => {}); // missing clip — stay silent
+    if (pr && pr.catch) pr.catch(() => { paintWord(-1); });
+    tickKaraoke();
+    return true;
   }
   function stopNarration() {
+    karaokeOn = false;
     try { narrator.pause(); } catch (e) {}
+    paintWord(-1);
+  }
+  narrator.addEventListener("ended", () => paintWord(-1));
+  narrator.addEventListener("error", () => paintWord(-1));
+
+  /* ---- word highlighting ------------------------------------
+     We know the clip's real length (from the <audio> element) and,
+     once CI has rendered it, the length of every sentence inside
+     it. Time inside a sentence is shared out between its words in
+     proportion to how long they are, which lands each word close
+     enough that a 6-year-old can follow the bouncing highlight.
+     ----------------------------------------------------------- */
+  const SENTENCE_GAP = 0.45;              // matches build_audio.py
+  const ENDS_SENTENCE = /[.!?]+["'”’)\]]*$/;
+  let wordSpans = [];      // the tappable <span class="w"> words, in order
+  let wordTimes = null;    // parallel [{a: startSec, b: endSec}]
+  let litWord = -1, rafId = 0;
+
+  // lower-case a word with its punctuation trimmed off ("“Boo!”" -> "boo").
+  // Returns "" for tokens with no letters at all (a lone emoji), which are
+  // never spoken and so never highlighted.
+  function normWord(t) {
+    return String(t).toLowerCase()
+      .replace(/^[^0-9a-zÀ-ɏ]+/, "")
+      .replace(/[^0-9a-zÀ-ɏ]+$/, "");
+  }
+
+  function buildTiming(dur, sents) {
+    if (!wordSpans.length || !isFinite(dur) || dur <= 0.05) return null;
+    const weights = wordSpans.map(sp => normWord(sp.textContent).length + 1);
+
+    // group the words into sentences the same way build_audio.py does
+    const groups = [];
+    let g = [];
+    wordSpans.forEach((sp, i) => {
+      g.push(i);
+      if (ENDS_SENTENCE.test(sp.textContent)) { groups.push(g); g = []; }
+    });
+    if (g.length) groups.push(g);
+
+    const gw = groups.map(gr => gr.reduce((s, i) => s + weights[i], 0));
+    const starts = [], lens = [];
+    if (sents && sents.length === groups.length) {
+      // exact sentence lengths from the render
+      let t = 0;
+      for (let k = 0; k < groups.length; k++) {
+        starts.push(t); lens.push(sents[k]); t += sents[k] + SENTENCE_GAP;
+      }
+      const modelled = t - SENTENCE_GAP;
+      if (modelled > 0.05) {           // stretch to the clip's real length
+        const f = dur / modelled;
+        for (let k = 0; k < groups.length; k++) { starts[k] *= f; lens[k] *= f; }
+      }
+    } else {
+      // estimate: take the sentence gaps out, share the rest out by length
+      const gaps = SENTENCE_GAP * (groups.length - 1);
+      const speech = Math.max(dur - gaps, dur * 0.55);
+      const gapEach = groups.length > 1 ? (dur - speech) / (groups.length - 1) : 0;
+      const totalW = gw.reduce((a, b) => a + b, 0) || 1;
+      let t = 0;
+      for (let k = 0; k < groups.length; k++) {
+        const len = speech * gw[k] / totalW;
+        starts.push(t); lens.push(len); t += len + gapEach;
+      }
+    }
+
+    const times = new Array(wordSpans.length);
+    groups.forEach((gr, k) => {
+      const tw = gw[k] || 1;
+      let t = starts[k];
+      gr.forEach(i => {
+        const d = lens[k] * weights[i] / tw;
+        times[i] = { a: t, b: t + d };
+        t += d;
+      });
+    });
+    return times;
+  }
+
+  function ensureTiming() {
+    if (!wordTimes) wordTimes = buildTiming(narrator.duration, clipTiming(currentClip));
+    return wordTimes;
+  }
+
+  function wordAt(t) {
+    if (!wordTimes) return -1;
+    let hit = -1;
+    for (let i = 0; i < wordTimes.length; i++) {
+      if (wordTimes[i] && wordTimes[i].a <= t) hit = i; else break;
+    }
+    return hit;
+  }
+
+  function paintWord(i) {
+    if (i === litWord) return;
+    if (litWord >= 0 && wordSpans[litWord]) wordSpans[litWord].classList.remove("now");
+    litWord = i;
+    if (i >= 0 && wordSpans[i]) wordSpans[i].classList.add("now");
+  }
+
+  function tickKaraoke() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+    if (!karaokeOn) { paintWord(-1); return; }
+    if (narrator.paused || narrator.ended) { paintWord(-1); return; }
+    if (ensureTiming()) paintWord(wordAt(narrator.currentTime));
+    rafId = requestAnimationFrame(tickKaraoke);
   }
 
   /* -----------------------------------------------------------
@@ -1343,36 +1631,103 @@
   const dotsEl = document.getElementById("dots");
   const titleEl = document.getElementById("reader-title");
   const hintEl = document.getElementById("tap-hint");
+  const countEl = document.getElementById("page-count");
   const prevBtn = document.getElementById("prev-btn");
   const nextBtn = document.getElementById("next-btn");
   const againBtn = document.getElementById("again-btn");
+  const quizBtn = document.getElementById("quiz-btn");
   const homeBtn = document.getElementById("home-btn");
   const readBtn = document.getElementById("read-btn");
+  const selfBtn = document.getElementById("self-btn");
   const shelfEl = document.getElementById("sticker-shelf");
+  const wordCard = document.getElementById("word-card");
+  const wordTitleEl = document.getElementById("word-title");
+  const wordDefEl = document.getElementById("word-def");
+  const wordCloseBtn = document.getElementById("word-close");
+  const quizEl = document.getElementById("quiz");
+  const quizProgEl = document.getElementById("quiz-progress");
+  const quizAskEl = document.getElementById("quiz-ask");
+  const quizChoicesEl = document.getElementById("quiz-choices");
+  const quizFbEl = document.getElementById("quiz-feedback");
+  const quizDoneEl = document.getElementById("quiz-done");
+
+  const reduceMotion = !!(window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  /* ---- saved state -------------------------------------------
+     spooky-stories-done    { storyId: true }  finished stories
+     spooky-stories-marks   { storyId: page }  a bookmark PER story
+     spooky-stories-quiz    { storyId: true }  story-question badges
+     spooky-stories-prefs   { self: bool }     "I'll read it myself"
+     (spooky-stories-resume was the old single, whole-game bookmark —
+      it is migrated into -marks the first time we see it.)
+     ----------------------------------------------------------- */
+  function readJSON(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch (e) { return fallback; }
+  }
+  function writeJSON(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+  }
 
   const STORE_KEY = "spooky-stories-done";
-  function loadDone() { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; } }
-  function saveDone(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {} }
-
-  // remember the exact page a story was left on, so bedtime can
-  // pick up right where it stopped
+  const MARKS_KEY = "spooky-stories-marks";
   const RESUME_KEY = "spooky-stories-resume";
-  function loadResume() { try { return JSON.parse(localStorage.getItem(RESUME_KEY)); } catch (e) { return null; } }
-  function saveResume(r) {
-    try {
-      if (r) localStorage.setItem(RESUME_KEY, JSON.stringify(r));
-      else localStorage.removeItem(RESUME_KEY);
-    } catch (e) {}
+  const BADGE_KEY = "spooky-stories-quiz";
+  const PREFS_KEY = "spooky-stories-prefs";
+
+  function loadDone() { return readJSON(STORE_KEY, {}); }
+  function saveDone(d) { writeJSON(STORE_KEY, d); }
+  function loadBadges() { return readJSON(BADGE_KEY, {}); }
+  function saveBadges(b) { writeJSON(BADGE_KEY, b); }
+
+  function loadMarks() {
+    const marks = readJSON(MARKS_KEY, {});
+    // one-time migration of the old "one bookmark for the whole game" key
+    let old = null;
+    try { old = JSON.parse(localStorage.getItem(RESUME_KEY)); } catch (e) { old = null; }
+    if (old) {
+      if (old.id && old.page > 0 && !(old.id in marks)) marks[old.id] = old.page;
+      writeJSON(MARKS_KEY, marks);
+      try { localStorage.removeItem(RESUME_KEY); } catch (e) {}
+    }
+    return marks;
   }
+  function setMark(storyId, pageIndex) {
+    const marks = loadMarks();
+    if (pageIndex > 0) marks[storyId] = pageIndex; else delete marks[storyId];
+    writeJSON(MARKS_KEY, marks);
+  }
+
+  let prefs = readJSON(PREFS_KEY, { self: false });
+  function savePrefs() { writeJSON(PREFS_KEY, prefs); }
+
+  const QUIZ_BY_ID = {};
+  QUIZZES.forEach(q => { QUIZ_BY_ID[q.id] = q.qs; });
 
   let current = null;   // current story object
   let page = 0;
+
+  function vocabFor(storyId, pageIndex) {
+    const v = VOCAB[storyId];
+    return (v && v[pageIndex]) || null;
+  }
+  function clipName(storyId, pageIndex) { return storyId + "-" + pageIndex; }
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
 
   // ---- Sticker shelf: one shiny sticker per finished story ----
   function buildShelf() {
     if (!shelfEl) return;
     const done = loadDone();
+    const badges = loadBadges();
     const earned = STORIES.filter(s => done[s.id]).length;
+    const brains = STORIES.filter(s => badges[s.id]).length;
     let slots = "";
     STORIES.forEach(s => {
       slots += done[s.id]
@@ -1385,23 +1740,37 @@
       `<div class="shelf-row">${slots}</div>` +
       (allDone
         ? `<p class="shelf-msg all-done">🏆 WOW! You collected EVERY sticker! 🏆</p>`
-        : `<p class="shelf-msg">${earned} of ${STORIES.length} stickers — finish a story to earn one!</p>`);
+        : `<p class="shelf-msg">${earned} of ${STORIES.length} stickers — finish a story to earn one!</p>`) +
+      `<p class="shelf-msg">🧠 ${brains} of ${STORIES.length} thinking-cap badges — answer a story's questions to earn one.</p>`;
   }
 
   // ---- Library ----
   function buildLibrary() {
     const done = loadDone();
+    const badges = loadBadges();
+    const marks = loadMarks();
     buildShelf();
     grid.innerHTML = "";
     STORIES.forEach(story => {
+      const last = story.pages.length - 1;   // the "The End" page
       const card = document.createElement("button");
       card.className = "story-card";
       card.style.background = `linear-gradient(160deg, ${shade(story.color, 25)}, ${shade(story.color, -40)})`;
+      const at = marks[story.id];
+      const cover = COVER_ART[story.id]
+        ? `<img class="cover-img" src="art/${story.id}-cover.png" alt="" loading="lazy">`
+        : story.cover();
+      const badgeRow = (done[story.id] ? "⭐" : "") + (badges[story.id] ? "🧠" : "");
       card.innerHTML =
-        `${done[story.id] ? '<span class="done-star" aria-hidden="true">⭐</span>' : ""}
-         <span class="cover-svg">${story.cover()}</span>
+        `${badgeRow ? `<span class="badges" aria-hidden="true">${badgeRow}</span>` : ""}
+         <span class="cover-svg">${cover}</span>
          <h2>${story.title}</h2>
-         <p>${story.pages.length - 1} pages • Tap to read</p>`;
+         <p>${last} pages • Tap to read</p>
+         ${at ? `<span class="bookmark">🔖 Keep reading — page ${at + 1}</span>` : ""}`;
+      card.setAttribute("aria-label",
+        story.title + ", " + last + " pages" +
+        (at ? ", bookmarked at page " + (at + 1) : "") +
+        (done[story.id] ? ", finished" : ""));
       card.addEventListener("click", () => openStory(story));
       grid.appendChild(card);
     });
@@ -1411,29 +1780,61 @@
   function openStory(story) {
     current = story;
     page = 0;
-    // pick up where this story was left off (never on the end page)
-    const r = loadResume();
-    if (r && r.id === story.id && r.page > 0 && r.page < story.pages.length - 1) {
-      page = r.page;
-    }
+    // pick up where this story was left off (never on the "The End" page)
+    const marks = loadMarks();
+    const at = marks[story.id];
+    if (at > 0 && at < story.pages.length - 1) page = at;
     titleEl.textContent = story.title;
     library.style.display = "none";
     reader.classList.add("active");
-    audio(); // unlock audio on this tap gesture
+    audio(); // unlock the chimes on this tap gesture
+    closeQuiz();
     renderPage(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   }
 
   function goHome() {
     stopNarration();
+    closeQuiz();
+    hideWordCard();
     current = null;
     reader.classList.remove("active");
     library.style.display = "";
     buildLibrary();
   }
 
+  /* Lay the page text out as individual tappable words. Every word can be
+     tapped to hear the storyteller say it again from there; the handful of
+     "big words" also carry a kid-sized meaning. */
+  function layoutText(text, defs) {
+    textEl.innerHTML = "";
+    wordSpans = []; wordTimes = null; litWord = -1;
+    const tokens = String(text || "").trim().split(/\s+/);
+    tokens.forEach((tok, i) => {
+      if (i) textEl.appendChild(document.createTextNode(" "));
+      const norm = normWord(tok);
+      if (!norm) { textEl.appendChild(document.createTextNode(tok)); return; }
+      const sp = document.createElement("span");
+      sp.className = "w";
+      sp.textContent = tok;
+      sp.dataset.i = String(wordSpans.length);
+      sp.tabIndex = 0;
+      sp.setAttribute("role", "button");
+      if (defs && defs[norm]) {
+        sp.classList.add("vocab");
+        sp.setAttribute("aria-label", norm + " — a big word, tap to hear it and see what it means");
+      } else {
+        sp.setAttribute("aria-label", norm + " — tap to hear this word");
+      }
+      textEl.appendChild(sp);
+      wordSpans.push(sp);
+    });
+  }
+
   function renderPage(animate) {
     const p = current.pages[page];
+    hideWordCard();
+    closeQuiz();
 
     // art — a page may carry a generated image (img) or an art() function
     // (the art is hand-authored vector SVG, drawn directly).
@@ -1442,30 +1843,33 @@
     } else {
       artEl.innerHTML = p.art();
     }
-    if (animate) {
+    if (animate && !reduceMotion) {
       artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");
     }
 
-    // text
-    textEl.textContent = p.text;
+    // text, split into tappable words
+    layoutText(p.text, vocabFor(current.id, page));
 
-    // dots
+    // dots + a plain "page 3 of 6" for readers and screen readers
     dotsEl.innerHTML = "";
     current.pages.forEach((_, i) => {
       const d = document.createElement("span");
       if (i === page) d.className = "on";
       dotsEl.appendChild(d);
     });
+    const lastPage = current.pages.length - 1;
+    countEl.textContent = p.end ? "🌟 The End 🌟" : "Page " + (page + 1) + " of " + lastPage;
 
     // hint only when there are tappable things
     const hasTaps = artEl.querySelector(".tap");
     hintEl.style.visibility = (hasTaps || p.end) ? "visible" : "hidden";
-    hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : "✨ Tap the picture to play! ✨";
+    hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : "✨ Tap the picture to play — or tap a word to hear it! ✨";
 
     // buttons
     prevBtn.disabled = page === 0;
     nextBtn.textContent = p.end ? "📚 More stories" : "Turn the page ▶";
     againBtn.style.display = p.end ? "" : "none";
+    quizBtn.style.display = (p.end && QUIZ_BY_ID[current.id]) ? "" : "none";
 
     // hook up tappable art
     wireTaps();
@@ -1475,7 +1879,7 @@
       const done = loadDone();
       const wasNew = !done[current.id];
       done[current.id] = true; saveDone(done);
-      saveResume(null);   // finished — start fresh next time
+      setMark(current.id, 0);   // finished — start fresh next time
       const allDone = STORIES.every(s => done[s.id]);
       hintEl.textContent = wasNew
         ? (allDone
@@ -1486,11 +1890,139 @@
       confetti();
       if (wasNew && allDone) { confetti(); setTimeout(confetti, 700); }
     } else {
-      saveResume({ id: current.id, page: page });
+      setMark(current.id, page);
     }
 
-    // read this page aloud automatically (pre-rendered voice + fallback)
-    narrate(current.id, page);
+    // read this page aloud — unless the reader is in "I'll read it myself" mode
+    if (prefs.self) stopNarration();
+    else narrate(clipName(current.id, page), 0, true);
+  }
+
+  // ---- tapping a word: hear it again, and learn the big ones ----
+  function speakWordAt(i) {
+    if (!current) return;
+    const name = clipName(current.id, page);
+    if (!hasClip(name)) return;
+    // make sure we know where each word sits inside the clip
+    if (currentClip !== name) { narrate(name, 0, true); return; }
+    ensureTiming();
+    const t = (wordTimes && wordTimes[i]) ? Math.max(0, wordTimes[i].a - 0.06) : 0;
+    narrate(name, t, true);
+  }
+
+  function onWordActivate(sp) {
+    const i = Number(sp.dataset.i);
+    const norm = normWord(sp.textContent);
+    const defs = vocabFor(current && current.id, page);
+    if (defs && defs[norm]) showWordCard(norm, defs[norm]); else hideWordCard();
+    speakWordAt(i);
+  }
+
+  textEl.addEventListener("click", ev => {
+    const sp = ev.target && ev.target.closest && ev.target.closest(".w");
+    if (sp && current) onWordActivate(sp);
+  });
+  textEl.addEventListener("keydown", ev => {
+    if (ev.key !== "Enter" && ev.key !== " ") return;
+    const sp = ev.target && ev.target.closest && ev.target.closest(".w");
+    if (!sp || !current) return;
+    ev.preventDefault(); ev.stopPropagation();
+    onWordActivate(sp);
+  });
+
+  function showWordCard(word, def) {
+    wordTitleEl.textContent = "📖 " + word;
+    wordDefEl.textContent = def;
+    wordCard.hidden = false;
+  }
+  function hideWordCard() { wordCard.hidden = true; }
+  wordCloseBtn.addEventListener("click", hideWordCard);
+
+  // ---- the story questions ----
+  let quizQs = null, quizI = 0;
+  const PRAISE = ["⭐ That's it!", "🌟 Exactly right!", "💜 Well listened!", "✨ Spot on!", "🎉 Yes — well done!"];
+
+  function openQuiz() {
+    if (!current) return;
+    const qs = QUIZ_BY_ID[current.id];
+    if (!qs || !qs.length) return;
+    quizQs = qs; quizI = 0;
+    hideWordCard();
+    stopNarration();
+    quizEl.hidden = false;
+    quizDoneEl.hidden = true;
+    quizBtn.style.display = "none";
+    showQuestion();
+  }
+
+  function closeQuiz() {
+    quizEl.hidden = true;
+    quizDoneEl.hidden = true;
+    quizChoicesEl.innerHTML = "";
+    quizAskEl.textContent = "";
+    quizProgEl.textContent = "";
+    quizFbEl.textContent = "";
+    quizQs = null;
+  }
+
+  function showQuestion() {
+    const q = quizQs[quizI];
+    quizProgEl.textContent = "Question " + (quizI + 1) + " of " + quizQs.length;
+    quizAskEl.textContent = q.ask;
+    quizFbEl.textContent = "";
+    quizChoicesEl.innerHTML = "";
+    shuffle(q.choices.map((c, i) => i)).forEach(ci => {
+      const c = q.choices[ci];
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "qa";
+      if (ci === 0) b.dataset.correct = "1";
+      const e = document.createElement("span");
+      e.className = "qe"; e.setAttribute("aria-hidden", "true"); e.textContent = c[0];
+      const t = document.createElement("span");
+      t.className = "qt"; t.textContent = c[1];
+      b.appendChild(e); b.appendChild(t);
+      b.addEventListener("click", () => answerQuiz(b, ci === 0));
+      quizChoicesEl.appendChild(b);
+    });
+    // the question is narrated too, once the audio pipeline has rendered it
+    narrate(current.id + "-q" + quizI, 0, false);
+  }
+
+  function answerQuiz(btn, right) {
+    if (btn.disabled) return;
+    if (!right) {
+      btn.classList.add("wrong");
+      btn.disabled = true;
+      quizFbEl.textContent = "Not quite — have another look at the pictures!";
+      playSound("boing");
+      return;
+    }
+    Array.prototype.forEach.call(quizChoicesEl.children, b => { b.disabled = true; });
+    btn.classList.add("right");
+    quizFbEl.textContent = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+    playSound("twinkle");
+    setTimeout(() => {
+      if (!quizQs) return;
+      quizI++;
+      if (quizI < quizQs.length) showQuestion(); else finishQuiz();
+    }, 800);
+  }
+
+  function finishQuiz() {
+    quizChoicesEl.innerHTML = "";
+    quizAskEl.textContent = "";
+    quizProgEl.textContent = "";
+    quizFbEl.textContent = "";
+    const badges = loadBadges();
+    const isNew = !badges[current.id];
+    badges[current.id] = true; saveBadges(badges);
+    quizDoneEl.textContent = isNew
+      ? "🧠 You answered every question — a thinking-cap badge is yours!"
+      : "🧠 All correct again — you really know this story!";
+    quizDoneEl.hidden = false;
+    playSound("yay");
+    confetti();
   }
 
   function wireTaps() {
@@ -1498,8 +2030,12 @@
     taps.forEach(node => {
       node.addEventListener("click", ev => {
         ev.stopPropagation();
-        node.classList.remove("wiggle"); void node.getBBox; node.classList.add("wiggle");
-        node.addEventListener("animationend", () => node.classList.remove("wiggle"), { once: true });
+        if (!reduceMotion) {
+          node.classList.remove("wiggle");
+          void node.getBoundingClientRect();   // force a reflow so it replays
+          node.classList.add("wiggle");
+          node.addEventListener("animationend", () => node.classList.remove("wiggle"), { once: true });
+        }
         playSound(node.getAttribute("data-sound") || "chime");
         sparkleAt(ev);
       });
@@ -1509,6 +2045,7 @@
   // spawn a few sparkle emojis where the child tapped
   const SPARKLES = ["✨", "⭐", "💜", "🌟", "💫"];
   function sparkleAt(ev) {
+    if (reduceMotion) return;   // the CSS stops the animation, so don't spawn
     const stage = artEl.parentElement; // .stage
     const rect = stage.getBoundingClientRect();
     let cx, cy;
@@ -1531,6 +2068,7 @@
 
   // gentle confetti rain for the last page
   function confetti() {
+    if (reduceMotion) return;
     const stage = artEl.parentElement;
     const rect = stage.getBoundingClientRect();
     const items = ["✨","⭐","💜","🎉","🌟","🎃","🦇","👻"];
@@ -1549,6 +2087,7 @@
   }
 
   function nextPage() {
+    if (!current) return;
     const p = current.pages[page];
     if (p.end) { goHome(); return; }
     if (page < current.pages.length - 1) {
@@ -1558,6 +2097,7 @@
     }
   }
   function prevPage() {
+    if (!current) return;
     if (page > 0) { page--; playSound("page"); renderPage(true); }
   }
 
@@ -1570,14 +2110,39 @@
     playSound("page");
     renderPage(true);
   });
+  quizBtn.addEventListener("click", openQuiz);
   homeBtn.addEventListener("click", goHome);
-  readBtn.addEventListener("click", () => { if (current) narrate(current.id, page); });
+  readBtn.addEventListener("click", () => {
+    if (!current) return;
+    narrate(clipName(current.id, page), 0, true);
+  });
 
-  // keyboard niceties (arrows / space)
+  // "Read it to me" <-> "I'll read it myself" — Jeannie can switch the voice
+  // off and read the page herself, then tap 🔊 (or any word) to check.
+  function paintSelfBtn() {
+    selfBtn.setAttribute("aria-pressed", prefs.self ? "true" : "false");
+    selfBtn.textContent = prefs.self ? "🙋 I'll read it myself" : "🔊 Read it to me";
+  }
+  selfBtn.addEventListener("click", () => {
+    prefs.self = !prefs.self;
+    savePrefs();
+    paintSelfBtn();
+    if (prefs.self) stopNarration();
+    else if (current) narrate(clipName(current.id, page), 0, true);
+  });
+  paintSelfBtn();
+
+  // keyboard niceties (arrows / space / escape) — but never steal the key
+  // from a focused button or a word the reader is about to tap
   document.addEventListener("keydown", e => {
     if (!current) return;
+    const t = e.target;
+    if (t && t.closest && t.closest("button, .w, input, textarea, select")) {
+      if (e.key === "Escape") { goHome(); }
+      return;
+    }
     if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextPage(); }
-    else if (e.key === "ArrowLeft") { prevPage(); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); prevPage(); }
     else if (e.key === "Escape") { goHome(); }
   });
 

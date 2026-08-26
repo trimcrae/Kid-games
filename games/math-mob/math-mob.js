@@ -21,6 +21,11 @@
 
   // ---- Save / load progress -------------------------------------------
   const SAVE_KEY = "mcrae-math-mob-v1";
+  const MODE_KEYS = ["easy", "medium", "hard", "expert"];
+  // Each difficulty keeps its OWN ladder now. Clearing Level 8 on Easy used to
+  // drop you straight into Level 9 on Expert, which was unwinnable; every tier
+  // now has its own unlocked level, best level, best distance and top finish.
+  const blankProg = () => ({ level: 1, pick: 1, bestLevel: 1, bestDist: 0, bestEndCrew: 0 });
   const defaultSave = () => ({
     coins: 0,
     bestDist: 0,
@@ -31,7 +36,9 @@
     muted: false,
     mode: "medium",
     upg: { crew: 0, coin: 0, shield: 0, magnet: 0 },
-    stats: { runs: 0, walls: 0, quizCorrect: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0, expertBestDist: 0, fevers: 0, coinsEarned: 0 },
+    prog: { easy: blankProg(), medium: blankProg(), hard: blankProg(), expert: blankProg() },
+    progMigrated: false,
+    stats: { runs: 0, walls: 0, quizCorrect: 0, quizWrong: 0, perfectLevels: 0, upgradesBought: 0, bestCombo: 0, hardBestDist: 0, expertBestDist: 0, fevers: 0, coinsEarned: 0 },
     ach: [],
     skin: "classic",
     skinsOwned: ["classic"],
@@ -63,13 +70,13 @@
   // Infinity/NaN — the mob can still get gloriously huge, just not un-printable.
   const MAX_CREW = 9999999;
   const MODES = {
-    easy:   { label: "🌱 Easy",   sub: "add & double", speed: 135, barrier: 0.18,
-              levelBase: 300, levelStep: 70,  wallBase: 4,  levelScale: 1.6 },
-    medium: { label: "⭐ Medium", sub: "add & times",  speed: 155, barrier: 0.28,
+    easy:   { label: "🌱 Easy",   sub: "+ & − to 10",     speed: 122, barrier: 0.12,
+              levelBase: 260, levelStep: 55,  wallBase: 4,  levelScale: 1.6 },
+    medium: { label: "⭐ Medium", sub: "tables & tens",   speed: 155, barrier: 0.26,
               levelBase: 360, levelStep: 90,  wallBase: 5,  levelScale: 1.7 },
-    hard:   { label: "🔥 Hard",   sub: "all 4 ops",    speed: 180, barrier: 0.34,
+    hard:   { label: "🔥 Hard",   sub: "2-step & ÷",      speed: 180, barrier: 0.34,
               levelBase: 420, levelStep: 110, wallBase: 8,  levelScale: 1.8 },
-    expert: { label: "🚀 Expert", sub: "x² & √ roots", speed: 205, barrier: 0.38,
+    expert: { label: "🚀 Expert", sub: "grown-up maths",  speed: 205, barrier: 0.38,
               levelBase: 480, levelStep: 130, wallBase: 12, levelScale: 1.9 },
   };
   const mode = () => MODES[save.mode] || MODES.medium;
@@ -109,6 +116,21 @@
       const s = Object.assign(defaultSave(), JSON.parse(raw));
       s.upg = Object.assign(defaultSave().upg, s.upg || {});
       s.stats = Object.assign(defaultSave().stats, s.stats || {});
+      // Per-mode ladders: fill in anything missing, then hand an OLD save's
+      // single shared level/best over to whichever mode it was last playing so
+      // nobody's progress is orphaned by the upgrade.
+      s.prog = Object.assign({}, defaultSave().prog, s.prog || {});
+      for (const k of MODE_KEYS) s.prog[k] = Object.assign(blankProg(), s.prog[k] || {});
+      if (!s.progMigrated) {
+        const m = MODE_KEYS.indexOf(s.mode) >= 0 ? s.mode : "medium";
+        const p = s.prog[m];
+        p.level      = Math.max(p.level, s.level || 1);
+        p.bestLevel  = Math.max(p.bestLevel, s.bestLevel || 1);
+        p.bestDist   = Math.max(p.bestDist, s.bestDist || 0);
+        p.bestEndCrew = Math.max(p.bestEndCrew, s.bestEndCrew || 0);
+        p.pick = p.level;
+        s.progMigrated = true;
+      }
       if (!Array.isArray(s.ach)) s.ach = [];
       if (!Array.isArray(s.skinsOwned) || !s.skinsOwned.length) s.skinsOwned = ["classic"];
       if (!s.skin) s.skin = "classic";
@@ -121,6 +143,8 @@
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
   }
   let save = loadSave();
+  // The ladder for the difficulty you're on right now.
+  const prog = () => (save.prog[save.mode] || (save.prog[save.mode] = blankProg()));
 
   // ---- Upgrade definitions --------------------------------------------
   const UPGRADES = [
@@ -168,11 +192,22 @@
     { id: "level10", ico: "🗼", name: "World Tour",       desc: "Reach Level 10 and see every land.", ok: s => s.bestLevel >= 10 },
     { id: "fever3",  ico: "🌟", name: "Fever Dream",      desc: "Start coin fever 3 times (5× streak).", ok: s => s.fevers >= 3 },
     { id: "coins1k", ico: "💰", name: "Coin Collector",   desc: "Earn 1,000 coins in total.",    ok: s => s.coinsEarned >= 1000 },
+    { id: "quiz100", ico: "🎓", name: "Maths Machine",    desc: "Answer 100 quiz gates right.",  ok: s => s.quizCorrect >= 100 },
+    { id: "perfect1", ico: "⭐", name: "Flawless",         desc: "Clear a level without a single wrong answer.", ok: s => s.perfectLevels >= 1 },
+    { id: "expertL5", ico: "🧮", name: "Grown-Up Grade",  desc: "Reach Level 5 on Expert.",      ok: s => s.expertBestLevel >= 5 },
   ];
 
   function statsSnapshot() {
+    // Badges look across every difficulty, so take the best of all the ladders.
+    let bestDist = save.bestDist || 0, bestLevel = save.bestLevel || 1;
+    for (const k of MODE_KEYS) {
+      const p = save.prog[k] || blankProg();
+      bestDist = Math.max(bestDist, p.bestDist || 0);
+      bestLevel = Math.max(bestLevel, p.bestLevel || 1);
+    }
     return Object.assign(
-      { bestDist: save.bestDist, bestCrew: save.bestCrew, bestLevel: save.bestLevel || 1 },
+      { bestDist, bestCrew: save.bestCrew, bestLevel,
+        expertBestLevel: (save.prog.expert || blankProg()).bestLevel || 1 },
       save.stats);
   }
   // Returns the achievement defs newly unlocked by the current stats.
@@ -201,19 +236,31 @@
   const comboPill = $("combo-pill");
   const comboEl   = $("combo");
   const muteBtn   = $("mute-btn");
+  const pauseBtn  = $("pause-btn");
+  const progWrap  = $("progwrap");
+  const progFill  = $("prog-fill");
+  const distUnitEl = $("dist-unit");
+  const srStatus  = $("sr-status");
 
   const menu     = $("menu");
   const shopScreen = $("shop-screen");
   const badgesScreen = $("badges-screen");
   const skinsScreen = $("skins-screen");
   const gameover = $("gameover");
+  const pauseScreen = $("pause-screen");
 
   // ---- Canvas sizing (crisp on retina) --------------------------------
   let W = 0, H = 0, DPR = 1;
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2);
     const r = stage.getBoundingClientRect();
+    const oldW = W;
     W = r.width; H = r.height;
+    // Rotating the phone mid-run must not fling the crew into a wall.
+    if (oldW > 0 && W > 0 && state === "playing") {
+      const k = W / oldW;
+      crewX *= k; targetX *= k;
+    }
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -311,6 +358,15 @@
   let finaleGap = 0;           // spawn spacing accumulator for finale walls
   let banner = null;           // { text, sub, life, color } big centre banner
 
+  // Pause + a single owned animation-frame handle, so a stray Space press or a
+  // double-tapped Play button can never start two game loops at once (which
+  // used to make the track scroll at double speed).
+  let paused = false;
+  let rafId = 0;
+  // Learning log for this run — every quiz gate you miss, so the end screen can
+  // show you the worked answer instead of just "oops".
+  let runMistakes = [], runQuizRight = 0, runQuizWrong = 0;
+
   // Parallax scenery (built once at boot, scrolls at fractions of run speed).
   let hills = [], clouds = [];
 
@@ -324,11 +380,12 @@
 
   function makeOp(type, val) {
     const COL = { add: "#2e9bd6", mul: "#8a5cff", sub: "#ff7a3d", div: "#ff4d6d",
-                  pow: "#e8477e", root: "#12b5a5" };
+                  pow: "#e8477e", root: "#12b5a5", pct: "#e08a00" };
     const SY  = { add: "+", mul: "×", sub: "−", div: "÷" };
     let label;
     if (type === "pow")       label = val === 2 ? "x²" : val === 3 ? "x³" : "x^" + val;
     else if (type === "root") label = "√";                 // square root
+    else if (type === "pct")  label = "+" + val + "%";     // percentage increase
     else                      label = SY[type] + val;
     return {
       type, val, color: COL[type], label,
@@ -339,94 +396,263 @@
         if (type === "div")  return Math.floor(n / val);
         if (type === "pow")  return Math.min(MAX_CREW, Math.pow(n, val));   // exponent
         if (type === "root") return Math.floor(Math.sqrt(n));               // shrinks!
+        if (type === "pct")  return n + Math.round(n * val / 100);          // "+50%"
         return n;
       },
     };
   }
 
+  // ---- Gate pairs: the "which is bigger?" comparison ------------------
+  // This is the mental-strategy half of the game: is "+25" better than "x3"?
+  // It depends on the mob you have RIGHT NOW. The numbers scale with the level
+  // so the tipping point keeps moving and you can't just memorise one answer.
   function makeGatePair() {
-    let a, b;
+    const lv = level || 1;
     const r = Math.random();
+    let a, b;
     if (save.mode === "easy") {
-      // Just adding and doubling — no take-aways. Gentle for little ones.
-      if (r < 0.7) { a = makeOp("add", pick([2, 3, 4, 5])); b = makeOp("add", pick([6, 8, 10])); }
-      else         { a = makeOp("mul", 2); b = makeOp("add", pick([3, 4, 5])); }
+      // Ellie: only ever grows. Small adds against bigger adds, plus doubling.
+      if (r < 0.6)      { a = makeOp("add", pick([1, 2, 3, 4, 5])); b = makeOp("add", pick([6, 8, 10])); }
+      else              { a = makeOp("mul", 2); b = makeOp("add", pick([3, 4, 5])); }
     } else if (save.mode === "hard") {
-      // Big numbers and all four operations, including traps.
-      if (r < 0.35)      { a = makeOp("mul", pick([2, 3, 4, 5])); b = makeOp("add", pick([15, 20, 25, 30, 40])); }
-      else if (r < 0.6)  { a = makeOp("mul", pick([3, 4])); b = makeOp("div", pick([2, 3])); }
-      else if (r < 0.8)  { a = makeOp("add", pick([20, 30, 40])); b = makeOp("sub", pick([5, 8, 12])); }
-      else               { a = makeOp("mul", pick([2, 3])); b = makeOp("mul", pick([4, 5])); }
+      // Big numbers, all four operations, and traps that punish autopilot.
+      const big = 12 + lv * 8;
+      if (r < 0.28)     { a = makeOp("mul", pick([2, 3, 4, 5])); b = makeOp("add", pick([big, big + 10, big + 20])); }
+      else if (r < 0.48){ a = makeOp("mul", pick([3, 4])); b = makeOp("div", pick([2, 3])); }
+      else if (r < 0.66){ a = makeOp("add", pick([big, big + 15])); b = makeOp("sub", pick([5, 8, 12])); }
+      else if (r < 0.84){ a = makeOp("mul", pick([2, 3])); b = makeOp("mul", pick([4, 5])); }
+      else              { a = makeOp("pct", pick([50, 100])); b = makeOp("add", pick([big, big + 10])); }
     } else if (save.mode === "expert") {
-      // Toughest of all — exponents and square roots on top of the four ops.
-      // x² rewards a big crew; √ (square root) SHRINKS you, so it's usually a
-      // trap to steer around — the sneaky lesson that roots make numbers smaller.
-      if (r < 0.26)      { a = makeOp("pow", 2);                b = makeOp("add", pick([25, 40, 60, 80])); }   // square vs big add
-      else if (r < 0.46) { a = makeOp("pow", 2);                b = makeOp("mul", pick([3, 4, 5])); }          // square vs times
-      else if (r < 0.64) { a = makeOp("root", 2);               b = makeOp("add", pick([15, 20, 30, 40])); }   // √ trap vs add
-      else if (r < 0.80) { a = makeOp("mul", pick([4, 5, 6]));  b = makeOp("root", 2); }                        // grow vs √ trap
-      else if (r < 0.92) { a = makeOp("mul", pick([2, 3]));     b = makeOp("mul", pick([4, 5])); }
-      else               { a = makeOp("add", pick([40, 50, 60])); b = makeOp("sub", pick([8, 12, 15])); }
+      // Toughest of all — exponents, square roots and percentages on top of the
+      // four ops. x2 rewards a big crew; the square root SHRINKS you, so it's
+      // usually a trap to steer around: roots make numbers smaller.
+      const big = 25 + lv * 12;
+      if (r < 0.22)     { a = makeOp("pow", 2);               b = makeOp("add", pick([big, big + 20, big + 40])); }
+      else if (r < 0.40){ a = makeOp("pow", 2);               b = makeOp("mul", pick([3, 4, 5])); }
+      else if (r < 0.56){ a = makeOp("root", 2);              b = makeOp("add", pick([15, 20, 30, 40])); }
+      else if (r < 0.70){ a = makeOp("mul", pick([4, 5, 6])); b = makeOp("root", 2); }
+      else if (r < 0.82){ a = makeOp("pct", pick([25, 50, 75, 100])); b = makeOp("mul", pick([2, 3])); }
+      else if (r < 0.92){ a = makeOp("mul", pick([2, 3]));    b = makeOp("mul", pick([4, 5])); }
+      else              { a = makeOp("add", pick([big, big + 25])); b = makeOp("sub", pick([8, 12, 15])); }
     } else {
-      // Medium — ramps a little with distance.
-      const tier = dist < 200 ? 1 : 2;
+      // Medium — ramps with the level as well as the metres run.
+      const tier = (lv <= 1 && dist < 200) ? 1 : 2;
       if (tier === 1) {
         if (r < 0.5)      { a = makeOp("add", pick([3, 5])); b = makeOp("add", pick([8, 10])); }
         else if (r < 0.8) { a = makeOp("mul", 2); b = makeOp("add", pick([4, 5, 6])); }
         else              { a = makeOp("mul", pick([2, 3])); b = makeOp("add", pick([8, 10, 12])); }
       } else {
-        if (r < 0.45)     { a = makeOp("mul", pick([2, 3])); b = makeOp("add", pick([10, 12, 15, 20])); }
-        else if (r < 0.8) { a = makeOp("add", pick([10, 15, 20])); b = makeOp("sub", pick([3, 5, 8])); }
+        const big = 8 + lv * 5;
+        if (r < 0.42)     { a = makeOp("mul", pick([2, 3])); b = makeOp("add", pick([big, big + 5, big + 10])); }
+        else if (r < 0.74){ a = makeOp("add", pick([big, big + 8])); b = makeOp("sub", pick([3, 5, 8])); }
         else              { a = makeOp("mul", 2); b = makeOp("mul", 3); }
       }
     }
     return Math.random() < 0.5 ? [a, b] : [b, a];
   }
 
-  // A direct "what's the answer?" gate — explicit arithmetic practice.
+  // ---- Quiz gates: the explicit "work it out" practice ------------------
+  // Every question knows its own answer AND a strategy hint, so a wrong pick
+  // isn't just a punishment — the track shows the sum worked out, and the
+  // end-of-run screen lists the ones you missed. Each mode has a different
+  // ladder, and the ladder deepens with the level you're on.
   const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+
   function makeWrong(c) {
-    const cands = [c + 1, c - 1, c + 2, c - 2, c + rint(3, 6), c - rint(3, 6), c + 10];
-    let w;
-    do { w = pick(cands); } while (w < 0 || w === c);
-    return w;
+    // Plausible near-misses — the slips a kid actually makes, never the right
+    // answer, and never negative unless the answer itself is.
+    const cands = [c + 1, c - 1, c + 2, c - 2, c + 10, c - 10,
+                   c + rint(3, 6), c - rint(3, 6)];
+    const ok = cands.filter(w => (c < 0 || w >= 0) && w !== c);
+    return ok.length ? pick(ok) : c + 1;
   }
-  // Build a quiz row from an arbitrary question string + its answer (lets the
-  // expert mode ask things like "7²" or "√49" that aren't a plain "a op b").
-  function quizFrom(qText, res) {
+
+  // Build a quiz row from a question string, its answer, and a "why" hint.
+  function quizFrom(qText, res, hint) {
     const wrong = makeWrong(res);
     const leftCorrect = Math.random() < 0.5;
     return {
-      qText, answer: res,
+      qText, answer: res, hint: hint || "",
       left: leftCorrect ? res : wrong,
       right: leftCorrect ? wrong : res,
       correctSide: leftCorrect ? "L" : "R",
     };
   }
+
+  // Mental-maths strategy hints for the times tables — the real lesson.
+  function timesHint(a, b) {
+    if (a === 10 || b === 10) return "×10 just puts a zero on the end.";
+    if (b === 9)  return a + " × 10 = " + (a * 10) + ", then take away " + a + ".";
+    if (b === 5)  return "Half of " + a + " × 10 (" + (a * 10) + ").";
+    if (b === 4)  return "Double " + a + " twice: " + (a * 2) + ", then " + (a * 4) + ".";
+    if (b === 2)  return "Just double " + a + ".";
+    return a + " × " + b + " = " + a + " × " + (b - 1) + " (" + (a * (b - 1)) + ") + " + a + ".";
+  }
+
+  const Q = {
+    addTo(maxA, maxB) {
+      const a = rint(1, maxA), b = rint(1, maxB);
+      return quizFrom(a + " + " + b, a + b, "Start at " + a + " and count on " + b + ".");
+    },
+    subFrom(max) {
+      const a = rint(3, max), b = rint(1, a - 1);
+      return quizFrom(a + " − " + b, a - b,
+        (a - b) + " + " + b + " = " + a + ", so " + a + " − " + b + " = " + (a - b) + ".");
+    },
+    dbl(max) {
+      const a = rint(1, max);
+      return quizFrom(a + " + " + a, a + a, "Double " + a + " — " + a + " and " + a + " more.");
+    },
+    times(maxA, maxB) {
+      const a = rint(2, maxA), b = rint(2, maxB);
+      return quizFrom(a + " × " + b, a * b, timesHint(a, b));
+    },
+    divide(maxR, maxB) {
+      const b = rint(2, maxB), r = rint(2, maxR), a = b * r;
+      return quizFrom(a + " ÷ " + b, r, b + " × " + r + " = " + a + ", so " + a + " ÷ " + b + " = " + r + ".");
+    },
+    missAdd(max) {
+      const a = rint(2, max), s = a + rint(2, max);
+      return quizFrom(a + " + ? = " + s, s - a, s + " − " + a + " = " + (s - a) + ".");
+    },
+    missFactor(maxR, maxB) {
+      const b = rint(2, maxB), r = rint(2, maxR);
+      return quizFrom("? × " + b + " = " + (b * r), r, (b * r) + " ÷ " + b + " = " + r + ".");
+    },
+    add2digit() {
+      const a = rint(11, 89), b = rint(11, 89);
+      const ta = Math.floor(a / 10) * 10, tb = Math.floor(b / 10) * 10;
+      return quizFrom(a + " + " + b, a + b,
+        "Tens first: " + ta + " + " + tb + " = " + (ta + tb) + ", then the ones.");
+    },
+    sub2digit() {
+      const a = rint(35, 99), b = rint(11, a - 6);
+      return quizFrom(a + " − " + b, a - b, "Count up from " + b + " to " + a + ".");
+    },
+    twoStep() {
+      const a = rint(2, 9), b = rint(2, 9), c = rint(1, 20);
+      const plus = Math.random() < 0.5 || a * b <= c;
+      const res = plus ? a * b + c : a * b - c;
+      return quizFrom(a + " × " + b + " " + (plus ? "+" : "−") + " " + c, res,
+        "Times first: " + a + " × " + b + " = " + (a * b) + ", then " + (plus ? "+ " : "− ") + c + ".");
+    },
+    bracket() {
+      const a = rint(2, 9), b = rint(2, 9), c = rint(2, 6);
+      return quizFrom("(" + a + " + " + b + ") × " + c, (a + b) * c,
+        "Brackets first: " + a + " + " + b + " = " + (a + b) + ", then × " + c + ".");
+    },
+    orderOps() {
+      const a = rint(2, 12), b = rint(2, 9), c = rint(2, 9);
+      return quizFrom(a + " + " + b + " × " + c, a + b * c,
+        "Times before plus: " + b + " × " + c + " = " + (b * c) + ", then + " + a + ".");
+    },
+    square() {
+      const n = rint(2, 15);
+      return quizFrom(n + "²", n * n, n + "² means " + n + " × " + n + ".");
+    },
+    root() {
+      const n = rint(2, 15);
+      return quizFrom("√" + (n * n), n, n + " × " + n + " = " + (n * n) + ", so √" + (n * n) + " = " + n + ".");
+    },
+    percent() {
+      const p = pick([10, 20, 25, 50, 75]);
+      const base = pick([40, 60, 80, 120, 160, 200, 240]);
+      const res = base * p / 100;
+      const hint = p === 50 ? "Half of " + base + "."
+                 : p === 25 ? "A quarter of " + base + " (halve it twice)."
+                 : p === 75 ? "Half (" + (base / 2) + ") plus a quarter (" + (base / 4) + ")."
+                 : p === 10 ? base + " ÷ 10."
+                 : base + " ÷ 10 = " + (base / 10) + ", then double it.";
+      return quizFrom(p + "% of " + base, res, hint);
+    },
+    fractionOf() {
+      const den = pick([2, 3, 4, 5]);
+      const num = rint(1, den - 1) || 1;
+      const base = den * pick([4, 6, 8, 12]);
+      return quizFrom(num + "/" + den + " of " + base, base / den * num,
+        base + " ÷ " + den + " = " + (base / den) + ", then × " + num + ".");
+    },
+    negatives() {
+      const a = rint(2, 15), b = rint(1, 25);
+      return quizFrom("−" + a + " + " + b, b - a, "Start at −" + a + " and count up " + b + ".");
+    },
+    bigTimes() {
+      const a = rint(12, 29), b = rint(3, 9);
+      const t = Math.floor(a / 10) * 10, o = a % 10;
+      return quizFrom(a + " × " + b, a * b,
+        "Split it: " + t + " × " + b + " = " + (t * b) + ", plus " + o + " × " + b + " = " + (o * b) + ".");
+    },
+  };
+
   function makeQuiz() {
-    let aN, bN, res, sym;
+    const lv = level || 1;
     const r = Math.random();
     if (save.mode === "easy") {
-      if (r < 0.6) { aN = rint(1, 12); bN = rint(1, 8); res = aN + bN; sym = "+"; }
-      else         { aN = rint(5, 15); bN = rint(1, aN); res = aN - bN; sym = "−"; }
-    } else if (save.mode === "hard") {
-      if (r < 0.55)     { aN = rint(2, 12); bN = rint(2, 12); res = aN * bN; sym = "×"; }
-      else if (r < 0.8) { bN = rint(2, 9); res = rint(2, 9); aN = bN * res; sym = "÷"; } // aN÷bN
-      else              { aN = rint(15, 40); bN = rint(8, 25); res = aN + bN; sym = "+"; }
-    } else if (save.mode === "expert") {
-      // Exponents & square roots front and centre, plus some ×/÷ to keep it spicy.
-      if (r < 0.4) {                                    // squares:  n² = ?
-        const nn = rint(2, 15); return quizFrom(nn + "²", nn * nn);
-      } else if (r < 0.72) {                            // square roots:  √(n²) = ?
-        const nn = rint(2, 15); return quizFrom("√" + (nn * nn), nn);
-      } else if (r < 0.88) { aN = rint(3, 12); bN = rint(3, 12); res = aN * bN; sym = "×"; }
-      else               { bN = rint(2, 9); res = rint(2, 12); aN = bN * res; sym = "÷"; } // aN÷bN
-    } else {
-      if (r < 0.4)      { aN = rint(5, 25); bN = rint(4, 18); res = aN + bN; sym = "+"; }
-      else if (r < 0.7) { aN = rint(2, 5); bN = rint(2, 5); res = aN * bN; sym = "×"; }
-      else              { aN = rint(10, 30); bN = rint(1, aN - 1); res = aN - bN; sym = "−"; }
+      // Ellie (3): sums she can count on her fingers, growing very slowly.
+      const cap = Math.min(10, 3 + lv);
+      if (r < 0.55) return Q.addTo(cap, Math.min(5, cap));
+      if (r < 0.85) return Q.subFrom(cap + 2);
+      return Q.dbl(Math.min(6, cap));
     }
-    return quizFrom(`${aN} ${sym} ${bN}`, res);
+    if (save.mode === "medium") {
+      // Jeannie (7): number bonds → times tables → two-digit work.
+      if (lv <= 2) {
+        if (r < 0.40) return Q.addTo(20, 12);
+        if (r < 0.70) return Q.subFrom(20);
+        return Q.times(5, 5);
+      }
+      if (lv <= 4) {
+        if (r < 0.35) return Q.times(6, 9);
+        if (r < 0.60) return Q.missAdd(20);
+        if (r < 0.80) return Q.add2digit();
+        return Q.subFrom(50);
+      }
+      if (r < 0.40) return Q.times(9, 10);
+      if (r < 0.60) return Q.divide(9, 9);
+      if (r < 0.80) return Q.add2digit();
+      return Q.missFactor(9, 9);
+    }
+    if (save.mode === "hard") {
+      // Cory (6, works at 4th-grade level): full tables, division, then real
+      // multi-step work with brackets and order of operations.
+      if (lv <= 2) {
+        if (r < 0.45) return Q.times(12, 9);
+        if (r < 0.75) return Q.divide(10, 9);
+        return Q.add2digit();
+      }
+      if (lv <= 4) {
+        if (r < 0.30) return Q.times(12, 12);
+        if (r < 0.55) return Q.twoStep();
+        if (r < 0.75) return Q.divide(12, 9);
+        return Q.sub2digit();
+      }
+      if (r < 0.28) return Q.twoStep();
+      if (r < 0.48) return Q.bracket();
+      if (r < 0.66) return Q.missFactor(12, 12);
+      if (r < 0.84) return Q.bigTimes();
+      return Q.divide(12, 12);
+    }
+    // Expert — the grown-up tier (hi Mum): squares, roots, order of operations,
+    // percentages, fractions of amounts and negative numbers.
+    if (lv <= 2) {
+      if (r < 0.35) return Q.square();
+      if (r < 0.65) return Q.root();
+      if (r < 0.85) return Q.orderOps();
+      return Q.bigTimes();
+    }
+    if (lv <= 4) {
+      if (r < 0.24) return Q.square();
+      if (r < 0.44) return Q.root();
+      if (r < 0.64) return Q.percent();
+      if (r < 0.84) return Q.orderOps();
+      return Q.bigTimes();
+    }
+    if (r < 0.20) return Q.percent();
+    if (r < 0.40) return Q.fractionOf();
+    if (r < 0.55) return Q.negatives();
+    if (r < 0.70) return Q.orderOps();
+    if (r < 0.85) return Q.bigTimes();
+    return Q.root();
   }
 
   // During the run we only ever spawn the mob-growers: math gates, quiz gates,
@@ -503,8 +729,8 @@
     }
   }
 
-  function addFloater(x, y, text, color, big) {
-    floaters.push({ x, y, text, color, life: 1, big: !!big });
+  function addFloater(x, y, text, color, big, scale) {
+    floaters.push({ x, y, text, color, life: 1, big: !!big, scale: scale || 1 });
   }
   function burst(x, y, color, n, power) {
     if (reduceMotion) n = Math.ceil(n / 3);
@@ -517,13 +743,20 @@
     }
   }
   function addShake(m) { if (!reduceMotion) shake = Math.max(shake, m); }
+  function addFlash(v) { flash = Math.max(flash, reduceMotion ? Math.min(v, 0.18) : v); }
+  function say(msg) { if (srStatus) srStatus.textContent = msg; }
   function popLabel(m) { labelScale = Math.max(labelScale, m || 1.35); }
 
   // ---- Start / end ----------------------------------------------------
   function startRun() {
+    if (state === "playing") return;    // never boot a second loop over the top
     initAudio();
     if (actx && actx.state === "suspended") actx.resume();
-    level = save.level || 1;     // set first so the scenery builds in this level's theme
+    // Play the level you picked on the menu (never above what you've unlocked)
+    // so a kid can go back and grind a favourite level.
+    const P = prog();
+    P.pick = clamp(P.pick || P.level, 1, P.level);
+    level = P.pick;              // set first so the scenery builds in this level's theme
     resize();
     crew = 1 + upgLevel("crew");
     crewX = targetX = W / 2;
@@ -534,6 +767,9 @@
     spawnAccum = 0; coinAccum = 0; worldScroll = 0; shake = 0; flash = 0;
     labelScale = 1; mobSquash = 1;
     keyDir = 0; combo = 0; bestComboThisRun = 0;
+    paused = false; pauseBtn.hidden = false;
+    pauseBtn.textContent = "⏸"; pauseBtn.setAttribute("aria-label", "Pause game");
+    runMistakes = []; runQuizRight = 0; runQuizWrong = 0;
     levelTarget = levelTargetFor(level); phase = "run"; phaseT = 0;
     wallsSmashedThisRun = 0; levelCleared = false;
     finaleTotal = 0; finaleSmashed = 0; finaleSpawned = 0; finaleGap = 0;
@@ -541,16 +777,52 @@
                life: 2.0, color: "#8a5cff" };
     state = "playing";
     hide(menu); hide(shopScreen); hide(gameover);
+    hide(skinsScreen); hide(badgesScreen); hide(pauseScreen);
     hud.style.display = "flex";
+    progWrap.style.display = "flex";
     setCombo(0);
     syncHud();
+    say("Level " + level + " started. " + theme().name + ".");
+    startLoop();
+  }
+
+  // One owned rAF handle — cancel any in-flight frame before booking a new one.
+  function startLoop() {
+    cancelAnimationFrame(rafId);
     lastT = performance.now();
-    requestAnimationFrame(loop);
+    rafId = requestAnimationFrame(loop);
+  }
+
+  // ---- Pause ----------------------------------------------------------
+  function setPause(on) {
+    if (state !== "playing" || on === paused) return;
+    paused = on;
+    if (paused) {
+      cancelAnimationFrame(rafId);
+      pauseBtn.textContent = "▶"; pauseBtn.setAttribute("aria-label", "Resume game");
+      $("pause-line").textContent =
+        "Level " + level + " · 🏃 " + crew + " crew · 🪙 " + runCoins;
+      show(pauseScreen);
+      $("resume-btn").focus();
+      if (actx && actx.state === "running") { try { actx.suspend(); } catch (e) {} }
+      say("Paused.");
+    } else {
+      pauseBtn.textContent = "⏸"; pauseBtn.setAttribute("aria-label", "Pause game");
+      hide(pauseScreen);
+      if (actx && actx.state === "suspended") { try { actx.resume(); } catch (e) {} }
+      startLoop();
+      say("Resumed.");
+    }
   }
 
   function endRun() {
     state = "over";
+    paused = false;
+    cancelAnimationFrame(rafId);
+    hide(pauseScreen);
+    pauseBtn.hidden = true;
     hud.style.display = "none";
+    progWrap.style.display = "none";
     levelCleared ? sfx.bossWin() : sfx.lose();
 
     // Clearing the whole gauntlet beats the level: bonus coins + advance so the
@@ -559,17 +831,26 @@
     const earned = Math.round((runCoins + clearBonus) * (1 + upgLevel("coin") * 0.25));
     save.coins += earned;
     const distR = Math.round(dist);
-    if (distR > save.bestDist) save.bestDist = distR;
     if (bestCrewThisRun > save.bestCrew) save.bestCrew = bestCrewThisRun;
     // High score: the mob you FINISHED with (0 on a wipeout). Distinct from the
     // peak-mob stat above — this rewards ending big, not just spiking big.
     const endCrew = crew;
-    const newEndRecord = endCrew > (save.bestEndCrew || 0);
-    if (newEndRecord) save.bestEndCrew = endCrew;
-    if (levelCleared) save.level = level + 1;          // unlock the next level
+    // Records are kept per difficulty, so Easy runs can't inflate Expert.
+    const P = prog();
+    if (distR > P.bestDist) P.bestDist = distR;
+    const newEndRecord = endCrew > (P.bestEndCrew || 0);
+    if (newEndRecord) P.bestEndCrew = endCrew;
+    if (levelCleared) { P.level = Math.max(P.level, level + 1); P.pick = P.level; }
     const reached = levelCleared ? level + 1 : level;  // "best level reached"
-    const newBestLevel = reached > (save.bestLevel || 1);
-    if (newBestLevel) save.bestLevel = reached;
+    const newBestLevel = reached > (P.bestLevel || 1);
+    if (newBestLevel) P.bestLevel = reached;
+    // Keep the legacy top-level fields in step for old badges & older saves.
+    save.bestDist = Math.max(save.bestDist || 0, distR);
+    save.bestEndCrew = Math.max(save.bestEndCrew || 0, endCrew);
+    save.bestLevel = Math.max(save.bestLevel || 1, reached);
+    save.level = P.level;
+    // A clean sweep: cleared the level without missing a single quiz gate.
+    if (levelCleared && runQuizWrong === 0 && runQuizRight >= 3) save.stats.perfectLevels++;
 
     // Lifetime stats for badges.
     save.stats.runs++;
@@ -588,6 +869,7 @@
       ? `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> — 🏆 new high score!`
       : `Finished with: 🏁🏃 <span id="go-end">${endCrew}</span> <span class="hint">(best ever ${save.bestEndCrew})</span>`;
     $("go-coins").textContent = earned;
+    renderReview();
     const badgeBox = $("go-badges");
     badgeBox.innerHTML = "";
     for (const a of freshBadges) {
@@ -600,21 +882,54 @@
       ? "Level " + level + " cleared! 🎉"
       : (newBestLevel ? "New record! 🏆" : "Run finished! 🏁");
     $("go-best").textContent =
-      `Best: Level ${save.bestLevel} • biggest mob ${save.bestCrew}` +
+      `${mode().label} best: Level ${P.bestLevel} • top finish ${P.bestEndCrew}` +
       (earned !== runCoins ? "  (bonus coins!)" : "");
     show(gameover);
+    $("again-btn").focus();
+    say((levelCleared ? "Level " + level + " cleared. " : "Run finished. ") +
+        "Quiz gates " + runQuizRight + " right, " + runQuizWrong + " wrong.");
+  }
+
+  // Turn this run's misses into a short "let's check these" list — the sum
+  // written out with the correct answer and the strategy that gets you there.
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function renderReview() {
+    const box = $("go-review");
+    box.innerHTML = "";
+    const total = runQuizRight + runQuizWrong;
+    $("go-accuracy").textContent = total
+      ? "🧠 Quiz gates: " + runQuizRight + "/" + total + " right" +
+        (runQuizWrong === 0 ? " — perfect! ⭐" : "")
+      : "";
+    if (!runMistakes.length) return;
+    const head = document.createElement("div");
+    head.className = "rv-head";
+    head.textContent = "🔎 Let's check these";
+    box.appendChild(head);
+    for (const m of runMistakes.slice(-3)) {
+      const d = document.createElement("div");
+      d.className = "rv";
+      d.innerHTML = esc(m.q) + " = <b>" + esc(m.a) + "</b> " +
+        '<span class="hint">(you picked ' + esc(m.picked) + ")</span>" +
+        (m.hint ? "<small>" + esc(m.hint) + "</small>" : "");
+      box.appendChild(d);
+    }
   }
 
   // ---- Main loop ------------------------------------------------------
   function loop(t) {
-    if (state !== "playing") return;
+    if (state !== "playing" || paused) return;
     let dt = (t - lastT) / 1000;
     lastT = t;
-    if (dt > 0.05) dt = 0.05;
+    if (dt > 0.05) dt = 0.05;      // a long stall never teleports the mob
+    if (dt < 0) dt = 0;
     now += dt;
     update(dt);
     render();
-    requestAnimationFrame(loop);
+    if (state === "playing" && !paused) rafId = requestAnimationFrame(loop);
   }
 
   function update(dt) {
@@ -747,6 +1062,7 @@
     rows = [];   // clear leftover gates/quizzes/barriers — the finish line wipes the track
     rows.push({ kind: "finish", y: -bandH - 4, done: true });
     banner = { text: "FINAL WALLS! 🧱", sub: "smash as far as you can!", life: 1.6, color: "#ff7a3d" };
+    say("Finish line! " + finaleTotal + " brick walls ahead with " + crew + " crew.");
     addShake(4);
   }
 
@@ -762,12 +1078,12 @@
       addFloater(W / 2, py - 38, "SMASH! 🧱", "#2bb673", true);
       addFloater(W / 2, py - 70, "+" + reward + "🪙", "#c98a00");
       popLabel(1.5); mobSquash = 1.45; addShake(9);
-      flash = Math.max(flash, 0.45); buzz(50); sfx.bossWin();
+      addFlash(0.45); buzz(50); sfx.bossWin();
     } else {
       crew = 0;
       smashWall(row, false);
       addFloater(W / 2, py - 38, "Wall held! Needed " + (row.need + 1), "#ff4d6d", true);
-      addShake(16); flash = Math.max(flash, 0.7); buzz(120);
+      addShake(16); addFlash(0.7); buzz(120);
     }
     row.dead = true;     // the intact wall vanishes into flying bricks
   }
@@ -800,7 +1116,8 @@
     levelCleared = true;
     banner = { text: "Level " + level + " cleared! 🎉",
                sub: "back to base to upgrade", life: 2.0, color: "#2bb673" };
-    flash = Math.max(flash, 0.4); addShake(8);
+    say("Level " + level + " cleared!");
+    addFlash(0.4); addShake(8);
     burst(W / 2, playerY() - 30, "#ffd166", reduceMotion ? 12 : 34, 360);
     sfx.bossWin();
   }
@@ -829,8 +1146,15 @@
       addFloater(crewX + 34, playerY() - 56,
                  (combo >= 2 ? combo + "x " : "") + "Smart! +" + bonus + "🪙", "#8a5cff");
       maybeStartFever();
-    } else if (mine < theirs) {
+    } else if (mine === theirs) {
+      // Both gates land on the same number — a real maths moment, not a miss.
+      addFloater(crewX, playerY() - 56, "Same either way! 🤝", "#8a5cff", false, 0.9);
+    } else {
+      // Show the working, so "wrong lane" turns into "ah — x2 was only 40".
       if (combo >= 2) addFloater(crewX - 34, playerY() - 56, "streak lost", "#ff7a3d");
+      addFloater(W / 2, playerY() - 84,
+                 before + ": " + chosen.label + " → " + mine + "  ·  " +
+                 other.label + " → " + theirs + " ✔", "#2b2440", false, 0.85);
       combo = 0; setCombo(0);
       sfx.bad();
     }
@@ -844,6 +1168,7 @@
       popLabel(1.5); mobSquash = 1.4;
       combo++;
       save.stats.quizCorrect++;
+      runQuizRight++;
       const bonus = Math.min(combo, 6);
       runCoins += bonus;
       setCombo(combo);
@@ -857,8 +1182,14 @@
       popLabel(1.2); mobSquash = 0.78;
       combo = 0; setCombo(0);
       sfx.bad();
+      save.stats.quizWrong++;
+      runQuizWrong++;
+      const picked = side === "L" ? row.left : row.right;
+      runMistakes.push({ q: row.qText, a: row.answer, picked, hint: row.hint || "" });
+      // Show the sum worked out AND the strategy — a miss should teach.
       addFloater(crewX, playerY() - 30, "Oops!", "#ff4d6d", true);
-      addFloater(W / 2, playerY() - 60, row.qText + " = " + row.answer, "#6a6385");
+      addFloater(W / 2, playerY() - 62, row.qText + " = " + row.answer, "#2b2440", false, 0.95);
+      if (row.hint) addFloater(W / 2, playerY() - 88, row.hint, "#5c5578", false, 0.72);
       burst(crewX, playerY() - 24, "#ff4d6d", 12, 220);
     }
   }
@@ -1132,7 +1463,11 @@
       ctx.save();
       ctx.translate(f.x, f.y);
       ctx.scale(sc, sc);
-      ctx.font = "bold " + (f.big ? 28 : 21) + "px " + FONT;
+      const px = (f.big ? 28 : 21) * (f.scale || 1);
+      ctx.font = "bold " + px.toFixed(1) + "px " + FONT;
+      // Long teaching hints must never run off the edge of the track.
+      const tw = ctx.measureText(f.text).width * sc;
+      if (tw > W - 22) ctx.scale((W - 22) / tw, (W - 22) / tw);
       ctx.lineWidth = 4; ctx.lineJoin = "round";
       ctx.strokeStyle = "rgba(255,255,255,0.85)";
       ctx.strokeText(f.text, 0, 0);
@@ -1547,10 +1882,15 @@
     runCoinsEl.textContent = runCoins;
     levelEl.textContent = level;
     if (phase === "run") {
-      const left = Math.max(0, Math.ceil(levelTarget - dist));
-      distEl.textContent = left + "m";
+      const left = Math.max(1, Math.ceil(levelTarget - dist));
+      distEl.textContent = left;
+      distUnitEl.textContent = "m";
+      progFill.style.width = clamp((dist / levelTarget) * 100, 0, 100).toFixed(1) + "%";
     } else {
-      distEl.textContent = "🧱";    // in the wall finale
+      // In the finale the meter counts brick walls left instead of metres.
+      distEl.textContent = Math.max(0, finaleTotal - finaleSmashed);
+      distUnitEl.textContent = "";
+      progFill.style.width = "100%";
     }
   }
   function setCombo(n) {
@@ -1584,19 +1924,43 @@
   canvas.addEventListener("touchmove", onMove, { passive: false });
   window.addEventListener("touchend", onUp);
 
+  const isOpen = el => !el.classList.contains("hidden");
   window.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft" || e.key === "a") keyDir = -1;
-    else if (e.key === "ArrowRight" || e.key === "d") keyDir = 1;
-    else if (e.key === " " && state !== "playing") startRun();
+    const k = e.key;
+    const onBtn = document.activeElement && document.activeElement.tagName === "BUTTON";
+    if (k === "ArrowLeft" || k === "a" || k === "A") {
+      keyDir = -1; if (state === "playing") e.preventDefault();
+    } else if (k === "ArrowRight" || k === "d" || k === "D") {
+      keyDir = 1; if (state === "playing") e.preventDefault();
+    } else if (k === "p" || k === "P") {
+      if (state === "playing") { e.preventDefault(); setPause(!paused); }
+    } else if (k === "m" || k === "M") {
+      if (!onBtn) { e.preventDefault(); toggleMute(); }
+    } else if (k === "Escape") {
+      // Escape = pause in a run, "back to the menu" on any sub-screen.
+      if (state === "playing") { e.preventDefault(); setPause(!paused); }
+      else if (isOpen(shopScreen)) { hide(shopScreen); refreshMenu(); show(menu); }
+      else if (isOpen(skinsScreen)) { hide(skinsScreen); refreshMenu(); show(menu); }
+      else if (isOpen(badgesScreen)) { hide(badgesScreen); refreshMenu(); show(menu); }
+    } else if (k === " " || k === "Enter") {
+      // Don't double-fire when a button already has focus (Space clicks it).
+      if (onBtn) return;
+      if (state !== "playing" && (isOpen(menu) || isOpen(gameover))) {
+        e.preventDefault(); startRun();
+      }
+    }
   });
   window.addEventListener("keyup", e => {
-    if (["ArrowLeft", "ArrowRight", "a", "d"].includes(e.key)) keyDir = 0;
+    if (["ArrowLeft", "ArrowRight", "a", "A", "d", "D"].includes(e.key)) keyDir = 0;
   });
 
-  // Pause cleanly when the tab/app loses focus.
+  // Leaving the tab mid-run used to keep the mob running into walls it couldn't
+  // see. Now it just pauses — come back and pick up exactly where you were.
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) return;
-    if (state === "playing") { lastT = performance.now(); }
+    if (document.hidden && state === "playing") setPause(true);
+  });
+  window.addEventListener("blur", () => {
+    if (state === "playing") setPause(true);
   });
 
   // ---- Overlays / shop UI ---------------------------------------------
@@ -1605,25 +1969,42 @@
 
   function refreshMenu() {
     $("bank").textContent = save.coins;
-    const lv = save.level || 1;
-    $("best-line").textContent = save.bestDist
-      ? `Now on Level ${lv} • best Level ${save.bestLevel || 1} • biggest mob ${save.bestCrew}` +
-        ` • 🏆 top finish ${save.bestEndCrew || 0}`
-      : "Your first run awaits!";
+    const P = prog();
+    P.pick = clamp(P.pick || P.level, 1, P.level);
+    $("lvl-now").textContent = P.pick;
+    $("lvl-dn").disabled = P.pick <= 1;
+    $("lvl-up").disabled = P.pick >= P.level;
+    $("best-line").textContent = P.bestDist
+      ? `${mode().label}: unlocked to Level ${P.level} • best Level ${P.bestLevel}` +
+        ` • 🏆 top finish ${P.bestEndCrew || 0} • biggest mob ever ${save.bestCrew}`
+      : `${mode().label}: your first run awaits!`;
     renderModes();
   }
 
   function renderModes() {
     const wrap = $("modes");
     wrap.innerHTML = "";
-    for (const key of ["easy", "medium", "hard", "expert"]) {
+    for (const key of MODE_KEYS) {
       const m = MODES[key];
+      const p = save.prog[key] || blankProg();
       const btn = document.createElement("button");
-      btn.className = "mode-btn" + (save.mode === key ? " sel" : "");
+      const on = save.mode === key;
+      btn.className = "mode-btn" + (on ? " sel" : "");
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.setAttribute("aria-label", m.label.replace(/[^\w ]/g, "").trim() +
+                       ", " + m.sub + ", unlocked to level " + p.level);
       btn.innerHTML = `<b>${m.label}</b><small>${m.sub}</small>`;
-      btn.onclick = () => { save.mode = key; persist(); renderModes(); };
+      btn.onclick = () => { save.mode = key; persist(); refreshMenu(); };
       wrap.appendChild(btn);
     }
+  }
+
+  function bumpLevel(d) {
+    const P = prog();
+    P.pick = clamp((P.pick || P.level) + d, 1, P.level);
+    persist();
+    refreshMenu();
+    initAudio(); sfx.coin();
   }
 
   function renderShop() {
@@ -1725,6 +2106,12 @@
   $("badges-back").onclick = () => { hide(badgesScreen); refreshMenu(); show(menu); };
   $("skins-btn").onclick   = () => { renderSkins(); hide(menu); show(skinsScreen); };
   $("skins-back").onclick  = () => { hide(skinsScreen); refreshMenu(); show(menu); };
+  $("go-menu-btn").onclick = () => { hide(gameover); refreshMenu(); show(menu); };
+  $("lvl-dn").onclick      = () => bumpLevel(-1);
+  $("lvl-up").onclick      = () => bumpLevel(1);
+  pauseBtn.onclick         = () => setPause(!paused);
+  $("resume-btn").onclick  = () => setPause(false);
+  $("quit-btn").onclick    = () => { paused = false; hide(pauseScreen); endRun(); };
 
   // ---- Boot -----------------------------------------------------------
   resize();

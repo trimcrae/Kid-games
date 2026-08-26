@@ -22,6 +22,7 @@
   "use strict";
 
   var STORAGE_KEY = "jeannieComicMaker.v1";
+  var LEGACY_KEYS = ["jeannieComicMaker", "comicMaker.v1", "comic-maker.v1"];
   var PANELS_FOR = { "1": 1, "2v": 2, "2h": 2, "3": 3, "4": 4 };
   var TAILS = ["bl", "br", "tr", "tl"];
   var TEXT_TYPES = { speech: 1, thought: 1, shout: 1, caption: 1, sfx: 1 };
@@ -53,6 +54,10 @@
   var history = [];
   var future = [];
   var coKey = null, coTime = 0;     // history coalescing
+  var lastTextId = null;            // last bubble the kid typed in (for Juicy words)
+  var lastPageW = 0;                // last rendered page width, for the resize guard
+  var BUBBLE_NAME = { speech: "Talk bubble", thought: "Thought bubble", shout: "Shout",
+                      caption: "Story caption", sfx: "Sound word" };
   var editingSession = false;       // text-edit history guard
 
   /* ---------- drawing tool state ---------- */
@@ -70,8 +75,6 @@
   var fileSaveTimer = null;
 
   /* ---------- storage ---------- */
-  var LEGACY_KEYS = ["jeannieComicMaker", "comicMaker.v1", "comic-maker.v1"];
-
   function load() {
     var raw = null;
     try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
@@ -149,6 +152,7 @@
       }
     }
     scheduleFileSave();
+    updateChecklist();
   }
   function newBook() { return { title: "My Comic", pages: [ newPage("4") ] }; }
   function newPage(layout) {
@@ -337,10 +341,14 @@
   /* ---------- tabs ---------- */
   var tabs = document.querySelectorAll(".tab");
   [].forEach.call(tabs, function (t) {
+    t.setAttribute("aria-pressed", t.classList.contains("on") ? "true" : "false");
     t.addEventListener("click", function () {
       var name = t.dataset.tab;
-      [].forEach.call(tabs, function (x) { x.classList.toggle("on", x === t); });
-      ["draw", "stickers", "words", "sounds", "scenes", "page", "book"].forEach(function (n) {
+      [].forEach.call(tabs, function (x) {
+        x.classList.toggle("on", x === t);
+        x.setAttribute("aria-pressed", x === t ? "true" : "false");
+      });
+      ["draw", "stickers", "words", "story", "sounds", "scenes", "page", "book"].forEach(function (n) {
         document.getElementById("tray-" + n).classList.toggle("hide", n !== name);
       });
       setDrawMode(name === "draw");
@@ -413,8 +421,22 @@
       pe.className = "panel" + (pi === selPanel ? " sel" : "") + (empty ? " empty" : "");
       pe.style.background = (SCENE_MAP[pan.scene] || SCENE_MAP.sky).css;
       pe.dataset.index = pi;
+      pe.tabIndex = 0;
+      pe.setAttribute("role", "button");
+      pe.setAttribute("aria-label", "Panel " + (pi + 1) + " of " + p.panels.length +
+        (empty ? " (empty)" : "") + " — pick this panel");
       pe.addEventListener("pointerdown", function (ev) {
         if (ev.target === pe) { selPanel = pi; selItemId = null; refreshSelection(); }
+      });
+      pe.addEventListener("focus", function () {
+        if (selPanel !== pi) { selPanel = pi; selItemId = null; refreshSelection(); }
+      });
+      pe.addEventListener("keydown", function (ev) {
+        if (ev.target !== pe) return;
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault(); selPanel = pi; selItemId = null; refreshSelection();
+          flash("Panel " + (pi + 1) + " picked — now add a sticker or some words ✨");
+        }
       });
 
       // drawing layer — sits under the stickers/bubbles
@@ -434,9 +456,11 @@
       attachDrawing(c.canvas, c.pi, c.pan);
     });
 
+    lastPageW = Math.round(pageEl.getBoundingClientRect().width);
     updatePageNav();
     syncLayoutButtons();
     refreshSelection();
+    updateChecklist();
   }
 
   function buildItem(it, panelIdx) {
@@ -464,8 +488,12 @@
       txt.textContent = it.text || "";
       if (it.type === "sfx" && it.color) txt.style.color = it.color;
       txt.addEventListener("input", function () { it.text = txt.textContent; save(); });
+      txt.addEventListener("pointerup", function () { lastTextId = it.id; });
+      txt.setAttribute("role", "textbox");
+      txt.setAttribute("aria-label", BUBBLE_NAME[it.type] || "Words");
       txt.addEventListener("focus", function () {
         if (!editingSession) { pushHistory(); editingSession = true; }
+        lastTextId = it.id;
         selectItem(it.id, panelIdx);
       });
       txt.addEventListener("blur", function () { editingSession = false; });
@@ -480,14 +508,19 @@
       content.appendChild(bubble);
       el.appendChild(content);
 
+      // dragging by the bubble's frame (anywhere that isn't the words themselves)
       el.addEventListener("pointerdown", function (ev) {
-        if (ev.target === el || ev.target === content || ev.target === bubble) selectItem(it.id, panelIdx);
+        if (ev.target === el || ev.target === content || ev.target === bubble ||
+            (ev.target.classList && ev.target.classList.contains("tail"))) {
+          startDrag(ev, it, el, panelIdx);
+        }
       });
 
       var grip = document.createElement("div");
       grip.className = "grip";
       grip.textContent = "✥";
       grip.title = "Drag to move";
+      grip.setAttribute("aria-hidden", "true");
       grip.addEventListener("pointerdown", function (ev) { startDrag(ev, it, el, panelIdx); });
       el.appendChild(grip);
     } else {
@@ -496,6 +529,11 @@
       em.textContent = it.text;
       content.appendChild(em);
       el.appendChild(content);
+      el.tabIndex = 0;
+      el.setAttribute("role", "img");
+      el.setAttribute("aria-label", "Sticker " + (it.text || "") +
+        " — press the arrow keys to move it, Delete to remove it");
+      el.addEventListener("focus", function () { selectItem(it.id, panelIdx); });
       el.addEventListener("pointerdown", function (ev) { startDrag(ev, it, el, panelIdx); });
     }
     return el;
@@ -535,12 +573,16 @@
     ev.stopPropagation();
     selectItem(it.id, panelIdx);
     var panelEl = el.parentNode;
-    var rect = panelEl.getBoundingClientRect();
     var moved = false;
-    try { el.setPointerCapture(ev.pointerId); } catch (e) {}
+    var pid = ev.pointerId;
+    try { el.setPointerCapture(pid); } catch (e) {}
 
     function onMove(e) {
-      if (!moved) { pushHistory(); moved = true; }
+      if (!moved) { pushHistory(); moved = true; el.classList.add("dragging"); }
+      // measured every move so a scroll / keyboard popping up mid-drag can't
+      // send the sticker flying to the wrong corner
+      var rect = panelEl.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
       it.x = clamp((e.clientX - rect.left) / rect.width * 100, 2, 98);
       it.y = clamp((e.clientY - rect.top) / rect.height * 100, 2, 98);
       el.style.left = it.x + "%";
@@ -550,7 +592,13 @@
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerup", onUp);
       el.removeEventListener("pointercancel", onUp);
-      if (moved) save();
+      el.classList.remove("dragging");
+      try { if (el.hasPointerCapture && el.hasPointerCapture(pid)) el.releasePointerCapture(pid); } catch (e) {}
+      if (moved) {
+        var pe = panelEl;
+        if (pe && pe.classList) pe.classList.remove("empty");
+        save();
+      }
     }
     el.addEventListener("pointermove", onMove);
     el.addEventListener("pointerup", onUp);
@@ -793,12 +841,13 @@
     refreshSelection();
   }
   function setScene(key) {
+    var sc = SCENE_MAP[key] || SCENE_MAP.sky;
     pushHistory();
-    panel().scene = key;
+    panel().scene = sc.key;
     save();
     var pe = pageEl.querySelector('.panel[data-index="' + selPanel + '"]');
-    if (pe) pe.style.background = SCENE_MAP[key].css;
-    flash("Scene changed! 🎨");
+    if (pe) pe.style.background = sc.css;
+    flash("Backdrop: " + sc.name + " 🎨");
   }
 
   /* ---------- page navigation ---------- */
@@ -830,13 +879,14 @@
     flash("Page copied! ⧉");
   });
   document.getElementById("del-page").addEventListener("click", function () {
-    pushHistory();
     if (book.pages.length === 1) {
-      if (!confirm("This is the only page. Clear it and start fresh?")) { history.pop(); updateUndoButtons(); return; }
+      if (!confirm("This is the only page. Clear it and start fresh?")) return;
+      pushHistory();
       book.pages[0] = newPage(page().layout);
       save(); goPage(0); return;
     }
-    if (!confirm("Delete this whole page?")) { history.pop(); updateUndoButtons(); return; }
+    if (!confirm("Delete this whole page?")) return;
+    pushHistory();
     book.pages.splice(curPage, 1);
     save(); goPage(Math.max(0, curPage - 1));
   });
@@ -1282,7 +1332,7 @@
       throw new Error("That doesn't look like a comic file.");
     }
     pushHistory();
-    book = obj;
+    book = sanitizeBook(obj);
     curPage = 0; selPanel = 0; selItemId = null;
     primeSeq();
     titleEl.textContent = book.title || "My Comic";
@@ -1434,6 +1484,11 @@
       return;
     }
     if (meta && (e.key === "y" || e.key === "Y")) { e.preventDefault(); redo(); return; }
+    if (e.key === "Escape") {
+      if (typing && ae.blur) { ae.blur(); return; }
+      if (selItemId) { selItemId = null; refreshSelection(); }
+      return;
+    }
     if (typing) return;
 
     var sel = findSelected();
@@ -1442,6 +1497,14 @@
 
     if (e.key === "Delete" || e.key === "Backspace") {
       e.preventDefault(); itemAction("del");
+    } else if (e.key === "+" || e.key === "=") {
+      e.preventDefault(); itemAction("bigger");
+    } else if (e.key === "-" || e.key === "_") {
+      e.preventDefault(); itemAction("smaller");
+    } else if (e.key === "[") {
+      e.preventDefault(); itemAction("rotL");
+    } else if (e.key === "]") {
+      e.preventDefault(); itemAction("rotR");
     } else if (e.key.indexOf("Arrow") === 0) {
       e.preventDefault();
       pushHistory("nudge");
@@ -1468,7 +1531,9 @@
     hintEl.textContent = msg;
     if (hintTimer) clearTimeout(hintTimer);
     hintTimer = setTimeout(function () {
-      hintEl.textContent = "Tap a panel, then add stickers, sounds & words ✨";
+      hintEl.textContent = drawMode
+        ? "Pick a colour below and draw right on the panel! ✏️"
+        : "Tap a panel, then add stickers, sounds & words — or open 📖 Story for ideas ✨";
     }, 2600);
   }
 
@@ -1488,11 +1553,389 @@
   primeSeq();
 
   /* ---------- keep canvases sized to the page on resize ---------- */
+  /* A mobile keyboard opening fires "resize". Re-rendering there used to blow
+     away the caret mid-sentence, so only re-render when the page really is a
+     different size, and never while someone is typing. */
   var resizeTimer = null;
   window.addEventListener("resize", function () {
     if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(renderPage, 200);
+    resizeTimer = setTimeout(function () {
+      var ae = document.activeElement;
+      if (ae && ae.isContentEditable) return;
+      if (Math.abs(Math.round(pageEl.getBoundingClientRect().width) - lastPageW) < 2) return;
+      renderPage();
+    }, 220);
   });
+
+
+  /* ===========================================================
+     STORY COACH — the teaching half
+     -----------------------------------------------------------
+     A comic is a *story*, not just a pile of stickers. This tab
+     gives a random story spark, sentence starters sorted into
+     beginning / middle / end, a vocabulary bank, and a gentle
+     writing check (capital letters + end punctuation).
+     =========================================================== */
+  var sparkCard  = document.getElementById("spark-card");
+  var starterPad = document.getElementById("starter-pad");
+  var partRow    = document.getElementById("part-row");
+  var partTip    = document.getElementById("part-tip");
+  var wordCatRow = document.getElementById("word-cat-row");
+  var wordPad    = document.getElementById("word-pad");
+  var checkNote  = document.getElementById("check-note");
+  var checklistEl = document.getElementById("checklist");
+
+  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+  function capFirst(t) { return String(t || "").charAt(0).toUpperCase() + String(t || "").slice(1); }
+
+  /* ---- story spark ---- */
+  var curSpark = null;
+  function newSpark() {
+    curSpark = {
+      who: pick(STORY_SPARKS.who),
+      where: pick(STORY_SPARKS.where),
+      problem: pick(STORY_SPARKS.problem),
+      ending: pick(STORY_SPARKS.ending)
+    };
+    sparkCard.innerHTML =
+      "<b>Who?</b> " + esc(curSpark.who) + "<br>" +
+      "<b>Where?</b> " + esc(curSpark.where) + "<br>" +
+      "<b>What goes wrong?</b> " + esc(curSpark.problem) + "<br>" +
+      "<b>Then?</b> " + esc(curSpark.ending);
+  }
+  function esc(t) {
+    return String(t).replace(/[&<>]/g, function (c) {
+      return c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;";
+    });
+  }
+  document.getElementById("spark-btn").addEventListener("click", function () {
+    newSpark();
+    flash("A brand new story idea! 🎲");
+  });
+
+  // Drop the spark into the page as captions, one per panel, in story order.
+  document.getElementById("spark-use").addEventListener("click", function () {
+    if (!curSpark) newSpark();
+    var p = page(), n = p.panels.length;
+    var parts = [
+      "Once upon a time, " + curSpark.who + " was " + curSpark.where + ".",
+      capFirst(curSpark.problem) + "…",
+      curSpark.ending,
+      pick(STARTERS.end)
+    ];
+    if (n === 1) parts = [parts[0]];
+    else if (parts.length > n) parts = parts.slice(0, n - 1).concat([parts[parts.length - 1]]);
+
+    pushHistory();
+    parts.forEach(function (text, i) {
+      addCaptionTo(i, text);
+    });
+    if (!book.title || book.title === "My Comic") {
+      book.title = capFirst(curSpark.who);
+      titleEl.textContent = book.title;
+    }
+    save(); renderPage();
+    flash("Your story plan is on the page — now draw each part! ✏️");
+  });
+
+  function addCaptionTo(panelIdx, text) {
+    var pan = page().panels[panelIdx];
+    if (!pan) return;
+    var top = 0;
+    pan.items.forEach(function (o) { if ((o.z || 0) > top) top = o.z || 0; });
+    pan.items.push({
+      id: nextId(), type: "caption", text: text,
+      x: 50, y: 12, size: 4.2, rot: 0, flip: false, tail: "bl", z: top + 1
+    });
+  }
+
+  /* ---- beginning / middle / end sentence starters ---- */
+  var PART_TIP = {
+    begin:  "The beginning tells us WHO the story is about and WHERE they are.",
+    middle: "The middle is where the problem shows up — something goes wrong!",
+    end:    "The end sorts the problem out and tells us how everyone feels."
+  };
+  var curPart = "begin";
+  function buildStarterPad() {
+    partTip.textContent = PART_TIP[curPart];
+    starterPad.innerHTML = "";
+    STARTERS[curPart].forEach(function (text) {
+      var b = document.createElement("button");
+      b.className = "starter-btn";
+      b.textContent = text;
+      b.setAttribute("aria-label", "Add the story starter " + text);
+      b.addEventListener("click", function () {
+        pushHistory();
+        addCaptionTo(selPanel, text);
+        save(); renderPage(); selectLastItem();
+        flash("Now finish the sentence in your own words ✍️");
+      });
+      starterPad.appendChild(b);
+    });
+  }
+  partRow.addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-part]");
+    if (!b) return;
+    curPart = b.dataset.part;
+    [].forEach.call(partRow.children, function (c) { c.classList.toggle("on", c === b); });
+    buildStarterPad();
+  });
+  buildStarterPad();
+
+  /* ---- juicy words (vocabulary) ---- */
+  var curWordCat = 0;
+  JUICY_WORDS.forEach(function (cat, idx) {
+    var b = document.createElement("button");
+    b.className = "cat" + (idx === 0 ? " on" : "");
+    b.textContent = cat.tab + " " + cat.name;
+    b.addEventListener("click", function () {
+      curWordCat = idx;
+      [].forEach.call(wordCatRow.children, function (c, i) { c.classList.toggle("on", i === idx); });
+      buildWordPad();
+    });
+    wordCatRow.appendChild(b);
+  });
+  function buildWordPad() {
+    wordPad.innerHTML = "";
+    JUICY_WORDS[curWordCat].words.trim().split(/\s+/).forEach(function (w) {
+      var b = document.createElement("button");
+      b.className = "word-btn";
+      b.textContent = w;
+      b.setAttribute("aria-label", "Add the word " + w);
+      b.addEventListener("click", function () { addWord(w); });
+      wordPad.appendChild(b);
+    });
+  }
+  buildWordPad();
+
+  function findItemById(id) {
+    if (!id) return null;
+    var pans = page().panels;
+    for (var i = 0; i < pans.length; i++) {
+      for (var j = 0; j < pans[i].items.length; j++) {
+        if (pans[i].items[j].id === id) return { item: pans[i].items[j], pi: i };
+      }
+    }
+    return null;
+  }
+
+  function addWord(w) {
+    var sel = findSelected();
+    if (!sel || !isText(sel.item.type)) sel = findItemById(lastTextId);
+    if (!sel || !isText(sel.item.type)) {
+      flash("Tap a bubble or caption first, then tap a word 💬");
+      return;
+    }
+    pushHistory("word");
+    var it = sel.item;
+    var t = String(it.text || "");
+    it.text = t && !/\s$/.test(t) ? t + " " + w : t + w;
+    var el = elFor(it.id);
+    var txt = el && el.querySelector(".txt");
+    if (txt) txt.textContent = it.text;
+    lastTextId = it.id;
+    selectItem(it.id, sel.pi);
+    save();
+    flash("“" + w + "” added — juicy! 💎");
+  }
+
+  /* ---- writing check + story checklist ---- */
+  function allTextItems() {
+    var out = [];
+    book.pages.forEach(function (p, pi) {
+      p.panels.forEach(function (pan, qi) {
+        pan.items.forEach(function (it) {
+          if (isText(it.type) && it.type !== "sfx") out.push({ it: it, page: pi + 1, panel: qi + 1 });
+        });
+      });
+    });
+    return out;
+  }
+  function endsWellPunctuated(t) { return /[.!?…"'’”]\s*$/.test(String(t).trim()); }
+  function startsCapital(t) {
+    var m = String(t).trim().match(/[A-Za-z]/);
+    return !m || m[0] === m[0].toUpperCase();
+  }
+
+  function writingIssues() {
+    var issues = [];
+    allTextItems().forEach(function (rec) {
+      var t = String(rec.it.text || "").trim();
+      var where = "page " + rec.page + ", panel " + rec.panel;
+      if (!t) { issues.push("An empty bubble on " + where + " is waiting for words."); return; }
+      if (!startsCapital(t)) issues.push("“" + t.slice(0, 18) + "…” on " + where + " needs a CAPITAL letter to start.");
+      if (!endsWellPunctuated(t)) issues.push("“" + t.slice(0, 18) + "…” on " + where + " needs a . ! or ? at the end.");
+      if (/\bi\b/.test(t)) issues.push("The word “I” is always a capital I (" + where + ").");
+    });
+    return issues;
+  }
+
+  document.getElementById("check-writing").addEventListener("click", function () {
+    var texts = allTextItems();
+    if (!texts.length) {
+      checkNote.className = "check-note";
+      checkNote.textContent = "No words yet! Add a talk bubble or a caption, then check again. 💬";
+      return;
+    }
+    var issues = writingIssues();
+    if (!issues.length) {
+      checkNote.className = "check-note";
+      checkNote.textContent = "Perfect! Every bubble starts with a capital and ends with . ! or ? 🌟";
+      flash("Your writing is spot on! 🌟");
+    } else {
+      checkNote.className = "check-note bad";
+      checkNote.textContent = (issues.length === 1 ? "One thing to fix: " : issues.length + " things to fix: ") + issues[0];
+      flash("Have a look at the ✅ Story check-up 🔎");
+    }
+    updateChecklist();
+  });
+
+  var CHECKS = [
+    { label: "Give your comic a name", test: function () {
+        return !!(book.title && book.title.trim() && book.title.trim() !== "My Comic"); } },
+    { label: "Beginning: a caption in the first panel", test: function () {
+        var pan = book.pages[0] && book.pages[0].panels[0];
+        return !!(pan && pan.items.some(function (i) { return i.type === "caption"; })); } },
+    { label: "Someone talks: add a speech or thought bubble", test: function () {
+        return anyItem(function (i) { return i.type === "speech" || i.type === "thought"; }); } },
+    { label: "Middle: something happens in 3 panels or more", test: function () {
+        var n = 0;
+        book.pages.forEach(function (p) { p.panels.forEach(function (pan) {
+          if (pan.items.length || pan.draw) n++; }); });
+        return n >= 3; } },
+    { label: "Ending: a caption in the very last panel", test: function () {
+        var lp = book.pages[book.pages.length - 1];
+        var pan = lp && lp.panels[lp.panels.length - 1];
+        return !!(pan && pan.items.some(function (i) { return i.type === "caption"; })); } },
+    { label: "Every bubble ends with . ! or ?", test: function () {
+        var t = allTextItems();
+        return t.length > 0 && t.every(function (r) {
+          return String(r.it.text || "").trim() && endsWellPunctuated(r.it.text); }); } }
+  ];
+  function anyItem(fn) {
+    return book.pages.some(function (p) {
+      return p.panels.some(function (pan) { return pan.items.some(fn); });
+    });
+  }
+  var checkTimer = null;
+  function updateChecklist() {
+    if (!checklistEl) return;
+    if (checkTimer) clearTimeout(checkTimer);
+    checkTimer = setTimeout(function () {
+      var done = 0;
+      checklistEl.innerHTML = "";
+      CHECKS.forEach(function (c) {
+        var ok = false;
+        try { ok = !!c.test(); } catch (e) {}
+        if (ok) done++;
+        var li = document.createElement("li");
+        li.className = ok ? "done" : "";
+        li.innerHTML = '<span class="mark">' + (ok ? "✅" : "⬜") + "</span><span>" + esc(c.label) + "</span>";
+        checklistEl.appendChild(li);
+      });
+      var li = document.createElement("li");
+      li.className = done === CHECKS.length ? "done" : "";
+      li.innerHTML = '<span class="mark">' + (done === CHECKS.length ? "🏆" : "⭐") + "</span><span>" +
+        done + " of " + CHECKS.length + (done === CHECKS.length ? " — a whole story! 🏆" : " done") + "</span>";
+      checklistEl.appendChild(li);
+    }, 120);
+  }
+
+  /* ===========================================================
+     MY COMIC SHELF — keep lots of comics, right in the browser
+     =========================================================== */
+  var SHELF_KEY = "jeannieComicMaker.shelf.v1";
+  var shelfEl = document.getElementById("shelf");
+
+  function readShelf() {
+    try {
+      var raw = localStorage.getItem(SHELF_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function writeShelf(arr) {
+    try { localStorage.setItem(SHELF_KEY, JSON.stringify(arr)); return true; }
+    catch (e) { return false; }
+  }
+  function countPanelsWithStuff(b) {
+    var n = 0;
+    b.pages.forEach(function (p) { p.panels.forEach(function (pan) {
+      if (pan.items.length || pan.draw) n++; }); });
+    return n;
+  }
+  function renderShelf() {
+    if (!shelfEl) return;
+    var arr = readShelf();
+    shelfEl.innerHTML = "";
+    if (!arr.length) {
+      var li = document.createElement("li");
+      li.innerHTML = '<span class="nm empty-note">Nothing on the shelf yet — save this comic to start your collection. 📚</span>';
+      shelfEl.appendChild(li);
+      return;
+    }
+    arr.forEach(function (entry) {
+      var li = document.createElement("li");
+      var nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = entry.title || "My Comic";
+      var meta = document.createElement("span");
+      meta.className = "meta";
+      meta.textContent = (entry.pages || 1) + (entry.pages === 1 ? " page · " : " pages · ") + (entry.when || "");
+      var open = document.createElement("button");
+      open.textContent = "📂 Open";
+      open.setAttribute("aria-label", "Open " + (entry.title || "comic"));
+      open.addEventListener("click", function () { openFromShelf(entry.id); });
+      var rm = document.createElement("button");
+      rm.className = "rm";
+      rm.textContent = "🗑 Delete";
+      rm.setAttribute("aria-label", "Delete " + (entry.title || "comic") + " from the shelf");
+      rm.addEventListener("click", function () {
+        if (!confirm("Take “" + (entry.title || "My Comic") + "” off the shelf?")) return;
+        writeShelf(readShelf().filter(function (e) { return e.id !== entry.id; }));
+        renderShelf();
+        flash("Removed from the shelf 🗑");
+      });
+      li.appendChild(nm); li.appendChild(meta); li.appendChild(open); li.appendChild(rm);
+      shelfEl.appendChild(li);
+    });
+  }
+
+  document.getElementById("shelf-save").addEventListener("click", function () {
+    var arr = readShelf();
+    var title = (book.title || "My Comic").trim() || "My Comic";
+    var when = new Date().toLocaleDateString();
+    var existing = arr.filter(function (e) { return e.title === title; })[0];
+    if (existing && !confirm("You already have a comic called “" + title + "”. Save over it?")) return;
+    var entry = {
+      id: existing ? existing.id : ("c" + Date.now()),
+      title: title, when: when, pages: book.pages.length, data: cloneBook(book)
+    };
+    arr = arr.filter(function (e) { return e.id !== entry.id; });
+    arr.unshift(entry);
+    if (arr.length > 12) arr = arr.slice(0, 12);
+    if (writeShelf(arr)) {
+      renderShelf();
+      setStatus("“" + title + "” is on your shelf. 📚", "saved");
+      flash("Saved to your shelf! ⭐");
+    } else {
+      setStatus("The shelf is full. Delete an old comic, or use 💾 Save to computer.", "warn");
+      flash("No room left — delete an old comic first 🗑");
+    }
+  });
+
+  function openFromShelf(id) {
+    var entry = readShelf().filter(function (e) { return e.id === id; })[0];
+    if (!entry || !entry.data) { flash("Couldn't find that comic 🤔"); return; }
+    if (!confirm("Open “" + entry.title + "”? Your comic on screen will be swapped out. (Undo brings it back.)")) return;
+    pushHistory();
+    book = sanitizeBook(entry.data);
+    curPage = 0; selPanel = 0; selItemId = null;
+    titleEl.textContent = book.title || "My Comic";
+    save(); renderPage();
+    flash("Opened “" + entry.title + "” 📂");
+  }
+  renderShelf();
 
   /* ---------- go! ---------- */
   renderPage();

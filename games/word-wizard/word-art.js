@@ -1267,9 +1267,46 @@ window.WordArt = (function () {
     },
   };
 
+  /* ---------- fallback: an enchanted scroll ----------
+     The grown-up spellbook uses abstract words ("conscience",
+     "onomatopoeia") that no picture could ever show. Instead of an
+     empty gap they get a sealed spell scroll stamped with the word's
+     initial, tinted from the word itself so each one is its own. */
+  var RUNE_INKS = [
+    ["#8a5cff", "#5b3a9e"], ["#ff5d8f", "#b32b58"], ["#38b6ff", "#1a6ea8"],
+    ["#3ddc84", "#1c8f53"], ["#ff8c42", "#b95412"], ["#1ec8c8", "#0f7f7f"],
+  ];
+  function runeScroll(word) {
+    var h = 0;
+    for (var i = 0; i < word.length; i++) h = (h * 31 + word.charCodeAt(i)) % 997;
+    var ink = RUNE_INKS[h % RUNE_INKS.length];
+    var g1 = uid(), g2 = uid(), f1 = uid();
+    var defs =
+      lg(g1, 32, 10, 32, 54, [["0", "#fdf6e3"], ["1", "#efe0bf"]]) +
+      lg(g2, 22, 20, 44, 46, [["0", ink[0]], ["1", ink[1]]]) +
+      glow(f1, 1.2);
+    var letter = word.charAt(0).toUpperCase();
+    return svg(defs,
+      shadow(32, 59, 19, 3) +
+      Rc(12.5, 9.5, 39, 45, 3, U(g1)) +
+      Ln("M17 22 H47 M17 45 H41", "#cbb894", 1.1) +
+      Rc(8.5, 5.5, 47, 8, 4, "#e3d0a8") +
+      Ln("M11 9.5 H53", "#fdf6e3", 1.6) +
+      Rc(8.5, 50.5, 47, 8, 4, "#e3d0a8") +
+      Ln("M11 54.5 H53", "#fdf6e3", 1.6) +
+      C(32, 33, 11, U(g2), 'opacity="0.16"') +
+      '<text x="32" y="33" text-anchor="middle" dominant-baseline="central" ' +
+      'font-family="Trebuchet MS, Segoe UI, sans-serif" font-size="21" font-weight="bold" ' +
+      'fill="' + U(g2) + '" filter="' + U(f1) + '">' + letter + "</text>" +
+      sparkle(50, 20, 2.4, ink[0], 2.4) +
+      sparkle(15, 42, 1.8, ink[0], 3.1, 0.6)
+    );
+  }
+
   function draw(word) {
     var fn = ART[word];
-    return fn ? fn() : "";
+    if (fn) return fn();
+    return word ? runeScroll(String(word)) : "";
   }
 
   return { draw: draw, has: function (w) { return !!ART[w]; } };
