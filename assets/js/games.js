@@ -46,10 +46,10 @@ const GAMES = [
   {
     title: "Number Grid Builder",
     emoji: "🔢",
-    blurb: "Like the Color Grid, but with NUMBERS! Guess how many letters your word has, then watch the game count them out — C-A-N-D-Y = 5 — and drop it in the right row and column. Counting, spelling & word length. For Cory & Jeannie!",
+    blurb: "Like the Color Grid, but with NUMBERS! Guess how many letters your word has, then watch the game count them out — C-A-N-D-Y = 5 — and drop it in the right row and column. Quick Count adds no-typing rounds, and Stats shows the mode and mean of your own grid. Counting, spelling, word length & averages. Mum gets a grown-up tier.",
     url:   "games/number-grid/",
     ages:  "5+",
-    kids:  ["cory","jeannie","ellie"],
+    kids: ["cory","jeannie","ellie","shannon"],
     color: "#2b8cff",
     ready: true
   },
@@ -90,10 +90,10 @@ const GAMES = [
   {
     title: "Rock Detective",
     emoji: "🪨",
-    blurb: "Found a cool rock? Tap the clues you see & feel to identify it like a real geologist, browse the illustrated rock book, or take the naming quiz — igneous, sedimentary, metamorphic & minerals. For Jeannie & Cory!",
+    blurb: "Found a cool rock? Tap what you see and feel and a key narrows 38 specimens down to exactly one — then run scratch, streak, vinegar and magnet tests on a mystery specimen in the Lab, explore the Mohs hardness scale in the Rock Book, and take the naming quiz at Explorer, Rockhound or Geologist level. Igneous, sedimentary, metamorphic & minerals.",
     url:   "games/rock-detective/",
     ages:  "6+",
-    kids:  ["jeannie","cory"],
+    kids: ["jeannie","cory","shannon"],
     color: "#a97c50",
     ready: true
   },
@@ -101,10 +101,10 @@ const GAMES = [
   {
     title: "Unit Converter",
     emoji: "📏",
-    blurb: "Type a number and see it in EVERY other unit at once — with the × and ÷ maths shown for each — then win quiz stars guessing things like how many cm make a foot. For Cory!",
+    blurb: "Type a number and see it in EVERY other unit at once — with the × and ÷ shown on every row, so you learn the method and not just the answer. Then climb a 7-level quiz ladder: metric steps, feet & pounds, °F ⇄ °C, and grown-up two-step problems. Every wrong answer shows you the full working. Plus scale a recipe, or chart your height in cm and feet-and-inches.",
     url:   "games/unit-converter/",
     ages:  "6+",
-    kids:  ["cory"],
+    kids: ["cory","shannon"],
     color: "#38b6ff",
     ready: true
   },
@@ -123,7 +123,7 @@ const GAMES = [
   {
     title: "Life Lab",
     emoji: "🦠",
-    blurb: "Conway's Game of Life! Paint cells that live or die by counting their neighbours — stamp gliders & factories, then invent your own rules in the Rule Lab. Counting, logic & patterns. For Cory!",
+    blurb: "Conway's Game of Life! Paint cells that live or die by counting their neighbours — stamp gliders, spaceships & glider factories, then tap 🔍 Inspect to hear exactly why a cell lived or died, or press ⏪ Back to watch a generation again. Beat the computer at Predict the Next Generation, hunt nine Discovery badges, and invent your own rules in the Rule Lab. Counting, logic & patterns.",
     url:   "games/game-of-life/",
     ages:  "6+",
     kids:  ["cory","shannon"],
@@ -145,10 +145,10 @@ const GAMES = [
   {
     title: "Block Coordinates",
     emoji: "⛏️",
-    blurb: "Build pixel-art scenes the Minecraft way! Read (X, Y) coordinates to place blocks on the grid — learn the coordinate plane. For Cory!",
+    blurb: "The Minecraft coordinate plane! Read (X, Y) to build pixel art, dig for treasure, walk and measure distances, and cross into the negative quadrants — plus real F3 X/Y/Z where Y is height. Four difficulties, up to a grown-up tier.",
     url:   "games/block-coordinates/",
     ages:  "6+",
-    kids:  ["cory"],
+    kids: ["cory","jeannie","shannon"],
     color: "#3ddc84",
     ready: true
   },
@@ -178,7 +178,7 @@ const GAMES = [
   {
     title: "Pumpkin Pies Roster",
     emoji: "🥧",
-    blurb: "Coach tool for Shannon — fair Pumpkin Pies soccer line-ups for 2, 4 or 8 periods with even playing time & rotating goalies. Easy to print!",
+    blurb: "Coach tool for Shannon — fair soccer line-ups for 2, 4 or 8 periods: even playing time, rotating goalies, must-be/never-goalie picks, and late arrivals who only share the periods they're here for. One-page printout.",
     url:   "games/soccer-roster/",
     ages:  "Grown-ups",
     kids:  ["shannon"],
@@ -288,10 +288,10 @@ const GAMES = [
   {
     title: "Number Bubble Pop",
     emoji: "🫧",
-    blurb: "Find and pop the matching number — or letter in ABC mode, or count the dots in Dots mode! Practice counting, number & letter recognition. For Ellie!",
+    blurb: "Nine levels of bubble popping: match numbers or letters, count dice dots, count out a set — then add, take away, double and skip count by 2s, 3s, 5s and 10s. Every wrong pop explains itself out loud.",
     url:   "games/bubble-pop/",
     ages:  "3+",
-    kids:  ["ellie"],
+    kids: ["ellie","cory","jeannie"],
     color: "#38b6ff",
     ready: true
   },
