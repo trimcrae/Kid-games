@@ -678,14 +678,15 @@
     streak: 0,
     best: 0,
     right: {},     // levelId -> correct answers ever
-    wish: 0
+    wish: 0,
+    voice: 0       // 1 = read every question out loud (Ellie can't read yet)
   };
 
   function loadState() {
     try {
       var raw = JSON.parse(localStorage.getItem(SAVE));
       if (raw && typeof raw === "object") {
-        ["level", "unlocked", "piggy", "streak", "best", "wish"].forEach(function (k) {
+        ["level", "unlocked", "piggy", "streak", "best", "wish", "voice"].forEach(function (k) {
           if (typeof raw[k] === "number" && isFinite(raw[k])) S[k] = raw[k];
         });
         if (raw.right && typeof raw.right === "object") S.right = raw.right;
@@ -698,6 +699,42 @@
   }
   function saveState() {
     try { localStorage.setItem(SAVE, JSON.stringify(S)); } catch (e) { /* private mode */ }
+  }
+
+  /* ---- read it out loud (browser speech — no downloads) ----
+     Ellie is 3 and cannot read a word of this, so every question
+     and every explanation can be spoken. Off by default, and the
+     choice is remembered. --------------------------------- */
+  var CAN_SPEAK = typeof window !== "undefined" &&
+    "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+
+  function strip(html) {
+    return String(html)
+      .replace(/<[^>]+>/g, "")
+      .replace(/¢/g, " cents")
+      .replace(/\$(\d+)\.(\d\d)/g, "$1 dollars $2")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  function speak(text) {
+    if (!CAN_SPEAK || !S.voice || !text) return;
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(strip(text));
+      u.rate = 0.92;
+      u.pitch = 1.05;
+      speechSynthesis.speak(u);
+    } catch (e) { /* no voice available — the words are on screen */ }
+  }
+  function hush() { try { if (CAN_SPEAK) speechSynthesis.cancel(); } catch (e) {} }
+
+  function drawVoiceBtn() {
+    var b = $("csVoice");
+    if (!b) return;
+    if (!CAN_SPEAK) { b.hidden = true; return; }
+    b.textContent = S.voice ? "🔊 Reading out loud" : "🔈 Read it to me";
+    b.setAttribute("aria-pressed", S.voice ? "true" : "false");
+    b.classList.toggle("on", !!S.voice);
   }
 
   /* ---- coin drawing (pure CSS, no images) ---- */
@@ -802,6 +839,7 @@
     }
 
     $("csPrompt").innerHTML = round.prompt;
+    speak(round.prompt);
     $("csStage").innerHTML = stageHTML(round);
     $("csFeedback").innerHTML = "";
     $("csFeedback").className = "cs-feedback";
@@ -945,6 +983,7 @@
         window.Confetti && Confetti.burst({ count: 80 });
       }
       say("✅ <b>Right!</b> " + round.teach + ' <span class="earned">+' + centsText(earn) + " to the piggy bank</span>", "good");
+      speak("Right! " + round.teach);
       window.SFX && (S.streak > 2 ? SFX.streak(S.streak) : SFX.good());
 
       // wish-list milestone
@@ -960,7 +999,9 @@
       }
     } else {
       S.streak = 0;
-      say("🤔 <b>Not quite.</b> " + round.explain(given), "bad");
+      var why = round.explain(given);
+      say("🤔 <b>Not quite.</b> " + why, "bad");
+      speak("Not quite. " + why);
       window.SFX && SFX.nope && SFX.nope();
     }
     saveState();
@@ -976,18 +1017,34 @@
     if (!box) return;
     box.innerHTML =
       '<div class="ref-row">' + COINS.map(function (c) {
-        return '<span class="ref-coin"><span role="img" aria-label="' + label(c.id) + '">' +
-          coinHTML(c.id, 0.85) + "</span><b>" + c.name + "</b><small>" + centsText(c.value) + "</small></span>";
+        return '<button type="button" class="ref-coin" data-coin="' + c.id +
+          '" aria-label="' + label(c.id) + '">' +
+          coinHTML(c.id, 0.85) + "<b>" + c.name + "</b><small>" + centsText(c.value) + "</small></button>";
       }).join("") + "</div>" +
       "<p><b>Handy swaps:</b> 5 pennies = 1 nickel · 2 nickels = 1 dime · " +
       "5 nickels = 1 quarter · 2 dimes + 1 nickel = 1 quarter · 4 quarters = $1.00</p>" +
       "<p><b>Watch out:</b> the dime is the <i>smallest</i> coin but it is worth more than " +
       "a penny <i>and</i> a nickel. Size does not tell you value — the number does.</p>";
+    [].forEach.call(box.querySelectorAll(".ref-coin"), function (b) {
+      b.addEventListener("click", function () {
+        var c = piece(b.getAttribute("data-coin"));
+        window.SFX && SFX.coin && SFX.coin();
+        var line = c.name + ", " + centsText(c.value);
+        say("🪙 <b>" + line + "</b>", "hint");
+        if (!S.voice && CAN_SPEAK) {   // one-off read even with the toggle off
+          try {
+            speechSynthesis.cancel();
+            speechSynthesis.speak(new SpeechSynthesisUtterance(strip(line)));
+          } catch (e) {}
+        } else { speak(line); }
+      });
+    });
   }
 
   /* ---- tabs ---- */
   function showTab(which) {
     var isCoins = which !== "machine";
+    if (!isCoins) hush();
     $("panelCoins").hidden = !isCoins;
     $("panelMachine").hidden = isCoins;
     $("tabCoins").setAttribute("aria-selected", isCoins ? "true" : "false");
@@ -1028,6 +1085,13 @@
     });
     $("csNext").addEventListener("click", newRound);
     $("csSkip").addEventListener("click", function () { S.streak = 0; saveState(); drawStatus(); newRound(); });
+    $("csVoice").addEventListener("click", function () {
+      S.voice = S.voice ? 0 : 1;
+      saveState();
+      drawVoiceBtn();
+      if (S.voice) speak(round ? round.prompt : "Reading out loud."); else hush();
+    });
+    drawVoiceBtn();
     $("tabCoins").addEventListener("click", function () { showTab("coins"); });
     $("tabMachine").addEventListener("click", function () { showTab("machine"); });
 

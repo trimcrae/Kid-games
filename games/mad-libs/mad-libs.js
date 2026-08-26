@@ -356,7 +356,11 @@
 
   function saveDraft() {
     if (!story) return;
-    state.draft = { sid: story.id, answers: answers.slice(), step: step, when: Date.now() };
+    // nothing typed yet? then there is nothing worth coming back to
+    const started = answers.some(function (a) { return a && String(a).trim(); });
+    state.draft = started
+      ? { sid: story.id, answers: answers.slice(), step: step, when: Date.now() }
+      : null;
     save();
   }
 

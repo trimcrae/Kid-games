@@ -548,6 +548,8 @@
     .btn-check { width: 100%; background: linear-gradient(90deg, var(--green), #2bb673); box-shadow: 0 6px 18px rgba(61, 220, 132, 0.35); }
     .btn-next2 { width: 100%; margin-top: 0.7rem; background: linear-gradient(90deg, #8a5cff, #6f47e0); }
     .btn-skip  { background: #b9b3cc; }
+    .btn-voice { background: #7aa7d6; font-size: 0.98rem; }
+    .btn-voice.on { background: linear-gradient(90deg, var(--blue), #2f9fe0); }
 
     .cs-feedback {
       margin: 0.7rem 0 0; padding: 0 0.2rem;
@@ -561,7 +563,14 @@
     .cs-foot { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
 
     .ref-row { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin: 0.4rem 0 0.6rem; }
-    .ref-coin { text-align: center; font-size: 0.72rem; }
+    .ref-coin {
+      display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+      min-width: 68px; min-height: 92px; padding: 0.35rem 0.3rem;
+      border: 3px solid #f0eefc; border-radius: 14px; background: #fff;
+      font-family: var(--font); color: var(--ink);
+      text-align: center; font-size: 0.72rem; cursor: pointer;
+    }
+    .ref-coin:hover { border-color: var(--blue); }
     .ref-coin b { display: block; font-size: 0.78rem; }
     .ref-coin small { color: #6a6385; }
 
@@ -644,6 +653,7 @@
 
       <div class="cs-foot">
         <button class="act-btn btn-skip" id="csSkip" type="button">↷ Different question</button>
+        <button class="act-btn btn-voice" id="csVoice" type="button" aria-pressed="false">🔈 Read it to me</button>
       </div>
 
       <details class="lesson">

@@ -446,9 +446,16 @@
     }
     .qopt:hover { transform: translateY(-2px); }
     .qopt:focus-visible { outline: 4px solid #2b2440; outline-offset: 2px; }
-    .qopt.ok { background: #2f8d3e; }
-    .qopt.no { background: #c62d2d; }
+    /* the count questions colour each button by its LENGTH, so a green
+       "correct" fill would be indistinguishable from the 5 column —
+       ring the answer instead, which reads on any background */
+    .qopt.ok { box-shadow: 0 0 0 5px #1f6b2c, 0 6px 14px rgba(43,36,64,0.25); }
+    .qopt.no { box-shadow: 0 0 0 5px #c62d2d, 0 6px 14px rgba(43,36,64,0.25); opacity: 0.75; }
     .qopt[disabled] { cursor: default; }
+    .qopt[disabled]:not(.ok):not(.no) { opacity: 0.45; }
+    .qverdict { font-weight: 900; font-size: 1.05rem; margin: 0.6rem 0 0; }
+    .qverdict.ok { color: #1f6b2c; }
+    .qverdict.no { color: #a8410e; }
 
     .streak-line { text-align: center; font-weight: bold; color: #6b41c9; margin-bottom: 0.6rem; min-height: 1.5rem; }
     .streak-line .fire { font-size: 1.2rem; }
@@ -469,7 +476,9 @@
       text-align: center;
       box-shadow: 0 6px 14px rgba(43,36,64,0.1);
     }
-    .stat-card .big { display: block; font-size: 1.7rem; font-weight: 900; color: var(--ink); line-height: 1.1; word-break: break-word; }
+    .stat-card .big { display: block; font-size: 1.7rem; font-weight: 900; color: var(--ink); line-height: 1.1; overflow-wrap: anywhere; }
+    /* a 13-letter word in a 1.7rem box snaps in half — shrink it instead */
+    .stat-card .big.long { font-size: 1.05rem; letter-spacing: -0.01em; }
     .stat-card .cap { display: block; font-size: 0.8rem; font-weight: bold; color: #6b41c9; margin-top: 0.2rem; }
 
     .chart {

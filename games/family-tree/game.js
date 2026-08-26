@@ -441,6 +441,11 @@
         "Great-aunt", "Great-uncle", "Sister-in-law", "Brother-in-law", "Mother-in-law"]
   };
 
+  // "aunt" → "an aunt", "brother" → "a brother"
+  function withArticle(word) {
+    return (/^[aeiou]/i.test(word) ? "an " : "a ") + word;
+  }
+
   function shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -1337,8 +1342,9 @@
       setTimeout(() => el.classList.remove("quiz-wrong"), 500);
     }
     const target = quiz.label.toLowerCase();
-    const why = (label ? P()[id].name + " is your " + label.toLowerCase() + " — a " : "A ") +
-      target + " is " + shortDef(quiz.label) + ".";
+    const why = label
+      ? P()[id].name + " is your " + label.toLowerCase() + " — " + withArticle(target) + " is " + shortDef(quiz.label) + "."
+      : capFirst(withArticle(target)) + " is " + shortDef(quiz.label) + ".";
     quizQ.textContent = "Not quite. " + why + " Try again!";
     window.SFX && SFX.nope();
   }
@@ -1360,7 +1366,7 @@
     Array.prototype.forEach.call(quizChoices.children, (b) => {
       if (wordKey(b.textContent) === wordKey(quiz.label)) b.classList.add("right");
     });
-    quizQ.textContent = "Not quite — a " + word.toLowerCase() + " is " + shortDef(word) + ". " +
+    quizQ.textContent = "Not quite — " + withArticle(word.toLowerCase()) + " is " + shortDef(word) + ". " +
       name + " is your " + quiz.label.toLowerCase() + ": " + shortDef(quiz.label) + ".";
     window.SFX && SFX.nope();
     quizTimer = setTimeout(() => { if (quiz.on) nextQuizQuestion(); }, 3800);

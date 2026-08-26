@@ -1177,6 +1177,20 @@
     showCountout(showWords, why, right ? "right" : "wrong");
     renderStreakLine(right ? "✅ Right!" : "Try the next one");
 
+    // say it right where they tapped — the count-out strip lives further
+    // down the page and can be off-screen on a phone
+    var ansLabel = quizQ.kind === "count"
+      ? labelFor(quizQ.answer) + " " + plural(quizQ.answer)
+      : quizQ.kind === "pick-word" ? String(quizQ.answer).toUpperCase()
+      : String(quizQ.answer);
+    var verdict = document.createElement("p");
+    verdict.className = "qverdict " + (right ? "ok" : "no");
+    verdict.innerHTML = right
+      ? "✅ Right — <b>" + escapeHtml(ansLabel) + "</b>!"
+      : "❌ Not quite — the answer is <b>" + escapeHtml(ansLabel) +
+        "</b>. Have a look at the count below 👇";
+    qcard.appendChild(verdict);
+
     // a clear way forward, plus a gentle auto-advance when they got it right
     var next = document.createElement("button");
     next.type = "button";
@@ -1204,9 +1218,10 @@
 
   function statCard(big, cap) {
     var d = document.createElement("div");
+    var text = String(big);
     d.className = "stat-card";
-    d.innerHTML = '<span class="big">' + escapeHtml(String(big)) + '</span><span class="cap">' +
-      escapeHtml(cap) + "</span>";
+    d.innerHTML = '<span class="big' + (text.length > 8 ? " long" : "") + '">' +
+      escapeHtml(text) + '</span><span class="cap">' + escapeHtml(cap) + "</span>";
     return d;
   }
 

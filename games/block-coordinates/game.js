@@ -1122,7 +1122,7 @@
       const words = [wordX, wordY].filter(Boolean).join(" and then ");
       return {
         kind: "walk", target: { x: tx, y: ty }, start: { x: sx, y: sy }, dx, dy,
-        html: `🚶 You're standing at <span class="coord">(${sx}, ${sy})</span>. Walk ${words}. Tap where you land!`,
+        html: `🚶 You're standing at <span class="coord">(${sx}, ${sy})</span> — walk ${words}, then tap where you land!`,
         aria: `You are at X ${sx}, Y ${sy}. Walk ${words}. Tap where you land.`,
         maths: `${sx} ${dx < 0 ? "−" : "+"} ${Math.abs(dx)} = ${tx} across, and ` +
                `${sy} ${dy < 0 ? "−" : "+"} ${Math.abs(dy)} = ${ty} up.`,
@@ -1191,8 +1191,8 @@
       const opts = [...set].sort(() => Math.random() - 0.5);
       return {
         kind: "far", a, b, answer,
-        html: `📏 How many blocks from 🏠 <span class="coord">(${a.x}, ${a.y})</span> ` +
-              `to 🧰 <span class="coord">(${b.x}, ${b.y})</span>?` +
+        html: `📏 How many blocks is it from 🏠 <span class="coord">(${a.x}, ${a.y})</span> ` +
+              `to 🧰 <span class="coord">(${b.x}, ${b.y})</span> ?` +
               (taxi ? ' <span class="step-of">(walk across, then up)</span>' : ""),
         aria: `How many blocks from home at X ${a.x}, Y ${a.y} to the chest at X ${b.x}, Y ${b.y}?`,
         choices: opts.map((d) => ({ label: String(d), value: d, ok: d === answer })),
