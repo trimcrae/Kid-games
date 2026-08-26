@@ -356,7 +356,7 @@
     .pboard {
       display: grid;
       gap: 4px;
-      width: min(340px, 100%);
+      width: min(360px, 100%);
       margin: 0 auto;
       background: #241b45;
       padding: 6px;
@@ -416,6 +416,9 @@
     }
 
     @media (max-width: 480px) {
+      /* let the prediction board use the panel's padding so the squares
+         stay finger-sized on a phone */
+      .pboard { margin-left: -0.7rem; margin-right: -0.7rem; gap: 3px; padding: 4px; }
       .stat-pill { font-size: 0.9rem; min-width: 7.6em; padding: 0.28rem 0.7rem; }
       .ctl-btn { font-size: 1rem; padding: 0.75rem 1.15rem; }
       #playBtn { font-size: 1.1rem; padding: 0.75rem 1.4rem; }

@@ -1172,7 +1172,10 @@
      it — showing the neighbour count on every square they got wrong.
      Puzzles always run Conway's original B3/S23 so the lesson is stable
      even when the Rule Lab is set to something silly. */
-  const PSIZE = 7;
+  // 6x6 is deliberate: on a 390px phone that makes every square about
+  // 48px across — a real tap target for a six-year-old — while still
+  // leaving a one-square margin so the answer is exact.
+  const PSIZE = 6;
   const P_BIRTH = new Array(9).fill(false); P_BIRTH[3] = true;
   const P_SURV  = new Array(9).fill(false); P_SURV[2] = P_SURV[3] = true;
 
