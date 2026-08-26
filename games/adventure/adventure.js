@@ -739,7 +739,10 @@
       leaveStory(); return;
     }
     if (/^[1-9]$/.test(e.key)) {
-      const btns = choicesEl.querySelectorAll("button");
+      // during the Word Challenge the digits pick an answer instead
+      const btns = quizEl.hidden
+        ? choicesEl.querySelectorAll("button")
+        : quizEl.querySelectorAll(".choices button");
       const b = btns[parseInt(e.key, 10) - 1];
       if (b && !b.disabled) { b.click(); e.preventDefault(); }
     }
