@@ -338,10 +338,13 @@
   const coordChip = (x, y, cls) =>
     `<span class="coord${cls ? " " + cls : ""}">(${x}, ${y})</span>`;
 
-  function walkWords(x, y, names) {
+  function walkWords(x, y, names, flipY) {
     const nx = (names && names[0]) || "X", ny = (names && names[1]) || "Y";
     const ax = x < 0 ? `${Math.abs(x)} left ←` : `${x} across →`;
-    const ay = y < 0 ? `${Math.abs(y)} down ↓` : `${y} up ↑`;
+    // On a flipped board (Minecraft's Z) the numbers grow DOWNWARD, so
+    // counting to a positive Z means walking down the screen, not up.
+    const down = flipY ? y >= 0 : y < 0;
+    const ay = `${Math.abs(y)} ${down ? "down ↓" : "up ↑"}`;
     return `${ax} (${nx} = ${x}) and ${ay} (${ny} = ${y})`;
   }
 
@@ -350,10 +353,13 @@
     opts = opts || {};
     const names = opts.names || ["X", "Y"];
     const thing = opts.thing || "chest";
+    const flipY = !!opts.flipY;
     const dx = target.x - guess.x, dy = target.y - guess.y;
     const moves = [];
     if (dx) moves.push(`${Math.abs(dx)} block${Math.abs(dx) > 1 ? "s" : ""} ${dx > 0 ? "right →" : "left ←"}`);
-    if (dy) moves.push(`${Math.abs(dy)} block${Math.abs(dy) > 1 ? "s" : ""} ${dy > 0 ? "up ↑" : "down ↓"}`);
+    // which way the finger really travels on THIS board
+    const goesDown = flipY ? dy > 0 : dy < 0;
+    if (dy) moves.push(`${Math.abs(dy)} block${Math.abs(dy) > 1 ? "s" : ""} ${goesDown ? "down ↓" : "up ↑"}`);
     const move = moves.join(" and ");
     const swapped = guess.x === target.y && guess.y === target.x && target.x !== target.y;
     const head = swapped
@@ -362,9 +368,9 @@
       : `That square is ${coordChip(guess.x, guess.y, "bad")}.`;
     return `
       <div class="ex-line">${head}</div>
-      <div class="ex-line">You went ${walkWords(guess.x, guess.y, names)}.</div>
+      <div class="ex-line">You went ${walkWords(guess.x, guess.y, names, flipY)}.</div>
       <div class="ex-line">The ${thing} is at ${coordChip(target.x, target.y, "good")} —
-        ${walkWords(target.x, target.y, names)}.</div>
+        ${walkWords(target.x, target.y, names, flipY)}.</div>
       ${move ? `<div class="ex-line ex-move">Move ${move} and you're there!</div>` : ""}`;
   }
 
@@ -759,7 +765,7 @@
     const lvl = LEVELS[idx];
     const steps = cellsOf(lvl);
     let pos = 0, misses = 0, streak = 0, totalMisses = 0;
-    let nums = save.numbersOn;
+    let nums = startNums();
 
     const hud = document.createElement("div");
     hud.className = "hud";
@@ -907,7 +913,7 @@
     const n = quad ? half * 2 + 1 : Math.max(5, Math.min(cfg.dig, cap));
     const lo = quad ? -half : 1;
     const hi = lo + n - 1;
-    const TARGETS = quad ? Math.max(4, Math.min(cfg.rounds, 8)) : Math.max(4, Math.min(cfg.rounds, 8));
+    const TARGETS = Math.max(4, Math.min(cfg.rounds, 8));
     const spots = [], used = {};
     if (quad) {
       // one treasure in every quadrant, so all four sign combos get practised
@@ -955,7 +961,16 @@
 
     const prog = document.createElement("div");
     prog.className = "progress"; prog.innerHTML = "<i></i>";
+    prog.setAttribute("role", "progressbar");
+    prog.setAttribute("aria-label", "Progress through this run");
+    prog.setAttribute("aria-valuemin", "0");
+    prog.setAttribute("aria-valuemax", String(total));
+    prog.setAttribute("aria-valuenow", "0");
     app.appendChild(prog);
+    const setProg = (v) => {
+      prog.firstChild.style.width = (total ? v / total * 100 : 0) + "%";
+      prog.setAttribute("aria-valuenow", String(v));
+    };
 
     const ctx = makeBoard(n, onTap, { lo, numbers: nums });
     boardCtx = ctx;
@@ -980,7 +995,7 @@
         `<span class="step-of">${idx}/${total} found${streak >= 3 ? " · 🔥" + streak : ""}</span>`;
       instr.setAttribute("aria-label",
         `Dig at X ${s.x}, Y ${s.y}. ${idx} of ${total} found.`);
-      prog.firstChild.style.width = (idx / total * 100) + "%";
+      setProg(idx);
     }
     function onTap(x, y, cell) {
       if (idx >= total || cell.classList.contains("filled")) return;
@@ -1004,7 +1019,7 @@
     }
     function done() {
       instr.innerHTML = `All ${total} treasures found! 💎✨`;
-      prog.firstChild.style.width = "100%";
+      setProg(total);
       hideExplain(explain);
       const bestKey = quad ? "quadBest" : "treasureBest";
       const isBest = save[bestKey] === null || wrong < save[bestKey];
@@ -1064,7 +1079,16 @@
 
     const prog = document.createElement("div");
     prog.className = "progress"; prog.innerHTML = "<i></i>";
+    prog.setAttribute("role", "progressbar");
+    prog.setAttribute("aria-label", "Progress through this run");
+    prog.setAttribute("aria-valuemin", "0");
+    prog.setAttribute("aria-valuemax", String(total));
+    prog.setAttribute("aria-valuenow", "0");
     app.appendChild(prog);
+    const setProg = (v) => {
+      prog.firstChild.style.width = (total ? v / total * 100 : 0) + "%";
+      prog.setAttribute("aria-valuenow", String(v));
+    };
 
     const ctx = makeBoard(n, onTap, { lo, numbers: nums });
     boardCtx = ctx;
@@ -1105,7 +1129,7 @@
       if (round >= total) return done();
       clearBoard(); hideExplain(explain);
       misses = 0;
-      prog.firstChild.style.width = (round / total * 100) + "%";
+      setProg(round);
       const kind = pickKind();
       q = kind === "walk" ? makeWalk() : kind === "read" ? makeRead() : makeFar();
       instr.innerHTML = q.html + ` <span class="step-of">round ${round + 1}/${total}` +
@@ -1256,12 +1280,15 @@
         good();
       } else {
         shake(cell); Sound.dig(); misses++; wrong++; streak = 0;
-        ctx.litAxis(q.target.x, q.target.y, true);
-        setTimeout(() => ctx.litAxis(q.target.x, q.target.y, false), 1500);
-        showExplain(explain, explainMiss({ x, y }, q.target, { thing: "landing square" }) +
+        // grab this round's target: the next question may be a
+        // multiple-choice one with no target square at all.
+        const aim = q.target;
+        ctx.litAxis(aim.x, aim.y, true);
+        setTimeout(() => ctx.litAxis(aim.x, aim.y, false), 1500);
+        showExplain(explain, explainMiss({ x, y }, aim, { thing: "landing square" }) +
           `<div class="ex-line ex-move">${q.maths}</div>`);
-        say(explainText({ x, y }, q.target));
-        if (misses >= cfg.hintAfter) ctx.flash(q.target.x, q.target.y);
+        say(explainText({ x, y }, aim));
+        if (misses >= cfg.hintAfter) ctx.flash(aim.x, aim.y);
       }
     }
     function good() {
@@ -1276,7 +1303,7 @@
     function done() {
       q = null;
       clearBoard(); hideExplain(explain);
-      prog.firstChild.style.width = "100%";
+      setProg(total);
       instr.innerHTML = `Explorer run finished! 🚶✨`;
       const best = save.walkBest[save.tier] || 0;
       const isBest = score > best;
@@ -1336,7 +1363,16 @@
 
     const prog = document.createElement("div");
     prog.className = "progress"; prog.innerHTML = "<i></i>";
+    prog.setAttribute("role", "progressbar");
+    prog.setAttribute("aria-label", "Progress through this run");
+    prog.setAttribute("aria-valuemin", "0");
+    prog.setAttribute("aria-valuemax", String(total));
+    prog.setAttribute("aria-valuenow", "0");
     app.appendChild(prog);
+    const setProg = (v) => {
+      prog.firstChild.style.width = (total ? v / total * 100 : 0) + "%";
+      prog.setAttribute("aria-valuenow", String(v));
+    };
 
     const boardHost = document.createElement("div");
     boardHost.className = "board-wrap";
@@ -1351,7 +1387,6 @@
 
     $("z-back").onclick = renderMenu;
     $("z-nums").onclick = () => { nums = toggleNums(ctx, $("z-nums"), nums); };
-    nextRound();
 
     const QUIZ = [
       { q: "Which number tells you <b>how high up</b> you are?",
@@ -1374,6 +1409,7 @@
         why: "Looking down at a map you only need east–west (X) and north–south (Z)." },
     ];
     const quizBag = QUIZ.slice().sort(() => Math.random() - 0.5);
+    nextRound();
 
     function nextRound() {
       if (round >= total) return done();
@@ -1381,7 +1417,7 @@
       choices.hidden = true; choices.innerHTML = "";
       boardHost.innerHTML = "";
       misses = 0;
-      prog.firstChild.style.width = (round / total * 100) + "%";
+      setProg(round);
       const kind = ["side", "top", "quiz"][round % 3];
       if (kind === "quiz") return askQuiz();
       if (kind === "side") return askSide();
@@ -1397,7 +1433,7 @@
       buildBoard({ xName: "X", yName: "Y" });
       ctx.board.classList.add("sideview");
       const x = rnd(1, n), y = rnd(1, n);
-      q = { kind: "side", target: { x, y }, names: ["X", "Y"],
+      q = { kind: "side", target: { x, y }, names: ["X", "Y"], flipY: false,
             maths: `X = ${x} means ${x} across. Y = ${y} means ${y} blocks HIGH.` };
       instr.innerHTML = `⛏️ <b>Side view</b> (you can see the height!). The diamonds are at ` +
         `<span class="coord">X ${x}</span> <span class="coord">Y ${y}</span> — dig there. ` +
@@ -1408,7 +1444,7 @@
       buildBoard({ xName: "X", yName: "Z", flipY: true });
       ctx.board.classList.add("topview");
       const x = rnd(1, n), z = rnd(1, n);
-      q = { kind: "top", target: { x, y: z }, names: ["X", "Z"],
+      q = { kind: "top", target: { x, y: z }, names: ["X", "Z"], flipY: true,
             maths: `X = ${x} goes east →. Z = ${z} goes south ↓ (bigger Z is further down the map).` };
       instr.innerHTML = `🗺️ <b>Map view</b> (looking straight down). The village is at ` +
         `<span class="coord">X ${x}</span> <span class="coord">Z ${z}</span> — tap it. ` +
@@ -1446,13 +1482,18 @@
         good();
       } else {
         shake(cell); Sound.dig(); misses++; wrong++;
-        ctx.litAxis(q.target.x, q.target.y, true);
-        setTimeout(() => ctx.litAxis(q.target.x, q.target.y, false), 1500);
+        // Hold on to THIS round's board and target: by the time the
+        // 1.5s hint timer fires the run may have moved on to a quiz round
+        // (no board at all) or finished, and `ctx`/`q` will have changed.
+        const board = ctx, aim = q.target;
+        board.litAxis(aim.x, aim.y, true);
+        setTimeout(() => board.litAxis(aim.x, aim.y, false), 1500);
         showExplain(explain,
-          explainMiss({ x, y }, q.target, { names: q.names, thing: q.kind === "side" ? "diamond" : "village" }) +
+          explainMiss({ x, y }, q.target,
+            { names: q.names, flipY: q.flipY, thing: q.kind === "side" ? "diamond" : "village" }) +
           `<div class="ex-line ex-move">${q.maths}</div>`);
         say(explainText({ x, y }, q.target, q.names));
-        if (misses >= cfg.hintAfter) ctx.flash(q.target.x, q.target.y);
+        if (misses >= cfg.hintAfter) board.flash(aim.x, aim.y);
       }
     }
     function good() {
@@ -1467,7 +1508,7 @@
       q = null; ctx = null;
       boardHost.innerHTML = ""; choices.hidden = true; choices.innerHTML = "";
       hideExplain(explain);
-      prog.firstChild.style.width = "100%";
+      setProg(total);
       instr.innerHTML = "F3 run complete! 🧊";
       const best = save.f3Best[save.tier] || 0;
       const isBest = score > best;
@@ -1498,6 +1539,7 @@
     const n = 8;
     const BLOCKS = ["grass", "dirt", "stone", "cobble", "planks", "log", "leaves",
       "water", "sand", "diamond", "gold", "red", "purple", "pink", "white", "black"];
+    const ERASER = "__rubber__";   // sentinel — never a real block name
     let selected = BLOCKS[0];
     let nums = save.numbersOn;
     const grid = (save.free && save.free.n === n && save.free.cells) ? save.free.cells : {};
@@ -1511,7 +1553,8 @@
 
     const tip = document.createElement("p");
     tip.className = "intro"; tip.style.margin = "0.5rem 0";
-    tip.innerHTML = "Pick a block, then tap the grid. Tap the same block again to erase it. " +
+    tip.innerHTML = "Pick a block, then tap the grid. Grab the 🧽 <b>rubber</b> " +
+      "(or tap a block with its own colour) to take one away. " +
       "Your world saves itself — come back and it'll still be here.";
     app.appendChild(tip);
 
@@ -1535,6 +1578,19 @@
       };
       pal.appendChild(sw);
     });
+    const rub = document.createElement("button");
+    rub.type = "button";
+    rub.className = "swatch eraser";
+    rub.innerHTML = '<span aria-hidden="true">🧽</span>';
+    rub.title = "Rubber — tap a block to take it away";
+    rub.setAttribute("aria-label", "rubber: take a block away");
+    rub.onclick = () => {
+      selected = ERASER;
+      pal.querySelectorAll(".swatch").forEach((s) => s.classList.remove("sel"));
+      rub.classList.add("sel");
+      say("Rubber ready — tap a block to take it away.");
+    };
+    pal.appendChild(rub);
     app.appendChild(pal);
 
     const ctx = makeBoard(n, onTap, { numbers: nums });
@@ -1570,6 +1626,16 @@
     function onTap(x, y, cell) {
       const key = x + "," + y;
       readout.innerHTML = `<span class="coord">(${x}, ${y})</span>`;
+      if (selected === ERASER) {
+        if (grid[key]) {
+          delete grid[key]; clearCell(cell); Sound.dig();
+          say(`Cleared (${x}, ${y})`);
+        } else {
+          say(`(${x}, ${y}) is already empty`);
+        }
+        persistFree();
+        return;
+      }
       if (grid[key] === selected) {
         delete grid[key]; clearCell(cell);
         say(`Cleared (${x}, ${y})`);

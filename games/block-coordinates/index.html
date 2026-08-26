@@ -135,7 +135,6 @@
     }
     .cell.filled { background: transparent; box-shadow: none; }
     .cell.filled::after { display: none; }
-    .cell.cursor { box-shadow: inset 0 0 0 3px var(--yellow); z-index: 3; }
     /* row/column trace — teaches "across then up" */
     .cell.trace { background: rgba(255, 220, 120, 0.18); }
     .cell.target-pulse { animation: tpulse 0.7s ease-in-out 3; z-index: 4; }
@@ -390,6 +389,11 @@
     }
     .swatch.sel { border-color: var(--yellow); transform: scale(1.08); }
     .swatch .b { border-radius: 3px; }
+    .swatch.eraser {
+      background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; line-height: 1;
+    }
 
     /* --- win banner --- */
     .win-banner {
