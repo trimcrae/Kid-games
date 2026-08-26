@@ -647,3 +647,905 @@
     buildQuick();
     render();
   }
+
+  // =====================================================================
+  //  🎯 QUIZ — a real ladder, typed answers, and the working shown
+  // =====================================================================
+  const clean = x => Number(Number(x).toPrecision(12));
+
+  // ---- Level 1: the metric ladder (everything is ×10 / ×100 / ×1000) ---
+  const METRIC_STEPS = [
+    { big: "cm", small: "mm", k: 10, bigName: "centimetres", smallName: "millimetres",
+      anchor: "Look at a ruler: between each big cm line there are 10 little mm lines." },
+    { big: "m", small: "cm", k: 100, bigName: "metres", smallName: "centimetres",
+      anchor: "A metre stick is about as tall as Ellie; a centimetre is about as wide as your fingernail." },
+    { big: "m", small: "mm", k: 1000, bigName: "metres", smallName: "millimetres",
+      anchor: "A millimetre is about the thickness of a coin." },
+    { big: "km", small: "m", k: 1000, bigName: "kilometres", smallName: "metres",
+      anchor: "1 km is about two and a half laps of a running track." },
+    { big: "kg", small: "g", k: 1000, bigName: "kilograms", smallName: "grams",
+      anchor: "A bag of sugar is about 1 kg — that's 1000 g." },
+    { big: "g", small: "mg", k: 1000, bigName: "grams", smallName: "milligrams",
+      anchor: "A paperclip is about 1 g. A grain of sand is a few mg." },
+    { big: "t", small: "kg", k: 1000, bigName: "tonnes", smallName: "kilograms",
+      anchor: "A small car weighs about 1 tonne = 1000 kg." },
+    { big: "L", small: "mL", k: 1000, bigName: "litres", smallName: "millilitres",
+      anchor: "A big soda bottle is 2 L = 2000 mL. A teaspoon is 5 mL." },
+    { big: "s", small: "ms", k: 1000, bigName: "seconds", smallName: "milliseconds",
+      anchor: "A blink takes about 100 ms — a tenth of a second." }
+  ];
+
+  // ---- Level 2: the imperial family (the awkward numbers) --------------
+  const IMP_STEPS = [
+    { big: "ft", small: "in", k: 12, bigName: "feet", smallName: "inches",
+      anchor: "A school ruler is 12 inches long — exactly 1 foot." },
+    { big: "yd", small: "ft", k: 3, bigName: "yards", smallName: "feet",
+      anchor: "A yard is 3 feet — about one big step." },
+    { big: "mi", small: "ft", k: 5280, bigName: "miles", smallName: "feet",
+      anchor: "1 mile = 5280 feet. Odd number! It came from 1000 Roman double-steps." },
+    { big: "lb", small: "oz", k: 16, bigName: "pounds", smallName: "ounces",
+      anchor: "A tin of beans is about 1 lb = 16 oz." },
+    { big: "st", small: "lb", k: 14, bigName: "stone", smallName: "pounds",
+      anchor: "Brits weigh themselves in stone: 1 stone = 14 lb." },
+    { big: "gal", small: "qt", k: 4, bigName: "US gallons", smallName: "quarts",
+      anchor: "A gallon of milk splits into 4 quarts." },
+    { big: "qt", small: "pt", k: 2, bigName: "quarts", smallName: "pints",
+      anchor: "Quart is short for 'quarter of a gallon'." },
+    { big: "pt", small: "cup", k: 2, bigName: "US pints", smallName: "cups",
+      anchor: "1 US pint = 2 cups." },
+    { big: "cup", small: "fl oz", k: 8, bigName: "US cups", smallName: "fluid ounces",
+      anchor: "1 US cup = 8 fl oz — that's why measuring jugs show both." },
+    { big: "gal", small: "cup", k: 16, bigName: "US gallons", smallName: "cups",
+      anchor: "4 quarts × 2 pints × 2 cups = 16 cups in a gallon." },
+    { big: "ton", small: "lb", k: 2000, bigName: "US tons", smallName: "pounds",
+      anchor: "A US (short) ton is 2000 lb — about the weight of a small car." }
+  ];
+
+  // ---- Level 3: crossovers (1 a = k b) ---------------------------------
+  const CROSS = [
+    { a: "in", b: "cm", k: 2.54, aName: "inches", bName: "centimetres",
+      say: "1 inch = 2.54 cm exactly", anchor: "Your thumb is about 1 inch wide." },
+    { a: "ft", b: "m", k: 0.3048, aName: "feet", bName: "metres",
+      say: "1 foot = 0.3048 m exactly (so 1 m ≈ 3.28 ft)", anchor: "A door is about 2 m ≈ 6.6 ft tall." },
+    { a: "mi", b: "km", k: 1.609344, aName: "miles", bName: "kilometres",
+      say: "1 mile = 1.609 km", anchor: "A 5 km fun run is about 3.1 miles." },
+    { a: "lb", b: "kg", k: 0.45359237, aName: "pounds", bName: "kilograms",
+      say: "1 pound = 0.4536 kg (and 1 kg ≈ 2.2046 lb)", anchor: "A bag of sugar is 1 kg ≈ 2.2 lb." },
+    { a: "oz", b: "g", k: 28.349523125, aName: "ounces", bName: "grams",
+      say: "1 ounce = 28.35 g", anchor: "A slice of bread is about 1 oz." },
+    { a: "gal", b: "L", k: 3.785411784, aName: "US gallons", bName: "litres",
+      say: "1 US gallon = 3.785 L", anchor: "A big milk jug is 1 gallon ≈ 3.8 L." },
+    { a: "yd", b: "m", k: 0.9144, aName: "yards", bName: "metres",
+      say: "1 yard = 0.9144 m exactly — nearly the same as a metre!", anchor: "A yard is a metre minus about 9 cm." },
+    { a: "qt", b: "L", k: 0.946352946, aName: "US quarts", bName: "litres",
+      say: "1 US quart = 0.9464 L — almost exactly a litre", anchor: "Swap quarts for litres in a recipe and nobody notices." }
+  ];
+
+  // ---- Level 5: time ---------------------------------------------------
+  const TIME_STEPS = [
+    { big: "min", small: "s", k: 60, bigName: "minutes", smallName: "seconds",
+      anchor: "Count to 60 and a minute has gone by." },
+    { big: "hr", small: "min", k: 60, bigName: "hours", smallName: "minutes",
+      anchor: "A school lesson is often 45 min — three quarters of an hour." },
+    { big: "day", small: "hr", k: 24, bigName: "days", smallName: "hours",
+      anchor: "24 hours: the time the Earth takes to spin once." },
+    { big: "wk", small: "day", k: 7, bigName: "weeks", smallName: "days",
+      anchor: "7 days in a week — 5 school days plus the weekend." },
+    { big: "yr", small: "mo", k: 12, bigName: "years", smallName: "months",
+      anchor: "12 months in a year, one for each page of the calendar." },
+    { big: "hr", small: "s", k: 3600, bigName: "hours", smallName: "seconds",
+      anchor: "60 × 60 = 3600 seconds in an hour." },
+    { big: "day", small: "min", k: 1440, bigName: "days", smallName: "minutes",
+      anchor: "24 × 60 = 1440 minutes in a day." },
+    { big: "normal year", small: "day", k: 365, bigName: "years", smallName: "days",
+      anchor: "365 days in a normal year (366 in a leap year!)." }
+  ];
+
+  // ---- Level 6: area & volume (square/cube the factor!) ----------------
+  const SQ_STEPS = [
+    { big: "cm²", small: "mm²", k: 100, bigName: "square centimetres", smallName: "square millimetres",
+      anchor: "1 cm = 10 mm, so 1 cm² = 10 × 10 = 100 mm². Square the factor!" },
+    { big: "m²", small: "cm²", k: 10000, bigName: "square metres", smallName: "square centimetres",
+      anchor: "1 m = 100 cm, so 1 m² = 100 × 100 = 10,000 cm². Square the factor!" },
+    { big: "km²", small: "m²", k: 1000000, bigName: "square kilometres", smallName: "square metres",
+      anchor: "1 km = 1000 m, so 1 km² = 1000 × 1000 = 1,000,000 m²." },
+    { big: "ha", small: "m²", k: 10000, bigName: "hectares", smallName: "square metres",
+      anchor: "A hectare is a square 100 m on each side — about a rugby pitch." },
+    { big: "ft²", small: "in²", k: 144, bigName: "square feet", smallName: "square inches",
+      anchor: "1 ft = 12 in, so 1 ft² = 12 × 12 = 144 in²." },
+    { big: "yd²", small: "ft²", k: 9, bigName: "square yards", smallName: "square feet",
+      anchor: "1 yd = 3 ft, so 1 yd² = 3 × 3 = 9 ft²." },
+    { big: "L", small: "cm³", k: 1000, bigName: "litres", smallName: "cubic centimetres",
+      anchor: "1 mL = 1 cm³ exactly. A litre is a 10 cm cube: 10 × 10 × 10 = 1000 cm³." },
+    { big: "m³", small: "L", k: 1000, bigName: "cubic metres", smallName: "litres",
+      anchor: "A cubic metre of water is 1000 L — and it weighs a whole tonne!" },
+    { big: "m³", small: "cm³", k: 1000000, bigName: "cubic metres", smallName: "cubic centimetres",
+      anchor: "1 m = 100 cm, so 1 m³ = 100 × 100 × 100 = 1,000,000 cm³. Cube the factor!" }
+  ];
+
+  // A ladder question: "how many X in n Y?", both directions.
+  function ladderQ(s) {
+    const set = s.k >= 1000 ? [2, 3, 4, 5, 10, 1.5, 0.5] : [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 20, 25, 1.5, 2.5, 0.5];
+    const big2small = Math.random() < 0.5;
+    if (big2small) {
+      const n = pick(set);
+      const exact = clean(n * s.k);
+      return {
+        text: "How many " + s.smallName + " (" + s.small + ") are in " + fmt(n) + " " + s.big + "?",
+        unit: s.small, exact: exact, dp: decimalsOf(exact),
+        hint: "There are <b>" + fmt(s.k) + " " + s.small + " in 1 " + s.big +
+              "</b>. You're going from the BIG unit down to the small one, so you need <b>more</b> of them — <b>multiply</b>.",
+        work: fmt(n) + " " + s.big + " × " + fmt(s.k) + " = <b>" + fmt(exact) + " " + s.small + "</b>",
+        anchor: s.anchor,
+        trap: clean(n / s.k),
+        trapMsg: "You divided when you needed to multiply. Small units are tiny, so it takes <b>more</b> of them — the answer has to be <b>bigger</b> than " + fmt(n) + "."
+      };
+    }
+    const ans = pick(set);
+    const q = clean(ans * s.k);
+    return {
+      text: "How many " + s.bigName + " (" + s.big + ") are in " + fmt(q) + " " + s.small + "?",
+      unit: s.big, exact: ans, dp: decimalsOf(ans),
+      hint: "There are <b>" + fmt(s.k) + " " + s.small + " in 1 " + s.big +
+            "</b>. You're going from the small unit up to the BIG one, so you need <b>fewer</b> — <b>divide</b>.",
+      work: fmt(q) + " " + s.small + " ÷ " + fmt(s.k) + " = <b>" + fmt(ans) + " " + s.big + "</b>",
+      anchor: s.anchor,
+      trap: clean(q * s.k),
+      trapMsg: "You multiplied when you needed to divide. Big units are big, so it takes <b>fewer</b> of them — the answer has to be <b>smaller</b> than " + fmt(q) + "."
+    };
+  }
+
+  // A crossover question between the two systems.
+  function crossQ(c) {
+    const n = pick([2, 3, 4, 5, 6, 8, 10, 12, 20]);
+    const aToB = Math.random() < 0.5;
+    const exact = clean(aToB ? n * c.k : n / c.k);
+    const dp = Math.abs(exact) >= 100 ? 0 : 1;
+    const src = aToB ? c.a : c.b, dst = aToB ? c.b : c.a;
+    const dstName = aToB ? c.bName : c.aName;
+    return {
+      text: "About how many " + dstName + " (" + dst + ") is " + n + " " + src + "?",
+      sub: dp === 0 ? "round to the nearest whole number" : "round to 1 decimal place",
+      unit: dst, exact: exact, dp: dp, relTol: 0.008,
+      hint: c.say + ". Going from <b>" + src + "</b> to <b>" + dst + "</b> means " +
+            (aToB ? "<b>× " + fmt(c.k) + "</b>" : "<b>÷ " + fmt(c.k) + "</b>") + ".",
+      work: n + " " + src + (aToB ? " × " : " ÷ ") + fmt(c.k) + " = " + fmt(clean(exact)) +
+            " → <b>" + fmt(roundTo(exact, dp)) + " " + dst + "</b>",
+      anchor: c.anchor,
+      trap: clean(aToB ? n / c.k : n * c.k),
+      trapMsg: "You went the wrong way — you " + (aToB ? "divided" : "multiplied") +
+               " instead. Think about which unit is bigger first!"
+    };
+  }
+
+  // Temperature: real formulas, substituted step by step.
+  const C_VALS = [-40, -20, -10, 0, 5, 10, 15, 20, 25, 30, 35, 37, 40, 45, 100];
+  const F_VALS = [-40, 14, 32, 50, 68, 77, 86, 98.6, 104, 212];
+  function tempQ() {
+    const kind = pick(["c2f", "c2f", "f2c", "f2c", "c2k", "k2c"]);
+    if (kind === "c2f") {
+      const c = pick(C_VALS), exact = clean(c * 9 / 5 + 32);
+      return {
+        text: "It is " + c + " °C. What is that in °F?", unit: "°F",
+        exact: exact, dp: decimalsOf(exact),
+        hint: "The formula is <b>°F = °C × 9⁄5 + 32</b>. (×9⁄5 is the same as ×1.8.)",
+        work: "°F = " + c + " × 9⁄5 + 32 = " + fmt(clean(c * 9 / 5)) + " + 32 = <b>" + fmt(exact) + " °F</b>",
+        anchor: "0 °C = 32 °F (ice) and 100 °C = 212 °F (boiling) — two anchors worth remembering.",
+        trap: clean((c - 32) * 5 / 9),
+        trapMsg: "That's the <i>other</i> formula — you turned it into °C instead of °F."
+      };
+    }
+    if (kind === "f2c") {
+      const f = pick(F_VALS), raw = (f - 32) * 5 / 9;
+      const exact = clean(raw), dp = Math.abs(exact - Math.round(exact)) < 1e-9 ? 0 : 1;
+      return {
+        text: "It is " + f + " °F. What is that in °C?", unit: "°C",
+        exact: exact, dp: dp,
+        hint: "The formula is <b>°C = (°F − 32) × 5⁄9</b>. Take away 32 <i>first</i>, then multiply.",
+        work: "°C = (" + f + " − 32) × 5⁄9 = " + fmt(clean(f - 32)) + " × 5⁄9 = <b>" + fmt(roundTo(exact, dp)) + " °C</b>",
+        anchor: "A quick trick: take 30 off the °F, then halve it — close enough for the weather!",
+        trap: clean(f * 9 / 5 + 32),
+        trapMsg: "That's the <i>other</i> formula — you turned it into °F instead of °C."
+      };
+    }
+    if (kind === "c2k") {
+      const c = pick(C_VALS), exact = clean(c + 273.15);
+      return {
+        text: "It is " + c + " °C. What is that in kelvin (K)?", unit: "K",
+        exact: exact, dp: 2, tolAbs: 0.6,
+        sub: "the nearest whole number is fine",
+        hint: "Kelvin uses the same size step as Celsius, it just starts at absolute zero: <b>K = °C + 273.15</b>. No multiplying!",
+        work: "K = " + c + " + 273.15 = <b>" + fmt(exact) + " K</b>",
+        anchor: "0 K is absolute zero (−273.15 °C) — the coldest anything can ever get. Kelvin never goes negative.",
+        trap: clean(c - 273.15),
+        trapMsg: "You subtracted — that's the way <i>back</i> from kelvin to Celsius."
+      };
+    }
+    const k = pick([200, 250, 273.15, 300, 310, 373.15]), exact = clean(k - 273.15);
+    return {
+      text: "It is " + k + " K. What is that in °C?", unit: "°C",
+      exact: exact, dp: 2, tolAbs: 0.6, sub: "the nearest whole number is fine",
+      hint: "Going back from kelvin: <b>°C = K − 273.15</b>.",
+      work: "°C = " + k + " − 273.15 = <b>" + fmt(exact) + " °C</b>",
+      anchor: "Room temperature is about 293 K — you can see why we use °C every day!",
+      trap: clean(k + 273.15),
+      trapMsg: "You added instead of subtracting — kelvin numbers are always <i>bigger</i> than Celsius ones."
+    };
+  }
+
+  // ---- Level 7: two-step problems (for Shannon, and brave kids) --------
+  const MULTI = [
+    function () {
+      const n = pick([1, 1.5, 2, 2.5, 3, 4]), exact = clean(n * 236.5882365);
+      return {
+        text: "A recipe asks for " + fmt(n) + " US cups of milk, but your jug only has millilitres. How many mL?",
+        sub: "nearest whole mL", unit: "mL", exact: exact, dp: 0, tolAbs: 2,
+        hint: "Two steps: <b>1 cup = 8 fl oz</b>, and <b>1 US fl oz = 29.57 mL</b>.",
+        work: fmt(n) + " cup × 8 = " + fmt(clean(n * 8)) + " fl oz<br>" +
+              fmt(clean(n * 8)) + " fl oz × 29.5735 = <b>" + fmt(Math.round(exact)) + " mL</b>",
+        anchor: "1 US cup ≈ 237 mL — just under a quarter of a litre."
+      };
+    },
+    function () {
+      const f = pick([300, 325, 350, 375, 400, 425, 450]), exact = clean((f - 32) * 5 / 9);
+      return {
+        text: "An American recipe says bake at " + f + " °F. Your oven is in °C — what do you set it to?",
+        sub: "nearest whole °C", unit: "°C", exact: exact, dp: 0, tolAbs: 1,
+        hint: "<b>°C = (°F − 32) × 5⁄9</b>. Subtract first, then multiply.",
+        work: "(" + f + " − 32) × 5⁄9 = " + (f - 32) + " × 5⁄9 = <b>" + Math.round(exact) + " °C</b>",
+        anchor: "Ovens go in steps of 5 or 10, so cooks round: 350 °F ≈ 180 °C."
+      };
+    },
+    function () {
+      const km = pick([5, 10, 15, 21.1, 42.2]), exact = clean(km / 1.609344);
+      return {
+        text: "Shannon ran " + km + " km. Her American friend asks how many MILES that is.",
+        sub: "round to 1 decimal place", unit: "mi", exact: exact, dp: 1, relTol: 0.008,
+        hint: "<b>1 mile = 1.609 km</b>. Kilometres are smaller, so the number of miles is <b>smaller</b> — divide.",
+        work: km + " km ÷ 1.609344 = <b>" + fmt(roundTo(exact, 1)) + " miles</b>",
+        anchor: "A marathon is 42.2 km = 26.2 miles."
+      };
+    },
+    function () {
+      const kg = pick([2.5, 3, 3.5, 4, 5, 6]), exact = clean(kg / 0.45359237);
+      return {
+        text: "Baby Kieran weighs " + kg + " kg. How many POUNDS is that?",
+        sub: "round to 1 decimal place", unit: "lb", exact: exact, dp: 1, relTol: 0.008,
+        hint: "<b>1 kg ≈ 2.2046 lb</b> (because 1 lb = 0.4536 kg). Multiply by 2.2046.",
+        work: kg + " kg × 2.2046 = <b>" + fmt(roundTo(exact, 1)) + " lb</b>",
+        anchor: "A bag of sugar is 1 kg ≈ 2.2 lb — handy for guessing."
+      };
+    },
+    function () {
+      const d = pick([1, 2, 3, 5]), exact = d * 86400;
+      return {
+        text: "How many SECONDS are there in " + d + " day" + (d > 1 ? "s" : "") + "?",
+        unit: "s", exact: exact, dp: 0,
+        hint: "Three steps: days → hours (×24), hours → minutes (×60), minutes → seconds (×60).",
+        work: d + " × 24 = " + (d * 24) + " hours<br>" + (d * 24) + " × 60 = " + fmt(d * 1440) +
+              " minutes<br>" + fmt(d * 1440) + " × 60 = <b>" + fmt(exact) + " seconds</b>",
+        anchor: "One day = 86,400 seconds. Worth memorising!"
+      };
+    },
+    function () {
+      const w = pick([1, 2, 3, 4]), exact = w * 10080;
+      return {
+        text: "How many MINUTES are there in " + w + " week" + (w > 1 ? "s" : "") + "?",
+        unit: "min", exact: exact, dp: 0,
+        hint: "weeks → days (×7), days → hours (×24), hours → minutes (×60).",
+        work: w + " × 7 = " + (w * 7) + " days<br>" + (w * 7) + " × 24 = " + fmt(w * 168) +
+              " hours<br>" + fmt(w * 168) + " × 60 = <b>" + fmt(exact) + " minutes</b>",
+        anchor: "One week = 10,080 minutes."
+      };
+    },
+    function () {
+      const a = pick([3, 4, 5]), b = pick([3, 4, 5]);
+      const exact = clean(a * b / 0.09290304);
+      return {
+        text: "A room is " + a + " m × " + b + " m. How many SQUARE FEET is that?",
+        sub: "nearest whole ft²", unit: "ft²", exact: exact, dp: 0, tolAbs: 1,
+        hint: "First find the area: " + a + " × " + b + " = " + (a * b) +
+              " m². Then <b>1 m² = 10.764 ft²</b> (because 1 m = 3.28 ft, and 3.28² = 10.76).",
+        work: a + " × " + b + " = " + (a * b) + " m²<br>" + (a * b) +
+              " × 10.7639 = <b>" + Math.round(exact) + " ft²</b>",
+        anchor: "Areas square the factor: 1 m = 3.28 ft, but 1 m² = 10.76 ft²."
+      };
+    },
+    function () {
+      const r = pick([1, 2, 3, 5]), exact = clean(r * 3600 / 1000);
+      return {
+        text: "A tap drips " + r + " mL every second. How many LITRES leak in one hour?",
+        sub: "round to 1 decimal place", unit: "L", exact: exact, dp: 1,
+        hint: "Seconds → hours first (×3600), then mL → L (÷1000).",
+        work: r + " mL × 3600 = " + fmt(r * 3600) + " mL in an hour<br>" +
+              fmt(r * 3600) + " ÷ 1000 = <b>" + fmt(exact) + " L</b>",
+        anchor: "A dripping tap really can waste a bathtub of water in a week!"
+      };
+    },
+    function () {
+      const kmh = pick([36, 54, 72, 90, 108, 120]), exact = clean(kmh / 3.6);
+      return {
+        text: "A car is doing " + kmh + " km/h. How many METRES PER SECOND is that?",
+        sub: "round to 1 decimal place", unit: "m/s", exact: exact, dp: 1,
+        hint: "1 km = 1000 m and 1 hour = 3600 s, so km/h → m/s is <b>× 1000 ÷ 3600</b>, which is just <b>÷ 3.6</b>.",
+        work: kmh + " × 1000 = " + fmt(kmh * 1000) + " m per hour<br>" +
+              fmt(kmh * 1000) + " ÷ 3600 = <b>" + fmt(roundTo(exact, 1)) + " m/s</b>",
+        anchor: "Divide by 3.6 to go km/h → m/s; multiply by 3.6 to come back."
+      };
+    },
+    function () {
+      const st = pick([8, 9, 10, 11, 12]), exact = clean(st * 6.35029318);
+      return {
+        text: "Grandad weighs " + st + " stone. How many KILOGRAMS is that?",
+        sub: "round to 1 decimal place", unit: "kg", exact: exact, dp: 1, relTol: 0.008,
+        hint: "Two steps: <b>1 stone = 14 lb</b>, and <b>1 lb = 0.4536 kg</b>.",
+        work: st + " × 14 = " + (st * 14) + " lb<br>" + (st * 14) +
+              " × 0.45359 = <b>" + fmt(roundTo(exact, 1)) + " kg</b>",
+        anchor: "1 stone ≈ 6.35 kg."
+      };
+    },
+    function () {
+      const l = pick([1, 1.5, 2, 3]), exact = clean(l / 0.2365882365);
+      return {
+        text: "A " + l + " L bottle of juice — how many US CUPS will it fill?",
+        sub: "round to 1 decimal place", unit: "cups", exact: exact, dp: 1, relTol: 0.008,
+        hint: "<b>1 cup = 236.6 mL</b>, so " + l + " L = " + fmt(l * 1000) + " mL, then divide by 236.6.",
+        work: l + " L × 1000 = " + fmt(l * 1000) + " mL<br>" + fmt(l * 1000) +
+              " ÷ 236.588 = <b>" + fmt(roundTo(exact, 1)) + " cups</b>",
+        anchor: "A litre is a bit more than 4 cups."
+      };
+    }
+  ];
+
+  const LEVELS = [
+    { key: "metric", name: "1 · Metric steps", emoji: "🔟",
+      blurb: "mm → cm → m → km, g → kg, mL → L. Every step is ×10, ×100 or ×1000 — the easiest ladder there is.",
+      make: () => ladderQ(pick(METRIC_STEPS)) },
+    { key: "imperial", name: "2 · Feet & pounds", emoji: "👣",
+      blurb: "The American units that DON'T go in tens: 12 in a foot, 3 ft in a yard, 16 oz in a pound, 5280 ft in a mile.",
+      make: () => ladderQ(pick(IMP_STEPS)) },
+    { key: "cross", name: "3 · Metric ⇄ Imperial", emoji: "🔁",
+      blurb: "The crossovers worth memorising: 1 in = 2.54 cm · 1 mi ≈ 1.609 km · 1 kg ≈ 2.2 lb · 1 US gal ≈ 3.785 L.",
+      make: () => crossQ(pick(CROSS)) },
+    { key: "temp", name: "4 · Temperature", emoji: "🌡️",
+      blurb: "Temperature is the odd one out — you add and subtract as well as multiply. °F = °C × 9⁄5 + 32, and K = °C + 273.15.",
+      make: tempQ },
+    { key: "time", name: "5 · Time", emoji: "⏱️",
+      blurb: "60 seconds, 60 minutes, 24 hours, 7 days, 12 months. Nothing here is a power of ten!",
+      make: () => ladderQ(pick(TIME_STEPS)) },
+    { key: "areavol", name: "6 · Area & Volume", emoji: "🟩",
+      blurb: "The big idea: for AREA you square the factor (1 m = 100 cm, so 1 m² = 10,000 cm²) and for VOLUME you cube it.",
+      make: () => ladderQ(pick(SQ_STEPS)) },
+    { key: "multi", name: "7 · Two-step 🧠", emoji: "🧠",
+      blurb: "Grown-up level: real problems that need two or three conversions in a row — recipes, ovens, marathons, oh my.",
+      make: () => pick(MULTI)() }
+  ];
+
+  const QUIZ_KEY = "unitConverter-quiz";
+  let quiz = { stars: 0, best: 0, level: 0, unlocked: 1, lvl: {} };
+  try {
+    const s = JSON.parse(localStorage.getItem(QUIZ_KEY)) || {};
+    if (typeof s.stars === "number") quiz.stars = s.stars;
+    if (typeof s.best === "number") quiz.best = s.best;
+    if (typeof s.level === "number") quiz.level = s.level;
+    if (typeof s.unlocked === "number") quiz.unlocked = s.unlocked;
+    if (s.lvl && typeof s.lvl === "object") quiz.lvl = s.lvl;
+  } catch (e) {}
+  quiz.unlocked = Math.min(Math.max(1, quiz.unlocked | 0), LEVELS.length);
+  quiz.level = Math.min(Math.max(0, quiz.level | 0), quiz.unlocked - 1);
+
+  let quizStreak = 0;
+  let lastQText = "";
+  let current = null;
+  let usedHint = false;
+
+  function saveQuiz() {
+    try { localStorage.setItem(QUIZ_KEY, JSON.stringify(quiz)); } catch (e) {}
+  }
+  function lvlStat(key) {
+    if (!quiz.lvl[key]) quiz.lvl[key] = { c: 0, a: 0 };
+    return quiz.lvl[key];
+  }
+  function medal(key) {
+    const c = lvlStat(key).c;
+    return c >= 20 ? "🥇" : c >= 10 ? "🥈" : c >= 4 ? "🥉" : "";
+  }
+  function syncQuizScore() {
+    $("quizStars").textContent = quiz.stars;
+    $("quizBest").textContent = quiz.best;
+  }
+
+  function buildLevels() {
+    const box = $("lvls");
+    box.innerHTML = "";
+    LEVELS.forEach((L, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      const locked = i >= quiz.unlocked;
+      b.className = "lvl" + (locked ? " locked" : "");
+      b.setAttribute("aria-pressed", i === quiz.level ? "true" : "false");
+      b.innerHTML = esc(L.name) + (medal(L.key) ? ' <span class="medal">' + medal(L.key) + "</span>" : "") +
+        (locked ? " 🔒" : "");
+      b.setAttribute("aria-label", L.name + (locked ? " (locked — get 4 right on the level before)" : ""));
+      b.onclick = () => {
+        if (locked) {
+          const need = LEVELS[quiz.unlocked - 1];
+          $("lvlBlurb").innerHTML = "🔒 Get <b>4 right</b> on <b>" + esc(need.name) +
+            "</b> to unlock this one. (Grown-ups can tap <b>unlock all</b> below.)";
+          window.SFX && SFX.nope && SFX.nope();
+          return;
+        }
+        quiz.level = i; saveQuiz(); renderQuiz();
+      };
+      box.appendChild(b);
+    });
+    if (quiz.unlocked < LEVELS.length) {
+      const u = document.createElement("button");
+      u.type = "button";
+      u.className = "lvl";
+      u.textContent = "🔑 unlock all";
+      u.setAttribute("aria-label", "Grown-ups: unlock every level");
+      u.onclick = () => { quiz.unlocked = LEVELS.length; saveQuiz(); renderQuiz(); };
+      box.appendChild(u);
+    }
+  }
+
+  // Is the typed answer close enough? A correctly-rounded answer must pass.
+  function grade(q, user) {
+    if (!isFinite(user)) return "wrong";
+    const step = Math.pow(10, -(q.dp || 0));
+    const tol = Math.max(step * 0.5, Math.abs(q.exact) * (q.relTol || 0), q.tolAbs || 0) + 1e-9;
+    if (Math.abs(user - q.exact) <= tol) return "right";
+    if (q.trap != null && Math.abs(user - q.trap) <= Math.max(Math.abs(q.trap) * 0.01, tol)) return "trap";
+    const ps = [10, 100, 1000, 0.1, 0.01, 0.001];
+    for (let i = 0; i < ps.length; i++) {
+      if (Math.abs(user * ps[i] - q.exact) <= Math.max(tol, Math.abs(q.exact) * 0.01)) return "ten";
+    }
+    return "wrong";
+  }
+
+  function renderQuiz() {
+    syncQuizScore();
+    buildLevels();
+    const L = LEVELS[quiz.level];
+    const st = lvlStat(L.key);
+    $("lvlBlurb").innerHTML = esc(L.emoji) + " <b>" + esc(L.name) + "</b> — " + L.blurb +
+      " <br><span style=\"opacity:.8\">You've got <b>" + st.c + "</b> right here" +
+      (medal(L.key) ? " " + medal(L.key) : "") + ".</span>";
+    quizIdle();
+  }
+
+  function quizIdle() {
+    current = null;
+    const body = $("quizBody");
+    body.innerHTML = "";
+    const p = document.createElement("div");
+    p.className = "quiz-q";
+    p.textContent = "Ready? 🧠";
+    body.appendChild(p);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn go";
+    btn.textContent = "🎯 Ask me a question";
+    btn.onclick = askQ;
+    body.appendChild(btn);
+  }
+
+  function askQ() {
+    const L = LEVELS[quiz.level];
+    let q = null;
+    for (let i = 0; i < 25; i++) {
+      q = L.make();
+      if (q && q.text !== lastQText) break;
+    }
+    if (!q) { quizIdle(); return; }
+    lastQText = q.text;
+    current = q;
+    usedHint = false;
+
+    const body = $("quizBody");
+    body.innerHTML = "";
+
+    const qEl = document.createElement("div");
+    qEl.className = "quiz-q";
+    qEl.innerHTML = esc(q.text);
+    body.appendChild(qEl);
+
+    const sub = document.createElement("div");
+    sub.className = "quiz-sub";
+    sub.textContent = q.sub ? "✏️ " + q.sub : "✏️ type your answer, then press Check";
+    body.appendChild(sub);
+
+    const row = document.createElement("div");
+    row.className = "ans-row";
+    const inp = document.createElement("input");
+    inp.type = "text";
+    inp.id = "ansInput";
+    inp.inputMode = "decimal";
+    inp.autocomplete = "off";
+    inp.setAttribute("aria-label", "Your answer in " + q.unit);
+    inp.placeholder = "?";
+    const unit = document.createElement("span");
+    unit.className = "ans-unit";
+    unit.textContent = q.unit;
+    const go = document.createElement("button");
+    go.type = "button";
+    go.className = "btn go";
+    go.id = "ansCheck";
+    go.textContent = "Check ✔";
+    go.onclick = () => submitAnswer(inp.value);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submitAnswer(inp.value); } });
+    row.appendChild(inp); row.appendChild(unit); row.appendChild(go);
+    body.appendChild(row);
+
+    const acts = document.createElement("div");
+    acts.className = "quiz-actions";
+    const hint = document.createElement("button");
+    hint.type = "button";
+    hint.className = "btn ghost";
+    hint.id = "hintBtn";
+    hint.textContent = "🤔 How do I do it?";
+    hint.onclick = () => {
+      usedHint = true;
+      hint.disabled = true;
+      const h = document.createElement("div");
+      h.className = "quiz-feedback";
+      h.innerHTML = "💡 " + q.hint;
+      body.insertBefore(h, acts.nextSibling);
+    };
+    const skip = document.createElement("button");
+    skip.type = "button";
+    skip.className = "btn ghost";
+    skip.textContent = "🔀 Different question";
+    skip.onclick = askQ;
+    acts.appendChild(hint); acts.appendChild(skip);
+    body.appendChild(acts);
+
+    const streak = document.createElement("div");
+    streak.className = "quiz-streak";
+    streak.textContent = quizStreak >= 2 ? "🔥 Streak: " + quizStreak : "";
+    body.appendChild(streak);
+
+    try { inp.focus(); } catch (e) {}
+  }
+
+  function submitAnswer(raw) {
+    const q = current;
+    if (!q) return;
+    const txt = String(raw == null ? "" : raw).trim().replace(/,/g, "").replace(/^\+/, "");
+    if (txt === "") {
+      const inp = $("ansInput");
+      if (inp) { inp.placeholder = "type a number!"; try { inp.focus(); } catch (e) {} }
+      return;
+    }
+    const user = parseFloat(txt);
+    const verdict = grade(q, user);
+    current = null;
+
+    const L = LEVELS[quiz.level];
+    const st = lvlStat(L.key);
+    st.a++;
+
+    const body = $("quizBody");
+    const inp = $("ansInput");
+    if (inp) inp.disabled = true;
+    const chk = $("ansCheck");
+    if (chk) chk.disabled = true;
+    const hb = $("hintBtn");
+    if (hb) hb.disabled = true;
+
+    const fb = document.createElement("div");
+    fb.className = "quiz-feedback";
+    const shown = fmt(roundTo(q.exact, q.dp || 0));
+
+    if (verdict === "right") {
+      st.c++;
+      quiz.stars++;
+      quizStreak++;
+      if (quizStreak > quiz.best) quiz.best = quizStreak;
+      let cheer = usedHint ? "✅ <b>Yes — and you worked it out!</b> " : "✅ <b>Yes!</b> ";
+      if (quizStreak > 0 && quizStreak % 5 === 0) {
+        cheer = "🎉 <b>" + quizStreak + " in a row!</b> ";
+        window.SFX && SFX.win && SFX.win();
+        window.Confetti && Confetti.burst({ count: 90 });
+      } else {
+        window.SFX && SFX.good && SFX.good();
+      }
+      fb.innerHTML = cheer + "<span class=\"work\">" + q.work + "</span>" +
+        (q.anchor ? '<span class="anchor">📌 ' + esc(q.anchor) + "</span>" : "");
+      // Unlock the next rung of the ladder.
+      if (st.c >= 4 && quiz.unlocked === quiz.level + 1 && quiz.unlocked < LEVELS.length) {
+        quiz.unlocked++;
+        window.SFX && SFX.win && SFX.win();
+        window.Confetti && Confetti.burst({ count: 120 });
+        const un = document.createElement("div");
+        un.className = "quiz-feedback";
+        un.innerHTML = "🔓 <b>New level unlocked:</b> " + esc(LEVELS[quiz.unlocked - 1].name) + "!";
+        fb.appendChild(un);
+      }
+    } else {
+      quizStreak = 0;
+      window.SFX && SFX.nope && SFX.nope();
+      let lead;
+      if (verdict === "trap") {
+        lead = "🔄 <b>Right numbers, wrong direction!</b> " + q.trapMsg + " The answer is <b>" + shown + " " + esc(q.unit) + "</b>.";
+      } else if (verdict === "ten") {
+        lead = "😮 <b>So close!</b> Your digits are right but you're out by a factor of ten — check where the decimal point goes. It's <b>" + shown + " " + esc(q.unit) + "</b>.";
+      } else {
+        lead = "❌ Not quite — it's <b>" + shown + " " + esc(q.unit) + "</b>. Here's how:";
+      }
+      fb.innerHTML = lead + "<span class=\"work\">" + q.work + "</span>" +
+        "<span class=\"anchor\">💡 " + q.hint + "</span>" +
+        (q.anchor ? '<span class="anchor">📌 ' + esc(q.anchor) + "</span>" : "");
+    }
+    body.appendChild(fb);
+
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "btn next";
+    next.textContent = "Next question ▶";
+    next.onclick = askQ;
+    body.appendChild(next);
+    try { next.focus(); } catch (e) {}
+
+    saveQuiz();
+    syncQuizScore();
+    buildLevels();
+  }
+
+  function buildLadder() {
+    $("ladder").innerHTML = LEVELS.map(L =>
+      "<p><b>" + esc(L.emoji + " " + L.name) + "</b><br>" + L.blurb + "</p>").join("");
+  }
+
+  // =====================================================================
+  //  🍰 REAL LIFE — scale a recipe, and a height chart
+  // =====================================================================
+  const REAL_KEY = "unitConverter-real";
+  const RECIPES = [
+    { key: "pancakes", name: "🥞 Pancakes", base: 4, unitWord: "pancake servings", ovenF: null,
+      note: "Cook these on a hot pan — no oven needed. 🍳",
+      items: [
+        { e: "🌾", n: "plain flour",   us: { v: 1.5,  u: "cups" }, si: { v: 190, u: "g" } },
+        { e: "🥄", n: "baking powder", us: { v: 3.5,  u: "tsp"  }, si: { v: 14,  u: "g" } },
+        { e: "🧂", n: "salt",          us: { v: 1,    u: "tsp"  }, si: { v: 6,   u: "g" } },
+        { e: "🍚", n: "sugar",         us: { v: 1,    u: "tbsp" }, si: { v: 12,  u: "g" } },
+        { e: "🥛", n: "milk",          us: { v: 1.25, u: "cups" }, si: { v: 295, u: "mL" } },
+        { e: "🥚", n: "egg",           us: { v: 1,    u: "egg"  }, si: { v: 1,   u: "egg" } },
+        { e: "🧈", n: "melted butter", us: { v: 3,    u: "tbsp" }, si: { v: 43,  u: "g" } }
+      ] },
+    { key: "cookies", name: "🍪 Chocolate chip cookies", base: 24, unitWord: "cookies", ovenF: 375,
+      note: "Bake for about 10 minutes, until the edges go golden. 🍪",
+      items: [
+        { e: "🧈", n: "soft butter",     us: { v: 1,    u: "cup"  }, si: { v: 225, u: "g" } },
+        { e: "🍚", n: "sugar",           us: { v: 0.75, u: "cup"  }, si: { v: 150, u: "g" } },
+        { e: "🟤", n: "brown sugar",     us: { v: 0.75, u: "cup"  }, si: { v: 165, u: "g" } },
+        { e: "🥚", n: "eggs",            us: { v: 2,    u: "eggs" }, si: { v: 2,   u: "eggs" } },
+        { e: "🌾", n: "plain flour",     us: { v: 2.25, u: "cups" }, si: { v: 280, u: "g" } },
+        { e: "🥄", n: "baking soda",     us: { v: 1,    u: "tsp"  }, si: { v: 5,   u: "g" } },
+        { e: "🍫", n: "chocolate chips", us: { v: 2,    u: "cups" }, si: { v: 340, u: "g" } }
+      ] },
+    { key: "cocoa", name: "☕ Hot cocoa", base: 2, unitWord: "mugs", ovenF: null,
+      note: "Warm it gently — don't let it boil! ☕",
+      items: [
+        { e: "🥛", n: "milk",         us: { v: 2,    u: "cups" }, si: { v: 475, u: "mL" } },
+        { e: "🍫", n: "cocoa powder", us: { v: 2,    u: "tbsp" }, si: { v: 12,  u: "g" } },
+        { e: "🍚", n: "sugar",        us: { v: 2,    u: "tbsp" }, si: { v: 25,  u: "g" } },
+        { e: "🧂", n: "pinch of salt", us: { v: 0.125, u: "tsp" }, si: { v: 0.75, u: "g" } },
+        { e: "🍦", n: "vanilla",      us: { v: 0.5,  u: "tsp"  }, si: { v: 2.5, u: "mL" } }
+      ] }
+  ];
+
+  const FRACS = [[0.125, "⅛"], [0.25, "¼"], [1 / 3, "⅓"], [0.375, "⅜"], [0.5, "½"],
+                 [0.625, "⅝"], [2 / 3, "⅔"], [0.75, "¾"], [0.875, "⅞"]];
+
+  // Cooks write "1½ cups", not "1.5 cups".
+  function fmtCook(x) {
+    if (Math.abs(x - Math.round(x)) < 1e-9) return String(Math.round(x));
+    const whole = Math.floor(x), frac = x - whole;
+    for (let i = 0; i < FRACS.length; i++) {
+      if (Math.abs(frac - FRACS[i][0]) < 0.02) return (whole ? whole + " " : "") + FRACS[i][1];
+    }
+    return String(Math.round(x * 100) / 100);
+  }
+  function fmtMetric(x) {
+    if (x >= 100) return String(Math.round(x / 5) * 5);
+    if (x >= 10) return String(Math.round(x));
+    return String(Math.round(x * 10) / 10);
+  }
+
+  let recipeIdx = 0, serveMult = 1, sysUS = true;
+
+  function loadReal() {
+    try {
+      const s = JSON.parse(localStorage.getItem(REAL_KEY) || "{}");
+      const i = RECIPES.findIndex(r => r.key === s.recipe);
+      if (i >= 0) recipeIdx = i;
+      if (typeof s.mult === "number" && s.mult > 0) serveMult = s.mult;
+      if (typeof s.us === "boolean") sysUS = s.us;
+      if (typeof s.cm === "number" && s.cm > 0) $("htCm").value = s.cm;
+    } catch (e) {}
+  }
+  function saveReal() {
+    try {
+      localStorage.setItem(REAL_KEY, JSON.stringify({
+        recipe: RECIPES[recipeIdx].key, mult: serveMult, us: sysUS,
+        cm: parseFloat($("htCm").value) || 0
+      }));
+    } catch (e) {}
+  }
+
+  function chipRow(box, items, isOn, onPick, labeller) {
+    box.innerHTML = "";
+    items.forEach((it, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.textContent = labeller(it, i);
+      b.setAttribute("aria-pressed", isOn(it, i) ? "true" : "false");
+      b.onclick = () => { onPick(it, i); };
+      box.appendChild(b);
+    });
+  }
+
+  function renderRecipe() {
+    const r = RECIPES[recipeIdx];
+    chipRow($("recipePick"), RECIPES, (it, i) => i === recipeIdx,
+      (it, i) => { recipeIdx = i; serveMult = 1; renderRecipe(); saveReal(); },
+      it => it.name);
+
+    const mults = [0.5, 1, 2, 3];
+    chipRow($("servePick"), mults, m => Math.abs(m - serveMult) < 1e-9,
+      m => { serveMult = m; renderRecipe(); saveReal(); },
+      m => fmtCook(r.base * m) + " " + r.unitWord + (Math.abs(m - 1) < 1e-9 ? "" : " (×" + fmtCook(m) + ")"));
+
+    chipRow($("sysPick"), [true, false], v => v === sysUS,
+      v => { sysUS = v; renderRecipe(); saveReal(); },
+      v => v ? "🇺🇸 cups & spoons" : "🌍 grams & mL");
+
+    const ul = $("ings");
+    ul.innerHTML = "";
+    r.items.forEach(it => {
+      const src = sysUS ? it.us : it.si;
+      const amt = src.v * serveMult;
+      const li = document.createElement("li");
+      const txt = (sysUS ? fmtCook(amt) : fmtMetric(amt)) + " " + src.u;
+      li.innerHTML = "<span>" + it.e + " " + esc(it.n) + "</span><span class=\"amt\">" + esc(txt) + "</span>";
+      ul.appendChild(li);
+    });
+
+    const ov = $("oven");
+    if (r.ovenF) {
+      const c = (r.ovenF - 32) * 5 / 9;
+      ov.style.display = "";
+      ov.innerHTML = "🔥 <b>Oven:</b> " + r.ovenF + " °F = <b>" + Math.round(c) + " °C</b>" +
+        " (most cooks round to " + (Math.round(c / 10) * 10) + " °C).<br>" +
+        "<small>°C = (°F − 32) × 5⁄9 &nbsp;→&nbsp; (" + r.ovenF + " − 32) × 5⁄9 = " +
+        (Math.round(c * 10) / 10) + "</small><br>" + esc(r.note);
+    } else {
+      ov.style.display = "";
+      ov.innerHTML = "🍳 " + esc(r.note);
+    }
+
+    const ex = r.items[0];
+    const exSrc = sysUS ? ex.us : ex.si;
+    const m = $("recipeMethod");
+    let html = "<b>Scaling:</b> every ingredient gets multiplied by the same number. " +
+      "For <b>" + fmtCook(r.base * serveMult) + " " + esc(r.unitWord) + "</b> that's <b>×" + fmtCook(serveMult) + "</b> — " +
+      "<code>" + (sysUS ? fmtCook(ex.us.v) : fmtMetric(ex.si.v)) + " " + esc(exSrc.u) +
+      " × " + fmtCook(serveMult) + " = " +
+      (sysUS ? fmtCook(exSrc.v * serveMult) : fmtMetric(exSrc.v * serveMult)) + " " + esc(exSrc.u) + "</code>.";
+    if (sysUS) {
+      html += "<br><b>Handy:</b> 1 cup = 8 fl oz = 16 tbsp = 48 tsp ≈ 237 mL. 3 tsp = 1 tbsp.";
+    } else {
+      html += "<br><b>Handy:</b> 1000 g = 1 kg, 1000 mL = 1 L, and 1 mL of water weighs exactly 1 g.";
+    }
+    m.innerHTML = html;
+  }
+
+  // ---- Height chart ----------------------------------------------------
+  const HEIGHTS = [
+    { n: "Ellie (3)", cm: 96, e: "👧" },
+    { n: "Cory (6)", cm: 116, e: "🧒" },
+    { n: "Jeannie (7)", cm: 122, e: "👦" },
+    { n: "A door", cm: 200, e: "🚪" },
+    { n: "Basketball hoop", cm: 305, e: "🏀" },
+    { n: "A giraffe", cm: 550, e: "🦒" }
+  ];
+  let htGuard = false;
+
+  function renderHeight(from) {
+    if (htGuard) return;
+    htGuard = true;
+    try {
+      let cm;
+      if (from === "imp") {
+        const ft = parseFloat($("htFt").value) || 0;
+        const inch = parseFloat($("htIn").value) || 0;
+        cm = (ft * 12 + inch) * 2.54;
+        $("htCm").value = Math.round(cm * 10) / 10;
+      } else {
+        cm = parseFloat($("htCm").value);
+        if (!isFinite(cm) || cm < 0) cm = 0;
+        const totalIn = cm / 2.54;
+        const ft = Math.floor(totalIn / 12);
+        const inch = totalIn - ft * 12;
+        $("htFt").value = ft;
+        $("htIn").value = Math.round(inch * 10) / 10;
+      }
+
+      const totalIn = cm / 2.54;
+      const ft = Math.floor(totalIn / 12);
+      const inch = Math.round((totalIn - ft * 12) * 10) / 10;
+      $("htOut").innerHTML =
+        "<b>" + fmt(Math.round(cm * 10) / 10) + " cm</b> = <b>" + fmt(Math.round(cm) / 100) + " m</b> = <b>" +
+        ft + " ft " + inch + " in</b> = <b>" + fmt(Math.round(totalIn * 10) / 10) + " inches</b>";
+
+      const list = HEIGHTS.concat([{ n: "You", cm: cm, e: "⭐", you: 1 }])
+        .sort((a, b) => a.cm - b.cm);
+      const max = Math.max(cm, 550) * 1.05 || 1;
+      $("htBars").innerHTML = list.map(h => {
+        const pc = Math.max(1, Math.min(100, (h.cm / max) * 100));
+        const ti = h.cm / 2.54;
+        const f = Math.floor(ti / 12), i2 = Math.round(ti - f * 12);
+        return '<div class="barrow' + (h.you ? " you" : "") + '">' +
+          '<span class="lbl">' + h.e + " " + esc(h.n) + "</span>" +
+          '<span class="track"><span class="fill" style="width:' + pc.toFixed(1) + '%"></span></span>' +
+          '<span class="num">' + Math.round(h.cm) + " cm</span>" +
+          '<span class="num">' + f + "′" + i2 + "″</span></div>";
+      }).join("");
+
+      $("htMethod").innerHTML =
+        "<b>cm → inches:</b> divide by 2.54, because 1 inch = 2.54 cm. " +
+        "<code>" + fmt(Math.round(cm * 10) / 10) + " ÷ 2.54 = " + fmt(Math.round(totalIn * 10) / 10) + " in</code><br>" +
+        "<b>inches → feet:</b> divide by 12 and keep the remainder. " +
+        "<code>" + fmt(Math.round(totalIn * 10) / 10) + " ÷ 12 = " + ft + " remainder " + inch + "</code><br>" +
+        "<b>cm → m:</b> divide by 100. <code>" + fmt(Math.round(cm * 10) / 10) + " ÷ 100 = " +
+        fmt(Math.round(cm) / 100) + " m</code>";
+      saveReal();
+    } catch (e) {}
+    htGuard = false;
+  }
+
+  // =====================================================================
+  //  Tabs + boot
+  // =====================================================================
+  const TABS = [["explore", "tabExplore", "panelExplore"],
+                ["quiz", "tabQuiz", "panelQuiz"],
+                ["real", "tabReal", "panelReal"]];
+
+  function showTab(name) {
+    tab = name;
+    TABS.forEach(t => {
+      const on = t[0] === name;
+      $(t[1]).setAttribute("aria-selected", on ? "true" : "false");
+      $(t[2]).hidden = !on;
+    });
+    if (name === "quiz") renderQuiz();
+    if (name === "real") { renderRecipe(); renderHeight("cm"); }
+    saveState();
+  }
+
+  TABS.forEach(t => {
+    $(t[1]).addEventListener("click", () => {
+      window.SFX && SFX.pop && SFX.pop();
+      showTab(t[0]);
+    });
+  });
+
+  loadState();
+  loadReal();
+  $("value").addEventListener("input", render);
+  $("depthBtn").addEventListener("click", () => {
+    showAll = !showAll;
+    window.SFX && SFX.pop && SFX.pop();
+    render();
+  });
+  $("htCm").addEventListener("input", () => renderHeight("cm"));
+  $("htFt").addEventListener("input", () => renderHeight("imp"));
+  $("htIn").addEventListener("input", () => renderHeight("imp"));
+
+  renderExplore();
+  buildLadder();
+  showTab(tab);
+})();

@@ -291,6 +291,10 @@
         label: "Counting by " + step + "s — what comes next?",
         speech: "Counting by " + numWord(step) + "s. " + seq.join(", ") + ". What comes next?",
         wrong: function (v) {
+          if (seq.indexOf(parseInt(v, 10)) >= 0) {
+            return { t: v + " is already in our count — the NEXT one is " + ans + ".",
+                     s: "We already said " + v + ". The next one is " + ans };
+          }
           return { t: "Count by " + step + "s: " + seq.join(", ") + ", " + ans + ". Not " + v + ".",
                    s: "Counting by " + numWord(step) + "s, after " + seq[2] + " comes " + ans };
         },
@@ -395,7 +399,7 @@
     const now = Date.now();
     for (let i = 0; i < live.length; i++) {
       const r = live[i];
-      const xClash = left < r.left + r.size + 8 && r.left < left + size + 8;
+      const xClash = left < r.left + r.size + 14 && r.left < left + size + 14;
       if (!xClash) continue;
       if (reduceMotion) {
         if (top != null && r.top != null &&
@@ -576,7 +580,7 @@
         round.done = true;
         setsDone += 1;
         setCombo(combo + 1);
-        const bonus = 2 + Math.floor(combo / 3);
+        const bonus = 2 + Math.min(4, Math.floor(combo / 3));
         score += bonus;
         scoreEl.textContent = String(score);
         coach("🎉 " + round.need + " bubbles! You counted to " + round.need + ".", "yay");
@@ -595,7 +599,7 @@
 
     // every other level: one right bubble finishes the round
     setCombo(combo + 1);
-    let gained = 1 + Math.floor(combo / 3);
+    let gained = 1 + Math.min(4, Math.floor(combo / 3));   // capped: a long streak shouldn't run away
     if (mode.kind === "add" || mode.kind === "sub" || mode.kind === "skip") gained += 1;
     if (gold) gained *= 2;
     score += gained;
@@ -650,7 +654,8 @@
   function spawnDelay() { return Math.max(430, mode.spawn - score * 10); }
   function riseSeconds() {
     const speedUp = Math.min(1.6, score * 0.045);
-    return Math.max(3.2, mode.rise - speedUp) + Math.random() * 2.2;
+    // a narrow spread keeps bubbles in their lane instead of catching each other up
+    return Math.max(3.2, mode.rise - speedUp) + Math.random() * 1.2;
   }
   function scheduleSpawn() {
     clearTimeout(spawnTimer);

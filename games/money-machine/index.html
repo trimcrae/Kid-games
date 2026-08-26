@@ -131,8 +131,10 @@
     .chart {
       display: flex;
       align-items: flex-end;
-      gap: 3px;
+      gap: 2px;
       height: 150px;
+      overflow-x: auto;   /* 60 bars on a 390px phone: scroll HERE, never the page */
+      overflow-y: hidden;
     }
     .chart-empty {
       width: 100%;
@@ -144,7 +146,7 @@
     }
     .bar {
       flex: 1 1 0;
-      min-width: 4px;
+      min-width: 3px;
       max-width: 46px;
       margin: 0 auto;
       display: flex;
@@ -506,7 +508,7 @@
     .choice-btn.right { border-color: var(--green); background: #e9fff2; }
     .choice-btn.wrong { border-color: var(--pink); background: #fff0f5; }
     .choice-btn:disabled { cursor: default; }
-    .choice-btn.has-coin { flex-direction: column; gap: 0.25rem; min-height: 96px; }
+    .choice-btn.has-coin { flex-direction: column; gap: 0.3rem; min-height: 110px; padding-top: 0.7rem; }
     .choice-btn .ctext { font-size: 0.95rem; }
 
     /* ---- build tray + palette ---- */
@@ -548,7 +550,7 @@
     .btn-skip  { background: #b9b3cc; }
 
     .cs-feedback {
-      margin-top: 0.7rem; padding: 0 0.2rem;
+      margin: 0.7rem 0 0; padding: 0 0.2rem;
       font-size: 0.98rem; line-height: 1.45; min-height: 1.4em;
     }
     .cs-feedback.good { color: #17754a; }

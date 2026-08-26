@@ -141,9 +141,10 @@
 
   const ZOOM_KEY = "family-tree.zoom";
   let zoom = 1;
+  let zoomChosen = false;   // true once someone has used ➕ / ➖ themselves
   try {
     const z = parseFloat(localStorage.getItem(ZOOM_KEY));
-    if (z >= 0.4 && z <= 1.5) zoom = z;
+    if (z >= 0.4 && z <= 1.5) { zoom = z; zoomChosen = true; }
   } catch (e) { /* fine */ }
 
   const P = () => state.people;
@@ -1434,8 +1435,22 @@
 
   function setZoom(z) {
     zoom = Math.min(1.5, Math.max(0.4, Math.round(z * 100) / 100));
+    zoomChosen = true;
     try { localStorage.setItem(ZOOM_KEY, String(zoom)); } catch (e) { /* fine */ }
     render();
+  }
+
+  // On a phone the tree is usually wider than the screen, so until someone
+  // picks a zoom themselves we shrink it just enough to see the whole family.
+  function fitZoom() {
+    if (zoomChosen) return false;
+    const w = computeLayout().width;
+    const avail = viewport.clientWidth - 10;
+    if (!(w > 0) || !(avail > 0)) return false;
+    const z = Math.min(1, Math.max(0.65, Math.round((avail / w) * 100) / 100));
+    if (Math.abs(z - zoom) < 0.02) return false;
+    zoom = z;
+    return true;
   }
   document.getElementById("zoom-in").addEventListener("click", () => setZoom(zoom + 0.15));
   document.getElementById("zoom-out").addEventListener("click", () => setZoom(zoom - 0.15));
@@ -1631,11 +1646,21 @@
     CW = smallScreen.matches ? 96 : 112;
     CH = smallScreen.matches ? 118 : 128;
   }
-  const onScreenChange = () => { applyCardSize(); render(); };
+  const onScreenChange = () => { applyCardSize(); fitZoom(); render(); centerView(); };
   if (smallScreen.addEventListener) smallScreen.addEventListener("change", onScreenChange);
   else if (smallScreen.addListener) smallScreen.addListener(onScreenChange);
   applyCardSize();
 
+  // Re-fit when the window changes shape (rotate a tablet, resize a laptop).
+  let resizeTimer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (fitZoom()) { render(); centerView(); }
+    }, 200);
+  });
+
+  fitZoom();
   render();
   centerView();
 })();

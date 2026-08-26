@@ -202,11 +202,14 @@
     /* dots mode: real dice patterns, so 5 can be SEEN without counting */
     .ball.dots {
       display: grid;
+      align-items: stretch;   /* .ball centres its text; pips must fill their cell */
+      justify-items: stretch;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
       padding: 17%;
       gap: 5%;
     }
+    .ball.dots::after { display: none; }   /* the gloss would sit right on a pip */
     .ball.dots .pip {
       border-radius: 50%;
       background: #23193d;

@@ -275,6 +275,11 @@
     colorRow.classList.toggle("answering", det);
     updateHow();
     if (det) {
+      // no colour is "chosen" in Detective mode — the bar is the answer bar
+      [].forEach.call(colorRow.children, function (b) {
+        b.classList.remove("selected");
+        b.setAttribute("aria-pressed", "false");
+      });
       syncTiers();
       nextDetective();
     } else {
@@ -1186,7 +1191,13 @@
   detPanel.hidden = activeMode !== "detective";
   colorRow.classList.toggle("answering", activeMode === "detective");
   updateHow();
-  if (activeMode === "detective") nextDetective();
+  if (activeMode === "detective") {
+    [].forEach.call(colorRow.children, function (b) {
+      b.classList.remove("selected");
+      b.setAttribute("aria-pressed", "false");
+    });
+    nextDetective();
+  }
 
   if (updateCount() === 0) {
     flashHint("Your grid is empty — pick a colour and type your first word! 🎨", false);

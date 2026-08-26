@@ -356,7 +356,8 @@
     const move = moves.join(" and ");
     const swapped = guess.x === target.y && guess.y === target.x && target.x !== target.y;
     const head = swapped
-      ? `<b>You swapped them!</b> ${names[0]} always comes first.`
+      ? `<b>You swapped them!</b> That square is ${coordChip(guess.x, guess.y, "bad")} —
+         ${names[0]} always comes first.`
       : `That square is ${coordChip(guess.x, guess.y, "bad")}.`;
     return `
       <div class="ex-line">${head}</div>

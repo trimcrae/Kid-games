@@ -338,23 +338,27 @@
       color: var(--purple);
       overflow-wrap: anywhere;
     }
+    /* The coloured chip is painted with a box-shadow ring rather than
+       padding, so a highlighted word never shoves the comma or the
+       quote mark next to it out of place. */
     .ml-fill {
       font-weight: bold;
-      padding: 0.05em 0.3em;
-      border-radius: 8px;
+      padding: 0;
+      border-radius: 5px;
       cursor: pointer;
+      box-shadow: 0 0 0 3px var(--fill-bg, transparent);
       transition: opacity 0.2s ease, box-shadow 0.2s ease;
     }
-    .ml-fill.dim { opacity: 0.28; }
+    .ml-fill.dim { opacity: 0.3; }
     .ml-fill.lit { box-shadow: 0 0 0 3px currentColor; }
 
-    .pos-noun  { color: var(--noun-ink);  background: var(--noun-bg); }
-    .pos-verb  { color: var(--verb-ink);  background: var(--verb-bg); }
-    .pos-adj   { color: var(--adj-ink);   background: var(--adj-bg); }
-    .pos-adv   { color: var(--adv-ink);   background: var(--adv-bg); }
-    .pos-num   { color: var(--num-ink);   background: var(--num-bg); }
-    .pos-excl  { color: var(--excl-ink);  background: var(--excl-bg); }
-    .pos-silly { color: var(--silly-ink); background: var(--silly-bg); }
+    .pos-noun  { color: var(--noun-ink);  background: var(--noun-bg);  --fill-bg: var(--noun-bg); }
+    .pos-verb  { color: var(--verb-ink);  background: var(--verb-bg);  --fill-bg: var(--verb-bg); }
+    .pos-adj   { color: var(--adj-ink);   background: var(--adj-bg);   --fill-bg: var(--adj-bg); }
+    .pos-adv   { color: var(--adv-ink);   background: var(--adv-bg);   --fill-bg: var(--adv-bg); }
+    .pos-num   { color: var(--num-ink);   background: var(--num-bg);   --fill-bg: var(--num-bg); }
+    .pos-excl  { color: var(--excl-ink);  background: var(--excl-bg);  --fill-bg: var(--excl-bg); }
+    .pos-silly { color: var(--silly-ink); background: var(--silly-bg); --fill-bg: var(--silly-bg); }
 
     /* the word currently being read aloud lights up */
     .ml-w { border-radius: 6px; transition: background 0.12s ease; }

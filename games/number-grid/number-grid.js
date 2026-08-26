@@ -334,6 +334,10 @@
     var p = packById(activePack);
     packsSummary.innerHTML = '<span aria-hidden="true">🎒</span> Word pack: <b>' +
       escapeHtml(p.label) + "</b> " + p.emoji;
+    // say up front which words the button will pour in
+    starterBtn.textContent = activePack === "all"
+      ? "Load starter words ✨"
+      : "Load " + p.label + " words " + p.emoji;
   }
   function setPack(id) {
     activePack = id;
@@ -771,15 +775,18 @@
         placeWord(word, letters[Math.floor(letters.length / 2)], activeGuess);
       } else {
         showChooser(word, letters);
+        return "chooser";   // the chooser owns the focus now — don't steal it back
       }
     }
   }
 
   // File `word` into the row for `letter`. The COLUMN is never a choice —
   // it's however many letters the word really has. Pass guess = null to
-  // file a word without it counting as a guess (the Quick Count rounds do
-  // their own scoring).
+  // file a word quietly, without it counting as a guess and without
+  // touching the count-out strip (the Quick Count rounds do their own
+  // scoring and write their own explanation).
   function placeWord(word, letter, guess) {
+    var quiet = guess === null;
     var letters = lettersOf(word);
     var len = letters.length;
     var num = columnFor(len);
@@ -798,21 +805,23 @@
     var total = updateCount();
     renderStatsPanel();
 
-    var verdict = guess === null ? null : explainGuess(word, guess);
-    if (guess !== null && !exists) bumpScore(verdict.right);
+    var verdict = quiet ? null : explainGuess(word, guess);
+    if (verdict && !exists) bumpScore(verdict.right);
 
     var how = activeVariant === "end" ? "ends in " + letter
       : activeVariant === "middle" ? "counts as " + letter
       : "starts with " + letter;
 
-    if (exists) {
+    if (quiet) {
+      // filed by a Quick Count win — that round writes its own explanation
+    } else if (exists) {
       // Already in this square — say so instead of quietly scoring it again.
       showCountout([word],
         "🔁 <b>" + escapeHtml(word) + "</b> is already in row <b>" + letter +
         "</b>, column <b>" + labelFor(num) + "</b>. Try a different word!", "wrong");
       flashHint('"' + word + '" is already in your grid — try another! 🔁', false);
       window.SFX && SFX.nope();
-    } else if (verdict) {
+    } else {
       showCountout([word], verdict.html + '<br><span style="font-weight:normal">It ' + how +
         ", so it lands in row <b>" + letter + "</b>.</span>",
         verdict.right ? "right" : "wrong");
@@ -821,10 +830,6 @@
         : '"' + word + '" really has ' + len + " " + plural(len) + " — into the " +
           labelFor(num) + " column it goes!", false);
       window.SFX && (verdict.right ? SFX.coin() : SFX.good());
-    } else {
-      showCountout([word],
-        "✅ <b>" + escapeHtml(word) + "</b> " + how + " and has <b>" + len + "</b> " +
-        plural(len) + " — into row <b>" + letter + "</b> it goes!", "right");
     }
 
     var td = document.getElementById("c-" + letter + "-" + num);
@@ -835,7 +840,7 @@
       revealCell(td);
     }
 
-    input.value = "";
+    if (!quiet) input.value = "";
 
     // did that finish the quest? (any NEW word in the quest square counts)
     if (!exists && quest && quest.letter === letter && quest.num === num) {
@@ -1088,7 +1093,8 @@
         var b = document.createElement("button");
         b.type = "button";
         b.className = "qword-btn";
-        b.style.setProperty("--wc", LENGTHS[(i * 4 + 3) % LENGTHS.length].hex);
+        // neutral colours — a green button would look like "this one's right"
+        b.style.setProperty("--wc", i === 0 ? "#8331ad" : "#1e6fd9");
         b.textContent = word.toUpperCase();
         b.dataset.value = word;
         b.addEventListener("click", function () { answerQuiz(word, b); });
@@ -1159,16 +1165,16 @@
         Math.max.apply(null, lens) + "</b> letters and the other is <b>" +
         Math.min.apply(null, lens) + "</b>.";
     }
-    showCountout(showWords, why, right ? "right" : "wrong");
-
-    // a right answer files the word(s) into the grid — the grid grows either way you play
+    // A right answer files the word(s) into the grid, so the grid grows
+    // whichever way you play. File FIRST, then write the explanation — the
+    // quiet filing must not overwrite the count-out we're about to show.
     if (right) {
       showWords.forEach(function (w) {
-        var letters = lettersOf(w);
-        if (!letters.length) return;
+        if (!lenOf(w)) return;
         placeWord(w, starterLetter(w), null);
       });
     }
+    showCountout(showWords, why, right ? "right" : "wrong");
     renderStreakLine(right ? "✅ Right!" : "Try the next one");
 
     // a clear way forward, plus a gentle auto-advance when they got it right
@@ -1313,7 +1319,7 @@
     renderStatsPanel();
     initQuest(); // the starter words may have filled the quest square
     flashHint(added
-      ? "Loaded " + added + " " + packById(pack).label.toLowerCase() +
+      ? "Loaded " + added + (pack === "all" ? " starter" : " " + packById(pack).label) +
         " words — add your own too! ✨"
       : "Those words are all in your grid already — try another pack! 🎒", false);
   });
@@ -1332,8 +1338,7 @@
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    addWord(input.value);
-    input.focus();
+    if (addWord(input.value) !== "chooser") input.focus();
   });
 
   /* ---------- "only rows with words" ---------- */

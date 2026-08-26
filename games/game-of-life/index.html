@@ -379,6 +379,8 @@
       transition: background 0.12s ease;
     }
     .pcell[aria-pressed="true"] { background: var(--green); border-color: #26b768; }
+    .pcell.was { border-style: dashed; border-color: var(--yellow); }
+    .pcell.was[aria-pressed="true"] { border-color: #ffd166; }
     .pcell.right { box-shadow: 0 0 0 3px var(--green) inset; }
     .pcell.wrong { box-shadow: 0 0 0 3px #ff3b6b inset; }
     .pcell:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
@@ -532,10 +534,10 @@
         <div id="pboard" class="pboard" role="group" aria-label="Prediction board — tap squares to mark which cells will be alive next generation"></div>
         <div class="predict-side">
           <div class="chip-row">
-            <button id="checkBtn" class="chip" aria-pressed="false">✅ Check my answer</button>
-            <button id="newPuzzleBtn" class="chip" aria-pressed="false">🎲 New puzzle</button>
-            <button id="showBtn" class="chip" aria-pressed="false">👀 Show me</button>
-            <button id="resetPredBtn" class="chip" aria-pressed="false">↩️ Start over</button>
+            <button id="checkBtn" class="chip">✅ Check my answer</button>
+            <button id="newPuzzleBtn" class="chip">🎲 New puzzle</button>
+            <button id="showBtn" class="chip">👀 Show me</button>
+            <button id="resetPredBtn" class="chip">↩️ Start over</button>
           </div>
           <p class="predict-result" id="predResult" role="status" aria-live="polite"></p>
           <p class="streak-line">🔥 Streak: <b id="predStreak">0</b> &nbsp;•&nbsp; 🏆 Best: <b id="predBest">0</b></p>

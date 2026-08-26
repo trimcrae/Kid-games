@@ -815,7 +815,7 @@
         var b = document.createElement("button");
         b.type = "button";
         b.className = "choice-btn" + (c.coin ? " has-coin" : "");
-        b.innerHTML = (c.coin ? coinHTML(c.coin, 0.85) : "") +
+        b.innerHTML = (c.coin ? coinHTML(c.coin, 1) : "") +
           '<span class="ctext">' + c.label + "</span>";
         b.setAttribute("aria-label", (i + 1) + ". " + (c.coin ? label(c.coin) : c.label));
         b.addEventListener("click", function () { answerChoice(c.value, b); });

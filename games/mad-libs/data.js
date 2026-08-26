@@ -62,13 +62,13 @@ const MADLIB_POS = {
 
 /* The legend under a finished story: one row per part of speech. */
 const MADLIB_POS_INFO = [
-  { pos: "noun",        cls: "pos-noun",  label: "Noun",        what: "a person, place or thing" },
-  { pos: "verb",        cls: "pos-verb",  label: "Verb",        what: "a doing word" },
-  { pos: "adjective",   cls: "pos-adj",   label: "Adjective",   what: "a describing word" },
-  { pos: "adverb",      cls: "pos-adv",   label: "Adverb",      what: "tells HOW you do it" },
-  { pos: "number",      cls: "pos-num",   label: "Number",      what: "how many" },
-  { pos: "exclamation", cls: "pos-excl",  label: "Exclamation", what: "a word you shout" },
-  { pos: "silly word",  cls: "pos-silly", label: "Silly word",  what: "a word you made up" }
+  { pos: "noun",        cls: "pos-noun",  label: "Noun",        what: "a naming word for a person, a place or a thing" },
+  { pos: "verb",        cls: "pos-verb",  label: "Verb",        what: "a doing word — something you can act out" },
+  { pos: "adjective",   cls: "pos-adj",   label: "Adjective",   what: "a describing word — it tells what something is like" },
+  { pos: "adverb",      cls: "pos-adv",   label: "Adverb",      what: "a word that tells HOW something is done" },
+  { pos: "number",      cls: "pos-num",   label: "Number",      what: "a counting word — it tells how many" },
+  { pos: "exclamation", cls: "pos-excl",  label: "Exclamation", what: "a word you shout when you are surprised" },
+  { pos: "silly word",  cls: "pos-silly", label: "Silly word",  what: "a word nobody had invented until you did" }
 ];
 
 /* Live "you got it!" coaching while a kid types. Never blocks anything —

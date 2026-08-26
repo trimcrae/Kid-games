@@ -339,7 +339,9 @@
     const p = population();
     popCountEl.textContent = p;
     // A gentle nudge when every last cell has died out.
-    worldMsg.hidden = !(p === 0 && state.generation > 0);
+    const empty = p === 0 && state.generation > 0;
+    if (empty) worldMsg.textContent = "🌙 The world went quiet… stamp a creature or press 🎲 Random!";
+    worldMsg.hidden = !empty;
   }
 
   /* ---------- painting & stamping ---------- */
@@ -1141,19 +1143,189 @@
     badgeCount.textContent = "— " + n + " of " + BADGES.length + " earned";
   }
 
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3400);
+  }
+
+  function party(count) {
+    if (REDUCE) return;   // respect "reduce motion"
+    window.Confetti && Confetti.burst && Confetti.burst({ count: count || 70 });
+  }
+
   function award(key) {
     if (state.badges[key]) return;
     state.badges[key] = true;
     const b = BADGES.find((x) => x.key === key);
-    toastEl.textContent = "🏅 Discovery! " + b.emoji + " " + b.name;
-    toastEl.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 3400);
+    toast("🏅 Discovery! " + b.emoji + " " + b.name);
     window.SFX && SFX.win && SFX.win();
-    window.Confetti && Confetti.burst && Confetti.burst({ count: 70 });
+    party(70);
     refreshBadges();
     scheduleSave();
   }
+
+  /* ================= 🔮 PREDICT THE NEXT GENERATION =================
+     The heart of the learning. We show a small world, the player marks
+     which squares they think will be alive next turn, and the game marks
+     it — showing the neighbour count on every square they got wrong.
+     Puzzles always run Conway's original B3/S23 so the lesson is stable
+     even when the Rule Lab is set to something silly. */
+  const PSIZE = 7;
+  const P_BIRTH = new Array(9).fill(false); P_BIRTH[3] = true;
+  const P_SURV  = new Array(9).fill(false); P_SURV[2] = P_SURV[3] = true;
+
+  const PUZZLE_SEEDS = [
+    ["OOO"],
+    ["OO", "OO"],
+    [".O.", "O.O", ".O."],
+    ["OO.", "O.O", ".O."],
+    [".O.", "..O", "OOO"],
+    ["OO.", ".OO"],
+    [".OOO", "OOO."],
+    ["O.O", ".O.", "O.O"],
+    ["OOO", ".O."],
+    ["O..", ".O.", "..O"],
+    ["OO", "O.", "O."],
+    [".OO.", "O..O", ".OO."],
+  ];
+
+  const pboardEl = $("pboard");
+  const predResult = $("predResult");
+  const predStreakEl = $("predStreak");
+  const predBestEl = $("predBest");
+  let predBoard = new Uint8Array(PSIZE * PSIZE);   // the generation shown
+  let predGuess = new Uint8Array(PSIZE * PSIZE);   // what the player says
+  let predAnswer = new Uint8Array(PSIZE * PSIZE);  // the truth
+  let predChecked = false, predRevealed = false;
+  const pcells = [];
+
+  pboardEl.style.gridTemplateColumns = "repeat(" + PSIZE + ", 1fr)";
+  for (let i = 0; i < PSIZE * PSIZE; i++) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pcell";
+    b.dataset.i = i;
+    b.addEventListener("click", () => {
+      predGuess[i] = predGuess[i] ? 0 : 1;
+      predChecked = false;
+      predRevealed = false;
+      predResult.textContent = "";
+      predResult.className = "predict-result";
+      renderPBoard();
+      window.SFX && SFX.pop && SFX.pop();
+    });
+    pcells.push(b);
+    pboardEl.appendChild(b);
+  }
+
+  function renderPBoard() {
+    for (let i = 0; i < pcells.length; i++) {
+      const b = pcells[i];
+      const x = i % PSIZE, y = (i / PSIZE) | 0;
+      const wasAlive = !!predBoard[i];
+      const right = predGuess[i] === predAnswer[i];
+      b.className = "pcell" + (wasAlive ? " was" : "") +
+                    (predChecked ? (right ? " right" : " wrong") : "");
+      b.setAttribute("aria-pressed", String(!!predGuess[i]));
+      if (predChecked && !right) {
+        b.textContent = String(countNeighbours(predBoard, PSIZE, PSIZE, x, y, false));
+      } else {
+        b.textContent = "";
+      }
+      b.setAttribute("aria-label",
+        "Row " + (y + 1) + " column " + (x + 1) + ", " +
+        (wasAlive ? "alive now" : "empty now") + ", " +
+        (predGuess[i] ? "you predict alive" : "you predict empty") +
+        (predChecked ? (right ? ", correct" : ", wrong") : ""));
+    }
+  }
+
+  function newPuzzle() {
+    predBoard = new Uint8Array(PSIZE * PSIZE);
+    const seed = PUZZLE_SEEDS[Math.floor(Math.random() * PUZZLE_SEEDS.length)];
+    const h = seed.length, w = seed[0].length;
+    const ox = 1 + Math.floor(Math.random() * Math.max(1, PSIZE - 1 - w));
+    const oy = 1 + Math.floor(Math.random() * Math.max(1, PSIZE - 1 - h));
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (seed[y][x] === "O") predBoard[(oy + y) * PSIZE + (ox + x)] = 1;
+      }
+    }
+    // once you're on a roll, sprinkle a couple of extra cells to think about
+    if (state.predStreak >= 2) {
+      for (let k = 0; k < 2; k++) {
+        const x = 1 + Math.floor(Math.random() * (PSIZE - 2));
+        const y = 1 + Math.floor(Math.random() * (PSIZE - 2));
+        predBoard[y * PSIZE + x] = 1;
+      }
+    }
+    predAnswer = stepBoard(predBoard, PSIZE, PSIZE, P_BIRTH, P_SURV, false);
+    predGuess = predBoard.slice();     // start from "nothing changes"
+    predChecked = false;
+    predRevealed = false;
+    predResult.textContent = "Yellow dashed squares are alive right now. Tap to show what's alive NEXT turn.";
+    predResult.className = "predict-result";
+    renderPBoard();
+  }
+
+  function checkPuzzle() {
+    let right = 0;
+    for (let i = 0; i < predAnswer.length; i++) if (predGuess[i] === predAnswer[i]) right++;
+    predChecked = true;
+    const total = predAnswer.length;
+    const perfect = right === total;
+    if (perfect && !predRevealed) {
+      state.predStreak++;
+      if (state.predStreak > state.predBest) state.predBest = state.predStreak;
+      predResult.textContent = "🎉 Perfect! All " + total + " squares right. Streak " + state.predStreak + "!";
+      predResult.className = "predict-result good";
+      window.SFX && SFX.win && SFX.win();
+      party(60);
+      if (state.predStreak >= 3) award("seer");
+    } else if (perfect) {
+      predResult.textContent = "👀 That's the right answer — now try the next one without peeking!";
+      predResult.className = "predict-result good";
+    } else {
+      state.predStreak = 0;
+      const wrong = total - right;
+      predResult.textContent = "You got " + right + " of " + total + " right. The " + wrong +
+        " red square" + (wrong === 1 ? "" : "s") + " show" + (wrong === 1 ? "s" : "") +
+        " their neighbour count — check each one against the rule: born on 3, survive on 2 or 3.";
+      predResult.className = "predict-result bad";
+      window.SFX && SFX.nope && SFX.nope();
+    }
+    renderPBoard();
+    refreshPredStats();
+    scheduleSave();
+  }
+
+  function refreshPredStats() {
+    predStreakEl.textContent = state.predStreak;
+    predBestEl.textContent = state.predBest;
+  }
+
+  $("newPuzzleBtn").addEventListener("click", () => { newPuzzle(); refreshPredStats(); });
+  $("checkBtn").addEventListener("click", checkPuzzle);
+  $("resetPredBtn").addEventListener("click", () => {
+    predGuess = predBoard.slice();
+    predChecked = false;
+    predResult.textContent = "Back to the start — every square set to how it looks right now.";
+    predResult.className = "predict-result";
+    renderPBoard();
+  });
+  $("showBtn").addEventListener("click", () => {
+    predGuess = predAnswer.slice();
+    predChecked = true;
+    predRevealed = true;
+    state.predStreak = 0;
+    predResult.textContent = "👀 Here's the answer. Look at each square that changed and count its neighbours — that's the whole secret.";
+    predResult.className = "predict-result";
+    renderPBoard();
+    refreshPredStats();
+    scheduleSave();
+  });
 
   /* ---------- save / load ---------- */
   let saveTimer = null;
@@ -1168,6 +1340,8 @@
       for (let i = 0; i < state.cells.length; i++) if (state.cells[i]) live.push(i);
       localStorage.setItem(STORE_KEY, JSON.stringify({
         sizeKey: state.sizeKey,
+        cols: state.cols,
+        rows: state.rows,
         live,
         birth: state.birth,
         survive: state.survive,
@@ -1176,6 +1350,12 @@
         generation: state.generation,
         badges: state.badges,
         stampsUsed: state.stampsUsed,
+        brush: state.brush,
+        rot: state.rot,
+        myPatterns: state.myPatterns,
+        inspected: state.inspected,
+        predStreak: state.predStreak,
+        predBest: state.predBest,
       }));
     } catch (e) { /* storage full or blocked — no problem */ }
   }
@@ -1188,12 +1368,19 @@
       if (!d || !SIZES[d.sizeKey] || !Array.isArray(d.live)) return false;
       state.sizeKey = d.sizeKey;
       allocate(SIZES[d.sizeKey].cols, SIZES[d.sizeKey].rows, false);
-      d.live.forEach((i) => {
-        if (i >= 0 && i < state.cells.length) {
-          state.cells[i] = 1;
-          state.age[i] = 1;
-        }
-      });
+      // Only trust the saved cell list if it was written for this exact
+      // grid — otherwise the indices would land in the wrong squares.
+      const gridMatches = (d.cols === undefined && d.rows === undefined) ||
+        (d.cols === state.cols && d.rows === state.rows);
+      if (gridMatches) {
+        d.live.forEach((i) => {
+          if (i >= 0 && i < state.cells.length) {
+            state.cells[i] = 1;
+            state.age[i] = 1;
+            state.energy[i] = 1;
+          }
+        });
+      }
       if (Array.isArray(d.birth) && d.birth.length === 9)
         d.birth.forEach((v, i) => (state.birth[i] = !!v));
       if (Array.isArray(d.survive) && d.survive.length === 9)
@@ -1203,6 +1390,21 @@
       state.generation = Number(d.generation) || 0;
       if (d.badges && typeof d.badges === "object") state.badges = Object.assign({}, d.badges);
       if (d.stampsUsed && typeof d.stampsUsed === "object") state.stampsUsed = Object.assign({}, d.stampsUsed);
+      if (d.inspected && typeof d.inspected === "object") state.inspected = Object.assign({}, d.inspected);
+      if (Array.isArray(d.myPatterns)) {
+        state.myPatterns = d.myPatterns.filter((m) =>
+          m && typeof m.id === "string" && typeof m.name === "string" &&
+          Array.isArray(m.cells) && m.cells.length && m.cells.every((r) => typeof r === "string")
+        ).slice(0, 8);
+      }
+      state.rot = Math.max(0, Math.min(3, Number(d.rot) || 0));
+      if (typeof d.brush === "string" &&
+          (PATTERNS.some((p) => p.key === d.brush) ||
+           state.myPatterns.some((m) => "my:" + m.id === d.brush))) {
+        state.brush = d.brush;
+      }
+      state.predStreak = Math.max(0, Number(d.predStreak) || 0);
+      state.predBest = Math.max(0, Number(d.predBest) || 0);
       return true;
     } catch (e) {
       return false;
@@ -1216,6 +1418,9 @@
   /* ---------- boot ---------- */
   const restored = load();
   if (!restored) {
+    // Phones get the Tiny world by default: 24 columns means fat, juicy
+    // squares you can actually hit with a three-year-old's finger.
+    state.sizeKey = (window.innerWidth || 1024) < 560 ? "tiny" : "medium";
     allocate(SIZES[state.sizeKey].cols, SIZES[state.sizeKey].rows, false);
     seedShowcase();
   }
@@ -1225,14 +1430,25 @@
   refreshRuleUI();
   refreshSizeUI();
   refreshBadges();
+  refreshMineRow();
+  refreshBrushInfo();
+  refreshPredStats();
+  newPuzzle();
   resizeCanvas();
   updateStats();
-  setPlaying(true);
+  pushPop(population());
+  // A world you came back to stays PAUSED so your drawing is still there
+  // when you look at it; a brand-new showcase world plays straight away.
+  setPlaying(!restored);
+  if (restored) {
+    worldMsg.hidden = false;
+    worldMsg.textContent = "👋 Welcome back — your world is exactly where you left it. Press ▶️ Play!";
+  }
 
   if (window.ResizeObserver) {
-    new ResizeObserver(() => resizeCanvas()).observe(canvas.parentElement);
+    new ResizeObserver(() => { resizeCanvas(); resizeGraph(); }).observe(canvas.parentElement);
   } else {
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", () => { resizeCanvas(); resizeGraph(); });
   }
 
   requestAnimationFrame((t) => { lastT = t; requestAnimationFrame(frame); });

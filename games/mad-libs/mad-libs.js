@@ -560,13 +560,15 @@
       chip.innerHTML = '<span class="dot" aria-hidden="true"></span>' +
                        escapeHtml(row.label) + ' <b>×' + counts[row.pos] + "</b>";
       chip.setAttribute("aria-label",
-        row.label + ", " + row.what + ". You used " + counts[row.pos] + ". Tap to light them up.");
+        row.label + " — " + row.what + ". You used " + counts[row.pos] +
+        ". Tap to light them up in the story.");
       chip.addEventListener("click", function () {
         const already = el.storyBox.dataset.focus === row.pos;
         setFocus(already ? "" : row.pos);
-        el.posNote.textContent = already ? ""
-          : "✨ A " + row.label.toLowerCase() + " is " + row.what + ". Yours: " +
-            words[row.pos].join(", ") + ".";
+        el.posNote.textContent = already
+          ? "Tap any coloured word (or a colour below) to see what it is!"
+          : "✨ " + upperFirst(articleFor(row.pos)) + " " + row.pos + " is " + row.what +
+            ". Yours: " + words[row.pos].join(", ") + ".";
       });
       el.legend.appendChild(chip);
     });
@@ -618,8 +620,8 @@
     const type = fill.dataset.type;
     const hint = (typeof MADLIB_HINTS !== "undefined" && MADLIB_HINTS[type]) || "";
     setFocus(pos);
-    el.posNote.textContent = "“" + fill.textContent.trim() + "” is a " + pos +
-      (hint ? " — " + hint : ".");
+    el.posNote.textContent = "“" + fill.textContent.trim() + "” is " + articleFor(pos) +
+      " " + pos + (hint ? " — " + hint : ".");
   }
 
   el.storyText.addEventListener("click", function (e) {
