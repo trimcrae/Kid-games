@@ -15,122 +15,185 @@
       display: flex; align-items: center; justify-content: space-between;
       gap: 0.5rem; max-width: 900px; margin: 0 auto; padding: 0.4rem 0.75rem 0;
     }
-    .topbar .game-name { font-size: 1.2rem; font-weight: bold; color: #a97c50; }
+    .topbar .game-name { font-size: 1.2rem; font-weight: bold; color: #8a5f36; }
 
     .wrap { max-width: 900px; margin: 0 auto 2rem; padding: 0.4rem 0.8rem 0; }
 
     /* --- Mode tabs --- */
-    .tabs { display: flex; gap: 0.4rem; margin: 0.4rem 0 0.8rem; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 0.8rem; }
     .tab {
-      flex: 1; border: none; cursor: pointer; font-family: var(--font);
+      flex: 1 1 44%; min-height: 48px; border: none; cursor: pointer; font-family: var(--font);
       font-weight: bold; font-size: 1rem; padding: 0.6rem 0.4rem;
       border-radius: 14px; background: #fff; color: var(--ink);
       box-shadow: 0 3px 10px rgba(43, 36, 64, 0.1);
       transition: transform 0.1s ease, background 0.15s ease, color 0.15s ease;
     }
     .tab:hover { transform: translateY(-2px); }
-    .tab.active { background: #a97c50; color: #fff; box-shadow: 0 5px 16px rgba(169,124,80,0.45); }
+    .tab.active { background: #8a5f36; color: #fff; box-shadow: 0 5px 16px rgba(138,95,54,0.45); }
+    @media (min-width: 620px) { .tab { flex: 1 1 0; } }
 
     .panel { display: none; }
     .panel.active { display: block; }
 
     /* --- Detective clues --- */
-    .clue-intro { font-size: 0.95rem; color: #6a6385; margin: 0 0 0.6rem; }
+    .clue-intro { font-size: 0.95rem; color: #5c5675; margin: 0 0 0.6rem; }
+    .clue-group { margin: 0 0 0.55rem; }
+    .clue-group > summary {
+      cursor: pointer; font-weight: bold; font-size: 0.95rem; color: #8a5f36;
+      padding: 0.35rem 0.2rem; list-style: none; min-height: 34px;
+    }
+    .clue-group > summary::-webkit-details-marker { display: none; }
+    .clue-group > summary::before { content: "▾ "; font-size: 0.8em; }
+    .clue-group:not([open]) > summary::before { content: "▸ "; }
+    .clue-group .g-help { font-size: 0.8rem; color: #6a6385; margin: 0 0 0.35rem 0.9rem; }
     .clues { display: flex; flex-wrap: wrap; gap: 0.4rem; }
     .clue {
-      border: 3px solid #efe7dc; background: #fff; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 0.3rem; min-height: 44px;
+      border: 3px solid #e4d9c9; background: #fff; cursor: pointer;
       font-family: var(--font); font-weight: bold; font-size: 0.88rem;
-      padding: 0.4rem 0.7rem; border-radius: 13px; color: var(--ink);
+      padding: 0.3rem 0.7rem; border-radius: 13px; color: var(--ink);
       transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
     }
     .clue:hover { transform: translateY(-2px); }
-    .clue.on { border-color: #a97c50; background: #fbf1e4; box-shadow: 0 4px 12px rgba(169,124,80,0.25); }
-    .clue.off { opacity: 0.32; filter: grayscale(0.6); pointer-events: none; }
+    .clue:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
+    .clue.on { border-color: #8a5f36; background: #fbf1e4; box-shadow: 0 4px 12px rgba(138,95,54,0.25); }
+    .clue.on::after { content: "✓"; color: #8a5f36; font-size: 0.9rem; }
+    .clue.off { opacity: 0.36; filter: grayscale(0.6); }
     .clue .n {
-      display: inline-block; min-width: 1.3em; margin-left: 0.35rem;
-      font-size: 0.72rem; color: #fff; background: #c9a97e;
-      border-radius: 999px; padding: 0.05rem 0.35rem; vertical-align: 1px;
+      display: inline-block; min-width: 1.4em; text-align: center;
+      font-size: 0.72rem; color: #fff; background: #b08a5e;
+      border-radius: 999px; padding: 0.08rem 0.35rem;
     }
-    .clue.on .n { background: #a97c50; }
+    .clue.on .n { background: #8a5f36; }
 
     /* --- Case solved banner --- */
     .solved {
       display: flex; align-items: center; gap: 0.8rem;
-      background: linear-gradient(135deg, #2bc46f, #3ddc84);
+      background: linear-gradient(135deg, #1f9e57, #2bc46f);
       color: #fff; border-radius: 18px; padding: 0.7rem 1rem;
       margin: 0.6rem 0 0.2rem; box-shadow: 0 8px 22px rgba(43,196,111,0.35);
       animation: solvedPop 0.35s ease;
     }
+    /* [hidden] must win over display:flex — this was a real bug! */
+    .solved[hidden] { display: none; }
     .solved .s-emoji { font-size: 2rem; }
     .solved .s-title { font-weight: bold; font-size: 1.1rem; }
-    .solved .s-sub { font-size: 0.88rem; opacity: 0.95; }
+    .solved .s-sub { font-size: 0.88rem; }
     @keyframes solvedPop {
       0% { transform: scale(0.85); opacity: 0; }
       70% { transform: scale(1.04); }
       100% { transform: scale(1); opacity: 1; }
     }
-    @media (prefers-reduced-motion: reduce) { .solved { animation: none; } }
     .clue-bar {
       display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
-      margin: 0.7rem 0 0.4rem;
+      flex-wrap: wrap; margin: 0.7rem 0 0.4rem;
     }
-    .clue-count { font-weight: bold; color: #a97c50; }
+    .clue-count { font-weight: bold; color: #7a5228; }
     .reset-clues {
       border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
-      font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 12px;
-      background: #efe7dc; color: #7a5a34;
+      font-size: 0.9rem; min-height: 44px; padding: 0.4rem 1rem; border-radius: 12px;
+      background: #efe7dc; color: #6b4c26;
     }
 
     /* --- Rock grid --- */
     .rock-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
       gap: 0.7rem; margin-top: 0.5rem;
     }
     .rock-card {
+      font-family: var(--font); text-align: left; color: var(--ink);
+      border: none; padding: 0; width: 100%;
       background: var(--paper); border-radius: 16px; overflow: hidden;
       box-shadow: 0 5px 16px rgba(43, 36, 64, 0.1); cursor: pointer;
       transition: transform 0.12s ease, opacity 0.2s ease, box-shadow 0.15s ease;
       display: flex; flex-direction: column; position: relative;
     }
-    /* collection log: a "found" ribbon appears once a rock is discovered */
+    .rock-card:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
     .found-flag {
       position: absolute; top: 6px; right: 6px; font-size: 0.68rem; font-weight: bold;
-      color: #fff; background: var(--green); border-radius: 999px; padding: 0.16rem 0.5rem;
+      color: #fff; background: #1f9e57; border-radius: 999px; padding: 0.16rem 0.5rem;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22); display: none; pointer-events: none;
     }
     .rock-card.found .found-flag { display: inline-block; }
     .rock-card:hover { transform: translateY(-3px); box-shadow: 0 9px 22px rgba(43,36,64,0.16); }
-    .rock-card.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
+    .rock-card.dim { opacity: 0.2; filter: grayscale(0.7); }
     .rock-card svg { width: 100%; height: 96px; display: block; background: #f4efe8; }
     .rock-body { padding: 0.5rem 0.6rem 0.7rem; }
     .rock-name { font-weight: bold; font-size: 1rem; }
     .rock-badge {
       display: inline-block; font-size: 0.66rem; font-weight: bold; color: #fff;
-      padding: 0.12rem 0.45rem; border-radius: 20px; margin-top: 0.2rem;
+      padding: 0.14rem 0.5rem; border-radius: 20px; margin-top: 0.2rem;
     }
-    .b-Igneous     { background: #e8603c; }
-    .b-Sedimentary { background: #d9a441; }
-    .b-Metamorphic { background: #6f8f4e; }
-    .b-Mineral     { background: #7a6bd8; }
-    .rock-fact { font-size: 0.8rem; color: #6a6385; line-height: 1.35; margin-top: 0.35rem; }
-    .rock-more { font-size: 0.8rem; color: #4a4463; line-height: 1.4; margin-top: 0.4rem; display: none; }
+    .b-Igneous     { background: #c1421f; }
+    .b-Sedimentary { background: #8a6412; }
+    .b-Metamorphic { background: #4c6a33; }
+    .b-Mineral     { background: #5b4ac0; }
+    .rock-mohs {
+      display: inline-block; font-size: 0.66rem; font-weight: bold; color: #5a4326;
+      background: #f0e4d2; padding: 0.14rem 0.5rem; border-radius: 20px; margin: 0.2rem 0 0 0.2rem;
+    }
+    .rock-fact { font-size: 0.8rem; color: #575070; line-height: 1.35; margin-top: 0.35rem; }
+    .rock-more { font-size: 0.8rem; color: #453f5c; line-height: 1.45; margin-top: 0.45rem; display: none; }
     .rock-card.open .rock-more { display: block; }
-    .rock-more b { color: #a97c50; }
+    .rock-more b { color: #7a5228; }
+    .rock-more dl { margin: 0.3rem 0 0; }
+    .rock-more dt { font-weight: bold; color: #7a5228; margin-top: 0.3rem; font-size: 0.78rem; }
+    .rock-more dd { margin: 0; }
+    .tap-hint { font-size: 0.7rem; color: #8a84a0; margin-top: 0.35rem; }
+    .rock-card.open .tap-hint { display: none; }
 
     .empty-note {
-      grid-column: 1 / -1; text-align: center; color: #a7a3b8;
+      grid-column: 1 / -1; text-align: center; color: #7c7791;
       font-weight: bold; padding: 1.4rem 0;
     }
+
+    /* --- Lab --- */
+    .lab-card {
+      background: var(--paper); border-radius: 20px; padding: 0.9rem;
+      box-shadow: 0 8px 22px rgba(43, 36, 64, 0.12);
+    }
+    .lab-head { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+    .lab-head svg { width: 150px; height: 110px; background: #f4efe8; border-radius: 14px; flex: 0 0 auto; }
+    .lab-title { font-weight: bold; font-size: 1.05rem; }
+    .lab-sub { font-size: 0.85rem; color: #575070; }
+    .lab-tests { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.7rem 0 0.2rem; }
+    .lab-test {
+      min-height: 44px; border: 3px solid #e4d9c9; background: #fff; cursor: pointer;
+      font-family: var(--font); font-weight: bold; font-size: 0.85rem;
+      padding: 0.3rem 0.7rem; border-radius: 13px; color: var(--ink);
+    }
+    .lab-test:hover { background: #fbf1e4; }
+    .lab-test.used { background: #f2ece1; color: #8a84a0; border-color: #efe7dc; }
+    .lab-test:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
+    .notebook {
+      background: #fdf8ee; border: 2px dashed #d9c7ab; border-radius: 14px;
+      padding: 0.6rem 0.8rem; margin-top: 0.6rem; font-size: 0.9rem; line-height: 1.5;
+      min-height: 3.2em;
+    }
+    .notebook li { margin: 0.15rem 0; }
+    .notebook ol { margin: 0; padding-left: 1.2rem; }
+    .notebook .nb-empty { color: #8a84a0; }
+    .lab-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+    .lab-opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.5rem; margin-top: 0.7rem; }
+    .lab-stats { font-size: 0.85rem; color: #575070; font-weight: bold; margin-top: 0.6rem; }
 
     /* --- Quiz --- */
     .quiz-card {
       background: var(--paper); border-radius: 20px; padding: 1rem;
       box-shadow: 0 8px 22px rgba(43, 36, 64, 0.12); text-align: center;
     }
-    .quiz-card svg { width: 220px; max-width: 80%; height: 150px; background: #f4efe8; border-radius: 14px; }
+    .quiz-card > div > svg { width: 220px; max-width: 80%; height: 150px; background: #f4efe8; border-radius: 14px; }
+    .tiers { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin-bottom: 0.7rem; }
+    .tier-btn {
+      min-height: 44px; border: 3px solid #e4d9c9; background: #fff; cursor: pointer;
+      font-family: var(--font); font-weight: bold; font-size: 0.88rem;
+      padding: 0.3rem 0.8rem; border-radius: 13px; color: var(--ink);
+    }
+    .tier-btn.on { border-color: #8a5f36; background: #fbf1e4; }
+    .tier-btn:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
     .quiz-top {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 0.85rem; font-weight: bold; color: #8a6a45; margin-bottom: 0.5rem;
+      font-size: 0.85rem; font-weight: bold; color: #7a5228; margin-bottom: 0.5rem;
     }
     .quiz-progress {
       height: 10px; background: #efe7dc; border-radius: 999px;
@@ -138,55 +201,83 @@
     }
     .quiz-bar {
       height: 100%; width: 0; border-radius: 999px;
-      background: linear-gradient(90deg, #a97c50, #d9a441);
+      background: linear-gradient(90deg, #8a5f36, #c79a3f);
       transition: width 0.3s ease;
     }
-    .quiz-q { font-size: 1.15rem; font-weight: bold; margin: 0.7rem 0 0.2rem; }
-    .quiz-hint { font-size: 0.9rem; color: #6a6385; min-height: 1.3em; }
+    .quiz-q { font-size: 1.12rem; font-weight: bold; margin: 0.7rem 0 0.2rem; line-height: 1.35; }
+    .quiz-hint { font-size: 0.9rem; color: #575070; min-height: 1.3em; }
     .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.8rem; }
     .quiz-opt {
-      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
-      font-size: 1rem; padding: 0.8rem 0.4rem; border-radius: 14px;
-      background: #fbf1e4; color: #5a4326;
+      min-height: 52px; border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 1rem; padding: 0.7rem 0.4rem; border-radius: 14px;
+      background: #fbf1e4; color: #4b3720;
       transition: transform 0.1s ease, background 0.15s ease;
     }
     .quiz-opt:hover { transform: translateY(-2px); }
-    .quiz-opt.right { background: var(--green); color: #fff; }
-    .quiz-opt.wrong { background: var(--pink); color: #fff; }
+    .quiz-opt:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
+    .quiz-opt.right { background: #1f9e57; color: #fff; }
+    .quiz-opt.wrong { background: #d63864; color: #fff; }
     .quiz-opt:disabled { cursor: default; }
     .quiz-feedback { margin-top: 0.7rem; font-weight: bold; min-height: 1.4em; font-size: 1rem; }
-    .quiz-score { margin-top: 0.4rem; color: #6a6385; font-weight: bold; }
-    .next-btn {
-      margin-top: 0.7rem; border: none; cursor: pointer; font-family: var(--font);
-      font-weight: bold; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 14px;
-      background: #a97c50; color: #fff; box-shadow: 0 5px 14px rgba(169,124,80,0.4);
+    .why {
+      background: #fdf8ee; border-left: 5px solid #c79a3f; border-radius: 10px;
+      text-align: left; padding: 0.6rem 0.8rem; margin-top: 0.6rem;
+      font-size: 0.9rem; line-height: 1.5; color: #453f5c; font-weight: normal;
     }
+    .why b { color: #7a5228; }
+    .why[hidden] { display: none; }
+    .next-btn {
+      margin-top: 0.7rem; min-height: 48px; border: none; cursor: pointer; font-family: var(--font);
+      font-weight: bold; font-size: 1.05rem; padding: 0.7rem 1.4rem; border-radius: 14px;
+      background: #8a5f36; color: #fff; box-shadow: 0 5px 14px rgba(138,95,54,0.4);
+    }
+    .next-btn.ghost { background: #efe7dc; color: #6b4c26; box-shadow: none; }
+    .next-btn:focus-visible { outline: 3px solid #453f5c; outline-offset: 2px; }
 
     /* --- Round over --- */
     .round-end { text-align: center; padding: 0.6rem 0 0.2rem; }
     .round-stars { font-size: 2.6rem; letter-spacing: 0.12em; margin: 0.3rem 0; }
     .round-big { font-size: 1.4rem; font-weight: bold; }
-    .round-msg { color: #6a6385; font-weight: bold; margin: 0.3rem 0 0.1rem; }
-    .round-best { color: #a97c50; font-weight: bold; font-size: 0.95rem; }
+    .round-msg { color: #575070; font-weight: bold; margin: 0.3rem 0 0.1rem; }
+    .round-best { color: #7a5228; font-weight: bold; font-size: 0.95rem; }
 
     /* --- Book filter chips --- */
-    .book-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.3rem; }
+    .book-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0 0 0.4rem; }
     .bfilter {
-      border: 3px solid #efe7dc; background: #fff; cursor: pointer;
+      min-height: 44px; border: 3px solid #e4d9c9; background: #fff; cursor: pointer;
       font-family: var(--font); font-weight: bold; font-size: 0.85rem;
-      padding: 0.35rem 0.7rem; border-radius: 13px; color: var(--ink);
+      padding: 0.3rem 0.7rem; border-radius: 13px; color: var(--ink);
       transition: transform 0.1s ease, border-color 0.15s ease;
     }
     .bfilter:hover { transform: translateY(-2px); }
-    .bfilter.on { border-color: #a97c50; background: #fbf1e4; }
+    .bfilter.on { border-color: #8a5f36; background: #fbf1e4; }
+    .bfilter:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
+
+    /* --- Mohs scale strip --- */
+    .mohs-strip { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.2rem 0 0.6rem; }
+    .mohs-chip {
+      min-height: 44px; flex: 1 1 60px; border: 2px solid #e4d9c9; background: #fff;
+      cursor: pointer; font-family: var(--font); border-radius: 11px; padding: 0.25rem;
+      font-size: 0.7rem; font-weight: bold; color: #453f5c; line-height: 1.15;
+    }
+    .mohs-chip .m-n { display: block; font-size: 1rem; color: #7a5228; }
+    .mohs-chip.on { border-color: #8a5f36; background: #fbf1e4; }
+    .mohs-chip:focus-visible { outline: 3px solid #8a5f36; outline-offset: 2px; }
 
     .lesson {
       background: #f6f1e8; border-radius: 16px; padding: 0.6rem 1rem;
       margin-top: 0.9rem; font-size: 0.9rem; line-height: 1.45;
     }
-    .lesson summary { cursor: pointer; font-weight: bold; color: #a97c50; font-size: 1rem; }
+    .lesson summary { cursor: pointer; font-weight: bold; color: #8a5f36; font-size: 1rem; min-height: 34px; }
     .lesson p { margin: 0.5rem 0; }
-    .lesson b { color: #7a5a34; }
+    .lesson b { color: #6b4c26; }
+    .cycle-svg { width: 100%; max-width: 460px; height: auto; display: block; margin: 0.4rem auto; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .solved { animation: none; }
+      .rock-card, .clue, .tab, .quiz-opt, .bfilter, .quiz-bar { transition: none; }
+      .rock-card:hover, .clue:hover, .tab:hover, .quiz-opt:hover, .bfilter:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
@@ -200,23 +291,25 @@
   </div>
 
   <div class="wrap">
-    <div class="tabs">
-      <button class="tab active" data-panel="detective">🔍 Detective</button>
-      <button class="tab" data-panel="book">📚 Rock Book</button>
-      <button class="tab" data-panel="quiz">🎯 Quiz</button>
+    <div class="tabs" role="tablist" aria-label="Game modes">
+      <button class="tab active" role="tab" id="tab-detective" aria-controls="detective" aria-selected="true" data-panel="detective">🔍 Detective</button>
+      <button class="tab" role="tab" id="tab-lab" aria-controls="lab" aria-selected="false" tabindex="-1" data-panel="lab">🔬 Lab</button>
+      <button class="tab" role="tab" id="tab-book" aria-controls="book" aria-selected="false" tabindex="-1" data-panel="book">📚 Rock Book</button>
+      <button class="tab" role="tab" id="tab-quiz" aria-controls="quiz" aria-selected="false" tabindex="-1" data-panel="quiz">🎯 Quiz</button>
     </div>
 
     <!-- DETECTIVE -->
-    <div class="panel active" id="detective">
-      <p class="clue-intro">Found a rock? Tap the clues you can see and feel — like a real geologist using a
-        <b>dichotomous key</b> — and watch the suspects narrow down! 🕵️</p>
-      <div class="clues" id="clues"></div>
+    <div class="panel active" id="detective" role="tabpanel" aria-labelledby="tab-detective">
+      <p class="clue-intro">Found a rock? Don't guess from its look — <b>test it</b>. Tap what you observe and
+        the suspects narrow down, just like a geologist's <b>dichotomous key</b>. Every one of the
+        <span id="totalRocks">38</span> specimens can be pinned down to exactly one. 🕵️</p>
+      <div id="clueGroups"></div>
       <div class="clue-bar">
         <span class="clue-count" id="clueCount" role="status"></span>
-        <button class="reset-clues" id="resetClues">↺ Clear clues</button>
+        <button class="reset-clues" id="resetClues">↺ Clear all clues</button>
       </div>
       <div class="solved" id="solvedBanner" hidden>
-        <span class="s-emoji">🎉</span>
+        <span class="s-emoji" aria-hidden="true">🎉</span>
         <span>
           <span class="s-title" id="solvedTitle">Case solved!</span><br>
           <span class="s-sub" id="solvedSub"></span>
@@ -225,17 +318,46 @@
       <div class="rock-grid" id="detectiveGrid"></div>
     </div>
 
+    <!-- LAB -->
+    <div class="panel" id="lab" role="tabpanel" aria-labelledby="tab-lab">
+      <p class="clue-intro">A mystery specimen just landed on your bench — and it looks just like its
+        neighbours. <b>Run the tests</b>, write down what happens, then name it. Fewer tests = a better
+        detective. 🔬</p>
+      <div class="lab-card">
+        <div class="lab-head">
+          <svg id="labSvg" viewBox="0 0 120 100" role="img" aria-label="Mystery specimen"></svg>
+          <span>
+            <span class="lab-title" id="labTitle">Mystery specimen</span><br>
+            <span class="lab-sub" id="labSub"></span>
+          </span>
+        </div>
+        <div class="lab-tests" id="labTests" role="group" aria-label="Tests you can run"></div>
+        <div class="notebook" id="labNotebook" role="status" aria-live="polite"></div>
+        <div class="lab-actions">
+          <button class="next-btn" id="labNameIt">🔎 I know what it is!</button>
+          <button class="next-btn ghost" id="labNew">🧪 New specimen</button>
+        </div>
+        <div class="lab-opts" id="labOpts"></div>
+        <div class="why" id="labWhy" hidden></div>
+        <div class="lab-stats" id="labStats"></div>
+      </div>
+    </div>
+
     <!-- ROCK BOOK -->
-    <div class="panel" id="book">
-      <p class="clue-intro">Every rock in the collection — tap a card to learn its secrets. There are three big
-        rock families plus some star minerals. 💎</p>
+    <div class="panel" id="book" role="tabpanel" aria-labelledby="tab-book">
+      <p class="clue-intro">Every specimen in the museum — tap a card for its hardness, streak, how it breaks
+        and how it was made. Three rock families, plus the minerals rocks are built from. 💎</p>
       <p class="clue-intro" id="bookProgress" role="status" style="font-weight:bold;"></p>
       <div class="book-filters" id="bookFilters" role="group" aria-label="Filter by rock family"></div>
+      <p class="clue-intro" style="margin:0.5rem 0 0.1rem;"><b>The Mohs hardness scale</b> — tap a number to
+        see everything about that hard. Each mineral scratches every one below it.</p>
+      <div class="mohs-strip" id="mohsStrip" role="group" aria-label="Filter by Mohs hardness"></div>
       <div class="rock-grid" id="bookGrid"></div>
     </div>
 
     <!-- QUIZ -->
-    <div class="panel" id="quiz">
+    <div class="panel" id="quiz" role="tabpanel" aria-labelledby="tab-quiz">
+      <div class="tiers" id="tiers" role="group" aria-label="Difficulty"></div>
       <div class="quiz-card">
         <div id="quizPlay">
           <div class="quiz-top">
@@ -248,6 +370,7 @@
           <div class="quiz-hint" id="quizHint"></div>
           <div class="quiz-opts" id="quizOpts"></div>
           <div class="quiz-feedback" id="quizFeedback" role="status"></div>
+          <div class="why" id="quizWhy" hidden></div>
           <button class="next-btn" id="nextQuiz" style="display:none;">Next rock →</button>
         </div>
         <div id="quizEnd" class="round-end" hidden>
@@ -262,20 +385,80 @@
     </div>
 
     <details class="lesson">
-      <summary>🧠 The three rock families & the rock cycle</summary>
-      <p><b>Igneous</b> rocks form when hot melted rock (magma or lava) cools and hardens —
-        like granite and basalt. 🌋</p>
-      <p><b>Sedimentary</b> rocks form when bits of sand, mud, or shells pile up in layers and
-        get squished together over ages — like sandstone and limestone. They often hold fossils! 🐚</p>
-      <p><b>Metamorphic</b> rocks are other rocks that got <i>changed</i> by heat and pressure deep
-        underground — limestone becomes marble, shale becomes slate. 🔥</p>
-      <p>In the <b>rock cycle</b>, rocks slowly turn into each other over millions of years —
-        melting, wearing down, and squishing round and round forever. ♻️</p>
+      <summary>♻️ The rock cycle — how rocks turn into each other</summary>
+      <svg class="cycle-svg" viewBox="0 0 440 320" role="img"
+           aria-label="The rock cycle: magma cools into igneous rock; weathering and erosion break it into sediment; burial and cementing make sedimentary rock; heat and pressure make metamorphic rock; melting turns it back into magma.">
+        <defs>
+          <marker id="rcArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#8a5f36"/>
+          </marker>
+        </defs>
+        <g fill="none" stroke="#8a5f36" stroke-width="3" marker-end="url(#rcArrow)">
+          <path d="M 268 52 Q 350 62 372 108"/>
+          <path d="M 392 156 Q 398 220 340 258"/>
+          <path d="M 246 286 Q 190 296 132 278"/>
+          <path d="M 52 232 Q 26 176 44 130"/>
+          <path d="M 78 74 Q 120 40 168 36"/>
+        </g>
+        <g font-family="Trebuchet MS, sans-serif" font-size="13" font-weight="bold" fill="#4b3720" text-anchor="middle">
+          <rect x="140" y="14" width="112" height="44" rx="12" fill="#f6cdbf" stroke="#c1421f" stroke-width="2"/>
+          <text x="196" y="33">🌋 Igneous</text><text x="196" y="49" font-size="11" font-weight="normal">granite, basalt</text>
+
+          <rect x="326" y="104" width="106" height="44" rx="12" fill="#f3e3bd" stroke="#8a6412" stroke-width="2"/>
+          <text x="379" y="123">🏖️ Sediment</text><text x="379" y="139" font-size="11" font-weight="normal">sand &amp; mud</text>
+
+          <rect x="248" y="252" width="128" height="44" rx="12" fill="#f3e3bd" stroke="#8a6412" stroke-width="2"/>
+          <text x="312" y="271">🥞 Sedimentary</text><text x="312" y="287" font-size="11" font-weight="normal">sandstone, shale</text>
+
+          <rect x="58" y="252" width="128" height="44" rx="12" fill="#d9e7c9" stroke="#4c6a33" stroke-width="2"/>
+          <text x="122" y="271">🔥 Metamorphic</text><text x="122" y="287" font-size="11" font-weight="normal">slate, marble</text>
+
+          <rect x="8" y="104" width="100" height="44" rx="12" fill="#f6cdbf" stroke="#c1421f" stroke-width="2"/>
+          <text x="58" y="123">🔴 Magma</text><text x="58" y="139" font-size="11" font-weight="normal">melted rock</text>
+        </g>
+        <g font-family="Trebuchet MS, sans-serif" font-size="11" fill="#6b4c26" text-anchor="middle">
+          <text x="352" y="72">wind, rain &amp; ice</text>
+          <text x="352" y="85">break it up</text>
+          <text x="404" y="205">buried &amp;</text>
+          <text x="404" y="218">cemented</text>
+          <text x="196" y="313">heat &amp; pressure</text>
+          <text x="26" y="186">melts</text>
+          <text x="26" y="199">again</text>
+          <text x="112" y="30">cools</text>
+        </g>
+      </svg>
+      <p><b>Igneous</b> rocks cool from melted rock. Cool it <b>slowly</b> deep underground and the crystals grow
+        big (granite, gabbro); cool it <b>fast</b> at the surface and they stay tiny (rhyolite, basalt). 🌋</p>
+      <p><b>Sedimentary</b> rocks are built from bits: sand, mud, pebbles or shells settle in layers, get buried
+        and are cemented together. They're the only rocks that hold <b>fossils</b>. 🐚</p>
+      <p><b>Metamorphic</b> rocks are older rocks cooked and squeezed — never melted, just changed.
+        Limestone → marble, shale → slate → schist → gneiss, sandstone → quartzite. 🔥</p>
+      <p>Melt a metamorphic rock and it becomes magma again. Round and round, for billions of years. ♻️</p>
+    </details>
+
+    <details class="lesson">
+      <summary>🧰 The detective's five tests (and why colour is a liar)</summary>
+      <p><b>1. Hardness.</b> Find the softest thing that scratches it: fingernail (2½), copper coin (3½),
+        iron nail (4½), glass (5½), steel file (6½). That's the <b>Mohs scale</b>, and it's the single most
+        useful test there is.</p>
+      <p><b>2. Streak.</b> Rub the mineral on unglazed tile and look at the <b>powder</b> colour. Hematite looks
+        silvery-black but its streak is always rust red. Streak only works on minerals — a rock is a mixture,
+        so its powder is a muddle.</p>
+      <p><b>3. Acid.</b> A drop of vinegar makes <b>calcite</b> fizz. That's limestone, chalk, marble and
+        calcite itself — and nothing else in this collection.</p>
+      <p><b>4. Magnet.</b> Only <b>magnetite</b> jumps onto a magnet. (Basalt gives a faint tug, because it has
+        specks of magnetite in it.)</p>
+      <p><b>5. How it breaks.</b> <b>Cleavage</b> means it splits along flat faces — mica peels into sheets,
+        halite breaks into cubes. <b>Fracture</b> means it breaks any old way — quartz and obsidian break in
+        curved, razor-sharp shells.</p>
+      <p>And <b>colour is the worst clue of all</b>: quartz comes in a dozen colours, and pyrite is exactly
+        the colour of gold. Test, don't guess! 🕵️</p>
     </details>
   </div>
 
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
+  <script src="rocks.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

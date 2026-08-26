@@ -271,7 +271,38 @@
     return slot;
   }
 
+  /* Build once, then score it. Everything above is deterministic, so the
+     only lever left is the rotation order — we try a handful of them and
+     keep the best sheet. In practice the first one is already perfect; this
+     is what makes the promises hold for awkward squad sizes too. */
+  function penalties(r, periods) {
+    var bad = 0;
+    var elig = r.present.filter(function (g) { return g.gk !== "no"; }).length;
+    var cap = elig ? Math.ceil(periods / elig) : 0;
+    r.present.forEach(function (g) {
+      var st = r.stat[g.name];
+      bad += Math.abs(st.plays - st.target) * 40;            // playing time off quota
+      if (g.gk === "must" && st.goalie === 0) bad += 80;     // a ★ girl never in goal
+      if (st.goalie > cap) bad += 40;                        // hogging the gloves
+      for (var p = 1; p < periods; p++) {
+        if (st.roles[p] === "-" && st.roles[p - 1] === "-") bad += 1;   // clumped rest
+      }
+    });
+    return bad;
+  }
+
   function buildRoster(team, periods, seed) {
+    var best = null, bestBad = Infinity;
+    for (var tryN = 0; tryN < 12; tryN++) {
+      var r = buildOnce(team, periods, ((Number(seed) || 1) + tryN * 7919) | 0);
+      var bad = penalties(r, r.periods);
+      if (bad < bestBad) { best = r; bestBad = bad; }
+      if (!bad) break;
+    }
+    return best;
+  }
+
+  function buildOnce(team, periods, seed) {
     periods = Math.max(1, Math.round(Number(periods) || 1));
     var present = (team || []).filter(function (g) { return g && g.present; });
     var rng = mulberry32(Number(seed) || 1);

@@ -464,7 +464,8 @@
       ball.textContent = value;
       bubble.setAttribute("aria-label",
         (mode.kind === "letters" ? "bubble letter " : "bubble ") + value);
-      ball.style.fontSize = Math.round(size * (value.length > 1 ? 0.36 : 0.46)) + "px";
+      const fit = value.length >= 3 ? 0.28 : (value.length === 2 ? 0.36 : 0.46);
+      ball.style.fontSize = Math.round(size * fit) + "px";
     }
 
     bubble.appendChild(ball);

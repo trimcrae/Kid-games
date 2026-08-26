@@ -40,8 +40,8 @@
     },
     {
       "id": "mermaid-cover",
-      "prompt": "a friendly cartoon mermaid with a golden harp singing on a coral reef, dolphins and colourful fish, sunbeams through clear blue water",
-      "width": 512, "height": 384, "seed": 11006,
+      "prompt": "a cute chibi cartoon mermaid CHILD with a big friendly smile holding a golden harp, simple flat childrens picture book illustration, modest full coverage clothing, bright cartoon coral reef and smiling cartoon fish, not photorealistic",
+      "width": 512, "height": 384, "seed": 11016,
       "out": "games/adventure/art/mermaid-cover.png"
     },
     {

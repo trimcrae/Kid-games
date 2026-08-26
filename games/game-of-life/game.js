@@ -492,13 +492,21 @@
     graphCanvas.height = Math.round(gH * dpr);
   }
 
+  const GRAPH_IDLE = "📈 Population graph — press ▶️ Play and watch the line wiggle!";
+  let lastCap = "";
+  function setCap(html) {
+    if (html === lastCap) return;   // don't touch the DOM 60 times a second
+    lastCap = html;
+    graphCap.innerHTML = html;
+  }
+
   function drawGraph() {
     if (!graphCanvas || !graphCanvas.width) return;
     const g = graphCanvas.getContext("2d");
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, gW, gH);
     const n = popHist.length;
-    if (n < 2) return;
+    if (n < 2) { setCap(GRAPH_IDLE); return; }
     let max = 1;
     for (let i = 0; i < n; i++) if (popHist[i] > max) max = popHist[i];
     const px = (i) => (i / (n - 1)) * gW;
@@ -517,8 +525,8 @@
     g.strokeStyle = "#3ddc84";
     g.lineWidth = 2;
     g.stroke();
-    graphCap.innerHTML = "📈 Population over the last <b>" + n +
-      "</b> generation" + (n === 1 ? "" : "s") + " — highest so far <b>" + max + "</b>";
+    setCap("📈 Population over the last <b>" + n +
+      "</b> generation" + (n === 1 ? "" : "s") + " — highest so far <b>" + max + "</b>");
   }
 
   function buildGridLayer() {
