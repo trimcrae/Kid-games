@@ -376,6 +376,54 @@ window.PrincessArt = (function () {
       });
     },
 
+    // a posy of little blooms held in her clasped hands
+    bouquet: function (svg, defs, g) {
+      var pink = url(pinkGrad(defs));
+      var grp = el("g", { filter: url(glowFilter(defs, 1.2)) }, g);
+      el("path", {
+        d: "M 165 292 L 157 306 M 165 292 L 173 306 M 165 292 L 165 308",
+        stroke: "#3d9a4e", "stroke-width": 3, "stroke-linecap": "round", fill: "none"
+      }, grp);
+      el("ellipse", { cx: 153, cy: 302, rx: 5.5, ry: 3, fill: "#4fbf63", transform: "rotate(-28 153 302)" }, grp);
+      el("ellipse", { cx: 178, cy: 302, rx: 5.5, ry: 3, fill: "#4fbf63", transform: "rotate(28 178 302)" }, grp);
+      [[152, 288, 7, pink], [179, 288, 7, "#ffb1d9"], [165, 278, 8.5, pink]].forEach(function (b) {
+        for (var a = 0; a < 360; a += 72) {
+          el("ellipse", {
+            cx: 0, cy: -b[2] * 0.62, rx: b[2] * 0.38, ry: b[2] * 0.62, fill: b[3],
+            transform: "translate(" + b[0] + " " + b[1] + ") rotate(" + a + ")"
+          }, grp);
+        }
+        el("circle", { cx: b[0], cy: b[1], r: b[2] * 0.34, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 1 }, grp);
+      });
+    },
+
+    // long satin gloves that follow the arms exactly
+    gloves: function (svg, defs, g) {
+      var grp = el("g", {}, g);
+      var cuff = el("g", { fill: "none", stroke: "#fff6fb", "stroke-width": 13, "stroke-linecap": "round" }, grp);
+      el("path", { d: "M 117 240 C 111 262 120 277 149 284" }, cuff);
+      el("path", { d: "M 213 240 C 219 262 210 277 181 284" }, cuff);
+      el("circle", { cx: 152, cy: 285, r: 8.2, fill: "#fff6fb" }, grp);
+      el("circle", { cx: 178, cy: 285, r: 8.2, fill: "#fff6fb" }, grp);
+      var shine = el("g", { fill: "none", stroke: "#ffd8ec", "stroke-width": 2.5, "stroke-linecap": "round", opacity: 0.9 }, grp);
+      el("path", { d: "M 114 244 C 109 262 117 274 140 281" }, shine);
+      el("path", { d: "M 216 244 C 221 262 213 274 190 281" }, shine);
+      el("circle", { cx: 119, cy: 244, r: 3.2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 1 }, grp);
+      el("circle", { cx: 211, cy: 244, r: 3.2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 1 }, grp);
+    },
+
+    // a big satin bow tied into her side hair
+    hairbow: function (svg, defs, g) {
+      var pink = url(pinkGrad(defs));
+      var grp = el("g", { transform: "translate(226 146) rotate(10)", filter: url(glowFilter(defs, 1.5)) }, g);
+      el("path", { d: "M -4 8 C -12 20 -16 28 -9 34", stroke: "#ff7fc0", "stroke-width": 5, fill: "none", "stroke-linecap": "round" }, grp);
+      el("path", { d: "M 4 8 C 12 20 16 28 9 34", stroke: "#ff7fc0", "stroke-width": 5, fill: "none", "stroke-linecap": "round" }, grp);
+      el("path", { d: "M 0 0 C -7 -17 -27 -19 -27 -4 C -27 9 -8 11 0 0 Z", fill: pink, stroke: "#e35ba2", "stroke-width": 1.5 }, grp);
+      el("path", { d: "M 0 0 C 7 -17 27 -19 27 -4 C 27 9 8 11 0 0 Z", fill: pink, stroke: "#e35ba2", "stroke-width": 1.5 }, grp);
+      el("circle", { cx: 0, cy: 0, r: 6, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 1.5 }, grp);
+      el("circle", { cx: -2, cy: -2, r: 1.7, fill: "#ffffff", opacity: 0.85 }, grp);
+    },
+
     sparkle1: function (svg, defs, g) { sparkleAt(defs, g, 66, 118, 13, "2.2s", "0s"); },
     sparkle2: function (svg, defs, g) { sparkleAt(defs, g, 272, 226, 11, "2.6s", "-0.8s"); },
     sparkle3: function (svg, defs, g) { sparkleAt(defs, g, 70, 372, 11, "2s", "-1.5s"); }
@@ -400,7 +448,8 @@ window.PrincessArt = (function () {
   // where each piece sits, so the pop-in bounce grows from the piece
   var ORIGIN = {
     crown: "50% 15%", flower: "30% 23%", necklace: "50% 53%",
-    wand: "78% 30%", shoes: "50% 96%", sparkle: "50% 50%"
+    wand: "78% 30%", shoes: "50% 96%", sparkle: "50% 50%",
+    bouquet: "50% 66%", gloves: "50% 60%", hairbow: "68% 33%"
   };
 
   function layer(slot, key) {
@@ -436,7 +485,11 @@ window.PrincessArt = (function () {
 
     container.appendChild(layer("crown", "crown"));
     container.appendChild(layer("flower", "flower"));
+    container.appendChild(layer("hairbow", "hairbow"));
     container.appendChild(layer("necklace", "necklace"));
+    // gloves go on before anything she holds, so the posy sits in her hands
+    container.appendChild(layer("gloves", "gloves"));
+    container.appendChild(layer("bouquet", "bouquet"));
     container.appendChild(layer("wand", "wand"));
     container.appendChild(layer("shoes", "shoes"));
     container.appendChild(layer("sparkle", "sparkle1"));

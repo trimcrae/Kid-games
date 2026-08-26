@@ -12,8 +12,12 @@
     .maker { max-width: 1100px; margin: 0 auto; padding: 0 0.75rem 3rem; }
 
     .how {
-      text-align: center; color: #6a6385; font-size: 1.02rem;
-      margin: 0 auto 0.6rem; max-width: 42rem;
+      text-align: center; color: #6a6385; font-size: 0.98rem;
+      margin: 0 auto 0.5rem; max-width: 44rem;
+    }
+    @media (max-height: 900px) and (min-width: 700px) {
+      .hero .title { font-size: clamp(1.6rem, 4vw, 2.3rem); }
+      .how { font-size: 0.92rem; }
     }
 
     /* editable book title */
@@ -39,7 +43,7 @@
     /* ---- the comic page ---- */
     .stage { display: flex; justify-content: center; }
     .page {
-      width: min(94vw, 620px);
+      width: min(94vw, 620px, 56vh);
       aspect-ratio: 3 / 4;
       background: #fff;
       border-radius: 18px;
@@ -172,11 +176,11 @@
 
     /* drag grip for text bubbles */
     .item .grip {
-      position: absolute; left: -0.8rem; top: -0.8rem;
-      width: 1.7rem; height: 1.7rem; border-radius: 50%;
+      position: absolute; left: -1.1rem; top: -1.1rem;
+      width: 2.2rem; height: 2.2rem; border-radius: 50%;
       background: var(--purple); color: #fff; display: none;
       align-items: center; justify-content: center; cursor: grab;
-      font-size: 0.9rem; z-index: 90; box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      font-size: 1.05rem; z-index: 90; box-shadow: 0 3px 8px rgba(0,0,0,0.3);
       touch-action: none;
     }
     .item.text.sel .grip { display: flex; }
@@ -191,7 +195,7 @@
     .item-bar.show { display: flex; }
     .item-bar button {
       font-family: var(--font); font-size: 1.05rem; line-height: 1;
-      min-width: 2.3rem; height: 2.3rem; border-radius: 999px;
+      min-width: 2.7rem; height: 2.7rem; border-radius: 999px;
       border: none; cursor: pointer; background: #f1ecff; color: var(--ink);
       padding: 0 0.6rem; font-weight: bold;
     }
@@ -297,6 +301,72 @@
     .resume-btn { background: #fff7d6; border-color: #e6c200; color: #8a6d00; }
     .resume-btn:hover { background: #ffefae; }
 
+
+    /* ---- story coach ---- */
+    .story-sec { border-top: 2px dashed #ece4ff; padding-top: 0.8rem; margin-top: 0.8rem; }
+    .story-sec:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    .story-h { font-size: 1.05rem; color: var(--purple); text-align: center; margin: 0 0 0.25rem; }
+    .spark-card {
+      background: linear-gradient(135deg, #fff4ff, #eef4ff);
+      border: 3px solid #e0d6ff; border-radius: 14px;
+      padding: 0.7rem 0.9rem; text-align: center; color: #3d3560;
+      font-size: 1.05rem; line-height: 1.4; min-height: 3.2rem;
+    }
+    .spark-card b { color: var(--purple); }
+    .part-tip {
+      text-align: center; color: #7a52d6; font-weight: bold;
+      font-size: 0.95rem; margin: 0 0 0.5rem; min-height: 1.2rem;
+    }
+    .starter-btn, .word-btn {
+      font-family: var(--font); font-weight: bold; font-size: 0.95rem;
+      border: 2px solid #e0d6ff; background: #faf8ff; color: #3d3560;
+      border-radius: 999px; padding: 0.5rem 0.85rem; cursor: pointer; min-height: 2.6rem;
+    }
+    .starter-btn:hover, .word-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .word-btn { font-size: 1rem; }
+
+    .checklist { list-style: none; margin: 0.3rem 0 0; padding: 0; max-width: 26rem; margin-inline: auto; }
+    .checklist li {
+      display: flex; gap: 0.5rem; align-items: baseline;
+      padding: 0.25rem 0.2rem; color: #6a6385; font-size: 0.98rem;
+    }
+    .checklist li.done { color: #1f9d57; font-weight: bold; }
+    .checklist .mark { font-size: 1.05rem; }
+    .check-note {
+      text-align: center; color: #7a52d6; font-weight: bold;
+      margin: 0 0 0.3rem; min-height: 1.2rem; font-size: 0.98rem;
+    }
+    .check-note.bad { color: #c0392b; }
+
+    /* ---- comic shelf ---- */
+    .shelf-box { border-top: 2px dashed #ece4ff; margin-top: 0.9rem; padding-top: 0.8rem; }
+    .shelf { list-style: none; margin: 0.6rem auto 0; padding: 0; max-width: 30rem; }
+    .shelf li {
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+      background: #faf8ff; border: 2px solid #ece4ff; border-radius: 12px;
+      padding: 0.45rem 0.6rem; margin-bottom: 0.4rem;
+    }
+    .shelf .nm { flex: 1 1 8rem; font-weight: bold; color: #3d3560; text-align: left; }
+    .shelf .meta { color: #8a83a3; font-size: 0.8rem; }
+    .shelf button {
+      font-family: var(--font); font-weight: bold; font-size: 0.9rem;
+      border: 2px solid #cdbfff; background: #fff; color: var(--purple);
+      border-radius: 999px; padding: 0.35rem 0.7rem; cursor: pointer; min-height: 2.4rem;
+    }
+    .shelf button.rm { border-color: #f2b6b6; color: #c0392b; }
+    .shelf .empty-note { color: #8a83a3; }
+
+    /* ---- accessibility polish ---- */
+    .panel:focus-visible, .item:focus-visible, .txt:focus-visible {
+      outline: 4px solid #ffb703; outline-offset: 2px;
+    }
+    .item:focus { outline: none; }
+    .item.kb .content { outline: 0.7cqmin dashed var(--purple); outline-offset: 1cqmin; }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+      .sticker-btn:hover, .color-btn:hover, .scene-btn:hover, .sfx-btn:hover, .big-btn:hover { transform: none; }
+    }
+
     /* ---- printing: only the comic ---- */
     @media print {
       body { background: #fff; }
@@ -324,7 +394,7 @@
   <div class="maker">
     <p class="how">
       <b>Draw</b> your own graphic novel! Pick a colour and draw right inside a panel — like a paint program,
-      but with comic <b>panels, pages &amp; speech bubbles</b> ready to go. Add stickers &amp; sound words too. ✨
+      but with comic <b>panels, pages &amp; speech bubbles</b> ready to go. Add stickers &amp; sound words — and tap <b>📖 Story</b> for ideas, sentence starters and a writing check. ✨
     </p>
 
     <h2 class="book-title" id="book-title" contenteditable="true" spellcheck="false"
@@ -350,13 +420,14 @@
       <button class="nav-arrow" id="next-page" aria-label="Next page">▶</button>
     </div>
 
-    <div class="hint" id="hint">Pick a colour below and draw right on the panel! ✏️</div>
+    <div class="hint" id="hint" role="status" aria-live="polite">Pick a colour below and draw right on the panel! ✏️</div>
 
     <div class="toolbox">
       <div class="tabs">
         <button class="tab on" data-tab="draw">✏️ Draw</button>
         <button class="tab" data-tab="stickers">🧸 Stickers</button>
         <button class="tab" data-tab="words">💬 Words</button>
+        <button class="tab" data-tab="story">📖 Story</button>
         <button class="tab" data-tab="sounds">💥 Sounds</button>
         <button class="tab" data-tab="scenes">🎨 Paper</button>
         <button class="tab" data-tab="page">📄 Page</button>
@@ -402,6 +473,56 @@
           <button class="big-btn" data-add="thought">💭 Thought</button>
           <button class="big-btn" data-add="shout">💥 Shout!</button>
           <button class="big-btn" data-add="caption">📃 Story caption</button>
+        </div>
+        <p class="tray-label" style="margin-top:0.6rem;">
+          Tip: a <b>caption</b> tells the story (“Later that night…”) and a <b>talk bubble</b>
+          is what a character actually says.
+        </p>
+      </div>
+
+      <!-- Story coach: sparks, structure, word bank, writing check -->
+      <div class="tray hide" id="tray-story">
+        <div class="story-sec">
+          <h3 class="story-h">✨ Story spark</h3>
+          <p class="tray-label" style="margin:0 0 0.5rem;">Stuck? Get a brand-new story idea.</p>
+          <div class="spark-card" id="spark-card">Tap <b>Give me an idea</b> for a story to draw!</div>
+          <div class="btn-row" style="margin-top:0.5rem;">
+            <button class="big-btn" id="spark-btn">🎲 Give me an idea</button>
+            <button class="ghost-btn" id="spark-use">📃 Put it in my comic</button>
+          </div>
+        </div>
+
+        <div class="story-sec">
+          <h3 class="story-h">🧱 Beginning · Middle · End</h3>
+          <p class="tray-label" style="margin:0 0 0.5rem;">
+            Every story has three parts. Tap a sentence starter to drop it into the panel you picked —
+            then finish the sentence in your own words.
+          </p>
+          <div class="cat-row" id="part-row">
+            <button class="cat on" data-part="begin">🌅 Beginning</button>
+            <button class="cat" data-part="middle">⚡ Middle</button>
+            <button class="cat" data-part="end">🌙 End</button>
+          </div>
+          <p class="part-tip" id="part-tip"></p>
+          <div class="pad" id="starter-pad"></div>
+        </div>
+
+        <div class="story-sec">
+          <h3 class="story-h">💎 Juicy words</h3>
+          <p class="tray-label" style="margin:0 0 0.5rem;">
+            Tap a bubble or caption first, then tap a word to add it. Swap <i>big</i> for <i>enormous</i>!
+          </p>
+          <div class="cat-row" id="word-cat-row"></div>
+          <div class="pad" id="word-pad"></div>
+        </div>
+
+        <div class="story-sec">
+          <h3 class="story-h">✅ Story check-up</h3>
+          <div class="btn-row" style="margin-bottom:0.5rem;">
+            <button class="big-btn" id="check-writing">🔎 Check my writing</button>
+          </div>
+          <p class="check-note" id="check-note"></p>
+          <ul class="checklist" id="checklist"></ul>
         </div>
       </div>
 
@@ -449,6 +570,17 @@
           <button class="big-btn" id="print">🖨️ Print / Save PDF</button>
           <button class="big-btn" id="export-png">🖼️ Save page as picture</button>
         </div>
+        <div class="shelf-box">
+          <h3 class="story-h">📚 My comic shelf</h3>
+          <p class="tray-label" style="margin:0 0 0.5rem;">
+            Keep as many comics as you like right here in this browser — no file needed.
+          </p>
+          <div class="btn-row">
+            <button class="big-btn" id="shelf-save">⭐ Save this comic to my shelf</button>
+          </div>
+          <ul class="shelf" id="shelf"></ul>
+        </div>
+
         <div class="btn-row" style="margin-top:0.7rem;">
           <button class="ghost-btn" id="dupe-page">⧉ Copy this page</button>
           <button class="ghost-btn" id="example">✨ Show an example</button>

@@ -173,8 +173,22 @@ window.CPData = (function () {
       function () {
         var big = range(3, 5), small = range(1, 2), e = pick(COUNTABLES);
         return mk({ subject: "math", q: "Which pile has MORE?",
-          right: { t: emojiRun(e, big), big: true }, wrong: [{ t: emojiRun(e, small), big: true }],
+          right: { emoji: emojiRun(e, big) }, wrong: [{ emoji: emojiRun(e, small) }],
           teach: "More means a bigger pile — " + big + " beats " + small + "." }, "tot");
+      },
+      function () {
+        var e = pick(COUNTABLES), n = range(1, 3);
+        var other = n === 1 ? 3 : n - 1;
+        return mk({ subject: "math", kind: "big", q: "Which pile is " + n + "?", big: { text: String(n) },
+          right: { emoji: emojiRun(e, n) }, wrong: [{ emoji: emojiRun(e, other) }],
+          teach: "The number " + n + " means " + n + " thing" + (n === 1 ? "" : "s") + "." }, "tot");
+      },
+      function () {
+        var shp = [["Circle", "⭕"], ["Square", "🟥"], ["Triangle", "🔺"], ["Star", "⭐"], ["Heart", "💜"]];
+        var s = pick(shp), o = pick(shp.filter(function (x) { return x[0] !== s[0]; }));
+        return mk({ subject: "math", q: "Where is the " + s[0].toLowerCase() + "?",
+          right: { emoji: s[1] }, wrong: [{ emoji: o[1] }],
+          teach: "That's the " + s[0].toLowerCase() + "!" }, "tot");
       }
     ],
     early: [
@@ -208,6 +222,26 @@ window.CPData = (function () {
         return mk({ subject: "math", kind: "big", q: "Keep the pattern going!", big: { text: seq.join(", ") + ", ?" },
           right: String(start * (k + 3)), wrong: nearMiss(start * (k + 3), start).map(String),
           teach: "This one counts up by " + start + " each time." }, "early");
+      },
+      function () {
+        var a = range(1, 9);
+        return mk({ subject: "math", kind: "big", q: "How many more to make 10?", big: { text: a + " + ? = 10" },
+          right: String(10 - a), wrong: nearMiss(10 - a, 3).map(String),
+          teach: "Start at " + a + " and count on your fingers up to 10 — that's " + (10 - a) + " more." }, "early");
+      },
+      function () {
+        var a = range(1, 10);
+        return mk({ subject: "math", kind: "big", q: "Double it!", big: { text: a + " + " + a },
+          right: String(a * 2), wrong: nearMiss(a * 2, 3).map(String),
+          teach: "Doubling means two of the same: " + a + " and another " + a + " makes " + (a * 2) + "." }, "early");
+      },
+      function () {
+        var e = pick(COUNTABLES), n = range(4, 10);
+        var half = Math.floor(n / 2);
+        return mk({ subject: "math", kind: "big", q: "Share these fairly between 2 friends. How many each?",
+          big: { emoji: emojiRun(e, half * 2) },
+          right: String(half), wrong: nearMiss(half, 3).map(String),
+          teach: "Give one to you, one to them, one to you… " + (half * 2) + " shared between 2 is " + half + " each." }, "early");
       }
     ],
     mid: [
@@ -278,6 +312,55 @@ window.CPData = (function () {
           right: nh + ":" + String(nm).padStart(2, "0"),
           wrong: [((nh % 12) + 1) + ":" + String(nm).padStart(2, "0"), nh + ":" + String((nm + 15) % 60).padStart(2, "0"), (nh === 1 ? 12 : nh - 1) + ":" + String(nm).padStart(2, "0")],
           teach: "There are 60 minutes in an hour, so " + m + " + " + add + " rolls over into the next hour." }, "mid");
+      },
+      function () {
+        var n = range(1000, 9999);
+        var slots = [["thousands", 0, 1000], ["hundreds", 1, 100], ["tens", 2, 10], ["ones", 3, 1]];
+        var s = pick(slots);
+        var digit = String(n)[s[1]];
+        // Other digits from the number itself make the sharpest distractors;
+        // top up from 0-9 when the number repeats a digit.
+        var distractors = String(n).split("").filter(function (d) { return d !== digit; })
+          .concat(shuffle("0123456789".split("").filter(function (d) { return d !== digit; })));
+        return mk({ subject: "math", q: "In the number " + commas(n) + ", which digit is in the " + s[0] + " place?",
+          right: digit, wrong: distractors,
+          teach: "Read the places from the right: ones, tens, hundreds, thousands. " +
+                 "So that " + digit + " is really worth " + commas(Number(digit) * s[2]) + "." }, "mid");
+      },
+      function () {
+        var to = pick([10, 100]);
+        var n = range(to === 10 ? 12 : 120, to === 10 ? 199 : 1999);
+        var v = Math.round(n / to) * to;
+        return mk({ subject: "math", q: "Round " + commas(n) + " to the nearest " + to + ".",
+          right: commas(v), wrong: [commas(v + to), commas(v - to), commas(v + to * 2)],
+          teach: "Look at the digit just to the right: 5 or more rounds up, 4 or less rounds down. " +
+                 commas(n) + " → " + commas(v) + "." }, "mid");
+      },
+      function () {
+        // Cory's Minecraft question: how many blocks in a solid cuboid?
+        var w = range(2, 6), d = range(2, 6), h = range(2, 5);
+        var v = w * d * h;
+        return mk({ subject: "math", q: "You build a solid block of stone " + w + " wide, " + d + " deep and " + h + " tall. How many blocks did it take?",
+          right: String(v), wrong: nearMiss(v, Math.max(3, Math.round(v * 0.25))).map(String),
+          teach: "One layer is " + w + " × " + d + " = " + (w * d) + " blocks, and there are " + h + " layers → " + (w * d) + " × " + h + " = " + v + "." }, "mid");
+      },
+      function () {
+        var n = range(6, 40) * 2 + (rnd(2) ? 1 : 0);
+        var isEven = n % 2 === 0;
+        return mk({ subject: "math", q: "Is " + n + " odd or even — and how do you know?",
+          right: (isEven ? "Even" : "Odd") + " — it ends in " + (n % 10),
+          wrong: [(isEven ? "Odd" : "Even") + " — it ends in " + (n % 10),
+                  (isEven ? "Odd" : "Even") + " — it is more than 10",
+                  (isEven ? "Even" : "Odd") + " — its digits add to " + String(n).split("").reduce(function (s, d) { return s + Number(d); }, 0)],
+          teach: "Only the LAST digit matters. 0, 2, 4, 6, 8 → even. 1, 3, 5, 7, 9 → odd." }, "mid");
+      },
+      function () {
+        var per = pick([3, 4, 5, 6, 8]), groups = range(3, 9), spare = rnd(per);
+        var total = per * groups + spare;
+        return mk({ subject: "math", q: "You put " + total + " berries into baskets of " + per + ". How many baskets are FULL?",
+          right: String(groups), wrong: nearMiss(groups, 3).map(String),
+          teach: total + " ÷ " + per + " = " + groups + " with " + spare + " left over, so " + groups + " baskets fill up" +
+                 (spare ? " and " + spare + " berr" + (spare === 1 ? "y" : "ies") + " sit in the next one." : ".") }, "mid");
       }
     ],
     big: [
@@ -437,7 +520,33 @@ window.CPData = (function () {
     ["M", "🌙", "Moon"], ["N", "👃", "Nose"], ["O", "🐙", "Octopus"], ["P", "🐧", "Penguin"],
     ["Q", "👑", "Queen"], ["R", "🌈", "Rainbow"], ["S", "☀️", "Sun"], ["T", "🌳", "Tree"],
     ["U", "☂️", "Umbrella"], ["V", "🎻", "Violin"], ["W", "🍉", "Watermelon"],
-    ["Y", "🪀", "Yo-yo"], ["Z", "🦓", "Zebra"]
+    ["X", "🩻", "X-ray"], ["Y", "🪀", "Yo-yo"], ["Z", "🦓", "Zebra"]
+  ];
+
+  /* Beginning SOUNDS, which is a different skill from letter NAMES:
+     "b… b… ball" is how a four-year-old actually cracks reading. */
+  var SOUNDS = [
+    ["b", "🎈", "balloon"], ["c", "🥕", "carrot"], ["d", "🦆", "duck"], ["f", "🐟", "fish"],
+    ["g", "🐐", "goat"], ["h", "🎩", "hat"], ["j", "🧃", "juice"], ["l", "🍃", "leaf"],
+    ["m", "🌝", "moon"], ["n", "🪺", "nest"], ["p", "🥧", "pie"], ["r", "🤖", "robot"],
+    ["s", "🧦", "sock"], ["t", "🚂", "train"], ["v", "🚐", "van"], ["w", "🌊", "wave"]
+  ];
+
+  /* Little words a pre-reader can sound out, each with the picture that
+     says what the word MEANS — so "which is spelled right" has an answer. */
+  var TINY_WORDS = [
+    ["cat", "🐱", ["kat", "cta", "cate"]],
+    ["dog", "🐶", ["dawg", "dogg", "doog"]],
+    ["sun", "☀️", ["sunn", "son", "sen"]],
+    ["bed", "🛏️", ["bd", "bead", "bedd"]],
+    ["fish", "🐟", ["fsh", "fich", "phish"]],
+    ["hat", "🎩", ["haat", "hatt", "het"]],
+    ["cup", "☕", ["kup", "cupp", "cop"]],
+    ["bus", "🚌", ["buss", "bas", "bux"]],
+    ["star", "⭐", ["stur", "starr", "sta"]],
+    ["frog", "🐸", ["frogg", "farg", "flog"]],
+    ["milk", "🥛", ["mik", "milck", "melk"]],
+    ["tree", "🌳", ["tre", "trea", "tri"]]
   ];
 
   var RHYMES = [
@@ -697,12 +806,32 @@ window.CPData = (function () {
           teach: "Big " + t[0] + " and little " + t[0].toLowerCase() + " are the same letter." }, "early");
       },
       function () {
-        var pairs = [["cat", "kat"], ["dog", "dawg"], ["sun", "sunn"], ["bed", "bd"], ["fish", "fsh"],
-                     ["hat", "haat"], ["cup", "kup"], ["red", "rud"], ["big", "bigg"], ["top", "topp"]];
-        var p = pick(pairs);
-        return mk({ subject: "word", q: "Which one is spelled RIGHT?",
-          right: p[0], wrong: [p[1], p[0].split("").reverse().join(""), p[0] + "e"],
-          teach: "It's spelled " + p[0].split("").join("-") + "." }, "early");
+        // The picture says WHICH word we mean, so exactly one spelling can
+        // be right. (Without it, "top" and "pot" are both spelled fine.)
+        var w = pick(TINY_WORDS);
+        return mk({ subject: "word", kind: "big", q: "Which one spells this?", big: { emoji: w[1] },
+          right: w[0], wrong: w[2],
+          teach: w[1] + " is spelled " + w[0].split("").join("-") + "." }, "early");
+      },
+      function () {
+        var s = pick(SOUNDS);
+        var others = shuffle(SOUNDS.filter(function (x) { return x[0] !== s[0]; })).slice(0, 3);
+        return mk({ subject: "word", q: "Which one starts with the “" + s[0] + "” sound?",
+          right: { t: s[2], emoji: s[1] },
+          wrong: others.map(function (o) { return { t: o[2], emoji: o[1] }; }),
+          teach: "“" + s[0] + "” … " + s[2] + ". Say it slowly and listen to the very first sound." }, "early");
+      },
+      function () {
+        // Which letter is MISSING — the first real spelling puzzle.
+        var w = pick(TINY_WORDS);
+        var i = 1 + rnd(w[0].length - 1);
+        var gap = w[0].slice(0, i) + "_" + w[0].slice(i + 1);
+        var letter = w[0][i];
+        var others = shuffle("abcdefghijklmnoprstuw".split("").filter(function (c) { return c !== letter; })).slice(0, 3);
+        return mk({ subject: "word", kind: "big", q: "Which letter is missing?", big: { text: gap.toUpperCase() },
+          right: { t: letter, huge: true },
+          wrong: others.map(function (c) { return { t: c, huge: true }; }),
+          teach: "The word is " + w[0] + " " + w[1] + " — " + w[0].split("").join("-") + "." }, "early");
       }
     ],
     mid: [
@@ -1064,15 +1193,35 @@ window.CPData = (function () {
           teach: "Baby " + b[0] + " = " + b[1] + "." }, "early");
       },
       function () {
-        var sets = [["Which one flies?", "🦋", ["🐟", "🐌", "🐢"]],
-                    ["Which one lives in water?", "🐠", ["🐪", "🦒", "🐿️"]],
-                    ["Which one is a fruit?", "🍌", ["🥕", "🥦", "🧅"]],
-                    ["Which one do you wear?", "👟", ["🍕", "🚗", "📚"]],
-                    ["Which one is hot?", "🔥", ["❄️", "🧊", "⛄"]],
-                    ["Which one comes out at night?", "🌙", ["☀️", "🌻", "🏖️"]]];
+        // Every one of these carries a REASON, because "nice spotting!"
+        // teaches a three-year-old absolutely nothing.
+        var sets = [
+          ["Which one flies?", "🦋", ["🐟", "🐌", "🐢"], "A butterfly has wings. Fish swim, and snails and turtles crawl."],
+          ["Which one lives in water?", "🐠", ["🐪", "🦒", "🐿️"], "Fish breathe underwater with gills. Camels, giraffes and squirrels live on land."],
+          ["Which one is a fruit?", "🍌", ["🥕", "🥦", "🧅"], "Fruit grows from a flower and carries seeds. Carrots are roots, broccoli is a flower bud, onions are bulbs."],
+          ["Which one do you wear?", "👟", ["🍕", "🚗", "📚"], "Shoes go on your feet. Pizza you eat, a car you ride in, a book you read."],
+          ["Which one is hot?", "🔥", ["❄️", "🧊", "⛄"], "Fire is hot. Snow, ice and snowmen are all freezing cold."],
+          ["Which one comes out at night?", "🌙", ["☀️", "🌻", "🏖️"], "The moon shines at night. The sun, sunflowers and the beach belong to the daytime."],
+          ["Which one is an animal?", "🐘", ["🌳", "🚗", "🏠"], "Animals eat, move and grow. Trees grow but can't walk; cars and houses aren't alive at all."],
+          ["Which one do you use to hear?", "👂", ["👁️", "👃", "✋"], "Ears hear, eyes see, a nose smells and a hand touches."],
+          ["Which one grows in the ground?", "🥔", ["🐟", "☁️", "🧦"], "Potatoes grow underground. Fish swim, clouds float and socks come from a drawer!"],
+          ["Which one is round?", "⚽", ["📕", "🚪", "🧊"], "A ball is round everywhere — no corners. Books, doors and ice cubes have straight edges."],
+          ["Which one is the baby?", "🐣", ["🐔", "🦆", "🦢"], "A chick has just hatched. Hens, ducks and swans are all grown up."],
+          ["Which one keeps you dry in the rain?", "☂️", ["🕶️", "🧤", "🎈"], "An umbrella covers you. Sunglasses are for bright sun and gloves are for cold hands."]
+        ];
         var s = pick(sets);
         return mk({ subject: "wonder", q: s[0], right: { t: "", emoji: s[1] },
-          wrong: s[2].map(function (e) { return { t: "", emoji: e }; }), teach: "Nice spotting!" }, "early");
+          wrong: s[2].map(function (e) { return { t: "", emoji: e }; }), teach: s[3] }, "early");
+      },
+      function () {
+        var seq = [["🌱", "🌿", "🌳", "A seed sprouts, grows leaves, then becomes a tree."],
+                   ["🥚", "🐣", "🐔", "An egg hatches into a chick, and the chick grows into a hen."],
+                   ["🌧️", "🌈", "☀️", "Rain, then a rainbow while the sun comes back out."]];
+        var s = pick(seq);
+        return mk({ subject: "wonder", kind: "big", q: "What comes NEXT?", big: { emoji: s[0] + " " + s[1] + " ?" },
+          right: { t: "", emoji: s[2] },
+          wrong: shuffle(["🚗", "🧦", "🍕", "🎈", "🪑"]).slice(0, 3).map(function (e) { return { t: "", emoji: e }; }),
+          teach: s[3] }, "early");
       }
     ],
     mid: [function () { var s = pick(SCI_MID); return mk({ subject: "wonder", q: s[0], right: s[1], wrong: s[2], teach: s[3] }, "mid"); }],
