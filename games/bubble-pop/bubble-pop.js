@@ -76,15 +76,15 @@
   const LEVEL_KEY = "bubblePopLevel";    // last level played     (new)
 
   const MODES = {
-    easy:   { label: "Easy",   kind: "match",   max: 5,  secs: 45, stars: [4, 10, 18], spawn: 800, rise: 5.6 },
-    normal: { label: "Normal", kind: "match",   max: 9,  secs: 45, stars: [4, 10, 18], spawn: 760, rise: 5.2 },
-    count:  { label: "Dots",   kind: "dots",    max: 6,  secs: 45, stars: [4, 9, 15],  spawn: 850, rise: 6.0 },
+    easy:   { label: "Easy",   kind: "match",   max: 5,  secs: 45, stars: [4, 10, 18], spawn: 800, rise: 5.6, bias: 0.5 },
+    normal: { label: "Normal", kind: "match",   max: 9,  secs: 45, stars: [4, 10, 18], spawn: 760, rise: 5.2, bias: 0.45 },
+    count:  { label: "Dots",   kind: "dots",    max: 6,  secs: 45, stars: [4, 9, 15],  spawn: 850, rise: 6.0, bias: 0.45 },
     popn:   { label: "Count Out", kind: "popn", max: 6,  secs: 60, stars: [8, 16, 26], spawn: 700, rise: 6.4 },
-    abc:    { label: "ABC",    kind: "letters",          secs: 45, stars: [4, 10, 18], spawn: 780, rise: 5.4 },
-    hard:   { label: "Hard",   kind: "match",   max: 20, secs: 45, stars: [4, 9, 15],  spawn: 780, rise: 5.6 },
-    add:    { label: "Add",    kind: "add",     secs: 60, stars: [3, 7, 12], spawn: 900, rise: 7.0 },
-    sub:    { label: "Take Away", kind: "sub",  secs: 60, stars: [3, 7, 12], spawn: 900, rise: 7.0 },
-    skip:   { label: "Skip & Double", kind: "skip", secs: 60, stars: [3, 6, 10], spawn: 950, rise: 7.4 },
+    abc:    { label: "ABC",    kind: "letters",          secs: 45, stars: [4, 10, 18], spawn: 780, rise: 5.4, bias: 0.42 },
+    hard:   { label: "Hard",   kind: "match",   max: 20, secs: 45, stars: [4, 9, 15],  spawn: 780, rise: 5.6, bias: 0.34 },
+    add:    { label: "Add",    kind: "add",     secs: 60, stars: [3, 7, 12], spawn: 900, rise: 7.0, bias: 0.34 },
+    sub:    { label: "Take Away", kind: "sub",  secs: 60, stars: [3, 7, 12], spawn: 900, rise: 7.0, bias: 0.34 },
+    skip:   { label: "Skip & Double", kind: "skip", secs: 60, stars: [3, 6, 10], spawn: 950, rise: 7.4, bias: 0.34 },
   };
 
   const SWAY = 7;          // px of gentle side-to-side drift (kept inside the board)
@@ -416,7 +416,12 @@
 
     const dots = mode.kind === "dots";
     const blank = mode.kind === "popn";
-    const value = blank ? null : ((!answerOnScreen() || Math.random() < 0.45) ? round.answer : distractor());
+    // always keep a real CHOICE on the board: at least one right bubble and,
+    // once there's company, at least one wrong one to think about.
+    const onlyAnswers = live.length >= 2 && !live.some(function (r) { return r.value && r.value !== round.answer; });
+    const value = blank ? null
+      : (onlyAnswers ? distractor()
+        : ((!answerOnScreen() || Math.random() < (mode.bias || 0.42)) ? round.answer : distractor()));
 
     const size = dots ? randInt(88, 112) : randInt(66, 104);
     const areaW = playArea.clientWidth;

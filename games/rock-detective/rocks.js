@@ -8,7 +8,7 @@
      browser:  <script src="rocks.js"></script>  ->  window.ROCK_DATA
      node:     const D = require("./rocks.js");
 
-   EVERY number in here is meant to be真 correct. If you change
+   EVERY number in here is meant to be correct. If you change
    a hardness, a streak or a "fizzes", run validate.js again.
    =========================================================== */
 (function (root, factory) {
@@ -475,7 +475,7 @@
       c1: "#d4af37", c2: "#a8862a", mohs: 6.5,
       streak: "Greenish-black", lustre: "Bright metallic",
       breaks: "Brittle — it shatters. Real gold just bends.",
-      k: ["g-cube", "l-metal", "c-gold", "h4", "s-rock", "t-heavy"],
+      k: ["g-cube", "l-metal", "c-gold", "h4", "s-dark", "t-heavy"],
       fact: "'Fool's Gold' — brassy cubes that fooled a lot of miners.",
       forms: "Grows from sulfur-rich fluids, in veins, in coal beds and even inside fossils.",
       more: "The streak test busts it instantly: pyrite's powder is <b>greenish-black</b>, real gold's powder is golden. Pyrite is also hard (6½) and brittle; gold is soft (2½) and squishy. 😅"
