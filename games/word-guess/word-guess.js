@@ -355,7 +355,7 @@
     let html = '<span class="c-known">✔ ' + known.join(" ") + "</span>";
     if (stillIn.length) html += '<span class="c-in">↔ somewhere: ' + stillIn.join(" ") + "</span>";
     if (out.length) html += '<span class="c-out">✖ ruled out: ' + out.slice(0, 14).join(" ") + "</span>";
-    html += '<span class="c-left">🔎 ' + left + (left === 1 ? " word still fits" : " words still fit") + "</span>";
+    html += '<span class="c-left">🔎 ' + left + (left === 1 ? " word in my list still fits" : " words in my list still fit") + "</span>";
     el.coach.innerHTML = html;
   }
 

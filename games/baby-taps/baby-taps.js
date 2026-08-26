@@ -418,7 +418,22 @@
     b.style.top = spot.y + "px";
     b.style.animationDelay = "0s, " + (Math.random() * 2).toFixed(2) + "s";   // stagger the glow
 
-    (BUILDERS[mode] || buildShape)(b, d);
+    // Try a few times to avoid handing a kid three identical owls at once —
+    // variety is half the point. If everything collides we keep the last try.
+    const onScreen = {};
+    el.pit.querySelectorAll(".thing:not(.gone)").forEach(function (t) {
+      onScreen[t.dataset.word] = 1;
+      if (t.dataset.kind === "shape") onScreen["shape:" + (t.dataset.word || "").split(" ").pop()] = 1;
+    });
+    const build = BUILDERS[mode] || buildShape;
+    for (let tries = 0; tries < 6; tries++) {
+      b.innerHTML = "";
+      b.className = "thing" + (reduce ? "" : " bob");
+      build(b, d);
+      const dupe = onScreen[b.dataset.word] ||
+        (b.dataset.kind === "shape" && onScreen["shape:" + b.dataset.word.split(" ").pop()]);
+      if (!dupe) break;
+    }
 
     // Once in a while one arrives wearing a golden glow. Popping it
     // showers confetti — a small surprise to keep the game interesting.
