@@ -13,46 +13,63 @@
   const STORE_KEY = "life-lab-v1";
 
   const SIZES = {
+    tiny:   { label: "🔎 Tiny",   cols: 24,  rows: 16 },
     small:  { label: "🟩 Small",  cols: 48,  rows: 30 },
     medium: { label: "🟨 Medium", cols: 72,  rows: 45 },
     large:  { label: "🟦 Big",    cols: 108, rows: 68 },
   };
 
-  /* Patterns are drawn with O = alive. Stamped centred on the tap. */
+  /* Honour the OS "reduce motion" setting: no eased fades, no confetti. */
+  const REDUCE = !!(window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  /* Patterns are drawn with O = alive. Stamped centred on the tap.
+     `kind` groups them in the pattern library and `desc` is the one-line
+     science lesson shown whenever a brush is picked. */
   const PATTERNS = [
-    { key: "pencil", name: "✏️ Pencil", cells: null },
-    { key: "block", name: "🧊 Block", cells: [
+    { key: "pencil", name: "✏️ Pencil", cells: null,
+      desc: "Draw one cell at a time. Tap an empty square to bring it to life, or tap a living cell to rub it out. Drag to draw a line!" },
+    { key: "eraser", name: "🧽 Eraser", cells: null,
+      desc: "Rubs cells out wherever you drag. Handy for tidying up a busy world." },
+    { key: "inspect", name: "🔍 Inspect", cells: null,
+      desc: "Tap any square and the game counts its 8 neighbours for you and explains — in words — whether it lives, dies or is born next turn." },
+    { key: "block", name: "🧊 Block", kind: "Still life", cells: [
       "OO",
       "OO",
-    ]},
-    { key: "blinker", name: "💡 Blinker", cells: [
+    ], desc: "A still life: every cell has exactly 3 neighbours, so all four survive and no empty square has 3. It never, ever changes." },
+    { key: "beehive", name: "🍯 Beehive", kind: "Still life", cells: [
+      ".OO.",
+      "O..O",
+      ".OO.",
+    ], desc: "Another still life. Each of the 6 cells has exactly 2 neighbours — just enough to survive, never enough to grow." },
+    { key: "blinker", name: "💡 Blinker", kind: "Oscillator", cells: [
       "OOO",
-    ]},
-    { key: "toad", name: "🐸 Toad", cells: [
+    ], desc: "An oscillator with period 2: it flips between lying down and standing up, over and over, forever." },
+    { key: "toad", name: "🐸 Toad", kind: "Oscillator", cells: [
       ".OOO",
       "OOO.",
-    ]},
-    { key: "glider", name: "🚀 Glider", cells: [
+    ], desc: "A period-2 oscillator too, but fatter — it puffs out and sucks back in like a breathing frog." },
+    { key: "glider", name: "🚀 Glider", kind: "Spaceship", cells: [
       ".O.",
       "..O",
       "OOO",
-    ]},
-    { key: "lwss", name: "🛸 Spaceship", cells: [
+    ], desc: "A spaceship! It repeats its own shape every 4 generations, but one square diagonally further on. Nothing is moving — cells just keep being born in front and dying behind." },
+    { key: "lwss", name: "🛸 Spaceship", kind: "Spaceship", cells: [
       ".O..O",
       "O....",
       "O...O",
       "OOOO.",
-    ]},
-    { key: "rpent", name: "🌪️ Chaos Seed", cells: [
+    ], desc: "The lightweight spaceship: it travels straight sideways, 2 squares every 4 generations — twice as fast as a glider." },
+    { key: "rpent", name: "🌪️ Chaos Seed", kind: "Methuselah", cells: [
       ".OO",
       "OO.",
       ".O.",
-    ]},
-    { key: "acorn", name: "🌰 Acorn", cells: [
+    ], desc: "The R-pentomino — only 5 cells, but it explodes into chaos for over a thousand generations before it settles. Tiny start, huge story." },
+    { key: "acorn", name: "🌰 Acorn", kind: "Methuselah", cells: [
       ".O.....",
       "...O...",
       "OO..OOO",
-    ]},
+    ], desc: "7 cells that grow for more than 5,000 generations. Turn wrap OFF and a big world ON to see it run properly." },
     { key: "pulsar", name: "💫 Pulsar", cells: [
       "..OOO...OOO..",
       ".............",
@@ -68,12 +85,12 @@
       ".............",
       "..OOO...OOO..",
     ]},
-    { key: "penta", name: "⚡ Sparkler", cells: [
+    { key: "penta", name: "⚡ Sparkler", kind: "Oscillator", cells: [
       "..O....O..",
       "OO.OOOO.OO",
       "..O....O..",
-    ]},
-    { key: "gun", name: "🏭 Glider Factory", cells: [
+    ], desc: "The pentadecathlon — an oscillator with period 15. Count the beats: it takes 15 generations to look the same again." },
+    { key: "gun", name: "🏭 Glider Factory", kind: "Gun", cells: [
       "........................O...........",
       "......................O.O...........",
       "............OO......OO............OO",
@@ -85,6 +102,11 @@
       "............OO......................",
     ]},
   ];
+  PATTERNS.find((p) => p.key === "pulsar").kind = "Oscillator";
+  PATTERNS.find((p) => p.key === "pulsar").desc =
+    "A big period-3 oscillator with beautiful symmetry — one of the most common oscillators you'll find in a random world.";
+  PATTERNS.find((p) => p.key === "gun").desc =
+    "Gosper's glider gun: it pops out a brand new glider every 30 generations, forever. It proved that Life can grow without limit.";
 
   /* Discovery badges — earned automatically when the world does
      something scientifically interesting. Saved with the world. */
@@ -103,6 +125,10 @@
       desc: "Invent your OWN rule in the Rule Lab — one that isn't a famous recipe." },
     { key: "stamps",   emoji: "📚", name: "Stamp Collector",
       desc: "Stamp every creature in the Stamp Shop at least once." },
+    { key: "seer",     emoji: "🔮", name: "Fortune Teller",
+      desc: "Get 3 predictions perfect in a row in Predict the Next Generation. Now you ARE the computer!" },
+    { key: "detective",emoji: "🕵️", name: "Cell Detective",
+      desc: "Use the 🔍 Inspect tool on 10 different squares to see why they live or die." },
   ];
 
   const PRESETS = [
@@ -133,6 +159,11 @@
     rot: 0,           // stamp rotation, quarter turns clockwise
     badges: {},       // discovery badges earned (key -> true)
     stampsUsed: {},   // stamp brushes tried at least once
+    myPatterns: [],   // stamps the player saved themselves
+    cursor: null,     // {x,y} keyboard cursor on the world
+    inspected: {},    // squares looked at with the 🔍 tool (key "x,y")
+    predStreak: 0,
+    predBest: 0,
   };
   state.birth[3] = true;
   state.survive[2] = state.survive[3] = true;
@@ -198,33 +229,54 @@
     return Math.min(PAL_N - 1, Math.round(t * (PAL_N - 1)));
   }
 
-  /* ---------- simulation ---------- */
-  function step() {
-    const { cols, rows, cells, next, age, colorIdx, birth, survive, wrap } = state;
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        let n = 0;
-        for (let dy = -1; dy <= 1; dy++) {
-          let ny = y + dy;
-          if (ny < 0 || ny >= rows) {
-            if (!wrap) continue;
-            ny = (ny + rows) % rows;
-          }
-          const row = ny * cols;
-          for (let dx = -1; dx <= 1; dx++) {
-            if (dx === 0 && dy === 0) continue;
-            let nx = x + dx;
-            if (nx < 0 || nx >= cols) {
-              if (!wrap) continue;
-              nx = (nx + cols) % cols;
-            }
-            n += cells[row + nx];
-          }
+  /* ---------- simulation ----------
+     THE RULE lives between the markers below and nowhere else: the world,
+     the 🔍 inspector and the 🔮 prediction puzzle all call these two
+     functions, so what the game teaches is literally what the game runs.
+     (tests/ extracts this block straight out of the file and checks it.) */
+  /* @rule-core-start */
+  // How many of the 8 squares touching (x, y) are alive?
+  function countNeighbours(cells, cols, rows, x, y, wrap) {
+    let n = 0;
+    for (let dy = -1; dy <= 1; dy++) {
+      let ny = y + dy;
+      if (ny < 0 || ny >= rows) {
+        if (!wrap) continue;
+        ny = (ny + rows) % rows;
+      }
+      const row = ny * cols;
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        let nx = x + dx;
+        if (nx < 0 || nx >= cols) {
+          if (!wrap) continue;
+          nx = (nx + cols) % cols;
         }
-        const i = y * cols + x;
-        next[i] = cells[i] ? (survive[n] ? 1 : 0) : (birth[n] ? 1 : 0);
+        n += cells[row + nx];
       }
     }
+    return n;
+  }
+
+  // One whole generation, all at once. Every cell reads the OLD board
+  // (`cells`) and writes to a SEPARATE board (`out`) — no cell is ever
+  // allowed to see a half-updated world.
+  function stepBoard(cells, cols, rows, birth, survive, wrap, out) {
+    const dst = out || new Uint8Array(cols * rows);
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const n = countNeighbours(cells, cols, rows, x, y, wrap);
+        const i = y * cols + x;
+        dst[i] = cells[i] ? (survive[n] ? 1 : 0) : (birth[n] ? 1 : 0);
+      }
+    }
+    return dst;
+  }
+  /* @rule-core-end */
+
+  function step() {
+    const { cols, rows, cells, next, age, colorIdx, birth, survive, wrap } = state;
+    stepBoard(cells, cols, rows, birth, survive, wrap, next);
     // commit + bookkeeping (and fingerprint the world for discoveries)
     let pop = 0, h = 2166136261;
     for (let i = 0; i < cells.length; i++) {
@@ -239,8 +291,18 @@
       cells[i] = next[i];
     }
     state.generation++;
+    pushPop(pop);
     checkDiscoveries(pop, h);
   }
+
+  /* ---------- population history (drives the little graph) ---------- */
+  const POP_HIST_MAX = 260;
+  let popHist = [];
+  function pushPop(p) {
+    popHist.push(p);
+    if (popHist.length > POP_HIST_MAX) popHist.shift();
+  }
+  function resetPopHist() { popHist = []; }
 
   /* ---------- discovery detection ----------
      Compare the world's fingerprint with the last two generations:
@@ -301,9 +363,22 @@
     return out;
   }
 
+  /* Look up the active brush — either a built-in pattern/tool or one of
+     the player's own saved stamps ("my:<id>"). */
+  function brushDef(key) {
+    key = key || state.brush;
+    const p = PATTERNS.find((x) => x.key === key);
+    if (p) return p;
+    const m = state.myPatterns.find((x) => "my:" + x.id === key);
+    if (m) return { key: key, name: m.name, cells: m.cells, kind: "Yours",
+                    desc: "One of your own creations — you saved this shape yourself. 🌟" };
+    return PATTERNS[0];
+  }
+  function isTool(key) { return !brushDef(key).cells; }
+
   // The active brush's pattern, turned by the current rotation.
   function brushPattern() {
-    let pat = PATTERNS.find((p) => p.key === state.brush).cells;
+    let pat = brushDef().cells;
     if (!pat) return null;
     for (let i = 0; i < state.rot % 4; i++) pat = rotate90(pat);
     return pat;
@@ -332,6 +407,7 @@
     }
     state.generation = 0;
     forgetHistory();
+    resetPopHist();
   }
 
   function clearWorld() {
@@ -339,6 +415,7 @@
     state.age.fill(0);
     state.generation = 0;
     forgetHistory();
+    resetPopHist();
     hadLife = false;
   }
 
@@ -346,22 +423,50 @@
      the world should feel alive the moment the page opens. */
   function seedShowcase() {
     clearWorld();
-    const gun = PATTERNS.find((p) => p.key === "gun").cells;
-    const pulsar = PATTERNS.find((p) => p.key === "pulsar").cells;
-    const glider = PATTERNS.find((p) => p.key === "glider").cells;
-    stampPattern(gun, Math.floor(state.cols * 0.3), Math.floor(state.rows * 0.22));
-    stampPattern(pulsar, Math.floor(state.cols * 0.72), Math.floor(state.rows * 0.68));
-    stampPattern(glider, Math.floor(state.cols * 0.18), Math.floor(state.rows * 0.75));
+    const pat = (k) => PATTERNS.find((p) => p.key === k).cells;
+    const cx = (f) => Math.floor(state.cols * f);
+    const cy = (f) => Math.floor(state.rows * f);
+    if (state.cols >= 60) {
+      stampPattern(pat("gun"),    cx(0.30), cy(0.22));
+      stampPattern(pat("pulsar"), cx(0.72), cy(0.68));
+      stampPattern(pat("glider"), cx(0.18), cy(0.75));
+    } else if (state.cols >= 40) {
+      stampPattern(pat("pulsar"), cx(0.66), cy(0.42));
+      stampPattern(pat("glider"), cx(0.12), cy(0.18));
+      stampPattern(pat("penta"),  cx(0.28), cy(0.80));
+    } else {
+      // A Tiny world: one of each family, so the first thing a small
+      // player sees is "some stay, some blink, some fly".
+      stampPattern(pat("block"),   cx(0.16), cy(0.22));
+      stampPattern(pat("blinker"), cx(0.55), cy(0.22));
+      stampPattern(pat("toad"),    cx(0.82), cy(0.55));
+      stampPattern(pat("glider"),  cx(0.20), cy(0.70));
+    }
   }
 
   /* ---------- canvas sizing & static grid layer ---------- */
   let dpr = 1, cssW = 0, cssH = 0, cellPx = 0;
   const gridLayer = document.createElement("canvas");
+  let lastLayout = "";
+
+  /* The canvas is width:100%, so its OWN box is the honest width — the
+     parent's clientWidth still includes the panel padding, which used to
+     make every cell very slightly taller than it was wide. */
+  function canvasWidth() {
+    const w = canvas.getBoundingClientRect().width;
+    if (w > 0) return w;
+    const parent = canvas.parentElement;
+    const cs = window.getComputedStyle(parent);
+    return parent.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
+  }
 
   function resizeCanvas() {
-    const w = canvas.parentElement.clientWidth - 0; // panel padding already outside
+    const w = canvasWidth();
     if (w <= 0) return;
     dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const sig = Math.round(w) + "|" + state.cols + "|" + state.rows + "|" + dpr;
+    if (sig === lastLayout) return;   // nothing changed — don't thrash
+    lastLayout = sig;
     cssW = w;
     cellPx = cssW / state.cols;
     cssH = Math.round(cellPx * state.rows);
@@ -369,6 +474,49 @@
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
     buildGridLayer();
+    resizeGraph();
+  }
+
+  /* ---------- population graph ---------- */
+  const graphCanvas = $("popGraph");
+  const graphCap = $("graphCap");
+  let gW = 0, gH = 0;
+  function resizeGraph() {
+    if (!graphCanvas) return;
+    const w = graphCanvas.getBoundingClientRect().width || cssW;
+    if (w <= 0) return;
+    gW = w; gH = 62;
+    graphCanvas.width = Math.round(gW * dpr);
+    graphCanvas.height = Math.round(gH * dpr);
+  }
+
+  function drawGraph() {
+    if (!graphCanvas || !graphCanvas.width) return;
+    const g = graphCanvas.getContext("2d");
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, gW, gH);
+    const n = popHist.length;
+    if (n < 2) return;
+    let max = 1;
+    for (let i = 0; i < n; i++) if (popHist[i] > max) max = popHist[i];
+    const px = (i) => (i / (n - 1)) * gW;
+    const py = (v) => gH - 4 - (v / max) * (gH - 10);
+    // filled area under the curve
+    g.beginPath();
+    g.moveTo(0, gH);
+    for (let i = 0; i < n; i++) g.lineTo(px(i), py(popHist[i]));
+    g.lineTo(gW, gH);
+    g.closePath();
+    g.fillStyle = "rgba(61, 220, 132, 0.22)";
+    g.fill();
+    // the line itself
+    g.beginPath();
+    for (let i = 0; i < n; i++) (i ? g.lineTo : g.moveTo).call(g, px(i), py(popHist[i]));
+    g.strokeStyle = "#3ddc84";
+    g.lineWidth = 2;
+    g.stroke();
+    graphCap.innerHTML = "📈 Population over the last <b>" + n +
+      "</b> generation" + (n === 1 ? "" : "s") + " — highest so far <b>" + max + "</b>";
   }
 
   function buildGridLayer() {
@@ -409,13 +557,15 @@
     }
 
     // ease every cell's brightness toward its true state
-    const k = 1 - Math.exp(-dt * 14);
+    // (with "reduce motion" on, cells simply snap — no fading)
+    const k = REDUCE ? 1 : 1 - Math.exp(-dt * 14);
     const { cells, energy } = state;
     for (let i = 0; i < cells.length; i++) {
       energy[i] += (cells[i] - energy[i]) * k;
     }
 
     draw();
+    drawGraph();
     requestAnimationFrame(frame);
   }
 
@@ -465,12 +615,25 @@
     }
     ctx.globalAlpha = 1;
 
-    // ghost preview of the selected stamp under the pointer
-    if (hoverCell && state.brush !== "pencil") {
-      const pat = brushPattern();
+    // the 🔍 inspector ring: the square being explained plus its 8 neighbours
+    if (inspectCell) {
+      ctx.strokeStyle = "rgba(255,209,102,0.55)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect((inspectCell.x - 1) * cellPx, (inspectCell.y - 1) * cellPx,
+                     cellPx * 3, cellPx * 3);
+      ctx.strokeStyle = "#ffd166";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(inspectCell.x * cellPx + 1, inspectCell.y * cellPx + 1,
+                     cellPx - 2, cellPx - 2);
+    }
+
+    // ghost preview of the selected stamp under the pointer / keyboard cursor
+    const marker = hoverCell || state.cursor;
+    const pat = marker && !isTool(state.brush) ? brushPattern() : null;
+    if (marker && pat) {
       const h = pat.length, w = pat[0].length;
-      let ox = hoverCell.x - Math.floor(w / 2);
-      let oy = hoverCell.y - Math.floor(h / 2);
+      let ox = marker.x - Math.floor(w / 2);
+      let oy = marker.y - Math.floor(h / 2);
       ox = Math.max(0, Math.min(cols - w, ox));
       oy = Math.max(0, Math.min(rows - h, oy));
       ctx.fillStyle = "rgba(255,255,255,0.45)";
@@ -480,12 +643,94 @@
           ctx.fillRect((ox + x) * cellPx + 1, (oy + y) * cellPx + 1, cellPx - 2, cellPx - 2);
         }
       }
-    } else if (hoverCell) {
+    } else if (marker) {
       ctx.strokeStyle = "rgba(255,255,255,0.6)";
       ctx.lineWidth = 2;
-      ctx.strokeRect(hoverCell.x * cellPx + 1, hoverCell.y * cellPx + 1, cellPx - 2, cellPx - 2);
+      ctx.strokeRect(marker.x * cellPx + 1, marker.y * cellPx + 1, cellPx - 2, cellPx - 2);
+    }
+    // the keyboard cursor always gets a bright ring of its own
+    if (state.cursor) {
+      ctx.strokeStyle = "#ffd166";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(state.cursor.x * cellPx + 1.5, state.cursor.y * cellPx + 1.5,
+                     cellPx - 3, cellPx - 3);
     }
   }
+
+  /* ================= 🔍 THE INSPECTOR =================
+     Tap a square and the game does the maths out loud: counts the 8
+     neighbours and says, in plain words, which half of the rule applies.
+     Everything it says is read from the LIVE rule arrays, so it stays
+     honest even after a trip to the Rule Lab. */
+  const inspectBox = $("inspectBox");
+  const inspGrid = $("inspGrid");
+  const inspHead = $("inspHead");
+  const inspWhy = $("inspWhy");
+  let inspectCell = null;
+
+  for (let i = 0; i < 9; i++) inspGrid.appendChild(document.createElement("i"));
+
+  function listOf(arr) {
+    const ns = arr.map((v, i) => (v ? i : -1)).filter((i) => i >= 0);
+    if (!ns.length) return "no number at all";
+    if (ns.length === 1) return String(ns[0]);
+    return ns.slice(0, -1).join(", ") + " or " + ns[ns.length - 1];
+  }
+
+  function cellAt(x, y) {
+    if (state.wrap) {
+      x = (x + state.cols) % state.cols;
+      y = (y + state.rows) % state.rows;
+    } else if (x < 0 || x >= state.cols || y < 0 || y >= state.rows) return 0;
+    return state.cells[y * state.cols + x];
+  }
+
+  function showInspect(x, y) {
+    inspectCell = { x: x, y: y };
+    const alive = !!cellAt(x, y);
+    const n = countNeighbours(state.cells, state.cols, state.rows, x, y, state.wrap);
+    const lives = alive ? !!state.survive[n] : !!state.birth[n];
+
+    // mini 3×3 picture of the neighbourhood
+    const boxes = inspGrid.children;
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const el = boxes[(dy + 1) * 3 + (dx + 1)];
+        el.className = (cellAt(x + dx, y + dy) ? "on" : "") + (dx === 0 && dy === 0 ? " mid" : "");
+      }
+    }
+
+    let head, why;
+    if (alive) {
+      head = "🟢 This cell is ALIVE and has " + n + " neighbour" + (n === 1 ? "" : "s") + ".";
+      if (lives) {
+        why = "Living cells survive with <b>" + listOf(state.survive) + "</b> neighbours — " + n +
+              " is on the list, so it <b>stays alive</b> next turn. ✅";
+      } else {
+        const surv = state.survive.map((v, i) => (v ? i : -1)).filter((i) => i >= 0);
+        const lonely = surv.length && n < surv[0];
+        why = "Living cells only survive with <b>" + listOf(state.survive) + "</b> neighbours. " +
+              n + " isn't on the list, so it <b>disappears</b> — " +
+              (lonely ? "too lonely. 💤" : "too crowded. 😵") ;
+      }
+    } else {
+      head = "⬛ This square is EMPTY and has " + n + " neighbour" + (n === 1 ? "" : "s") + ".";
+      why = lives
+        ? "A new cell is born in an empty square with <b>" + listOf(state.birth) +
+          "</b> neighbours — " + n + " matches, so a cell is <b>BORN</b> here! 🐣"
+        : "A birth needs exactly <b>" + listOf(state.birth) + "</b> neighbours. " + n +
+          " isn't enough of a match, so this square <b>stays empty</b>.";
+    }
+    inspHead.textContent = head;
+    inspWhy.innerHTML = why;
+    inspectBox.hidden = false;
+
+    state.inspected[x + "," + y] = true;
+    if (Object.keys(state.inspected).length >= 10) award("detective");
+    scheduleSave();
+  }
+
+  function hideInspect() { inspectCell = null; inspectBox.hidden = true; }
 
   /* ---------- pointer input ---------- */
   let painting = false, paintValue = 1, lastPaint = null;
@@ -519,16 +764,21 @@
     const c = cellFromEvent(ev);
     if (!c) return;
     try { canvas.setPointerCapture(ev.pointerId); } catch (e) { /* synthetic pointer */ }
-    if (state.brush === "pencil") {
+    state.cursor = null;
+    if (state.brush === "inspect") {
+      showInspect(c.x, c.y);
+      window.SFX && SFX.pop && SFX.pop();
+    } else if (state.brush === "pencil" || state.brush === "eraser") {
       painting = true;
-      paintValue = state.cells[c.y * state.cols + c.x] ? 0 : 1;
+      paintValue = state.brush === "eraser" ? 0
+                 : (state.cells[c.y * state.cols + c.x] ? 0 : 1);
       setCell(c.x, c.y, paintValue);
       lastPaint = c;
       window.SFX && SFX.pop && SFX.pop();
     } else {
       stampPattern(brushPattern(), c.x, c.y);
       state.stampsUsed[state.brush] = true;
-      if (PATTERNS.every((p) => p.key === "pencil" || state.stampsUsed[p.key])) award("stamps");
+      if (PATTERNS.filter((p) => p.cells).every((p) => state.stampsUsed[p.key])) award("stamps");
       window.SFX && SFX.good && SFX.good();
     }
     updateStats();
@@ -546,6 +796,58 @@
       scheduleSave();
     }
   });
+
+  /* ---------- keyboard play ----------
+     Focus the world, then drive it with the arrow keys — no mouse or
+     finger needed, and the cursor is big and bright enough to follow. */
+  function moveCursor(dx, dy) {
+    const c = state.cursor || { x: Math.floor(state.cols / 2), y: Math.floor(state.rows / 2) };
+    state.cursor = {
+      x: Math.max(0, Math.min(state.cols - 1, c.x + dx)),
+      y: Math.max(0, Math.min(state.rows - 1, c.y + dy)),
+    };
+    hoverCell = null;
+  }
+
+  const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+
+  canvas.addEventListener("keydown", (ev) => {
+    const arrow = ARROWS[ev.key];
+    if (arrow) {
+      ev.preventDefault();
+      const jump = ev.shiftKey ? 5 : 1;
+      moveCursor(arrow[0] * jump, arrow[1] * jump);
+      return;
+    }
+    if (ev.key === " " || ev.key === "Enter") {
+      ev.preventDefault();
+      if (!state.cursor) moveCursor(0, 0);
+      const c = state.cursor;
+      if (state.brush === "inspect" || isTool(state.brush)) {
+        if (state.brush !== "inspect") {
+          const on = state.cells[c.y * state.cols + c.x];
+          setCell(c.x, c.y, state.brush === "eraser" ? 0 : (on ? 0 : 1));
+        }
+        // always explain what just happened — this is also the
+        // screen-reader's only way to hear the state of a square
+        showInspect(c.x, c.y);
+      } else {
+        stampPattern(brushPattern(), c.x, c.y);
+        state.stampsUsed[state.brush] = true;
+        if (PATTERNS.filter((p) => p.cells).every((p) => state.stampsUsed[p.key])) award("stamps");
+      }
+      window.SFX && SFX.pop && SFX.pop();
+      updateStats();
+      scheduleSave();
+      return;
+    }
+    const k = ev.key.toLowerCase();
+    if (k === "s") { ev.preventDefault(); doStep(); }
+    else if (k === "p") { ev.preventDefault(); setPlaying(!state.playing); }
+    else if (k === "escape") { state.cursor = null; canvas.blur(); }
+  });
+
+  canvas.addEventListener("blur", () => { state.cursor = null; });
 
   function endPaint() { painting = false; lastPaint = null; }
   canvas.addEventListener("pointerup", endPaint);
@@ -565,12 +867,15 @@
     window.SFX && SFX.good && SFX.good();
   });
 
-  $("stepBtn").addEventListener("click", () => {
+  function doStep() {
     setPlaying(false);
     step();
     updateStats();
+    // keep the inspector's explanation in sync with the new generation
+    if (inspectCell) showInspect(inspectCell.x, inspectCell.y);
     scheduleSave();
-  });
+  }
+  $("stepBtn").addEventListener("click", doStep);
 
   $("randomBtn").addEventListener("click", () => {
     randomize();
@@ -582,6 +887,7 @@
   $("clearBtn").addEventListener("click", () => {
     setPlaying(false);
     clearWorld();
+    hideInspect();
     updateStats();
     scheduleSave();
   });
@@ -594,6 +900,7 @@
 
   wrapToggle.addEventListener("change", () => {
     state.wrap = wrapToggle.checked;
+    if (inspectCell) showInspect(inspectCell.x, inspectCell.y);
     scheduleSave();
   });
 
@@ -604,36 +911,118 @@
     }
   });
 
-  /* ---------- brush chips ---------- */
+  /* ---------- brush chips + the pattern library ---------- */
   const brushRow = $("brushRow");
-  PATTERNS.forEach((p) => {
-    const b = document.createElement("button");
-    b.className = "chip";
-    b.textContent = p.name;
-    b.dataset.brush = p.key;
-    b.setAttribute("aria-pressed", String(p.key === state.brush));
-    b.addEventListener("click", () => {
-      state.brush = p.key;
-      brushRow.querySelectorAll(".chip[data-brush]").forEach((el) => el.setAttribute("aria-pressed", "false"));
-      b.setAttribute("aria-pressed", "true");
-      rotateChip.disabled = p.key === "pencil";
-      rotateChip.style.opacity = rotateChip.disabled ? 0.45 : 1;
-    });
-    brushRow.appendChild(b);
-  });
+  const brushInfo = $("brushInfo");
+  const mineRow = $("mineRow");
 
   // Turn the stamp a quarter turn — aim gliders wherever you like!
   const rotateChip = document.createElement("button");
   rotateChip.className = "chip";
   rotateChip.textContent = "↻ Turn";
   rotateChip.setAttribute("aria-label", "Rotate the stamp a quarter turn");
-  rotateChip.disabled = state.brush === "pencil";
-  rotateChip.style.opacity = rotateChip.disabled ? 0.45 : 1;
   rotateChip.addEventListener("click", () => {
     state.rot = (state.rot + 1) % 4;
     window.SFX && SFX.pop && SFX.pop();
   });
+
+  /* One sentence of real science for whatever brush is selected. */
+  function refreshBrushInfo() {
+    const d = brushDef();
+    brushInfo.innerHTML =
+      "<b>" + d.name + (d.kind ? " — " + d.kind : "") + "</b><br>" + (d.desc || "");
+    const tool = isTool(state.brush);
+    rotateChip.disabled = tool;
+    rotateChip.style.opacity = tool ? 0.45 : 1;
+    document.querySelectorAll("#brushRow .chip[data-brush], #mineRow .chip[data-brush]")
+      .forEach((el) => el.setAttribute("aria-pressed", String(el.dataset.brush === state.brush)));
+  }
+
+  function selectBrush(key) {
+    state.brush = key;
+    if (key !== "inspect") hideInspect();
+    refreshBrushInfo();
+    scheduleSave();
+  }
+
+  function makeBrushChip(key, label, extraClass) {
+    const b = document.createElement("button");
+    b.className = "chip" + (extraClass ? " " + extraClass : "");
+    b.textContent = label;
+    b.dataset.brush = key;
+    b.setAttribute("aria-pressed", String(key === state.brush));
+    b.addEventListener("click", () => selectBrush(key));
+    return b;
+  }
+
+  PATTERNS.forEach((p) => brushRow.appendChild(makeBrushChip(p.key, p.name)));
   brushRow.appendChild(rotateChip);
+
+  /* ---------- the player's own saved stamps ---------- */
+  function boundingPattern() {
+    let minX = state.cols, minY = state.rows, maxX = -1, maxY = -1;
+    for (let y = 0; y < state.rows; y++) {
+      for (let x = 0; x < state.cols; x++) {
+        if (!state.cells[y * state.cols + x]) continue;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+    if (maxX < 0) return null;
+    if (maxX - minX > 23) maxX = minX + 23;      // keep saved stamps sane
+    if (maxY - minY > 23) maxY = minY + 23;
+    const out = [];
+    for (let y = minY; y <= maxY; y++) {
+      let row = "";
+      for (let x = minX; x <= maxX; x++) row += state.cells[y * state.cols + x] ? "O" : ".";
+      out.push(row);
+    }
+    return out;
+  }
+
+  function refreshMineRow() {
+    mineRow.textContent = "";
+    state.myPatterns.forEach((m) => {
+      const chip = makeBrushChip("my:" + m.id, m.name, "mine");
+      const del = document.createElement("span");
+      del.className = "del";
+      del.textContent = "✕";
+      del.setAttribute("role", "button");
+      del.setAttribute("aria-label", "Delete the stamp " + m.name);
+      del.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        state.myPatterns = state.myPatterns.filter((x) => x.id !== m.id);
+        if (state.brush === "my:" + m.id) selectBrush("pencil");
+        refreshMineRow();
+        refreshBrushInfo();
+        scheduleSave();
+      });
+      chip.appendChild(del);
+      mineRow.appendChild(chip);
+    });
+    const save = document.createElement("button");
+    save.className = "chip";
+    save.id = "saveStampBtn";
+    save.textContent = "💾 Save this world";
+    save.addEventListener("click", () => {
+      const pat = boundingPattern();
+      if (!pat) {
+        toast("😴 Nothing to save — draw some cells first!");
+        window.SFX && SFX.nope && SFX.nope();
+        return;
+      }
+      if (state.myPatterns.length >= 8) state.myPatterns.shift();
+      const id = String(Date.now()).slice(-7);
+      state.myPatterns.push({ id: id, name: "⭐ Mine " + (state.myPatterns.length + 1), cells: pat });
+      refreshMineRow();
+      selectBrush("my:" + id);
+      toast("💾 Saved! It's now a stamp you can use.");
+      window.SFX && SFX.good && SFX.good();
+    });
+    mineRow.appendChild(save);
+  }
 
   /* ---------- rule lab ---------- */
   const birthRow = $("birthRow");
@@ -649,6 +1038,7 @@
         arr[n] = !arr[n];
         b.setAttribute("aria-pressed", String(arr[n]));
         refreshRuleUI();
+        if (inspectCell) showInspect(inspectCell.x, inspectCell.y);
         // Rule Wizard: a hand-made rule that isn't one of the famous recipes
         const rs = ruleString();
         if (state.birth.some(Boolean) && state.survive.some(Boolean) &&
@@ -694,6 +1084,7 @@
       p.b.forEach((n) => (state.birth[n] = true));
       p.s.forEach((n) => (state.survive[n] = true));
       refreshRuleUI();
+      if (inspectCell) showInspect(inspectCell.x, inspectCell.y);
       scheduleSave();
       window.SFX && SFX.good && SFX.good();
     });

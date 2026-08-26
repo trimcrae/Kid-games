@@ -372,6 +372,126 @@
     return "";
   }
 
+  /* ---------- word levels & short definitions (the quiz curriculum) ----------
+     Every relationship word gets a difficulty tier so the quiz can start on
+     "brother" and work its way up to "2nd cousin once removed", and a short
+     definition so a wrong answer can be explained in one sentence. */
+
+  // Collapse a label into the word being learnt: Great-Great-Grandma and
+  // Great-Grandma are the same badge, "3× removed" reads as "twice removed".
+  function wordKey(label) {
+    return String(label).toLowerCase()
+      .replace(/(great-)+/, "great-")
+      .replace(/\s*\d+×\s*removed/, " twice removed")
+      .trim();
+  }
+
+  const LEVEL_NAMES = ["", "⭐ Level 1 · family words", "⭐⭐ Level 2 · bigger words", "⭐⭐⭐ Level 3 · tricky words"];
+  const TOP_LEVEL = 3;
+
+  function levelOf(label) {
+    const s = wordKey(label);
+    if (!s || s === "you!") return 0;
+    if (s.indexOf("cousin") !== -1 || s.indexOf("-in-law") !== -1 || s.indexOf("removed") !== -1 ||
+        s.indexOf("great-") === 0 || s.indexOf("married in") !== -1 ||
+        s === "family by marriage" || s === "my partner's family" || s === "family ❤️") return 3;
+    if (s.indexOf("grand") !== -1 || s.indexOf("aunt") !== -1 || s.indexOf("uncle") !== -1 ||
+        s.indexOf("niece") !== -1 || s.indexOf("nephew") !== -1 ||
+        s.indexOf("step") === 0 || s.indexOf("half-") === 0) return 2;
+    return 1;
+  }
+
+  function removedBit(s) {
+    if (s.indexOf("once removed") !== -1) return ", and “once removed” means you are 1 generation apart";
+    if (s.indexOf("twice removed") !== -1) return ", and “twice removed” means you are 2 generations apart";
+    return "";
+  }
+
+  // A one-line "a X is …" definition, used to explain wrong answers.
+  function shortDef(label) {
+    const s = wordKey(label);
+    const gr = s.indexOf("great-") === 0;
+    if (s === "mom" || s === "dad" || s === "parent") return "the grown-up whose child you are — one generation above you";
+    if (s === "brother" || s === "sister" || s === "sibling") return "someone with the same mom and dad as you";
+    if (s === "son" || s === "daughter" || s === "my child") return "your own child — one generation below you";
+    if (s === "husband" || s === "wife" || s === "partner") return "the person you married";
+    if (s.indexOf("half-") === 0) return "someone who shares just ONE parent with you";
+    if (s.indexOf("married in") !== -1) return "someone who married your aunt or uncle";
+    if (s.indexOf("-in-law") !== -1) return "family you got through a marriage, not by blood";
+    if (s.indexOf("step-grand") === 0) return "the person who married your grandma or grandpa";
+    if (/^step-?(mom|dad|parent)/.test(s)) return "the person who married your mom or dad";
+    if (/^step(brother|sister|-sibling)/.test(s)) return "your step-parent's child — you don't share a parent";
+    if (/^step(son|daughter|child)/.test(s)) return "your partner's child";
+    if (/grand(ma|pa|parent)$/.test(s)) return gr ? "your grandparent's parent — one more “great-” for each extra generation up" : "your mom or dad's mom or dad";
+    if (/grand(son|daughter|child)$/.test(s)) return gr ? "your grandchild's child" : "your child's child";
+    if (s.indexOf("aunt") !== -1 || s.indexOf("uncle") !== -1) return gr ? "your grandparent's brother or sister" : "your mom or dad's brother or sister";
+    if (s.indexOf("niece") !== -1 || s.indexOf("nephew") !== -1) return gr ? "your niece or nephew's child" : "your brother or sister's child";
+    if (s.indexOf("1st cousin") === 0) return "your aunt or uncle's child" + removedBit(s);
+    if (s.indexOf("2nd cousin") === 0) return "the grandchild of your great-aunt or great-uncle" + removedBit(s);
+    if (s.indexOf("cousin") !== -1) return "a faraway cousin — you share one ancestor high up the tree" + removedBit(s);
+    return "part of your family";
+  }
+
+  // Extra words to mix in as quiz choices when the tree itself is small.
+  const WORD_BANK = {
+    1: ["Mom", "Dad", "Brother", "Sister", "Son", "Daughter", "Partner"],
+    2: ["Grandma", "Grandpa", "Aunt", "Uncle", "Niece", "Nephew", "Grandson", "Granddaughter", "Half-sister", "Stepdad"],
+    3: ["1st cousin", "2nd cousin", "1st cousin once removed", "Great-grandma", "Great-grandpa",
+        "Great-aunt", "Great-uncle", "Sister-in-law", "Brother-in-law", "Mother-in-law"]
+  };
+
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ---------- who's who around one person ----------
+     The relationship words seen from THAT person's point of view — so tapping
+     Cory teaches "Cory's sister: Jeannie" even when you are playing as Ellie. */
+
+  // "Brother-in-law" → "Brothers-in-law", "My child" → "My children", …
+  function pluralLabel(label) {
+    if (/-in-law$/i.test(label)) return label.replace(/-in-law$/i, "s-in-law");
+    if (/child$/i.test(label)) return label.replace(/child$/i, "children");
+    if (/removed$/i.test(label)) return label.replace(/cousin/i, "cousins");
+    if (/(s|x|z|ch|sh)$/i.test(label)) return label + "es";
+    return label + "s";
+  }
+
+  function famRank(u, d) {
+    if (u === 1 && d === 0) return 0;   // parents
+    if (d === 0) return 1;              // grandparents and up
+    if (u === 1 && d === 1) return 3;   // siblings
+    if (d === 1 && u >= 2) return 4;    // aunts / uncles
+    if (u === 0 && d === 1) return 5;   // children
+    if (u === 1 && d >= 2) return 6;    // nieces / nephews
+    if (u === 0) return 8;              // grandchildren
+    return 7;                           // cousins
+  }
+
+  function closeFamily(id) {
+    const groups = {};
+    const order = [];
+    state.order.filter(alive).forEach((other) => {
+      if (other === id) return;
+      const isPartner = P()[id].partners.indexOf(other) !== -1;
+      const b = bloodPath(id, other);
+      let rank;
+      if (isPartner) rank = 2;
+      else if (b && b.u + b.d <= 4) rank = famRank(b.u, b.d);
+      else return;
+      const label = relationLabel(id, other);
+      if (!label || label === "You!") return;
+      if (!groups[label]) { groups[label] = { label: label, rank: rank, names: [] }; order.push(label); }
+      groups[label].names.push(P()[other].name);
+      groups[label].rank = Math.min(groups[label].rank, rank);
+    });
+    return order.map((l) => groups[l]).sort((a, b) => a.rank - b.rank).slice(0, 8);
+  }
+
   /* ---------- layout ----------
      Rows = generations. Partners sit together in a "unit".
      A few barycenter sweeps pull children under their parents. */
@@ -612,8 +732,11 @@
     return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
+  let lastLayout = { pos: {}, rows: [], width: 0, height: 0 };
+
   function render() {
     const layout = computeLayout();
+    lastLayout = layout;
 
     canvas.style.width = layout.width + "px";
     canvas.style.height = layout.height + "px";
@@ -635,9 +758,11 @@
       btn.style.top = at.y + "px";
       btn.style.borderColor = genColor(p.gen);
       const rel = state.me ? relationLabel(state.me, id) : "";
+      btn.setAttribute("aria-label",
+        p.name + (id === state.me ? " — this is you" : rel ? " — your " + rel.toLowerCase() : ""));
       btn.innerHTML =
-        (id === state.me ? '<span class="you-star">⭐</span>' : "") +
-        '<span class="face">' + p.emoji + "</span>" +
+        (id === state.me ? '<span class="you-star" aria-hidden="true">⭐</span>' : "") +
+        '<span class="face" aria-hidden="true">' + p.emoji + "</span>" +
         '<span class="pname">' + esc(p.name) + "</span>" +
         '<span class="rel"' + (rel ? ' style="background:' + genColor(p.gen) + '"' : "") + ">" +
         esc(rel) + "</span>";
@@ -656,8 +781,14 @@
     // little stats line: how big has the tree grown?
     const n = state.order.filter(alive).length;
     const genCount = layout.rows.length;
-    document.getElementById("tree-stats").textContent =
+    document.getElementById("stats-text").textContent =
       "🌳 " + n + " people across " + generationsWord(genCount);
+    updateBadgeCount();
+  }
+
+  function updateBadgeCount() {
+    document.getElementById("badge-count").textContent =
+      String(Object.keys(progress.learned).length);
   }
 
   function centerView() {
@@ -674,7 +805,7 @@
       viewport.scrollTo({
         left: x - viewport.clientWidth / 2,
         top: y - viewport.clientHeight / 2,
-        behavior: "smooth"
+        behavior: reduceMotion.matches ? "auto" : "smooth"
       });
     } catch (e) {
       viewport.scrollLeft = x - viewport.clientWidth / 2;
@@ -728,6 +859,21 @@
     factEl.textContent = fact ? "💡 " + fact : "";
     factEl.hidden = !fact;
 
+    // Who's who around this person, in their own words.
+    const famEl = document.getElementById("action-family");
+    const fam = closeFamily(id);
+    if (fam.length) {
+      famEl.innerHTML = "<h3>" + esc(p.name) + "'s family</h3>" + fam.map((row) =>
+        '<div class="fam-row"><span class="fam-label">' +
+        esc(row.names.length > 1 ? pluralLabel(row.label) : row.label) +
+        ":</span> " + esc(row.names.join(", ")) + "</div>"
+      ).join("");
+      famEl.hidden = false;
+    } else {
+      famEl.innerHTML = "";
+      famEl.hidden = true;
+    }
+
     const list = document.getElementById("action-list");
     list.innerHTML = "";
     function act(label, fn) {
@@ -738,6 +884,9 @@
       list.appendChild(b);
     }
 
+    if (state.me !== id) {
+      act("⭐ This is me! (show words from " + p.name + "'s side)", () => { closeAll(); setMe(id); });
+    }
     act("✏️ Change name or face", () => { closeAll(); openForm({ mode: "edit", id: id }); });
     const pars = p.parents.filter(alive);
     if (pars.length === 0) {
@@ -793,7 +942,10 @@
       list.appendChild(b);
     }
     act("✖ Close", closeAll);
+    lastFocus = document.activeElement;
     actionOverlay.hidden = false;
+    const first = list.querySelector(".ft-btn");
+    if (first) first.focus();
   }
 
   /* --- add/edit form --- */
@@ -887,6 +1039,7 @@
       otherParentField.hidden = true;
     }
 
+    lastFocus = document.activeElement;
     formOverlay.hidden = false;
     setTimeout(() => nameInput.focus(), 50);
   }
@@ -896,7 +1049,8 @@
     const name = nameInput.value.trim();
     if (!name) { nameInput.focus(); return; }
     const who = P()[form.id];
-    let focusId = form.id; // the card to scroll to afterwards
+    const mode = form.mode;       // closeAll() clears `form`, so keep what we need
+    let focusId = form.id;        // the card to scroll to afterwards
 
     if (form.mode === "edit") {
       who.name = name; who.gender = form.gender; who.emoji = form.emoji;
@@ -944,13 +1098,12 @@
     closeAll();
     render();
     spotlight(focusId);
-    if (form.mode === "edit") {
+    if (mode === "edit") {
       window.SFX && SFX.good();
     } else {
       window.SFX && SFX.win();
-      window.Confetti && Confetti.burst({ count: 60 });
+      party(60);
     }
-    form = null;
   }
 
   /* --- confirm --- */
@@ -959,57 +1112,143 @@
     document.getElementById("confirm-title").textContent = title;
     document.getElementById("confirm-sub").textContent = sub;
     confirmFn = fn;
+    lastFocus = document.activeElement;
     confirmOverlay.hidden = false;
+    document.getElementById("confirm-yes").focus();
   }
 
+  // Closing any sheet also drops the half-filled form and hands keyboard
+  // focus back to whatever opened it.
+  let lastFocus = null;
   function closeAll() {
+    const wasOpen = !actionOverlay.hidden || !formOverlay.hidden ||
+                    !confirmOverlay.hidden || !badgeOverlay.hidden;
     actionOverlay.hidden = true;
     formOverlay.hidden = true;
     confirmOverlay.hidden = true;
+    badgeOverlay.hidden = true;
+    form = null;
+    if (wasOpen && lastFocus && document.body.contains(lastFocus)) {
+      try { lastFocus.focus(); } catch (e) { /* element went away */ }
+    }
+    lastFocus = null;
   }
 
   /* ---------- family-words quiz ----------
-     "Tap your Grandma!" — the tree itself is the game board. Uses the
-     same relationship labels the cards show, so the kids practise the
-     kinship words they just learnt. Any person with a matching label
-     counts (two sisters are both a right answer for "Sister"). */
+     Three question shapes, all built from the same relationship labels the
+     cards already show:
+       • tap    — "Find your grandma — tap them on the tree!"        (any level)
+       • name   — "What is Cory to you?" + four word buttons         (any level)
+       • riddle — "Tap the person who is your mom or dad's brother"  (level 2+)
+     Words are tiered by levelOf(): level 1 is mom/dad/brother/sister, level 2
+     grandma/aunt/niece/step/half, level 3 cousins, in-laws and great-s. Five
+     right in a row unlocks the next level. Every wrong answer is explained
+     ("Cory is your brother — a cousin is your aunt or uncle's child"), and
+     every word you get right is saved so the badges keep filling up. */
 
-  const quiz = { on: false, label: "", streak: 0 };
+  const quiz = { on: false, mode: "", label: "", target: null, lvl: 1, streak: 0, locked: false, qHTML: "" };
   const quizBar = document.getElementById("quiz-bar");
   const quizQ = document.getElementById("quiz-q");
   const quizScore = document.getElementById("quiz-score");
+  const quizLevelEl = document.getElementById("quiz-level");
+  const quizChoices = document.getElementById("quiz-choices");
+  let quizTimer = null;
 
-  function quizCandidates() {
+  function quizCandidates(lvl) {
     if (!state.me || !alive(state.me)) return [];
     return state.order.filter(alive).filter((id) => {
       if (id === state.me) return false;
       const l = relationLabel(state.me, id);
-      return l && l !== "Family ❤️";
+      if (!l || l === "You!" || l === "Family ❤️") return false;
+      return lvl == null || levelOf(l) === lvl;
     });
   }
 
   function showQuizScore() {
-    quizScore.hidden = quiz.streak === 0;
-    quizScore.textContent = "⭐ " + quiz.streak + " in a row";
+    quizScore.hidden = quiz.streak === 0 && progress.best === 0;
+    quizScore.textContent = "⭐ " + quiz.streak + " in a row" +
+      (progress.best > 0 ? " · best " + progress.best : "");
+    quizLevelEl.textContent = LEVEL_NAMES[quiz.lvl] || LEVEL_NAMES[1];
   }
 
+  function clearChoices() {
+    quizChoices.hidden = true;
+    quizChoices.innerHTML = "";
+  }
+
+  function buildChoices(correct) {
+    const bank = {};
+    quizCandidates(null).forEach((id) => {
+      const l = relationLabel(state.me, id);
+      if (l && l !== "You!") bank[l] = true;
+    });
+    (WORD_BANK[quiz.lvl] || []).forEach((w) => { bank[w] = true; });
+    const others = shuffle(Object.keys(bank).filter((w) => wordKey(w) !== wordKey(correct)));
+    return shuffle([correct].concat(others.slice(0, 3)));
+  }
+
+  function renderChoices(words) {
+    quizChoices.innerHTML = "";
+    words.forEach((w) => {
+      const b = document.createElement("button");
+      b.className = "ft-btn";
+      b.textContent = w;
+      b.addEventListener("click", () => quizChoose(w, b));
+      quizChoices.appendChild(b);
+    });
+    quizChoices.hidden = false;
+  }
+
+  function askQ(html) { quiz.qHTML = html; quizQ.innerHTML = html; }
+
   function nextQuizQuestion() {
-    const pool = quizCandidates();
+    clearTimeout(quizTimer);
+    quiz.locked = false;
+    clearChoices();
+
+    // Start from the saved level, then step down (wrapping round) until we
+    // find words this particular tree actually contains.
+    let lvl = progress.level, pool = quizCandidates(lvl);
+    for (let i = 0; i < TOP_LEVEL && !pool.length; i++) {
+      lvl = lvl > 1 ? lvl - 1 : TOP_LEVEL;
+      pool = quizCandidates(lvl);
+    }
     if (!pool.length) {
-      quizQ.textContent = "Add more family to the tree first, then quiz me again! 🌳";
       quiz.label = "";
+      quiz.lvl = progress.level;
+      quizQ.textContent = "Add more family to the tree first, then quiz me again! 🌳";
+      showQuizScore();
       return;
     }
+    quiz.lvl = lvl;
+
     const pick = pool[Math.floor(Math.random() * pool.length)];
+    quiz.target = pick;
     quiz.label = relationLabel(state.me, pick);
-    quizQ.innerHTML = "Find your <u>" + esc(quiz.label.toLowerCase()) + "</u> — tap them!";
+
+    const modes = ["tap", "name"];
+    // A riddle only works when the word has a real definition to give away.
+    if (lvl >= 2 && shortDef(quiz.label) !== "part of your family") modes.push("riddle");
+    quiz.mode = modes[Math.floor(Math.random() * modes.length)];
+
+    if (quiz.mode === "name") {
+      askQ("What is <b>" + esc(P()[pick].name) + "</b> to you? Pick the right word 👇");
+      renderChoices(buildChoices(quiz.label));
+    } else if (quiz.mode === "riddle") {
+      askQ("Tap the person who is <u>" + esc(shortDef(quiz.label)) + "</u>.");
+    } else {
+      askQ("Find your <u>" + esc(quiz.label.toLowerCase()) + "</u> — tap them on the tree!");
+    }
     showQuizScore();
   }
 
   function startQuiz() {
     if (!state.me || !alive(state.me)) {
-      quizBar.hidden = false;
       quiz.on = false;
+      quiz.label = "";
+      clearChoices();
+      quizBar.hidden = false;
+      quizLevelEl.textContent = LEVEL_NAMES[progress.level];
       quizQ.textContent = "First pick who YOU are up top ⭐ — then I can quiz you!";
       quizScore.hidden = true;
       meSelect.focus();
@@ -1023,48 +1262,146 @@
   }
 
   function stopQuiz() {
+    clearTimeout(quizTimer);
     quiz.on = false;
     quiz.label = "";
+    quiz.locked = false;
+    clearChoices();
     quizBar.hidden = true;
   }
 
+  function flashCard(el) {
+    if (!el) return;
+    el.classList.add("flash");
+    setTimeout(() => el.classList.remove("flash"), 1400);
+  }
+
+  // A right answer: bank the word, bump the streak, maybe level up.
+  function quizWin(name, label) {
+    quiz.locked = true;
+    quiz.streak++;
+    progress.correct++;
+    const key = wordKey(label);
+    progress.learned[key] = (progress.learned[key] || 0) + 1;
+    if (quiz.streak > progress.best) progress.best = quiz.streak;
+
+    let levelledUp = false;
+    if (quiz.streak % 5 === 0 && progress.level < TOP_LEVEL &&
+        quizCandidates(progress.level + 1).length) {
+      progress.level++;
+      levelledUp = true;
+    }
+    saveProgress();
+    updateBadgeCount();
+
+    const fact = explainLabel(label);
+    let msg = "Yes! " + name + " is your " + label.toLowerCase() + "! 🎉" + (fact ? " " + fact : "");
+    if (progress.learned[key] === 3) msg += " 🏅 Badge unlocked — you know the word “" + label.toLowerCase() + "”!";
+    if (levelledUp) msg += " 🚀 Level up: " + LEVEL_NAMES[progress.level].replace(/^[⭐\s]+/, "") + "!";
+    quizQ.textContent = msg;
+    showQuizScore();
+
+    if (levelledUp || quiz.streak % 5 === 0) { window.SFX && SFX.win(); party(80); }
+    else { window.SFX && SFX.good(); party(25); }
+    quizTimer = setTimeout(() => { if (quiz.on) nextQuizQuestion(); }, 2300);
+  }
+
+  // Tapping a card on the tree.
   function quizGuess(id) {
     if (!quiz.label) { stopQuiz(); return; }
+    if (quiz.locked) return;
+    if (quiz.mode === "name") {
+      quizQ.innerHTML = quiz.qHTML + "<br>👇 Pick one of the words below!";
+      window.SFX && SFX.nope();
+      return;
+    }
     const el = canvas.querySelector('.person[data-id="' + id + '"]');
     const label = relationLabel(state.me, id);
-    if (label === quiz.label) {
-      quiz.streak++;
-      if (el) {
-        el.classList.add("flash");
-        setTimeout(() => el.classList.remove("flash"), 1400);
-      }
-      const fact = explainLabel(label);
-      quizQ.textContent = "Yes! " + P()[id].name + " is your " + label.toLowerCase() + "! 🎉" +
-        (fact ? " " + fact : "");
-      showQuizScore();
-      if (quiz.streak % 5 === 0) {
-        window.SFX && SFX.win();
-        window.Confetti && Confetti.burst({ count: 80 });
-      } else {
-        window.SFX && SFX.good();
-        window.Confetti && Confetti.burst({ count: 25 });
-      }
-      setTimeout(() => { if (quiz.on) nextQuizQuestion(); }, 1900);
-    } else {
-      quiz.streak = 0;
-      showQuizScore();
-      if (el) {
-        el.classList.add("quiz-wrong");
-        setTimeout(() => el.classList.remove("quiz-wrong"), 500);
-      }
-      quizQ.innerHTML = "Not quite — that's your <b>" + esc(label.toLowerCase() || "family") +
-        "</b>. Find your <u>" + esc(quiz.label.toLowerCase()) + "</u>!";
-      window.SFX && SFX.nope();
+    // A riddle describes the relationship, so a grandpa answers a
+    // "your mom or dad's mom or dad" riddle just as well as a grandma.
+    const right = quiz.mode === "riddle"
+      ? !!label && shortDef(label) === shortDef(quiz.label)
+      : label === quiz.label;
+
+    if (right) {
+      flashCard(el);
+      quizWin(P()[id].name, label);
+      return;
     }
+
+    quiz.streak = 0;
+    showQuizScore();
+    if (el && !reduceMotion.matches) {
+      el.classList.add("quiz-wrong");
+      setTimeout(() => el.classList.remove("quiz-wrong"), 500);
+    }
+    const target = quiz.label.toLowerCase();
+    const why = (label ? P()[id].name + " is your " + label.toLowerCase() + " — a " : "A ") +
+      target + " is " + shortDef(quiz.label) + ".";
+    quizQ.textContent = "Not quite. " + why + " Try again!";
+    window.SFX && SFX.nope();
+  }
+
+  // Tapping a word button in "name" mode.
+  function quizChoose(word, btn) {
+    if (quiz.locked || !quiz.label) return;
+    const name = alive(quiz.target) ? P()[quiz.target].name : "They";
+    if (wordKey(word) === wordKey(quiz.label)) {
+      btn.classList.add("right");
+      flashCard(canvas.querySelector('.person[data-id="' + quiz.target + '"]'));
+      quizWin(name, quiz.label);
+      return;
+    }
+    quiz.locked = true;
+    quiz.streak = 0;
+    showQuizScore();
+    btn.classList.add("wrong");
+    Array.prototype.forEach.call(quizChoices.children, (b) => {
+      if (wordKey(b.textContent) === wordKey(quiz.label)) b.classList.add("right");
+    });
+    quizQ.textContent = "Not quite — a " + word.toLowerCase() + " is " + shortDef(word) + ". " +
+      name + " is your " + quiz.label.toLowerCase() + ": " + shortDef(quiz.label) + ".";
+    window.SFX && SFX.nope();
+    quizTimer = setTimeout(() => { if (quiz.on) nextQuizQuestion(); }, 3800);
   }
 
   document.getElementById("quiz-btn").addEventListener("click", startQuiz);
   document.getElementById("quiz-stop").addEventListener("click", stopQuiz);
+
+  /* ---------- word badges ---------- */
+
+  const badgeOverlay = document.getElementById("badge-overlay");
+
+  function capFirst(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function openBadges() {
+    const words = Object.keys(progress.learned).sort((a, b) =>
+      (progress.learned[b] - progress.learned[a]) || a.localeCompare(b));
+    const mastered = words.filter((w) => progress.learned[w] >= 3).length;
+    document.getElementById("badge-sub").textContent = words.length
+      ? words.length + " word" + (words.length === 1 ? "" : "s") + " practised · " +
+        mastered + " mastered 🏅 · best streak ⭐ " + progress.best
+      : "Play 🎯 Quiz me! — every family word you get right lands here.";
+
+    const list = document.getElementById("badge-list");
+    list.innerHTML = words.length
+      ? words.map((w) => {
+          const n = progress.learned[w];
+          const stars = n >= 3 ? "🏅" : new Array(Math.min(n, 3) + 1).join("⭐");
+          return '<div class="badge-item' + (n >= 3 ? " master" : "") + '">' +
+            "<span>" + esc(capFirst(w)) + "</span>" +
+            '<span class="stars">' + stars + "</span>" +
+            '<span class="def">' + esc(shortDef(w)) + "</span></div>";
+        }).join("")
+      : '<p class="badge-empty">No words yet — the quiz is waiting! 🎯</p>';
+
+    lastFocus = document.activeElement;
+    badgeOverlay.hidden = false;
+    document.getElementById("badge-close").focus();
+  }
+
+  document.getElementById("badge-btn").addEventListener("click", openBadges);
+  document.getElementById("badge-close").addEventListener("click", closeAll);
 
   /* ---------- wire up ---------- */
 
@@ -1083,15 +1420,17 @@
     ov.addEventListener("click", (e) => { if (e.target === ov) closeAll(); });
   });
 
-  meSelect.addEventListener("change", () => {
-    state.me = meSelect.value || null;
+  function setMe(id) {
+    state.me = id && alive(id) ? id : null;
     persist();
     render();
     if (quiz.on || !quizBar.hidden) {
       if (state.me) startQuiz(); else stopQuiz();  // re-ask for the new "me"
     }
-    if (state.me) { window.SFX && SFX.good(); }
-  });
+    if (state.me) { spotlight(state.me); window.SFX && SFX.good(); }
+  }
+
+  meSelect.addEventListener("change", () => setMe(meSelect.value || null));
 
   function setZoom(z) {
     zoom = Math.min(1.5, Math.max(0.4, Math.round(z * 100) / 100));
@@ -1110,7 +1449,38 @@
 
   // Escape backs out of any open sheet.
   window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") { form = null; closeAll(); }
+    if (e.key === "Escape") closeAll();
+  });
+
+  /* ---------- keyboard: walk the tree with the arrow keys ----------
+     Tab already reaches every card (they are real buttons); the arrows let
+     you move the way the tree looks — left/right along a generation,
+     up to parents, down to children. */
+  canvas.addEventListener("keydown", (e) => {
+    const dirs = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    const d = dirs[e.key];
+    if (!d) return;
+    const cur = e.target && e.target.closest ? e.target.closest(".person") : null;
+    if (!cur) return;
+    const from = lastLayout.pos[cur.dataset.id];
+    if (!from) return;
+    e.preventDefault();
+
+    let best = null, bestScore = Infinity;
+    state.order.filter(alive).forEach((id) => {
+      if (id === cur.dataset.id) return;
+      const at = lastLayout.pos[id];
+      if (!at) return;
+      const dx = at.x - from.x, dy = at.y - from.y;
+      const along  = dx * d[0] + dy * d[1];            // distance in the arrow's direction
+      const across = Math.abs(dx * d[1] + dy * d[0]);  // how far off to the side
+      if (along <= 4) return;
+      const score = along + across * 2.5;
+      if (score < bestScore) { bestScore = score; best = id; }
+    });
+    if (!best) return;
+    const el = canvas.querySelector('.person[data-id="' + best + '"]');
+    if (el) el.focus();
   });
 
   /* ---------- print ----------
@@ -1249,7 +1619,7 @@
         render();
         centerView();
         showUndo("🔄 Started the tree over", snap);
-        window.Confetti && Confetti.burst({ count: 40 });
+        party(40);
       });
   });
 

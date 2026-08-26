@@ -146,14 +146,15 @@
       z-index: 2;
     }
     .ball {
+      /* inset:0 (not height:100%) — a percentage height does NOT resolve
+         inside a <button>, which silently collapsed the dice dots to 0px. */
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
-      height: 100%;
       border-radius: 50%;
-      position: relative;
-      background: radial-gradient(circle at 30% 26%, #ffffff 0%, var(--soft, #d2eeff) 62%, var(--c, #38b6ff) 135%);
+      background: radial-gradient(circle at 30% 26%, #ffffff 0%, var(--soft, #d2eeff) 55%, var(--c, #38b6ff) 118%);
       box-shadow: inset 0 0 0 5px var(--c, #38b6ff), 0 6px 14px rgba(43,36,64,0.18);
       font-family: var(--font);
       font-weight: 900;

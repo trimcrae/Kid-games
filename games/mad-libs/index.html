@@ -4,12 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>📝 Mad Libs</title>
-  <meta name="description" content="Give silly words by category, then watch them fill a story you've never seen — parts of speech & grammar for big readers." />
+  <meta name="description" content="Give silly words by category, then watch them fill a story you've never seen — nouns, verbs, adjectives and adverbs colour-coded so you can see what you built." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>" />
   <meta name="theme-color" content="#8a5cff" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="../../assets/css/style.css" />
   <style>
+    /* ---- part-of-speech colours (dark ink on a pale tint = easy to read) ---- */
+    :root {
+      --noun-ink:  #1a5fb4;  --noun-bg:  #e3f0ff;
+      --verb-ink:  #146c43;  --verb-bg:  #e2f7ec;
+      --adj-ink:   #6f2dbd;  --adj-bg:   #f1e8fe;
+      --adv-ink:   #a8500a;  --adv-bg:   #fdeedd;
+      --num-ink:   #0b6a70;  --num-bg:   #ddf4f5;
+      --excl-ink:  #b02a37;  --excl-bg:  #fde8ea;
+      --silly-ink: #a01f74;  --silly-bg: #fde6f4;
+    }
+
     /* ---- shared button look (matches the other games) ---- */
     .btn {
       font-family: var(--font);
@@ -20,6 +31,7 @@
       border: none;
       border-radius: 999px;
       padding: 0.8rem 2rem;
+      min-height: 48px;
       cursor: pointer;
       box-shadow: 0 8px 20px rgba(138, 92, 255, 0.3);
       transition: transform 0.15s ease;
@@ -32,15 +44,24 @@
       color: var(--purple);
       box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
     }
+    .btn.tiny { font-size: 1rem; padding: 0.6rem 1.2rem; }
+    :focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; }
 
     .hidden { display: none !important; }
 
     /* ---- picker (story cards) ---- */
     .ml-intro {
       text-align: center;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: var(--ink);
-      margin: 0 0 1.5rem;
+      margin: 0 0 1rem;
+    }
+    .ml-topline {
+      display: flex;
+      justify-content: center;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      margin: 0 0 1.2rem;
     }
     .ml-cards {
       display: grid;
@@ -54,6 +75,7 @@
       border: 4px solid var(--accent, var(--blue));
       border-radius: 24px;
       padding: 1.2rem 1rem;
+      min-height: 130px;
       cursor: pointer;
       text-align: center;
       box-shadow: 0 10px 24px rgba(43, 36, 64, 0.12);
@@ -61,13 +83,21 @@
       touch-action: manipulation;
     }
     .ml-card:hover { transform: translateY(-4px) scale(1.03); }
-    .ml-card .ml-emoji { font-size: 2.6rem; display: block; }
+    .ml-card .ml-emoji { font-size: 2.6rem; display: block; line-height: 1.1; }
     .ml-card .ml-name {
       display: block;
       margin-top: 0.4rem;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: bold;
       color: var(--ink);
+      overflow-wrap: anywhere;
+    }
+    .ml-card .ml-words {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #6a6385;
     }
     .ml-card .ml-tick {
       position: absolute;
@@ -75,6 +105,69 @@
       right: 0.6rem;
       font-size: 1.3rem;
     }
+
+    /* ---- resume banner & story shelf ---- */
+    .ml-panel {
+      background: var(--paper);
+      border-radius: 20px;
+      padding: 1rem;
+      box-shadow: 0 8px 22px rgba(43, 36, 64, 0.1);
+      margin: 0 0 1.4rem;
+    }
+    .ml-panel h2 {
+      margin: 0 0 0.7rem;
+      font-size: 1.15rem;
+      color: var(--purple);
+      text-align: center;
+    }
+    .ml-resume-row {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .ml-shelf-item {
+      display: flex;
+      align-items: stretch;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .ml-shelf-open {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--font);
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--ink);
+      background: #f7f4ff;
+      border: 2px solid #e6dcff;
+      border-radius: 14px;
+      padding: 0.7rem 0.9rem;
+      min-height: 52px;
+      text-align: left;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .ml-shelf-open:hover { background: #f0eaff; }
+    .ml-shelf-open .se { font-size: 1.5rem; }
+    .ml-shelf-open .st { flex: 1; overflow-wrap: anywhere; }
+    .ml-shelf-open .sd { font-size: 0.85rem; color: #6a6385; font-weight: normal; }
+    .ml-shelf-del {
+      font-family: var(--font);
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #8b8399;
+      background: #f4f2f8;
+      border: 2px solid #e5e1ee;
+      border-radius: 14px;
+      width: 52px;
+      min-height: 52px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .ml-shelf-del:hover { color: var(--pink); border-color: var(--pink); }
 
     /* ---- word entry ---- */
     .ml-progress {
@@ -88,7 +181,7 @@
       height: 12px;
       width: 100%;
       max-width: 420px;
-      margin: 0 auto 1.5rem;
+      margin: 0 auto 1.2rem;
       background: #eee;
       border-radius: 999px;
       overflow: hidden;
@@ -103,15 +196,25 @@
     .ml-ask {
       background: var(--paper);
       border-radius: 24px;
-      padding: 2rem 1.5rem;
+      padding: 1.6rem 1.1rem;
       box-shadow: 0 10px 30px rgba(43, 36, 64, 0.12);
       text-align: center;
     }
+    .ml-badge {
+      display: inline-block;
+      font-size: 0.95rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      margin: 0 0 0.7rem;
+    }
     .ml-ask .ml-label {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: bold;
       color: var(--ink);
       margin: 0 0 0.3rem;
+      overflow-wrap: anywhere;
     }
     .ml-ask .ml-example {
       font-size: 1.05rem;
@@ -119,21 +222,14 @@
       margin: 0 0 0.9rem;
     }
     .ml-ask .ml-hint {
-      font-size: 0.95rem;
-      color: #6a6385;
+      font-size: 0.98rem;
+      color: #4c4666;
       background: #f4effc;
       border-radius: 14px;
-      padding: 0.55rem 0.9rem;
-      margin: 0 auto 1.2rem;
-      max-width: 420px;
-      line-height: 1.4;
-    }
-    .ml-input.shake { animation: ml-shake 0.35s ease; border-color: var(--pink); }
-    @keyframes ml-shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      50% { transform: translateX(8px); }
-      75% { transform: translateX(-5px); }
+      padding: 0.6rem 0.9rem;
+      margin: 0 auto 1.1rem;
+      max-width: 430px;
+      line-height: 1.45;
     }
     .ml-input {
       font-family: var(--font);
@@ -146,41 +242,170 @@
       border-radius: 16px;
       outline: none;
       color: var(--ink);
+      background: #fff;
     }
     .ml-input:focus { border-color: var(--purple); }
-    .ml-controls {
+    .ml-input.shake { animation: ml-shake 0.35s ease; border-color: var(--pink); }
+    @keyframes ml-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-5px); }
+    }
+    .ml-coach {
+      min-height: 1.5rem;
+      font-size: 0.95rem;
+      font-weight: bold;
+      margin: 0.55rem auto 0;
+      max-width: 430px;
+      line-height: 1.35;
+    }
+    .ml-coach.good { color: #146c43; }
+    .ml-coach.tip  { color: #6a6385; font-weight: normal; }
+
+    /* word bank */
+    .ml-bank { margin-top: 1rem; }
+    .ml-bank-title {
+      font-size: 0.98rem;
+      font-weight: bold;
+      color: #6a6385;
+      margin: 0 0 0.55rem;
+    }
+    .ml-chips {
       display: flex;
-      gap: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .ml-chip {
+      font-family: var(--font);
+      font-size: 1.05rem;
+      font-weight: bold;
+      border-radius: 999px;
+      padding: 0.6rem 1rem;
+      min-height: 46px;
+      border: 2px solid currentColor;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.12s ease;
+      overflow-wrap: anywhere;
+    }
+    .ml-chip:hover { transform: translateY(-2px) scale(1.04); }
+    .ml-bank-row {
+      display: flex;
+      gap: 0.6rem;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 1.5rem;
+      margin-top: 0.8rem;
+    }
+    .ml-linkbtn {
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: var(--purple);
+      background: none;
+      border: 2px solid transparent;
+      border-radius: 999px;
+      padding: 0.55rem 0.9rem;
+      min-height: 44px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .ml-linkbtn:hover { border-color: var(--purple); }
+
+    .ml-controls {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.4rem;
     }
 
     /* ---- reveal ---- */
     .ml-story {
       background: var(--paper);
       border-radius: 24px;
-      padding: 1.8rem 1.6rem;
+      padding: 1.6rem 1.2rem;
       box-shadow: 0 10px 30px rgba(43, 36, 64, 0.12);
-      font-size: 1.4rem;
-      line-height: 1.9;
+      font-size: 1.3rem;
+      line-height: 1.95;
       color: var(--ink);
+      overflow-wrap: anywhere;
     }
     .ml-story h2 {
       margin: 0 0 1rem;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       color: var(--purple);
+      overflow-wrap: anywhere;
     }
     .ml-fill {
       font-weight: bold;
-      color: var(--pink);
-      background: #fff0f5;
-      padding: 0 0.25em;
-      border-radius: 6px;
+      padding: 0.05em 0.3em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s ease, box-shadow 0.2s ease;
     }
+    .ml-fill.dim { opacity: 0.28; }
+    .ml-fill.lit { box-shadow: 0 0 0 3px currentColor; }
+
+    .pos-noun  { color: var(--noun-ink);  background: var(--noun-bg); }
+    .pos-verb  { color: var(--verb-ink);  background: var(--verb-bg); }
+    .pos-adj   { color: var(--adj-ink);   background: var(--adj-bg); }
+    .pos-adv   { color: var(--adv-ink);   background: var(--adv-bg); }
+    .pos-num   { color: var(--num-ink);   background: var(--num-bg); }
+    .pos-excl  { color: var(--excl-ink);  background: var(--excl-bg); }
+    .pos-silly { color: var(--silly-ink); background: var(--silly-bg); }
+
     /* the word currently being read aloud lights up */
     .ml-w { border-radius: 6px; transition: background 0.12s ease; }
     .ml-w.speaking { background: #ffe9a8; box-shadow: 0 0 0 3px #ffe9a8; }
+
+    .ml-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 1rem 0 0.4rem;
+    }
+    .ml-legend-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font);
+      font-size: 0.98rem;
+      font-weight: bold;
+      border: 2px solid currentColor;
+      border-radius: 999px;
+      padding: 0.5rem 0.9rem;
+      min-height: 44px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .ml-legend-chip .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: currentColor; flex: none;
+    }
+    .ml-legend-chip.on { box-shadow: 0 0 0 3px currentColor; }
+    .ml-posnote {
+      text-align: center;
+      font-size: 1rem;
+      color: #4c4666;
+      background: #f7f4ff;
+      border-radius: 14px;
+      padding: 0.65rem 0.9rem;
+      margin: 0.4rem auto 0;
+      max-width: 620px;
+      line-height: 1.45;
+      min-height: 2.6rem;
+    }
+    .ml-tally {
+      text-align: center;
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--purple);
+      margin: 0.7rem 0 0;
+      line-height: 1.4;
+    }
 
     /* picker progress line */
     .ml-count {
@@ -190,8 +415,18 @@
       color: var(--purple);
       margin: 0 0 1rem;
     }
+
+    @media (max-width: 420px) {
+      .ml-story { font-size: 1.2rem; padding: 1.2rem 0.9rem; }
+      .btn { font-size: 1.05rem; padding: 0.75rem 1.3rem; }
+      .ml-ask .ml-label { font-size: 1.35rem; }
+      .ml-input { font-size: 1.4rem; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .ml-input.shake { animation: none; }
+      .btn, .ml-card, .ml-chip, .ml-fill, .ml-w, .ml-bar > span { transition: none; }
+      .btn:hover, .ml-card:hover, .ml-chip:hover { transform: none; }
     }
   </style>
 </head>
@@ -211,39 +446,75 @@
   <main class="game-stage">
     <!-- 1. PICKER -->
     <section id="picker">
-      <p class="ml-intro">Pick a story. Give us silly words — but you can't see the
-        story yet! Then read your goofy creation out loud. 🤪</p>
+      <p class="ml-intro">Pick a story and give us silly words — a noun, a verb, a goofy
+        adjective. You can't see the story yet! Then read your creation out loud. 🤪</p>
+
+      <div class="ml-panel hidden" id="resumeWrap">
+        <h2>You left a story half-finished</h2>
+        <div class="ml-resume-row">
+          <button class="btn" id="resumeBtn" type="button">▶ Keep going</button>
+          <button class="btn ghost tiny" id="resumeDrop" type="button">Start something else</button>
+        </div>
+      </div>
+
+      <div class="ml-panel hidden" id="shelfWrap">
+        <h2>📖 My story shelf</h2>
+        <div id="shelfList"></div>
+      </div>
+
       <p class="ml-count" id="playedCount"></p>
+      <div class="ml-topline">
+        <button class="btn tiny" id="surpriseBtn" type="button">🎲 Surprise me!</button>
+      </div>
       <div id="cards" class="ml-cards"></div>
     </section>
 
     <!-- 2. WORD ENTRY -->
     <section id="entry" class="hidden">
-      <div class="ml-progress" id="progress">word 1 of 8</div>
-      <div class="ml-bar"><span id="barFill" style="width:0%"></span></div>
+      <div class="ml-topline">
+        <button class="btn ghost tiny" id="quitBtn" type="button">📚 Back to stories</button>
+      </div>
+      <div class="ml-progress" id="progress" role="status" aria-live="polite">word 1 of 8</div>
+      <div class="ml-bar" role="presentation"><span id="barFill" style="width:0%"></span></div>
       <div class="ml-ask">
+        <span class="ml-badge pos-adj" id="posBadge">ADJECTIVE</span>
         <p class="ml-label" id="askLabel">a silly adjective</p>
         <p class="ml-example" id="askExample">like “slimy”</p>
         <p class="ml-hint" id="askHint"></p>
         <input class="ml-input" id="wordInput" type="text" autocomplete="off"
-               autocapitalize="none" spellcheck="false" />
+               autocapitalize="none" spellcheck="false" maxlength="24"
+               aria-label="your word" />
+        <p class="ml-coach" id="coach" role="status" aria-live="polite"></p>
+
+        <div class="ml-bank" id="bankWrap">
+          <p class="ml-bank-title">Stuck? Tap a word instead:</p>
+          <div class="ml-chips" id="bankChips"></div>
+        </div>
+        <div class="ml-bank-row">
+          <button class="ml-linkbtn" id="bankShuffle" type="button">🎲 Different words</button>
+          <button class="ml-linkbtn" id="bankToggle" type="button" aria-pressed="true">🙈 Hide word bank</button>
+        </div>
+
         <div class="ml-controls">
-          <button class="btn ghost" id="backBtn">← Back</button>
-          <button class="btn" id="nextBtn">Next →</button>
+          <button class="btn ghost" id="backBtn" type="button">← Back</button>
+          <button class="btn" id="nextBtn" type="button">Next →</button>
         </div>
       </div>
     </section>
 
     <!-- 3. REVEAL -->
     <section id="reveal" class="hidden">
-      <div class="ml-story">
+      <div class="ml-story" id="storyBox">
         <h2 id="storyTitle"></h2>
         <p id="storyText"></p>
       </div>
+      <div class="ml-legend" id="legend" role="group" aria-label="The parts of speech in your story"></div>
+      <p class="ml-posnote" id="posNote" role="status" aria-live="polite"></p>
+      <p class="ml-tally" id="tally"></p>
       <div class="ml-controls">
-        <button class="btn" id="readBtn">🔊 Read it to me</button>
-        <button class="btn ghost" id="againBtn">▶ Play again</button>
-        <button class="btn ghost" id="pickBtn">📚 Pick another</button>
+        <button class="btn" id="readBtn" type="button">🔊 Read it to me</button>
+        <button class="btn ghost" id="againBtn" type="button">▶ New silly words</button>
+        <button class="btn ghost" id="pickBtn" type="button">📚 Pick another</button>
       </div>
     </section>
   </main>

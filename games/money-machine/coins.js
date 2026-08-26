@@ -108,6 +108,15 @@
     return bits.join(" + ") + " = " + total + "¢";
   }
 
+  /** Write out a sum/difference in ONE consistent unit.
+      All small? plain cents ("50 + 10 = 60¢"). Anything a dollar
+      or more? dollars everywhere ("$1.80 − $1.65 = 15¢"). */
+  function mathLine(parts, op, result) {
+    var big = parts.concat([result]).some(function (v) { return v >= 100; });
+    var f = big ? dollarText : function (v) { return "" + v; };
+    return parts.map(f).join(" " + op + " ") + " = " + centsText(result);
+  }
+
   /** "5, 10, 15, 20, 25" — skip counting out loud */
   function skipCount(p, n) {
     var out = [];
@@ -294,25 +303,33 @@
 
   /* ---- 3. Mixed coins ------------------------------------- */
   function makeMixed(rng, hard) {
-    var pool = hard ? ALL_COINS : SMALL_COINS;
-    var kinds = shuffle(rng, pool).slice(0, ri(rng, 2, 3));
-    var ids = [], total = 0, guard = 0;
-    kinds.forEach(function (id) {
-      var p = piece(id);
-      var n = ri(rng, 1, p.value >= 25 ? 2 : 3);
-      for (var i = 0; i < n; i++) { ids.push(id); total += p.value; }
-    });
-    // keep it countable: under a dollar for the easy tier
-    while (!hard && total > 99 && guard++ < 30) {
-      var biggest = group(ids)[0].piece.id;
-      ids.splice(ids.indexOf(biggest), 1);
-      total = sum(ids);
+    var pool = hard ? ALL_COINS : (rng() < 0.25 ? SMALL_COINS.concat(["half"]) : SMALL_COINS);
+    var cap = hard ? 499 : 99;                    // keep it countable
+    var ids = [], total = 0, attempt = 0;
+
+    while (attempt++ < 25) {
+      var kinds = shuffle(rng, pool).slice(0, ri(rng, 2, 3))
+        .map(piece)
+        .sort(function (a, b) { return b.value - a.value; });
+      // one of every chosen kind must fit, so every kind really appears
+      var base = kinds.reduce(function (t, p) { return t + p.value; }, 0);
+      if (base > cap) continue;
+
+      ids = []; total = 0;
+      kinds.forEach(function (p) { ids.push(p.id); total += p.value; });
+      kinds.forEach(function (p) {                // then top up within budget
+        var room = Math.floor((cap - total) / p.value);
+        var maxExtra = Math.min(p.value >= 25 ? 1 : 3, room);
+        var extra = maxExtra > 0 ? ri(rng, 0, maxExtra) : 0;
+        for (var i = 0; i < extra; i++) { ids.push(p.id); total += p.value; }
+      });
+      break;
     }
-    if (ids.length < 2) { ids.push("penny"); total = sum(ids); }
+    if (ids.length < 2) { ids = ["dime", "nickel"]; total = 15; }
 
     var gs = group(ids);
-    var countedByOnes = ids.length;
-    var missedOne = total - gs[0].piece.value;
+    var countedByOnes = ids.length;               // "I counted the coins, not the money"
+    var missedOne = total - gs[0].piece.value;    // "I skipped the big one"
     var wrongs = [countedByOnes, missedOne, total + 5, total - 5, total + 10];
     return {
       kind: "choice",
@@ -360,7 +377,7 @@
     var target, best, tries = 0;
     do {
       target = ri(rng, 6, 99);
-      best = fewest(target, ALL_COINS);
+      best = fewest(target, SMALL_COINS);
       tries++;
     } while (best.length < 2 && tries < 50);
     return {
@@ -368,7 +385,7 @@
       prompt: "Make " + centsText(target) + " using the FEWEST coins you can.",
       show: [],
       target: target,
-      palette: ALL_COINS,
+      palette: SMALL_COINS,
       needFewest: true,
       fewestCount: best.length,
       teach: "The smartest pile is " + best.length + " coins: " + phrase(best) + ".",
@@ -393,7 +410,7 @@
     var paid = pick(rng, [100, 100, 100, 50, 25].filter(function (v) { return v > item.price; }));
     if (!paid) paid = 100;
     var change = paid - item.price;
-    var best = fewest(change, ALL_COINS);
+    var best = fewest(change, SMALL_COINS);
     return {
       kind: "build",
       prompt: "The " + item.name + " costs " + centsText(item.price) + ". You pay with " +
@@ -401,7 +418,7 @@
       showItems: [item],
       show: [],
       target: change,
-      palette: ALL_COINS,
+      palette: SMALL_COINS,
       needFewest: false,
       fewestCount: best.length,
       cost: item.price,
@@ -437,12 +454,12 @@
         show: [],
         choices: choiceSet(rng, left, [have - two[0].price, cost, left + 10, left - 5], centsText),
         answer: left,
-        teach: two[0].price + " + " + two[1].price + " = " + cost + ", and " + have + " − " + cost + " = " + left + "¢.",
+        teach: mathLine([two[0].price, two[1].price], "+", cost) + ", and " + mathLine([have, cost], "−", left) + ".",
         check: function (a) { return a === left; },
         explain: function (a) {
-          return "First add what you spend: <b>" + two[0].price + " + " + two[1].price + " = " +
-            cost + "¢</b>. Then take that off your money: <b>" + have + " − " + cost + " = " +
-            centsText(left) + "</b>" + (a != null && a !== left ? ", not " + centsText(a) : "") + ".";
+          return "First add what you spend: <b>" + mathLine([two[0].price, two[1].price], "+", cost) +
+            "</b>. Then take that off your money: <b>" + mathLine([have, cost], "−", left) +
+            "</b>" + (a != null && a !== left ? ", not " + centsText(a) : "") + ".";
         }
       };
     }
@@ -462,12 +479,12 @@
         show: coins,
         choices: choiceSet(rng, short, [it.price + have2, have2, short + 5, short - 5], centsText),
         answer: short,
-        teach: it.price + " − " + have2 + " = " + short + "¢ more.",
+        teach: mathLine([it.price, have2], "−", short) + " more.",
         check: function (a) { return a === short; },
         explain: function (a) {
           return "You are holding " + phrase(coins) + " = <b>" + sumSentence(coins) +
-            "</b>. Take that off the price: <b>" + it.price + " − " + have2 + " = " +
-            centsText(short) + "</b> more" + (a != null && a !== short ? ", not " + centsText(a) : "") + ".";
+            "</b>. Take that off the price: <b>" + mathLine([it.price, have2], "−", short) +
+            "</b> more" + (a != null && a !== short ? ", not " + centsText(a) : "") + ".";
         }
       };
     }
@@ -486,11 +503,13 @@
         show: [],
         choices: choiceSet(rng, many, [over, Math.max(0, many - 1), many + 2], function (v) { return v + ""; }),
         answer: many,
-        teach: many + " × " + it3.price + " = " + (many * it3.price) + "¢, and " + over + " would cost " + (over * it3.price) + "¢.",
+        teach: many + " × " + centsText(it3.price) + " = " + centsText(many * it3.price) +
+             ", and " + over + " would cost " + centsText(over * it3.price) + ".",
         check: function (a) { return a === many; },
         explain: function (a) {
-          return "<b>" + many + " × " + it3.price + "¢ = " + (many * it3.price) + "¢</b>, which you can pay. " +
-            "<b>" + over + " × " + it3.price + "¢ = " + (over * it3.price) + "¢</b> is more than " +
+          return "<b>" + many + " × " + centsText(it3.price) + " = " + centsText(many * it3.price) +
+            "</b>, which you can pay. <b>" + over + " × " + centsText(it3.price) + " = " +
+            centsText(over * it3.price) + "</b> is more than " +
             centsText(have3) + ", so the answer is <b>" + many + "</b>" +
             (a != null && a !== many ? ", not " + a : "") + ". (You'd have " +
             centsText(have3 - many * it3.price) + " left over.)";
@@ -514,12 +533,13 @@
         show: [],
         choices: choiceSet(rng, save, [packPrice, singles, save + 5, save + 10], centsText),
         answer: save,
-        teach: packN + " × " + single + " = " + singles + "¢, and " + singles + " − " + packPrice + " = " + save + "¢ saved.",
+        teach: packN + " × " + centsText(single) + " = " + centsText(singles) + ", and " +
+             mathLine([singles, packPrice], "−", save) + " saved.",
         check: function (a) { return a === save; },
         explain: function (a) {
-          return "Buying them one at a time: <b>" + packN + " × " + single + " = " + singles +
-            "¢</b>. The pack is only " + centsText(packPrice) + ". So you save <b>" + singles +
-            " − " + packPrice + " = " + centsText(save) + "</b>" +
+          return "Buying them one at a time: <b>" + packN + " × " + centsText(single) + " = " +
+            centsText(singles) + "</b>. The pack is only " + centsText(packPrice) +
+            ". So you save <b>" + mathLine([singles, packPrice], "−", save) + "</b>" +
             (a != null && a !== save ? ", not " + centsText(a) : "") + ".";
         }
       };
@@ -538,7 +558,8 @@
       choices: choiceSet(rng, weeks, [weeks - 1, weeks + 1, weeks + 2, Math.floor(goal.price / week)],
                          function (v) { return v + " weeks"; }),
       answer: weeks,
-      teach: weeks + " × " + week + " = " + (weeks * week) + "¢, enough for " + centsText(goal.price) + ".",
+      teach: weeks + " × " + centsText(week) + " = " + centsText(weeks * week) +
+             ", enough for " + centsText(goal.price) + ".",
       check: function (a) { return a === weeks; },
       explain: function (a) {
         return "After " + (weeks - 1) + " weeks you have <b>" + centsText((weeks - 1) * week) +
@@ -625,7 +646,7 @@
     COINS: COINS, BILLS: BILLS, PIECES: PIECES, LEVELS: LEVELS,
     SMALL_COINS: SMALL_COINS, ALL_COINS: ALL_COINS, REGISTER: REGISTER,
     piece: piece, sum: sum, group: group, phrase: phrase, fewest: fewest,
-    centsText: centsText, dollarText: dollarText, sumSentence: sumSentence,
+    centsText: centsText, dollarText: dollarText, sumSentence: sumSentence, mathLine: mathLine,
     makeRound: makeRound, SHOP: SHOP, BIG_SHOP: BIG_SHOP
   };
 
@@ -771,7 +792,11 @@
   function newRound() {
     answered = false;
     tray = [];
-    round = makeRound(S.level, Math.random);
+    var lastPrompt = round ? round.prompt : null;
+    for (var tries = 0; tries < 8; tries++) {
+      round = makeRound(S.level, Math.random);
+      if (round.prompt !== lastPrompt) break;
+    }
 
     $("csPrompt").innerHTML = round.prompt;
     $("csStage").innerHTML = stageHTML(round);

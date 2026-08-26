@@ -1,18 +1,24 @@
 /* ===========================================================
    Unit Converter — for Cory!
    -----------------------------------------------------------
-   Convert ANY unit into EVERY other unit at once, across SI,
-   imperial and mixed categories — from the Planck length all
-   the way up to a parsec, and everything in between. Type a
-   number, pick a unit, and the whole table updates live. Tap
-   any row to convert from that unit instead.
+   Three modes:
+     🔎 Explore  — type a number, see it in EVERY other unit at
+                   once, with the × / ÷ maths shown for each row.
+     🎯 Quiz     — a 7-level conversion LADDER with typed answers,
+                   hints, and full working shown for every answer.
+     🍰 Real life — scale a recipe, and a height chart.
 
    Each unit is either linear:   { n, sym, sys, factor }
      (value_in_base = value * factor)
    or has custom maths:          { n, sym, sys, to, from }
      (to: unit->base, from: base->unit) — used for temperature.
 
-   "sys" = si | imp | mix  (just for a little coloured tag / facts)
+   "sys" = si | imp | mix   "kid: true" = an everyday unit that
+   shows up before you tap "show every unit".
+
+   Every factor in here is the exact defined value where one
+   exists (1 in = 0.0254 m exactly, 1 lb = 0.45359237 kg exactly,
+   1 mile = 5280 ft, …) — see check-factors.js.
    =========================================================== */
 (function () {
   "use strict";
@@ -30,58 +36,58 @@
         { n: "Nanometre",        sym: "nm",   sys: "si",  factor: 1e-9 },
         { n: "Micron",           sym: "µm",   sys: "si",  factor: 1e-6 },
         { n: "Thou (mil)",       sym: "thou", sys: "imp", factor: 2.54e-5 },
-        { n: "Millimetre",       sym: "mm",   sys: "si",  factor: 0.001 },
-        { n: "Centimetre",       sym: "cm",   sys: "si",  factor: 0.01 },
-        { n: "Inch",             sym: "in",   sys: "imp", factor: 0.0254 },
+        { n: "Millimetre",       sym: "mm",   sys: "si",  factor: 0.001, kid: 1 },
+        { n: "Centimetre",       sym: "cm",   sys: "si",  factor: 0.01, kid: 1 },
+        { n: "Inch",             sym: "in",   sys: "imp", factor: 0.0254, kid: 1 },
         { n: "Hand",             sym: "hh",   sys: "imp", factor: 0.1016 },
-        { n: "Foot",             sym: "ft",   sys: "imp", factor: 0.3048 },
-        { n: "Yard",             sym: "yd",   sys: "imp", factor: 0.9144 },
+        { n: "Foot",             sym: "ft",   sys: "imp", factor: 0.3048, kid: 1 },
+        { n: "Yard",             sym: "yd",   sys: "imp", factor: 0.9144, kid: 1 },
         { n: "Fathom",           sym: "ftm",  sys: "mix", factor: 1.8288 },
-        { n: "Metre",            sym: "m",    sys: "si",  factor: 1 },
+        { n: "Metre",            sym: "m",    sys: "si",  factor: 1, kid: 1 },
         { n: "Rod (perch)",      sym: "rod",  sys: "imp", factor: 5.0292 },
         { n: "Chain",            sym: "ch",   sys: "imp", factor: 20.1168 },
         { n: "Furlong",          sym: "fur",  sys: "imp", factor: 201.168 },
-        { n: "Kilometre",        sym: "km",   sys: "si",  factor: 1000 },
-        { n: "Mile",             sym: "mi",   sys: "imp", factor: 1609.344 },
+        { n: "Kilometre",        sym: "km",   sys: "si",  factor: 1000, kid: 1 },
+        { n: "Mile",             sym: "mi",   sys: "imp", factor: 1609.344, kid: 1 },
         { n: "Nautical mile",    sym: "nmi",  sys: "mix", factor: 1852 },
         { n: "League",           sym: "lea",  sys: "imp", factor: 4828.032 },
         { n: "Astronomical unit", sym: "AU",  sys: "mix", factor: 1.495978707e11 },
-        { n: "Light-year",       sym: "ly",   sys: "mix", factor: 9.4607e15 },
-        { n: "Parsec",           sym: "pc",   sys: "mix", factor: 3.0856776e16 }
+        { n: "Light-year",       sym: "ly",   sys: "mix", factor: 9.4607304725808e15 },
+        { n: "Parsec",           sym: "pc",   sys: "mix", factor: 3.0856775814913673e16 }
       ]
     },
     {
       key: "mass", label: "⚖️ Weight / Mass", base: "kilogram",
-      fact: "From a single <b>dalton</b> (the mass of one atom) up to the <b>Sun</b> — that's about 57 zeros of difference! 1 kg ≈ a pineapple 🍍, 1 tonne ≈ a small car, and the Earth weighs ~6 septillion kg. 🌍",
+      fact: "From a single <b>dalton</b> (the mass of one atom) up to the <b>Sun</b> — that's about 57 zeros of difference! A bag of sugar is about <b>1 kg</b> 🍚, 1 tonne ≈ a small car, and the Earth weighs ~6 septillion kg. 🌍",
       units: [
-        { n: "Dalton (atomic mass)", sym: "Da", sys: "si",  factor: 1.66053907e-27 },
+        { n: "Dalton (atomic mass)", sym: "Da", sys: "si",  factor: 1.66053906892e-27 },
         { n: "Picogram",   sym: "pg", sys: "si",  factor: 1e-15 },
         { n: "Nanogram",   sym: "ng", sys: "si",  factor: 1e-12 },
         { n: "Microgram",  sym: "µg", sys: "si",  factor: 1e-9 },
-        { n: "Milligram",  sym: "mg", sys: "si",  factor: 1e-6 },
+        { n: "Milligram",  sym: "mg", sys: "si",  factor: 1e-6, kid: 1 },
         { n: "Grain",      sym: "gr", sys: "imp", factor: 6.479891e-5 },
         { n: "Carat",      sym: "ct", sys: "mix", factor: 2e-4 },
-        { n: "Gram",       sym: "g",  sys: "si",  factor: 0.001 },
-        { n: "Dram",       sym: "dr", sys: "imp", factor: 1.7718452e-3 },
-        { n: "Ounce",      sym: "oz", sys: "imp", factor: 0.0283495 },
-        { n: "Pound",      sym: "lb", sys: "imp", factor: 0.453592 },
-        { n: "Kilogram",   sym: "kg", sys: "si",  factor: 1 },
-        { n: "Stone",      sym: "st", sys: "imp", factor: 6.35029 },
-        { n: "Slug",       sym: "slug", sys: "imp", factor: 14.5939 },
-        { n: "US ton (short)", sym: "ton (US)", sys: "imp", factor: 907.185 },
-        { n: "Tonne",      sym: "t",  sys: "si",  factor: 1000 },
-        { n: "Imperial ton (long)", sym: "ton (UK)", sys: "imp", factor: 1016.05 },
+        { n: "Gram",       sym: "g",  sys: "si",  factor: 0.001, kid: 1 },
+        { n: "Dram",       sym: "dr", sys: "imp", factor: 1.7718451953125e-3 },
+        { n: "Ounce",      sym: "oz", sys: "imp", factor: 0.028349523125, kid: 1 },
+        { n: "Pound",      sym: "lb", sys: "imp", factor: 0.45359237, kid: 1 },
+        { n: "Kilogram",   sym: "kg", sys: "si",  factor: 1, kid: 1 },
+        { n: "Stone",      sym: "st", sys: "imp", factor: 6.35029318, kid: 1 },
+        { n: "Slug",       sym: "slug", sys: "imp", factor: 14.5939029372 },
+        { n: "US ton (short)", sym: "ton (US)", sys: "imp", factor: 907.18474 },
+        { n: "Tonne",      sym: "t",  sys: "si",  factor: 1000, kid: 1 },
+        { n: "Imperial ton (long)", sym: "ton (UK)", sys: "imp", factor: 1016.0469088 },
         { n: "Earth mass", sym: "M⊕", sys: "mix", factor: 5.9722e24 },
-        { n: "Solar mass", sym: "M☉", sys: "mix", factor: 1.98892e30 }
+        { n: "Solar mass", sym: "M☉", sys: "mix", factor: 1.98847e30 }
       ]
     },
     {
       key: "temp", label: "🌡️ Temperature", base: "°C",
       fact: "Water freezes at <b>0°C</b> (32°F) and boils at <b>100°C</b> (212°F). Your body is ~<b>37°C</b>. The coldest possible temperature is <b>0 Kelvin</b> (−273.15°C) — nothing can be colder! Scientists use Kelvin; engineers sometimes use Rankine. ❄️",
       units: [
-        { n: "Celsius",    sym: "°C", sys: "si",  to: c => c,                from: c => c },
-        { n: "Fahrenheit", sym: "°F", sys: "imp", to: f => (f - 32) * 5/9,   from: c => c * 9/5 + 32 },
-        { n: "Kelvin",     sym: "K",  sys: "si",  to: k => k - 273.15,       from: c => c + 273.15 },
+        { n: "Celsius",    sym: "°C", sys: "si",  kid: 1, to: c => c,                from: c => c },
+        { n: "Fahrenheit", sym: "°F", sys: "imp", kid: 1, to: f => (f - 32) * 5/9,   from: c => c * 9/5 + 32 },
+        { n: "Kelvin",     sym: "K",  sys: "si",  kid: 1, to: k => k - 273.15,       from: c => c + 273.15 },
         { n: "Rankine",    sym: "°R", sys: "imp", to: r => (r - 491.67) * 5/9, from: c => c * 9/5 + 491.67 },
         { n: "Réaumur",    sym: "°Ré", sys: "mix", to: re => re * 5/4,        from: c => c * 4/5 },
         { n: "Delisle",    sym: "°De", sys: "mix", to: d => 100 - d * 2/3,    from: c => (100 - c) * 3/2 }
@@ -92,25 +98,25 @@
       fact: "A US <b>gallon</b> (3.79 L) is smaller than an imperial <b>gallon</b> (4.55 L)! A teaspoon is 5 mL, a big soda bottle is 2 L, and an <b>acre-foot</b> (enough to flood an acre a foot deep) is over 1.2 million litres. 🌊",
       units: [
         { n: "Microlitre",  sym: "µL",  sys: "si",  factor: 1e-6 },
-        { n: "Millilitre",  sym: "mL",  sys: "si",  factor: 0.001 },
-        { n: "Cubic centimetre", sym: "cm³", sys: "si", factor: 0.001 },
-        { n: "Teaspoon",    sym: "tsp", sys: "mix", factor: 0.00492892 },
-        { n: "Tablespoon",  sym: "tbsp", sys: "mix", factor: 0.0147868 },
-        { n: "Cubic inch",  sym: "in³", sys: "imp", factor: 0.0163871 },
-        { n: "Fluid ounce (US)", sym: "fl oz (US)", sys: "imp", factor: 0.0295735 },
-        { n: "Fluid ounce (imperial)", sym: "fl oz (UK)", sys: "imp", factor: 0.0284131 },
-        { n: "Cup (US)",    sym: "cup", sys: "imp", factor: 0.236588 },
-        { n: "Pint (US)",   sym: "pt (US)", sys: "imp", factor: 0.473176 },
-        { n: "Pint (imperial)", sym: "pt (UK)", sys: "imp", factor: 0.568261 },
-        { n: "Quart (US)",  sym: "qt",  sys: "imp", factor: 0.946353 },
-        { n: "Litre",       sym: "L",   sys: "si",  factor: 1 },
-        { n: "Gallon (US)", sym: "gal (US)", sys: "imp", factor: 3.78541 },
+        { n: "Millilitre",  sym: "mL",  sys: "si",  factor: 0.001, kid: 1 },
+        { n: "Cubic centimetre", sym: "cm³", sys: "si", factor: 0.001, kid: 1 },
+        { n: "Teaspoon (US)", sym: "tsp", sys: "mix", factor: 0.00492892159375, kid: 1 },
+        { n: "Tablespoon (US)", sym: "tbsp", sys: "mix", factor: 0.01478676478125, kid: 1 },
+        { n: "Cubic inch",  sym: "in³", sys: "imp", factor: 0.016387064 },
+        { n: "Fluid ounce (US)", sym: "fl oz (US)", sys: "imp", factor: 0.0295735295625, kid: 1 },
+        { n: "Fluid ounce (imperial)", sym: "fl oz (UK)", sys: "imp", factor: 0.0284130625 },
+        { n: "Cup (US)",    sym: "cup", sys: "imp", factor: 0.2365882365, kid: 1 },
+        { n: "Pint (US)",   sym: "pt (US)", sys: "imp", factor: 0.473176473, kid: 1 },
+        { n: "Pint (imperial)", sym: "pt (UK)", sys: "imp", factor: 0.56826125 },
+        { n: "Quart (US)",  sym: "qt",  sys: "imp", factor: 0.946352946, kid: 1 },
+        { n: "Litre",       sym: "L",   sys: "si",  factor: 1, kid: 1 },
+        { n: "Gallon (US)", sym: "gal (US)", sys: "imp", factor: 3.785411784, kid: 1 },
         { n: "Gallon (imperial)", sym: "gal (UK)", sys: "imp", factor: 4.54609 },
-        { n: "Cubic foot",  sym: "ft³", sys: "imp", factor: 28.3168 },
-        { n: "Oil barrel",  sym: "bbl", sys: "mix", factor: 158.987 },
-        { n: "Cubic yard",  sym: "yd³", sys: "imp", factor: 764.555 },
-        { n: "Cubic metre", sym: "m³",  sys: "si",  factor: 1000 },
-        { n: "Acre-foot",   sym: "ac·ft", sys: "imp", factor: 1.233482e6 }
+        { n: "Cubic foot",  sym: "ft³", sys: "imp", factor: 28.316846592 },
+        { n: "Oil barrel",  sym: "bbl", sys: "mix", factor: 158.987294928 },
+        { n: "Cubic yard",  sym: "yd³", sys: "imp", factor: 764.554857984 },
+        { n: "Cubic metre", sym: "m³",  sys: "si",  factor: 1000, kid: 1 },
+        { n: "Acre-foot",   sym: "ac·ft", sys: "imp", factor: 1233481.83754752 }
       ]
     },
     {
@@ -118,17 +124,17 @@
       fact: "A <b>hectare</b> (10,000 m²) is about a rugby field; an <b>acre</b> is a bit smaller — old idea: how much land an ox could plough in a day! 🐂 Physicists even measure atoms in tiny <b>barns</b> (10⁻²⁸ m²).",
       units: [
         { n: "Barn",              sym: "b",   sys: "mix", factor: 1e-28 },
-        { n: "Square millimetre", sym: "mm²", sys: "si",  factor: 1e-6 },
-        { n: "Square centimetre", sym: "cm²", sys: "si",  factor: 1e-4 },
-        { n: "Square inch",       sym: "in²", sys: "imp", factor: 6.4516e-4 },
-        { n: "Square foot",       sym: "ft²", sys: "imp", factor: 0.092903 },
-        { n: "Square yard",       sym: "yd²", sys: "imp", factor: 0.836127 },
-        { n: "Square metre",      sym: "m²",  sys: "si",  factor: 1 },
+        { n: "Square millimetre", sym: "mm²", sys: "si",  factor: 1e-6, kid: 1 },
+        { n: "Square centimetre", sym: "cm²", sys: "si",  factor: 1e-4, kid: 1 },
+        { n: "Square inch",       sym: "in²", sys: "imp", factor: 6.4516e-4, kid: 1 },
+        { n: "Square foot",       sym: "ft²", sys: "imp", factor: 0.09290304, kid: 1 },
+        { n: "Square yard",       sym: "yd²", sys: "imp", factor: 0.83612736, kid: 1 },
+        { n: "Square metre",      sym: "m²",  sys: "si",  factor: 1, kid: 1 },
         { n: "Are",               sym: "a",   sys: "si",  factor: 100 },
-        { n: "Acre",              sym: "ac",  sys: "imp", factor: 4046.86 },
-        { n: "Hectare",           sym: "ha",  sys: "si",  factor: 10000 },
-        { n: "Square kilometre",  sym: "km²", sys: "si",  factor: 1e6 },
-        { n: "Square mile",       sym: "mi²", sys: "imp", factor: 2.589988e6 }
+        { n: "Acre",              sym: "ac",  sys: "imp", factor: 4046.8564224, kid: 1 },
+        { n: "Hectare",           sym: "ha",  sys: "si",  factor: 10000, kid: 1 },
+        { n: "Square kilometre",  sym: "km²", sys: "si",  factor: 1e6, kid: 1 },
+        { n: "Square mile",       sym: "mi²", sys: "imp", factor: 2589988.110336, kid: 1 }
       ]
     },
     {
@@ -136,11 +142,11 @@
       fact: "A cheetah runs ~100 km/h (60 mph) 🐆. Sound travels 343 m/s (<b>Mach 1</b>). A <b>knot</b> is one nautical mile per hour. And the ultimate speed limit — <b>light</b> — is 299,792,458 m/s! 💡",
       units: [
         { n: "Millimetre / second", sym: "mm/s", sys: "si",  factor: 0.001 },
-        { n: "Foot / second",       sym: "ft/s", sys: "imp", factor: 0.3048 },
-        { n: "Metre / second",      sym: "m/s",  sys: "si",  factor: 1 },
-        { n: "Kilometre / hour",    sym: "km/h", sys: "si",  factor: 0.277778 },
-        { n: "Mile / hour",         sym: "mph",  sys: "imp", factor: 0.44704 },
-        { n: "Knot",                sym: "kn",   sys: "mix", factor: 0.514444 },
+        { n: "Kilometre / hour",    sym: "km/h", sys: "si",  factor: 1 / 3.6, kid: 1 },
+        { n: "Foot / second",       sym: "ft/s", sys: "imp", factor: 0.3048, kid: 1 },
+        { n: "Mile / hour",         sym: "mph",  sys: "imp", factor: 0.44704, kid: 1 },
+        { n: "Knot",                sym: "kn",   sys: "mix", factor: 1852 / 3600, kid: 1 },
+        { n: "Metre / second",      sym: "m/s",  sys: "si",  factor: 1, kid: 1 },
         { n: "Kilometre / second",  sym: "km/s", sys: "si",  factor: 1000 },
         { n: "Mach (sea level)",    sym: "Mach", sys: "mix", factor: 340.29 },
         { n: "Speed of light",      sym: "c",    sys: "mix", factor: 299792458 }
@@ -153,15 +159,15 @@
         { n: "Planck time", sym: "tP",   sys: "mix", factor: 5.391247e-44 },
         { n: "Nanosecond",  sym: "ns",   sys: "si",  factor: 1e-9 },
         { n: "Microsecond", sym: "µs",   sys: "si",  factor: 1e-6 },
-        { n: "Millisecond", sym: "ms",   sys: "si",  factor: 0.001 },
-        { n: "Second",      sym: "s",    sys: "si",  factor: 1 },
-        { n: "Minute",      sym: "min",  sys: "si",  factor: 60 },
-        { n: "Hour",        sym: "hr",   sys: "si",  factor: 3600 },
-        { n: "Day",         sym: "day",  sys: "si",  factor: 86400 },
-        { n: "Week",        sym: "wk",   sys: "si",  factor: 604800 },
+        { n: "Millisecond", sym: "ms",   sys: "si",  factor: 0.001, kid: 1 },
+        { n: "Second",      sym: "s",    sys: "si",  factor: 1, kid: 1 },
+        { n: "Minute",      sym: "min",  sys: "si",  factor: 60, kid: 1 },
+        { n: "Hour",        sym: "hr",   sys: "si",  factor: 3600, kid: 1 },
+        { n: "Day",         sym: "day",  sys: "si",  factor: 86400, kid: 1 },
+        { n: "Week",        sym: "wk",   sys: "si",  factor: 604800, kid: 1 },
         { n: "Fortnight",   sym: "fn",   sys: "mix", factor: 1209600 },
         { n: "Month (avg)", sym: "mo",   sys: "mix", factor: 2629800 },
-        { n: "Year",        sym: "yr",   sys: "si",  factor: 31557600 },
+        { n: "Year (365¼ days)", sym: "yr", sys: "si", factor: 31557600, kid: 1 },
         { n: "Decade",      sym: "dec",  sys: "mix", factor: 315576000 },
         { n: "Century",     sym: "cent", sys: "mix", factor: 3155760000 },
         { n: "Millennium",  sym: "kyr",  sys: "mix", factor: 31557600000 }
@@ -173,15 +179,15 @@
       units: [
         { n: "Electronvolt",  sym: "eV",   sys: "mix", factor: 1.602176634e-19 },
         { n: "Erg",           sym: "erg",  sys: "mix", factor: 1e-7 },
-        { n: "Joule",         sym: "J",    sys: "si",  factor: 1 },
-        { n: "Calorie",       sym: "cal",  sys: "mix", factor: 4.184 },
-        { n: "Foot-pound",    sym: "ft·lb", sys: "imp", factor: 1.35582 },
-        { n: "Kilojoule",     sym: "kJ",   sys: "si",  factor: 1000 },
-        { n: "BTU",           sym: "BTU",  sys: "imp", factor: 1055.06 },
-        { n: "Food Calorie",  sym: "kcal", sys: "mix", factor: 4184 },
-        { n: "Watt-hour",     sym: "Wh",   sys: "si",  factor: 3600 },
+        { n: "Joule",         sym: "J",    sys: "si",  factor: 1, kid: 1 },
+        { n: "Foot-pound",    sym: "ft·lb", sys: "imp", factor: 1.3558179483314004 },
+        { n: "Calorie",       sym: "cal",  sys: "mix", factor: 4.184, kid: 1 },
+        { n: "Kilojoule",     sym: "kJ",   sys: "si",  factor: 1000, kid: 1 },
+        { n: "BTU",           sym: "BTU",  sys: "imp", factor: 1055.05585262 },
+        { n: "Watt-hour",     sym: "Wh",   sys: "si",  factor: 3600, kid: 1 },
+        { n: "Food Calorie",  sym: "kcal", sys: "mix", factor: 4184, kid: 1 },
         { n: "Megajoule",     sym: "MJ",   sys: "si",  factor: 1e6 },
-        { n: "Kilowatt-hour", sym: "kWh",  sys: "si",  factor: 3.6e6 },
+        { n: "Kilowatt-hour", sym: "kWh",  sys: "si",  factor: 3.6e6, kid: 1 },
         { n: "Ton of TNT",    sym: "ton TNT", sys: "mix", factor: 4.184e9 }
       ]
     },
@@ -190,28 +196,28 @@
       fact: "One <b>horsepower</b> (746 W) really was measured from a working horse! 🐴 A bright bulb is ~100 W; a car engine ~100 hp; and a big power station makes over a <b>gigawatt</b> (a billion watts).",
       units: [
         { n: "Milliwatt",  sym: "mW",  sys: "si",  factor: 1e-3 },
-        { n: "Watt",       sym: "W",   sys: "si",  factor: 1 },
-        { n: "BTU / hour", sym: "BTU/h", sys: "imp", factor: 0.293071 },
-        { n: "Horsepower (metric)",    sym: "PS", sys: "mix", factor: 735.499 },
-        { n: "Horsepower (mechanical)", sym: "hp", sys: "imp", factor: 745.7 },
-        { n: "Kilowatt",   sym: "kW",  sys: "si",  factor: 1000 },
-        { n: "Megawatt",   sym: "MW",  sys: "si",  factor: 1e6 },
-        { n: "Gigawatt",   sym: "GW",  sys: "si",  factor: 1e9 }
+        { n: "BTU / hour", sym: "BTU/h", sys: "imp", factor: 1055.05585262 / 3600 },
+        { n: "Watt",       sym: "W",   sys: "si",  factor: 1, kid: 1 },
+        { n: "Horsepower (metric)",    sym: "PS", sys: "mix", factor: 735.49875 },
+        { n: "Horsepower (mechanical)", sym: "hp", sys: "imp", factor: 745.69987158227022, kid: 1 },
+        { n: "Kilowatt",   sym: "kW",  sys: "si",  factor: 1000, kid: 1 },
+        { n: "Megawatt",   sym: "MW",  sys: "si",  factor: 1e6, kid: 1 },
+        { n: "Gigawatt",   sym: "GW",  sys: "si",  factor: 1e9, kid: 1 }
       ]
     },
     {
       key: "pressure", label: "🎈 Pressure", base: "pascal",
       fact: "The air around you pushes at ~1 <b>atmosphere</b> (101,325 Pa). A car tyre is ~32 psi. Weather maps use <b>bars</b> & millibars, and doctors measure blood pressure in <b>mmHg</b>. 🌦️",
       units: [
-        { n: "Pascal",        sym: "Pa",   sys: "si",  factor: 1 },
+        { n: "Pascal",        sym: "Pa",   sys: "si",  factor: 1, kid: 1 },
         { n: "Hectopascal",   sym: "hPa",  sys: "si",  factor: 100 },
-        { n: "Millibar",      sym: "mbar", sys: "mix", factor: 100 },
-        { n: "Kilopascal",    sym: "kPa",  sys: "si",  factor: 1000 },
-        { n: "mm of mercury (torr)", sym: "mmHg", sys: "mix", factor: 133.322 },
-        { n: "Inch of mercury", sym: "inHg", sys: "imp", factor: 3386.39 },
-        { n: "Pound / sq in", sym: "psi",  sys: "imp", factor: 6894.76 },
-        { n: "Bar",           sym: "bar",  sys: "mix", factor: 1e5 },
-        { n: "Atmosphere",    sym: "atm",  sys: "mix", factor: 101325 },
+        { n: "Millibar",      sym: "mbar", sys: "mix", factor: 100, kid: 1 },
+        { n: "Kilopascal",    sym: "kPa",  sys: "si",  factor: 1000, kid: 1 },
+        { n: "mm of mercury (torr)", sym: "mmHg", sys: "mix", factor: 133.322387415, kid: 1 },
+        { n: "Inch of mercury", sym: "inHg", sys: "imp", factor: 3386.388640341 },
+        { n: "Pound / sq in", sym: "psi",  sys: "imp", factor: 6894.757293168, kid: 1 },
+        { n: "Bar",           sym: "bar",  sys: "mix", factor: 1e5, kid: 1 },
+        { n: "Atmosphere",    sym: "atm",  sys: "mix", factor: 101325, kid: 1 },
         { n: "Megapascal",    sym: "MPa",  sys: "si",  factor: 1e6 }
       ]
     },
@@ -219,16 +225,16 @@
       key: "data", label: "💾 Data", base: "byte",
       fact: "8 <b>bits</b> = 1 <b>byte</b> (one letter). Computers count in powers of 2, so a <b>kibibyte</b> is 1024 bytes, not 1000! A photo is a few MB; a whole movie a few GB; big companies store <b>petabytes</b>. 🖼️",
       units: [
-        { n: "Bit",       sym: "bit", sys: "si",  factor: 0.125 },
+        { n: "Bit",       sym: "bit", sys: "si",  factor: 0.125, kid: 1 },
         { n: "Nibble",    sym: "nib", sys: "mix", factor: 0.5 },
-        { n: "Byte",      sym: "B",   sys: "si",  factor: 1 },
-        { n: "Kilobyte",  sym: "kB",  sys: "si",  factor: 1e3 },
+        { n: "Byte",      sym: "B",   sys: "si",  factor: 1, kid: 1 },
+        { n: "Kilobyte",  sym: "kB",  sys: "si",  factor: 1e3, kid: 1 },
         { n: "Kibibyte",  sym: "KiB", sys: "mix", factor: 1024 },
-        { n: "Megabyte",  sym: "MB",  sys: "si",  factor: 1e6 },
+        { n: "Megabyte",  sym: "MB",  sys: "si",  factor: 1e6, kid: 1 },
         { n: "Mebibyte",  sym: "MiB", sys: "mix", factor: 1048576 },
-        { n: "Gigabyte",  sym: "GB",  sys: "si",  factor: 1e9 },
+        { n: "Gigabyte",  sym: "GB",  sys: "si",  factor: 1e9, kid: 1 },
         { n: "Gibibyte",  sym: "GiB", sys: "mix", factor: 1073741824 },
-        { n: "Terabyte",  sym: "TB",  sys: "si",  factor: 1e12 },
+        { n: "Terabyte",  sym: "TB",  sys: "si",  factor: 1e12, kid: 1 },
         { n: "Tebibyte",  sym: "TiB", sys: "mix", factor: 1099511627776 },
         { n: "Petabyte",  sym: "PB",  sys: "si",  factor: 1e15 },
         { n: "Pebibyte",  sym: "PiB", sys: "mix", factor: 1125899906842624 }
@@ -240,19 +246,25 @@
       units: [
         { n: "Arcsecond",   sym: "″",    sys: "mix", factor: 1/3600 },
         { n: "Arcminute",   sym: "′",    sys: "mix", factor: 1/60 },
-        { n: "Milliradian", sym: "mrad", sys: "si",  factor: 0.0572957795 },
-        { n: "Gradian",     sym: "grad", sys: "mix", factor: 0.9 },
-        { n: "Degree",      sym: "°",    sys: "mix", factor: 1 },
-        { n: "Radian",      sym: "rad",  sys: "si",  factor: 57.29577951 },
-        { n: "Full turn",   sym: "turn", sys: "mix", factor: 360 }
+        { n: "Milliradian", sym: "mrad", sys: "si",  factor: 180 / Math.PI / 1000 },
+        { n: "Gradian",     sym: "grad", sys: "mix", factor: 0.9, kid: 1 },
+        { n: "Degree",      sym: "°",    sys: "mix", factor: 1, kid: 1 },
+        { n: "Radian",      sym: "rad",  sys: "si",  factor: 180 / Math.PI, kid: 1 },
+        { n: "Full turn",   sym: "turn", sys: "mix", factor: 360, kid: 1 }
       ]
     }
   ];
 
+  // Keep every linear list in size order — a couple used to be out of
+  // order (km/h after m/s, ft·lb after cal, BTU/h after W), which made
+  // the "ladder" of units on screen look wrong.
+  CATS.forEach(c => {
+    if (c.units.every(u => typeof u.factor === "number")) {
+      c.units.sort((a, b) => a.factor - b.factor);
+    }
+  });
+
   // ---- "How big is that?" — everyday things to compare against --------
-  // Each anchor is {v: size in the category's base unit, one, many, e}.
-  // mode "count" reads "about 3 school buses"; mode "times" reads
-  // "about 3× as much as a cheetah".
   const COMPARES = {
     length: { mode: "count", anchors: [
       { v: 1e-10,      one: "an atom",              many: "atoms in a row",        e: "⚛️" },
@@ -272,6 +284,7 @@
       { v: 2.5e-6,   one: "a mosquito",       many: "mosquitoes",       e: "🦟" },
       { v: 0.0025,   one: "a LEGO brick",     many: "LEGO bricks",      e: "🧱" },
       { v: 0.2,      one: "an apple",         many: "apples",           e: "🍎" },
+      { v: 1,        one: "a bag of sugar",   many: "bags of sugar",    e: "🍚" },
       { v: 4.5,      one: "a pet cat",        many: "pet cats",         e: "🐱" },
       { v: 45,       one: "a big dog",        many: "big dogs",         e: "🐕" },
       { v: 1500,     one: "a car",            many: "cars",             e: "🚗" },
@@ -383,15 +396,13 @@
 
   // Friendly number formatting: readable, no ugly floating-point tails.
   function fmt(x) {
-    if (!isFinite(x)) return "—";
+    if (typeof x !== "number" || !isFinite(x)) return "—";
     if (x === 0) return "0";
     const a = Math.abs(x);
     if (a >= 1e15 || a < 1e-6) {
       return x.toExponential(4).replace(/e([+-])(\d)$/, "e$10$2");
     }
-    // round to ~7 significant figures, then trim trailing zeros
     let s = Number(x.toPrecision(7)).toString();
-    // add thousands separators to the integer part for readability
     if (s.indexOf("e") === -1) {
       const neg = s[0] === "-";
       if (neg) s = s.slice(1);
@@ -402,18 +413,26 @@
     return s;
   }
 
-  // Same as fmt, but renders huge/tiny numbers as a proper "× 10ⁿ"
-  // instead of computer e-notation. Returns HTML.
+  // Same as fmt, but renders huge/tiny numbers as a proper "× 10ⁿ".
   function fmtHTML(x) {
-    if (!isFinite(x)) return "—";
+    if (typeof x !== "number" || !isFinite(x)) return "—";
     if (x === 0) return "0";
     const a = Math.abs(x);
     if (a >= 1e15 || a < 1e-6) {
-      const [m, e] = x.toExponential(4).split("e");
-      return Number(m) + " × 10<sup>" + Number(e) + "</sup>";
+      const parts = x.toExponential(4).split("e");
+      return Number(parts[0]) + " × 10<sup>" + Number(parts[1]) + "</sup>";
     }
     return fmt(x);
   }
+
+  // How many decimal places does this number actually need?
+  function decimalsOf(x) {
+    const s = String(Number(x.toPrecision(10)));
+    if (s.indexOf("e") !== -1) return 6;
+    const i = s.indexOf(".");
+    return i === -1 ? 0 : Math.min(s.length - i - 1, 6);
+  }
+  function roundTo(x, dp) { const p = Math.pow(10, dp); return Math.round(x * p) / p; }
 
   // Build the "That's about 3 school buses! 🚌" line.
   function compareLine(catKey, baseVal) {
@@ -423,7 +442,6 @@
     }
     const cmp = COMPARES[catKey];
     if (!cmp || !(baseVal > 0)) return "";
-    // nearest anchor on the log scale
     let bestA = cmp.anchors[0], bestD = Infinity;
     cmp.anchors.forEach(an => {
       const d = Math.abs(Math.log10(baseVal / an.v));
@@ -433,10 +451,7 @@
     const times = cmp.mode === "times";
 
     function amount(n) {
-      if (n < 10) {
-        const s = (Math.round(n * 10) / 10).toString();
-        return s.replace(/\.0$/, "");
-      }
+      if (n < 10) return (Math.round(n * 10) / 10).toString().replace(/\.0$/, "");
       return fmtHTML(Math.round(n));
     }
 
@@ -452,7 +467,7 @@
       }
     } else {
       const f = 1 / r;
-      if (Math.round(f) <= 1) { // e.g. 0.85× — close enough to call it one
+      if (Math.round(f) <= 1) {
         phrase = times ? "the same as <b>" + bestA.one + "</b>" : "<b>" + bestA.one + "</b>";
       } else {
         const fs = f <= 20 ? String(Math.round(f)) : "(" + amount(f) + ")";
@@ -462,27 +477,50 @@
     return "🤔 That's about " + phrase + " " + bestA.e;
   }
 
-  // ---- State + DOM -----------------------------------------------------
+  // ---- tiny helpers ----------------------------------------------------
   const $ = id => document.getElementById(id);
+  function pick(a) { return a[(Math.random() * a.length) | 0]; }
+  function esc(s) {
+    return String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+  }
+
+  // =====================================================================
+  //  🔎 EXPLORE
+  // =====================================================================
   const KEY = "unitConverter";
   let cat = CATS[0];
   let fromIdx = CATS[0].units.findIndex(u => u.sym === "m"); // default: metre
+  let showAll = false;
+  let tab = "explore";
 
   function loadState() {
     try {
       const s = JSON.parse(localStorage.getItem(KEY) || "{}");
       const c = CATS.find(k => k.key === s.cat);
-      if (c) { cat = c; }
-      if (s.from != null) fromIdx = Math.min(Math.max(0, s.from), cat.units.length - 1);
-      if (s.value != null) $("value").value = s.value;
+      if (c) cat = c;
+      if (s.from != null && isFinite(s.from)) {
+        fromIdx = Math.min(Math.max(0, s.from | 0), cat.units.length - 1);
+      } else {
+        fromIdx = baseUnitIndex(cat);
+      }
+      if (s.value != null && s.value !== "") $("value").value = s.value;
+      showAll = !!s.showAll;
+      if (s.tab === "quiz" || s.tab === "real" || s.tab === "explore") tab = s.tab;
     } catch (e) {}
   }
   function saveState() {
     try {
       localStorage.setItem(KEY, JSON.stringify({
-        cat: cat.key, from: fromIdx, value: $("value").value
+        cat: cat.key, from: fromIdx, value: $("value").value, showAll: showAll, tab: tab
       }));
     } catch (e) {}
+  }
+
+  // Which units show right now? Everyday ones first, unless "show every unit".
+  function visibleUnits() {
+    if (showAll) return cat.units;
+    const kids = cat.units.filter(u => u.kid);
+    return kids.length >= 3 ? kids : cat.units;
   }
 
   function buildCats() {
@@ -490,13 +528,15 @@
     box.innerHTML = "";
     CATS.forEach(c => {
       const b = document.createElement("button");
-      b.className = "cat" + (c === cat ? " active" : "");
+      b.type = "button";
+      b.className = "cat";
+      b.setAttribute("aria-pressed", c === cat ? "true" : "false");
       b.textContent = c.label;
       b.onclick = () => {
         if (c === cat) return;
         cat = c; fromIdx = baseUnitIndex(c);
         window.SFX && SFX.good && SFX.good();
-        renderAll();
+        renderExplore();
       };
       box.appendChild(b);
     });
@@ -515,16 +555,14 @@
     sel.onchange = () => { fromIdx = +sel.value; render(); };
   }
 
-  // Start each category on its everyday base unit (metre, kilogram, …)
-  // instead of the very first (often extreme) unit in the list.
+  // Start each category on its everyday base unit (metre, kilogram, …).
   function baseUnitIndex(c) {
     const i = c.units.findIndex(u => u.factor === 1 || (u.to && u.to(1) === 1));
     return i === -1 ? 0 : i;
   }
 
-  // Quick-tap numbers that make sense for each category.
   const QUICKS = {
-    temp:  [0, 32, 37, 98.6, 100, -40],
+    temp:  [0, 20, 32, 37, 100, -40],
     time:  [1, 30, 60, 90, 3600],
     data:  [1, 8, 512, 1024, 2048],
     angle: [30, 45, 90, 180, 360]
@@ -532,10 +570,12 @@
 
   function buildQuick() {
     const q = $("quick");
-    q.innerHTML = "";
+    q.innerHTML = '<span class="qlabel">try:</span>';
     (QUICKS[cat.key] || [1, 2, 5, 10, 100, 0.5]).forEach(v => {
       const b = document.createElement("button");
+      b.type = "button";
       b.textContent = v;
+      b.setAttribute("aria-label", "Use the number " + v);
       b.onclick = () => { $("value").value = v; render(); };
       q.appendChild(b);
     });
@@ -548,16 +588,21 @@
     const baseVal = toBase(from, val);
 
     $("inputTitle").textContent = "CONVERT " + cat.label.replace(/^\S+\s/, "").toUpperCase();
-    $("resHead").innerHTML = fmtHTML(val) + " " + from.sym + " &nbsp;=";
+    $("resHead").innerHTML = fmtHTML(val) + " " + esc(from.sym) + " &nbsp;=";
 
     const rows = $("rows");
     rows.innerHTML = "";
-    cat.units.forEach((u, i) => {
-      const row = document.createElement("div");
+    const list = visibleUnits();
+    // Always show the unit you're converting FROM, even in everyday mode.
+    if (list.indexOf(from) === -1) list.unshift(from);
+
+    list.forEach(u => {
+      const i = cat.units.indexOf(u);
+      const row = document.createElement("button");
+      row.type = "button";
       row.className = "row" + (i === fromIdx ? " active" : "");
       const out = fromBase(u, baseVal);
       // The maths relationship: how do you turn a "from" number into this row?
-      // (Only for linear units — temperature needs a formula, not a factor.)
       let rel = "";
       if (i !== fromIdx && from.factor && u.factor) {
         const k = from.factor / u.factor;
@@ -566,11 +611,13 @@
           : '<span class="u-rel">÷ ' + fmtHTML(Number((1 / k).toPrecision(6))) + "</span>";
       }
       row.innerHTML =
-        '<span class="u-name">' + u.sym +
-          '<span class="u-full">' + u.n + '</span>' + rel + '</span>' +
+        '<span class="u-name">' + esc(u.sym) +
+          '<span class="u-full">' + esc(u.n) + '</span>' + rel + '</span>' +
         '<span class="u-val">' + fmtHTML(out) + '</span>';
+      row.setAttribute("aria-label",
+        fmt(val) + " " + from.sym + " is " + fmt(out) + " " + u.n +
+        ". Tap to convert from " + u.n + " instead.");
       row.onclick = () => {
-        // "convert from this unit instead": keep the shown number, switch source
         fromIdx = i;
         $("value").value = Number(out.toPrecision(7));
         $("fromUnit").value = i;
@@ -580,6 +627,12 @@
       rows.appendChild(row);
     });
 
+    const hidden = cat.units.length - list.length;
+    const db = $("depthBtn");
+    db.textContent = showAll ? "🙈 Just everyday units" : "🔬 Show every unit (+" + hidden + ")";
+    db.setAttribute("aria-pressed", showAll ? "true" : "false");
+    db.hidden = hidden <= 0 && !showAll;
+
     const cmp = compareLine(cat.key, baseVal);
     $("compare").innerHTML = cmp;
     $("compare").style.display = cmp ? "" : "none";
@@ -588,170 +641,9 @@
     saveState();
   }
 
-  function renderAll() {
+  function renderExplore() {
     buildCats();
     buildFromSelect();
     buildQuick();
     render();
-    quizIdle();
   }
-
-  // ---- 🎯 Quiz mode ----------------------------------------------------
-  // "About how many cm make 1 foot?" — estimation questions built from the
-  // very units on screen, so the table doubles as the study sheet. Stars and
-  // best streak stick around in localStorage.
-  const QUIZ_KEY = "unitConverter-quiz";
-  let quiz = { stars: 0, best: 0 };
-  try { quiz = Object.assign(quiz, JSON.parse(localStorage.getItem(QUIZ_KEY)) || {}); } catch (e) {}
-  let quizStreak = 0;
-  let lastQuizText = "";
-
-  function saveQuiz() {
-    try { localStorage.setItem(QUIZ_KEY, JSON.stringify({ stars: quiz.stars, best: quiz.best })); } catch (e) {}
-  }
-  function syncQuizScore() {
-    $("quizStars").textContent = quiz.stars;
-    $("quizBest").textContent = quiz.best;
-  }
-
-  // Temperature can't be a "× n" question — use famous anchor facts instead.
-  const TEMP_QUIZ = [
-    { text: "Water freezes at 0 °C. What is that in °F?", answer: 32, wrongs: [0, 100],
-      explain: "°F = °C × 9⁄5 + 32, so 0 °C → 0 × 9⁄5 + 32 = <b>32 °F</b>." },
-    { text: "Water boils at 100 °C. What is that in °F?", answer: 212, wrongs: [100, 180],
-      explain: "°F = °C × 9⁄5 + 32, so 100 °C → 180 + 32 = <b>212 °F</b>." },
-    { text: "Your body is about 37 °C. What is that in °F?", answer: 98.6, wrongs: [37, 73.4],
-      explain: "°F = °C × 9⁄5 + 32, so 37 °C → 66.6 + 32 = <b>98.6 °F</b>." },
-    { text: "A hot summer day is 95 °F. About what is that in °C?", answer: 35, wrongs: [95, 63],
-      explain: "°C = (°F − 32) × 5⁄9, so (95 − 32) × 5⁄9 = <b>35 °C</b>." },
-    { text: "0 °C in Kelvin is about…", answer: 273, wrongs: [0, 100],
-      explain: "Kelvin starts at absolute zero: K = °C + 273.15, so 0 °C ≈ <b>273 K</b>." },
-  ];
-
-  function makeQuizQ() {
-    if (cat.key === "temp") {
-      let q, tries = 0;
-      do { q = TEMP_QUIZ[(Math.random() * TEMP_QUIZ.length) | 0]; }
-      while (q.text === lastQuizText && ++tries < 10);
-      return { text: q.text, answer: q.answer, wrongs: q.wrongs.slice(), explain: q.explain };
-    }
-    // Pick two linear units whose ratio makes a kid-sized number.
-    for (let tries = 0; tries < 80; tries++) {
-      const A = cat.units[(Math.random() * cat.units.length) | 0];
-      const B = cat.units[(Math.random() * cat.units.length) | 0];
-      if (A === B || !A.factor || !B.factor) continue;
-      const k = A.factor / B.factor;
-      if (k < 2 || k > 5000) continue;
-      const ans = k >= 20 ? Math.round(k) : Number(k.toPrecision(3));
-      const text = "About how many " + B.sym + " make 1 " + A.n.toLowerCase() + " (" + A.sym + ")?";
-      if (text === lastQuizText && tries < 60) continue;
-      return {
-        text: text,
-        answer: ans,
-        wrongs: [],
-        explain: "1 " + A.sym + " = " + fmt(k) + " " + B.sym +
-          " — to turn <b>" + A.sym + "</b> into <b>" + B.sym +
-          "</b> you <b>multiply by " + fmt(k) + "</b> (and divide to go back).",
-      };
-    }
-    return null; // no sensible pair in this category
-  }
-
-  // Distractors that FEEL plausible: double, half, or a place-value slip.
-  function quizChoices(q) {
-    const opts = [q.answer];
-    const cands = q.wrongs.length ? q.wrongs.slice() : [
-      q.answer * 2, Math.max(1, Math.round(q.answer / 2 * 10) / 10),
-      q.answer * 10, Math.round(q.answer / 10 * 10) / 10,
-      q.answer + 10,
-    ];
-    while (opts.length < 3 && cands.length) {
-      const c = cands.splice((Math.random() * cands.length) | 0, 1)[0];
-      if (c >= 0 && !opts.some(o => fmt(o) === fmt(c))) opts.push(c);
-    }
-    while (opts.length < 3) opts.push(q.answer + opts.length * 7);
-    // shuffle
-    for (let i = opts.length - 1; i > 0; i--) {
-      const j = (Math.random() * (i + 1)) | 0;
-      const t = opts[i]; opts[i] = opts[j]; opts[j] = t;
-    }
-    return opts;
-  }
-
-  function quizIdle() {
-    syncQuizScore();
-    const body = $("quizBody");
-    body.innerHTML =
-      '<div class="quiz-q">Think you know your ' +
-      cat.label.replace(/^\S+\s/, "").toLowerCase() +
-      " units? Prove it! 🧠</div>";
-    const btn = document.createElement("button");
-    btn.className = "quiz-start";
-    btn.textContent = "🎯 Quiz me!";
-    btn.onclick = askQuizQ;
-    body.appendChild(btn);
-  }
-
-  function askQuizQ() {
-    const q = makeQuizQ();
-    if (!q) { quizIdle(); return; }
-    lastQuizText = q.text;
-    const body = $("quizBody");
-    body.innerHTML = '<div class="quiz-q">' + q.text + "</div>";
-    const wrap = document.createElement("div");
-    wrap.className = "quiz-answers";
-    const opts = quizChoices(q);
-    opts.forEach((v) => {
-      const b = document.createElement("button");
-      b.textContent = fmt(v);
-      b.onclick = () => answerQuiz(q, v, b, wrap);
-      wrap.appendChild(b);
-    });
-    body.appendChild(wrap);
-    const streak = document.createElement("div");
-    streak.className = "quiz-streak";
-    streak.textContent = quizStreak >= 2 ? "🔥 Streak: " + quizStreak : "";
-    body.appendChild(streak);
-  }
-
-  function answerQuiz(q, picked, btn, wrap) {
-    const right = fmt(picked) === fmt(q.answer);
-    [...wrap.children].forEach((b) => {
-      b.disabled = true;
-      if (b.textContent === fmt(q.answer)) b.classList.add("right");
-      else b.classList.add(b === btn ? "wrong" : "dim");
-    });
-    const body = $("quizBody");
-    const fb = document.createElement("div");
-    fb.className = "quiz-feedback";
-    if (right) {
-      quiz.stars++;
-      quizStreak++;
-      if (quizStreak > quiz.best) quiz.best = quizStreak;
-      saveQuiz();
-      syncQuizScore();
-      window.SFX && SFX.good && SFX.good();
-      let cheer = "✅ <b>Yes!</b> ";
-      if (quizStreak > 0 && quizStreak % 5 === 0) {
-        cheer = "🎉 <b>" + quizStreak + " in a row!</b> ";
-        window.SFX && SFX.win && SFX.win();
-        window.Confetti && Confetti.burst({ count: 90 });
-      }
-      fb.innerHTML = cheer + q.explain;
-    } else {
-      quizStreak = 0;
-      window.SFX && SFX.nope && SFX.nope();
-      fb.innerHTML = "❌ Not quite — it's <b>" + fmt(q.answer) + "</b>. " + q.explain;
-    }
-    body.appendChild(fb);
-    const next = document.createElement("button");
-    next.className = "quiz-next";
-    next.textContent = "Next question ▶";
-    next.onclick = askQuizQ;
-    body.appendChild(next);
-  }
-
-  loadState();
-  $("value").addEventListener("input", render);
-  renderAll();
-})();
