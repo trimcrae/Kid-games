@@ -22,6 +22,12 @@
    just buzzing, the helper voice counts along as you pop, and a
    hint pulses the right bubble if a round gets sticky.
 
+   The wrong bubbles are built by wrongPool(), which guarantees that a
+   wrong answer is never the right one, never negative or a nonsense
+   zero, never a dot count a bubble cannot draw — and that the board
+   never shows the same wrong bubble twice while there is a real choice
+   left to offer. There is always at least one right bubble to find.
+
    Saved in localStorage: per-level best score, per-level stars,
    lifetime pops, voice on/off and the level you last played.
    =========================================================== */
@@ -76,7 +82,7 @@
   const LEVEL_KEY = "bubblePopLevel";    // last level played     (new)
 
   const MODES = {
-    easy:   { label: "Easy",   kind: "match",   max: 5,  secs: 45, stars: [4, 10, 18], spawn: 800, rise: 5.6, bias: 0.5 },
+    easy:   { label: "Easy",   kind: "match",   max: 5,  secs: 45, stars: [4, 10, 18], spawn: 800, rise: 5.6, bias: 0.5, copies: 3 },
     normal: { label: "Normal", kind: "match",   max: 9,  secs: 45, stars: [4, 10, 18], spawn: 760, rise: 5.2, bias: 0.45 },
     count:  { label: "Dots",   kind: "dots",    max: 6,  secs: 45, stars: [4, 9, 15],  spawn: 850, rise: 6.0, bias: 0.45 },
     popn:   { label: "Count Out", kind: "popn", max: 6,  secs: 60, stars: [8, 16, 26], spawn: 700, rise: 6.4 },
@@ -165,6 +171,10 @@
     "eight", "nine", "ten", "eleven", "twelve"];
   function numWord(n) { return WORDS[n] || String(n); }
 
+  /* The big-kid levels start gently and open up as the score climbs, so
+     the first questions of a round are always ones you can get. */
+  function tier() { return score < 6 ? 0 : (score < 16 ? 1 : 2); }
+
   function coach(text, cls, hold) {
     clearTimeout(coachTimer);
     coachEl.textContent = text || "";
@@ -240,7 +250,8 @@
     }
 
     if (k === "add") {
-      const a = randInt(1, 10), b = randInt(1, 10);
+      const cap = [5, 10, 12][tier()];
+      const a = randInt(1, cap), b = randInt(1, cap);
       const ans = a + b;
       return {
         kind: k, a: a, b: b, answer: String(ans), prompt: a + " + " + b,
@@ -254,7 +265,8 @@
     }
 
     if (k === "sub") {
-      const a = randInt(4, 20), b = randInt(1, Math.min(9, a - 1));
+      const top = [10, 20, 20][tier()];
+      const a = randInt(4, top), b = randInt(1, Math.min(tier() > 1 ? 12 : 9, a - 1));
       const ans = a - b;
       return {
         kind: k, a: a, b: b, answer: String(ans), prompt: a + " − " + b,
@@ -269,7 +281,7 @@
 
     if (k === "skip") {
       if (Math.random() < 0.4) {
-        const a = randInt(2, 12);
+        const a = randInt(2, [6, 12, 20][tier()]);
         const ans = a * 2;
         return {
           kind: k, a: a, answer: String(ans), prompt: "double " + a,
@@ -281,8 +293,8 @@
           },
         };
       }
-      const step = pick([2, 3, 5, 10]);
-      const start = step * randInt(1, 8);
+      const step = pick([[2, 5, 10], [2, 3, 5, 10], [2, 3, 4, 5, 10]][tier()]);
+      const start = step * randInt(1, [4, 8, 10][tier()]);
       const seq = [start, start + step, start + 2 * step];
       const ans = start + 3 * step;
       return {
@@ -314,51 +326,98 @@
     };
   }
 
-  /* A believable wrong bubble: close enough to make you think. */
-  function distractor() {
+  /* =========================================================
+     Wrong bubbles.
+
+     wrongPool() lists every believable miss for the round we are on,
+     the most tempting near-misses first. Everything is checked on the
+     way in, so a wrong bubble can NEVER be:
+       • the right answer,
+       • negative, or a nonsense zero ("6 + 6 = 0" used to be offered),
+       • a dot count the bubble cannot actually draw.
+     distractor() then picks one, preferring a value that is not
+     already floating so the board shows a real spread of choices
+     instead of six copies of the same miss.
+     ========================================================= */
+  function wrongPool() {
     const k = mode.kind;
     const ans = round.answer;
+    const out = [];
+    const floor = k === "sub" ? 0 : 1;    // taking away really can leave nothing
 
-    if (k === "letters") {
-      const near = LOOKALIKE[ans];
-      if (near && Math.random() < 0.55) return pick(near.split(""));
-      let c = ans;
-      while (c === ans) c = pick(ABC.split(""));
-      return c;
+    function add(v) {
+      if (v == null) return;
+      const s = String(v);
+      if (s === ans) return;                                  // never the right answer
+      if (k !== "letters") {
+        const x = Number(v);
+        if (!isFinite(x) || Math.floor(x) !== x) return;
+        if (x < floor || x > 200) return;                     // no negatives, no wild numbers
+      }
+      if (out.indexOf(s) < 0) out.push(s);
     }
 
+    if (k === "letters") {
+      (LOOKALIKE[ans] || "").split("").forEach(add);           // the ones kids really mix up
+      ABC.split("").forEach(add);
+      return out;
+    }
+
+    const n = parseInt(ans, 10);
+
     if (k === "dots") {
-      let n = parseInt(ans, 10);
-      const opts = [n - 1, n + 1, n - 2, n + 2].filter(function (x) { return x >= 1 && x <= mode.max; });
-      return String(opts.length ? pick(opts) : (n === 1 ? 2 : 1));
+      // has to stay inside 1…max — a bubble can only draw a real dice face
+      [n - 1, n + 1, n - 2, n + 2].forEach(function (x) { if (x <= mode.max) add(x); });
+      for (let x = 1; x <= mode.max; x++) add(x);
+      return out;
     }
 
     if (k === "match") {
-      const n = parseInt(ans, 10);
       const max = mode.max;
-      const opts = [];
-      if (max >= 10) {
-        // look-alike pairs: 12/21, 13/31, 6/9, and the neighbours
+      if (n === 6) add(9);                                     // the classic upside-down pair…
+      if (n === 9) add(6);
+      if (n >= 10) {                                           // …and swapped digits: 12/21, 13/31
         const rev = parseInt(String(n).split("").reverse().join(""), 10);
-        if (rev !== n && rev >= 1 && rev <= max) opts.push(rev);
-        if (n === 6) opts.push(9);
-        if (n === 9) opts.push(6);
+        add(rev);            // 21 is a perfectly good WRONG answer for 12, even past the level's max
       }
-      [n - 1, n + 1].forEach(function (x) { if (x >= 1 && x <= max) opts.push(x); });
-      if (opts.length && Math.random() < 0.6) return String(pick(opts));
-      let c = n;
-      while (c === n) c = randInt(1, max);
-      return String(c);
+      [n - 1, n + 1, n - 2, n + 2].forEach(function (x) { if (x <= max) add(x); });
+      for (let x = 1; x <= max; x++) add(x);
+      return out;
     }
 
-    // arithmetic levels: near misses you learn something from —
-    // including the classic slip of adding when you meant to take away.
-    const n = parseInt(ans, 10);
-    const opts = [n + 1, n - 1, n + 2, n - 2, n + 10, n - 10];
-    if (round.a != null && round.b != null) opts.push(round.a + round.b, Math.abs(round.a - round.b));
-    if (round.step) opts.push(n + round.step, n - round.step, n + 2 * round.step);
-    const good = opts.filter(function (x) { return x >= 0 && x <= 200 && x !== n; });
-    return String(good.length ? pick(good) : n + (round.step || 1));
+    // arithmetic: misses you can actually learn something from
+    if (round.a != null && round.b != null) {
+      add(round.a + round.b);          // added when you meant to take away…
+      add(round.a - round.b);          // …and the other way round
+      add(round.a);                    // read only the first number
+      add(round.b);
+    }
+    if (round.step) {
+      add(n - round.step);             // the one we already counted
+      add(n + round.step);             // one step too far
+      add(n + 2 * round.step);
+    }
+    [n + 1, n - 1, n + 2, n - 2, n + 10, n - 10].forEach(add);
+    for (let d = 3; d <= 6 && out.length < 8; d++) { add(n + d); add(n - d); }
+    return out;
+  }
+
+  /* Pick one wrong bubble. `taken` is the set of values already floating. */
+  function distractor(taken) {
+    const pool = wrongPool();
+    if (!pool.length) return null;
+    // mostly a near-miss (they make you think); now and then something wider
+    const list = (pool.length > 4 && Math.random() < 0.6) ? pool.slice(0, 4) : pool;
+    let from = taken ? list.filter(function (v) { return !taken.has(v); }) : list;
+    if (!from.length && taken) from = pool.filter(function (v) { return !taken.has(v); });
+    return pick(from.length ? from : list);
+  }
+
+  /* Never crowd the board with more bubbles than there are different
+     things to show — otherwise "Easy" (1–5) fills up with duplicates. */
+  function maxBubbles() {
+    if (!round || round.kind === "popn") return MAX_BUBBLES;
+    return Math.min(MAX_BUBBLES, 1 + wrongPool().length);
   }
 
   /* ---------------- tally strip (count-out mode) ---------------- */
@@ -381,7 +440,22 @@
     wrongThisRound = 0;
     hinting = false;
     roundStart = Date.now();
-    live.forEach(function (r) { r.el.classList.remove("hint"); });
+    // Tidy the bubbles left over from the last round: drop the stale gold
+    // halo, and pop away any repeat of a value that is already floating, so
+    // the new round starts with one bubble per number instead of five 10s.
+    const kept = Object.create(null);
+    live.slice().forEach(function (r) {
+      if (r.el.classList.contains("pop")) return;
+      r.el.classList.remove("hint");
+      // a bubble that used to be the answer must not keep its "double points" glow
+      if (r.value !== round.answer) r.el.classList.remove("gold");
+      if (r.value == null) return;                 // count-out bubbles are blank
+      if (kept[r.value]) {
+        r.el.classList.add("pop");
+        r.el.setAttribute("aria-hidden", "true");
+        (function (dead) { setTimeout(function () { drop(dead); }, 300); })(r);
+      } else kept[r.value] = true;
+    });
     targetLabelEl.textContent = round.label;
     targetEl.textContent = round.prompt;
     renderTally();
@@ -413,16 +487,26 @@
   }
 
   function spawnBubble() {
-    if (!running || live.length >= MAX_BUBBLES) return;
+    if (!running || !round || live.length >= maxBubbles()) return;
 
     const dots = mode.kind === "dots";
     const blank = mode.kind === "popn";
-    // always keep a real CHOICE on the board: at least one right bubble and,
-    // once there's company, at least one wrong one to think about.
+    // what is already floating, so a new wrong bubble can pick something else
+    const taken = new Set();
+    live.forEach(function (r) {
+      if (r.value && !r.el.classList.contains("pop")) taken.add(r.value);
+    });
+    // Always keep a real CHOICE on the board: at least one right bubble and,
+    // once there's company, at least one wrong one to think about. The right
+    // bubble is allowed a couple of copies (little ones need an easy target)
+    // but not a boardful — those all turn stale the moment the round changes.
+    let answersUp = 0;
+    live.forEach(function (r) { if (r.value === round.answer && !r.el.classList.contains("pop")) answersUp++; });
     const onlyAnswers = live.length >= 2 && !live.some(function (r) { return r.value && r.value !== round.answer; });
+    const wantAnswer = answersUp === 0 ||
+      (!onlyAnswers && answersUp < (mode.copies || 2) && Math.random() < (mode.bias || 0.42));
     const value = blank ? null
-      : (onlyAnswers ? distractor()
-        : ((!answerOnScreen() || Math.random() < (mode.bias || 0.42)) ? round.answer : distractor()));
+      : (wantAnswer ? round.answer : (distractor(taken) || round.answer));
 
     const size = dots ? randInt(88, 112) : randInt(66, 104);
     const areaW = playArea.clientWidth;
@@ -492,7 +576,12 @@
     const rec = { el: bubble, value: value, left: left, size: size, top: top, at: Date.now(), color: col.c };
     bubble.addEventListener("click", function () { tap(rec); });
     bubble.addEventListener("animationend", function (e) {
-      if (e.animationName === "rise") drop(rec);
+      if (e.animationName !== "rise") return;
+      const wasTheAnswer = round && rec.value === round.answer;
+      drop(rec);
+      // the right bubble just floated off the top — send another one up,
+      // so there is always something correct to find
+      if (running && round && round.kind !== "popn" && wasTheAnswer && !answerOnScreen()) spawnBubble();
     });
 
     live.push(rec);
@@ -649,7 +738,14 @@
   }
 
   function applyHint() {
-    if (!round || round.kind === "popn") return;
+    if (!round) return;
+    if (round.kind === "popn") {
+      // nothing to point at in count-out — say the instruction again instead
+      hinting = true;
+      coach(round.label + " " + round.prompt, "", 3000);
+      say(round.speech);
+      return;
+    }
     hinting = true;
     live.forEach(function (r) {
       if (r.value === round.answer && !r.el.classList.contains("pop")) r.el.classList.add("hint");
@@ -788,7 +884,9 @@
       const slot = btn.querySelector(".chip-stars");
       if (slot) slot.textContent = s > 0 ? "⭐".repeat(s) : "";
       const m = MODES[btn.dataset.level];
-      btn.setAttribute("aria-label", m.label + (s > 0 ? ", " + s + " star" + (s === 1 ? "" : "s") + " earned" : ""));
+      const sub = btn.querySelector("small");
+      btn.setAttribute("aria-label", m.label + (sub ? ", " + sub.textContent : "") +
+        (s > 0 ? ", " + s + " star" + (s === 1 ? "" : "s") + " earned" : ""));
     });
   }
 
@@ -848,15 +946,23 @@
     else if (round && round.kind !== "letters" && /^[0-9]$/.test(e.key)) buf += e.key;
     else return;
 
+    const need = round.answer ? round.answer.length : 1;
     clearTimeout(bufTimer);
-    bufTimer = setTimeout(function () { buf = ""; }, 1100);
+    bufTimer = setTimeout(function () {
+      // a guess that never grew long enough: count it once the typing stops,
+      // so you still get told WHY it was wrong
+      const late = (running && buf.length >= need) ? liveByValue(buf) : null;
+      buf = "";
+      if (late) tap(late);
+    }, 1100);
 
-    let rec = liveByValue(buf);
+    // "1" must not pop the 1 bubble while we are waiting for the 2 of "12"
+    let rec = buf.length >= need ? liveByValue(buf) : null;
     if (!rec) {
       const isPrefix = live.some(function (r) { return r.value && r.value.indexOf(buf) === 0; });
       if (!isPrefix && buf.length > 1) {
         buf = buf.slice(-1);
-        rec = liveByValue(buf);
+        rec = buf.length >= need ? liveByValue(buf) : null;
       }
     }
     if (rec) { buf = ""; tap(rec); }
@@ -884,4 +990,19 @@
   try { saved = localStorage.getItem(LEVEL_KEY); } catch (e) { /* ignore */ }
   chooseLevel(MODES[saved] ? saved : "normal");
   starsLineEl.textContent = loadTotal() > 0 ? "Lifetime pops: " + loadTotal() : "";
+
+  /* ---------------- test hook ----------------
+     Lets the play-tests hammer the round + wrong-answer generators
+     directly (thousands of rounds a second) instead of guessing from
+     the outside. Nothing in the game itself reads this. */
+  window.__bubblePopTest = {
+    MODES: MODES,
+    setLevel: function (lv) { level = lv; mode = MODES[lv] || MODES.normal; },
+    setScore: function (n) { score = n; },
+    newRound: function () { round = makeRound(); return round; },
+    getRound: function () { return round; },
+    wrongPool: function () { return wrongPool(); },
+    distractor: function (taken) { return distractor(taken); },
+    maxBubbles: function () { return maxBubbles(); },
+  };
 })();
