@@ -264,6 +264,168 @@
     #toast.show { transform: translateX(-50%) translateY(0); }
     @media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
 
+    /* ---- inspector readout ---- */
+    .inspect-box {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      border-radius: 16px;
+      padding: 0.6rem 0.7rem;
+      margin: 0.6rem 0 0.15rem;
+      text-align: left;
+    }
+    .inspect-box[hidden] { display: none; }
+    .insp-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 20px);
+      grid-template-rows: repeat(3, 20px);
+      gap: 3px;
+      flex: 0 0 auto;
+    }
+    .insp-grid i {
+      display: block;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.13);
+    }
+    .insp-grid i.on { background: var(--green); }
+    .insp-grid i.mid { outline: 3px solid var(--yellow); outline-offset: 1px; }
+    .insp-text { min-width: 0; }
+    .insp-head {
+      margin: 0 0 0.15rem;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      line-height: 1.25;
+    }
+    .insp-why {
+      margin: 0;
+      color: #d5cfff;
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+    .insp-why b { color: var(--yellow); }
+
+    /* ---- population graph ---- */
+    .graph-wrap { margin: 0.55rem 0 0.1rem; }
+    #popGraph {
+      display: block;
+      width: 100%;
+      height: 62px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.28);
+    }
+    .graph-cap {
+      margin: 0.3rem 0 0;
+      text-align: center;
+      color: #cfc8ff;
+      font-size: 0.82rem;
+    }
+    .graph-cap b { color: var(--yellow); }
+
+    /* ---- brush info line ---- */
+    .brush-info {
+      margin: 0.65rem 0 0;
+      background: #f4f1ff;
+      border-left: 5px solid var(--purple);
+      border-radius: 10px;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .brush-info b { color: var(--purple); }
+
+    /* ---- my stamps ---- */
+    .mine-row { margin-top: 0.7rem; }
+    .chip.mine { background: #fff7d6; border-color: var(--yellow); }
+    .chip .del {
+      display: inline-block;
+      margin-left: 0.35rem;
+      color: #b3306a;
+      font-weight: bold;
+    }
+    #saveStampBtn {
+      background: linear-gradient(90deg, var(--yellow), #ffb347);
+      border-color: transparent;
+      color: var(--ink);
+    }
+
+    /* ---- predict puzzle ---- */
+    .predict-wrap { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; }
+    .pboard {
+      display: grid;
+      gap: 4px;
+      width: min(340px, 100%);
+      margin: 0 auto;
+      background: #241b45;
+      padding: 6px;
+      border-radius: 14px;
+      touch-action: manipulation;
+    }
+    .pcell {
+      aspect-ratio: 1 / 1;
+      min-width: 0;
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      border-radius: 7px;
+      background: #1a1435;
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+      line-height: 1;
+      transition: background 0.12s ease;
+    }
+    .pcell[aria-pressed="true"] { background: var(--green); border-color: #26b768; }
+    .pcell.right { box-shadow: 0 0 0 3px var(--green) inset; }
+    .pcell.wrong { box-shadow: 0 0 0 3px #ff3b6b inset; }
+    .pcell:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+    .predict-side { flex: 1 1 220px; min-width: 200px; }
+    .predict-result {
+      margin: 0.6rem 0 0;
+      font-weight: bold;
+      font-size: 1.02rem;
+      line-height: 1.4;
+      min-height: 1.4em;
+    }
+    .predict-result.good { color: #1f9d55; }
+    .predict-result.bad { color: #c22b5c; }
+    .streak-line { margin: 0.35rem 0 0.7rem; font-size: 0.95rem; color: #6b6389; }
+    .streak-line b { color: var(--purple); }
+
+    /* ---- keyboard focus & cursor ---- */
+    #world:focus-visible { outline: 4px solid var(--yellow); outline-offset: 3px; }
+    .kbd-hint {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #6b6389;
+      margin: 0.2rem 0 1rem;
+    }
+    .kbd-hint kbd {
+      background: #f4f1ff;
+      border: 2px solid #d9d2f5;
+      border-radius: 6px;
+      padding: 0.05rem 0.35rem;
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      .stat-pill { font-size: 0.9rem; min-width: 7.6em; padding: 0.28rem 0.7rem; }
+      .ctl-btn { font-size: 1rem; padding: 0.75rem 1.15rem; }
+      #playBtn { font-size: 1.1rem; padding: 0.75rem 1.4rem; }
+      .insp-grid { grid-template-columns: repeat(3, 17px); grid-template-rows: repeat(3, 17px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ctl-btn, .chip, .num-btn { transition: none; }
+      .ctl-btn:hover, .chip:hover, .num-btn:hover { transform: none; }
+      .world-msg { animation: none; }
+    }
+
     /* ---- how it works ---- */
     details.howto {
       background: var(--paper);
@@ -307,8 +469,22 @@
         <span class="stat-pill">⏱️ Generation <b id="genCount">0</b></span>
         <span class="stat-pill">🟢 Alive <b id="popCount">0</b></span>
       </div>
-      <canvas id="world" aria-label="Game of Life world — tap or drag to paint cells"></canvas>
+      <canvas id="world" tabindex="0" role="application"
+              aria-label="Game of Life world. Tap or drag to paint cells. With a keyboard: arrow keys move the cursor, space toggles a cell."></canvas>
       <p class="world-msg" id="worldMsg" hidden>🌙 The world went quiet… stamp a creature or press 🎲 Random!</p>
+
+      <div id="inspectBox" class="inspect-box" hidden role="status" aria-live="polite">
+        <div class="insp-grid" id="inspGrid" aria-hidden="true"></div>
+        <div class="insp-text">
+          <p class="insp-head" id="inspHead"></p>
+          <p class="insp-why" id="inspWhy"></p>
+        </div>
+      </div>
+
+      <div class="graph-wrap">
+        <canvas id="popGraph" aria-hidden="true"></canvas>
+        <p class="graph-cap" id="graphCap">📈 Population graph — press ▶️ Play and watch the line wiggle!</p>
+      </div>
     </div>
 
     <!-- Main controls -->
@@ -325,9 +501,11 @@
              aria-label="Simulation speed in generations per second" />
       <span class="critter" aria-hidden="true">🐇</span>
     </div>
-    <p class="hint" style="text-align:center; color:#6b6389; margin:0.3rem 0 1.1rem;">
+    <p class="hint" style="text-align:center; color:#6b6389; margin:0.3rem 0 0.4rem;">
       Speed: <b id="speedLabel">10</b> generations per second
     </p>
+    <p class="kbd-hint">⌨️ Keyboard: click the world, then <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd> to move,
+      <kbd>Space</kbd> to flip a cell, <kbd>S</kbd> to step, <kbd>P</kbd> to play or pause.</p>
 
     <!-- Brushes / patterns -->
     <section class="panel">
@@ -335,12 +513,43 @@
       <p class="hint">Pick a brush, then tap the world! The pencil draws one cell at a time — the others stamp famous creatures.
         Use <b>↻ Turn</b> to aim gliders and spaceships in a different direction.</p>
       <div id="brushRow" class="chip-row" role="group" aria-label="Drawing brushes"></div>
+      <p class="brush-info" id="brushInfo"></p>
+
+      <div class="mine-row">
+        <p class="rule-label" style="margin-bottom:0.4rem;">💾 My own stamps</p>
+        <p class="hint">Built something great? Save the whole world as your own stamp and use it forever.</p>
+        <div id="mineRow" class="chip-row" role="group" aria-label="My saved stamps"></div>
+      </div>
+    </section>
+
+    <!-- Predict the next generation -->
+    <section class="panel">
+      <h2>🔮 Predict the Next Generation</h2>
+      <p class="hint">The real test! Look at the little world, work out what happens <b>next turn</b>, and tap the
+        squares to show your answer. Every square counts its 8 neighbours at the <b>same moment</b> — nobody goes first.
+        These puzzles always use the classic rule <b>B3/S23</b>.</p>
+      <div class="predict-wrap">
+        <div id="pboard" class="pboard" role="group" aria-label="Prediction board — tap squares to mark which cells will be alive next generation"></div>
+        <div class="predict-side">
+          <div class="chip-row">
+            <button id="checkBtn" class="chip" aria-pressed="false">✅ Check my answer</button>
+            <button id="newPuzzleBtn" class="chip" aria-pressed="false">🎲 New puzzle</button>
+            <button id="showBtn" class="chip" aria-pressed="false">👀 Show me</button>
+            <button id="resetPredBtn" class="chip" aria-pressed="false">↩️ Start over</button>
+          </div>
+          <p class="predict-result" id="predResult" role="status" aria-live="polite"></p>
+          <p class="streak-line">🔥 Streak: <b id="predStreak">0</b> &nbsp;•&nbsp; 🏆 Best: <b id="predBest">0</b></p>
+          <p class="hint" style="margin:0;">Tip: a square that's wrong turns <b>red</b> and shows its neighbour count,
+            so you can see exactly which rule you missed.</p>
+        </div>
+      </div>
     </section>
 
     <!-- Rule lab -->
     <section class="panel">
       <h2>🧪 Rule Lab</h2>
-      <p class="hint">Every square counts its 8 neighbours each turn. YOU decide which counts make life happen!</p>
+      <p class="hint">Every square counts its 8 neighbours each turn. YOU decide which counts make life happen!
+        (Conway's original is <b>B3/S23</b> — the 🟢 Classic Life button puts it back.)</p>
 
       <div class="rule-group">
         <p class="rule-label"><span class="rl-icon">🐣</span> A new cell is <b>BORN</b> in an empty square with this many neighbours:</p>
@@ -391,6 +600,10 @@
         <li>💤 With fewer than 2 it gets lonely, with more than 3 it gets too crowded — either way it disappears.</li>
         <li>🚀 Try stamping a <b>Glider</b> and watch it fly, or the <b>Glider Factory</b> to build a spaceship machine!</li>
         <li>🧪 Then visit the Rule Lab and change the numbers — can you invent a rule that makes mazes? Coral? Total chaos?</li>
+        <li>🔍 Not sure why a cell lived or died? Pick the <b>🔍 Inspect</b> tool and tap it — the game shows its
+            neighbour count and reads the rule out to you.</li>
+        <li>🔮 Ready for a real challenge? Try <b>Predict the Next Generation</b> — that's exactly what a computer does,
+            one square at a time.</li>
         <li>🏅 Some shapes never change (<b>still lifes</b>), some flip back and forth forever (<b>oscillators</b>) — find them and earn Discovery badges!</li>
       </ul>
     </details>

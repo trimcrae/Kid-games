@@ -13,73 +13,115 @@
 
     .how {
       text-align: center;
-      color: #6a6385;
-      font-size: 1.05rem;
-      margin: 0 auto 1rem;
-      max-width: 38rem;
+      color: #5b5476;
+      font-size: 1rem;
+      line-height: 1.35;
+      margin: 0 auto 0.8rem;
+      max-width: 40rem;
     }
 
-    /* kid picker */
-    .kid-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.6rem;
-      margin-bottom: 1rem;
-    }
-    .kid-pick {
+    /* ---------- shared pill button look ---------- */
+    .pill {
       font-family: var(--font);
       font-weight: bold;
       font-size: 1.05rem;
-      border: 3px solid var(--kc, #ccc);
+      border: 3px solid var(--pc, #cdbfff);
       background: #fff;
       color: var(--ink);
       border-radius: 999px;
-      padding: 0.45rem 1.1rem;
+      padding: 0.5rem 1.1rem;
+      min-height: 48px;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(43,36,64,0.12);
       transition: transform 0.12s ease;
     }
-    .kid-pick:hover { transform: translateY(-2px); }
-    .kid-pick.selected {
-      background: var(--kc, #ccc);
+    .pill:hover { transform: translateY(-2px); }
+    .pill[aria-pressed="true"] {
+      background: var(--pc, #8a5cff);
       color: #fff;
-      transform: translateY(-2px) scale(1.05);
+      transform: translateY(-2px) scale(1.04);
       box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
     }
+    .pill:focus-visible, .num-pick:focus-visible, .chip-x:focus-visible,
+    .tab:focus-visible, .letter-pick:focus-visible, .mini-btn:focus-visible {
+      outline: 4px solid #2b2440;
+      outline-offset: 2px;
+    }
 
-    /* variant picker (start / middle / end) */
-    .variant-row {
+    .row-of-pills {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
-    .variant-pick {
+
+    /* kid picker */
+    .kid-pick { border-color: var(--kc, #ccc); }
+    .kid-pick[aria-pressed="true"] { background: var(--kc, #8a5cff); }
+
+    /* variant picker (start / middle / end) */
+    .variant-pick { font-size: 1rem; border-color: var(--purple); color: var(--purple); }
+    .variant-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.85; }
+    .variant-pick[aria-pressed="true"] { background: var(--purple); color: #fff; }
+
+    /* word-pack picker, tucked into a <details> so it doesn't eat the screen */
+    .packs { max-width: 40rem; margin: 0 auto 0.8rem; }
+    .packs > summary {
+      list-style: none;
+      cursor: pointer;
+      text-align: center;
+      font-weight: bold;
+      color: var(--purple);
+      background: #fff;
+      border: 3px solid #e6dcff;
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+    .packs > summary::-webkit-details-marker { display: none; }
+    .packs[open] > summary { border-color: var(--purple); }
+    .packs .row-of-pills { margin-top: 0.6rem; }
+    .pack-pick { font-size: 0.95rem; border-color: #cdbfff; color: var(--purple); padding: 0.45rem 0.9rem; }
+    .pack-pick[aria-pressed="true"] { background: var(--purple); color: #fff; }
+
+    /* ---------- mode tabs ---------- */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      margin: 0 auto 1rem;
+      max-width: 34rem;
+      background: #f1ecff;
+      border-radius: 999px;
+      padding: 0.3rem;
+    }
+    .tab {
+      flex: 1;
       font-family: var(--font);
       font-weight: bold;
       font-size: 1rem;
-      border: 3px solid var(--purple);
-      background: #fff;
+      min-height: 48px;
+      border: none;
+      background: transparent;
       color: var(--purple);
       border-radius: 999px;
-      padding: 0.4rem 1rem;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      padding: 0.4rem 0.5rem;
       transition: transform 0.12s ease;
     }
-    .variant-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.8; }
-    .variant-pick:hover { transform: translateY(-2px); }
-    .variant-pick.selected {
-      background: var(--purple);
+    .tab[aria-selected="true"] {
+      background: linear-gradient(90deg, var(--pink), var(--purple));
       color: #fff;
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
+      box-shadow: 0 5px 12px rgba(138,92,255,0.35);
     }
-    .variant-pick.selected small { opacity: 0.9; }
+    .panel[hidden] { display: none; }
 
-    /* "which letter?" chooser for the middle variant */
+    /* ---------- "which letter?" chooser for the middle variant ---------- */
     #chooser {
       display: none;
       flex-direction: column;
@@ -97,9 +139,9 @@
     .letter-pick {
       font-family: var(--font);
       font-weight: 900;
-      font-size: 1.4rem;
-      width: 2.6rem;
-      height: 2.6rem;
+      font-size: 1.5rem;
+      width: 3rem;
+      height: 3rem;
       border: 3px solid var(--purple);
       background: #fff;
       color: var(--purple);
@@ -109,19 +151,21 @@
     }
     .letter-pick:hover { transform: translateY(-2px) scale(1.06); }
     .letter-pick.edge {
-      border-color: #ddd;
-      color: #bbb;
-      background: #f3f3f6;
+      border-color: #c9c9d4;
+      color: #6e6e80;
+      background: #eeeef3;
       cursor: default;
     }
 
-    /* number picker (how many letters do you think it has?) */
+    /* ---------- number picker ---------- */
     .guess-label {
       text-align: center;
       font-weight: bold;
       color: var(--purple);
       margin-bottom: 0.35rem;
+      font-size: 1.05rem;
     }
+    .guess-label .kbd-tip { display: block; font-size: 0.75rem; font-weight: normal; color: #6a6385; }
     .num-row {
       display: flex;
       flex-wrap: wrap;
@@ -133,8 +177,8 @@
       font-family: var(--font);
       font-weight: 900;
       font-size: 1.5rem;
-      min-width: 3.1rem;
-      height: 3.1rem;
+      min-width: 3.4rem;
+      height: 3.4rem;
       color: #fff;
       border: 4px solid transparent;
       border-radius: 16px;
@@ -143,13 +187,15 @@
       transition: transform 0.12s ease;
     }
     .num-pick:hover { transform: translateY(-2px); }
-    .num-pick.selected {
+    .num-pick[aria-pressed="true"] {
       border-color: #2b2440;
       transform: translateY(-2px) scale(1.08);
       box-shadow: 0 0 0 3px #fff, 0 6px 14px rgba(43,36,64,0.25);
     }
+    .num-pick.wrong-flash { animation: shake 0.4s ease; }
+    .num-pick.right-flash { animation: quest-pop 0.5s ease; }
 
-    /* add-a-word form */
+    /* ---------- add-a-word form ---------- */
     #add-form {
       display: flex;
       gap: 0.5rem;
@@ -166,6 +212,7 @@
       border-radius: 16px;
       outline: none;
       min-width: 0;
+      color: var(--ink);
     }
     #word-input.shake { animation: shake 0.4s ease; }
     @keyframes shake {
@@ -182,6 +229,7 @@
       border: none;
       border-radius: 16px;
       padding: 0.7rem 1.25rem;
+      min-height: 52px;
       cursor: pointer;
       box-shadow: 0 8px 18px rgba(138,92,255,0.3);
       transition: transform 0.15s ease;
@@ -189,15 +237,14 @@
     }
     .btn:hover { transform: scale(1.04); }
 
-    .hint { text-align: center; min-height: 1.5rem; font-weight: bold; color: #7a52d6; margin-bottom: 0.5rem; }
+    .hint { text-align: center; min-height: 1.5rem; font-weight: bold; color: #6b41c9; margin-bottom: 0.5rem; }
 
-    /* the counting-out strip: T¹ I² G³ E⁴ R⁵ = 5 */
+    /* ---------- the counting-out strip: T¹ I² G³ E⁴ R⁵ = 5 ---------- */
     #countout {
       display: none;
-      flex-wrap: wrap;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 0.3rem;
+      gap: 0.35rem;
       max-width: 38rem;
       margin: 0 auto 0.8rem;
       padding: 0.6rem 0.8rem;
@@ -206,6 +253,7 @@
       border-radius: 16px;
       box-shadow: 0 6px 16px rgba(43,36,64,0.1);
     }
+    .co-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.3rem; }
     .co-letter {
       position: relative;
       display: inline-flex;
@@ -239,39 +287,71 @@
     }
     .co-total {
       font-weight: 900;
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       color: var(--ink);
       margin-left: 0.4rem;
       opacity: 0;
       animation: co-pop 0.3s ease forwards;
+      white-space: nowrap;
     }
-    .co-total.right { color: #2e8b40; }
-    .co-total.wrong { color: #e2703b; }
+    /* the plain-language explanation of a wrong guess */
+    .co-why {
+      font-weight: bold;
+      font-size: 1rem;
+      text-align: center;
+      line-height: 1.35;
+      opacity: 0;
+      animation: co-pop 0.3s ease forwards;
+    }
+    .co-why.right { color: #1f6b2c; }
+    .co-why.wrong { color: #a8410e; }
+    .co-why b { color: inherit; }
 
+    /* ---------- stats strip ---------- */
     .stats {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.6rem;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.6rem;
       font-weight: bold;
-      color: var(--purple);
+      color: #6b41c9;
     }
     .mini-btn {
       font-family: var(--font);
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: bold;
       border: 2px solid #cdbfff;
       background: #fff;
-      color: var(--purple);
+      color: #6b41c9;
       border-radius: 999px;
-      padding: 0.35rem 0.8rem;
+      padding: 0.5rem 0.9rem;
+      min-height: 44px;
       cursor: pointer;
     }
     .mini-btn:hover { background: #f3efff; }
+    .mini-btn[aria-pressed="true"] { background: var(--purple); color: #fff; border-color: var(--purple); }
 
-    /* word quest banner */
+    /* squares-filled progress bar */
+    .progress-wrap { max-width: 32rem; margin: 0 auto 1rem; }
+    .progress-label { text-align: center; font-weight: bold; color: #6b41c9; font-size: 0.95rem; margin-bottom: 0.25rem; }
+    .progress-track {
+      height: 16px;
+      background: #eee8ff;
+      border-radius: 999px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(43,36,64,0.12);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--green), var(--blue), var(--purple));
+      transition: width 0.5s ease;
+    }
+
+    /* ---------- word quest banner ---------- */
     .quest {
       display: flex;
       flex-wrap: wrap;
@@ -282,13 +362,13 @@
       margin: 0 auto 0.9rem;
       padding: 0.6rem 0.9rem;
       background: #fffbea;
-      border: 3px dashed var(--yellow);
+      border: 3px dashed #d9a400;
       border-radius: 16px;
       text-align: center;
     }
     .quest.done {
       background: #eaffef;
-      border-color: var(--green);
+      border-color: #2f8d3e;
       animation: quest-pop 0.6s ease;
     }
     @keyframes quest-pop {
@@ -303,56 +383,183 @@
     }
     .quest-actions { display: flex; gap: 0.4rem; }
 
-    /* the grid */
+    /* ---------- Quick Count quiz ---------- */
+    .level-row { margin-bottom: 0.7rem; }
+    .level-pick { font-size: 1rem; border-color: #1e6fd9; color: #1e6fd9; }
+    .level-pick small { display: block; font-size: 0.72rem; font-weight: normal; opacity: 0.85; }
+    .level-pick[aria-pressed="true"] { background: #1e6fd9; color: #fff; }
+
+    .qcard {
+      max-width: 36rem;
+      margin: 0 auto 0.8rem;
+      padding: 1rem 0.9rem;
+      background: #fff;
+      border: 4px solid #e6dcff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(43,36,64,0.12);
+      text-align: center;
+    }
+    .qask { font-weight: bold; color: #6b41c9; font-size: 1.1rem; margin-bottom: 0.6rem; line-height: 1.35; }
+    .qword {
+      font-weight: 900;
+      font-size: clamp(1.6rem, 8vw, 2.6rem);
+      letter-spacing: 0.14em;
+      color: var(--ink);
+      word-break: break-word;
+      line-height: 1.15;
+    }
+    .qpair { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+    .qword-btn {
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: clamp(1.1rem, 5vw, 1.6rem);
+      letter-spacing: 0.08em;
+      color: #fff;
+      background: var(--wc, #8a5cff);
+      border: 4px solid transparent;
+      border-radius: 18px;
+      padding: 0.7rem 1rem;
+      min-height: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(43,36,64,0.2);
+      transition: transform 0.12s ease;
+      word-break: break-word;
+    }
+    .qword-btn:hover { transform: translateY(-3px) scale(1.03); }
+    .qword-btn:focus-visible { outline: 4px solid #2b2440; outline-offset: 2px; }
+    .qword-btn[disabled] { opacity: 0.55; cursor: default; transform: none; }
+
+    .qopts { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 0.2rem; }
+    .qopt {
+      font-family: var(--font);
+      font-weight: 900;
+      font-size: 1.5rem;
+      min-width: 3.6rem;
+      height: 3.6rem;
+      color: #fff;
+      background: #1e6fd9;
+      border: 4px solid transparent;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.15);
+      transition: transform 0.12s ease;
+    }
+    .qopt:hover { transform: translateY(-2px); }
+    .qopt:focus-visible { outline: 4px solid #2b2440; outline-offset: 2px; }
+    .qopt.ok { background: #2f8d3e; }
+    .qopt.no { background: #c62d2d; }
+    .qopt[disabled] { cursor: default; }
+
+    .streak-line { text-align: center; font-weight: bold; color: #6b41c9; margin-bottom: 0.6rem; min-height: 1.5rem; }
+    .streak-line .fire { font-size: 1.2rem; }
+
+    /* ---------- stats panel ---------- */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+      gap: 0.6rem;
+      max-width: 40rem;
+      margin: 0 auto 1rem;
+    }
+    .stat-card {
+      background: #fff;
+      border: 3px solid #e6dcff;
+      border-radius: 16px;
+      padding: 0.7rem 0.6rem;
+      text-align: center;
+      box-shadow: 0 6px 14px rgba(43,36,64,0.1);
+    }
+    .stat-card .big { display: block; font-size: 1.7rem; font-weight: 900; color: var(--ink); line-height: 1.1; word-break: break-word; }
+    .stat-card .cap { display: block; font-size: 0.8rem; font-weight: bold; color: #6b41c9; margin-top: 0.2rem; }
+
+    .chart {
+      max-width: 40rem;
+      margin: 0 auto 1rem;
+      background: #fff;
+      border: 3px solid #e6dcff;
+      border-radius: 16px;
+      padding: 0.8rem 0.7rem 0.6rem;
+      box-shadow: 0 6px 14px rgba(43,36,64,0.1);
+    }
+    .chart h3 { text-align: center; color: #6b41c9; font-size: 1.05rem; margin: 0 0 0.6rem; }
+    .bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.25rem; height: 150px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+    .bar-n { font-size: 0.75rem; font-weight: 900; color: var(--ink); }
+    .bar {
+      width: 100%;
+      min-height: 4px;
+      border-radius: 6px 6px 0 0;
+      transition: height 0.4s ease;
+    }
+    .bar.top { box-shadow: 0 0 0 3px #2b2440 inset; }
+    .bar-lab { font-size: 0.8rem; font-weight: 900; color: var(--ink); margin-top: 0.25rem; }
+    .chart-note { text-align: center; font-size: 0.9rem; font-weight: bold; color: #6b41c9; margin: 0.5rem 0 0; }
+
+    /* ---------- the grid ---------- */
+    .grid-tools { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
     .grid-scroll {
       max-height: 64vh;
       overflow: auto;
       border-radius: 16px;
       box-shadow: 0 10px 26px rgba(43,36,64,0.14);
       background: #fff;
+      -webkit-overflow-scrolling: touch;
     }
     table { border-collapse: separate; border-spacing: 0; width: 100%; }
     th, td { border-right: 1px solid #eee; border-bottom: 1px solid #eee; }
 
     .corner {
       position: sticky; top: 0; left: 0; z-index: 5;
-      background: #fff; width: 40px; min-width: 40px;
+      background: #fff; width: 42px; min-width: 42px;
     }
     .col-head {
       position: sticky; top: 0; z-index: 4;
       font-size: 1.15rem; font-weight: 900;
       padding: 0.5rem 0.25rem;
-      min-width: 92px;
+      min-width: 104px;
     }
-    .col-head small { display: block; font-size: 0.6rem; font-weight: normal; opacity: 0.85; }
+    .col-head small { display: block; font-size: 0.6rem; font-weight: normal; opacity: 0.9; }
     .row-head {
       position: sticky; left: 0; z-index: 3;
-      background: #faf8ff; color: var(--purple);
+      background: #faf8ff; color: #6b41c9;
       font-size: 1.1rem; font-weight: 900;
-      width: 40px; min-width: 40px; text-align: center;
+      width: 42px; min-width: 42px; text-align: center;
     }
     .cell {
       vertical-align: top;
       padding: 4px;
-      min-width: 92px;
-      height: 44px;
+      min-width: 104px;
+      height: 46px;
     }
     .cell.flash { animation: flash 0.7s ease; }
     @keyframes flash {
       0% { background: #fff7c2; }
       100% { background: transparent; }
     }
+    /* "only rows with words" toggle */
+    tbody.hide-empty tr[data-empty="1"] { display: none; }
+
+    .tally-head { background: #faf8ff; color: #6b41c9; font-size: 0.85rem; font-weight: 900; text-align: center; }
+    .tally {
+      text-align: center;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--ink);
+      background: #f7f4ff;
+      padding: 0.35rem 0.2rem;
+    }
 
     .chip {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      font-size: 0.8rem;
+      gap: 4px;
+      font-size: 0.85rem;
       font-weight: bold;
-      border-radius: 8px;
-      padding: 2px 4px 2px 7px;
+      border-radius: 9px;
+      padding: 3px 4px 3px 8px;
       margin: 2px;
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.15);
+      min-height: 28px;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.2);
       animation: drop-in 0.35s cubic-bezier(.34,1.56,.64,1);
     }
     @keyframes drop-in {
@@ -361,16 +568,41 @@
     }
     .chip-x {
       border: none;
-      background: rgba(0,0,0,0.18);
+      background: rgba(0,0,0,0.25);
       color: inherit;
       border-radius: 50%;
-      width: 16px; height: 16px;
-      line-height: 14px;
-      font-size: 0.85rem;
+      width: 24px; height: 24px;
+      line-height: 22px;
+      font-size: 1rem;
+      font-weight: bold;
       cursor: pointer;
       padding: 0;
+      flex: none;
     }
-    .chip-x:hover { background: rgba(0,0,0,0.35); }
+    .chip-x:hover { background: rgba(0,0,0,0.45); }
+
+    /* ---------- phone tightening ---------- */
+    @media (max-width: 560px) {
+      .title { font-size: 2rem; }
+      .how { font-size: 0.95rem; }
+      .num-pick { min-width: 3rem; height: 3rem; font-size: 1.3rem; }
+      .qopt { min-width: 3.2rem; height: 3.2rem; font-size: 1.3rem; }
+      .tab { font-size: 0.9rem; padding: 0.4rem 0.25rem; }
+      .grid-scroll { max-height: 58vh; }
+      .bars { height: 120px; }
+    }
+
+    /* ---------- calm mode ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .co-letter, .co-total, .co-why, .chip, .cell.flash, .quest.done,
+      #word-input.shake, .num-pick, .qopt, .qword-btn, .pill, .tab,
+      .letter-pick, .progress-fill, .bar {
+        animation: none !important;
+        transition: none !important;
+      }
+      /* these start invisible and rely on the animation to appear */
+      .co-letter, .co-total, .co-why { opacity: 1 !important; }
+    }
   </style>
 </head>
 <body>
@@ -389,44 +621,99 @@
   <div class="builder-wrap">
     <p class="how" id="how"></p>
 
-    <div class="kid-row" id="kid-row" aria-label="Whose grid?"></div>
+    <div class="row-of-pills" id="kid-row" role="group" aria-label="Whose grid?"></div>
 
-    <div class="variant-row" id="variant-row" aria-label="Which letter counts?"></div>
+    <details class="packs" id="packs">
+      <summary id="packs-summary">🎒 Word pack: Everything</summary>
+      <div class="row-of-pills" id="pack-row" role="group" aria-label="Which word pack?"></div>
+    </details>
 
-    <p class="guess-label" id="guess-label">How many letters do you think your word has?</p>
-    <div class="num-row" id="num-row" aria-label="Guess how many letters"></div>
-
-    <div class="quest" id="quest" aria-live="polite">
-      <div class="quest-text" id="quest-text"></div>
-      <div class="quest-actions">
-        <button class="mini-btn" id="quest-hint" type="button">Hint 💡</button>
-        <button class="mini-btn" id="quest-new" type="button">New quest 🔄</button>
-      </div>
+    <div class="tabs" role="tablist" aria-label="Game mode">
+      <button class="tab" id="tab-build" type="button" role="tab" aria-selected="true"
+              aria-controls="panel-build">✍️ Build</button>
+      <button class="tab" id="tab-quiz" type="button" role="tab" aria-selected="false"
+              aria-controls="panel-quiz">⚡ Quick Count</button>
+      <button class="tab" id="tab-stats" type="button" role="tab" aria-selected="false"
+              aria-controls="panel-stats">📊 Stats</button>
     </div>
 
-    <form id="add-form" autocomplete="off">
-      <input id="word-input" type="text" placeholder="Type a word…" aria-label="Type a word" />
-      <button class="btn" type="submit">Add ＋</button>
-    </form>
+    <!-- ============ BUILD ============ -->
+    <section class="panel" id="panel-build" role="tabpanel" aria-labelledby="tab-build">
+      <div class="row-of-pills" id="variant-row" role="group" aria-label="Which letter picks the row?"></div>
 
-    <div id="chooser" aria-live="polite"></div>
+      <p class="guess-label" id="guess-label">
+        How many letters do you think your word has?
+        <span class="kbd-tip">Tip: tap a number, or press keys 2–9 (0 = 10+)</span>
+      </p>
+      <div class="num-row" id="num-row" role="group" aria-label="Guess how many letters"></div>
 
+      <div class="quest" id="quest" aria-live="polite">
+        <div class="quest-text" id="quest-text"></div>
+        <div class="quest-actions">
+          <button class="mini-btn" id="quest-hint" type="button">Hint 💡</button>
+          <button class="mini-btn" id="quest-new" type="button">New quest 🔄</button>
+        </div>
+      </div>
+
+      <form id="add-form" autocomplete="off">
+        <input id="word-input" type="text" maxlength="40" placeholder="Type a word…" aria-label="Type a word" />
+        <button class="btn" type="submit">Add ＋</button>
+      </form>
+
+      <div id="chooser" aria-live="polite"></div>
+    </section>
+
+    <!-- ============ QUICK COUNT ============ -->
+    <section class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
+      <div class="row-of-pills level-row" id="level-row" role="group" aria-label="How hard?"></div>
+      <div class="qcard" id="qcard" aria-live="polite"></div>
+      <div class="streak-line" id="streak-line"></div>
+      <div style="text-align:center; margin-bottom:0.8rem;">
+        <button class="mini-btn" id="quiz-skip" type="button">Skip this one ⏭️</button>
+      </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="panel" id="panel-stats" role="tabpanel" aria-labelledby="tab-stats" hidden>
+      <div class="stat-cards" id="stat-cards"></div>
+      <div class="chart">
+        <h3>How many words of each length?</h3>
+        <div class="bars" id="bars" role="img" aria-label="Bar chart of word counts by length"></div>
+        <p class="chart-note" id="chart-note"></p>
+      </div>
+    </section>
+
+    <!-- shared under every panel -->
     <div class="hint" id="hint" aria-live="polite"></div>
-
     <div id="countout" aria-live="polite"></div>
 
     <div class="stats">
       <span>Words in grid: <span id="count">0</span></span>
       <span>Guesses right: <span id="score">0</span>/<span id="tries">0</span> 🎯</span>
+      <span>Streak: <span id="streak">0</span> 🔥 (best <span id="best-streak">0</span>)</span>
       <span>Quest stars: <span id="stars">0</span> ⭐</span>
+    </div>
+    <div class="stats">
       <button class="mini-btn" id="starter" type="button">Load starter words ✨</button>
       <button class="mini-btn" id="clear" type="button">Clear grid 🗑️</button>
+    </div>
+
+    <div class="progress-wrap">
+      <p class="progress-label" id="progress-label">Squares filled: 0 of 234</p>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <div class="grid-tools">
+      <button class="mini-btn" id="filter-empty" type="button" aria-pressed="false">Only rows with words 👀</button>
     </div>
 
     <div class="grid-scroll">
       <table>
         <thead id="grid-head"></thead>
         <tbody id="grid-body"></tbody>
+        <tfoot id="grid-foot"></tfoot>
       </table>
     </div>
   </div>

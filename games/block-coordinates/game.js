@@ -817,7 +817,10 @@
       const s = steps[pos];
       instr.innerHTML =
         `Place <span class="ib">${blockHTML(s.type)}</span> at ` +
-        `<span class="coord">(${s.x}, ${s.y})</span>`;
+        `<span class="coord">(${s.x}, ${s.y})</span> ` +
+        `<span class="step-of">block ${pos + 1} of ${steps.length}</span>`;
+      instr.setAttribute("aria-label",
+        `Place a ${s.type} block at X ${s.x}, Y ${s.y}. Block ${pos + 1} of ${steps.length}.`);
       misses = 0;
     }
     function onTap(x, y, cell) {
@@ -825,31 +828,34 @@
       const s = steps[pos];
       if (x === s.x && y === s.y) {
         place(cell, s.type, true);
-        streak++;
+        streak++; noteStreak(streak);
         Sound.place(streak);
         if (streak % 5 === 0) sfx("good");
         pos++;
         prog.firstChild.style.width = (pos / steps.length * 100) + "%";
+        prog.setAttribute("aria-valuenow", String(pos));
+        hideExplain(explain);
         updateCombo();
         showStep();
       } else {
-        shake(cell); Sound.dig(); streak = 0; misses++; updateCombo();
+        shake(cell); Sound.dig(); streak = 0; misses++; totalMisses++; updateCombo();
         ctx.litAxis(s.x, s.y, true);
         setTimeout(() => ctx.litAxis(s.x, s.y, false), 1500);
-        say(misses === 1
-          ? `Not quite — count across to ${s.x}, then up to ${s.y}.`
-          : `Find where column ${s.x} and row ${s.y} meet ✨`);
-        if (misses >= 2) {
-          const t = ctx.cellMap[s.x + "," + s.y];
-          if (t) { t.classList.add("target-pulse"); setTimeout(() => t.classList.remove("target-pulse"), 2100); }
-        }
+        // Say WHAT went wrong, not just "nope".
+        showExplain(explain, explainMiss({ x, y }, s, { thing: "next block" }));
+        say(explainText({ x, y }, s));
+        if (misses >= tier().hintAfter) ctx.flash(s.x, s.y);
       }
     }
     function finish() {
       instr.innerHTML = `You built a ${lvl.name}! ${lvl.emoji}`;
+      hideExplain(explain);
       const firstTime = !save.done[lvl.id];
-      save.done[lvl.id] = true; persist();
-      disableCursor();
+      const perfect = totalMisses === 0;
+      const firstPerfect = perfect && !save.perfect[lvl.id];
+      save.done[lvl.id] = true;
+      if (perfect) save.perfect[lvl.id] = true;
+      addBlocks(steps.length);   // persists
       // ripple the finished picture, then celebrate
       steps.forEach((s, i) => {
         setTimeout(() => bounce(ctx.cellMap[s.x + "," + s.y]), i * 40);
