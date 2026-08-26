@@ -790,7 +790,9 @@ const GAMES = {
         let goalieRepeat = false;
         let maxConsecSit = 0;
         rows.forEach((tr) => {
-          const cells = tr.querySelectorAll("td");
+          // the name cell is a <th scope="row"> (proper row header for screen
+          // readers), so walk every child rather than just the <td>s
+          const cells = tr.children;
           let g = 0, sit = 0, run = 0;
           for (let i = 0; i < periods; i++) {
             const cls = cells[i + 1].className;
@@ -868,10 +870,10 @@ const GAMES = {
     await page.waitForTimeout(150);
     const mustGk = await page.evaluate((name) => {
       const tr = Array.from(document.querySelectorAll("table.gridtbl tbody tr"))
-        .find((r) => { const c = r.querySelector("td.name"); return c && c.textContent.trim() === name; });
+        .find((r) => { const c = r.querySelector(".name"); return c && c.textContent.trim() === name; });
       if (!tr) return -1;
-      const tds = tr.querySelectorAll("td");
-      return Number(tds[tds.length - 1].textContent) || 0;
+      const cells = tr.children;
+      return Number(cells[cells.length - 1].textContent) || 0;
     }, mustName);
     if (mustGk < 1) throw new Error(`${mustName} was set to ★ must-goalie but never played goalie`);
 
