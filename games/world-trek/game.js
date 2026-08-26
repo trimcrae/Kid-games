@@ -67,6 +67,7 @@
     infoFact: document.getElementById("info-fact"),
     infoMore: document.getElementById("info-more"),
     infoWhy: document.getElementById("info-why"),
+    atlasCountries: document.getElementById("atlas-countries"),
     passport: document.getElementById("passport")
   };
 
@@ -110,6 +111,11 @@
     return out;
   }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  const REDUCE = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function bringIntoView(node) {
+    try { node.scrollIntoView({ block: "nearest", behavior: REDUCE ? "auto" : "smooth" }); }
+    catch (e) { /* older browsers: the card is still there to scroll to */ }
+  }
   function miles(n) { return n.toLocaleString("en-US") + " sq miles"; }
   function show(node, on) { node.classList.toggle("hidden", !on); }
   function flagSvg(code, cls) {
@@ -381,6 +387,8 @@
     el.scorebar.innerHTML = "";
     el.stars.textContent = "";
     el.passport.innerHTML = "";
+    el.atlasCountries.innerHTML = "";
+    show(el.atlasCountries, false);
     show(el.choices, false);
     show(el.flagStage, false);
     show(el.info, false);
@@ -869,16 +877,27 @@
       const list = COUNTRY_CODES.filter(function (k) {
         return COUNTRIES[k][2] === cont || COUNTRIES[k][5] === cont;
       });
-      el.choices.innerHTML = "";
-      if (!list.length) { show(el.choices, false); return; }
-      show(el.choices, true);
+      el.atlasCountries.innerHTML = "";
+      if (!list.length) { show(el.atlasCountries, false); return; }
+      show(el.atlasCountries, true);
       list.forEach(function (k) {
-        const html = (FLAGS[k] ? flagSvg(k, "mini") : "") + "<span>" + COUNTRIES[k][0] + "</span>";
-        choiceButton(html, COUNTRIES[k][0], function () {
+        const html = (FLAGS[k]
+          ? flagSvg(k, "mini")
+          : '<span class="cont-dot" aria-hidden="true">' + PLACES[COUNTRIES[k][2]].emoji + "</span>") +
+          "<span>" + COUNTRIES[k][0] + "</span>";
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "choice";
+        b.innerHTML = html;
+        b.dataset.key = k;
+        b.setAttribute("aria-label", COUNTRIES[k][0]);
+        b.addEventListener("click", function () {
           countryCard(k);
           if (window.SFX) SFX.pop();
           tally();
-        }, k);
+          bringIntoView(el.info);
+        });
+        el.atlasCountries.appendChild(b);
       });
     }
 
@@ -890,8 +909,9 @@
       placeCard(code);
       if (window.SFX) SFX.pop();
       if (p.kind === "continent") countryList(code);
-      else { el.choices.innerHTML = ""; show(el.choices, false); }
+      else { el.atlasCountries.innerHTML = ""; show(el.atlasCountries, false); }
       tally();
+      bringIntoView(el.info);
     };
 
     onState = function (code) {
@@ -900,9 +920,10 @@
       seen("seenStates", code);
       stateCard(code);
       if (window.SFX) SFX.pop();
-      el.choices.innerHTML = "";
-      show(el.choices, false);
+      el.atlasCountries.innerHTML = "";
+      show(el.atlasCountries, false);
       tally();
+      bringIntoView(el.info);
     };
   }
 

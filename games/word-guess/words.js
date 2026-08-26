@@ -388,7 +388,7 @@ const WG_EXTRA5 = [
   "trees", "trick", "trunk", "twins", "uncle", "watch", "worms", "yummy",
 ];
 const WG_EXTRA4 = [
-  "bake", "blue", "book", "calm", "camp", "card", "city",
+  "ball", "bake", "blue", "book", "calm", "camp", "card", "city",
   "club", "cold", "cool", "cube", "dark", "desk",
   "dive", "doll", "down", "drop", "easy", "fast", "feet",
   "film", "fire", "foot", "game", "gate", "girl",

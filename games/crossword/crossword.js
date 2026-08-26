@@ -260,8 +260,12 @@
      8.5vw used to run straight off the side of a 390px screen). */
   function sizeGrid() {
     if (!puzzle || !el.grid) return;
-    const host = el.gridScroll || el.grid.parentElement;
-    const avail = Math.max(200, (host ? host.clientWidth : window.innerWidth) - 14);
+    // measure the LAYOUT row, not the scroller: the scroller shrink-wraps the
+    // grid, so asking it how wide it is would just echo the last answer back.
+    const host = (el.gridScroll && el.gridScroll.parentElement) || el.play;
+    const w = (host && host.clientWidth) || window.innerWidth;
+    const sideBySide = w >= 640;              // where .cw-layout stops wrapping
+    const avail = Math.max(180, (sideBySide ? w - 300 : w) - 12);
     const gap = puzzle.cols > 11 ? 1 : 2;
     let cell = Math.floor((avail - gap * (puzzle.cols - 1)) / puzzle.cols);
     cell = Math.max(26, Math.min(40, cell));

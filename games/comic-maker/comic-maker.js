@@ -920,8 +920,15 @@
   function setLayout(layout) {
     var p = page();
     if (p.layout === layout) return;
-    pushHistory();
     var want = PANELS_FOR[layout];
+    // Shrinking the layout throws panels away — say so before it happens.
+    var lost = p.panels.slice(want).filter(function (pan) {
+      return pan.items.length || pan.draw;
+    }).length;
+    if (lost && !confirm("That layout has fewer boxes, so " + lost +
+        (lost === 1 ? " panel you've drawn in will be removed." : " panels you've drawn in will be removed.") +
+        "\n\n(↶ Undo can bring them back.) Change it anyway?")) return;
+    pushHistory();
     var panels = p.panels.slice(0, want);
     while (panels.length < want) panels.push({ scene: "sky", draw: null, items: [] });
     p.layout = layout; p.panels = panels;

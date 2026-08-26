@@ -397,22 +397,23 @@ window.PrincessArt = (function () {
       });
     },
 
-    // little white satin gloves with a frilly cuff at each wrist
+    // little white satin gloves with a neat cuff at each wrist
     gloves: function (svg, defs, g) {
       var grp = el("g", {}, g);
-      [[1, 152, 138, 122], [-1, 178, 192, 208]].forEach(function (side) {
+      [[1, 152, 131], [-1, 178, 199]].forEach(function (side) {
         var dir = side[0], hx = side[1], wx = side[2];
         el("path", {
-          d: "M " + wx + " 278 C " + (wx + 5 * dir) + " 283 " + (hx - 4 * dir) + " 285 " + hx + " 285",
+          d: "M " + wx + " 280 C " + (wx + 7 * dir) + " 284 " + (hx - 6 * dir) + " 285 " + hx + " 285",
           stroke: "#fffafd", "stroke-width": 15, "stroke-linecap": "round", fill: "none"
         }, grp);
         el("circle", { cx: hx, cy: 285, r: 9, fill: "#fffafd", stroke: "#f0d2e4", "stroke-width": 1.5 }, grp);
-        // the frill, sitting across the wrist
-        el("ellipse", {
-          cx: wx, cy: 277, rx: 4.5, ry: 10, fill: "#ffe3f2", stroke: "#f0b8d8", "stroke-width": 1.5,
-          transform: "rotate(" + (-32 * dir) + " " + wx + " 277)"
+        // the cuff, banded across the wrist
+        el("path", {
+          d: "M " + wx + " 273 L " + wx + " 288",
+          stroke: "#ffd7ee", "stroke-width": 6, "stroke-linecap": "round", fill: "none",
+          transform: "rotate(" + (-14 * dir) + " " + wx + " 280)"
         }, grp);
-        el("circle", { cx: hx - 3 * dir, cy: 282, r: 2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 0.8 }, grp);
+        el("circle", { cx: hx - 2 * dir, cy: 282, r: 2.2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 0.8 }, grp);
       });
     },
 
