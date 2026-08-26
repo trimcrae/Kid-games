@@ -210,11 +210,18 @@
     .item.text.sel .grip { display: flex; }
 
     /* ---- floating control bar for the selected item ---- */
-    .item-bar-wrap { min-height: 3rem; display: flex; justify-content: center; margin: 0.7rem 0 0.2rem; }
+    /* Fixed height: the bar appearing/disappearing must never shove the
+       toolbox up and down while a kid is aiming at a button. */
+    .item-bar-wrap {
+      min-height: 3.7rem; display: flex; align-items: center;
+      justify-content: center; margin: 0.6rem 0 0.2rem;
+    }
     .item-bar {
-      display: none; flex-wrap: wrap; gap: 5px; justify-content: center;
+      display: none; flex-wrap: nowrap; gap: 5px; justify-content: center;
+      max-width: 100%; overflow-x: auto; overflow-y: hidden;
       background: #fff; padding: 6px; border-radius: 999px;
       box-shadow: 0 8px 20px rgba(43,36,64,0.25);
+      scrollbar-width: thin;
     }
     .item-bar.show { display: flex; }
     .item-bar button {
@@ -226,6 +233,16 @@
     .item-bar button:hover { background: var(--purple); color: #fff; }
     .item-bar button.del:hover { background: #e23b3b; }
     .item-bar button.hide { display: none; }
+
+    @media (max-width: 700px) {
+      .item-bar-wrap { min-height: 0.4rem; margin: 0.3rem 0 0; }
+      .item-bar.show {
+        position: fixed; left: 0.4rem; right: 0.4rem; bottom: 0.4rem;
+        z-index: 200; border-radius: 18px; justify-content: flex-start;
+        padding: 7px 8px;
+      }
+      .item-bar button { min-width: 2.9rem; height: 2.9rem; flex: 0 0 auto; }
+    }
 
     /* ---- toolbox below the page ---- */
     .toolbox { max-width: 720px; margin: 0.4rem auto 0; }
@@ -318,7 +335,10 @@
     .nav-arrow:disabled { opacity: 0.35; cursor: default; }
     .nav-arrow:not(:disabled):hover { background: var(--purple); color: #fff; }
 
-    .hint { text-align: center; min-height: 1.3rem; font-weight: bold; color: #7a52d6; margin-top: 0.3rem; }
+    .hint {
+      text-align: center; min-height: 2.6rem; font-weight: bold; color: #7a52d6;
+      margin-top: 0.3rem; display: flex; align-items: center; justify-content: center;
+    }
     .tray-label { text-align: center; color: #6a6385; font-size: 0.9rem; margin: 0 0 0.5rem; }
 
     .file-status {

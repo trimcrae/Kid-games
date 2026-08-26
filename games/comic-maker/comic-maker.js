@@ -1518,9 +1518,13 @@
     }
   });
 
-  /* ---------- click empty space deselects ---------- */
+  /* ---------- click empty space deselects ----------
+     Reaching for a tool used to drop the selection, which made the item bar
+     vanish and jumped every button up the screen mid-tap. The selection now
+     survives anything you do inside the toolbox. */
   document.addEventListener("pointerdown", function (ev) {
-    if (!ev.target.closest(".page") && !ev.target.closest(".item-bar")) {
+    if (!ev.target.closest(".page") && !ev.target.closest(".item-bar") &&
+        !ev.target.closest(".toolbox") && !ev.target.closest(".top-tools")) {
       if (selItemId) { selItemId = null; refreshSelection(); }
     }
   });

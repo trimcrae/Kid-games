@@ -592,14 +592,16 @@
     ask.textContent = "Which word means: “" + q.d + "”";
     quizEl.appendChild(h); quizEl.appendChild(c); quizEl.appendChild(ask);
 
-    const box = document.createElement("div");
-    box.className = "choices";
-    quizEl.appendChild(box);
-
+    // feedback sits ABOVE the answers so a phone-sized screen shows the
+    // explanation without anyone having to scroll for it
     const fb = document.createElement("p");
     fb.className = "q-fb";
     fb.hidden = true;
     quizEl.appendChild(fb);
+
+    const box = document.createElement("div");
+    box.className = "choices";
+    quizEl.appendChild(box);
 
     let answered = false;
     options.forEach(opt => {
@@ -636,6 +638,7 @@
           fb.className = "q-fb bad";
           fb.textContent = "❌ Not that one — “" + opt.w + "” means " + lower(opt.d) +
             " Have another go!";
+          fb.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
         }
       });
       box.appendChild(b);

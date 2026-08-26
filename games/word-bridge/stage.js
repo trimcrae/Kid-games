@@ -165,16 +165,17 @@ window.WBStage = (function () {
     ["you", "bot"].forEach(function (who) {
       var side = world[who];
       if (side.at < side.target) {
-        // planks per second — a brisk but readable walking pace
-        side.at = Math.min(side.target, side.at + dt * 7);
-        side.moving = true;
+        // planks per second — a brisk but readable walking pace.
+        // Reduced-motion kids get put down at the far end instead.
+        side.at = reduced ? side.target : Math.min(side.target, side.at + dt * 7);
+        side.moving = !reduced;
       } else {
         side.moving = false;
       }
     });
     // camera eases along behind you
     var want = world.you.at * GAP - CAM_BACK;
-    world.camZ += (want - world.camZ) * Math.min(1, dt * 3.4);
+    world.camZ += (want - world.camZ) * (reduced ? 1 : Math.min(1, dt * 3.4));
     if (world.shake > 0) world.shake = Math.max(0, world.shake - dt * 2);
   }
 

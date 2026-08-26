@@ -18,7 +18,8 @@
     .pick {
       font-family: var(--font); font-weight: bold; font-size: 0.98rem;
       border: 3px solid var(--pc, var(--purple)); background: #fff; color: var(--ink);
-      border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer;
+      border-radius: 999px; padding: 0.45rem 0.95rem; cursor: pointer;
+      min-height: 44px;
       box-shadow: 0 4px 10px rgba(43,36,64,0.12);
       transition: transform 0.12s ease; touch-action: manipulation;
     }
@@ -67,15 +68,38 @@
       position: fixed; inset: 0; z-index: 30; display: flex;
       align-items: center; justify-content: center; padding: 1rem;
       background: rgba(43,36,64,0.5);
+      /* The prompt covers the whole page, so without this the shop, the kid
+         buttons and "New race" would only be tappable in the second between
+         rounds. The dimmer is decoration; only the card takes taps. */
+      pointer-events: none;
     }
     .modal[hidden] { display: none; }
     .modal-card {
+      position: relative; pointer-events: auto;
       background: var(--paper); border-radius: 22px; padding: 1rem 0.9rem 1.1rem;
       width: 100%; max-width: 520px; text-align: center;
       box-shadow: 0 22px 50px rgba(43,36,64,0.4);
       animation: modal-in 0.25s ease;
       max-height: 92vh; overflow-y: auto;
     }
+    .pause-btn {
+      position: absolute; top: 0.45rem; right: 0.45rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      font-size: 1.1rem; line-height: 1; cursor: pointer;
+      border: 3px solid #e7e0f7; background: #faf7ff; color: var(--purple);
+      touch-action: manipulation;
+    }
+    .pause-btn:hover { background: #f1ebff; }
+    .round-line { margin: 0 2.6rem 0.1rem; font-size: 0.85rem; color: #8d86a5; font-weight: bold; }
+    .round-line .streak { color: #e0761a; }
+
+    /* the way back into a paused race */
+    .pause-bar {
+      position: fixed; left: 50%; bottom: 1rem; transform: translateX(-50%);
+      z-index: 40; background: var(--paper); border-radius: 999px;
+      padding: 0.35rem; box-shadow: 0 12px 30px rgba(43,36,64,0.28);
+    }
+    .pause-bar[hidden] { display: none; }
     @keyframes modal-in { from { opacity: 0; transform: translateY(18px) scale(0.95); } }
 
     .q-emoji { font-size: 2.3rem; line-height: 1.1; }
@@ -101,9 +125,15 @@
       padding: 0.55rem 0.4rem; cursor: pointer; box-shadow: 0 5px 0 rgba(56,182,255,0.35);
       touch-action: manipulation; transition: transform 0.12s ease;
     }
-    .tap .te { display: block; font-size: 2rem; line-height: 1.15; }
+    .tap { position: relative; min-height: 92px; }
+    .tap .te { display: block; font-size: 2.1rem; line-height: 1.15; }
+    .tap .num {
+      position: absolute; top: 4px; left: 6px; font-size: 0.7rem;
+      color: #9fb9c9; font-weight: bold;
+    }
     .tap:hover { transform: translateY(-3px); }
     .tap.used { opacity: 0.45; }
+    .tap:disabled { cursor: default; }
 
     .feedback { min-height: 1.9rem; margin: 0.6rem 0 0; font-weight: bold; font-size: 1rem; color: #e08b1a; }
     .feedback b { color: var(--purple); }
@@ -146,18 +176,26 @@
     .win-panel .big { font-size: 3rem; line-height: 1.2; }
     .win-panel h2 { margin: 0.2rem 0; color: var(--pink); font-size: 1.45rem; }
     .win-panel p { color: #6a6385; margin: 0.3rem 0 0.8rem; }
-    .win-panel .words { font-size: 0.9rem; }
+    .win-panel .words { font-size: 0.9rem; line-height: 1.7; }
+    .win-panel .words i { font-style: normal; color: var(--blue); }
+    .win-panel .rank-line { color: var(--purple); font-size: 0.95rem; }
+    .skin-card.shake { animation: shake 0.36s ease; }
+    @keyframes shake {
+      25% { transform: translateX(-5px); } 75% { transform: translateX(5px); }
+    }
 
     @media (max-width: 480px) {
       .back-link { margin: 0.6rem 0.8rem; padding: 0.45rem 0.9rem; font-size: 0.95rem; }
       .hero { padding: 0 1rem 0.35rem; }
       .subtitle { display: none; }
-      .pick { font-size: 0.88rem; padding: 0.3rem 0.75rem; }
+      .pick { font-size: 0.88rem; padding: 0.4rem 0.7rem; }
       .bar { font-size: 0.92rem; gap: 0.5rem; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .plk.drop, .mover.step, .modal-card { animation: none; }
-      .world, .mover, .island { transition: none; }
+      .modal-card, .skin-card.shake { animation: none; }
+      .prog i { transition: none; }
+      .pick, .tap, .btn { transition: none; }
+      .pick:hover, .tap:hover, .btn:hover { transform: none; }
     }
   </style>
 </head>
@@ -177,8 +215,8 @@
     <div class="pick-row" id="kid-row"></div>
     <div class="pick-row" id="opt-row"></div>
 
-    <section class="scene" id="scene">
-      <canvas id="stage"></canvas>
+    <section class="scene" id="scene" role="img" aria-label="The canyon">
+      <canvas id="stage" aria-hidden="true"></canvas>
       <div class="hud" id="hud"></div>
       <div class="prog" aria-hidden="true">
         <span class="you"><i id="prog-you"></i></span>
@@ -189,7 +227,8 @@
     <p class="bar" id="bar"></p>
 
     <div class="pick-row">
-      <button class="btn ghost small" id="shop-btn" type="button">Bridge shop</button>
+      <button class="btn ghost small" id="shop-btn" type="button"
+              aria-expanded="false" aria-controls="shop">Bridge shop</button>
       <button class="btn ghost small" id="restart-btn" type="button">New race</button>
     </div>
 
@@ -199,7 +238,11 @@
     </section>
   </main>
 
-  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-live="polite" hidden>
+  <div class="pause-bar" id="pause-bar" hidden>
+    <button class="btn" type="button">▶ Back to the race</button>
+  </div>
+
+  <div class="modal" id="modal" role="dialog" aria-label="Word Bridge prompt" hidden>
     <div class="modal-card" id="modal-card"></div>
   </div>
 
