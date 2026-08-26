@@ -68,20 +68,103 @@
   const blockHTML = (type, extra) =>
     `<i class="b b-${type}${extra ? " " + extra : ""}"></i>`;
 
-  /* ---------------- save / load ---------------- */
+  /* ---------------- save / load ----------------
+     Same storage key as before, so every ⭐ / best score a kid has
+     already earned still loads. New fields are merged in with
+     defaults, and nested objects are repaired if an old save is
+     missing them. */
   const KEY = "block-coordinates.v2";
   const defaults = () => ({
-    done: {}, numbersOn: true, treasureBest: null, quadBest: null, free: null,
+    done: {},            // levelId -> true   (built at least once)
+    perfect: {},         // levelId -> true   (built with zero misses)
+    numbersOn: true,
+    treasureBest: null,  // fewest wrong digs
+    quadBest: null,
+    free: null,
+    tier: "normal",      // easy | normal | expert | master
+    walkBest: {},        // tier -> best score
+    f3Best: {},          // tier -> best score
+    stats: { blocks: 0, bestStreak: 0, quests: 0 },
   });
+  function normalize(s) {
+    const d = defaults();
+    if (!s || typeof s !== "object") return d;
+    const out = Object.assign(d, s);
+    ["done", "perfect", "walkBest", "f3Best"].forEach((k) => {
+      if (!out[k] || typeof out[k] !== "object") out[k] = {};
+    });
+    out.stats = Object.assign({ blocks: 0, bestStreak: 0, quests: 0 }, out.stats || {});
+    if (!TIER_CFG[out.tier]) out.tier = "normal";
+    return out;
+  }
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) return Object.assign(defaults(), JSON.parse(raw));
+      if (raw) return normalize(JSON.parse(raw));
     } catch (e) {}
     return defaults();
   }
-  let save = load();
   function persist() { try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (e) {} }
+
+  /* ---------------- difficulty ladder ----------------
+     One tier choice drives every quest mode: how big the world is,
+     how soon a hint appears, and whether the axis numbers are given
+     to you. "Grown-up" is a real challenge for mum. */
+  const TIERS = [
+    { id: "easy",   name: "Easy",     emoji: "🐣", note: "small world, quick hints" },
+    { id: "normal", name: "Normal",   emoji: "⭐", note: "the classic grid" },
+    { id: "expert", name: "Expert",   emoji: "🔥", note: "big world, negatives" },
+    { id: "master", name: "Grown-up", emoji: "👑", note: "huge world, numbers hidden" },
+  ];
+  const TIER_CFG = {
+    easy:   { dig: 6,  half: 3, rounds: 4,  hintAfter: 1, hideNums: false, neg: false },
+    normal: { dig: 8,  half: 4, rounds: 6,  hintAfter: 1, hideNums: false, neg: false },
+    expert: { dig: 10, half: 5, rounds: 8,  hintAfter: 2, hideNums: false, neg: true  },
+    master: { dig: 12, half: 6, rounds: 10, hintAfter: 3, hideNums: true,  neg: true  },
+  };
+  let save = load();
+  const tier = () => TIER_CFG[save.tier] || TIER_CFG.normal;
+  const tierMeta = () => TIERS.find((t) => t.id === save.tier) || TIERS[1];
+
+  // Numbers stay hidden on the grown-up tier until the player asks for
+  // them; the choice lasts for this visit only.
+  let numsOverride = null;
+  function startNums() {
+    if (numsOverride !== null) return numsOverride;
+    return tier().hideNums ? false : save.numbersOn;
+  }
+
+  /* Biggest grid that still leaves finger-sized squares on this screen.
+     Phones quietly get a smaller world instead of an off-screen one. */
+  function maxGrid() {
+    const host = $("app");
+    const avail = Math.min((host && host.clientWidth) || 360, 560);
+    return Math.max(6, Math.min(13, Math.floor((avail - 46) / 30)));
+  }
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ---------------- rank (a reason to come back) ---------------- */
+  const RANKS = [
+    { at: 0,   name: "Wood Pick",    emoji: "🪵" },
+    { at: 40,  name: "Stone Pick",   emoji: "🪨" },
+    { at: 120, name: "Iron Pick",    emoji: "⚙️" },
+    { at: 260, name: "Gold Pick",    emoji: "🥇" },
+    { at: 450, name: "Diamond Pick", emoji: "💎" },
+    { at: 700, name: "Netherite",    emoji: "🖤" },
+  ];
+  function rankOf(blocks) {
+    let r = RANKS[0];
+    for (const x of RANKS) if (blocks >= x.at) r = x;
+    return r;
+  }
+  function nextRank(blocks) { return RANKS.find((x) => x.at > blocks) || null; }
+  function addBlocks(n) {
+    save.stats.blocks = (save.stats.blocks || 0) + n;
+    persist();
+  }
+  function noteStreak(s) {
+    if (s > (save.stats.bestStreak || 0)) { save.stats.bestStreak = s; persist(); }
+  }
 
   /* ---------------- blueprints ----------------
      Art rows are typed top → bottom; '.' is empty.
@@ -243,6 +326,65 @@
     cell.classList.remove("shake"); void cell.offsetWidth; cell.classList.add("shake");
   }
   function say(msg) { const s = $("say"); if (s) s.textContent = msg || ""; }
+
+  /* ===========================================================
+     EXPLAIN A WRONG ANSWER
+     The most important teaching bit: never just "nope". Say what
+     the tapped square actually *is*, name the mistake if it's the
+     classic X/Y swap, then say exactly how far to move.
+     =========================================================== */
+  const coordChip = (x, y, cls) =>
+    `<span class="coord${cls ? " " + cls : ""}">(${x}, ${y})</span>`;
+
+  function walkWords(x, y, names) {
+    const nx = (names && names[0]) || "X", ny = (names && names[1]) || "Y";
+    const ax = x < 0 ? `${Math.abs(x)} left ←` : `${x} across →`;
+    const ay = y < 0 ? `${Math.abs(y)} down ↓` : `${y} up ↑`;
+    return `${ax} (${nx} = ${x}) and ${ay} (${ny} = ${y})`;
+  }
+
+  // guess & target are {x,y}. Returns HTML for the explain panel.
+  function explainMiss(guess, target, opts) {
+    opts = opts || {};
+    const names = opts.names || ["X", "Y"];
+    const thing = opts.thing || "chest";
+    const dx = target.x - guess.x, dy = target.y - guess.y;
+    const moves = [];
+    if (dx) moves.push(`${Math.abs(dx)} block${Math.abs(dx) > 1 ? "s" : ""} ${dx > 0 ? "right →" : "left ←"}`);
+    if (dy) moves.push(`${Math.abs(dy)} block${Math.abs(dy) > 1 ? "s" : ""} ${dy > 0 ? "up ↑" : "down ↓"}`);
+    const move = moves.join(" and ");
+    const swapped = guess.x === target.y && guess.y === target.x && target.x !== target.y;
+    const head = swapped
+      ? `<b>You swapped them!</b> ${names[0]} always comes first.`
+      : `That square is ${coordChip(guess.x, guess.y, "bad")}.`;
+    return `
+      <div class="ex-line">${head}</div>
+      <div class="ex-line">You went ${walkWords(guess.x, guess.y, names)}.</div>
+      <div class="ex-line">The ${thing} is at ${coordChip(target.x, target.y, "good")} —
+        ${walkWords(target.x, target.y, names)}.</div>
+      ${move ? `<div class="ex-line ex-move">Move ${move} and you're there!</div>` : ""}`;
+  }
+
+  // plain-text version for the aria-live line (screen readers / Ellie's ears)
+  function explainText(guess, target, names) {
+    names = names || ["X", "Y"];
+    const swapped = guess.x === target.y && guess.y === target.x && target.x !== target.y;
+    return (swapped ? "You swapped them! " : "") +
+      `You tapped (${guess.x}, ${guess.y}). It is at (${target.x}, ${target.y}).`;
+  }
+
+  function makeExplain() {
+    const el = document.createElement("div");
+    el.className = "explain";
+    el.hidden = true;
+    return el;
+  }
+  function showExplain(el, html) {
+    if (!el) return;
+    el.innerHTML = html;
+    el.hidden = false;
+  }
+  function hideExplain(el) { if (el) { el.hidden = true; el.innerHTML = ""; } }
 
   function sparkle(emoji) {
     if (reduceMotion) return;
