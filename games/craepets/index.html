@@ -169,8 +169,13 @@
     .choice:disabled { cursor: default; opacity: 0.95; }
     /* After two misses at the Tiny level the right one starts to glow,
        so a toddler is never stuck. */
-    .choice.hint { border-color: var(--green); box-shadow: 0 0 0 4px rgba(61,220,132,0.35); animation: nudge 1s ease infinite; }
-    @keyframes nudge { 50% { transform: translateY(-4px); } }
+    /* The glow pulses, it does NOT move: a target that keeps sliding away
+       is harder for a small finger, not easier. */
+    .choice.hint { border-color: var(--green); animation: nudge 1.1s ease-in-out infinite; }
+    @keyframes nudge {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(61,220,132,0.55); background: #fff; }
+      50%      { box-shadow: 0 0 0 9px rgba(61,220,132,0); background: #e8fff1; }
+    }
     @keyframes shake-yes { 50% { transform: scale(1.07); } }
     @keyframes shake-no { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 

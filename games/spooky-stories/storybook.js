@@ -1636,6 +1636,7 @@
   const nextBtn = document.getElementById("next-btn");
   const againBtn = document.getElementById("again-btn");
   const quizBtn = document.getElementById("quiz-btn");
+  const endActions = document.getElementById("end-actions");
   const homeBtn = document.getElementById("home-btn");
   const readBtn = document.getElementById("read-btn");
   const selfBtn = document.getElementById("self-btn");
@@ -1868,6 +1869,7 @@
     // buttons
     prevBtn.disabled = page === 0;
     nextBtn.textContent = p.end ? "📚 More stories" : "Turn the page ▶";
+    endActions.hidden = !p.end;
     againBtn.style.display = p.end ? "" : "none";
     quizBtn.style.display = (p.end && QUIZ_BY_ID[current.id]) ? "" : "none";
 
@@ -1953,6 +1955,7 @@
     quizDoneEl.hidden = true;
     quizBtn.style.display = "none";
     showQuestion();
+    try { quizEl.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" }); } catch (e) {}
   }
 
   function closeQuiz() {
@@ -2136,14 +2139,15 @@
   // from a focused button or a word the reader is about to tap
   document.addEventListener("keydown", e => {
     if (!current) return;
+    if (e.key === "Escape") { goHome(); return; }
+    if (e.key === "ArrowRight") { e.preventDefault(); nextPage(); return; }
+    if (e.key === "ArrowLeft") { e.preventDefault(); prevPage(); return; }
+    // Space turns the page too — but not while a button or a word has focus,
+    // where space is already how you press the thing you are standing on.
     const t = e.target;
-    if (t && t.closest && t.closest("button, .w, input, textarea, select")) {
-      if (e.key === "Escape") { goHome(); }
-      return;
+    if (e.key === " " && !(t && t.closest && t.closest("button, .w, input, textarea, select"))) {
+      e.preventDefault(); nextPage();
     }
-    if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); nextPage(); }
-    else if (e.key === "ArrowLeft") { e.preventDefault(); prevPage(); }
-    else if (e.key === "Escape") { goHome(); }
   });
 
   // stop reading if the page is hidden/closed

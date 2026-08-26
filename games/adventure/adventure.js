@@ -315,6 +315,8 @@
           ? `⭐ ${foundAll} of ${totalAll} endings discovered so far — keep exploring!`
           : `${totalAll} different endings are hiding in these stories. Every choice matters!`;
     }
+    const tbox = document.getElementById("treasure");
+    if (tbox) tbox.hidden = true;
     buildStatStrip();
   }
 
@@ -323,17 +325,59 @@
     if (!strip) return;
     const s = loadStats(), w = loadWords();
     const bits = [];
-    if (s.streak > 0) bits.push(`📅 ${s.streak} day${s.streak === 1 ? "" : "s"} in a row` + (s.best > s.streak ? ` (best ${s.best})` : ""));
-    if (s.pages > 0) bits.push(`📄 ${s.pages} pages read`);
-    if (s.choices > 0) bits.push(`🔀 ${s.choices} choices made`);
-    if (w.seen.length) bits.push(`📖 ${w.seen.length} word${w.seen.length === 1 ? "" : "s"} looked up`);
-    if (w.mastered.length) bits.push(`🧠 ${w.mastered.length} word${w.mastered.length === 1 ? "" : "s"} mastered`);
+    if (s.streak > 0) bits.push({ t: `📅 ${s.streak} day${s.streak === 1 ? "" : "s"} in a row` + (s.best > s.streak ? ` (best ${s.best})` : "") });
+    if (s.pages > 0) bits.push({ t: `📄 ${s.pages} pages read` });
+    if (s.choices > 0) bits.push({ t: `🔀 ${s.choices} choices made` });
+    if (w.seen.length) bits.push({ t: `📖 ${w.seen.length} word${w.seen.length === 1 ? "" : "s"} looked up`, tap: true });
+    if (w.mastered.length) bits.push({ t: `🧠 ${w.mastered.length} word${w.mastered.length === 1 ? "" : "s"} mastered` });
     strip.innerHTML = "";
-    bits.forEach(t => {
+    bits.forEach(b => {
       const li = document.createElement("li");
-      li.textContent = t;
+      if (b.tap) {
+        li.className = "tappable";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = b.t + " ▾";
+        btn.setAttribute("aria-expanded", "false");
+        btn.setAttribute("aria-controls", "treasure");
+        btn.addEventListener("click", () => toggleTreasure(btn));
+        li.appendChild(btn);
+      } else {
+        li.textContent = b.t;
+      }
       strip.appendChild(li);
     });
+  }
+
+  /* The word treasure chest: every word they have ever looked up, with
+     its meaning, so Jeannie (or Mum) can go back over them together. */
+  function toggleTreasure(btn) {
+    const box = document.getElementById("treasure");
+    const list = document.getElementById("treasure-list");
+    const ttl = document.getElementById("treasure-title");
+    if (!box || !list) return;
+    if (!box.hidden) {
+      box.hidden = true;
+      if (btn) btn.setAttribute("aria-expanded", "false");
+      return;
+    }
+    const w = loadWords();
+    const mastered = new Set(w.mastered);
+    const items = w.seen.slice().sort();
+    ttl.textContent = `📖 My word treasure — ${items.length} word${items.length === 1 ? "" : "s"}` +
+      (mastered.size ? ` (${mastered.size} mastered 🧠)` : "");
+    list.innerHTML = "";
+    items.forEach(word => {
+      const entry = GLOSS && GLOSS.lookup(word);
+      const li = document.createElement("li");
+      const b = document.createElement("b");
+      b.textContent = (mastered.has(word) ? "🧠 " : "📖 ") + word;
+      li.appendChild(b);
+      li.appendChild(document.createTextNode(" — " + (entry ? entry.d : "")));
+      list.appendChild(li);
+    });
+    box.hidden = false;
+    if (btn) btn.setAttribute("aria-expanded", "true");
   }
 
   /* ---- Open a story ---- */

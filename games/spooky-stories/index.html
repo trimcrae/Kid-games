@@ -105,7 +105,7 @@
        words, to see what it means. */
     .page-text .w {
       display: inline-block; cursor: pointer; border-radius: 8px;
-      padding: 0 .12em; margin: 0 -.02em;
+      padding: .02em .1em; margin: 0 -.06em;
       -webkit-tap-highlight-color: transparent;
       transition: background-color .12s ease, color .12s ease;
     }
@@ -144,6 +144,15 @@
     .mode-btn[aria-pressed="true"] { background: var(--yellow); color: #2b2440; border-color: #ffe9a8; }
 
     .page-count { text-align: center; color: #d9c8ff; font-size: .85rem; margin: .15rem 0 0; }
+
+    .end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin: .6rem 0 .1rem; }
+
+    /* On a phone the story title gets its own line so it never squashes
+       against the home / speaker buttons. */
+    @media (max-width: 480px) {
+      .reader-top { flex-wrap: wrap; }
+      .reader-title { order: -1; flex: 1 0 100%; text-align: center; margin-bottom: .1rem; }
+    }
 
     /* Comprehension questions */
     .quiz {
@@ -277,6 +286,19 @@
           <p class="wc-def" id="word-def"></p>
         </div>
 
+        <p class="tap-hint" id="tap-hint">✨ Tap the picture to play! ✨</p>
+        <div class="dots" id="dots" aria-hidden="true"></div>
+        <p class="page-count" id="page-count"></p>
+        <div class="mode-row">
+          <button class="mode-btn" id="self-btn" aria-pressed="false">🔊 Read it to me</button>
+        </div>
+
+        <!-- what you can do once you reach "The End" -->
+        <div class="end-actions" id="end-actions" hidden>
+          <button class="big-btn blue" id="again-btn">🔁 Read again</button>
+          <button class="big-btn blue" id="quiz-btn">🧠 Story questions</button>
+        </div>
+
         <!-- comprehension questions, opened from the last page -->
         <div class="quiz" id="quiz" hidden>
           <p class="q-progress" id="quiz-progress"></p>
@@ -285,19 +307,10 @@
           <p class="q-feedback" id="quiz-feedback" aria-live="polite"></p>
           <p class="quiz-done" id="quiz-done" hidden></p>
         </div>
-
-        <p class="tap-hint" id="tap-hint">✨ Tap the picture to play! ✨</p>
-        <div class="dots" id="dots" aria-hidden="true"></div>
-        <p class="page-count" id="page-count"></p>
-        <div class="mode-row">
-          <button class="mode-btn" id="self-btn" aria-pressed="false">🔊 Read it to me</button>
-        </div>
       </div>
 
       <div class="controls">
         <button class="big-btn pink" id="prev-btn">◀ Back</button>
-        <button class="big-btn blue" id="again-btn" style="display:none">🔁 Read again</button>
-        <button class="big-btn blue" id="quiz-btn" style="display:none">🧠 Story questions</button>
         <button class="big-btn" id="next-btn">Turn the page ▶</button>
       </div>
     </section>

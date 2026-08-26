@@ -115,6 +115,13 @@ window.WBSprites = (function () {
       "..RRRRRRRR..",
       ".RRRRRRRRRR.",
       "..RRRRRRRR.."
+    ],
+    // a hair bun, seen from behind — grown-ups get one too
+    bun: [
+      "....OOOO....",
+      "...OHHHHO...",
+      "...OHHHHO...",
+      "....OOOO...."
     ]
   };
 
@@ -127,10 +134,14 @@ window.WBSprites = (function () {
                B: "#3d3a45", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#3aa84a", g: "#2c7d38" },
     ellie:   { O: "#2b2440", H: "#f5d06b", h: "#d9ad42", S: "#f9d3b0",
                C: "#ff6fa5", c: "#d94f83", P: "#9b6bff", p: "#7a4fd6",
-               B: "#c94f86", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#3aa84a", g: "#2c7d38" }
+               B: "#c94f86", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#3aa84a", g: "#2c7d38" },
+    // Mum plays too — same body, her own colours and a hair bun.
+    shannon: { O: "#2b2440", H: "#5d3a26", h: "#42281a", S: "#f4c8a2",
+               C: "#12a594", c: "#0d7d70", P: "#f2a03d", p: "#c97c26",
+               B: "#4a4455", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#3aa84a", g: "#2c7d38" }
   };
 
-  var KID_HATS = { jeannie: "band", cory: "cap", ellie: "crown" };
+  var KID_HATS = { jeannie: "band", cory: "cap", ellie: "crown", shannon: "bun" };
 
   function heroFrames(kidId) {
     var pal = KID_PALETTES[kidId] || KID_PALETTES.jeannie;

@@ -15,6 +15,10 @@
     @media (max-width: 460px) {
       .title { font-size: 1.75rem; }
       .back-link { padding: 0.4rem 0.9rem; font-size: 0.95rem; }
+      /* keep the score and both buttons on ONE row on a phone */
+      .stars .wide { display: none; }
+      .stars .narrow { display: inline; }
+      .stars { font-size: 1.05rem; }
     }
 
     .topbar {
@@ -26,7 +30,8 @@
       margin-bottom: 0.35rem;
     }
     .stars { font-size: 1.15rem; font-weight: bold; color: var(--purple); }
-    .stars span { color: var(--pink); }
+    .stars #stars { color: var(--pink); }
+    .stars .narrow { display: none; }
     .icon-btn {
       font-size: 1.35rem;
       border: none;
@@ -365,7 +370,7 @@
 
   <div class="stage">
     <div class="topbar">
-      <div class="stars">Princesses dressed: <span id="stars">0</span> ⭐</div>
+      <div class="stars"><span class="wide">Princesses dressed:</span><span class="narrow">Dressed:</span> <span id="stars">0</span> ⭐</div>
       <button class="icon-btn" id="wardrobe-btn" aria-label="Open the dressing room">👗</button>
       <button class="icon-btn" id="mute" aria-label="Turn sound on or off" aria-pressed="false">🔊</button>
     </div>

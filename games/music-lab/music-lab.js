@@ -588,7 +588,7 @@
       }
     };
 
-    el.stars.innerHTML = '<span class="lbl">Tip:</span> the black keys are the sharps &amp; flats — press one to find out both of its names.';
+    el.stars.innerHTML = '<span class="lbl">Tip:</span> the black keys are the sharps &amp; flats.';
     refresh();
   }
 

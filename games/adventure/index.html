@@ -128,8 +128,26 @@
     .stat-strip li {
       background:#fff; color:#5b4a8a; border:2px solid #e7d6ff; border-radius:999px;
       padding:.25rem .75rem; font-size:clamp(.72rem,2.7vw,.86rem); font-weight:bold;
-      box-shadow:0 3px 8px rgba(43,36,64,.1);
+      box-shadow:0 3px 8px rgba(43,36,64,.1); display:flex;
     }
+    .stat-strip li.tappable { padding:0; }
+    .stat-strip li.tappable button {
+      font:inherit; color:inherit; background:transparent; border:none; cursor:pointer;
+      padding:.45rem .8rem; border-radius:999px; -webkit-tap-highlight-color:transparent;
+    }
+    .stat-strip li.tappable button:hover, .stat-strip li.tappable button:focus-visible {
+      background:#f0e4ff; outline:none;
+    }
+
+    /* ---- word treasure review list ---- */
+    .treasure {
+      max-width:640px; margin:0 auto 1.1rem; background:#fff8e6; border:3px solid var(--yellow);
+      border-radius:20px; padding:.8rem 1rem; text-align:left;
+    }
+    .treasure h2 { margin:0 0 .5rem; color:var(--purple); font-size:clamp(1rem,3.4vw,1.2rem); }
+    .treasure ul { list-style:none; margin:0; padding:0; display:grid; gap:.45rem; }
+    .treasure li { font-size:clamp(.85rem,3vw,1rem); color:var(--ink); line-height:1.35; }
+    .treasure b { color:var(--purple); }
 
     /* ---- tappable vocabulary words ---- */
     .gloss-word {
@@ -207,6 +225,10 @@
         <span style="font-size:.85em;font-weight:normal;color:#6a6385">Ellie's stories read themselves out loud — tap 🔊 to mute.<br>In the big stories, tap any <b>dotted word</b> to find out what it means.</span></p>
       <p class="total-progress" id="total-progress"></p>
       <ul class="stat-strip" id="stat-strip"></ul>
+      <section class="treasure" id="treasure" hidden aria-live="polite">
+        <h2 id="treasure-title">My word treasure</h2>
+        <ul id="treasure-list"></ul>
+      </section>
       <div id="resume-slot"></div>
       <div id="story-grid" class="story-grid"></div>
     </section>
