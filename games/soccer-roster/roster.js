@@ -193,7 +193,7 @@
 
   // Safety net 1: swap a girl who ended up with too much time for one with
   // too little, in a period where that swap is actually possible.
-  function balance(roles, played, target, periods) {
+  function balance(roles, played, target, periods, locked) {
     var n = played.length, guard = n * periods + 20;
     while (guard-- > 0) {
       var over = -1, under = -1, i;
@@ -205,6 +205,7 @@
       var swapped = false;
       for (var p = 0; p < periods && !swapped; p++) {
         if (roles[over][p] !== "F") continue;
+        if (locked && locked[over + ":" + p]) continue;
         if (roles[under][p] !== "-") continue;   // she has to be here and on the bench
         roles[over][p] = "-"; roles[under][p] = "F";
         played[over]--; played[under]++;
@@ -216,10 +217,12 @@
 
   // Safety net 2: nobody should sit two periods running while someone else
   // plays both. Swaps in pairs, so the playing-time totals never move.
-  function spread(roles, periods) {
+  function spread(roles, periods, locked) {
     var n = roles.length, i, j, p, q, hole;
 
     function restsAt(x, at) { return at >= 0 && at < periods && roles[x][at] === "-"; }
+    // a girl seated so she can keep goal must not be moved back off again
+    function pinned(x, at) { return !!(locked && locked[x + ":" + at]); }
     // moving j off at "at" must not leave her sitting twice in a row either
     function safeOff(j, at) { return !restsAt(j, at - 1) && !restsAt(j, at + 1); }
 
@@ -231,9 +234,10 @@
           hole = t === 0 ? p : p - 1;
           for (j = 0; j < n; j++) {
             if (j === i || roles[j][hole] !== "F" || !safeOff(j, hole)) continue;
+            if (pinned(j, hole)) continue;
             for (q = 0; q < periods; q++) {   // ...and swap back so totals hold
               if (q === hole || roles[i][q] !== "F" || roles[j][q] !== "-") continue;
-              if (!safeOff(i, q)) continue;
+              if (!safeOff(i, q) || pinned(i, q)) continue;
               roles[i][hole] = "F"; roles[j][hole] = "-";
               roles[j][q] = "F"; roles[i][q] = "-";
               break;
@@ -335,8 +339,60 @@
       }
     }
 
-    balance(roles, played, target, periods);
-    spread(roles, periods);
+    var locked = {};
+    balance(roles, played, target, periods, locked);
+    spread(roles, periods, locked);
+
+    // ---- make sure every ★ must-be-goalie girl is on the pitch in a period
+    //      that can still be hers. Swaps come in pairs, so seating her costs
+    //      nobody any playing time. ----
+    var musts = elig.filter(function (ix) { return order[ix].gk === "must"; });
+    if (musts.length) {
+      var mCap = [];
+      for (i = 0; i < n; i++) mCap.push(order[i].gk === "must" ? 1 : 0);
+      for (var pass = 0; pass <= musts.length; pass++) {
+        var mPool = [], mSlot = [], mUsed = {};
+        for (p = 0; p < periods; p++) {
+          mSlot.push(-1);
+          mPool.push(musts.filter(function (ix) { return roles[ix][p] === "F"; }));
+        }
+        matchKeepers(mPool, mCap, mSlot, mUsed, periods);
+        var stuck = musts.filter(function (ix) { return !mUsed[ix]; });
+        if (!stuck.length) break;
+        var m = stuck[0], seated = false, x, q;
+        for (p = 0; p < periods && !seated; p++) {
+          if (roles[m][p] !== "-" || mSlot[p] !== -1) continue;
+          for (x = 0; x < n && !seated; x++) {
+            if (roles[x][p] !== "F" || order[x].gk === "must") continue;
+            for (q = 0; q < periods; q++) {      // swap back, so the totals hold
+              if (q === p || roles[m][q] !== "F" || roles[x][q] !== "-") continue;
+              roles[m][p] = "F"; roles[x][p] = "-";
+              roles[x][q] = "F"; roles[m][q] = "-";
+              locked[m + ":" + p] = 1;
+              seated = true; break;
+            }
+          }
+        }
+        // she never gets on at all (a huge squad, two halves): give her one
+        // period from whoever has the most — still within one period of fair
+        for (p = 0; p < periods && !seated; p++) {
+          if (roles[m][p] !== "-" || mSlot[p] !== -1) continue;
+          var give = -1;
+          for (x = 0; x < n; x++) {
+            if (roles[x][p] !== "F" || order[x].gk === "must") continue;
+            if (played[x] <= played[m]) continue;
+            if (give < 0 || played[x] > played[give]) give = x;
+          }
+          if (give < 0) continue;
+          roles[m][p] = "F"; roles[give][p] = "-";
+          played[m]++; played[give]--;
+          locked[m + ":" + p] = 1;
+          seated = true;
+        }
+        if (!seated) break;   // genuinely impossible — the warning banner says so
+        spread(roles, periods, locked);   // tidy any rests that swap clumped up
+      }
+    }
 
     // ---- keepers: always someone who is already playing that period ----
     var slot = [], used = {};

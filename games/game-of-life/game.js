@@ -727,7 +727,7 @@
     inspWhy.innerHTML = why;
     inspectBox.hidden = false;
 
-    state.inspected[x + "," + y] = true;
+    if (Object.keys(state.inspected).length < 40) state.inspected[x + "," + y] = true;
     if (Object.keys(state.inspected).length >= 10) award("detective");
     scheduleSave();
   }
@@ -987,22 +987,21 @@
   function refreshMineRow() {
     mineRow.textContent = "";
     state.myPatterns.forEach((m) => {
-      const chip = makeBrushChip("my:" + m.id, m.name, "mine");
-      const del = document.createElement("span");
-      del.className = "del";
+      mineRow.appendChild(makeBrushChip("my:" + m.id, m.name, "mine"));
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "chip del-chip";
       del.textContent = "✕";
-      del.setAttribute("role", "button");
       del.setAttribute("aria-label", "Delete the stamp " + m.name);
-      del.addEventListener("click", (ev) => {
-        ev.stopPropagation();
+      del.addEventListener("click", () => {
         state.myPatterns = state.myPatterns.filter((x) => x.id !== m.id);
         if (state.brush === "my:" + m.id) selectBrush("pencil");
         refreshMineRow();
         refreshBrushInfo();
+        window.SFX && SFX.nope && SFX.nope();
         scheduleSave();
       });
-      chip.appendChild(del);
-      mineRow.appendChild(chip);
+      mineRow.appendChild(del);
     });
     const save = document.createElement("button");
     save.className = "chip";

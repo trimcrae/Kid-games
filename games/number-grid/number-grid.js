@@ -967,14 +967,19 @@
     return list;
   }
 
-  // two entries whose TRUE lengths differ (so "longer" and "how many more"
-  // always have one clean answer)
-  function pickPair(pool) {
-    for (var tries = 0; tries < 60; tries++) {
-      var a = pick(pool), b = pick(pool);
-      if (!a || !b) return null;
-      var la = lenOf(a.w), lb = lenOf(b.w);
-      if (la !== lb && Math.abs(la - lb) <= 9) return la > lb ? [a, b] : [b, a]; // longer first
+  // Two entries whose TRUE lengths differ, so "which is longer" and "how many
+  // more" always have exactly one clean answer. The grown-up tier asks for a
+  // wider gap first — 8 minus 7 is not a maths question for Shannon.
+  function pickPair(pool, minGap) {
+    var want = minGap || 1;
+    for (var pass = 0; pass < 2; pass++) {
+      for (var tries = 0; tries < 60; tries++) {
+        var a = pick(pool), b = pick(pool);
+        if (!a || !b) return null;
+        var la = lenOf(a.w), lb = lenOf(b.w), gap = Math.abs(la - lb);
+        if (gap >= want && gap <= 9) return la > lb ? [a, b] : [b, a]; // longer first
+      }
+      want = 1;   // couldn't find a wide gap in this pack — settle for any
     }
     return null;
   }
@@ -997,7 +1002,7 @@
       return { kind: "count", words: [e.w], emoji: e.e, answer: columnFor(lenOf(e.w)) };
     }
 
-    var pair = pickPair(pool);
+    var pair = pickPair(pool, activeLevel === "grown" ? 3 : 1);
     if (!pair) {
       var f = pick(pool);
       return { kind: "count", words: [f.w], emoji: f.e, answer: columnFor(lenOf(f.w)) };
@@ -1057,6 +1062,7 @@
 
   function newQuizQuestion() {
     if (quizTimer) { clearTimeout(quizTimer); quizTimer = null; }
+    hideCountout();      // the last question's working-out must not sit under a new one
     quizQ = makeQuestion();
     renderQuiz();
   }

@@ -139,7 +139,8 @@
   function maxGrid() {
     const host = $("app");
     const avail = Math.min((host && host.clientWidth) || 360, 560);
-    return Math.max(6, Math.min(13, Math.floor((avail - 46) / 30)));
+    // n cells of >=30px + 2px gaps + the label column + the board padding
+    return Math.max(6, Math.min(13, Math.floor((avail - 54) / 32)));
   }
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -517,9 +518,14 @@
     function size() {
       const host = $("app");
       const avail = Math.min((host && host.clientWidth) || 360, 560);
-      const chrome = 24 /*label col*/ + 20 /*padding*/ + 2 * (n + 1) /*gaps*/;
-      const cell = clamp(Math.floor((avail - chrome) / n), 24, 58);
+      const PAD = 20;            // .board left+right padding
+      const GAPS = 2 * n;        // n gaps between the n+1 columns
+      const fit = (lab) => clamp(Math.floor((avail - lab - PAD - GAPS) / n), 24, 58);
+      let cell = fit(28);
+      const lab = clamp(Math.round(cell * 0.6), 22, 34);  // room for "-12"
+      cell = fit(lab);
       board.style.setProperty("--cell", cell + "px");
+      board.style.setProperty("--lab", lab + "px");
     }
     function litAxis(x, y, on) {
       [xLabels[x], yLabels[y]].forEach((el) => el && el.classList.toggle("lit", !!on));
