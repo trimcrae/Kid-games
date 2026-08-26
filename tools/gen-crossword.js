@@ -113,15 +113,25 @@ function normalize(theme, placed, grid) {
     if (startsAcross(r, c) || startsDown(r, c)) { num++; numAt[r + "," + c] = num; }
   }
 
+  // the optional "teach" tip travels with the answer word
+  const teachOf = {};
+  (theme.words || []).forEach(w => {
+    teachOf[w.answer.toUpperCase().replace(/[^A-Z]/g, "")] = w.teach || "";
+  });
+
   // entries with their numbers (match placed words by normalized start + dir)
   const entries = placed.map(p => {
     const first = p.cells[0];
     const r = first.r - minR, c = first.c - minC;
-    return { num: numAt[r + "," + c], dir: p.dir, row: r, col: c, answer: p.answer, clue: p.clue };
+    return {
+      num: numAt[r + "," + c], dir: p.dir, row: r, col: c,
+      answer: p.answer, clue: p.clue, teach: teachOf[p.answer] || "",
+    };
   }).sort((a, b) => a.num - b.num || (a.dir === "across" ? -1 : 1));
 
   return {
     name: theme.name, emoji: theme.emoji, blurb: theme.blurb,
+    level: theme.level || "medium",
     rows, cols,
     cells,                       // letters or null
     numbers: numAt,              // "r,c" -> number
@@ -424,7 +434,7 @@ const THEMES = [
 
 const out = THEMES.map(compile);
 console.log(JSON.stringify(out.map(o => ({
-  name: o.name, emoji: o.emoji, blurb: o.blurb,
+  name: o.name, emoji: o.emoji, blurb: o.blurb, level: o.level,
   rows: o.rows, cols: o.cols, cells: o.cells, numbers: o.numbers, entries: o.entries,
 }))));
 console.error("Generated crosswords:");

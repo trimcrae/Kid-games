@@ -45,11 +45,11 @@
   var redoBtn    = document.getElementById("redo");
 
   /* ---------- state ---------- */
+  var seq = 1;                      // must exist before load() sanitises ids
   var book = load();
   var curPage = 0;
   var selPanel = 0;
   var selItemId = null;
-  var seq = 1;
   var history = [];
   var future = [];
   var coKey = null, coTime = 0;     // history coalescing
@@ -70,12 +70,74 @@
   var fileSaveTimer = null;
 
   /* ---------- storage ---------- */
+  var LEGACY_KEYS = ["jeannieComicMaker", "comicMaker.v1", "comic-maker.v1"];
+
   function load() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    if (!raw) {
+      // Older builds used other key names — keep those comics instead of orphaning them.
+      for (var i = 0; i < LEGACY_KEYS.length && !raw; i++) {
+        try {
+          raw = localStorage.getItem(LEGACY_KEYS[i]);
+          if (raw) localStorage.setItem(STORAGE_KEY, raw);
+        } catch (e) {}
+      }
+    }
+    if (raw) {
+      try { return sanitizeBook(JSON.parse(raw)); } catch (e) {}
+    }
     return newBook();
+  }
+
+  /* A half-written or hand-edited save used to be able to soft-lock the page
+     (no pages, a panel count that doesn't match the layout, items with no id).
+     Everything that comes in from storage or a file goes through here first. */
+  var sanCount = 0;
+  function sanitizeBook(b) {
+    sanCount = 0;
+    if (!b || typeof b !== "object") return newBook();
+    var out = { title: typeof b.title === "string" ? b.title : "My Comic", pages: [] };
+    var pages = Array.isArray(b.pages) ? b.pages : [];
+    pages.forEach(function (p) {
+      if (!p || typeof p !== "object") return;
+      var layout = PANELS_FOR[p.layout] ? p.layout : "4";
+      var want = PANELS_FOR[layout];
+      var panels = (Array.isArray(p.panels) ? p.panels : []).slice(0, want).map(function (pan) {
+        pan = (pan && typeof pan === "object") ? pan : {};
+        return {
+          scene: SCENE_MAP[pan.scene] ? pan.scene : "sky",
+          draw: typeof pan.draw === "string" && pan.draw.indexOf("data:image") === 0 ? pan.draw : null,
+          items: (Array.isArray(pan.items) ? pan.items : []).filter(function (it) {
+            return it && typeof it === "object" && (it.type === "sticker" || isText(it.type));
+          }).map(function (it) {
+            return {
+              // ids are internal only, so hand out fresh ones — that makes
+              // duplicate/missing ids from an old save impossible.
+              id: "i" + (++sanCount),
+              type: it.type,
+              text: typeof it.text === "string" ? it.text : "",
+              x: num(it.x, 50, 2, 98), y: num(it.y, 50, 2, 98),
+              size: num(it.size, isText(it.type) ? 6 : 16, 2, 60),
+              rot: num(it.rot, 0, -360, 360),
+              flip: !!it.flip,
+              tail: TAILS.indexOf(it.tail) >= 0 ? it.tail : "bl",
+              color: typeof it.color === "string" ? it.color : undefined,
+              z: num(it.z, 0, 0, 9999)
+            };
+          })
+        };
+      });
+      while (panels.length < want) panels.push({ scene: "sky", draw: null, items: [] });
+      out.pages.push({ layout: layout, panels: panels });
+    });
+    if (!out.pages.length) out.pages.push(newPage("4"));
+    seq = sanCount + 1;
+    return out;
+  }
+  function num(v, dflt, lo, hi) {
+    v = typeof v === "number" && isFinite(v) ? v : dflt;
+    return Math.max(lo, Math.min(hi, v));
   }
   function save() {
     try {
@@ -101,9 +163,34 @@
   function panel() { return page().panels[selPanel]; }
   function isText(t) { return !!TEXT_TYPES[t]; }
 
-  /* ---------- history / undo-redo ---------- */
+  /* ---------- history / undo-redo ----------
+     A snapshot used to be JSON.stringify(book) — which re-copied every
+     panel's PNG data-URL on *every single brush stroke*. On a tablet that
+     meant multi-megabyte strings and visible stutter while drawing.
+     Now we shallow-clone the structure and simply re-point at the same
+     (immutable) drawing strings, so history is cheap. */
+  function cloneBook(b) {
+    return {
+      title: b.title,
+      pages: b.pages.map(function (p) {
+        return {
+          layout: p.layout,
+          panels: p.panels.map(function (pan) {
+            return {
+              scene: pan.scene,
+              draw: pan.draw,                 // shared string, never copied
+              items: pan.items.map(function (it) {
+                var o = {}; for (var k in it) if (it.hasOwnProperty(k)) o[k] = it[k];
+                return o;
+              })
+            };
+          })
+        };
+      })
+    };
+  }
   function snapshot() {
-    return JSON.stringify({ book: book, curPage: curPage, selPanel: selPanel });
+    return { book: cloneBook(book), curPage: curPage, selPanel: selPanel };
   }
   function pushHistory(coalesce) {
     var now = Date.now();
@@ -114,11 +201,10 @@
     future = [];
     updateUndoButtons();
   }
-  function applySnapshot(str) {
-    var obj = JSON.parse(str);
-    book = obj.book;
-    curPage = Math.min(obj.curPage || 0, book.pages.length - 1);
-    selPanel = obj.selPanel || 0;
+  function applySnapshot(snap) {
+    book = cloneBook(snap.book);
+    curPage = Math.max(0, Math.min(snap.curPage || 0, book.pages.length - 1));
+    selPanel = snap.selPanel || 0;
     selItemId = null;
     titleEl.textContent = book.title || "My Comic";
     renderPage();

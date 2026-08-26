@@ -900,6 +900,38 @@ window.CPData = (function () {
         return mk({ subject: "word", q: "Squash “" + c[0] + "” into a contraction.",
           right: c[1], wrong: c[2],
           teach: "The apostrophe stands in for the missing letters: " + c[1] + "." }, "mid");
+      },
+      function () {
+        // Parts of speech — the vocabulary you need to talk about writing.
+        var pos = [
+          ["noun", "a person, place or thing", ["dragon", "river", "teacher", "castle", "biscuit"]],
+          ["verb", "an action word", ["jump", "whisper", "build", "swim", "shout"]],
+          ["adjective", "a describing word", ["sparkly", "enormous", "grumpy", "purple", "brave"]],
+          ["adverb", "how something is done", ["quickly", "gently", "loudly", "carefully", "sadly"]]
+        ];
+        var target = pick(pos);
+        var others = pos.filter(function (p) { return p[0] !== target[0]; });
+        var w = pick(target[2]);
+        return mk({ subject: "word", q: "What kind of word is “" + w + "”?",
+          right: target[0], wrong: others.map(function (p) { return p[0]; }),
+          teach: "A " + target[0] + " is " + target[1] + " — and “" + w + "” is one." }, "mid");
+      },
+      function () {
+        // Context clues: the meaning is IN the sentence if you read carefully.
+        var ctx = [
+          ["The path was so narrow that we had to walk in single file.", "narrow", "not very wide", ["very muddy", "brand new", "going downhill"]],
+          ["She was famished — she hadn't eaten since breakfast.", "famished", "very hungry", ["very tired", "very late", "very angry"]],
+          ["The puppy was timid and hid behind the sofa.", "timid", "shy and nervous", ["excited", "hungry", "noisy"]],
+          ["He glanced at the clock and then kept reading.", "glanced", "looked quickly", ["stared for ages", "pointed", "shouted"]],
+          ["The soup was bland, so we added salt and pepper.", "bland", "not very tasty", ["far too hot", "burnt", "delicious"]],
+          ["We sprinted for the bus and only just caught it.", "sprinted", "ran very fast", ["walked slowly", "waited", "waved"]],
+          ["The old bridge was rickety and creaked as we crossed.", "rickety", "wobbly and unsafe", ["freshly painted", "very wide", "made of stone"]],
+          ["The audience was silent, then began to applaud.", "applaud", "clap", ["leave", "boo", "sing"]]
+        ];
+        var c = pick(ctx);
+        return mk({ subject: "word", q: "“" + c[0] + "”  —  what does " + c[1].toUpperCase() + " mean here?",
+          right: c[2], wrong: c[3],
+          teach: "The rest of the sentence gives it away: that's what " + c[1] + " means." }, "mid");
       }
     ],
     big: [
@@ -1253,6 +1285,21 @@ window.CPData = (function () {
     return q;
   }
 
+  /* A question coming back out of the review basket must not arrive with
+     its answer sitting in the same spot — otherwise a child "learns" the
+     position, not the answer. Re-deal the choices every time. */
+  function reshuffle(q) {
+    if (!q || !q.choices || !q.choices.length) return q;
+    var right = q.choices[q.answer];
+    var order = shuffle(q.choices.slice());
+    var copy = {};
+    for (var k in q) if (Object.prototype.hasOwnProperty.call(q, k)) copy[k] = q[k];
+    copy.choices = order;
+    copy.answer = order.indexOf(right);
+    if (copy.answer < 0) copy.answer = 0;
+    return copy;
+  }
+
   /* =========================================================
      THINGS YOU CAN OWN
      ========================================================= */
@@ -1407,7 +1454,14 @@ window.CPData = (function () {
     { id: "streak5", track: "bestStreak", goal: 5, coins: 55, text: "Get 5 answers right in a row" },
     { id: "learn15", track: "correct", goal: 15, coins: 60, text: "Answer 15 questions correctly" },
     { id: "read1",   track: "read",   goal: 1, coins: 35, text: "Read a book to your Craepet" },
-    { id: "shop1",   track: "buy",    goal: 1, coins: 25, text: "Buy something at the Market" }
+    { id: "shop1",   track: "buy",    goal: 1, coins: 25, text: "Buy something at the Market" },
+    { id: "pool10",  track: "pool",   goal: 10, coins: 80, text: "Win 10 rounds at the Rainbow Pool" },
+    { id: "well12",  track: "well",   goal: 12, coins: 90, text: "Solve 12 puzzles at the Word Well" },
+    { id: "fix3",    track: "fixed",  goal: 3, coins: 55, text: "Put right 3 questions you had missed" },
+    { id: "streak8", track: "bestStreak", goal: 8, coins: 85, text: "Get 8 answers right in a row" },
+    { id: "learn30", track: "correct", goal: 30, coins: 120, text: "Answer 30 questions correctly" },
+    { id: "arena2",  track: "arenaWin", goal: 2, coins: 130, text: "Win 2 battles in the Quiz Arena" },
+    { id: "mixed3",  track: "subjects", goal: 3, coins: 60, text: "Learn something at the Farm, the Well AND the Pool" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
@@ -1446,7 +1500,11 @@ window.CPData = (function () {
     { id: "arena3",   emoji: "🏅", name: "Arena Regular",  note: "Win 3 battles" },
     { id: "shade",    emoji: "🌑", name: "Shade Breaker",  note: "Beat The Shade" },
     { id: "reader",   emoji: "📚", name: "Bookworm",       note: "Read 5 books" },
-    { id: "questor",  emoji: "📜", name: "Quest Runner",   note: "Finish 10 daily quests" }
+    { id: "questor",  emoji: "📜", name: "Quest Runner",   note: "Finish 10 daily quests" },
+    { id: "fixer",    emoji: "🔁", name: "Second Look",    note: "Put right 25 you had missed" },
+    { id: "week",     emoji: "📅", name: "Every Day",      note: "Play 7 days in a row" },
+    { id: "palette",  emoji: "🌈", name: "Full Palette",   note: "Own every paint brush" },
+    { id: "level20",  emoji: "🌟", name: "Fully Grown",    note: "Reach level 20" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -1482,6 +1540,7 @@ window.CPData = (function () {
     QUEST_POOL: QUEST_POOL,
 
     ask: ask,
+    reshuffle: reshuffle,
     shopStock: shopStock,
     questsFor: questsFor,
     itemById: itemById,

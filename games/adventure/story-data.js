@@ -40,6 +40,7 @@
      ======================================================= */
   const rainbow = {
     id: "rainbow",
+    coverImg: "art/rainbow-cover.png",
     title: "Ellie & the Rainbow Dragon",
     emoji: "🐉",
     color: "#ff7eb6",
@@ -172,6 +173,7 @@
      ======================================================= */
   const campout = {
     id: "campout",
+    coverImg: "art/campout-cover.png",
     title: "The Great Family Campout",
     emoji: "🏕️",
     color: "#f4791f",
@@ -303,6 +305,7 @@
      ======================================================= */
   const pizza = {
     id: "pizza",
+    coverImg: "art/pizza-cover.png",
     title: "Pizza Planet Rescue",
     emoji: "🍕",
     color: "#ffb142",

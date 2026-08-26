@@ -20,7 +20,7 @@ Setup, then run from this folder:
     python3 build_audio.py
 """
 
-import os, re, struct, subprocess, sys, tempfile, wave
+import json, os, re, struct, subprocess, sys, tempfile, wave
 import imageio_ffmpeg
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -32,15 +32,17 @@ SENTENCE_GAP = 0.45  # seconds of silence stitched between sentences
 
 src = open(JS, encoding="utf-8").read()
 
-# Walk id:/text: tokens in document order, bucketing texts under the current story id.
+# Walk id:/text:/ask: tokens in document order, bucketing them under the current
+# story id. `text:` is a story page (-> "<id>-<n>.mp3"); `ask:` is one of the
+# comprehension questions that follow the pages (-> "<id>-q<n>.mp3").
 stories, cur = [], None
-for m in re.finditer(r'\b(id|text):\s*"((?:[^"\\]|\\.)*)"', src):
+for m in re.finditer(r'\b(id|text|ask):\s*"((?:[^"\\]|\\.)*)"', src):
     key, val = m.group(1), m.group(2)
     if key == "id":
-        cur = {"id": val, "texts": []}
+        cur = {"id": val, "texts": [], "asks": []}
         stories.append(cur)
     elif cur is not None:
-        cur["texts"].append(val)
+        cur["texts" if key == "text" else "asks"].append(val)
 
 # Words the page SHOUTS for emphasis. espeak (Piper's phonemizer) reads an
 # all-caps word out letter by letter — "RED" comes out "R-E-D" — so the
@@ -108,43 +110,77 @@ def assert_not_static(pcm, rate, name):
             "- refusing to ship broken narration")
 
 total = 0
+timings = {}   # clip name -> [seconds of speech in each sentence]
+
+def render(raw, name):
+    """Synthesize one line to <name>.mp3; returns its per-sentence lengths."""
+    global total
+    text = clean(raw)
+    if not text:
+        return None
+    dst = os.path.join(OUT, name + ".mp3")
+
+    # synthesize sentence by sentence, then stitch with true silence
+    chunks, rate = [], None
+    for sent in split_sentences(text):
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
+            swav = tf.name
+        piper_sentence(sent, swav)
+        with wave.open(swav, "rb") as w:
+            assert w.getnchannels() == 1 and w.getsampwidth() == 2, swav
+            if rate is None:
+                rate = w.getframerate()
+            assert w.getframerate() == rate, swav
+            chunks.append(w.readframes(w.getnframes()))
+        os.unlink(swav)
+    gap = b"\x00" * (int(rate * SENTENCE_GAP) * 2)
+    pcm = gap.join(chunks)
+    assert_not_static(pcm, rate, os.path.basename(dst))
+
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
+        wav = tf.name
+    with wave.open(wav, "wb") as w:
+        w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate)
+        w.writeframes(pcm)
+    # Encode -> MP3, mono, loudness-normalised for consistent volume
+    subprocess.run([FFMPEG, "-y", "-i", wav,
+                    "-af", "loudnorm=I=-15:TP=-1.5:LRA=11",
+                    "-c:a", "libmp3lame", "-b:a", "56k", "-ar", "22050", "-ac", "1", dst],
+                   check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    os.unlink(wav)
+    sz = os.path.getsize(dst)
+    total += sz
+    print(f"  {os.path.basename(dst):26s} {sz/1024:5.1f} KB  | {text[:46]}")
+    # how long the voice spends on each sentence, so the storybook can light up
+    # the words in time with the reading
+    return [round(len(c) / 2 / rate, 3) for c in chunks]
+
+
+count = 0
 for st in stories:
     for i, raw in enumerate(st["texts"]):
-        text = clean(raw)
-        if not text:
-            continue
-        dst = os.path.join(OUT, f'{st["id"]}-{i}.mp3')
+        sents = render(raw, f'{st["id"]}-{i}')
+        if sents is not None:
+            timings[f'{st["id"]}-{i}'] = sents
+            count += 1
+    for i, raw in enumerate(st["asks"]):
+        sents = render(raw, f'{st["id"]}-q{i}')
+        if sents is not None:
+            timings[f'{st["id"]}-q{i}'] = sents
+            count += 1
 
-        # synthesize sentence by sentence, then stitch with true silence
-        chunks, rate = [], None
-        for sent in split_sentences(text):
-            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
-                swav = tf.name
-            piper_sentence(sent, swav)
-            with wave.open(swav, "rb") as w:
-                assert w.getnchannels() == 1 and w.getsampwidth() == 2, swav
-                if rate is None:
-                    rate = w.getframerate()
-                assert w.getframerate() == rate, swav
-                chunks.append(w.readframes(w.getnframes()))
-            os.unlink(swav)
-        gap = b"\x00" * (int(rate * SENTENCE_GAP) * 2)
-        pcm = gap.join(chunks)
-        assert_not_static(pcm, rate, os.path.basename(dst))
+# Manifest: which clips exist + their sentence lengths. The page loads this as a
+# plain script, so it never requests an mp3 that has not been rendered yet.
+lines = ",\n".join('  "%s": %s' % (k, json.dumps(v)) for k, v in sorted(timings.items()))
+with open(os.path.join(OUT, "manifest.js"), "w", encoding="utf-8") as f:
+    f.write(
+        "/* AUTO-GENERATED by build_audio.py - do not edit by hand.\n"
+        "   Lists the narration clips that exist in this folder, so the storybook only\n"
+        "   ever asks for an mp3 that is really there (new story text stays silent, with\n"
+        "   no failed requests, until the build-audio workflow renders it).\n"
+        "   Each value is the length in seconds of each spoken sentence in the clip,\n"
+        "   used to line the word highlighting up with the voice; [] = not measured yet,\n"
+        "   in which case the reader estimates from the clip's own duration. */\n"
+        "window.SPOOKY_NARRATION = {\n" + lines + "\n};\n")
 
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tf:
-            wav = tf.name
-        with wave.open(wav, "wb") as w:
-            w.setnchannels(1); w.setsampwidth(2); w.setframerate(rate)
-            w.writeframes(pcm)
-        # Encode -> MP3, mono, loudness-normalised for consistent volume
-        subprocess.run([FFMPEG, "-y", "-i", wav,
-                        "-af", "loudnorm=I=-15:TP=-1.5:LRA=11",
-                        "-c:a", "libmp3lame", "-b:a", "56k", "-ar", "22050", "-ac", "1", dst],
-                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        os.unlink(wav)
-        sz = os.path.getsize(dst)
-        total += sz
-        print(f"  {os.path.basename(dst):24s} {sz/1024:5.1f} KB  | {text[:48]}")
-
-print(f"\nClips: {sum(len(s['texts']) for s in stories)}  Total: {total/1024:.0f} KB")
+print(f"\nClips: {count}  Total: {total/1024:.0f} KB  (+ manifest.js)")

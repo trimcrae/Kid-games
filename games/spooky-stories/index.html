@@ -96,9 +96,85 @@
       100% { transform: perspective(900px) rotateY(0); opacity: 1; }
     }
     .page-text {
-      color: #fff; font-size: clamp(1.15rem, 4.4vw, 1.6rem); line-height: 1.4;
+      color: #fff; font-size: clamp(1.15rem, 4.4vw, 1.6rem); line-height: 1.55;
       text-align: center; margin: .9rem .4rem .2rem; min-height: 3.2em;
       font-weight: bold; text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+    /* Every word is its own tap target: tap it to hear the storyteller
+       say it (the narration jumps back to that word) and, for the big
+       words, to see what it means. */
+    .page-text .w {
+      display: inline-block; cursor: pointer; border-radius: 8px;
+      padding: 0 .12em; margin: 0 -.02em;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color .12s ease, color .12s ease;
+    }
+    .page-text .w:hover { background: rgba(255,255,255,.14); }
+    .page-text .w:focus-visible { outline: 3px solid var(--yellow); outline-offset: 1px; }
+    /* the word the voice is saying right now */
+    .page-text .w.now { background: var(--yellow); color: #2b2440; text-shadow: none; }
+    /* a "big word" that has a kid-sized meaning behind it */
+    .page-text .w.vocab { box-shadow: inset 0 -3px 0 rgba(255,209,102,.8); }
+    .page-text .w.vocab.now { box-shadow: none; }
+
+    /* Word meaning card */
+    .word-card {
+      background: linear-gradient(160deg, #4a2f80, #2a1a52);
+      border: 3px solid var(--yellow); border-radius: 18px;
+      margin: .2rem .2rem .5rem; padding: .7rem .9rem .8rem;
+      text-align: left; position: relative; animation: wc-in .18s ease;
+    }
+    @keyframes wc-in { from { opacity: 0; transform: translateY(-6px); } }
+    .word-card .wc-word { margin: 0; color: var(--yellow); font-weight: bold; font-size: 1.15rem; }
+    .word-card .wc-def  { margin: .2rem 3rem .1rem 0; color: #fff; font-size: 1rem; line-height: 1.35; }
+    .word-card .wc-close {
+      position: absolute; top: .35rem; right: .35rem; width: 2.6rem; height: 2.6rem;
+      border-radius: 50%; border: none; cursor: pointer; font-size: 1.1rem;
+      background: rgba(255,255,255,.16); color: #fff; font-family: inherit;
+    }
+
+    /* Read-to-me / read-it-myself toggle */
+    .mode-row { display: flex; justify-content: center; margin: .5rem 0 .1rem; }
+    .mode-btn {
+      border: 2px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08);
+      color: #fff; font-family: inherit; font-weight: bold; cursor: pointer;
+      border-radius: 999px; padding: .6rem 1.1rem; font-size: 1rem;
+      min-height: 48px; -webkit-tap-highlight-color: transparent;
+    }
+    .mode-btn[aria-pressed="true"] { background: var(--yellow); color: #2b2440; border-color: #ffe9a8; }
+
+    .page-count { text-align: center; color: #d9c8ff; font-size: .85rem; margin: .15rem 0 0; }
+
+    /* Comprehension questions */
+    .quiz {
+      background: linear-gradient(160deg, #432b7a, #241747);
+      border: 3px solid #7d59d6; border-radius: 20px;
+      margin: .7rem .2rem .2rem; padding: .8rem .8rem 1rem; text-align: center;
+    }
+    .quiz .q-ask { color: #fff; font-size: clamp(1.05rem, 4vw, 1.3rem); font-weight: bold;
+                   margin: 0 0 .7rem; line-height: 1.35; }
+    .quiz .q-choices { display: grid; gap: .55rem; }
+    .quiz .qa {
+      display: flex; align-items: center; gap: .6rem; text-align: left;
+      border: 3px solid rgba(255,255,255,.25); background: rgba(255,255,255,.10);
+      color: #fff; font-family: inherit; font-weight: bold; font-size: 1.05rem;
+      border-radius: 16px; padding: .7rem .8rem; min-height: 56px; cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .quiz .qa .qe { font-size: 1.7rem; line-height: 1; }
+    .quiz .qa:hover, .quiz .qa:focus-visible { border-color: var(--yellow); outline: none; }
+    .quiz .qa.right { background: #2e9c62; border-color: #7ff0b4; }
+    .quiz .qa.wrong { background: #a33b58; border-color: #ff9ab3; animation: q-shake .35s ease; }
+    @keyframes q-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .quiz .q-feedback { color: var(--yellow); font-weight: bold; margin: .6rem 0 0; min-height: 1.3em; }
+    .quiz .q-progress { color: #d9c8ff; font-size: .85rem; margin: 0 0 .4rem; }
+    .quiz-done { color: var(--yellow); font-weight: bold; font-size: 1.15rem; margin: .2rem 0 0; }
+
+    .story-card .badges { position: absolute; top: 10px; right: 12px; font-size: 1.4rem; line-height: 1; }
+    .story-card .bookmark {
+      display: block; margin: .35rem auto 0; background: rgba(0,0,0,.28);
+      border-radius: 999px; padding: .2rem .7rem; font-size: .82rem; color: #ffe9a8;
+      width: fit-content; font-weight: bold;
     }
 
     /* dots */
@@ -153,7 +229,9 @@
     .tap-hint { text-align:center; color:#d9c8ff; font-size:.9rem; margin:.2rem 0 0; min-height:1.1em; }
 
     @media (prefers-reduced-motion: reduce) {
-      .page-art.turning, .wiggle, .hint-bob, .spark, .story-card .done-star { animation: none; }
+      .page-art.turning, .wiggle, .hint-bob, .spark, .story-card .done-star,
+      .sticker-shelf .slot.earned, .word-card, .quiz .qa.wrong { animation: none; }
+      .page-text .w { transition: none; }
     }
   </style>
 </head>
@@ -190,19 +268,46 @@
         <div class="stage">
           <div class="page-art" id="page-art" role="img" aria-label="story picture"></div>
         </div>
-        <p class="page-text" id="page-text"></p>
+        <p class="page-text" id="page-text" aria-live="polite"></p>
+
+        <!-- meaning of a "big word" the reader tapped -->
+        <div class="word-card" id="word-card" hidden>
+          <button class="wc-close" id="word-close" aria-label="Close the word card">✕</button>
+          <p class="wc-word" id="word-title"></p>
+          <p class="wc-def" id="word-def"></p>
+        </div>
+
+        <!-- comprehension questions, opened from the last page -->
+        <div class="quiz" id="quiz" hidden>
+          <p class="q-progress" id="quiz-progress"></p>
+          <p class="q-ask" id="quiz-ask"></p>
+          <div class="q-choices" id="quiz-choices"></div>
+          <p class="q-feedback" id="quiz-feedback" aria-live="polite"></p>
+          <p class="quiz-done" id="quiz-done" hidden></p>
+        </div>
+
         <p class="tap-hint" id="tap-hint">✨ Tap the picture to play! ✨</p>
         <div class="dots" id="dots" aria-hidden="true"></div>
+        <p class="page-count" id="page-count"></p>
+        <div class="mode-row">
+          <button class="mode-btn" id="self-btn" aria-pressed="false">🔊 Read it to me</button>
+        </div>
       </div>
 
       <div class="controls">
         <button class="big-btn pink" id="prev-btn">◀ Back</button>
         <button class="big-btn blue" id="again-btn" style="display:none">🔁 Read again</button>
+        <button class="big-btn blue" id="quiz-btn" style="display:none">🧠 Story questions</button>
         <button class="big-btn" id="next-btn">Turn the page ▶</button>
       </div>
     </section>
   </main>
 
+  <!-- Which narration clips exist (written by audio/build_audio.py). Loading it
+       as a plain script means the reader never requests an mp3 that the audio
+       pipeline hasn't rendered yet — new story text is simply silent instead of
+       404-ing, and it works from a file:// copy too. -->
+  <script src="audio/manifest.js"></script>
   <script src="storybook.js"></script>
 </body>
 </html>

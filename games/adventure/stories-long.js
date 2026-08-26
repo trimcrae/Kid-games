@@ -19,6 +19,7 @@
 
   const blockworld = {
     id: "blockworld",
+    coverImg: "art/blockworld-cover.png",
     title: "Block World: The Big Adventure",
     emoji: "⛏️",
     color: "#5cb85c",
@@ -29,12 +30,14 @@
     cover: () => A.skyDay({ hills: false }) + A.grassBlocks(180) +
       A.boy({ x: 120, y: 175, scale: 1.1, shirt: "#4a8fe0" }) +
       A.diamond(300, 140, 1.6) + A.pickaxe(300, 205, 1.2),
+    hub: "bw_hub",          // ending screens offer a jump straight back here
     start: "bw_intro",
     nodes: Object.assign(toMap(BW_NODES), {"bw_intro":{"scene":{"bg":"grassblocks","props":[["boy",{"x":200,"y":180,"scale":1.3,"shirt":"#4a8fe0"}]]},"text":"A brand-new block world pops into being, one pixel at a time! Cory cracks his knuckles. There are mountains to mine, seas to sail, and skies to build — and somewhere out there, blocks are mysteriously going missing. Ready, player one?","choices":[{"label":"🎮 Let's play!","to":"bw_hub"}]},"bw_hub":{"scene":{"bg":"plains","props":[["sign",{"x":88,"y":214,"scale":1.1}],["boy",{"x":200,"y":216,"scale":1.1,"shirt":"#4a8fe0"}],["chest",{"x":322,"y":228,"scale":1}]]},"text":"Cory stands at the Crossroads of Blockville. Seven adventures stretch out in every direction. Where to first? (You can always come back to this signpost!)","choices":[{"label":"🌳 The Whispering Woods","to":"fr_enter"},{"label":"⛏️ The Diamond Caves","to":"cv_enter"},{"label":"🏡 Blockville Village","to":"vil_enter"},{"label":"🌊 The Big Blocky Sea","to":"oc_enter"},{"label":"☁️ The Sky Islands","to":"sk_enter"},{"label":"🔘 The Redstone Workshop","to":"rs_enter"},{"label":"🟣 The Voider's Lair (big finale!)","to":"vd_enter"}]}})
   };
 
   const library = {
     id: "library",
+    coverImg: "art/library-cover.png",
     title: "The Whispering Library",
     emoji: "📚",
     color: "#a368d8",
@@ -45,6 +48,7 @@
     cover: () => A.library({}) +
       A.princess({ x: 200, y: 250, scale: 1.05, dress: "#a368d8", hair: "#3a2a1a" }) +
       A.bookGlow({ x: 90, y: 120, scale: 1.1 }) + A.portal({ x: 320, y: 150, scale: .8 }),
+    hub: "wl_hub",          // ending screens offer a jump straight back here
     start: "wl_intro",
     nodes: Object.assign(toMap(LIB_NODES), {"wl_intro":{"scene":{"bg":"library","props":[["princess",{"x":200,"y":252,"scale":1.1,"dress":"#a368d8","hair":"#3a2a1a"}],["bookGlow",{"x":305,"y":140,"scale":1.2}]]},"text":"Late at night, Jeannie finds a dusty corner of the library where the books are WARM and humming. A tiny grumpy quill-pen named Inkwell hops onto her shoulder. 'Pick one, then,' he sighs. 'These books don't just tell stories — they let you walk right into them.'","choices":[{"label":"✨ Choose a glowing book","to":"wl_hub"}]},"wl_hub":{"scene":{"bg":"library","props":[["princess",{"x":200,"y":252,"scale":1.05,"dress":"#a368d8","hair":"#3a2a1a"}],["bookGlow",{"x":80,"y":120,"scale":1.05}],["bookGlow",{"x":320,"y":130,"scale":1,"color":"#7fd4ff"}],["portal",{"x":322,"y":215,"scale":0.7}]]},"text":"Seven books glow on the shelf, each a doorway to a different world. Inkwell taps his nib impatiently. Which one will Jeannie leap into? (She can always pop back to the library.)","choices":[{"label":"🧚 The Fairy-Tale Forest","to":"ft_enter"},{"label":"🏴‍☠️ The Pirate Seas","to":"pr_enter"},{"label":"🚀 The Space Odyssey","to":"sp_enter"},{"label":"🦕 Dinosaur Valley","to":"dn_enter"},{"label":"🔍 The Mystery Mansion","to":"my_enter"},{"label":"🏛️ Mount Mythos","to":"mt_enter"},{"label":"✨ The Story Keeper (big finale!)","to":"fin_enter"}]}})
   };

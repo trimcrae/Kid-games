@@ -119,8 +119,71 @@
 
     .reader-bottom { display:flex; align-items:center; justify-content:center; gap:.6rem; margin-top:.7rem; }
 
+
+    /* ---- stats strip (streak / pages / words) ---- */
+    .stat-strip {
+      display:flex; flex-wrap:wrap; justify-content:center; gap:.4rem .5rem;
+      margin: 0 0 .9rem; padding:0; list-style:none;
+    }
+    .stat-strip li {
+      background:#fff; color:#5b4a8a; border:2px solid #e7d6ff; border-radius:999px;
+      padding:.25rem .75rem; font-size:clamp(.72rem,2.7vw,.86rem); font-weight:bold;
+      box-shadow:0 3px 8px rgba(43,36,64,.1);
+    }
+
+    /* ---- tappable vocabulary words ---- */
+    .gloss-word {
+      font:inherit; color:inherit; background:transparent; border:none; padding:0 .06em;
+      cursor:pointer; border-bottom:2.5px dotted var(--purple); border-radius:4px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .gloss-word:hover, .gloss-word:focus-visible { background:#f0e4ff; outline:none; }
+    .gloss-word.known { border-bottom-color:#3ddc84; }
+
+    .word-pop {
+      margin:.5rem .2rem 0; background:#fff8e6; border:3px solid var(--yellow);
+      border-radius:18px; padding:.65rem 2.4rem .7rem .9rem; position:relative;
+      text-align:left; box-shadow:0 6px 16px rgba(43,36,64,.14);
+    }
+    .word-pop .ww { margin:0; font-weight:bold; color:var(--purple);
+                    font-size:clamp(1rem,3.4vw,1.2rem); }
+    .word-pop .wd { margin:.15rem 0 0; color:var(--ink);
+                    font-size:clamp(.9rem,3.1vw,1.05rem); line-height:1.35; }
+    .word-pop .wnew { display:inline-block; margin-left:.4rem; font-size:.7em;
+                      background:var(--purple); color:#fff; border-radius:999px; padding:.1rem .5rem; }
+    .word-close {
+      position:absolute; top:.35rem; right:.35rem; width:38px; height:38px;
+      border:none; border-radius:50%; background:#f0e2bd; color:#6a5a2e;
+      font-size:1.1rem; font-family:inherit; cursor:pointer; line-height:1;
+    }
+
+    /* ---- endings trophy shelf ---- */
+    .shelf {
+      margin:.8rem .2rem 0; background:#f6f0ff; border:3px solid #e7d6ff;
+      border-radius:18px; padding:.7rem .9rem; text-align:left;
+    }
+    .shelf h3 { margin:0 0 .4rem; color:var(--purple); font-size:clamp(.95rem,3.3vw,1.15rem); }
+    .shelf ul { list-style:none; margin:0; padding:0; display:grid; gap:.3rem; }
+    .shelf li { font-size:clamp(.82rem,3vw,.98rem); color:var(--ink); line-height:1.3; }
+    .shelf li.locked { color:#8c85a3; font-style:italic; }
+
+    /* ---- word challenge quiz ---- */
+    .quiz { margin:.8rem .2rem 0; text-align:center; }
+    .quiz h3 { margin:0 0 .2rem; color:var(--purple); font-size:clamp(1rem,3.5vw,1.25rem); }
+    .quiz .q-count { margin:0 0 .5rem; font-size:.85rem; color:#6a6385; font-weight:bold; }
+    .quiz .q-ask { margin:0 0 .7rem; font-size:clamp(1rem,3.4vw,1.2rem); color:var(--ink); font-weight:600; }
+    .quiz .q-fb {
+      margin:.7rem auto 0; max-width:520px; border-radius:16px; padding:.6rem .8rem;
+      font-size:clamp(.9rem,3.1vw,1.05rem); line-height:1.35; text-align:left;
+    }
+    .quiz .q-fb.good { background:#e2fbec; border:3px solid #3ddc84; color:#1f6b41; }
+    .quiz .q-fb.bad  { background:#fff0f4; border:3px solid var(--pink); color:#8c2a4c; }
+    .choice-btn.wrong { opacity:.5; text-decoration:line-through; }
+
     @media (prefers-reduced-motion: reduce) {
       .scene-art.turning, .story-card .done-star { animation: none; }
+      .story-card, .resume-btn, .choice-btn, .round-btn { transition: none; }
+      .story-card:hover, .story-card:focus-visible, .resume-btn:hover, .resume-btn:focus-visible { transform: none; }
     }
   </style>
 </head>
@@ -141,8 +204,9 @@
     <!-- LIBRARY -->
     <section id="library">
       <p class="adv-intro">Pick a story, then YOU choose what happens next! 🌟<br>
-        <span style="font-size:.85em;font-weight:normal;color:#6a6385">Ellie's stories read themselves out loud — tap 🔊 to mute.</span></p>
+        <span style="font-size:.85em;font-weight:normal;color:#6a6385">Ellie's stories read themselves out loud — tap 🔊 to mute.<br>In the big stories, tap any <b>dotted word</b> to find out what it means.</span></p>
       <p class="total-progress" id="total-progress"></p>
+      <ul class="stat-strip" id="stat-strip"></ul>
       <div id="resume-slot"></div>
       <div id="story-grid" class="story-grid"></div>
     </section>
@@ -157,12 +221,23 @@
 
       <div class="book">
         <div class="scene-art" id="scene-art"></div>
-        <p class="scene-text" id="scene-text"></p>
+        <p class="scene-text" id="scene-text" tabindex="-1" aria-live="polite"></p>
+        <div class="word-pop" id="word-pop" hidden>
+          <button class="word-close" id="word-close" aria-label="Close the word meaning">✕</button>
+          <p class="ww" id="word-w"></p>
+          <p class="wd" id="word-d"></p>
+        </div>
         <div class="end-badge" id="end-badge"></div>
         <div id="choices" class="choices"></div>
+        <section class="quiz" id="quiz" hidden aria-live="polite"></section>
+        <section class="shelf" id="shelf" hidden>
+          <h3 id="shelf-title">Endings</h3>
+          <ul id="shelf-list"></ul>
+        </section>
         <div class="reader-bottom">
           <button class="round-btn" id="back-btn" aria-label="Go back one choice" style="background:var(--blue);box-shadow:0 5px 0 #2a86bd,0 8px 14px rgba(0,0,0,.18)">◀</button>
           <button class="round-btn" id="read-btn" aria-label="Read this page again">🔁🔊</button>
+          <button class="round-btn" id="shelf-btn" aria-label="Show the endings you have found" aria-expanded="false" style="background:var(--pink);box-shadow:0 5px 0 #c23968,0 8px 14px rgba(0,0,0,.18)">🏆</button>
         </div>
       </div>
     </section>
@@ -171,6 +246,7 @@
   <script src="../../assets/js/voice.js"></script>
   <script src="../../assets/js/confetti.js"></script>
   <script src="art.js"></script>
+  <script src="glossary.js"></script>
   <script src="story-data.js"></script>
   <script src="stories-long.js"></script>
   <script src="adventure.js"></script>

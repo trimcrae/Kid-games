@@ -16,16 +16,23 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 0.5rem;
+      gap: 0.4rem;
       max-width: 560px;
       margin: 0 auto;
-      padding: 0 0.75rem;
+      padding: 0 0.7rem;
     }
-    .topbar .back-link { margin: 0.6rem 0; }
+    .topbar .back-link { margin: 0.5rem 0; white-space: nowrap; }
     .topbar .game-name {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: bold;
       color: var(--purple);
+      white-space: nowrap;
+    }
+    /* Phones: shrink the title instead of letting it wrap onto two lines. */
+    @media (max-width: 430px) {
+      .topbar { padding: 0 0.5rem; }
+      .topbar .game-name { font-size: 1rem; }
+      .topbar .back-link { font-size: 0.9rem; padding: 0.4rem 0.7rem; }
     }
 
     /* The stage holds the canvas + overlays */
@@ -50,26 +57,29 @@
       position: absolute;
       top: 0; left: 0; right: 0;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: flex-start;
-      padding: 0.6rem 3.4rem 0.6rem 0.8rem;
+      gap: 0.4rem;
+      /* keep clear of the pause + mute buttons in the corner */
+      padding: 0.6rem 6.1rem 0.6rem 0.7rem;
       pointer-events: none;
       font-weight: bold;
       text-shadow: 0 2px 6px rgba(0,0,0,0.25);
       color: #fff;
     }
     .hud .pill {
-      background: rgba(43, 36, 64, 0.55);
+      background: rgba(43, 36, 64, 0.62);
       border-radius: 999px;
-      padding: 0.3rem 0.8rem;
+      padding: 0.3rem 0.75rem;
       font-size: 1.05rem;
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.3rem;
+      white-space: nowrap;
     }
-    .hud .crew { font-size: 1.5rem; background: rgba(138, 92, 255, 0.85); }
+    .hud .crew { font-size: 1.35rem; background: rgba(138, 92, 255, 0.9); }
     .hud .combo {
-      background: rgba(255, 122, 61, 0.9);
+      background: rgba(255, 122, 61, 0.92);
       font-size: 1.05rem;
       opacity: 0;
       transform: scale(0.6);
@@ -77,21 +87,66 @@
     }
     .hud .combo.on { opacity: 1; transform: scale(1); }
     .hud .combo.fever {
-      background: rgba(232, 162, 0, 0.95);
+      background: rgba(232, 162, 0, 0.98);
       box-shadow: 0 0 14px rgba(255, 209, 102, 0.9);
     }
+    @media (max-width: 400px) {
+      .hud { padding-right: 5.9rem; }
+      .hud .pill { font-size: 0.95rem; padding: 0.28rem 0.6rem; }
+      .hud .crew { font-size: 1.2rem; }
+    }
 
-    /* Sound toggle — always reachable in the corner */
-    .mute-btn {
+    /* Level progress meter along the bottom — how far to the brick finale */
+    .progwrap {
       position: absolute;
-      top: 0.6rem; right: 0.7rem;
+      left: 0.7rem; right: 0.7rem; bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      pointer-events: none;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.95rem;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    }
+    .progwrap .cap {
+      background: rgba(43, 36, 64, 0.62);
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      white-space: nowrap;
+    }
+    .progwrap .track {
+      flex: 1;
+      height: 0.72rem;
+      min-width: 3rem;
+      border-radius: 999px;
+      background: rgba(43, 36, 64, 0.45);
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .progwrap .fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #7ee0a0, #ffd166);
+      transition: width 0.2s linear;
+    }
+
+    /* Corner buttons — 44px tap targets */
+    .corner-btns {
+      position: absolute;
+      top: 0.55rem; right: 0.6rem;
       z-index: 5;
-      width: 2.4rem; height: 2.4rem;
+      display: flex;
+      gap: 0.35rem;
+    }
+    .icon-btn {
+      width: 2.75rem; height: 2.75rem;
       border: none;
       border-radius: 50%;
-      background: rgba(43, 36, 64, 0.55);
+      background: rgba(43, 36, 64, 0.62);
       color: #fff;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -99,7 +154,8 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       touch-action: manipulation;
     }
-    .mute-btn:active { transform: scale(0.9); }
+    .icon-btn:active { transform: scale(0.9); }
+    .icon-btn[hidden] { display: none; }
 
     /* Overlays (menu, shop, game over) */
     .overlay {
@@ -109,17 +165,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 0.8rem;
-      padding: 1.1rem;
+      gap: 0.7rem;
+      padding: 1.1rem 0.9rem;
       text-align: center;
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(3px);
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .overlay.hidden { display: none; }
-    .overlay h2 { font-size: 1.9rem; margin: 0; color: var(--purple); }
+    .overlay h2 { font-size: 1.8rem; margin: 0; color: var(--purple); }
     .overlay p  { margin: 0.2rem 0; color: var(--ink); max-width: 30rem; }
-    .overlay .big { font-size: 1.25rem; font-weight: bold; }
+    .overlay .big { font-size: 1.2rem; font-weight: bold; }
 
     .btn {
       font-family: var(--font);
@@ -130,6 +187,7 @@
       border: none;
       border-radius: 999px;
       padding: 0.8rem 2.2rem;
+      min-height: 2.9rem;
       cursor: pointer;
       box-shadow: 0 8px 20px rgba(56, 182, 255, 0.35);
       transition: transform 0.12s ease;
@@ -140,11 +198,15 @@
       background: linear-gradient(90deg, var(--pink), var(--purple));
       box-shadow: 0 8px 20px rgba(138, 92, 255, 0.3);
     }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid #2b2440;
+      outline-offset: 3px;
+    }
 
     .coinbar {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       font-weight: bold;
-      color: #c98a00;
+      color: #7a5400;
       background: var(--yellow);
       border-radius: 999px;
       padding: 0.35rem 1rem;
@@ -156,7 +218,7 @@
       width: 100%;
       max-width: 30rem;
       display: grid;
-      gap: 0.6rem;
+      gap: 0.55rem;
     }
     .shop-row {
       display: flex;
@@ -164,14 +226,14 @@
       gap: 0.7rem;
       background: #fff;
       border-radius: 16px;
-      padding: 0.6rem 0.8rem;
+      padding: 0.6rem 0.7rem;
       box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
       text-align: left;
     }
-    .shop-row .ico { font-size: 1.9rem; line-height: 1; }
+    .shop-row .ico { font-size: 1.8rem; line-height: 1; }
     .shop-row .info { flex: 1; min-width: 0; }
-    .shop-row .info b { display: block; font-size: 1.05rem; }
-    .shop-row .info small { color: #6a6385; }
+    .shop-row .info b { display: block; font-size: 1.02rem; }
+    .shop-row .info small { color: #5c5578; }
     .shop-row .lvl {
       font-size: 0.8rem;
       color: #fff;
@@ -184,28 +246,58 @@
       font-family: var(--font);
       font-weight: bold;
       font-size: 0.95rem;
-      color: #7a5400;
+      color: #6d4a00;
       background: var(--yellow);
       border: none;
       border-radius: 999px;
-      padding: 0.55rem 0.9rem;
+      padding: 0.6rem 0.95rem;
+      min-height: 2.75rem;
+      min-width: 4.4rem;
       cursor: pointer;
       white-space: nowrap;
       box-shadow: 0 4px 10px rgba(255, 209, 102, 0.5);
+      touch-action: manipulation;
     }
     .buy-btn:active { transform: scale(0.94); }
     .buy-btn:disabled {
       background: #e6e1f0;
-      color: #a59fb8;
+      color: #6f6885;
       cursor: not-allowed;
       box-shadow: none;
     }
     .buy-btn.maxed { background: var(--green); color: #fff; }
 
-    .hint { font-size: 0.9rem; color: #6a6385; }
+    .hint { font-size: 0.9rem; color: #5c5578; }
 
-    .menu-row { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; }
-    .menu-row .btn { padding: 0.7rem 1.3rem; font-size: 1.05rem; }
+    .menu-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
+    .menu-row .btn { padding: 0.7rem 1.2rem; font-size: 1.02rem; }
+
+    /* Level picker */
+    .lvlpick {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #fff;
+      border-radius: 999px;
+      padding: 0.25rem 0.5rem;
+      box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
+      font-weight: bold;
+      color: var(--ink);
+    }
+    .lvlpick .step {
+      font-family: var(--font);
+      font-size: 1.05rem;
+      font-weight: bold;
+      width: 2.6rem; height: 2.6rem;
+      border: none;
+      border-radius: 50%;
+      background: var(--purple);
+      color: #fff;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    .lvlpick .step:disabled { background: #ded7ee; color: #8a83a3; cursor: not-allowed; }
+    .lvlpick .step:active:not(:disabled) { transform: scale(0.92); }
 
     /* Badges */
     .badge-row {
@@ -214,19 +306,19 @@
       gap: 0.7rem;
       background: #fff;
       border-radius: 16px;
-      padding: 0.55rem 0.8rem;
+      padding: 0.55rem 0.75rem;
       box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12);
       text-align: left;
     }
-    .badge-row.locked { opacity: 0.55; filter: grayscale(0.8); }
-    .badge-row .ico { font-size: 1.9rem; line-height: 1; }
+    .badge-row.locked { opacity: 0.6; filter: grayscale(0.8); }
+    .badge-row .ico { font-size: 1.8rem; line-height: 1; }
     .badge-row .info b { display: block; font-size: 1.02rem; }
-    .badge-row .info small { color: #6a6385; }
+    .badge-row .info small { color: #5c5578; }
     .badge-row .tick { margin-left: auto; font-size: 1.3rem; color: var(--green); }
 
     .new-badge {
       background: linear-gradient(90deg, var(--yellow), #ffe39a);
-      color: #7a5400;
+      color: #6d4a00;
       font-weight: bold;
       border-radius: 14px;
       padding: 0.5rem 0.9rem;
@@ -237,10 +329,30 @@
     }
     @keyframes pop-in { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
+    /* "Let's check" mistake review on the end screen */
+    .review {
+      width: 100%;
+      max-width: 28rem;
+      display: grid;
+      gap: 0.35rem;
+      text-align: left;
+    }
+    .review .rv-head { font-weight: bold; color: var(--purple); text-align: center; }
+    .review .rv {
+      background: #fff7e6;
+      border-left: 5px solid var(--yellow);
+      border-radius: 10px;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.95rem;
+      color: #4a4266;
+    }
+    .review .rv b { color: #1c9e5e; }
+    .review .rv small { display: block; color: #6a6385; }
+
     /* Difficulty picker */
     .modes {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.45rem;
       flex-wrap: wrap;
       justify-content: center;
     }
@@ -251,40 +363,64 @@
       border: 3px solid #e0d8f5;
       background: #fff;
       border-radius: 16px;
-      padding: 0.5rem 0.8rem;
-      min-width: 6.2rem;
+      padding: 0.5rem 0.7rem;
+      min-width: 6.4rem;
+      min-height: 2.9rem;
       color: var(--ink);
       box-shadow: 0 4px 12px rgba(43, 36, 64, 0.1);
       transition: transform 0.12s ease, border-color 0.12s ease;
       touch-action: manipulation;
     }
     .mode-btn:active { transform: scale(0.95); }
-    .mode-btn b { display: block; font-size: 1.05rem; }
-    .mode-btn small { color: #6a6385; font-size: 0.78rem; }
+    .mode-btn b { display: block; font-size: 1.02rem; }
+    .mode-btn small { color: #5c5578; font-size: 0.76rem; }
     .mode-btn.sel { border-color: var(--green); background: #f0fff6; }
-    .mode-btn.sel small { color: #1c9e5e; }
+    .mode-btn.sel small { color: #157a49; }
+
+    /* Screen-reader-only live status */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="topbar">
     <a class="back-link" href="../../">← Arcade</a>
     <span class="game-name">🏃 Math Mob Run</span>
-    <span style="width: 5.5rem"></span>
+    <span style="width: 4.5rem"></span>
   </div>
 
   <div id="stage">
-    <canvas id="game"></canvas>
+    <canvas id="game" role="img" aria-label="Math Mob Run play field. Steer your crew with the left and right arrow keys, or drag across the track."></canvas>
 
-    <button class="mute-btn" id="mute-btn" aria-label="Toggle sound">🔊</button>
+    <div class="corner-btns">
+      <button class="icon-btn" id="pause-btn" aria-label="Pause game" hidden>⏸</button>
+      <button class="icon-btn" id="mute-btn" aria-label="Toggle sound">🔊</button>
+    </div>
 
     <!-- Live HUD -->
     <div class="hud" id="hud" style="display:none">
-      <div class="pill crew">🏃 <span id="crew">1</span></div>
-      <div class="pill combo" id="combo-pill">🔥 <span id="combo">0</span></div>
-      <div class="pill">🏰 <span id="level">1</span></div>
-      <div class="pill">🪙 <span id="run-coins">0</span></div>
-      <div class="pill">🏁 <span id="dist">0m</span></div>
+      <div class="pill crew" aria-label="Crew size">🏃 <span id="crew">1</span></div>
+      <div class="pill combo" id="combo-pill" aria-label="Streak">🔥 <span id="combo">0</span></div>
+      <div class="pill" aria-label="Coins this run">🪙 <span id="run-coins">0</span></div>
     </div>
+    <div class="progwrap" id="progwrap" style="display:none">
+      <span class="cap">🏰 <span id="level">1</span></span>
+      <div class="track"><div class="fill" id="prog-fill"></div></div>
+      <span class="cap"><span id="dist">0</span><span id="dist-unit">m</span> 🧱</span>
+    </div>
+
+    <p class="sr-only" id="sr-status" aria-live="polite"></p>
 
     <!-- Start menu + shop -->
     <div class="overlay" id="menu">
@@ -293,9 +429,14 @@
          <b>biggest</b> mob. Answer ❓ quiz gates and build a 🔥 streak — 5 in a
          row starts 🌟 <b>COIN FEVER</b> (double coins)! At each level's finish
          line <b>smash through 🧱 brick walls</b>, and every level runs through
-         a new land. See how far you get. 🧠</p>
+         a new land. 🧠</p>
       <div class="coinbar">🪙 <span id="bank">0</span> coins</div>
-      <div class="modes" id="modes"></div>
+      <div class="modes" id="modes" role="group" aria-label="Difficulty"></div>
+      <div class="lvlpick">
+        <button class="step" id="lvl-dn" aria-label="Play an earlier level">◀</button>
+        <span>🏰 Level <b id="lvl-now">1</b></span>
+        <button class="step" id="lvl-up" aria-label="Play a later level">▶</button>
+      </div>
       <button class="btn" id="play-btn">Play ▶</button>
       <div class="menu-row">
         <button class="btn secondary" id="shop-btn">🛒 Upgrades</button>
@@ -303,6 +444,7 @@
         <button class="btn secondary" id="badges-btn">🏅 Badges</button>
       </div>
       <div class="hint" id="best-line"></div>
+      <div class="hint">Keys: ← → steer · Space play · P pause · M mute</div>
     </div>
 
     <!-- Shop screen -->
@@ -328,6 +470,14 @@
       <button class="btn" id="badges-back">Done</button>
     </div>
 
+    <!-- Paused -->
+    <div class="overlay hidden" id="pause-screen">
+      <h2>⏸ Paused</h2>
+      <p class="big" id="pause-line">Take your time.</p>
+      <button class="btn" id="resume-btn">Keep running ▶</button>
+      <button class="btn secondary" id="quit-btn">End this run</button>
+    </div>
+
     <!-- Game over -->
     <div class="overlay hidden" id="gameover">
       <h2 id="go-title">Run finished! 🏁</h2>
@@ -336,10 +486,13 @@
       <p>Biggest mob: 🏃 <span id="go-crew">0</span></p>
       <p id="go-endmob">Finished with: 🏁🏃 <span id="go-end">0</span></p>
       <p>🪙 <span id="go-coins">0</span> coins collected</p>
+      <p id="go-accuracy" class="hint"></p>
+      <div class="review" id="go-review"></div>
       <div id="go-badges"></div>
       <p class="hint" id="go-best"></p>
       <button class="btn" id="again-btn">Run again ▶</button>
       <button class="btn secondary" id="go-shop-btn">🛒 Spend coins</button>
+      <button class="btn secondary" id="go-menu-btn">🏠 Menu</button>
     </div>
   </div>
 

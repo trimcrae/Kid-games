@@ -31,7 +31,38 @@
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
   }
-  function sfx(name) { try { if (window.SFX && SFX[name]) SFX[name](); } catch (e) {} }
+  /* SFX.streak(n) picks its pitch from the combo length, so pass it on. */
+  function sfx(name, arg) { try { if (window.SFX && SFX[name]) SFX[name](arg); } catch (e) {} }
+
+  /* ---------- read-aloud, for the players who can't read yet ----------
+     Ellie and Kieran can't read the question, so the browser reads it to
+     them. Off by default for everyone who can read; the choice is
+     remembered per device. */
+  var VOICE_KEY = "craepets.voice";
+  var canSpeak = typeof window !== "undefined" &&
+    "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  var voiceOn = false;
+  try {
+    var stored = localStorage.getItem(VOICE_KEY);
+    voiceOn = stored === null ? null : stored === "1";
+  } catch (e) { voiceOn = null; }
+
+  /* Nobody has chosen yet? Then the littlest tiers get it on. */
+  function voiceWanted() {
+    if (voiceOn === null) return tier() === "tot" || tier() === "early";
+    return !!voiceOn;
+  }
+  function hush() { try { if (canSpeak) window.speechSynthesis.cancel(); } catch (e) {} }
+  function speak(text) {
+    if (!canSpeak || !voiceWanted() || !text) return;
+    try {
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(String(text).replace(/[“”]/g, ""));
+      u.rate = 0.92;
+      u.pitch = 1.05;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
 
   /* =========================================================
      STATE
