@@ -92,7 +92,10 @@
     .board-wrap { display: flex; justify-content: center; margin: 0.9rem 0; }
     .board {
       display: inline-grid;
-      grid-template-columns: auto repeat(var(--n), var(--cell));
+      /* the axis-label column is a KNOWN width (--lab) so the board's
+         total size is predictable — an `auto` column silently grew with
+         the corner caption and pushed the grid off narrow screens. */
+      grid-template-columns: var(--lab, 28px) repeat(var(--n), var(--cell));
       grid-template-rows: repeat(var(--n), var(--cell)) auto;
       gap: 2px;
       background:
@@ -175,18 +178,23 @@
       justify-content: center;
       font-weight: bold;
       color: #ffd98a;
-      font-size: calc(var(--cell) * 0.42);
-      min-width: 1.3rem;
+      font-size: min(calc(var(--cell) * 0.42), calc(var(--lab, 28px) * 0.62));
+      min-width: 0;
+      overflow: hidden;
       text-shadow: 0 1px 2px rgba(0,0,0,0.5);
       transition: transform 0.12s ease, color 0.12s ease;
     }
     .board.nonums .axis { opacity: 0; }
     .board.nonums .axis.lit { opacity: 1; }
     .axis.lit { color: #fff36b; transform: scale(1.45); text-shadow: 0 0 8px #ffd34d; }
+    /* two stacked mini-captions so the axis letters never widen the column */
     .corner {
-      font-size: calc(var(--cell) * 0.34);
-      display: flex; align-items: flex-end; justify-content: flex-end;
+      font-size: calc(var(--lab, 28px) * 0.42);
+      line-height: 1.05;
+      display: flex; flex-direction: column;
+      align-items: flex-end; justify-content: flex-end;
       color: #9fb0d6; padding-right: 2px; font-weight: bold;
+      white-space: nowrap; overflow: hidden;
     }
 
     /* =======================================================

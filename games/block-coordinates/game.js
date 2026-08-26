@@ -472,7 +472,8 @@
     }
     const corner = document.createElement("div");
     corner.className = "corner";
-    corner.textContent = `${yName}${flipY ? "↓" : "↑"}/${xName}→`;
+    corner.setAttribute("aria-hidden", "true");
+    corner.innerHTML = `<span>${yName}${flipY ? "↓" : "↑"}</span><span>${xName}→</span>`;
     board.appendChild(corner);
     for (let x = lo; x <= hi; x++) {
       const xl = document.createElement("div");
