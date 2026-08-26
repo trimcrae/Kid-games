@@ -646,7 +646,7 @@
   /* ---- buttons ---- */
   el.clear.addEventListener("click", () => { sel = []; afterChange(); });
   el.hint.addEventListener("click", hint);
-  el.quit.addEventListener("click", () => { filterTier = filterTier; renderTabs(); renderPuzzles(); show("puzzles"); });
+  el.quit.addEventListener("click", () => { renderTabs(); renderPuzzles(); show("puzzles"); });
   el.again.addEventListener("click", playAgain);
   el.next.addEventListener("click", () => {
     const j = nextUnfinished();

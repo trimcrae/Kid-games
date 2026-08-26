@@ -419,9 +419,18 @@
     .stars { font-size: 1.3rem; min-height: 1.3rem; margin: 0.35rem 0 0; text-align: center; }
     .hidden { display: none !important; }
 
+    .lbl-short { display: none; }
+
     @media (max-width: 470px) {
-      .mode-btn { font-size: 0.86rem; padding: 0.4rem 0.55rem; }
-      .mode-row > .row-tag { min-width: 0; }
+      /* Keep the whole menu to three tight rows so the map stays in view. */
+      .lbl-long { display: none; }
+      .lbl-short { display: inline; }
+      .modes { padding: 0 0.4rem; margin-bottom: 0.35rem; }
+      .mode-row { gap: 0.3rem; margin-bottom: 0.3rem; }
+      .mode-row > .row-tag { display: none; }
+      .mode-btn { font-size: 0.85rem; padding: 0.35rem 0.5rem; border-width: 2px; }
+      .diffs { gap: 0.3rem; margin-bottom: 0.45rem; }
+      .diff-btn { font-size: 0.82rem; padding: 0.3rem 0.55rem; }
       .stage { padding: 0 0.5rem; }
       /* Let the maps use the whole screen width so the state squares
          stay big enough for small fingers. */
@@ -463,19 +472,19 @@
     </div>
     <div class="mode-row">
       <span class="row-tag">USA</span>
-      <button class="mode-btn" data-mode="states" aria-pressed="false">🗺️ Find&nbsp;a&nbsp;State</button>
+      <button class="mode-btn" data-mode="states" aria-pressed="false">🗺️ <span class="lbl-long">Find&nbsp;a&nbsp;State</span><span class="lbl-short">States</span></button>
       <button class="mode-btn" data-mode="capitals" aria-pressed="false">🏛️ Capitals</button>
     </div>
     <div class="mode-row">
       <span class="row-tag">More</span>
-      <button class="mode-btn" data-mode="bigger" aria-pressed="false">⚖️ Which&nbsp;Is&nbsp;Bigger?</button>
+      <button class="mode-btn" data-mode="bigger" aria-pressed="false">⚖️ <span class="lbl-long">Which&nbsp;Is&nbsp;Bigger?</span><span class="lbl-short">Bigger?</span></button>
       <button class="mode-btn" data-mode="atlas" aria-pressed="false">📖 Atlas</button>
       <button class="mode-btn" data-mode="passport" aria-pressed="false">🛂 Passport</button>
     </div>
   </nav>
 
   <div class="diffs" id="diffs" role="group" aria-label="How hard should it be?">
-    <span>How hard?</span>
+    <span class="lbl-long">How hard?</span>
     <button class="diff-btn" data-diff="easy" aria-pressed="true">🐣 Easy</button>
     <button class="diff-btn" data-diff="normal" aria-pressed="false">🧭 Explorer</button>
     <button class="diff-btn" data-diff="expert" aria-pressed="false">🎓 Grown-up</button>

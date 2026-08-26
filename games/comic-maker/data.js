@@ -150,7 +150,7 @@ const SCENES = [
   { key: "cave",    name: "Cave",    css: "linear-gradient(#4a4a5a, #17171f)", dark: true },
   { key: "school",  name: "School",  css: "linear-gradient(#ffe9c9 60%, #c58f5a 60%)" },
   { key: "home",    name: "Bedroom", css: "linear-gradient(#ffe3f2 62%, #b98a5f 62%)" },
-  { key: "moon",    name: "Moon",    css: "linear-gradient(#1a1030 58%, #cfcfd8 58%)", dark: true },
+  { key: "moon",    name: "Moon",    css: "linear-gradient(#1a1030 58%, #cfcfd8 58%)" },
   { key: "deep",    name: "Deep sea",css: "linear-gradient(#1d7fd6, #06264a)", dark: true },
   { key: "storm",   name: "Storm",   css: "linear-gradient(#7f8aa3, #3b4356)", dark: true },
   { key: "spooky",  name: "Spooky",  css: "linear-gradient(#5b3f7a, #1b1030)", dark: true },

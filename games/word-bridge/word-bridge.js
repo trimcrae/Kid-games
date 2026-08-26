@@ -170,7 +170,14 @@
 
   // Every answer the game knows, anywhere — so a real word typed into the
   // wrong category gets told what it IS, instead of "I don't know that".
+  // The showcase lists go in first, so DOG comes back as "an animal with
+  // four legs" rather than whichever obscure list happens to hold it too.
   var ELSEWHERE = {};
+  WB_QUESTIONS.forEach(function (q, i) {
+    (q.top || []).forEach(function (w) {
+      if (ELSEWHERE[norm(w)] === undefined) ELSEWHERE[norm(w)] = i;
+    });
+  });
   WB_QUESTIONS.forEach(function (q, i) {
     Object.keys(ANSWERS[i]).forEach(function (k) {
       if (ELSEWHERE[k] === undefined) ELSEWHERE[k] = i;

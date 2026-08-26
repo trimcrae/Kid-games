@@ -491,6 +491,7 @@
     who: "Ellie & Jeannie",
     teaches: "listening, music & counting",
     blurb: "A little mermaid lost her song — follow the sounds of the sea to find it!",
+    coverImg: "art/mermaid-cover.png",
     cover: () => A.beachBg({}) + A.mermaid({ x: 265, y: 205, scale: 2.2 }) +
       A.princess({ x: 100, y: 215, scale: .95, dress: "#b06ad9" }) +
       A.shell({ x: 175, y: 222, scale: 1.4 }),
