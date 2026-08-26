@@ -19,21 +19,38 @@
 
     .wrap { max-width: 860px; margin: 0 auto 2rem; padding: 0.4rem 0.8rem 0; }
 
-    /* --- Category chips --- */
-    .cats {
-      display: flex; flex-wrap: wrap; gap: 0.4rem;
-      margin: 0.4rem 0 0.7rem;
+    /* ---------- Mode tabs ---------- */
+    .tabs {
+      display: flex; gap: 0.4rem; margin: 0.5rem 0 0.7rem;
+      background: rgba(255,255,255,0.6); padding: 0.3rem; border-radius: 18px;
+      box-shadow: 0 3px 12px rgba(43,36,64,0.09);
     }
+    .tab {
+      flex: 1 1 0; min-width: 0; min-height: 48px;
+      border: none; cursor: pointer; font-family: var(--font);
+      font-weight: bold; font-size: 0.95rem; padding: 0.5rem 0.3rem;
+      border-radius: 14px; background: transparent; color: var(--ink);
+      touch-action: manipulation;
+    }
+    .tab[aria-selected="true"] {
+      background: var(--blue); color: #fff;
+      box-shadow: 0 5px 14px rgba(56,182,255,0.4);
+    }
+    .panel[hidden] { display: none; }
+
+    /* --- Category chips --- */
+    .cats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 0.7rem; }
     .cat {
       border: none; cursor: pointer; font-family: var(--font);
       font-weight: bold; font-size: 0.92rem;
-      padding: 0.5rem 0.75rem; border-radius: 14px;
+      padding: 0.55rem 0.75rem; min-height: 44px; border-radius: 14px;
       background: #fff; color: var(--ink);
       box-shadow: 0 3px 10px rgba(43, 36, 64, 0.1);
       transition: transform 0.1s ease, background 0.15s ease, color 0.15s ease;
+      touch-action: manipulation;
     }
     .cat:hover { transform: translateY(-2px); }
-    .cat.active { background: var(--blue); color: #fff; box-shadow: 0 5px 16px rgba(56,182,255,0.45); }
+    .cat[aria-pressed="true"] { background: var(--blue); color: #fff; box-shadow: 0 5px 16px rgba(56,182,255,0.45); }
 
     /* --- Input card --- */
     .input-card {
@@ -41,26 +58,28 @@
       border-radius: 20px; padding: 0.9rem 1rem 1rem;
       box-shadow: 0 12px 34px rgba(14, 59, 87, 0.32); color: #eaf6ff;
     }
-    .input-title { font-size: 0.85rem; font-weight: bold; letter-spacing: 0.05em; opacity: 0.85; }
+    .input-title { font-size: 0.85rem; font-weight: bold; letter-spacing: 0.05em; opacity: 0.9; }
     .input-row { display: flex; gap: 0.5rem; margin-top: 0.45rem; flex-wrap: wrap; }
     .input-row input[type="number"] {
       flex: 2 1 140px; min-width: 0; font-family: "Courier New", monospace;
-      font-size: 1.7rem; font-weight: bold; padding: 0.4rem 0.7rem;
+      font-size: 1.7rem; font-weight: bold; padding: 0.4rem 0.7rem; min-height: 52px;
       border: none; border-radius: 14px; background: #eaf6ff; color: #0e3b57;
     }
     .input-row select {
       flex: 3 1 180px; min-width: 0; font-family: var(--font);
-      font-size: 1.05rem; font-weight: bold; padding: 0.5rem 0.6rem;
+      font-size: 1.05rem; font-weight: bold; padding: 0.5rem 0.6rem; min-height: 52px;
       border: none; border-radius: 14px; background: #fff; color: var(--ink);
       cursor: pointer;
     }
-    .quick { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+    .quick { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; align-items: center; }
     .quick button {
       border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
-      font-size: 0.82rem; padding: 0.32rem 0.6rem; border-radius: 11px;
-      background: rgba(255,255,255,0.16); color: #eaf6ff; transition: background 0.15s ease;
+      font-size: 0.9rem; padding: 0.45rem 0.75rem; min-height: 40px; border-radius: 12px;
+      background: rgba(255,255,255,0.18); color: #eaf6ff; transition: background 0.15s ease;
+      touch-action: manipulation;
     }
-    .quick button:hover { background: rgba(255,255,255,0.3); }
+    .quick button:hover { background: rgba(255,255,255,0.32); }
+    .quick .qlabel { font-size: 0.78rem; opacity: 0.8; margin-right: 0.15rem; }
 
     /* --- Results table --- */
     .results {
@@ -68,27 +87,38 @@
       box-shadow: 0 6px 18px rgba(43, 36, 64, 0.1); overflow: hidden;
     }
     .res-head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      padding: 0.7rem 0.9rem 0.3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.5rem; flex-wrap: wrap; padding: 0.7rem 0.9rem 0.4rem;
     }
     .res-head h3 { margin: 0; font-size: 1rem; color: var(--ink); }
-    .res-head .hint { font-size: 0.78rem; color: #8a84a0; }
+    .res-head .hint { font-size: 0.78rem; color: #6f6a83; }
+    .depth {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 0.8rem; padding: 0.45rem 0.7rem; min-height: 40px; border-radius: 12px;
+      background: #eef6ff; color: #1a6fa8; touch-action: manipulation;
+    }
     .row {
       display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
-      padding: 0.5rem 0.9rem; border-top: 1px solid #f0eef8; cursor: pointer;
-      transition: background 0.12s ease;
+      width: 100%; text-align: left; font-family: var(--font); color: var(--ink);
+      padding: 0.55rem 0.9rem; border: none; border-top: 1px solid #f0eef8;
+      background: transparent; cursor: pointer; min-height: 52px;
+      transition: background 0.12s ease; touch-action: manipulation;
     }
     .row:hover { background: #f6fbff; }
     .row.active { background: #e7f6ff; }
     .row .u-name { font-weight: bold; font-size: 0.95rem; }
-    .row .u-name .u-sym { color: #8a84a0; font-weight: normal; font-size: 0.82rem; margin-left: 0.3rem; }
-    .row .u-name .u-full { display: block; font-weight: normal; font-size: 0.74rem; color: #a7a3b8; }
+    .row .u-name .u-full { display: block; font-weight: normal; font-size: 0.76rem; color: #6f6a83; }
     .row .u-val {
       font-family: "Courier New", monospace; font-weight: bold; font-size: 1.15rem;
-      color: var(--blue); text-align: right; white-space: nowrap;
+      color: #1580c4; text-align: right; white-space: nowrap;
     }
-    .row.active .u-val { color: #1a8fd6; }
+    .row.active .u-val { color: #0f6ba6; }
     .row .u-val sup, .res-head sup { font-size: 0.68em; }
+    .row .u-rel {
+      display: block; font-size: 0.74rem; font-weight: normal;
+      color: #2b8a5c; margin-top: 0.05rem;
+    }
+    .row .u-rel sup { font-size: 0.68em; }
 
     /* --- "How big is that?" comparison --- */
     .compare {
@@ -96,7 +126,7 @@
       margin-top: 0.8rem; font-size: 1rem; line-height: 1.45;
       border-left: 6px solid var(--green);
     }
-    .compare b { color: #1f9d57; }
+    .compare b { color: #17804a; }
     .compare sup { font-size: 0.7em; }
 
     /* --- Fun fact --- */
@@ -105,21 +135,13 @@
       margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.45;
       border-left: 6px solid var(--yellow);
     }
-    .fact b { color: #b8791f; }
+    .fact b { color: #9c6614; }
 
-    /* --- "× n" relationship hints in the table --- */
-    .row .u-rel {
-      display: block; font-size: 0.72rem; font-weight: normal;
-      color: #35a06b; margin-top: 0.05rem;
-    }
-    .row .u-rel sup { font-size: 0.68em; }
-
-    /* --- Quiz mode --- */
+    /* ---------- Quiz ---------- */
     .quiz-card {
-      background: linear-gradient(160deg, #4a2a7a, #6f47e0);
+      background: linear-gradient(160deg, #40246c, #6f47e0);
       border-radius: 18px; padding: 0.8rem 1rem 1rem;
-      margin-top: 0.8rem; color: #f3edff;
-      box-shadow: 0 10px 28px rgba(111, 71, 224, 0.35);
+      color: #f3edff; box-shadow: 0 10px 28px rgba(111, 71, 224, 0.35);
     }
     .quiz-head {
       display: flex; align-items: baseline; justify-content: space-between;
@@ -127,40 +149,128 @@
     }
     .quiz-head h3 { margin: 0; font-size: 1.05rem; }
     .quiz-score { font-size: 0.85rem; font-weight: bold; color: #ffe9a8; }
-    .quiz-q {
-      font-size: 1.15rem; font-weight: bold; margin: 0.6rem 0 0.7rem;
-      line-height: 1.35;
-    }
-    .quiz-answers { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .quiz-answers button, .quiz-next, .quiz-start {
+
+    .lvls { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.6rem 0 0.2rem; }
+    .lvl {
       border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
-      font-size: 1.1rem; padding: 0.75rem 1rem; border-radius: 14px;
-      background: #fff; color: #4a2a7a; flex: 1 1 28%;
-      min-width: 90px; min-height: 52px;
-      box-shadow: 0 5px 14px rgba(20, 10, 50, 0.25);
-      transition: transform 0.1s ease, background 0.15s ease;
-      touch-action: manipulation;
+      font-size: 0.82rem; padding: 0.5rem 0.6rem; min-height: 44px; border-radius: 12px;
+      background: rgba(255,255,255,0.16); color: #f3edff; touch-action: manipulation;
     }
-    .quiz-answers button:active { transform: scale(0.95); }
-    .quiz-answers button:disabled { cursor: default; }
-    .quiz-answers button.right { background: var(--green); color: #fff; }
-    .quiz-answers button.wrong { background: #ff6b85; color: #fff; opacity: 0.9; }
-    .quiz-answers button.dim { opacity: 0.45; }
-    .quiz-start { flex: 0 1 auto; background: var(--yellow); color: #7a5400; }
-    .quiz-next { margin-top: 0.6rem; background: var(--yellow); color: #7a5400; flex: none; }
+    .lvl[aria-pressed="true"] { background: var(--yellow); color: #6a4700; }
+    .lvl.locked { opacity: 0.55; }
+    .lvl .medal { margin-left: 0.15rem; }
+    .lvl-blurb { font-size: 0.82rem; opacity: 0.9; margin: 0.35rem 0 0; line-height: 1.4; }
+
+    .quiz-q { font-size: 1.15rem; font-weight: bold; margin: 0.7rem 0 0.2rem; line-height: 1.4; }
+    .quiz-sub { font-size: 0.82rem; opacity: 0.88; margin-bottom: 0.6rem; }
+
+    .ans-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: stretch; }
+    .ans-row input {
+      flex: 1 1 130px; min-width: 0; font-family: "Courier New", monospace;
+      font-size: 1.5rem; font-weight: bold; padding: 0.4rem 0.7rem; min-height: 56px;
+      border: 3px solid transparent; border-radius: 14px; background: #fff; color: #40246c;
+    }
+    .ans-row input:focus { outline: none; border-color: var(--yellow); }
+    .ans-unit {
+      display: flex; align-items: center; font-weight: bold; font-size: 1.15rem;
+      color: #ffe9a8; padding: 0 0.2rem;
+    }
+    .btn {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 1.05rem; padding: 0.6rem 1rem; min-height: 56px; border-radius: 14px;
+      background: #fff; color: #40246c; box-shadow: 0 5px 14px rgba(20, 10, 50, 0.25);
+      transition: transform 0.1s ease; touch-action: manipulation;
+    }
+    .btn:active { transform: scale(0.96); }
+    .btn.go { background: var(--green); color: #08361e; }
+    .btn.ghost { background: rgba(255,255,255,0.18); color: #f3edff; box-shadow: none; font-size: 0.92rem; min-height: 48px; }
+    .btn.next { background: var(--yellow); color: #6a4700; margin-top: 0.6rem; }
+    .quiz-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.55rem; }
+
     .quiz-feedback {
-      margin-top: 0.6rem; font-size: 0.92rem; line-height: 1.4;
-      background: rgba(255,255,255,0.14); border-radius: 12px; padding: 0.5rem 0.7rem;
+      margin-top: 0.6rem; font-size: 0.95rem; line-height: 1.5;
+      background: rgba(255,255,255,0.15); border-radius: 12px; padding: 0.6rem 0.75rem;
     }
     .quiz-feedback b { color: #ffe9a8; }
-    .quiz-streak { font-size: 0.85rem; font-weight: bold; margin-top: 0.5rem; color: #d9ccff; }
+    .quiz-feedback .work {
+      display: block; margin-top: 0.4rem; font-family: "Courier New", monospace;
+      font-size: 1.02rem; background: rgba(0,0,0,0.22); border-radius: 9px; padding: 0.4rem 0.6rem;
+      overflow-x: auto;
+    }
+    .quiz-feedback .anchor { display: block; margin-top: 0.4rem; font-size: 0.88rem; opacity: 0.92; }
+    .quiz-streak { font-size: 0.88rem; font-weight: bold; margin-top: 0.5rem; color: #e3d8ff; }
+
+    /* ---------- Real life ---------- */
+    .tool-card {
+      background: var(--paper); border-radius: 18px; padding: 0.85rem 1rem 1rem;
+      box-shadow: 0 6px 18px rgba(43, 36, 64, 0.1); margin-bottom: 0.8rem;
+    }
+    .tool-card h3 { margin: 0 0 0.15rem; font-size: 1.05rem; }
+    .tool-card .sub { font-size: 0.82rem; color: #6f6a83; margin: 0 0 0.6rem; }
+    .chipline { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.6rem; }
+    .chip {
+      border: none; cursor: pointer; font-family: var(--font); font-weight: bold;
+      font-size: 0.88rem; padding: 0.5rem 0.7rem; min-height: 44px; border-radius: 12px;
+      background: #f1eefc; color: var(--ink); touch-action: manipulation;
+    }
+    .chip[aria-pressed="true"] { background: var(--purple); color: #fff; }
+    .ings { list-style: none; margin: 0; padding: 0; }
+    .ings li {
+      display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+      padding: 0.45rem 0.2rem; border-top: 1px solid #f0eef8; font-size: 1rem;
+    }
+    .ings li .amt { font-family: "Courier New", monospace; font-weight: bold; color: #1580c4; white-space: nowrap; }
+    .oven {
+      margin-top: 0.7rem; background: #fff2f5; border-left: 6px solid var(--pink);
+      border-radius: 12px; padding: 0.55rem 0.8rem; font-size: 0.95rem; line-height: 1.45;
+    }
+    .method {
+      margin-top: 0.6rem; background: #eef6ff; border-left: 6px solid var(--blue);
+      border-radius: 12px; padding: 0.55rem 0.8rem; font-size: 0.9rem; line-height: 1.5;
+    }
+    .method code { font-family: "Courier New", monospace; font-weight: bold; }
+
+    .ht-row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: stretch; }
+    .ht-row input {
+      flex: 1 1 110px; min-width: 0; font-family: "Courier New", monospace;
+      font-size: 1.35rem; font-weight: bold; padding: 0.4rem 0.6rem; min-height: 52px;
+      border: 2px solid #ddd6f3; border-radius: 12px; background: #fff; color: var(--ink);
+    }
+    .ht-row .unit-tag { display: flex; align-items: center; font-weight: bold; color: #6f6a83; }
+    .ht-out { font-size: 1.1rem; font-weight: bold; margin-top: 0.6rem; line-height: 1.5; }
+    .ht-out b { color: #1580c4; }
+    .bars { margin-top: 0.7rem; }
+    .barrow { display: flex; align-items: center; gap: 0.5rem; margin: 0.28rem 0; font-size: 0.85rem; }
+    .barrow .lbl { flex: 0 0 7.5rem; }
+    .barrow .track { flex: 1 1 auto; height: 16px; background: #f1eefc; border-radius: 8px; overflow: hidden; }
+    .barrow .fill { display: block; height: 100%; border-radius: 8px; background: var(--blue); }
+    .barrow.you .fill { background: var(--pink); }
+    .barrow.you .lbl { font-weight: bold; color: #c9265c; }
+    .barrow .num { flex: 0 0 5.2rem; text-align: right; font-family: "Courier New", monospace; }
 
     .lesson {
       background: #eef6ff; border-radius: 16px; padding: 0.6rem 1rem;
-      margin-top: 0.8rem; font-size: 0.9rem; line-height: 1.45;
+      margin-top: 0.8rem; font-size: 0.9rem; line-height: 1.5;
     }
-    .lesson summary { cursor: pointer; font-weight: bold; color: var(--blue); font-size: 1rem; }
+    .lesson summary { cursor: pointer; font-weight: bold; color: #1a6fa8; font-size: 1rem; padding: 0.35rem 0; }
     .lesson p { margin: 0.5rem 0; }
+
+    :focus-visible { outline: 3px solid #ff8fb1; outline-offset: 2px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+      .cat:hover, .btn:active { transform: none; }
+    }
+
+    @media (max-width: 420px) {
+      .row .u-val { font-size: 1rem; }
+      .tab { font-size: 0.85rem; }
+      .barrow .lbl { flex-basis: 5.6rem; font-size: 0.78rem; }
+      .barrow .num { flex-basis: 4.4rem; font-size: 0.78rem; }
+    }
   </style>
 </head>
 <body>
@@ -174,50 +284,105 @@
   </div>
 
   <div class="wrap">
-    <div class="cats" id="cats"></div>
-
-    <div class="input-card">
-      <div class="input-title" id="inputTitle">CONVERT LENGTH</div>
-      <div class="input-row">
-        <input type="number" id="value" value="1" inputmode="decimal" />
-        <select id="fromUnit"></select>
-      </div>
-      <div class="quick" id="quick"></div>
+    <div class="tabs" role="tablist" aria-label="Choose a mode">
+      <button class="tab" id="tabExplore" role="tab" aria-selected="true" aria-controls="panelExplore">🔎 Explore</button>
+      <button class="tab" id="tabQuiz" role="tab" aria-selected="false" aria-controls="panelQuiz">🎯 Quiz</button>
+      <button class="tab" id="tabReal" role="tab" aria-selected="false" aria-controls="panelReal">🍰 Real life</button>
     </div>
 
-    <div class="results">
-      <div class="res-head">
-        <h3 id="resHead">= in every other unit</h3>
-        <span class="hint">tap a row to convert from it</span>
+    <!-- ================= EXPLORE ================= -->
+    <section class="panel" id="panelExplore" role="tabpanel" aria-labelledby="tabExplore">
+      <div class="cats" id="cats" role="group" aria-label="Kind of measurement"></div>
+
+      <div class="input-card">
+        <div class="input-title" id="inputTitle">CONVERT LENGTH</div>
+        <div class="input-row">
+          <input type="number" id="value" value="1" inputmode="decimal" step="any"
+                 aria-label="Amount to convert" />
+          <select id="fromUnit" aria-label="Unit you are converting from"></select>
+        </div>
+        <div class="quick" id="quick"><span class="qlabel">try:</span></div>
       </div>
-      <div id="rows"></div>
-    </div>
 
-    <div class="compare" id="compare"></div>
-
-    <div class="fact" id="fact"></div>
-
-    <!-- QUIZ MODE -->
-    <div class="quiz-card">
-      <div class="quiz-head">
-        <h3>🎯 Unit Quiz</h3>
-        <span class="quiz-score">⭐ <span id="quizStars">0</span> stars
-          &nbsp;·&nbsp; 🔥 best streak <span id="quizBest">0</span></span>
+      <div class="results">
+        <div class="res-head">
+          <h3 id="resHead">= in every other unit</h3>
+          <span class="hint">tap a row to convert from it</span>
+          <button class="depth" id="depthBtn" type="button" aria-pressed="false">🔬 Show every unit</button>
+        </div>
+        <div id="rows" aria-live="polite"></div>
       </div>
-      <div id="quizBody"></div>
-    </div>
 
-    <details class="lesson">
-      <summary>🧠 How does converting units work?</summary>
-      <p>Every measurement can be written in <b>lots of different units</b>. 3 feet, 1 yard,
-        and 0.9144 metres are all the <i>same length</i> — just different rulers!</p>
-      <p>The trick: turn your number into one <b>base unit</b> first (like metres), then turn
-        that base amount into whatever unit you want. This tool does it for <i>every</i> unit at
-        once so you can see them all line up. 🔢</p>
-      <p><b>SI</b> units (metres, kilograms, litres) are used by most of the world and by all
-        scientists. <b>Imperial</b> units (feet, pounds, gallons) are used in the USA. Being able
-        to switch between them is a superpower! 💪</p>
-    </details>
+      <div class="compare" id="compare" aria-live="polite"></div>
+
+      <div class="fact" id="fact"></div>
+
+      <details class="lesson">
+        <summary>🧠 How does converting units work?</summary>
+        <p>Every measurement can be written in <b>lots of different units</b>. 3 feet, 1 yard,
+          and 0.9144 metres are all the <i>same length</i> — just different rulers!</p>
+        <p><b>The rule:</b> going from a <b>big</b> unit to a <b>small</b> one, you get <i>more</i>
+          of them, so you <b>multiply</b>. Going from a small unit to a big one you get <i>fewer</i>,
+          so you <b>divide</b>. 2 m → cm is 2 × 100 = 200 cm. 250 cm → m is 250 ÷ 100 = 2.5 m.</p>
+        <p>The green <b>× and ÷</b> under each unit below tells you exactly which one to do. 🔢</p>
+        <p><b>SI</b> units (metres, kilograms, litres) are used by most of the world and by all
+          scientists. <b>Imperial</b> units (feet, pounds, gallons) are used in the USA. Being able
+          to switch between them is a superpower! 💪</p>
+      </details>
+    </section>
+
+    <!-- ================= QUIZ ================= -->
+    <section class="panel" id="panelQuiz" role="tabpanel" aria-labelledby="tabQuiz" hidden>
+      <div class="quiz-card">
+        <div class="quiz-head">
+          <h3>🎯 Conversion Quiz</h3>
+          <span class="quiz-score">⭐ <span id="quizStars">0</span> stars
+            &nbsp;·&nbsp; 🔥 best streak <span id="quizBest">0</span></span>
+        </div>
+        <div class="lvls" id="lvls" role="group" aria-label="Choose a level"></div>
+        <p class="lvl-blurb" id="lvlBlurb"></p>
+        <div id="quizBody" aria-live="polite"></div>
+      </div>
+
+      <details class="lesson">
+        <summary>🪜 The conversion ladder — what each level teaches</summary>
+        <div id="ladder"></div>
+      </details>
+    </section>
+
+    <!-- ================= REAL LIFE ================= -->
+    <section class="panel" id="panelReal" role="tabpanel" aria-labelledby="tabReal" hidden>
+      <div class="tool-card">
+        <h3>🍰 Scale a recipe</h3>
+        <p class="sub">Cooking for more people? Multiply every ingredient by the same number — that's
+          scaling. Then flip to the other measuring system.</p>
+        <div class="chipline" id="recipePick" role="group" aria-label="Pick a recipe"></div>
+        <div class="chipline" id="servePick" role="group" aria-label="How many servings"></div>
+        <div class="chipline" id="sysPick" role="group" aria-label="Measuring system"></div>
+        <ul class="ings" id="ings" aria-live="polite"></ul>
+        <div class="oven" id="oven"></div>
+        <div class="method" id="recipeMethod"></div>
+      </div>
+
+      <div class="tool-card">
+        <h3>📐 How tall is that?</h3>
+        <p class="sub">Type a height and see it both ways — then see how it stacks up.</p>
+        <div class="ht-row">
+          <input type="number" id="htCm" inputmode="decimal" step="any" value="120"
+                 aria-label="Height in centimetres" />
+          <span class="unit-tag">cm</span>
+          <input type="number" id="htFt" inputmode="numeric" step="1" value="3"
+                 aria-label="Height, feet part" />
+          <span class="unit-tag">ft</span>
+          <input type="number" id="htIn" inputmode="decimal" step="any" value="11"
+                 aria-label="Height, inches part" />
+          <span class="unit-tag">in</span>
+        </div>
+        <div class="ht-out" id="htOut" aria-live="polite"></div>
+        <div class="bars" id="htBars"></div>
+        <div class="method" id="htMethod"></div>
+      </div>
+    </section>
   </div>
 
   <script src="../../assets/js/sfx.js"></script>

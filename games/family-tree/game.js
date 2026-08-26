@@ -58,9 +58,41 @@
   function load() {
     try {
       const s = JSON.parse(localStorage.getItem(KEY));
-      if (s && s.people && s.order && s.order.length) return s;
+      if (s && s.people && s.order && s.order.length) return sanitize(s);
     } catch (e) { /* fall through */ }
     return seed();
+  }
+
+  // A half-written or hand-edited save must never be able to soft-lock the
+  // tree, so repair it on the way in: drop links to people who aren't there,
+  // make partner links mutual again, and make sure nextId is past every id
+  // that already exists (a bad nextId used to mint duplicate/NaN ids).
+  function sanitize(s) {
+    s.people = s.people || {};
+    const known = Object.keys(s.people);
+    s.order = (s.order || []).filter((id) => s.people[id]);
+    known.forEach((id) => { if (s.order.indexOf(id) === -1) s.order.push(id); });
+
+    let max = 0;
+    s.order.forEach((id) => {
+      const n = parseInt(String(id).replace(/^p/, ""), 10);
+      if (isFinite(n) && n > max) max = n;
+      const p = s.people[id];
+      p.parents = (p.parents || []).filter((x) => s.people[x] && x !== id);
+      p.partners = (p.partners || []).filter((x) => s.people[x] && x !== id);
+      p.gen = (typeof p.gen === "number" && isFinite(p.gen)) ? p.gen : 0;
+      p.name = String(p.name == null || p.name === "" ? "?" : p.name);
+      p.emoji = p.emoji || "🧑";
+      p.gender = p.gender === "m" || p.gender === "f" ? p.gender : "";
+    });
+    s.order.forEach((id) => {
+      s.people[id].partners.forEach((o) => {
+        if (s.people[o].partners.indexOf(id) === -1) s.people[o].partners.push(id);
+      });
+    });
+    if (typeof s.nextId !== "number" || !isFinite(s.nextId) || s.nextId <= max) s.nextId = max + 1;
+    if (s.me && !s.people[s.me]) s.me = null;
+    return s;
   }
 
   function persist() {
@@ -68,6 +100,44 @@
   }
 
   let state = load();
+
+  /* ---------- learning progress (separate key: never touches the tree) ----------
+     Which relationship words this device has got right, the best streak and
+     the quiz level reached. Kept apart from family-tree.v1 so an old saved
+     tree keeps loading exactly as before. */
+
+  const PROG_KEY = "family-tree.progress.v1";
+
+  function loadProgress() {
+    const d = { best: 0, level: 1, correct: 0, learned: {} };
+    try {
+      const s = JSON.parse(localStorage.getItem(PROG_KEY));
+      if (s && typeof s === "object") {
+        if (typeof s.best === "number" && s.best > 0) d.best = Math.floor(s.best);
+        if (s.level >= 1 && s.level <= 3) d.level = Math.floor(s.level);
+        if (typeof s.correct === "number" && s.correct > 0) d.correct = Math.floor(s.correct);
+        if (s.learned && typeof s.learned === "object") {
+          Object.keys(s.learned).forEach((k) => {
+            const n = s.learned[k];
+            if (typeof n === "number" && n > 0) d.learned[k] = Math.floor(n);
+          });
+        }
+      }
+    } catch (e) { /* fall through to fresh progress */ }
+    return d;
+  }
+
+  const progress = loadProgress();
+
+  function saveProgress() {
+    try { localStorage.setItem(PROG_KEY, JSON.stringify(progress)); } catch (e) { /* private mode */ }
+  }
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function party(count) {
+    if (reduceMotion.matches) return;
+    window.Confetti && Confetti.burst({ count: count });
+  }
 
   const ZOOM_KEY = "family-tree.zoom";
   let zoom = 1;

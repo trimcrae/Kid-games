@@ -81,6 +81,10 @@
     }
     .person .rel:empty { display: none; }
     .person.is-me { outline: 4px solid var(--yellow); outline-offset: 2px; }
+    .person:focus-visible { outline: 4px solid var(--blue); outline-offset: 3px; z-index: 6; }
+    .ft-btn:focus-visible, .chip:focus-visible, .ft-toolbar select:focus-visible {
+      outline: 3px solid var(--ink); outline-offset: 2px;
+    }
     .person.flash { animation: personFlash 1.6s ease; }
     @keyframes personFlash {
       0%, 100% { box-shadow: 0 4px 0 rgba(43,36,64,0.12); }
@@ -93,23 +97,54 @@
     }
 
     .ft-hint { text-align: center; color: #6b6383; font-weight: 600; margin: 0.8rem auto 0; max-width: 40rem; }
-    .ft-stats { text-align: center; color: #6b6383; font-weight: 800; font-size: 0.85rem; margin: 0 auto 0.5rem; }
+    .ft-stats {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.5rem;
+      text-align: center; color: #6b6383; font-weight: 800; font-size: 0.85rem; margin: 0 auto 0.5rem;
+    }
+    .badge-btn {
+      font: inherit; font-weight: 800; font-size: 0.85rem; color: var(--ink); cursor: pointer;
+      background: var(--paper); border: 3px solid var(--yellow); border-radius: 999px;
+      padding: 0.3rem 0.85rem; min-height: 42px;
+      box-shadow: 0 3px 0 rgba(43,36,64,0.12);
+    }
+    .badge-btn:active { transform: translateY(2px); box-shadow: none; }
+    .badge-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 
     /* ---------- family-words quiz bar ---------- */
     .quiz-bar {
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-      gap: 0.6rem; max-width: 40rem;
-      margin: 0 auto 0.7rem; padding: 0.55rem 0.9rem;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.5rem; max-width: 40rem;
+      margin: 0 auto 0.7rem; padding: 0.6rem 0.9rem;
       background: var(--purple); color: #fff; font-weight: 800;
       border-radius: 18px; box-shadow: 0 6px 0 rgba(43,36,64,0.18);
       text-align: center;
     }
     .quiz-bar[hidden] { display: none; }
+    .quiz-top {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 0.4rem; width: 100%;
+    }
+    .quiz-bar .quiz-level {
+      background: rgba(255,255,255,0.22); border-radius: 999px;
+      padding: 0.2rem 0.7rem; font-size: 0.8rem;
+    }
     .quiz-bar .quiz-score {
       background: var(--yellow); color: var(--ink);
-      border-radius: 999px; padding: 0.15rem 0.7rem; font-size: 0.85rem;
+      border-radius: 999px; padding: 0.2rem 0.7rem; font-size: 0.8rem;
     }
-    .quiz-bar .ft-btn { min-height: 36px; padding: 0.25rem 0.7rem; border-color: #fff; }
+    .quiz-bar .quiz-score[hidden] { display: none; }
+    .quiz-q { margin: 0; font-size: 1rem; line-height: 1.4; }
+    .quiz-q u { text-underline-offset: 3px; }
+    .quiz-choices {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; width: 100%;
+    }
+    .quiz-choices[hidden] { display: none; }
+    .quiz-choices .ft-btn {
+      background: #fff; border-color: #fff; min-height: 46px; font-size: 0.95rem;
+    }
+    .quiz-choices .ft-btn.right { background: var(--green); border-color: var(--green); }
+    .quiz-choices .ft-btn.wrong { background: #ffd0de; border-color: #ffd0de; }
+    .quiz-bar .ft-btn { min-height: 40px; padding: 0.3rem 0.75rem; border-color: #fff; }
     .person.quiz-wrong { animation: quizWrong 0.4s ease; }
     @keyframes quizWrong {
       0%, 100% { transform: translateX(0); }
@@ -138,6 +173,30 @@
     }
     .sheet .sub.fact[hidden] { display: none; }
     .action-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    /* who's who around this person — relationship words from THEIR point of view */
+    .fam-box {
+      background: #f4f1ff; border-radius: 16px; padding: 0.55rem 0.75rem;
+      margin: 0 0 0.8rem; text-align: left;
+    }
+    .fam-box[hidden] { display: none; }
+    .fam-box h3 {
+      margin: 0 0 0.35rem; font-size: 0.72rem; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #6b6383;
+    }
+    .fam-row { font-size: 0.92rem; font-weight: 700; line-height: 1.45; }
+    .fam-row .fam-label { color: var(--purple); }
+
+    /* learned-words badge sheet */
+    .badge-list { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.8rem; }
+    .badge-item {
+      display: flex; align-items: center; gap: 0.5rem; font-weight: 800;
+      background: #f4f1ff; border: 2px solid transparent; border-radius: 12px;
+      padding: 0.45rem 0.7rem; text-align: left;
+    }
+    .badge-item .stars { margin-left: auto; letter-spacing: 1px; flex: 0 0 auto; }
+    .badge-item.master { background: #fff6d8; border-color: var(--yellow); }
+    .badge-empty { text-align: center; color: #6b6383; font-weight: 700; margin: 0 0 0.8rem; }
     .action-list .ft-btn { width: 100%; text-align: left; border-radius: 16px; font-size: 1rem; }
 
     .field { margin-bottom: 0.9rem; }
@@ -178,6 +237,18 @@
       .person { width: 96px; height: 118px; }
       .person .face { font-size: 2rem; }
       .emoji-grid { grid-template-columns: repeat(6, 1fr); }
+      /* keep the toolbar to fewer rows on a phone so the tree stays on screen */
+      .ft-toolbar { gap: 0.4rem; margin-bottom: 0.6rem; }
+      .ft-toolbar .ft-btn { padding: 0.4rem 0.65rem; font-size: 0.92rem; }
+      .ft-toolbar .me-pick { padding: 0.3rem 0.6rem; }
+      .ft-toolbar select { max-width: 8rem; }
+      .quiz-choices .ft-btn { font-size: 0.9rem; padding: 0.35rem 0.7rem; }
+    }
+
+    /* one place that honours "reduce motion" for every animation here */
+    @media (prefers-reduced-motion: reduce) {
+      .person, .person:hover { transition: none; transform: none; }
+      .person.flash, .person.quiz-wrong, .snackbar { animation: none !important; }
     }
 
     /* ---------- print ----------
@@ -246,16 +317,24 @@
       <button class="ft-btn danger" id="reset-btn">🔄 Start over</button>
     </div>
 
-    <!-- family-words quiz: "tap your Grandma!" -->
+    <!-- family-words quiz: "tap your Grandma!", "what is Cory to you?", word riddles -->
     <div class="quiz-bar" id="quiz-bar" hidden>
-      <span id="quiz-q"></span>
-      <span class="quiz-score" id="quiz-score" hidden></span>
-      <button class="ft-btn" id="quiz-stop">✖ Stop</button>
+      <div class="quiz-top">
+        <span class="quiz-level" id="quiz-level"></span>
+        <span class="quiz-score" id="quiz-score" hidden></span>
+        <button class="ft-btn" id="quiz-stop">✖ Stop</button>
+      </div>
+      <p class="quiz-q" id="quiz-q" role="status" aria-live="polite"></p>
+      <div class="quiz-choices" id="quiz-choices" hidden></div>
     </div>
 
-    <p class="ft-stats" id="tree-stats"></p>
+    <p class="ft-stats" id="tree-stats">
+      <span id="stats-text"></span>
+      <button class="badge-btn" id="badge-btn" aria-label="See the family words you have learned">
+        🏅 <span id="badge-count">0</span> words learned</button>
+    </p>
 
-    <div id="viewport">
+    <div id="viewport" role="group" aria-label="Family tree. Use Tab or the arrow keys to move between people, then press Enter.">
       <div id="sizer">
         <div id="canvas">
           <svg id="edges" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -265,9 +344,12 @@
 
     <p class="ft-hint">Tap anyone to add their mom, dad, partner, kids, brothers &amp; sisters —
     keep growing the tree forever! Pick who <strong>you</strong> are up top to learn the special
-    word for how each person is related to you (tap a card for a 💡 fun fact about the word!).
-    Try 🎯 <strong>Quiz me!</strong> to play "find your grandma". One tree for the whole family,
-    saved on this device. 💾 Press 🖨️ <strong>Print</strong> to turn the tree into a poster you can hang up!</p>
+    word for how each person is related to you (tap a card for a 💡 fun fact <em>and</em> a list of
+    who's who around them). Try 🎯 <strong>Quiz me!</strong> — it starts with easy words like
+    <em>brother</em> and works up to <em>great-aunt</em> and <em>2nd cousin once removed</em>.
+    Every word you get right is saved in 🏅 <strong>words learned</strong>. On a keyboard? Use the
+    <strong>arrow keys</strong> to walk around the tree. One tree for the whole family, saved on this
+    device 💾. Press 🖨️ <strong>Print</strong> to turn the tree into a poster you can hang up!</p>
   </main>
 
   <!-- print-only layout, built by game.js just before printing -->
@@ -275,17 +357,30 @@
 
   <!-- action sheet: tap a person -->
   <div class="overlay" id="action-overlay" hidden>
-    <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="action-title">
       <h2 id="action-title"></h2>
       <p class="sub" id="action-sub"></p>
       <p class="sub fact" id="action-fact" hidden></p>
+      <div class="fam-box" id="action-family" hidden></div>
       <div class="action-list" id="action-list"></div>
+    </div>
+  </div>
+
+  <!-- learned family words -->
+  <div class="overlay" id="badge-overlay" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="badge-title">
+      <h2 id="badge-title">🏅 My family words</h2>
+      <p class="sub" id="badge-sub"></p>
+      <div class="badge-list" id="badge-list"></div>
+      <div class="sheet-btns">
+        <button class="ft-btn primary" id="badge-close">✔ Close</button>
+      </div>
     </div>
   </div>
 
   <!-- add / edit form -->
   <div class="overlay" id="form-overlay" hidden>
-    <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="form-title">
       <h2 id="form-title"></h2>
       <div class="field">
         <label for="name-input">Name</label>
@@ -316,7 +411,7 @@
 
   <!-- confirm -->
   <div class="overlay" id="confirm-overlay" hidden>
-    <div class="sheet" role="dialog" aria-modal="true">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
       <h2 id="confirm-title"></h2>
       <p class="sub" id="confirm-sub"></p>
       <div class="sheet-btns">
@@ -327,7 +422,7 @@
   </div>
 
   <!-- undo snackbar -->
-  <div class="snackbar" id="snackbar" hidden>
+  <div class="snackbar" id="snackbar" role="status" aria-live="polite" hidden>
     <span id="snack-text"></span>
     <button class="ft-btn" id="snack-undo">↩️ Undo</button>
   </div>

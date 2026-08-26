@@ -33,7 +33,76 @@ const MADLIB_HINTS = {
   "number":      "Any number — teeny-tiny, super-huge, or in between.",
   "name":        "A person's name — maybe someone in your family!",
   "exclamation": "A word you SHOUT when you're surprised, like WOW or YIKES.",
-  "silly-word":  "Make one up! Any goofy sound counts (blorp, zizzlefish…)."
+  "silly-word":  "Make one up! Any goofy sound counts (blorp, zizzlefish…).",
+  "adjective-er":"A COMPARING word — it puts two things side by side and ends in -er (bigger, sillier, wigglier)."
+};
+
+/* Which part of speech each blank type really is. This is what the
+   finished story gets colour-coded by, so a kid can SEE the nouns,
+   verbs and adjectives they chose. */
+const MADLIB_POS = {
+  "adjective":    { pos: "adjective",   cls: "pos-adj" },
+  "adjective-er": { pos: "adjective",   cls: "pos-adj" },
+  "color":        { pos: "adjective",   cls: "pos-adj" },
+  "noun":         { pos: "noun",        cls: "pos-noun" },
+  "plural-noun":  { pos: "noun",        cls: "pos-noun" },
+  "animal":       { pos: "noun",        cls: "pos-noun" },
+  "place":        { pos: "noun",        cls: "pos-noun" },
+  "food":         { pos: "noun",        cls: "pos-noun" },
+  "body-part":    { pos: "noun",        cls: "pos-noun" },
+  "name":         { pos: "noun",        cls: "pos-noun" },
+  "verb":         { pos: "verb",        cls: "pos-verb" },
+  "verb-ed":      { pos: "verb",        cls: "pos-verb" },
+  "verb-ing":     { pos: "verb",        cls: "pos-verb" },
+  "adverb":       { pos: "adverb",      cls: "pos-adv" },
+  "number":       { pos: "number",      cls: "pos-num" },
+  "exclamation":  { pos: "exclamation", cls: "pos-excl" },
+  "silly-word":   { pos: "silly word",  cls: "pos-silly" }
+};
+
+/* The legend under a finished story: one row per part of speech. */
+const MADLIB_POS_INFO = [
+  { pos: "noun",        cls: "pos-noun",  label: "Noun",        what: "a person, place or thing" },
+  { pos: "verb",        cls: "pos-verb",  label: "Verb",        what: "a doing word" },
+  { pos: "adjective",   cls: "pos-adj",   label: "Adjective",   what: "a describing word" },
+  { pos: "adverb",      cls: "pos-adv",   label: "Adverb",      what: "tells HOW you do it" },
+  { pos: "number",      cls: "pos-num",   label: "Number",      what: "how many" },
+  { pos: "exclamation", cls: "pos-excl",  label: "Exclamation", what: "a word you shout" },
+  { pos: "silly word",  cls: "pos-silly", label: "Silly word",  what: "a word you made up" }
+];
+
+/* Live "you got it!" coaching while a kid types. Never blocks anything —
+   any word is always allowed, this just points out the pattern. */
+const MADLIB_COACH = {
+  "adverb":       { test: /ly$/i,   ok: "Nice — it ends in -ly, so it tells HOW!",  tip: "Most adverbs end in -ly (slowly, bravely)." },
+  "verb-ing":     { test: /ing$/i,  ok: "Nice — -ing means it's happening now!",     tip: "An -ing word is happening RIGHT NOW (jumping)." },
+  "verb-ed":      { test: /ed$/i,   ok: "Nice — -ed means it already happened!",     tip: "An -ed word ALREADY happened (jumped, wiggled)." },
+  "adjective-er": { test: /er$/i,   ok: "Nice — -er compares two things!",           tip: "Comparing words end in -er (bigger, sillier)." },
+  "plural-noun":  { test: /(s|children|mice|teeth|feet|people|geese)$/i, ok: "Nice — that's more than one!", tip: "Plural means MORE than one — most end in -s." },
+  "number":       { test: /^[0-9]/, ok: "Great, that's a number!",                   tip: "Try digits, like 7 or 42." }
+};
+
+/* A tap-a-word bank so a pre-reader (or anyone stuck) can play without
+   typing. Every single word here is one you would be happy to hear a
+   three-year-old read out loud. */
+const MADLIB_BANK = {
+  "adjective":    ["fuzzy","giant","sparkly","slimy","wiggly","bouncy","stinky","squeaky","gigantic","tiny","fluffy","silly","sleepy","spotty","bumpy","shiny","grumpy","cheerful","wobbly","fancy"],
+  "adjective-er": ["bigger","sillier","fuzzier","louder","faster","sleepier","bouncier","taller","wigglier","wetter","braver","slower"],
+  "noun":         ["toaster","rocket","pickle","sock","banana","dinosaur","umbrella","trombone","snowball","bathtub","castle","robot","pancake","wagon","teapot","cactus","mountain","volcano"],
+  "plural-noun":  ["socks","cookies","bubbles","rockets","pickles","marshmallows","penguins","crayons","balloons","noodles","mittens","snowflakes","buttons","jellybeans","pillows","umbrellas"],
+  "verb":         ["jump","wiggle","snore","dance","sneeze","giggle","zoom","tickle","hop","stomp","twirl","munch","wobble","gallop","tiptoe","juggle"],
+  "verb-ed":      ["jumped","wiggled","giggled","zoomed","danced","snored","hopped","stomped","twirled","sneezed","wobbled","munched","tiptoed","wiggled"],
+  "verb-ing":     ["jumping","wiggling","giggling","zooming","dancing","snoring","hopping","stomping","twirling","sneezing","tiptoeing","munching"],
+  "adverb":       ["slowly","bravely","loudly","quietly","quickly","gently","happily","sleepily","wildly","politely","carefully","proudly","grumpily","cheerfully"],
+  "body-part":    ["elbow","nose","toe","ear","knee","thumb","chin","ankle","eyebrow","pinky finger","tummy","shoulder","foot","eyelash"],
+  "animal":       ["llama","penguin","hamster","dragon","walrus","poodle","octopus","kitten","hippo","flamingo","parrot","goat","moose","koala","otter","tortoise"],
+  "place":        ["the library","the moon","the playground","Grandma's house","the beach","a volcano","the treehouse","the supermarket","the North Pole","under the bed","the jungle","the swimming pool"],
+  "food":         ["noodles","pizza","broccoli","pancakes","jellybeans","spaghetti","popcorn","watermelon","tacos","cupcakes","pickles","porridge","toast","ice cream"],
+  "color":        ["purple","turquoise","gold","lime green","hot pink","silver","sky blue","orange","rainbow","bright red"],
+  "number":       ["3","7","8","11","12","21","42","99","100","1000"],
+  "name":         ["Sam","Alex","Riley","Jo","Pip","Nina","Max","Ellie","Cory","Jeannie","Kieran","Mum"],
+  "exclamation":  ["Wow","Yikes","Hooray","Woohoo","Oh no","Yippee","Bravo","Goodness","Wahoo","Zowie","Amazing"],
+  "silly-word":   ["Blorp","Zizzlefish","Wobblenoodle","Snickerblob","Floofington","Bizzlebop","Kerfuffle","Doodlesnort","Pipsqueakle","Glumbo"]
 };
 
 const MADLIBS = [
@@ -351,5 +420,193 @@ const MADLIBS = [
       "{5} — which only made it worse. In the end it took {6} firefighters to catch my " +
       "homework and staple it back together. \"{7}!\" gasped my teacher when I told her. " +
       "Then she gave me an A+ for adventure."
+  },
+
+  {
+    id: "snowman-freezer",
+    title: "The Snowman Who Wouldn't Melt",
+    emoji: "⛄",
+    color: "#38b6ff",
+    blanks: [
+      { type: "adjective",   label: "a silly adjective",         example: "lumpy" },
+      { type: "noun",        label: "a noun (a thing)",          example: "carrot" },
+      { type: "verb-ed",     label: "an action word ending in -ed", example: "hopped" },
+      { type: "body-part",   label: "a part of the body",        example: "toes" },
+      { type: "food",        label: "a food",                    example: "porridge" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "snowballs" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "calmly" },
+      { type: "exclamation", label: "something you shout",       example: "Goodness" }
+    ],
+    template:
+      "One morning I built a {0} snowman in the front yard and gave him a {1} for a nose. " +
+      "That night he {2} right off the lawn and knocked on our door! He warmed his {3} by " +
+      "the fire, ate a whole bowl of {4}, and juggled {5} for us until bedtime. When spring " +
+      "came he refused to melt \u2014 he just walked {6} into the freezer and shut the door. " +
+      "\"{7}!\" said Mum. He still lives in there, right next to the peas."
+  },
+
+  {
+    id: "squeaky-castle",
+    title: "The Castle with the Squeaky Door",
+    emoji: "🏰",
+    color: "#ff5d8f",
+    blanks: [
+      { type: "name",        label: "a person's name",           example: "Ellie" },
+      { type: "adjective",   label: "a silly adjective",         example: "enormous" },
+      { type: "color",       label: "a color",                   example: "sparkly pink" },
+      { type: "animal",      label: "an animal",                 example: "llama" },
+      { type: "verb",        label: "an action word",            example: "twirl" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "petals" },
+      { type: "exclamation", label: "something you shout",       example: "Yikes" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "gently" }
+    ],
+    template:
+      "Princess {0} lived in a {1} castle with a front door that squeaked louder than a " +
+      "trumpet. Every morning she put on her {2} dress and rode her royal {3} down the " +
+      "spiral stairs. Her favourite thing in the whole kingdom was to {4} across the throne " +
+      "room while the guards tossed {5} into the air. When the squeaky door woke up the " +
+      "entire village, everybody shouted \"{6}!\" \u2014 so the princess oiled the hinges {7}, " +
+      "and the castle was peaceful again."
+  },
+
+  {
+    id: "missing-socks",
+    title: "The Missing Sock Mystery",
+    emoji: "🧦",
+    color: "#8a5cff",
+    blanks: [
+      { type: "adjective",   label: "a silly adjective",         example: "trickiest" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "socks" },
+      { type: "place",       label: "a place",                   example: "the laundry room" },
+      { type: "animal",      label: "an animal",                 example: "raccoon" },
+      { type: "verb-ed",     label: "an action word ending in -ed", example: "squeaked" },
+      { type: "number",      label: "a number",                  example: "11" },
+      { type: "silly-word",  label: "a made-up silly word (the thief's name)", example: "Blorp" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "politely" }
+    ],
+    template:
+      "Detective work is hard, but this was the {0} case of my whole career: every single " +
+      "one of my {1} had vanished. I searched {2} and found nothing but fluff. Then a very " +
+      "suspicious {3} strolled past wearing eleven socks at once. It {4} the moment it saw " +
+      "me and dropped exactly {5} of them on the floor. The thief's name, it turns out, was " +
+      "{6}, and it apologised {7}. Now we do the laundry together every Saturday."
+  },
+
+  {
+    id: "family-talent-show",
+    title: "Our Family Talent Show",
+    emoji: "🎤",
+    color: "#ffd166",
+    blanks: [
+      { type: "name",        label: "a person's name",           example: "Jeannie" },
+      { type: "verb-ing",    label: "an action word ending in -ing", example: "cartwheeling" },
+      { type: "adjective",   label: "a silly adjective",         example: "astonishing" },
+      { type: "number",      label: "a number",                  example: "52" },
+      { type: "animal",      label: "an animal",                 example: "hamster" },
+      { type: "food",        label: "a food",                    example: "orange juice" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "wildly" },
+      { type: "exclamation", label: "something you shout",       example: "Bravo" }
+    ],
+    template:
+      "Welcome to the family talent show! First up was {0}, who went {1} across the living " +
+      "room carpet without knocking over one single lamp. Next, Grandpa did a {2} magic " +
+      "trick using {3} playing cards and one extremely surprised {4}. The baby's talent was " +
+      "blowing bubbles into a cup of {5}. Everybody clapped {6} and the judges yelled " +
+      "\"{7}!\" In the end we gave the trophy to the cat, who had done absolutely nothing."
+  },
+
+  {
+    id: "snail-race",
+    title: "The Great Snail Race",
+    emoji: "🐌",
+    color: "#3ddc84",
+    blanks: [
+      { type: "number",       label: "a number",                 example: "26" },
+      { type: "adjective-er", label: "a comparing word ending in -er", example: "bouncier" },
+      { type: "silly-word",   label: "a made-up silly word (the snail's name)", example: "Zizzlefish" },
+      { type: "verb",         label: "an action word",           example: "cartwheel" },
+      { type: "plural-noun",  label: "a plural noun (more than one thing)", example: "daisies" },
+      { type: "food",         label: "a food",                   example: "lettuce" },
+      { type: "adverb",       label: "an adverb (ends in -ly)",  example: "proudly" },
+      { type: "exclamation",  label: "something you shout",      example: "Hooray" }
+    ],
+    template:
+      "On your marks! {0} snails lined up at the start of the world's slowest race. " +
+      "Everyone was certain the {1} snail would win, but one tiny snail named {2} had a " +
+      "secret: it could {3} instead of crawl. Halfway round the track all the snails " +
+      "stopped to admire some {4} and share a snack of {5}. Three whole hours later {2} " +
+      "slid over the finish line {6}. \"{7}!\" roared the crowd, who had been waiting " +
+      "patiently since Tuesday."
+  },
+
+  {
+    id: "block-world",
+    title: "The Block World Builder",
+    emoji: "⛏️",
+    color: "#3ddc84",
+    blanks: [
+      { type: "name",        label: "a person's name",           example: "Cory" },
+      { type: "number",      label: "a number",                  example: "64" },
+      { type: "noun",        label: "a noun (a thing)",          example: "waffle" },
+      { type: "adjective",   label: "a silly adjective",         example: "glowing" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "ladders" },
+      { type: "verb-ed",     label: "an action word ending in -ed", example: "sprinted" },
+      { type: "animal",      label: "an animal",                 example: "bat" },
+      { type: "exclamation", label: "something you shout",       example: "Phew" }
+    ],
+    template:
+      "{0} logged into the block world and started digging straight down \u2014 {1} blocks " +
+      "deep! At the very bottom was a cave shaped like a gigantic {2}, lit up by {3} lava. " +
+      "{0} built a bridge out of {4}, then {5} all the way across it while a {6} flapped " +
+      "along behind. \"{7}!\" they yelled when they finally popped back out at the surface " +
+      "with a backpack stuffed full of diamonds."
+  },
+
+  {
+    id: "ceiling-breakfast",
+    title: "Breakfast on the Ceiling",
+    emoji: "🥞",
+    color: "#38b6ff",
+    blanks: [
+      { type: "adjective",   label: "a silly adjective",         example: "enormous" },
+      { type: "food",        label: "a food",                    example: "pancakes" },
+      { type: "verb-ed",     label: "an action word ending in -ed", example: "floated" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "lampshades" },
+      { type: "body-part",   label: "a part of the body",        example: "eyebrow" },
+      { type: "animal",      label: "an animal",                 example: "goldfish" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "dreamily" },
+      { type: "exclamation", label: "something you shout",       example: "Whoa" }
+    ],
+    template:
+      "We woke up one Tuesday to discover that gravity had gone on holiday. My {0} " +
+      "breakfast lifted straight off the plate, and a whole stack of {1} stuck to the " +
+      "ceiling like wallpaper. Dad {2} after it and got completely tangled in the curtains. " +
+      "The milk rolled itself into wobbly balls that bounced off the {3} and landed on my " +
+      "{4}. Even our {5} paddled {6} through the air like it was swimming. \"{7}!\" said my " +
+      "little sister, who thought it was the best morning of her entire life."
+  },
+
+  {
+    id: "talking-book",
+    title: "The Library Book That Talked",
+    emoji: "📖",
+    color: "#9b3fc4",
+    blanks: [
+      { type: "adjective",   label: "a silly adjective",         example: "dusty" },
+      { type: "noun",        label: "a noun (a thing)",          example: "octopus" },
+      { type: "verb-ing",    label: "an action word ending in -ing", example: "sitting" },
+      { type: "name",        label: "a person's name",           example: "Nina" },
+      { type: "plural-noun", label: "a plural noun (more than one thing)", example: "bookmarks" },
+      { type: "place",       label: "a place",                   example: "the playground" },
+      { type: "adverb",      label: "an adverb (ends in -ly)",   example: "dramatically" },
+      { type: "exclamation", label: "something you shout",       example: "Incredible" }
+    ],
+    template:
+      "I pulled a very {0} book off the library shelf, and the second I opened it a tiny " +
+      "voice said hello. It was a book all about a {1} \u2014 and it had got extremely bored " +
+      "of {2} on the same page for eleven years. It begged me to read it to {3}, who was " +
+      "busy sorting {4} at the front desk. Instead we snuck it out to {5}, where it read " +
+      "ITSELF to us, {6}, until the sun went down. \"{7}!\" whispered the librarian when we " +
+      "brought it back. Now that book has its very own library card."
   }
 ];

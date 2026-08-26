@@ -820,6 +820,21 @@
       escapeHtml(c.name) + " column. " +
       "<span>(" + info.letters.length + " letter" + (info.letters.length === 1 ? "" : "s") + ")</span>";
     spellEl.appendChild(why);
+
+    // Gentle "did you know" when the word list usually calls this something else.
+    // It never blocks the choice — it's the player's grid — it just teaches.
+    var known = BY_WORD[String(word).toLowerCase()];
+    if (known && known.c !== color && (known.also || []).indexOf(color) === -1) {
+      var usual = COLORS[known.c];
+      var note = document.createElement("div");
+      note.className = "so-why";
+      note.style.fontSize = "0.92rem";
+      note.style.opacity = "0.9";
+      note.innerHTML = "💡 Most people say " + escapeHtml(word) + " is <b class=\"swatch\" style=\"background:" +
+        usual.hex + ";color:" + (usual.dark ? "#2b2440" : "#fff") + "\">" + escapeHtml(usual.name) +
+        "</b> — but it's your grid, so you decide!";
+      spellEl.appendChild(note);
+    }
   }
   function hideSpellout() {
     spellEl.style.display = "none";

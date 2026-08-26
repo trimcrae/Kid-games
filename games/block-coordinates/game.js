@@ -406,21 +406,45 @@
   }
 
   /* ---------------- shared board widget ----------------
-     lo is the lowest coordinate (default 1). Pass a negative lo
-     to get a four-quadrant board: the x=0 / y=0 lines are tinted
-     so kids can SEE the axes cross at the origin. */
-  function makeBoard(n, onTap, lo) {
-    lo = lo === undefined ? 1 : lo;
+     opts:
+       lo       lowest coordinate (default 1). Negative -> four
+                quadrants, with the x=0 / y=0 lines tinted so kids
+                can SEE the axes cross at the origin.
+       flipY    numbers grow DOWNWARD instead of upward — that is
+                exactly how Minecraft's Z axis works on a map
+                (+Z is south), so it gets its own mode.
+       xName/yName   axis letters ("X"/"Y", or "X"/"Z").
+       numbers  start with the axis numbers visible?
+
+     Keyboard: the grid is one tab stop (roving tabindex). Tab into
+     it, arrow around, Enter/Space to place. Arrow keys are only
+     swallowed while the grid itself has focus, so the page still
+     scrolls normally everywhere else. */
+  function makeBoard(n, onTap, opts) {
+    opts = opts || {};
+    const lo = opts.lo === undefined ? 1 : opts.lo;
     const hi = lo + n - 1;
+    const flipY = !!opts.flipY;
+    const xName = opts.xName || "X";
+    const yName = opts.yName || "Y";
+    let numsOn = opts.numbers === undefined ? save.numbersOn : opts.numbers;
+
     const board = document.createElement("div");
     board.className = "board";
     board.style.setProperty("--n", n);
-    if (!save.numbersOn) board.classList.add("nonums");
+    board.setAttribute("role", "group");
+    board.setAttribute("aria-label",
+      `${n} by ${n} block grid. ${xName} runs ${lo} to ${hi} across, ` +
+      `${yName} runs ${lo} to ${hi} ${flipY ? "downward" : "upward"}. ` +
+      "Use the arrow keys to move and Enter to choose.");
+    if (!numsOn) board.classList.add("nonums");
 
     const cellMap = {}, xLabels = {}, yLabels = {};
+    const rowVal = (r) => (flipY ? lo + r : hi - r);
+    const rowOf = (y) => (flipY ? y - lo : hi - y);
 
     for (let r = 0; r < n; r++) {
-      const y = hi - r;
+      const y = rowVal(r);
       const yl = document.createElement("div");
       yl.className = "axis y"; yl.textContent = y; yLabels[y] = yl;
       if (y === 0) yl.classList.add("zero");
@@ -429,19 +453,24 @@
         const cell = document.createElement("button");
         cell.type = "button";
         cell.className = "cell";
+        cell.tabIndex = -1;
         cell.dataset.x = x; cell.dataset.y = y;
+        cell.dataset.base = `${xName} ${x}, ${yName} ${y}`;
         if (lo < 1 && (x === 0 || y === 0)) cell.classList.add("zl");
         if (lo < 1 && x === 0 && y === 0) cell.classList.add("origin");
-        cell.setAttribute("aria-label", `column ${x}, row ${y}`);
+        cell.setAttribute("aria-label", cell.dataset.base);
         cell.addEventListener("click", () => onTap(x, y, cell));
         cell.addEventListener("mouseenter", () => trace(x, y, true));
         cell.addEventListener("mouseleave", () => trace(x, y, false));
+        cell.addEventListener("focus", () => { rove(x, y); trace(x, y, true); });
+        cell.addEventListener("blur", () => trace(x, y, false));
         cellMap[x + "," + y] = cell;
         board.appendChild(cell);
       }
     }
     const corner = document.createElement("div");
-    corner.className = "corner"; corner.textContent = "y/x";
+    corner.className = "corner";
+    corner.textContent = `${yName}${flipY ? "↓" : "↑"}/${xName}→`;
     board.appendChild(corner);
     for (let x = lo; x <= hi; x++) {
       const xl = document.createElement("div");
@@ -450,10 +479,43 @@
       board.appendChild(xl);
     }
 
+    /* --- roving tabindex: the grid behaves as ONE tab stop --- */
+    let focusX = lo, focusY = rowVal(n - 1);   // visual bottom-left
+    function rove(x, y) {
+      const next = cellMap[x + "," + y];
+      if (!next) return;
+      const cur = cellMap[focusX + "," + focusY];
+      if (cur) cur.tabIndex = -1;
+      next.tabIndex = 0;
+      focusX = x; focusY = y;
+    }
+    rove(focusX, focusY);
+    board.addEventListener("keydown", (e) => {
+      let dc = 0, dr = 0;
+      switch (e.key) {
+        case "ArrowRight": dc = 1; break;
+        case "ArrowLeft":  dc = -1; break;
+        case "ArrowUp":    dr = -1; break;
+        case "ArrowDown":  dr = 1; break;
+        case "Home": case "End": break;
+        default: return;
+      }
+      e.preventDefault();
+      let c = focusX - lo, r = rowOf(focusY);
+      if (e.key === "Home") { c = 0; r = n - 1; }
+      else if (e.key === "End") { c = n - 1; r = 0; }
+      else { c = clamp(c + dc, 0, n - 1); r = clamp(r + dr, 0, n - 1); }
+      const cell = cellMap[(lo + c) + "," + rowVal(r)];
+      if (cell) cell.focus();
+    });
+
+    /* --- responsive sizing: never wider than the screen, never
+           smaller than a fingertip we can help it --- */
     function size() {
       const host = $("app");
       const avail = Math.min((host && host.clientWidth) || 360, 560);
-      const cell = Math.max(26, Math.min(58, Math.floor((avail - 40) / n) - 2));
+      const chrome = 24 /*label col*/ + 20 /*padding*/ + 2 * (n + 1) /*gaps*/;
+      const cell = clamp(Math.floor((avail - chrome) / n), 24, 58);
       board.style.setProperty("--cell", cell + "px");
     }
     function litAxis(x, y, on) {
@@ -468,59 +530,27 @@
       }
       litAxis(x, y, on);
     }
-    return { board, cellMap, xLabels, yLabels, size, litAxis, trace, lo, hi };
+    function setNums(on) {
+      numsOn = !!on;
+      board.classList.toggle("nonums", !numsOn);
+    }
+    function flash(x, y, ms) {
+      const t = cellMap[x + "," + y];
+      if (!t) return;
+      t.classList.add("target-pulse");
+      setTimeout(() => t.classList.remove("target-pulse"), ms || 2100);
+    }
+    return { board, cellMap, xLabels, yLabels, size, litAxis, trace, setNums,
+             flash, focusAt: rove, lo, hi, names: [xName, yName], flipY };
   }
 
-  /* ---------------- keyboard cursor (accessibility) ---------------- */
-  let kbCursor = null;
-  // The cursor stays hidden (active:false) until the player actually presses a
-  // key — otherwise mouse/touch players see a stray yellow box and a tinted
-  // row+column at (1,1) that look like random mis-coloured squares.
-  function enableCursor(n, ctx, tap) {
-    kbCursor = { x: ctx.lo, y: ctx.lo, lo: ctx.lo, hi: ctx.hi, ctx, tap, active: false };
+  /* Reset a cell back to bare grass-less ground without wiping the
+     axis/origin classes that make the quadrant board readable. */
+  function clearCell(cell) {
+    cell.classList.remove("filled", "dug", "plan", "trace", "target-pulse", "shake");
+    cell.innerHTML = "";
+    if (cell.dataset.base) cell.setAttribute("aria-label", cell.dataset.base);
   }
-  function disableCursor() {
-    if (kbCursor && kbCursor.active) {
-      kbCursor.ctx.trace(kbCursor.x, kbCursor.y, false);
-      const c = kbCursor.ctx.cellMap[kbCursor.x + "," + kbCursor.y];
-      if (c) c.classList.remove("cursor");
-    }
-    kbCursor = null;
-  }
-  function paintCursor(prev) {
-    if (!kbCursor || !kbCursor.active) return;
-    Object.values(kbCursor.ctx.cellMap).forEach((c) => c.classList.remove("cursor"));
-    if (prev) kbCursor.ctx.trace(prev.x, prev.y, false);
-    kbCursor.ctx.trace(kbCursor.x, kbCursor.y, true);
-    const c = kbCursor.ctx.cellMap[kbCursor.x + "," + kbCursor.y];
-    if (c) c.classList.add("cursor");
-  }
-  document.addEventListener("keydown", (e) => {
-    if (!kbCursor) return;
-    const k = e.key;
-    const nav = k === "ArrowRight" || k === "ArrowLeft" || k === "ArrowUp" || k === "ArrowDown";
-    const act = k === "Enter" || k === " ";
-    if (!nav && !act) return;
-    // First key reveals the cursor where it already sits — no jump, no surprise.
-    if (!kbCursor.active) {
-      kbCursor.active = true;
-      paintCursor();
-      e.preventDefault();
-      return;
-    }
-    const prev = { x: kbCursor.x, y: kbCursor.y };
-    if (k === "ArrowRight") kbCursor.x = Math.min(kbCursor.hi, kbCursor.x + 1);
-    else if (k === "ArrowLeft") kbCursor.x = Math.max(kbCursor.lo, kbCursor.x - 1);
-    else if (k === "ArrowUp") kbCursor.y = Math.min(kbCursor.hi, kbCursor.y + 1);
-    else if (k === "ArrowDown") kbCursor.y = Math.max(kbCursor.lo, kbCursor.y - 1);
-    else if (k === "Enter" || k === " ") {
-      const cell = kbCursor.ctx.cellMap[kbCursor.x + "," + kbCursor.y];
-      if (cell) kbCursor.tap(kbCursor.x, kbCursor.y, cell);
-      e.preventDefault(); return;
-    } else return;
-    e.preventDefault();
-    paintCursor(prev);
-  });
 
   let boardCtx = null;
   window.addEventListener("resize", () => { if (boardCtx) boardCtx.size(); });
@@ -529,25 +559,54 @@
      SCREENS
      ============================================================ */
   const app = $("app");
-  function clearScreen() { disableCursor(); boardCtx = null; app.innerHTML = ""; say(""); }
+  function clearScreen() { boardCtx = null; app.innerHTML = ""; say(""); }
 
   /* ---------- menu ---------- */
   function renderMenu() {
     clearScreen();
     const stars = LEVELS.filter((l) => save.done[l.id]).length;
+    const perfects = LEVELS.filter((l) => save.perfect[l.id]).length;
     const allDone = stars === LEVELS.length;
     const tBest = save.treasureBest === null ? "" : ` · best: ${save.treasureBest} wrong`;
     const qBest = save.quadBest === null ? "" : ` · best: ${save.quadBest} wrong`;
+    const wBest = save.walkBest[save.tier] ? ` · best: ${save.walkBest[save.tier]}` : "";
+    const fBest = save.f3Best[save.tier] ? ` · best: ${save.f3Best[save.tier]}` : "";
+    const blocks = save.stats.blocks || 0;
+    const rank = rankOf(blocks), nxt = nextRank(blocks);
     const wrap = document.createElement("div");
     wrap.innerHTML = `
       <p class="intro">
         Read the grid like Minecraft! Every block has a spot:
-        <b>(X, Y)</b> means count <b>across →</b> then <b>up ↑</b>
+        <b>(X, Y)</b> means count <b>across →</b> <i>first</i>, then <b>up ↑</b>
         from the bottom-left corner. Build pictures, dig for treasure,
-        or brave the four quadrants where numbers go <b>negative</b>!
+        walk the world in steps, or brave the four quadrants where
+        numbers go <b>negative</b>.
       </p>
+
+      <div class="rank-card">
+        <span class="rk-emoji" aria-hidden="true">${rank.emoji}</span>
+        <span class="rk-text">
+          <b>${rank.name}</b>
+          <small>${blocks} blocks mined${nxt ? ` · ${nxt.at - blocks} to ${nxt.emoji} ${nxt.name}` : " · top rank!"}${
+            save.stats.bestStreak ? ` · best streak ${save.stats.bestStreak}🔥` : ""}</small>
+        </span>
+        <button class="pill tiny" id="m-help" aria-expanded="false"
+          aria-controls="helpbox">❓ How do I read (X, Y)?</button>
+      </div>
+
+      <div id="helpbox" class="helpbox" hidden></div>
+
+      <div class="tier-row" role="group" aria-label="Difficulty">
+        <span class="tier-lab">Difficulty:</span>
+        ${TIERS.map((t) => `<button class="pill tier${t.id === save.tier ? " on" : ""}"
+            data-tier="${t.id}" aria-pressed="${t.id === save.tier}"
+            title="${t.note}">${t.emoji} ${t.name}</button>`).join("")}
+      </div>
+      <p class="tier-note">${tierMeta().emoji} <b>${tierMeta().name}</b> — ${tierMeta().note}.</p>
+
       ${allDone ? `<p class="intro" style="color:var(--green);font-weight:bold">
-        🏆 MASTER BUILDER — every blueprint complete! 🏆</p>` : ""}
+        🏆 MASTER BUILDER — every blueprint complete!${perfects === LEVELS.length ? " And every one PERFECT! 🌟" : ""} 🏆</p>` : ""}
+
       <div class="mode-grid">
         <button class="mode-btn" id="m-build" style="--accent:var(--green)">
           <span class="big">🏗️</span><span class="name">Build</span>
@@ -561,6 +620,14 @@
           <span class="big">🧭</span><span class="name">Quadrant Quest</span>
           <span class="desc">Negative numbers! Dig around (0, 0)${qBest}</span>
         </button>
+        <button class="mode-btn" id="m-walk" style="--accent:var(--pink)">
+          <span class="big">🚶</span><span class="name">Steps &amp; Distance</span>
+          <span class="desc">Move N blocks, measure the gap${wBest}</span>
+        </button>
+        <button class="mode-btn" id="m-f3" style="--accent:var(--blue)">
+          <span class="big">🧊</span><span class="name">X, Y, Z</span>
+          <span class="desc">Real Minecraft coords — Y is height!${fBest}</span>
+        </button>
         <button class="mode-btn" id="m-free" style="--accent:var(--purple)">
           <span class="big">🧱</span><span class="name">Free Build</span>
           <span class="desc">Place any blocks you want</span>
@@ -570,7 +637,71 @@
     $("m-build").onclick = renderLevelPicker;
     $("m-treasure").onclick = () => startTreasure(false);
     $("m-quad").onclick = () => startTreasure(true);
+    $("m-walk").onclick = startWalk;
+    $("m-f3").onclick = startF3;
     $("m-free").onclick = startFree;
+    wrap.querySelectorAll(".pill.tier").forEach((b) => {
+      b.onclick = () => {
+        save.tier = b.dataset.tier; numsOverride = null; persist();
+        sfx("pop"); renderMenu();
+      };
+    });
+    const help = $("helpbox"), hbtn = $("m-help");
+    hbtn.onclick = () => {
+      const open = help.hidden;
+      if (open && !help.dataset.built) { help.innerHTML = helpHTML(); help.dataset.built = "1"; }
+      help.hidden = !open;
+      hbtn.setAttribute("aria-expanded", String(open));
+      if (open) help.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "nearest" });
+    };
+  }
+
+  /* A tiny always-there lesson: an SVG showing "across first, then up". */
+  function helpHTML() {
+    const g = [];
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+      g.push(`<rect x="${30 + c * 30}" y="${10 + r * 30}" width="28" height="28" rx="3"
+        fill="${(r === 1 && c === 2) ? "#56d6d0" : "rgba(255,255,255,.08)"}"
+        stroke="rgba(255,255,255,.18)"/>`);
+    }
+    for (let i = 1; i <= 4; i++) {
+      g.push(`<text x="${44 + (i - 1) * 30}" y="146" fill="#ffd98a" font-size="14"
+        text-anchor="middle" font-weight="bold">${i}</text>`);
+      g.push(`<text x="18" y="${29 + (4 - i) * 30}" fill="#ffd98a" font-size="14"
+        text-anchor="middle" font-weight="bold">${i}</text>`);
+    }
+    return `
+      <h3>Reading a coordinate</h3>
+      <div class="help-flex">
+        <svg viewBox="0 0 170 158" width="170" height="158" role="img"
+             aria-label="A four by four grid with a diamond at x 3, y 3">
+          <rect x="0" y="0" width="170" height="158" rx="10" fill="#2a3047"/>
+          ${g.join("")}
+          <path d="M30 128 H 104" stroke="#3ddc84" stroke-width="4" fill="none"
+                marker-end="url(#ar)"/>
+          <path d="M104 128 V 58" stroke="#ff5d8f" stroke-width="4" fill="none"
+                marker-end="url(#ar2)"/>
+          <defs>
+            <marker id="ar" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+              <path d="M0 0 L7 3.5 L0 7 z" fill="#3ddc84"/></marker>
+            <marker id="ar2" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+              <path d="M0 0 L7 3.5 L0 7 z" fill="#ff5d8f"/></marker>
+          </defs>
+        </svg>
+        <ul class="help-list">
+          <li><b>X first</b> — walk <span class="hx">across →</span> the bottom. Here: 3.</li>
+          <li><b>Y second</b> — then climb <span class="hy">up ↑</span>. Here: 3.</li>
+          <li>So the diamond is at <span class="coord">(3, 3)</span>.
+              <b>(1, 4)</b> would be a totally different block!</li>
+          <li><b>(0, 0)</b> is the <b>origin</b> — where the two axes cross.</li>
+          <li>Going <b>left</b> of 0 or <b>below</b> 0 gives <b>negative</b> numbers,
+              like <span class="coord">(-2, -1)</span>.</li>
+          <li>In <b>Minecraft</b> it's X, Y and Z: X is east/west, Z is
+              north/south, and <b>Y is how high up you are</b>.</li>
+        </ul>
+      </div>
+      <p class="help-kb">⌨️ On a keyboard: press <b>Tab</b> until the grid lights up,
+         move with the <b>arrow keys</b>, and press <b>Enter</b> to place a block.</p>`;
   }
 
   /* ---------- build: level picker ---------- */
@@ -594,7 +725,8 @@
       card.className = "level-card";
       if (save.done[lvl.id]) {
         const star = document.createElement("span");
-        star.className = "star"; star.textContent = "⭐";
+        star.className = "star";
+        star.textContent = save.perfect[lvl.id] ? "🌟" : "⭐";
         card.appendChild(star);
       }
       card.appendChild(miniGrid(lvl, 7));
@@ -603,6 +735,9 @@
       const sz = document.createElement("span");
       sz.className = "lvsize"; sz.textContent = lvl.size + "×" + lvl.size;
       card.appendChild(nm); card.appendChild(sz);
+      card.setAttribute("aria-label",
+        `Build the ${lvl.name}, ${lvl.size} by ${lvl.size} grid` +
+        (save.perfect[lvl.id] ? ", built perfectly" : save.done[lvl.id] ? ", built" : ""));
       card.onclick = () => startBuild(i);
       grid.appendChild(card);
     });
@@ -614,14 +749,15 @@
     clearScreen();
     const lvl = LEVELS[idx];
     const steps = cellsOf(lvl);
-    let pos = 0, misses = 0, streak = 0;
+    let pos = 0, misses = 0, streak = 0, totalMisses = 0;
+    let nums = save.numbersOn;
 
     const hud = document.createElement("div");
     hud.className = "hud";
     hud.innerHTML = `
       <button class="pill" id="b-back">← Levels</button>
-      <button class="pill ${save.numbersOn ? "on" : ""}" id="b-nums">
-        Numbers: ${save.numbersOn ? "On" : "Off"}</button>`;
+      <button class="pill ${nums ? "on" : ""}" id="b-nums" aria-pressed="${nums}">
+        Numbers: ${nums ? "On" : "Off"}</button>`;
     app.appendChild(hud);
 
     // top row: blueprint preview + live combo
@@ -641,16 +777,24 @@
     app.appendChild(instr);
 
     const prog = document.createElement("div");
-    prog.className = "progress"; prog.innerHTML = "<i></i>";
+    prog.className = "progress";
+    prog.innerHTML = '<i></i>';
+    prog.setAttribute("role", "progressbar");
+    prog.setAttribute("aria-label", "Blocks placed");
+    prog.setAttribute("aria-valuemin", "0");
+    prog.setAttribute("aria-valuemax", String(steps.length));
+    prog.setAttribute("aria-valuenow", "0");
     app.appendChild(prog);
 
-    const ctx = makeBoard(lvl.size, onTap);
+    const ctx = makeBoard(lvl.size, onTap, { numbers: nums });
     boardCtx = ctx;
     const bw = document.createElement("div");
     bw.className = "board-wrap"; bw.appendChild(ctx.board);
     app.appendChild(bw);
     ctx.size();
-    enableCursor(lvl.size, ctx, onTap);
+
+    const explain = makeExplain();
+    app.appendChild(explain);
 
     // faint blueprint outline (footprint only — no colours given away)
     steps.forEach((s) => {
@@ -659,7 +803,7 @@
     });
 
     $("b-back").onclick = renderLevelPicker;
-    $("b-nums").onclick = () => toggleNums(ctx, $("b-nums"));
+    $("b-nums").onclick = () => { nums = toggleNums(ctx, $("b-nums"), nums); };
     updateCombo();
     showStep();
 

@@ -539,6 +539,17 @@
     updatePrintTitle();
   }
 
+  // ---- test hook -------------------------------------------------------
+  // Lets the offline fairness checker (and Playwright) exercise the roster
+  // algorithm directly, with no DOM involved. Harmless in the browser.
+  if (typeof window !== "undefined") {
+    window.__rosterTestHook = {
+      buildRoster: buildRoster,
+      FIELD: FIELD,
+      ON_FIELD: ON_FIELD
+    };
+  }
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
