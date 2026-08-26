@@ -622,6 +622,9 @@
     delete copy.fromReview;
     S.review.push({ key: key, tier: tier(), subject: q.subject, misses: 1, q: copy });
     while (S.review.length > REVIEW_MAX) S.review.shift();
+    // Not on the very next question: the answer is still on screen, and
+    // parroting it back a second later isn't remembering, it's copying.
+    if (reviewGap < 2) reviewGap = 2;
   }
 
   function forget(key) {

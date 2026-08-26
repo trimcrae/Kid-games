@@ -54,7 +54,7 @@
   };
 
   const SAVE_KEY = "music-lab.v1";
-  const DEFAULT_HINT = 'On a computer you can play with your keyboard too: <b>A S D F G H J K L ;</b> are the white keys and <b>W E T Y U O P</b> are the black ones.';
+  let DEFAULT_HINT = 'On a computer you can play with your keyboard too: <b>A S D F G H J K L ;</b> are the white keys and <b>W E T Y U O P</b> are the black ones.';
 
   /* ---------------- elements ---------------- */
   const el = {
@@ -1345,8 +1345,9 @@
 
   // hide the laptop hint on touch devices where it means nothing
   if (window.matchMedia && window.matchMedia("(hover: none)").matches) {
-    el.hint.textContent = "Tip: turn the note names off for a real challenge!";
+    DEFAULT_HINT = "Tip: turn the note names off for a real challenge — or flip on the flat names to meet B♭.";
   }
+  el.hint.innerHTML = DEFAULT_HINT;
 
   // a tab-away or a locked phone should not leave notes ringing
   document.addEventListener("visibilitychange", function () {
