@@ -1957,6 +1957,100 @@
   }
   renderShelf();
 
+
+  /* ===========================================================
+     READ IT OUT LOUD
+     -----------------------------------------------------------
+     Jeannie writes the story; Ellie (3) gets to hear it. Walks
+     the whole book in reading order, turning pages as it goes and
+     glowing the bubble it is currently reading.
+     =========================================================== */
+  var readSec = document.getElementById("read-sec");
+  var readBtn = document.getElementById("read-comic");
+  var speech = window.speechSynthesis;
+  var reading = false, readQueue = [], readAt = 0, readGuard = null;
+
+  if (speech && readSec) readSec.hidden = false;
+
+  function buildReadQueue() {
+    var q = [];
+    book.pages.forEach(function (p, pi) {
+      p.panels.forEach(function (pan, qi) {
+        // captions first (they narrate), then everything else top-to-bottom
+        var items = pan.items.slice().sort(function (a, b) {
+          var ca = a.type === "caption" ? 0 : 1, cb = b.type === "caption" ? 0 : 1;
+          if (ca !== cb) return ca - cb;
+          return (a.y || 0) - (b.y || 0);
+        });
+        items.forEach(function (it) {
+          var t = String(it.text || "").trim();
+          if (!t || !isText(it.type)) return;
+          q.push({ page: pi, panel: qi, id: it.id, text: t });
+        });
+      });
+    });
+    return q;
+  }
+
+  function stopReading() {
+    reading = false;
+    if (readGuard) { clearTimeout(readGuard); readGuard = null; }
+    try { if (speech) speech.cancel(); } catch (e) {}
+    [].forEach.call(pageEl.querySelectorAll(".item.reading"), function (el) {
+      el.classList.remove("reading");
+    });
+    if (readBtn) readBtn.textContent = "🔊 Read my comic";
+  }
+
+  function readStep() {
+    if (!reading) return;
+    [].forEach.call(pageEl.querySelectorAll(".item.reading"), function (el) {
+      el.classList.remove("reading");
+    });
+    if (readAt >= readQueue.length) {
+      stopReading();
+      flash("The End! 📖 Lovely story.");
+      return;
+    }
+    var step = readQueue[readAt++];
+    if (step.page !== curPage) { goPage(step.page); }
+    selPanel = step.panel;
+    refreshSelection();
+    var el = elFor(step.id);
+    if (el) el.classList.add("reading");
+
+    var next = function () { if (reading) readStep(); };
+    // watchdog: some browsers never fire "end", so never leave a kid stuck
+    var wait = Math.min(12000, 1200 + step.text.length * 90);
+    if (readGuard) clearTimeout(readGuard);
+    readGuard = setTimeout(next, wait);
+
+    try {
+      var u = new SpeechSynthesisUtterance(step.text);
+      u.rate = 0.92; u.pitch = 1.05;
+      u.onend = function () {
+        if (!reading) return;
+        if (readGuard) { clearTimeout(readGuard); readGuard = null; }
+        setTimeout(next, 220);
+      };
+      speech.speak(u);
+    } catch (e) { /* the watchdog keeps things moving */ }
+  }
+
+  if (readBtn) {
+    readBtn.addEventListener("click", function () {
+      if (reading) { stopReading(); flash("Stopped reading 🔇"); return; }
+      readQueue = buildReadQueue();
+      if (!readQueue.length) { flash("No words yet — add a caption or a bubble first 💬"); return; }
+      readAt = 0; reading = true;
+      readBtn.textContent = "⏹ Stop reading";
+      selItemId = null;
+      flash("Listen to your story… 🔊");
+      readStep();
+    });
+  }
+  window.addEventListener("pagehide", stopReading);
+
   /* ---------- go! ---------- */
   renderPage();
   updateUndoButtons();

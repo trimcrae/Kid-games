@@ -150,7 +150,7 @@ const STATES = {
   KS: ["Kansas", "Topeka", "Midwest", "Flat prairie, golden wheat fields and lots of thunderstorms."],
   KY: ["Kentucky", "Frankfort", "South", "Mammoth Cave has hundreds of miles of tunnels underground."],
   LA: ["Louisiana", "Baton Rouge", "South", "Jazz music was invented in New Orleans."],
-  ME: ["Maine", "Augusta", "Northeast", "Lobster boats, lighthouses — and the first sunrise in the USA."],
+  ME: ["Maine", "Augusta", "Northeast", "Lobster boats, lighthouses — and for most of the year, the first place in the USA to see the sunrise."],
   MD: ["Maryland", "Annapolis", "South", "The Star-Spangled Banner was written about a battle at Fort McHenry."],
   MA: ["Massachusetts", "Boston", "Northeast", "The Pilgrims landed at Plymouth here in 1620."],
   MI: ["Michigan", "Lansing", "Midwest", "Shaped like a mitten, and it touches four of the five Great Lakes."],

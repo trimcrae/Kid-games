@@ -803,7 +803,7 @@
       $("pause-line").textContent =
         "Level " + level + " · 🏃 " + crew + " crew · 🪙 " + runCoins;
       show(pauseScreen);
-      $("resume-btn").focus();
+      $("resume-btn").focus({ preventScroll: true });
       if (actx && actx.state === "running") { try { actx.suspend(); } catch (e) {} }
       say("Paused.");
     } else {
@@ -892,7 +892,7 @@
       `${mode().label} best: Level ${P.bestLevel} • top finish ${P.bestEndCrew}` +
       (earned !== runCoins ? "  (bonus coins!)" : "");
     show(gameover);
-    $("again-btn").focus();
+    $("again-btn").focus({ preventScroll: true });
     say((levelCleared ? "Level " + level + " cleared. " : "Run finished. ") +
         "Quiz gates " + runQuizRight + " right, " + runQuizWrong + " wrong.");
   }

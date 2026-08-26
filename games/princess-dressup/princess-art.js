@@ -397,25 +397,29 @@ window.PrincessArt = (function () {
       });
     },
 
-    // long satin gloves that follow the arms exactly
+    // little white satin gloves with a frilly cuff at each wrist
     gloves: function (svg, defs, g) {
       var grp = el("g", {}, g);
-      var cuff = el("g", { fill: "none", stroke: "#fff6fb", "stroke-width": 13, "stroke-linecap": "round" }, grp);
-      el("path", { d: "M 117 240 C 111 262 120 277 149 284" }, cuff);
-      el("path", { d: "M 213 240 C 219 262 210 277 181 284" }, cuff);
-      el("circle", { cx: 152, cy: 285, r: 8.2, fill: "#fff6fb" }, grp);
-      el("circle", { cx: 178, cy: 285, r: 8.2, fill: "#fff6fb" }, grp);
-      var shine = el("g", { fill: "none", stroke: "#ffd8ec", "stroke-width": 2.5, "stroke-linecap": "round", opacity: 0.9 }, grp);
-      el("path", { d: "M 114 244 C 109 262 117 274 140 281" }, shine);
-      el("path", { d: "M 216 244 C 221 262 213 274 190 281" }, shine);
-      el("circle", { cx: 119, cy: 244, r: 3.2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 1 }, grp);
-      el("circle", { cx: 211, cy: 244, r: 3.2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 1 }, grp);
+      [[1, 152, 138, 122], [-1, 178, 192, 208]].forEach(function (side) {
+        var dir = side[0], hx = side[1], wx = side[2];
+        el("path", {
+          d: "M " + wx + " 278 C " + (wx + 5 * dir) + " 283 " + (hx - 4 * dir) + " 285 " + hx + " 285",
+          stroke: "#fffafd", "stroke-width": 15, "stroke-linecap": "round", fill: "none"
+        }, grp);
+        el("circle", { cx: hx, cy: 285, r: 9, fill: "#fffafd", stroke: "#f0d2e4", "stroke-width": 1.5 }, grp);
+        // the frill, sitting across the wrist
+        el("ellipse", {
+          cx: wx, cy: 277, rx: 4.5, ry: 10, fill: "#ffe3f2", stroke: "#f0b8d8", "stroke-width": 1.5,
+          transform: "rotate(" + (-32 * dir) + " " + wx + " 277)"
+        }, grp);
+        el("circle", { cx: hx - 3 * dir, cy: 282, r: 2, fill: "#ffe07a", stroke: "#e8b83d", "stroke-width": 0.8 }, grp);
+      });
     },
 
     // a big satin bow tied into her side hair
     hairbow: function (svg, defs, g) {
       var pink = url(pinkGrad(defs));
-      var grp = el("g", { transform: "translate(226 146) rotate(10)", filter: url(glowFilter(defs, 1.5)) }, g);
+      var grp = el("g", { transform: "translate(233 180) rotate(12) scale(0.92)", filter: url(glowFilter(defs, 1.5)) }, g);
       el("path", { d: "M -4 8 C -12 20 -16 28 -9 34", stroke: "#ff7fc0", "stroke-width": 5, fill: "none", "stroke-linecap": "round" }, grp);
       el("path", { d: "M 4 8 C 12 20 16 28 9 34", stroke: "#ff7fc0", "stroke-width": 5, fill: "none", "stroke-linecap": "round" }, grp);
       el("path", { d: "M 0 0 C -7 -17 -27 -19 -27 -4 C -27 9 -8 11 0 0 Z", fill: pink, stroke: "#e35ba2", "stroke-width": 1.5 }, grp);
@@ -449,7 +453,7 @@ window.PrincessArt = (function () {
   var ORIGIN = {
     crown: "50% 15%", flower: "30% 23%", necklace: "50% 53%",
     wand: "78% 30%", shoes: "50% 96%", sparkle: "50% 50%",
-    bouquet: "50% 66%", gloves: "50% 60%", hairbow: "68% 33%"
+    bouquet: "50% 66%", gloves: "50% 65%", hairbow: "71% 41%"
   };
 
   function layer(slot, key) {

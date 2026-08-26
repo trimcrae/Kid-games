@@ -17,7 +17,6 @@
       .back-link { padding: 0.4rem 0.9rem; font-size: 0.95rem; }
       /* keep the score and both buttons on ONE row on a phone */
       .stars .wide { display: none; }
-      .stars .narrow { display: inline; }
       .stars { font-size: 1.05rem; }
     }
 
@@ -31,7 +30,7 @@
     }
     .stars { font-size: 1.15rem; font-weight: bold; color: var(--purple); }
     .stars #stars { color: var(--pink); }
-    .stars .narrow { display: none; }
+    @media (min-width: 461px) { .stars .narrow { display: none; } }
     .icon-btn {
       font-size: 1.35rem;
       border: none;

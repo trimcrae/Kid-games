@@ -746,6 +746,7 @@
       '<p class="words">' + words + "</p>" +
       '<p class="rank-line">🏅 <b>' + esc(rank(m.planks)) + "</b>" +
       (next ? " — " + (next[0] - m.planks) + " more planks to <b>" + esc(next[1]) + "</b>" : " — top rank!") +
+      (m.fewest ? "<br>Fastest crossing so far: <b>" + m.fewest + "</b> words. Beat it!" : "") +
       "</p>" +
       '<button class="btn" type="button" id="again-btn">Race again →</button>' +
       "</div>";
