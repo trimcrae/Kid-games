@@ -118,12 +118,16 @@
     /* ---------- the board ---------- */
     #play-area {
       position: relative;
-      height: clamp(340px, 54vh, 560px);
-      margin: 0 0.75rem 1.5rem;
+      /* fill whatever is left of the screen, so the level menu never clips */
+      height: clamp(360px, calc(100vh - 240px), 700px);
+      margin: 0 0.75rem 1.2rem;
       border-radius: 28px;
       background: rgba(255, 255, 255, 0.55);
       box-shadow: inset 0 0 0 4px rgba(138, 92, 255, 0.15);
       overflow: hidden;
+    }
+    @supports (height: 100dvh) {
+      #play-area { height: clamp(360px, calc(100dvh - 240px), 700px); }
     }
 
     /* ---------- bubbles ----------
@@ -249,7 +253,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 0.5rem;
       background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(2px);
@@ -258,7 +262,10 @@
       overflow-y: auto;            /* never clip the Start button */
       overscroll-behavior: contain;
     }
+    /* centre the menu when it fits, scroll (never clip) when it doesn't */
     .start-overlay > * { flex: 0 0 auto; }
+    .start-overlay::before { content: ""; margin-top: auto; }
+    .start-overlay::after  { content: ""; margin-bottom: auto; }
     .start-overlay h2 { font-size: clamp(1.15rem, 4.4vw, 1.7rem); margin: 0; color: var(--purple); }
     .start-overlay p { margin: 0; max-width: 24rem; font-size: clamp(0.85rem, 3vw, 1rem); color: var(--ink); }
     .start-overlay.hidden { display: none; }
@@ -323,6 +330,8 @@
     .btn:hover { transform: scale(1.04); }
 
     .keys-hint { font-size: 0.72rem; color: #6a6385; margin: 0; }
+    /* no keyboard on a finger-only device — save the space */
+    @media (pointer: coarse) { .keys-hint { display: none; } }
 
     /* ---------- calm mode for kids who prefer reduced motion ----------
        Re-declaring the keyframes keeps every animation NAME the same, so the

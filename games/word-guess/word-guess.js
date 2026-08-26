@@ -573,6 +573,10 @@
     buildGrid();
     buildKeyboard();
 
+    // Ellie is 3 and can't read the clue list — in Easy mode the picture
+    // hint is on from the very first tap.
+    if (!restored && tierId === "easy") { hintStage = 1; showHint(); }
+
     if (restored && Array.isArray(saved.guesses)) {
       replay(saved.guesses.filter(function (g) { return typeof g === "string" && g.length === LEN; }));
       hintStage = Number(saved.hintStage) || 0;
@@ -612,10 +616,12 @@
   }
 
   function updateModeNote() {
-    if (!el.modeNote) return;
-    el.modeNote.textContent = daily
-      ? "🗓️ Word of the Day — one " + tier().name + " puzzle, the same for everyone, new every morning."
-      : "♾️ Practice — as many " + tier().name + " words as you like.";
+    if (el.modeNote) {
+      el.modeNote.textContent = daily
+        ? "🗓️ Word of the Day — one " + tier().name + " puzzle, the same for everyone, new every morning."
+        : "♾️ Practice — as many " + tier().name + " words as you like.";
+    }
+    el.newBtn.textContent = daily ? "♾️ Practice word" : "🔄 New word";
   }
 
   function setTier(id) {
