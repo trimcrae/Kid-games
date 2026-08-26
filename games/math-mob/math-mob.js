@@ -781,6 +781,8 @@
     hud.style.display = "flex";
     progWrap.style.display = "flex";
     setCombo(0);
+    hudWas.crew = hudWas.coins = hudWas.level = hudWas.dist = -1;
+    hudWas.unit = hudWas.fill = null;
     syncHud();
     say("Level " + level + " started. " + theme().name + ".");
     startLoop();
@@ -1884,21 +1886,32 @@
   }
 
   // ---- HUD ------------------------------------------------------------
+  // The HUD is touched every frame, so only actually write to the DOM when a
+  // value really changed — otherwise we'd force a layout 60 times a second.
+  const hudWas = { crew: -1, coins: -1, level: -1, dist: -1, unit: null, fill: null };
+  function setText(el, key, val) {
+    if (hudWas[key] === val) return;
+    hudWas[key] = val;
+    el.textContent = val;
+  }
   function syncHud() {
-    crewEl.textContent = crew;
-    runCoinsEl.textContent = runCoins;
-    levelEl.textContent = level;
+    setText(crewEl, "crew", crew);
+    setText(runCoinsEl, "coins", runCoins);
+    setText(levelEl, "level", level);
+    let dv, unit, fill;
     if (phase === "run") {
-      const left = Math.max(1, Math.ceil(levelTarget - dist));
-      distEl.textContent = left;
-      distUnitEl.textContent = "m";
-      progFill.style.width = clamp((dist / levelTarget) * 100, 0, 100).toFixed(1) + "%";
+      dv = Math.max(1, Math.ceil(levelTarget - dist));
+      unit = "m";
+      fill = clamp((dist / levelTarget) * 100, 0, 100).toFixed(1) + "%";
     } else {
       // In the finale the meter counts brick walls left instead of metres.
-      distEl.textContent = Math.max(0, finaleTotal - finaleSmashed);
-      distUnitEl.textContent = "";
-      progFill.style.width = "100%";
+      dv = Math.max(0, finaleTotal - finaleSmashed);
+      unit = "";
+      fill = "100%";
     }
+    setText(distEl, "dist", dv);
+    setText(distUnitEl, "unit", unit);
+    if (hudWas.fill !== fill) { hudWas.fill = fill; progFill.style.width = fill; }
   }
   function setCombo(n) {
     comboEl.textContent = n;

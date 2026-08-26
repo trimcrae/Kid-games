@@ -419,7 +419,7 @@ window.PrincessArt = (function () {
     // a big satin bow tied into her side hair
     hairbow: function (svg, defs, g) {
       var pink = url(pinkGrad(defs));
-      var grp = el("g", { transform: "translate(233 180) rotate(12) scale(0.92)", filter: url(glowFilter(defs, 1.5)) }, g);
+      var grp = el("g", { transform: "translate(242 184) rotate(12) scale(0.9)", filter: url(glowFilter(defs, 1.5)) }, g);
       el("path", { d: "M -4 8 C -12 20 -16 28 -9 34", stroke: "#ff7fc0", "stroke-width": 5, fill: "none", "stroke-linecap": "round" }, grp);
       el("path", { d: "M 4 8 C 12 20 16 28 9 34", stroke: "#ff7fc0", "stroke-width": 5, fill: "none", "stroke-linecap": "round" }, grp);
       el("path", { d: "M 0 0 C -7 -17 -27 -19 -27 -4 C -27 9 -8 11 0 0 Z", fill: pink, stroke: "#e35ba2", "stroke-width": 1.5 }, grp);

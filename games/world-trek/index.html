@@ -308,6 +308,21 @@
       max-width: 620px;
     }
     .choices.wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .choices.compact {
+      grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+      gap: 0.4rem;
+      max-width: 780px;
+    }
+    .choices.compact .choice {
+      flex-direction: row;
+      gap: 0.45rem;
+      min-height: 46px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.92rem;
+      border-width: 2px;
+    }
+    .choices.compact .flag.mini { width: 2.1rem; flex: 0 0 auto; }
+    .choices.compact .cont-dot { font-size: 1.1rem; }
     .choice {
       font-family: var(--font);
       font-size: 1rem;
@@ -502,6 +517,17 @@
     <div class="scorebar" id="scorebar"></div>
     <p class="stars" id="stars"></p>
 
+    <div class="info hidden" id="info">
+      <div class="info-flag hidden" id="info-flag"></div>
+      <h3 id="info-name"></h3>
+      <p class="sub" id="info-sub"></p>
+      <p id="info-fact"></p>
+      <p class="more hidden" id="info-more"></p>
+      <p class="why hidden" id="info-why"></p>
+    </div>
+
+    <div class="choices compact hidden" id="atlas-countries"></div>
+
     <div class="map-card" id="world-card">
       <div id="world" role="group" aria-label="A pixel map of the world — tab to each continent and ocean">
         <div class="map-labels" id="world-labels" aria-hidden="true"></div>
@@ -517,15 +543,6 @@
         <div id="states" role="group" aria-label="A puzzle map of the 50 states — use the arrow keys to move around it"></div>
       </div>
       <div class="legend" id="states-legend"></div>
-    </div>
-
-    <div class="info hidden" id="info">
-      <div class="info-flag hidden" id="info-flag"></div>
-      <h3 id="info-name"></h3>
-      <p class="sub" id="info-sub"></p>
-      <p id="info-fact"></p>
-      <p class="more hidden" id="info-more"></p>
-      <p class="why hidden" id="info-why"></p>
     </div>
 
     <div class="passport hidden" id="passport" aria-live="polite"></div>

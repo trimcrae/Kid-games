@@ -241,7 +241,10 @@
         b.textContent = puzzle.grid[r][c];
         b.dataset.r = r; b.dataset.c = c;
         b.tabIndex = (r === 0 && c === 0) ? 0 : -1;
-        b.addEventListener("pointerdown", (e) => { e.preventDefault(); b.focus(); setFocusRC(r, c); pointerDown(r, c); });
+        // note: no .focus() here — that would paint a focus ring on every tap
+        // and can scroll the page mid-drag. Moving the roving tabindex is enough,
+        // so a keyboard player who tabs in lands on the last letter touched.
+        b.addEventListener("pointerdown", (e) => { e.preventDefault(); setFocusRC(r, c); pointerDown(r, c); });
         b.addEventListener("pointerenter", () => pointerEnter(r, c));
         b.addEventListener("keydown", (e) => onCellKey(e, r, c));
         cells[r][c] = b;
