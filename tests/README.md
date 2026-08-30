@@ -38,6 +38,12 @@ For **every game** (and the landing page), at **each of the three sizes**:
     Free Play, Echo, Find the Note & Read Music all score
   - **World Trek** — the world map and all 50 states build, continents,
     oceans, states & capitals score, and the Atlas reads a place out
+  - **Craepets** — every sprite bakes, the Farm/Well/Pool pay for maths, words
+    and world knowledge, the market asks for your change, a duel is won, a
+    house is bought and furnished (and the furniture shows up in the nest),
+    the prize wheel pays once a day and refuses a second spin, a shop is
+    stocked at a price you set — and one player buying from another's shelf
+    really does move the coins between their two saves
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

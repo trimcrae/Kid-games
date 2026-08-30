@@ -1158,6 +1158,74 @@ const GAMES = {
       throw new Error("repainting from the bag did nothing");
     }
 
+    // ---- your own house: buy furniture, put it out, move somewhere bigger
+    await page.evaluate(() => Craepets.grant(5000));
+    await page.locator('[data-go="home"]').click();
+    const houseLv = await page.evaluate(() => Craepets.house().level);
+    await page.locator("[data-upgrade]").click();
+    await page.waitForSelector(".sheet");
+    await page.locator(".sheet .close").click();
+    if (await page.evaluate(() => Craepets.house().level) !== houseLv + 1) {
+      throw new Error("paying for a bigger house did not move you into it");
+    }
+    await page.locator('[data-go="market"]').click();
+    const decor = await page.evaluate(() => CPData.shopStock().filter((i) => i.kind === "decor").map((i) => i.id));
+    if (decor.length < 2) throw new Error("the market is not stocking furniture");
+    for (const id of decor.slice(0, 2)) {
+      await page.locator(`[data-buy="${id}"]`).click();
+      if (await page.locator("[data-change]").count()) {
+        await page.locator(`[data-change="${await page.evaluate(() => Craepets.changeIndex())}"]`).click();
+      }
+      await page.waitForTimeout(120);
+      if (await page.locator(".sheet .close").count()) await page.locator(".sheet .close").click();
+      await page.waitForTimeout(80);
+    }
+    const home = await page.evaluate(() => Craepets.house());
+    if (home.owned.length !== 2) throw new Error("furniture was not bought");
+    // furniture is only worth anything when it is OUT — and then you can see it
+    await page.locator('[data-go="nest"]').click();
+    await page.waitForTimeout(120);
+    if (await page.locator(".scene .deco").count() !== home.placed.length) {
+      throw new Error("furniture that is out is not showing in the nest");
+    }
+    await page.locator('[data-go="home"]').click();
+    await page.locator("[data-store]").first().click();
+    await page.waitForTimeout(120);
+    if (await page.evaluate(() => Craepets.house().placed.length) !== home.placed.length - 1) {
+      throw new Error("furniture could not be put away");
+    }
+    await page.locator("[data-place]").first().click();
+    await page.waitForTimeout(120);
+    if (await page.evaluate(() => Craepets.house().placed.length) !== home.placed.length) {
+      throw new Error("furniture could not be put back out");
+    }
+
+    // ---- the prize wheel: one free spin a day, and it pays
+    await page.locator('[data-go="quests"]').click();
+    await page.waitForSelector("#wheel");
+    const preSpin = await page.evaluate(() => Craepets.state().coins);
+    await page.locator("[data-spin]").click();
+    await page.waitForSelector(".sheet h3", { timeout: 9000 });
+    if (await page.evaluate(() => Craepets.state().coins) <= preSpin) throw new Error("the wheel paid nothing");
+    await page.locator(".sheet .close").click();
+    if (await page.locator("[data-spin]").count()) throw new Error("the wheel can be spun twice in one day");
+
+    // ---- your own shop: stock it at your own price
+    await page.locator('[data-go="stall"]').click();
+    await page.waitForSelector("[data-stock]");
+    await page.locator("[data-stock]").first().click();
+    await page.waitForSelector("[data-listit]");
+    await page.locator('[data-priced="5"]').click();
+    await page.waitForSelector("[data-listit]");
+    await page.locator("[data-listit]").click();
+    await page.waitForTimeout(150);
+    const shelf = await page.evaluate(() => Craepets.stall().goods);
+    if (!shelf.length) throw new Error("nothing went on your own shop shelf");
+    const listed = shelf[0];
+    if (listed.price <= (await page.evaluate((id) => CPData.itemById(id).cost, listed.id))) {
+      throw new Error("the price you set was not used");
+    }
+
     // the trophy case lists the whole family, each with their own pet
     await page.locator('[data-go="case"]').click();
     if (await page.locator(".trophy:not(.locked)").count() < 1) throw new Error("no trophies earned");
@@ -1178,12 +1246,35 @@ const GAMES = {
     if (await page.evaluate(() => Craepets.session().q.tier) !== "grown") throw new Error("Shannon got a child's question");
     if (await page.locator(".choice").count() !== 4) throw new Error("the grown-up level should offer 4 choices");
 
+    // Shannon can walk up to Cory's shelf and buy from it, and the coins
+    // really do move from her purse into his — the whole point of a shop
+    await page.locator('[data-go="market"]').click();
+    await page.waitForSelector("[data-stallbuy]");
+    const herCoins = await page.evaluate(() => Craepets.state().coins);
+    const hisBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("craepets.v1.cory")).coins);
+    await page.locator("[data-stallbuy]:not([disabled])").first().click();
+    if (await page.locator("[data-change]").count()) {
+      await page.locator(`[data-change="${await page.evaluate(() => Craepets.changeIndex())}"]`).click();
+    }
+    await page.waitForTimeout(200);
+    const hisAfter = await page.evaluate(() => JSON.parse(localStorage.getItem("craepets.v1.cory")));
+    if (await page.evaluate(() => Craepets.state().coins) >= herCoins) throw new Error("the buyer was not charged");
+    if (hisAfter.coins <= hisBefore) throw new Error("the shopkeeper was not paid");
+    if (hisAfter.stats.sold !== 1) throw new Error("the sale was not written into the seller's save");
+    if (!hisAfter.stall.sales.length) throw new Error("the seller got no receipt");
+
     // ...and Cory's pet is exactly where he left it
     await page.locator("[data-swap]").click();
     await page.locator('[data-who="cory"]').click();
     await page.waitForTimeout(200);
     const cory = await page.evaluate(() => Craepets.state());
     if (!cory.pet || cory.pet.name !== "Wobble") throw new Error("switching profiles lost Cory's pet");
+    // he sees the receipt waiting for him
+    await page.locator('[data-go="stall"]').click();
+    await page.waitForSelector("[data-clearsales]");
+    await page.locator("[data-clearsales]").click();
+    await page.waitForTimeout(120);
+    if ((await page.evaluate(() => Craepets.stall().sales.length)) !== 0) throw new Error("receipts would not clear");
 
     // Kieran's level cannot be lost: two choices, and a miss just waits
     await page.locator("[data-swap]").click();
@@ -1206,7 +1297,10 @@ const GAMES = {
       .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
     return `${art.n} sprites bake; farm/well/pool pay for maths, words & world; ` +
       "market asks for change; feed/play/wash; a duel won; paint brushes " +
-      "repaint; quests, trophies, and separate saves for Shannon, Cory & Kieran";
+      "repaint; a house bought, furnished & seen in the nest; the prize wheel " +
+      "spins once a day; a shop stocked at your own price and Shannon buying " +
+      "from it pays Cory; quests, trophies, and separate saves for Shannon, " +
+      "Cory & Kieran";
   },
 
   async "Crossword"(page, g, d) {

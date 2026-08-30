@@ -12,7 +12,7 @@
      • One versioned cache — bump VERSION to flush everything.
    =========================================================== */
 
-const VERSION = "v7";   // v7: Craepets joins the arcade
+const VERSION = "v8";   // v8: Craepets gets a house, a shop and a prize wheel
 const CACHE = "arcade-" + VERSION;
 
 const CORE = [

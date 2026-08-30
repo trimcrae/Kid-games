@@ -43,7 +43,13 @@ no logins.
 > science and geography at the Rainbow Pool, and any of the three in the
 > Quiz Arena. It has **five learning levels** (Tiny → Grown-up) so the
 > toddler and the grown-ups can play the same game, and **every person on
-> the device gets their own pet, coins and trophy case**.
+> the device gets their own pet, coins and trophy case**. What you do with
+> the coins is a lesson too: **furnish your own house** (each piece really
+> does slow boredom, speed up sleep or earn extra XP), **open your own shop**
+> and set your own prices — everybody else in the family sees your shelf in
+> their Market and buys from it, and the coins land in your purse — and take
+> a **free spin of the prize wheel** every day, which is eight equal slices
+> and tells you the odds every time it stops.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times

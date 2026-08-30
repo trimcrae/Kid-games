@@ -1317,7 +1317,24 @@ window.CPData = (function () {
     { id: "pizza",     name: "Pizza Slice",   emoji: "🍕", cost: 24, fill: 40, joy: 8 },
     { id: "cake",      name: "Birthday Cake", emoji: "🍰", cost: 30, fill: 32, joy: 18 },
     { id: "starfruit", name: "Star Fruit",    emoji: "⭐", cost: 40, fill: 50, joy: 14, rare: true },
-    { id: "jelly",     name: "Rainbow Jelly", emoji: "🌈", cost: 55, fill: 55, joy: 28, rare: true }
+    { id: "jelly",     name: "Rainbow Jelly", emoji: "🌈", cost: 55, fill: 55, joy: 28, rare: true },
+    /* --- the second shelf, so the market has something new most mornings --- */
+    { id: "banana",    name: "Banana",        emoji: "🍌", cost: 6,  fill: 14, joy: 2 },
+    { id: "pear",      name: "Green Pear",    emoji: "🍐", cost: 7,  fill: 13, joy: 2 },
+    { id: "egg",       name: "Boiled Egg",    emoji: "🥚", cost: 7,  fill: 14, joy: 1 },
+    { id: "grapes",    name: "Grapes",        emoji: "🍇", cost: 8,  fill: 15, joy: 3 },
+    { id: "corn",      name: "Sweetcorn",     emoji: "🌽", cost: 9,  fill: 17, joy: 2 },
+    { id: "melon",     name: "Melon Slice",   emoji: "🍉", cost: 11, fill: 19, joy: 4 },
+    { id: "popcorn",   name: "Popcorn Tub",   emoji: "🍿", cost: 13, fill: 12, joy: 11 },
+    { id: "donut",     name: "Sprinkle Donut", emoji: "🍩", cost: 17, fill: 16, joy: 15 },
+    { id: "icecream",  name: "Ice Cream",     emoji: "🍨", cost: 19, fill: 14, joy: 20 },
+    { id: "taco",      name: "Crunchy Taco",  emoji: "🌮", cost: 21, fill: 33, joy: 7 },
+    { id: "pancakes",  name: "Pancake Stack", emoji: "🥞", cost: 22, fill: 34, joy: 10 },
+    { id: "noodles",   name: "Noodle Bowl",   emoji: "🍜", cost: 26, fill: 42, joy: 9 },
+    { id: "stew",      name: "Hearty Stew",   emoji: "🥘", cost: 28, fill: 46, joy: 6 },
+    { id: "sushi",     name: "Sushi Set",     emoji: "🍣", cost: 34, fill: 44, joy: 12 },
+    { id: "cloudfloss", name: "Cloud Floss",  emoji: "🍧", cost: 48, fill: 30, joy: 40, rare: true },
+    { id: "moonpie",   name: "Moon Pie",      emoji: "🌜", cost: 60, fill: 60, joy: 30, rare: true }
   ];
 
   var TOYS = [
@@ -1327,14 +1344,29 @@ window.CPData = (function () {
     { id: "kite",    name: "Paper Kite",   emoji: "🪁", cost: 55, joy: 15 },
     { id: "plush",   name: "Plush Friend", emoji: "🧸", cost: 70, joy: 18 },
     { id: "trumpet", name: "Tiny Trumpet", emoji: "🎺", cost: 85, joy: 20 },
-    { id: "skate",   name: "Skateboard",   emoji: "🛹", cost: 100, joy: 24 }
+    { id: "skate",   name: "Skateboard",   emoji: "🛹", cost: 100, joy: 24 },
+    { id: "yoyo",    name: "Yo-yo",        emoji: "🪀", cost: 20,  joy: 7 },
+    { id: "blocks",  name: "Building Blocks", emoji: "🧱", cost: 35, joy: 10 },
+    { id: "puzzle",  name: "Jigsaw Puzzle", emoji: "🧩", cost: 45, joy: 13 },
+    { id: "boat",    name: "Toy Boat",     emoji: "⛵", cost: 60,  joy: 16 },
+    { id: "drum",    name: "Little Drum",  emoji: "🥁", cost: 75,  joy: 19 },
+    { id: "robot",   name: "Wind-up Robot", emoji: "🤖", cost: 110, joy: 26 },
+    { id: "scope",   name: "Star Telescope", emoji: "🔭", cost: 130, joy: 28 },
+    { id: "rocket",  name: "Rocket Ride",  emoji: "🚀", cost: 160, joy: 32 }
   ];
 
   var CARE = [
     { id: "soap",   name: "Berry Soap",   emoji: "🧼", cost: 8,  clean: 30 },
     { id: "bath",   name: "Bubble Bath",  emoji: "🛁", cost: 20, clean: 70, joy: 8 },
     { id: "tonic",  name: "Berry Tonic",  emoji: "🧪", cost: 35, energy: 60, joy: 15 },
-    { id: "pillow", name: "Cloud Pillow", emoji: "☁️", cost: 45, energy: 100 }
+    { id: "pillow", name: "Cloud Pillow", emoji: "☁️", cost: 45, energy: 100 },
+    { id: "sponge", name: "Scrub Sponge", emoji: "🧽", cost: 12, clean: 42 },
+    { id: "lotion", name: "Shine Lotion", emoji: "🧴", cost: 18, clean: 50, joy: 4 },
+    { id: "tea",    name: "Sleepy Tea",   emoji: "🍵", cost: 24, energy: 45, joy: 6 },
+    { id: "shower", name: "Rain Shower",  emoji: "🚿", cost: 28, clean: 85, joy: 5 },
+    { id: "wrap",   name: "Warm Wrap",    emoji: "🧣", cost: 32, energy: 70, joy: 10 },
+    { id: "milk",   name: "Moon Milk",    emoji: "🥛", cost: 40, energy: 90, joy: 12 },
+    { id: "lounger", name: "Sun Lounger", emoji: "⛱️", cost: 50, energy: 100, joy: 20 }
   ];
 
   /* Books are read once: they teach a real fact and level your pet's mind. */
@@ -1343,7 +1375,83 @@ window.CPData = (function () {
     { id: "atlas",   name: "Star Atlas",       emoji: "📗", cost: 35, xp: 30, topic: "wonder" },
     { id: "hoard",   name: "The Word Hoard",   emoji: "📘", cost: 35, xp: 30, topic: "word" },
     { id: "numbers", name: "Number Lore",      emoji: "📙", cost: 35, xp: 30, topic: "math" },
-    { id: "valley",  name: "Valley Histories", emoji: "📓", cost: 45, xp: 45, topic: "wonder" }
+    { id: "valley",  name: "Valley Histories", emoji: "📓", cost: 45, xp: 45, topic: "wonder" },
+    { id: "maps",    name: "Book of Maps",     emoji: "🗺️", cost: 35, xp: 30, topic: "wonder" },
+    { id: "shapes",  name: "Shapes & Patterns", emoji: "📐", cost: 40, xp: 38, topic: "math" },
+    { id: "poems",   name: "Book of Poems",    emoji: "🧾", cost: 40, xp: 38, topic: "word" },
+    { id: "riddles", name: "Riddle Book",      emoji: "📔", cost: 40, xp: 36, topic: "word" },
+    { id: "machines", name: "How Things Work", emoji: "📒", cost: 55, xp: 55, topic: "wonder" },
+    { id: "grimoire", name: "The Deep Grimoire", emoji: "📚", cost: 75, xp: 80, topic: "wonder" }
+  ];
+
+  /* =========================================================
+     FURNITURE — the things that turn a nest into a home.
+     Bought once and kept for ever (like a toy or a brush), then
+     PUT OUT in your house, where you can actually see it standing
+     behind your Craepet. Every piece is worth some "cosy", and a
+     cosy house pays you back all day long:
+       · cosy  — your Craepet gets bored far more slowly while
+                 the game is closed
+       · rest  — more energy comes back per hour of sleep
+       · tidy  — it stays clean for longer
+       · study — every right answer anywhere is worth extra XP
+     ========================================================= */
+  var FURNITURE = [
+    { id: "candle",  name: "Warm Candle",    emoji: "🕯️", cost: 20,  cosy: 3 },
+    { id: "lamp",    name: "Little Lamp",    emoji: "💡", cost: 25,  cosy: 4 },
+    { id: "plant",   name: "Potted Plant",   emoji: "🪴", cost: 30,  cosy: 5 },
+    { id: "picture", name: "Framed Picture", emoji: "🖼️", cost: 35,  cosy: 6 },
+    { id: "chair",   name: "Little Chair",   emoji: "🪑", cost: 40,  cosy: 6,  rest: 2 },
+    { id: "clock",   name: "Cuckoo Clock",   emoji: "🕰️", cost: 45,  cosy: 7 },
+    { id: "basket",  name: "Toy Basket",     emoji: "🧺", cost: 45,  cosy: 6,  tidy: 2 },
+    { id: "mirror",  name: "Tall Mirror",    emoji: "🪞", cost: 50,  cosy: 7,  tidy: 3 },
+    { id: "shelf",   name: "Book Shelf",     emoji: "📚", cost: 70,  cosy: 8,  study: 4 },
+    { id: "bed",     name: "Cosy Bed",       emoji: "🛏️", cost: 80,  cosy: 9,  rest: 5 },
+    { id: "tub",     name: "Claw-foot Tub",  emoji: "🛁", cost: 85,  cosy: 8,  tidy: 5 },
+    { id: "sofa",    name: "Big Sofa",       emoji: "🛋️", cost: 110, cosy: 12 },
+    { id: "fire",    name: "Fireplace",      emoji: "🔥", cost: 120, cosy: 13, rest: 3 },
+    { id: "tank",    name: "Fish Tank",      emoji: "🐠", cost: 130, cosy: 12, study: 3 },
+    { id: "tree",    name: "Indoor Tree",    emoji: "🎄", cost: 140, cosy: 13 },
+    { id: "horse",   name: "Rocking Horse",  emoji: "🎠", cost: 150, cosy: 14 },
+    { id: "piano",   name: "Upright Piano",  emoji: "🎹", cost: 165, cosy: 15, study: 3 },
+    { id: "globe",   name: "Spinning Globe", emoji: "🌍", cost: 175, cosy: 12, study: 6 },
+    { id: "window",  name: "Star Window",    emoji: "🪟", cost: 195, cosy: 16, study: 4 },
+    { id: "crown",   name: "Crown Stand",    emoji: "👑", cost: 260, cosy: 20 }
+  ];
+
+  /* =========================================================
+     YOUR HOUSE — five homes, each bigger than the last.
+     "slots" is how many pieces you can have out at once;
+     everything else waits in storage until you swap it in.
+     ========================================================= */
+  var HOUSES = [
+    { name: "Straw Nest",     emoji: "🪹", slots: 3,  cost: 0,
+      note: "A round nest of straw. Every Craepet starts here." },
+    { name: "Snug Burrow",    emoji: "🕳️", slots: 5,  cost: 150,
+      note: "Dug into the hillside — warm all winter." },
+    { name: "Little Cottage", emoji: "🏡", slots: 8,  cost: 450,
+      note: "A proper door, a proper window and a proper roof." },
+    { name: "Big House",      emoji: "🏠", slots: 12, cost: 1100,
+      note: "Room for a sofa AND a piano." },
+    { name: "Valley Tower",   emoji: "🏰", slots: 16, cost: 2500,
+      note: "The tallest home in the valley. You can see the Rainbow Pool from up here." }
+  ];
+
+  /* =========================================================
+     THE PRIZE WHEEL — one free spin every day.
+     Eight EQUAL slices, on purpose: "one slice out of eight" is
+     a fraction a six-year-old can see, and the wheel says so out
+     loud every time it stops.
+     ========================================================= */
+  var WHEEL = [
+    { label: "🪙 10",  coins: 10,  colour: "#ffe08a", say: "Ten coins." },
+    { label: "🪙 40",  coins: 40,  colour: "#a8e6cf", say: "Forty coins!" },
+    { label: "🎁 Treat", coins: 15, colour: "#ffb3c6", treat: true, say: "A snack and fifteen coins!" },
+    { label: "🪙 20",  coins: 20,  colour: "#bde0fe", say: "Twenty coins." },
+    { label: "⭐ 30 XP",   coins: 10,  xp: 30, colour: "#d0bfff", say: "A big lump of experience!" },
+    { label: "🪙 75",  coins: 75,  colour: "#ffd6a5", say: "Seventy five coins!" },
+    { label: "🪙 15",  coins: 15,  colour: "#caffbf", say: "Fifteen coins." },
+    { label: "💎 150", coins: 150, colour: "#9bf6ff", jackpot: true, say: "The jackpot! A hundred and fifty coins!" }
   ];
 
   /* Facts a book can teach — true, short, and worth knowing. */
@@ -1399,8 +1507,10 @@ window.CPData = (function () {
     return a.slice(0, n);
   }
 
-  /* Today's shelves: always some cheap food, plus a rotating handful
-     of treats, toys, books and one paint brush. */
+  /* Today's shelves: always some cheap food, plus a rotating handful of
+     treats, soap, toys, books, furniture and a couple of paint brushes.
+     The shelf is deliberately big — with this much stock the shop is a
+     real choice ("what is this worth to me?") rather than a queue. */
   function shopStock(now) {
     var day = dayNumber(now);
     var cheap = FOODS.filter(function (f) { return f.cost <= 12; });
@@ -1412,17 +1522,21 @@ window.CPData = (function () {
       if (!c.free) brushes.push({ id: "brush:" + c.id, name: c.name + " Brush", emoji: "🖌️", cost: c.cost, kind: "brush", colour: c.id, swatch: c.swatch });
     });
     return []
-      .concat(seededPick(cheap, 3, day * 7 + 1).map(tag("food")))
-      .concat(seededPick(treats, 3, day * 7 + 2).map(tag("food")))
-      .concat(seededPick(CARE, 2, day * 7 + 3).map(tag("care")))
+      .concat(seededPick(cheap, 4, day * 7 + 1).map(tag("food")))
+      .concat(seededPick(treats, 4, day * 7 + 2).map(tag("food")))
+      .concat(seededPick(CARE, 3, day * 7 + 3).map(tag("care")))
       .concat(seededPick(TOYS, 3, day * 7 + 4).map(tag("toy")))
       .concat(seededPick(BOOKS, 2, day * 7 + 5).map(tag("book")))
+      // furniture in two price bands, so there is always something a
+      // small purse can afford AND something worth saving up for
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 50; }), 2, day * 7 + 8).map(tag("decor")))
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 50; }), 2, day * 7 + 9).map(tag("decor")))
       .concat(seededPick(brushes, 2, day * 7 + 6));
   }
   function tag(kind) { return function (it) { var c = {}; for (var k in it) c[k] = it[k]; c.kind = kind; return c; }; }
 
   function itemById(id) {
-    var all = FOODS.concat(TOYS, CARE, BOOKS);
+    var all = FOODS.concat(TOYS, CARE, BOOKS, FURNITURE);
     for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
     if (id.indexOf("brush:") === 0 && window.CPPets) {
       var c = window.CPPets.colour(id.slice(6));
@@ -1436,6 +1550,7 @@ window.CPData = (function () {
     if (TOYS.some(function (f) { return f.id === id; })) return "toy";
     if (CARE.some(function (f) { return f.id === id; })) return "care";
     if (BOOKS.some(function (f) { return f.id === id; })) return "book";
+    if (FURNITURE.some(function (f) { return f.id === id; })) return "decor";
     return "thing";
   }
 
@@ -1461,7 +1576,11 @@ window.CPData = (function () {
     { id: "streak8", track: "bestStreak", goal: 8, coins: 85, text: "Get 8 answers right in a row" },
     { id: "learn30", track: "correct", goal: 30, coins: 120, text: "Answer 30 questions correctly" },
     { id: "arena2",  track: "arenaWin", goal: 2, coins: 130, text: "Win 2 battles in the Quiz Arena" },
-    { id: "mixed3",  track: "subjects", goal: 3, coins: 60, text: "Learn something at the Farm, the Well AND the Pool" }
+    { id: "mixed3",  track: "subjects", goal: 3, coins: 60, text: "Learn something at the Farm, the Well AND the Pool" },
+    { id: "spin1",   track: "spin",   goal: 1, coins: 25, text: "Spin the prize wheel" },
+    { id: "decor1",  track: "placed", goal: 1, coins: 40, text: "Put something out in your house" },
+    { id: "stock1",  track: "stocked", goal: 1, coins: 45, text: "Put something on your own shop shelf" },
+    { id: "stock3",  track: "stocked", goal: 3, coins: 90, text: "Stock 3 things in your own shop" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
@@ -1504,7 +1623,14 @@ window.CPData = (function () {
     { id: "fixer",    emoji: "🔁", name: "Second Look",    note: "Put right 25 you had missed" },
     { id: "week",     emoji: "📅", name: "Every Day",      note: "Play 7 days in a row" },
     { id: "palette",  emoji: "🌈", name: "Full Palette",   note: "Own every paint brush" },
-    { id: "level20",  emoji: "🌟", name: "Fully Grown",    note: "Reach level 20" }
+    { id: "level20",  emoji: "🌟", name: "Fully Grown",    note: "Reach level 20" },
+    { id: "homeowner", emoji: "🏡", name: "Homeowner",    note: "Move to a bigger house" },
+    { id: "decorator", emoji: "🛋️", name: "Decorator",   note: "Have 8 things out at home" },
+    { id: "tower",    emoji: "🏰", name: "Tower Keeper",  note: "Build the Valley Tower" },
+    { id: "shopkeep", emoji: "🏬", name: "Shopkeeper",    note: "Open your own shop" },
+    { id: "trader",   emoji: "🤝", name: "Fair Trader",   note: "Sell 10 things to the family" },
+    { id: "spinner",  emoji: "🎡", name: "Wheel Watcher", note: "Spin the wheel 10 days" },
+    { id: "jackpot",  emoji: "💎", name: "Jackpot!",      note: "Land the wheel on the diamond" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -1532,6 +1658,9 @@ window.CPData = (function () {
     TOYS: TOYS,
     CARE: CARE,
     BOOKS: BOOKS,
+    FURNITURE: FURNITURE,
+    HOUSES: HOUSES,
+    WHEEL: WHEEL,
     FACTS: FACTS,
     RIVALS: RIVALS,
     TROPHIES: TROPHIES,
