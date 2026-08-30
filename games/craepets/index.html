@@ -412,6 +412,11 @@
       position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
       background: var(--ink); color: #fff; font-weight: bold; font-size: 0.95rem;
       padding: 0.55rem 1rem; border-radius: 999px; z-index: 60; max-width: 90vw; text-align: center;
+      /* A toast floats over everything, including an open sheet — and on a
+         phone the sheet's own Close button sits exactly where the toast
+         lands. Nothing ever taps a toast, so let taps go straight through
+         to whatever is underneath, the way the bubble and the floaty do. */
+      pointer-events: none;
       box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: toast-in 0.25s ease;
     }
     @keyframes toast-in { from { transform: translate(-50%, 16px); opacity: 0; } }

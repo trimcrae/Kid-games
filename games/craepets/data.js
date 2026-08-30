@@ -1524,7 +1524,11 @@ window.CPData = (function () {
     return []
       .concat(seededPick(cheap, 4, day * 7 + 1).map(tag("food")))
       .concat(seededPick(treats, 4, day * 7 + 2).map(tag("food")))
-      .concat(seededPick(CARE, 3, day * 7 + 3).map(tag("care")))
+      // Something to WASH with, every single day. A Craepet gets grubby on
+      // its own whether you have coins or not, so the shelf must never come
+      // up all pillows and tonics and no soap.
+      .concat(seededPick(CARE.filter(function (c) { return c.clean; }), 2, day * 7 + 3).map(tag("care")))
+      .concat(seededPick(CARE.filter(function (c) { return !c.clean; }), 2, day * 7 + 10).map(tag("care")))
       .concat(seededPick(TOYS, 3, day * 7 + 4).map(tag("toy")))
       .concat(seededPick(BOOKS, 2, day * 7 + 5).map(tag("book")))
       // furniture in two price bands, so there is always something a

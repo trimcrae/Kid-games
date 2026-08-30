@@ -1080,6 +1080,50 @@ const GAMES = {
     if (!/answer is/.test(await page.locator(".teach").textContent())) throw new Error("a miss gave no explanation");
     if (await page.locator(".choice.right").count() !== 1) throw new Error("a miss did not show the right answer");
 
+    // A Craepet gets grubby on its own, so there must ALWAYS be a way to
+    // wash it: a free rinse, soap on the shelf every single day, and the
+    // Pool washing a bar up for anyone with no coins at all.
+    const wash = await page.evaluate(() => {
+      const days = [];
+      for (let i = 0; i < 40; i++) {
+        const d = (CPData.dayNumber() + i) * 86400000;
+        days.push(CPData.shopStock(d).filter((s) => s.kind === "care" && s.clean).length);
+      }
+      return { min: Math.min(...days), pool: CPData.CARE.filter((c) => c.clean && c.cost <= 18).length };
+    });
+    if (wash.min < 1) throw new Error("the market can run out of soap for a whole day");
+    if (wash.pool < 1) throw new Error("the pool has no cheap soap to wash up");
+    await page.locator('[data-go="nest"]').click();
+    // borrow the bag for a moment: the point is that a pet with NOTHING can
+    // still get clean, but the later steps need the bag back
+    await page.evaluate(() => {
+      const S = Craepets.state();
+      window.__bag = S.bag;
+      S.bag = {};
+      S.pet.clean = 20;
+    });
+    await page.locator('[data-do="wash"]').click();
+    await page.locator('[data-use="rinse"]').click();
+    await page.waitForTimeout(150);
+    if (await page.evaluate(() => Craepets.state().pet.clean) <= 20) {
+      throw new Error("the free rinse does not clean a pet with an empty bag");
+    }
+    await page.evaluate(() => { Craepets.state().bag = window.__bag; });
+
+    // A toast floats over an open sheet, and on a phone it lands right on the
+    // sheet's own Close button. It must never swallow the tap.
+    await page.locator('[data-do="wash"]').click();
+    await page.waitForSelector(".sheet .close");
+    await page.evaluate(() => {
+      const e = document.createElement("div");
+      e.className = "toast";
+      e.textContent = "The pool washed up a bar of soap!";
+      document.body.appendChild(e);
+    });
+    await page.locator(".sheet .close").click({ timeout: 5000 });
+    if (await page.locator(".sheet").count()) throw new Error("a toast blocked the sheet's Close button");
+    await page.evaluate(() => document.querySelectorAll(".toast").forEach((t) => t.remove()));
+
     // the market makes you work out your change, then hands the item over
     await page.evaluate(() => Craepets.grant(400));
     await page.locator('[data-go="market"]').click();
@@ -1248,8 +1292,12 @@ const GAMES = {
 
     // Shannon can walk up to Cory's shelf and buy from it, and the coins
     // really do move from her purse into his — the whole point of a shop
+    await page.evaluate(() => Craepets.grant(400));   // she cannot shop on 60 coins
     await page.locator('[data-go="market"]').click();
     await page.waitForSelector("[data-stallbuy]");
+    if (!(await page.locator("[data-stallbuy]:not([disabled])").count())) {
+      throw new Error("Cory's whole shelf is priced out of reach");
+    }
     const herCoins = await page.evaluate(() => Craepets.state().coins);
     const hisBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("craepets.v1.cory")).coins);
     await page.locator("[data-stallbuy]:not([disabled])").first().click();

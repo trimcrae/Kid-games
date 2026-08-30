@@ -43,7 +43,10 @@ For **every game** (and the landing page), at **each of the three sizes**:
     house is bought and furnished (and the furniture shows up in the nest),
     the prize wheel pays once a day and refuses a second spin, a shop is
     stocked at a price you set — and one player buying from another's shelf
-    really does move the coins between their two saves
+    really does move the coins between their two saves. It also guards the
+    ways a pet can be *washed*: soap is on the shelf every single day, the
+    Pool washes bars up for free, a pet with a completely empty bag can
+    still be rinsed clean, and a toast can never cover a sheet's Close button
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

@@ -1066,8 +1066,17 @@
       var book = D.BOOKS[Math.floor(Math.random() * D.BOOKS.length)];
       addItem(book.id);
       toast("The bucket brought up " + book.emoji + " " + book.name + "!");
-    } else if (sess.place === "pool" && S.stats.pool % 15 === 0) {
-      grantBrush();
+    } else if (sess.place === "pool") {
+      // The Farm feeds you and the Well reads to you; the Pool is the only
+      // water in the valley, so it is where the soap comes from. Without
+      // this, washing was the one need with no way to meet it but coins.
+      if (S.stats.pool % 15 === 0) grantBrush();
+      else if (Math.random() < 0.2) {
+        var wash = D.CARE.filter(function (c) { return c.clean && c.cost <= 18; });
+        var bar = wash[Math.floor(Math.random() * wash.length)];
+        addItem(bar.id);
+        toast("The pool washed up " + bar.emoji + " " + bar.name + "!");
+      }
     }
 
     if (sess.plots.length >= SLOTS) {
@@ -1203,8 +1212,13 @@
     var rinse = '<button class="act" data-use="rinse" style="--ac:var(--blue);width:100%;margin-bottom:0.6rem">' +
                 '<span class="em">💦</span>Quick rinse (free)</button>';
     return sheet("🫧 Bath time", rinse + (soaps.length
-      ? '<div class="items">' + soaps.map(function (id) { return itemButton(id, "×" + S.bag[id]); }).join("") + "</div>"
-      : '<p class="sub">Soap and bubble bath from the 🏪 Market get a Craepet much cleaner than a rinse.</p>'));
+      ? '<div class="items">' + soaps.map(function (id) { return itemButton(id, "×" + S.bag[id]); }).join("") + "</div>" +
+        '<p class="sub" style="margin-top:0.6rem">Soap is used up when you use it — but the ' +
+        "💦 <b>quick rinse above is free and never runs out</b>, so " + esc(S.pet.name) +
+        " can always get clean.</p>"
+      : '<p class="sub">The 💦 <b>quick rinse is free and you can use it as often as you like</b>, ' +
+        "so " + esc(S.pet.name) + " is never stuck being grubby. Soap and bubble bath from the " +
+        "🏪 Market do more in one go, and the 🌈 Rainbow Pool washes a bar up now and then.</p>"));
   }
 
   /* Bedtime. Pillows and tonics live here — they put energy back, which is
