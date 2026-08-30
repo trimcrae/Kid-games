@@ -92,11 +92,19 @@
       review: [],
       /* A half-filled berry patch should still be there tomorrow. */
       harvest: { farm: [], well: [], pool: [] },
+      /* Your own house: which home you live in, the furniture you own,
+         and the pieces you currently have out where you can see them. */
+      house: { level: 0, owned: [], placed: [] },
+      /* Your own shop, which the rest of the family can buy from. */
+      stall: { name: "", goods: [], sales: [] },
+      /* The day you last span the prize wheel. */
+      spinDay: 0,
       dayStreak: 0,
       lastPlayDay: 0,
       stats: { correct: 0, wrong: 0, best: 0, streak: 0, farm: 0, well: 0, pool: 0,
                arena: 0, arenaWin: 0, feed: 0, play: 0, wash: 0, read: 0, buy: 0,
-               quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {} },
+               quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {},
+               spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0 },
       trophies: []
     };
   }
@@ -118,12 +126,38 @@
       if (!Array.isArray(s.harvest[p])) s.harvest[p] = [];
       if (s.harvest[p].length > SLOTS) s.harvest[p] = s.harvest[p].slice(0, SLOTS);
     });
+    // The house and the shop were added later, so an older save has neither.
+    if (!s.house || typeof s.house !== "object") s.house = { level: 0, owned: [], placed: [] };
+    if (!Array.isArray(s.house.owned)) s.house.owned = [];
+    if (!Array.isArray(s.house.placed)) s.house.placed = [];
+    s.house.level = Math.max(0, Math.min(D.HOUSES.length - 1, s.house.level || 0));
+    // You can never have out more than you own, or more than the house holds.
+    s.house.placed = s.house.placed
+      .filter(function (id, i, a) { return s.house.owned.indexOf(id) !== -1 && a.indexOf(id) === i; })
+      .slice(0, D.HOUSES[s.house.level].slots);
+    if (!s.stall || typeof s.stall !== "object") s.stall = { name: "", goods: [], sales: [] };
+    if (!Array.isArray(s.stall.goods)) s.stall.goods = [];
+    if (!Array.isArray(s.stall.sales)) s.stall.sales = [];
+    s.stall.goods = s.stall.goods.filter(function (g) {
+      return g && D.itemById(g.id) && g.n > 0 && g.price > 0;
+    });
     return s;
   }
 
   function save() {
     if (!S) return;
     try { localStorage.setItem(slot(who), JSON.stringify(S)); } catch (e) {}
+  }
+
+  /* Somebody ELSE's valley. Buying from a family shop has to pay the
+     shopkeeper even though it is not their turn, so these two are the
+     only places that ever touch another person's save. */
+  function readSlot(id) {
+    try { return JSON.parse(localStorage.getItem(slot(id))); } catch (e) { return null; }
+  }
+  function writeSlot(id, s) {
+    if (id === who) return;                 // never write over the live save
+    try { localStorage.setItem(slot(id), JSON.stringify(s)); } catch (e) {}
   }
 
   /* =========================================================
@@ -141,11 +175,13 @@
     var hours = Math.max(0, (now - (S.lastTick || now)) / 3600000);
     if (hours > 72) hours = 72;                     // a long holiday is still just a nap
     S.pet.hunger = clamp(S.pet.hunger - DECAY.hunger * hours, FLOOR, 100);
-    // A shelf of toys is a real, lasting purchase: the more your Craepet
-    // owns, the slower it gets bored while you're away.
-    S.pet.happy  = clamp(S.pet.happy  - DECAY.happy * (1 - toyCalm()) * hours, FLOOR, 100);
-    S.pet.clean  = clamp(S.pet.clean  - DECAY.clean  * hours, FLOOR, 100);
-    S.pet.energy = clamp(S.pet.energy + REGEN * hours, 0, 100);
+    // A shelf of toys and a cosy house are real, lasting purchases: the
+    // more your Craepet has around it, the slower it gets bored, the
+    // longer it stays clean and the better it sleeps while you're away.
+    var bored = Math.max(0.15, 1 - toyCalm() - houseCalm());
+    S.pet.happy  = clamp(S.pet.happy  - DECAY.happy * bored * hours, FLOOR, 100);
+    S.pet.clean  = clamp(S.pet.clean  - DECAY.clean * (1 - tidyBonus()) * hours, FLOOR, 100);
+    S.pet.energy = clamp(S.pet.energy + (REGEN + restBonus()) * hours, 0, 100);
     S.lastTick = now;
     rollDay();
   }
@@ -261,12 +297,44 @@
   }
   function toyCalm() { return Math.min(0.5, bagOf("toy").length * 0.08); }
 
+  /* =========================================================
+     YOUR HOUSE
+     Furniture is bought once and kept for ever, like a toy or a
+     brush. What it is WORTH is decided by what you have out:
+     a sofa in storage keeps nobody warm.
+     ========================================================= */
+  function houseInfo() { return D.HOUSES[(S.house && S.house.level) || 0]; }
+  function nextHouse() { return D.HOUSES[((S.house && S.house.level) || 0) + 1] || null; }
+  function slotsFree() { return houseInfo().slots - (S.house.placed || []).length; }
+  function placedItems() {
+    return (S.house.placed || []).map(function (id) { return D.itemById(id); }).filter(Boolean);
+  }
+  function storedItems() {
+    return (S.house.owned || []).filter(function (id) {
+      return (S.house.placed || []).indexOf(id) === -1;
+    }).map(function (id) { return D.itemById(id); }).filter(Boolean);
+  }
+  function homeSum(key) {
+    var n = 0;
+    placedItems().forEach(function (it) { n += it[key] || 0; });
+    return n;
+  }
+  function houseCosy() { return homeSum("cosy"); }
+  /* Cosy slows boredom. A full Valley Tower comes to roughly 45%, which
+     stacks with the toy shelf but can never make a Craepet immortal. */
+  function houseCalm() { return Math.min(0.45, houseCosy() / 130); }
+  function restBonus() { return Math.min(14, homeSum("rest")); }        // energy per hour
+  function tidyBonus() { return Math.min(0.6, homeSum("tidy") / 22); }  // slower to get grubby
+  function studyBonus() { return Math.min(0.5, homeSum("study") / 22); } // extra XP per answer
+
   /* Do you already own this, for good? Toys and brushes are kept, not
      eaten — so the shop must never sell you a second one. */
   function alreadyOwned(it) {
     if (!it) return false;
-    if (it.kind === "brush") return S.colours.indexOf(it.colour) !== -1;
-    if ((it.kind || D.kindOf(it.id)) === "toy") return (S.bag[it.id] || 0) > 0;
+    var kind = it.kind || D.kindOf(it.id);
+    if (kind === "brush") return S.colours.indexOf(it.colour) !== -1;
+    if (kind === "toy") return (S.bag[it.id] || 0) > 0;
+    if (kind === "decor") return (S.house.owned || []).indexOf(it.id) !== -1;
     return false;
   }
 
@@ -279,6 +347,13 @@
     if (kind === "food") return "+" + it.fill + " 🍽️" + (it.joy ? " +" + it.joy + " 😊" : "");
     if (kind === "toy") return "+" + it.joy + " 😊 · yours for good";
     if (kind === "book") return "+" + it.xp + " XP · a real fact";
+    if (kind === "decor") {
+      var extra = [];
+      if (it.rest) extra.push("+" + it.rest + " ⚡/hr");
+      if (it.tidy) extra.push("stays cleaner");
+      if (it.study) extra.push("+XP");
+      return "🏠 " + it.cosy + " cosy" + (extra.length ? " · " + extra.join(" · ") : "");
+    }
     var bits = [];
     if (it.clean) bits.push("+" + it.clean + " 🫧");
     if (it.energy) bits.push("+" + it.energy + " ⚡");
@@ -290,6 +365,7 @@
      one thing a shop must never do to a six-year-old. */
   function whereItWent(it) {
     var kind = it.kind || D.kindOf(it.id);
+    if (kind === "decor") return "It's in your 🏠 House — go there to put it out where you can see it.";
     if (kind === "toy") return "It's on the 🧸 toy shelf in your 🎒 Bag — play with it any time.";
     if (kind === "book") return "It's in your 🎒 Bag — tap 📖 Read at the nest.";
     if (kind === "food") return "It's in your 🎒 Bag — tap 🍽️ Feed at the nest.";
@@ -319,7 +395,14 @@
       fixer: (st.fixed || 0) >= 25,
       week: (st.bestDayStreak || 0) >= 7,
       palette: S.colours.length >= P.COLOURS.length,
-      level20: level() >= 20
+      level20: level() >= 20,
+      homeowner: (S.house.level || 0) >= 1,
+      decorator: (S.house.placed || []).length >= 8,
+      tower: (S.house.level || 0) >= D.HOUSES.length - 1,
+      shopkeep: !!S.everStocked,
+      trader: (st.sold || 0) >= 10,
+      spinner: (st.spin || 0) >= 10,
+      jackpot: !!S.everJackpot
     };
     Object.keys(tests).forEach(function (id) {
       if (tests[id] && S.trophies.indexOf(id) === -1) { S.trophies.push(id); got.push(id); }
@@ -336,6 +419,8 @@
      ========================================================= */
   var PLACES = {
     nest:   { tag: "🏡 The Nest",     deco: [["🪟", 8, 12], ["🛏️", 78, 8], ["🧸", 20, 6], ["🖼️", 55, 14]] },
+    home:   { tag: "🏠 Your House",   deco: [] },
+    stall:  { tag: "🏬 Your Shop",    deco: [["🏷️", 10, 58], ["🪙", 88, 12], ["📦", 16, 8], ["📦", 30, 7]] },
     farm:   { tag: "🍓 Berry Farm",   deco: [["☁️", 12, 72], ["☁️", 70, 78], ["🌻", 6, 6], ["🌾", 88, 5], ["🐝", 30, 55]] },
     well:   { tag: "📖 Word Well",    deco: [["🌕", 78, 74], ["⭐", 16, 76], ["✨", 44, 82], ["🪣", 8, 8], ["📚", 86, 6]] },
     pool:   { tag: "🌈 Rainbow Pool", deco: [["🌈", 62, 70], ["🫧", 14, 26], ["🫧", 82, 18], ["💧", 34, 12]] },
@@ -345,6 +430,25 @@
     quests: { tag: "📜 Quest Board",  deco: [["📜", 84, 10], ["🪶", 12, 62]] },
     case:   { tag: "🏆 Trophy Case",  deco: [["🏆", 12, 10], ["🎖️", 86, 12], ["✨", 50, 74]] }
   };
+
+  /* Where each piece of furniture stands in the room. The middle of the
+     floor is left clear on purpose — that is where the Craepet is. */
+  var HOME_SPOTS = [
+    [7, 9], [21, 8], [34, 10], [67, 10], [80, 8], [93, 9],
+    [11, 27], [26, 25], [75, 25], [90, 27],
+    [8, 58], [24, 62], [40, 60], [61, 60], [77, 62], [92, 58],
+    [16, 78], [46, 80], [85, 78]
+  ];
+  /* An empty house keeps the starter decorations; the moment you put
+     something out, the room becomes yours instead. */
+  function nestDeco() {
+    var mine = placedItems();
+    if (!mine.length) return PLACES.nest.deco;
+    return mine.map(function (it, i) {
+      var sp = HOME_SPOTS[i % HOME_SPOTS.length];
+      return [it.emoji, sp[0], sp[1]];
+    });
+  }
 
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var anim = { t: 0, napping: false, cv: null, measure: true };
@@ -384,16 +488,21 @@
 
   function sceneHtml(place) {
     var pl = PLACES[place] || PLACES.nest;
-    var deco = pl.deco.map(function (d) {
+    // The nest and the House tab are the same room seen from two tabs, so
+    // the furniture you put out shows up in both.
+    var atHome = (place === "nest" || place === "home");
+    var skin = atHome ? "nest h" + ((S.house && S.house.level) || 0) : place;
+    var tag = place === "home" ? houseInfo().emoji + " " + houseInfo().name : pl.tag;
+    var deco = (atHome ? nestDeco() : pl.deco).map(function (d) {
       return '<span class="deco" aria-hidden="true" style="left:' + d[1] + '%;bottom:' + d[2] + '%">' + d[0] + "</span>";
     }).join("");
     var label = S.pet
       ? S.pet.name + ", a " + P.colour(S.pet.colour).name + " " + P.species(S.pet.species).name +
-        ", looking " + mood() + ", at " + pl.tag.replace(/^\S+\s/, "")
+        ", looking " + mood() + ", at " + tag.replace(/^\S+\s/, "")
       : "your Craepet";
-    return '<div class="scene ' + place + (place === "nest" ? "" : " compact") + '" id="scene" ' +
+    return '<div class="scene ' + skin + (place === "nest" ? "" : " compact") + '" id="scene" ' +
       'role="button" tabindex="0" aria-label="' + esc(label) + '. Tap to say hello.">' +
-      '<span class="place-tag" aria-hidden="true">' + pl.tag + "</span>" + deco +
+      '<span class="place-tag" aria-hidden="true">' + esc(tag) + "</span>" + deco +
       '<canvas id="pet-canvas" aria-hidden="true"></canvas>' +
       '<div id="bubble-slot" role="status" aria-live="polite"></div>' +
     "</div>";
@@ -521,9 +630,10 @@
   }
 
   var NAV = [
-    ["nest", "🏡", "Nest"], ["farm", "🍓", "Farm"], ["well", "📖", "Well"], ["pool", "🌈", "Pool"],
-    ["market", "🏪", "Market"], ["arena", "⚔️", "Arena"], ["bag", "🎒", "Bag"],
-    ["quests", "📜", "Quests"], ["case", "🏆", "Case"]
+    ["nest", "🏡", "Nest"], ["home", "🏠", "House"],
+    ["farm", "🍓", "Farm"], ["well", "📖", "Well"], ["pool", "🌈", "Pool"],
+    ["market", "🏪", "Market"], ["stall", "🏬", "Stall"], ["arena", "⚔️", "Arena"],
+    ["bag", "🎒", "Bag"], ["quests", "📜", "Daily"], ["case", "🏆", "Case"]
   ];
 
   function navHtml() {
@@ -539,6 +649,12 @@
       if (n[0] === "quests" && ready) dot = '<span class="dot">' + ready + "</span>";
       if (n[0] === "nest" && due) dot = '<span class="dot review" title="' + due + ' to review">🔁</span>';
       if (n[0] === "bag" && fresh) dot = '<span class="dot">' + fresh + "</span>";
+      // A free spin waiting, and money taken while you were away, are both
+      // things you should be able to see without opening the tab.
+      if (n[0] === "quests" && !dot && !spunToday()) dot = '<span class="dot">🎡</span>';
+      if (n[0] === "stall" && (S.stall.sales || []).length) {
+        dot = '<span class="dot">' + S.stall.sales.length + "</span>";
+      }
       return '<button data-go="' + n[0] + '"' + (view === n[0] ? ' class="on" aria-current="page"' : "") + ">" +
              n[1] + " " + n[2] + dot + "</button>";
     }).join("") + "</nav>";
@@ -550,7 +666,9 @@
       case "farm": return placeHtml("farm");
       case "well": return placeHtml("well");
       case "pool": return placeHtml("pool");
+      case "home": return houseHtml();
       case "market": return marketHtml();
+      case "stall": return stallHtml();
       case "arena": return arenaHtml();
       case "bag": return bagHtml();
       case "quests": return questsHtml();
@@ -931,7 +1049,8 @@
 
     var coins = info.base + Math.min(6, S.stats.streak) + Math.floor(level() / 3);
     earn(coins);
-    giveXp(4);
+    // A book shelf, a globe and a star window really do make you learn faster.
+    giveXp(Math.round(4 * (1 + studyBonus())));
     floaty("+" + coins + " 🪙", "#ffe07a");
 
     if (sess.plots.length < SLOTS) {
@@ -1249,6 +1368,485 @@
   }
 
   /* =========================================================
+     YOUR HOUSE — the one thing in the valley you build rather
+     than answer. Furniture is bought at the Market, kept for
+     ever, and then PUT OUT here, where it stands behind your
+     Craepet in the nest. Every piece you have out does real
+     work while the game is closed, and the panel says exactly
+     how much, in plain numbers, so a bigger house is a choice
+     you can reason about instead of a shiny nothing.
+     ========================================================= */
+  function houseHtml() {
+    var h = houseInfo(), nx = nextHouse();
+    var out = placedItems(), stored = storedItems();
+    var used = out.length, room = h.slots;
+
+    var effects = [
+      ["😊", Math.round((toyCalm() + houseCalm()) * 100) + "%", "slower to get bored"],
+      ["⚡", "+" + restBonus(), "energy an hour"],
+      ["🧼", Math.round(tidyBonus() * 100) + "%", "slower to get grubby"],
+      ["⭐", "+" + Math.round(studyBonus() * 100) + "%", "XP per right answer"]
+    ].map(function (e) {
+      return '<div class="stat"><b>' + e[0] + " " + e[1] + "</b><small>" + e[2] + "</small></div>";
+    }).join("");
+
+    var upgrade = nx
+      ? '<p style="margin:0.8rem 0 0"><button class="act" data-upgrade="1"' +
+        (S.coins < nx.cost ? " disabled" : "") + ' style="--ac:var(--green);width:100%">' +
+        '<span class="em">' + nx.emoji + "</span>Move to the " + esc(nx.name) + " — 🪙 " + nx.cost +
+        " (" + nx.slots + " spaces)</button></p>" +
+        '<p class="sub" style="margin:0.4rem 0 0">' + esc(nx.note) +
+        (S.coins < nx.cost ? " You need 🪙 " + (nx.cost - S.coins) + " more." : "") + "</p>"
+      : '<p class="sub" style="margin:0.8rem 0 0">🏰 <b>The Valley Tower.</b> ' +
+        "There is nowhere bigger to move to — this is the top of the hill.</p>";
+
+    var shelf = out.length
+      ? '<div class="items">' + out.map(function (it) {
+          return '<button class="item" data-store="' + esc(it.id) + '" ' +
+            'aria-label="Put ' + esc(it.name) + ' away in storage">' +
+            '<span class="pic">' + it.emoji + "</span>" +
+            '<span class="nm">' + esc(it.name) + "</span>" +
+            '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
+            '<span class="own">tap to put away</span></button>';
+        }).join("") + "</div>"
+      : '<p class="sub">Nothing out yet. Anything you put out shows up in the room above ' +
+        "and in 🏡 the Nest — and starts doing its job straight away.</p>";
+
+    var box = stored.length
+      ? '<div class="items">' + stored.map(function (it) {
+          var full = slotsFree() <= 0;
+          return '<button class="item" data-place="' + esc(it.id) + '"' + (full ? " disabled" : "") + ">" +
+            '<span class="pic">' + it.emoji + "</span>" +
+            '<span class="nm">' + esc(it.name) + "</span>" +
+            '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
+            '<span class="own">' + (full ? "house is full" : "tap to put out") + "</span></button>";
+        }).join("") + "</div>"
+      : "";
+
+    return '<div class="panel">' +
+      "<h2>" + h.emoji + " " + esc(h.name) + "</h2>" +
+      '<p class="sub">' + esc(h.note) + " Your Craepet lives here, and everything you put out is " +
+        "working for " + esc(S.pet.name) + " even when the game is shut.</p>" +
+      '<div class="statgrid">' + effects + "</div>" +
+      '<p class="sub" style="margin:0.8rem 0 0">🛋️ <b>' + used + " of " + room +
+        " spaces used</b> · 🏠 <b>" + houseCosy() + " cosy</b> altogether. " +
+        (S.house.owned.length ? "You own " + S.house.owned.length + " pieces of furniture." :
+         "Furniture is on sale at the 🏪 Market — look for the 🏠 pieces.") + "</p>" +
+      upgrade +
+    "</div>" +
+    '<div class="panel"><h2>🛋️ Out where you can see it</h2>' +
+      '<p class="sub">' + used + " / " + room + " spaces. Tap a piece to put it back in storage " +
+      "and free up the space for something else.</p>" + shelf +
+    "</div>" +
+    (stored.length
+      ? '<div class="panel"><h2>📦 In storage</h2>' +
+        '<p class="sub">Yours, but packed away. ' +
+        (slotsFree() > 0
+          ? "There " + (slotsFree() === 1 ? "is 1 space" : "are " + slotsFree() + " spaces") + " left — tap to put something out."
+          : "The house is full: put something away first, or move somewhere bigger.") + "</p>" + box +
+      "</div>"
+      : "");
+  }
+
+  function placeFurniture(id) {
+    if ((S.house.owned || []).indexOf(id) === -1) return;
+    if ((S.house.placed || []).indexOf(id) !== -1) return;
+    if (slotsFree() <= 0) { toast("The " + houseInfo().name + " is full — move somewhere bigger!"); return; }
+    S.house.placed.push(id);
+    bump("placed");
+    var it = D.itemById(id);
+    checkTrophies();
+    save();
+    render();
+    say("Ooh, the " + (it ? it.name.toLowerCase() : "furniture") + "!", 2800);
+    sfx("good");
+  }
+
+  function storeFurniture(id) {
+    var i = (S.house.placed || []).indexOf(id);
+    if (i === -1) return;
+    S.house.placed.splice(i, 1);
+    save();
+    render();
+    sfx("pop");
+  }
+
+  /* Moving house. The price is on the button, so it is also the biggest
+     savings target in the game — which is the point of it. */
+  function upgradeHouse() {
+    var nx = nextHouse();
+    if (!nx || S.coins < nx.cost) return;
+    S.coins -= nx.cost;
+    S.house.level++;
+    checkTrophies();
+    save();
+    render();
+    openSheet(sheet(nx.emoji + " Welcome to the " + esc(nx.name) + "!",
+      '<p class="sub" style="font-size:1.02rem">' + esc(nx.note) + "</p>" +
+      '<p class="sub">You now have <b>' + nx.slots + " spaces</b> for furniture — " +
+      (slotsFree() > 0 ? slotsFree() + " of them empty." : "all of them full already!") + "</p>" +
+      '<p class="teach"><b>That cost 🪙 ' + nx.cost + ".</b> You have 🪙 " + S.coins + " left.</p>"));
+    sfx("win");
+    try { window.Confetti && Confetti.burst({ count: 100 }); } catch (e) {}
+  }
+
+  /* =========================================================
+     YOUR OWN SHOP — the other half of the market.
+     Anything in your bag can go on your own shelf at a price
+     YOU choose, and everyone else on this device can walk up
+     and buy it. Setting the price is the whole lesson: the
+     panel shows what the Market charges, what you would make
+     per sale, and what the whole shelf is worth.
+     ========================================================= */
+  var pendingSale = null;              // { id, price, n } while the price sheet is open
+
+  function stallName() {
+    return (S.stall.name || "").trim() || (D.profile(who).name + "'s Corner");
+  }
+  /* What you can put on the shelf: anything in the bag. Brushes are not
+     in the bag and furniture is nailed down, so neither can be sold. */
+  function sellable() {
+    return Object.keys(S.bag).filter(function (id) {
+      return S.bag[id] > 0 && D.itemById(id);
+    });
+  }
+  function shelfWorth() {
+    var n = 0;
+    (S.stall.goods || []).forEach(function (g) { n += g.price * g.n; });
+    return n;
+  }
+
+  function stallHtml() {
+    var goods = S.stall.goods || [], sales = S.stall.sales || [];
+
+    var receipts = sales.length
+      ? '<div class="panel"><h2>🔔 While you were out</h2>' +
+        '<p class="sub">The coins are already in your purse — this is just the receipt.</p>' +
+        sales.slice().reverse().map(function (r) {
+          var it = D.itemById(r.id), p = D.profile(r.from);
+          return '<div class="quest"><div class="qtx">' + (it ? it.emoji : "📦") + " <b>" +
+            esc(it ? it.name : r.id) + "</b> — bought by " + esc(p.name) + " " + p.emoji +
+            '</div><span class="rw">+🪙 ' + r.price + "</span></div>";
+        }).join("") +
+        '<p style="margin:0.7rem 0 0"><button class="act" data-clearsales="1" style="--ac:var(--purple);width:100%">' +
+        '<span class="em">✅</span>Got it, thanks</button></p></div>'
+      : "";
+
+    var shelf = goods.length
+      ? '<div class="items">' + goods.map(function (g, i) {
+          var it = D.itemById(g.id);
+          if (!it) return "";
+          return '<button class="item" data-unstock="' + i + '" ' +
+            'aria-label="Take ' + esc(it.name) + ' back off the shelf">' +
+            '<span class="pic">' + it.emoji + "</span>" +
+            '<span class="nm">' + esc(it.name) + "</span>" +
+            '<span class="price">🪙 ' + g.price + " each</span>" +
+            '<span class="own">' + g.n + " on the shelf</span>" +
+            '<span class="what">tap to take back</span></button>';
+        }).join("") + "</div>"
+      : '<p class="sub">Your shelf is empty. Put something on it from the list below and the rest of ' +
+        "the family will see it in <b>their</b> 🏪 Market.</p>";
+
+    var mine = sellable();
+    var stock = mine.length
+      ? '<div class="items">' + mine.map(function (id) {
+          var it = D.itemById(id);
+          return '<button class="item" data-stock="' + esc(id) + '">' +
+            '<span class="pic">' + it.emoji + "</span>" +
+            '<span class="nm">' + esc(it.name) + "</span>" +
+            '<span class="what">market price 🪙 ' + it.cost + "</span>" +
+            '<span class="own">you have ' + S.bag[id] + "</span></button>";
+        }).join("") + "</div>"
+      : '<p class="sub">Nothing in your 🎒 Bag to sell yet. Harvest berries at the 🍓 Farm, ' +
+        "or buy cheap at the 🏪 Market and sell for a little more here.</p>";
+
+    return receipts +
+    '<div class="panel">' +
+      "<h2>🏬 " + esc(stallName()) + "</h2>" +
+      '<p class="sub">Your own shop. Everyone else who plays on this device sees your shelf in ' +
+        "their Market and can buy from it — and the coins come straight to you. " +
+        '<button class="ghost small" data-shopname="1">✏️ Rename the shop</button></p>' +
+      '<div class="statgrid">' +
+        '<div class="stat"><b>📦 ' + goods.length + "</b><small>kinds on the shelf</small></div>" +
+        '<div class="stat"><b>🪙 ' + shelfWorth() + "</b><small>the shelf is worth</small></div>" +
+        '<div class="stat"><b>🤝 ' + (S.stats.sold || 0) + "</b><small>things sold</small></div>" +
+        '<div class="stat"><b>🪙 ' + (S.stats.soldCoins || 0) + "</b><small>earned selling</small></div>" +
+      "</div>" +
+    "</div>" +
+    '<div class="panel"><h2>🛒 On your shelf</h2>' + shelf + "</div>" +
+    '<div class="panel"><h2>➕ Put something on the shelf</h2>' +
+      '<p class="sub">Tap anything from your bag, then choose your price. Charge more than the ' +
+      "Market and you make a profit on every sale — charge too much and nobody buys it.</p>" + stock +
+    "</div>";
+  }
+
+  /* The price sheet. This is a live sum: change the price and the profit
+     line changes with it, which is a far better lesson than being told. */
+  function priceSheet() {
+    var it = D.itemById(pendingSale.id);
+    var have = S.bag[pendingSale.id] || 0;
+    if (pendingSale.n > have) pendingSale.n = have;
+    var profit = pendingSale.price - it.cost;
+    var line = profit > 0
+      ? "You would make <b>🪙 " + profit + "</b> on every one you sell."
+      : profit === 0
+        ? "That is exactly what the Market charges. No profit, but it will sell."
+        : "That is <b>🪙 " + (-profit) + " cheaper</b> than the Market — a bargain for them, a loss for you.";
+
+    var counts = [1, 2, 3, 5].filter(function (n) { return n <= have; });
+    if (counts.indexOf(have) === -1) counts.push(have);
+
+    return sheet("🏷️ " + esc(it.name) + " — what's your price?",
+      '<p class="sub" style="text-align:center;font-size:1.05rem">' + it.emoji +
+        " The 🏪 Market sells this for <b>🪙 " + it.cost + "</b>.</p>" +
+      '<div class="name-row" style="gap:0.6rem">' +
+        '<button class="ghost" data-priced="-5" aria-label="five coins cheaper">−5</button>' +
+        '<button class="ghost" data-priced="-1" aria-label="one coin cheaper">−1</button>' +
+        '<b style="font-size:1.6rem;color:#d99000;min-width:5.5rem;text-align:center">🪙 ' +
+          pendingSale.price + "</b>" +
+        '<button class="ghost" data-priced="1" aria-label="one coin dearer">+1</button>' +
+        '<button class="ghost" data-priced="5" aria-label="five coins dearer">+5</button>' +
+      "</div>" +
+      '<p class="teach" style="text-align:center">' + line + "</p>" +
+      '<p class="sub" style="margin:0.7rem 0 0.3rem;text-align:center">How many? You have ' + have + ".</p>" +
+      '<div class="swatches">' + counts.map(function (n) {
+        return '<button class="ghost small' + (n === pendingSale.n ? " on" : "") + '" data-saleqty="' + n + '">' +
+          n + (n === have ? " (all)" : "") + "</button>";
+      }).join("") + "</div>" +
+      '<p class="sub" style="margin:0.7rem 0 0;text-align:center">' + pendingSale.n + " × 🪙 " +
+        pendingSale.price + " = <b>🪙 " + (pendingSale.n * pendingSale.price) +
+        "</b> if the whole lot sells.</p>" +
+      '<p style="margin:0.8rem 0 0"><button class="act" data-listit="1" style="--ac:var(--green);width:100%">' +
+      '<span class="em">🏬</span>Put it on the shelf</button></p>');
+  }
+
+  function openPriceSheet(id) {
+    var it = D.itemById(id);
+    if (!it || !S.bag[id]) return;
+    // A sensible opening bid — a small mark-up on what the shop charges.
+    pendingSale = { id: id, price: it.cost + Math.max(1, Math.round(it.cost * 0.2)), n: 1 };
+    sfx("pop");
+    openSheet(priceSheet());
+  }
+
+  function nudgePrice(by) {
+    if (!pendingSale) return;
+    pendingSale.price = Math.max(1, Math.min(999, pendingSale.price + by));
+    sfx("pop");
+    openSheet(priceSheet());
+  }
+  function setSaleQty(n) {
+    if (!pendingSale) return;
+    pendingSale.n = Math.max(1, Math.min(S.bag[pendingSale.id] || 1, n));
+    sfx("pop");
+    openSheet(priceSheet());
+  }
+
+  function listForSale() {
+    if (!pendingSale) return;
+    var deal = pendingSale;
+    pendingSale = null;
+    var it = D.itemById(deal.id);
+    var have = S.bag[deal.id] || 0;
+    var n = Math.max(1, Math.min(have, deal.n));
+    if (!it || !have) return closeSheet();
+    if ((S.stall.goods || []).length >= 8) {
+      toast("Your shelf is full — take something off it first.");
+      return closeSheet();
+    }
+    for (var i = 0; i < n; i++) takeItem(deal.id);
+    if (S.bagNew) delete S.bagNew[deal.id];
+    // The same thing at the same price stacks instead of taking a second space.
+    var row = null;
+    S.stall.goods.forEach(function (g) { if (g.id === deal.id && g.price === deal.price) row = g; });
+    if (row) row.n += n;
+    else S.stall.goods.push({ id: deal.id, price: deal.price, n: n });
+    S.everStocked = true;
+    bump("stocked", n);
+    checkTrophies();
+    closeSheet();
+    save();
+    render();
+    toast("🏬 " + n + " × " + it.emoji + " " + it.name + " on the shelf at 🪙 " + deal.price + " each.");
+    sfx("coin");
+  }
+
+  function unstock(i) {
+    var g = (S.stall.goods || [])[i];
+    if (!g) return;
+    S.stall.goods.splice(i, 1);
+    addItem(g.id, g.n);
+    save();
+    render();
+    var it = D.itemById(g.id);
+    toast("Took " + g.n + " × " + (it ? it.name : g.id) + " back into your 🎒 Bag.");
+    sfx("pop");
+  }
+
+  function shopNameSheet() {
+    return sheet("✏️ Name your shop",
+      '<p class="sub">Whatever you call it is what the rest of the family sees above your shelf.</p>' +
+      '<div class="name-row"><input id="shop-input" maxlength="20" value="' + esc(stallName()) +
+      '" aria-label="Shop name"></div>' +
+      '<p style="margin:0.8rem 0 0"><button class="act" id="shop-go" style="--ac:var(--green);width:100%">' +
+      '<span class="em">🏬</span>Put up the sign</button></p>');
+  }
+
+  function clearSales() {
+    S.stall.sales = [];
+    save();
+    render();
+    sfx("pop");
+  }
+
+  /* Every OTHER player's shelf, read straight out of their save. */
+  function familyStalls() {
+    return D.PROFILES.filter(function (p) { return p.id !== who; }).map(function (p) {
+      var s = readSlot(p.id);
+      if (!s || !s.stall || !Array.isArray(s.stall.goods) || !s.stall.goods.length) return null;
+      return { p: p, name: (s.stall.name || "").trim() || (p.name + "'s Corner"), goods: s.stall.goods };
+    }).filter(Boolean);
+  }
+
+  /* Paying the shopkeeper. This is the only write into somebody else's
+     valley, and it re-reads their shelf first so two tabs cannot sell the
+     same cookie twice. */
+  function payStall(deal) {
+    var seller = readSlot(deal.seller);
+    if (!seller || !seller.stall || !Array.isArray(seller.stall.goods)) return false;
+    var g = seller.stall.goods[deal.gi];
+    if (!g || g.id !== deal.item.id || g.price !== deal.item.cost || g.n <= 0) return false;
+    g.n--;
+    if (g.n <= 0) seller.stall.goods.splice(deal.gi, 1);
+    seller.coins = (seller.coins || 0) + deal.item.cost;
+    if (seller.stats) {
+      seller.stats.coinsEarned = (seller.stats.coinsEarned || 0) + deal.item.cost;
+      seller.stats.sold = (seller.stats.sold || 0) + 1;
+      seller.stats.soldCoins = (seller.stats.soldCoins || 0) + deal.item.cost;
+    }
+    if (!Array.isArray(seller.stall.sales)) seller.stall.sales = [];
+    seller.stall.sales.push({ from: who, id: deal.item.id, price: deal.item.cost, day: D.dayNumber() });
+    while (seller.stall.sales.length > 20) seller.stall.sales.shift();
+    writeSlot(deal.seller, seller);
+    return true;
+  }
+
+  /* =========================================================
+     THE PRIZE WHEEL — one free spin a day, eight equal slices.
+     The slices are equal ON PURPOSE: when it stops, the sheet
+     says "one slice out of eight", which is a fraction you can
+     see with your eyes before you can do it on paper.
+     ========================================================= */
+  var wheelAngle = 0, spinning = false;
+
+  function spunToday() { return S.spinDay === D.dayNumber(); }
+
+  function wheelHtml() {
+    var n = D.WHEEL.length, seg = 360 / n;
+    var stops = D.WHEEL.map(function (w, i) {
+      return w.colour + " " + (i * seg) + "deg " + ((i + 1) * seg) + "deg";
+    }).join(",");
+    var labels = D.WHEEL.map(function (w, i) {
+      var a = i * seg + seg / 2;
+      return '<span class="wlabel" style="transform:translate(-50%,-50%) rotate(' + a +
+        "deg) translateY(calc(var(--r) * -0.335)) rotate(" + (-a) + 'deg)">' + w.label + "</span>";
+    }).join("");
+    var done = spunToday();
+    return '<div class="panel"><h2>🎡 The prize wheel</h2>' +
+      '<p class="sub">One free spin every single day. Eight slices, all exactly the same size — ' +
+      "so every slice is a <b>1 in 8</b> chance, including the 💎.</p>" +
+      '<div class="wheelwrap">' +
+        '<span class="wheelpin" aria-hidden="true">▼</span>' +
+        '<div class="wheel' + (spinning ? " spinning" : "") + '" id="wheel" aria-hidden="true" ' +
+          'style="background:conic-gradient(' + stops + ');transform:rotate(' + wheelAngle + 'deg)">' +
+          labels +
+        "</div>" +
+        '<span class="wheelhub" aria-hidden="true">🎡</span>' +
+      "</div>" +
+      (done
+        ? '<p class="sub" style="text-align:center"><b>Today\'s spin is used up.</b> ' +
+          "The wheel resets overnight — come back tomorrow. Spun " + (S.stats.spin || 0) +
+          " time" + ((S.stats.spin || 0) === 1 ? "" : "s") + " so far.</p>"
+        : '<p style="margin:0.6rem 0 0"><button class="act" data-spin="1"' + (spinning ? " disabled" : "") +
+          ' style="--ac:var(--pink);width:100%"><span class="em">🎡</span>' +
+          (spinning ? "Spinning…" : "Spin the wheel — free!") + "</button></p>") +
+    "</div>";
+  }
+
+  function spinWheel() {
+    if (spinning || spunToday()) return;
+    var n = D.WHEEL.length, seg = 360 / n;
+    var idx = Math.floor(Math.random() * n);
+    // Wind it up so the winning slice ends under the pointer at the top.
+    var here = ((wheelAngle % 360) + 360) % 360;
+    var want = ((-(idx * seg + seg / 2)) % 360 + 360) % 360;
+    var target = wheelAngle + 360 * 5 + ((((want - here) % 360) + 360) % 360);
+
+    spinning = true;
+    S.spinDay = D.dayNumber();          // claimed the moment it starts, so a
+    bump("spin");                       // reload mid-spin cannot win it twice
+    save();
+    render();                           // draws the wheel still at its old angle
+    sfx("pop");
+
+    // A transition needs a FROM and a TO. The wheel has just been drawn at
+    // the old angle, so hand the browser a frame with it before moving.
+    var el = $("#wheel");
+    wheelAngle = target;
+    if (el && !calm) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          el.style.transform = "rotate(" + target + "deg)";
+        });
+      });
+    } else if (el) {
+      el.style.transform = "rotate(" + target + "deg)";
+    }
+
+    // Whose spin this is. Switching player mid-spin must not drop the
+    // prize into the next person's purse.
+    var spinner = who;
+    var wait = calm ? 350 : 4300;       // no long ride for anyone who asked for less motion
+    setTimeout(function () {
+      if (who !== spinner) return;      // they walked away; the day is still spent
+      spinning = false;
+      awardSpin(D.WHEEL[idx]);
+    }, wait);
+  }
+
+  function awardSpin(prize) {
+    earn(prize.coins);
+    var extra = "";
+    if (prize.xp) { giveXp(prize.xp); extra += '<p class="sub">⭐ ' + prize.xp + " XP for " + esc(S.pet.name) + ".</p>"; }
+    if (prize.treat) {
+      var treats = D.FOODS.filter(function (f) { return f.cost >= 14; });
+      var food = treats[Math.floor(Math.random() * treats.length)];
+      addItem(food.id);
+      extra += '<p class="sub">🎁 A ' + food.emoji + " <b>" + esc(food.name) +
+        "</b> for the bag, too.</p>";
+    }
+    if (prize.jackpot) {
+      S.everJackpot = true;
+      try { window.Confetti && Confetti.burst({ count: 140 }); } catch (e) {}
+    }
+    checkTrophies();
+    save();
+    render();
+    var t = tier();
+    var chance = (t === "tot" || t === "early")
+      ? "The wheel has <b>8</b> slices and it stopped on <b>1</b> of them."
+      : "One slice out of eight — a <b>1 in 8</b> chance, or <b>1/8</b>" +
+        (t === "mid" ? "." : ", which is <b>12.5%</b>. Every slice had exactly the same chance.");
+    openSheet(sheet("🎡 " + prize.label + "!",
+      '<p class="sub" style="font-size:1.1rem;text-align:center">You won <b>🪙 ' + prize.coins +
+        "</b>!</p>" + extra +
+      '<p class="teach"><b>How likely was that? </b>' + chance + "</p>" +
+      '<p class="sub" style="margin-top:0.5rem">Come back tomorrow for another free spin.</p>'));
+    speak(prize.say);
+    sfx(prize.jackpot ? "win" : "coin");
+  }
+
+  /* =========================================================
      THE MARKET — buying is a maths lesson wearing a hat.
      From the Middle level up, the shopkeeper asks you to work
      out your change before handing anything over. Get it wrong
@@ -1275,10 +1873,46 @@
       '<p class="sub">Fresh stock every morning, the same for the whole family. You have 🪙 ' + S.coins + ".</p>" +
       '<div class="items">' + cards + "</div>" +
       '<p class="sub" style="margin-top:0.8rem">Everything you buy lands in your 🎒 <b>Bag</b> — ' +
-        "food for 🍽️ Feed, toys for 🎾 Play, soap for 🫧 Wash, pillows for 😴 Rest and books for 📖 Read.</p>" +
-      '<p class="sub">🧸 Toys and 🖌️ brushes are <b>yours for good</b>, so the shop will only sell you one of each. ' +
+        "food for 🍽️ Feed, toys for 🎾 Play, soap for 🫧 Wash, pillows for 😴 Rest and books for 📖 Read. " +
+        "🏠 <b>Furniture</b> goes to your House instead, to put out where you can see it.</p>" +
+      '<p class="sub">🧸 Toys, 🏠 furniture and 🖌️ brushes are <b>yours for good</b>, so the shop will only sell you one of each. ' +
         "The 🌈 Rainbow Pool gives a free brush away every 15 right answers.</p>" +
-    "</div>";
+    "</div>" + familyStallsHtml();
+  }
+
+  /* The rest of the family's shelves, sitting under the Market's own.
+     This is the other side of your 🏬 Stall: what they price, you pay. */
+  function familyStallsHtml() {
+    var stalls = familyStalls();
+    if (!stalls.length) {
+      return '<div class="panel"><h2>🏬 Family shops</h2>' +
+        '<p class="sub">Nobody else has anything on their shelf right now. Open your own at the ' +
+        "🏬 <b>Stall</b> tab — put something from your bag out at your own price and the rest of " +
+        "the family can buy it from here.</p></div>";
+    }
+    return stalls.map(function (st) {
+      var cards = st.goods.map(function (g, i) {
+        var it = D.itemById(g.id);
+        if (!it) return "";
+        var owned = alreadyOwned(it);
+        var afford = S.coins >= g.price;
+        var note = g.price < it.cost ? "cheaper than the Market!"
+          : g.price === it.cost ? "the same as the Market"
+          : "🪙 " + (g.price - it.cost) + " over the Market price";
+        return '<button class="item" data-stallbuy="' + esc(st.p.id) + ":" + i + '"' +
+          (!afford || owned ? " disabled" : "") + ">" +
+          '<span class="pic">' + it.emoji + "</span>" +
+          '<span class="nm">' + esc(it.name) + "</span>" +
+          '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
+          (owned ? '<span class="own">✔ owned</span>' : '<span class="price">🪙 ' + g.price + "</span>") +
+          '<span class="own">' + esc(note) + "</span>" +
+          '<span class="own">' + g.n + " left</span></button>";
+      }).join("");
+      return '<div class="panel"><h2>' + st.p.emoji + " " + esc(st.name) + "</h2>" +
+        '<p class="sub">' + esc(st.p.name) + " set these prices. Every coin you spend here goes " +
+        "straight into " + esc(st.p.name) + "'s purse.</p>" +
+        '<div class="items">' + cards + "</div></div>";
+    }).join("");
   }
 
   function tryBuy(id) {
@@ -1288,11 +1922,36 @@
     if (!it || S.coins < it.cost) return;
     // Never take coins for something you already keep forever.
     if (alreadyOwned(it)) { toast("You already own " + it.name + "!"); return; }
+    askChange({ item: it, seller: null });
+  }
 
+  /* Buying off another player's shelf. Same shopkeeper's question, but the
+     price is one THEY chose and the coins end up in THEIR purse. */
+  function tryStallBuy(ref) {
+    var bits = String(ref).split(":");
+    var sellerId = bits[0], gi = Number(bits[1]);
+    var seller = readSlot(sellerId);
+    if (!seller || !seller.stall || !seller.stall.goods) return;
+    var g = seller.stall.goods[gi];
+    if (!g || g.n <= 0) { toast("That one has just been sold!"); render(); return; }
+    var base = D.itemById(g.id);
+    if (!base) return;
+    // a copy of the item at the shopkeeper's price, not the Market's
+    var it = {};
+    for (var k in base) it[k] = base[k];
+    it.cost = g.price;
+    it.kind = base.kind || D.kindOf(g.id);
+    if (S.coins < it.cost) return;
+    if (alreadyOwned(it)) { toast("You already own " + it.name + "!"); return; }
+    askChange({ item: it, seller: sellerId, gi: gi });
+  }
+
+  /* The shopkeeper's change question, wherever you are shopping. */
+  function askChange(deal) {
+    var it = deal.item;
     var t = tier();
-    if (t === "tot" || t === "early") return finishBuy(it, 0);
+    if (t === "tot" || t === "early") return finishBuy(deal, 0);
 
-    // the shopkeeper's change question
     var left = S.coins - it.cost;
     var wrong = D._u.nearMiss(left, Math.max(3, Math.round(it.cost * 0.4)))
       .map(function (n) { return "🪙 " + n; });
@@ -1302,7 +1961,7 @@
       right: "🪙 " + left, wrong: wrong,
       teach: S.coins + " − " + it.cost + " = " + left + "."
     }, t);
-    pendingBuy = { item: it, q: q, correct: "🪙 " + left };
+    pendingBuy = { deal: deal, q: q, correct: "🪙 " + left };
     openSheet(sheet("🧾 " + esc(it.name) + " — 🪙 " + it.cost,
       '<div class="qcard"><p class="qprompt">' + esc(q.q) + "</p>" +
       '<div class="choices" role="group" aria-label="Answers">' + q.choices.map(function (c, i) {
@@ -1314,7 +1973,8 @@
   function answerChange(idx) {
     if (!pendingBuy) return;
     var ok = idx === pendingBuy.q.answer;
-    var it = pendingBuy.item;
+    var deal = pendingBuy.deal;
+    var it = deal.item;
     var teach = pendingBuy.q.teach;
     pendingBuy = null;
     // Never tip more than half the price: buying a 4-coin blueberry must
@@ -1328,13 +1988,53 @@
       sfx("nope");
       toast("Not quite — " + teach);
     }
-    finishBuy(it, ok ? tip : 0);
+    finishBuy(deal, ok ? tip : 0);
   }
 
-  function finishBuy(it, tip) {
+  function finishBuy(deal, tip) {
+    var it = deal.item;
+    // Buying off a family shelf has to move the goods AND the coins first —
+    // if their shelf changed under us, nobody is charged for anything.
+    if (deal.seller && !payStall(deal)) {
+      closeSheet();
+      render();
+      toast("That one has just been sold!");
+      return;
+    }
     S.coins -= it.cost;
     if (tip) earn(tip);
     bump("buy");
+    if (deal.seller) {
+      addItem(it.id);
+      closeSheet();
+      checkTrophies();
+      save();
+      render();
+      toast("Bought " + it.emoji + " " + it.name + " from " + D.profile(deal.seller).name +
+            " for 🪙 " + it.cost + ". " + whereItWent(it));
+      sfx("coin");
+      return;
+    }
+    // Furniture is not carried around: it goes straight home.
+    if (it.kind === "decor") {
+      if (S.house.owned.indexOf(it.id) === -1) S.house.owned.push(it.id);
+      var room = slotsFree() > 0;
+      if (room) { S.house.placed.push(it.id); bump("placed"); }
+      closeSheet();
+      checkTrophies();
+      save();
+      render();
+      openSheet(sheet(it.emoji + " " + esc(it.name),
+        '<p class="sub">' + esc(itemBlurb(it)) + "</p>" +
+        (room
+          ? '<p class="sub">It is out in your <b>' + esc(houseInfo().name) +
+            "</b> already — go to 🏠 <b>House</b> to move it about.</p>"
+          : '<p class="sub">Your <b>' + esc(houseInfo().name) + "</b> is full, so it is in storage. " +
+            "Put something else away at 🏠 <b>House</b>, or move somewhere bigger.</p>") +
+        '<p style="margin:0.8rem 0 0"><button class="ghost" data-go="home" data-close="1">🏠 Go to your House</button></p>'));
+      sfx("coin");
+      return;
+    }
     if (it.kind === "brush") {
       if (S.colours.indexOf(it.colour) === -1) S.colours.push(it.colour);
       closeSheet();
@@ -1545,7 +2245,8 @@
     var dots = "";
     for (var d = 1; d <= 7; d++) dots += (d <= ((days - 1) % 7) + 1 ? "🟢" : "⚪");
 
-    return '<div class="panel">' +
+    return wheelHtml() +
+    '<div class="panel">' +
       "<h2>📜 Today's quests</h2>" +
       '<p class="sub">Three every day, the same three for everyone in the family. They reset overnight.</p>' +
       rows +
@@ -1692,6 +2393,7 @@
   function closeSheet() {
     dropSheet();
     pendingBuy = null;
+    pendingSale = null;
     if (sheetReturn && sheetReturn.focus && document.contains(sheetReturn)) {
       try { sheetReturn.focus(); } catch (e) {}
     }
@@ -1722,7 +2424,13 @@
     if (w) { closeSheet(); return switchTo(w.dataset.who); }
 
     // sheets
-    if (t.closest && t.closest("[data-close]")) return closeSheet();
+    var closer = t.closest && t.closest("[data-close]");
+    if (closer) {
+      closeSheet();
+      // a sheet button may also send you somewhere ("go to your House")
+      if (closer.dataset && closer.dataset.go) { view = closer.dataset.go; render(); }
+      return;
+    }
     var backdrop = t.id === "sheet-back";
     if (backdrop) return closeSheet();
 
@@ -1766,6 +2474,7 @@
         if (["farm", "well", "pool"].indexOf(dest) === -1) sess = null;
         if (dest !== "arena") battle = null;
         if (dest === "bag") { S.bagNew = {}; save(); }   // you have seen them now
+        pendingSale = null;
         view = dest;
         sfx("pop");
         render();
@@ -1808,6 +2517,42 @@
 
     var buy = t.closest("[data-buy]");
     if (buy) return tryBuy(buy.dataset.buy);
+
+    var stallBuy = t.closest("[data-stallbuy]");
+    if (stallBuy) return tryStallBuy(stallBuy.dataset.stallbuy);
+
+    // --- your house ---
+    var put = t.closest("[data-place]");
+    if (put) return placeFurniture(put.dataset.place);
+    var away = t.closest("[data-store]");
+    if (away) return storeFurniture(away.dataset.store);
+    if (t.closest("[data-upgrade]")) return upgradeHouse();
+
+    // --- your shop ---
+    var stockIt = t.closest("[data-stock]");
+    if (stockIt) return openPriceSheet(stockIt.dataset.stock);
+    var priced = t.closest("[data-priced]");
+    if (priced) return nudgePrice(Number(priced.dataset.priced));
+    var qty = t.closest("[data-saleqty]");
+    if (qty) return setSaleQty(Number(qty.dataset.saleqty));
+    if (t.closest("[data-listit]")) return listForSale();
+    var un = t.closest("[data-unstock]");
+    if (un) return unstock(Number(un.dataset.unstock));
+    if (t.closest("[data-clearsales]")) return clearSales();
+    if (t.closest("[data-shopname]")) { sfx("pop"); return openSheet(shopNameSheet()); }
+    if (t.closest("#shop-go")) {
+      var sf = $("#shop-input");
+      S.stall.name = ((sf ? sf.value : "") || "").trim().slice(0, 20);
+      save();
+      closeSheet();
+      render();
+      toast("🏬 The sign says " + stallName() + " now.");
+      sfx("win");
+      return;
+    }
+
+    // --- the prize wheel ---
+    if (t.closest("[data-spin]")) return spinWheel();
 
     var fight = t.closest("[data-fight]");
     if (fight) return startBattle(fight.dataset.fight);
@@ -1895,6 +2640,9 @@
     sess = null;
     battle = null;
     pendingBuy = null;
+    pendingSale = null;
+    spinning = false;
+    wheelAngle = 0;
     view = "nest";
     closeSheet();
     passTime();
@@ -1963,6 +2711,9 @@
     },
     changeIndex: function () { return pendingBuy ? pendingBuy.q.answer : -1; },
     review: function () { return S.review; },
+    house: function () { return S.house; },
+    stall: function () { return S.stall; },
+    spun: function () { return spunToday(); },
     _nextQuestion: function () { if (sess) { nextQuestion(); render(); } },
     grant: function (n) { S.coins += n; save(); render(); }
   };

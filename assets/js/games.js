@@ -24,7 +24,7 @@ const GAMES = [
   {
     title: "Craepets",
     emoji: "🥚",
-    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, questions you get wrong come back until you fix them, and everyone in the family gets their own pet.",
+    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, questions you get wrong come back until you fix them, and everyone in the family gets their own pet. Now with a house to furnish, your own shop the rest of the family really can buy from, and a free spin of the prize wheel every day.",
     url:   "games/craepets/",
     ages:  "2+",
     kids:  ["jeannie","cory","ellie","kieran","shannon"],

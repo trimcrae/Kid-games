@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🥚 Craepets</title>
-  <meta name="description" content="Adopt a Craepet, then feed, teach and raise it — every coin in the valley is earned by learning something, at your own level." />
+  <meta name="description" content="Adopt a Craepet, then feed, teach and raise it — furnish a house, open your own shop and spin the daily prize wheel. Every coin in the valley is earned by learning something, at your own level." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥚</text></svg>" />
   <meta name="theme-color" content="#5ec6a8" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
@@ -63,11 +63,18 @@
        choices come up the screen. */
     .scene.compact { height: clamp(118px, 26vw, 172px); }
     .scene.nest   { background: linear-gradient(180deg, #ffe9c9 0%, #fff6e8 55%, #d9a86a 55%, #b98549 100%); }
+    /* Moving house repaints the room, so the upgrade is visible the
+       moment you buy it — not just a bigger number on a panel. */
+    .scene.nest.h1 { background: linear-gradient(180deg, #efe0c8 0%, #fbf1e0 55%, #b08a5e 55%, #8d6a44 100%); }
+    .scene.nest.h2 { background: linear-gradient(180deg, #ffeede 0%, #fff8f0 55%, #c98f63 55%, #9f6c46 100%); }
+    .scene.nest.h3 { background: linear-gradient(180deg, #f3ecff 0%, #fbf8ff 55%, #bfa07e 55%, #96775a 100%); }
+    .scene.nest.h4 { background: linear-gradient(180deg, #e6ecff 0%, #f6f2ff 55%, #9aa4cf 55%, #6d76a6 100%); }
     .scene.farm   { background: linear-gradient(180deg, #bfe9ff 0%, #e8f7ff 52%, #9bd97f 52%, #5fa845 100%); }
     .scene.well   { background: linear-gradient(180deg, #3f4a7a 0%, #6b76ad 50%, #4a5382 50%, #2c3358 100%); }
     .scene.pool   { background: linear-gradient(180deg, #ffe6fb 0%, #e5f6ff 50%, #8fe4ff 50%, #4bb8e8 100%); }
     .scene.market { background: linear-gradient(180deg, #ffd9a8 0%, #fff2dd 52%, #c9906a 52%, #a06f4f 100%); }
     .scene.arena  { background: linear-gradient(180deg, #ffc9c9 0%, #ffeaea 52%, #e0b489 52%, #bb8f65 100%); }
+    .scene.stall  { background: linear-gradient(180deg, #d8f0ff 0%, #f0faff 52%, #e2b57e 52%, #b9895a 100%); }
     .scene canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
     .scene .deco {
       position: absolute; font-size: clamp(1.2rem, 4vw, 2rem); opacity: 0.9;
@@ -368,6 +375,38 @@
     .sheet .close { display: block; margin: 0.7rem auto 0; }
     @media (min-width: 700px) { .sheet-back { align-items: center; } }
 
+    /* --- the daily prize wheel ---
+       Eight equal slices painted with one conic-gradient; the labels are
+       rotated out to the rim and then rotated back so they read straight. */
+    .wheelwrap {
+      --r: clamp(210px, 62vw, 280px);
+      position: relative; width: var(--r); height: var(--r);
+      margin: 0.5rem auto 0.2rem;
+    }
+    .wheel {
+      width: 100%; height: 100%; border-radius: 50%;
+      border: 7px solid #fff; box-sizing: border-box;
+      box-shadow: 0 10px 26px rgba(43,36,64,0.25), inset 0 0 0 3px rgba(43,36,64,0.08);
+    }
+    .wheel.spinning { transition: transform 4.1s cubic-bezier(0.15, 0.72, 0.13, 1); }
+    .wlabel {
+      position: absolute; left: 50%; top: 50%;
+      font-weight: bold; font-size: clamp(0.72rem, 2.8vw, 0.92rem); color: #2b2440;
+      white-space: nowrap; pointer-events: none;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .wheelpin {
+      position: absolute; left: 50%; top: -12px; transform: translateX(-50%);
+      font-size: 1.7rem; line-height: 1; color: var(--ink); z-index: 2;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    }
+    .wheelhub {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: 46px; height: 46px; border-radius: 50%; background: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+      box-shadow: 0 3px 10px rgba(43,36,64,0.25);
+    }
+
     /* --- toast --- */
     .toast {
       position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
@@ -379,6 +418,9 @@
 
     .settings-row { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
     .settings-row .ghost.on { background: var(--purple); color: #fff; }
+    /* A picked option is a picked option wherever it is — the price sheet's
+       "how many?" row needs to show which number is chosen too. */
+    .ghost.on { background: var(--purple); color: #fff; border-color: var(--purple); }
 
     /* On a small phone every pixel above the question counts — but a
        three-year-old's finger still needs something like 40px to land on,
@@ -398,6 +440,7 @@
     @media (prefers-reduced-motion: reduce) {
       .bubble, .floaty, .sheet, .sheet-back, .toast, .choice.right, .choice.wrong,
       .choice.hint { animation: none; }
+      .wheel.spinning { transition: none; }
       .who:hover, .nav button:hover, .choice:hover:not(:disabled), .item:hover:not(:disabled),
       .act:hover:not(:disabled), .ghost:hover, .sw:hover, .adopt:hover { transform: none; }
     }
