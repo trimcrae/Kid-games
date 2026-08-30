@@ -1333,7 +1333,7 @@ window.CPData = (function () {
   var CARE = [
     { id: "soap",   name: "Berry Soap",   emoji: "🧼", cost: 8,  clean: 30 },
     { id: "bath",   name: "Bubble Bath",  emoji: "🛁", cost: 20, clean: 70, joy: 8 },
-    { id: "tonic",  name: "Berry Tonic",  emoji: "🧪", cost: 35, energy: 60, heal: 25 },
+    { id: "tonic",  name: "Berry Tonic",  emoji: "🧪", cost: 35, energy: 60, joy: 15 },
     { id: "pillow", name: "Cloud Pillow", emoji: "☁️", cost: 45, energy: 100 }
   ];
 

@@ -79,6 +79,9 @@
       coins: 60,
       pet: null,
       bag: {},
+      /* Anything bought or found that hasn't been used yet — this is what
+         puts the badge on the 🎒 Bag tab so a purchase can't vanish. */
+      bagNew: {},
       colours: P.COLOURS.filter(function (c) { return c.free; }).map(function (c) { return c.id; }),
       lastTick: Date.now(),
       day: D.dayNumber(),
@@ -138,7 +141,9 @@
     var hours = Math.max(0, (now - (S.lastTick || now)) / 3600000);
     if (hours > 72) hours = 72;                     // a long holiday is still just a nap
     S.pet.hunger = clamp(S.pet.hunger - DECAY.hunger * hours, FLOOR, 100);
-    S.pet.happy  = clamp(S.pet.happy  - DECAY.happy  * hours, FLOOR, 100);
+    // A shelf of toys is a real, lasting purchase: the more your Craepet
+    // owns, the slower it gets bored while you're away.
+    S.pet.happy  = clamp(S.pet.happy  - DECAY.happy * (1 - toyCalm()) * hours, FLOOR, 100);
     S.pet.clean  = clamp(S.pet.clean  - DECAY.clean  * hours, FLOOR, 100);
     S.pet.energy = clamp(S.pet.energy + REGEN * hours, 0, 100);
     S.lastTick = now;
@@ -231,12 +236,66 @@
   function addItem(id, n) {
     n = n || 1;
     S.bag[id] = (S.bag[id] || 0) + n;
+    if (!S.bagNew) S.bagNew = {};
+    S.bagNew[id] = true;                 // badge the Bag tab until it's used
   }
   function takeItem(id) {
     if (!S.bag[id]) return false;
     S.bag[id]--;
     if (S.bag[id] <= 0) delete S.bag[id];
     return true;
+  }
+  /* Everything in the bag of one kind, in the order it was picked up. */
+  function bagOf(kind) {
+    return Object.keys(S.bag).filter(function (id) {
+      return S.bag[id] > 0 && D.kindOf(id) === kind;
+    });
+  }
+  /* Things that put energy back — a pillow or a tonic belongs at bedtime,
+     not in the bath, which is why they used to have nowhere to be used. */
+  function comforts() {
+    return Object.keys(S.bag).filter(function (id) {
+      var it = D.itemById(id);
+      return S.bag[id] > 0 && it && it.energy;
+    });
+  }
+  function toyCalm() { return Math.min(0.5, bagOf("toy").length * 0.08); }
+
+  /* Do you already own this, for good? Toys and brushes are kept, not
+     eaten — so the shop must never sell you a second one. */
+  function alreadyOwned(it) {
+    if (!it) return false;
+    if (it.kind === "brush") return S.colours.indexOf(it.colour) !== -1;
+    if ((it.kind || D.kindOf(it.id)) === "toy") return (S.bag[it.id] || 0) > 0;
+    return false;
+  }
+
+  /* What an item actually DOES, in one short line. Shown on the shop shelf
+     AND in the bag, so nobody has to spend coins to find out. */
+  function itemBlurb(it) {
+    if (!it) return "";
+    var kind = it.kind || D.kindOf(it.id);
+    if (kind === "brush") return "a color for keeps";
+    if (kind === "food") return "+" + it.fill + " 🍽️" + (it.joy ? " +" + it.joy + " 😊" : "");
+    if (kind === "toy") return "+" + it.joy + " 😊 · yours for good";
+    if (kind === "book") return "+" + it.xp + " XP · a real fact";
+    var bits = [];
+    if (it.clean) bits.push("+" + it.clean + " 🫧");
+    if (it.energy) bits.push("+" + it.energy + " ⚡");
+    if (it.joy) bits.push("+" + it.joy + " 😊");
+    return bits.join(" ");
+  }
+
+  /* Where a purchase went, said out loud, because "it vanished" is the
+     one thing a shop must never do to a six-year-old. */
+  function whereItWent(it) {
+    var kind = it.kind || D.kindOf(it.id);
+    if (kind === "toy") return "It's on the 🧸 toy shelf in your 🎒 Bag — play with it any time.";
+    if (kind === "book") return "It's in your 🎒 Bag — tap 📖 Read at the nest.";
+    if (kind === "food") return "It's in your 🎒 Bag — tap 🍽️ Feed at the nest.";
+    if (it.clean) return "It's in your 🎒 Bag — tap 🫧 Wash at the nest.";
+    if (it.energy) return "It's in your 🎒 Bag — tap 😴 Rest at the nest.";
+    return "It's in your 🎒 Bag.";
   }
 
   /* Trophies are checked after anything interesting happens. */
@@ -472,10 +531,14 @@
       return !S.claimed[q.id] && (S.today[q.track] || 0) >= q.goal;
     }).length;
     var due = S.review.filter(function (r) { return r.tier === tier(); }).length;
+    // Anything bought or found and not yet used — so a purchase is visibly
+    // waiting for you instead of quietly disappearing into the bag.
+    var fresh = Object.keys(S.bagNew || {}).filter(function (id) { return S.bag[id] > 0; }).length;
     return '<nav class="nav" id="nav" aria-label="Where to go">' + NAV.map(function (n) {
       var dot = "";
       if (n[0] === "quests" && ready) dot = '<span class="dot">' + ready + "</span>";
       if (n[0] === "nest" && due) dot = '<span class="dot review" title="' + due + ' to review">🔁</span>';
+      if (n[0] === "bag" && fresh) dot = '<span class="dot">' + fresh + "</span>";
       return '<button data-go="' + n[0] + '"' + (view === n[0] ? ' class="on" aria-current="page"' : "") + ">" +
              n[1] + " " + n[2] + dot + "</button>";
     }).join("") + "</nav>";
@@ -938,10 +1001,25 @@
         '<button class="act" data-do="play" style="--ac:#3ddc84"><span class="em">🎾</span>Play</button>' +
         '<button class="act" data-do="wash" style="--ac:#38b6ff"><span class="em">🫧</span>Wash</button>' +
         '<button class="act" data-do="rest" style="--ac:#8a5cff"><span class="em">😴</span>Rest</button>' +
-      "</div>" +
+        '<button class="act" data-do="read" style="--ac:#e05fa8"><span class="em">📖</span>Read</button>' +
+      "</div>" + shelfLine() +
       '<p class="sub" style="margin:0.8rem 0 0">Coins come from the Farm, the Well, the Pool and the Arena — ' +
         "every one of them pays you for learning something.</p>" + streakBit +
     "</div>" + reviewHtml() + levelPickerHtml();
+  }
+
+  /* Toys keep paying you back long after you bought them — say so, or
+     nobody can tell the 100-coin skateboard did anything. */
+  function shelfLine() {
+    var n = bagOf("toy").length;
+    if (!n) {
+      return '<p class="sub" style="margin:0.8rem 0 0">🧸 No toys yet. A toy from the 🏪 Market is yours ' +
+        "for good — you can play with it as often as you like, and it keeps " + esc(S.pet.name) +
+        " cheerful even while the game is closed.</p>";
+    }
+    return '<p class="sub" style="margin:0.8rem 0 0">🧸 <b>' + n + " toy" + (n === 1 ? "" : "s") +
+      " on the shelf</b> — " + esc(S.pet.name) + " gets bored <b>" + Math.round(toyCalm() * 100) +
+      "% slower</b> because of them.</p>";
   }
 
   /* The review basket, shown plainly: "here is what you are still
@@ -983,9 +1061,7 @@
     }
     return sheet("🍽️ What shall " + esc(S.pet.name) + " eat?",
       '<div class="items">' + foods.map(function (id) {
-        var it = D.itemById(id);
-        return '<button class="item" data-use="' + id + '"><span class="pic">' + it.emoji + "</span>" +
-               '<span class="nm">' + esc(it.name) + '</span><span class="own">×' + S.bag[id] + "</span></button>";
+        return itemButton(id, "×" + S.bag[id]);
       }).join("") + "</div>");
   }
 
@@ -994,12 +1070,10 @@
     var romp = '<button class="act" data-use="romp" style="--ac:var(--green);width:100%;margin-bottom:0.6rem">' +
                '<span class="em">🤸</span>Just romp about (free)</button>';
     return sheet("🎾 Playtime!", romp + (toys.length
-      ? '<div class="items">' + toys.map(function (id) {
-          var it = D.itemById(id);
-          return '<button class="item" data-use="' + id + '"><span class="pic">' + it.emoji + "</span>" +
-                 '<span class="nm">' + esc(it.name) + "</span></button>";
-        }).join("") + "</div>"
-      : '<p class="sub">Toys from the 🏪 Market make playtime count for a lot more.</p>'));
+      ? '<div class="items">' + toys.map(function (id) { return itemButton(id, "owned"); }).join("") + "</div>" +
+        '<p class="sub" style="margin-top:0.6rem">Toys never run out — play with the same one for ever.</p>'
+      : '<p class="sub">Toys from the 🏪 Market make playtime count for a lot more, ' +
+        "and once you buy one it is yours to keep.</p>"));
   }
 
   function washSheet() {
@@ -1010,28 +1084,66 @@
     var rinse = '<button class="act" data-use="rinse" style="--ac:var(--blue);width:100%;margin-bottom:0.6rem">' +
                 '<span class="em">💦</span>Quick rinse (free)</button>';
     return sheet("🫧 Bath time", rinse + (soaps.length
-      ? '<div class="items">' + soaps.map(function (id) {
-          var it = D.itemById(id);
-          return '<button class="item" data-use="' + id + '"><span class="pic">' + it.emoji + "</span>" +
-                 '<span class="nm">' + esc(it.name) + '</span><span class="own">×' + S.bag[id] + "</span></button>";
-        }).join("") + "</div>"
-      : ""));
+      ? '<div class="items">' + soaps.map(function (id) { return itemButton(id, "×" + S.bag[id]); }).join("") + "</div>"
+      : '<p class="sub">Soap and bubble bath from the 🏪 Market get a Craepet much cleaner than a rinse.</p>'));
+  }
+
+  /* Bedtime. Pillows and tonics live here — they put energy back, which is
+     exactly what Rest is for, and nowhere else in the nest wanted them. */
+  function restSheet() {
+    var comfy = comforts();
+    var nap = '<button class="act" data-use="nap" style="--ac:var(--purple);width:100%;margin-bottom:0.6rem">' +
+              '<span class="em">😴</span>Short nap (free, +18 ⚡)</button>';
+    return sheet("😴 Bedtime", nap + (comfy.length
+      ? '<div class="items">' + comfy.map(function (id) { return itemButton(id, "×" + S.bag[id]); }).join("") + "</div>"
+      : '<p class="sub">A ☁️ Cloud Pillow or a 🧪 Berry Tonic from the 🏪 Market refills the energy bar in one go.</p>'));
+  }
+
+  /* Reading. Books used to be buyable but only usable from the Bag tab,
+     so a 45-coin book looked like it did nothing. */
+  function readSheet() {
+    var books = bagOf("book");
+    return sheet("📖 Story time", books.length
+      ? '<div class="items">' + books.map(function (id) { return itemButton(id, "×" + S.bag[id]); }).join("") + "</div>" +
+        '<p class="sub" style="margin-top:0.6rem">A book is read once: it teaches a real fact and gives ' +
+        esc(S.pet.name) + " a big lump of XP.</p>"
+      : '<p class="sub">No books yet. The 📖 Word Well turns them up while you answer, ' +
+        "and the 🏪 Market always has a couple on the shelf.</p>");
+  }
+
+  /* One item button, drawn the same way everywhere: picture, name, what it
+     does, and how many you have. */
+  function itemButton(id, tail) {
+    var it = D.itemById(id);
+    if (!it) return "";
+    return '<button class="item" data-use="' + esc(id) + '"><span class="pic">' + it.emoji + "</span>" +
+      '<span class="nm">' + esc(it.name) + "</span>" +
+      '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
+      (tail ? '<span class="own">' + esc(tail) + "</span>" : "") +
+    "</button>";
   }
 
   function doAction(what) {
     if (what === "feed") return openSheet(feedSheet());
     if (what === "play") return openSheet(playSheet());
     if (what === "wash") return openSheet(washSheet());
+    if (what === "read") return openSheet(readSheet());
     if (what === "rest") {
-      anim.napping = true;
-      S.pet.energy = clamp(S.pet.energy + 18, 0, 100);
-      S.pet.happy = clamp(S.pet.happy + 2, 0, 100);
-      say("Zzz… 💤", 2600);
-      sfx("pop");
-      setTimeout(function () { anim.napping = false; }, 2600);
-      save();
-      return render();
+      if (comforts().length) return openSheet(restSheet());
+      return nap();
     }
+  }
+
+  function nap() {
+    anim.napping = true;
+    S.pet.energy = clamp(S.pet.energy + 18, 0, 100);
+    S.pet.happy = clamp(S.pet.happy + 2, 0, 100);
+    say("Zzz… 💤", 2600);
+    floaty("+18 ⚡", "#e2d4ff");
+    sfx("pop");
+    setTimeout(function () { anim.napping = false; }, 2600);
+    save();
+    render();
   }
 
   /* Using anything at all from the bag routes through here. */
@@ -1047,6 +1159,7 @@
       sfx("pop");
       return after();
     }
+    if (id === "nap") { closeSheet(); return nap(); }
     if (id === "rinse") {
       S.pet.clean = clamp(S.pet.clean + 14, 0, 100);
       bump("wash");
@@ -1062,6 +1175,7 @@
     // Brushes are not carried in the bag — owning the colour IS the item.
     if (kind === "brush") return paint(it.colour);
     if (!S.bag[id]) return closeSheet();
+    if (S.bagNew) delete S.bagNew[id];          // it has been used; drop the badge
 
     if (kind === "food") {
       if (S.pet.hunger > 96) { toast(S.pet.name + " is completely full!"); return closeSheet(); }
@@ -1092,6 +1206,7 @@
       if (it.energy) S.pet.energy = clamp(S.pet.energy + it.energy, 0, 100);
       if (it.joy) S.pet.happy = clamp(S.pet.happy + it.joy, 0, 100);
       if (it.clean) bump("wash");
+      floaty(itemBlurb(it), it.clean ? "#cdf1ff" : "#e2d4ff");
       say("Aaah.");
       sfx("good");
       return after();
@@ -1142,23 +1257,27 @@
   function marketHtml() {
     var stock = D.shopStock();
     var cards = stock.map(function (it) {
-      var owned = it.kind === "brush" ? (S.colours.indexOf(it.colour) !== -1) : false;
+      var owned = alreadyOwned(it);
       var afford = S.coins >= it.cost;
       var pic = it.kind === "brush"
         ? '<span class="brushdot" style="background:' + it.swatch + '"></span>'
         : '<span class="pic">' + it.emoji + "</span>";
+      var have = !owned && S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "";
       return '<button class="item" data-buy="' + esc(it.id) + '"' + (!afford || owned ? " disabled" : "") + ">" +
         pic + '<span class="nm">' + esc(it.name) + "</span>" +
-        (owned ? '<span class="own">owned</span>' : '<span class="price">🪙 ' + it.cost + "</span>") +
-        (S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "") +
+        '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
+        (owned ? '<span class="own">✔ owned</span>' : '<span class="price">🪙 ' + it.cost + "</span>") +
+        have +
       "</button>";
     }).join("");
     return '<div class="panel">' +
       "<h2>🏪 The Market</h2>" +
       '<p class="sub">Fresh stock every morning, the same for the whole family. You have 🪙 ' + S.coins + ".</p>" +
       '<div class="items">' + cards + "</div>" +
-      '<p class="sub" style="margin-top:0.8rem">🖌️ Paint brushes change your Craepet\'s color for good — ' +
-        "and the 🌈 Rainbow Pool gives one away free every 15 right answers.</p>" +
+      '<p class="sub" style="margin-top:0.8rem">Everything you buy lands in your 🎒 <b>Bag</b> — ' +
+        "food for 🍽️ Feed, toys for 🎾 Play, soap for 🫧 Wash, pillows for 😴 Rest and books for 📖 Read.</p>" +
+      '<p class="sub">🧸 Toys and 🖌️ brushes are <b>yours for good</b>, so the shop will only sell you one of each. ' +
+        "The 🌈 Rainbow Pool gives a free brush away every 15 right answers.</p>" +
     "</div>";
   }
 
@@ -1167,6 +1286,8 @@
     var it = null;
     for (var i = 0; i < stock.length; i++) if (stock[i].id === id) it = stock[i];
     if (!it || S.coins < it.cost) return;
+    // Never take coins for something you already keep forever.
+    if (alreadyOwned(it)) { toast("You already own " + it.name + "!"); return; }
 
     var t = tier();
     if (t === "tot" || t === "early") return finishBuy(it, 0);
@@ -1217,6 +1338,7 @@
     if (it.kind === "brush") {
       if (S.colours.indexOf(it.colour) === -1) S.colours.push(it.colour);
       closeSheet();
+      checkTrophies();
       save();
       render();
       openSheet(sheet("🖌️ " + esc(it.name),
@@ -1230,7 +1352,7 @@
     checkTrophies();
     save();
     render();
-    toast("Bought " + it.emoji + " " + it.name + "!");
+    toast("Bought " + it.emoji + " " + it.name + "! " + whereItWent(it));
     sfx("coin");
   }
 
@@ -1238,25 +1360,40 @@
      THE BAG
      ========================================================= */
   function bagHtml() {
-    var ids = Object.keys(S.bag).filter(function (id) { return S.bag[id] > 0; });
+    var groups = [
+      { kind: "food", title: "🍽️ Food", note: "Tap to feed " + esc(S.pet.name) + ". Food is eaten up." },
+      { kind: "toy",  title: "🧸 Toy shelf",
+        note: "Yours for good — play with these as often as you like. " +
+              "They also keep " + esc(S.pet.name) + " from getting bored while the game is closed." },
+      { kind: "care", title: "🧼 Soap, baths & bedtime", note: "Cleans, or puts energy back. Used up when you use it." },
+      { kind: "book", title: "📚 Books", note: "Read once for a real fact and a big lump of XP." }
+    ];
+    var any = false;
+    var sections = groups.map(function (g) {
+      var ids = bagOf(g.kind);
+      if (!ids.length) return "";
+      any = true;
+      return "<h3 style=\"margin:1rem 0 0.2rem\">" + g.title + "</h3>" +
+        '<p class="sub" style="margin:0 0 0.5rem">' + g.note + "</p>" +
+        '<div class="items">' + ids.map(function (id) {
+          return itemButton(id, g.kind === "toy" ? "owned" : "×" + S.bag[id]);
+        }).join("") + "</div>";
+    }).join("");
+
     var brushes = P.COLOURS.filter(function (c) { return S.colours.indexOf(c.id) !== -1; });
-    var body = ids.length
-      ? '<div class="items">' + ids.map(function (id) {
-          var it = D.itemById(id);
-          if (!it) return "";
-          return '<button class="item" data-use="' + esc(id) + '"><span class="pic">' + it.emoji + "</span>" +
-                 '<span class="nm">' + esc(it.name) + '</span><span class="own">×' + S.bag[id] + "</span></button>";
-        }).join("") + "</div>"
-      : '<p class="sub">Your bag is empty. The 🍓 Farm drops food, the 📖 Well turns up books, ' +
-        "and the 🏪 Market sells everything else.</p>";
 
     return '<div class="panel">' +
       "<h2>🎒 Your bag</h2>" +
-      '<p class="sub">Tap anything to use it on ' + esc(S.pet.name) + ".</p>" + body +
+      (any
+        ? '<p class="sub">Everything you have bought or found lives here. Tap anything to use it on ' +
+          esc(S.pet.name) + ".</p>" + sections
+        : '<p class="sub">Your bag is empty. The 🍓 Farm drops food, the 📖 Well turns up books, ' +
+          "and the 🏪 Market sells everything else.</p>") +
     "</div>" +
     '<div class="panel">' +
       "<h2>🎨 Colors you own</h2>" +
-      '<p class="sub">Tap a color to repaint ' + esc(S.pet.name) + " — it's free once you own the brush.</p>" +
+      '<p class="sub">' + brushes.length + " of " + P.COLOURS.length +
+        " colors. Tap one to repaint " + esc(S.pet.name) + " — it's free once you own the brush.</p>" +
       '<div class="swatches">' + brushes.map(function (c) {
         return '<button class="sw' + (c.id === S.pet.colour ? " on" : "") + '" data-paint="' + c.id +
                '" title="' + esc(c.name) + '" aria-label="' + esc(c.name) + '" style="background:' + c.swatch + '"></button>';
@@ -1628,6 +1765,7 @@
         hush();
         if (["farm", "well", "pool"].indexOf(dest) === -1) sess = null;
         if (dest !== "arena") battle = null;
+        if (dest === "bag") { S.bagNew = {}; save(); }   // you have seen them now
         view = dest;
         sfx("pop");
         render();
