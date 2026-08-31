@@ -1647,13 +1647,13 @@
     if (!pendingSale) return;
     pendingSale.price = Math.max(1, Math.min(999, pendingSale.price + by));
     sfx("pop");
-    openSheet(priceSheet());
+    refreshSheet(priceSheet());
   }
   function setSaleQty(n) {
     if (!pendingSale) return;
     pendingSale.n = Math.max(1, Math.min(S.bag[pendingSale.id] || 1, n));
     sfx("pop");
-    openSheet(priceSheet());
+    refreshSheet(priceSheet());
   }
 
   function listForSale() {
@@ -2396,6 +2396,37 @@
     // behind it, and so Escape has something obvious to return from.
     var first = document.querySelector(".sheet input, .sheet button");
     if (first && first.focus) { try { first.focus(); } catch (e) {} }
+  }
+  /* Re-draw the sheet that is ALREADY open, in place. Calling openSheet()
+     again would tear the sheet off the page and put a new one back, which
+     replays the backdrop fade and the slide-up — that is the whole screen
+     flashing every time you tap +1 on a price. Swapping the innards keeps
+     the backdrop, the scroll position and the keyboard exactly where they
+     were, so only the numbers change. */
+  function refreshSheet(html) {
+    var open = $("#sheet-back");
+    var box = open && $(".sheet", open);
+    var wrap = document.createElement("div");
+    wrap.innerHTML = html;
+    var next = $(".sheet", wrap);
+    if (!box || !next) return openSheet(html);
+    var top = box.scrollTop;
+    var here = box.contains(document.activeElement) ? sameButton(document.activeElement) : null;
+    box.innerHTML = next.innerHTML;
+    box.scrollTop = top;
+    var back = here && $(here, box);
+    if (back && back.focus) { try { back.focus(); } catch (e) {} }
+  }
+  /* A selector that finds the same button again after the swap, so tapping
+     +1 five times in a row keeps working from the keyboard. */
+  function sameButton(el) {
+    var at = (el && el.attributes) || [];
+    for (var i = 0; i < at.length; i++) {
+      if (at[i].name.indexOf("data-") === 0) {
+        return "[" + at[i].name + '="' + at[i].value.replace(/"/g, '\\"') + '"]';
+      }
+    }
+    return null;
   }
   /* Take the sheet off the page WITHOUT forgetting what it was asking —
      the shopkeeper's change question replaces its own sheet mid-purchase. */
