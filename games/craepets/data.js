@@ -1352,7 +1352,11 @@ window.CPData = (function () {
     { id: "drum",    name: "Little Drum",  emoji: "🥁", cost: 75,  joy: 19 },
     { id: "robot",   name: "Wind-up Robot", emoji: "🤖", cost: 110, joy: 26 },
     { id: "scope",   name: "Star Telescope", emoji: "🔭", cost: 130, joy: 28 },
-    { id: "rocket",  name: "Rocket Ride",  emoji: "🚀", cost: 160, joy: 32 }
+    { id: "rocket",  name: "Rocket Ride",  emoji: "🚀", cost: 160, joy: 32 },
+    /* Rare toys never sit on the ordinary shelf — see RARE FINDS below. */
+    { id: "marble",  name: "Galaxy Marble", emoji: "🌀", cost: 70,  joy: 22, rare: true },
+    { id: "wand",    name: "Sparkle Wand", emoji: "🪄", cost: 95,  joy: 26, rare: true },
+    { id: "glider",  name: "Star Glider",  emoji: "🛩️", cost: 125, joy: 29, rare: true }
   ];
 
   var CARE = [
@@ -1366,7 +1370,9 @@ window.CPData = (function () {
     { id: "shower", name: "Rain Shower",  emoji: "🚿", cost: 28, clean: 85, joy: 5 },
     { id: "wrap",   name: "Warm Wrap",    emoji: "🧣", cost: 32, energy: 70, joy: 10 },
     { id: "milk",   name: "Moon Milk",    emoji: "🥛", cost: 40, energy: 90, joy: 12 },
-    { id: "lounger", name: "Sun Lounger", emoji: "⛱️", cost: 50, energy: 100, joy: 20 }
+    { id: "lounger", name: "Sun Lounger", emoji: "⛱️", cost: 50, energy: 100, joy: 20 },
+    { id: "starsoap", name: "Stardust Soap", emoji: "🌟", cost: 42, clean: 100, joy: 12, rare: true },
+    { id: "dreamtea", name: "Dream Tea",  emoji: "🫖", cost: 58, energy: 100, joy: 22, rare: true }
   ];
 
   /* Books are read once: they teach a real fact and level your pet's mind. */
@@ -1381,7 +1387,8 @@ window.CPData = (function () {
     { id: "poems",   name: "Book of Poems",    emoji: "🧾", cost: 40, xp: 38, topic: "word" },
     { id: "riddles", name: "Riddle Book",      emoji: "📔", cost: 40, xp: 36, topic: "word" },
     { id: "machines", name: "How Things Work", emoji: "📒", cost: 55, xp: 55, topic: "wonder" },
-    { id: "grimoire", name: "The Deep Grimoire", emoji: "📚", cost: 75, xp: 80, topic: "wonder" }
+    { id: "grimoire", name: "The Deep Grimoire", emoji: "📚", cost: 75, xp: 80, topic: "wonder" },
+    { id: "marslog", name: "The Mars Log",  emoji: "🧭", cost: 95, xp: 105, topic: "wonder", rare: true }
   ];
 
   /* =========================================================
@@ -1397,45 +1404,448 @@ window.CPData = (function () {
        · study — every right answer anywhere is worth extra XP
      ========================================================= */
   var FURNITURE = [
-    { id: "candle",  name: "Warm Candle",    emoji: "🕯️", cost: 20,  cosy: 3 },
-    { id: "lamp",    name: "Little Lamp",    emoji: "💡", cost: 25,  cosy: 4 },
-    { id: "plant",   name: "Potted Plant",   emoji: "🪴", cost: 30,  cosy: 5 },
-    { id: "picture", name: "Framed Picture", emoji: "🖼️", cost: 35,  cosy: 6 },
-    { id: "chair",   name: "Little Chair",   emoji: "🪑", cost: 40,  cosy: 6,  rest: 2 },
-    { id: "clock",   name: "Cuckoo Clock",   emoji: "🕰️", cost: 45,  cosy: 7 },
-    { id: "basket",  name: "Toy Basket",     emoji: "🧺", cost: 45,  cosy: 6,  tidy: 2 },
-    { id: "mirror",  name: "Tall Mirror",    emoji: "🪞", cost: 50,  cosy: 7,  tidy: 3 },
-    { id: "shelf",   name: "Book Shelf",     emoji: "📚", cost: 70,  cosy: 8,  study: 4 },
-    { id: "bed",     name: "Cosy Bed",       emoji: "🛏️", cost: 80,  cosy: 9,  rest: 5 },
-    { id: "tub",     name: "Claw-foot Tub",  emoji: "🛁", cost: 85,  cosy: 8,  tidy: 5 },
-    { id: "sofa",    name: "Big Sofa",       emoji: "🛋️", cost: 110, cosy: 12 },
-    { id: "fire",    name: "Fireplace",      emoji: "🔥", cost: 120, cosy: 13, rest: 3 },
-    { id: "tank",    name: "Fish Tank",      emoji: "🐠", cost: 130, cosy: 12, study: 3 },
-    { id: "tree",    name: "Indoor Tree",    emoji: "🎄", cost: 140, cosy: 13 },
-    { id: "horse",   name: "Rocking Horse",  emoji: "🎠", cost: 150, cosy: 14 },
-    { id: "piano",   name: "Upright Piano",  emoji: "🎹", cost: 165, cosy: 15, study: 3 },
-    { id: "globe",   name: "Spinning Globe", emoji: "🌍", cost: 175, cosy: 12, study: 6 },
-    { id: "window",  name: "Star Window",    emoji: "🪟", cost: 195, cosy: 16, study: 4 },
-    { id: "crown",   name: "Crown Stand",    emoji: "👑", cost: 260, cosy: 20 }
+    /* --- 🕯️ Cosy Corner: the everyday pieces every house starts with --- */
+    { id: "candle",  name: "Warm Candle",    emoji: "🕯️", cost: 20,  cosy: 3,  set: "cosy" },
+    { id: "lamp",    name: "Little Lamp",    emoji: "💡", cost: 25,  cosy: 4,  set: "cosy" },
+    { id: "picture", name: "Framed Picture", emoji: "🖼️", cost: 35,  cosy: 6,  set: "art" },
+    { id: "chair",   name: "Little Chair",   emoji: "🪑", cost: 40,  cosy: 6,  rest: 2, set: "cosy" },
+    { id: "clock",   name: "Cuckoo Clock",   emoji: "🕰️", cost: 45,  cosy: 7,  set: "cosy" },
+    { id: "basket",  name: "Toy Basket",     emoji: "🧺", cost: 45,  cosy: 6,  tidy: 2, set: "cosy" },
+    { id: "mirror",  name: "Tall Mirror",    emoji: "🪞", cost: 50,  cosy: 7,  tidy: 3, set: "cosy" },
+    { id: "nightlight", name: "Night Light", emoji: "🌟", cost: 55,  cosy: 7,  rest: 2, set: "cosy" },
+    { id: "brooms",  name: "Broom Corner",   emoji: "🧹", cost: 48,  cosy: 5,  tidy: 4, set: "cosy" },
+    { id: "phone",   name: "Old Telephone",  emoji: "☎️", cost: 70,  cosy: 7,  set: "cosy" },
+    { id: "bed",     name: "Cosy Bed",       emoji: "🛏️", cost: 80,  cosy: 9,  rest: 5, set: "cosy" },
+    { id: "teddyshelf", name: "Teddy Shelf", emoji: "🧸", cost: 85,  cosy: 10, set: "cosy" },
+    { id: "tub",     name: "Claw-foot Tub",  emoji: "🛁", cost: 85,  cosy: 8,  tidy: 5, set: "cosy" },
+    { id: "beanbag", name: "Bean Bag",       emoji: "🫘", cost: 90,  cosy: 10, rest: 4, set: "cosy" },
+    { id: "sofa",    name: "Big Sofa",       emoji: "🛋️", cost: 110, cosy: 12, set: "cosy" },
+    { id: "fire",    name: "Fireplace",      emoji: "🔥", cost: 120, cosy: 13, rest: 3, set: "cosy" },
+    { id: "horse",   name: "Rocking Horse",  emoji: "🎠", cost: 150, cosy: 14, set: "cosy" },
+    { id: "wardrobe", name: "Big Wardrobe",  emoji: "🚪", cost: 160, cosy: 12, tidy: 5, set: "cosy" },
+    { id: "kitchen", name: "Little Kitchen", emoji: "🍳", cost: 175, cosy: 13, set: "cosy" },
+    { id: "tvset",   name: "Story Screen",   emoji: "📺", cost: 190, cosy: 15, rest: 2, set: "cosy" },
+    { id: "window",  name: "Star Window",    emoji: "🪟", cost: 195, cosy: 16, study: 4, set: "cosy" },
+    { id: "console", name: "Games Console",  emoji: "🎮", cost: 215, cosy: 17, rare: true, set: "cosy" },
+
+    /* --- 🪴 Garden Room --- */
+    { id: "cactus",  name: "Prickly Cactus", emoji: "🌵", cost: 28,  cosy: 4,  set: "garden" },
+    { id: "plant",   name: "Potted Plant",   emoji: "🪴", cost: 30,  cosy: 5,  set: "garden" },
+    { id: "sunflower", name: "Tall Sunflower", emoji: "🌻", cost: 32, cosy: 5, set: "garden" },
+    { id: "tulips",  name: "Tulip Pots",     emoji: "🌷", cost: 38,  cosy: 6,  set: "garden" },
+    { id: "herbs",   name: "Herb Rack",      emoji: "🌿", cost: 45,  cosy: 6,  tidy: 2, set: "garden" },
+    { id: "roses",   name: "Rose Bush",      emoji: "🌹", cost: 55,  cosy: 8,  set: "garden" },
+    { id: "bonsai",  name: "Bonsai Tree",    emoji: "🎍", cost: 60,  cosy: 7,  study: 2, set: "garden" },
+    { id: "birdcage", name: "Singing Bird",  emoji: "🐦", cost: 95,  cosy: 11, set: "garden" },
+    { id: "butterfly", name: "Butterfly Case", emoji: "🦋", cost: 115, cosy: 9, study: 4, rare: true, set: "garden" },
+    { id: "beehive", name: "Busy Beehive",   emoji: "🍯", cost: 125, cosy: 10, study: 3, set: "garden" },
+    { id: "tree",    name: "Indoor Tree",    emoji: "🎄", cost: 140, cosy: 13, set: "garden" },
+    { id: "fountain", name: "Stone Fountain", emoji: "⛲", cost: 190, cosy: 16, tidy: 4, set: "garden" },
+
+    /* --- 👑 Royal Rooms (Ellie's wing) --- */
+    { id: "goblet",  name: "Gold Goblet",    emoji: "🏆", cost: 165, cosy: 13, set: "royal" },
+    { id: "tiara",   name: "Tiara Stand",    emoji: "👸", cost: 150, cosy: 12, set: "royal" },
+    { id: "banner",  name: "Royal Banners",  emoji: "🎏", cost: 140, cosy: 12, set: "royal" },
+    { id: "swan",    name: "Swan Statue",    emoji: "🦢", cost: 178, cosy: 14, set: "royal" },
+    { id: "ballgown", name: "Ball Gown Stand", emoji: "👗", cost: 205, cosy: 15, set: "royal" },
+    { id: "chandelier", name: "Crystal Chandelier", emoji: "✨", cost: 245, cosy: 18, set: "royal" },
+    { id: "crown",   name: "Crown Stand",    emoji: "👑", cost: 260, cosy: 20, set: "royal" },
+    { id: "gemchest", name: "Jewel Chest",   emoji: "💰", cost: 285, cosy: 19, tidy: 3, set: "royal" },
+    { id: "throne",  name: "Gold Throne",    emoji: "💺", cost: 340, cosy: 22, rest: 4, rare: true, set: "royal" },
+
+    /* --- 🚀 Space Wing (and a few things brought back from Mars) --- */
+    { id: "moonlamp", name: "Moon Lamp",     emoji: "🌙", cost: 90,  cosy: 10, rest: 3, set: "space" },
+    { id: "marsrock", name: "Mars Rock",     emoji: "🪨", cost: 125, cosy: 9,  study: 5, rare: true, set: "space" },
+    { id: "rocketmodel", name: "Rocket Model", emoji: "🚀", cost: 160, cosy: 13, study: 4, set: "space" },
+    { id: "starmap", name: "Star Map Wall",  emoji: "🌌", cost: 178, cosy: 14, study: 7, set: "space" },
+    { id: "planetmobile", name: "Planet Mobile", emoji: "🪐", cost: 188, cosy: 14, study: 6, set: "space" },
+    { id: "alienplant", name: "Alien Fern",  emoji: "👽", cost: 208, cosy: 15, rare: true, set: "space" },
+    { id: "telescope", name: "Big Telescope", emoji: "🔭", cost: 215, cosy: 12, study: 8, set: "space" },
+    { id: "astrosuit", name: "Spacesuit Stand", emoji: "👨‍🚀", cost: 232, cosy: 16, set: "space" },
+    { id: "satellite", name: "Model Satellite", emoji: "🛰️", cost: 248, cosy: 15, study: 6, set: "space" },
+    { id: "hoverlamp", name: "Hover Lamp",   emoji: "🛸", cost: 310, cosy: 20, rest: 4, rare: true, set: "space" },
+
+    /* --- ⛏️ Block Craft (Cory's wing) --- */
+    { id: "torchwall", name: "Wall Torch",   emoji: "🔦", cost: 40,  cosy: 6,  set: "blocks" },
+    { id: "blockchest", name: "Block Chest", emoji: "🧰", cost: 72,  cosy: 7,  tidy: 4, set: "blocks" },
+    { id: "pickaxe", name: "Pickaxe Rack",   emoji: "⛏️", cost: 88,  cosy: 8,  set: "blocks" },
+    { id: "cubelamp", name: "Glow Cube",     emoji: "🟦", cost: 96,  cosy: 11, set: "blocks" },
+    { id: "redlamp", name: "Red Lamp",       emoji: "🔴", cost: 112, cosy: 9,  set: "blocks" },
+    { id: "anvil",   name: "Anvil Bench",    emoji: "🛠️", cost: 132, cosy: 10, study: 3, set: "blocks" },
+    { id: "minecart", name: "Mine Cart",     emoji: "🛒", cost: 148, cosy: 12, set: "blocks" },
+    { id: "orevein", name: "Ore Block",      emoji: "💠", cost: 168, cosy: 13, study: 4, set: "blocks" },
+    { id: "diamondblock", name: "Diamond Block", emoji: "💎", cost: 355, cosy: 24, rare: true, set: "blocks" },
+
+    /* --- 📚 The Library (Jeannie's wing) --- */
+    { id: "quill",   name: "Quill & Ink",    emoji: "🪶", cost: 65,  cosy: 6,  study: 3, set: "library" },
+    { id: "shelf",   name: "Book Shelf",     emoji: "📚", cost: 70,  cosy: 8,  study: 4, set: "library" },
+    { id: "readlamp", name: "Reading Lamp",  emoji: "🪔", cost: 78,  cosy: 8,  rest: 2, study: 2, set: "library" },
+    { id: "wordwall", name: "Word Wall",     emoji: "🔤", cost: 108, cosy: 8,  study: 5, set: "library" },
+    { id: "desk",    name: "Writing Desk",   emoji: "🖊️", cost: 122, cosy: 9,  study: 5, set: "library" },
+    { id: "atlasstand", name: "Atlas Stand", emoji: "🗺️", cost: 142, cosy: 10, study: 6, set: "library" },
+    { id: "storynook", name: "Story Nook",   emoji: "📖", cost: 158, cosy: 13, rest: 3, study: 3, set: "library" },
+    { id: "globe",   name: "Spinning Globe", emoji: "🌍", cost: 175, cosy: 12, study: 6, set: "library" },
+    { id: "scroll",  name: "Ancient Scroll", emoji: "📜", cost: 195, cosy: 12, study: 7, rare: true, set: "library" },
+    { id: "bigshelf", name: "Wall of Books", emoji: "🗄️", cost: 205, cosy: 14, study: 8, set: "library" },
+
+    /* --- 🌊 Under the Sea --- */
+    { id: "lifering", name: "Life Ring",     emoji: "🛟", cost: 70,  cosy: 7,  set: "sea" },
+    { id: "coral",   name: "Coral Fan",      emoji: "🪸", cost: 92,  cosy: 9,  set: "sea" },
+    { id: "anchor",  name: "Old Anchor",     emoji: "⚓", cost: 100, cosy: 9,  set: "sea" },
+    { id: "shellchair", name: "Shell Seat",  emoji: "🐚", cost: 118, cosy: 10, rest: 3, set: "sea" },
+    { id: "tank",    name: "Fish Tank",      emoji: "🐠", cost: 130, cosy: 12, study: 3, set: "sea" },
+    { id: "wavewall", name: "Wave Mural",    emoji: "🌊", cost: 148, cosy: 12, set: "sea" },
+    { id: "jellylamp", name: "Jellyfish Lamp", emoji: "🪼", cost: 162, cosy: 13, rest: 3, set: "sea" },
+    { id: "seachest", name: "Sea Chest",     emoji: "🧳", cost: 178, cosy: 12, tidy: 4, set: "sea" },
+    { id: "octopal", name: "Octopus Friend", emoji: "🐙", cost: 215, cosy: 16, rare: true, set: "sea" },
+
+    /* --- 🌴 Jungle --- */
+    { id: "vines",   name: "Hanging Vines",  emoji: "🍃", cost: 55,  cosy: 7,  set: "jungle" },
+    { id: "palm",    name: "Palm in a Pot",  emoji: "🌴", cost: 82,  cosy: 8,  set: "jungle" },
+    { id: "tiki",    name: "Tiki Statue",    emoji: "🗿", cost: 132, cosy: 11, set: "jungle" },
+    { id: "hammock", name: "Jungle Hammock", emoji: "🛌", cost: 152, cosy: 12, rest: 6, set: "jungle" },
+    { id: "monkeyswing", name: "Monkey Swing", emoji: "🐒", cost: 168, cosy: 13, set: "jungle" },
+    { id: "parrot",  name: "Perching Parrot", emoji: "🦜", cost: 198, cosy: 15, study: 3, set: "jungle" },
+    { id: "waterfall", name: "Little Waterfall", emoji: "💦", cost: 245, cosy: 18, tidy: 5, rare: true, set: "jungle" },
+
+    /* --- 🎵 Music Room --- */
+    { id: "musicbox", name: "Music Box",     emoji: "🎶", cost: 85,  cosy: 9,  rest: 3, set: "music" },
+    { id: "guitar",  name: "Guitar Stand",   emoji: "🎸", cost: 108, cosy: 10, set: "music" },
+    { id: "records", name: "Record Player",  emoji: "💿", cost: 118, cosy: 10, rest: 2, set: "music" },
+    { id: "violin",  name: "Violin Case",    emoji: "🎻", cost: 128, cosy: 11, study: 3, set: "music" },
+    { id: "mic",     name: "Karaoke Mic",    emoji: "🎤", cost: 135, cosy: 12, set: "music" },
+    { id: "drumkit", name: "Drum Kit",       emoji: "🥁", cost: 142, cosy: 12, set: "music" },
+    { id: "piano",   name: "Upright Piano",  emoji: "🎹", cost: 165, cosy: 15, study: 3, set: "music" },
+    { id: "harp",    name: "Little Harp",    emoji: "🪕", cost: 185, cosy: 14, rest: 3, rare: true, set: "music" },
+
+    /* --- 🔬 The Laboratory --- */
+    { id: "batterylamp", name: "Spark Lamp", emoji: "🔋", cost: 88,  cosy: 8,  study: 3, set: "science" },
+    { id: "magnet",  name: "Big Magnet",     emoji: "🧲", cost: 98,  cosy: 7,  study: 4, set: "science" },
+    { id: "abacus",  name: "Giant Abacus",   emoji: "🧮", cost: 112, cosy: 9,  study: 6, set: "science" },
+    { id: "beakers", name: "Bubbling Beakers", emoji: "⚗️", cost: 138, cosy: 9, study: 6, set: "science" },
+    { id: "microscope", name: "Microscope",  emoji: "🔬", cost: 152, cosy: 10, study: 7, set: "science" },
+    { id: "dnamodel", name: "DNA Model",     emoji: "🧬", cost: 182, cosy: 12, study: 7, set: "science" },
+    { id: "brainjar", name: "Thinking Jar",  emoji: "🧠", cost: 228, cosy: 14, study: 9, rare: true, set: "science" },
+
+    /* --- 🍭 Sweet Shop --- */
+    { id: "candyjar", name: "Candy Jar",     emoji: "🍬", cost: 60,  cosy: 7,  set: "sweets" },
+    { id: "cupcakes", name: "Cupcake Stand", emoji: "🧁", cost: 92,  cosy: 9,  set: "sweets" },
+    { id: "lollipop", name: "Giant Lollipop", emoji: "🍭", cost: 122, cosy: 11, set: "sweets" },
+    { id: "gingerwall", name: "Gingerbread Wall", emoji: "🍪", cost: 148, cosy: 12, set: "sweets" },
+    { id: "icecreambar", name: "Ice Cream Bar", emoji: "🍦", cost: 205, cosy: 15, rare: true, set: "sweets" },
+    { id: "chocfountain", name: "Chocolate Fountain", emoji: "🍫", cost: 265, cosy: 19, rare: true, set: "sweets" },
+
+    /* --- 👻 Spooky --- */
+    { id: "spiderweb", name: "Corner Web",   emoji: "🕸️", cost: 50,  cosy: 6,  set: "spooky" },
+    { id: "pumpkin", name: "Grinning Pumpkin", emoji: "🎃", cost: 68,  cosy: 7,  set: "spooky" },
+    { id: "batbanner", name: "Bat Banner",   emoji: "🦇", cost: 82,  cosy: 8,  set: "spooky" },
+    { id: "ghostlamp", name: "Ghost Lamp",   emoji: "👻", cost: 108, cosy: 10, set: "spooky" },
+    { id: "cauldron", name: "Bubbling Cauldron", emoji: "🫕", cost: 142, cosy: 11, study: 3, set: "spooky" },
+    { id: "crystalball", name: "Crystal Ball", emoji: "🔮", cost: 188, cosy: 14, study: 5, rare: true, set: "spooky" },
+
+    /* --- ❄️ Winter --- */
+    { id: "snowglobe", name: "Snow Globe",   emoji: "❄️", cost: 75,  cosy: 8,  set: "winter" },
+    { id: "sled",    name: "Little Sled",    emoji: "🛷", cost: 95,  cosy: 9,  set: "winter" },
+    { id: "cocoa",   name: "Cocoa Cart",     emoji: "☕", cost: 112, cosy: 10, rest: 3, set: "winter" },
+    { id: "icelamp", name: "Ice Lantern",    emoji: "🧊", cost: 122, cosy: 10, set: "winter" },
+    { id: "penguin", name: "Penguin Pal",    emoji: "🐧", cost: 168, cosy: 13, rare: true, set: "winter" },
+
+    /* --- ⚽ Games Room --- */
+    { id: "goal",    name: "Mini Goal",      emoji: "🥅", cost: 102, cosy: 9,  set: "sport" },
+    { id: "hoop",    name: "Basket Hoop",    emoji: "🏀", cost: 118, cosy: 10, set: "sport" },
+    { id: "chess",   name: "Chess Table",    emoji: "♟️", cost: 128, cosy: 10, study: 6, rare: true, set: "sport" },
+    { id: "trophyshelf", name: "Trophy Shelf", emoji: "🏅", cost: 133, cosy: 11, set: "sport" },
+    { id: "skateramp", name: "Skate Ramp",   emoji: "🛹", cost: 148, cosy: 12, set: "sport" },
+
+    /* --- 🎨 Art Studio --- */
+    { id: "sketchwall", name: "Crayon Wall", emoji: "🖍️", cost: 70,  cosy: 8,  set: "art" },
+    { id: "vase",    name: "Clay Vase",      emoji: "🏺", cost: 85,  cosy: 8,  set: "art" },
+    { id: "easel",   name: "Painting Easel", emoji: "🎨", cost: 102, cosy: 9,  study: 4, set: "art" },
+    { id: "photowall", name: "Photo Wall",   emoji: "📷", cost: 112, cosy: 10, set: "art" },
+    { id: "rainbowrug", name: "Rainbow Rug", emoji: "🌈", cost: 158, cosy: 13, rest: 3, rare: true, set: "art" }
+  ];
+
+  /* The name of each themed set, for the House tab's shelves. */
+  var FURNITURE_SETS = [
+    { id: "cosy",    name: "🕯️ Cosy Corner" },
+    { id: "garden",  name: "🪴 Garden Room" },
+    { id: "royal",   name: "👑 Royal Rooms" },
+    { id: "space",   name: "🚀 Space Wing" },
+    { id: "blocks",  name: "⛏️ Block Craft" },
+    { id: "library", name: "📚 The Library" },
+    { id: "sea",     name: "🌊 Under the Sea" },
+    { id: "jungle",  name: "🌴 Jungle" },
+    { id: "music",   name: "🎵 Music Room" },
+    { id: "science", name: "🔬 Laboratory" },
+    { id: "sweets",  name: "🍭 Sweet Shop" },
+    { id: "spooky",  name: "👻 Spooky" },
+    { id: "winter",  name: "❄️ Winter" },
+    { id: "sport",   name: "⚽ Games Room" },
+    { id: "art",     name: "🎨 Art Studio" }
   ];
 
   /* =========================================================
-     YOUR HOUSE — five homes, each bigger than the last.
-     "slots" is how many pieces you can have out at once;
-     everything else waits in storage until you swap it in.
+     YOUR HOUSE — thirty-seven homes, all over the map and off
+     it. "slots" is how many pieces of furniture you can have
+     out at once; everything else waits in storage.
+
+     These are NOT a ladder any more. You buy any home you can
+     afford, you KEEP every home you have ever bought, and you
+     can move between them whenever you like — so a Craepet can
+     summer in the Cloud Castle and winter in the Igloo.
+
+     Every home also comes with its own signature wall, floor
+     and view (see STYLE below). Those are yours for good once
+     you own the place, and you can use them in ANY of your
+     homes — which is where most of the combinations come from:
+     Mars-red walls in a straw nest is a perfectly good choice.
      ========================================================= */
   var HOUSES = [
-    { name: "Straw Nest",     emoji: "🪹", slots: 3,  cost: 0,
-      note: "A round nest of straw. Every Craepet starts here." },
-    { name: "Snug Burrow",    emoji: "🕳️", slots: 5,  cost: 150,
-      note: "Dug into the hillside — warm all winter." },
-    { name: "Little Cottage", emoji: "🏡", slots: 8,  cost: 450,
-      note: "A proper door, a proper window and a proper roof." },
-    { name: "Big House",      emoji: "🏠", slots: 12, cost: 1100,
-      note: "Room for a sofa AND a piano." },
-    { name: "Valley Tower",   emoji: "🏰", slots: 16, cost: 2500,
-      note: "The tallest home in the valley. You can see the Rainbow Pool from up here." }
+    /* --- the valley: the five homes the game started with --- */
+    { id: "nest", name: "Straw Nest", emoji: "🪹", slots: 3, cost: 0, world: "The Valley",
+      note: "A round nest of straw. Every Craepet starts here.",
+      style: { wall: "straw", floor: "earth", view: "windowsun" } },
+    { id: "burrow", name: "Snug Burrow", emoji: "🕳️", slots: 5, cost: 150, world: "The Valley",
+      note: "Dug into the hillside — warm all winter.",
+      style: { wall: "earthbrown", floor: "wood", view: "none" } },
+    { id: "cottage", name: "Little Cottage", emoji: "🏡", slots: 8, cost: 450, world: "The Valley",
+      note: "A proper door, a proper window and a proper roof.",
+      style: { wall: "butter", floor: "rug", view: "garden" } },
+    { id: "bighouse", name: "Big House", emoji: "🏠", slots: 12, cost: 1100, world: "The Valley",
+      note: "Room for a sofa AND a piano.",
+      style: { wall: "plainwhite", floor: "tile", view: "city" } },
+    { id: "tower", name: "Valley Tower", emoji: "🏰", slots: 16, cost: 2500, world: "The Valley",
+      note: "The tallest home in the valley. You can see the Rainbow Pool from up here.",
+      style: { wall: "stone", floor: "stonefloor", view: "mountains" } },
+
+    /* --- ponds, woods and the road --- */
+    { id: "lilypad", name: "Lily Pad Perch", emoji: "🪷", slots: 4, cost: 220, world: "The Pond",
+      note: "One enormous lily pad, and a frog for a neighbour.",
+      style: { wall: "mint", floor: "water", view: "fireflies" } },
+    { id: "mushroom", name: "Toadstool House", emoji: "🍄", slots: 7, cost: 380, world: "The Woods",
+      note: "Red roof, white spots, and it grew here all by itself.",
+      style: { wall: "rose", floor: "moss", view: "forest" } },
+    { id: "caravan", name: "Painted Caravan", emoji: "🚐", slots: 9, cost: 620, world: "The Road",
+      note: "A house with wheels. Wake up somewhere new whenever you like.",
+      style: { wall: "sunset", floor: "wood", view: "mountains" } },
+    { id: "treehouse", name: "Tree House", emoji: "🌳", slots: 10, cost: 700, world: "The Woods",
+      note: "Up a rope ladder, forty feet above the ferns.",
+      style: { wall: "forest", floor: "wood", view: "forest" } },
+    { id: "windmill", name: "Old Windmill", emoji: "🌾", slots: 11, cost: 900, world: "The Valley",
+      note: "The sails still turn, and the top floor is round.",
+      style: { wall: "straw", floor: "wood", view: "garden" } },
+    { id: "train", name: "Sleeper Train", emoji: "🚂", slots: 10, cost: 1000, world: "The Road",
+      note: "Four carriages of your own, always going somewhere.",
+      style: { wall: "earthbrown", floor: "carpetblue", view: "mountains" } },
+    { id: "circus", name: "Circus Tent", emoji: "🎪", slots: 11, cost: 1150, world: "The Road",
+      note: "Stripes, sawdust and a trapeze nobody uses.",
+      style: { wall: "candy", floor: "sand", view: "balloons" } },
+    { id: "pixelfort", name: "Pixel Fort", emoji: "⛏️", slots: 14, cost: 1700, world: "The Blocklands",
+      note: "You built this one out of cubes, one block at a time.",
+      style: { wall: "forest", floor: "blockfloor", view: "mountains" } },
+
+    /* --- the shore and the sea --- */
+    { id: "oasis", name: "Oasis Hut", emoji: "🏝️", slots: 9, cost: 780, world: "The Desert",
+      note: "Three palm trees, one spring, and shade all afternoon.",
+      style: { wall: "peach", floor: "sand", view: "garden" } },
+    { id: "pyramid", name: "Sand Pyramid", emoji: "🏜️", slots: 10, cost: 850, world: "The Desert",
+      note: "Cool inside, whatever the sun is doing.",
+      style: { wall: "gold", floor: "sand", view: "stars" } },
+    { id: "lighthouse", name: "Lighthouse", emoji: "🗼", slots: 12, cost: 1350, world: "The Shore",
+      note: "A spiral staircase and the biggest lamp in the world.",
+      style: { wall: "plainwhite", floor: "stonefloor", view: "sea" } },
+    { id: "shipwreck", name: "Sunken Ship", emoji: "🚢", slots: 13, cost: 1550, world: "The Shore",
+      note: "Wedged on the rocks and dry as a bone below decks.",
+      style: { wall: "ocean", floor: "wood", view: "sea" } },
+    { id: "pirate", name: "Pirate Cove", emoji: "🏴‍☠️", slots: 13, cost: 1600, world: "The Shore",
+      note: "A cave, a jetty and absolutely no rules.",
+      style: { wall: "stone", floor: "sand", view: "sea" } },
+    { id: "reef", name: "Reef Dome", emoji: "🐚", slots: 15, cost: 1950, world: "Under the Sea",
+      note: "A glass bubble on the sea floor. The fish look in at you.",
+      style: { wall: "ocean", floor: "water", view: "underwater" } },
+
+    /* --- ice and fire --- */
+    { id: "igloo", name: "Cosy Igloo", emoji: "🧊", slots: 9, cost: 600, world: "The Frozen North",
+      note: "Snow keeps the warm in. It really does.",
+      style: { wall: "ice", floor: "snow", view: "aurora" } },
+    { id: "icepalace", name: "Ice Palace", emoji: "⛄", slots: 18, cost: 3200, world: "The Frozen North",
+      note: "Every wall is carved ice, and none of it melts.",
+      style: { wall: "ice", floor: "marble", view: "aurora" } },
+    { id: "temple", name: "Jungle Temple", emoji: "🛕", slots: 14, cost: 1850, world: "The Jungle",
+      note: "Older than anyone can say, and the vines have moved in.",
+      style: { wall: "jungle", floor: "stonefloor", view: "jungle" } },
+    { id: "volcano", name: "Volcano Lodge", emoji: "🌋", slots: 15, cost: 2250, world: "The Firelands",
+      note: "Built into the warm side. Central heating, forever.",
+      style: { wall: "lava", floor: "lavafloor", view: "volcano" } },
+    { id: "dragon", name: "Dragon Keep", emoji: "🐉", slots: 20, cost: 4600, world: "The Firelands",
+      note: "The dragon moved out. It left the treasure and the perch.",
+      style: { wall: "lava", floor: "goldfloor", view: "dragonview" } },
+
+    /* --- sweet, royal and bookish --- */
+    { id: "candy", name: "Candy Cottage", emoji: "🍬", slots: 12, cost: 1450, world: "Sugar Hill",
+      note: "Do not lick the walls. (Everybody licks the walls.)",
+      style: { wall: "candy", floor: "candyfloor", view: "rainbowview" } },
+    { id: "palace", name: "Princess Palace", emoji: "👑", slots: 19, cost: 3400, world: "The Kingdom",
+      note: "Ballroom, throne room, and a staircase made for a big entrance.",
+      style: { wall: "royalpurple", floor: "marble", view: "castle" } },
+    { id: "library", name: "The Great Library", emoji: "📚", slots: 17, cost: 3150, world: "The Kingdom",
+      note: "Live in it. Every wall is books to the ceiling.",
+      style: { wall: "earthbrown", floor: "carpetblue", view: "city" } },
+
+    /* --- the sky --- */
+    { id: "balloon", name: "Balloon House", emoji: "🎈", slots: 9, cost: 980, world: "The Sky",
+      note: "A basket, a burner, and wherever the wind is going.",
+      style: { wall: "sky", floor: "wood", view: "balloons" } },
+    { id: "rainbow", name: "Rainbow Arch", emoji: "🌈", slots: 16, cost: 2650, world: "The Sky",
+      note: "You live inside the rainbow. Yes, really.",
+      style: { wall: "rainbowwall", floor: "rainbowfloor", view: "rainbowview" } },
+    { id: "cloud", name: "Cloud Castle", emoji: "☁️", slots: 17, cost: 2850, world: "The Sky",
+      note: "Soft floors, soft walls, and a very long way down.",
+      style: { wall: "sky", floor: "cloudfloor", view: "balloons" } },
+
+    /* --- underground --- */
+    { id: "crystal", name: "Crystal Cave", emoji: "💎", slots: 16, cost: 3050, world: "Deep Down",
+      note: "It glows on its own. You will never need a lamp.",
+      style: { wall: "galaxy", floor: "glass", view: "fireflies" } },
+
+    /* --- space, ending on Mars --- */
+    { id: "observatory", name: "Star Observatory", emoji: "🔭", slots: 15, cost: 2450, world: "The Sky",
+      note: "The roof opens. That is the whole point of it.",
+      style: { wall: "night", floor: "marble", view: "stars" } },
+    { id: "rocketship", name: "Rocket Ship", emoji: "🚀", slots: 12, cost: 2050, world: "Space",
+      note: "Small, loud, and pointed at the stars.",
+      style: { wall: "stone", floor: "metal", view: "planets" } },
+    { id: "moonbase", name: "Moon Base", emoji: "🌙", slots: 18, cost: 3650, world: "Space",
+      note: "Grey dust outside, warm light inside, Earth in the window.",
+      style: { wall: "plainwhite", floor: "metal", view: "earthrise" } },
+    { id: "station", name: "Space Station", emoji: "🛰️", slots: 20, cost: 4300, world: "Space",
+      note: "Round and round the Earth, sixteen sunrises a day.",
+      style: { wall: "stone", floor: "metal", view: "earthrise" } },
+    { id: "marscastle", name: "Mars Castle", emoji: "🪐", slots: 22, cost: 5200, world: "Space",
+      note: "A real castle, with real towers, on the red planet. " +
+            "Two little moons cross the sky every night.",
+      style: { wall: "mars", floor: "regolith", view: "marsview" } },
+    { id: "starring", name: "The Star Ring", emoji: "💫", slots: 24, cost: 8000, world: "Space",
+      note: "A ring of glass around a quiet star. Nobody has a bigger home than this.",
+      style: { wall: "galaxy", floor: "starfloor", view: "galaxyview" } }
   ];
+
+  /* =========================================================
+     STYLE — walls, floors and the view out of the window.
+     These are the cheap, endless part of customising a house:
+     any wall goes with any floor goes with any view goes with
+     any home, so there are hundreds of thousands of rooms in
+     here even before you put a stick of furniture out.
+     Bought once, kept for ever, and usable in every home you own.
+     ========================================================= */
+  var WALLS = [
+    { id: "straw",      name: "Straw & Sun",   emoji: "🌾", cost: 0,   a: "#ffe9c9", b: "#fff6e8" },
+    { id: "plainwhite", name: "Fresh White",   emoji: "⬜", cost: 0,   a: "#f2f0fb", b: "#ffffff" },
+    { id: "sky",        name: "Sky Blue",      emoji: "🩵", cost: 0,   a: "#cdeeff", b: "#ecf9ff" },
+    { id: "rose",       name: "Rose Pink",     emoji: "🌸", cost: 60,  a: "#ffd6ec", b: "#fff0f8" },
+    { id: "mint",       name: "Mint Green",    emoji: "🌿", cost: 60,  a: "#d3f6e3", b: "#eefff6" },
+    { id: "butter",     name: "Butter Yellow", emoji: "🧈", cost: 60,  a: "#fff0bf", b: "#fffbe6" },
+    { id: "lilac",      name: "Lilac",         emoji: "💜", cost: 75,  a: "#e6dcff", b: "#f7f2ff" },
+    { id: "peach",      name: "Peach",         emoji: "🍑", cost: 75,  a: "#ffe0cc", b: "#fff4ec" },
+    { id: "earthbrown", name: "Warm Cocoa",    emoji: "🤎", cost: 90,  a: "#e7d3bd", b: "#f7ece0" },
+    { id: "stone",      name: "Grey Stone",    emoji: "🪨", cost: 90,  a: "#dfe3ea", b: "#f2f5f9" },
+    { id: "forest",     name: "Deep Forest",   emoji: "🌲", cost: 120, a: "#b9dcb5", b: "#e2f4de" },
+    { id: "ocean",      name: "Ocean Blue",    emoji: "🌊", cost: 120, a: "#a8dcf0", b: "#dff3fb" },
+    { id: "sunset",     name: "Sunset",        emoji: "🌇", cost: 150, a: "#ffc9a8", b: "#ffe6cf" },
+    { id: "candy",      name: "Candy Stripe",  emoji: "🍬", cost: 180, a: "#ffd4e8", b: "#ffeef6" },
+    { id: "ice",        name: "Ice Blue",      emoji: "🧊", cost: 180, a: "#d6f0ff", b: "#f0fbff" },
+    { id: "lava",       name: "Lava Glow",     emoji: "🌋", cost: 190, a: "#ffb3a0", b: "#ffdcd2" },
+    { id: "jungle",     name: "Jungle Leaf",   emoji: "🍃", cost: 200, a: "#bfe9b0", b: "#e7fadd" },
+    { id: "royalpurple", name: "Royal Purple", emoji: "👑", cost: 240, a: "#d9c2ff", b: "#efe6ff" },
+    { id: "gold",       name: "Gold Leaf",     emoji: "🏅", cost: 280, a: "#ffe6a0", b: "#fff6d8" },
+    { id: "night",      name: "Night Sky",     emoji: "🌌", cost: 300, a: "#2f3763", b: "#59639a" },
+    { id: "mars",       name: "Martian Sky",   emoji: "🪐", cost: 320, a: "#e8bfa0", b: "#ffe3cb" },
+    { id: "rainbowwall", name: "Rainbow Wash", emoji: "🌈", cost: 380, a: "#ffd1dc", b: "#d6f0ff" },
+    { id: "galaxy",     name: "Galaxy Swirl",  emoji: "💫", cost: 420, a: "#3b2a63", b: "#7a5fb0" }
+  ];
+
+  var FLOORS = [
+    { id: "earth",       name: "Packed Earth",  emoji: "🟫", cost: 0,   a: "#d9a86a", b: "#b98549" },
+    { id: "wood",        name: "Wood Boards",   emoji: "🪵", cost: 0,   a: "#cfa06b", b: "#a97c4c" },
+    { id: "grass",       name: "Green Grass",   emoji: "🌱", cost: 0,   a: "#9bd97f", b: "#5fa845" },
+    { id: "rug",         name: "Soft Red Rug",  emoji: "🟥", cost: 60,  a: "#e08c8c", b: "#b95f5f" },
+    { id: "tile",        name: "Chequer Tiles", emoji: "♟️", cost: 60,  a: "#dfe4ec", b: "#a9b2c4" },
+    { id: "sand",        name: "Warm Sand",     emoji: "🏖️", cost: 60,  a: "#f2dcae", b: "#d4b877" },
+    { id: "carpetpink",  name: "Pink Carpet",   emoji: "🩷", cost: 75,  a: "#ffb8d9", b: "#e07eb0" },
+    { id: "carpetblue",  name: "Blue Carpet",   emoji: "💙", cost: 75,  a: "#a9c8f5", b: "#6d92cf" },
+    { id: "stonefloor",  name: "Stone Slabs",   emoji: "🪨", cost: 90,  a: "#c3c7cf", b: "#91959e" },
+    { id: "moss",        name: "Mossy Ground",  emoji: "🍀", cost: 120, a: "#8fc98a", b: "#5c9059" },
+    { id: "marble",      name: "White Marble",  emoji: "🤍", cost: 120, a: "#f0f0f6", b: "#c9cad6" },
+    { id: "water",       name: "Shallow Water", emoji: "💧", cost: 150, a: "#8fe4ff", b: "#4bb8e8" },
+    { id: "snow",        name: "Fresh Snow",    emoji: "❄️", cost: 150, a: "#eef7ff", b: "#c3d8ea" },
+    { id: "lavafloor",   name: "Cooling Lava",  emoji: "🔥", cost: 190, a: "#e8724a", b: "#a83a22" },
+    { id: "cloudfloor",  name: "Cloud Floor",   emoji: "☁️", cost: 200, a: "#ffffff", b: "#dfe8ff" },
+    { id: "candyfloor",  name: "Candy Floor",   emoji: "🍭", cost: 200, a: "#ffc2e0", b: "#f07fb8" },
+    { id: "blockfloor",  name: "Block Tiles",   emoji: "🟩", cost: 220, a: "#7ecb6b", b: "#4d9440" },
+    { id: "goldfloor",   name: "Gold Floor",    emoji: "🪙", cost: 300, a: "#ffd97a", b: "#d2a02f" },
+    { id: "glass",       name: "Glass Deck",    emoji: "🔷", cost: 320, a: "#bfe6ff", b: "#7fb8dd" },
+    { id: "metal",       name: "Steel Deck",    emoji: "🛠️", cost: 340, a: "#c8ccd6", b: "#8b91a0" },
+    { id: "regolith",    name: "Mars Dust",     emoji: "🪐", cost: 360, a: "#d98a5f", b: "#a3552f" },
+    { id: "starfloor",   name: "Star Field",    emoji: "🌠", cost: 420, a: "#2b2450", b: "#10102a" },
+    { id: "rainbowfloor", name: "Rainbow Tiles", emoji: "🌈", cost: 460, a: "#ffb3c6", b: "#9bf6ff" }
+  ];
+
+  /* What you can see from the room. Each is a handful of things pinned
+     high up the scene, behind the Craepet and behind the furniture. */
+  var VIEWS = [
+    { id: "none",       name: "Plain Walls",     emoji: "🚫", cost: 0,   deco: [] },
+    { id: "windowsun",  name: "Sunny Window",    emoji: "🌤️", cost: 0,
+      deco: [["🌤️", 12, 74], ["☁️", 32, 80]] },
+    { id: "stars",      name: "Starry Night",    emoji: "⭐", cost: 60,
+      deco: [["⭐", 10, 80], ["✨", 30, 86], ["🌙", 50, 84], ["⭐", 72, 82], ["✨", 88, 74]] },
+    { id: "garden",     name: "Garden View",     emoji: "🌻", cost: 60,
+      deco: [["🌻", 6, 66], ["🦋", 26, 76], ["🌼", 92, 66]] },
+    { id: "rainstorm",  name: "Rainy Window",    emoji: "🌧️", cost: 75,
+      deco: [["🌧️", 14, 78], ["💧", 36, 72], ["💧", 70, 78]] },
+    { id: "rainbowview", name: "Rainbow Outside", emoji: "🌈", cost: 90,
+      deco: [["☁️", 14, 80], ["🌈", 50, 72], ["☁️", 86, 80]] },
+    { id: "mountains",  name: "Mountain View",   emoji: "🏔️", cost: 90,
+      deco: [["🏔️", 14, 62], ["🦅", 50, 84], ["🏔️", 80, 62]] },
+    { id: "sea",        name: "Sea View",        emoji: "⛵", cost: 110,
+      deco: [["⛵", 22, 72], ["🌊", 64, 64], ["🐬", 86, 66]] },
+    { id: "forest",     name: "Forest Edge",     emoji: "🌲", cost: 110,
+      deco: [["🌲", 6, 62], ["🦌", 76, 60], ["🌲", 94, 62]] },
+    { id: "city",       name: "Town Lights",     emoji: "🏘️", cost: 130,
+      deco: [["🏘️", 12, 62], ["🌆", 50, 72], ["🏠", 86, 62]] },
+    { id: "balloons",   name: "Balloon Race",    emoji: "🎈", cost: 150,
+      deco: [["🎈", 18, 80], ["🎈", 44, 86], ["🎈", 76, 78]] },
+    { id: "fireflies",  name: "Fireflies",       emoji: "✨", cost: 180,
+      deco: [["✨", 12, 70], ["✨", 38, 82], ["✨", 64, 68], ["✨", 88, 78]] },
+    { id: "aurora",     name: "Northern Lights", emoji: "🌌", cost: 180,
+      deco: [["🌌", 28, 84], ["✨", 60, 86], ["❄️", 88, 72]] },
+    { id: "volcano",    name: "Volcano View",    emoji: "🌋", cost: 200,
+      deco: [["🌋", 18, 62], ["🌫️", 50, 84], ["🔥", 80, 66]] },
+    { id: "jungle",     name: "Jungle Canopy",   emoji: "🌴", cost: 200,
+      deco: [["🌴", 8, 62], ["🦜", 34, 80], ["🍃", 60, 84], ["🐒", 86, 66]] },
+    { id: "underwater", name: "Under the Waves", emoji: "🐟", cost: 220,
+      deco: [["🐟", 16, 74], ["🐠", 44, 84], ["🫧", 70, 70], ["🐙", 88, 62]] },
+    { id: "castle",     name: "Castle on the Hill", emoji: "🏰", cost: 240,
+      deco: [["☁️", 18, 82], ["🚩", 50, 76], ["🏰", 78, 64]] },
+    { id: "dragonview", name: "Dragon Flight",   emoji: "🐉", cost: 300,
+      deco: [["🏔️", 10, 62], ["☁️", 30, 84], ["🐉", 66, 80]] },
+    { id: "planets",    name: "Planets Outside", emoji: "🪐", cost: 340,
+      deco: [["🪐", 20, 80], ["✨", 40, 70], ["🌑", 58, 86], ["⭐", 82, 76]] },
+    { id: "marsview",   name: "Two Moons of Mars", emoji: "🌗", cost: 380,
+      deco: [["🌗", 20, 84], ["🌘", 44, 88], ["🛸", 74, 80], ["🪨", 90, 58]] },
+    { id: "earthrise",  name: "Earthrise",       emoji: "🌍", cost: 420,
+      deco: [["⭐", 14, 84], ["🛰️", 32, 72], ["✨", 46, 88], ["🌍", 74, 80]] },
+    { id: "galaxyview", name: "The Whole Galaxy", emoji: "💫", cost: 480,
+      deco: [["✨", 12, 76], ["💫", 32, 84], ["🌌", 60, 88], ["🌠", 84, 74]] }
+  ];
+
+  function byId(list, id, fallback) {
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+    return fallback === undefined ? list[0] : fallback;
+  }
+  function houseById(id) { return byId(HOUSES, id); }
+  function wallById(id) { return byId(WALLS, id); }
+  function floorById(id) { return byId(FLOORS, id); }
+  function viewById(id) { return byId(VIEWS, id); }
 
   /* =========================================================
      THE PRIZE WHEEL — one free spin every day.
@@ -1507,14 +1917,69 @@ window.CPData = (function () {
     return a.slice(0, n);
   }
 
+  /* =========================================================
+     RARE FINDS — the reason to walk into somebody else's shop.
+
+     The ordinary Market shelf never stocks a `rare` item. Instead
+     four rare things turn up in the valley each day, and each one
+     lands in exactly ONE person's Market. If the Mars Rock is in
+     Cory's Market today, the only way Jeannie gets one is to ask
+     Cory to buy it and put it on his shelf — which is the whole
+     point: a family shop now sells something the Market cannot.
+
+     Everyone's ordinary shelf is shuffled differently too, so even
+     the everyday stock is worth comparing between shops.
+     ========================================================= */
+  var RARE_PER_DAY = 4;
+
+  function isRare(it) { return !!(it && it.rare); }
+  function notRare(it) { return !it.rare; }
+  function rarePool() { return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE).filter(isRare); }
+
+  /* Who has what today: four rare items dealt out to four different
+     people, the same for everyone because the shuffle is seeded.
+
+     `players` is the list of profile ids actually being played on this
+     device. Dealing a rare find to a profile nobody has ever opened
+     would put it out of everybody's reach for the day, which is the
+     one thing scarcity must never do. */
+  function rareFinds(now, players) {
+    var day = dayNumber(now);
+    var ids = (players && players.length)
+      ? players.slice()
+      : PROFILES.map(function (p) { return p.id; });
+    var picks = seededPick(rarePool(), RARE_PER_DAY, day * 31 + 17);
+    var people = seededPick(ids, ids.length, day * 31 + 23);
+    return picks.map(function (it, i) {
+      return { item: tag(kindOf(it.id))(it), owner: people[i % people.length] };
+    });
+  }
+  /* Just the ones on THIS player's shelf. */
+  function rareFor(whoId, now, players) {
+    return rareFinds(now, players).filter(function (r) { return r.owner === whoId; })
+      .map(function (r) { return r.item; });
+  }
+  /* …and the ones they can only get by trading with the family. */
+  function rareElsewhere(whoId, now, players) {
+    return rareFinds(now, players).filter(function (r) { return r.owner !== whoId; });
+  }
+
+  /* A different shuffle per person, so two shops in the same house
+     are not the same shop. Unknown players (a fresh profile) just
+     get the valley's default shelf. */
+  function whoSeed(whoId) {
+    for (var i = 0; i < PROFILES.length; i++) if (PROFILES[i].id === whoId) return (i + 1) * 101;
+    return 0;
+  }
+
   /* Today's shelves: always some cheap food, plus a rotating handful of
      treats, soap, toys, books, furniture and a couple of paint brushes.
      The shelf is deliberately big — with this much stock the shop is a
      real choice ("what is this worth to me?") rather than a queue. */
-  function shopStock(now) {
-    var day = dayNumber(now);
-    var cheap = FOODS.filter(function (f) { return f.cost <= 12; });
-    var treats = FOODS.filter(function (f) { return f.cost > 12; });
+  function shopStock(now, whoId) {
+    var day = dayNumber(now) + whoSeed(whoId);
+    var cheap = FOODS.filter(function (f) { return f.cost <= 12 && notRare(f); });
+    var treats = FOODS.filter(function (f) { return f.cost > 12 && notRare(f); });
     var brushes = [];
     // the paint brushes on sale today
     var palette = (window.CPPets && window.CPPets.COLOURS) || [];
@@ -1527,14 +1992,16 @@ window.CPData = (function () {
       // Something to WASH with, every single day. A Craepet gets grubby on
       // its own whether you have coins or not, so the shelf must never come
       // up all pillows and tonics and no soap.
-      .concat(seededPick(CARE.filter(function (c) { return c.clean; }), 2, day * 7 + 3).map(tag("care")))
-      .concat(seededPick(CARE.filter(function (c) { return !c.clean; }), 2, day * 7 + 10).map(tag("care")))
-      .concat(seededPick(TOYS, 3, day * 7 + 4).map(tag("toy")))
-      .concat(seededPick(BOOKS, 2, day * 7 + 5).map(tag("book")))
-      // furniture in two price bands, so there is always something a
-      // small purse can afford AND something worth saving up for
-      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 50; }), 2, day * 7 + 8).map(tag("decor")))
-      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 50; }), 2, day * 7 + 9).map(tag("decor")))
+      .concat(seededPick(CARE.filter(function (c) { return c.clean && notRare(c); }), 2, day * 7 + 3).map(tag("care")))
+      .concat(seededPick(CARE.filter(function (c) { return !c.clean && notRare(c); }), 2, day * 7 + 10).map(tag("care")))
+      .concat(seededPick(TOYS.filter(notRare), 3, day * 7 + 4).map(tag("toy")))
+      .concat(seededPick(BOOKS.filter(notRare), 2, day * 7 + 5).map(tag("book")))
+      // Furniture in three price bands now that there are well over a
+      // hundred pieces: something a small purse can afford, something to
+      // save a day for, and something to save a week for.
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 60 && notRare(f); }), 3, day * 7 + 8).map(tag("decor")))
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 60 && f.cost <= 150 && notRare(f); }), 3, day * 7 + 9).map(tag("decor")))
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 150 && notRare(f); }), 2, day * 7 + 11).map(tag("decor")))
       .concat(seededPick(brushes, 2, day * 7 + 6));
   }
   function tag(kind) { return function (it) { var c = {}; for (var k in it) c[k] = it[k]; c.kind = kind; return c; }; }
@@ -1584,7 +2051,10 @@ window.CPData = (function () {
     { id: "spin1",   track: "spin",   goal: 1, coins: 25, text: "Spin the prize wheel" },
     { id: "decor1",  track: "placed", goal: 1, coins: 40, text: "Put something out in your house" },
     { id: "stock1",  track: "stocked", goal: 1, coins: 45, text: "Put something on your own shop shelf" },
-    { id: "stock3",  track: "stocked", goal: 3, coins: 90, text: "Stock 3 things in your own shop" }
+    { id: "stock3",  track: "stocked", goal: 3, coins: 90, text: "Stock 3 things in your own shop" },
+    { id: "decor3",  track: "placed",  goal: 3, coins: 80, text: "Put 3 things out in your house" },
+    { id: "style1",  track: "styled",  goal: 1, coins: 45, text: "Change a wall, a floor or the view at home" },
+    { id: "style3",  track: "styled",  goal: 3, coins: 95, text: "Redecorate your house 3 times" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
@@ -1630,11 +2100,17 @@ window.CPData = (function () {
     { id: "level20",  emoji: "🌟", name: "Fully Grown",    note: "Reach level 20" },
     { id: "homeowner", emoji: "🏡", name: "Homeowner",    note: "Move to a bigger house" },
     { id: "decorator", emoji: "🛋️", name: "Decorator",   note: "Have 8 things out at home" },
-    { id: "tower",    emoji: "🏰", name: "Tower Keeper",  note: "Build the Valley Tower" },
+    { id: "tower",    emoji: "🏰", name: "Tower Keeper",  note: "Buy the Valley Tower" },
     { id: "shopkeep", emoji: "🏬", name: "Shopkeeper",    note: "Open your own shop" },
     { id: "trader",   emoji: "🤝", name: "Fair Trader",   note: "Sell 10 things to the family" },
     { id: "spinner",  emoji: "🎡", name: "Wheel Watcher", note: "Spin the wheel 10 days" },
-    { id: "jackpot",  emoji: "💎", name: "Jackpot!",      note: "Land the wheel on the diamond" }
+    { id: "jackpot",  emoji: "💎", name: "Jackpot!",      note: "Land the wheel on the diamond" },
+    { id: "stylist",  emoji: "🎨", name: "Interior Designer", note: "Own 6 walls, floors or views" },
+    { id: "estate",   emoji: "🏘️", name: "Property Empire", note: "Own 5 different homes" },
+    { id: "collector", emoji: "🛋️", name: "Furniture Hoard", note: "Own 30 pieces of furniture" },
+    { id: "martian",  emoji: "🪐", name: "Martian",       note: "Live in the Mars Castle" },
+    { id: "rarehunt", emoji: "🌟", name: "Treasure Hunter", note: "Buy a rare find" },
+    { id: "starlord", emoji: "💫", name: "Ring Keeper",   note: "Buy the Star Ring" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -1663,7 +2139,11 @@ window.CPData = (function () {
     CARE: CARE,
     BOOKS: BOOKS,
     FURNITURE: FURNITURE,
+    FURNITURE_SETS: FURNITURE_SETS,
     HOUSES: HOUSES,
+    WALLS: WALLS,
+    FLOORS: FLOORS,
+    VIEWS: VIEWS,
     WHEEL: WHEEL,
     FACTS: FACTS,
     RIVALS: RIVALS,
@@ -1675,9 +2155,16 @@ window.CPData = (function () {
     ask: ask,
     reshuffle: reshuffle,
     shopStock: shopStock,
+    rareFinds: rareFinds,
+    rareFor: rareFor,
+    rareElsewhere: rareElsewhere,
     questsFor: questsFor,
     itemById: itemById,
     kindOf: kindOf,
+    houseById: houseById,
+    wallById: wallById,
+    floorById: floorById,
+    viewById: viewById,
     dayNumber: dayNumber,
     fact: function (tier) { return pick(FACTS[tier] || FACTS.mid); },
     profile: function (id) {
