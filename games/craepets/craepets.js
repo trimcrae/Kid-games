@@ -92,9 +92,21 @@
       review: [],
       /* A half-filled berry patch should still be there tomorrow. */
       harvest: { farm: [], well: [], pool: [] },
-      /* Your own house: which home you live in, the furniture you own,
-         and the pieces you currently have out where you can see them. */
-      house: { level: 0, owned: [], placed: [] },
+      /* Your own house. `homes` is every home you have ever bought —
+         you keep them all and move between them freely — and `home` is
+         the one you are living in today.
+
+         `rooms` is how each of those homes is decorated: its wall, its
+         floor, the view out of the window and what you call it. Every
+         home keeps its own, so the Igloo can stay icy while the Mars
+         Castle stays red, and moving house is a change of scene rather
+         than a change of number. `walls`/`floors`/`views` are the style
+         pieces you have BOUGHT, which work in every home you own. */
+      house: {
+        home: "nest", homes: ["nest"], rooms: {},
+        walls: [], floors: [], views: [],
+        owned: [], placed: []
+      },
       /* Your own shop, which the rest of the family can buy from. */
       stall: { name: "", goods: [], sales: [] },
       /* The day you last span the prize wheel. */
@@ -104,7 +116,7 @@
       stats: { correct: 0, wrong: 0, best: 0, streak: 0, farm: 0, well: 0, pool: 0,
                arena: 0, arenaWin: 0, feed: 0, play: 0, wash: 0, read: 0, buy: 0,
                quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {},
-               spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0 },
+               spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0, styled: 0 },
       trophies: []
     };
   }
@@ -127,14 +139,45 @@
       if (s.harvest[p].length > SLOTS) s.harvest[p] = s.harvest[p].slice(0, SLOTS);
     });
     // The house and the shop were added later, so an older save has neither.
-    if (!s.house || typeof s.house !== "object") s.house = { level: 0, owned: [], placed: [] };
+    if (!s.house || typeof s.house !== "object") s.house = {};
     if (!Array.isArray(s.house.owned)) s.house.owned = [];
     if (!Array.isArray(s.house.placed)) s.house.placed = [];
-    s.house.level = Math.max(0, Math.min(D.HOUSES.length - 1, s.house.level || 0));
+    // A save from the five-house ladder stored a `level` number. You had
+    // paid your way up it, so you keep every home on the way as well as
+    // the one you were living in.
+    if (typeof s.house.level === "number" && !Array.isArray(s.house.homes)) {
+      var lvl = Math.max(0, Math.min(4, s.house.level));
+      s.house.homes = D.HOUSES.slice(0, lvl + 1).map(function (h) { return h.id; });
+      s.house.home = D.HOUSES[lvl].id;
+    }
+    delete s.house.level;
+    if (!Array.isArray(s.house.homes) || !s.house.homes.length) s.house.homes = ["nest"];
+    s.house.homes = s.house.homes.filter(function (id, i, a) {
+      return D.HOUSES.some(function (h) { return h.id === id; }) && a.indexOf(id) === i;
+    });
+    if (s.house.homes.indexOf("nest") === -1) s.house.homes.unshift("nest");
+    if (s.house.homes.indexOf(s.house.home) === -1) s.house.home = s.house.homes[s.house.homes.length - 1];
+    ["walls", "floors", "views"].forEach(function (k) {
+      if (!Array.isArray(s.house[k])) s.house[k] = [];
+    });
+    // Whatever style each room is carrying, it has to still exist and still
+    // be something this player is allowed to use.
+    if (!s.house.rooms || typeof s.house.rooms !== "object") s.house.rooms = {};
+    Object.keys(s.house.rooms).forEach(function (id) {
+      var h = D.HOUSES.some(function (x) { return x.id === id; }) ? D.houseById(id) : null;
+      if (!h) { delete s.house.rooms[id]; return; }
+      var r = s.house.rooms[id];
+      if (!r || typeof r !== "object") { delete s.house.rooms[id]; return; }
+      if (!styleAllowed(s, "wall", r.wall)) r.wall = h.style.wall;
+      if (!styleAllowed(s, "floor", r.floor)) r.floor = h.style.floor;
+      if (!styleAllowed(s, "view", r.view)) r.view = h.style.view;
+      if (typeof r.name !== "string") r.name = "";
+    });
+    var home = D.houseById(s.house.home);
     // You can never have out more than you own, or more than the house holds.
     s.house.placed = s.house.placed
       .filter(function (id, i, a) { return s.house.owned.indexOf(id) !== -1 && a.indexOf(id) === i; })
-      .slice(0, D.HOUSES[s.house.level].slots);
+      .slice(0, home.slots);
     if (!s.stall || typeof s.stall !== "object") s.stall = { name: "", goods: [], sales: [] };
     if (!Array.isArray(s.stall.goods)) s.stall.goods = [];
     if (!Array.isArray(s.stall.sales)) s.stall.sales = [];
@@ -303,9 +346,75 @@
      brush. What it is WORTH is decided by what you have out:
      a sofa in storage keeps nobody warm.
      ========================================================= */
-  function houseInfo() { return D.HOUSES[(S.house && S.house.level) || 0]; }
-  function nextHouse() { return D.HOUSES[((S.house && S.house.level) || 0) + 1] || null; }
+  function houseInfo() { return D.houseById((S.house && S.house.home) || "nest"); }
+  /* What you might move to next: the cheapest home you do not own yet.
+     There is no ladder any more, so this is a suggestion, not a queue. */
+  function nextHouse() {
+    var mine = (S.house && S.house.homes) || [];
+    var best = null;
+    D.HOUSES.forEach(function (h) {
+      if (mine.indexOf(h.id) !== -1) return;
+      if (!best || h.cost < best.cost) best = h;
+    });
+    return best;
+  }
+  function ownsHome(id) { return ((S.house && S.house.homes) || []).indexOf(id) !== -1; }
   function slotsFree() { return houseInfo().slots - (S.house.placed || []).length; }
+
+  /* --- walls, floors and the view: the three style slots ---
+     Each is free if it costs nothing, yours if you bought it, and also
+     yours if it came with a home you own — which is why buying the Mars
+     Castle also gets you Martian walls to use in the straw nest. */
+  var STYLE = {
+    wall:  { key: "wall",  own: "walls",  list: function () { return D.WALLS; },  word: "wall" },
+    floor: { key: "floor", own: "floors", list: function () { return D.FLOORS; }, word: "floor" },
+    view:  { key: "view",  own: "views",  list: function () { return D.VIEWS; },  word: "view" }
+  };
+  function styleItem(kind, id) {
+    var found = null;
+    STYLE[kind].list().forEach(function (x) { if (x.id === id) found = x; });
+    return found;
+  }
+  /* Takes a whole save rather than reading S, because load() has to ask
+     this question before the save is live. */
+  function styleAllowed(s, kind, id) {
+    var it = styleItem(kind, id);
+    if (!it || !s || !s.house) return false;
+    if (!it.cost) return true;
+    if ((s.house[STYLE[kind].own] || []).indexOf(id) !== -1) return true;
+    return (s.house.homes || []).some(function (hid) {
+      return D.houseById(hid).style[kind] === id;
+    });
+  }
+  function ownsStyle(kind, id) { return styleAllowed(S, kind, id); }
+  /* Which home lent you this one — so the panel can say where it came from. */
+  function styleFrom(kind, id) {
+    var from = null;
+    ((S.house && S.house.homes) || []).forEach(function (hid) {
+      var h = D.houseById(hid);
+      if (!from && h.style[kind] === id) from = h;
+    });
+    return from;
+  }
+  function stylesBought() {
+    return (S.house.walls || []).length + (S.house.floors || []).length + (S.house.views || []).length;
+  }
+  /* How the home you are standing in is decorated. A home you have never
+     redecorated simply wears the style it was built with. */
+  function room() {
+    var h = S.house;
+    if (!h.rooms || typeof h.rooms !== "object") h.rooms = {};
+    if (!h.rooms[h.home]) {
+      var st = houseInfo().style;
+      h.rooms[h.home] = { wall: st.wall, floor: st.floor, view: st.view, name: "" };
+    }
+    return h.rooms[h.home];
+  }
+  function wallNow()  { return styleItem("wall", room().wall)   || D.WALLS[0]; }
+  function floorNow() { return styleItem("floor", room().floor) || D.FLOORS[0]; }
+  function viewNow()  { return styleItem("view", room().view)   || D.VIEWS[0]; }
+  /* What the place is called: whatever you typed, or the home's own name. */
+  function homeName() { return (room().name || "").trim() || houseInfo().name; }
   function placedItems() {
     return (S.house.placed || []).map(function (id) { return D.itemById(id); }).filter(Boolean);
   }
@@ -396,9 +505,15 @@
       week: (st.bestDayStreak || 0) >= 7,
       palette: S.colours.length >= P.COLOURS.length,
       level20: level() >= 20,
-      homeowner: (S.house.level || 0) >= 1,
+      homeowner: (S.house.homes || []).length >= 2,
       decorator: (S.house.placed || []).length >= 8,
-      tower: (S.house.level || 0) >= D.HOUSES.length - 1,
+      tower: ownsHome("tower"),
+      estate: (S.house.homes || []).length >= 5,
+      collector: (S.house.owned || []).length >= 30,
+      stylist: stylesBought() >= 6,
+      martian: S.house.home === "marscastle",
+      starlord: ownsHome("starring"),
+      rarehunt: !!S.everRare,
       shopkeep: !!S.everStocked,
       trader: (st.sold || 0) >= 10,
       spinner: (st.spin || 0) >= 10,
@@ -432,22 +547,39 @@
   };
 
   /* Where each piece of furniture stands in the room. The middle of the
-     floor is left clear on purpose — that is where the Craepet is. */
+     floor is left clear on purpose — that is where the Craepet is.
+     There are enough spots here for the biggest home in the game. */
   var HOME_SPOTS = [
     [7, 9], [21, 8], [34, 10], [67, 10], [80, 8], [93, 9],
     [11, 27], [26, 25], [75, 25], [90, 27],
+    [4, 44], [18, 42], [83, 42], [97, 44],
     [8, 58], [24, 62], [40, 60], [61, 60], [77, 62], [92, 58],
-    [16, 78], [46, 80], [85, 78]
+    [16, 78], [46, 80], [85, 78],
+    [2, 32], [98, 32], [3, 66], [97, 66], [62, 74]
   ];
-  /* An empty house keeps the starter decorations; the moment you put
-     something out, the room becomes yours instead. */
+  /* The room = what you can see out of the window, and then whatever you
+     have put out standing in front of it. An empty house with no view
+     chosen keeps the starter decorations so it is never a bare box. */
   function nestDeco() {
     var mine = placedItems();
-    if (!mine.length) return PLACES.nest.deco;
-    return mine.map(function (it, i) {
-      var sp = HOME_SPOTS[i % HOME_SPOTS.length];
-      return [it.emoji, sp[0], sp[1]];
+    // The view sits high up, but never so high that it collides with the
+    // room's name badge in the top-left corner of the scene.
+    var out = (viewNow().deco || []).map(function (d) {
+      return [d[0], d[1], Math.min(d[2], 72)];
     });
+    if (!mine.length && !out.length) return PLACES.nest.deco;
+    mine.forEach(function (it, i) {
+      var sp = HOME_SPOTS[i % HOME_SPOTS.length];
+      out.push([it.emoji, sp[0], sp[1]]);
+    });
+    return out;
+  }
+  /* The walls and the floor, as one background. The join sits at 55%,
+     which is where the Craepet's feet are. */
+  function homeBackground() {
+    var w = wallNow(), f = floorNow();
+    return "linear-gradient(180deg," + w.a + " 0%," + w.b + " 55%," +
+           f.a + " 55%," + f.b + " 100%)";
   }
 
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -491,8 +623,11 @@
     // The nest and the House tab are the same room seen from two tabs, so
     // the furniture you put out shows up in both.
     var atHome = (place === "nest" || place === "home");
-    var skin = atHome ? "nest h" + ((S.house && S.house.level) || 0) : place;
-    var tag = place === "home" ? houseInfo().emoji + " " + houseInfo().name : pl.tag;
+    var skin = atHome ? "nest" : place;
+    // At home the room is painted from the wall and floor you chose, so
+    // repainting shows up the instant you tap it.
+    var paint = atHome ? ' style="background:' + homeBackground() + '"' : "";
+    var tag = atHome ? houseInfo().emoji + " " + homeName() : pl.tag;
     var deco = (atHome ? nestDeco() : pl.deco).map(function (d) {
       return '<span class="deco" aria-hidden="true" style="left:' + d[1] + '%;bottom:' + d[2] + '%">' + d[0] + "</span>";
     }).join("");
@@ -500,7 +635,7 @@
       ? S.pet.name + ", a " + P.colour(S.pet.colour).name + " " + P.species(S.pet.species).name +
         ", looking " + mood() + ", at " + tag.replace(/^\S+\s/, "")
       : "your Craepet";
-    return '<div class="scene ' + skin + (place === "nest" ? "" : " compact") + '" id="scene" ' +
+    return '<div class="scene ' + skin + (place === "nest" ? "" : " compact") + '" id="scene"' + paint + " " +
       'role="button" tabindex="0" aria-label="' + esc(label) + '. Tap to say hello.">' +
       '<span class="place-tag" aria-hidden="true">' + esc(tag) + "</span>" + deco +
       '<canvas id="pet-canvas" aria-hidden="true"></canvas>' +
@@ -1390,10 +1525,11 @@
      how much, in plain numbers, so a bigger house is a choice
      you can reason about instead of a shiny nothing.
      ========================================================= */
+  var homeTab = "room";                 // room | homes | style
+
   function houseHtml() {
-    var h = houseInfo(), nx = nextHouse();
-    var out = placedItems(), stored = storedItems();
-    var used = out.length, room = h.slots;
+    var h = houseInfo();
+    var used = (S.house.placed || []).length;
 
     var effects = [
       ["😊", Math.round((toyCalm() + houseCalm()) * 100) + "%", "slower to get bored"],
@@ -1404,15 +1540,34 @@
       return '<div class="stat"><b>' + e[0] + " " + e[1] + "</b><small>" + e[2] + "</small></div>";
     }).join("");
 
-    var upgrade = nx
-      ? '<p style="margin:0.8rem 0 0"><button class="act" data-upgrade="1"' +
-        (S.coins < nx.cost ? " disabled" : "") + ' style="--ac:var(--green);width:100%">' +
-        '<span class="em">' + nx.emoji + "</span>Move to the " + esc(nx.name) + " — 🪙 " + nx.cost +
-        " (" + nx.slots + " spaces)</button></p>" +
-        '<p class="sub" style="margin:0.4rem 0 0">' + esc(nx.note) +
-        (S.coins < nx.cost ? " You need 🪙 " + (nx.cost - S.coins) + " more." : "") + "</p>"
-      : '<p class="sub" style="margin:0.8rem 0 0">🏰 <b>The Valley Tower.</b> ' +
-        "There is nowhere bigger to move to — this is the top of the hill.</p>";
+    var tabs = [["room", "🛋️", "Furniture"], ["homes", "🏘️", "Homes"], ["style", "🎨", "Decorate"]];
+    var chips = '<div class="subnav">' + tabs.map(function (t) {
+      return '<button data-hometab="' + t[0] + '"' + (homeTab === t[0] ? ' class="on"' : "") + ">" +
+        t[1] + " " + t[2] + "</button>";
+    }).join("") + "</div>";
+
+    var head = '<div class="panel">' +
+      "<h2>" + h.emoji + " " + esc(homeName()) + "</h2>" +
+      '<p class="sub">' + esc(h.note) + " Your Craepet lives here, and everything you put out is " +
+        "working for " + esc(S.pet.name) + " even when the game is shut. " +
+        '<button class="ghost small" data-homename="1">✏️ Rename it</button></p>' +
+      '<div class="statgrid">' + effects + "</div>" +
+      '<p class="sub" style="margin:0.8rem 0 0">🛋️ <b>' + used + " of " + h.slots +
+        " spaces used</b> · 🏠 <b>" + houseCosy() + " cosy</b> · 🏘️ <b>" +
+        S.house.homes.length + (S.house.homes.length === 1 ? " home" : " homes") + "</b> owned. " +
+        (S.house.owned.length ? "You own " + S.house.owned.length + " pieces of furniture." :
+         "Furniture is on sale at the 🏪 Market — look for the 🏠 pieces.") + "</p>" +
+      chips +
+    "</div>";
+
+    return head + (homeTab === "homes" ? homesHtml() : homeTab === "style" ? styleHtml() : roomHtml());
+  }
+
+  /* --- 🛋️ tab one: the furniture you own, out or packed away --- */
+  function roomHtml() {
+    var h = houseInfo();
+    var out = placedItems(), stored = storedItems();
+    var used = out.length;
 
     var shelf = out.length
       ? '<div class="items">' + out.map(function (it) {
@@ -1426,30 +1581,25 @@
       : '<p class="sub">Nothing out yet. Anything you put out shows up in the room above ' +
         "and in 🏡 the Nest — and starts doing its job straight away.</p>";
 
-    var box = stored.length
-      ? '<div class="items">' + stored.map(function (it) {
-          var full = slotsFree() <= 0;
+    // Storage is grouped by set, because with a hundred-odd pieces in the
+    // game an ungrouped cupboard is just a wall of emoji.
+    var full = slotsFree() <= 0;
+    var box = D.FURNITURE_SETS.map(function (set) {
+      var mine = stored.filter(function (it) { return it.set === set.id; });
+      if (!mine.length) return "";
+      return '<h3 style="margin:0.9rem 0 0.4rem;font-size:0.98rem">' + set.name +
+        ' <small style="color:#8b83a8;font-weight:normal">' + mine.length + "</small></h3>" +
+        '<div class="items">' + mine.map(function (it) {
           return '<button class="item" data-place="' + esc(it.id) + '"' + (full ? " disabled" : "") + ">" +
             '<span class="pic">' + it.emoji + "</span>" +
             '<span class="nm">' + esc(it.name) + "</span>" +
             '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
             '<span class="own">' + (full ? "house is full" : "tap to put out") + "</span></button>";
-        }).join("") + "</div>"
-      : "";
+        }).join("") + "</div>";
+    }).join("");
 
-    return '<div class="panel">' +
-      "<h2>" + h.emoji + " " + esc(h.name) + "</h2>" +
-      '<p class="sub">' + esc(h.note) + " Your Craepet lives here, and everything you put out is " +
-        "working for " + esc(S.pet.name) + " even when the game is shut.</p>" +
-      '<div class="statgrid">' + effects + "</div>" +
-      '<p class="sub" style="margin:0.8rem 0 0">🛋️ <b>' + used + " of " + room +
-        " spaces used</b> · 🏠 <b>" + houseCosy() + " cosy</b> altogether. " +
-        (S.house.owned.length ? "You own " + S.house.owned.length + " pieces of furniture." :
-         "Furniture is on sale at the 🏪 Market — look for the 🏠 pieces.") + "</p>" +
-      upgrade +
-    "</div>" +
-    '<div class="panel"><h2>🛋️ Out where you can see it</h2>' +
-      '<p class="sub">' + used + " / " + room + " spaces. Tap a piece to put it back in storage " +
+    return '<div class="panel"><h2>🛋️ Out where you can see it</h2>' +
+      '<p class="sub">' + used + " / " + h.slots + " spaces. Tap a piece to put it back in storage " +
       "and free up the space for something else.</p>" + shelf +
     "</div>" +
     (stored.length
@@ -1459,7 +1609,180 @@
           ? "There " + (slotsFree() === 1 ? "is 1 space" : "are " + slotsFree() + " spaces") + " left — tap to put something out."
           : "The house is full: put something away first, or move somewhere bigger.") + "</p>" + box +
       "</div>"
-      : "");
+      : '<div class="panel"><h2>📦 In storage</h2>' +
+        '<p class="sub">Nothing packed away. There are <b>' + D.FURNITURE.length +
+        " pieces of furniture</b> in the valley — the 🏪 Market puts eight different ones " +
+        "on the shelf every morning.</p></div>");
+  }
+
+  /* --- 🏘️ tab two: every home in the game, grouped by where it is ---
+     You keep every home you buy and can move in and out for nothing, so
+     this reads as a collection rather than a ladder. */
+  function homesHtml() {
+    var worlds = [];
+    D.HOUSES.forEach(function (h) { if (worlds.indexOf(h.world) === -1) worlds.push(h.world); });
+
+    var body = worlds.map(function (world) {
+      var homes = D.HOUSES.filter(function (h) { return h.world === world; });
+      var cards = homes.map(function (h) {
+        var mine = ownsHome(h.id);
+        var here = S.house.home === h.id;
+        var afford = S.coins >= h.cost;
+        var act = here ? "data-hometab=\"style\"" : mine ? 'data-movehome="' + h.id + '"'
+                                                        : 'data-buyhome="' + h.id + '"';
+        var foot = here ? '<span class="own">✔ you live here</span>'
+          : mine ? '<span class="own">tap to move in</span>'
+          : '<span class="price">🪙 ' + h.cost + "</span>";
+        return '<button class="item' + (here ? " here" : "") + '" ' + act +
+          (!mine && !afford ? " disabled" : "") + ">" +
+          '<span class="pic">' + h.emoji + "</span>" +
+          '<span class="nm">' + esc(h.name) + "</span>" +
+          '<span class="what">' + h.slots + " spaces</span>" + foot +
+          (!mine && !afford ? '<span class="own">🪙 ' + (h.cost - S.coins) + " to go</span>" : "") +
+        "</button>";
+      }).join("");
+      return '<h3 style="margin:0.9rem 0 0.4rem;font-size:0.98rem">' + esc(world) + "</h3>" +
+        '<div class="items">' + cards + "</div>";
+    }).join("");
+
+    var nx = nextHouse();
+    return '<div class="panel"><h2>🏘️ Homes</h2>' +
+      '<p class="sub">There are <b>' + D.HOUSES.length + " homes</b> in the game, and you own <b>" +
+        S.house.homes.length + "</b>. Buying one is for ever: you keep every home you buy and can " +
+        "move between them whenever you like, for free. Each one remembers its own walls, floor and view — " +
+        "and every home you own lends you its style to use in all the others." +
+        (nx ? " The cheapest one you don't own yet is the " + esc(nx.name) + ", at 🪙 " + nx.cost + "." : "") +
+      "</p>" + body + "</div>";
+  }
+
+  /* --- 🎨 tab three: walls, floors and the view --- */
+  function styleHtml() {
+    var r = room();
+    var parts = [
+      { kind: "wall",  title: "🎨 Walls",  list: D.WALLS,  now: r.wall,
+        note: "The top half of the room." },
+      { kind: "floor", title: "🪵 Floors", list: D.FLOORS, now: r.floor,
+        note: "What your Craepet is standing on." },
+      { kind: "view",  title: "🪟 The view", list: D.VIEWS, now: r.view,
+        note: "What you can see out of the window." }
+    ];
+
+    var body = parts.map(function (p) {
+      var owned = p.list.filter(function (x) { return ownsStyle(p.kind, x.id); }).length;
+      var cards = p.list.map(function (x) {
+        var have = ownsStyle(p.kind, x.id);
+        var on = x.id === p.now;
+        var afford = S.coins >= x.cost;
+        var chip = p.kind === "view"
+          ? '<span class="pic">' + x.emoji + "</span>"
+          : '<span class="paintchip" style="background:linear-gradient(180deg,' + x.a + ',' + x.b + ')"></span>';
+        var from = (!x.cost || (S.house[STYLE[p.kind].own] || []).indexOf(x.id) !== -1)
+          ? null : styleFrom(p.kind, x.id);
+        var foot = on ? '<span class="own">✔ in use</span>'
+          : have ? '<span class="own">tap to use</span>'
+          : '<span class="price">🪙 ' + x.cost + "</span>";
+        return '<button class="item' + (on ? " here" : "") + '" data-style="' + p.kind + ":" + x.id + '"' +
+          (!have && !afford ? " disabled" : "") + ">" + chip +
+          '<span class="nm">' + esc(x.name) + "</span>" + foot +
+          (from ? '<span class="what">comes with the ' + esc(from.name) + "</span>" : "") +
+        "</button>";
+      }).join("");
+      return '<div class="panel"><h2>' + p.title + "</h2>" +
+        '<p class="sub">' + p.note + " You have <b>" + owned + " of " + p.list.length +
+          "</b>. Whatever you pick here is remembered for the <b>" + esc(houseInfo().name) +
+          "</b> on its own.</p>" +
+        '<div class="items">' + cards + "</div></div>";
+    }).join("");
+
+    var combos = D.WALLS.length * D.FLOORS.length * D.VIEWS.length;
+    return '<div class="panel"><h2>🎨 Decorating the ' + esc(houseInfo().name) + "</h2>" +
+      '<p class="sub">Any wall goes with any floor goes with any view — that is <b>' +
+        combos.toLocaleString() + " different rooms</b> for this home alone, before you " +
+        "put a single thing out. Buy one once and you can use it in every home you own.</p></div>" +
+      body;
+  }
+
+  /* Buying a new home. The price is on the button, so the homes tab is
+     also the biggest savings target in the game — which is the point. */
+  function buyHome(id) {
+    var h = D.houseById(id);
+    if (!h || ownsHome(id) || S.coins < h.cost) return;
+    S.coins -= h.cost;
+    S.house.homes.push(id);
+    moveHome(id, true);
+    checkTrophies();
+    save();
+    render();
+    var st = h.style;
+    openSheet(sheet(h.emoji + " Welcome to the " + esc(h.name) + "!",
+      '<p class="sub" style="font-size:1.02rem">' + esc(h.note) + "</p>" +
+      '<p class="sub">You now have <b>' + h.slots + " spaces</b> for furniture — " +
+      (slotsFree() > 0 ? slotsFree() + " of them empty." : "all of them full already!") + "</p>" +
+      '<p class="sub">It came with <b>' + esc(styleItem("wall", st.wall).name) + "</b> walls, a <b>" +
+      esc(styleItem("floor", st.floor).name) + "</b> floor and the <b>" +
+      esc(styleItem("view", st.view).name) + "</b> view — and those are now yours to use in " +
+      "any of your homes.</p>" +
+      '<p class="teach"><b>That cost 🪙 ' + h.cost + ".</b> You have 🪙 " + S.coins + " left. " +
+      "You still own your other " + (S.house.homes.length - 1) +
+      (S.house.homes.length === 2 ? " home" : " homes") + " — moving back is free.</p>"));
+    sfx("win");
+    try { window.Confetti && Confetti.burst({ count: 100 }); } catch (e) {}
+  }
+
+  /* Moving in. Free, and you keep everything — but a smaller home holds
+     fewer pieces, so the overflow goes into storage rather than vanishing. */
+  function moveHome(id, quiet) {
+    if (!ownsHome(id)) return;
+    S.house.home = id;
+    var h = houseInfo();
+    var over = (S.house.placed || []).length - h.slots;
+    if (over > 0) {
+      S.house.placed = S.house.placed.slice(0, h.slots);
+      if (!quiet) toast("The " + h.name + " is smaller — " + over +
+                        (over === 1 ? " piece went" : " pieces went") + " into storage.");
+    }
+    room();                                  // make sure it has a look of its own
+    checkTrophies();
+    if (quiet) return;
+    save();
+    render();
+    say("Home sweet " + h.name.toLowerCase() + "!", 2800);
+    sfx("good");
+  }
+
+  /* Tapping a wall, floor or view: use it if it is yours, buy it if not. */
+  function pickStyle(ref) {
+    var bits = String(ref).split(":");
+    var kind = bits[0], id = bits[1];
+    if (!STYLE[kind]) return;
+    var it = styleItem(kind, id);
+    if (!it) return;
+    var r = room();
+    if (!ownsStyle(kind, id)) {
+      if (S.coins < it.cost) return;
+      S.coins -= it.cost;
+      S.house[STYLE[kind].own].push(id);
+      toast("Bought " + it.name + " for 🪙 " + it.cost + ".");
+      sfx("coin");
+    } else {
+      if (r[STYLE[kind].key] === id) return;   // already in use
+      sfx("pop");
+    }
+    r[STYLE[kind].key] = id;
+    bump("styled");
+    checkTrophies();
+    save();
+    render();
+  }
+
+  function homeNameSheet() {
+    return sheet("✏️ Name your home",
+      '<p class="sub">Every home can have its own name — the ' + esc(houseInfo().name) +
+      " is called this one. Leave it empty to go back to <b>" + esc(houseInfo().name) + "</b>.</p>" +
+      '<div class="name-row"><input id="home-input" maxlength="22" value="' + esc(room().name || "") +
+      '" aria-label="Home name"></div>' +
+      '<p style="margin:0.8rem 0 0"><button class="act" id="home-go" style="--ac:var(--green);width:100%">' +
+      '<span class="em">🏠</span>Put up the sign</button></p>');
   }
 
   function placeFurniture(id) {
@@ -1485,25 +1808,6 @@
     sfx("pop");
   }
 
-  /* Moving house. The price is on the button, so it is also the biggest
-     savings target in the game — which is the point of it. */
-  function upgradeHouse() {
-    var nx = nextHouse();
-    if (!nx || S.coins < nx.cost) return;
-    S.coins -= nx.cost;
-    S.house.level++;
-    checkTrophies();
-    save();
-    render();
-    openSheet(sheet(nx.emoji + " Welcome to the " + esc(nx.name) + "!",
-      '<p class="sub" style="font-size:1.02rem">' + esc(nx.note) + "</p>" +
-      '<p class="sub">You now have <b>' + nx.slots + " spaces</b> for furniture — " +
-      (slotsFree() > 0 ? slotsFree() + " of them empty." : "all of them full already!") + "</p>" +
-      '<p class="teach"><b>That cost 🪙 ' + nx.cost + ".</b> You have 🪙 " + S.coins + " left.</p>"));
-    sfx("win");
-    try { window.Confetti && Confetti.burst({ count: 100 }); } catch (e) {}
-  }
-
   /* =========================================================
      YOUR OWN SHOP — the other half of the market.
      Anything in your bag can go on your own shelf at a price
@@ -1517,12 +1821,28 @@
   function stallName() {
     return (S.stall.name || "").trim() || (D.profile(who).name + "'s Corner");
   }
-  /* What you can put on the shelf: anything in the bag. Brushes are not
-     in the bag and furniture is nailed down, so neither can be sold. */
+  /* What you can put on the shelf: anything in your bag, plus any piece of
+     furniture you own that is currently packed away in storage. Selling
+     furniture on is what makes a rare find worth chasing — the Mars Rock
+     that landed in your Market this morning is the only one in the valley,
+     and the rest of the family can only get it from you. Brushes stay
+     unsellable: a colour cannot be un-learnt. */
+  function sellableFurniture() {
+    return (S.house.owned || []).filter(function (id) {
+      return (S.house.placed || []).indexOf(id) === -1 && D.itemById(id);
+    });
+  }
   function sellable() {
     return Object.keys(S.bag).filter(function (id) {
       return S.bag[id] > 0 && D.itemById(id);
-    });
+    }).concat(sellableFurniture());
+  }
+  /* How many of a thing you could put on the shelf right now. Furniture is
+     owned once, so it is always exactly one. */
+  function haveToSell(id) {
+    if (D.kindOf(id) === "decor") return (S.house.owned || []).indexOf(id) !== -1 &&
+      (S.house.placed || []).indexOf(id) === -1 ? 1 : 0;
+    return S.bag[id] || 0;
   }
   function shelfWorth() {
     var n = 0;
@@ -1565,13 +1885,15 @@
     var stock = mine.length
       ? '<div class="items">' + mine.map(function (id) {
           var it = D.itemById(id);
-          return '<button class="item" data-stock="' + esc(id) + '">' +
+          var isDecor = D.kindOf(id) === "decor";
+          return '<button class="item' + (it.rare ? " rare" : "") + '" data-stock="' + esc(id) + '">' +
             '<span class="pic">' + it.emoji + "</span>" +
             '<span class="nm">' + esc(it.name) + "</span>" +
             '<span class="what">market price 🪙 ' + it.cost + "</span>" +
-            '<span class="own">you have ' + S.bag[id] + "</span></button>";
+            '<span class="own">' + (isDecor ? "🏠 from storage" : "you have " + S.bag[id]) + "</span>" +
+            (it.rare ? '<span class="own">🌟 rare</span>' : "") + "</button>";
         }).join("") + "</div>"
-      : '<p class="sub">Nothing in your 🎒 Bag to sell yet. Harvest berries at the 🍓 Farm, ' +
+      : '<p class="sub">Nothing to sell yet. Harvest berries at the 🍓 Farm, ' +
         "or buy cheap at the 🏪 Market and sell for a little more here.</p>";
 
     return receipts +
@@ -1589,8 +1911,10 @@
     "</div>" +
     '<div class="panel"><h2>🛒 On your shelf</h2>' + shelf + "</div>" +
     '<div class="panel"><h2>➕ Put something on the shelf</h2>' +
-      '<p class="sub">Tap anything from your bag, then choose your price. Charge more than the ' +
-      "Market and you make a profit on every sale — charge too much and nobody buys it.</p>" + stock +
+      '<p class="sub">Tap anything from your bag — or any furniture packed away in 🏠 storage — ' +
+      "then choose your price. Charge more than the Market and you make a profit on every sale — " +
+      "charge too much and nobody buys it. A 🌟 <b>rare</b> thing is worth a lot more to the family " +
+      "than the Market price, because their Market cannot sell them one at all.</p>" + stock +
     "</div>";
   }
 
@@ -1598,7 +1922,7 @@
      line changes with it, which is a far better lesson than being told. */
   function priceSheet() {
     var it = D.itemById(pendingSale.id);
-    var have = S.bag[pendingSale.id] || 0;
+    var have = haveToSell(pendingSale.id);
     if (pendingSale.n > have) pendingSale.n = have;
     var profit = pendingSale.price - it.cost;
     var line = profit > 0
@@ -1609,10 +1933,20 @@
 
     var counts = [1, 2, 3, 5].filter(function (n) { return n <= have; });
     if (counts.indexOf(have) === -1) counts.push(have);
+    var isDecor = D.kindOf(pendingSale.id) === "decor";
 
     return sheet("🏷️ " + esc(it.name) + " — what's your price?",
       '<p class="sub" style="text-align:center;font-size:1.05rem">' + it.emoji +
         " The 🏪 Market sells this for <b>🪙 " + it.cost + "</b>.</p>" +
+      (isDecor
+        ? '<p class="teach" style="text-align:center">🏠 This is <b>your furniture</b>. ' +
+          "If somebody buys it, it is theirs and it leaves your house for good. " +
+          "You can take it back off the shelf any time before it sells.</p>"
+        : "") +
+      (it.rare
+        ? '<p class="teach" style="text-align:center">🌟 <b>This is rare.</b> Nobody else\'s Market ' +
+          "is selling one today, so you can ask more than the Market price and still sell it.</p>"
+        : "") +
       '<div class="name-row" style="gap:0.6rem">' +
         '<button class="ghost" data-priced="-5" aria-label="five coins cheaper">−5</button>' +
         '<button class="ghost" data-priced="-1" aria-label="one coin cheaper">−1</button>' +
@@ -1636,7 +1970,7 @@
 
   function openPriceSheet(id) {
     var it = D.itemById(id);
-    if (!it || !S.bag[id]) return;
+    if (!it || !haveToSell(id)) return;
     // A sensible opening bid — a small mark-up on what the shop charges.
     pendingSale = { id: id, price: it.cost + Math.max(1, Math.round(it.cost * 0.2)), n: 1 };
     sfx("pop");
@@ -1651,7 +1985,7 @@
   }
   function setSaleQty(n) {
     if (!pendingSale) return;
-    pendingSale.n = Math.max(1, Math.min(S.bag[pendingSale.id] || 1, n));
+    pendingSale.n = Math.max(1, Math.min(haveToSell(pendingSale.id) || 1, n));
     sfx("pop");
     refreshSheet(priceSheet());
   }
@@ -1661,14 +1995,21 @@
     var deal = pendingSale;
     pendingSale = null;
     var it = D.itemById(deal.id);
-    var have = S.bag[deal.id] || 0;
+    var have = haveToSell(deal.id);
     var n = Math.max(1, Math.min(have, deal.n));
     if (!it || !have) return closeSheet();
     if ((S.stall.goods || []).length >= 8) {
       toast("Your shelf is full — take something off it first.");
       return closeSheet();
     }
-    for (var i = 0; i < n; i++) takeItem(deal.id);
+    // A piece of furniture leaves the house when it goes on the shelf, so
+    // it cannot be both sold to a sibling and still standing in your room.
+    if (D.kindOf(deal.id) === "decor") {
+      var oi = S.house.owned.indexOf(deal.id);
+      if (oi !== -1) S.house.owned.splice(oi, 1);
+    } else {
+      for (var i = 0; i < n; i++) takeItem(deal.id);
+    }
     if (S.bagNew) delete S.bagNew[deal.id];
     // The same thing at the same price stacks instead of taking a second space.
     var row = null;
@@ -1689,11 +2030,18 @@
     var g = (S.stall.goods || [])[i];
     if (!g) return;
     S.stall.goods.splice(i, 1);
-    addItem(g.id, g.n);
+    var it = D.itemById(g.id);
+    var isDecor = D.kindOf(g.id) === "decor";
+    if (isDecor) {
+      if (S.house.owned.indexOf(g.id) === -1) S.house.owned.push(g.id);
+    } else {
+      addItem(g.id, g.n);
+    }
     save();
     render();
-    var it = D.itemById(g.id);
-    toast("Took " + g.n + " × " + (it ? it.name : g.id) + " back into your 🎒 Bag.");
+    toast(isDecor
+      ? "Took the " + (it ? it.name : g.id) + " back into your 🏠 storage."
+      : "Took " + g.n + " × " + (it ? it.name : g.id) + " back into your 🎒 Bag.");
     sfx("pop");
   }
 
@@ -1866,32 +2214,75 @@
      out your change before handing anything over. Get it wrong
      and you still get the item — you just miss the tip.
      ========================================================= */
+  /* Everyone with a Craepet on this device. Rare finds are only ever dealt
+     to people who actually play, so a find can never land somewhere nobody
+     will ever open. */
+  function activePlayers() {
+    return D.PROFILES.filter(function (p) {
+      if (p.id === who) return true;
+      var s = readSlot(p.id);
+      return !!(s && s.pet);
+    }).map(function (p) { return p.id; });
+  }
+  /* This player's shelf: their own shuffle of the ordinary stock, plus
+     whichever rare finds the valley sent their way this morning. */
+  function myStock() {
+    return D.shopStock(null, who).concat(D.rareFor(who, null, activePlayers()));
+  }
+
+  function itemCard(it, extra) {
+    var owned = alreadyOwned(it);
+    var afford = S.coins >= it.cost;
+    var pic = it.kind === "brush"
+      ? '<span class="brushdot" style="background:' + it.swatch + '"></span>'
+      : '<span class="pic">' + it.emoji + "</span>";
+    var have = !owned && S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "";
+    return '<button class="item' + (it.rare ? " rare" : "") + '" data-buy="' + esc(it.id) + '"' +
+      (!afford || owned ? " disabled" : "") + ">" +
+      pic + '<span class="nm">' + esc(it.name) + "</span>" +
+      '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
+      (owned ? '<span class="own">✔ owned</span>' : '<span class="price">🪙 ' + it.cost + "</span>") +
+      have + (extra || "") +
+    "</button>";
+  }
+
   function marketHtml() {
-    var stock = D.shopStock();
-    var cards = stock.map(function (it) {
-      var owned = alreadyOwned(it);
-      var afford = S.coins >= it.cost;
-      var pic = it.kind === "brush"
-        ? '<span class="brushdot" style="background:' + it.swatch + '"></span>'
-        : '<span class="pic">' + it.emoji + "</span>";
-      var have = !owned && S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "";
-      return '<button class="item" data-buy="' + esc(it.id) + '"' + (!afford || owned ? " disabled" : "") + ">" +
-        pic + '<span class="nm">' + esc(it.name) + "</span>" +
-        '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
-        (owned ? '<span class="own">✔ owned</span>' : '<span class="price">🪙 ' + it.cost + "</span>") +
-        have +
-      "</button>";
-    }).join("");
+    var cards = D.shopStock(null, who).map(function (it) { return itemCard(it); }).join("");
+    var mineRare = D.rareFor(who, null, activePlayers());
+    var elsewhere = D.rareElsewhere(who, null, activePlayers());
+
+    // The rare shelf. This is the whole reason family shops matter: what
+    // is here today is here for YOU and for nobody else in the valley.
+    var rarePanel = '<div class="panel"><h2>🌟 Today\'s rare finds</h2>' +
+      '<p class="sub">Four rare things turn up in the valley every morning, and each one goes to ' +
+      "<b>one person's Market only</b>. Nobody else can buy it — unless you put it on your " +
+      "🏬 <b>Stall</b> and sell it to them.</p>" +
+      (mineRare.length
+        ? '<div class="items">' + mineRare.map(function (it) {
+            return itemCard(it, '<span class="own">🌟 only in your Market</span>');
+          }).join("") + "</div>"
+        : '<p class="sub">Nothing rare came your way today — but somebody in the family got ' +
+          "something. Go and look at their shelf.</p>") +
+      (elsewhere.length
+        ? '<p class="sub" style="margin-top:0.8rem">Elsewhere in the valley today: ' +
+          elsewhere.map(function (r) {
+            var p = D.profile(r.owner);
+            return r.item.emoji + " <b>" + esc(r.item.name) + "</b> (" + p.emoji + " " + esc(p.name) + ")";
+          }).join(" · ") + ". Ask them to stock it!</p>"
+        : "") +
+    "</div>";
+
     return '<div class="panel">' +
       "<h2>🏪 The Market</h2>" +
-      '<p class="sub">Fresh stock every morning, the same for the whole family. You have 🪙 ' + S.coins + ".</p>" +
+      '<p class="sub">Fresh stock every morning — and <b>everybody\'s shelf is different</b>, so ' +
+        "what you cannot find here might be sitting in somebody else's shop. You have 🪙 " + S.coins + ".</p>" +
       '<div class="items">' + cards + "</div>" +
       '<p class="sub" style="margin-top:0.8rem">Everything you buy lands in your 🎒 <b>Bag</b> — ' +
         "food for 🍽️ Feed, toys for 🎾 Play, soap for 🫧 Wash, pillows for 😴 Rest and books for 📖 Read. " +
         "🏠 <b>Furniture</b> goes to your House instead, to put out where you can see it.</p>" +
       '<p class="sub">🧸 Toys, 🏠 furniture and 🖌️ brushes are <b>yours for good</b>, so the shop will only sell you one of each. ' +
         "The 🌈 Rainbow Pool gives a free brush away every 15 right answers.</p>" +
-    "</div>" + familyStallsHtml();
+    "</div>" + rarePanel + familyStallsHtml();
   }
 
   /* The rest of the family's shelves, sitting under the Market's own.
@@ -1904,6 +2295,10 @@
         "🏬 <b>Stall</b> tab — put something from your bag out at your own price and the rest of " +
         "the family can buy it from here.</p></div>";
     }
+    // What today's Market already offers this player, so a shelf can say
+    // "you can't buy this anywhere else" and be telling the truth.
+    var mineToday = {};
+    myStock().forEach(function (it) { mineToday[it.id] = true; });
     return stalls.map(function (st) {
       var cards = st.goods.map(function (g, i) {
         var it = D.itemById(g.id);
@@ -1913,13 +2308,15 @@
         var note = g.price < it.cost ? "cheaper than the Market!"
           : g.price === it.cost ? "the same as the Market"
           : "🪙 " + (g.price - it.cost) + " over the Market price";
-        return '<button class="item" data-stallbuy="' + esc(st.p.id) + ":" + i + '"' +
-          (!afford || owned ? " disabled" : "") + ">" +
+        // The line that makes a family shop worth walking into.
+        var scarce = it.rare && !mineToday[it.id];
+        return '<button class="item' + (it.rare ? " rare" : "") + '" data-stallbuy="' +
+          esc(st.p.id) + ":" + i + '"' + (!afford || owned ? " disabled" : "") + ">" +
           '<span class="pic">' + it.emoji + "</span>" +
           '<span class="nm">' + esc(it.name) + "</span>" +
           '<span class="what">' + esc(itemBlurb(it)) + "</span>" +
           (owned ? '<span class="own">✔ owned</span>' : '<span class="price">🪙 ' + g.price + "</span>") +
-          '<span class="own">' + esc(note) + "</span>" +
+          '<span class="own">' + (scarce ? "🌟 you can't buy this anywhere else" : esc(note)) + "</span>" +
           '<span class="own">' + g.n + " left</span></button>";
       }).join("");
       return '<div class="panel"><h2>' + st.p.emoji + " " + esc(st.name) + "</h2>" +
@@ -1930,7 +2327,7 @@
   }
 
   function tryBuy(id) {
-    var stock = D.shopStock();
+    var stock = myStock();
     var it = null;
     for (var i = 0; i < stock.length; i++) if (stock[i].id === id) it = stock[i];
     if (!it || S.coins < it.cost) return;
@@ -2017,9 +2414,19 @@
     }
     S.coins -= it.cost;
     if (tip) earn(tip);
+    if (it.rare) S.everRare = true;
     bump("buy");
     if (deal.seller) {
-      addItem(it.id);
+      // Furniture off a family shelf still belongs in the house, not the bag.
+      if ((it.kind || D.kindOf(it.id)) === "decor") {
+        if (S.house.owned.indexOf(it.id) === -1) S.house.owned.push(it.id);
+        if (slotsFree() > 0 && S.house.placed.indexOf(it.id) === -1) {
+          S.house.placed.push(it.id);
+          bump("placed");
+        }
+      } else {
+        addItem(it.id);
+      }
       closeSheet();
       checkTrophies();
       save();
@@ -2571,7 +2978,25 @@
     if (put) return placeFurniture(put.dataset.place);
     var away = t.closest("[data-store]");
     if (away) return storeFurniture(away.dataset.store);
-    if (t.closest("[data-upgrade]")) return upgradeHouse();
+    var htab = t.closest("[data-hometab]");
+    if (htab) { homeTab = htab.dataset.hometab; sfx("pop"); return render(); }
+    var buyH = t.closest("[data-buyhome]");
+    if (buyH) return buyHome(buyH.dataset.buyhome);
+    var moveH = t.closest("[data-movehome]");
+    if (moveH) return moveHome(moveH.dataset.movehome);
+    var sty = t.closest("[data-style]");
+    if (sty) return pickStyle(sty.dataset.style);
+    if (t.closest("[data-homename]")) { sfx("pop"); return openSheet(homeNameSheet()); }
+    if (t.closest("#home-go")) {
+      var hf = $("#home-input");
+      room().name = ((hf ? hf.value : "") || "").trim().slice(0, 22);
+      save();
+      closeSheet();
+      render();
+      toast("🏠 The sign says " + homeName() + " now.");
+      sfx("win");
+      return;
+    }
 
     // --- your shop ---
     var stockIt = t.closest("[data-stock]");

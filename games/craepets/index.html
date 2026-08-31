@@ -62,13 +62,11 @@
        question is the point, so the scene shrinks to a band and the
        choices come up the screen. */
     .scene.compact { height: clamp(118px, 26vw, 172px); }
+    /* The home scene is painted from the wall and floor the player picked
+       (an inline gradient, set in craepets.js), so redecorating and moving
+       house are visible the moment you tap — not just a number on a panel.
+       This is only the fallback for a save that has no room yet. */
     .scene.nest   { background: linear-gradient(180deg, #ffe9c9 0%, #fff6e8 55%, #d9a86a 55%, #b98549 100%); }
-    /* Moving house repaints the room, so the upgrade is visible the
-       moment you buy it — not just a bigger number on a panel. */
-    .scene.nest.h1 { background: linear-gradient(180deg, #efe0c8 0%, #fbf1e0 55%, #b08a5e 55%, #8d6a44 100%); }
-    .scene.nest.h2 { background: linear-gradient(180deg, #ffeede 0%, #fff8f0 55%, #c98f63 55%, #9f6c46 100%); }
-    .scene.nest.h3 { background: linear-gradient(180deg, #f3ecff 0%, #fbf8ff 55%, #bfa07e 55%, #96775a 100%); }
-    .scene.nest.h4 { background: linear-gradient(180deg, #e6ecff 0%, #f6f2ff 55%, #9aa4cf 55%, #6d76a6 100%); }
     .scene.farm   { background: linear-gradient(180deg, #bfe9ff 0%, #e8f7ff 52%, #9bd97f 52%, #5fa845 100%); }
     .scene.well   { background: linear-gradient(180deg, #3f4a7a 0%, #6b76ad 50%, #4a5382 50%, #2c3358 100%); }
     .scene.pool   { background: linear-gradient(180deg, #ffe6fb 0%, #e5f6ff 50%, #8fe4ff 50%, #4bb8e8 100%); }
@@ -81,9 +79,11 @@
       pointer-events: none; user-select: none;
       filter: drop-shadow(0 3px 4px rgba(0,0,0,0.15));
     }
+    /* The room's name sits ABOVE the scenery: a view with something in the
+       top-left corner must never make the label unreadable. */
     .scene .place-tag {
       position: absolute; left: 10px; top: 8px; font-weight: bold; font-size: 0.85rem;
-      background: rgba(255,255,255,0.85); color: var(--ink);
+      background: rgba(255,255,255,0.9); color: var(--ink); z-index: 2;
       border-radius: 999px; padding: 0.15rem 0.65rem; pointer-events: none;
     }
     .scene.well .place-tag, .scene.arena .place-tag { background: rgba(255,255,255,0.9); }
@@ -245,6 +245,29 @@
     .item .own { font-size: 0.72rem; color: #6a6385; }
     .item .what { font-size: 0.68rem; color: #6a6385; line-height: 1.2; opacity: 0.9; }
     .item .brushdot { width: 34px; height: 34px; border-radius: 10px; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    /* A wall or a floor is a colour, not an emoji: show the actual paint. */
+    .item .paintchip {
+      width: 100%; height: 40px; border-radius: 11px; border: 3px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+    /* The home you live in / the wall you are using. */
+    .item.here { border-color: var(--green); background: #f1fff6; }
+    /* Something only YOUR market is selling today. */
+    .item.rare { border-color: #ffc93d; background: #fffaef; }
+    .item.rare .nm::after { content: " 🌟"; }
+
+    /* --- the little row of tabs inside the House panel --- */
+    .subnav { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.8rem 0 0; }
+    .subnav button {
+      font-family: var(--font); font-weight: bold; font-size: 0.88rem;
+      border: 3px solid #dfd6ff; background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer;
+      touch-action: manipulation; min-height: 42px;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+    .subnav button:hover { transform: translateY(-2px); }
+    .subnav button.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+    .subnav button:focus-visible { outline: 4px solid #2b2440; outline-offset: 3px; }
 
     /* --- big friendly action buttons --- */
     .acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem; }
