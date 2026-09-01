@@ -1152,6 +1152,31 @@ const GAMES = {
     const today = await page.evaluate(() => Craepets.state().today);
     if (!today.play || !today.wash) throw new Error("playing and washing were not tracked");
 
+    // ---- THE WISH: the pet asks for one thing; giving it exactly that pays
+    await page.evaluate(() => {
+      const S = Craepets.state();
+      S.bag.blueberry = (S.bag.blueberry || 0) + 1;
+      S.pet.hunger = 40;
+      Craepets._setWish({ kind: "food", id: "blueberry", at: Date.now(), day: CPData.dayNumber(), done: false });
+    });
+    if (!/Blueberry/.test(await page.locator(".wish").textContent())) throw new Error("the nest does not show the wish");
+    // (the pet may already have wished for something the steps above happened to grant)
+    const wishes0 = await page.evaluate(() => Craepets.state().today.wishes || 0);
+    const wishCoins = await page.evaluate(() => Craepets.state().coins);
+    await page.locator('[data-do="feed"]').click();
+    await page.waitForSelector('.sheet [data-use="blueberry"]');
+    await page.locator('.sheet [data-use="blueberry"]').click();
+    await page.waitForTimeout(200);
+    const wished = await page.evaluate(() => ({ done: Craepets.wish().done, n: Craepets.state().today.wishes, coins: Craepets.state().coins }));
+    if (!wished.done || wished.n !== wishes0 + 1 || wished.coins <= wishCoins) throw new Error("granting the wish did not pay out");
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "💭")))) throw new Error("a granted wish was not written in the diary");
+    // an action wish, too: "will you play with me?"
+    await page.evaluate(() => Craepets._setWish({ kind: "act", id: "play", at: Date.now(), day: CPData.dayNumber(), done: false }));
+    await page.locator('[data-do="play"]').click();
+    await page.locator('[data-use="romp"]').click();
+    await page.waitForTimeout(150);
+    if (await page.evaluate(() => Craepets.state().today.wishes) !== wishes0 + 2) throw new Error("a play wish was not granted by playing");
+
     // a whole arena duel, answered correctly, is a win
     await page.locator('[data-go="arena"]').click();
     await page.locator('[data-fight="pip"]').click();
@@ -1316,6 +1341,72 @@ const GAMES = {
       throw new Error("repainting from the bag did nothing");
     }
 
+    // ---- THE WARDROBE: the Market sells a hat, the shop offers to put it
+    // straight on, and the pet is then drawn wearing it everywhere
+    const wearArt = await page.evaluate(() => {
+      const bad = [];
+      CPPets.SPECIES.forEach((sp) => CPPets.WEAR.forEach((w) => {
+        const wear = {}; wear[w.slot] = w.id;
+        const plain = CPPets.chip(sp.id, "berry", 48, {}, 1), on = CPPets.chip(sp.id, "berry", 48, wear, 1);
+        if (plain === on) bad.push(sp.id + "/" + w.id);
+      }));
+      return { bad, n: CPPets.WEAR.length };
+    });
+    if (wearArt.bad.length) throw new Error(`clothes that draw nothing: ${wearArt.bad.slice(0, 3).join(", ")}`);
+    await page.locator('[data-go="market"]').click();
+    const wearOnShelf = await page.evaluate(() => CPData.shopStock(null, Craepets.who()).filter((i) => i.kind === "wear").map((i) => i.id));
+    if (wearOnShelf.length < 1) throw new Error("the market has no dress-up shelf");
+    await page.locator(`[data-buy="${wearOnShelf[0]}"]`).click();
+    if (await page.locator("[data-change]").count()) {
+      await page.locator(`[data-change="${await page.evaluate(() => Craepets.changeIndex())}"]`).click();
+    }
+    await page.waitForSelector('[data-use^="wear:"]');
+    await page.locator('[data-use^="wear:"]').click();
+    await page.waitForTimeout(200);
+    const worn = await page.evaluate((id) => {
+      const it = CPPets.wearById(id), S = Craepets.state();
+      return { on: S.pet.wear[it.slot] === id, owned: S.wardrobe.indexOf(id) !== -1, dressed: S.today.dressed };
+    }, wearOnShelf[0]);
+    if (!worn.owned || !worn.on || !worn.dressed) throw new Error("a bought hat was not put on");
+    if (await page.locator(".sheet").count()) await page.locator(".sheet .close").click();
+    // …and the shop will not sell it twice
+    if (!(await page.locator(`[data-buy="${wearOnShelf[0]}"][disabled]`).count())) throw new Error("the market would sell the same hat twice");
+    // the Dress button at the nest opens the wardrobe, and things come off again
+    await page.locator('[data-go="nest"]').click();
+    await page.locator('[data-do="dress"]').click();
+    await page.waitForSelector('.sheet [data-use^="unwear:"]');
+    await page.locator('.sheet [data-use^="unwear:"]').first().click();
+    await page.waitForTimeout(150);
+    if (await page.evaluate((id) => Craepets.state().pet.wear[CPPets.wearById(id).slot], wearOnShelf[0])) throw new Error("a hat could not be taken off");
+    await page.locator('.sheet [data-use^="wear:"]').first().click();
+    await page.waitForTimeout(150);
+    await page.locator(".sheet .close").click();
+
+    // ---- THE CLOCK: after dark the window fills with stars and the room dims
+    await page.evaluate(() => Craepets._setHour(22));
+    await page.waitForTimeout(100);
+    if (await page.evaluate(() => Craepets.timeOfDay()) !== "night") throw new Error("10pm is not night");
+    if (!(await page.locator(".scene.tod-night .win .tod-night").count())) throw new Error("no stars in the window at night");
+    if (!(await page.locator(".scene .roomtint").count())) throw new Error("the room does not dim at night");
+    await page.evaluate(() => Craepets._setHour(12));
+    await page.waitForTimeout(100);
+    if (await page.locator(".scene .tod, .scene .roomtint").count()) throw new Error("it is still dark at noon");
+    await page.evaluate(() => Craepets._setHour(null));
+
+    // ---- THE DIARY: the pet has been writing, and you can write too
+    await page.locator('[data-go="diary"]').click();
+    await page.waitForSelector(".entry");
+    const diaryBefore = await page.evaluate(() => Craepets.diary().length);
+    if (diaryBefore < 3) throw new Error("the diary is nearly empty after all that");
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🥚")))) throw new Error("hatching was not written down");
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "👒")))) throw new Error("dressing up was not written down");
+    await page.fill("#diary-input", "Today we beat Pip.");
+    await page.locator("#diary-go").click();
+    await page.waitForTimeout(150);
+    const diaryNow = await page.evaluate(() => Craepets.diary());
+    if (diaryNow.length !== diaryBefore + 1 || !diaryNow[diaryNow.length - 1].me) throw new Error("writing in the diary did not add an entry");
+    if (await page.locator(".entry.mine").count() !== 1) throw new Error("the player's own entry is not marked");
+
     // ---- your own house: buy furniture, put it out, move somewhere bigger
     await page.evaluate(() => Craepets.grant(5000));
     await page.locator('[data-go="home"]').click();
@@ -1428,12 +1519,42 @@ const GAMES = {
     if (hisAfter.stats.sold !== 1) throw new Error("the sale was not written into the seller's save");
     if (!hisAfter.stall.sales.length) throw new Error("the seller got no receipt");
 
+    // ---- THE POST: Shannon posts Cory a present with a note, out of her bag
+    await page.evaluate(() => { const S = Craepets.state(); S.bag.cookie = (S.bag.cookie || 0) + 1; });
+    await page.locator('[data-go="case"]').click();
+    await page.locator('[data-post="cory"]').click();
+    await page.waitForSelector('.sheet [data-postpick="cookie"]');
+    await page.locator('.sheet [data-postpick="cookie"]').click();
+    await page.waitForSelector("[data-postsend]");
+    await page.locator('[data-postnote="2"]').click();
+    await page.waitForSelector("[data-postsend]");
+    await page.locator("[data-postsend]").click();
+    await page.waitForTimeout(200);
+    const posted = await page.evaluate(() => ({ bag: Craepets.state().bag.cookie || 0, gifts: Craepets.state().stats.gifts,
+      his: JSON.parse(localStorage.getItem("craepets.v1.cory")).mail }));
+    if (posted.bag !== 0) throw new Error("the posted cookie stayed in the sender's bag");
+    if (posted.gifts !== 1) throw new Error("posting was not counted");
+    if (!posted.his || posted.his.length !== 1 || posted.his[0].id !== "cookie" || posted.his[0].from !== "shannon") {
+      throw new Error("the parcel did not land in Cory's post");
+    }
+    if (!/best/.test(posted.his[0].note)) throw new Error("the chosen note was not sent");
+
     // ...and Cory's pet is exactly where he left it
     await page.locator("[data-swap]").click();
     await page.locator('[data-who="cory"]').click();
     await page.waitForTimeout(200);
     const cory = await page.evaluate(() => Craepets.state());
     if (!cory.pet || cory.pet.name !== "Wobble") throw new Error("switching profiles lost Cory's pet");
+    // …with Shannon's parcel waiting at the nest, and the cookie inside it
+    if (!(await page.locator('[data-go="nest"] .dot').count())) throw new Error("the nest tab does not flag the post");
+    await page.waitForSelector("[data-openpost]");
+    const cookies0 = cory.bag.cookie || 0;
+    await page.locator("[data-openpost]").click();
+    await page.waitForSelector(".sheet");
+    const opened = await page.evaluate(() => ({ mail: Craepets.mail().length, cookie: Craepets.state().bag.cookie || 0,
+      wrote: Craepets.diary().some((e) => e.e === "📬"), got: Craepets.state().stats.received }));
+    if (opened.mail !== 0 || opened.cookie !== cookies0 + 1 || !opened.wrote || opened.got !== 1) throw new Error("opening the post did not hand over the cookie");
+    await page.locator(".sheet .close").click();
     // he sees the receipt waiting for him
     await page.locator('[data-go="stall"]').click();
     await page.waitForSelector("[data-clearsales]");
@@ -1490,7 +1611,10 @@ const GAMES = {
       "climbed to The Shade (snack, criticals, trick, phase 2, loot, Gold rank); " +
       "paint brushes repaint; a house bought, furnished & seen in the nest; the " +
       "prize wheel spins once a day; a shop stocked at your own price and Shannon " +
-      "buying from it pays Cory; quests, trophies, separate saves for Shannon, " +
+      "buying from it pays Cory; a food wish and a play wish granted; " +
+      `${wearArt.n} things to wear all draw on all 7 creatures, a bought hat goes on and comes off; ` +
+      "stars in the window at 10pm; the diary fills up and takes an entry; Shannon posts Cory a " +
+      "cookie and he opens it; quests, trophies, separate saves for Shannon, " +
       `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;
   },
 

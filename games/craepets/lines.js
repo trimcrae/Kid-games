@@ -319,6 +319,15 @@ window.CPLines = (function () {
   add("m-favourite", "My favourite!");
   add("m-look-at-me", "Look at me!");
   add("m-home-sweet-home", "Home sweet home!");
+  /* --- wishes, the wardrobe and the post --- */
+  add("w-granted", "You granted my wish! Thank you!");
+  add("w-new", "I have a new wish. Can you guess what it is?");
+  add("w-all-done", "That is all my wishes for today. You are the best.");
+  add("m-dress-up", "Look at me! Do you like it?");
+  add("post-arrived", "You have post! Somebody sent you a present.");
+  add("post-open", "Let's open it!");
+  add("post-sent", "Your present is on its way.");
+  add("diary-intro", "Here is what I wrote in my diary.");
 
   /* --- the prize wheel --- */
   ["Ten coins.", "Forty coins!", "A snack and fifteen coins!", "Twenty coins.",

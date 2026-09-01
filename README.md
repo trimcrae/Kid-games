@@ -56,6 +56,13 @@ no logins.
 > army to The Shade himself, and the little levels are **read aloud in a real
 > storyteller's voice** — every line is in `games/craepets/lines.js` and
 > rendered by the audio pipeline in `tools/`.
+> The pet is also a *pet*: **dress it up** in pixel hats, glasses and scarves
+> (drawn straight onto the sprite, so it wears them in the arena and on the
+> family board), **grant its wishes** ("I'd love a blueberry!" — read it, do
+> it, get paid), **read the diary** it writes about its day and write in it
+> yourself, **post presents** with a note to anyone else in the family, and
+> watch the window fill with stars after dark — the valley follows the real
+> clock.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times

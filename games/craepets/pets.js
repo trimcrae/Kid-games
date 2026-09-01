@@ -355,6 +355,213 @@ window.CPPets = (function () {
   }
 
   /* =========================================================
+     THE WARDROBE — hats, glasses and scarves the pet WEARS.
+
+     Bought once at the Market and kept for ever, like a paint
+     brush, and drawn straight onto the creature everywhere it
+     appears: the nest, the arena, the family board, the little
+     chip next to your name. Three slots — head, face, neck —
+     so a Craepet can be in a wizard hat, heart glasses and a
+     scarf all at once, which is exactly what a three-year-old
+     will do.
+
+     Head things are pixel grids, anchored just above the eyes,
+     the same way the level-up tiara is. Face and neck things
+     are drawn from the creature's own grid instead — every
+     species has its eyes and its belly in a different place,
+     and glasses that miss the eyes are not glasses.
+     ========================================================= */
+  var WEAR = [
+    /* --- hats: the bottom row sits just above the eyes --- */
+    { id: "partyhat", name: "Party Hat", emoji: "🥳", cost: 40, slot: "head",
+      pal: { S: "#ffd863", P: "#ff5d8f", Y: "#ffd863", O: "#7a1f2c" },
+      grid: ["...S...", "..OPO..", "..OYO..", ".OPPPO.", ".OYYYO.", "OOOOOOO"] },
+    { id: "bow", name: "Big Bow", emoji: "🎀", cost: 30, slot: "head", dx: 3,
+      pal: { P: "#ff6ec7", p: "#e560ae", O: "#77234f" },
+      grid: ["OO...OO", "OPPOPPO", "OPPpPPO", "OPPOPPO", "OO...OO"] },
+    { id: "flowercrown", name: "Flower Crown", emoji: "🌸", cost: 45, slot: "head",
+      pal: { P: "#ff8fd0", Y: "#ffd863", G: "#3fb469" },
+      grid: ["P.Y.P.Y.P", "GGGGGGGGG", ".G.G.G.G."] },
+    { id: "beanie", name: "Bobble Hat", emoji: "🧢", cost: 35, slot: "head",
+      pal: { B: "#57c4ff", W: "#ffffff", O: "#14496b" },
+      grid: ["...OWO...", "..OBBBO..", ".OBBBBBO.", ".OBWBWBO.", "OBBBBBBBO"] },
+    { id: "chef", name: "Chef's Hat", emoji: "👨‍🍳", cost: 50, slot: "head",
+      pal: { W: "#ffffff", O: "#8a8fa8" },
+      grid: [".OWWWWWO.", "OWWWWWWWO", "OWWWWWWWO", ".OWWWWWO.", ".OOOOOOO."] },
+    { id: "helmet", name: "Miner's Helmet", emoji: "⛏️", cost: 60, slot: "head",
+      pal: { Y: "#ffd166", W: "#ffffff", O: "#6d4a06" },
+      grid: ["...OOO...", "..OYYYO..", ".OYYWYYO.", ".OYYYYYO.", "OYYYYYYYO"] },
+    { id: "cowboy", name: "Cowboy Hat", emoji: "🤠", cost: 60, slot: "head",
+      pal: { C: "#c99a6b", D: "#7a4a1f", O: "#4a3018" },
+      grid: ["...OOOOO...", "...OCCCO...", "...OCCCO...", "OOOOCDCOOOO", "OCCCCCCCCCO", ".OOOOOOOOO."] },
+    { id: "tophat", name: "Top Hat", emoji: "🎩", cost: 70, slot: "head",
+      pal: { K: "#2b2440", R: "#ff5d6c", O: "#111018" },
+      grid: [".OOOOO.", ".OKKKO.", ".OKKKO.", ".ORRRO.", "OOOOOOO"] },
+    { id: "bunnyears", name: "Bunny Ears", emoji: "🐰", cost: 45, slot: "head",
+      pal: { W: "#ffffff", P: "#ffb3d9", O: "#7a5a6a" },
+      grid: ["OWO.....OWO", "OWPO...OPWO", "OWPO...OPWO", "OWPO...OPWO", ".OWO...OWO.", "..OOOOOOO.."] },
+    { id: "pirate", name: "Pirate Hat", emoji: "🏴‍☠️", cost: 80, slot: "head",
+      pal: { K: "#2b2440", W: "#ffffff", O: "#111018" },
+      grid: ["O.........O", "OKO.....OKO", ".OKKKWKKKO.", ".OKKWWWKKO.", "OOOOOOOOOOO"] },
+    { id: "wizard", name: "Wizard Hat", emoji: "🧙", cost: 90, slot: "head",
+      pal: { B: "#5b3fa8", S: "#ffd863", O: "#2b1a5e" },
+      grid: ["....OO...", "...OBBO..", "...OBSO..", "..OBBBBO.", "..OSBBBO.", "OBBBBBBBO"] },
+    { id: "princess", name: "Princess Tiara", emoji: "👸", cost: 120, slot: "head",
+      pal: { P: "#ff8fd0", G: "#9bf6ff", O: "#77234f" },
+      grid: ["P...P...P", "OP.OPO.PO", "OPPPPPPPO", ".OGOGOGO."] },
+    { id: "halo", name: "Golden Halo", emoji: "😇", cost: 150, slot: "head", dy: 1, rare: true,
+      pal: { Y: "#ffe27a", O: "#d9a300" },
+      grid: [".OYYYYYO.", "OY.....YO", ".OYYYYYO."] },
+    { id: "starcrown", name: "Crown of Stars", emoji: "🌟", cost: 200, slot: "head", rare: true,
+      pal: { S: "#ffe27a", Y: "#ffd166", O: "#6d4a06" },
+      grid: ["S...S...S", "OSOOSOOSO", "OYYYYYYYO", ".OOOOOOO."] },
+
+    /* --- glasses: drawn around wherever THIS creature's eyes are --- */
+    { id: "glasses", name: "Round Glasses", emoji: "👓", cost: 40, slot: "face", style: "round", colour: "#2b2440" },
+    { id: "sunglasses", name: "Sunglasses", emoji: "🕶️", cost: 55, slot: "face", style: "shades", colour: "#111018", lens: "#241f36" },
+    { id: "heartglasses", name: "Heart Glasses", emoji: "💕", cost: 60, slot: "face", style: "round", colour: "#ff5d8f" },
+    { id: "starglasses", name: "Star Glasses", emoji: "🤩", cost: 90, slot: "face", style: "round", colour: "#ffd166", rare: true },
+
+    /* --- round the neck: drawn across the top of the belly --- */
+    { id: "scarf", name: "Cosy Scarf", emoji: "🧣", cost: 35, slot: "neck", style: "scarf", colour: "#ff5d6c", dark: "#b8323f" },
+    { id: "bluescarf", name: "Sky Scarf", emoji: "🧣", cost: 35, slot: "neck", style: "scarf", colour: "#57c4ff", dark: "#2f9fe0" },
+    { id: "bowtie", name: "Bow Tie", emoji: "🎀", cost: 45, slot: "neck", style: "bowtie", colour: "#8a5cff", dark: "#5b3fa8" },
+    { id: "pearls", name: "Pearl Necklace", emoji: "📿", cost: 60, slot: "neck", style: "pearls", colour: "#fff6f0", dark: "#c9c0d6" },
+    { id: "medal", name: "Gold Medal", emoji: "🏅", cost: 80, slot: "neck", style: "medal", colour: "#ffd166", dark: "#ff5d6c" }
+  ];
+  var SLOTS = ["head", "face", "neck"];
+
+  function wearById(id) {
+    for (var i = 0; i < WEAR.length; i++) if (WEAR[i].id === id) return WEAR[i];
+    return null;
+  }
+
+  function hatSprite(item, scale) {
+    var key = "wear|" + item.id + "|" + scale;
+    if (cache[key]) return cache[key];
+    var cv = bake(item.grid, item.pal, scale);
+    cache[key] = cv;
+    return cv;
+  }
+
+  /* Where the eyes are on this creature: the row they start on and the
+     first column of each eye, read off the grid. */
+  function eyeSpots(sp) {
+    var row = eyeTop(sp), line = sp.grid[row] || "";
+    var runs = [], inRun = false;
+    for (var x = 0; x < line.length; x++) {
+      if (line[x] === "W" && !inRun) { runs.push(x); inRun = true; }
+      if (line[x] !== "W") inRun = false;
+    }
+    return { row: row, eyes: runs };
+  }
+  /* The top of the belly: the first accent row under the mouth. That is
+     where a scarf goes on every creature, whatever shape it is. */
+  function bellyTop(sp) {
+    var g = sp.grid, lastMouth = rowOf(g, /M/, true);
+    for (var i = lastMouth + 1; i < g.length; i++) if (/A/.test(g[i])) return i;
+    return lastMouth + 1;
+  }
+  /* The body's left and right edge on one row, inside the outline. */
+  function bodySpan(sp, row) {
+    var line = sp.grid[row] || "";
+    var l = -1, r = -1;
+    for (var x = 0; x < line.length; x++) {
+      if (line[x] !== ".") { if (l < 0) l = x; r = x; }
+    }
+    return l < 0 ? null : { l: l + 1, r: r - 1 };
+  }
+
+  function px(g, x, y, s, col) {
+    g.fillStyle = col;
+    g.fillRect(Math.round(x), Math.round(y), s, s);
+  }
+
+  function drawFace(g, sp, item, ox, oy, s) {
+    var e = eyeSpots(sp);
+    if (!e.eyes.length) return;
+    var col = item.colour;
+    e.eyes.forEach(function (ex) {
+      // a ring one pixel outside the 3×3 eye
+      for (var dx = -1; dx <= 3; dx++) {
+        px(g, ox + (ex + dx) * s, oy + (e.row - 1) * s, s, col);
+        px(g, ox + (ex + dx) * s, oy + (e.row + 3) * s, s, col);
+      }
+      for (var dy = 0; dy <= 2; dy++) {
+        px(g, ox + (ex - 1) * s, oy + (e.row + dy) * s, s, col);
+        px(g, ox + (ex + 3) * s, oy + (e.row + dy) * s, s, col);
+      }
+      if (item.style === "shades") {
+        for (var yy = 0; yy <= 2; yy++) for (var xx = 0; xx <= 2; xx++) {
+          px(g, ox + (ex + xx) * s, oy + (e.row + yy) * s, s, item.lens);
+        }
+        px(g, ox + ex * s, oy + e.row * s, s, "#8f88b0");   // a glint
+      }
+    });
+    // the bridge between the two lenses
+    if (e.eyes.length >= 2) {
+      var a = e.eyes[0] + 4, b = e.eyes[e.eyes.length - 1] - 2;
+      for (var bx = a; bx <= b; bx++) px(g, ox + bx * s, oy + (e.row + 1) * s, s, col);
+    }
+  }
+
+  function drawNeck(g, sp, item, ox, oy, s) {
+    var row = bellyTop(sp), span = bodySpan(sp, row);
+    if (!span) return;
+    var mid = Math.floor((span.l + span.r) / 2);
+    var x;
+    if (item.style === "scarf") {
+      for (x = span.l; x <= span.r; x++) px(g, ox + x * s, oy + row * s, s, (x % 3 === 1) ? item.dark : item.colour);
+      // a tail hanging down on one side
+      px(g, ox + (span.l + 1) * s, oy + (row + 1) * s, s, item.colour);
+      px(g, ox + (span.l + 1) * s, oy + (row + 2) * s, s, item.dark);
+      px(g, ox + (span.l + 2) * s, oy + (row + 1) * s, s, item.dark);
+    } else if (item.style === "bowtie") {
+      var bt = ["PP.PP", "PPDPP", "PP.PP"];
+      for (var yy = 0; yy < 3; yy++) for (var xx = 0; xx < 5; xx++) {
+        var ch = bt[yy][xx];
+        if (ch === ".") continue;
+        px(g, ox + (mid - 2 + xx) * s, oy + (row + yy) * s, s, ch === "D" ? item.dark : item.colour);
+      }
+    } else if (item.style === "pearls") {
+      for (x = span.l; x <= span.r; x++) {
+        var lift = (x === span.l || x === span.r) ? -1 : 0;   // a gentle curve
+        px(g, ox + x * s, oy + (row + lift) * s, s, (x % 2) ? item.colour : item.dark);
+      }
+    } else if (item.style === "medal") {
+      for (x = span.l; x <= span.r; x++) px(g, ox + x * s, oy + row * s, s, item.dark);
+      var md = [".YY.", "YYYY", "YYYY", ".YY."];
+      for (var my = 0; my < 4; my++) for (var mx = 0; mx < 4; mx++) {
+        if (md[my][mx] === "Y") px(g, ox + (mid - 1 + mx) * s, oy + (row + 1 + my) * s, s, item.colour);
+      }
+      px(g, ox + mid * s, oy + (row + 2) * s, s, "#fff3c4");
+    }
+  }
+
+  /* Everything the pet has on, drawn over the body. `wear` is
+     {head, face, neck} of item ids (any may be empty); `level` decides
+     the free tiara / crown that shows when nothing is on the head. */
+  function drawWear(g, sp, ox, oy, scale, wear, level) {
+    wear = wear || {};
+    var head = wear.head && wearById(wear.head);
+    if (head && head.grid) {
+      var hs = hatSprite(head, scale);
+      g.drawImage(hs,
+        Math.round(ox + (8 + (head.dx || 0)) * scale - hs.width / 2),
+        Math.round(oy + (eyeTop(sp) - (head.dy || 0)) * scale - hs.height));
+    } else if ((level || 1) >= 5) {
+      var acc = accessory(level >= 12 ? "crown" : "tiara", scale);
+      g.drawImage(acc,
+        Math.round(ox + 8 * scale - acc.width / 2),
+        Math.round(oy + eyeTop(sp) * scale - acc.height));
+    }
+    var face = wear.face && wearById(wear.face);
+    if (face) drawFace(g, sp, face, ox, oy, scale);
+    var neck = wear.neck && wearById(wear.neck);
+    if (neck) drawNeck(g, sp, neck, ox, oy, scale);
+  }
+
+  /* =========================================================
      DRAWING a pet into a canvas the page owns.
      opts: { frame, level, scale, bob }
      ========================================================= */
@@ -381,16 +588,18 @@ window.CPPets = (function () {
 
     g.drawImage(body, x, y);
 
-    var level = opts.level || 1;
-    var sp = species(speciesId);
-    if (level >= 5) {
-      // level 5 earns a scarf; level 12 swaps it for a crown
-      var acc = accessory(level >= 12 ? "crown" : "tiara", scale);
-      g.drawImage(acc,
-        Math.round(x + 8 * scale - acc.width / 2),
-        Math.round(y + eyeTop(sp) * scale - acc.height));
-    }
+    // level 5 earns a tiara and level 12 a crown — unless a hat from the
+    // wardrobe is on, which sits in the same place
+    drawWear(g, species(speciesId), x, y, scale, opts.wear, opts.level || 1);
     return { x: x, y: y, w: body.width, h: body.height, scale: scale };
+  }
+
+  /* How many rows of headroom a chip needs, so a hat is not cropped. */
+  function headroom(sp, wear, level) {
+    var head = wear && wear.head && wearById(wear.head);
+    if (head && head.grid) return Math.max(0, head.grid.length + (head.dy || 0) - eyeTop(sp));
+    if ((level || 1) >= 5) return Math.max(0, (level >= 12 ? 4 : 3) - eyeTop(sp));
+    return 0;
   }
 
   /* Anchors read straight off the grid: the crown sits just above the
@@ -406,24 +615,30 @@ window.CPPets = (function () {
   function eyeTop(sp) { var r = rowOf(sp.grid, /W/, false); return r < 0 ? 4 : r; }
 
   /* A small square face for chips, buttons and the family board. */
-  function chip(speciesId, colourId, px) {
-    px = px || 48;
-    var scale = Math.max(1, Math.round(px / 16));
+  function chip(speciesId, colourId, pxSize, wear, level) {
+    pxSize = pxSize || 48;
+    var scale = Math.max(1, Math.round(pxSize / 16));
+    var sp = species(speciesId);
     var body = sprite(speciesId, colourId, "idle", scale);
+    var top = headroom(sp, wear, level) * scale;
     var cv = document.createElement("canvas");
     cv.width = body.width;
-    cv.height = body.height;
+    cv.height = body.height + top;
     var g = cv.getContext("2d");
     g.imageSmoothingEnabled = false;
-    g.drawImage(body, 0, 0);
+    g.drawImage(body, 0, top);
+    drawWear(g, sp, 0, top, scale, wear, level || 1);
     return cv.toDataURL();
   }
 
   return {
     SPECIES: SPECIES,
     COLOURS: COLOURS,
+    WEAR: WEAR,
+    SLOTS: SLOTS,
     species: species,
     colour: colour,
+    wearById: wearById,
     sprite: sprite,
     draw: draw,
     chip: chip

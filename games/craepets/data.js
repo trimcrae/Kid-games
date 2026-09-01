@@ -2331,8 +2331,13 @@ window.CPData = (function () {
 
   function isRare(it) { return !!(it && it.rare); }
   function notRare(it) { return !it.rare; }
+  /* The wardrobe — hats, glasses and scarves — is drawn by pets.js, so
+     the list lives there next to the pixels. It is stocked and bought
+     here like anything else. */
+  function WEAR() { return (window.CPPets && window.CPPets.WEAR) || []; }
+
   function rarePool() {
-    return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE).filter(function (it) { return isRare(it) && !it.loot; });
+    return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR()).filter(function (it) { return isRare(it) && !it.loot; });
   }
   /* The Shade's own furniture, in the order he gives it up. */
   function hoard() { return FURNITURE.filter(function (f) { return f.loot; }); }
@@ -2405,12 +2410,14 @@ window.CPData = (function () {
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 60 && notRare(f); }), 4, day * 7 + 8).map(tag("decor")))
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 60 && f.cost <= 150 && notRare(f); }), 5, day * 7 + 9).map(tag("decor")))
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 150 && notRare(f); }), 4, day * 7 + 11).map(tag("decor")))
+      // Something to WEAR: a hat, a pair of glasses or a scarf, three a day.
+      .concat(seededPick(WEAR().filter(notRare), 3, day * 7 + 12).map(tag("wear")))
       .concat(seededPick(brushes, 3, day * 7 + 6));
   }
   function tag(kind) { return function (it) { var c = {}; for (var k in it) c[k] = it[k]; c.kind = kind; return c; }; }
 
   function itemById(id) {
-    var all = FOODS.concat(TOYS, CARE, BOOKS, FURNITURE);
+    var all = FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR());
     for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
     if (id.indexOf("brush:") === 0 && window.CPPets) {
       var c = window.CPPets.colour(id.slice(6));
@@ -2425,6 +2432,7 @@ window.CPData = (function () {
     if (CARE.some(function (f) { return f.id === id; })) return "care";
     if (BOOKS.some(function (f) { return f.id === id; })) return "book";
     if (FURNITURE.some(function (f) { return f.id === id; })) return "decor";
+    if (WEAR().some(function (f) { return f.id === id; })) return "wear";
     return "thing";
   }
 
@@ -2463,7 +2471,11 @@ window.CPData = (function () {
     { id: "crit1",   track: "crit",    goal: 1, coins: 55, text: "Land a charged critical hit in the Arena" },
     { id: "quick5",  track: "quick",   goal: 5, coins: 60, text: "Answer 5 Arena questions quickly" },
     { id: "heat1",   track: "heat",    goal: 1, coins: 50, text: "Turn the heat up a rung anywhere" },
-    { id: "stepup1", track: "stepup",  goal: 1, coins: 65, text: "Get a step-up question right" }
+    { id: "stepup1", track: "stepup",  goal: 1, coins: 65, text: "Get a step-up question right" },
+    { id: "wish1",   track: "wishes",  goal: 1, coins: 40, text: "Grant your Craepet a wish" },
+    { id: "wish2",   track: "wishes",  goal: 2, coins: 75, text: "Grant your Craepet 2 wishes" },
+    { id: "dress1",  track: "dressed", goal: 1, coins: 35, text: "Dress your Craepet up in something" },
+    { id: "post1",   track: "gifts",   goal: 1, coins: 50, text: "Post a present to somebody in the family" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
@@ -2599,7 +2611,12 @@ window.CPData = (function () {
     { id: "onfire",   emoji: "🔥", name: "On Fire",        note: "Turn the heat all the way up" },
     { id: "stepup",   emoji: "⬆️", name: "Step Up",        note: "Get a question from the level above right" },
     { id: "quick25",  emoji: "🏃", name: "Quick Draw",     note: "25 quick answers in the Arena" },
-    { id: "ally",     emoji: "🤝", name: "Better Together", note: "Win a tower fight with a family Craepet beside you" }
+    { id: "ally",     emoji: "🤝", name: "Better Together", note: "Win a tower fight with a family Craepet beside you" },
+    { id: "dressed",  emoji: "👒", name: "Dressed Up",      note: "Put something from the wardrobe on" },
+    { id: "wardrobe", emoji: "🎩", name: "Fashion Icon",    note: "Own 6 things to wear" },
+    { id: "wish10",   emoji: "💭", name: "Wish Granter",    note: "Grant 10 of your Craepet's wishes" },
+    { id: "postie",   emoji: "🎁", name: "Kind Heart",      note: "Post 5 presents to the family" },
+    { id: "scribe",   emoji: "📔", name: "Diary Keeper",    note: "Write 5 diary entries yourself" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -2642,6 +2659,7 @@ window.CPData = (function () {
     BOOKS: BOOKS,
     FURNITURE: FURNITURE,
     FURNITURE_SETS: FURNITURE_SETS,
+    WEAR: WEAR,
     HOUSES: HOUSES,
     WALLS: WALLS,
     FLOORS: FLOORS,
