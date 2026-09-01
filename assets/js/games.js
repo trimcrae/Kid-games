@@ -24,7 +24,7 @@ const GAMES = [
   {
     title: "Craepets",
     emoji: "🥚",
-    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, questions you get wrong come back until you fix them, and everyone in the family gets their own pet. Now with 37 homes to buy and keep — treehouse, igloo, pirate cove, dragon keep, a castle on Mars — 130 pieces of furniture and a wall, floor and view for every room. Every Market shelf is different, and the rare finds each morning go to one person only, so your own shop is the only place the rest of the family can get them.",
+    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, and the game now REMEMBERS every question it has asked you: it hunts for one you have never seen, and the card tells you outright whether it is brand new or a repeat. Over 700 hand-written questions plus endless generated sums. 37 homes to buy and keep — treehouse, igloo, pirate cove, dragon keep, a castle on Mars — 200+ pieces of furniture in 25 themed sets, and a painted view out of every window: real moons over the Mars castle, an aurora over the igloo, a coral reef through a porthole. Every Market shelf is different, and the rare finds each morning go to one person only.",
     url:   "games/craepets/",
     ages:  "2+",
     kids:  ["jeannie","cory","ellie","kieran","shannon"],
