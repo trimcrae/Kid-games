@@ -9,7 +9,7 @@
 
        CPMap.svg({ here, homes: [{id, name, colour, chip, mine}] })
 
-   The markers carry the same data-go / data-visit attributes
+   The markers carry the same data-goto / data-visit attributes
    as the nav buttons, so the engine's one click handler does
    the rest.
    =========================================================== */
@@ -80,14 +80,14 @@ window.CPMap = (function () {
       '<ellipse cx="78" cy="41" rx="6" ry="2.2" fill="#8fe4ff"/>';
 
     PLACES.forEach(function (p) {
-      var attrs = 'data-go="' + p.go + '" data-map="' + p.id + '" role="button" tabindex="0" aria-label="Go to the ' + esc(p.label) + '"';
+      var attrs = 'data-goto="' + p.go + '" data-map="' + p.id + '" role="button" tabindex="0" aria-label="Go to the ' + esc(p.label) + '"';
       out += marker(p.x, p.y, p.emoji, p.label, attrs, (p.dark ? "dark " : "") + (here === p.id || (p.id === "tower" && false) ? "here" : ""));
     });
     // the family's houses along the lane
     homes.forEach(function (h, i) {
       var spot = HOME_SPOTS[i % HOME_SPOTS.length];
       var attrs = h.mine
-        ? 'data-go="nest" data-map="nest" role="button" tabindex="0" aria-label="Go home to ' + esc(h.name) + '"'
+        ? 'data-goto="nest" data-map="nest" role="button" tabindex="0" aria-label="Go home to ' + esc(h.name) + '"'
         : 'data-visit="' + esc(h.id) + '" role="button" tabindex="0" aria-label="Visit ' + esc(h.name) + '"';
       out += '<g class="mp home' + (h.mine ? " mine" : "") + (h.mine && here === "nest" ? " here" : "") + '" ' + attrs +
         ' transform="translate(' + spot[0] + " " + spot[1] + ')">' +

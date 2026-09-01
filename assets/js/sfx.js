@@ -55,6 +55,21 @@ window.SFX = (function () {
   }
 
   return {
+    /* A creature's voice: two or three quick notes around a base pitch.
+       `base` is the pitch in Hz, `type` the oscillator shape, so a low
+       square wave growls and a high sine chirps. */
+    voice(base, type) {
+      const b = base || 520, ty = type || "sine";
+      play([
+        { f: b, t: 0, d: 0.09, type: ty, g: 0.09 },
+        { f: b * 1.25, t: 0.08, d: 0.09, type: ty, g: 0.09 },
+        { f: b * (Math.random() < 0.5 ? 1.5 : 0.9), t: 0.17, d: 0.12, type: ty, g: 0.08 },
+      ]);
+    },
+    /* A soft knock, for tapping an egg. */
+    knock() { play([{ f: 300, t: 0, d: 0.07, type: "triangle", g: 0.12 }, { f: 240, t: 0.06, d: 0.09, type: "triangle", g: 0.1 }]); },
+    /* A crack. */
+    crack() { play([{ f: 1200, t: 0, d: 0.04, type: "square", g: 0.08 }, { f: 700, t: 0.03, d: 0.05, type: "square", g: 0.08 }, { f: 400, t: 0.07, d: 0.1, type: "triangle", g: 0.1 }]); },
     good() { play([{ f: 660, t: 0, d: 0.11 }, { f: 880, t: 0.08, d: 0.15 }]); },
     win() {
       play([

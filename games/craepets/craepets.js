@@ -343,6 +343,8 @@
 
   function passTime() {
     if (!S.pet) { S.lastTick = Date.now(); return; }
+    // an egg does not get hungry, bored or grubby — it just waits
+    if (S.pet.egg) { S.lastTick = Date.now(); rollDay(); return; }
     var now = Date.now();
     var hours = Math.max(0, (now - (S.lastTick || now)) / 3600000);
     if (hours > 72) hours = 72;                     // a long holiday is still just a nap
@@ -554,6 +556,7 @@
   }
 
   function moodFace() {
+    if (S.pet && S.pet.egg) return "🥚";
     return { great: "😄", good: "🙂", hungry: "😋", bored: "😕", tired: "😴", dirty: "😖" }[mood()];
   }
 
@@ -1267,7 +1270,7 @@
         rk.emoji + " " + esc(rk.name) + (fl ? " · floor " + fl + " of the tower." : ".") + "</p>" +
       '<div class="acts">' +
         '<button class="act" data-post="' + p.id + '" style="--ac:var(--pink)"><span class="em">🎁</span>Post ' + esc(p.name) + " a present</button>" +
-        '<button class="act" data-go="case" style="--ac:var(--purple)"><span class="em">🏠</span>Go home</button>' +
+        '<button class="act" data-goto="case" style="--ac:var(--purple)"><span class="em">🏠</span>Go home</button>' +
       "</div>" +
       (lines.length
         ? '<h3 style="margin:1rem 0 0.2rem;font-size:0.98rem">📔 From ' + esc(pet.name) + "'s diary</h3>" +
@@ -1331,7 +1334,8 @@
     // the star of the show
     var tmp = document.createElement("canvas");
     tmp.width = 220; tmp.height = 250;
-    P.draw(tmp, S.pet.species, S.pet.colour, { frame: "idle", level: level(), scale: 11, wear: S.pet.wear });
+    if (S.pet.egg) P.drawEgg(tmp, S.pet.colour, { scale: 11, crack: S.pet.egg.got >= 2 ? 2 : S.pet.egg.got >= 0.5 ? 1 : 0 });
+    else P.draw(tmp, S.pet.species, S.pet.colour, { frame: "idle", level: level(), scale: 11, wear: S.pet.wear });
     g.imageSmoothingEnabled = false;
     g.drawImage(tmp, Math.round(W / 2 - tmp.width / 2), H - tmp.height - 4);
     if (S.pet.petpet) {
@@ -1502,16 +1506,44 @@
      tx is where it has decided to wander to next; face is which way it
      is looking. They live outside the render so a redraw never makes
      the pet jump back to the middle. */
-  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0,
+  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0, wobble: 0,
                x: 0.5, tx: null, face: 1, wanderAt: 0, shadow: null };
 
   function levelOf(pet) { return Math.min(20, 1 + Math.floor(((pet && pet.xp) || 0) / 50)); }
+
+  /* The egg in the room: it sits in the middle, breathes a little, and
+     rocks when it is tapped or when a right answer cracks it. */
+  function drawEggScene(cv, pet) {
+    if (cv !== anim.cv || anim.measure) {
+      var rect = cv.getBoundingClientRect();
+      if (!rect.width) return;
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      cv.width = Math.round(rect.width * dpr);
+      cv.height = Math.round(rect.height * dpr);
+      anim.cv = cv;
+      anim.shadow = $("#scene .pet-shadow");
+      anim.measure = false;
+    }
+    var w = cv.width, h = cv.height;
+    if (!w || !h) return;
+    anim.t++;
+    anim.x = 0.5;
+    if (anim.shadow) anim.shadow.style.left = "50%";
+    var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * 0.9));
+    var tilt = 0;
+    if (anim.wobble > 0 && !calm) { tilt = Math.sin(anim.wobble / 2) * 0.16 * (anim.wobble / 24); anim.wobble--; }
+    else if (!calm && anim.t % 240 > 228) tilt = Math.sin(anim.t / 1.5) * 0.06;     // a twitch now and then
+    var crack = pet.egg.got >= 2 ? 2 : pet.egg.got >= 0.5 ? 1 : 0;
+    P.drawEgg(cv, pet.colour, { scale: scale, cx: Math.round(w / 2), tilt: tilt, crack: crack,
+                                bob: calm ? 0 : Math.round(Math.sin(anim.t / 30) * scale * 0.15) });
+  }
 
   function drawScene() {
     var cv = $("#pet-canvas");
     // in somebody else's house it is THEIR Craepet in the room
     var pet = (view === "visit" && visit) ? visit.s.pet : S.pet;
     if (!cv || !pet) return;
+    if (pet.egg) return drawEggScene(cv, pet);
     if (cv !== anim.cv || anim.measure) {
       var rect = cv.getBoundingClientRect();
       if (!rect.width) return;
@@ -1638,10 +1670,24 @@
     "</div>";
   }
 
-  var bubbleTimer = null;
+  var bubbleTimer = null, lastChirp = 0;
+  /* Every species has a voice of its own: a low growl for a Flarn, a
+     high chirp for a Glimmr. Two or three notes whenever it speaks. */
+  var VOICES = {
+    blorb: [440, "sine"], snorbit: [720, "triangle"], flarn: [200, "square"], twiggle: [600, "sine"],
+    puddlepop: [900, "triangle"], zibbit: [320, "square"], glimmr: [1150, "sine"]
+  };
+  function chirp(pet) {
+    pet = pet || S.pet;
+    if (!pet || pet.egg || Date.now() - lastChirp < 1200) return;
+    lastChirp = Date.now();
+    var v = VOICES[pet.species] || VOICES.blorb;
+    try { if (window.SFX && SFX.voice) SFX.voice(v[0], v[1]); } catch (e) {}
+  }
   /* The pet's speech bubble — and, given a token, its voice. */
   function say(text, ms, tok) {
     if (tok) narrate([tok]);
+    chirp((view === "visit" && visit) ? visit.s.pet : S.pet);
     var slotEl = $("#bubble-slot");
     if (!slotEl) return;
     slotEl.innerHTML = '<div class="bubble">' + esc(text) + "</div>";
@@ -1719,8 +1765,51 @@
   }
   /* A pet's face, with whatever it is wearing. */
   function chipOf(pet, px) {
+    if (pet.egg) return P.eggChip(pet.colour, px, pet.egg.got);
     var lv = Math.min(20, 1 + Math.floor((pet.xp || 0) / 50));
     return P.chip(pet.species, pet.colour, px, pet.wear, lv);
+  }
+
+  /* =========================================================
+     HATCHING — a Craepet starts as an egg.
+     Three right answers anywhere (or eight taps on the shell)
+     and it cracks open. It is the first minute of the game,
+     and the first thing the diary remembers.
+     ========================================================= */
+  var EGG_NEED = 3, EGG_TAPS = 8;
+  function eggProgress() {
+    var e = S.pet && S.pet.egg;
+    if (!e) return;
+    e.got++;
+    if (e.got >= e.need) hatch();
+    else { anim.wobble = 30; sfx("crack"); toast("🥚 The egg cracks a little… " + (e.need - e.got) + " to go!"); }
+  }
+  function tapEgg() {
+    var e = S.pet.egg;
+    e.taps++;
+    anim.wobble = 24;
+    sfx(e.taps >= EGG_TAPS - 2 ? "crack" : "knock");
+    if (e.taps >= EGG_TAPS) { hatch(); return; }
+    say(["*wobble*", "*tap tap*", "…?", "*wiggle*", "Something's in there!"][e.taps % 5], 1400);
+    // a crack shows at the halfway mark
+    if (e.taps === Math.ceil(EGG_TAPS / 2) && e.got < 1) e.got = 0.5;
+    save();
+  }
+  function hatch() {
+    if (!S.pet || !S.pet.egg) return;
+    delete S.pet.egg;
+    S.pet.born = Date.now();
+    anim.wobble = 0;
+    diary("🐣", "I hatched today! Out of a " + P.colour(S.pet.colour).name + " egg, and I'm a " + spec().name + ". " + D.profile(who).name + " called me " + S.pet.name + ".");
+    checkTrophies();
+    save();
+    render();
+    sfx("win");
+    hop();
+    hearts();
+    try { window.Confetti && Confetti.burst({ count: 140 }); } catch (e) {}
+    toast("🐣 " + S.pet.name + " hatched!");
+    say("Hi! I'm " + S.pet.name + "!", 3600, "p-hello");
   }
 
   function whoSheet() {
@@ -1760,6 +1849,12 @@
 
   function needsHtml() {
     var p = S.pet;
+    if (p.egg) {
+      var left = Math.max(0, p.egg.need - p.egg.got);
+      return '<div class="needs egg"><div class="need" role="status">🥚 <b>Snug in the egg.</b> ' +
+        (left ? left + " more right answer" + (left === 1 ? "" : "s") + " anywhere — or " + Math.max(0, 8 - p.egg.taps) + " more taps on it — and it hatches." : "Hatching…") +
+        "</div></div>";
+    }
     var rows = [["🍽️", "Food", p.hunger], ["😊", "Happy", p.happy], ["⚡", "Energy", p.energy], ["🫧", "Clean", p.clean]];
     return '<div class="needs">' + rows.map(function (r) {
       var v = Math.round(r[2]);
@@ -2121,17 +2216,19 @@
       wear: { head: null, face: null, neck: null }
     };
     S.lastTick = Date.now();
+    S.pet.egg = { need: EGG_NEED, got: 0, taps: 0 };
     addItem("strawberry", 3);
     addItem("soap", 1);
     rollDay();
-    diary("🥚", "I hatched today! " + D.profile(who).name + " called me " + name + ". Hello, valley!");
+    diary("🥚", D.profile(who).name + " chose a " + P.colour(pickColour).name + " egg and called it " + name + " already. Something is moving inside…");
     checkTrophies();
     save();
     view = "nest";
     render();
     sfx("win");
-    try { window.Confetti && Confetti.burst({ count: 90 }); } catch (e) {}
-    say("Hi! I'm " + name + ".", 3400);
+    try { window.Confetti && Confetti.burst({ count: 60 }); } catch (e) {}
+    say("*wobble*", 3000);
+    narrate(["egg-hello"]);
   }
 
   function levelPickerHtml() {
@@ -2673,6 +2770,7 @@
       S.stats.streak++;
       if (S.stats.streak > S.stats.best) S.stats.best = S.stats.streak;
       bestToday("bestStreak", S.stats.streak);
+      eggProgress();
       bump("correct");
       var subj = Q.subject;
       S.stats.bySubject[subj] = (S.stats.bySubject[subj] || 0) + 1;
@@ -2805,6 +2903,7 @@
   }
   /* One of the pet's lines for its mood, with the recording's name. */
   function moodSay() {
+    if (S.pet && S.pet.egg) return { text: "*wobble*", tok: null };
     var m = mood(), i = Math.floor(Math.random() * D.MOODS[m].length);
     // now and then, something about the day itself: the hour, the
     // weather, the petpet — the things a pet would actually notice
@@ -2831,6 +2930,7 @@
   }
 
   function nestHtml() {
+    if (S.pet.egg) return eggHtml();
     var age = Math.max(0, Math.floor((Date.now() - (S.pet.born || Date.now())) / 86400000));
     var streakBit = (S.dayStreak || 0) > 1
       ? '<p class="sub" style="margin:0.8rem 0 0">📅 <b>' + S.dayStreak +
@@ -2852,7 +2952,60 @@
       '<p class="sub" style="margin:0.8rem 0 0">💛 ' + personalityLine() + "</p>" +
       '<p class="sub" style="margin:0.8rem 0 0">Coins come from the Farm, the Well, the Pool and the Arena — ' +
         "every one of them pays you for learning something.</p>" + streakBit +
-    "</div>" + mailHtml() + stepsHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
+    "</div>" + timesHtml() + mailHtml() + stepsHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
+  }
+
+  /* =========================================================
+     THE VALLEY TIMES — what is new today, on one card.
+     The weather, the wish, quests ready to claim, a spin or a
+     gift unopened, post waiting, rare finds, interest paid, the
+     family's shops — each a tap away. It is the front page.
+     ========================================================= */
+  function timesHtml() {
+    var rows = [];
+    var wx = weatherToday();
+    var wxPlace = PLACE_INFO[wx.place] ? PLACE_INFO[wx.place].title : "🎮 Games Room";
+    rows.push([wx.emoji, "<b>" + esc(wx.name) + " today.</b> " + esc(wx.line) + " +" + WEATHER_BONUS + " 🪙 a question at the " + esc(wxPlace) + ".", wx.place]);
+    var qs = quests();
+    var ready = qs.filter(function (q) { return !S.claimed[q.id] && (S.today[q.track] || 0) >= q.goal; }).length;
+    var done = qs.filter(function (q) { return S.claimed[q.id]; }).length;
+    if (ready) rows.push(["📜", "<b>" + ready + " quest" + (ready === 1 ? "" : "s") + " ready to claim!</b>", "quests"]);
+    else if (done < qs.length) rows.push(["📜", done + " of " + qs.length + " quests done today.", "quests"]);
+    if (!spunToday()) rows.push(["🎡", "Your <b>free spin</b> is waiting.", "quests"]);
+    if (!S.dailyGift) rows.push(["🎁", "Today's gift (🪙 " + giftCoins() + ") is <b>unopened</b>.", "quests"]);
+    if ((S.mail || []).length) rows.push(["📬", "<b>" + S.mail.length + (S.mail.length === 1 ? " parcel" : " parcels") + "</b> in the post — below.", null]);
+    var rare = D.rareFor(who, null, activePlayers());
+    if (rare.length) rows.push(["🌟", "Only in <b>your</b> Market today: " + rare.map(function (it) { return it.emoji + " " + esc(it.name); }).join(", ") + ".", "market"]);
+    if (S.bankNews) rows.push(["🏦", "The bank paid <b>🪙 " + S.bankNews + "</b> in interest overnight.", "market"]);
+    var stalls = familyStalls();
+    if (stalls.length) rows.push(["🏬", esc(stalls.map(function (st) { return st.p.name; }).join(" and ")) + (stalls.length === 1 ? " has" : " have") + " things for sale.", "market"]);
+    var w = wishNow();
+    if (w && !w.done) rows.push(["💭", esc(S.pet.name) + " wishes: <b>“" + esc(wishText(w)) + "”</b>", null]);
+    if ((S.dayStreak || 0) >= 2) rows.push(["📅", "<b>" + S.dayStreak + " days in a row!</b> Keep it going.", null]);
+    var date = new Date().toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+    return '<div class="panel times"><h2>📰 The Valley Times <small>' + esc(date) + "</small></h2>" +
+      rows.map(function (r) {
+        var inner = '<span class="tem" aria-hidden="true">' + r[0] + '</span><span class="ttx">' + r[1] + "</span>";
+        return r[2] ? '<button class="trow" data-goto="' + r[2] + '">' + inner + '<span class="tgo" aria-hidden="true">›</span></button>'
+                    : '<div class="trow">' + inner + "</div>";
+      }).join("") + "</div>";
+  }
+
+  /* The nest while the egg is still an egg. */
+  function eggHtml() {
+    var e = S.pet.egg, left = Math.max(0, e.need - e.got);
+    return '<div class="panel eggpanel"><h2>🥚 ' + esc(S.pet.name) + "'s egg</h2>" +
+      '<p class="sub">A ' + esc(P.colour(S.pet.colour).name) + " egg with a " + esc(spec().name) + " inside — " +
+      esc(spec().blurb) + " It hatches when it hears you learning: <b>" + left + " right answer" + (left === 1 ? "" : "s") +
+      "</b> anywhere in the valley, or <b>" + Math.max(0, EGG_TAPS - e.taps) + " more taps</b> on the shell.</p>" +
+      '<div class="acts">' +
+        '<button class="act" data-goto="farm" style="--ac:#ff8f4d"><span class="em">🍓</span>Sums at the Farm</button>' +
+        '<button class="act" data-goto="well" style="--ac:#8a5cff"><span class="em">📖</span>Words at the Well</button>' +
+        '<button class="act" data-goto="pool" style="--ac:#38b6ff"><span class="em">🌈</span>The Pool</button>' +
+        '<button class="act" data-tapegg="1" style="--ac:#d99000"><span class="em">👆</span>Tap the egg</button>' +
+      "</div>" +
+      '<p class="sub" style="margin:0.8rem 0 0">💛 ' + personalityLine() + "</p>" +
+    "</div>" + levelPickerHtml();
   }
 
   function wishPanel() {
@@ -2891,7 +3044,7 @@
         : '<p class="sub">Nothing to wear yet! The 🏪 Market puts three hats, glasses or scarves on the ' +
           "👒 <b>Dress-up</b> shelf every morning, and you keep them for ever. " +
           "The Prize Wheel and The Shade never give clothes — only the shop does.</p>" +
-          '<p style="margin:0.8rem 0 0"><button class="ghost" data-go="market" data-close="1">🏪 Go to the Market</button></p>'));
+          '<p style="margin:0.8rem 0 0"><button class="ghost" data-goto="market" data-close="1">🏪 Go to the Market</button></p>'));
   }
 
   /* --- 🐾 petpets: owning, choosing which one is out, naming --- */
@@ -4291,7 +4444,7 @@
             "</b> already — go to 🏠 <b>House</b> to move it about.</p>"
           : '<p class="sub">Your <b>' + esc(houseInfo().name) + "</b> is full, so it is in storage. " +
             "Put something else away at 🏠 <b>House</b>, or move somewhere bigger.</p>") +
-        '<p style="margin:0.8rem 0 0"><button class="ghost" data-go="home" data-close="1">🏠 Go to your House</button></p>'));
+        '<p style="margin:0.8rem 0 0"><button class="ghost" data-goto="home" data-close="1">🏠 Go to your House</button></p>'));
       sfx("coin");
       return;
     }
@@ -5081,7 +5234,37 @@
         "from your bag. It waits in their post until they next play. Sent so far: <b>" +
         (st.gifts || 0) + "</b>, received: <b>" + (st.received || 0) + "</b>.</p>" +
       '<div class="family">' + fam + "</div></div>" +
-    levelPickerHtml() + backupHtml();
+    recordsHtml() + levelPickerHtml() + backupHtml();
+  }
+
+  /* --- 🏅 the family records: who holds what, across every valley --- */
+  function recordsHtml() {
+    var people = D.PROFILES.map(function (p) {
+      var s = (p.id === who) ? S : readSlot(p.id);
+      return (s && s.pet) ? { p: p, s: s } : null;
+    }).filter(Boolean);
+    if (people.length < 2) return "";
+    var RECS = [
+      ["✅", "Most right answers", function (s) { return (s.stats && s.stats.correct) || 0; }],
+      ["🔥", "Longest streak of right answers", function (s) { return (s.stats && s.stats.best) || 0; }],
+      ["🗼", "Highest floor of the Shadow Tower", function (s) { return (s.arena && s.arena.floor) || 0; }],
+      ["⭐", "Best Sky Catch score", function (s) { return (s.catch && s.catch.best) || 0; }],
+      ["🏆", "Most trophies", function (s) { return (s.trophies || []).length; }],
+      ["🪙", "Richest (purse and bank together)", function (s) { return (s.coins || 0) + ((s.bank && s.bank.balance) || 0); }],
+      ["📅", "Most days in a row", function (s) { return (s.stats && s.stats.bestDayStreak) || 0; }],
+      ["🎁", "Most presents posted", function (s) { return (s.stats && s.stats.gifts) || 0; }]
+    ];
+    var rows = RECS.map(function (r) {
+      var best = null, top = 0;
+      people.forEach(function (x) { var v = r[2](x.s); if (v > top) { top = v; best = x; } });
+      if (!best) return "";
+      return '<div class="quest"><img alt="" class="recchip" src="' + chipOf(best.s.pet, 28) + '">' +
+        '<div class="qtx">' + r[0] + " <b>" + esc(r[1]) + "</b><br><small>" + esc(best.s.pet.name) + " · " + esc(best.p.name) + "</small></div>" +
+        '<span class="rw">' + top + "</span></div>";
+    }).join("");
+    if (!rows) return "";
+    return '<div class="panel records"><h2>🏅 Family records</h2>' +
+      '<p class="sub">Who holds what, across every valley on this device. Records change hands — go and take one.</p>' + rows + "</div>";
   }
 
   /* =========================================================
@@ -5328,6 +5511,8 @@
       return;
     }
 
+    if (t.closest("[data-tapegg]") && S.pet && S.pet.egg) return tapEgg();
+
     // help, and the backup tools
     if (t.closest("[data-help]")) { sfx("pop"); return openSheet(helpSheet()); }
     if (t.closest("[data-import]")) { sfx("pop"); return openSheet(importSheet()); }
@@ -5350,7 +5535,8 @@
     if (closer) {
       closeSheet();
       // a sheet button may also send you somewhere ("go to your House")
-      if (closer.dataset && closer.dataset.go) { view = closer.dataset.go; render(); }
+      var dest0 = closer.dataset && (closer.dataset.go || closer.dataset.goto);
+      if (dest0) { view = dest0; render(); }
       return;
     }
     var backdrop = t.id === "sheet-back";
@@ -5388,9 +5574,9 @@
       return;
     }
 
-    var go = t.closest("[data-go]");
+    var go = t.closest("[data-go],[data-goto]");
     if (go) {
-      var dest = go.dataset.go;
+      var dest = go.dataset.go || go.dataset.goto;
       if (dest === "catch") { dest = "games"; gamesTab = "catch"; }    // an old link into the games room
       if (dest !== view) {
         hush();
@@ -5603,12 +5789,14 @@
     if (t.closest("#scene")) {
       if (view === "visit" && visit) {
         // their Craepet says hello in its own voice; nothing of theirs changes
+        if (visit.s.pet.egg) { anim.wobble = 20; sfx("knock"); say("*wobble*", 1400); return; }
         var theirs = withSave(visit.s, moodSay);
         say(theirs.text, 2600, theirs.tok);
         hop(14);
         sfx("pop");
         return;
       }
+      if (S.pet.egg) return tapEgg();
       S.pet.happy = clamp(S.pet.happy + 1, 0, 100);
       var ml = moodSay();
       say(ml.text, 2600, ml.tok);

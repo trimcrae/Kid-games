@@ -328,6 +328,8 @@ window.CPLines = (function () {
   add("post-open", "Let's open it!");
   add("post-sent", "Your present is on its way.");
   add("diary-intro", "Here is what I wrote in my diary.");
+  add("egg-hello", "Your egg is here! Learn something, or tap it, and it will hatch.");
+  add("egg-crack", "It's cracking!");
 
   /* --- the prize wheel --- */
   ["Ten coins.", "Forty coins!", "A snack and fifteen coins!", "Twenty coins.",

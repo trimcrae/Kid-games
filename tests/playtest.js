@@ -1043,6 +1043,9 @@ const GAMES = {
     await page.locator("#do-adopt").click();
     await page.waitForSelector("#pet-canvas");
     if (!(await page.locator(".petname").textContent()).includes("Wobble")) throw new Error("the pet was not named");
+    // it starts as an egg, and hatches when it hears three right answers
+    if (!(await page.evaluate(() => !!Craepets.state().pet.egg))) throw new Error("a new Craepet should start as an egg");
+    if (!(await page.locator(".needs.egg").count())) throw new Error("the egg is not shown at the nest");
 
     // a run of right answers at the Berry Farm pays coins and ripens berries
     const answerAt = async (place, n) => {
@@ -1065,6 +1068,12 @@ const GAMES = {
     await answerAt("farm", 4);
     if (await page.evaluate(() => Craepets.state().coins) <= coins0) throw new Error("learning did not pay");
     if (await page.locator(".plot.full").count() < 1) throw new Error("no berries ripened");
+    if (await page.evaluate(() => !!Craepets.state().pet.egg)) throw new Error("three right answers did not hatch the egg");
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🐣")))) throw new Error("hatching was not written in the diary");
+    // and the front page of the nest says what is new today
+    await page.locator('[data-go="nest"]').click();
+    if (!(await page.locator(".panel.times .trow").count())) throw new Error("the Valley Times is blank");
+    if (!/today/.test(await page.locator(".panel.times").textContent())) throw new Error("the Valley Times has no weather");
 
     // the Well asks about words, the Pool about the world
     await answerAt("well", 2);
@@ -1536,8 +1545,8 @@ const GAMES = {
     // ---- THE MAP: every place is a marker, and tapping one goes there
     await page.locator('[data-go="map"]').click();
     await page.waitForSelector(".valley");
-    if (await page.locator(".valley .mp[data-go]").count() < 9) throw new Error("the map is missing places");
-    if (!(await page.locator('.valley .mp.home.mine[data-go="nest"]').count())) throw new Error("your own house is not on the map");
+    if (await page.locator(".valley .mp[data-goto]").count() < 9) throw new Error("the map is missing places");
+    if (!(await page.locator('.valley .mp.home.mine[data-goto="nest"]').count())) throw new Error("your own house is not on the map");
     await page.locator('.valley [data-map="farm"]').click();
     await page.waitForSelector(".choice");
     if (await page.evaluate(() => Craepets.view()) !== "farm") throw new Error("tapping the farm on the map did not go there");
@@ -1643,6 +1652,7 @@ const GAMES = {
     await page.locator('[data-go="case"]').click();
     if (await page.locator(".trophy:not(.locked)").count() < 1) throw new Error("no trophies earned");
     if (await page.locator(".fam").count() !== 6) throw new Error("the family board should list every profile");
+    if (await page.locator(".panel.records").count()) throw new Error("records need two players before they mean anything");
 
     // Shannon gets her own save, at the grown-up level
     await page.locator("[data-swap]").click();
@@ -1732,7 +1742,13 @@ const GAMES = {
     await page.waitForTimeout(100);
     if (await page.evaluate(() => localStorage.getItem("craepets.v1.shannon")) !== herSave) throw new Error("visiting changed the host's save");
     if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🏡")))) throw new Error("the visit was not written in the diary");
-    await page.locator('.panel.visit [data-go="case"]').click();
+    // with two valleys on the device, the family records board appears — and Cory holds the answers record
+    await page.locator('.panel.visit [data-goto="case"]').click();
+    await page.waitForSelector(".panel.records");
+    if (!/Most right answers[\s\S]*Wobble/.test(await page.locator(".panel.records").textContent())) throw new Error("the records board does not credit Wobble");
+    await page.locator('[data-visit="shannon"]').click();
+    await page.waitForSelector(".panel.visit");
+    await page.locator('.panel.visit [data-goto="case"]').click();
     if (await page.evaluate(() => Craepets.visiting()) !== null) throw new Error("could not leave the visit");
     if (await page.evaluate(() => Craepets.state().pet.name) !== "Wobble") throw new Error("coming home lost the visitor's own pet");
 
@@ -1759,6 +1775,10 @@ const GAMES = {
     await page.locator("[data-name]").first().click();
     await page.locator("#do-adopt").click();
     await page.waitForSelector("#pet-canvas");
+    // a toddler can hatch it just by tapping the shell
+    for (let tap = 0; tap < 8; tap++) { await page.locator("[data-tapegg]").click(); await page.waitForTimeout(40); }
+    await page.waitForTimeout(150);
+    if (await page.evaluate(() => !!Craepets.state().pet.egg)) throw new Error("eight taps did not hatch the egg");
     await page.locator('[data-go="farm"]').click();
     await page.waitForSelector(".choice");
     if (await page.locator(".choice").count() !== 2) throw new Error("the tiny level should offer 2 big choices");

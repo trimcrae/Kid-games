@@ -443,6 +443,74 @@ window.CPPets = (function () {
   var SLOTS = ["head", "face", "neck"];
 
   /* =========================================================
+     THE EGG — what a Craepet is before it is a Craepet.
+     Painted in the colour you chose, with spots in the accent
+     colour, so a Berry Red egg hatches a Berry Red Blorb. It
+     cracks in two stages as the hatching gets close.
+     ========================================================= */
+  var EGG = [
+    "................",
+    "......OOOO......",
+    "....OOBBBBOO....",
+    "...OBBLBBBBBO...",
+    "..OBBLBBBABBBO..",
+    "..OBBBBBBBBABO..",
+    ".OBBABBBBBBBBBO.",
+    ".OBBBBBBBBBBABO.",
+    ".OBBBBBABBBBBBO.",
+    ".OBBABBBBBBBBBO.",
+    ".OBBBBBBBBABBBO.",
+    "..OBBBBABBBBBO..",
+    "..ObbBBBBBBbbO..",
+    "...ObbbbbbbbO...",
+    "....OObbbbOO....",
+    "......OOOO......"
+  ];
+  /* The cracks, as cells to paint: first a hairline, then a gap. */
+  var CRACK1 = [[7, 6], [8, 7], [7, 8], [8, 9], [9, 10]];
+  var CRACK2 = CRACK1.concat([[6, 5], [9, 8], [10, 9], [6, 7], [5, 8], [10, 11], [9, 12]]);
+  function eggGrid(crack) {
+    if (!crack) return EGG;
+    var cells = crack >= 2 ? CRACK2 : CRACK1;
+    var rows = EGG.map(function (r) { return r.split(""); });
+    cells.forEach(function (c) { if (rows[c[1]] && rows[c[1]][c[0]] !== ".") rows[c[1]][c[0]] = crack >= 2 && CRACK1.indexOf(c) === -1 ? "W" : "O"; });
+    return rows.map(function (r) { return r.join(""); });
+  }
+  function eggSprite(colourId, crack, scale) {
+    var key = "egg|" + colourId + "|" + crack + "|" + scale;
+    if (cache[key]) return cache[key];
+    var pal = colour(colourId).pal;
+    var cv = bake(eggGrid(crack), { O: pal.O, B: pal.B, b: pal.b, L: pal.L, A: pal.A, W: "#fff" }, scale);
+    cache[key] = cv;
+    return cv;
+  }
+  /* Draw the egg where the pet would stand. opts: { scale, cx, bob, tilt (radians), crack } */
+  function drawEgg(canvas, colourId, opts) {
+    opts = opts || {};
+    var g = canvas.getContext("2d");
+    var scale = opts.scale || 8;
+    var sp = eggSprite(colourId, opts.crack | 0, scale);
+    var cx = (opts.cx === undefined || opts.cx === null) ? canvas.width / 2 : opts.cx;
+    var x = Math.round(cx - sp.width / 2);
+    var y = Math.round(canvas.height - sp.height - scale) + (opts.bob || 0);
+    g.imageSmoothingEnabled = false;
+    if (!opts.keep) g.clearRect(0, 0, canvas.width, canvas.height);
+    g.globalAlpha = 0.18; g.fillStyle = "#2b2440";
+    g.beginPath(); g.ellipse(cx, canvas.height - scale * 0.4, sp.width * 0.34, scale * 1.2, 0, 0, Math.PI * 2); g.fill();
+    g.globalAlpha = 1;
+    g.save();
+    // rock about the bottom of the egg
+    g.translate(cx, canvas.height - scale);
+    g.rotate(opts.tilt || 0);
+    g.drawImage(sp, x - cx, y - (canvas.height - scale));
+    g.restore();
+  }
+  function eggChip(colourId, px, crack) {
+    var scale = Math.max(1, Math.round((px || 48) / 16));
+    return eggSprite(colourId, crack | 0, scale).toDataURL();
+  }
+
+  /* =========================================================
      PETPETS — a pet for your pet.
 
      Tiny companions, eight pixels wide, that trot along behind
@@ -731,6 +799,8 @@ window.CPPets = (function () {
     WEAR: WEAR,
     SLOTS: SLOTS,
     PETPETS: PETPETS,
+    drawEgg: drawEgg,
+    eggChip: eggChip,
     petpetById: petpetById,
     drawPetpet: drawPetpet,
     petpetChip: petpetChip,

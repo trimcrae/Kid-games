@@ -77,6 +77,10 @@ no logins.
 > country and its capital), the **weather** changes daily and rains on the
 > window, every place has a **named shopkeeper** with something to say,
 > and new players get a **first-steps** list that pays as they go.
+> A new Craepet starts as an **egg** in the colour you chose and hatches when
+> it hears three right answers (or eight taps on the shell); the nest opens
+> with **The Valley Times** (what is new today, each line a tap away); the
+> Case has a **family records** board; and every species has a **voice**.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times

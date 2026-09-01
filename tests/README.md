@@ -60,7 +60,9 @@ For **every game** (and the landing page), at **each of the three sizes**:
     pays; Sky Catch starts, scores a right catch, ends and pays; and the
     map's markers really go places (the family's houses included). Memory Match is dealt and solved and pays, the first-steps list ticks
     off what was done, and rain streaks the window and pays extra at the Pool. The help sheet opens, a valley saved as a file loads back exactly (and a
-    bad file is refused), and starting over needs the pet's name typed
+    bad file is refused), and starting over needs the pet's name typed. A new pet is an egg that hatches after three right answers (or eight
+    taps for a toddler), the Valley Times front page is printed, and the
+    family records board credits the right pet
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

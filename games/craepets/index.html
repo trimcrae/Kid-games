@@ -708,6 +708,29 @@
     .pairlist .eq { color: var(--purple); }
     @media (prefers-reduced-motion: reduce) { .mcard .inner { transition: none; } }
 
+    /* --- the Valley Times --- */
+    .panel.times { background: linear-gradient(135deg, #fffdf5, #fff); border-top: 6px double #2b2440; }
+    .panel.times h2 small { font-weight: normal; font-size: 0.75rem; color: #8b83a8; margin-left: 0.4rem; }
+    .trow {
+      display: flex; align-items: center; gap: 0.55rem; width: 100%; box-sizing: border-box; text-align: left;
+      padding: 0.45rem 0.3rem; border: none; border-bottom: 2px dashed #efeaff; background: transparent;
+      font-family: var(--font); font-size: 0.9rem; color: var(--ink); line-height: 1.35;
+    }
+    button.trow { cursor: pointer; touch-action: manipulation; border-radius: 10px; }
+    button.trow:hover { background: #f4f0ff; }
+    .trow:last-child { border-bottom: none; }
+    .trow .tem { font-size: 1.3rem; line-height: 1.2; flex: 0 0 auto; }
+    .trow .ttx { flex: 1 1 auto; min-width: 0; }
+    .trow .tgo { color: var(--purple); font-weight: bold; font-size: 1.2rem; flex: 0 0 auto; }
+    .trow:focus-visible { outline: 4px solid #2b2440; outline-offset: 2px; }
+    /* --- family records --- */
+    .records .recchip { width: 28px; height: auto; image-rendering: pixelated; flex: 0 0 auto; }
+
+    /* --- the egg --- */
+    .needs.egg { grid-template-columns: 1fr; }
+    .needs.egg .need { font-size: 0.9rem; padding: 0.5rem 0.8rem; text-align: left; }
+    .panel.eggpanel { background: linear-gradient(135deg, #fff8e8, #fff); }
+
     /* --- first steps --- */
     .panel.steps { background: linear-gradient(135deg, #f1fff6, #fff); }
 
