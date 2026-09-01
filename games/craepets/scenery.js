@@ -80,8 +80,30 @@ window.CPArt = (function () {
       var cx = (prev[0] + p[0]) / 2;
       d += " Q" + cx + "," + p[1] + " " + p[0] + "," + p[1];
     });
-    d += " L200," + y0 + " L200,120 L-5,120 Z";
+    // close past the right edge of whichever box this is (120 for a view,
+    // 240 for a panorama), or the land stops short and leaves a gap
+    var end = Math.max(125, pts[pts.length - 1][0] + 5);
+    d += " L" + end + "," + y0 + " L" + end + ",120 L-5,120 Z";
     return path(d, fill, op);
+  }
+  /* A soft circle of light, for lanterns, torches and spotlights. */
+  function glow(cx, cy, r, colour, op) {
+    var id = "cpr" + (++gradN);
+    return defs(el("radialGradient", { id: id },
+        el("stop", { offset: 0, "stop-color": colour, "stop-opacity": op === undefined ? 0.55 : op }) +
+        el("stop", { offset: 1, "stop-color": colour, "stop-opacity": 0 }))) +
+      disc(cx, cy, r, "url(#" + id + ")");
+  }
+  /* A row of people in a stand: little heads and shoulders. */
+  function crowdRow(x0, y, n, step, seed) {
+    var out = "", cols = ["#8f5fc0", "#5f8fc0", "#c05f8f", "#c0a05f", "#5fc09a", "#e07a5f"];
+    for (var i = 0; i < n; i++) {
+      var x = x0 + i * step + ((i * 7 + seed) % 3) - 1;
+      var c = cols[(i + seed) % cols.length];
+      out += el("path", { d: "M" + (x - 2.2) + "," + (y + 3) + " q2.2,-3.2 4.4,0 Z", fill: c, opacity: 0.9 }) +
+        disc(x, y - 0.6, 1.6, c);
+    }
+    return out;
   }
 
   /* A scatter of stars that is the same every time you look at it —
@@ -1003,92 +1025,211 @@ window.CPArt = (function () {
       tree(16, 66, 1.4) + tree(220, 68, 1.2) + bird(110, 26, 2.2) + bird(126, 20, 1.7);
   };
 
+  /* The Word Well: a moonlit clearing with an old stone well, a lantern
+     on a post throwing warm light over the flagstones, a sleeping
+     village on the far hill, and fireflies drifting up from the grass. */
   P.well = function () {
-    var g = vgrad([[0, "#1b2247"], [0.6, "#3a4478"], [1, "#5a63a0"]]);
+    var g = vgrad([[0, "#141a3f"], [0.55, "#2c3570"], [1, "#4a5490"]]);
+    var stones = "";
+    // the well's ring, course by course
+    for (var r = 0; r < 3; r++) {
+      var y = 60 + r * 5;
+      for (var s = 0; s < 6; s++) {
+        var x = 98 + s * 7.6 + (r % 2 ? 3.8 : 0);
+        stones += rect(x, y, 6.8, 4.4, r % 2 ? "#7d83a8" : "#8b91b5", { rx: 1 });
+      }
+    }
+    var village = "";
+    [[26, 50, 10, 7], [40, 52, 8, 5], [176, 48, 12, 8], [192, 51, 9, 6], [208, 49, 10, 7]].forEach(function (h, i) {
+      village += rect(h[0], h[1], h[2], h[3], "#232a55") + poly((h[0] - 1) + "," + h[1] + " " + (h[0] + h[2] / 2) + "," + (h[1] - 5) + " " + (h[0] + h[2] + 1) + "," + h[1], "#1a2044") +
+        rect(h[0] + h[2] / 2 - 1, h[1] + 2, 2, 2, i % 2 ? "#ffd166" : "#ffb347", { opacity: 0.95 });
+    });
+    var flies = "";
+    [[40, 64], [62, 72], [150, 70], [178, 66], [204, 74], [86, 78], [16, 74]].forEach(function (f, i) {
+      flies += glow(f[0], f[1], 4, "#ffe27a", 0.35) + disc(f[0], f[1], 0.9, "#fff6c9", 0.95);
+    });
+    var grass = "";
+    for (var i = 0; i < 24; i++) {
+      var gx = 4 + i * 10.2;
+      grass += el("path", { d: "M" + gx + ",90 q1,-6 2,-9 M" + (gx + 3) + ",90 q-1,-5 -2,-8", fill: "none",
+        stroke: "#1e2a4f", "stroke-width": 0.9, "stroke-linecap": "round", opacity: 0.8 });
+    }
     return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") +
-      starfield(90, 240, 60, "#fff", 97) +
-      disc(190, 22, 12, "#fff3cf") + disc(185, 19, 10, "#26305c") +
-      twinkle(50, 22, 4, "#fff6c9") + twinkle(96, 34, 2.6, "#dfe8ff") + twinkle(150, 16, 2.2, "#fff") +
-      ridge([[70, 62], [160, 58], [240, 64]], 62, "#141b3a") +
-      el("g", {},
-        rect(96, 56, 48, 18, "#6b6f8f") +
-        el("g", { opacity: 0.4 }, line(96, 62, 144, 62, "#3f4463", 1) + line(112, 56, 112, 74, "#3f4463", 1) +
-          line(128, 56, 128, 74, "#3f4463", 1)) +
-        rect(100, 40, 4, 18, "#7a5230") + rect(136, 40, 4, 18, "#7a5230") +
-        poly("92,40 120,28 148,40", "#8f3f24") +
-        line(120, 40, 120, 52, "#cfc6a8", 0.8) +
-        rect(114, 52, 12, 8, "#a9743f", { rx: 1 })) +
-      el("g", {}, rect(38, 58, 14, 16, "#8f7fc0", { rx: 1 }) + rect(52, 62, 12, 12, "#c07f9f", { rx: 1 }) +
-        rect(64, 56, 10, 18, "#7fa8c0", { rx: 1 })) +
-      el("g", { opacity: 0.9 }, disc(170, 70, 2.6, "#ffd166") + disc(206, 74, 2, "#ffd166") + disc(76, 72, 1.8, "#ffd166"));
+      starfield(110, 240, 58, "#fff", 97) +
+      twinkle(48, 20, 3.6, "#fff6c9") + twinkle(132, 14, 2.2, "#dfe8ff") +
+      glow(196, 22, 26, "#fff3cf", 0.25) + disc(196, 22, 11, "#fff3cf") + disc(191, 19, 9, "#1f2854") +
+      ridge([[50, 56], [120, 60], [190, 54], [240, 58]], 56, "#1c2350") + village +
+      ridge([[40, 70], [130, 66], [240, 71]], 68, "#28325f") +
+      // the lantern post and its pool of light
+      glow(62, 44, 30, "#ffcc66", 0.42) +
+      line(62, 74, 62, 46, "#3b2a1a", 2) + rect(58, 40, 8, 9, "#3b2a1a", { rx: 1.5 }) +
+      rect(59.5, 41.5, 5, 6, "#ffe08a", { rx: 1 }) + poly("57,40 62,36 67,40", "#3b2a1a") +
+      // the well: roof, posts, rope, bucket, stone ring
+      rect(100, 34, 3, 26, "#5a3d22") + rect(137, 34, 3, 26, "#5a3d22") +
+      poly("94,36 120,24 146,36", "#7a3b2a") + poly("97,36 120,26 143,36", "#8f4a34") +
+      line(120, 36, 120, 52, "#d9cfb0", 0.9) + rect(115, 52, 10, 7, "#8a6a3f", { rx: 1 }) + rect(115, 52, 10, 1.6, "#5a3d22") +
+      el("ellipse", { cx: 120, cy: 60, rx: 22, ry: 5, fill: "#5d6388" }) +
+      el("ellipse", { cx: 120, cy: 60, rx: 17, ry: 3.4, fill: "#0f1430" }) +
+      stones +
+      el("g", { opacity: 0.55 }, path("M98,74 h44 v6 h-44 Z", "#3a4270")) +
+      // a stack of books somebody left on the rim
+      rect(146, 53, 9, 2.6, "#c05f8f", { rx: 0.6 }) + rect(147, 50.4, 8, 2.6, "#5f8fc0", { rx: 0.6 }) + rect(146.5, 47.8, 8, 2.6, "#c0a05f", { rx: 0.6 }) +
+      grass + flies;
   };
 
+  /* The Rainbow Pool: a turquoise pool in a rocky bowl, a waterfall
+     spilling in from the left, lily pads, a rainbow standing in the
+     spray, and the paint-splash colours the pool is famous for. */
   P.pool = function () {
-    var g = vgrad([[0, "#ffe0f4"], [0.55, "#e6f6ff"], [1, "#cdf0ff"]]);
+    var g = vgrad([[0, "#ffd7f0"], [0.5, "#dff4ff"], [1, "#bfeaff"]]);
     var bow = "", cols = ["#e8384f", "#ff8c1a", "#ffd400", "#2fbf4f", "#2b7fff", "#8a3ffc"];
     cols.forEach(function (c, i) {
-      bow += el("path", { d: "M60,74 A60,60 0 0 1 180,74", fill: "none", stroke: c,
-        "stroke-width": 4, opacity: 0.85, transform: "translate(0," + i * 4 + ")" });
+      bow += el("path", { d: "M70,66 A50,50 0 0 1 170,66", fill: "none", stroke: c,
+        "stroke-width": 3.2, opacity: 0.7, transform: "translate(0," + i * 3.2 + ")" });
     });
-    var bubbles = "";
-    for (var i = 0; i < 16; i++) {
-      bubbles += el("circle", { cx: 10 + (i * 53) % 226, cy: 30 + (i * 37) % 52,
-        r: 1 + (i % 4), fill: "none", stroke: "#ffffff", "stroke-width": 0.7, opacity: 0.7 });
+    var ripples = "";
+    for (var i = 0; i < 7; i++) {
+      ripples += el("ellipse", { cx: 60 + i * 24, cy: 74 + (i % 3) * 3, rx: 7 + (i % 2) * 3, ry: 1.2, fill: "none",
+        stroke: "#ffffff", "stroke-width": 0.7, opacity: 0.55 });
     }
+    var spray = "";
+    for (var s = 0; s < 14; s++) {
+      spray += el("circle", { cx: 22 + (s * 37) % 40, cy: 40 + (s * 23) % 34, r: 0.8 + (s % 3) * 0.5,
+        fill: "#fff", opacity: 0.6 });
+    }
+    var rocks = "";
+    [[6, 66, 14, 9, "#8fa0b5"], [18, 62, 16, 11, "#a7b6c9"], [204, 64, 18, 10, "#a7b6c9"], [222, 68, 16, 9, "#8fa0b5"], [232, 60, 12, 8, "#95a6ba"]].forEach(function (r) {
+      rocks += el("ellipse", { cx: r[0] + r[2] / 2, cy: r[1] + r[3] / 2, rx: r[2] / 2, ry: r[3] / 2, fill: r[4] }) +
+        el("ellipse", { cx: r[0] + r[2] / 2 - 2, cy: r[1] + r[3] / 2 - 2, rx: r[2] / 3, ry: r[3] / 4, fill: "#fff", opacity: 0.25 });
+    });
+    var pads = "";
+    [[96, 80, 5], [150, 83, 4], [186, 79, 4.5]].forEach(function (p) {
+      pads += el("ellipse", { cx: p[0], cy: p[1], rx: p[2], ry: p[2] * 0.42, fill: "#4fae63" }) +
+        poly(p[0] + "," + p[1] + " " + (p[0] + p[2]) + "," + (p[1] - p[2] * 0.4) + " " + (p[0] + p[2]) + "," + (p[1] + p[2] * 0.1), "#7fd4ff");
+    });
     return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") +
-      cloud(24, 20, 1.2) + cloud(206, 18, 1) + bow +
-      el("g", { opacity: 0.9 }, disc(36, 60, 4, "#ff9ad5") + disc(30, 66, 3, "#ffd166") +
-        disc(206, 62, 4, "#8fd8ff") + disc(214, 68, 2.6, "#3ddc84")) +
-      path("M0,76 q30,-6 60,0 t60,0 t60,0 t60,0 L240,90 L0,90 Z", "#7fd4ff") +
-      path("M0,82 q30,-5 60,0 t60,0 t60,0 t60,0 L240,90 L0,90 Z", "#4bb8e8") +
-      bubbles;
+      disc(206, 16, 9, "#ffe27a", 0.9) + cloud(40, 14, 1) + cloud(150, 12, 0.8) +
+      ridge([[40, 52], [110, 48], [180, 53], [240, 50]], 52, "#a8dd8f") +
+      tree(230, 58, 1.2) + tree(196, 56, 0.9) +
+      // the cliff and the fall
+      poly("0,30 36,30 40,62 0,66", "#7d8fa6") + poly("0,30 36,30 34,48 0,50", "#93a4ba") +
+      el("g", { opacity: 0.9 }, path("M14,30 q6,20 4,40 h10 q2,-20 -4,-40 Z", "#d7f3ff") + path("M17,30 q4,20 2,40 h4 q2,-20 -1,-40 Z", "#ffffff", 0.85)) +
+      // the pool
+      el("ellipse", { cx: 120, cy: 78, rx: 108, ry: 16, fill: "#5fbfe8" }) +
+      el("ellipse", { cx: 120, cy: 78, rx: 100, ry: 12.5, fill: "#7fd4ff" }) +
+      el("ellipse", { cx: 118, cy: 76, rx: 60, ry: 6, fill: "#a8e6ff", opacity: 0.8 }) +
+      spray + bow + ripples + rocks + pads +
+      // the paint-splash colours the pool gives away
+      el("g", { opacity: 0.95 }, disc(48, 60, 3.6, "#ff9ad5") + disc(41, 66, 2.6, "#ffd166") + disc(58, 66, 2.2, "#3ddc84") +
+        disc(200, 61, 3.4, "#8fd8ff") + disc(210, 66, 2.4, "#ffd166") + disc(190, 66, 2, "#ff9ad5")) +
+      el("g", { opacity: 0.9 }, disc(176, 60, 3, "#4fae63") + disc(179, 58, 0.8, "#111") + line(173, 62, 170, 64, "#4fae63", 1.2));
   };
 
+  /* The Market: a cobbled square under bunting, three different stalls
+     heaped with goods, a shop front with a striped awning behind, lamp
+     posts, and rooftops with chimneys against a warm afternoon sky. */
   P.market = function () {
-    var g = vgrad([[0, "#ffd9a8"], [0.6, "#fff2dd"], [1, "#ffe9c9"]]);
-    function stall(x, a, b) {
-      var awn = "";
-      for (var i = 0; i < 5; i++) awn += rect(x + i * 8, 40, 8, 8, i % 2 ? a : b);
-      return el("g", {},
-        rect(x, 48, 40, 26, "#e6d3b0") + awn +
-        el("path", { d: "M" + x + ",48 q20,6 40,0", fill: "none", stroke: shade(a, -40, 0.5), "stroke-width": 1 }) +
-        rect(x + 2, 40, 36, 2, "#a9743f") +
-        rect(x - 2, 48, 3, 26, "#a9743f") + rect(x + 39, 48, 3, 26, "#a9743f"));
+    var g = vgrad([[0, "#ffd3a0"], [0.55, "#fff0da"], [1, "#ffe6c4"]]);
+    function awning(x, w, y, a, b, scallop) {
+      var out = "";
+      for (var i = 0; i < w / 6; i++) out += rect(x + i * 6, y, 6, 7, i % 2 ? a : b);
+      if (scallop) for (var k = 0; k < w / 6; k++) out += disc(x + 3 + k * 6, y + 7, 3, k % 2 ? a : b);
+      return out;
     }
     var bunting = "";
-    for (var i = 0; i < 14; i++) {
-      bunting += poly((10 + i * 17) + ",22 " + (18 + i * 17) + ",22 " + (14 + i * 17) + ",30",
-        ["#e8384f", "#ffd400", "#2fbf4f", "#2b7fff"][i % 4]);
+    for (var i = 0; i < 15; i++) {
+      bunting += poly((6 + i * 16) + ",18 " + (14 + i * 16) + ",18 " + (10 + i * 16) + ",25",
+        ["#e8384f", "#ffd400", "#2fbf4f", "#2b7fff", "#ff8fd0"][i % 5]);
+    }
+    var cobbles = "";
+    for (var r = 0; r < 3; r++) for (var c = 0; c < 26; c++) {
+      cobbles += el("ellipse", { cx: 4 + c * 9.6 + (r % 2 ? 4.8 : 0), cy: 78 + r * 4.5, rx: 4, ry: 1.7, fill: r % 2 ? "#d9ab82" : "#cfa077", opacity: 0.8 });
+    }
+    // the fruit stall, the hat stall, the jar stall
+    var fruit = "";
+    [[26, 62, "#e8384f"], [31, 62, "#ff8c1a"], [36, 62, "#ffd400"], [28.5, 58.5, "#e8384f"], [33.5, 58.5, "#2fbf4f"], [31, 55, "#ff8c1a"]].forEach(function (f) {
+      fruit += disc(f[0], f[1], 2.4, f[2]) + disc(f[0] - 0.7, f[1] - 0.8, 0.7, "#fff", 0.5);
+    });
+    var hats = poly("104,52 118,52 111,44", "#8a3ffc") + rect(101, 52, 20, 2, "#5b2fb0") +
+      el("ellipse", { cx: 128, cy: 56, rx: 7, ry: 2.4, fill: "#c99a6b" }) + rect(124, 50, 8, 6, "#c99a6b", { rx: 2 }) + rect(124, 54, 8, 1.4, "#e8384f") +
+      rect(96, 58, 8, 6, "#ff8fd0", { rx: 3 }) + disc(100, 57, 2.2, "#ff8fd0");
+    var jars = "";
+    [[176, "#ffd166"], [184, "#ff9ad5"], [192, "#8fd8ff"], [200, "#a8e6a0"]].forEach(function (j, i) {
+      jars += rect(j[0], 52 + (i % 2) * 6, 7, 9, "#fff", { rx: 1.5, opacity: 0.85 }) + rect(j[0] + 1, 54 + (i % 2) * 6, 5, 6, j[1], { rx: 1 }) +
+        rect(j[0] + 0.5, 51.5 + (i % 2) * 6, 6, 1.4, "#a9743f");
+    });
+    function stall(x, w, a, b, scallop) {
+      return el("g", {},
+        rect(x - 2, 46, 3, 30, "#8a5a2b") + rect(x + w - 1, 46, 3, 30, "#8a5a2b") +
+        rect(x, 64, w, 12, "#e2c79c") + rect(x, 64, w, 2.4, "#c9a06a") +
+        el("g", { opacity: 0.25 }, line(x + 6, 68, x + 6, 76, "#8a5a2b", 1) + line(x + w - 6, 68, x + w - 6, 76, "#8a5a2b", 1)) +
+        awning(x - 3, w + 6, 40, a, b, scallop) + rect(x - 3, 39, w + 6, 1.6, "#8a5a2b"));
     }
     return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") +
-      cloud(60, 14, 0.9) + cloud(180, 12, 0.8) + disc(214, 20, 8, "#ffe27a", 0.85) +
-      el("path", { d: "M6,20 q114,10 228,0", fill: "none", stroke: "#a9743f", "stroke-width": 0.8 }) + bunting +
-      stall(20, "#e8384f", "#fff6e2") + stall(96, "#2fbf4f", "#fff6e2") + stall(172, "#2b7fff", "#fff6e2") +
-      el("g", {}, disc(30, 52, 2.4, "#e8384f") + disc(37, 52, 2.4, "#ff8c1a") + disc(44, 52, 2.4, "#ffd400") +
-        disc(106, 52, 2.4, "#8a3ffc") + disc(113, 52, 2.4, "#2fbf4f") +
-        rect(182, 48, 6, 6, "#a9743f") + rect(192, 48, 6, 6, "#a9743f")) +
-      rect(0, 74, 240, 16, "#c9906a") +
-      el("g", { opacity: 0.25 }, line(0, 78, 240, 78, "#8a5a2b", 1) + line(0, 84, 240, 84, "#8a5a2b", 1));
+      disc(214, 16, 8, "#ffe27a", 0.9) + cloud(52, 12, 0.9) + cloud(150, 10, 0.7) +
+      // the shop fronts behind the square
+      el("g", {},
+        rect(0, 30, 70, 46, "#f3dcc2") + rect(74, 26, 92, 50, "#efe0cf") + rect(170, 32, 70, 44, "#f6d9c9") +
+        poly("-2,30 35,18 72,30", "#c0552f") + poly("72,26 120,12 168,26", "#b8623a") + poly("168,32 205,20 242,32", "#c0552f") +
+        rect(24, 8, 5, 12, "#8a5a2b") + rect(188, 12, 5, 10, "#8a5a2b") +
+        el("g", {}, rect(10, 36, 10, 10, "#8fd8ff", { rx: 1 }) + rect(46, 36, 10, 10, "#8fd8ff", { rx: 1 }) + rect(184, 40, 10, 9, "#ffe08a", { rx: 1 }) + rect(218, 40, 10, 9, "#8fd8ff", { rx: 1 })) +
+        awning(84, 72, 32, "#e8384f", "#fff6e2", true) + rect(100, 44, 40, 32, "#8a5a2b", { opacity: 0.2 }) + rect(112, 50, 16, 26, "#5b3a1e") + disc(124, 64, 1, "#ffd166")) +
+      el("path", { d: "M4,16 q116,12 232,0", fill: "none", stroke: "#8a5a2b", "stroke-width": 0.8 }) + bunting +
+      // lamp posts
+      el("g", {}, line(80, 76, 80, 30, "#3b2a1a", 1.6) + rect(77, 26, 6, 6, "#3b2a1a", { rx: 1 }) + rect(78.2, 27.2, 3.6, 3.6, "#ffe08a") +
+        line(160, 76, 160, 30, "#3b2a1a", 1.6) + rect(157, 26, 6, 6, "#3b2a1a", { rx: 1 }) + rect(158.2, 27.2, 3.6, 3.6, "#ffe08a")) +
+      rect(0, 76, 240, 14, "#d3a67a") + cobbles +
+      stall(14, 36, "#2fbf4f", "#fff6e2", false) + stall(92, 44, "#2b7fff", "#fff6e2", true) + stall(172, 40, "#ffd400", "#fff6e2", false) +
+      el("g", {}, rect(20, 58, 24, 7, "#a9743f", { rx: 1.5 }) + fruit) + hats + jars +
+      // a basket of bread on the cobbles and a tiny stray coin
+      el("g", {}, el("ellipse", { cx: 60, cy: 80, rx: 7, ry: 3, fill: "#c9a06a" }) + rect(55, 76, 4, 3, "#e8b04c", { rx: 1.5 }) + rect(60, 75, 4, 3, "#e8b04c", { rx: 1.5 }) +
+        disc(226, 84, 1.8, "#ffd166"));
   };
 
+  /* The Arena: an evening stadium — two tiers of stands full of family
+     Craepets, torches burning, banners, a sand ring with a rope round
+     it, spotlights, and confetti already falling for whoever wins. */
   P.arena = function () {
-    var g = vgrad([[0, "#ffc9c9"], [0.6, "#ffeaea"], [1, "#ffe0cf"]]);
+    var g = vgrad([[0, "#ff9d8f"], [0.45, "#ffc9b8"], [1, "#ffe6d6"]]);
+    var stands = "";
+    // the far tier and the near tier
+    stands += path("M0,54 q120,-14 240,0 L240,66 q-120,-12 -240,0 Z", "#8a4f45") +
+      path("M0,52 q120,-14 240,0 L240,56 q-120,-13 -240,0 Z", "#a86157") +
+      path("M0,66 q120,-12 240,0 L240,78 q-120,-10 -240,0 Z", "#7a4239") +
+      path("M0,64 q120,-13 240,0 L240,68 q-120,-12 -240,0 Z", "#96524a");
     var crowd = "";
-    for (var i = 0; i < 40; i++) {
-      var x = 6 + (i * 29) % 232, y = 44 + ((i * 17) % 3) * 5;
-      crowd += disc(x, y, 2.2, ["#8f5fc0", "#5f8fc0", "#c05f8f", "#c0a05f"][i % 4], 0.75);
+    for (var i = 0; i < 22; i++) {
+      var x = 6 + i * 11, yFar = 51 - 12 * Math.sin(Math.PI * x / 240) * 0.9, yNear = 63 - 10 * Math.sin(Math.PI * x / 240) * 0.9;
+      crowd += crowdRow(x, yFar, 1, 0, i) + crowdRow(x + 5, yNear, 1, 0, i + 3);
+    }
+    var conf = "";
+    for (var c = 0; c < 26; c++) {
+      conf += rect(4 + (c * 53) % 234, 8 + (c * 31) % 40, 1.6, 2.6, ["#e8384f", "#ffd400", "#2fbf4f", "#2b7fff", "#ff8fd0"][c % 5],
+        { rx: 0.4, opacity: 0.85, transform: "rotate(" + ((c * 37) % 90 - 45) + " " + (4 + (c * 53) % 234) + " " + (8 + (c * 31) % 40) + ")" });
+    }
+    function torch(x, y) {
+      return glow(x, y - 4, 12, "#ffb347", 0.5) + rect(x - 1.2, y, 2.4, 14, "#5a3d22") +
+        poly((x - 3) + "," + y + " " + x + "," + (y - 7) + " " + (x + 3) + "," + y, "#ff8c1a") +
+        poly((x - 1.6) + "," + y + " " + x + "," + (y - 4.6) + " " + (x + 1.6) + "," + y, "#ffe27a");
+    }
+    function banner(x, y, c) {
+      return line(x, y + 22, x, y, "#5a3d22", 1.2) + poly(x + "," + y + " " + (x + 12) + "," + (y + 2) + " " + (x + 8) + "," + (y + 6) + " " + (x + 12) + "," + (y + 10) + " " + x + "," + (y + 12), c);
     }
     return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") +
-      cloud(40, 14, 1) + cloud(190, 16, 0.9) +
-      rect(0, 40, 240, 22, "#f2d5c0") + crowd +
-      rect(0, 60, 240, 6, "#d8a98f") +
-      el("g", {},
-        line(20, 60, 20, 22, "#a9743f", 1.4) + poly("20,22 40,28 20,34", "#e8384f") +
-        line(220, 60, 220, 22, "#a9743f", 1.4) + poly("220,22 200,28 220,34", "#2b7fff") +
-        line(120, 60, 120, 18, "#a9743f", 1.4) + poly("120,18 142,25 120,32", "#ffd400")) +
-      rect(0, 66, 240, 24, "#e0b489") +
-      el("g", { opacity: 0.3 }, path("M0,74 q60,-6 120,0 t120,0", "#bb8f65")) +
-      el("g", {}, disc(60, 80, 5, "#ffd166", 0.8) + disc(180, 82, 4, "#ffd166", 0.7));
+      disc(200, 14, 9, "#ffe27a", 0.9) + cloud(40, 12, 0.9, "#fff", 0.6) +
+      // spotlights
+      el("g", { opacity: 0.22 }, poly("30,0 62,0 130,78 96,78", "#fff6c9") + poly("178,0 210,0 144,78 110,78", "#fff6c9")) +
+      stands + crowd +
+      el("g", {}, torch(18, 40) + torch(222, 40) + torch(70, 34) + torch(170, 34)) +
+      banner(44, 24, "#e8384f") + banner(120, 16, "#ffd400") + banner(196, 24, "#2b7fff") +
+      // the ring: sand, a rope on posts
+      el("ellipse", { cx: 120, cy: 84, rx: 130, ry: 14, fill: "#e6c39a" }) +
+      el("ellipse", { cx: 120, cy: 84, rx: 118, ry: 10, fill: "#f0d2ac" }) +
+      el("path", { d: "M12,78 q108,-9 216,0", fill: "none", stroke: "#fff", "stroke-width": 1.4 }) +
+      el("path", { d: "M12,78 q108,-9 216,0", fill: "none", stroke: "#e8384f", "stroke-width": 1.4, "stroke-dasharray": "5 5" }) +
+      el("g", {}, rect(11, 72, 2.4, 8, "#5a3d22") + rect(226, 72, 2.4, 8, "#5a3d22") + rect(119, 68, 2.4, 8, "#5a3d22")) +
+      conf +
+      el("g", { opacity: 0.35 }, path("M0,88 q60,-4 120,0 t120,0", "#bb8f65"));
   };
 
   /* The Shadow Tower: a moonlit night, The Shade's tower with its
@@ -1110,22 +1251,55 @@ window.CPArt = (function () {
       el("g", { opacity: 0.35 }, path("M0,80 q40,-8 80,0 t80,0 t80,0 L240,90 L0,90 Z", "#8a5cff"));
   };
 
+  /* Your Stall: the inside of your own little shop — striped wallpaper,
+     shelves of real goods (jars, tins, a hat, a plant, books), a wooden
+     counter with a bell and a cash tin, a scalloped awning over the
+     window and a sign that says it is yours. */
   P.stall = function () {
-    var g = vgrad([[0, "#d8f0ff"], [0.6, "#f0faff"], [1, "#fff2e2"]]);
-    var jars = "";
-    for (var i = 0; i < 8; i++) {
-      jars += rect(20 + i * 26, 30, 14, 14, "#ffffff", { rx: 2, opacity: 0.8 }) +
-        rect(22 + i * 26, 34, 10, 9, ["#ff9ad5", "#8fd8ff", "#ffd166", "#a8e6a0"][i % 4], { rx: 1.5 });
-    }
-    return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") +
-      rect(0, 44, 240, 4, "#a9743f") + jars +
-      rect(0, 62, 240, 6, "#a9743f") +
-      el("g", {}, rect(30, 68, 20, 12, "#c9a06a", { rx: 1 }) + rect(58, 70, 16, 10, "#c9a06a", { rx: 1 }) +
-        rect(170, 68, 22, 12, "#c9a06a", { rx: 1 })) +
-      el("g", {}, rect(96, 56, 48, 12, "#fff6e2", { rx: 2 }) +
-        el("text", { x: 120, y: 65, "text-anchor": "middle", "font-size": 8, fill: "#a9743f",
-          "font-family": "system-ui, sans-serif", "font-weight": "bold" }, "OPEN")) +
-      rect(0, 80, 240, 10, "#b9895a");
+    var g = vgrad([[0, "#fff4e2"], [1, "#ffe9cc"]]);
+    var paper = "";
+    for (var i = 0; i < 20; i++) paper += rect(i * 12, 0, 6, 60, "#ffe2bf", { opacity: 0.55 });
+    function shelf(y) { return rect(6, y, 228, 2.6, "#a9743f") + rect(6, y + 2.6, 228, 1.2, "#7a5230", { opacity: 0.5 }); }
+    var goods = "";
+    // top shelf: jars and tins
+    [[14, "#ffd166"], [24, "#ff9ad5"], [34, "#8fd8ff"], [44, "#a8e6a0"]].forEach(function (j) {
+      goods += rect(j[0], 20, 8, 10, "#fff", { rx: 1.5, opacity: 0.9 }) + rect(j[0] + 1, 23, 6, 6, j[1], { rx: 1 }) + rect(j[0] + 0.5, 19.5, 7, 1.5, "#a9743f");
+    });
+    [[64, "#e8384f"], [74, "#2b7fff"], [84, "#2fbf4f"]].forEach(function (t) {
+      goods += rect(t[0], 21, 8, 9, t[1], { rx: 1 }) + rect(t[0], 24, 8, 2.4, "#fff", { opacity: 0.8 });
+    });
+    // a hat on a stand, a plant, a row of books
+    goods += line(112, 30, 112, 22, "#8a5a2b", 1.2) + el("ellipse", { cx: 112, cy: 22, rx: 8, ry: 2.4, fill: "#8a3ffc" }) + rect(107, 15, 10, 7, "#8a3ffc", { rx: 2 }) + rect(107, 19, 10, 1.4, "#ffd166");
+    goods += rect(132, 24, 8, 6, "#c0552f", { rx: 1 }) + disc(136, 21, 3, "#4fae63") + disc(133, 19, 2.4, "#4fae63") + disc(139, 19, 2.4, "#4fae63");
+    [[154, "#c05f8f"], [159, "#5f8fc0"], [164, "#c0a05f"], [169, "#5fc09a"], [174, "#e07a5f"]].forEach(function (b, i) {
+      goods += rect(b[0], 20 + (i % 2), 4.4, 10 - (i % 2), b[1], { rx: 0.6 });
+    });
+    // second shelf: teddy, cakes, soap, a lamp
+    goods += disc(20, 46, 4, "#c99a6b") + disc(17, 42.5, 1.6, "#c99a6b") + disc(23, 42.5, 1.6, "#c99a6b") + disc(18.6, 45.4, 0.6, "#241f36") + disc(21.4, 45.4, 0.6, "#241f36");
+    [[40, "#ff9ad5"], [50, "#ffd166"], [60, "#a8e6a0"]].forEach(function (c) {
+      goods += rect(c[0], 45, 8, 5, "#f6e2c0", { rx: 1 }) + rect(c[0], 43, 8, 2.5, c[1], { rx: 1 }) + disc(c[0] + 4, 42, 1, "#e8384f");
+    });
+    goods += rect(78, 45, 9, 5, "#8fd8ff", { rx: 1.5 }) + rect(90, 45, 9, 5, "#ff9ad5", { rx: 1.5 });
+    goods += rect(112, 40, 2, 10, "#3b2a1a") + poly("106,40 120,40 117,34 109,34", "#ffe08a") + glow(113, 37, 10, "#ffe08a", 0.35);
+    goods += rect(134, 42, 10, 8, "#fff6e2", { rx: 1 }) + rect(136, 44, 6, 4, "#e8384f", { rx: 0.6 });
+    goods += disc(158, 46, 4.2, "#ff8c1a") + disc(167, 46, 4.2, "#ffd400") + disc(176, 46, 4.2, "#2fbf4f");
+    // the window with its awning, looking out on the lane
+    var win = rect(190, 14, 40, 34, "#8a5a2b", { rx: 2 }) + rect(193, 17, 34, 28, "#bfe9ff", { rx: 1 }) +
+      ridge([[200, 36], [215, 33], [230, 37]], 36, "#a8dd8f").replace('d="M-5', 'd="M193').replace(/L\d+,36 L\d+,120 L-5,120 Z/, "L227,36 L227,45 L193,45 Z") +
+      disc(219, 24, 3.6, "#ffe27a") + rect(209, 17, 1.6, 28, "#8a5a2b") + rect(193, 30, 34, 1.6, "#8a5a2b");
+    var awn = "";
+    for (var k = 0; k < 8; k++) awn += rect(186 + k * 6, 8, 6, 6, k % 2 ? "#e8384f" : "#fff6e2") + disc(189 + k * 6, 14, 3, k % 2 ? "#e8384f" : "#fff6e2");
+    // the counter, the bell and the cash tin
+    var counter = rect(0, 60, 240, 30, "#c9a06a") + rect(0, 60, 240, 3, "#e2c79c") +
+      el("g", { opacity: 0.25 }, line(24, 66, 24, 90, "#7a5230", 1) + line(120, 66, 120, 90, "#7a5230", 1) + line(216, 66, 216, 90, "#7a5230", 1)) +
+      rect(0, 74, 240, 2, "#a9743f", { opacity: 0.6 }) +
+      el("g", {}, disc(206, 56, 4.4, "#ffd166") + rect(201.6, 56, 8.8, 3, "#ffd166") + rect(200, 59, 12, 1.6, "#a9743f") + disc(206, 51, 1, "#a9743f")) +
+      el("g", {}, rect(20, 50, 16, 10, "#3b2a1a", { rx: 1.5 }) + rect(22, 52, 12, 3, "#ffe08a", { rx: 0.5 }) + disc(28, 58, 1.2, "#ffd166")) +
+      el("g", {}, rect(96, 48, 48, 12, "#fff6e2", { rx: 2, stroke: "#a9743f", "stroke-width": 1 }) +
+        el("text", { x: 120, y: 57, "text-anchor": "middle", "font-size": 7, fill: "#a9743f",
+          "font-family": "system-ui, sans-serif", "font-weight": "bold" }, "MY SHOP"));
+    return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") + paper +
+      shelf(30) + shelf(50) + goods + win + awn + counter;
   };
 
   P.nest = function () {
