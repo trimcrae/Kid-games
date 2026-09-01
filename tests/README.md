@@ -58,7 +58,8 @@ For **every game** (and the landing page), at **each of the three sizes**:
     booth makes a real PNG. A petpet is bought, named and follows behind;
     the bank takes 100, pays 3 overnight and gives 103 back; a random event
     pays; Sky Catch starts, scores a right catch, ends and pays; and the
-    map's markers really go places (the family's houses included)
+    map's markers really go places (the family's houses included). Memory Match is dealt and solved and pays, the first-steps list ticks
+    off what was done, and rain streaks the window and pays extra at the Pool
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

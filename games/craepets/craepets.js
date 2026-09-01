@@ -203,7 +203,7 @@
                newq: 0, repeatq: 0, heat: 0, stepup: 0, crit: 0, quick: 0, tower: 0,
                shadeWin: 0, allyHits: 0, allyWins: 0, bestFloor: 0,
                wishes: 0, dressed: 0, gifts: 0, received: 0, diary: 0,
-               banked: 0, events: 0, catchGames: 0, visits: 0 },
+               banked: 0, events: 0, catchGames: 0, matchGames: 0, visits: 0 },
       trophies: []
     };
   }
@@ -431,7 +431,7 @@
     S.bankNews = 0;
     return '<div class="panel bank"><h2>🏦 The Valley Bank</h2>' +
       '<p class="sub">Put coins away and they <b>grow while you sleep</b>. Nothing in the bank can be spent by accident.</p>' +
-      news +
+      npcHtml("bank") + news +
       '<div class="statgrid">' +
         '<div class="stat"><b>🪙 ' + b.balance + "</b><small>in the bank</small></div>" +
         '<div class="stat"><b>+🪙 ' + tonight + "</b><small>tonight's interest</small></div>" +
@@ -820,8 +820,11 @@
       saver: (bank().earned || 0) >= 50,
       lucky: (st.events || 0) >= 10,
       skycatch: ((S.catch && S.catch.best) || 0) >= 15,
-      neighbour: Object.keys(S.visited || {}).length >= 3
+      neighbour: Object.keys(S.visited || {}).length >= 3,
+      sharp: ((S.match && S.match.best) || 0) >= 100,
+      settled: !!(S.steps && STEPS.every(function (s) { return S.steps[s.id]; }))
     };
+    checkSteps();
     Object.keys(tests).forEach(function (id) {
       if (tests[id] && S.trophies.indexOf(id) === -1) { S.trophies.push(id); got.push(id); }
     });
@@ -833,6 +836,44 @@
         }
       }
     });
+  }
+
+  /* =========================================================
+     FIRST STEPS — a new player's first quarter of an hour.
+     Six small things to do, each paid, ticked off as they
+     happen. It is the tutorial, without a tutorial: the list
+     lives at the nest until it is done, then goes away.
+     ========================================================= */
+  var STEPS = [
+    { id: "farm3", text: "Get 3 sums right at the 🍓 Berry Farm", coins: 15, done: function () { return (S.stats.farm || 0) >= 3; } },
+    { id: "feed",  text: "Feed your Craepet something", coins: 10, done: function () { return (S.stats.feed || 0) >= 1; } },
+    { id: "well2", text: "Answer 2 at the 📖 Word Well", coins: 15, done: function () { return (S.stats.well || 0) >= 2; } },
+    { id: "buy",   text: "Buy something at the 🏪 Market", coins: 15, done: function () { return (S.stats.buy || 0) >= 1; } },
+    { id: "spin",  text: "Spin the 🎡 prize wheel", coins: 10, done: function () { return (S.stats.spin || 0) >= 1; } },
+    { id: "game",  text: "Play a game in the 🎮 Games Room", coins: 15, done: function () { return (S.stats.catchGames || 0) + (S.stats.matchGames || 0) >= 1; } },
+    { id: "wear",  text: "Put something on from the 👒 wardrobe", coins: 15, done: function () { return !!S.everDressed; } }
+  ];
+  function checkSteps() {
+    if (!S.pet) return;
+    if (!S.steps) S.steps = {};
+    STEPS.forEach(function (st) {
+      if (S.steps[st.id] || !st.done()) return;
+      S.steps[st.id] = true;
+      earn(st.coins);
+      toast("✅ First steps: " + st.text.replace(/ (at|in|from) .*$/, "") + " — +🪙 " + st.coins);
+    });
+  }
+  function stepsHtml() {
+    if (!S.steps) S.steps = {};
+    var left = STEPS.filter(function (st) { return !S.steps[st.id]; });
+    if (!left.length) return "";
+    return '<div class="panel steps"><h2>🌱 First steps</h2>' +
+      '<p class="sub">Seven little things to try. Each one pays when you do it — ' + (STEPS.length - left.length) + " of " + STEPS.length + " done.</p>" +
+      STEPS.map(function (st) {
+        var ok = !!S.steps[st.id];
+        return '<div class="quest' + (ok ? " done" : "") + '"><div class="qtx">' + (ok ? "✅ " : "⬜ ") + esc(st.text) + "</div>" +
+          '<span class="rw">🪙 ' + st.coins + "</span></div>";
+      }).join("") + "</div>";
   }
 
   /* =========================================================
@@ -1346,7 +1387,7 @@
     quests: { tag: "📜 Quest Board",  deco: [["📜", 84, 10], ["🪶", 12, 62]] },
     case:   { tag: "🏆 Trophy Case",  deco: [["🏆", 12, 10], ["🎖️", 86, 12], ["✨", 50, 74]] },
     diary:  { tag: "📔 The Diary",    deco: [["📔", 86, 10], ["🖋️", 12, 60], ["✨", 30, 78]] },
-    catch:  { tag: "⭐ Sky Catch",    deco: [["⭐", 14, 76], ["⭐", 40, 84], ["🌟", 70, 78], ["☁️", 86, 62]] },
+    games:  { tag: "🎮 Games Room",   deco: [["⭐", 14, 76], ["🃏", 40, 84], ["🌟", 70, 78], ["☁️", 86, 62]] },
     map:    { tag: "🗺️ The Valley",  deco: [["🗺️", 86, 10], ["🧭", 12, 62]] }
   };
 
@@ -1430,7 +1471,7 @@
     }
     var frame = ART.frame(houseInfo());
     return '<div class="win win-' + frame + '" aria-hidden="true">' +
-      ART.view(v.id) + todHtml() +
+      ART.view(v.id) + weatherHtml() + todHtml() +
       '<span class="win-glass"></span><span class="win-bars"></span>' +
       "</div>";
   }
@@ -1570,7 +1611,7 @@
     } else if (ART && ART.hasPano(skin)) {
       // Everywhere else gets a painted panorama instead of the old
       // scatter of emoji — same idea, an actual picture of the place.
-      body = '<span class="pano" aria-hidden="true">' + ART.pano(skin) + (inTower ? "" : todHtml()) + "</span>";
+      body = '<span class="pano" aria-hidden="true">' + ART.pano(skin) + (inTower ? "" : weatherHtml() + todHtml()) + "</span>";
     } else {
       body = (pl.deco || []).map(function (d) {
         return decoSpan(d[0], d[1], d[2], 1, "");
@@ -1585,7 +1626,7 @@
     // where the Craepet stands.
     var tod = timeOfDay();
     var roomTint = (atHome && tod !== "day") ? '<span class="roomtint tod-' + tod + '" aria-hidden="true"></span>' : "";
-    var todMark = { night: " 🌙", dusk: " 🌇", dawn: " 🌅" }[tod] || "";
+    var todMark = ({ night: " 🌙", dusk: " 🌇", dawn: " 🌅" }[tod] || "") + " " + weatherToday().emoji;
     return '<div class="scene ' + skin + (place === "nest" ? "" : " compact") + " tod-" + tod + '" id="scene"' + paint + " " +
       'role="button" tabindex="0" aria-label="' + esc(label) + '. Tap to say hello.">' +
       body + roomTint +
@@ -1729,7 +1770,7 @@
 
   var NAV = [
     ["map", "🗺️", "Map"], ["nest", "🏡", "Nest"], ["home", "🏠", "House"],
-    ["farm", "🍓", "Farm"], ["well", "📖", "Well"], ["pool", "🌈", "Pool"], ["catch", "⭐", "Catch"],
+    ["farm", "🍓", "Farm"], ["well", "📖", "Well"], ["pool", "🌈", "Pool"], ["games", "🎮", "Games"],
     ["market", "🏪", "Market"], ["stall", "🏬", "Stall"], ["arena", "⚔️", "Arena"],
     ["bag", "🎒", "Bag"], ["quests", "📜", "Daily"], ["diary", "📔", "Diary"], ["case", "🏆", "Case"]
   ];
@@ -1777,11 +1818,138 @@
       case "diary": return diaryHtml();
       case "case": return caseHtml();
       case "visit": return visitHtml();
-      case "catch": return catchHtml();
+      case "games": return gamesHtml();
       case "map": return mapHtml();
     }
     return "";
   }
+
+  /* =========================================================
+     THE GAMES ROOM — Sky Catch and Memory Match under one roof.
+     ========================================================= */
+  var gamesTab = "catch";
+  function gamesHtml() {
+    var tabs = [["catch", "⭐", "Sky Catch"], ["match", "🃏", "Memory Match"]];
+    var chips = '<div class="subnav">' + tabs.map(function (t) {
+      return '<button data-gamestab="' + t[0] + '"' + (gamesTab === t[0] ? ' class="on"' : "") + ">" + t[1] + " " + t[2] + "</button>";
+    }).join("") + "</div>";
+    var head = (catchOn || match) ? "" :
+      '<div class="panel"><h2>🎮 The Games Room</h2>' + npcHtml("games") +
+      '<p class="sub">Two games, real ones: quick fingers in <b>Sky Catch</b>, a good memory in <b>Memory Match</b>. Both pay coins, both keep your best score, and both are sorting at your level.</p>' +
+      chips + "</div>";
+    return head + (gamesTab === "match" ? matchHtml() : catchHtml());
+  }
+
+  /* --- 🃏 Memory Match --- */
+  var match = null;            // { rule, pairs, cards, first, lock, flips, found }
+  function matchHtml() {
+    var m = S.match || { best: 0, games: 0 };
+    if (!match) {
+      var rules = window.CPMatch ? CPMatch.themes(tier(), D, L).map(function (t) { return t.rule; }) : [];
+      return '<div class="panel"><h2>🃏 Memory Match</h2>' +
+        '<p class="sub">Turn two cards over. A pair is a <b>sum and its answer</b>, an <b>animal and its baby</b>, a <b>word and its opposite</b>… ' +
+        "so every pair you keep is something you know. Fewer turns, more coins.</p>" +
+        '<div class="statgrid">' +
+          '<div class="stat"><b>🃏 ' + (m.best || 0) + "</b><small>best: pairs in fewest turns</small></div>" +
+          '<div class="stat"><b>🎮 ' + (m.games || 0) + "</b><small>games played</small></div>" +
+        "</div>" +
+        '<p style="margin:0.8rem 0 0"><button class="act" data-matchplay="1" style="--ac:#e05fa8;width:100%"><span class="em">🃏</span>Deal the cards</button></p>' +
+        '<p class="sub" style="margin-top:0.8rem">Rules at your level: ' + rules.map(function (r) { return "<b>" + esc(r.replace(/!$/, "")) + "</b>"; }).join(" · ") + ".</p>" +
+      "</div>";
+    }
+    var cols = match.cards.length <= 8 ? 4 : 4;
+    return '<div class="panel"><h2>🃏 ' + esc(match.rule) + "</h2>" +
+      '<p class="sub">' + match.found + " of " + match.pairs.length + " pairs · " + match.flips + " turn" + (match.flips === 1 ? "" : "s") +
+      ' <button class="ghost small" data-matchstop="1">Stop</button></p>' +
+      '<div class="mgrid" style="--cols:' + cols + '">' + match.cards.map(function (c, i) {
+        return '<button class="mcard' + (c.done ? " done" : c.up ? " up" : "") + '" data-mc="' + i + '" aria-label="' +
+          (c.up || c.done ? esc(cardLabel(c.face)) : "face-down card " + (i + 1)) + '"' + (c.done ? " disabled" : "") + ">" +
+          '<span class="inner"><span class="back">✨</span><span class="face">' + cardHtml(c.face) + "</span></span></button>";
+      }).join("") + "</div></div>";
+  }
+  function cardLabel(f) { return f.t || f.emoji || (f.colour ? "a colour" : ""); }
+  function cardHtml(f) {
+    if (f.colour) return '<span class="swatchcard" style="background:' + f.colour + '"></span>';
+    if (f.emoji) return '<span class="big">' + f.emoji + "</span>";
+    var t = String(f.t);
+    return '<span class="' + (t.length > 8 ? "small" : t.length > 4 ? "" : "big") + '">' + esc(t) + "</span>";
+  }
+  function startMatch() {
+    if (!window.CPMatch) return;
+    var d = CPMatch.deal(tier(), D, L);
+    match = { rule: d.rule, pairs: d.pairs, cards: d.cards.map(function (c) { c.up = false; c.done = false; return c; }),
+              first: -1, lock: false, flips: 0, found: 0 };
+    hush();
+    render();
+    narrate([d.rule]);
+    sfx("pop");
+  }
+  function flipCard(i) {
+    if (!match || match.lock) return;
+    var c = match.cards[i];
+    if (!c || c.up || c.done) return;
+    c.up = true;
+    var el = document.querySelector('[data-mc="' + i + '"]');
+    if (el) { el.classList.add("up"); el.setAttribute("aria-label", cardLabel(c.face)); }
+    sfx("pop");
+    if (match.first < 0) { match.first = i; return; }
+    var a = match.cards[match.first], b = c, ai = match.first;
+    match.first = -1;
+    match.flips++;
+    if (a.pair === b.pair) {
+      a.done = b.done = true;
+      match.found++;
+      [ai, i].forEach(function (k) { var e = document.querySelector('[data-mc="' + k + '"]'); if (e) { e.classList.add("done"); e.disabled = true; } });
+      sfx(match.found >= 3 ? "streak" : "good", match.found);
+      if (match.found >= match.pairs.length) { match.lock = true; setTimeout(endMatch, 500); }
+    } else {
+      match.lock = true;
+      sfx("nope");
+      setTimeout(function () {
+        if (!match) return;
+        a.up = b.up = false;
+        [ai, i].forEach(function (k) { var e = document.querySelector('[data-mc="' + k + '"]'); if (e) { e.classList.remove("up"); e.setAttribute("aria-label", "face-down card " + (k + 1)); } });
+        match.lock = false;
+      }, 750);
+    }
+    var sub = document.querySelector(".mgrid") && document.querySelector(".mgrid").previousElementSibling;
+    if (sub) sub.firstChild.nodeValue = match.found + " of " + match.pairs.length + " pairs · " + match.flips + " turn" + (match.flips === 1 ? "" : "s") + " ";
+  }
+  function endMatch() {
+    if (!match) return;
+    var m = match;
+    match = null;
+    var n = m.pairs.length;
+    var perfect = n, tidy = n + Math.ceil(n / 2);
+    var bonus = m.flips <= perfect ? 30 : m.flips <= tidy ? 20 : m.flips <= n * 2 ? 10 : 0;
+    var coins = n * 4 + bonus;
+    earn(coins);
+    giveXp(n * 2);
+    if (!S.match) S.match = { best: 0, games: 0 };
+    S.match.games++;
+    bump("matchGames");
+    bestToday("matchPairs", n);
+    // "best" is pairs found per turn taken, as a percentage — 100 is perfect
+    var eff = Math.round(n / m.flips * 100);
+    var newBest = eff > (S.match.best || 0);
+    if (newBest) { S.match.best = eff; diary("🃏", "Memory Match: " + n + " pairs in " + m.flips + " turns. My best yet!"); }
+    S.pet.happy = clamp(S.pet.happy + 5, 0, 100);
+    checkTrophies();
+    save();
+    render();
+    openSheet(sheet("🃏 " + (bonus >= 30 ? "Perfect memory!" : bonus >= 20 ? "Sharp!" : "All found!"),
+      '<p class="sub" style="text-align:center;font-size:1.15rem"><b>' + n + " pairs in " + m.flips + " turns</b>" + (newBest ? " — a new best! 🏆" : "") + "</p>" +
+      '<div class="statgrid"><div class="stat"><b>🪙 ' + coins + "</b><small>earned" + (bonus ? " (+" + bonus + " for few turns)" : "") + "</small></div>" +
+      '<div class="stat"><b>⭐ ' + (n * 2) + "</b><small>XP</small></div></div>" +
+      '<p class="teach"><b>' + esc(m.rule) + "</b></p>" +
+      '<div class="pairlist">' + m.pairs.map(function (p) {
+        return '<span class="pair">' + cardHtml(p[0]) + ' <span class="eq">=</span> ' + cardHtml(p[1]) + "</span>";
+      }).join("") + "</div>" +
+      '<p style="margin:0.8rem 0 0"><button class="act" data-matchplay="1" style="--ac:#e05fa8;width:100%"><span class="em">🔁</span>Deal again</button></p>'));
+    sfx("win");
+    try { window.Confetti && Confetti.burst({ count: bonus ? 80 : 40 }); } catch (e) {}
+  }
+  function stopMatch() { match = null; }
 
   /* =========================================================
      THE VALLEY MAP — every place as a picture you can tap.
@@ -1995,6 +2163,86 @@
       full: "🌊 A whole wave of color!" }
   };
   var SLOTS = 8;
+
+  /* =========================================================
+     THE PEOPLE OF THE VALLEY — somebody runs every place.
+     A named Craepet behind every counter, with something to say
+     that changes through the day. It is what turns "the maths
+     screen" into "Farmer Fen's place".
+     ========================================================= */
+  var NPCS = {
+    farm:   { name: "Farmer Fen", species: "snorbit", colour: "meadow", lines: [
+      "Berries are ripe! Every sum you get right, I'll pick you one.", "Mind the bees — they're friendly, mostly.",
+      "My Snorbits eat me out of carrots. Yours too?", "A full basket is worth a bonus. Don't stop at seven!" ] },
+    well:   { name: "Old Mossbeard", species: "twiggle", colour: "cocoa", lines: [
+      "Every word you know is a coin in the bucket, young one.", "I have read every book in this valley twice. Mossy read them once.",
+      "Words are the oldest magic there is.", "Drop a word down the well and listen for the splash." ] },
+    pool:   { name: "Splish", species: "puddlepop", colour: "sky", lines: [
+      "The pool knows EVERYTHING. Ask it about the sea, the stars, the sky!", "Fifteen right and I'll bubble you up a brand new colour.",
+      "Wet feet are happy feet.", "I washed up a bar of soap this morning. Somebody will want it." ] },
+    market: { name: "Mrs Marigold", species: "blorb", colour: "sunbeam", lines: [
+      "Fresh stock every morning, dear, and nobody's shelf is the same as anybody else's.", "Work out your change and I'll tip you for it.",
+      "A hat, a petpet, a bar of soap — something for everyone.", "The bank next door pays interest, you know. Three per cent!" ] },
+    bank:   { name: "Mr Pennyworth", species: "flarn", colour: "gold", lines: [
+      "Money that sits in the bank makes more money. That is the whole secret.", "Three per cent a night, compounded. Ask me what compounded means.",
+      "Nothing in my vault can be spent by accident. That is the point of a vault.", "A hundred in tonight is a hundred and three tomorrow." ] },
+    arena:  { name: "Referee Rook", species: "zibbit", colour: "grape", lines: [
+      "Right answers hit. Wrong answers get hit. Simple.", "Three in a row and you're charged. Fourth one's a critical.",
+      "The tower goes up for ever. So does The Shade's temper.", "Bring a friend. A family Craepet lands its own hits." ] },
+    games:  { name: "Dizzy", species: "glimmr", colour: "bubble", lines: [
+      "Quick fingers AND a quick mind — that's my games room!", "Sky Catch is all about the rule. Read it first, then run.",
+      "Memory Match: every pair you keep is something you know.", "Best scores go on the wall. Beat your own!" ] },
+    quests: { name: "Postmaster Quill", species: "glimmr", colour: "snow", lines: [
+      "Three quests a day, same three for the whole family. Race them.", "The wheel is eight slices, all the same size. One in eight, every time.",
+      "Your gift grows every day you come back. Don't break the streak!", "Random events? Oh, they happen on the paths. Keep walking." ] }
+  };
+  function npcLine(npc) {
+    var n = ((S.today.correct || 0) + (S.today.buy || 0) + D.dayNumber()) % npc.lines.length;
+    return npc.lines[n];
+  }
+  function npcHtml(id) {
+    var npc = NPCS[id];
+    if (!npc) return "";
+    var line = npcLine(npc);
+    return '<div class="npc"><img alt="" src="' + P.chip(npc.species, npc.colour, 48) + '">' +
+      '<div class="npcsay"><b>' + esc(npc.name) + '</b> <small>· a ' + esc(P.colour(npc.colour).name) + " " + esc(P.species(npc.species).name) + "</small>" +
+      '<i>“' + esc(line) + '”</i></div>' +
+      '<button class="mini" data-say-text="' + esc(npc.name + " says: " + line) + '" aria-label="Hear ' + esc(npc.name) + '">🔊</button></div>';
+  }
+
+  /* =========================================================
+     THE WEATHER — different every day, the same for everyone.
+     Seeded by the day, so the whole family sees the same rain.
+     Rain streaks the window and the outdoor places, snow falls,
+     wind blows leaves, and now and then there is a rainbow. One
+     place pays a coin more in each kind of weather, so a child
+     who reads the sky has a reason to.
+     ========================================================= */
+  var WEATHERS = [
+    { id: "sunny",   emoji: "☀️", name: "Sunny",   w: 5, place: "farm", line: "Lovely sunshine. The berries love it." },
+    { id: "cloudy",  emoji: "☁️", name: "Cloudy",  w: 3, place: "well", line: "Grey and quiet. A good day for words." },
+    { id: "rainy",   emoji: "🌧️", name: "Rainy",   w: 3, place: "pool", line: "Rain! The pool is brimming." },
+    { id: "windy",   emoji: "🍃", name: "Windy",   w: 2, place: "games", line: "Blowy! Hold on to your hat." },
+    { id: "snowy",   emoji: "❄️", name: "Snowy",   w: 1, place: "well", line: "Snow! Everything is soft and white." },
+    { id: "rainbow", emoji: "🌈", name: "Rainbow", w: 1, place: "pool", line: "A rainbow, right over the valley!" }
+  ];
+  var weatherOverride = null;     // the play-test robot picks the weather
+  function weatherToday() {
+    if (weatherOverride) for (var k = 0; k < WEATHERS.length; k++) if (WEATHERS[k].id === weatherOverride) return WEATHERS[k];
+    var seed = D.dayNumber() * 7919 + 3;
+    var s = seed % 2147483647; if (s <= 0) s += 2147483646;
+    s = (s * 16807) % 2147483647;
+    var r = (s - 1) / 2147483646;
+    var total = 0; WEATHERS.forEach(function (w) { total += w.w; });
+    var x = r * total;
+    for (var i = 0; i < WEATHERS.length; i++) { x -= WEATHERS[i].w; if (x <= 0) return WEATHERS[i]; }
+    return WEATHERS[0];
+  }
+  function weatherHtml() {
+    var w = weatherToday();
+    return (w.id === "sunny") ? "" : '<span class="wx wx-' + w.id + '" aria-hidden="true"></span>';
+  }
+  var WEATHER_BONUS = 1;
 
   /* =========================================================
      THE REVIEW BASKET — the single biggest teaching change.
@@ -2257,6 +2505,11 @@
       extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">💛 ' + esc(spec().name) + "s love the " + info.title.replace(/^\S+\s/, "") +
         ": <b>+" + FAV_BONUS + " 🪙</b> on every right answer here.</p>";
     }
+    var wxNow = weatherToday();
+    if (wxNow.place === place) {
+      extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">' + wxNow.emoji + " <b>" + esc(wxNow.name) + " today</b> — " +
+        esc(wxNow.line) + " <b>+" + WEATHER_BONUS + " 🪙</b> on every right answer here.</p>";
+    }
     if (tier() !== "tot") {
       var a = adaptOf(info.subject), h = HEAT[a.rung - 1];
       var run = a.hist.length ? a.hist.slice(-5).filter(function (x) { return x; }).length : 0;
@@ -2266,7 +2519,7 @@
 
     return '<div class="panel">' +
       "<h2>" + info.title + "</h2>" +
-      '<p class="sub">' + info.sub + "</p>" +
+      '<p class="sub">' + info.sub + "</p>" + npcHtml(place) +
       basket + extra +
       quizHtml(sess) +
     "</div>";
@@ -2465,11 +2718,13 @@
     // …and a Snorbit at the Farm, a Blorb at the Pool: the favourite place pays extra
     var fav = sess.place === favPlace();
     if (fav) coins += FAV_BONUS;
+    var wx = weatherToday().place === sess.place;
+    if (wx) coins += WEATHER_BONUS;
     earn(coins);
     // A book shelf, a globe and a star window really do make you learn
     // faster — and so does a hotter question.
     giveXp(Math.round((3 + D.hot(sess.q && sess.q.rung)) * (1 + studyBonus())));
-    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : "") + (fav ? " 💛" : ""), "#ffe07a");
+    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : "") + (fav ? " 💛" : "") + (wx ? " " + weatherToday().emoji : ""), "#ffe07a");
 
     if (sess.plots.length < SLOTS) {
       sess.plots.push(info.crops[Math.floor(Math.random() * info.crops.length)]);
@@ -2535,6 +2790,23 @@
   /* One of the pet's lines for its mood, with the recording's name. */
   function moodSay() {
     var m = mood(), i = Math.floor(Math.random() * D.MOODS[m].length);
+    // now and then, something about the day itself: the hour, the
+    // weather, the petpet — the things a pet would actually notice
+    if (Math.random() < 0.35 && m !== "tired") {
+      var extra = [];
+      var tod = timeOfDay(), wx = weatherToday();
+      if (tod === "night") extra.push("Yawn… is it bedtime soon?", "Look at all the stars!");
+      if (tod === "dawn") extra.push("Good morning! Is it breakfast?");
+      if (tod === "dusk") extra.push("The sky's gone all orange!");
+      if (wx.id === "rainy") extra.push("Listen to the rain!", "Splish splash!");
+      if (wx.id === "snowy") extra.push("SNOW! Can we go out in it?");
+      if (wx.id === "windy") extra.push("Whoosh! Hold my hat!");
+      if (wx.id === "rainbow") extra.push("A rainbow! Did you see it?");
+      if (wx.id === "sunny") extra.push("What a sunny day!");
+      if (S.pet.petpet) extra.push(S.pet.petpet.name + " is my best friend.", "Come on, " + S.pet.petpet.name + "!");
+      if (S.dayStreak >= 3) extra.push("You came back again! " + S.dayStreak + " days!");
+      if (extra.length) return { text: extra[Math.floor(Math.random() * extra.length)], tok: null };
+    }
     return { text: D.MOODS[m][i], tok: "m-" + m + "-" + i };
   }
 
@@ -2560,7 +2832,7 @@
       '<p class="sub" style="margin:0.8rem 0 0">💛 ' + personalityLine() + "</p>" +
       '<p class="sub" style="margin:0.8rem 0 0">Coins come from the Farm, the Well, the Pool and the Arena — ' +
         "every one of them pays you for learning something.</p>" + streakBit +
-    "</div>" + mailHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
+    "</div>" + mailHtml() + stepsHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
   }
 
   function wishPanel() {
@@ -3813,7 +4085,7 @@
     "</div>";
 
     return bankHtml() + '<div class="panel">' +
-      "<h2>🏪 The Market</h2>" +
+      "<h2>🏪 The Market</h2>" + npcHtml("market") +
       '<p class="sub"><b>' + stock.length + " things on the shelves today</b>, out of the <b>" +
         (D.FOODS.length + D.TOYS.length + D.CARE.length + D.BOOKS.length + D.FURNITURE.length) +
         "</b> in the valley — fresh stock every morning, and <b>everybody's shelf is different</b>, so " +
@@ -4273,7 +4545,7 @@
         (isOpen ? '<span class="price">🪙 ' + r.coins + "</span>" : '<span class="own">Level ' + need + "</span>") +
       "</button>";
     }).join("");
-    var spar = '<div class="panel"><h2>⚔️ Sparring partners</h2>' +
+    var spar = '<div class="panel"><h2>⚔️ Sparring partners</h2>' + npcHtml("arena") +
       '<p class="sub">Pick a rival. Every right answer is a hit; every wrong one lets them hit back. ' +
         "Your Craepet hits harder as it levels up — and harder still when it's happy.</p>" +
       '<div class="items">' + cards + "</div>" +
@@ -4630,7 +4902,7 @@
 
     return wheelHtml() +
     '<div class="panel">' +
-      "<h2>📜 Today's quests</h2>" +
+      "<h2>📜 Today's quests</h2>" + npcHtml("quests") +
       '<p class="sub">Three every day, the same three for everyone in the family. They reset overnight.</p>' +
       rows +
     "</div>" +
@@ -4996,12 +5268,14 @@
     var go = t.closest("[data-go]");
     if (go) {
       var dest = go.dataset.go;
+      if (dest === "catch") { dest = "games"; gamesTab = "catch"; }    // an old link into the games room
       if (dest !== view) {
         hush();
         stopCatch();
+        stopMatch();
         if (["farm", "well", "pool"].indexOf(dest) === -1) sess = null;
         if (dest !== "arena") { battle = null; clearTimeout(battleTimer); }
-        if (["nest", "farm", "well", "pool", "market", "stall", "arena", "quests", "catch"].indexOf(dest) !== -1) lastPlace = dest;
+        if (["nest", "farm", "well", "pool", "market", "stall", "arena", "quests", "games"].indexOf(dest) !== -1) lastPlace = dest;
         if (dest === "bag") { S.bagNew = {}; save(); }   // you have seen them now
         pendingSale = null;
         pendingPost = null;
@@ -5010,7 +5284,7 @@
         sfx("pop");
         render();
         // the paths between places are where things happen
-        if (["farm", "well", "pool", "market", "arena", "stall", "quests", "catch"].indexOf(dest) !== -1) maybeEvent();
+        if (["farm", "well", "pool", "market", "arena", "stall", "quests", "games"].indexOf(dest) !== -1) maybeEvent();
       }
       return;
     }
@@ -5151,9 +5425,17 @@
       return namePetpet(pv ? pv.value : (S.pet.petpet && S.pet.petpet.name));
     }
 
-    // --- Sky Catch ---
-    if (t.closest("[data-catchplay]")) { closeSheet(); return startCatch(); }
+    // --- the games room ---
+    var gt = t.closest("[data-gamestab]");
+    if (gt) { gamesTab = gt.dataset.gamestab; stopCatch(); stopMatch(); sfx("pop"); return render(); }
+    if (t.closest("[data-catchplay]")) { closeSheet(); gamesTab = "catch"; return startCatch(); }
     if (t.closest("[data-catchstop]")) { stopCatch(); render(); return; }
+    if (t.closest("[data-matchplay]")) { closeSheet(); gamesTab = "match"; return startMatch(); }
+    if (t.closest("[data-matchstop]")) { stopMatch(); render(); return; }
+    var mc = t.closest("[data-mc]");
+    if (mc) return flipCard(Number(mc.dataset.mc));
+    var sayText = t.closest("[data-say-text]");
+    if (sayText) { narrate([sayText.dataset.sayText], { force: true }); return; }
 
     // --- the bank ---
     var bankBtn = t.closest("[data-bank]");
@@ -5271,6 +5553,7 @@
     battle = null;
     visit = null;
     stopCatch();
+    stopMatch();
     lastPlace = "nest";
     clearTimeout(battleTimer);
     pendingBuy = null;
@@ -5379,6 +5662,10 @@
     _event: function (i) { randomEvent(i); },
     _events: function (on) { eventsOn = !!on; },
     catching: function () { return catchOn; },
+    match: function () { return match; },
+    weather: weatherToday,
+    _setWeather: function (id) { weatherOverride = id || null; render(); },
+    steps: function () { return S.steps; },
     _anim: function () { return anim; },
     _setHour: function (h) { hourOverride = (h === null || h === undefined) ? null : h; render(); }
   };

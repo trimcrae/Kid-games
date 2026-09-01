@@ -72,6 +72,11 @@ no logins.
 > on the paths, and **Sky Catch** — a proper arcade mini-game where you run
 > your Craepet under the falling sky and catch only what the rule asks for
 > (even numbers, primes, vowels, the letter A, the stars), at your level.
+> **Memory Match** is the second game in the games room (pairs are a sum
+> and its answer, an animal and its baby, a word and its opposite, a
+> country and its capital), the **weather** changes daily and rains on the
+> window, every place has a **named shopkeeper** with something to say,
+> and new players get a **first-steps** list that pays as they go.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times
