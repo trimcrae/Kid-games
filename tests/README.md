@@ -58,7 +58,11 @@ For **every game** (and the landing page), at **each of the three sizes**:
     booth makes a real PNG. A petpet is bought, named and follows behind;
     the bank takes 100, pays 3 overnight and gives 103 back; a random event
     pays; Sky Catch starts, scores a right catch, ends and pays; and the
-    map's markers really go places (the family's houses included). Memory Match is dealt and solved and pays, the first-steps list ticks
+    map's markers really go places (the family's houses included).
+    On Halloween a garland hangs, a present gives a pumpkin hat and every
+    answer pays extra; autumn grows pumpkins and stocks a seasonal shelf;
+    Advent counts the sleeps, it snows on Christmas Day, and a hatch-day
+    gets a cake and a party hat. Memory Match is dealt and solved and pays, the first-steps list ticks
     off what was done, and rain streaks the window and pays extra at the Pool. The help sheet opens, a valley saved as a file loads back exactly (and a
     bad file is refused), and starting over needs the pet's name typed. A new pet is an egg that hatches after three right answers (or eight
     taps for a toddler), the Valley Times front page is printed, and the
