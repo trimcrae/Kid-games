@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🥚 Craepets</title>
-  <meta name="description" content="Adopt a Craepet, then feed, teach and raise it — furnish a house, open your own shop, spin the daily prize wheel and climb The Shade's Shadow Tower. Every coin in the valley is earned by learning something, at your own level — and the questions heat up as you get better." />
+  <meta name="description" content="Adopt a Craepet, then feed, teach, dress up and raise it — grant its wishes, read its diary, post presents to the family, furnish a house, open your own shop, spin the daily prize wheel and climb The Shade's Shadow Tower. Every coin in the valley is earned by learning something, at your own level — and the questions heat up as you get better." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥚</text></svg>" />
   <meta name="theme-color" content="#5ec6a8" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
@@ -35,7 +35,9 @@
     }
     .who:hover { transform: translateY(-2px); }
     .who.on { background: var(--wc, var(--purple)); color: #fff; transform: translateY(-2px) scale(1.04); }
-    .who img { width: 22px; height: 22px; image-rendering: pixelated; }
+    /* the chip can be a little taller than it is wide when the pet has a
+       hat on, so only the width is pinned */
+    .who img { width: 22px; height: auto; image-rendering: pixelated; }
 
     /* --- money / level bar --- */
     .topbar {
@@ -173,6 +175,41 @@
       border-radius: 999px; padding: 0.15rem 0.65rem; pointer-events: none;
     }
     .scene.well .place-tag, .scene.arena .place-tag { background: rgba(255,255,255,0.9); }
+
+    /* --- the time of day ----------------------------------------------
+       The view through the window (and the outdoor panoramas) follow the
+       real clock: a warm wash at dusk, a pale one at dawn, and at night a
+       deep blue with a scatter of stars and a moon. At home the whole
+       room dims after dark, except for a pool of lamplight where the
+       Craepet stands. Purely a look — nothing in the game changes. */
+    .scene .tod { position: absolute; inset: 0; pointer-events: none; }
+    .scene .tod-dusk {
+      background: linear-gradient(180deg, rgba(255,140,80,0.28) 0%, rgba(255,90,130,0.18) 45%, rgba(90,40,110,0.22) 100%);
+    }
+    .scene .tod-dawn {
+      background: linear-gradient(180deg, rgba(255,205,150,0.30) 0%, rgba(255,240,220,0.10) 60%, rgba(255,255,255,0) 100%);
+    }
+    .scene .tod-night {
+      background:
+        radial-gradient(circle at 76% 22%, #fff6c8 0 7%, rgba(255,246,200,0.35) 8%, transparent 10%),
+        radial-gradient(circle at 14% 18%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 32% 34%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 52% 14%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 63% 40%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 44%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 24% 52%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 44% 28%, #fff 0 1px, transparent 2px),
+        linear-gradient(180deg, rgba(12,16,70,0.72) 0%, rgba(16,20,80,0.62) 55%, rgba(10,10,40,0.55) 100%);
+    }
+    /* the room after dark, lit by one lamp */
+    .scene .roomtint { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+    .scene .roomtint.tod-night {
+      background: radial-gradient(ellipse at 50% 68%, rgba(255,205,120,0.10) 0%, rgba(255,190,110,0) 26%, rgba(18,14,60,0.42) 62%);
+    }
+    .scene .roomtint.tod-dusk {
+      background: radial-gradient(ellipse at 50% 68%, rgba(255,190,110,0) 30%, rgba(120,50,90,0.18) 70%);
+    }
+    .scene .roomtint.tod-dawn { background: linear-gradient(180deg, rgba(255,220,180,0.14), rgba(255,255,255,0)); }
 
     /* the pet's speech bubble */
     .bubble {
@@ -539,6 +576,39 @@
     ul.rules li { margin-bottom: 0.25rem; }
     .scene.tower { background: linear-gradient(180deg, #120f26 0%, #2b2450 55%, #241f40 55%, #17142c 100%); }
     .scene.tower .place-tag { background: rgba(43,36,64,0.88); color: #ffd166; }
+
+    /* --- the wish --- */
+    .wish {
+      position: relative; margin: 0; padding: 0.65rem 3rem 0.65rem 0.8rem; border-radius: 16px;
+      background: linear-gradient(135deg, #fff4fb, #f0ecff); border: 3px dashed #e3d4ff;
+      font-size: 0.95rem; line-height: 1.4;
+    }
+    .wish .wtag { color: var(--purple); font-weight: bold; }
+    .wish b { font-size: 1.05rem; }
+    .wish small { display: block; margin-top: 0.3rem; color: #6a6385; font-size: 0.82rem; }
+    .wish .ghost.small { position: absolute; right: 0.5rem; top: 0.5rem; min-width: 40px; padding: 0.2rem 0.4rem; }
+    .wish.done { border-style: solid; border-color: #c9f2d8; background: #f1fff6; color: #46406b; padding-right: 0.8rem; }
+
+    /* --- the wardrobe's try-on pictures --- */
+    .item img.try { width: 64px; image-rendering: pixelated; }
+    img.try.big { width: 112px; image-rendering: pixelated; }
+
+    /* --- the diary --- */
+    h3.diaryday { margin: 1rem 0 0.3rem; font-size: 0.9rem; color: var(--purple); }
+    .entry {
+      display: flex; align-items: flex-start; gap: 0.55rem; padding: 0.5rem 0.4rem;
+      border-bottom: 2px dashed #efeaff; font-size: 0.95rem; line-height: 1.4;
+    }
+    .entry:last-child { border-bottom: none; }
+    .entry .em { font-size: 1.35rem; line-height: 1.2; flex: 0 0 auto; }
+    .entry .etx { flex: 1 1 auto; min-width: 0; }
+    .entry small { display: block; color: #8b83a8; font-size: 0.72rem; margin-top: 0.1rem; }
+    .entry.mine { background: #fff8e8; border-radius: 12px; border-bottom: none; margin-bottom: 0.2rem; }
+    .entry .mini { flex: 0 0 auto; }
+
+    /* --- the post --- */
+    .panel.post { background: linear-gradient(135deg, #fff5f9, #fff); box-shadow: 0 8px 24px rgba(255,93,143,0.18); }
+    .fam .ghost.small { margin-top: 0.35rem; font-size: 0.72rem; padding: 0.2rem 0.6rem; min-height: 36px; }
 
     /* --- quest list --- */
     .quest { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 2px dashed #efeaff; }

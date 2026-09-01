@@ -46,7 +46,12 @@ For **every game** (and the landing page), at **each of the three sizes**:
     really does move the coins between their two saves. It also guards the
     ways a pet can be *washed*: soap is on the shelf every single day, the
     Pool washes bars up for free, a pet with a completely empty bag can
-    still be rinsed clean, and a toast can never cover a sheet's Close button
+    still be rinsed clean, and a toast can never cover a sheet's Close button.
+    Then the newer half of the valley: a food wish and a play wish are
+    granted and paid, every hat, pair of glasses and scarf draws on every
+    creature and a bought one goes on (and comes off) the pet, the window
+    fills with stars at 10pm, the diary fills up and takes a written entry,
+    and Shannon posts Cory a cookie that he finds waiting at his nest
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)
