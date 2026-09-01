@@ -51,7 +51,11 @@ For **every game** (and the landing page), at **each of the three sizes**:
     granted and paid, every hat, pair of glasses and scarf draws on every
     creature and a bought one goes on (and comes off) the pet, the window
     fills with stars at 10pm, the diary fills up and takes a written entry,
-    and Shannon posts Cory a cookie that he finds waiting at his nest
+    and Shannon posts Cory a cookie that he finds waiting at his nest. A
+    Zibbit's favourite popcorn is worth more joy than bread and the Farm is
+    announced as its favourite place, the pet walks where it is pointed,
+    Cory visits Shannon's house without touching her save, and the photo
+    booth makes a real PNG
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

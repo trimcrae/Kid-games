@@ -174,14 +174,25 @@ window.CPPets = (function () {
     "......OOOO......"
   ];
 
+  /* Every species has a personality: three foods it LOVES (double the
+     joy, and it says so) and a favourite place in the valley (a couple
+     of extra coins for every right answer there). Reading the card and
+     remembering "Snorbits love carrots" is the whole lesson. */
   var SPECIES = [
-    { id: "blorb",     name: "Blorb",     grid: BLORB,     blurb: "Round, bouncy and permanently pleased." },
-    { id: "snorbit",   name: "Snorbit",   grid: SNORBIT,   blurb: "Long ears, quick hops, endless snacking." },
-    { id: "flarn",     name: "Flarn",     grid: FLARN,     blurb: "A pocket dragon. Warm, not dangerous." },
-    { id: "twiggle",   name: "Twiggle",   grid: TWIGGLE,   blurb: "A leafy little fawn from the deep woods." },
-    { id: "puddlepop", name: "Puddlepop", grid: PUDDLEPOP, blurb: "Half kitten, half raindrop, all trouble." },
-    { id: "zibbit",    name: "Zibbit",    grid: ZIBBIT,    blurb: "A star frog with an enormous grin." },
-    { id: "glimmr",    name: "Glimmr",    grid: GLIMMR,    blurb: "A wisp of a sprite that hums when happy." }
+    { id: "blorb",     name: "Blorb",     grid: BLORB,     blurb: "Round, bouncy and permanently pleased.",
+      likes: ["cookie", "cake", "pie"], fav: "pool", trait: "a sweet tooth and a soft spot for puddles" },
+    { id: "snorbit",   name: "Snorbit",   grid: SNORBIT,   blurb: "Long ears, quick hops, endless snacking.",
+      likes: ["carrot", "apple", "grapes"], fav: "farm", trait: "crunchy things and anything that grows" },
+    { id: "flarn",     name: "Flarn",     grid: FLARN,     blurb: "A pocket dragon. Warm, not dangerous.",
+      likes: ["pizza", "taco", "curry"], fav: "well", trait: "spicy food and a good long story" },
+    { id: "twiggle",   name: "Twiggle",   grid: TWIGGLE,   blurb: "A leafy little fawn from the deep woods.",
+      likes: ["salad", "broccoli", "pear"], fav: "well", trait: "green leaves and old words" },
+    { id: "puddlepop", name: "Puddlepop", grid: PUDDLEPOP, blurb: "Half kitten, half raindrop, all trouble.",
+      likes: ["cheese", "noodles", "sushi"], fav: "pool", trait: "cheese, noodles and splashing about" },
+    { id: "zibbit",    name: "Zibbit",    grid: ZIBBIT,    blurb: "A star frog with an enormous grin.",
+      likes: ["mushroomcap", "popcorn", "peanuts"], fav: "farm", trait: "little snacks and big skies" },
+    { id: "glimmr",    name: "Glimmr",    grid: GLIMMR,    blurb: "A wisp of a sprite that hums when happy.",
+      likes: ["candyfloss", "icecream", "cloudfloss"], fav: "well", trait: "fluffy food and a good tune" }
   ];
 
   /* =========================================================
@@ -563,7 +574,9 @@ window.CPPets = (function () {
 
   /* =========================================================
      DRAWING a pet into a canvas the page owns.
-     opts: { frame, level, scale, bob }
+     opts: { frame, level, scale, bob, wear,
+             cx   — where the pet's middle is, in pixels (default: centred),
+             flip — true to face left }
      ========================================================= */
   function draw(canvas, speciesId, colourId, opts) {
     opts = opts || {};
@@ -574,7 +587,8 @@ window.CPPets = (function () {
     g.clearRect(0, 0, canvas.width, canvas.height);
 
     var bob = opts.bob || 0;
-    var x = Math.round((canvas.width - body.width) / 2);
+    var cx = (opts.cx === undefined || opts.cx === null) ? canvas.width / 2 : opts.cx;
+    var x = Math.round(cx - body.width / 2);
     var y = Math.round(canvas.height - body.height - scale) + bob;
 
     // a soft shadow so the pet sits on the ground instead of floating
@@ -582,15 +596,18 @@ window.CPPets = (function () {
     g.fillStyle = "#2b2440";
     var sw = body.width * 0.72, sh = scale * 1.4;
     g.beginPath();
-    g.ellipse(canvas.width / 2, canvas.height - scale * 0.4, sw / 2, sh / 2, 0, 0, Math.PI * 2);
+    g.ellipse(cx, canvas.height - scale * 0.4, sw / 2, sh / 2, 0, 0, Math.PI * 2);
     g.fill();
     g.globalAlpha = 1;
 
+    // facing left is the same picture mirrored about its own middle
+    g.save();
+    if (opts.flip) { g.translate(2 * cx, 0); g.scale(-1, 1); }
     g.drawImage(body, x, y);
-
     // level 5 earns a tiara and level 12 a crown — unless a hat from the
     // wardrobe is on, which sits in the same place
     drawWear(g, species(speciesId), x, y, scale, opts.wear, opts.level || 1);
+    g.restore();
     return { x: x, y: y, w: body.width, h: body.height, scale: scale };
   }
 
