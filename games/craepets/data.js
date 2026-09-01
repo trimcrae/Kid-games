@@ -2336,6 +2336,10 @@ window.CPData = (function () {
      here like anything else. */
   function WEAR() { return (window.CPPets && window.CPPets.WEAR) || []; }
   function PETPETS() { return (window.CPPets && window.CPPets.PETPETS) || []; }
+  /* The calendar (calendar.js): which season it is decides the seasonal
+     shelf and which seasonal clothes are on sale. */
+  function seasonNow() { return (window.CPCal && window.CPCal.season()) || null; }
+  function inSeason(it) { var s = seasonNow(); return !it.season || (s && it.season === s.id); }
 
   function rarePool() {
     return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR(), PETPETS()).filter(function (it) { return isRare(it) && !it.loot; });
@@ -2411,13 +2415,27 @@ window.CPData = (function () {
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 60 && notRare(f); }), 4, day * 7 + 8).map(tag("decor")))
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 60 && f.cost <= 150 && notRare(f); }), 5, day * 7 + 9).map(tag("decor")))
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 150 && notRare(f); }), 4, day * 7 + 11).map(tag("decor")))
-      // Something to WEAR: a hat, a pair of glasses or a scarf, three a day.
-      .concat(seededPick(WEAR().filter(notRare), 3, day * 7 + 12).map(tag("wear")))
+      // Something to WEAR: a hat, a pair of glasses or a scarf, three a day
+      // (a Santa hat only in winter, a pumpkin only in autumn).
+      .concat(seededPick(WEAR().filter(notRare).filter(inSeason), 3, day * 7 + 12).map(tag("wear")))
+      // The seasonal shelf: two of the season's own foods, a fifth off.
+      .concat(seasonalShelf(day))
       // …and two petpets, so there is always a little friend for sale.
       .concat(seededPick(PETPETS().filter(notRare), 2, day * 7 + 13).map(tag("petpet")))
       .concat(seededPick(brushes, 3, day * 7 + 6));
   }
   function tag(kind) { return function (it) { var c = {}; for (var k in it) c[k] = it[k]; c.kind = kind; return c; }; }
+  function seasonalShelf(day) {
+    var s = seasonNow();
+    if (!s) return [];
+    var list = (s.foods || []).map(function (id) { return itemById(id); }).filter(Boolean);
+    return seededPick(list, 2, day * 7 + 14).map(function (f) {
+      var c = tag("food")(f);
+      c.seasonal = s.id;
+      c.cost = Math.max(1, Math.round(f.cost * 0.8));
+      return c;
+    });
+  }
 
   function itemById(id) {
     var all = FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR(), PETPETS());
@@ -2632,7 +2650,9 @@ window.CPData = (function () {
     { id: "skycatch", emoji: "⭐", name: "Star Catcher",    note: "Score 15 in one game of Sky Catch" },
     { id: "neighbour", emoji: "🏘️", name: "Good Neighbour", note: "Visit 3 different houses" },
     { id: "sharp",    emoji: "🃏", name: "Sharp Memory",    note: "A perfect game of Memory Match" },
-    { id: "settled",  emoji: "🌱", name: "Settled In",      note: "Finish all the first steps" }
+    { id: "settled",  emoji: "🌱", name: "Settled In",      note: "Finish all the first steps" },
+    { id: "festive",  emoji: "🎉", name: "Festive",         note: "Open 3 holiday presents" },
+    { id: "hatchday", emoji: "🎂", name: "Many Happy Returns", note: "Celebrate a hatch-day" }
   ];
 
   /* Names on offer for the kids who can't type yet. */

@@ -1017,6 +1017,7 @@ const GAMES = {
   },
 
   async "Craepets"(page, g, d) {
+    const CROPS_AUTUMN = ["🎃", "🍎", "🍂", "🌰", "🍄"];
     await page.goto(`${BASE}/games/craepets/`, { waitUntil: "networkidle" });
     await page.evaluate(() => Object.keys(localStorage)
       .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
@@ -1542,6 +1543,65 @@ const GAMES = {
     if (!(await page.locator(".npc").count())) throw new Error("nobody runs the pool");
     await page.evaluate(() => Craepets._setWeather(null));
 
+    // ---- THE CALENDAR: Halloween hangs a garland, leaves a present and pays extra;
+    // autumn grows pumpkins and puts a seasonal shelf in the Market; Advent counts
+    // the sleeps; a hatch-day gets a cake and a party hat
+    await page.locator('[data-go="nest"]').click();
+    await page.evaluate(() => Craepets._setDate("2026-10-31"));
+    await page.waitForTimeout(100);
+    if (!/🎃/.test(await page.locator(".scene .garland").textContent())) throw new Error("no pumpkins over the scene on Halloween");
+    if (!/Halloween/.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not say it is Halloween");
+    const halloweenCoins = await page.evaluate(() => Craepets.state().coins);
+    await page.locator("[data-claimparty]").first().click();
+    await page.waitForSelector(".sheet");
+    const present = await page.evaluate(() => ({ coins: Craepets.state().coins, hat: Craepets.wardrobe().indexOf("pumpkinhat") !== -1,
+      sweets: Craepets.state().bag.candyfloss || 0, on: Craepets.state().pet.wear.head, parties: Craepets.state().stats.parties }));
+    if (present.coins < halloweenCoins + 50 || !present.hat || !present.sweets || present.on !== "pumpkinhat" || present.parties !== 1) {
+      throw new Error(`the Halloween present was not handed over: ${JSON.stringify(present)}`);
+    }
+    await page.locator(".sheet .close").click();
+    if (await page.locator("[data-claimparty]").count()) throw new Error("a holiday present can be opened twice");
+    if (!/Halloween/.test(await page.locator(".panel.times").textContent())) throw new Error("the Valley Times missed the holiday");
+    // autumn at the farm: pumpkins in the patch and the holiday bonus announced
+    await page.locator('[data-go="farm"]').click();
+    await page.waitForSelector(".choice:not([disabled])");
+    if (!/every right answer, everywhere/.test(await page.locator(".panel").first().textContent())) throw new Error("the farm does not announce the holiday bonus");
+    const plotsBefore = await page.locator(".plot.full").count();
+    const farmCoinsBefore = await page.evaluate(() => Craepets.state().coins);
+    await page.locator(`[data-pick="${await page.evaluate(() => Craepets.correctIndex())}"]`).click();
+    await page.waitForSelector(".teach");
+    const crops = await page.evaluate(() => Array.from(document.querySelectorAll(".plot.full")).map((p) => p.textContent.trim()));
+    if (crops.length !== plotsBefore + 1 || !CROPS_AUTUMN.some((c) => crops.includes(c))) throw new Error(`the farm is not growing autumn crops: ${crops.join(" ")}`);
+    if (await page.evaluate(() => Craepets.state().coins) < farmCoinsBefore + 6 + 2) throw new Error("the holiday bonus was not paid");
+    // the seasonal shelf
+    await page.locator('[data-go="market"]').click();
+    if (!(await page.locator(".item .own", { hasText: "in season" }).count())) throw new Error("the Market has no seasonal shelf");
+    const seasonal = await page.evaluate(() => {
+      const ids = CPData.shopStock(null, Craepets.who()).filter((i) => i.seasonal).map((i) => i.id);
+      return { n: ids.length, autumn: ids.every((id) => CPCal.SEASONS.autumn.foods.includes(id)) };
+    });
+    if (seasonal.n !== 2 || !seasonal.autumn) throw new Error("the seasonal shelf is not autumn's");
+    // Christmas Eve: one sleep to go, and the snow is guaranteed on the day itself
+    await page.locator('[data-go="nest"]').click();
+    await page.evaluate(() => Craepets._setDate("2026-12-24"));
+    await page.waitForTimeout(100);
+    if (!/1 sleep until Christmas/.test(await page.locator(".panel.party").textContent())) throw new Error("Advent is not counting the sleeps");
+    await page.evaluate(() => Craepets._setDate("2026-12-25"));
+    await page.waitForTimeout(100);
+    if (await page.evaluate(() => Craepets.weather().id) !== "snowy") throw new Error("it is not snowing on Christmas Day");
+    if (!/🎅|🎄/.test(await page.locator(".scene .garland").textContent())) throw new Error("no Christmas garland");
+    // a hatch-day, a year to the day after it hatched
+    await page.evaluate(() => { Craepets.state().pet.born = new Date(2026, 5, 1).getTime(); Craepets._setDate("2027-06-01"); });
+    await page.waitForTimeout(100);
+    const hatchdays = await page.evaluate(() => Craepets.celebrations().filter((c) => c.kind === "hatchday").length);
+    if (hatchdays !== 1) throw new Error("the hatch-day was not noticed");
+    await page.locator("[data-claimparty]").first().click();
+    await page.waitForSelector(".sheet");
+    const bday = await page.evaluate(() => ({ cake: Craepets.state().bag.cake || 0, hat: Craepets.wardrobe().indexOf("partyhat") !== -1, trophy: Craepets.state().trophies.indexOf("hatchday") !== -1 }));
+    if (!bday.cake || !bday.hat || !bday.trophy) throw new Error(`the hatch-day party was thin: ${JSON.stringify(bday)}`);
+    await page.locator(".sheet .close").click();
+    await page.evaluate(() => Craepets._setDate(null));
+
     // ---- THE MAP: every place is a marker, and tapping one goes there
     await page.locator('[data-go="map"]').click();
     await page.waitForSelector(".valley");
@@ -1862,6 +1922,8 @@ const GAMES = {
       "cookie and he opens it; a Zibbit loves popcorn and the Farm; the pet wanders; a petpet is " +
       "named and follows; the bank pays 3% overnight; a random event pays; Sky Catch scores and pays; " +
       "Memory Match is solved and pays; first steps tick off; rain on the window pays at the pool; " +
+      "Halloween hangs pumpkins, pays a bonus and gives a pumpkin hat, autumn grows pumpkins and stocks a seasonal shelf, " +
+      "Advent counts sleeps, Christmas snows, a hatch-day gets cake; " +
       "the map goes to the farm; help, a saved valley loads back, start-over needs the name; Cory visits " +
       "Shannon's house and takes a photo; quests, trophies, separate saves for Shannon, " +
       `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;

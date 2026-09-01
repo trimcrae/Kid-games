@@ -426,6 +426,13 @@ window.CPPets = (function () {
     { id: "starcrown", name: "Crown of Stars", emoji: "🌟", cost: 200, slot: "head", rare: true,
       pal: { S: "#ffe27a", Y: "#ffd166", O: "#6d4a06" },
       grid: ["S...S...S", "OSOOSOOSO", "OYYYYYYYO", ".OOOOOOO."] },
+    /* --- the seasonal ones: on the shelf in their season, a present on the day --- */
+    { id: "santahat", name: "Santa Hat", emoji: "🎅", cost: 50, slot: "head", season: "winter",
+      pal: { R: "#e8384f", r: "#b8323f", W: "#ffffff", O: "#7a1f2c" },
+      grid: [".......OWO", "......OWWO", "....OORRO.", "...ORRRRO.", "..ORRrRRO.", ".ORRRRRRO.", "OWWWWWWWWO"] },
+    { id: "pumpkinhat", name: "Pumpkin Hat", emoji: "🎃", cost: 50, slot: "head", season: "autumn",
+      pal: { P: "#ff8c1a", p: "#d9701a", G: "#3fb469", K: "#241f36", O: "#7a4010" },
+      grid: ["....OGO....", "..OOOGOOO..", ".OPPpPpPPO.", "OPKPPPPPKPO", "OPPPKKKPPPO", ".OPpPPPpPO.", "..OOOOOOO.."] },
 
     /* --- glasses: drawn around wherever THIS creature's eyes are --- */
     { id: "glasses", name: "Round Glasses", emoji: "👓", cost: 40, slot: "face", style: "round", colour: "#2b2440" },
