@@ -50,6 +50,12 @@ no logins.
 > their Market and buys from it, and the coins land in your purse — and take
 > a **free spin of the prize wheel** every day, which is eight equal slices
 > and tells you the odds every time it stops.
+> The questions **heat up** as you get better (five right in a row turns a
+> subject up a rung: bigger sums, more coins, and at the top a peek at the
+> level above), the **Shadow Tower** is an endless climb through The Shade's
+> army to The Shade himself, and the little levels are **read aloud in a real
+> storyteller's voice** — every line is in `games/craepets/lines.js` and
+> rendered by the audio pipeline in `tools/`.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times

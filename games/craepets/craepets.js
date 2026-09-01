@@ -35,12 +35,23 @@
   function sfx(name, arg) { try { if (window.SFX && SFX[name]) SFX[name](arg); } catch (e) {} }
 
   /* ---------- read-aloud, for the players who can't read yet ----------
-     Ellie and Kieran can't read the question, so the browser reads it to
-     them. Off by default for everyone who can read; the choice is
+     Ellie and Kieran can't read the question, so the valley reads it to
+     them — with REAL recordings now. Every line the little levels ask,
+     every lesson under an answer, the pet's chatter, the prize wheel and
+     the rivals' taunts are written once in lines.js, rendered by the same
+     warm storyteller voice as the Spooky Stories (tools/build_audio.py)
+     and played from audio/. audio/manifest.js lists which clips exist,
+     so the page never asks for a recording that is not there; a line with
+     no clip yet falls back to the browser's own voice reading the very
+     same words. Off by default for everyone who can read; the choice is
      remembered per device. */
   var VOICE_KEY = "craepets.voice";
+  var L = window.CPLines || null;
+  var CLIPS = window.CRAEPETS_NARRATION || {};
   var canSpeak = typeof window !== "undefined" &&
     "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
+  var hasClips = typeof Audio !== "undefined" && !!window.Voice && Object.keys(CLIPS).length > 0;
+  var canTalk = canSpeak || hasClips;
   var voiceOn = false;
   try {
     var stored = localStorage.getItem(VOICE_KEY);
@@ -52,16 +63,61 @@
     if (voiceOn === null) return tier() === "tot" || tier() === "early";
     return !!voiceOn;
   }
-  function hush() { try { if (canSpeak) window.speechSynthesis.cancel(); } catch (e) {} }
-  function speak(text) {
-    if (!canSpeak || !voiceWanted() || !text) return;
+
+  var narrating = 0;             // a ticket: a newer narrate() cancels an older chain
+  var lastSaid = [];             // what was said last, for the play-test robot
+  function hush() {
+    narrating++;
+    try { if (window.Voice) Voice.stop(); } catch (e) {}
+    try { if (canSpeak) window.speechSynthesis.cancel(); } catch (e) {}
+  }
+  function clipFor(tok) { return CLIPS[tok] ? "audio/" + tok + ".mp3" : null; }
+
+  /* Say a list of things in order. Each is a token from lines.js (which
+     may have a recording) or a plain sentence (which never does). When
+     every piece has a clip the recordings play back to back; otherwise
+     the browser voice reads the whole thing. */
+  function narrate(tokens, opts) {
+    opts = opts || {};
+    if (!tokens || !tokens.length) return;
+    if (!voiceWanted() && !opts.force) return;
+    tokens = tokens.filter(function (t) { return t !== null && t !== undefined && t !== ""; })
+                   .map(function (t) { return String(t); });
+    if (!tokens.length) return;
+    hush();
+    var ticket = narrating;
+    lastSaid = tokens.slice();
+    var everyClip = hasClips && tokens.every(function (t) { return !!clipFor(t); });
+    if (everyClip) {
+      var i = 0;
+      (function next() {
+        if (ticket !== narrating || i >= tokens.length) return;
+        var a = Voice.play(clipFor(tokens[i++]), next);
+        // a clip that will not load must not silence the rest of the line
+        if (a && a.addEventListener) a.addEventListener("error", next);
+      })();
+      return;
+    }
+    if (!canSpeak) return;
+    var text = L ? L.textOf(tokens) : tokens.join(" ");
     try {
-      window.speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(String(text).replace(/[“”]/g, ""));
       u.rate = 0.92;
       u.pitch = 1.05;
       window.speechSynthesis.speak(u);
     } catch (e) {}
+  }
+  function speak(text) { narrate([text]); }
+  /* A random word of praise, recorded. */
+  function praiseToken() {
+    return L ? "p-" + Math.floor(Math.random() * L.PRAISE.length) : "Yes!";
+  }
+  /* The right answer, as something the narrator can say. */
+  function answerToken(q) {
+    var right = (q && q.choices && q.choices[q.answer]) || {};
+    if (q && q.sayA) return q.sayA;
+    var tok = L && L.tokenFor(right.t);
+    return tok || right.t || "this one";
   }
 
   /* =========================================================
@@ -112,6 +168,13 @@
       },
       /* Your own shop, which the rest of the family can buy from. */
       stall: { name: "", goods: [], sales: [] },
+      /* THE HEAT — how hard each subject is asking right now (1–5),
+         and the last few answers that decide whether it moves. */
+      adapt: { math: { rung: 1, hist: [], best: 1 }, word: { rung: 1, hist: [], best: 1 },
+               wonder: { rung: 1, hist: [], best: 1 } },
+      /* The Shadow Tower: floors cleared, the friend you bring, and
+         what The Shade has given up so far. */
+      arena: { floor: 0, ally: null, shadeWins: 0, hoardGot: 0, hoardIds: [] },
       /* The day you last span the prize wheel. */
       spinDay: 0,
       dayStreak: 0,
@@ -120,7 +183,8 @@
                arena: 0, arenaWin: 0, feed: 0, play: 0, wash: 0, read: 0, buy: 0,
                quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {},
                spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0, styled: 0,
-               newq: 0, repeatq: 0 },
+               newq: 0, repeatq: 0, heat: 0, stepup: 0, crit: 0, quick: 0, tower: 0,
+               shadeWin: 0, allyHits: 0, allyWins: 0, bestFloor: 0 },
       trophies: []
     };
   }
@@ -138,6 +202,19 @@
     // normalise them here so nothing downstream has to keep checking.
     if (!Array.isArray(s.review)) s.review = [];
     if (!s.seen || typeof s.seen !== "object" || Array.isArray(s.seen)) s.seen = {};
+    // The heat and the tower were added later; an older save has neither.
+    if (!s.adapt || typeof s.adapt !== "object") s.adapt = {};
+    ["math", "word", "wonder"].forEach(function (k) {
+      var a = s.adapt[k];
+      if (!a || typeof a !== "object") a = s.adapt[k] = { rung: 1, hist: [], best: 1 };
+      a.rung = D.hot(a.rung);
+      if (!Array.isArray(a.hist)) a.hist = [];
+      if (!a.best || a.best < a.rung) a.best = a.rung;
+    });
+    if (!s.arena || typeof s.arena !== "object") s.arena = { floor: 0, ally: null, shadeWins: 0, hoardGot: 0, hoardIds: [] };
+    s.arena.floor = Math.max(0, s.arena.floor | 0);
+    if (!Array.isArray(s.arena.hoardIds)) s.arena.hoardIds = [];
+    if (s.arena.ally && !D.PROFILES.some(function (p) { return p.id === s.arena.ally; })) s.arena.ally = null;
     if (!s.harvest || typeof s.harvest !== "object") s.harvest = { farm: [], well: [], pool: [] };
     ["farm", "well", "pool"].forEach(function (p) {
       if (!Array.isArray(s.harvest[p])) s.harvest[p] = [];
@@ -519,6 +596,15 @@
       martian: S.house.home === "marscastle",
       starlord: ownsHome("starring"),
       rarehunt: !!S.everRare,
+      shade5: (arena().shadeWins | 0) >= 5,
+      floor14: bestFloor() >= 14,
+      floor21: bestFloor() >= 21,
+      crit10: (st.crit || 0) >= 10,
+      hoard: (arena().hoardGot | 0) >= D.hoard().length,
+      onfire: ["math", "word", "wonder"].some(function (k) { return (S.adapt && S.adapt[k] && S.adapt[k].best | 0) >= 5; }),
+      stepup: (st.stepup || 0) >= 1,
+      quick25: (st.quick || 0) >= 25,
+      ally: (st.allyWins || 0) >= 1,
       shopkeep: !!S.everStocked,
       trader: (st.sold || 0) >= 10,
       spinner: (st.spin || 0) >= 10,
@@ -697,10 +783,13 @@
     // the furniture you put out shows up in both.
     var atHome = (place === "nest" || place === "home");
     var skin = atHome ? "nest" : place;
+    var inTower = place === "arena" && battle && battle.mode === "tower";
+    if (inTower) skin = "tower";
     // At home the room is painted from the wall and floor you chose, so
     // repainting shows up the instant you tap it.
     var paint = atHome ? ' style="background:' + homeBackground() + '"' : "";
     var tag = atHome ? houseInfo().emoji + " " + homeName() : pl.tag;
+    if (inTower) tag = "🗼 Shadow Tower · floor " + battle.floor;
 
     var body;
     if (atHome) {
@@ -708,10 +797,10 @@
       // furniture standing in front of both.
       body = textureHtml() + windowHtml() + homeItemsHtml() +
         '<span class="pet-shadow" aria-hidden="true"></span>';
-    } else if (ART && ART.hasPano(place)) {
+    } else if (ART && ART.hasPano(skin)) {
       // Everywhere else gets a painted panorama instead of the old
       // scatter of emoji — same idea, an actual picture of the place.
-      body = '<span class="pano" aria-hidden="true">' + ART.pano(place) + "</span>";
+      body = '<span class="pano" aria-hidden="true">' + ART.pano(skin) + "</span>";
     } else {
       body = (pl.deco || []).map(function (d) {
         return decoSpan(d[0], d[1], d[2], 1, "");
@@ -732,7 +821,9 @@
   }
 
   var bubbleTimer = null;
-  function say(text, ms) {
+  /* The pet's speech bubble — and, given a token, its voice. */
+  function say(text, ms, tok) {
+    if (tok) narrate([tok]);
     var slotEl = $("#bubble-slot");
     if (!slotEl) return;
     slotEl.innerHTML = '<div class="bubble">' + esc(text) + "</div>";
@@ -823,7 +914,7 @@
   function topbarHtml() {
     var lv = level();
     var on = voiceWanted();
-    var voiceBtn = canSpeak
+    var voiceBtn = canTalk
       ? '<button class="mini" data-voice="1" aria-pressed="' + on + '" ' +
         'aria-label="' + (on ? "Reading questions aloud. Turn off." : "Read questions aloud") + '" ' +
         'title="' + (on ? "Reading aloud is ON" : "Read questions aloud") + '">' +
@@ -975,9 +1066,11 @@
       }).join("") + "</div>" +
       '<p class="sub" style="margin:0.5rem 0 0;text-align:center">' +
         esc((D.TIERS.filter(function (x) { return x.id === t; })[0] || D.TIERS[2]).note) + "</p>" +
-      (canSpeak
+      heatLine() +
+      (canTalk
         ? '<p class="sub" style="margin:0.6rem 0 0;text-align:center">' +
           (voiceWanted() ? "🔊 Questions are being read aloud" : "🔇 Questions are not read aloud") +
+          (hasClips ? " in the storyteller's voice" : "") +
           " — tap the speaker in the coin bar to change it. On a keyboard, " +
           "<b>1</b>–<b>4</b> pick an answer and <b>Enter</b> moves on.</p>"
         : "") +
@@ -1031,6 +1124,83 @@
      short fingerprints will.
      ========================================================= */
   var SEEN_MAX = 4000;
+
+  /* =========================================================
+     THE HEAT — adaptive difficulty, inside your level.
+
+     Each subject has a rung from 1 to 5. Five right answers in a
+     row in that subject turn it up; three misses out of the last
+     four turn it down. The rung is handed to the question maker
+     (so the sums really do get bigger), it multiplies the coins,
+     and at the top two rungs some questions come from the level
+     ABOVE — a "step up", paid extra. A child who has outgrown
+     "3 + 4" is never stuck on it, and one who is struggling is
+     never stranded on something too hard.
+     ========================================================= */
+  var HEAT = [
+    { name: "Warm-up", emoji: "🌱", mult: 1 },
+    { name: "Steady",  emoji: "🔥", mult: 1.2 },
+    { name: "Tricky",  emoji: "🔥🔥", mult: 1.45 },
+    { name: "Tough",   emoji: "🔥🔥🔥", mult: 1.75 },
+    { name: "On fire", emoji: "🔥🔥🔥🔥", mult: 2.1 }
+  ];
+  function adaptOf(subject) {
+    if (!S.adapt || typeof S.adapt !== "object") S.adapt = {};
+    var a = S.adapt[subject];
+    if (!a || typeof a !== "object") a = S.adapt[subject] = { rung: 1, hist: [], best: 1 };
+    if (!Array.isArray(a.hist)) a.hist = [];
+    a.rung = D.hot(a.rung);
+    return a;
+  }
+  /* Nothing is ever hard at the Tiny level. */
+  function rungOf(subject) { return tier() === "tot" ? 1 : adaptOf(subject).rung; }
+  function heatOf(q) { return HEAT[D.hot(q && q.rung) - 1]; }
+  /* What a right answer to this question is worth, as a multiplier. A
+     step-up question pays half as much again on top of the heat. */
+  function heatMult(q) {
+    var m = heatOf(q).mult;
+    return (q && q.step) ? Math.round(m * 1.5 * 100) / 100 : m;
+  }
+  function tierName(id) {
+    for (var i = 0; i < D.TIERS.length; i++) if (D.TIERS[i].id === id) return D.TIERS[i].name;
+    return id;
+  }
+  /* The whole adaptive rule, in one place. Returns "up", "down" or null. */
+  function adaptAfter(subject, correct) {
+    if (tier() === "tot" || !subject) return null;
+    var a = adaptOf(subject);
+    a.hist.push(correct ? 1 : 0);
+    if (a.hist.length > 8) a.hist.shift();
+    var last5 = a.hist.slice(-5), last4 = a.hist.slice(-4);
+    var allRight = last5.length === 5 && last5.every(function (x) { return x === 1; });
+    var misses = last4.filter(function (x) { return !x; }).length;
+    if (allRight && a.rung < 5) {
+      a.rung++;
+      a.hist = [];
+      if (a.rung > (a.best | 0)) a.best = a.rung;
+      bump("heat");
+      var h = HEAT[a.rung - 1];
+      toast("🔥 Heating up! " + subjectName(subject) + " is now " + h.name + " — right answers pay ×" + h.mult + ".");
+      return "up";
+    }
+    if (last4.length === 4 && misses >= 3 && a.rung > 1) {
+      a.rung--;
+      a.hist = [];
+      toast("🧊 Easing off a little — " + subjectName(subject) + " is now " + HEAT[a.rung - 1].name + ".");
+      return "down";
+    }
+    return null;
+  }
+  /* One line for the settings panel: where the heat stands right now. */
+  function heatLine() {
+    if (tier() === "tot") return "";
+    var bits = ["math", "word", "wonder"].map(function (k) {
+      var h = HEAT[rungOf(k) - 1];
+      return subjectName(k) + " <b>" + h.name + "</b> ×" + h.mult;
+    });
+    return '<p class="sub" style="margin:0.6rem 0 0;text-align:center">🔥 <b>The heat:</b> five right in a row turns a subject up a rung ' +
+      "(harder questions, more coins); three misses in four turns it down. Right now: " + bits.join(" · ") + ".</p>";
+  }
 
   function qhash(str) {
     var h = 5381;
@@ -1134,11 +1304,14 @@
     if (again) {
       var q = D.reshuffle(again.q);
       q.fromReview = again.key;
+      // a second look pays at today's heat, not the heat it was first asked at
+      q.rung = rungOf(q.subject || subject);
+      q.step = 0;
       reviewGap = 3;
       return q;
     }
     if (reviewGap > 0) reviewGap--;
-    var fresh = D.ask(subject, tier(), seenTimes);
+    var fresh = D.ask(subject, tier(), seenTimes, rungOf(subject));
     if (fresh) {
       // Snapshot the log now: by the time the card is drawn the answer
       // has been counted, and "you have seen this once" would be a lie
@@ -1153,11 +1326,13 @@
   /* Read the question out for the players who can't read it yet. */
   function announce(q) {
     if (!q) return;
+    // The little levels' questions come with their recordings named.
+    if (q.say && q.say.length) return narrate(q.say);
     var extra = "";
     // A sum or a letter reads fine out loud; a gapped word ("C_T") does
     // not, and it is the thing the child is supposed to LOOK at anyway.
     if (q.big && q.big.text && q.big.text.indexOf("_") === -1) extra = ". " + q.big.text;
-    speak(q.q + extra);
+    narrate([q.q + extra]);
   }
 
   function placeHtml(place) {
@@ -1179,6 +1354,12 @@
       var toBrush = 15 - (S.stats.pool % 15);
       extra = '<p class="sub" style="margin:-0.35rem 0 0.6rem">🖌️ ' + toBrush +
               " more right answers and the pool gives you a free paint brush.</p>";
+    }
+    if (tier() !== "tot") {
+      var a = adaptOf(info.subject), h = HEAT[a.rung - 1];
+      var run = a.hist.length ? a.hist.slice(-5).filter(function (x) { return x; }).length : 0;
+      extra += '<p class="sub heatline" style="margin:-0.2rem 0 0.6rem">' + h.emoji + " <b>" + h.name + "</b> — right answers pay ×" + h.mult +
+        (a.rung < 5 ? ". " + (a.hist.length && run < 5 ? (5 - run) + " more in a row" : "5 in a row") + " and the heat goes up." : ". That is as hot as it gets!") + "</p>";
     }
 
     return '<div class="panel">' +
@@ -1237,6 +1418,14 @@
     } else if (Q.seen === 0) {
       badge = '<p class="second-look brand-new">🆕 Brand new — you have never been asked this one</p>';
     }
+    // …and how hot it is. A step-up question says where it came from.
+    if (tier() !== "tot" && Q.rung) {
+      if (Q.step) {
+        badge += '<p class="second-look step-up">⬆️ Step up — a ' + esc(tierName(Q.tier)) + " question, pays ×" + heatMult(Q) + "</p>";
+      } else if (Q.rung > 1) {
+        badge += '<p class="second-look heat-chip">' + heatOf(Q).emoji + " " + esc(heatOf(Q).name) + " · pays ×" + heatMult(Q) + "</p>";
+      }
+    }
 
     var after = "";
     if (q.state === "done") {
@@ -1244,9 +1433,9 @@
       var rightLabel = right.t || right.emoji || "that one";
       var head, mine = "";
       if (q.correct) {
-        head = Q.fromReview ? "Fixed it! 🔁 " : "Yes! ";
+        head = Q.fromReview ? "Fixed it! 🔁 " : (Q.step ? "Yes — a step up! ⬆️ " : "Yes! ");
       } else {
-        head = "The answer is " + esc(rightLabel) + ". ";
+        head = (q.chose < 0 ? "Too slow! " : "") + "The answer is " + esc(rightLabel) + ". ";
         // Naming the choice the child actually made turns "nope" into a
         // comparison, which is the bit that teaches.
         var chosen = Q.choices[q.chose];
@@ -1292,17 +1481,23 @@
         var hint = document.querySelector('[data-pick="' + Q.answer + '"]');
         if (hint) hint.classList.add("hint");
         say("This one!", 2200);
-        speak("Try this one");
+        narrate(["p-try-this"]);
       }
       return;
     }
 
+    // a quick answer in a duel hits harder (big kids and up)
+    var quick = !!(battle && !battle.over && battle.askedAt && idx >= 0 &&
+                   (Date.now() - battle.askedAt) <= QUICK_MS);
     holder.chose = idx;
     holder.correct = correct;
     holder.state = "done";
     holder.misses = 0;
     markSeen(Q, correct);
 
+    // Everything the narrator will say about this answer, in order: the
+    // verdict, then (in a duel) the blow, then the lesson, then the rest.
+    var told = [], head = 0;
     if (correct) {
       S.stats.streak++;
       if (S.stats.streak > S.stats.best) S.stats.best = S.stats.streak;
@@ -1310,6 +1505,8 @@
       bump("correct");
       var subj = Q.subject;
       S.stats.bySubject[subj] = (S.stats.bySubject[subj] || 0) + 1;
+      if (Q.step) bump("stepup");
+      told.push(praiseToken());
       // Getting it right takes it out of the basket — whether it came
       // BACK from the basket or just happened to turn up again.
       if (forget(Q.fromReview || reviewKey(Q))) {
@@ -1317,24 +1514,37 @@
         bump("fixed");
         toast("🔁 Fixed it! That one is out of your review basket.");
         earn(5);
+        told.push("p-fixed");
       }
+      head = told.length;
       sfx(S.stats.streak >= 3 ? "streak" : "good", S.stats.streak);
     } else {
       S.stats.wrong++;
       S.stats.streak = 0;
       remember(Q);
       sfx("nope");
+      told.push("frag-the-answer-is", answerToken(Q));
+      head = told.length;
     }
+    // Say the explanation out loud too — for a pre-reader the teaching
+    // line is the only part that is worth anything.
+    told = told.concat(Q.sayTeach && Q.sayTeach.length ? Q.sayTeach : [Q.teach]);
+    var heatEvent = adaptAfter(Q.subject, correct);
+    if (heatEvent === "up") told.push("p-heating-up");
+    if (heatEvent === "down") told.push("p-cooling-off");
 
-    if (battle) battleTurn(correct);
-    else harvest(correct);
+    if (battle) {
+      battleTurn(correct, { quick: quick });
+      // the duel's own calls: a critical, a charge, the friend, The Shade
+      told = told.slice(0, head).concat(battle.calls || [], told.slice(head), battle.after || []);
+    } else {
+      harvest(correct);
+    }
 
     checkTrophies();
     save();
     render();
-    // Say the explanation out loud too — for a pre-reader the teaching
-    // line is the only part that is worth anything.
-    speak((correct ? "Yes! " : "The answer is " + (Q.choices[Q.answer].t || "this one") + ". ") + Q.teach);
+    narrate(told);
   }
 
   /* What the place pays out for a right answer. */
@@ -1347,11 +1557,14 @@
     // that have seen work today, not another counter to keep in step.
     S.today.subjects = ["farm", "well", "pool"].filter(function (p) { return (S.today[p] || 0) > 0; }).length;
 
-    var coins = info.base + Math.min(6, S.stats.streak) + Math.floor(level() / 3);
+    // The heat multiplies the coins: a harder question is worth more.
+    var mult = heatMult(sess.q);
+    var coins = Math.round((info.base + Math.min(6, S.stats.streak) + Math.floor(level() / 3)) * mult);
     earn(coins);
-    // A book shelf, a globe and a star window really do make you learn faster.
-    giveXp(Math.round(4 * (1 + studyBonus())));
-    floaty("+" + coins + " 🪙", "#ffe07a");
+    // A book shelf, a globe and a star window really do make you learn
+    // faster — and so does a hotter question.
+    giveXp(Math.round((3 + D.hot(sess.q && sess.q.rung)) * (1 + studyBonus())));
+    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : ""), "#ffe07a");
 
     if (sess.plots.length < SLOTS) {
       sess.plots.push(info.crops[Math.floor(Math.random() * info.crops.length)]);
@@ -1412,6 +1625,11 @@
       moodLine.text = D.MOODS[m][Math.floor(Math.random() * D.MOODS[m].length)];
     }
     return moodLine.text;
+  }
+  /* One of the pet's lines for its mood, with the recording's name. */
+  function moodSay() {
+    var m = mood(), i = Math.floor(Math.random() * D.MOODS[m].length);
+    return { text: D.MOODS[m][i], tok: "m-" + m + "-" + i };
   }
 
   function nestHtml() {
@@ -1571,7 +1789,7 @@
     anim.napping = true;
     S.pet.energy = clamp(S.pet.energy + 18, 0, 100);
     S.pet.happy = clamp(S.pet.happy + 2, 0, 100);
-    say("Zzz… 💤", 2600);
+    say("Zzz… 💤", 2600, "m-zzz");
     floaty("+18 ⚡", "#e2d4ff");
     sfx("pop");
     setTimeout(function () { anim.napping = false; }, 2600);
@@ -1588,7 +1806,7 @@
       S.pet.clean = clamp(S.pet.clean - 4, 0, 100);
       bump("play");
       floaty("+8 😊", "#b6ffcf");
-      say("Wheee!");
+      say("Wheee!", 2600, "m-wheee");
       sfx("pop");
       return after();
     }
@@ -1597,7 +1815,7 @@
       S.pet.clean = clamp(S.pet.clean + 14, 0, 100);
       bump("wash");
       floaty("+14 🫧", "#cdf1ff");
-      say("Much better!");
+      say("Much better!", 2600, "m-much-better");
       sfx("pop");
       return after();
     }
@@ -1611,14 +1829,27 @@
     if (S.bagNew) delete S.bagNew[id];          // it has been used; drop the badge
 
     if (kind === "food") {
-      if (S.pet.hunger > 96) { toast(S.pet.name + " is completely full!"); return closeSheet(); }
+      // In a duel a snack is a heal — two a fight, and never when full up.
+      var snacking = !!(battle && !battle.over && battle.snacks > 0 && battle.myHp < battle.myMax);
+      if (!snacking && S.pet.hunger > 96) { toast(S.pet.name + " is completely full!"); return closeSheet(); }
       takeItem(id);
       S.pet.hunger = clamp(S.pet.hunger + it.fill, 0, 100);
       S.pet.happy = clamp(S.pet.happy + (it.joy || 0), 0, 100);
       S.pet.clean = clamp(S.pet.clean - 3, 0, 100);
       bump("feed");
+      if (snacking) {
+        var heal = Math.min(battle.myMax - battle.myHp, it.fill + 5);
+        battle.myHp += heal;
+        battle.snacks--;
+        battle.log = S.pet.name + " munches " + it.name.toLowerCase() + " and gets " + heal + " HP back!";
+        battle.fx = { me: "heal" };
+        floaty("+" + heal + " ❤️", "#ffb3c6");
+        say("Yum!", 2200, "a-b-snack");
+        sfx("good");
+        return after();
+      }
       floaty("+" + it.fill + " 🍽️", "#ffd9a8");
-      say("Mmm, " + it.name.toLowerCase() + "!");
+      say("Mmm, " + it.name.toLowerCase() + "!", 2600, "m-yum");
       sfx("good");
       return after();
     }
@@ -1629,7 +1860,7 @@
       bump("play");
       giveXp(2);
       floaty("+" + it.joy + " 😊", "#b6ffcf");
-      say("The " + it.name.toLowerCase() + "! My favourite!");
+      say("The " + it.name.toLowerCase() + "! My favourite!", 2600, "m-favourite");
       sfx("pop");
       return after();
     }
@@ -1640,7 +1871,7 @@
       if (it.joy) S.pet.happy = clamp(S.pet.happy + it.joy, 0, 100);
       if (it.clean) bump("wash");
       floaty(itemBlurb(it), it.clean ? "#cdf1ff" : "#e2d4ff");
-      say("Aaah.");
+      say("Aaah.", 2600, "m-aaah");
       sfx("good");
       return after();
     }
@@ -1649,14 +1880,15 @@
       giveXp(it.xp);
       bump("read");
       S.pet.happy = clamp(S.pet.happy + 5, 0, 100);
-      var fact = D.fact(tier());
+      var fact = factSay();
       closeSheet();
       save();
       render();
       openSheet(sheet("📖 " + esc(it.name),
-        '<p class="teach" style="font-size:1.02rem"><b>Did you know? </b>' + esc(fact) + "</p>" +
+        '<p class="teach" style="font-size:1.02rem"><b>Did you know? </b>' + esc(fact.text) + "</p>" +
         '<p class="sub" style="margin-top:0.6rem">' + esc(S.pet.name) + " gained " + it.xp + " XP from reading.</p>"));
       sfx("win");
+      narrate(["fact-intro", fact.tok]);
       return;
     }
     closeSheet();
@@ -1669,6 +1901,13 @@
     }
   }
 
+  /* A fact for this level, with the recording that reads it. */
+  function factSay() {
+    var t = D.FACTS[tier()] ? tier() : "mid";
+    var i = Math.floor(Math.random() * D.FACTS[t].length);
+    return { text: D.FACTS[t][i], tok: "fact-" + t + "-" + i };
+  }
+
   function paint(colourId) {
     S.pet.colour = colourId;
     S.everPainted = true;
@@ -1676,7 +1915,7 @@
     save();
     closeSheet();
     render();
-    say("Look at me! " + P.colour(colourId).name + "!", 3200);
+    say("Look at me! " + P.colour(colourId).name + "!", 3200, "m-look-at-me");
     sfx("win");
     try { window.Confetti && Confetti.burst({ count: 70 }); } catch (e) {}
   }
@@ -1917,7 +2156,7 @@
     if (quiet) return;
     save();
     render();
-    say("Home sweet " + h.name.toLowerCase() + "!", 2800);
+    say("Home sweet " + h.name.toLowerCase() + "!", 2800, "m-home-sweet-home");
     sfx("good");
   }
 
@@ -2343,11 +2582,11 @@
     setTimeout(function () {
       if (who !== spinner) return;      // they walked away; the day is still spent
       spinning = false;
-      awardSpin(D.WHEEL[idx]);
+      awardSpin(D.WHEEL[idx], idx);
     }, wait);
   }
 
-  function awardSpin(prize) {
+  function awardSpin(prize, idx) {
     earn(prize.coins);
     var extra = "";
     if (prize.xp) { giveXp(prize.xp); extra += '<p class="sub">⭐ ' + prize.xp + " XP for " + esc(S.pet.name) + ".</p>"; }
@@ -2375,7 +2614,7 @@
         "</b>!</p>" + extra +
       '<p class="teach"><b>How likely was that? </b>' + chance + "</p>" +
       '<p class="sub" style="margin-top:0.5rem">Come back tomorrow for another free spin.</p>'));
-    speak(prize.say);
+    narrate(["wheel-" + idx]);
     sfx(prize.jackpot ? "win" : "coin");
   }
 
@@ -2729,115 +2968,481 @@
   }
 
   /* =========================================================
-     THE QUIZ ARENA — a friendly duel. Answer right, you land a
-     hit; answer wrong and your rival lands one. Nobody can be
-     hurt, and at the Tiny level nobody can even lose.
+     THE QUIZ ARENA — friendly duels, and the SHADOW TOWER.
+
+     Two ways to fight. The five sparring partners are what they
+     always were: answer right, land a hit; answer wrong, take
+     one. The Shadow Tower is The Shade's own domain: floors that
+     go up for ever, his shadow army on six of every seven, and
+     The Shade himself on the seventh — darker every time round.
+
+     What makes a duel more than a quiz with health bars:
+       ⚡ three right in a row CHARGES you — the next hit is a
+          critical, double damage;
+       🏃 a quick answer (six seconds, big kids up) hits harder;
+       🍎 two snacks a fight heal you with food from your bag;
+       🤝 a family Craepet can come along and land its own hit
+          every fourth right answer;
+       🌑 The Shade brings a trick every fight, grows darker at
+          half health, and drops loot nobody else can sell.
+     Nobody can be hurt, and at the Tiny level nobody can lose.
      ========================================================= */
-  var GATE = { pip: 1, mossy: 2, splash: 4, ember: 6, orbit: 9, shade: 12 };
+  var GATE = { pip: 1, mossy: 2, splash: 4, ember: 6, orbit: 9 };
+  var TOWER_GATE = 3;
+  var SNACKS = 2;
+  var QUICK_MS = 6000;
+  var TIMER_MS = { mid: 12000, big: 10000, grown: 9000 };
+  var battleTimer = null;
 
   function maxHp() { return 40 + level() * 8; }
-  function myPower() { return 10 + level() * 2 + (mood() === "great" ? 4 : 0); }
+  /* A happy Craepet hits harder, and a house full of books harder still. */
+  function myPower() {
+    return 10 + level() * 2 + (mood() === "great" ? 4 : 0) + Math.round(studyBonus() * 10);
+  }
+  function little() { return tier() === "tot" || tier() === "early"; }
+  function arena() {
+    if (!S.arena || typeof S.arena !== "object") S.arena = { floor: 0, ally: null, shadeWins: 0, hoardGot: 0, hoardIds: [] };
+    if (!Array.isArray(S.arena.hoardIds)) S.arena.hoardIds = [];
+    return S.arena;
+  }
+  function bestFloor() { return arena().floor | 0; }
+  function rank() { return D.rankFor(bestFloor()); }
+  function subjectWord(s) {
+    return { math: "maths", word: "words", wonder: "the wide world", mixed: "a bit of everything" }[s] || s;
+  }
+  function subjectName(s) { return { math: "🔢 Maths", word: "📖 Words", wonder: "🌍 The world" }[s] || s; }
+
+  /* The rest of the family's Craepets, as possible allies. Read-only:
+     bringing a friend never touches their save. */
+  function allies() {
+    return D.PROFILES.filter(function (p) { return p.id !== who; }).map(function (p) {
+      var s = readSlot(p.id);
+      if (!s || !s.pet) return null;
+      var lv = Math.min(20, 1 + Math.floor((s.pet.xp || 0) / 50));
+      return { who: p.id, name: s.pet.name, species: s.pet.species, colour: s.pet.colour,
+               level: lv, owner: p, power: 6 + lv * 2 };
+    }).filter(Boolean);
+  }
+  function allyNow() {
+    var id = arena().ally;
+    if (!id) return null;
+    var list = allies();
+    for (var i = 0; i < list.length; i++) if (list[i].who === id) return list[i];
+    return null;
+  }
+  /* The subject this player knows least, by the heat: the Mirror trick. */
+  function weakestSubject() {
+    var subs = ["math", "word", "wonder"], low = 99, out = [];
+    subs.forEach(function (s) {
+      var r = rungOf(s);
+      if (r < low) { low = r; out = [s]; } else if (r === low) out.push(s);
+    });
+    return out[Math.floor(Math.random() * out.length)];
+  }
+
+  /* What a rival says — a token into the narrator's script, so the
+     littlest players can HEAR The Shade sneer. */
+  function pickOne(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function lineKey(r, kind) {
+    if (r.boss) {
+      var wins = arena().shadeWins | 0;
+      if (kind === "intro") return wins ? "a-shade-return" : pickOne(["a-shade-intro", "a-shade-intro-2", "a-shade-intro-3"]);
+      if (kind === "hit") return pickOne(["a-shade-hit-1", "a-shade-hit-2", "a-shade-hit-3"]);
+      if (kind === "hits") return pickOne(["a-shade-hits-1", "a-shade-hits-2", "a-shade-hits-3"]);
+      if (kind === "low") return "a-shade-low";
+      if (kind === "lose") return wins > 1 ? "a-shade-lose-again" : "a-shade-lose";
+      return "a-shade-win";
+    }
+    if (r.minion) return kind === "intro" ? "a-" + r.id + "-intro" : "a-minion-" + (kind === "low" ? "hit" : kind);
+    return "a-" + r.id + "-" + (kind === "low" ? "hit" : kind);
+  }
+  function foeLine(r, kind) {
+    var k = lineKey(r, kind);
+    return { tok: k, text: (L && L.T[k]) || r.taunt || "" };
+  }
 
   function arenaHtml() {
     if (battle) return battleHtml();
     var lv = level();
+    var A = arena(), best = bestFloor(), next = best + 1;
+    var foe = D.towerFoe(next);
+    var rk = rank(), nx = D.nextRank(best);
+    var open = lv >= TOWER_GATE;
+
+    var foeCard = '<div class="foecard' + (foe.boss ? " boss" : "") + '">' +
+      '<img alt="" src="' + P.chip(foe.species, foe.colour, 72) + '">' +
+      "<div><b>" + esc(foe.name) + "</b><small>" +
+        (foe.boss ? "The master of the tower" : "One of The Shade's shadow army") +
+        " · " + foe.hp + " HP · hits for " + foe.power + " · asks " + esc(subjectWord(foe.subject)) + "</small>" +
+      '<span class="price">🪙 ' + foe.coins + " for the win</span></div></div>";
+
+    var allyList = allies();
+    var allyRow = allyList.length
+      ? '<p class="sub" style="margin:0.8rem 0 0.3rem">🤝 <b>Bring a friend.</b> Every fourth right answer, a family Craepet lands a hit of its own.</p>' +
+        '<div class="who-row" style="justify-content:flex-start">' +
+          '<button class="who' + (!A.ally ? " on" : "") + '" data-ally="" style="--wc:#8b83a8">Just me</button>' +
+          allyList.map(function (a) {
+            return '<button class="who' + (A.ally === a.who ? " on" : "") + '" data-ally="' + a.who + '" style="--wc:' + a.owner.colour + '">' +
+              '<img alt="" src="' + P.chip(a.species, a.colour, 22) + '"> ' + esc(a.name) +
+              " <small>Lv " + a.level + " · hits " + a.power + "</small></button>";
+          }).join("") + "</div>"
+      : '<p class="sub" style="margin:0.8rem 0 0">🤝 Adopt a Craepet on another profile and you can bring it along as a friend.</p>';
+
+    var replay = "";
+    if (best > 0 && open) {
+      var chips = [];
+      for (var f = Math.max(1, best - 6); f <= best; f++) {
+        var rf = D.towerFoe(f);
+        chips.push('<button class="ghost small" data-floor="' + f + '">' + (rf.boss ? "🌑 " : "") + f + " · " + esc(rf.name) + "</button>");
+      }
+      replay = '<p class="sub" style="margin:0.8rem 0 0.3rem">🔁 Fight a cleared floor again for 4 in 10 of the coins:</p>' +
+        '<div class="swatches" style="justify-content:flex-start">' + chips.join("") + "</div>";
+    }
+
+    var tower = '<div class="panel tower">' +
+      '<h2>🗼 The Shadow Tower <span class="rankchip">' + rk.emoji + " " + esc(rk.name) + "</span></h2>" +
+      '<p class="sub">The Shade rules the tower, and his shadow army guards every floor. Six floors up, he is waiting — ' +
+        "and every time you beat him he comes back darker, seven floors higher, for ever. " +
+        (best
+          ? "You have cleared <b>" + best + (best === 1 ? " floor" : " floors") + "</b>" +
+            (A.shadeWins ? " and beaten The Shade <b>" + A.shadeWins + (A.shadeWins === 1 ? " time" : " times") + "</b>" : "") + "."
+          : "You have not climbed it yet.") +
+        (nx ? " Reach floor " + nx.floor + " for the " + nx.emoji + " <b>" + esc(nx.name) + "</b> rank." : " You hold the highest rank there is.") +
+      "</p>" +
+      '<p class="sub" style="margin:0 0 0.4rem"><b>Floor ' + next + "</b></p>" + foeCard +
+      (open
+        ? '<p style="margin:0.6rem 0 0"><button class="act" data-tower="' + next + '" style="--ac:#3a2f5c;width:100%">' +
+          '<span class="em">🗼</span>Climb — fight ' + esc(foe.name) + "</button></p>"
+        : '<p class="teach">🔒 The tower opens at <b>level ' + TOWER_GATE + "</b>. You are level " + lv +
+          " — every right answer anywhere brings it closer.</p>") +
+      allyRow + replay +
+    "</div>";
+
     var cards = D.RIVALS.map(function (r) {
       var need = GATE[r.id] || 1;
-      var open = lv >= need;
-      return '<button class="item" data-fight="' + r.id + '"' + (open ? "" : " disabled") + ">" +
+      var isOpen = lv >= need;
+      return '<button class="item" data-fight="' + r.id + '"' + (isOpen ? "" : " disabled") + ">" +
         '<img alt="" src="' + P.chip(r.species, r.colour, 56) + '" style="width:56px;image-rendering:pixelated">' +
         '<span class="nm">' + esc(r.name) + "</span>" +
-        (open ? '<span class="price">🪙 ' + r.coins + "</span>" : '<span class="own">Level ' + need + "</span>") +
+        '<span class="what">' + r.hp + " HP · asks " + esc(subjectWord(r.subject)) + "</span>" +
+        (isOpen ? '<span class="price">🪙 ' + r.coins + "</span>" : '<span class="own">Level ' + need + "</span>") +
       "</button>";
     }).join("");
-    return '<div class="panel">' +
-      "<h2>⚔️ Quiz Arena</h2>" +
+    var spar = '<div class="panel"><h2>⚔️ Sparring partners</h2>' +
       '<p class="sub">Pick a rival. Every right answer is a hit; every wrong one lets them hit back. ' +
         "Your Craepet hits harder as it levels up — and harder still when it's happy.</p>" +
       '<div class="items">' + cards + "</div>" +
       '<p class="sub" style="margin-top:0.7rem">Losing costs nothing but pride. You can always try again.</p>' +
     "</div>";
+
+    var rules = '<div class="panel"><h2>📜 How a duel works</h2><ul class="rules">' +
+      "<li>✅ Every right answer is a hit. ❌ Every wrong one, they hit back.</li>" +
+      "<li>⚡ Three right in a row <b>charges</b> your Craepet: the next hit is a <b>critical</b>, for double damage.</li>" +
+      (little() ? "" : "<li>🏃 Answer within 6 seconds for a <b>quick bonus</b>.</li>") +
+      "<li>🍎 Two <b>snacks</b> a fight: food from your bag puts health back.</li>" +
+      "<li>🌑 The Shade has a <b>trick</b> every fight, and turns darker at half health.</li>" +
+      "<li>😊 A happy Craepet hits harder, and a house full of study things harder still.</li>" +
+      (tier() === "tot" ? "<li>👶 At the Tiny level nobody can lose — a miss just waits.</li>" : "") +
+    "</ul></div>";
+    return tower + spar + rules;
   }
 
+  /* --- starting a fight --- */
   function startBattle(id) {
     var r = null;
     for (var i = 0; i < D.RIVALS.length; i++) if (D.RIVALS[i].id === id) r = D.RIVALS[i];
     if (!r || level() < (GATE[id] || 1)) return;
+    beginBattle(r, { mode: "spar" });
+  }
+  function startTower(floor) {
+    floor = floor | 0;
+    if (level() < TOWER_GATE || floor < 1 || floor > bestFloor() + 1) return;
+    beginBattle(D.towerFoe(floor), { mode: "tower", floor: floor, replay: floor <= bestFloor() });
+  }
+  function beginBattle(r, opts) {
+    clearTimeout(battleTimer);
+    var intro = foeLine(r, "intro");
     battle = { rival: r, foeHp: r.hp, foeMax: r.hp, myHp: maxHp(), myMax: maxHp(),
-               q: null, state: "ask", chose: -1, log: r.taunt };
-    battle.q = pickQuestion(battleSubject(r));
+               q: null, state: "ask", chose: -1, log: intro.text, foeLine: null, over: null,
+               mode: opts.mode, floor: opts.floor || 0, replay: !!opts.replay, cfg: { r: r, opts: opts },
+               trick: null, phase: 1, charge: 0, snacks: SNACKS,
+               ally: opts.mode === "tower" ? allyNow() : null, allyCount: 0,
+               asked: 0, hits: 0, crits: 0, fx: null, calls: [] };
+    if (r.boss) {
+      var pool = D.TRICKS.filter(function (t) { return !little() || t.little; });
+      battle.trick = pool[Math.floor(Math.random() * pool.length)];
+    }
+    nextBattleQuestion(true);
     bump("arena");
     view = "arena";
     render();
-    announce(battle.q);
+    var open = [intro.tok];
+    if (battle.trick) open.push("a-shade-trick-" + battle.trick.id);
+    narrate(open.concat(battle.q.say || [battle.q.q]));
   }
 
   function battleSubject(r) {
     return r.subject === "mixed" ? ["math", "word", "wonder"][Math.floor(Math.random() * 3)] : r.subject;
   }
 
-  function battleHtml() {
+  function nextBattleQuestion(first) {
     var b = battle;
-    return '<div class="panel">' +
-      '<div class="fighters">' +
-        '<div class="fighter"><img alt="" src="' + P.chip(S.pet.species, S.pet.colour, 80) + '">' +
-          "<b>" + esc(S.pet.name) + "</b><small>Lv " + level() + " · hits for " + myPower() + "</small>" +
-          '<span class="hpbar"><i style="width:' + (b.myHp / b.myMax * 100) + '%"></i></span></div>' +
-        '<div class="vs">VS</div>' +
-        '<div class="fighter foe"><img alt="" src="' + P.chip(b.rival.species, b.rival.colour, 80) + '">' +
-          "<b>" + esc(b.rival.name) + "</b><small>hits for " + b.rival.power + "</small>" +
-          '<span class="hpbar"><i style="width:' + (b.foeHp / b.foeMax * 100) + '%"></i></span></div>' +
-      "</div>" +
-      '<p class="sub" style="text-align:center;margin:0.6rem 0 0.3rem">' + esc(b.log) + "</p>" +
-      quizHtml(b) + (b.over ? battleEndHtml() : "") +
+    var subject = battleSubject(b.rival);
+    if (b.trick && b.trick.id === "mirror") subject = weakestSubject();
+    b.q = pickQuestion(subject);
+    b.state = "ask";
+    b.chose = -1;
+    b.misses = 0;
+    b.asked++;
+    b.askedAt = Date.now();
+    b.fx = null;
+    b.calls = [];
+    armTimer();
+    if (!first) announce(b.q);
+  }
+
+  /* The Time Squeeze: answer before the bar runs out, or it counts as a
+     miss. Never at the little levels. */
+  function armTimer() {
+    clearTimeout(battleTimer);
+    battleTimer = null;
+    var b = battle;
+    if (!b) return;
+    if (b.over || !b.trick || b.trick.id !== "time" || little()) { b.deadline = 0; return; }
+    var ms = TIMER_MS[tier()] || 12000;
+    b.deadline = Date.now() + ms;
+    battleTimer = setTimeout(function () {
+      if (battle === b && b.state === "ask" && !b.over) { b.timedOut = true; answer(-1); }
+    }, ms);
+  }
+
+  function battleHtml() {
+    var b = battle, r = b.rival;
+    var fx = b.fx || {};
+    b.fx = null;                                   // an animation plays once
+    var pips = "";
+    for (var i = 0; i < 3; i++) pips += '<i class="' + (i < b.charge ? "on" : "") + '"></i>';
+    var chargeRow = '<span class="charge' + (b.charge >= 3 ? " ready" : "") +
+      '" title="Three right in a row charges a critical hit" aria-label="charge ' + Math.min(3, b.charge) + ' of 3">' +
+      pips + (b.charge >= 3 ? " ⚡ charged!" : "") + "</span>";
+    var allyDots = "";
+    if (b.ally) for (var j = 0; j < 4; j++) allyDots += (j < b.allyCount % 4 ? "●" : "○");
+    var me = '<div class="fighter' + (fx.me ? " " + fx.me : "") + '">' +
+      '<img alt="" src="' + P.chip(S.pet.species, S.pet.colour, 80) + '">' +
+      (fx.me === "hit" && fx.dmg ? '<span class="dmg" aria-hidden="true">−' + fx.dmg + "</span>" : "") +
+      "<b>" + esc(S.pet.name) + "</b><small>Lv " + level() + " · hits for " + myPower() + "</small>" +
+      '<span class="hpbar"><i style="width:' + (b.myHp / b.myMax * 100) + '%"></i></span>' +
+      '<small class="hpnum">' + b.myHp + " / " + b.myMax + "</small>" + chargeRow +
+      (b.ally ? '<span class="allychip" title="' + esc(b.ally.name) + ' joins in every fourth right answer">' +
+        '<img alt="" src="' + P.chip(b.ally.species, b.ally.colour, 22) + '"> ' + esc(b.ally.name) + ' <span class="dots">' + allyDots + "</span></span>" : "") +
+    "</div>";
+    var foe = '<div class="fighter foe' + (r.boss ? " shade" : "") + (b.phase === 2 ? " dark" : "") + (fx.foe ? " " + fx.foe : "") + '">' +
+      '<img alt="" src="' + P.chip(r.species, r.colour, 80) + '">' +
+      (fx.foe === "hit" && fx.dmg ? '<span class="dmg' + (fx.crit ? " crit" : "") + '" aria-hidden="true">−' + fx.dmg +
+        (fx.ally ? " −" + fx.ally : "") + "</span>" : "") +
+      "<b>" + esc(r.name) + "</b><small>" + (b.mode === "tower" ? "floor " + b.floor + " · " : "") +
+        "hits for " + (r.power + (b.phase === 2 ? 4 : 0)) + "</small>" +
+      '<span class="hpbar"><i style="width:' + (b.foeHp / b.foeMax * 100) + '%"></i></span>' +
+      '<small class="hpnum">' + b.foeHp + " / " + b.foeMax + "</small>" +
+      (b.trick ? '<span class="trick">' + b.trick.emoji + " " + esc(b.trick.name) + "</span>" : "") +
+    "</div>";
+    var timer = "";
+    if (b.deadline && b.state === "ask" && !b.over) {
+      var total = TIMER_MS[tier()] || 12000, left = Math.max(0, b.deadline - Date.now());
+      timer = '<div class="timerbar" role="img" aria-label="time left"><i style="animation-duration:' + total +
+        "ms;animation-delay:-" + (total - left) + 'ms"></i></div>';
+    }
+    var foeSays = (b.foeLine && b.foeLine.text) ? '<p class="foesays">' + esc(b.foeLine.text) + "</p>" : "";
+    var snack = (!b.over && b.snacks > 0 && b.myHp < b.myMax && bagOf("food").length)
+      ? '<p style="margin:0.5rem 0 0;text-align:center"><button class="ghost small" data-snack="1">🍎 Snack (' +
+        b.snacks + " left) — heal with food from your bag</button></p>" : "";
+    var trickNote = (b.trick && b.asked <= 1 && !b.over)
+      ? '<p class="teach">' + b.trick.emoji + " <b>" + esc(b.trick.name) + ":</b> " + esc(b.trick.note) + "</p>" : "";
+    return '<div class="panel arena-panel' + (b.mode === "tower" ? " in-tower" : "") + '">' +
+      '<div class="fighters">' + me + '<div class="vs">VS</div>' + foe + "</div>" +
+      '<p class="sub log" style="text-align:center;margin:0.6rem 0 0.2rem">' + esc(b.log) + "</p>" + foeSays + trickNote +
+      timer + quizHtml(b) + snack + (b.over ? battleEndHtml() : "") +
     "</div>";
   }
 
-  function nextBattleQuestion() {
-    battle.q = pickQuestion(battleSubject(battle.rival));
-    battle.state = "ask";
-    battle.chose = -1;
-    battle.misses = 0;
-    announce(battle.q);
-  }
-
   function battleEndHtml() {
-    return '<p style="margin:0.8rem 0 0"><button class="act" data-leave="1" style="--ac:var(--purple);width:100%">' +
-           "Back to the arena →</button></p>";
+    var b = battle, rw = b.reward;
+    var body = "";
+    if (b.over === "win" && rw) {
+      body = '<div class="statgrid" style="margin-top:0.7rem">' +
+        '<div class="stat"><b>🪙 ' + rw.coins + "</b><small>coins</small></div>" +
+        '<div class="stat"><b>⭐ ' + rw.xp + "</b><small>XP</small></div>" +
+        '<div class="stat"><b>🎯 ' + b.hits + "</b><small>hits</small></div>" +
+        (b.crits ? '<div class="stat"><b>⚡ ' + b.crits + "</b><small>critical" + (b.crits === 1 ? "" : "s") + "</small></div>" : "") +
+      "</div>" +
+      (rw.cleared ? '<p class="teach">🗼 <b>Floor ' + b.floor + " cleared!</b> " +
+        (rw.rankUp ? "New arena rank: " + rw.rankUp.emoji + " <b>" + esc(rw.rankUp.name) + "</b>. " : "") +
+        "The next floor is waiting.</p>" : "") +
+      (rw.loot ? '<p class="teach">' + rw.loot.emoji + " <b>The Shade drops " + esc(rw.loot.name) + ".</b> " + esc(rw.loot.text) + "</p>" : "");
+    }
+    var next = (b.mode === "tower" && b.over === "win" && !b.replay)
+      ? '<button class="act" data-tower="' + (b.floor + 1) + '" style="--ac:#3a2f5c"><span class="em">🗼</span>Climb to floor ' + (b.floor + 1) + "</button>" : "";
+    var again = (b.over === "lose")
+      ? '<button class="act" data-rematch="1" style="--ac:var(--pink)"><span class="em">🔁</span>Try again</button>' : "";
+    return body + '<div class="acts" style="margin-top:0.8rem">' + next + again +
+      '<button class="act" data-leave="1" style="--ac:var(--purple)">Back to the arena →</button></div>';
   }
 
-  function battleTurn(correct) {
-    var b = battle;
+  /* One exchange. `meta.quick` is whether the answer came inside the
+     quick-bonus window. Returns nothing; the narrator's calls for this
+     turn are left in battle.calls for answer() to read out. */
+  function battleTurn(correct, meta) {
+    var b = battle, r = b.rival;
+    var dbl = (b.trick && b.trick.id === "double") ? 2 : 1;
+    var calls = [];
+    b.fx = null;
     if (correct) {
       var dmg = myPower() + Math.floor(Math.random() * 5);
+      var crit = b.charge >= 3;
+      var quick = !little() && !!(meta && meta.quick);
+      if (quick) { dmg = Math.round(dmg * 1.25); bump("quick"); }
+      if (crit) { dmg *= 2; b.charge = 0; b.crits++; bump("crit"); }
+      else b.charge++;
+      dmg *= dbl;
       b.foeHp = Math.max(0, b.foeHp - dmg);
-      b.log = S.pet.name + " lands a hit for " + dmg + "!";
-      floaty("−" + dmg, "#ffd0d6");
+      b.hits++;
+      b.log = S.pet.name + (crit ? " lands a CRITICAL hit for " : " lands a hit for ") + dmg + "!" + (quick ? " 🏃 Quick!" : "");
+      b.fx = { me: "lunge", foe: "hit", dmg: dmg, crit: crit, quick: quick };
+      floaty("−" + dmg, crit ? "#ffe07a" : "#ffd0d6");
+      sfx(crit ? "crit" : "hit");
+      if (crit) calls.push("a-b-crit");
+      else if (quick) calls.push("a-b-quick");
+      if (b.charge === 3) calls.push("a-b-charged");
+      if (b.ally && b.foeHp > 0) {
+        b.allyCount++;
+        if (b.allyCount % 4 === 0) {
+          var ad = b.ally.power * dbl;
+          b.foeHp = Math.max(0, b.foeHp - ad);
+          b.log += " " + b.ally.name + " joins in for " + ad + "!";
+          b.fx.ally = ad;
+          calls.push("a-b-ally");
+          bump("allyHits");
+        }
+      }
       earn(4);
       giveXp(5);
+      if (b.foeHp > 0) b.foeLine = foeLine(r, (r.boss && b.foeHp < b.foeMax / 4) ? "low" : "hit");
     } else {
-      var hit = tier() === "tot" ? 0 : b.rival.power + Math.floor(Math.random() * 4);
+      var hit = tier() === "tot" ? 0 : (r.power + (b.phase === 2 ? 4 : 0) + Math.floor(Math.random() * 4)) * dbl;
       b.myHp = Math.max(0, b.myHp - hit);
-      b.log = hit ? b.rival.name + " hits back for " + hit + "!" : b.rival.name + " goes easy on you.";
+      b.charge = 0;
+      b.log = (b.timedOut ? "⏱️ Too slow! " : "") +
+        (hit ? r.name + " hits back for " + hit + "!" : r.name + " goes easy on you.");
+      b.fx = { me: hit ? "hit" : "", foe: "lunge", dmg: hit };
+      if (hit) sfx("hit");
+      if (b.trick && b.trick.id === "heal" && b.foeHp > 0 && b.foeHp < b.foeMax) {
+        var heal = Math.min(10, b.foeMax - b.foeHp);
+        b.foeHp += heal;
+        b.log += " He heals " + heal + ".";
+      }
+      if (b.myHp > 0) b.foeLine = foeLine(r, "hits");
     }
+    b.timedOut = false;
+    // The Shade's second form, once, at half health
+    if (r.boss && b.phase === 1 && b.foeHp > 0 && b.foeHp <= b.foeMax / 2) {
+      b.phase = 2;
+      b.foeLine = { tok: "a-shade-phase", text: (L && L.T["a-shade-phase"]) || "" };
+      b.log += " 🌑 " + r.name + " grows darker!";
+      sfx("nope");
+    }
+    b.after = (b.phase === 2 && b.foeLine && b.foeLine.tok === "a-shade-phase") ? ["a-shade-phase"] : [];
+    if (b.foeHp <= 0) endBattle("win", b.after);
+    else if (b.myHp <= 0) endBattle("lose", b.after);
+    b.calls = calls;
+  }
 
-    if (b.foeHp <= 0) {
-      b.over = "win";
-      b.log = "🏆 " + b.rival.name + " gives in — you win!";
-      earn(b.rival.coins);
-      giveXp(30);
+  function endBattle(result, calls) {
+    var b = battle, r = b.rival;
+    clearTimeout(battleTimer);
+    b.deadline = 0;
+    b.over = result;
+    if (result === "win") {
+      var coins = r.coins;
+      if (b.mode === "tower" && b.replay) coins = Math.round(coins * 0.4);
+      var xp = 30 + (b.mode === "tower" ? b.floor * 2 : 0);
+      earn(coins);
+      giveXp(xp);
       bump("arenaWin");
       S.pet.happy = clamp(S.pet.happy + 12, 0, 100);
-      if (b.rival.id === "shade") S.beatShade = true;
+      b.reward = { coins: coins, xp: xp, loot: null, rankUp: null, cleared: false };
+      b.log = "🏆 " + r.name + " gives in — you win!";
+      if (b.mode === "tower") {
+        var A = arena();
+        if (!b.replay && b.floor === A.floor + 1) {
+          var before = rank();
+          A.floor = b.floor;
+          b.reward.cleared = true;
+          bump("tower");
+          if (A.floor > (S.stats.bestFloor || 0)) S.stats.bestFloor = A.floor;
+          var after = rank();
+          if (after !== before) { b.reward.rankUp = after; calls.push("a-b-new-rank"); }
+          else calls.push("a-b-floor-clear");
+          if (b.ally) bump("allyWins");
+        }
+        if (r.boss) {
+          S.beatShade = true;
+          if (!b.replay) {
+            A.shadeWins = (A.shadeWins | 0) + 1;
+            bump("shadeWin");
+            b.reward.loot = shadeLoot();
+          }
+        }
+      }
+      b.foeLine = foeLine(r, "lose");
+      calls.push(b.foeLine.tok);
       sfx("win");
-      try { window.Confetti && Confetti.burst({ count: 100 }); } catch (e) {}
-      toast("You beat " + b.rival.name + "! +🪙 " + b.rival.coins);
-    } else if (b.myHp <= 0) {
-      b.over = "lose";
-      b.log = S.pet.name + " is worn out. Good try — " + b.rival.name + " nods respectfully.";
+      try { window.Confetti && Confetti.burst({ count: r.boss ? 160 : 100 }); } catch (e) {}
+      toast("You beat " + r.name + "! +🪙 " + coins);
+    } else {
+      b.log = S.pet.name + " is worn out. Good try — " + r.name + " nods respectfully.";
+      b.foeLine = foeLine(r, "win");
+      calls.push("a-b-lose", b.foeLine.tok);
       earn(10);
       sfx("nope");
     }
+  }
+
+  /* What The Shade gives up: first his own colour, then his furniture,
+     piece by piece, then plain coins once you have the lot. */
+  function shadeLoot() {
+    var A = arena();
+    if (S.colours.indexOf("shadow") === -1) {
+      S.colours.push("shadow");
+      return { kind: "brush", name: "the Shadow paint brush", emoji: "🖌️",
+               text: "His own colour, and now yours. Paint " + S.pet.name + " with it from the 🎒 Bag." };
+    }
+    var left = D.hoard().filter(function (f) { return A.hoardIds.indexOf(f.id) === -1; });
+    if (left.length) {
+      var piece = left[0];
+      A.hoardIds.push(piece.id);
+      A.hoardGot = A.hoardIds.length;
+      if (S.house.owned.indexOf(piece.id) === -1) S.house.owned.push(piece.id);
+      var room = slotsFree() > 0;
+      if (room) { S.house.placed.push(piece.id); bump("placed"); }
+      return { kind: "decor", name: "the " + piece.name, emoji: piece.emoji,
+               text: "A piece of Shade's Hoard — furniture no Market has ever sold. " +
+                     (room ? "It is out in your house already." : "It is in your house's storage.") +
+                     " Piece " + A.hoardGot + " of " + D.hoard().length + "." };
+    }
+    earn(150);
+    return { kind: "coins", name: "150 extra coins", emoji: "🪙", text: "You own every piece of his hoard, so he pays in coins." };
+  }
+
+  function rematch() {
+    if (!battle || !battle.cfg) return;
+    var cfg = battle.cfg;
+    beginBattle(cfg.r, cfg.opts);
+  }
+  function leaveBattle() {
+    clearTimeout(battleTimer);
+    battle = null;
+    hush();
+    render();
   }
 
   /* =========================================================
@@ -2930,13 +3535,15 @@
     checkTrophies();
     save();
     render();
+    var fact = factSay();
     openSheet(sheet("🎁 Today's gift",
       '<p class="sub" style="font-size:1.05rem">🪙 ' + coins + " coins and " + food.emoji + " " + esc(food.name) + "!</p>" +
       extra +
       '<p class="sub">📅 That is <b>' + (S.dayStreak || 1) + "</b> day" + ((S.dayStreak || 1) === 1 ? "" : "s") +
         " in a row. Tomorrow's gift is 🪙 " + (20 + Math.min(7, (S.dayStreak || 1) + 1) * 10) + ".</p>" +
-      '<p class="teach"><b>Did you know? </b>' + esc(D.fact(tier())) + "</p>"));
+      '<p class="teach"><b>Did you know? </b>' + esc(fact.text) + "</p>"));
     sfx("coin");
+    narrate(["fact-intro", fact.tok]);
   }
 
   function caseHtml() {
@@ -2956,7 +3563,10 @@
       ["🏅", st.arenaWin, "arena wins"],
       ["📚", st.read, "books read"],
       ["🔁", st.fixed || 0, "put right"],
-      ["📅", st.bestDayStreak || 0, "best day run"]
+      ["📅", st.bestDayStreak || 0, "best day run"],
+      ["🗼", bestFloor(), "tower floor"],
+      ["⚡", st.crit || 0, "critical hits"],
+      ["🔥", st.heat || 0, "heat rungs climbed"]
     ].map(function (s) {
       return '<div class="stat"><b>' + s[0] + " " + s[1] + "</b><small>" + s[2] + "</small></div>";
     }).join("") + subjects.map(function (s) {
@@ -2971,9 +3581,11 @@
                "<b>" + esc(p.name) + "</b><small>no pet yet</small></div>";
       }
       var lv = Math.min(20, 1 + Math.floor((s.pet.xp || 0) / 50));
+      var fl = (s.arena && s.arena.floor) | 0, rk = D.rankFor(fl);
       return '<div class="fam"><img alt="" src="' + P.chip(s.pet.species, s.pet.colour, 54) + '">' +
         "<b>" + esc(s.pet.name) + "</b><small>" + esc(p.name) + " · Lv " + lv + "</small>" +
-        "<small>" + ((s.stats && s.stats.correct) || 0) + " right</small></div>";
+        "<small>" + ((s.stats && s.stats.correct) || 0) + " right</small>" +
+        "<small>" + rk.emoji + " " + esc(rk.name) + (fl ? " · floor " + fl : "") + "</small></div>";
     }).join("");
 
     /* --- 🧠 the trivia log ---------------------------------------
@@ -3108,7 +3720,7 @@
       hush();
       sfx("pop");
       render();
-      if (voiceOn) speak("I will read the questions out loud.");
+      if (voiceOn) narrate(["p-read-aloud-on"], { force: true });
       return;
     }
 
@@ -3166,7 +3778,7 @@
       if (dest !== view) {
         hush();
         if (["farm", "well", "pool"].indexOf(dest) === -1) sess = null;
-        if (dest !== "arena") battle = null;
+        if (dest !== "arena") { battle = null; clearTimeout(battleTimer); }
         if (dest === "bag") { S.bagNew = {}; save(); }   // you have seen them now
         pendingSale = null;
         view = dest;
@@ -3268,8 +3880,16 @@
 
     var fight = t.closest("[data-fight]");
     if (fight) return startBattle(fight.dataset.fight);
+    var climb = t.closest("[data-tower]");
+    if (climb) return startTower(Number(climb.dataset.tower));
+    var floorBtn = t.closest("[data-floor]");
+    if (floorBtn) return startTower(Number(floorBtn.dataset.floor));
+    var allyBtn = t.closest("[data-ally]");
+    if (allyBtn) { arena().ally = allyBtn.dataset.ally || null; save(); sfx("pop"); return render(); }
+    if (t.closest("[data-snack]")) { sfx("pop"); return openSheet(feedSheet()); }
+    if (t.closest("[data-rematch]")) return rematch();
 
-    if (t.closest("[data-leave]")) { battle = null; render(); return; }
+    if (t.closest("[data-leave]")) return leaveBattle();
 
     var claim = t.closest("[data-claim]");
     if (claim) return claimQuest(claim.dataset.claim);
@@ -3278,9 +3898,11 @@
 
     var tier2 = t.closest("[data-tier]");
     if (tier2) {
+      if (S.tier !== tier2.dataset.tier) S.adapt = {};   // a new level starts at warm-up
       S.tier = tier2.dataset.tier;
       sess = null;
       battle = null;
+      clearTimeout(battleTimer);
       save();
       sfx("pop");
       return render();
@@ -3289,8 +3911,8 @@
     // tapping the pet itself is always worth something
     if (t.closest("#scene")) {
       S.pet.happy = clamp(S.pet.happy + 1, 0, 100);
-      var m = mood();
-      say(D.MOODS[m][Math.floor(Math.random() * D.MOODS[m].length)]);
+      var ml = moodSay();
+      say(ml.text, 2600, ml.tok);
       sfx("pop");
       save();
     }
@@ -3351,6 +3973,7 @@
     S = load(id);
     sess = null;
     battle = null;
+    clearTimeout(battleTimer);
     pendingBuy = null;
     pendingSale = null;
     spinning = false;
@@ -3426,6 +4049,12 @@
     house: function () { return S.house; },
     stall: function () { return S.stall; },
     spun: function () { return spunToday(); },
+    adapt: function () { return S.adapt; },
+    heat: function (subject) { return rungOf(subject); },
+    arena: function () { return arena(); },
+    said: function () { return lastSaid; },
+    narration: function () { return { clips: Object.keys(CLIPS).length, hasClips: hasClips, canSpeak: canSpeak }; },
+    _setRung: function (subject, r) { adaptOf(subject).rung = D.hot(r); adaptOf(subject).hist = []; save(); },
     _nextQuestion: function () { if (sess) { nextQuestion(); render(); } },
     grant: function (n) { S.coins += n; save(); render(); }
   };

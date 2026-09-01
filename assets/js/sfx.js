@@ -70,6 +70,17 @@ window.SFX = (function () {
     /* A bright coin/treasure "ting". */
     coin() { play([{ f: 988, t: 0, d: 0.09 }, { f: 1319, t: 0.07, d: 0.14 }]); },
 
+    /* A low thud for a blow landing in an arena. */
+    hit() { play([{ f: 160, t: 0, d: 0.12, type: "triangle", g: 0.14 }, { f: 90, t: 0.05, d: 0.16, type: "sine", g: 0.12 }]); },
+
+    /* A big bright critical hit. */
+    crit() {
+      play([
+        { f: 330, t: 0, d: 0.08, type: "square", g: 0.1 }, { f: 660, t: 0.07, d: 0.1, type: "square", g: 0.1 },
+        { f: 1320, t: 0.14, d: 0.24, type: "sine", g: 0.14 },
+      ]);
+    },
+
     /* A rising blip whose pitch climbs with a combo streak (clamped). */
     streak(n) {
       const step = Math.min(Math.max(n || 1, 1), 12);

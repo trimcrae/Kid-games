@@ -74,8 +74,11 @@ window.CPData = (function () {
      question maker below has to remember it. */
   function label(c) { return String(typeof c === "object" ? (c.t || c.emoji || "") : c).trim().toLowerCase(); }
 
-  function mk(o, tier) {
+  function mk(o, tier, r) {
     var need = nChoices(tier) - 1;
+    // At the top of the heat the Little level gets a fourth choice: the
+    // same question, genuinely harder, with nothing new to read.
+    if (tier === "early" && hot(r) >= 4) need = 3;
     var seen = {};
     seen[label(o.right)] = 1;
     var wrongs = [];
@@ -106,7 +109,11 @@ window.CPData = (function () {
       answer: idx,
       teach: o.teach || "",
       subject: o.subject,
-      tier: tier
+      tier: tier,
+      /* what the narrator says: the question, the lesson, and the answer */
+      say: o.say || null,
+      sayTeach: o.sayTeach || null,
+      sayA: o.sayA || null
     };
   }
 
@@ -164,10 +171,30 @@ window.CPData = (function () {
   function money(v) { return "$" + (Math.round(v * 100) % 100 === 0 ? commas(Math.round(v)) : v.toFixed(2)); }
 
   /* =========================================================
+     THE HEAT — how hard a question is, INSIDE its level.
+
+     Every generator takes a rung `r` from 1 (warm-up) to 5 (on
+     fire). The engine turns the rung up when you keep nailing
+     questions and down when you keep missing them, and the coins
+     climb with it — so a child who has outgrown "3 + 4" is never
+     stuck on it, and one who is struggling is never stranded.
+     `grow(hi, top, r)` is the whole trick: a range whose top end
+     is `hi` at rung 1 and `top` at rung 5.
+     ========================================================= */
+  function hot(r) { r = r | 0; return r < 1 ? 1 : r > 5 ? 5 : r; }
+  function grow(hi, top, r) { return Math.round(hi + (top - hi) * (hot(r) - 1) / 4); }
+  /* The narrator's tokens (see lines.js). N(7) is the clip that says "7". */
+  var LINES = window.CPLines || null;
+  function N(n) { return "n-" + n; }
+  function slug(s) { return LINES ? LINES.slug(s) : String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
+
+  /* =========================================================
      MATHS — the Berry Farm.
      Generated, so it never runs out and never repeats a page.
      ========================================================= */
   var COUNTABLES = ["🍓", "🫐", "🍎", "⭐", "🌸", "🐞", "🍄", "🐟", "🥕", "🍋"];
+
+  function countUp(n) { var a = []; for (var i = 1; i <= n; i++) a.push(N(i)); return a; }
 
   var MATH = {
     tot: [
@@ -175,154 +202,200 @@ window.CPData = (function () {
         var e = pick(COUNTABLES), n = range(1, 3);
         return mk({ subject: "math", kind: "big", q: "How many?", big: { emoji: emojiRun(e, n) },
           right: String(n), wrong: [String(n === 1 ? 2 : n - 1), String(n + 1)],
-          teach: "Count them one at a time: " + Array.from({ length: n }, function (_, i) { return i + 1; }).join(", ") + "." }, "tot");
+          teach: "Count them one at a time: " + Array.from({ length: n }, function (_, i) { return i + 1; }).join(", ") + ".",
+          say: ["q-how-many"], sayTeach: ["frag-count-one-at-a-time"].concat(countUp(n)) }, "tot");
       },
       function () {
         var big = range(3, 5), small = range(1, 2), e = pick(COUNTABLES);
         return mk({ subject: "math", q: "Which pile has MORE?",
           right: { emoji: emojiRun(e, big) }, wrong: [{ emoji: emojiRun(e, small) }],
-          teach: "More means a bigger pile — " + big + " beats " + small + "." }, "tot");
+          teach: "More means a bigger pile — " + big + " beats " + small + ".",
+          say: ["q-more"], sayTeach: ["frag-more-means", N(big), "frag-beats", N(small)] }, "tot");
       },
       function () {
         var e = pick(COUNTABLES), n = range(1, 3);
         var other = n === 1 ? 3 : n - 1;
         return mk({ subject: "math", kind: "big", q: "Which pile is " + n + "?", big: { text: String(n) },
           right: { emoji: emojiRun(e, n) }, wrong: [{ emoji: emojiRun(e, other) }],
-          teach: "The number " + n + " means " + n + " thing" + (n === 1 ? "" : "s") + "." }, "tot");
+          teach: "The number " + n + " means " + n + " thing" + (n === 1 ? "" : "s") + ".",
+          say: ["q-which-pile", N(n)],
+          sayTeach: ["frag-the-number", N(n), "frag-means", N(n), n === 1 ? "frag-thing" : "frag-things"] }, "tot");
       },
       function () {
-        var shp = [["Circle", "⭕"], ["Square", "🟥"], ["Triangle", "🔺"], ["Star", "⭐"], ["Heart", "💜"]];
+        var shp = LINES.SHAPES.slice(0, 5);
         var s = pick(shp), o = pick(shp.filter(function (x) { return x[0] !== s[0]; }));
+        var k = slug(s[0]);
         return mk({ subject: "math", q: "Where is the " + s[0].toLowerCase() + "?",
           right: { emoji: s[1] }, wrong: [{ emoji: o[1] }],
-          teach: "That's the " + s[0].toLowerCase() + "!" }, "tot");
+          teach: "That's the " + s[0].toLowerCase() + "!",
+          say: ["q-where-" + k], sayTeach: ["t-shape-" + k] }, "tot");
       }
     ],
     early: [
-      function () {
-        var e = pick(COUNTABLES), n = range(3, 10);
+      function (r) {
+        var e = pick(COUNTABLES), n = range(3, grow(10, 15, r));
         return mk({ subject: "math", kind: "big", q: "How many altogether?", big: { emoji: emojiRun(e, n) },
           right: String(n), wrong: nearMiss(n, 2).map(String),
-          teach: "There are " + n + ". Touch each one as you count." }, "early");
+          teach: "There are " + n + ". Touch each one as you count.",
+          say: ["q-how-many-altogether"], sayTeach: ["frag-there-are", N(n), "frag-touch-each"] }, "early", r);
       },
-      function () {
-        var a = range(1, 5), b = range(1, 4);
+      function (r) {
+        var a = range(1, grow(5, 8, r)), b = range(1, grow(4, 7, r));
         return mk({ subject: "math", kind: "big", q: "Add them up!", big: { emoji: emojiRun("🍓", a) + " + " + emojiRun("🫐", b) },
           right: String(a + b), wrong: nearMiss(a + b, 2).map(String),
-          teach: a + " and " + b + " more makes " + (a + b) + "." }, "early");
+          teach: a + " and " + b + " more makes " + (a + b) + ".",
+          say: ["q-add-them", N(a), "frag-plus", N(b)],
+          sayTeach: [N(a), "frag-and", N(b), "frag-more-makes", N(a + b)] }, "early", r);
       },
-      function () {
-        var a = range(4, 10), b = range(1, 3);
+      function (r) {
+        var a = range(4, grow(10, 15, r)), b = Math.min(a - 1, range(1, grow(3, 6, r)));
         return mk({ subject: "math", q: "You have " + a + " berries and eat " + b + ". How many are left?",
           right: String(a - b), wrong: nearMiss(a - b, 2).map(String),
-          teach: a + " take away " + b + " leaves " + (a - b) + "." }, "early");
+          teach: a + " take away " + b + " leaves " + (a - b) + ".",
+          say: ["frag-you-have", N(a), "frag-berries-and-eat", N(b), "frag-how-many-left"],
+          sayTeach: [N(a), "frag-minus", N(b), "frag-leaves", N(a - b)] }, "early", r);
       },
-      function () {
-        var n = range(1, 9);
+      function (r) {
+        var n = range(1, grow(9, 40, r));
+        var shown = (n - 1 > 0 ? [N(n - 1)] : []).concat([N(n)]);
         return mk({ subject: "math", kind: "big", q: "Which number comes NEXT?", big: { text: (n - 1 > 0 ? (n - 1) + ", " : "") + n + ", ?" },
           right: String(n + 1), wrong: [String(n), String(n + 2), String(n - 1 > 0 ? n - 1 : n + 3)],
-          teach: "Counting up: " + n + " then " + (n + 1) + "." }, "early");
+          teach: "Counting up: " + n + " then " + (n + 1) + ".",
+          say: ["q-next-number"].concat(shown), sayTeach: ["frag-counting-up", N(n), "frag-then", N(n + 1)] }, "early", r);
       },
-      function () {
-        var start = pick([2, 5, 10]), k = range(1, 3);
+      function (r) {
+        var start = pick(hot(r) >= 4 ? [2, 3, 5, 10] : [2, 5, 10]), k = range(1, grow(3, 5, r));
         var seq = [start * k, start * (k + 1), start * (k + 2)];
         return mk({ subject: "math", kind: "big", q: "Keep the pattern going!", big: { text: seq.join(", ") + ", ?" },
           right: String(start * (k + 3)), wrong: nearMiss(start * (k + 3), start).map(String),
-          teach: "This one counts up by " + start + " each time." }, "early");
+          teach: "This one counts up by " + start + " each time.",
+          say: ["q-pattern"].concat(seq.map(N)), sayTeach: ["frag-counts-up-by", N(start), "frag-each-time"] }, "early", r);
       },
-      function () {
-        var a = range(1, 9);
-        return mk({ subject: "math", kind: "big", q: "How many more to make 10?", big: { text: a + " + ? = 10" },
-          right: String(10 - a), wrong: nearMiss(10 - a, 3).map(String),
-          teach: "Start at " + a + " and count on your fingers up to 10 — that's " + (10 - a) + " more." }, "early");
+      function (r) {
+        var to = hot(r) >= 5 ? 20 : 10, a = range(1, to - 1);
+        return mk({ subject: "math", kind: "big", q: "How many more to make " + to + "?", big: { text: a + " + ? = " + to },
+          right: String(to - a), wrong: nearMiss(to - a, 3).map(String),
+          teach: a + " and " + (to - a) + " more makes " + to + ". Count on your fingers from " + a + ".",
+          say: ["q-make-" + to, N(a), "frag-plus-what-makes", N(to)],
+          sayTeach: [N(a), "frag-and", N(to - a), "frag-more-makes", N(to)] }, "early", r);
       },
-      function () {
-        var a = range(1, 10);
+      function (r) {
+        var a = range(1, grow(10, 20, r));
         return mk({ subject: "math", kind: "big", q: "Double it!", big: { text: a + " + " + a },
           right: String(a * 2), wrong: nearMiss(a * 2, 3).map(String),
-          teach: "Doubling means two of the same: " + a + " and another " + a + " makes " + (a * 2) + "." }, "early");
+          teach: "Doubling means two of the same: " + a + " and another " + a + " makes " + (a * 2) + ".",
+          say: ["q-double", N(a), "frag-plus", N(a)],
+          sayTeach: ["frag-doubling", N(a), "frag-and-another", N(a), "frag-makes", N(a * 2)] }, "early", r);
       },
-      function () {
-        var e = pick(COUNTABLES), n = range(4, 10);
-        var half = Math.floor(n / 2);
-        return mk({ subject: "math", kind: "big", q: "Share these fairly between 2 friends. How many each?",
-          big: { emoji: emojiRun(e, half * 2) },
-          right: String(half), wrong: nearMiss(half, 3).map(String),
-          teach: "Give one to you, one to them, one to you… " + (half * 2) + " shared between 2 is " + half + " each." }, "early");
+      function (r) {
+        var e = pick(COUNTABLES), between = (hot(r) >= 4 && rnd(2)) ? 3 : 2;
+        var each = range(2, grow(5, 7, r)), total = each * between;
+        return mk({ subject: "math", kind: "big", q: "Share these fairly between " + between + " friends. How many each?",
+          big: { emoji: emojiRun(e, total) },
+          right: String(each), wrong: nearMiss(each, 3).map(String),
+          teach: "Give one to each friend, then another… " + total + " shared between " + between + " is " + each + " each.",
+          say: ["frag-share-between", N(between), "frag-friends-how-many-each"],
+          sayTeach: [N(total), "frag-shared-between", N(between), "frag-is", N(each), "frag-each"] }, "early", r);
       }
     ],
     mid: [
-      function () {
-        var a = range(11, 99), b = range(11, 99);
+      function (r) {
+        var lim = grow(99, 499, r), a = range(11, lim), b = range(11, lim);
         return mk({ subject: "math", kind: "big", q: "Add it up.", big: { text: a + " + " + b },
           right: String(a + b), wrong: nearMiss(a + b, 12).map(String),
-          teach: "Add the tens (" + (Math.floor(a / 10) * 10) + " + " + (Math.floor(b / 10) * 10) + ") then the ones." }, "mid");
+          teach: "Add the tens (" + (Math.floor(a / 10) * 10) + " + " + (Math.floor(b / 10) * 10) + ") then the ones.",
+          say: (a <= 100 && b <= 100) ? ["q-add-it-up", N(a), "frag-plus", N(b)] : null }, "mid", r);
       },
-      function () {
-        var a = range(30, 200), b = range(10, a - 1);
+      function (r) {
+        var a = range(30, grow(200, 999, r)), b = range(10, a - 1);
         return mk({ subject: "math", kind: "big", q: "Take it away.", big: { text: a + " − " + b },
           right: String(a - b), wrong: nearMiss(a - b, 12).map(String),
-          teach: "Count up from " + b + " to " + a + " — that gap is " + (a - b) + "." }, "mid");
+          teach: "Count up from " + b + " to " + a + " — that gap is " + (a - b) + ".",
+          say: (a <= 100) ? ["q-take-it-away", N(a), "frag-minus", N(b)] : null }, "mid", r);
       },
-      function () {
-        var a = range(2, 12), b = range(2, 12);
+      function (r) {
+        var aMax = [6, 9, 12, 12, 12][hot(r) - 1], bMax = [6, 9, 12, 15, 25][hot(r) - 1];
+        var a = range(2, aMax), b = range(2, bMax);
         return mk({ subject: "math", kind: "big", q: "Times tables!", big: { text: a + " × " + b },
           right: String(a * b), wrong: nearMiss(a * b, Math.max(a, b)).map(String),
-          teach: a + " × " + b + " = " + (a * b) + " — that's " + b + " lots of " + a + "." }, "mid");
+          teach: a + " × " + b + " = " + (a * b) + " — that's " + b + " lots of " + a + ".",
+          say: ["q-times-tables", N(a), "frag-times", N(b)] }, "mid", r);
       },
-      function () {
-        var b = range(2, 12), q = range(2, 12), a = b * q;
+      function (r) {
+        var bMax = [6, 9, 12, 12, 12][hot(r) - 1], qMax = [6, 9, 12, 15, 25][hot(r) - 1];
+        var b = range(2, bMax), q = range(2, qMax), a = b * q;
         return mk({ subject: "math", kind: "big", q: "Share them out.", big: { text: a + " ÷ " + b },
           right: String(q), wrong: nearMiss(q, 4).map(String),
-          teach: a + " ÷ " + b + " = " + q + ", because " + b + " × " + q + " = " + a + "." }, "mid");
+          teach: a + " ÷ " + b + " = " + q + ", because " + b + " × " + q + " = " + a + "." }, "mid", r);
       },
-      function () {
-        var w = range(3, 12), h = range(3, 12);
+      function (r) {
+        var w = range(3, grow(12, 25, r)), h = range(3, grow(12, 25, r));
         var area = rnd(2) === 0;
         return mk({ subject: "math", q: "A berry patch is " + w + " feet wide and " + h + " feet tall. What is its " + (area ? "AREA" : "PERIMETER") + "?",
           right: String(area ? w * h : 2 * (w + h)), wrong: nearMiss(area ? w * h : 2 * (w + h), 8).map(String),
           teach: area ? "Area = width × height = " + w + " × " + h + " = " + (w * h) + "."
-                      : "Perimeter is all four sides: " + w + " + " + h + " + " + w + " + " + h + " = " + (2 * (w + h)) + "." }, "mid");
+                      : "Perimeter is all four sides: " + w + " + " + h + " + " + w + " + " + h + " = " + (2 * (w + h)) + "." }, "mid", r);
       },
-      function () {
-        var den = pick([2, 3, 4, 5, 6, 10]), num = range(1, den - 1);
-        var total = den * range(2, 6);
+      function (r) {
+        var den = pick(hot(r) >= 3 ? [2, 3, 4, 5, 6, 8, 10, 12] : [2, 3, 4, 5, 6, 10]), num = range(1, den - 1);
+        var total = den * range(2, grow(6, 12, r));
         return mk({ subject: "math", q: "What is " + num + "/" + den + " of " + total + " berries?",
           right: String(total / den * num), wrong: nearMiss(total / den * num, 5).map(String),
-          teach: "Split " + total + " into " + den + " equal piles of " + (total / den) + ", then take " + num + "." }, "mid");
+          teach: "Split " + total + " into " + den + " equal piles of " + (total / den) + ", then take " + num + "." }, "mid", r);
       },
-      function () {
+      function (r) {
         var x = range(1, 6), y = range(1, 6);
-        return mk({ subject: "math", q: "Your pet is at (" + x + ", " + y + ") on the farm grid. Which way does it walk to reach (" + x + ", " + (y + 2) + ")?",
-          right: "Up 2", wrong: ["Down 2", "Right 2", "Left 2"],
-          teach: "The first number is across, the second is up. Only the second changed, so it goes UP." }, "mid");
+        var dx = 0, dy = 0, dir;
+        if (hot(r) >= 3) {
+          // both numbers can change now, and the move can go any way
+          dx = pick([-2, 0, 2, 3]); dy = dx ? pick([0, 2, -1]) : pick([2, 3, -2]);
+        } else { dy = 2; }
+        if (x + dx < 0) dx = 2; if (y + dy < 0) dy = 2;
+        var words = [];
+        if (dy) words.push((dy > 0 ? "Up " : "Down ") + Math.abs(dy));
+        if (dx) words.push((dx > 0 ? "Right " : "Left ") + Math.abs(dx));
+        dir = words.join(", ");
+        var wrongs = [
+          (dy ? (dy > 0 ? "Down " : "Up ") + Math.abs(dy) : "Up 2") + (dx ? ", " + (dx > 0 ? "Left " : "Right ") + Math.abs(dx) : ""),
+          "Right " + (Math.abs(dy) || 2) + (dx ? ", Up " + Math.abs(dx) : ""),
+          "Left " + (Math.abs(dy) || 2) + (dy && dx ? "" : ", Down 1")
+        ];
+        return mk({ subject: "math", q: "Your pet is at (" + x + ", " + y + ") on the farm grid. Which way does it walk to reach (" + (x + dx) + ", " + (y + dy) + ")?",
+          right: dir, wrong: wrongs,
+          teach: "The first number is across, the second is up. " +
+                 (dx && dy ? "Both changed, so it goes across AND up or down." :
+                  dx ? "Only the first changed, so it goes sideways." : "Only the second changed, so it goes " + (dy > 0 ? "UP." : "DOWN.")) }, "mid", r);
       },
-      function () {
+      function (r) {
         var coins = [range(1, 3) * 25, range(1, 4) * 10, range(1, 4) * 5];
+        if (hot(r) >= 3) coins.push(range(1, 4) * 1);
+        if (hot(r) >= 5) coins.push(range(1, 2) * 50);
         var total = coins.reduce(function (s, c) { return s + c; }, 0);
-        return mk({ subject: "math", q: "You have " + coins[0] + "¢, " + coins[1] + "¢ and " + coins[2] + "¢. How much money is that?",
+        return mk({ subject: "math", q: "You have " + coins.map(function (c) { return c + "¢"; }).join(", ").replace(/, ([^,]*)$/, " and $1") + ". How much money is that?",
           right: total + "¢", wrong: nearMiss(total, 15).map(function (n) { return n + "¢"; }),
-          teach: coins.join(" + ") + " = " + total + "¢." }, "mid");
+          teach: coins.join(" + ") + " = " + total + "¢." }, "mid", r);
       },
-      function () {
-        var n = range(2, 9), m = range(3, 9);
+      function (r) {
+        var n = range(2, grow(9, 12, r)), m = range(3, grow(9, 12, r));
         return mk({ subject: "math", kind: "big", q: "Fill in the gap.", big: { text: n + " × ? = " + (n * m) },
           right: String(m), wrong: nearMiss(m, 4).map(String),
-          teach: "Ask: how many " + n + "s make " + (n * m) + "? " + m + " of them." }, "mid");
+          teach: "Ask: how many " + n + "s make " + (n * m) + "? " + m + " of them." }, "mid", r);
       },
-      function () {
-        var h = range(1, 11), m = pick([15, 30, 45]);
-        var add = pick([30, 45, 60]);
+      function (r) {
+        var h = range(1, 11), m = pick(hot(r) >= 3 ? [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55] : [15, 30, 45]);
+        var add = pick(hot(r) >= 4 ? [25, 35, 40, 50, 70, 90] : [30, 45, 60]);
         var tot = h * 60 + m + add;
         var nh = Math.floor(tot / 60) % 12 || 12, nm = tot % 60;
         return mk({ subject: "math", q: "It is " + h + ":" + String(m).padStart(2, "0") + ". What time is it " + add + " minutes later?",
           right: nh + ":" + String(nm).padStart(2, "0"),
           wrong: [((nh % 12) + 1) + ":" + String(nm).padStart(2, "0"), nh + ":" + String((nm + 15) % 60).padStart(2, "0"), (nh === 1 ? 12 : nh - 1) + ":" + String(nm).padStart(2, "0")],
-          teach: "There are 60 minutes in an hour, so " + m + " + " + add + " rolls over into the next hour." }, "mid");
+          teach: "There are 60 minutes in an hour, so " + m + " + " + add + " rolls over into the next hour." }, "mid", r);
       },
-      function () {
-        var n = range(1000, 9999);
-        var slots = [["thousands", 0, 1000], ["hundreds", 1, 100], ["tens", 2, 10], ["ones", 3, 1]];
+      function (r) {
+        var big5 = hot(r) >= 4;
+        var n = big5 ? range(10000, 99999) : range(1000, 9999);
+        var slots = [["thousands", big5 ? 1 : 0, 1000], ["hundreds", big5 ? 2 : 1, 100], ["tens", big5 ? 3 : 2, 10], ["ones", big5 ? 4 : 3, 1]];
+        if (big5) slots.unshift(["ten thousands", 0, 10000]);
         var s = pick(slots);
         var digit = String(n)[s[1]];
         // Other digits from the number itself make the sharpest distractors;
@@ -331,149 +404,152 @@ window.CPData = (function () {
           .concat(shuffle("0123456789".split("").filter(function (d) { return d !== digit; })));
         return mk({ subject: "math", q: "In the number " + commas(n) + ", which digit is in the " + s[0] + " place?",
           right: digit, wrong: distractors,
-          teach: "Read the places from the right: ones, tens, hundreds, thousands. " +
-                 "So that " + digit + " is really worth " + commas(Number(digit) * s[2]) + "." }, "mid");
+          teach: "Read the places from the right: ones, tens, hundreds, thousands" + (big5 ? ", ten thousands" : "") + ". " +
+                 "So that " + digit + " is really worth " + commas(Number(digit) * s[2]) + "." }, "mid", r);
       },
-      function () {
-        var to = pick([10, 100]);
-        var n = range(to === 10 ? 12 : 120, to === 10 ? 199 : 1999);
+      function (r) {
+        var to = pick(hot(r) >= 3 ? [10, 100, 1000] : [10, 100]);
+        var n = range(to === 10 ? 12 : to === 100 ? 120 : 1200, to === 10 ? 199 : to === 100 ? 1999 : 19999);
         var v = Math.round(n / to) * to;
-        return mk({ subject: "math", q: "Round " + commas(n) + " to the nearest " + to + ".",
+        return mk({ subject: "math", q: "Round " + commas(n) + " to the nearest " + commas(to) + ".",
           right: commas(v), wrong: [commas(v + to), commas(v - to), commas(v + to * 2)],
           teach: "Look at the digit just to the right: 5 or more rounds up, 4 or less rounds down. " +
-                 commas(n) + " → " + commas(v) + "." }, "mid");
+                 commas(n) + " → " + commas(v) + "." }, "mid", r);
       },
-      function () {
+      function (r) {
         // Cory's Minecraft question: how many blocks in a solid cuboid?
-        var w = range(2, 6), d = range(2, 6), h = range(2, 5);
+        var w = range(2, grow(6, 9, r)), d = range(2, grow(6, 9, r)), h = range(2, grow(5, 7, r));
         var v = w * d * h;
         return mk({ subject: "math", q: "You build a solid block of stone " + w + " wide, " + d + " deep and " + h + " tall. How many blocks did it take?",
           right: String(v), wrong: nearMiss(v, Math.max(3, Math.round(v * 0.25))).map(String),
-          teach: "One layer is " + w + " × " + d + " = " + (w * d) + " blocks, and there are " + h + " layers → " + (w * d) + " × " + h + " = " + v + "." }, "mid");
+          teach: "One layer is " + w + " × " + d + " = " + (w * d) + " blocks, and there are " + h + " layers → " + (w * d) + " × " + h + " = " + v + "." }, "mid", r);
       },
-      function () {
-        var n = range(6, 40) * 2 + (rnd(2) ? 1 : 0);
+      function (r) {
+        var n = range(6, grow(40, 400, r)) * 2 + (rnd(2) ? 1 : 0);
         var isEven = n % 2 === 0;
         return mk({ subject: "math", q: "Is " + n + " odd or even — and how do you know?",
           right: (isEven ? "Even" : "Odd") + " — it ends in " + (n % 10),
           wrong: [(isEven ? "Odd" : "Even") + " — it ends in " + (n % 10),
                   (isEven ? "Odd" : "Even") + " — it is more than 10",
                   (isEven ? "Even" : "Odd") + " — its digits add to " + String(n).split("").reduce(function (s, d) { return s + Number(d); }, 0)],
-          teach: "Only the LAST digit matters. 0, 2, 4, 6, 8 → even. 1, 3, 5, 7, 9 → odd." }, "mid");
+          teach: "Only the LAST digit matters. 0, 2, 4, 6, 8 → even. 1, 3, 5, 7, 9 → odd." }, "mid", r);
       },
-      function () {
-        var per = pick([3, 4, 5, 6, 8]), groups = range(3, 9), spare = rnd(per);
+      function (r) {
+        var per = pick([3, 4, 5, 6, 8]), groups = range(3, grow(9, 15, r)), spare = rnd(per);
         var total = per * groups + spare;
         return mk({ subject: "math", q: "You put " + total + " berries into baskets of " + per + ". How many baskets are FULL?",
           right: String(groups), wrong: nearMiss(groups, 3).map(String),
           teach: total + " ÷ " + per + " = " + groups + " with " + spare + " left over, so " + groups + " baskets fill up" +
-                 (spare ? " and " + spare + " berr" + (spare === 1 ? "y" : "ies") + " sit in the next one." : ".") }, "mid");
+                 (spare ? " and " + spare + " berr" + (spare === 1 ? "y" : "ies") + " sit in the next one." : ".") }, "mid", r);
       }
     ],
     big: [
-      function () {
-        var a = range(12, 99), b = range(11, 40);
+      function (r) {
+        var a = range(12, 99), b = range(11, grow(40, 99, r));
         return mk({ subject: "math", kind: "big", q: "Long multiplication.", big: { text: a + " × " + b },
           right: commas(a * b), wrong: nearMiss(a * b, Math.round(a * b * 0.09)).map(commas),
-          teach: a + " × " + b + " = " + a + "×" + (Math.floor(b / 10) * 10) + " + " + a + "×" + (b % 10) + " = " + commas(a * b) + "." }, "big");
+          teach: a + " × " + b + " = " + a + "×" + (Math.floor(b / 10) * 10) + " + " + a + "×" + (b % 10) + " = " + commas(a * b) + "." }, "big", r);
       },
-      function () {
-        var d = range(3, 12), q = range(11, 40), r = range(1, d - 1);
-        var n = d * q + r;
+      function (r) {
+        var d = range(3, grow(12, 25, r)), q = range(11, grow(40, 99, r)), rem = range(1, d - 1);
+        var n = d * q + rem;
         return mk({ subject: "math", q: "What is " + n + " ÷ " + d + "?",
-          right: q + " r" + r, wrong: [(q + 1) + " r" + r, q + " r" + ((r % (d - 1)) + 1), (q - 1) + " r" + r],
-          teach: d + " goes into " + n + " " + q + " times (" + (d * q) + "), leaving " + r + " over." }, "big");
+          right: q + " r" + rem, wrong: [(q + 1) + " r" + rem, q + " r" + ((rem % (d - 1)) + 1), (q - 1) + " r" + rem],
+          teach: d + " goes into " + n + " " + q + " times (" + (d * q) + "), leaving " + rem + " over." }, "big", r);
       },
-      function () {
-        var den = pick([4, 5, 6, 8, 10, 12]);
+      function (r) {
+        var den = pick(hot(r) >= 3 ? [4, 5, 6, 8, 9, 10, 12, 15, 16] : [4, 5, 6, 8, 10, 12]);
         var a = range(1, den - 2), b = range(1, den - a - 1);
         var g = gcd(a + b, den);
         var simp = ((a + b) / g) + "/" + (den / g);
         return mk({ subject: "math", kind: "big", q: "Add the fractions (simplest form).", big: { text: a + "/" + den + " + " + b + "/" + den },
           right: simp, wrong: [(a + b) + "/" + (den * 2), (a * b) + "/" + den, (a + b + 1) + "/" + den],
-          teach: "Same bottom number, so just add the tops: " + a + " + " + b + " = " + (a + b) + " out of " + den + (g > 1 ? ", which simplifies to " + simp : "") + "." }, "big");
+          teach: "Same bottom number, so just add the tops: " + a + " + " + b + " = " + (a + b) + " out of " + den + (g > 1 ? ", which simplifies to " + simp : "") + "." }, "big", r);
       },
-      function () {
-        var p = pick([10, 20, 25, 50, 75]), n = pick([40, 60, 80, 120, 200, 240]);
+      function (r) {
+        var p = pick(hot(r) >= 3 ? [10, 15, 20, 25, 35, 50, 60, 75] : [10, 20, 25, 50, 75]);
+        var n = pick(hot(r) >= 4 ? [120, 160, 240, 320, 480, 600, 800] : [40, 60, 80, 120, 200, 240]);
         return mk({ subject: "math", q: "What is " + p + "% of " + n + "?",
           right: String(n * p / 100), wrong: nearMiss(n * p / 100, Math.max(4, Math.round(n * 0.12))).map(String),
-          teach: p + "% means " + p + " out of every 100, so " + n + " × " + (p / 100) + " = " + (n * p / 100) + "." }, "big");
+          teach: p + "% means " + p + " out of every 100, so " + n + " × " + (p / 100) + " = " + (n * p / 100) + "." }, "big", r);
       },
-      function () {
-        var a = range(2, 9), b = range(2, 9), c = range(2, 9);
+      function (r) {
+        var a = range(2, grow(9, 15, r)), b = range(2, grow(9, 12, r)), c = range(2, grow(9, 12, r));
         var v = a + b * c;
         return mk({ subject: "math", kind: "big", q: "Careful — order of operations!", big: { text: a + " + " + b + " × " + c },
           right: String(v), wrong: [String((a + b) * c), String(a + b + c), String(a * b + c)],
-          teach: "Multiply first: " + b + " × " + c + " = " + (b * c) + ", then add " + a + " → " + v + "." }, "big");
+          teach: "Multiply first: " + b + " × " + c + " = " + (b * c) + ", then add " + a + " → " + v + "." }, "big", r);
       },
-      function () {
-        var nums = [range(2, 20), range(2, 20), range(2, 20), range(2, 20)];
+      function (r) {
+        var top = grow(20, 60, r);
+        var nums = [range(2, top), range(2, top), range(2, top), range(2, top)];
         var sum = nums.reduce(function (s, n) { return s + n; }, 0);
         while (sum % 4 !== 0) { nums[0]++; sum++; }
         return mk({ subject: "math", q: "What is the AVERAGE of " + nums.join(", ") + "?",
           right: String(sum / 4), wrong: nearMiss(sum / 4, 5).map(String),
-          teach: "Add them (" + sum + ") and share between " + nums.length + " → " + (sum / 4) + "." }, "big");
+          teach: "Add them (" + sum + ") and share between " + nums.length + " → " + (sum / 4) + "." }, "big", r);
       },
-      function () {
-        var n = pick([12, 16, 18, 20, 24, 28, 30, 36, 42, 45]);
+      function (r) {
+        var n = pick(hot(r) >= 3 ? [24, 28, 30, 36, 42, 45, 48, 54, 60, 72] : [12, 16, 18, 20, 24, 28, 30, 36, 42, 45]);
         var facs = [];
         for (var i = 1; i <= n; i++) if (n % i === 0) facs.push(i);
         var notFac = [];
         for (var j = 2; j < n && notFac.length < 6; j++) if (n % j !== 0) notFac.push(j);
         return mk({ subject: "math", q: "Which of these is NOT a factor of " + n + "?",
           right: String(pick(notFac)), wrong: shuffle(facs.filter(function (f) { return f > 1 && f < n; })).slice(0, 3).map(String),
-          teach: "A factor divides in with nothing left over. " + n + "'s factors are " + facs.join(", ") + "." }, "big");
+          teach: "A factor divides in with nothing left over. " + n + "'s factors are " + facs.join(", ") + "." }, "big", r);
       },
-      function () {
+      function (r) {
         var d = pick([[0.5, "1/2"], [0.25, "1/4"], [0.75, "3/4"], [0.2, "1/5"], [0.1, "1/10"], [0.125, "1/8"]]);
         return mk({ subject: "math", q: "Which fraction equals " + d[0] + "?",
           right: d[1], wrong: shuffle(["1/2", "1/4", "3/4", "1/5", "1/10", "1/8", "2/3", "3/5"].filter(function (f) { return f !== d[1]; })).slice(0, 3),
-          teach: d[0] + " = " + d[1] + "." }, "big");
+          teach: d[0] + " = " + d[1] + "." }, "big", r);
       },
-      function () {
-        var speed = pick([4, 5, 6, 8, 10]), hrs = range(2, 6);
+      function (r) {
+        var speed = pick(hot(r) >= 3 ? [4, 5, 6, 8, 10, 12, 15] : [4, 5, 6, 8, 10]), hrs = range(2, grow(6, 12, r));
         return mk({ subject: "math", q: "Your Craepet walks " + speed + " km every hour. How far does it get in " + hrs + " hours?",
           right: speed * hrs + " km", wrong: nearMiss(speed * hrs, 9).map(function (n) { return n + " km"; }),
-          teach: "Distance = speed × time = " + speed + " × " + hrs + " = " + (speed * hrs) + " km." }, "big");
+          teach: "Distance = speed × time = " + speed + " × " + hrs + " = " + (speed * hrs) + " km." }, "big", r);
       }
     ],
     grown: [
-      function () {
-        var bill = pick([46, 58, 72, 84, 96, 124, 137]), tip = pick([15, 18, 20]);
+      function (r) {
+        var bill = pick(hot(r) >= 3 ? [67, 83, 94, 118, 142, 163, 189] : [46, 58, 72, 84, 96, 124, 137]), tip = pick([15, 18, 20]);
         var v = Math.round(bill * tip) / 100;
         return mk({ subject: "math", q: "A " + tip + "% tip on a $" + bill + " bill is…",
           right: "$" + v.toFixed(2), wrong: [ "$" + (bill * (tip + 5) / 100).toFixed(2), "$" + (bill * (tip - 5) / 100).toFixed(2), "$" + (bill * tip / 1000).toFixed(2)],
-          teach: "10% is $" + (bill / 10).toFixed(2) + "; " + tip + "% is " + (tip / 10) + " of that → $" + v.toFixed(2) + "." }, "grown");
+          teach: "10% is $" + (bill / 10).toFixed(2) + "; " + tip + "% is " + (tip / 10) + " of that → $" + v.toFixed(2) + "." }, "grown", r);
       },
-      function () {
-        var price = pick([80, 120, 150, 240, 320]), off = pick([15, 25, 30, 40]);
+      function (r) {
+        var price = pick([80, 120, 150, 240, 320]), off = pick(hot(r) >= 3 ? [15, 25, 30, 35, 40, 45, 60] : [15, 25, 30, 40]);
         var v = price * (100 - off) / 100;
         return mk({ subject: "math", q: "A $" + price + " coat is " + off + "% off. What do you pay?",
           right: money(v), wrong: [money(price * off / 100), money(v + price * 0.1), money(price - off)],
-          teach: "You pay " + (100 - off) + "% → " + price + " × 0." + (100 - off) + " = $" + v + "." }, "grown");
+          teach: "You pay " + (100 - off) + "% → " + price + " × 0." + (100 - off) + " = $" + v + "." }, "grown", r);
       },
-      function () {
-        var a = range(3, 9), b = range(2, 6), c = range(2, 9);
+      function (r) {
+        var a = range(3, grow(9, 15, r)), b = range(2, grow(6, 9, r)), c = range(2, grow(9, 12, r));
         var v = a * a - b * c;
         return mk({ subject: "math", kind: "big", q: "Order of operations.", big: { text: a + "² − " + b + " × " + c },
           right: String(v), wrong: [String((a * a - b) * c), String(a * 2 - b * c), String(a * a - b - c)],
-          teach: "Exponents first (" + a + "² = " + a * a + "), then the multiply (" + b * c + "), then subtract → " + v + "." }, "grown");
+          teach: "Exponents first (" + a + "² = " + a * a + "), then the multiply (" + b * c + "), then subtract → " + v + "." }, "grown", r);
       },
-      function () {
-        var n = pick([144, 169, 196, 225, 256, 289, 324, 361, 400, 441, 484, 625]);
+      function (r) {
+        var n = pick(hot(r) >= 3 ? [289, 324, 361, 441, 484, 529, 576, 625, 676, 729, 784, 841, 961]
+                                 : [144, 169, 196, 225, 256, 289, 324, 361, 400, 441, 484, 625]);
         return mk({ subject: "math", q: "What is √" + n + "?",
           right: String(Math.sqrt(n)), wrong: nearMiss(Math.sqrt(n), 4).map(String),
-          teach: Math.sqrt(n) + " × " + Math.sqrt(n) + " = " + n + "." }, "grown");
+          teach: Math.sqrt(n) + " × " + Math.sqrt(n) + " = " + n + "." }, "grown", r);
       },
-      function () {
+      function (r) {
         var mL = pick([2, 3, 4, 5]), b = pick([3, 5, 7, 11, 13]);
-        var x = pick([4, 6, 8, 12]);
+        var x = pick(hot(r) >= 4 ? [7, 9, 11, 13, 14, 17] : [4, 6, 8, 12]);
         var rhs = mL * x + b;
         return mk({ subject: "math", q: "Solve for x:  " + mL + "x + " + b + " = " + rhs,
           right: String(x), wrong: nearMiss(x, 4).map(String),
-          teach: "Subtract " + b + " (" + (rhs - b) + "), then divide by " + mL + " → x = " + x + "." }, "grown");
+          teach: "Subtract " + b + " (" + (rhs - b) + "), then divide by " + mL + " → x = " + x + "." }, "grown", r);
       },
-      function () {
+      function (r) {
         var reds = range(3, 9), blues = range(3, 9);
         while (blues === reds) blues = range(3, 9);
         var total = reds + blues, g = gcd(reds, total);
@@ -485,28 +561,29 @@ window.CPData = (function () {
           .filter(function (f) { var p = f.split("/"); return Math.abs(p[0] / p[1] - val) > 1e-9; });
         return mk({ subject: "math", q: "A bag holds " + reds + " red and " + blues + " blue marbles. Pick one — what is the chance it's red?",
           right: right, wrong: wrong,
-          teach: "Wanted over total: " + reds + " of " + total + (g > 1 ? ", which simplifies to " + right : "") + "." }, "grown");
+          teach: "Wanted over total: " + reds + " of " + total + (g > 1 ? ", which simplifies to " + right : "") + "." }, "grown", r);
       },
-      function () {
+      function (r) {
         var kg = pick([250, 400, 750, 1200, 1600]), price = pick([3, 4, 6, 8]);
         var per = pick([100, 250, 500]);
         var v = (kg / per) * price;
         return mk({ subject: "math", q: "Berries cost $" + price + " per " + per + " g. What do " + kg + " g cost?",
           right: money(v), wrong: [money(v * 2), money(v / 2), money(kg * price / 1000)],
-          teach: kg + " g is " + (kg / per) + " lots of " + per + " g, so " + (kg / per) + " × $" + price + " = $" + v + "." }, "grown");
+          teach: kg + " g is " + (kg / per) + " lots of " + per + " g, so " + (kg / per) + " × $" + price + " = $" + v + "." }, "grown", r);
       },
-      function () {
+      function (r) {
         var f = pick([[3, 8, "37.5%"], [5, 8, "62.5%"], [7, 20, "35%"], [9, 25, "36%"], [3, 16, "18.75%"], [11, 40, "27.5%"]]);
         return mk({ subject: "math", q: "Write " + f[0] + "/" + f[1] + " as a percentage.",
           right: f[2], wrong: shuffle(["37.5%", "62.5%", "35%", "36%", "18.75%", "27.5%", "42.5%", "56%"].filter(function (p) { return p !== f[2]; })).slice(0, 3),
-          teach: f[0] + " ÷ " + f[1] + " = " + (f[0] / f[1]) + " → " + f[2] + "." }, "grown");
+          teach: f[0] + " ÷ " + f[1] + " = " + (f[0] / f[1]) + " → " + f[2] + "." }, "grown", r);
       },
-      function () {
+      function (r) {
         var start = pick([1200, 2500, 4000, 8000]), rate = pick([5, 10, 20]);
-        var v = Math.round(start * Math.pow(1 + rate / 100, 2));
-        return mk({ subject: "math", q: "$" + commas(start) + " grows " + rate + "% a year. What is it worth after 2 years?",
-          right: "$" + commas(v), wrong: ["$" + commas(start + start * rate * 2 / 100), "$" + commas(Math.round(start * (1 + rate / 100))), "$" + commas(Math.round(start * (1 + rate / 50)))],
-          teach: "Growth compounds: " + start + " × 1." + String(rate).padStart(2, "0") + "² = " + commas(v) + " — more than simple interest." }, "grown");
+        var years = hot(r) >= 4 ? 3 : 2;
+        var v = Math.round(start * Math.pow(1 + rate / 100, years));
+        return mk({ subject: "math", q: "$" + commas(start) + " grows " + rate + "% a year. What is it worth after " + years + " years?",
+          right: "$" + commas(v), wrong: ["$" + commas(start + start * rate * years / 100), "$" + commas(Math.round(start * (1 + rate / 100))), "$" + commas(Math.round(start * (1 + rate / 50)))],
+          teach: "Growth compounds: " + start + " × 1." + String(rate).padStart(2, "0") + (years === 3 ? "³" : "²") + " = " + commas(v) + " — more than simple interest." }, "grown", r);
       }
     ]
   };
@@ -517,59 +594,10 @@ window.CPData = (function () {
      LETTERS & WORDS — the Word Well.
      The little ones' questions are deliberately PICTURE-first:
      a giant letter and two pictures needs no reading at all.
+     The word lists themselves live in lines.js, next to the
+     sentences the narrator says about them.
      ========================================================= */
-
-  /* One picture per letter — the alphabet the pre-readers work from. */
-  var ABC = [
-    ["A", "🍎", "Apple"], ["B", "🐻", "Bear"], ["C", "🐱", "Cat"], ["D", "🐶", "Dog"],
-    ["E", "🐘", "Elephant"], ["F", "🐸", "Frog"], ["G", "🍇", "Grapes"], ["H", "🏠", "House"],
-    ["I", "🍦", "Ice cream"], ["J", "🫙", "Jar"], ["K", "🔑", "Key"], ["L", "🦁", "Lion"],
-    ["M", "🌙", "Moon"], ["N", "👃", "Nose"], ["O", "🐙", "Octopus"], ["P", "🐧", "Penguin"],
-    ["Q", "👑", "Queen"], ["R", "🌈", "Rainbow"], ["S", "☀️", "Sun"], ["T", "🌳", "Tree"],
-    ["U", "☂️", "Umbrella"], ["V", "🎻", "Violin"], ["W", "🍉", "Watermelon"],
-    ["X", "🩻", "X-ray"], ["Y", "🪀", "Yo-yo"], ["Z", "🦓", "Zebra"]
-  ];
-
-  /* Beginning SOUNDS, which is a different skill from letter NAMES:
-     "b… b… ball" is how a four-year-old actually cracks reading. */
-  var SOUNDS = [
-    ["b", "🎈", "balloon"], ["c", "🥕", "carrot"], ["d", "🦆", "duck"], ["f", "🐟", "fish"],
-    ["g", "🐐", "goat"], ["h", "🎩", "hat"], ["j", "🧃", "juice"], ["l", "🍃", "leaf"],
-    ["m", "🌝", "moon"], ["n", "🪺", "nest"], ["p", "🥧", "pie"], ["r", "🤖", "robot"],
-    ["s", "🧦", "sock"], ["t", "🚂", "train"], ["v", "🚐", "van"], ["w", "🌊", "wave"]
-  ];
-
-  /* Little words a pre-reader can sound out, each with the picture that
-     says what the word MEANS — so "which is spelled right" has an answer. */
-  var TINY_WORDS = [
-    ["cat", "🐱", ["kat", "cta", "cate"]],
-    ["dog", "🐶", ["dawg", "dogg", "doog"]],
-    ["sun", "☀️", ["sunn", "son", "sen"]],
-    ["bed", "🛏️", ["bd", "bead", "bedd"]],
-    ["fish", "🐟", ["fsh", "fich", "phish"]],
-    ["hat", "🎩", ["haat", "hatt", "het"]],
-    ["cup", "☕", ["kup", "cupp", "cop"]],
-    ["bus", "🚌", ["buss", "bas", "bux"]],
-    ["star", "⭐", ["stur", "starr", "sta"]],
-    ["frog", "🐸", ["frogg", "farg", "flog"]],
-    ["milk", "🥛", ["mik", "milck", "melk"]],
-    ["tree", "🌳", ["tre", "trea", "tri"]]
-  ];
-
-  var RHYMES = [
-    ["cat", ["hat", "bat", "mat"], ["dog", "sun", "cup"]],
-    ["dog", ["log", "frog", "hog"], ["cat", "bed", "pin"]],
-    ["star", ["car", "jar", "far"], ["moon", "tree", "hand"]],
-    ["tree", ["bee", "knee", "sea"], ["cat", "door", "sock"]],
-    ["sun", ["run", "bun", "fun"], ["star", "leaf", "milk"]],
-    ["moon", ["spoon", "balloon", "soon"], ["sun", "dog", "hat"]],
-    ["cake", ["lake", "snake", "rake"], ["pie", "book", "shoe"]],
-    ["bug", ["rug", "mug", "hug"], ["ant", "sky", "door"]],
-    ["fish", ["dish", "wish", "swish"], ["bird", "rock", "lamp"]],
-    ["hop", ["top", "mop", "stop"], ["jump", "bird", "sand"]],
-    ["bell", ["shell", "well", "tell"], ["ring", "door", "cake"]],
-    ["night", ["light", "kite", "bright"], ["day", "moon", "sleep"]]
-  ];
+  var ABC = LINES.ABC, SOUNDS = LINES.SOUNDS, TINY_WORDS = LINES.TINY_WORDS, RHYMES = LINES.RHYMES;
 
   /* Words kids reliably spell wrong, with the wrong spelling they pick. */
   var SPELL_MID = [
@@ -743,12 +771,12 @@ window.CPData = (function () {
     ["“Preaching to the choir” means…", "arguing for something to people who already agree", ["singing badly", "speaking in church", "teaching children"], "The choir already believes you."],
     ["“A pyrrhic victory” is…", "a win that costs you more than losing would", ["an easy win", "a stolen win", "a win by one point"], "King Pyrrhus beat Rome but lost his army doing it."],
     ["“Beg the question” strictly means…", "assume the very thing you are trying to prove", ["raise an obvious question", "ask politely", "avoid an answer"], "A logic term: circular reasoning, not “invite the question”."],
-    ["\u201cBurn the midnight oil\u201d means…", "work late into the night", ["waste money", "start an argument", "cook badly"], "From working by oil lamp long after dark."],
-    ["\u201cThe tip of the iceberg\u201d means…", "a small visible part of a much bigger problem", ["a cold reception", "the very best part", "a dangerous person"], "About nine tenths of an iceberg sits below the water."],
-    ["\u201cThrow in the towel\u201d means…", "give up", ["clean up", "start over", "join in"], "A boxer's corner throws a towel into the ring to stop the fight."],
-    ["\u201cA blessing in disguise\u201d is…", "something bad that turns out well", ["a secret gift", "a lucky guess", "a hidden insult"], "You only recognize it afterwards."],
-    ["\u201cSpill the beans\u201d means…", "reveal a secret", ["make a mess", "lose your temper", "share a meal"], "Possibly from ancient voting with beans in jars."],
-    ["\u201cOnce in a blue moon\u201d means…", "very rarely", ["every night", "at sunset", "twice a year"], "A blue moon is the second full moon in a calendar month."]
+    ["“Burn the midnight oil” means…", "work late into the night", ["waste money", "start an argument", "cook badly"], "From working by oil lamp long after dark."],
+    ["“The tip of the iceberg” means…", "a small visible part of a much bigger problem", ["a cold reception", "the very best part", "a dangerous person"], "About nine tenths of an iceberg sits below the water."],
+    ["“Throw in the towel” means…", "give up", ["clean up", "start over", "join in"], "A boxer's corner throws a towel into the ring to stop the fight."],
+    ["“A blessing in disguise” is…", "something bad that turns out well", ["a secret gift", "a lucky guess", "a hidden insult"], "You only recognize it afterwards."],
+    ["“Spill the beans” means…", "reveal a secret", ["make a mess", "lose your temper", "share a meal"], "Possibly from ancient voting with beans in jars."],
+    ["“Once in a blue moon” means…", "very rarely", ["every night", "at sunset", "twice a year"], "A blue moon is the second full moon in a calendar month."]
   ];
 
   var CONFUSED = [
@@ -779,58 +807,67 @@ window.CPData = (function () {
     tot: [
       function () {
         var t = pick(ABC), o = pick(ABC.filter(function (x) { return x[0] !== t[0]; }));
+        var k = t[0].toLowerCase();
         return mk({ subject: "word", q: "Which one starts with this letter?", big: { text: t[0] },
           right: { t: t[2], emoji: t[1] }, wrong: [{ t: o[2], emoji: o[1] }],
-          teach: t[2] + " starts with " + t[0] + "!" }, "tot");
+          teach: t[2] + " starts with " + t[0] + "!",
+          say: ["q-starts-" + k], sayTeach: ["t-abc-" + k], sayA: "w-" + slug(t[2]) }, "tot");
       },
       function () {
         var t = pick(ABC), o = pick(ABC.filter(function (x) { return x[0] !== t[0]; }));
+        var k = t[0].toLowerCase();
         return mk({ subject: "word", q: "Find the letter " + t[0] + ".", big: { emoji: t[1] },
           right: { t: t[0], huge: true }, wrong: [{ t: o[0], huge: true }],
-          teach: t[2] + " begins with " + t[0] + "." }, "tot");
+          teach: t[2] + " begins with " + t[0] + ".",
+          say: ["q-find-" + k], sayTeach: ["t-abc-" + k], sayA: "letter-" + k }, "tot");
       }
     ],
     early: [
-      function () {
-        var t = pick(ABC);
+      function (r) {
+        var t = pick(ABC), k = t[0].toLowerCase();
         var others = shuffle(ABC.filter(function (x) { return x[0] !== t[0]; })).slice(0, 3);
         return mk({ subject: "word", q: "Which picture starts with this letter?", big: { text: t[0] },
           right: { t: t[2], emoji: t[1] }, wrong: others.map(function (o) { return { t: o[2], emoji: o[1] }; }),
-          teach: t[2] + " starts with " + t[0] + " — " + t[0].toLowerCase() + " like in " + t[2].toLowerCase() + "." }, "early");
+          teach: t[2] + " starts with " + t[0] + " — " + t[0].toLowerCase() + " like in " + t[2].toLowerCase() + ".",
+          say: ["q-starts-" + k], sayTeach: ["t-abc-" + k], sayA: "w-" + slug(t[2]) }, "early", r);
       },
-      function () {
-        var r = pick(RHYMES);
-        return mk({ subject: "word", q: "Which word RHYMES with it?", big: { text: r[0].toUpperCase() },
-          right: pick(r[1]), wrong: r[2],
-          teach: "Rhyming words end with the same sound as " + r[0] + "." }, "early");
+      function (r) {
+        var rh = pick(RHYMES), k = slug(rh[0]), right = pick(rh[1]);
+        return mk({ subject: "word", q: "Which word RHYMES with it?", big: { text: rh[0].toUpperCase() },
+          right: right, wrong: rh[2],
+          teach: "Rhyming words end with the same sound as " + rh[0] + ".",
+          say: ["q-rhyme-" + k], sayTeach: ["t-rhyme-" + k], sayA: "w-" + slug(right) }, "early", r);
       },
-      function () {
-        var t = pick(ABC);
+      function (r) {
+        var t = pick(ABC), k = t[0].toLowerCase();
         return mk({ subject: "word", q: "Which is the little version of this letter?", big: { text: t[0] },
           right: { t: t[0].toLowerCase(), huge: true },
           wrong: shuffle(ABC.filter(function (x) { return x[0] !== t[0]; })).slice(0, 3)
             .map(function (o) { return { t: o[0].toLowerCase(), huge: true }; }),
-          teach: "Big " + t[0] + " and little " + t[0].toLowerCase() + " are the same letter." }, "early");
+          teach: "Big " + t[0] + " and little " + t[0].toLowerCase() + " are the same letter.",
+          say: ["q-little-" + k], sayTeach: ["t-little-" + k], sayA: "letter-" + k }, "early", r);
       },
-      function () {
+      function (r) {
         // The picture says WHICH word we mean, so exactly one spelling can
         // be right. (Without it, "top" and "pot" are both spelled fine.)
-        var w = pick(TINY_WORDS);
+        var w = pick(TINY_WORDS), k = slug(w[0]);
         return mk({ subject: "word", kind: "big", q: "Which one spells this?", big: { emoji: w[1] },
           right: w[0], wrong: w[2],
-          teach: w[1] + " is spelled " + w[0].split("").join("-") + "." }, "early");
+          teach: w[1] + " is spelled " + w[0].split("").join("-") + ".",
+          say: ["q-spell-" + k], sayTeach: ["t-spell-" + k], sayA: "w-" + k }, "early", r);
       },
-      function () {
+      function (r) {
         var s = pick(SOUNDS);
         var others = shuffle(SOUNDS.filter(function (x) { return x[0] !== s[0]; })).slice(0, 3);
         return mk({ subject: "word", q: "Which one starts with the “" + s[0] + "” sound?",
           right: { t: s[2], emoji: s[1] },
           wrong: others.map(function (o) { return { t: o[2], emoji: o[1] }; }),
-          teach: "“" + s[0] + "” … " + s[2] + ". Say it slowly and listen to the very first sound." }, "early");
+          teach: "“" + s[0] + "” … " + s[2] + ". Say it slowly and listen to the very first sound.",
+          say: ["q-sound-" + s[0]], sayTeach: ["t-sound-" + s[0]], sayA: "w-" + slug(s[2]) }, "early", r);
       },
-      function () {
+      function (r) {
         // Which letter is MISSING — the first real spelling puzzle.
-        var w = pick(TINY_WORDS);
+        var w = pick(TINY_WORDS), k = slug(w[0]);
         var i = 1 + rnd(w[0].length - 1);
         var gap = w[0].slice(0, i) + "_" + w[0].slice(i + 1);
         var letter = w[0][i];
@@ -838,26 +875,27 @@ window.CPData = (function () {
         return mk({ subject: "word", kind: "big", q: "Which letter is missing?", big: { text: gap.toUpperCase() },
           right: { t: letter, huge: true },
           wrong: others.map(function (c) { return { t: c, huge: true }; }),
-          teach: "The word is " + w[0] + " " + w[1] + " — " + w[0].split("").join("-") + "." }, "early");
+          teach: "The word is " + w[0] + " " + w[1] + " — " + w[0].split("").join("-") + ".",
+          say: ["q-letter-missing"], sayTeach: ["t-spell-" + k], sayA: "letter-" + letter }, "early", r);
       }
     ],
     mid: [
-      function () {
+      function (r) {
         var w = pick(SPELL_MID);
         return mk({ subject: "word", q: "Which spelling is correct?",
-          right: w[0], wrong: w[1], teach: "It's " + w[0].toUpperCase().split("").join("-") + "." }, "mid");
+          right: w[0], wrong: w[1], teach: "It's " + w[0].toUpperCase().split("").join("-") + "." }, "mid", r);
       },
-      function () {
+      function (r) {
         var s = pick(SYN_MID);
         return mk({ subject: "word", q: "Which word means about the same as “" + s[0] + "”?",
-          right: s[1], wrong: s[2], teach: "“" + s[0] + "” and “" + s[1] + "” mean nearly the same thing." }, "mid");
+          right: s[1], wrong: s[2], teach: "“" + s[0] + "” and “" + s[1] + "” mean nearly the same thing." }, "mid", r);
       },
-      function () {
+      function (r) {
         var c = pick(COMPOUNDS);
         return mk({ subject: "word", q: "Put them together: " + c[0].toUpperCase() + " + " + c[1].toUpperCase() + " = ?",
-          right: c[2][0], wrong: [c[1] + c[0], c[0] + "ing", c[1] + "s"], teach: c[3] + " — that's a compound word." }, "mid");
+          right: c[2][0], wrong: [c[1] + c[0], c[0] + "ing", c[1] + "s"], teach: c[3] + " — that's a compound word." }, "mid", r);
       },
-      function () {
+      function (r) {
         // Each irregular plural carries its OWN wrong answers — the
         // tempting ones a child actually writes.
         var plurals = [
@@ -879,18 +917,20 @@ window.CPData = (function () {
         var p = pick(plurals);
         return mk({ subject: "word", q: "More than one " + p[0] + " is…",
           right: p[1], wrong: p[2],
-          teach: "One " + p[0] + ", two " + p[1] + " — that one doesn't just add an s." }, "mid");
+          teach: "One " + p[0] + ", two " + p[1] + " — that one doesn't just add an s." }, "mid", r);
       },
-      function () {
+      function (r) {
         var words = [["butterfly", 3], ["elephant", 3], ["cat", 1], ["banana", 3], ["computer", 3],
                      ["rain", 1], ["window", 2], ["dinosaur", 3], ["helicopter", 4], ["table", 2],
                      ["watermelon", 4], ["pencil", 2]];
+        if (hot(r) >= 3) words = words.concat([["alligator", 4], ["refrigerator", 5], ["caterpillar", 4],
+                                               ["umbrella", 3], ["kangaroo", 3], ["encyclopedia", 6]]);
         var w = pick(words);
         return mk({ subject: "word", q: "How many syllables (claps) in “" + w[0] + "”?",
           right: String(w[1]), wrong: [String(w[1] + 1), String(Math.max(1, w[1] - 1)), String(w[1] + 2)],
-          teach: "Clap it out — " + w[0] + " has " + w[1] + "." }, "mid");
+          teach: "Clap it out — " + w[0] + " has " + w[1] + "." }, "mid", r);
       },
-      function () {
+      function (r) {
         var cons = [
           ["do not", "don't", ["dont", "do'nt", "donot"]],
           ["cannot", "can't", ["cant", "ca'nt", "can'not"]],
@@ -906,9 +946,9 @@ window.CPData = (function () {
         var c = pick(cons);
         return mk({ subject: "word", q: "Squash “" + c[0] + "” into a contraction.",
           right: c[1], wrong: c[2],
-          teach: "The apostrophe stands in for the missing letters: " + c[1] + "." }, "mid");
+          teach: "The apostrophe stands in for the missing letters: " + c[1] + "." }, "mid", r);
       },
-      function () {
+      function (r) {
         // Parts of speech — the vocabulary you need to talk about writing.
         var pos = [
           ["noun", "a person, place or thing", ["dragon", "river", "teacher", "castle", "biscuit"]],
@@ -921,9 +961,9 @@ window.CPData = (function () {
         var w = pick(target[2]);
         return mk({ subject: "word", q: "What kind of word is “" + w + "”?",
           right: target[0], wrong: others.map(function (p) { return p[0]; }),
-          teach: "A " + target[0] + " is " + target[1] + " — and “" + w + "” is one." }, "mid");
+          teach: "A " + target[0] + " is " + target[1] + " — and “" + w + "” is one." }, "mid", r);
       },
-      function () {
+      function (r) {
         // Context clues: the meaning is IN the sentence if you read carefully.
         var ctx = [
           ["The path was so narrow that we had to walk in single file.", "narrow", "not very wide", ["very muddy", "brand new", "going downhill"]],
@@ -938,34 +978,34 @@ window.CPData = (function () {
         var c = pick(ctx);
         return mk({ subject: "word", q: "“" + c[0] + "”  —  what does " + c[1].toUpperCase() + " mean here?",
           right: c[2], wrong: c[3],
-          teach: "The rest of the sentence gives it away: that's what " + c[1] + " means." }, "mid");
+          teach: "The rest of the sentence gives it away: that's what " + c[1] + " means." }, "mid", r);
       }
     ],
     big: [
-      function () {
+      function (r) {
         var s = pick(SYN_BIG);
         return mk({ subject: "word", q: "What does “" + s[0] + "” mean?",
-          right: s[1], wrong: s[2], teach: "“" + s[0] + "” means " + s[1] + "." }, "big");
+          right: s[1], wrong: s[2], teach: "“" + s[0] + "” means " + s[1] + "." }, "big", r);
       },
-      function () {
+      function (r) {
         var a = pick(ANT_BIG);
         return mk({ subject: "word", q: "Which is the OPPOSITE of “" + a[0] + "”?",
-          right: a[1], wrong: a[2], teach: "The opposite of " + a[0] + " is " + a[1] + "." }, "big");
+          right: a[1], wrong: a[2], teach: "The opposite of " + a[0] + " is " + a[1] + "." }, "big", r);
       },
-      function () {
+      function (r) {
         var w = pick(SPELL_BIG);
         return mk({ subject: "word", q: "Which spelling is correct?",
-          right: w[0], wrong: w[1], teach: "It's " + w[0].toUpperCase().split("").join("-") + "." }, "big");
+          right: w[0], wrong: w[1], teach: "It's " + w[0].toUpperCase().split("").join("-") + "." }, "big", r);
       },
-      function () {
+      function (r) {
         var h = pick(HOMOPHONES);
-        return mk({ subject: "word", q: h[0], right: h[1], wrong: h[2], teach: h[3] }, "big");
+        return mk({ subject: "word", q: h[0], right: h[1], wrong: h[2], teach: h[3] }, "big", r);
       },
-      function () {
+      function (r) {
         var a = pick(AFFIX_BIG);
-        return mk({ subject: "word", q: a[0], right: a[1], wrong: a[2], teach: a[3] }, "big");
+        return mk({ subject: "word", q: a[0], right: a[1], wrong: a[2], teach: a[3] }, "big", r);
       },
-      function () {
+      function (r) {
         var an = [["Puppy is to dog as kitten is to…", "cat", ["milk", "paw", "bird"]],
                   ["Hot is to cold as day is to…", "night", ["sun", "warm", "week"]],
                   ["Author is to book as composer is to…", "symphony", ["orchestra", "piano", "concert"]],
@@ -976,24 +1016,24 @@ window.CPData = (function () {
                   ["Herd is to cows as flock is to…", "sheep", ["grass", "farm", "wool"]]];
         var a = pick(an);
         return mk({ subject: "word", q: a[0], right: a[1], wrong: a[2],
-          teach: "Work out the relationship in the first pair, then copy it." }, "big");
+          teach: "Work out the relationship in the first pair, then copy it." }, "big", r);
       }
     ],
     grown: [
-      function () {
+      function (r) {
         var v = pick(VOCAB_GROWN);
         return mk({ subject: "word", q: "“" + v[0].toUpperCase() + "” means…",
-          right: v[1], wrong: v[2], teach: v[0] + ": " + v[1] + "." }, "grown");
+          right: v[1], wrong: v[2], teach: v[0] + ": " + v[1] + "." }, "grown", r);
       },
-      function () {
+      function (r) {
         var i = pick(IDIOMS);
-        return mk({ subject: "word", q: i[0], right: i[1], wrong: i[2], teach: i[3] }, "grown");
+        return mk({ subject: "word", q: i[0], right: i[1], wrong: i[2], teach: i[3] }, "grown", r);
       },
-      function () {
+      function (r) {
         var c = pick(CONFUSED);
-        return mk({ subject: "word", q: c[0], right: c[1], wrong: c[2], teach: c[3] }, "grown");
+        return mk({ subject: "word", q: c[0], right: c[1], wrong: c[2], teach: c[3] }, "grown", r);
       },
-      function () {
+      function (r) {
         var roots = [["The root PHOT- (photograph, photon) means…", "light", ["sound", "distance", "memory"]],
                      ["The root -DICT- (predict, dictate) means…", "say or speak", ["write", "carry", "break"]],
                      ["The root -PORT- (transport, portable) means…", "carry", ["cut", "join", "measure"]],
@@ -1004,11 +1044,11 @@ window.CPData = (function () {
                      ["The root CHRON- (chronology, anachronism) means…", "time", ["color", "gold", "order"]],
                      ["The root -CRED- (credible, credentials) means…", "believe or trust", ["create", "grow", "cross"]],
                      ["The root MAL- (malfunction, malevolent) means…", "bad", ["many", "small", "male"]]];
-        var r = pick(roots);
-        return mk({ subject: "word", q: r[0], right: r[1], wrong: r[2],
-          teach: "Knowing the root lets you decode words you have never met." }, "grown");
+        var rt = pick(roots);
+        return mk({ subject: "word", q: rt[0], right: rt[1], wrong: rt[2],
+          teach: "Knowing the root lets you decode words you have never met." }, "grown", r);
       },
-      function () {
+      function (r) {
         var an = [["Ephemeral is to permanence as arid is to…", "moisture", ["desert", "heat", "sand"]],
                   ["Meticulous is to care as reckless is to…", "caution", ["speed", "danger", "anger"]],
                   ["Sculptor is to marble as poet is to…", "language", ["paper", "emotion", "rhyme"]],
@@ -1017,7 +1057,7 @@ window.CPData = (function () {
                   ["Drought is to water as famine is to…", "food", ["crops", "hunger", "land"]]];
         var a = pick(an);
         return mk({ subject: "word", q: a[0], right: a[1], wrong: a[2],
-          teach: "These pairs are “thing : what it lacks” — the trickiest analogy shape." }, "grown");
+          teach: "These pairs are “thing : what it lacks” — the trickiest analogy shape." }, "grown", r);
       }
     ]
   };
@@ -1027,35 +1067,9 @@ window.CPData = (function () {
      Colours and shapes for the littles; science, geography and
      general knowledge as the tiers climb.
      ========================================================= */
-  var PAINTS = [
-    ["Red", "#e8384f", "🍓"], ["Orange", "#ff8c1a", "🍊"], ["Yellow", "#ffd400", "🍋"],
-    ["Green", "#2fbf4f", "🥦"], ["Blue", "#2b7fff", "🫐"], ["Purple", "#8a3ffc", "🍇"],
-    ["Pink", "#ff6ec7", "🌸"], ["Brown", "#8a5a2b", "🐻"], ["Black", "#22202e", "🐈‍⬛"],
-    ["White", "#fdfdff", "🦢"], ["Gray", "#9aa0b4", "🐘"]
-  ];
-
-  var SHAPES = [
-    ["Circle", "⭕", "round all the way — no corners at all"],
-    ["Square", "🟥", "4 sides, all the same length"],
-    ["Triangle", "🔺", "3 sides and 3 corners"],
-    ["Star", "⭐", "5 points"],
-    ["Heart", "💜", "two bumps and a point"],
-    ["Diamond", "🔷", "a square balanced on its corner"],
-    ["Moon", "🌙", "a curved crescent"]
-  ];
+  var PAINTS = LINES.PAINTS, SHAPES = LINES.SHAPES, ANIMAL_SOUNDS = LINES.ANIMAL_SOUNDS, BABIES = LINES.BABIES;
 
   function paintChoice(p) { return { t: p[0], colour: p[1] }; }
-
-  var ANIMAL_SOUNDS = [
-    ["🐄", "Moo"], ["🐶", "Woof"], ["🐱", "Meow"], ["🐸", "Ribbit"], ["🦆", "Quack"],
-    ["🐑", "Baa"], ["🐷", "Oink"], ["🦁", "Roar"], ["🐝", "Buzz"], ["🐴", "Neigh"], ["🐔", "Cluck"]
-  ];
-
-  var BABIES = [
-    ["cat", "kitten"], ["dog", "puppy"], ["cow", "calf"], ["sheep", "lamb"], ["horse", "foal"],
-    ["duck", "duckling"], ["frog", "tadpole"], ["bear", "cub"], ["kangaroo", "joey"], ["goat", "kid"],
-    ["butterfly", "caterpillar"], ["chicken", "chick"]
-  ];
 
   var SCI_MID = [
     ["Where does a polar bear live?", "The Arctic", ["The desert", "The rainforest", "The deep ocean"], "Polar bears live on Arctic sea ice — there are none at the South Pole."],
@@ -1206,9 +1220,9 @@ window.CPData = (function () {
      same four things: ask, answer, three wrongs, and the sentence
      that teaches it. */
   function written(list, subject, tier) {
-    return function () {
+    return function (r) {
       var s = pick(list);
-      return mk({ subject: subject, q: s[0], right: s[1], wrong: s[2], teach: s[3] }, tier);
+      return mk({ subject: subject, q: s[0], right: s[1], wrong: s[2], teach: s[3] }, tier, r);
     };
   }
 
@@ -1216,71 +1230,64 @@ window.CPData = (function () {
     tot: [
       function () {
         var p = pick(PAINTS.slice(0, 6)), o = pick(PAINTS.filter(function (x) { return x[0] !== p[0]; }));
+        var k = slug(p[0]);
         return mk({ subject: "wonder", kind: "colour", q: "Which paint matches?", big: { emoji: p[2] },
-          right: paintChoice(p), wrong: [paintChoice(o)], teach: p[2] + " is " + p[0].toLowerCase() + "!" }, "tot");
+          right: paintChoice(p), wrong: [paintChoice(o)], teach: p[2] + " is " + p[0].toLowerCase() + "!",
+          say: ["q-paint-matches"], sayTeach: ["t-colour-" + k], sayA: "w-" + k }, "tot");
       },
       function () {
         var a = pick(ANIMAL_SOUNDS), o = pick(ANIMAL_SOUNDS.filter(function (x) { return x[1] !== a[1]; }));
+        var k = slug(a[1]);
         return mk({ subject: "wonder", q: "What does this animal say?", big: { emoji: a[0] },
-          right: a[1], wrong: [o[1]], teach: "It says " + a[1] + "!" }, "tot");
+          right: a[1], wrong: [o[1]], teach: "It says " + a[1] + "!",
+          say: ["q-animal-say"], sayTeach: ["t-says-" + k], sayA: "w-" + k }, "tot");
       }
     ],
     early: [
-      function () {
-        var p = pick(PAINTS);
+      function (r) {
+        var p = pick(PAINTS), k = slug(p[0]);
         return mk({ subject: "wonder", kind: "colour", q: "Which one is " + p[0].toUpperCase() + "?", big: { text: p[0].toUpperCase() },
           right: paintChoice(p), wrong: shuffle(PAINTS.filter(function (x) { return x[0] !== p[0]; })).slice(0, 3).map(paintChoice),
-          teach: p[0] + " looks like " + p[2] + "." }, "early");
+          teach: p[0] + " looks like " + p[2] + ".",
+          say: ["q-which-is-" + k], sayTeach: ["t-colour-" + k], sayA: "w-" + k }, "early", r);
       },
-      function () {
-        var p = pick(PAINTS);
+      function (r) {
+        var p = pick(PAINTS), k = slug(p[0]);
         return mk({ subject: "wonder", kind: "colour", q: "What color is this?", big: { emoji: p[2] },
           right: paintChoice(p), wrong: shuffle(PAINTS.filter(function (x) { return x[0] !== p[0]; })).slice(0, 3).map(paintChoice),
-          teach: p[2] + " is " + p[0].toLowerCase() + "." }, "early");
+          teach: p[2] + " is " + p[0].toLowerCase() + ".",
+          say: ["q-what-colour"], sayTeach: ["t-colour-" + k], sayA: "w-" + k }, "early", r);
       },
-      function () {
-        var s = pick(SHAPES);
+      function (r) {
+        var s = pick(SHAPES), k = slug(s[0]);
         return mk({ subject: "wonder", q: "Which one is a " + s[0].toUpperCase() + "?", big: { text: s[0].toUpperCase() },
           right: { t: s[0], emoji: s[1] },
           wrong: shuffle(SHAPES.filter(function (x) { return x[0] !== s[0]; })).slice(0, 3).map(function (x) { return { t: x[0], emoji: x[1] }; }),
-          teach: "A " + s[0].toLowerCase() + " is " + s[2] + "." }, "early");
+          teach: "A " + s[0].toLowerCase() + " is " + s[2] + ".",
+          say: ["q-which-shape-" + k], sayTeach: ["t-shape-is-" + k], sayA: "w-" + k }, "early", r);
       },
-      function () {
-        var b = pick(BABIES);
+      function (r) {
+        var b = pick(BABIES), k = slug(b[0]);
         return mk({ subject: "wonder", q: "A baby " + b[0] + " is called a…",
           right: b[1], wrong: shuffle(BABIES.filter(function (x) { return x[1] !== b[1]; })).slice(0, 3).map(function (x) { return x[1]; }),
-          teach: "Baby " + b[0] + " = " + b[1] + "." }, "early");
+          teach: "Baby " + b[0] + " = " + b[1] + ".",
+          say: ["q-baby-" + k], sayTeach: ["t-baby-" + k], sayA: "w-" + slug(b[1]) }, "early", r);
       },
-      function () {
+      function (r) {
         // Every one of these carries a REASON, because "nice spotting!"
         // teaches a three-year-old absolutely nothing.
-        var sets = [
-          ["Which one flies?", "🦋", ["🐟", "🐌", "🐢"], "A butterfly has wings. Fish swim, and snails and turtles crawl."],
-          ["Which one lives in water?", "🐠", ["🐪", "🦒", "🐿️"], "Fish breathe underwater with gills. Camels, giraffes and squirrels live on land."],
-          ["Which one is a fruit?", "🍌", ["🥕", "🥦", "🧅"], "Fruit grows from a flower and carries seeds. Carrots are roots, broccoli is a flower bud, onions are bulbs."],
-          ["Which one do you wear?", "👟", ["🍕", "🚗", "📚"], "Shoes go on your feet. Pizza you eat, a car you ride in, a book you read."],
-          ["Which one is hot?", "🔥", ["❄️", "🧊", "⛄"], "Fire is hot. Snow, ice and snowmen are all freezing cold."],
-          ["Which one comes out at night?", "🌙", ["☀️", "🌻", "🏖️"], "The moon shines at night. The sun, sunflowers and the beach belong to the daytime."],
-          ["Which one is an animal?", "🐘", ["🌳", "🚗", "🏠"], "Animals eat, move and grow. Trees grow but can't walk; cars and houses aren't alive at all."],
-          ["Which one do you use to hear?", "👂", ["👁️", "👃", "✋"], "Ears hear, eyes see, a nose smells and a hand touches."],
-          ["Which one grows in the ground?", "🥔", ["🐟", "☁️", "🧦"], "Potatoes grow underground. Fish swim, clouds float and socks come from a drawer!"],
-          ["Which one is round?", "⚽", ["📕", "🚪", "🧊"], "A ball is round everywhere — no corners. Books, doors and ice cubes have straight edges."],
-          ["Which one is the baby?", "🐣", ["🐔", "🦆", "🦢"], "A chick has just hatched. Hens, ducks and swans are all grown up."],
-          ["Which one keeps you dry in the rain?", "☂️", ["🕶️", "🧤", "🎈"], "An umbrella covers you. Sunglasses are for bright sun and gloves are for cold hands."]
-        ];
-        var s = pick(sets);
+        var i = rnd(LINES.SETS.length), s = LINES.SETS[i];
         return mk({ subject: "wonder", q: s[0], right: { t: "", emoji: s[1] },
-          wrong: s[2].map(function (e) { return { t: "", emoji: e }; }), teach: s[3] }, "early");
+          wrong: s[2].map(function (e) { return { t: "", emoji: e }; }), teach: s[3],
+          say: ["q-set-" + i], sayTeach: ["t-set-" + i] }, "early", r);
       },
-      function () {
-        var seq = [["🌱", "🌿", "🌳", "A seed sprouts, grows leaves, then becomes a tree."],
-                   ["🥚", "🐣", "🐔", "An egg hatches into a chick, and the chick grows into a hen."],
-                   ["🌧️", "🌈", "☀️", "Rain, then a rainbow while the sun comes back out."]];
-        var s = pick(seq);
+      function (r) {
+        var i = rnd(LINES.SEQS.length), s = LINES.SEQS[i];
         return mk({ subject: "wonder", kind: "big", q: "What comes NEXT?", big: { emoji: s[0] + " " + s[1] + " ?" },
           right: { t: "", emoji: s[2] },
           wrong: shuffle(["🚗", "🧦", "🍕", "🎈", "🪑"]).slice(0, 3).map(function (e) { return { t: "", emoji: e }; }),
-          teach: s[3] }, "early");
+          teach: s[3],
+          say: ["q-what-next"], sayTeach: ["t-seq-" + i] }, "early", r);
       }
     ],
     mid:   [written(SCI_MID,   "wonder", "mid")],
@@ -1308,6 +1315,7 @@ window.CPData = (function () {
   });
 
   var BANKS = { math: MATH, word: WORD, wonder: WONDER };
+  var TIER_ORDER = ["tot", "early", "mid", "big", "grown"];
   var recent = [];
 
   /* Every question has a name. Two questions with the same name are
@@ -1327,14 +1335,27 @@ window.CPData = (function () {
      cannot find one does it settle for the question you have seen
      least often. Nothing is ever asked twice in a row either way.
 
-     The question comes back carrying `key` and `seen`, so the card can
-     tell you honestly whether this is new ground or a second look. */
-  function ask(subject, tier, seen) {
+     `rung` is the heat (1–5). It is handed to every generator so the
+     numbers grow with it, and at rungs 4 and 5 some questions come
+     from the level ABOVE — a "step up", marked on the card and paid
+     extra — because a child who is nailing everything at their own
+     level has earned a look at the next one.
+
+     The question comes back carrying `key`, `seen`, `rung` and `step`,
+     so the card can tell you honestly what it is. */
+  function ask(subject, tier, seen, rung) {
     if (!BANKS[subject]) subject = pick(["math", "word", "wonder"]);
     if (!BANKS[subject][tier]) tier = "mid";
+    rung = hot(rung);
+    var useTier = tier, step = 0, ti = TIER_ORDER.indexOf(tier);
+    if (tier !== "tot" && ti >= 0 && ti < TIER_ORDER.length - 1 && rung >= 4) {
+      if (Math.random() < (rung === 5 ? 0.45 : 0.22)) { useTier = TIER_ORDER[ti + 1]; step = 1; }
+    }
+    // a step-up question is asked gently: the next level's rung 2, not its rung 5
+    var genRung = step ? 2 : rung;
     var best = null, bestScore = Infinity, fallback = null;
     for (var i = 0; i < 24; i++) {
-      var q = pick(BANKS[subject][tier])();
+      var q = pick(BANKS[subject][useTier])(genRung);
       if (!q || !q.choices) continue;
       var key = qKey(q);
       if (!fallback) { fallback = q; fallback.key = key; }
@@ -1346,6 +1367,9 @@ window.CPData = (function () {
     var out = best || fallback;
     if (!out) return null;
     out.seen = best ? bestScore : (seen ? (seen(out.key) | 0) : 0);
+    out.rung = rung;
+    out.step = step;
+    out.homeTier = tier;
     recent.push(out.key);
     if (recent.length > 16) recent.shift();
     return out;
@@ -1865,7 +1889,18 @@ window.CPData = (function () {
     { id: "beanchair", name: "Gamer Chair",  emoji: "💺", cost: 132, cosy: 12, rest: 4, set: "arcade" },
     { id: "ledstrip", name: "Glow Strip",    emoji: "🌈", cost: 84,  cosy: 9,  hang: true, set: "arcade" },
     { id: "retrotv",  name: "Retro TV",      emoji: "📺", cost: 118, cosy: 11, set: "arcade" },
-    { id: "goldenpad", name: "Golden Controller", emoji: "🎮", cost: 225, cosy: 18, rare: true, set: "arcade" }
+    { id: "goldenpad", name: "Golden Controller", emoji: "🎮", cost: 225, cosy: 18, rare: true, set: "arcade" },
+
+    /* --- 🌑 Shade's Hoard: never on any shelf. The Shade drops one piece
+       each time you beat him in the Shadow Tower, and the family can only
+       get them from your Stall. --- */
+    { id: "shadelantern", name: "Shade's Lantern",    emoji: "🪔", cost: 240, cosy: 14, rest: 4, loot: true, rare: true, set: "shadow" },
+    { id: "duskbanner",   name: "Dusk Banner",        emoji: "🏴", cost: 220, cosy: 13, hang: true, loot: true, rare: true, set: "shadow" },
+    { id: "umbralorb",    name: "Umbral Orb",         emoji: "🔮", cost: 280, cosy: 15, study: 7, loot: true, rare: true, set: "shadow" },
+    { id: "shadecloak",   name: "Shade's Cloak Stand", emoji: "🧥", cost: 260, cosy: 16, loot: true, rare: true, set: "shadow" },
+    { id: "eclipsewindow", name: "Eclipse Window",    emoji: "🌘", cost: 320, cosy: 17, study: 8, hang: true, loot: true, rare: true, set: "shadow" },
+    { id: "shadowmirror", name: "Shadow Mirror",      emoji: "🪞", cost: 300, cosy: 16, tidy: 5, hang: true, loot: true, rare: true, set: "shadow" },
+    { id: "nightthrone",  name: "Night Throne",       emoji: "🪑", cost: 420, cosy: 22, rest: 6, loot: true, rare: true, set: "shadow" }
   ];
 
   /* The name of each themed set, for the House tab's shelves. */
@@ -1894,7 +1929,8 @@ window.CPData = (function () {
     { id: "pets",    name: "🐾 Pet Corner" },
     { id: "travel",  name: "✈️ Travel Room" },
     { id: "circus",  name: "🎪 Circus" },
-    { id: "arcade",  name: "🕹️ Arcade" }
+    { id: "arcade",  name: "🕹️ Arcade" },
+    { id: "shadow",  name: "🌑 Shade's Hoard" }
   ];
 
   /* =========================================================
@@ -2252,36 +2288,9 @@ window.CPData = (function () {
     { label: "💎 150", coins: 150, colour: "#9bf6ff", jackpot: true, say: "The jackpot! A hundred and fifty coins!" }
   ];
 
-  /* Facts a book can teach — true, short, and worth knowing. */
-  var FACTS = {
-    tot:   ["Cows say moo!", "The sun is a star.", "Fish live in water.", "Bees make honey.", "Owls fly at night."],
-    early: ["A baby frog is a tadpole.", "Rainbows have 7 colors.", "Spiders have 8 legs.", "Snow is frozen water.",
-            "Bats sleep upside down.", "A butterfly starts as a caterpillar."],
-    mid:   ["Honey never spoils — jars from ancient tombs were still edible.",
-            "A group of crows is called a murder.",
-            "Octopuses have three hearts and blue blood.",
-            "Bananas are berries, but strawberries are not.",
-            "Sharks existed before trees did.",
-            "A day on Venus is longer than its year.",
-            "Wombat poo is cube-shaped.",
-            "Your bones are about four times stronger than concrete."],
-    big:   ["The Eiffel Tower grows about 15 cm taller in summer as the iron expands.",
-            "Sound cannot travel through space — there is nothing to carry the vibration.",
-            "There are more trees on Earth than stars in the Milky Way.",
-            "Antarctica is technically a desert: it almost never rains or snows there.",
-            "Light from the Sun takes about 8 minutes and 20 seconds to reach us.",
-            "The heart pumps roughly 7,500 litres of blood every single day.",
-            "Venus spins backwards compared with almost every other planet.",
-            "A teaspoon of neutron star would weigh about a billion tonnes."],
-    grown: ["Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid.",
-            "Oxford University is older than the Aztec Empire.",
-            "The Fahrenheit and Celsius scales agree at exactly −40°.",
-            "Norway knighted a penguin — Sir Nils Olav, colonel-in-chief of the Norwegian King's Guard.",
-            "There is enough DNA in one human body to stretch from the Sun to Pluto and back — several times.",
-            "The shortest war in history lasted 38 minutes (Britain vs Zanzibar, 1896).",
-            "Bubble wrap was invented as textured wallpaper.",
-            "Iceland has no mosquitoes at all."]
-  };
+  /* Facts a book can teach — true, short, and worth knowing. They live in
+     lines.js so the narrator's recording and the printed fact are one text. */
+  var FACTS = LINES.FACTS;
 
   /* =========================================================
      THE SHOP — stock rotates once a day, the same for everyone
@@ -2322,7 +2331,11 @@ window.CPData = (function () {
 
   function isRare(it) { return !!(it && it.rare); }
   function notRare(it) { return !it.rare; }
-  function rarePool() { return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE).filter(isRare); }
+  function rarePool() {
+    return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE).filter(function (it) { return isRare(it) && !it.loot; });
+  }
+  /* The Shade's own furniture, in the order he gives it up. */
+  function hoard() { return FURNITURE.filter(function (f) { return f.loot; }); }
 
   /* Who has what today: four rare items dealt out to four different
      people, the same for everyone because the shuffle is seeded.
@@ -2444,12 +2457,19 @@ window.CPData = (function () {
     { id: "stock3",  track: "stocked", goal: 3, coins: 90, text: "Stock 3 things in your own shop" },
     { id: "decor3",  track: "placed",  goal: 3, coins: 80, text: "Put 3 things out in your house" },
     { id: "style1",  track: "styled",  goal: 1, coins: 45, text: "Change a wall, a floor or the view at home" },
-    { id: "style3",  track: "styled",  goal: 3, coins: 95, text: "Redecorate your house 3 times" }
+    { id: "style3",  track: "styled",  goal: 3, coins: 95, text: "Redecorate your house 3 times" },
+    { id: "tower1",  track: "tower",   goal: 1, coins: 80, text: "Clear a floor of the Shadow Tower" },
+    { id: "tower3",  track: "tower",   goal: 3, coins: 170, text: "Clear 3 floors of the Shadow Tower" },
+    { id: "crit1",   track: "crit",    goal: 1, coins: 55, text: "Land a charged critical hit in the Arena" },
+    { id: "quick5",  track: "quick",   goal: 5, coins: 60, text: "Answer 5 Arena questions quickly" },
+    { id: "heat1",   track: "heat",    goal: 1, coins: 50, text: "Turn the heat up a rung anywhere" },
+    { id: "stepup1", track: "stepup",  goal: 1, coins: 65, text: "Get a step-up question right" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
   /* =========================================================
      THE QUIZ ARENA — friendly rivals, not monsters.
+     Five sparring partners, always there to practise on.
      ========================================================= */
   var RIVALS = [
     { id: "pip",   name: "Pip",      species: "snorbit",   colour: "meadow", hp: 30,  power: 8,  coins: 40,  subject: "mixed",
@@ -2461,10 +2481,80 @@ window.CPData = (function () {
     { id: "ember", name: "Ember",    species: "flarn",     colour: "berry",  hp: 80,  power: 14, coins: 150, subject: "mixed",
       taunt: "Warm up. You'll need it." },
     { id: "orbit", name: "Professor Orbit", species: "zibbit", colour: "grape", hp: 100, power: 16, coins: 220, subject: "wonder",
-      taunt: "Ask me anything about the sky." },
-    { id: "shade", name: "The Shade", species: "blorb",    colour: "shadow", hp: 130, power: 20, coins: 350, subject: "mixed",
-      taunt: "Nobody has beaten me. Nobody." }
+      taunt: "Ask me anything about the sky." }
   ];
+
+  /* =========================================================
+     THE SHADOW TOWER — The Shade's own domain.
+
+     Floors go up for ever. Six of The Shade's shadow army guard
+     the way, then The Shade himself on every seventh floor — a
+     little stronger and a little darker each time round, with a
+     new name to match. Each lap of the tower is worth half as
+     much again as the last, so the coins keep pace with him.
+     ========================================================= */
+  var SHADOW_ARMY = [
+    { id: "umbra", name: "Umbra", species: "snorbit",   subject: "math",   hp: 36, power: 9 },
+    { id: "dusk",  name: "Dusk",  species: "twiggle",   subject: "word",   hp: 42, power: 10 },
+    { id: "gloom", name: "Gloom", species: "flarn",     subject: "wonder", hp: 48, power: 11 },
+    { id: "murk",  name: "Murk",  species: "puddlepop", subject: "mixed",  hp: 54, power: 12 },
+    { id: "hush",  name: "Hush",  species: "zibbit",    subject: "word",   hp: 60, power: 13 },
+    { id: "wisp",  name: "Wisp",  species: "glimmr",    subject: "wonder", hp: 66, power: 14 }
+  ];
+  var SHADE_FORMS = ["The Shade", "The Deeper Shade", "The Shade Ascendant", "The Eternal Shade", "The Shade Absolute"];
+  var LAP_NAMES = ["", " II", " III", " IV", " V", " VI", " VII", " VIII", " IX", " X"];
+
+  /* Who is waiting on floor `floor` (1 and up). */
+  function towerFoe(floor) {
+    floor = Math.max(1, floor | 0);
+    var lap = Math.floor((floor - 1) / 7);      // 0 the first time up
+    var pos = (floor - 1) % 7;                  // 0..5 the army, 6 The Shade
+    var scale = 1 + lap * 0.5;
+    if (pos === 6) {
+      var form = lap < SHADE_FORMS.length ? SHADE_FORMS[lap] : "The Shade, Round " + (lap + 1);
+      return { id: "shade", name: form, species: "blorb", colour: "shadow", boss: true,
+               hp: Math.round(130 * scale), power: Math.round(20 + lap * 3), coins: Math.round(350 * scale),
+               subject: "mixed", floor: floor, lap: lap, taunt: "Nobody has beaten me. Nobody." };
+    }
+    var m = SHADOW_ARMY[pos];
+    return { id: m.id, name: m.name + (lap < LAP_NAMES.length ? LAP_NAMES[lap] : " " + (lap + 1)),
+             species: m.species, colour: "shadow", minion: true,
+             hp: Math.round(m.hp * scale), power: Math.round(m.power + lap * 2),
+             coins: Math.round((30 + pos * 12) * scale), subject: m.subject, floor: floor, lap: lap };
+  }
+
+  /* The Shade's tricks — one per fight, announced up front. `little` is
+     whether the littlest levels (no reading, no losing) may meet it. */
+  var TRICKS = [
+    { id: "time",   name: "Time Squeeze", emoji: "⏱️", little: false,
+      note: "Answer within the timer or The Shade hits you." },
+    { id: "double", name: "Double Dark",  emoji: "🌗", little: true,
+      note: "Every hit counts double — his AND yours." },
+    { id: "mirror", name: "Mirror",       emoji: "🪞", little: true,
+      note: "He asks you the subject you know least." },
+    { id: "heal",   name: "Shadow Heal",  emoji: "🩹", little: true,
+      note: "Every wrong answer heals him a little." }
+  ];
+
+  /* Arena ranks, by the highest floor ever cleared. */
+  var RANKS = [
+    { floor: 0,  name: "Unranked",  emoji: "🔘" },
+    { floor: 1,  name: "Bronze",    emoji: "🥉" },
+    { floor: 4,  name: "Silver",    emoji: "🥈" },
+    { floor: 7,  name: "Gold",      emoji: "🥇" },
+    { floor: 14, name: "Shadow",    emoji: "🌑" },
+    { floor: 21, name: "Eclipse",   emoji: "🌒" },
+    { floor: 35, name: "Legend",    emoji: "👑" }
+  ];
+  function rankFor(bestFloor) {
+    var out = RANKS[0];
+    RANKS.forEach(function (r) { if ((bestFloor | 0) >= r.floor) out = r; });
+    return out;
+  }
+  function nextRank(bestFloor) {
+    for (var i = 0; i < RANKS.length; i++) if (RANKS[i].floor > (bestFloor | 0)) return RANKS[i];
+    return null;
+  }
 
   /* =========================================================
      TROPHIES — quiet, permanent milestones.
@@ -2500,7 +2590,16 @@ window.CPData = (function () {
     { id: "collector", emoji: "🛋️", name: "Furniture Hoard", note: "Own 30 pieces of furniture" },
     { id: "martian",  emoji: "🪐", name: "Martian",       note: "Live in the Mars Castle" },
     { id: "rarehunt", emoji: "🌟", name: "Treasure Hunter", note: "Buy a rare find" },
-    { id: "starlord", emoji: "💫", name: "Ring Keeper",   note: "Buy the Star Ring" }
+    { id: "starlord", emoji: "💫", name: "Ring Keeper",   note: "Buy the Star Ring" },
+    { id: "shade5",   emoji: "🌑", name: "Shadow Slayer",  note: "Beat The Shade 5 times" },
+    { id: "floor14",  emoji: "🗼", name: "Tower Climber",  note: "Clear floor 14 of the Shadow Tower" },
+    { id: "floor21",  emoji: "🌒", name: "Eclipse",        note: "Clear floor 21 of the Shadow Tower" },
+    { id: "crit10",   emoji: "⚡", name: "Heavy Hitter",   note: "Land 10 charged critical hits" },
+    { id: "hoard",    emoji: "🪔", name: "Shade's Hoard",  note: "Own all 7 pieces of his furniture" },
+    { id: "onfire",   emoji: "🔥", name: "On Fire",        note: "Turn the heat all the way up" },
+    { id: "stepup",   emoji: "⬆️", name: "Step Up",        note: "Get a question from the level above right" },
+    { id: "quick25",  emoji: "🏃", name: "Quick Draw",     note: "25 quick answers in the Arena" },
+    { id: "ally",     emoji: "🤝", name: "Better Together", note: "Win a tower fight with a family Craepet beside you" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -2510,16 +2609,9 @@ window.CPData = (function () {
     "Comet", "Biscuit", "Juniper", "Nutmeg", "Peaches", "Rusty", "Cricket", "Dumpling"
   ];
 
-  /* Little things the pet says. Kept short so a new reader can manage. */
-  var MOODS = {
-    great:  ["I feel amazing!", "Best day ever!", "Let's learn something!", "I love it here."],
-    good:   ["I'm doing okay!", "What's next?", "Nice to see you.", "Ready when you are."],
-    hungry: ["My tummy is rumbling…", "Got any berries?", "I could eat a whole pie.", "Snack? Please?"],
-    bored:  ["I'm a bit bored…", "Can we play?", "Let's do something!", "Where's my ball?"],
-    tired:  ["I'm sleepy…", "Just five more minutes.", "*yawn*", "So… tired…"],
-    dirty:  ["I'm all mucky.", "I need a wash!", "There's jam in my fur.", "Bath time?"]
-  };
-
+  /* Little things the pet says. Kept short so a new reader can manage —
+     and recorded, so the littlest players can hear them (see lines.js). */
+  var MOODS = LINES.MOODS;
 
   /* =========================================================
      HOW BIG IS THE VAULT? Only the HAND-WRITTEN questions can be
@@ -2557,6 +2649,15 @@ window.CPData = (function () {
     WHEEL: WHEEL,
     FACTS: FACTS,
     RIVALS: RIVALS,
+    SHADOW_ARMY: SHADOW_ARMY,
+    TRICKS: TRICKS,
+    RANKS: RANKS,
+    towerFoe: towerFoe,
+    rankFor: rankFor,
+    nextRank: nextRank,
+    hoard: hoard,
+    hot: hot,
+    TIER_ORDER: TIER_ORDER,
     TROPHIES: TROPHIES,
     PET_NAMES: PET_NAMES,
     MOODS: MOODS,

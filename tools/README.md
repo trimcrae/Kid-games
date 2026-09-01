@@ -19,6 +19,7 @@ missing, the game stays silent — there is no robotic fallback.
 | `spooky-stories` | — | has its **own** generator at `games/spooky-stories/audio/build_audio.py` |
 | `adventure` | 28 | only Ellie's pre-reader stories (rainbow, campout, pizza). The 6+/7+ epics for Cory & Jeannie stay silent — they'd be ~50 MB and those kids read. |
 | `mad-libs` | 0 | dynamic (kids' own words) — no voice by design |
+| `craepets` | ~800 | the whole script in `games/craepets/lines.js`: every question and lesson at the Tiny and Little levels, praise, the pet's chatter, the prize wheel, book facts, and every rival's lines (The Shade most of all). Numbers, letters and short fragments are stitched together at play time ("You have" + "9" + "berries, and you eat" + "3" + …), and `audio/manifest.js` (also generated) tells the page which clips exist so it never asks for a missing one. |
 
 ## Regenerating the clips
 
@@ -31,9 +32,18 @@ python3 tools/build_audio.py manifest.json     # add --force to rebuild all
 ```
 
 `extract_texts.js` derives every clip's filename from the same tokens the
-runtime uses (e.g. `find-letter-a`, `word-fox`, `pangram`), so the audio
-always matches what a game asks for. The ~60 MB voice model is downloaded once
-into `tools/voices/` (gitignored); only the small `.mp3` clips are committed.
+runtime uses (e.g. `find-letter-a`, `word-fox`, `pangram`, `q-how-many`), so
+the audio always matches what a game asks for. The ~60 MB voice model is
+downloaded once into `tools/voices/` (gitignored); only the small `.mp3` clips
+are committed. `build_audio.py` feeds Piper one sentence at a time and stitches
+real silence between them (a multi-sentence render can come out as static),
+checks every clip for that static before encoding it, and writes
+`games/craepets/audio/manifest.js`.
+
+You don't have to run this by hand: **`.github/workflows/build-game-audio.yml`**
+runs it on every push that changes a spoken line (or from the Actions tab)
+and commits the new clips back, because the GitHub runners can reach the voice
+model when a sandbox can't.
 
 > Note: huggingface (Piper's default voice host) may be blocked; the script
 > fetches the identical lessac model from a GitHub release mirror instead.

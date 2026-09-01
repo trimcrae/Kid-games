@@ -1,0 +1,74 @@
+name: Build game narration audio
+
+# Pre-renders the read-aloud lines for the games that speak — Craepets'
+# whole script (games/craepets/lines.js), Princess Dress-Up, Word Wizard,
+# Spelling Bee and the pre-reader Adventure stories — with Piper (neural
+# TTS) and commits the .mp3 clips back to the repo, plus Craepets'
+# audio/manifest.js so the page knows exactly which clips exist.
+#
+# GitHub's runners have open internet, so they can fetch the Piper voice
+# model, which sandboxed dev environments often cannot. Runs automatically
+# when any spoken text changes, or by hand from the Actions tab. Clips
+# that already exist are kept; only missing ones are rendered.
+# (The Spooky Stories keep their own workflow: build-audio.yml.)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-render every clip, not just the missing ones"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "games/craepets/lines.js"
+      - "games/word-wizard/word-wizard.js"
+      - "games/adventure/story-data.js"
+      - "games/adventure/stories-long.js"
+      - "tools/extract_texts.js"
+      - "tools/build_audio.py"
+      - ".github/workflows/build-game-audio.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-game-audio-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audio:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Piper + ffmpeg
+        # pinned: build_audio.py's sentence stitching works around a
+        # piper-tts bug, so keep the version deterministic
+        run: pip install piper-tts==1.5.0 imageio-ffmpeg
+
+      - name: List every spoken line
+        run: node tools/extract_texts.js > manifest.json
+
+      - name: Render narration
+        run: python3 tools/build_audio.py manifest.json ${{ inputs.force && '--force' || '' }}
+
+      - name: Commit narration audio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/*/audio
+          if git diff --cached --quiet; then
+            echo "No audio changes to commit."
+          else
+            git commit -m "Render game narration audio [skip ci]"
+            git push
+          fi

@@ -24,7 +24,7 @@ const GAMES = [
   {
     title: "Craepets",
     emoji: "🥚",
-    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, and the game now REMEMBERS every question it has asked you: it hunts for one you have never seen, and the card tells you outright whether it is brand new or a repeat. Over 700 hand-written questions plus endless generated sums. 37 homes to buy and keep — treehouse, igloo, pirate cove, dragon keep, a castle on Mars — 200+ pieces of furniture in 25 themed sets, and a painted view out of every window: real moons over the Mars castle, an aurora over the igloo, a coral reef through a porthole. Every Market shelf is different, and the rare finds each morning go to one person only.",
+    blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, and the questions HEAT UP as you get better: five right in a row turns the heat up a rung (bigger sums, more coins, and at the top a peek at the level above). Climb The Shade's Shadow Tower: his shadow army on six floors, then The Shade himself, darker every time you beat him — with charged critical hits, snacks from your bag, a family Craepet as your ally, tricks, and loot only he can drop. The little levels are now read aloud in a real storyteller's voice: every question, every lesson, the pet's chatter and The Shade's sneers. Over 700 hand-written questions plus endless generated sums, 37 homes, 200+ pieces of furniture, painted views, and a different Market for everyone.",
     url:   "games/craepets/",
     ages:  "2+",
     kids:  ["jeannie","cory","ellie","kieran","shannon"],
