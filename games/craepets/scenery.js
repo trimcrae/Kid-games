@@ -1091,6 +1091,25 @@ window.CPArt = (function () {
       el("g", {}, disc(60, 80, 5, "#ffd166", 0.8) + disc(180, 82, 4, "#ffd166", 0.7));
   };
 
+  /* The Shadow Tower: a moonlit night, The Shade's tower with its
+     windows lit purple, bats, and a low mist that is not quite fog. */
+  P.tower = function () {
+    var g = vgrad([[0, "#0d0b1f"], [0.55, "#2b2450"], [1, "#3a2f5c"]]);
+    var lit = "";
+    for (var i = 0; i < 6; i++) {
+      var y = 68 - i * 9;
+      lit += rect(112, y, 4, 5, "#c7a5ff", { rx: 1, opacity: i % 2 ? 0.9 : 0.6 }) +
+             rect(124, y, 4, 5, "#c7a5ff", { rx: 1, opacity: i % 2 ? 0.6 : 0.9 });
+    }
+    return defs(g.def) + rect(0, 0, 240, 90, "url(#" + g.id + ")") +
+      starfield(110, 240, 70, "#fff", 41) +
+      disc(200, 20, 11, "#fff3cf") + disc(194, 17, 9, "#1b1738") +
+      ridge([[50, 70], [120, 78], [200, 68], [240, 72]], 74, "#171330") +
+      tower(120, 82, 34, 68, "#241f40", "#0d0b1f", "#8a5cff") + lit +
+      el("g", { opacity: 0.9 }, bird(60, 30, 2, "#0d0b1f") + bird(160, 40, 1.8, "#0d0b1f") + bird(72, 24, 1.4, "#0d0b1f")) +
+      el("g", { opacity: 0.35 }, path("M0,80 q40,-8 80,0 t80,0 t80,0 L240,90 L0,90 Z", "#8a5cff"));
+  };
+
   P.stall = function () {
     var g = vgrad([[0, "#d8f0ff"], [0.6, "#f0faff"], [1, "#fff2e2"]]);
     var jars = "";

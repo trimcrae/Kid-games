@@ -12,7 +12,7 @@
      • One versioned cache — bump VERSION to flush everything.
    =========================================================== */
 
-const VERSION = "v8";   // v8: Craepets gets a house, a shop and a prize wheel
+const VERSION = "v9";   // v9: Craepets gets the Shadow Tower, the heat and a real voice
 const CACHE = "arcade-" + VERSION;
 
 const CORE = [

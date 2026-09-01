@@ -1170,6 +1170,120 @@ const GAMES = {
     }
     await page.locator("[data-leave]").click();
 
+    // ---- THE HEAT: five right in a row turns a subject up a rung, the
+    // coins climb with it, and the card says so
+    await page.evaluate(() => Craepets._setRung("math", 1));
+    await page.locator('[data-go="farm"]').click();
+    await page.waitForSelector(".choice:not([disabled])");
+    if (!(await page.locator(".heatline").count())) throw new Error("the farm does not show the heat");
+    const coinsHeat0 = await page.evaluate(() => Craepets.state().coins);
+    await answerAt("farm", 5);
+    if (await page.evaluate(() => Craepets.heat("math")) !== 2) throw new Error("five right in a row did not turn the heat up");
+    await page.locator("[data-next]").click();
+    await page.waitForSelector(".choice:not([disabled])");
+    if (!/×1\.2/.test(await page.locator(".heat-chip").textContent())) throw new Error("the card does not show the heat's pay");
+    const heatQ = await page.evaluate(() => Craepets.session().q);
+    if (heatQ.rung !== 2) throw new Error("the question was not asked at the new rung");
+    // …and at the top rung, some questions come from the level above
+    await page.evaluate(() => Craepets._setRung("math", 5));
+    let stepUps = 0;
+    for (let i = 0; i < 24 && !stepUps; i++) {
+      await page.evaluate(() => Craepets._nextQuestion());
+      if (await page.evaluate(() => Craepets.session().q.step)) stepUps++;
+    }
+    if (!stepUps) throw new Error("no step-up question turned up at the top rung");
+    if (!(await page.locator(".step-up").count())) throw new Error("a step-up question is not marked on the card");
+    const coinsHeat1 = await page.evaluate(() => Craepets.state().coins);
+    if (coinsHeat1 <= coinsHeat0) throw new Error("the heat did not pay");
+    // three misses in four turns it back down
+    await page.evaluate(() => Craepets._setRung("math", 3));
+    for (let i = 0; i < 4; i++) {
+      const rightIdx = await page.evaluate(() => Craepets.correctIndex());
+      const nChoice = await page.locator(".choice").count();
+      await page.locator(`[data-pick="${i === 0 ? rightIdx : (rightIdx + 1) % nChoice}"]`).click();
+      await page.waitForSelector(".teach");
+      await page.locator("[data-next]").click();
+      await page.waitForSelector(".choice:not([disabled])");
+    }
+    if (await page.evaluate(() => Craepets.heat("math")) !== 2) throw new Error("three misses in four did not ease the heat off");
+    await page.evaluate(() => Craepets._setRung("math", 1));
+
+    // ---- THE SHADOW TOWER: climb a floor, snack mid-fight, land a
+    // critical, and meet The Shade on the seventh floor
+    await page.evaluate(() => { Craepets.state().pet.xp = 200; Craepets.grant(0); });   // level 5
+    await page.locator('[data-go="arena"]').click();
+    await page.waitForSelector("[data-tower]");
+    if (!/Unranked/.test(await page.locator(".rankchip").textContent())) throw new Error("a new player should be unranked");
+    const fightFloor = async (floor) => {
+      // a level-3 Craepet every floor (the tower's own gate), so the climb
+      // needs the charged fourth hit — and The Shade's trick is noted, then
+      // switched off, because Double Dark would finish him in three
+      await page.evaluate(() => { Craepets.state().pet.xp = 100; });
+      await page.locator(`[data-tower="${floor}"]`).click();
+      await page.waitForSelector(".fighters");
+      const trick = await page.evaluate(() => {
+        const b = Craepets.battle(); const t = b.trick && b.trick.id; b.trick = null; b.deadline = 0; return t;
+      });
+      if (!/tower/.test(await page.evaluate(() => document.querySelector("#scene").className))) {
+        throw new Error("the tower does not get its own sky");
+      }
+      for (let i = 0; i < 40; i++) {
+        if (await page.evaluate(() => { const b = Craepets.battle(); return b && b.over; })) break;
+        const idx = await page.evaluate(() => Craepets.correctIndex());
+        if (idx < 0) break;
+        await page.locator(`[data-pick="${idx}"]`).click();
+        await page.waitForTimeout(60);
+        if (await page.locator("[data-next]").count()) await page.locator("[data-next]").click();
+        await page.waitForTimeout(60);
+      }
+      const r = await page.evaluate(() => { const b = Craepets.battle(); return { over: b.over, floor: b.floor, crits: b.crits, hits: b.hits, boss: !!b.rival.boss, reward: b.reward, phase: b.phase }; });
+      r.trick = trick;
+      return r;
+    };
+    // floor 1, with a snack first: food from the bag heals a hurt Craepet
+    await page.locator('[data-tower="1"]').click();
+    await page.waitForSelector(".fighters");
+    await page.evaluate(() => { Craepets.battle().myHp = 10; Craepets.grant(0); });
+    await page.waitForSelector("[data-snack]");
+    await page.locator("[data-snack]").click();
+    await page.waitForSelector(".sheet [data-use]");
+    await page.locator(".sheet [data-use]").first().click();
+    await page.waitForTimeout(150);
+    const snacked = await page.evaluate(() => { const b = Craepets.battle(); return { hp: b.myHp, snacks: b.snacks }; });
+    if (snacked.hp <= 10 || snacked.snacks !== 1) throw new Error("a snack did not heal in the duel");
+    for (let i = 0; i < 40; i++) {
+      if (await page.evaluate(() => { const b = Craepets.battle(); return b && b.over; })) break;
+      const idx = await page.evaluate(() => Craepets.correctIndex());
+      await page.locator(`[data-pick="${idx}"]`).click();
+      await page.waitForTimeout(60);
+      if (await page.locator("[data-next]").count()) await page.locator("[data-next]").click();
+      await page.waitForTimeout(60);
+    }
+    const f1 = await page.evaluate(() => { const b = Craepets.battle(); return { over: b.over, reward: b.reward }; });
+    if (f1.over !== "win" || !f1.reward || !f1.reward.cleared) throw new Error("floor 1 of the tower was not cleared");
+    if (await page.evaluate(() => Craepets.arena().floor) !== 1) throw new Error("clearing floor 1 was not remembered");
+    if (!(await page.locator('[data-tower="2"]').count())) throw new Error("no way on to floor 2 after a win");
+    // the rest of the way up to The Shade — a level-5 pet needs the
+    // charged criticals to get there
+    let sawCrit = 0, shade = null;
+    for (let floor = 2; floor <= 7; floor++) {
+      const r = await fightFloor(floor);
+      sawCrit += r.crits;
+      if (r.over !== "win") throw new Error(`floor ${floor} (${r.boss ? "The Shade" : "a shadow"}) was not won with every answer right`);
+      if (r.boss) shade = r;
+    }
+    if (!sawCrit) throw new Error("no charged critical hit landed in six floors of right answers");
+    if (!shade || shade.phase !== 2 || !shade.trick) throw new Error("The Shade did not bring a trick and grow darker");
+    if (!shade.reward.loot || shade.reward.loot.kind !== "brush") throw new Error("The Shade did not drop his paint brush the first time");
+    if (await page.evaluate(() => Craepets.state().colours.indexOf("shadow")) === -1) throw new Error("the Shadow brush was not really given");
+    if (!/Gold/.test(shade.reward.rankUp && shade.reward.rankUp.name)) throw new Error("beating The Shade should make you Gold");
+    if (await page.evaluate(() => Craepets.state().trophies.indexOf("shade")) === -1) throw new Error("no Shade Breaker trophy");
+    await page.locator("[data-leave]").click();
+    await page.waitForSelector(".panel.tower");
+    if (!/Gold/.test(await page.locator(".rankchip").textContent())) throw new Error("the rank chip did not update");
+    if (await page.locator("[data-floor]").count() < 7) throw new Error("cleared floors cannot be fought again");
+    if (!(await page.locator('[data-tower="8"]').count())) throw new Error("the tower does not go on past The Shade");
+
     // three daily quests and a daily gift
     await page.locator('[data-go="quests"]').click();
     if (await page.locator(".quest").count() !== 3) throw new Error("expected 3 daily quests");
@@ -1205,15 +1319,17 @@ const GAMES = {
     // ---- your own house: buy furniture, put it out, move somewhere bigger
     await page.evaluate(() => Craepets.grant(5000));
     await page.locator('[data-go="home"]').click();
-    const houseLv = await page.evaluate(() => Craepets.house().level);
-    await page.locator("[data-upgrade]").click();
+    await page.locator('[data-hometab="homes"]').click();
+    const homesBefore = await page.evaluate(() => Craepets.house().homes.length);
+    await page.locator("[data-buyhome]:not([disabled])").first().click();
     await page.waitForSelector(".sheet");
     await page.locator(".sheet .close").click();
-    if (await page.evaluate(() => Craepets.house().level) !== houseLv + 1) {
-      throw new Error("paying for a bigger house did not move you into it");
+    const houseNow = await page.evaluate(() => Craepets.house());
+    if (houseNow.homes.length !== homesBefore + 1 || houseNow.home === "nest") {
+      throw new Error("paying for a new home did not move you into it");
     }
     await page.locator('[data-go="market"]').click();
-    const decor = await page.evaluate(() => CPData.shopStock().filter((i) => i.kind === "decor").map((i) => i.id));
+    const decor = await page.evaluate(() => CPData.shopStock(null, Craepets.who()).filter((i) => i.kind === "decor").map((i) => i.id));
     if (decor.length < 2) throw new Error("the market is not stocking furniture");
     for (const id of decor.slice(0, 2)) {
       await page.locator(`[data-buy="${id}"]`).click();
@@ -1233,6 +1349,7 @@ const GAMES = {
       throw new Error("furniture that is out is not showing in the nest");
     }
     await page.locator('[data-go="home"]').click();
+    await page.locator('[data-hometab="room"]').click();
     await page.locator("[data-store]").first().click();
     await page.waitForTimeout(120);
     if (await page.evaluate(() => Craepets.house().placed.length) !== home.placed.length - 1) {
@@ -1340,15 +1457,41 @@ const GAMES = {
     await page.waitForTimeout(250);
     if (await page.locator(".teach").count()) throw new Error("a miss at the tiny level should just wait, not score");
     if (await page.evaluate(() => Craepets.state().stats.wrong) !== 0) throw new Error("a tiny miss was counted wrong");
+    // …and everything the narrator says at this level is a real recording
+    const narration = await page.evaluate(() => Craepets.narration());
+    const said = await page.evaluate(() => Craepets.said());
+    if (!said.length) throw new Error("the tiny level's question was not read aloud");
+    const unrecorded = await page.evaluate((toks) => toks.filter((t) => !window.CRAEPETS_NARRATION[t]), said);
+    if (narration.clips && unrecorded.length) throw new Error(`no recording for: ${unrecorded.join(", ")}`);
+    // every clip the manifest promises really is on disk (the play-test's
+    // own server 404s anything missing, and a 404 fails the run)
+    const clipCheck = await page.evaluate(async () => {
+      const names = Object.keys(window.CRAEPETS_NARRATION);
+      const sample = names.filter((n, i) => i % 40 === 0);
+      const bad = [];
+      for (const n of sample) {
+        const r = await fetch("audio/" + n + ".mp3", { method: "HEAD" });
+        if (!r.ok) bad.push(n);
+      }
+      return { total: names.length, checked: sample.length, bad };
+    });
+    if (clipCheck.bad.length) throw new Error(`manifest lists clips that are not there: ${clipCheck.bad.join(", ")}`);
+    const kIdx2 = await page.evaluate(() => Craepets.correctIndex());
+    await page.locator(`[data-pick="${kIdx2}"]`).click();
+    await page.waitForSelector(".teach");
+    const saidAfter = await page.evaluate(() => Craepets.said());
+    if (saidAfter.length < 2 || !/^p-/.test(saidAfter[0])) throw new Error("a right answer at the tiny level was not praised aloud");
 
     await page.evaluate(() => Object.keys(localStorage)
       .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
     return `${art.n} sprites bake; farm/well/pool pay for maths, words & world; ` +
-      "market asks for change; feed/play/wash; a duel won; paint brushes " +
-      "repaint; a house bought, furnished & seen in the nest; the prize wheel " +
-      "spins once a day; a shop stocked at your own price and Shannon buying " +
-      "from it pays Cory; quests, trophies, and separate saves for Shannon, " +
-      "Cory & Kieran";
+      "the heat rises after 5 right and pays more, step-ups appear at the top; " +
+      "market asks for change; feed/play/wash; a duel won; the Shadow Tower " +
+      "climbed to The Shade (snack, criticals, trick, phase 2, loot, Gold rank); " +
+      "paint brushes repaint; a house bought, furnished & seen in the nest; the " +
+      "prize wheel spins once a day; a shop stocked at your own price and Shannon " +
+      "buying from it pays Cory; quests, trophies, separate saves for Shannon, " +
+      `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;
   },
 
   async "Crossword"(page, g, d) {

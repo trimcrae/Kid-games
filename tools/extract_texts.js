@@ -12,6 +12,7 @@
      word-wiz :  word-<word>, you-did-it
      spelling :  pangram
      adventure:  <storyId>-<nodeId>
+     craepets :  every token in games/craepets/lines.js, as-is
    =========================================================== */
 "use strict";
 const fs = require("fs");
@@ -41,9 +42,12 @@ function clean(t) {
     .replace(/—/g, ", ").replace(/…/g, "...");
   return softenCaps(tidy).replace(/\s+/g, " ").replace(/ ,/g, ",").trim();
 }
-function add(game, file, text) {
+function add(game, file, text, tail) {
   const t = clean(text);
-  if (t) out.push({ game, file, text: t });
+  if (!t) return;
+  const entry = { game, file, text: t };
+  if (tail !== undefined) entry.tail = tail;
+  out.push(entry);
 }
 
 /* ---- Princess Dress-Up ------------------------------------ */
@@ -82,6 +86,20 @@ function preReader(st) {
     const node = nodes[nodeId];
     if (node && typeof node.text === "string") add("adventure", st.id + "-" + nodeId, node.text);
   });
+});
+
+/* ---- Craepets: the narrator's whole script -------------------
+   lines.js is the single source: every token it defines becomes a
+   clip of the same name, and the game plays them back to back
+   ("You have" + "9" + "berries, and you eat" + "3" + …). Numbers,
+   letters and the fragments that get stitched into a sentence get a
+   short tail so the join sounds like speech, not a list. */
+global.window = global.window || {};
+require(path.join(ROOT, "games/craepets/lines.js"));
+const CP = global.window.CPLines;
+Object.keys(CP.T).forEach((tok) => {
+  const fragment = /^(n-|letter-|w-|frag-)/.test(tok);
+  add("craepets", tok, CP.T[tok], fragment ? 0.12 : undefined);
 });
 
 process.stdout.write(JSON.stringify(out, null, 0));
