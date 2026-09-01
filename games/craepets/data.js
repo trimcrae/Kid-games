@@ -2483,7 +2483,8 @@ window.CPData = (function () {
     { id: "bank1",   track: "banked",  goal: 1, coins: 30, text: "Put some coins in the Valley Bank" },
     { id: "catch5",  track: "catchScore", goal: 5, coins: 45, text: "Score 5 in one game of Sky Catch" },
     { id: "catch12", track: "catchScore", goal: 12, coins: 90, text: "Score 12 in one game of Sky Catch" },
-    { id: "visit1",  track: "visits",  goal: 1, coins: 35, text: "Visit somebody's house" }
+    { id: "visit1",  track: "visits",  goal: 1, coins: 35, text: "Visit somebody's house" },
+    { id: "match1",  track: "matchPairs", goal: 4, coins: 40, text: "Finish a game of Memory Match" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
@@ -2629,7 +2630,9 @@ window.CPData = (function () {
     { id: "saver",    emoji: "🏦", name: "Saver",           note: "Earn 50 coins of bank interest" },
     { id: "lucky",    emoji: "🍀", name: "Lucky",           note: "Meet 10 random events on the paths" },
     { id: "skycatch", emoji: "⭐", name: "Star Catcher",    note: "Score 15 in one game of Sky Catch" },
-    { id: "neighbour", emoji: "🏘️", name: "Good Neighbour", note: "Visit 3 different houses" }
+    { id: "neighbour", emoji: "🏘️", name: "Good Neighbour", note: "Visit 3 different houses" },
+    { id: "sharp",    emoji: "🃏", name: "Sharp Memory",    note: "A perfect game of Memory Match" },
+    { id: "settled",  emoji: "🌱", name: "Settled In",      note: "Finish all the first steps" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -2717,6 +2720,8 @@ window.CPData = (function () {
       return PROFILES[PROFILES.length - 1];
     },
 
+    /* word pairs for the matching game: [word, partner, …] */
+    PAIRS: { synMid: SYN_MID, synBig: SYN_BIG, antBig: ANT_BIG, vocabGrown: VOCAB_GROWN },
     _MATH: MATH, _WORD: WORD, _WONDER: WONDER,
     _u: { rnd: rnd, pick: pick, range: range, shuffle: shuffle, mk: mk, nearMiss: nearMiss, emojiRun: emojiRun }
   };

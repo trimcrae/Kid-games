@@ -22,7 +22,7 @@ window.CPMap = (function () {
 
   /* Where everything is, on a 100 × 64 canvas. */
   var PLACES = [
-    { id: "catch",  x: 17, y: 12, emoji: "⭐", label: "Sky Catch",   go: "catch" },
+    { id: "games",  x: 17, y: 12, emoji: "🎮", label: "Games Room",  go: "games" },
     { id: "arena",  x: 63, y: 14, emoji: "⚔️", label: "Arena",       go: "arena" },
     { id: "tower",  x: 88, y: 10, emoji: "🗼", label: "Shadow Tower", go: "arena", dark: true },
     { id: "farm",   x: 18, y: 31, emoji: "🍓", label: "Berry Farm",  go: "farm" },

@@ -1135,7 +1135,9 @@ const GAMES = {
     await page.locator('[data-change="0"]').click();
     await page.waitForTimeout(150);
     const afterBuy = await page.evaluate(() => Craepets.state());
-    if (afterBuy.coins >= before) throw new Error("the market did not charge for the item");
+    // (a first purchase also pays the "first steps" reward, so only the
+    // purchase count and a changed purse are certain)
+    if (afterBuy.coins === before || (afterBuy.stats.buy || 0) !== 1) throw new Error("the market did not charge for the item");
 
     // feeding, playing and washing all move the right need
     await page.locator('[data-go="nest"]').click();
@@ -1461,8 +1463,9 @@ const GAMES = {
     await page.locator(".sheet .close").click();
 
     // ---- SKY CATCH: the game runs, a right catch scores, and it pays at the end
-    await page.locator('[data-go="catch"]').click();
+    await page.locator('[data-go="games"]').click();
     await page.waitForSelector("[data-catchplay]");
+    if (!(await page.locator('.npc[data-say-text], .npc [data-say-text]').count())) throw new Error("nobody runs the games room");
     await page.locator("[data-catchplay]").click();
     await page.waitForSelector("#catch-canvas");
     await page.waitForTimeout(300);
@@ -1483,6 +1486,42 @@ const GAMES = {
     const ended = await page.evaluate(() => ({ coins: Craepets.state().coins, best: Craepets.state().catch.best, games: Craepets.state().catch.games, on: Craepets.catching(), today: Craepets.state().today.catchScore }));
     if (ended.on || ended.games !== 1 || ended.best < 1 || ended.coins < catchCoins + 3 || !ended.today) throw new Error(`Sky Catch did not finish and pay: ${JSON.stringify(ended)}`);
     await page.locator(".sheet .close").click();
+
+    // ---- MEMORY MATCH: deal, find every pair, get paid, see the pairs listed
+    await page.locator('[data-gamestab="match"]').click();
+    await page.waitForSelector("[data-matchplay]");
+    await page.locator("[data-matchplay]").click();
+    await page.waitForSelector(".mcard");
+    const deck = await page.evaluate(() => Craepets.match().cards.map((c) => c.pair));
+    if (deck.length < 8) throw new Error("too few cards were dealt");
+    const matchCoins = await page.evaluate(() => Craepets.state().coins);
+    const byPair = {};
+    deck.forEach((p, i) => { (byPair[p] = byPair[p] || []).push(i); });
+    for (const p of Object.keys(byPair)) {
+      await page.locator(`[data-mc="${byPair[p][0]}"]`).click();
+      await page.locator(`[data-mc="${byPair[p][1]}"]`).click();
+      await page.waitForTimeout(60);
+    }
+    await page.waitForSelector(".sheet .pairlist", { timeout: 4000 });
+    const matched = await page.evaluate(() => ({ coins: Craepets.state().coins, games: Craepets.state().match.games, best: Craepets.state().match.best, on: !!Craepets.match() }));
+    if (matched.on || matched.games !== 1 || matched.best !== 100 || matched.coins <= matchCoins) throw new Error(`a perfect game of Memory Match did not pay: ${JSON.stringify(matched)}`);
+    if (await page.locator(".sheet .pair").count() !== Object.keys(byPair).length) throw new Error("the pairs were not listed at the end");
+    await page.locator(".sheet .close").click();
+    // …and the first steps noticed the game (and the earlier feed and sums)
+    const steps = await page.evaluate(() => Craepets.steps());
+    if (!steps.game || !steps.feed || !steps.farm3) throw new Error(`the first-steps list is not ticking things off: ${JSON.stringify(steps)}`);
+
+    // ---- WEATHER: rain streaks the window, and the wet place pays extra
+    await page.locator('[data-go="nest"]').click();
+    await page.evaluate(() => Craepets._setWeather("rainy"));
+    await page.waitForTimeout(100);
+    if (!(await page.locator(".scene .win .wx-rainy").count())) throw new Error("no rain on the window");
+    if (!/🌧️/.test(await page.locator(".place-tag").textContent())) throw new Error("the room's tag does not show the weather");
+    await page.locator('[data-go="pool"]').click();
+    await page.waitForSelector(".choice");
+    if (!/Rainy today/.test(await page.locator(".panel").first().textContent())) throw new Error("the pool does not announce the rain bonus");
+    if (!(await page.locator(".npc").count())) throw new Error("nobody runs the pool");
+    await page.evaluate(() => Craepets._setWeather(null));
 
     // ---- THE MAP: every place is a marker, and tapping one goes there
     await page.locator('[data-go="map"]').click();
@@ -1626,7 +1665,8 @@ const GAMES = {
     }
     await page.waitForTimeout(200);
     const hisAfter = await page.evaluate(() => JSON.parse(localStorage.getItem("craepets.v1.cory")));
-    if (await page.evaluate(() => Craepets.state().coins) >= herCoins) throw new Error("the buyer was not charged");
+    const herNow = await page.evaluate(() => ({ coins: Craepets.state().coins, buys: Craepets.state().stats.buy }));
+    if (herNow.coins === herCoins || herNow.buys !== 1) throw new Error("the buyer was not charged");
     if (hisAfter.coins <= hisBefore) throw new Error("the shopkeeper was not paid");
     if (hisAfter.stats.sold !== 1) throw new Error("the sale was not written into the seller's save");
     if (!hisAfter.stall.sales.length) throw new Error("the seller got no receipt");
@@ -1755,6 +1795,7 @@ const GAMES = {
       "stars in the window at 10pm; the diary fills up and takes an entry; Shannon posts Cory a " +
       "cookie and he opens it; a Zibbit loves popcorn and the Farm; the pet wanders; a petpet is " +
       "named and follows; the bank pays 3% overnight; a random event pays; Sky Catch scores and pays; " +
+      "Memory Match is solved and pays; first steps tick off; rain on the window pays at the pool; " +
       "the map goes to the farm; Cory visits " +
       "Shannon's house and takes a photo; quests, trophies, separate saves for Shannon, " +
       `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;

@@ -626,6 +626,82 @@
     .valley .vm-path { fill: none; stroke: #f3e2bf; stroke-width: 1.3; stroke-dasharray: 1.6 1.2; stroke-linecap: round; }
     .valley .mp.home .mp-dot { stroke-width: 1; }
 
+    /* --- the people behind the counters --- */
+    .npc {
+      display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.7rem; padding: 0.45rem 0.6rem;
+      background: #faf8ff; border: 3px solid #ece6ff; border-radius: 16px;
+    }
+    .npc img { width: 44px; height: auto; image-rendering: pixelated; flex: 0 0 auto; }
+    .npc .npcsay { flex: 1 1 auto; min-width: 0; font-size: 0.9rem; line-height: 1.35; }
+    .npc .npcsay small { color: #8b83a8; font-weight: normal; }
+    .npc .npcsay i { display: block; color: #46406b; }
+    .npc .mini { flex: 0 0 auto; }
+    .panel.tower .npc { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .panel.tower .npc .npcsay i { color: #e9e2ff; }
+
+    /* --- the weather --- */
+    .scene .wx { position: absolute; inset: 0; pointer-events: none; }
+    .scene .wx-rainy {
+      background: repeating-linear-gradient(105deg, transparent 0 9px, rgba(255,255,255,0.45) 9px 10.5px);
+      animation: rain 0.55s linear infinite; opacity: 0.8;
+    }
+    @keyframes rain { to { background-position: 0 44px; } }
+    .scene .wx-cloudy { background: linear-gradient(180deg, rgba(120,130,150,0.28), rgba(120,130,150,0.12)); }
+    .scene .wx-snowy {
+      background:
+        radial-gradient(circle at 12% 20%, #fff 0 1.6px, transparent 2.4px),
+        radial-gradient(circle at 40% 60%, #fff 0 1.4px, transparent 2.2px),
+        radial-gradient(circle at 68% 30%, #fff 0 1.8px, transparent 2.6px),
+        radial-gradient(circle at 86% 74%, #fff 0 1.4px, transparent 2.2px),
+        radial-gradient(circle at 26% 84%, #fff 0 1.6px, transparent 2.4px),
+        radial-gradient(circle at 56% 8%, #fff 0 1.3px, transparent 2px);
+      background-size: 90px 90px; animation: snow 5s linear infinite; opacity: 0.9;
+    }
+    @keyframes snow { to { background-position: 14px 90px; } }
+    .scene .wx-windy::after, .scene .wx-windy::before {
+      content: "🍃"; position: absolute; top: 24%; left: -8%; font-size: 1.1rem; animation: blow 3.6s linear infinite;
+    }
+    .scene .wx-windy::before { top: 48%; font-size: 0.85rem; animation-duration: 2.7s; animation-delay: 1.1s; }
+    @keyframes blow { to { transform: translate(120vw, 18px) rotate(400deg); } }
+    .scene .wx-rainbow {
+      background: radial-gradient(circle at 72% 118%, transparent 46%, rgba(255,93,108,0.55) 47% 49.5%, rgba(255,159,69,0.55) 49.5% 52%,
+        rgba(255,216,99,0.55) 52% 54.5%, rgba(111,220,140,0.55) 54.5% 57%, rgba(87,196,255,0.55) 57% 59.5%, rgba(138,92,255,0.55) 59.5% 62%, transparent 62.5%);
+    }
+    .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 0.8rem; }
+    @media (prefers-reduced-motion: reduce) { .scene .wx-rainy, .scene .wx-snowy, .scene .wx-windy::after, .scene .wx-windy::before { animation: none; } }
+
+    /* --- Memory Match --- */
+    .mgrid { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 0.5rem; perspective: 800px; }
+    .mcard {
+      aspect-ratio: 4 / 3.4; border: none; background: transparent; padding: 0; cursor: pointer;
+      font-family: var(--font); color: var(--ink); touch-action: manipulation; position: relative; min-height: 64px;
+    }
+    .mcard .inner {
+      position: absolute; inset: 0; transition: transform 0.35s ease; transform-style: preserve-3d; border-radius: 14px;
+    }
+    .mcard.up .inner, .mcard.done .inner { transform: rotateY(180deg); }
+    .mcard .back, .mcard .face {
+      position: absolute; inset: 0; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 0.2rem; box-sizing: border-box;
+      font-weight: bold; font-size: 0.95rem; text-align: center; line-height: 1.15; word-break: break-word;
+    }
+    .mcard .back { background: linear-gradient(135deg, #8a5cff, #e05fa8); color: #fff; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(43,36,64,0.2); }
+    .mcard .face { background: #fff; border: 3px solid #e6dfff; transform: rotateY(180deg); }
+    .mcard.done .face { background: #dcffe8; border-color: var(--green); }
+    .mcard .face .big { font-size: 1.7rem; }
+    .mcard .face .small { font-size: 0.72rem; }
+    .mcard .swatchcard { width: 70%; height: 70%; border-radius: 10px; border: 3px solid rgba(0,0,0,0.1); }
+    .mcard:focus-visible .inner { outline: 4px solid #2b2440; outline-offset: 2px; }
+    .pairlist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+    .pairlist .pair { background: #f4f0ff; border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .pairlist .pair .big { font-size: 1.1rem; }
+    .pairlist .pair .swatchcard { display: inline-block; width: 18px; height: 18px; border-radius: 6px; }
+    .pairlist .eq { color: var(--purple); }
+    @media (prefers-reduced-motion: reduce) { .mcard .inner { transition: none; } }
+
+    /* --- first steps --- */
+    .panel.steps { background: linear-gradient(135deg, #f1fff6, #fff); }
+
     /* --- Sky Catch --- */
     #catch-canvas {
       display: block; width: 100%; height: clamp(250px, 62vw, 360px); border-radius: 18px;
@@ -800,6 +876,7 @@
   <script src="scenery.js"></script>
   <script src="map.js"></script>
   <script src="catch.js"></script>
+  <script src="match.js"></script>
   <script src="data.js"></script>
   <!-- which narration clips exist in audio/ (written by tools/build_audio.py) -->
   <script src="audio/manifest.js"></script>
