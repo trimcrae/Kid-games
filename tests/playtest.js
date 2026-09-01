@@ -1177,6 +1177,29 @@ const GAMES = {
     await page.waitForTimeout(150);
     if (await page.evaluate(() => Craepets.state().today.wishes) !== wishes0 + 2) throw new Error("a play wish was not granted by playing");
 
+    // ---- PERSONALITY: a Zibbit loves popcorn, so popcorn is worth far
+    // more joy than bread — and the nest says so
+    if (!/Zibbits love/.test(await page.locator(".panel").first().textContent())) throw new Error("the nest does not say what a Zibbit loves");
+    const likes = await page.evaluate(() => CPPets.species(Craepets.state().pet.species).likes);
+    if (likes.indexOf("popcorn") === -1) throw new Error("a Zibbit should love popcorn");
+    const feedJoy = async (id) => {
+      await page.evaluate((id) => { const S = Craepets.state(); S.bag[id] = 1; S.pet.happy = 30; S.pet.hunger = 20; }, id);
+      await page.locator('[data-do="feed"]').click();
+      await page.waitForSelector(`.sheet [data-use="${id}"]`);
+      await page.locator(`.sheet [data-use="${id}"]`).click();
+      await page.waitForTimeout(150);
+      return (await page.evaluate(() => Craepets.state().pet.happy)) - 30;
+    };
+    const plainJoy = await feedJoy("bread"), lovedJoy = await feedJoy("popcorn");
+    if (lovedJoy <= plainJoy + 10) throw new Error(`a favourite food was not worth more joy (${lovedJoy} vs ${plainJoy})`);
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "💛")))) throw new Error("finding a favourite food was not written down");
+
+    // ---- the pet wanders: point it somewhere and it walks there
+    await page.evaluate(() => { const a = Craepets._anim(); a.x = 0.5; a.tx = 0.25; });
+    await page.waitForTimeout(700);
+    const wandered = await page.evaluate(() => Craepets._anim());
+    if (!(wandered.x < 0.46) || wandered.face !== -1) throw new Error("the pet does not wander about the room");
+
     // a whole arena duel, answered correctly, is a win
     await page.locator('[data-go="arena"]').click();
     await page.locator('[data-fight="pip"]').click();
@@ -1201,6 +1224,8 @@ const GAMES = {
     await page.locator('[data-go="farm"]').click();
     await page.waitForSelector(".choice:not([disabled])");
     if (!(await page.locator(".heatline").count())) throw new Error("the farm does not show the heat");
+    // a Zibbit's favourite place is the Farm, and it pays extra there
+    if (!/Zibbits love the Berry Farm/.test(await page.locator(".panel").first().textContent())) throw new Error("the favourite place is not announced");
     const coinsHeat0 = await page.evaluate(() => Craepets.state().coins);
     await answerAt("farm", 5);
     if (await page.evaluate(() => Craepets.heat("math")) !== 2) throw new Error("five right in a row did not turn the heat up");
@@ -1555,6 +1580,31 @@ const GAMES = {
       wrote: Craepets.diary().some((e) => e.e === "📬"), got: Craepets.state().stats.received }));
     if (opened.mail !== 0 || opened.cookie !== cookies0 + 1 || !opened.wrote || opened.got !== 1) throw new Error("opening the post did not hand over the cookie");
     await page.locator(".sheet .close").click();
+
+    // ---- VISITING: Cory walks round to Shannon's and finds Sable in her room
+    const herSave = await page.evaluate(() => localStorage.getItem("craepets.v1.shannon"));
+    await page.locator('[data-go="case"]').click();
+    await page.locator('[data-visit="shannon"]').click();
+    await page.waitForSelector(".panel.visit");
+    if (await page.evaluate(() => Craepets.visiting()) !== "shannon") throw new Error("the visit did not start");
+    if (!/Sable/.test(await page.locator(".panel.visit").textContent())) throw new Error("the visit does not introduce Shannon's pet");
+    if (!/Sable/.test(await page.locator("#scene").getAttribute("aria-label"))) throw new Error("the room is not drawn with Shannon's pet in it");
+    await page.locator("#scene").click();
+    await page.waitForTimeout(100);
+    if (await page.evaluate(() => localStorage.getItem("craepets.v1.shannon")) !== herSave) throw new Error("visiting changed the host's save");
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🏡")))) throw new Error("the visit was not written in the diary");
+    await page.locator('.panel.visit [data-go="case"]').click();
+    if (await page.evaluate(() => Craepets.visiting()) !== null) throw new Error("could not leave the visit");
+    if (await page.evaluate(() => Craepets.state().pet.name) !== "Wobble") throw new Error("coming home lost the visitor's own pet");
+
+    // ---- THE PHOTO BOOTH: a real PNG of the pet in its room
+    await page.locator('[data-go="nest"]').click();
+    await page.locator("[data-photo]").click();
+    await page.waitForSelector("img.photo");
+    const photo = await page.locator("img.photo").getAttribute("src");
+    if (!/^data:image\/png/.test(photo) || photo.length < 4000) throw new Error("the photo booth made no picture");
+    if (!(await page.locator(".sheet a[download]").count())) throw new Error("the photo cannot be saved");
+    await page.locator(".sheet .close").click();
     // he sees the receipt waiting for him
     await page.locator('[data-go="stall"]').click();
     await page.waitForSelector("[data-clearsales]");
@@ -1614,7 +1664,8 @@ const GAMES = {
       "buying from it pays Cory; a food wish and a play wish granted; " +
       `${wearArt.n} things to wear all draw on all 7 creatures, a bought hat goes on and comes off; ` +
       "stars in the window at 10pm; the diary fills up and takes an entry; Shannon posts Cory a " +
-      "cookie and he opens it; quests, trophies, separate saves for Shannon, " +
+      "cookie and he opens it; a Zibbit loves popcorn and the Farm; the pet wanders; Cory visits " +
+      "Shannon's house and takes a photo; quests, trophies, separate saves for Shannon, " +
       `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;
   },
 

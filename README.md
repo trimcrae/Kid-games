@@ -60,9 +60,12 @@ no logins.
 > (drawn straight onto the sprite, so it wears them in the arena and on the
 > family board), **grant its wishes** ("I'd love a blueberry!" — read it, do
 > it, get paid), **read the diary** it writes about its day and write in it
-> yourself, **post presents** with a note to anyone else in the family, and
-> watch the window fill with stars after dark — the valley follows the real
-> clock.
+> yourself, **post presents** with a note to anyone else in the family or
+> **visit their house** to see their room and their pet, and watch the window
+> fill with stars after dark — the valley follows the real clock. Every
+> species has **favourite foods and a favourite place** (worth reading the
+> card for), the pet **wanders about its room** and grows with every level,
+> and the **photo booth** makes a picture of it to keep.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times

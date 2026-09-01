@@ -709,7 +709,21 @@
 
   function makeWish() {
     var r = Math.random();
-    if (r < 0.5) {
+    // a hat you own but are not wearing; a fight to win; a friend to visit
+    var spare = (S.wardrobe || []).filter(function (id) {
+      var it = P.wearById(id); return it && S.pet.wear && S.pet.wear[it.slot] !== id;
+    });
+    var friends = allies();
+    if (r < 0.08 && spare.length) {
+      return { kind: "wear", id: spare[Math.floor(Math.random() * spare.length)], at: Date.now(), day: D.dayNumber(), done: false };
+    }
+    if (r < 0.14 && friends.length) {
+      return { kind: "visit", id: friends[Math.floor(Math.random() * friends.length)].who, at: Date.now(), day: D.dayNumber(), done: false };
+    }
+    if (r < 0.2 && tier() !== "tot") {
+      return { kind: "duel", id: "any", at: Date.now(), day: D.dayNumber(), done: false };
+    }
+    if (r < 0.55) {
       // a food you could actually get hold of today: in your bag, on the
       // shelf, or one of the ones the Farm hands out
       var pool = [];
@@ -719,7 +733,7 @@
       var id = pool[Math.floor(Math.random() * pool.length)];
       return { kind: "food", id: id, at: Date.now(), day: D.dayNumber(), done: false };
     }
-    if (r < 0.85) {
+    if (r < 0.87) {
       var acts = ["play", "wash", "rest"];
       if (bagOf("book").length) acts.push("read");
       if ((S.wardrobe || []).length) acts.push("dress");
@@ -744,10 +758,16 @@
     if (!w) return "";
     if (w.kind === "food") { var f = D.itemById(w.id); return f ? "I'd love a " + f.emoji + " " + f.name + "!" : ""; }
     if (w.kind === "act") return ACT_WISHES[w.id] ? ACT_WISHES[w.id].text : "";
+    if (w.kind === "wear") { var it = P.wearById(w.id); return it ? "Put my " + it.emoji + " " + it.name + " on me!" : ""; }
+    if (w.kind === "duel") return "Let's win a fight in the ⚔️ Arena!";
+    if (w.kind === "visit") { var vs = readSlot(w.id); return "Let's go and visit " + ((vs && vs.pet) ? vs.pet.name : D.profile(w.id).name) + "!"; }
     return PLACE_WISHES[w.id] ? PLACE_WISHES[w.id].text : "";
   }
   function wishHint(w) {
     if (!w) return "";
+    if (w.kind === "wear") return "Tap 👒 Dress — it is in the wardrobe already.";
+    if (w.kind === "duel") return "Any rival will do — even a floor you have cleared before.";
+    if (w.kind === "visit") return "🏆 Case → the family board → 🏡 Visit " + D.profile(w.id).name + ".";
     if (w.kind === "food") {
       var have = S.bag[w.id] || 0;
       if (have) return "You have " + have + " in your 🎒 Bag — tap 🍽️ Feed.";
@@ -950,6 +970,177 @@
   }
 
   /* =========================================================
+     PERSONALITY — what THIS kind of creature loves.
+     Each species (pets.js) has three favourite foods and a
+     favourite place. A loved food is worth double the joy, and
+     the favourite place pays two extra coins a question — so it
+     is worth reading the card at adoption and remembering it.
+     ========================================================= */
+  var FAV_BONUS = 2;
+  function spec(pet) { return P.species((pet || S.pet).species); }
+  function loves(foodId) { return !!S.pet && (spec().likes || []).indexOf(foodId) !== -1; }
+  function favPlace() { return S.pet ? spec().fav : null; }
+  function foodList(ids) {
+    var names = ids.map(function (id) { var f = D.itemById(id); return f ? f.emoji + " " + f.name : id; });
+    return names.length > 1 ? names.slice(0, -1).join(", ") + " and " + names[names.length - 1] : names.join("");
+  }
+  function personalityLine(sp) {
+    sp = sp || spec();
+    var pl = PLACE_INFO[sp.fav];
+    return sp.name + "s love " + foodList(sp.likes || []) + " — <b>double the joy</b> — and the " +
+      (pl ? pl.title : sp.fav) + " pays them <b>" + FAV_BONUS + " extra coins</b> on every right answer.";
+  }
+
+  /* =========================================================
+     VISITING — walk into somebody else's house.
+     Their room, their furniture, their Craepet in its outfit,
+     wandering about exactly as it does for them. Read-only:
+     nothing you do there touches their save, except knocking
+     to post a present, which goes through the post.
+     ========================================================= */
+  var visit = null;                 // { id, s } while you are round at theirs
+  /* Run something as if another save were live. All the room-drawing code
+     reads S, so this is how one function paints two different houses. */
+  function withSave(s, fn) {
+    var keep = S;
+    S = s;
+    try { return fn(); } finally { S = keep; }
+  }
+  function startVisit(id) {
+    if (id === who) return;
+    var s = load(id);
+    if (!s || !s.pet) { toast(D.profile(id).name + " has not adopted a Craepet yet."); return; }
+    visit = { id: id, s: s };
+    hush();
+    sess = null;
+    battle = null;
+    clearTimeout(battleTimer);
+    view = "visit";
+    anim.tx = null;
+    if (!S.visited) S.visited = {};
+    if (!S.visited[id]) {
+      S.visited[id] = true;
+      diary("🏡", "We went round to " + s.pet.name + "'s house to say hello. " +
+        (D.profile(id).name) + " has made it very " + (s.house && s.house.placed && s.house.placed.length > 3 ? "cosy" : "tidy") + ".");
+    }
+    checkWish("visit", id);
+    save();
+    render();
+    sfx("pop");
+    var greet = withSave(s, moodSay);
+    say(greet.text, 2600, greet.tok);
+  }
+  function visitHtml() {
+    if (!visit) return "";
+    var s = visit.s, p = D.profile(visit.id), pet = s.pet;
+    var lv = levelOf(pet);
+    var info = withSave(s, function () {
+      return { home: homeName(), house: houseInfo(), out: placedItems(), mood: mood(), moodFace: moodFace(), cosy: houseCosy() };
+    });
+    var wearing = P.SLOTS.map(function (k) { return pet.wear && pet.wear[k] && P.wearById(pet.wear[k]); })
+      .filter(Boolean).map(function (it) { return it.emoji + " " + it.name; });
+    var fl = (s.arena && s.arena.floor) | 0, rk = D.rankFor(fl);
+    var lines = (s.diary || []).filter(function (e) { return !e.me; }).slice(-4).reverse();
+    return '<div class="panel visit">' +
+      "<h2>" + info.house.emoji + " " + esc(info.home) + ' <span class="rankchip" style="background:#f4f0ff;color:var(--purple)">' + esc(p.name) + " " + p.emoji + "'s</span></h2>" +
+      '<p class="sub">This is <b>' + esc(pet.name) + "</b>, " + esc(p.name) + "'s " + esc(P.colour(pet.colour).name) + " " + esc(spec(pet).name) +
+        ", level " + lv + ", looking " + esc(info.mood) + " " + info.moodFace + ". " +
+        (wearing.length ? "Wearing " + esc(wearing.join(", ")) + ". " : "Not wearing anything today. ") +
+        (info.out.length ? info.out.length + " pieces of furniture out, " + info.cosy + " cosy. " : "Nothing out in the room yet. ") +
+        rk.emoji + " " + esc(rk.name) + (fl ? " · floor " + fl + " of the tower." : ".") + "</p>" +
+      '<div class="acts">' +
+        '<button class="act" data-post="' + p.id + '" style="--ac:var(--pink)"><span class="em">🎁</span>Post ' + esc(p.name) + " a present</button>" +
+        '<button class="act" data-go="case" style="--ac:var(--purple)"><span class="em">🏠</span>Go home</button>' +
+      "</div>" +
+      (lines.length
+        ? '<h3 style="margin:1rem 0 0.2rem;font-size:0.98rem">📔 From ' + esc(pet.name) + "'s diary</h3>" +
+          lines.map(function (e) {
+            return '<div class="entry"><span class="em" aria-hidden="true">' + e.e + '</span><div class="etx">' + esc(e.s) +
+              "<small>" + esc(dayLabel(e.d).split(" · ")[0]) + "</small></div></div>";
+          }).join("")
+        : "") +
+      '<p class="sub" style="margin:0.8rem 0 0">Tap ' + esc(pet.name) + " to say hello. Everything here is " + esc(p.name) +
+        "'s own — you can look, but only the post can change it.</p>" +
+    "</div>";
+  }
+
+  /* =========================================================
+     THE PHOTO BOOTH — a picture of your Craepet, in its outfit,
+     in its room, with its name on. A real PNG you can save.
+     ========================================================= */
+  function takePhoto() {
+    var W = 480, H = 360;
+    var cv = document.createElement("canvas");
+    cv.width = W; cv.height = H;
+    var g = cv.getContext("2d");
+    var wall = wallNow(), floor = floorNow();
+    var horizon = Math.round(H * 0.58);
+    var gw = g.createLinearGradient(0, 0, 0, horizon);
+    gw.addColorStop(0, wall.a); gw.addColorStop(1, wall.b);
+    g.fillStyle = gw; g.fillRect(0, 0, W, horizon);
+    var gf = g.createLinearGradient(0, horizon, 0, H);
+    gf.addColorStop(0, floor.a); gf.addColorStop(1, floor.b);
+    g.fillStyle = gf; g.fillRect(0, horizon, W, H - horizon);
+    g.fillStyle = "rgba(0,0,0,0.18)"; g.fillRect(0, horizon - 2, W, 3);
+    // the window, with a sky that knows what time it is
+    var tod = timeOfDay();
+    var sky = { day: ["#8fd3ff", "#e8f7ff"], dusk: ["#ff9a6a", "#6a3d8f"], dawn: ["#ffd9a8", "#bfe9ff"], night: ["#0f1450", "#2b2a6e"] }[tod];
+    var wx = W - 150, wy = 34, ww = 116, wh = 90;
+    g.fillStyle = "#fff"; g.fillRect(wx - 5, wy - 5, ww + 10, wh + 10);
+    var gs = g.createLinearGradient(0, wy, 0, wy + wh);
+    gs.addColorStop(0, sky[0]); gs.addColorStop(1, sky[1]);
+    g.fillStyle = gs; g.fillRect(wx, wy, ww, wh);
+    g.fillStyle = tod === "night" ? "#fff6c8" : tod === "day" ? "#ffe27a" : "#ffb347";
+    g.beginPath(); g.arc(wx + ww * 0.72, wy + wh * 0.32, 13, 0, Math.PI * 2); g.fill();
+    if (tod === "night") { g.fillStyle = "#fff"; [[18, 20], [40, 12], [60, 30], [28, 48], [90, 60], [75, 8]].forEach(function (p) { g.fillRect(wx + p[0], wy + p[1], 2, 2); }); }
+    g.fillStyle = "#7cc464"; g.fillRect(wx, wy + wh - 22, ww, 22);
+    g.fillStyle = "#fff"; g.fillRect(wx + ww / 2 - 2, wy, 4, wh); g.fillRect(wx, wy + wh / 2 - 2, ww, 4);
+    // furniture, standing where it stands in the room
+    g.textAlign = "center"; g.textBaseline = "alphabetic";
+    var out = placedItems(), fn = 0, wn = 0;
+    out.forEach(function (it) {
+      if (it.hang) {
+        var ws = WALL_SPOTS[wn++ % WALL_SPOTS.length];
+        g.font = Math.round(30 * ws[2]) + "px sans-serif";
+        g.fillText(it.emoji, ws[0] / 100 * W, H - ws[1] / 100 * H);
+      } else {
+        var row = FLOOR_ROWS[fn % FLOOR_ROWS.length];
+        var x = row.xs[Math.floor(fn / FLOOR_ROWS.length) % row.xs.length];
+        fn++;
+        g.font = Math.round(34 * row.s) + "px sans-serif";
+        g.fillText(it.emoji, x / 100 * W, H - row.y / 100 * H);
+      }
+    });
+    // the star of the show
+    var tmp = document.createElement("canvas");
+    tmp.width = 220; tmp.height = 250;
+    P.draw(tmp, S.pet.species, S.pet.colour, { frame: "idle", level: level(), scale: 11, wear: S.pet.wear });
+    g.imageSmoothingEnabled = false;
+    g.drawImage(tmp, Math.round(W / 2 - tmp.width / 2), H - tmp.height - 4);
+    // the name plate
+    var plate = S.pet.name + "  ·  Lv " + level() + "  ·  " + spec().name;
+    g.font = "bold 20px sans-serif";
+    var pw = g.measureText(plate).width + 34;
+    g.fillStyle = "rgba(255,255,255,0.92)";
+    g.beginPath(); g.roundRect ? g.roundRect(W / 2 - pw / 2, 14, pw, 40, 20) : g.rect(W / 2 - pw / 2, 14, pw, 40); g.fill();
+    g.fillStyle = "#2b2440"; g.textBaseline = "middle";
+    g.fillText(plate, W / 2, 34);
+    g.font = "bold 13px sans-serif"; g.textAlign = "left"; g.fillStyle = "rgba(255,255,255,0.95)";
+    g.fillText(homeName() + " · " + new Date().toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }), 14, H - 16);
+    g.textAlign = "right"; g.fillText("🥚 Craepets", W - 14, H - 16);
+    return cv.toDataURL("image/png");
+  }
+  function photoSheet() {
+    var url = takePhoto();
+    var file = (S.pet.name || "craepet").toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";
+    return sheet("📸 Say cheese, " + esc(S.pet.name) + "!",
+      '<p style="margin:0;text-align:center"><img class="photo" alt="' + esc(S.pet.name) + ' in the ' + esc(homeName()) + '" src="' + url + '"></p>' +
+      '<p class="sub" style="text-align:center;margin-top:0.6rem">A picture of ' + esc(S.pet.name) + " today — outfit, room and all. " +
+      "Press and hold the picture to save it on a phone, or tap the button.</p>" +
+      '<p style="text-align:center"><a class="ghost" download="' + esc(file) + '" href="' + url + '">💾 Save the picture</a></p>');
+  }
+
+  /* =========================================================
      LITTLE REACTIONS — the pet hops, hearts float up.
      ========================================================= */
   function hop(frames) { if (!calm) anim.hop = frames || 22; }
@@ -1081,11 +1272,20 @@
   }
 
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0 };
+  /* x is where the pet is standing, as a fraction of the room's width;
+     tx is where it has decided to wander to next; face is which way it
+     is looking. They live outside the render so a redraw never makes
+     the pet jump back to the middle. */
+  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0,
+               x: 0.5, tx: null, face: 1, wanderAt: 0, shadow: null };
+
+  function levelOf(pet) { return Math.min(20, 1 + Math.floor(((pet && pet.xp) || 0) / 50)); }
 
   function drawScene() {
     var cv = $("#pet-canvas");
-    if (!cv || !S.pet) return;
+    // in somebody else's house it is THEIR Craepet in the room
+    var pet = (view === "visit" && visit) ? visit.s.pet : S.pet;
+    if (!cv || !pet) return;
     if (cv !== anim.cv || anim.measure) {
       var rect = cv.getBoundingClientRect();
       if (!rect.width) return;
@@ -1093,20 +1293,50 @@
       cv.width = Math.round(rect.width * dpr);
       cv.height = Math.round(rect.height * dpr);
       anim.cv = cv;
+      anim.shadow = $("#scene .pet-shadow");
       anim.measure = false;
     }
     var w = cv.width, h = cv.height;
     if (!w || !h) return;
 
     anim.t++;
-    var sleeping = S.pet.energy < 20 || anim.napping;
+    var sleeping = pet.energy < 20 || anim.napping;
     var frame = "idle";
     if (sleeping) frame = "sleep";
     else if (anim.t % 150 > 144) frame = "blink";
 
-    var scale = Math.max(2, Math.floor(Math.min(h / 23, w / 26)));
+    // A Craepet grows a little with every level — about a sixth bigger by
+    // level 20 — so a grown one really is bigger than a hatchling.
+    var lv = levelOf(pet);
+    var grow = 1 + Math.min(19, lv - 1) * 0.008;
+    var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * grow));
+
+    // WANDERING. In the full-height room (the nest, or a house you are
+    // visiting) the pet strolls about now and then, turning to face the
+    // way it is going. In the compact band it stays in the middle where
+    // the question can see it.
+    var roomy = (view === "nest" || view === "visit") && !calm && !sleeping;
+    var walking = false;
+    if (roomy) {
+      if (anim.tx === null && anim.t >= anim.wanderAt) {
+        if (Math.random() < 0.6) anim.tx = 0.2 + Math.random() * 0.6;
+        anim.wanderAt = anim.t + 160 + Math.random() * 320;
+      }
+      if (anim.tx !== null) {
+        var d = anim.tx - anim.x;
+        if (Math.abs(d) < 0.004) { anim.tx = null; }
+        else { anim.x += (d < 0 ? -1 : 1) * 0.0022; anim.face = d < 0 ? -1 : 1; walking = true; }
+      }
+    } else if (anim.x !== 0.5) {
+      anim.x += (0.5 - anim.x) * 0.15;
+      if (Math.abs(anim.x - 0.5) < 0.002) anim.x = 0.5;
+      anim.tx = null;
+    }
+    if (anim.shadow) anim.shadow.style.left = (anim.x * 100) + "%";
+
     var bob = calm ? 0
       : sleeping ? Math.round(Math.sin(anim.t / 40) * scale * 0.35)
+      : walking  ? Math.round(Math.abs(Math.sin(anim.t / 5)) * scale * -0.7)
                  : Math.round(Math.sin(anim.t / 16) * scale * 0.6);
     // a little jump for joy: fed, played with, dressed up, a wish granted
     if (anim.hop > 0) {
@@ -1114,7 +1344,8 @@
       bob -= Math.round(Math.sin(k * Math.PI) * scale * 2.4);
       anim.hop--;
     }
-    P.draw(cv, S.pet.species, S.pet.colour, { frame: frame, level: level(), scale: scale, bob: bob, wear: S.pet.wear });
+    P.draw(cv, pet.species, pet.colour, { frame: frame, level: lv, scale: scale, bob: bob, wear: pet.wear,
+                                          cx: Math.round(anim.x * w), flip: anim.face < 0 });
   }
 
   function loop() {
@@ -1220,9 +1451,14 @@
     var g = $("#game");
     if (!g) return;
     if (!S.pet) { g.innerHTML = adoptHtml(); return; }
+    if (view === "visit" && !visit) view = "case";
+    // round at somebody's house, the room is painted from THEIR save
+    var scene = (view === "visit")
+      ? withSave(visit.s, function () { return sceneHtml("nest"); })
+      : sceneHtml(view);
     g.innerHTML =
       topbarHtml() +
-      sceneHtml(view) +
+      scene +
       needsHtml() +
       navHtml() +
       panelHtml();
@@ -1344,6 +1580,7 @@
       case "quests": return questsHtml();
       case "diary": return diaryHtml();
       case "case": return caseHtml();
+      case "visit": return visitHtml();
     }
     return "";
   }
@@ -1385,6 +1622,8 @@
       "<h2>Welcome to the valley, " + esc(prof.name) + "! 🥚</h2>" +
       '<p class="sub">' + esc(prof.hello) + " Pick a creature, pick a color, give it a name — then everything you teach it turns into coins.</p>" +
       '<div class="adopt-grid" id="species">' + species + "</div>" +
+      '<p class="sub" style="margin:0.6rem 0 0" id="species-note">' + esc(P.species(pickSpecies).blurb) + " " +
+        personalityLine(P.species(pickSpecies)) + "</p>" +
       '<p class="sub" style="margin:0.8rem 0 0.4rem">Choose a color</p>' +
       '<div class="swatches" id="colours">' + sw + "</div>" +
       '<p class="sub" style="margin:0.9rem 0 0.4rem">' + (little ? "Tap a name" : "Name your Craepet") + "</p>" +
@@ -1714,6 +1953,10 @@
       extra = '<p class="sub" style="margin:-0.35rem 0 0.6rem">🖌️ ' + toBrush +
               " more right answers and the pool gives you a free paint brush.</p>";
     }
+    if (place === favPlace()) {
+      extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">💛 ' + esc(spec().name) + "s love the " + info.title.replace(/^\S+\s/, "") +
+        ": <b>+" + FAV_BONUS + " 🪙</b> on every right answer here.</p>";
+    }
     if (tier() !== "tot") {
       var a = adaptOf(info.subject), h = HEAT[a.rung - 1];
       var run = a.hist.length ? a.hist.slice(-5).filter(function (x) { return x; }).length : 0;
@@ -1919,11 +2162,14 @@
     // The heat multiplies the coins: a harder question is worth more.
     var mult = heatMult(sess.q);
     var coins = Math.round((info.base + Math.min(6, S.stats.streak) + Math.floor(level() / 3)) * mult);
+    // …and a Snorbit at the Farm, a Blorb at the Pool: the favourite place pays extra
+    var fav = sess.place === favPlace();
+    if (fav) coins += FAV_BONUS;
     earn(coins);
     // A book shelf, a globe and a star window really do make you learn
     // faster — and so does a hotter question.
     giveXp(Math.round((3 + D.hot(sess.q && sess.q.rung)) * (1 + studyBonus())));
-    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : ""), "#ffe07a");
+    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : "") + (fav ? " 💛" : ""), "#ffe07a");
 
     if (sess.plots.length < SLOTS) {
       sess.plots.push(info.crops[Math.floor(Math.random() * info.crops.length)]);
@@ -2001,7 +2247,8 @@
       "<h2>🏡 " + esc(S.pet.name) + "'s nest</h2>" +
       '<p class="sub">' + esc(nestLine()) + " &nbsp;·&nbsp; " + esc(P.species(S.pet.species).name) +
         ", " + esc(P.colour(S.pet.colour).name) + ", " + age + (age === 1 ? " day" : " days") + " old. " +
-        '<button class="ghost small" data-rename="1">✏️ Rename</button></p>' +
+        '<button class="ghost small" data-rename="1">✏️ Rename</button> ' +
+        '<button class="ghost small" data-photo="1">📸 Photo</button></p>' +
       '<div class="acts">' +
         '<button class="act" data-do="feed" style="--ac:#ff8f4d"><span class="em">🍽️</span>Feed</button>' +
         '<button class="act" data-do="play" style="--ac:#3ddc84"><span class="em">🎾</span>Play</button>' +
@@ -2010,6 +2257,7 @@
         '<button class="act" data-do="read" style="--ac:#e05fa8"><span class="em">📖</span>Read</button>' +
         '<button class="act" data-do="dress" style="--ac:#d99000"><span class="em">👒</span>Dress</button>' +
       "</div>" + shelfLine() +
+      '<p class="sub" style="margin:0.8rem 0 0">💛 ' + personalityLine() + "</p>" +
       '<p class="sub" style="margin:0.8rem 0 0">Coins come from the Farm, the Well, the Pool and the Arena — ' +
         "every one of them pays you for learning something.</p>" + streakBit +
     "</div>" + mailHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
@@ -2062,7 +2310,7 @@
     S.pet.wear[it.slot] = id;
     S.everDressed = true;
     bump("dressed");
-    checkWish("act", "dress");
+    if (!checkWish("wear", id)) checkWish("act", "dress");
     diary("👒", "I'm wearing the " + it.name + " now." + (first ? " My very first outfit!" : ""));
     checkTrophies();
     save();
@@ -2138,8 +2386,9 @@
     }
     return sheet("🍽️ What shall " + esc(S.pet.name) + " eat?",
       '<div class="items">' + foods.map(function (id) {
-        return itemButton(id, "×" + S.bag[id]);
-      }).join("") + "</div>");
+        return itemButton(id, "×" + S.bag[id] + (loves(id) ? " · 💛 favourite" : ""));
+      }).join("") + "</div>" +
+      '<p class="sub" style="margin-top:0.6rem">💛 ' + personalityLine() + "</p>");
   }
 
   function playSheet() {
@@ -2273,10 +2522,21 @@
       var snacking = !!(battle && !battle.over && battle.snacks > 0 && battle.myHp < battle.myMax);
       if (!snacking && S.pet.hunger > 96) { toast(S.pet.name + " is completely full!"); return closeSheet(); }
       takeItem(id);
-      S.pet.hunger = clamp(S.pet.hunger + it.fill, 0, 100);
-      S.pet.happy = clamp(S.pet.happy + (it.joy || 0), 0, 100);
+      // a favourite food: double the joy, and the pet says so
+      var love = loves(id);
+      var joy = (it.joy || 0) * (love ? 2 : 1) + (love ? 4 : 0);
+      S.pet.hunger = clamp(S.pet.hunger + it.fill + (love ? 3 : 0), 0, 100);
+      S.pet.happy = clamp(S.pet.happy + joy, 0, 100);
       S.pet.clean = clamp(S.pet.clean - 3, 0, 100);
       bump("feed");
+      if (love && !snacking) {
+        if (!S.favFound) S.favFound = {};
+        if (!S.favFound[id]) {
+          S.favFound[id] = true;
+          diary("💛", "I found out I LOVE " + it.emoji + " " + it.name + ". All " + spec().name + "s do. Double the joy!");
+          toast("💛 " + S.pet.name + " LOVES " + it.name + "! " + spec().name + "s always do — double the joy.");
+        }
+      }
       if (snacking) {
         var heal = Math.min(battle.myMax - battle.myHp, it.fill + 5);
         battle.myHp += heal;
@@ -2288,11 +2548,12 @@
         sfx("good");
         return after();
       }
-      floaty("+" + it.fill + " 🍽️", "#ffd9a8");
-      say("Mmm, " + it.name.toLowerCase() + "!", 2600, "m-yum");
+      floaty("+" + it.fill + " 🍽️" + (love ? " +" + joy + " 💛" : ""), love ? "#ffd166" : "#ffd9a8");
+      if (love) say("My favourite! " + it.name + "!", 2800, "m-favourite");
+      else say("Mmm, " + it.name.toLowerCase() + "!", 2600, "m-yum");
       sfx("good");
       hop();
-      if (!checkWish("food", id) && it.joy >= 8) hearts();
+      if (!checkWish("food", id) && (love || it.joy >= 8)) hearts();
       return after();
     }
     if (kind === "toy") {
@@ -3099,6 +3360,7 @@
       ? '<span class="brushdot" style="background:' + it.swatch + '"></span>'
       : '<span class="pic">' + it.emoji + "</span>";
     var have = !owned && S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "";
+    if (it.kind === "food" && loves(it.id)) have += '<span class="own">💛 ' + esc(S.pet.name) + "'s favourite</span>";
     return '<button class="item' + (it.rare ? " rare" : "") + '" data-buy="' + esc(it.id) + '"' +
       (!afford || owned ? " disabled" : "") + ">" +
       pic + '<span class="nm">' + esc(it.name) + "</span>" +
@@ -3888,6 +4150,7 @@
       hop();
       try { window.Confetti && Confetti.burst({ count: r.boss ? 160 : 100 }); } catch (e) {}
       toast("You beat " + r.name + "! +🪙 " + coins);
+      checkWish("duel", "any");
       if (r.boss && !b.replay) diary("🌑", "WE BEAT " + r.name.toUpperCase() + "! On floor " + b.floor + " of the Shadow Tower. I was so brave.");
       else if (b.mode === "tower" && b.reward.cleared) diary("🗼", "We cleared floor " + b.floor + " of the Shadow Tower and beat " + r.name + "." +
         (b.ally ? " " + b.ally.name + " came along and helped!" : ""));
@@ -4077,7 +4340,8 @@
       var fl = (s.arena && s.arena.floor) | 0, rk = D.rankFor(fl);
       var post = p.id === who
         ? '<small>that\'s you</small>'
-        : '<button class="ghost small" data-post="' + p.id + '" aria-label="Post a present to ' + esc(p.name) + '">🎁 Post a present</button>';
+        : '<button class="ghost small" data-visit="' + p.id + '" aria-label="Visit ' + esc(p.name) + "'s house\">🏡 Visit</button>" +
+          '<button class="ghost small" data-post="' + p.id + '" aria-label="Post a present to ' + esc(p.name) + '">🎁 Post</button>';
       return '<div class="fam"><img alt="" src="' + chipOf(s.pet, 54) + '">' +
         "<b>" + esc(s.pet.name) + "</b><small>" + esc(p.name) + " · Lv " + lv + "</small>" +
         "<small>" + ((s.stats && s.stats.correct) || 0) + " right</small>" +
@@ -4126,8 +4390,9 @@
       '<div class="statgrid">' + stats + "</div></div>" +
     logPanel +
     '<div class="panel"><h2>👨‍👩‍👧‍👦 The family valley</h2>' +
-      '<p class="sub">Everyone who plays on this device has their own Craepet — and you can 🎁 <b>post a present</b> ' +
-        "from your bag to any of them. It waits in their post until they next play. Sent so far: <b>" +
+      '<p class="sub">Everyone who plays on this device has their own Craepet. 🏡 <b>Visit</b> anyone to see their room, ' +
+        "their furniture and their pet in its outfit, or 🎁 <b>post a present</b> " +
+        "from your bag. It waits in their post until they next play. Sent so far: <b>" +
         (st.gifts || 0) + "</b>, received: <b>" + (st.received || 0) + "</b>.</p>" +
       '<div class="family">' + fam + "</div></div>" +
     levelPickerHtml();
@@ -4173,10 +4438,13 @@
         '<button class="act" id="diary-go" style="--ac:var(--purple);min-height:48px;padding:0.4rem 1rem">✏️ Write it down</button></div></div>'
       : "";
 
+    var todayN = entries.filter(function (e) { return e.d === D.dayNumber(); }).length;
     return '<div class="panel"><h2>📔 ' + esc(S.pet.name) + "'s diary</h2>" +
       '<p class="sub">' + esc(S.pet.name) + " writes down everything that happens — levelling up, wishes, " +
       "the arena, the post, the house. Tap 🔊 on any line to hear it read out." +
       (entries.length ? " <b>" + entries.length + "</b> " + (entries.length === 1 ? "entry" : "entries") + " so far." : "") + "</p>" +
+      (todayN ? '<p style="margin:0 0 0.4rem"><button class="ghost small" data-say-today="1">🔊 Read me today\'s ' +
+        (todayN === 1 ? "entry" : todayN + " entries") + "</button></p>" : "") +
       (entries.length ? body : '<p class="sub">Nothing written yet — go and do something!</p>') +
       "</div>" + write;
   }
@@ -4341,6 +4609,7 @@
         if (dest === "bag") { S.bagNew = {}; save(); }   // you have seen them now
         pendingSale = null;
         pendingPost = null;
+        visit = null;
         view = dest;
         sfx("pop");
         render();
@@ -4458,6 +4727,16 @@
       if (w) narrate([S.pet.name + " wishes: " + wishText(w) + " " + wishHint(w)], { force: true });
       return;
     }
+    if (t.closest("[data-say-today]")) {
+      var todays = (S.diary || []).filter(function (e) { return e.d === D.dayNumber(); }).map(function (e) { return e.s; });
+      if (todays.length) narrate(["diary-intro"].concat(todays), { force: true });
+      return;
+    }
+
+    // --- visiting, and the photo booth ---
+    var visitBtn = t.closest("[data-visit]");
+    if (visitBtn) return startVisit(visitBtn.dataset.visit);
+    if (t.closest("[data-photo]")) { sfx("pop"); return openSheet(photoSheet()); }
 
     // --- the prize wheel ---
     if (t.closest("[data-spin]")) return spinWheel();
@@ -4494,6 +4773,14 @@
 
     // tapping the pet itself is always worth something
     if (t.closest("#scene")) {
+      if (view === "visit" && visit) {
+        // their Craepet says hello in its own voice; nothing of theirs changes
+        var theirs = withSave(visit.s, moodSay);
+        say(theirs.text, 2600, theirs.tok);
+        hop(14);
+        sfx("pop");
+        return;
+      }
       S.pet.happy = clamp(S.pet.happy + 1, 0, 100);
       var ml = moodSay();
       say(ml.text, 2600, ml.tok);
@@ -4559,6 +4846,7 @@
     S = load(id);
     sess = null;
     battle = null;
+    visit = null;
     clearTimeout(battleTimer);
     pendingBuy = null;
     pendingSale = null;
@@ -4659,6 +4947,9 @@
     diary: function () { return S.diary; },
     mail: function () { return S.mail; },
     timeOfDay: timeOfDay,
+    visiting: function () { return visit ? visit.id : null; },
+    photo: takePhoto,
+    _anim: function () { return anim; },
     _setHour: function (h) { hourOverride = (h === null || h === undefined) ? null : h; render(); }
   };
 })();
