@@ -59,7 +59,8 @@ For **every game** (and the landing page), at **each of the three sizes**:
     the bank takes 100, pays 3 overnight and gives 103 back; a random event
     pays; Sky Catch starts, scores a right catch, ends and pays; and the
     map's markers really go places (the family's houses included). Memory Match is dealt and solved and pays, the first-steps list ticks
-    off what was done, and rain streaks the window and pays extra at the Pool
+    off what was done, and rain streaks the window and pays extra at the Pool. The help sheet opens, a valley saved as a file loads back exactly (and a
+    bad file is refused), and starting over needs the pet's name typed
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

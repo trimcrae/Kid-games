@@ -1462,6 +1462,16 @@ const GAMES = {
     if (await page.evaluate(() => Craepets.state().today.events) !== 1) throw new Error("the event was not counted");
     await page.locator(".sheet .close").click();
 
+    // every rule the games room can ask has a line in the script (so it can be recorded)
+    const unspoken = await page.evaluate(() => {
+      const bad = [];
+      Object.keys(CPCatch.RULES).forEach((t) => CPCatch.RULES[t].forEach((r) => { if (CPLines.spoken(r.text) === r.text) bad.push(r.text); }));
+      ["tot", "early", "mid", "big", "grown"].forEach((t) => CPMatch.themes(t, CPData, CPLines).forEach((th) => { if (CPLines.spoken(th.rule) === th.rule) bad.push(th.rule); }));
+      Object.keys(CPData.PAIRS).forEach(() => {});
+      return bad;
+    });
+    if (unspoken.length) throw new Error(`game rules missing from lines.js: ${unspoken.slice(0, 3).join(" | ")}`);
+
     // ---- SKY CATCH: the game runs, a right catch scores, and it pays at the end
     await page.locator('[data-go="games"]').click();
     await page.waitForSelector("[data-catchplay]");
@@ -1782,6 +1792,42 @@ const GAMES = {
     const saidAfter = await page.evaluate(() => Craepets.said());
     if (saidAfter.length < 2 || !/^p-/.test(saidAfter[0])) throw new Error("a right answer at the tiny level was not praised aloud");
 
+    // ---- HELP and BACKUP: the help sheet opens; a valley saved as a file
+    // comes back exactly; starting over needs the pet's name typed
+    await page.locator("[data-help]").click();
+    await page.waitForSelector(".sheet .helprow");
+    if (await page.locator(".sheet .helprow").count() < 6) throw new Error("the help sheet is thin");
+    await page.locator(".sheet .close").click();
+    const kName = await page.evaluate(() => Craepets.state().pet.name);
+    const exported = await page.evaluate(() => Craepets.exportJson());
+    if (JSON.parse(exported).pet.name !== kName) throw new Error("the exported valley is not this valley");
+    await page.locator('[data-go="case"]').click();
+    if (!(await page.locator("a[download][href^='data:application/json']").count())) throw new Error("no file to save the valley as");
+    await page.evaluate(() => { Craepets.state().pet.name = "Somebody Else"; Craepets.grant(0); });
+    await page.locator("[data-import]").click();
+    await page.waitForSelector("#import-text");
+    await page.fill("#import-text", exported);
+    await page.locator("#import-go").click();
+    await page.waitForTimeout(200);
+    if (await page.evaluate(() => Craepets.state().pet.name) !== kName) throw new Error("loading the saved valley did not bring the pet back");
+    await page.locator('[data-go="case"]').click();      // a load takes you home to the nest
+    await page.locator("[data-import]").click();
+    await page.fill("#import-text", "{\"nonsense\":true}");
+    await page.locator("#import-go").click();
+    await page.waitForTimeout(150);
+    if (await page.evaluate(() => Craepets.state().pet.name) !== kName) throw new Error("a bad file replaced the valley");
+    await page.locator(".sheet .close").click();
+    await page.locator("[data-reset]").click();
+    await page.waitForSelector("#reset-input");
+    await page.fill("#reset-input", "wrong name");
+    await page.locator("#reset-go").click();
+    await page.waitForTimeout(150);
+    if (!(await page.evaluate(() => !!Craepets.state().pet))) throw new Error("the wrong name still started over");
+    await page.fill("#reset-input", kName);
+    await page.locator("#reset-go").click();
+    await page.waitForSelector("#do-adopt");
+    if (await page.evaluate(() => !!Craepets.state().pet)) throw new Error("starting over kept the old pet");
+
     await page.evaluate(() => Object.keys(localStorage)
       .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
     return `${art.n} sprites bake; farm/well/pool pay for maths, words & world; ` +
@@ -1796,7 +1842,7 @@ const GAMES = {
       "cookie and he opens it; a Zibbit loves popcorn and the Farm; the pet wanders; a petpet is " +
       "named and follows; the bank pays 3% overnight; a random event pays; Sky Catch scores and pays; " +
       "Memory Match is solved and pays; first steps tick off; rain on the window pays at the pool; " +
-      "the map goes to the farm; Cory visits " +
+      "the map goes to the farm; help, a saved valley loads back, start-over needs the name; Cory visits " +
       "Shannon's house and takes a photo; quests, trophies, separate saves for Shannon, " +
       `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;
   },

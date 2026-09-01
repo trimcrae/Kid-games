@@ -446,9 +446,68 @@ window.CPLines = (function () {
   Object.keys(ARENA).forEach(function (k) { add("a-" + k, ARENA[k]); });
 
   /* =========================================================
+     THE PEOPLE OF THE VALLEY — what the shopkeepers say.
+     ========================================================= */
+  var NPC = {
+    farm: ["Berries are ripe! Every sum you get right, I'll pick you one.", "Mind the bees — they're friendly, mostly.",
+      "My Snorbits eat me out of carrots. Yours too?", "A full basket is worth a bonus. Don't stop at seven!"],
+    well: ["Every word you know is a coin in the bucket, young one.", "I have read every book in this valley twice. Mossy read them once.",
+      "Words are the oldest magic there is.", "Drop a word down the well and listen for the splash."],
+    pool: ["The pool knows EVERYTHING. Ask it about the sea, the stars, the sky!", "Fifteen right and I'll bubble you up a brand new colour.",
+      "Wet feet are happy feet.", "I washed up a bar of soap this morning. Somebody will want it."],
+    market: ["Fresh stock every morning, dear, and nobody's shelf is the same as anybody else's.", "Work out your change and I'll tip you for it.",
+      "A hat, a petpet, a bar of soap — something for everyone.", "The bank next door pays interest, you know. Three per cent!"],
+    bank: ["Money that sits in the bank makes more money. That is the whole secret.", "Three per cent a night, compounded. Ask me what compounded means.",
+      "Nothing in my vault can be spent by accident. That is the point of a vault.", "A hundred in tonight is a hundred and three tomorrow."],
+    arena: ["Right answers hit. Wrong answers get hit. Simple.", "Three in a row and you're charged. Fourth one's a critical.",
+      "The tower goes up for ever. So does The Shade's temper.", "Bring a friend. A family Craepet lands its own hits."],
+    games: ["Quick fingers AND a quick mind — that's my games room!", "Sky Catch is all about the rule. Read it first, then run.",
+      "Memory Match: every pair you keep is something you know.", "Best scores go on the wall. Beat your own!"],
+    quests: ["Three quests a day, same three for the whole family. Race them.", "The wheel is eight slices, all the same size. One in eight, every time.",
+      "Your gift grows every day you come back. Don't break the streak!", "Random events? Oh, they happen on the paths. Keep walking."]
+  };
+  Object.keys(NPC).forEach(function (k) { NPC[k].forEach(function (line, i) { add("npc-" + k + "-" + i, line); }); });
+
+  /* The rules of the games room, so the littlest players can HEAR what to
+     catch. These must match the strings in catch.js and match.js exactly
+     — the play-test checks that they do. */
+  var GAME_RULES = [
+    "Catch the ⭐ stars!", "Catch the 🍓 strawberries!", "Catch the letter A!", "Catch the 🔴 red ones!",
+    "Catch the numbers, not the letters!", "Catch the EVEN numbers!", "Catch the ODD numbers!", "Catch numbers BIGGER than 10!",
+    "Catch the multiples of 5!", "Catch the multiples of 2!", "Catch the VOWELS!", "Catch the multiples of 3!",
+    "Catch the multiples of 4!", "Catch the PRIME numbers!", "Catch the SQUARE numbers!", "Catch numbers whose digits add up to 9!",
+    "Catch the multiples of 7!", "Catch the multiples of 8!", "Catch numbers whose digits add up to 10!", "Catch numbers that divide by 6!",
+    "Find the two that are the same!", "Match each animal to the sound it makes!", "Match each colour to something that colour!",
+    "Match each sum to its answer!", "Match each times table to its answer!", "Match each animal to its baby!",
+    "Match each word to one that means the SAME!", "Match each word to its OPPOSITE!", "Match each fraction to its percentage!",
+    "Match each country to its capital!", "Match each word to its meaning!", "Match each square root to its answer!",
+    "Match each product to its answer!"
+  ];
+  GAME_RULES.forEach(function (r, i) { add("rule-" + i, r); });
+
+  /* What the pet says about the day itself. */
+  var CHATTER = [
+    "Yawn… is it bedtime soon?", "Look at all the stars!", "Good morning! Is it breakfast?", "The sky's gone all orange!",
+    "Listen to the rain!", "Splish splash!", "SNOW! Can we go out in it?", "Whoosh! Hold my hat!", "A rainbow! Did you see it?",
+    "What a sunny day!"
+  ];
+  CHATTER.forEach(function (c, i) { add("chat-" + i, c); });
+  var GAME_TALK = { "g-catch-go": "Ready? Catch!", "g-catch-over": "Time's up! Let's see how you did.", "g-match-found": "That's a pair!",
+    "g-match-done": "You found them all!", "g-new-best": "A new best score!" };
+  Object.keys(GAME_TALK).forEach(function (k) { add(k, GAME_TALK[k]); });
+
+  /* =========================================================
      LOOK-UPS the game uses at play time.
      ========================================================= */
   function has(tok) { return Object.prototype.hasOwnProperty.call(T, tok); }
+  /* Every line, findable by its exact text — so a rule or a shopkeeper's
+     line written once here can be spoken from its recording. */
+  var BY_TEXT = {};
+  Object.keys(T).forEach(function (k) { if (BY_TEXT[T[k]] === undefined) BY_TEXT[T[k]] = k; });
+  function spoken(text) {
+    var s = String(text == null ? "" : text);
+    return Object.prototype.hasOwnProperty.call(BY_TEXT, s) ? BY_TEXT[s] : s;
+  }
   /* The token for a single answer: a number, a word from the lists, or
      nothing (the narrator then reads the plain text instead). */
   function tokenFor(text) {
@@ -469,7 +528,8 @@ window.CPLines = (function () {
     ABC: ABC, SOUNDS: SOUNDS, TINY_WORDS: TINY_WORDS, RHYMES: RHYMES,
     PAINTS: PAINTS, SHAPES: SHAPES, ANIMAL_SOUNDS: ANIMAL_SOUNDS, BABIES: BABIES,
     SETS: SETS, SEQS: SEQS, PRAISE: PRAISE, MOODS: MOODS, FACTS: FACTS, ARENA: ARENA,
-    slug: slug, has: has, tokenFor: tokenFor, textOf: textOf,
+    NPC: NPC, GAME_RULES: GAME_RULES, CHATTER: CHATTER,
+    slug: slug, has: has, tokenFor: tokenFor, textOf: textOf, spoken: spoken,
     count: function () { return Object.keys(T).length; }
   };
 })();

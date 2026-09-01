@@ -242,8 +242,17 @@
     .need small { font-size: 0.62rem; color: #7d7699; }
     .need span { margin-top: 0.2rem; height: 7px; }
 
-    /* --- where to go --- */
-    .nav { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; margin-bottom: 0.65rem; }
+    /* --- where to go: two labelled rows, the valley and your own things --- */
+    .nav { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.65rem; }
+    .navrow { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; align-items: center; }
+    .navlabel {
+      font-size: 0.62rem; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; color: #9d97b5;
+      width: 100%; text-align: center; line-height: 1; margin-top: 0.15rem;
+    }
+    .helprow { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.4rem 0; border-bottom: 2px dashed #efeaff; font-size: 0.9rem; line-height: 1.4; }
+    .helprow:last-of-type { border-bottom: none; }
+    .helprow .em { font-size: 1.4rem; line-height: 1.2; flex: 0 0 auto; }
+    .helprow b { color: var(--purple); }
     .nav button {
       font-family: var(--font); font-weight: bold; font-size: 0.88rem;
       border: 3px solid #dfd6ff; background: #fff; color: var(--ink);

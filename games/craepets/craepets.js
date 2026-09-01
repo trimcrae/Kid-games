@@ -108,6 +108,8 @@
     } catch (e) {}
   }
   function speak(text) { narrate([text]); }
+  /* A line's recording if the script has one, else the line itself. */
+  function spoken(text) { return (L && L.spoken) ? L.spoken(text) : text; }
   /* A random word of praise, recorded. */
   function praiseToken() {
     return L ? "p-" + Math.floor(Math.random() * L.PRAISE.length) : "Yes!";
@@ -1749,6 +1751,7 @@
       '<span class="coins" id="coin-count">🪙 ' + S.coins + "</span>" +
       '<span class="petname">' + esc(S.pet.name) + " " + moodFace() + "</span>" +
       voiceBtn +
+      '<button class="mini" data-help="1" aria-label="How to play" title="How to play">❓</button>' +
       '<span class="lvl" aria-label="Level ' + lv + '">Lv ' + lv + "</span>" +
       '<span class="xp" role="img" aria-label="' + xpInLevel() + ' of 50 experience to the next level" title="' +
         xpInLevel() + '/50 to the next level"><i style="width:' + (xpInLevel() / 50 * 100) + '%"></i></span>' +
@@ -1785,7 +1788,9 @@
     // Anything bought or found and not yet used — so a purchase is visibly
     // waiting for you instead of quietly disappearing into the bag.
     var fresh = Object.keys(S.bagNew || {}).filter(function (id) { return S.bag[id] > 0; }).length;
-    return '<nav class="nav" id="nav" aria-label="Where to go">' + NAV.map(function (n) {
+    // Two rows: the places in the valley, and the things that are yours.
+    var PLACES_ROW = ["map", "farm", "well", "pool", "games", "market", "stall", "arena", "quests"];
+    var btn = function (n) {
       var dot = "";
       if (n[0] === "quests" && ready) dot = '<span class="dot">' + ready + "</span>";
       if (n[0] === "nest" && due) dot = '<span class="dot review" title="' + due + ' to review">🔁</span>';
@@ -1800,7 +1805,13 @@
       }
       return '<button data-go="' + n[0] + '"' + (view === n[0] ? ' class="on" aria-current="page"' : "") + ">" +
              n[1] + " " + n[2] + dot + "</button>";
-    }).join("") + "</nav>";
+    };
+    var places = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) !== -1; }).map(btn).join("");
+    var mine = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) === -1; }).map(btn).join("");
+    return '<nav class="nav" id="nav" aria-label="Where to go">' +
+      '<div class="navrow"><span class="navlabel" aria-hidden="true">Valley</span>' + places + "</div>" +
+      '<div class="navrow"><span class="navlabel" aria-hidden="true">Mine</span>' + mine + "</div>" +
+    "</nav>";
   }
 
   function panelHtml() {
@@ -1881,7 +1892,7 @@
               first: -1, lock: false, flips: 0, found: 0 };
     hush();
     render();
-    narrate([d.rule]);
+    narrate([spoken(d.rule)]);
     sfx("pop");
   }
   function flipCard(i) {
@@ -1901,7 +1912,8 @@
       match.found++;
       [ai, i].forEach(function (k) { var e = document.querySelector('[data-mc="' + k + '"]'); if (e) { e.classList.add("done"); e.disabled = true; } });
       sfx(match.found >= 3 ? "streak" : "good", match.found);
-      if (match.found >= match.pairs.length) { match.lock = true; setTimeout(endMatch, 500); }
+      if (match.found >= match.pairs.length) { match.lock = true; narrate(["g-match-done"]); setTimeout(endMatch, 500); }
+      else if (match.found === 1) narrate(["g-match-found"]);
     } else {
       match.lock = true;
       sfx("nope");
@@ -2014,7 +2026,7 @@
       onEnd: endCatch
     });
     sfx("pop");
-    narrate([CPCatch.state().rule.text]);
+    narrate([spoken(CPCatch.state().rule.text), "g-catch-go"]);
   }
   function stopCatch() {
     if (window.CPCatch) CPCatch.stop();
@@ -2050,6 +2062,7 @@
       '<p class="teach"><b>' + esc(res.rule.text) + "</b> " + esc(res.rule.why) + "</p>" +
       '<p style="margin:0.8rem 0 0"><button class="act" data-catchplay="1" style="--ac:#38b6ff;width:100%"><span class="em">🔁</span>Play again</button></p>'));
     sfx(res.score >= 6 ? "win" : "good");
+    narrate(newBest && res.score > 0 ? ["g-catch-over", "g-new-best"] : ["g-catch-over"]);
     if (res.score >= 6) { try { window.Confetti && Confetti.burst({ count: 60 }); } catch (e) {} }
   }
 
@@ -2196,18 +2209,21 @@
       "Three quests a day, same three for the whole family. Race them.", "The wheel is eight slices, all the same size. One in eight, every time.",
       "Your gift grows every day you come back. Don't break the streak!", "Random events? Oh, they happen on the paths. Keep walking." ] }
   };
-  function npcLine(npc) {
-    var n = ((S.today.correct || 0) + (S.today.buy || 0) + D.dayNumber()) % npc.lines.length;
-    return npc.lines[n];
+  /* The lines live in lines.js (so they are recorded); these are the
+     fallback if the script is missing. */
+  function npcLine(id, npc) {
+    var lines = (L && L.NPC && L.NPC[id]) || npc.lines;
+    var n = ((S.today.correct || 0) + (S.today.buy || 0) + D.dayNumber()) % lines.length;
+    return lines[n];
   }
   function npcHtml(id) {
     var npc = NPCS[id];
     if (!npc) return "";
-    var line = npcLine(npc);
+    var line = npcLine(id, npc);
     return '<div class="npc"><img alt="" src="' + P.chip(npc.species, npc.colour, 48) + '">' +
       '<div class="npcsay"><b>' + esc(npc.name) + '</b> <small>· a ' + esc(P.colour(npc.colour).name) + " " + esc(P.species(npc.species).name) + "</small>" +
       '<i>“' + esc(line) + '”</i></div>' +
-      '<button class="mini" data-say-text="' + esc(npc.name + " says: " + line) + '" aria-label="Hear ' + esc(npc.name) + '">🔊</button></div>';
+      '<button class="mini" data-say-text="' + esc(line) + '" aria-label="Hear ' + esc(npc.name) + '">🔊</button></div>';
   }
 
   /* =========================================================
@@ -2805,7 +2821,11 @@
       if (wx.id === "sunny") extra.push("What a sunny day!");
       if (S.pet.petpet) extra.push(S.pet.petpet.name + " is my best friend.", "Come on, " + S.pet.petpet.name + "!");
       if (S.dayStreak >= 3) extra.push("You came back again! " + S.dayStreak + " days!");
-      if (extra.length) return { text: extra[Math.floor(Math.random() * extra.length)], tok: null };
+      if (extra.length) {
+        var line = extra[Math.floor(Math.random() * extra.length)];
+        var tk = spoken(line);
+        return { text: line, tok: tk === line ? null : tk };
+      }
     }
     return { text: D.MOODS[m][i], tok: "m-" + m + "-" + i };
   }
@@ -5061,7 +5081,98 @@
         "from your bag. It waits in their post until they next play. Sent so far: <b>" +
         (st.gifts || 0) + "</b>, received: <b>" + (st.received || 0) + "</b>.</p>" +
       '<div class="family">' + fam + "</div></div>" +
-    levelPickerHtml();
+    levelPickerHtml() + backupHtml();
+  }
+
+  /* =========================================================
+     HELP — the whole valley on one sheet.
+     ========================================================= */
+  function helpSheet() {
+    var rows = [
+      ["🪙", "Coins", "Every coin is earned by learning: sums at the 🍓 Farm, words at the 📖 Well, the wide world at the 🌈 Pool, any of them in the ⚔️ Arena. Five right in a row turns the heat up: harder questions, more coins."],
+      ["🏡", "Your Craepet", "Feed, play, wash, rest and read at the Nest. Dress it up, grant its wishes, read its diary. It has favourite foods and a favourite place — the card says which."],
+      ["🏠", "Your house", "Furniture from the 🏪 Market goes out in your house and really works: cosier, sleepier, cleaner, cleverer. Buy new homes, walls, floors and views."],
+      ["🏪", "Shopping", "The Market changes every morning and everybody's is different. Put your own things on your 🏬 Stall and the family buys them at your price. The 🏦 Bank pays 3% a night."],
+      ["🎮", "Games", "Sky Catch: run under the sky and catch only what the rule says. Memory Match: pairs are a sum and its answer, an animal and its baby, a word and its opposite."],
+      ["⚔️", "The Arena", "Right answers hit, wrong ones get hit. Three in a row charges a critical. The 🗼 Shadow Tower goes up for ever, with The Shade on every seventh floor."],
+      ["👨‍👩‍👧‍👦", "Family", "Everyone on this device has their own valley. 🏡 Visit their houses from the map or the 🏆 Case, 🎁 post them presents, bring their Craepet to the tower as an ally."],
+      ["📜", "Every day", "Three quests, a free spin of the wheel, a gift that grows with your streak, fresh weather, and random events on the paths between places."],
+      ["⚙️", "Levels", "Tiny (nothing to get wrong) → Little → Middle → Big Kid → Grown-up. Change it at the bottom of the Nest. 🔊 in the coin bar reads everything aloud."]
+    ];
+    return sheet("❓ How the valley works",
+      rows.map(function (r) {
+        return '<div class="helprow"><span class="em" aria-hidden="true">' + r[0] + "</span><div><b>" + esc(r[1]) + "</b><br>" + r[2] + "</div></div>";
+      }).join("") +
+      '<p class="sub" style="margin-top:0.6rem">On a keyboard: <b>1</b>–<b>4</b> pick an answer, <b>Enter</b> moves on, <b>Escape</b> closes a sheet, arrows move in Sky Catch.</p>');
+  }
+
+  /* =========================================================
+     BACKUP — your valley as a file, so it can move between
+     devices; a way to load one; and a way to start again.
+     ========================================================= */
+  function backupHtml() {
+    var p = D.profile(who);
+    var json = JSON.stringify(S);
+    var href = "data:application/json;charset=utf-8," + encodeURIComponent(json);
+    var file = "craepets-" + p.id + "-" + new Date().toISOString().slice(0, 10) + ".json";
+    return '<div class="panel"><h2>📦 Backup &amp; move</h2>' +
+      '<p class="sub">Your valley lives on <b>this device</b>. Save it as a file to keep it safe or move it to another phone or laptop, ' +
+      "then load the file there. About " + Math.round(json.length / 1024) + " KB.</p>" +
+      '<div class="acts">' +
+        '<a class="act" download="' + esc(file) + '" href="' + href + '" style="--ac:var(--green);text-decoration:none;display:flex;align-items:center;justify-content:center;flex-direction:column"><span class="em">💾</span>Save my valley</a>' +
+        '<button class="act" data-import="1" style="--ac:var(--purple)"><span class="em">📂</span>Load a valley</button>' +
+        '<button class="act" data-reset="1" style="--ac:#8b83a8"><span class="em">🥚</span>Start over</button>' +
+      "</div></div>";
+  }
+  function importSheet() {
+    return sheet("📂 Load a valley",
+      '<p class="sub">Pick a file you saved before, or paste what is inside it. It replaces <b>' + esc(D.profile(who).name) +
+      "'s</b> valley on this device — save this one first if you want to keep it.</p>" +
+      '<p><input type="file" id="import-file" accept=".json,application/json" aria-label="Choose a saved valley file"></p>' +
+      '<p><textarea id="import-text" rows="4" placeholder="…or paste the file\'s contents here" aria-label="Pasted valley" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:0.8rem;border:3px solid #ddd4ff;border-radius:12px;padding:0.5rem"></textarea></p>' +
+      '<p style="margin:0.6rem 0 0"><button class="act" id="import-go" style="--ac:var(--purple);width:100%"><span class="em">📂</span>Load it</button></p>');
+  }
+  function importValley(text) {
+    var s = null;
+    try { s = JSON.parse(text); } catch (e) { s = null; }
+    if (!s || typeof s !== "object" || s.v !== 1 || !s.pet || typeof s.pet !== "object" || !s.pet.name) {
+      toast("That is not a Craepets valley file.");
+      return;
+    }
+    try { localStorage.setItem(slot(who), JSON.stringify(s)); } catch (e) { toast("Could not save it here."); return; }
+    S = load(who);
+    sess = null; battle = null; visit = null; stopCatch(); stopMatch();
+    view = "nest";
+    closeSheet();
+    passTime();
+    render();
+    diary("📦", "We arrived here from another device! Everything came with us.");
+    save();
+    toast("📦 Welcome back, " + S.pet.name + "!");
+    sfx("win");
+    try { window.Confetti && Confetti.burst({ count: 80 }); } catch (e) {}
+  }
+  function resetSheet() {
+    return sheet("🥚 Start over?",
+      '<p class="sub">This puts <b>' + esc(D.profile(who).name) + "'s</b> whole valley back to the beginning — " + esc(S.pet.name) +
+      ", the coins, the house, the trophies, everything. It cannot be undone (save a backup first if you might want it back).</p>" +
+      '<p class="sub">To be sure, type ' + esc(S.pet.name) + "'s name:</p>" +
+      '<div class="name-row"><input id="reset-input" maxlength="14" aria-label="Type your Craepet\'s name to confirm" autocomplete="off"></div>' +
+      '<p style="margin:0.8rem 0 0"><button class="act" id="reset-go" style="--ac:var(--pink);width:100%"><span class="em">🥚</span>Yes, start over</button></p>');
+  }
+  function resetValley() {
+    var f = $("#reset-input");
+    var typed = ((f ? f.value : "") || "").trim().toLowerCase();
+    if (typed !== String(S.pet.name).trim().toLowerCase()) { toast("Type " + S.pet.name + "'s name exactly to start over."); return; }
+    try { localStorage.removeItem(slot(who)); } catch (e) {}
+    S = load(who);
+    sess = null; battle = null; visit = null; stopCatch(); stopMatch();
+    pickName = "";
+    view = "nest";
+    closeSheet();
+    render();
+    toast("🥚 A fresh valley. Pick a new Craepet!");
+    sfx("pop");
   }
 
   /* =========================================================
@@ -5216,6 +5327,18 @@
       if (voiceOn) narrate(["p-read-aloud-on"], { force: true });
       return;
     }
+
+    // help, and the backup tools
+    if (t.closest("[data-help]")) { sfx("pop"); return openSheet(helpSheet()); }
+    if (t.closest("[data-import]")) { sfx("pop"); return openSheet(importSheet()); }
+    if (t.closest("#import-go")) {
+      var ta = $("#import-text");
+      if (ta && ta.value.trim()) return importValley(ta.value);
+      toast("Choose a file or paste one first.");
+      return;
+    }
+    if (t.closest("[data-reset]")) { sfx("pop"); return openSheet(resetSheet()); }
+    if (t.closest("#reset-go")) return resetValley();
 
     // who's playing
     if (t.closest("[data-swap]")) { sfx("pop"); return openSheet(whoSheet()); }
@@ -5435,7 +5558,7 @@
     var mc = t.closest("[data-mc]");
     if (mc) return flipCard(Number(mc.dataset.mc));
     var sayText = t.closest("[data-say-text]");
-    if (sayText) { narrate([sayText.dataset.sayText], { force: true }); return; }
+    if (sayText) { narrate([spoken(sayText.dataset.sayText)], { force: true }); return; }
 
     // --- the bank ---
     var bankBtn = t.closest("[data-bank]");
@@ -5504,6 +5627,7 @@
     if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
     var el = document.activeElement;
     var typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
+    if (typing && el.tagName === "TEXTAREA") return;       // Enter is a new line there
 
     if (ev.key === "Escape") {
       hush();
@@ -5515,7 +5639,7 @@
       if (ev.key === "Enter") {
         ev.preventDefault();
         var go = $("#rename-go") || $("#home-go") || $("#shop-go") || $("[data-postsend]") ||
-                 $("#pp-go") || $("#diary-go") || $("#do-adopt");
+                 $("#pp-go") || $("#diary-go") || $("#reset-go") || $("#do-adopt");
         if (go) go.click();
       }
       return;
@@ -5594,6 +5718,14 @@
 
     document.addEventListener("click", onClick, false);
     document.addEventListener("keydown", onKey, false);
+    // a saved valley chosen as a file
+    document.addEventListener("change", function (ev) {
+      var f = ev.target;
+      if (!f || f.id !== "import-file" || !f.files || !f.files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function () { importValley(String(reader.result || "")); };
+      reader.readAsText(f.files[0]);
+    }, false);
     window.addEventListener("resize", function () { anim.measure = true; });
     window.addEventListener("beforeunload", save);
     document.addEventListener("visibilitychange", function () {
@@ -5665,6 +5797,8 @@
     match: function () { return match; },
     weather: weatherToday,
     _setWeather: function (id) { weatherOverride = id || null; render(); },
+    exportJson: function () { return JSON.stringify(S); },
+    importJson: importValley,
     steps: function () { return S.steps; },
     _anim: function () { return anim; },
     _setHour: function (h) { hourOverride = (h === null || h === undefined) ? null : h; render(); }
