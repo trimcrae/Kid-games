@@ -679,6 +679,52 @@
     .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 0.8rem; }
     @media (prefers-reduced-motion: reduce) { .scene .wx-rainy, .scene .wx-snowy, .scene .wx-windy::after, .scene .wx-windy::before { animation: none; } }
 
+    /* --- the calendar: a garland for a holiday, the season in the air --- */
+    .scene .garland {
+      position: absolute; left: 0; right: 0; top: 0; z-index: 4; pointer-events: none;
+      display: flex; justify-content: space-around; padding: 4px 8px 0;
+      font-size: clamp(1rem, 4vw, 1.5rem); line-height: 1;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+    }
+    .scene .garland::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 0;
+      border-top: 2px dashed rgba(255,255,255,0.7); z-index: -1;
+    }
+    .scene .garland span { animation: sway 3s ease-in-out infinite; transform-origin: 50% -10px; }
+    .scene .garland span:nth-child(2n) { animation-delay: -1.5s; }
+    @keyframes sway { 50% { transform: rotate(6deg); } }
+    /* compact scenes still get the garland, a size smaller */
+    .scene.compact .garland { font-size: clamp(0.85rem, 3vw, 1.2rem); }
+    /* the place tag sits above the garland, so nudge the garland right of it */
+    .scene .garland { padding-left: 40%; }
+    .scene .sea { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+    .scene .sea-spring::after, .scene .sea-spring::before {
+      content: "🌸"; position: absolute; top: -10%; left: 20%; font-size: 0.9rem; opacity: 0.85;
+      animation: petal 7s linear infinite;
+    }
+    .scene .sea-spring::before { left: 62%; font-size: 0.7rem; animation-duration: 9s; animation-delay: -4s; }
+    @keyframes petal { to { transform: translate(-30px, 120%) rotate(300deg); } }
+    .scene .sea-autumn::after, .scene .sea-autumn::before {
+      content: "🍂"; position: absolute; top: -10%; left: 30%; font-size: 0.95rem; opacity: 0.9;
+      animation: petal 6s linear infinite;
+    }
+    .scene .sea-autumn::before { content: "🍁"; left: 72%; font-size: 0.75rem; animation-duration: 8s; animation-delay: -3s; }
+    /* winter: frost creeping in from the corners of the window, snow lying on the ground outdoors */
+    .scene .win .sea-winter {
+      background:
+        radial-gradient(circle at 0 0, rgba(255,255,255,0.75), rgba(255,255,255,0) 40%),
+        radial-gradient(circle at 100% 100%, rgba(255,255,255,0.6), rgba(255,255,255,0) 38%),
+        radial-gradient(circle at 100% 0, rgba(255,255,255,0.45), rgba(255,255,255,0) 30%);
+    }
+    .scene .pano .sea-winter { background: linear-gradient(180deg, rgba(255,255,255,0) 70%, rgba(255,255,255,0.55) 88%, rgba(255,255,255,0.7) 100%); }
+    .scene .sea-summer { background: linear-gradient(180deg, rgba(255,230,150,0.16), rgba(255,255,255,0) 50%); }
+    @media (prefers-reduced-motion: reduce) { .scene .garland span, .scene .sea-spring::after, .scene .sea-spring::before, .scene .sea-autumn::after, .scene .sea-autumn::before { animation: none; } }
+    /* --- celebrations --- */
+    .panel.party { background: linear-gradient(135deg, #fff0f6, #fff8e6); border: 3px solid #ffd166; }
+    .panel.party h2 { font-size: 1.3rem; }
+    .party .sleeps { font-size: 1.05rem; text-align: center; margin: 0.4rem 0 0; }
+    .party .sleeps b { font-size: 1.6rem; color: var(--purple); }
+
     /* --- Memory Match --- */
     .mgrid { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 0.5rem; perspective: 800px; }
     .mcard {
@@ -906,6 +952,7 @@
   <script src="trivia.js"></script>
   <script src="lines.js"></script>
   <script src="scenery.js"></script>
+  <script src="calendar.js"></script>
   <script src="map.js"></script>
   <script src="catch.js"></script>
   <script src="match.js"></script>

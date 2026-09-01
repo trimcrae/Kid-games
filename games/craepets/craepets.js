@@ -205,7 +205,7 @@
                newq: 0, repeatq: 0, heat: 0, stepup: 0, crit: 0, quick: 0, tower: 0,
                shadeWin: 0, allyHits: 0, allyWins: 0, bestFloor: 0,
                wishes: 0, dressed: 0, gifts: 0, received: 0, diary: 0,
-               banked: 0, events: 0, catchGames: 0, matchGames: 0, visits: 0 },
+               banked: 0, events: 0, catchGames: 0, matchGames: 0, visits: 0, parties: 0 },
       trophies: []
     };
   }
@@ -827,7 +827,9 @@
       skycatch: ((S.catch && S.catch.best) || 0) >= 15,
       neighbour: Object.keys(S.visited || {}).length >= 3,
       sharp: ((S.match && S.match.best) || 0) >= 100,
-      settled: !!(S.steps && STEPS.every(function (s) { return S.steps[s.id]; }))
+      settled: !!(S.steps && STEPS.every(function (s) { return S.steps[s.id]; })),
+      festive: (st.parties || 0) >= 3,
+      hatchday: !!S.everHatchday
     };
     checkSteps();
     Object.keys(tests).forEach(function (id) {
@@ -1477,7 +1479,7 @@
     }
     var frame = ART.frame(houseInfo());
     return '<div class="win win-' + frame + '" aria-hidden="true">' +
-      ART.view(v.id) + weatherHtml() + todHtml() +
+      ART.view(v.id) + weatherHtml() + seasonHtml("win") + todHtml() +
       '<span class="win-glass"></span><span class="win-bars"></span>' +
       "</div>";
   }
@@ -1645,7 +1647,7 @@
     } else if (ART && ART.hasPano(skin)) {
       // Everywhere else gets a painted panorama instead of the old
       // scatter of emoji — same idea, an actual picture of the place.
-      body = '<span class="pano" aria-hidden="true">' + ART.pano(skin) + (inTower ? "" : weatherHtml() + todHtml()) + "</span>";
+      body = '<span class="pano" aria-hidden="true">' + ART.pano(skin) + (inTower ? "" : weatherHtml() + seasonHtml("pano") + todHtml()) + "</span>";
     } else {
       body = (pl.deco || []).map(function (d) {
         return decoSpan(d[0], d[1], d[2], 1, "");
@@ -1663,7 +1665,7 @@
     var todMark = ({ night: " 🌙", dusk: " 🌇", dawn: " 🌅" }[tod] || "") + " " + weatherToday().emoji;
     return '<div class="scene ' + skin + (place === "nest" ? "" : " compact") + " tod-" + tod + '" id="scene"' + paint + " " +
       'role="button" tabindex="0" aria-label="' + esc(label) + '. Tap to say hello.">' +
-      body + roomTint +
+      body + roomTint + (inTower ? "" : garlandHtml()) +
       '<span class="place-tag" aria-hidden="true">' + esc(tag) + (inTower ? "" : todMark) + "</span>" +
       '<canvas id="pet-canvas" aria-hidden="true"></canvas>' +
       '<div id="bubble-slot" role="status" aria-live="polite"></div>' +
@@ -2342,14 +2344,130 @@
   var weatherOverride = null;     // the play-test robot picks the weather
   function weatherToday() {
     if (weatherOverride) for (var k = 0; k < WEATHERS.length; k++) if (WEATHERS[k].id === weatherOverride) return WEATHERS[k];
+    // Christmas is white, whatever the dice say
+    if (CAL && CAL.holidays().some(function (h) { return h.id === "xmas"; })) return WEATHERS[4];
     var seed = D.dayNumber() * 7919 + 3;
     var s = seed % 2147483647; if (s <= 0) s += 2147483646;
     s = (s * 16807) % 2147483647;
     var r = (s - 1) / 2147483646;
-    var total = 0; WEATHERS.forEach(function (w) { total += w.w; });
+    // the season decides the odds: snow in winter, sun in summer, wind in autumn
+    var sw = (CAL && CAL.season().weather) || null;
+    var weight = function (w) { return sw && sw[w.id] !== undefined ? sw[w.id] : w.w; };
+    var total = 0; WEATHERS.forEach(function (w) { total += weight(w); });
     var x = r * total;
-    for (var i = 0; i < WEATHERS.length; i++) { x -= WEATHERS[i].w; if (x <= 0) return WEATHERS[i]; }
+    for (var i = 0; i < WEATHERS.length; i++) { x -= weight(WEATHERS[i]); if (x <= 0 && weight(WEATHERS[i]) > 0) return WEATHERS[i]; }
     return WEATHERS[0];
+  }
+
+  /* =========================================================
+     THE CALENDAR — seasons, holidays and hatch-days (calendar.js).
+     The season changes what grows and what the weather does;
+     a holiday hangs a garland over the scene, pays a bonus on
+     every right answer and leaves a present to open; and every
+     Craepet gets a party on its hatch-day.
+     ========================================================= */
+  var CAL = window.CPCal || null;
+  var HOLIDAY_BONUS = 2;
+  function seasonNow() { return CAL ? CAL.season() : null; }
+  function holidayNow() { return CAL ? CAL.holidayToday() : null; }
+  function cropsNow() {
+    var s = seasonNow();
+    return (s && s.crops) || PLACE_INFO.farm.crops;
+  }
+  function seasonHtml(where) {
+    var s = seasonNow();
+    if (!s || s.id === "summer" && where === "win") return "";
+    return '<span class="sea sea-' + s.id + '" aria-hidden="true"></span>';
+  }
+  function garlandHtml() {
+    if (!CAL) return "";
+    var hs = CAL.holidays();
+    if (!hs.length) return "";
+    var g = hs[0].garland || [];
+    var reps = [];
+    for (var i = 0; i < 8; i++) reps.push(g[i % g.length]);
+    return '<span class="garland" aria-hidden="true">' + reps.map(function (e) { return "<span>" + e + "</span>"; }).join("") + "</span>";
+  }
+  /* Everything there is to celebrate today, each with a present to
+     claim once: the holiday, this Craepet's hatch-day or month-day, a
+     family birthday. `key` is what the save remembers. */
+  function celebrations() {
+    if (!CAL || !S.pet) return [];
+    var d = CAL.today(), y = d.getFullYear(), out = [];
+    var h = holidayNow();
+    if (h && h.gift) {
+      out.push({ key: "hol:" + h.id + ":" + y, kind: "holiday", id: h.id, emoji: h.emoji, name: h.name, line: h.line,
+                 tok: "hol-" + h.id, gift: h.gift });
+    }
+    var years = CAL.hatchdayYears(S.pet.born, d);
+    if (years) {
+      out.push({ key: "hatch:" + years, kind: "hatchday", emoji: "🎂", name: S.pet.name + "'s hatch-day", tok: "hol-hatchday",
+                 line: S.pet.name + " is " + years + (years === 1 ? " year" : " years") + " old today!",
+                 gift: { coins: 50 + years * 10, item: "cake", wear: "partyhat" } });
+    }
+    var months = CAL.monthsOld(S.pet.born, d);
+    if (months) {
+      out.push({ key: "months:" + months, kind: "months", emoji: "🧁", name: months + (months === 1 ? " month" : " months") + " old", tok: "hol-months",
+                 line: S.pet.name + " is " + months + (months === 1 ? " month" : " months") + " old today. Look how big!",
+                 gift: { coins: 15 + months * 2, item: "birthdaypie" } });
+    }
+    CAL.birthdayToday(d).forEach(function (pid) {
+      var p = D.profile(pid);
+      out.push({ key: "bday:" + pid + ":" + y, kind: "birthday", emoji: "🎂", name: p.name + "'s birthday", tok: "hol-birthday",
+                 line: "Happy birthday, " + p.name + "! " + (pid === who ? "It's YOUR day." : "Post them a present!"),
+                 gift: { coins: pid === who ? 80 : 30, item: "cake", wear: pid === who ? "partyhat" : null } });
+    });
+    return out;
+  }
+  function claimed(key) { return !!(S.parties && S.parties[key]); }
+  function claimParty(key) {
+    var c = null;
+    celebrations().forEach(function (x) { if (x.key === key) c = x; });
+    if (!c || claimed(key)) return;
+    if (!S.parties) S.parties = {};
+    S.parties[key] = true;
+    var g = c.gift, got = [];
+    if (g.coins) { earn(g.coins); got.push("🪙 " + g.coins); }
+    if (g.item && D.itemById(g.item)) { addItem(g.item); got.push(D.itemById(g.item).emoji + " " + D.itemById(g.item).name); }
+    if (g.wear && P.wearById(g.wear)) {
+      if (S.wardrobe.indexOf(g.wear) === -1) { S.wardrobe.push(g.wear); got.push(P.wearById(g.wear).emoji + " " + P.wearById(g.wear).name + " (to wear!)"); }
+      if (!S.pet.egg) { S.pet.wear = S.pet.wear || {}; S.pet.wear.head = g.wear; S.everDressed = true; }
+    }
+    if (c.kind === "holiday") bump("parties");
+    if (c.kind === "hatchday") S.everHatchday = true;
+    diary(c.emoji, c.name.charAt(0).toUpperCase() + c.name.slice(1) + "! " + c.line + " We got " + got.join(", ") + ".");
+    checkTrophies();
+    save();
+    render();
+    hop();
+    hearts();
+    sfx("win");
+    try { window.Confetti && Confetti.burst({ count: 140 }); } catch (e) {}
+    openSheet(sheet(c.emoji + " " + esc(c.name.charAt(0).toUpperCase() + c.name.slice(1)) + "!",
+      '<p class="sub" style="text-align:center;font-size:1.05rem">' + esc(c.line) + "</p>" +
+      '<p class="teach" style="text-align:center"><b>Inside the present:</b> ' + esc(got.join(" · ")) + "</p>" +
+      (g.wear && !S.pet.egg ? '<p class="sub" style="text-align:center">' + esc(S.pet.name) + " is wearing the " + esc(P.wearById(g.wear).name) + " already.</p>" : "")));
+    narrate([c.tok, "hol-present"]);
+  }
+  function partyHtml() {
+    if (!CAL || !S.pet) return "";
+    var cs = celebrations();
+    var sleeps = CAL.sleepsTo("xmas");
+    var spooky = CAL.holidays().some(function (h) { return h.id === "spooky"; });
+    if (!cs.length && !(sleeps !== null && sleeps <= 24 && sleeps > 0) && !spooky) return "";
+    var body = cs.map(function (c) {
+      var done = claimed(c.key);
+      return '<div class="quest' + (done ? " done" : "") + '"><div class="qtx"><b>' + c.emoji + " " + esc(c.name.charAt(0).toUpperCase() + c.name.slice(1)) + "</b><br>" + esc(c.line) + "</div>" +
+        (done ? '<span class="rw">✅ opened</span>' : '<button class="act" data-claimparty="' + esc(c.key) + '" style="--ac:var(--pink);min-height:48px;padding:0.4rem 0.8rem"><span class="em">🎁</span>Open</button>') + "</div>";
+    }).join("");
+    if (sleeps !== null && sleeps <= 24 && sleeps > 0) {
+      body += '<p class="sleeps">🎄 <b>' + sleeps + "</b> sleep" + (sleeps === 1 ? "" : "s") + " until Christmas" +
+        (sleeps <= 7 ? " — nearly there!" : ".") + "</p>";
+    }
+    if (spooky) body += '<p class="sub" style="text-align:center">👻 Spooky Week: <b>' + CAL.sleepsTo("halloween") + " sleep" + (CAL.sleepsTo("halloween") === 1 ? "" : "s") + "</b> until Halloween.</p>";
+    var h = holidayNow();
+    return '<div class="panel party"><h2>🎉 ' + (h ? esc("Happy " + (h.name.indexOf("the ") === 0 ? h.name.slice(4) : h.name) + "!") : "Something to celebrate") + "</h2>" +
+      (h ? '<p class="sub">Every right answer pays <b>+' + HOLIDAY_BONUS + " 🪙</b> today, and there is a present to open.</p>" : "") + body + "</div>";
   }
   function weatherHtml() {
     var w = weatherToday();
@@ -2623,6 +2741,11 @@
       extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">' + wxNow.emoji + " <b>" + esc(wxNow.name) + " today</b> — " +
         esc(wxNow.line) + " <b>+" + WEATHER_BONUS + " 🪙</b> on every right answer here.</p>";
     }
+    var holNow = holidayNow();
+    if (holNow) {
+      extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">' + holNow.emoji + " <b>" + esc(holNow.name.charAt(0).toUpperCase() + holNow.name.slice(1)) +
+        "</b> — <b>+" + HOLIDAY_BONUS + " 🪙</b> on every right answer, everywhere, today.</p>";
+    }
     if (tier() !== "tot") {
       var a = adaptOf(info.subject), h = HEAT[a.rung - 1];
       var run = a.hist.length ? a.hist.slice(-5).filter(function (x) { return x; }).length : 0;
@@ -2834,14 +2957,17 @@
     if (fav) coins += FAV_BONUS;
     var wx = weatherToday().place === sess.place;
     if (wx) coins += WEATHER_BONUS;
+    var hol = holidayNow();
+    if (hol) coins += HOLIDAY_BONUS;
     earn(coins);
     // A book shelf, a globe and a star window really do make you learn
     // faster — and so does a hotter question.
     giveXp(Math.round((3 + D.hot(sess.q && sess.q.rung)) * (1 + studyBonus())));
-    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : "") + (fav ? " 💛" : "") + (wx ? " " + weatherToday().emoji : ""), "#ffe07a");
+    floaty("+" + coins + " 🪙" + (mult > 1 ? " ×" + mult : "") + (fav ? " 💛" : "") + (wx ? " " + weatherToday().emoji : "") + (hol ? " " + hol.emoji : ""), "#ffe07a");
 
     if (sess.plots.length < SLOTS) {
-      sess.plots.push(info.crops[Math.floor(Math.random() * info.crops.length)]);
+      var crops = sess.place === "farm" ? cropsNow() : info.crops;
+      sess.plots.push(crops[Math.floor(Math.random() * crops.length)]);
     }
     checkWish("place", sess.place);
 
@@ -2920,6 +3046,11 @@
       if (wx.id === "sunny") extra.push("What a sunny day!");
       if (S.pet.petpet) extra.push(S.pet.petpet.name + " is my best friend.", "Come on, " + S.pet.petpet.name + "!");
       if (S.dayStreak >= 3) extra.push("You came back again! " + S.dayStreak + " days!");
+      var hol = holidayNow(), sea = seasonNow();
+      if (hol) extra.push(hol.line, hol.line);
+      if (hol && hol.id === "aprilfool") extra.push("I'm a Snorbit now. No, really.", "The Farm pays in jelly today. Honest.");
+      if (sea) extra.push("It's " + sea.name.toLowerCase() + "! " + sea.line);
+      if (CAL && CAL.sleepsTo("xmas") !== null && CAL.sleepsTo("xmas") <= 24 && CAL.sleepsTo("xmas") > 0) extra.push("Only a few more sleeps until Christmas!");
       if (extra.length) {
         var line = extra[Math.floor(Math.random() * extra.length)];
         var tk = spoken(line);
@@ -2952,7 +3083,7 @@
       '<p class="sub" style="margin:0.8rem 0 0">💛 ' + personalityLine() + "</p>" +
       '<p class="sub" style="margin:0.8rem 0 0">Coins come from the Farm, the Well, the Pool and the Arena — ' +
         "every one of them pays you for learning something.</p>" + streakBit +
-    "</div>" + timesHtml() + mailHtml() + stepsHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
+    "</div>" + partyHtml() + timesHtml() + mailHtml() + stepsHtml() + wishPanel() + reviewHtml() + levelPickerHtml();
   }
 
   /* =========================================================
@@ -2963,6 +3094,15 @@
      ========================================================= */
   function timesHtml() {
     var rows = [];
+    var hol = holidayNow();
+    if (hol) rows.push([hol.emoji, "<b>" + esc(hol.name.charAt(0).toUpperCase() + hol.name.slice(1)) + "!</b> " + esc(hol.line) + " +" + HOLIDAY_BONUS + " 🪙 on every right answer today.", null]);
+    celebrations().forEach(function (c) {
+      if (c.kind !== "holiday" && !claimed(c.key)) rows.push([c.emoji, "<b>" + esc(c.name.charAt(0).toUpperCase() + c.name.slice(1)) + "!</b> There is a present to open, above.", null]);
+    });
+    var sleeps = CAL ? CAL.sleepsTo("xmas") : null;
+    if (sleeps !== null && sleeps > 0 && sleeps <= 24) rows.push(["🎄", "<b>" + sleeps + " sleep" + (sleeps === 1 ? "" : "s") + "</b> until Christmas.", null]);
+    var sea = seasonNow();
+    if (sea) rows.push([sea.emoji, "<b>" + esc(sea.name) + ".</b> " + esc(sea.line) + " The Farm is growing " + sea.crops.slice(0, 3).join(" ") + " and the Market has a seasonal shelf.", "market"]);
     var wx = weatherToday();
     var wxPlace = PLACE_INFO[wx.place] ? PLACE_INFO[wx.place].title : "🎮 Games Room";
     rows.push([wx.emoji, "<b>" + esc(wx.name) + " today.</b> " + esc(wx.line) + " +" + WEATHER_BONUS + " 🪙 a question at the " + esc(wxPlace) + ".", wx.place]);
@@ -4186,6 +4326,8 @@
       ? '<img alt="" class="ppchip" src="' + P.petpetChip(it.id, 40) + '">'
       : '<span class="pic">' + it.emoji + "</span>";
     var have = !owned && S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "";
+    if (it.seasonal && CAL) have += '<span class="own">' + CAL.SEASONS[it.seasonal].emoji + " in season · a fifth off</span>";
+    if (it.season && CAL) have += '<span class="own">' + CAL.SEASONS[it.season].emoji + " only in " + esc(CAL.SEASONS[it.season].name.toLowerCase()) + "</span>";
     if (it.kind === "food" && loves(it.id)) have += '<span class="own">💛 ' + esc(S.pet.name) + "'s favourite</span>";
     return '<button class="item' + (it.rare ? " rare" : "") + '" data-buy="' + esc(it.id) + '"' +
       (!afford || owned ? " disabled" : "") + ">" +
@@ -5512,6 +5654,8 @@
     }
 
     if (t.closest("[data-tapegg]") && S.pet && S.pet.egg) return tapEgg();
+    var partyBtn = t.closest("[data-claimparty]");
+    if (partyBtn) return claimParty(partyBtn.dataset.claimparty);
 
     // help, and the backup tools
     if (t.closest("[data-help]")) { sfx("pop"); return openSheet(helpSheet()); }
@@ -5985,6 +6129,8 @@
     match: function () { return match; },
     weather: weatherToday,
     _setWeather: function (id) { weatherOverride = id || null; render(); },
+    _setDate: function (s) { if (CAL) CAL._setDate(s); render(); },
+    celebrations: celebrations,
     exportJson: function () { return JSON.stringify(S); },
     importJson: importValley,
     steps: function () { return S.steps; },

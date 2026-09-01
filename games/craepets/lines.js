@@ -330,6 +330,22 @@ window.CPLines = (function () {
   add("diary-intro", "Here is what I wrote in my diary.");
   add("egg-hello", "Your egg is here! Learn something, or tap it, and it will hatch.");
   add("egg-crack", "It's cracking!");
+  /* --- the calendar: seasons, holidays and hatch-days --- */
+  var CALENDAR = {
+    "sea-spring": "It's spring! Everything is growing.", "sea-summer": "It's summer! Long days and ice cream.",
+    "sea-autumn": "It's autumn! Leaves everywhere and pumpkins on the vine.", "sea-winter": "It's winter! Cold outside, cosy in.",
+    "hol-newyear": "Happy New Year! A whole year of learning ahead.", "hol-valentine": "Happy Valentine's Day — give somebody a present!",
+    "hol-stpatrick": "Happy St Patrick's Day! Everything green pays extra.", "hol-aprilfool": "April Fools! Don't believe a word your Craepet says today.",
+    "hol-easter": "Happy Easter! Eggs everywhere — and you know all about those.", "hol-earthday": "Happy Earth Day! The Rainbow Pool knows all about the wide world.",
+    "hol-mothers": "Happy Mother's Day! Post Mum a present.", "hol-fathers": "Happy Father's Day!",
+    "hol-july4": "Happy Fourth of July! Fireworks over the valley tonight.", "hol-halloween": "Happy Halloween! The Shade is in a very good mood.",
+    "hol-spooky": "Spooky Week! Halloween is nearly here.", "hol-thanksgiving": "Happy Thanksgiving! Say thank you to somebody — post them a present.",
+    "hol-xmas": "Merry Christmas! There is a present under the tree.", "hol-nye": "Happy New Year's Eve! Stay up late (in the valley, at least).",
+    "hol-present": "There's a present for you! Open it!", "hol-hatchday": "Happy hatch-day! It's my birthday!",
+    "hol-months": "Look how big I'm getting!", "hol-birthday": "Happy birthday! Let's have cake.",
+    "hol-sleeps": "Only a few more sleeps until Christmas!"
+  };
+  Object.keys(CALENDAR).forEach(function (k) { add(k, CALENDAR[k]); });
 
   /* --- the prize wheel --- */
   ["Ten coins.", "Forty coins!", "A snack and fifteen coins!", "Twenty coins.",
