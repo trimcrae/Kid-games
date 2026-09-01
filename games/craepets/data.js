@@ -57,6 +57,13 @@ window.CPData = (function () {
     for (var i = a.length - 1; i > 0; i--) { var j = rnd(i + 1); var t = a[i]; a[i] = a[j]; a[j] = t; }
     return a;
   }
+  /* The hand-written question vault (trivia.js). Declared up here
+     because every bank below reaches for it. */
+  var VAULT = window.CPTrivia || {};
+  function vault(subject, tier) {
+    return (VAULT[subject] && VAULT[subject][tier]) || [];
+  }
+
   function nChoices(tier) { return (tier === "tot") ? 2 : (tier === "early" ? 3 : 4); }
 
   /* Build a question from an answer plus wrong answers, shuffled.
@@ -1185,6 +1192,26 @@ window.CPData = (function () {
     ["Which sea is bordered by Turkey, Ukraine and Georgia?", "The Black Sea", ["The Caspian Sea", "The Aegean Sea", "The Adriatic Sea"], "It connects to the Mediterranean through the Bosphorus."]
   ];
 
+  /* =========================================================
+     THE TRIVIA VAULT — several hundred more hand-written
+     questions live in trivia.js, so this file stays readable.
+     They are folded into the banks below exactly as if they had
+     always been here.
+     ========================================================= */
+  SCI_MID   = SCI_MID.concat(vault("wonder", "mid"));
+  SCI_BIG   = SCI_BIG.concat(vault("wonder", "big"));
+  SCI_GROWN = SCI_GROWN.concat(vault("wonder", "grown"));
+
+  /* A written question, whatever bank it came from, is always the
+     same four things: ask, answer, three wrongs, and the sentence
+     that teaches it. */
+  function written(list, subject, tier) {
+    return function () {
+      var s = pick(list);
+      return mk({ subject: subject, q: s[0], right: s[1], wrong: s[2], teach: s[3] }, tier);
+    };
+  }
+
   var WONDER = {
     tot: [
       function () {
@@ -1256,9 +1283,9 @@ window.CPData = (function () {
           teach: s[3] }, "early");
       }
     ],
-    mid: [function () { var s = pick(SCI_MID); return mk({ subject: "wonder", q: s[0], right: s[1], wrong: s[2], teach: s[3] }, "mid"); }],
-    big: [function () { var s = pick(SCI_BIG); return mk({ subject: "wonder", q: s[0], right: s[1], wrong: s[2], teach: s[3] }, "big"); }],
-    grown: [function () { var s = pick(SCI_GROWN); return mk({ subject: "wonder", q: s[0], right: s[1], wrong: s[2], teach: s[3] }, "grown"); }]
+    mid:   [written(SCI_MID,   "wonder", "mid")],
+    big:   [written(SCI_BIG,   "wonder", "big")],
+    grown: [written(SCI_GROWN, "wonder", "grown")]
   };
 
   /* =========================================================
@@ -1266,23 +1293,62 @@ window.CPData = (function () {
      A short memory of what was just asked stops the same
      question landing twice in a row, which kills the illusion.
      ========================================================= */
+  /* The vault's written questions join the rotation. They go in more
+     than once on purpose: a bank of forty hand-written questions
+     deserves a bigger share of the asking than one generator that
+     makes sums forever. */
+  [["word", WORD], ["math", MATH]].forEach(function (pair) {
+    ["mid", "big", "grown"].forEach(function (t) {
+      var list = vault(pair[0], t);
+      if (!list.length || !pair[1][t]) return;
+      var gen = written(list, pair[0], t);
+      var n = Math.max(1, Math.round(pair[1][t].length / 2));
+      for (var i = 0; i < n; i++) pair[1][t].push(gen);
+    });
+  });
+
   var BANKS = { math: MATH, word: WORD, wonder: WONDER };
   var recent = [];
 
-  function ask(subject, tier) {
+  /* Every question has a name. Two questions with the same name are
+     the same question, however the choices got shuffled — which is
+     what lets the game know whether you have met this one before. */
+  function qKey(q) {
+    if (!q || !q.choices) return "";
+    var right = q.choices[q.answer] || {};
+    return q.subject + "|" + q.q + "|" + (right.t || right.emoji || "") +
+           "|" + (q.big ? (q.big.text || q.big.emoji || "") : "");
+  }
+
+  /* ASK. `seen` (optional) is a function from a question's key to the
+     number of times this player has met it before, and it changes the
+     whole feel of the game: the asker deals candidate after candidate
+     and stops at the first one that is BRAND NEW to you. Only when it
+     cannot find one does it settle for the question you have seen
+     least often. Nothing is ever asked twice in a row either way.
+
+     The question comes back carrying `key` and `seen`, so the card can
+     tell you honestly whether this is new ground or a second look. */
+  function ask(subject, tier, seen) {
     if (!BANKS[subject]) subject = pick(["math", "word", "wonder"]);
     if (!BANKS[subject][tier]) tier = "mid";
-    var q = null;
-    for (var tries = 0; tries < 12; tries++) {
-      q = pick(BANKS[subject][tier])();
-      var key = q.q + "|" + q.choices[q.answer].t + "|" + (q.big ? (q.big.text || q.big.emoji) : "");
-      if (recent.indexOf(key) === -1) {
-        recent.push(key);
-        if (recent.length > 14) recent.shift();
-        break;
-      }
+    var best = null, bestScore = Infinity, fallback = null;
+    for (var i = 0; i < 24; i++) {
+      var q = pick(BANKS[subject][tier])();
+      if (!q || !q.choices) continue;
+      var key = qKey(q);
+      if (!fallback) { fallback = q; fallback.key = key; }
+      if (recent.indexOf(key) !== -1) continue;
+      var n = seen ? (seen(key) | 0) : 0;
+      if (n < bestScore) { best = q; best.key = key; bestScore = n; }
+      if (n === 0) break;
     }
-    return q;
+    var out = best || fallback;
+    if (!out) return null;
+    out.seen = best ? bestScore : (seen ? (seen(out.key) | 0) : 0);
+    recent.push(out.key);
+    if (recent.length > 16) recent.shift();
+    return out;
   }
 
   /* A question coming back out of the review basket must not arrive with
@@ -1334,7 +1400,55 @@ window.CPData = (function () {
     { id: "stew",      name: "Hearty Stew",   emoji: "🥘", cost: 28, fill: 46, joy: 6 },
     { id: "sushi",     name: "Sushi Set",     emoji: "🍣", cost: 34, fill: 44, joy: 12 },
     { id: "cloudfloss", name: "Cloud Floss",  emoji: "🍧", cost: 48, fill: 30, joy: 40, rare: true },
-    { id: "moonpie",   name: "Moon Pie",      emoji: "🌜", cost: 60, fill: 60, joy: 30, rare: true }
+    { id: "moonpie",   name: "Moon Pie",      emoji: "🌜", cost: 60, fill: 60, joy: 30, rare: true },
+    /* --- the third shelf: a proper greengrocer, a bakery and a deli --- */
+    { id: "cherry",    name: "Cherries",      emoji: "🍒", cost: 7,  fill: 12, joy: 4 },
+    { id: "peach",     name: "Ripe Peach",    emoji: "🍑", cost: 8,  fill: 15, joy: 3 },
+    { id: "kiwi",      name: "Kiwi Fruit",    emoji: "🥝", cost: 8,  fill: 14, joy: 3 },
+    { id: "mango",     name: "Mango",         emoji: "🥭", cost: 10, fill: 18, joy: 5 },
+    { id: "coconut",   name: "Coconut",       emoji: "🥥", cost: 11, fill: 20, joy: 3 },
+    { id: "pineapple", name: "Pineapple",     emoji: "🍍", cost: 12, fill: 21, joy: 5 },
+    { id: "tomato",    name: "Beef Tomato",   emoji: "🍅", cost: 6,  fill: 12, joy: 1 },
+    { id: "pepper",    name: "Sweet Pepper",  emoji: "🫑", cost: 7,  fill: 13, joy: 1 },
+    { id: "cucumber",  name: "Cucumber",      emoji: "🥒", cost: 6,  fill: 11, joy: 1 },
+    { id: "broccoli",  name: "Broccoli Tree", emoji: "🥦", cost: 9,  fill: 17, joy: 1 },
+    { id: "avocado",   name: "Avocado",       emoji: "🥑", cost: 12, fill: 22, joy: 3 },
+    { id: "mushroomcap", name: "Field Mushroom", emoji: "🍄", cost: 9, fill: 16, joy: 2 },
+    { id: "peanuts",   name: "Bag of Peanuts", emoji: "🥜", cost: 8,  fill: 15, joy: 4 },
+    { id: "chestnut",  name: "Roast Chestnuts", emoji: "🌰", cost: 10, fill: 18, joy: 5 },
+    { id: "croissant", name: "Croissant",     emoji: "🥐", cost: 13, fill: 22, joy: 6 },
+    { id: "bagel",     name: "Sesame Bagel",  emoji: "🥯", cost: 12, fill: 23, joy: 4 },
+    { id: "baguette",  name: "Baguette",      emoji: "🥖", cost: 14, fill: 26, joy: 4 },
+    { id: "pretzel",   name: "Soft Pretzel",  emoji: "🥨", cost: 13, fill: 21, joy: 7 },
+    { id: "waffle",    name: "Belgian Waffle", emoji: "🧇", cost: 20, fill: 30, joy: 13 },
+    { id: "flatbread", name: "Flatbread",     emoji: "🫓", cost: 15, fill: 27, joy: 3 },
+    { id: "butterdish", name: "Butter Dish",  emoji: "🧈", cost: 11, fill: 19, joy: 3 },
+    { id: "salad",     name: "Green Salad",   emoji: "🥗", cost: 16, fill: 28, joy: 3 },
+    { id: "burrito",   name: "Big Burrito",   emoji: "🌯", cost: 23, fill: 38, joy: 8 },
+    { id: "curry",     name: "Curry & Rice",  emoji: "🍛", cost: 27, fill: 45, joy: 9 },
+    { id: "dumplings", name: "Dumplings",     emoji: "🥟", cost: 24, fill: 39, joy: 10 },
+    { id: "ramen",     name: "Steaming Ramen", emoji: "🍥", cost: 29, fill: 47, joy: 11 },
+    { id: "burger",    name: "Veggie Burger", emoji: "🍔", cost: 25, fill: 42, joy: 12 },
+    { id: "hotdog",    name: "Hot Dog",       emoji: "🌭", cost: 20, fill: 32, joy: 10 },
+    { id: "fries",     name: "Hot Fries",     emoji: "🍟", cost: 18, fill: 25, joy: 13 },
+    { id: "riceball",  name: "Rice Ball",     emoji: "🍙", cost: 15, fill: 27, joy: 4 },
+    { id: "shrimp",    name: "Tempura",       emoji: "🍤", cost: 31, fill: 43, joy: 12 },
+    { id: "cheeseboard", name: "Cheese Board", emoji: "🧀", cost: 33, fill: 44, joy: 14 },
+    { id: "custard",   name: "Custard Pot",   emoji: "🍮", cost: 19, fill: 22, joy: 17 },
+    { id: "pie",       name: "Apple Pie",     emoji: "🥧", cost: 26, fill: 34, joy: 16 },
+    { id: "chocbar",   name: "Chocolate Bar", emoji: "🍫", cost: 16, fill: 14, joy: 19 },
+    { id: "candyfloss", name: "Candy Floss",  emoji: "🍬", cost: 15, fill: 10, joy: 21 },
+    { id: "lolly",     name: "Ice Lolly",     emoji: "🍡", cost: 14, fill: 12, joy: 16 },
+    { id: "shavedice", name: "Shaved Ice",    emoji: "🍧", cost: 17, fill: 13, joy: 18 },
+    { id: "smoothie",  name: "Berry Smoothie", emoji: "🥤", cost: 18, fill: 24, joy: 14 },
+    { id: "cocoacup",  name: "Hot Cocoa",     emoji: "☕", cost: 13, fill: 17, joy: 12 },
+    { id: "juicebox",  name: "Juice Box",     emoji: "🧃", cost: 9,  fill: 15, joy: 8 },
+    { id: "birthdaypie", name: "Party Cupcake", emoji: "🧁", cost: 22, fill: 20, joy: 24 },
+    { id: "gingerbread", name: "Gingerbread Kid", emoji: "🍪", cost: 21, fill: 24, joy: 18 },
+    { id: "sunfruit",  name: "Sun Fruit",     emoji: "🌞", cost: 45, fill: 52, joy: 22, rare: true },
+    { id: "cometcandy", name: "Comet Candy",  emoji: "☄️", cost: 52, fill: 34, joy: 44, rare: true },
+    { id: "dragonfruit", name: "Dragon Fruit", emoji: "🐲", cost: 66, fill: 62, joy: 34, rare: true },
+    { id: "auroraice", name: "Aurora Ice",    emoji: "🌌", cost: 72, fill: 58, joy: 42, rare: true }
   ];
 
   var TOYS = [
@@ -1356,7 +1470,41 @@ window.CPData = (function () {
     /* Rare toys never sit on the ordinary shelf — see RARE FINDS below. */
     { id: "marble",  name: "Galaxy Marble", emoji: "🌀", cost: 70,  joy: 22, rare: true },
     { id: "wand",    name: "Sparkle Wand", emoji: "🪄", cost: 95,  joy: 26, rare: true },
-    { id: "glider",  name: "Star Glider",  emoji: "🛩️", cost: 125, joy: 29, rare: true }
+    { id: "glider",  name: "Star Glider",  emoji: "🛩️", cost: 125, joy: 29, rare: true },
+    /* --- the toy chest got a lot deeper --- */
+    { id: "bubbles", name: "Bubble Wand",   emoji: "🫧", cost: 15,  joy: 6 },
+    { id: "spinner", name: "Spinning Top",  emoji: "🌀", cost: 18,  joy: 7 },
+    { id: "marbles", name: "Bag of Marbles", emoji: "⚪", cost: 22,  joy: 8 },
+    { id: "cards",   name: "Card Deck",     emoji: "🃏", cost: 26,  joy: 9 },
+    { id: "dice",    name: "Lucky Dice",    emoji: "🎲", cost: 28,  joy: 9 },
+    { id: "dominoes", name: "Domino Set",   emoji: "🁣", cost: 32,  joy: 10 },
+    { id: "frisbee", name: "Flying Disc",   emoji: "🥏", cost: 34,  joy: 11 },
+    { id: "jumprope", name: "Jump Rope",    emoji: "🪢", cost: 30,  joy: 10 },
+    { id: "hoopla",  name: "Ring Toss",     emoji: "⭕", cost: 38,  joy: 11 },
+    { id: "shuttle", name: "Badminton Set", emoji: "🏸", cost: 44,  joy: 12 },
+    { id: "football", name: "Football",     emoji: "⚽", cost: 46,  joy: 13 },
+    { id: "baseball", name: "Bat & Ball",   emoji: "⚾", cost: 48,  joy: 13 },
+    { id: "waterpistol", name: "Water Squirter", emoji: "🔫", cost: 42, joy: 14 },
+    { id: "sandpail", name: "Bucket & Spade", emoji: "🪣", cost: 36, joy: 11 },
+    { id: "windmilltoy", name: "Pinwheel",  emoji: "🎡", cost: 33,  joy: 10 },
+    { id: "paints",  name: "Paint Set",     emoji: "🎨", cost: 52,  joy: 15 },
+    { id: "crayons", name: "Crayon Box",    emoji: "🖍️", cost: 40,  joy: 12 },
+    { id: "stickers", name: "Sticker Sheet", emoji: "✨", cost: 24,  joy: 9 },
+    { id: "puppet",  name: "Sock Puppet",   emoji: "🧦", cost: 50,  joy: 15 },
+    { id: "dollhouse", name: "Doll House",  emoji: "🏚️", cost: 92,  joy: 22 },
+    { id: "traintoy", name: "Clockwork Train", emoji: "🚂", cost: 88, joy: 21 },
+    { id: "racecar", name: "Racing Car",    emoji: "🏎️", cost: 78,  joy: 20 },
+    { id: "digger",  name: "Toy Digger",    emoji: "🚜", cost: 72,  joy: 19 },
+    { id: "plane",   name: "Model Plane",   emoji: "✈️", cost: 84,  joy: 21 },
+    { id: "dino",    name: "Roaring Dino",  emoji: "🦖", cost: 96,  joy: 23 },
+    { id: "unicorn", name: "Unicorn Plush", emoji: "🦄", cost: 105, joy: 25 },
+    { id: "castleblocks", name: "Castle Bricks", emoji: "🏰", cost: 115, joy: 26 },
+    { id: "magicset", name: "Magic Set",    emoji: "🎩", cost: 120, joy: 27 },
+    { id: "microcar", name: "Remote Car",   emoji: "🕹️", cost: 138, joy: 29 },
+    { id: "droneToy", name: "Buzzing Drone", emoji: "🛸", cost: 150, joy: 30 },
+    { id: "kaleido", name: "Kaleidoscope",  emoji: "🔮", cost: 65,  joy: 21, rare: true },
+    { id: "musicalbox", name: "Dancing Music Box", emoji: "🎼", cost: 108, joy: 27, rare: true },
+    { id: "cometkite", name: "Comet Kite",  emoji: "☄️", cost: 142, joy: 31, rare: true }
   ];
 
   var CARE = [
@@ -1372,7 +1520,27 @@ window.CPData = (function () {
     { id: "milk",   name: "Moon Milk",    emoji: "🥛", cost: 40, energy: 90, joy: 12 },
     { id: "lounger", name: "Sun Lounger", emoji: "⛱️", cost: 50, energy: 100, joy: 20 },
     { id: "starsoap", name: "Stardust Soap", emoji: "🌟", cost: 42, clean: 100, joy: 12, rare: true },
-    { id: "dreamtea", name: "Dream Tea",  emoji: "🫖", cost: 58, energy: 100, joy: 22, rare: true }
+    { id: "dreamtea", name: "Dream Tea",  emoji: "🫖", cost: 58, energy: 100, joy: 22, rare: true },
+    /* --- the bathroom cupboard, properly stocked --- */
+    { id: "toothbrush", name: "Tooth Brush", emoji: "🪥", cost: 10, clean: 34 },
+    { id: "comb",   name: "Fine Comb",    emoji: "🪮", cost: 11, clean: 36, joy: 2 },
+    { id: "towel",  name: "Fluffy Towel", emoji: "🧻", cost: 14, clean: 44, joy: 3 },
+    { id: "bubbles2", name: "Foam Bubbles", emoji: "🫧", cost: 16, clean: 52, joy: 6 },
+    { id: "brushkit", name: "Grooming Kit", emoji: "🧰", cost: 22, clean: 60, joy: 4 },
+    { id: "flannel", name: "Warm Flannel", emoji: "🧽", cost: 9,  clean: 30 },
+    { id: "saltbath", name: "Mineral Soak", emoji: "🧂", cost: 26, clean: 72, joy: 7 },
+    { id: "perfume", name: "Flower Water", emoji: "🌺", cost: 30, clean: 66, joy: 12 },
+    { id: "mudmask", name: "Mud Mask",    emoji: "🟤", cost: 34, clean: 88, joy: 6 },
+    { id: "spaday",  name: "Whole Spa Day", emoji: "💆", cost: 62, clean: 100, energy: 40, joy: 25 },
+    { id: "blanket", name: "Weighted Blanket", emoji: "🛌", cost: 46, energy: 85, joy: 9 },
+    { id: "hotwater", name: "Hot Water Bottle", emoji: "♨️", cost: 26, energy: 52, joy: 8 },
+    { id: "nightcap", name: "Night Cap",  emoji: "🎩", cost: 22, energy: 44, joy: 6 },
+    { id: "lullaby", name: "Lullaby Record", emoji: "🎵", cost: 36, energy: 74, joy: 14 },
+    { id: "vitamins", name: "Berry Vitamins", emoji: "💊", cost: 30, energy: 58, joy: 4 },
+    { id: "sunhat",  name: "Shady Sun Hat", emoji: "👒", cost: 24, energy: 40, joy: 10 },
+    { id: "sleepmask", name: "Sleep Mask", emoji: "😴", cost: 28, energy: 66, joy: 5 },
+    { id: "starbath", name: "Starlight Bath", emoji: "🌟", cost: 54, clean: 100, energy: 40, joy: 20, rare: true },
+    { id: "cloudnap", name: "Cloud Nap",  emoji: "☁️", cost: 66, energy: 100, joy: 30, rare: true }
   ];
 
   /* Books are read once: they teach a real fact and level your pet's mind. */
@@ -1388,7 +1556,38 @@ window.CPData = (function () {
     { id: "riddles", name: "Riddle Book",      emoji: "📔", cost: 40, xp: 36, topic: "word" },
     { id: "machines", name: "How Things Work", emoji: "📒", cost: 55, xp: 55, topic: "wonder" },
     { id: "grimoire", name: "The Deep Grimoire", emoji: "📚", cost: 75, xp: 80, topic: "wonder" },
-    { id: "marslog", name: "The Mars Log",  emoji: "🧭", cost: 95, xp: 105, topic: "wonder", rare: true }
+    { id: "marslog", name: "The Mars Log",  emoji: "🧭", cost: 95, xp: 105, topic: "wonder", rare: true },
+    /* --- a whole second case of books --- */
+    { id: "abcbook", name: "My First Letters", emoji: "🔤", cost: 25, xp: 20, topic: "word" },
+    { id: "counting", name: "Counting Book",  emoji: "🔢", cost: 25, xp: 20, topic: "math" },
+    { id: "colours", name: "Book of Colors",  emoji: "🌈", cost: 28, xp: 24, topic: "wonder" },
+    { id: "fables",  name: "Aesop's Fables",  emoji: "🦊", cost: 38, xp: 34, topic: "word" },
+    { id: "myths",   name: "Myths & Monsters", emoji: "🐉", cost: 48, xp: 46, topic: "wonder" },
+    { id: "oceans",  name: "The Deep Ocean",  emoji: "🐋", cost: 45, xp: 44, topic: "wonder" },
+    { id: "rocks",   name: "Rocks & Minerals", emoji: "🪨", cost: 42, xp: 40, topic: "wonder" },
+    { id: "weather", name: "Reading the Sky", emoji: "⛅", cost: 44, xp: 42, topic: "wonder" },
+    { id: "bodybook", name: "Inside You",     emoji: "🫀", cost: 50, xp: 50, topic: "wonder" },
+    { id: "bugs",    name: "A Field of Bugs", emoji: "🐞", cost: 40, xp: 38, topic: "wonder" },
+    { id: "birdbook", name: "Book of Birds",  emoji: "🦉", cost: 40, xp: 38, topic: "wonder" },
+    { id: "dinos",   name: "Dinosaur Days",   emoji: "🦕", cost: 52, xp: 52, topic: "wonder" },
+    { id: "inventors", name: "Great Inventors", emoji: "💡", cost: 58, xp: 58, topic: "wonder" },
+    { id: "explorers", name: "Explorers",     emoji: "🧗", cost: 56, xp: 56, topic: "wonder" },
+    { id: "codes",   name: "Codes & Ciphers", emoji: "🔐", cost: 62, xp: 64, topic: "word" },
+    { id: "puzzlebook", name: "Puzzle Annual", emoji: "🧩", cost: 54, xp: 54, topic: "math" },
+    { id: "geometry", name: "Shapes in Space", emoji: "📏", cost: 60, xp: 62, topic: "math" },
+    { id: "moneybook", name: "Pennies & Pounds", emoji: "💰", cost: 58, xp: 58, topic: "math" },
+    { id: "grammar", name: "The Grammar Owl", emoji: "🦚", cost: 56, xp: 56, topic: "word" },
+    { id: "thesaurus", name: "Thesaurus",     emoji: "📖", cost: 64, xp: 68, topic: "word" },
+    { id: "dictionary", name: "Big Dictionary", emoji: "📗", cost: 70, xp: 74, topic: "word" },
+    { id: "atlas2",  name: "World Atlas",     emoji: "🌐", cost: 68, xp: 72, topic: "wonder" },
+    { id: "history", name: "Ages of the World", emoji: "🏛️", cost: 72, xp: 78, topic: "wonder" },
+    { id: "starcharts", name: "Star Charts",  emoji: "✨", cost: 80, xp: 86, topic: "wonder" },
+    { id: "poetry",  name: "Anthology of Verse", emoji: "🪶", cost: 78, xp: 84, topic: "word" },
+    { id: "physics", name: "Why Things Fall", emoji: "🍎", cost: 88, xp: 96, topic: "wonder" },
+    { id: "cookbook", name: "The Family Cookbook", emoji: "🍳", cost: 46, xp: 44, topic: "math" },
+    { id: "firstaid", name: "Book of Safety", emoji: "🩹", cost: 44, xp: 42, topic: "wonder" },
+    { id: "voyager", name: "The Voyager Record", emoji: "🛰️", cost: 105, xp: 118, topic: "wonder", rare: true },
+    { id: "lostlibrary", name: "The Lost Library", emoji: "🗝️", cost: 120, xp: 135, topic: "word", rare: true }
   ];
 
   /* =========================================================
@@ -1407,16 +1606,16 @@ window.CPData = (function () {
     /* --- 🕯️ Cosy Corner: the everyday pieces every house starts with --- */
     { id: "candle",  name: "Warm Candle",    emoji: "🕯️", cost: 20,  cosy: 3,  set: "cosy" },
     { id: "lamp",    name: "Little Lamp",    emoji: "💡", cost: 25,  cosy: 4,  set: "cosy" },
-    { id: "picture", name: "Framed Picture", emoji: "🖼️", cost: 35,  cosy: 6,  set: "art" },
+    { id: "picture", name: "Framed Picture", emoji: "🖼️", cost: 35,  cosy: 6, hang: true,  set: "art" },
     { id: "chair",   name: "Little Chair",   emoji: "🪑", cost: 40,  cosy: 6,  rest: 2, set: "cosy" },
-    { id: "clock",   name: "Cuckoo Clock",   emoji: "🕰️", cost: 45,  cosy: 7,  set: "cosy" },
+    { id: "clock",   name: "Cuckoo Clock",   emoji: "🕰️", cost: 45,  cosy: 7, hang: true,  set: "cosy" },
     { id: "basket",  name: "Toy Basket",     emoji: "🧺", cost: 45,  cosy: 6,  tidy: 2, set: "cosy" },
-    { id: "mirror",  name: "Tall Mirror",    emoji: "🪞", cost: 50,  cosy: 7,  tidy: 3, set: "cosy" },
+    { id: "mirror",  name: "Tall Mirror",    emoji: "🪞", cost: 50,  cosy: 7,  tidy: 3, hang: true, set: "cosy" },
     { id: "nightlight", name: "Night Light", emoji: "🌟", cost: 55,  cosy: 7,  rest: 2, set: "cosy" },
     { id: "brooms",  name: "Broom Corner",   emoji: "🧹", cost: 48,  cosy: 5,  tidy: 4, set: "cosy" },
-    { id: "phone",   name: "Old Telephone",  emoji: "☎️", cost: 70,  cosy: 7,  set: "cosy" },
+    { id: "phone",   name: "Old Telephone",  emoji: "☎️", cost: 70,  cosy: 7, hang: true,  set: "cosy" },
     { id: "bed",     name: "Cosy Bed",       emoji: "🛏️", cost: 80,  cosy: 9,  rest: 5, set: "cosy" },
-    { id: "teddyshelf", name: "Teddy Shelf", emoji: "🧸", cost: 85,  cosy: 10, set: "cosy" },
+    { id: "teddyshelf", name: "Teddy Shelf", emoji: "🧸", cost: 85,  cosy: 10, hang: true, set: "cosy" },
     { id: "tub",     name: "Claw-foot Tub",  emoji: "🛁", cost: 85,  cosy: 8,  tidy: 5, set: "cosy" },
     { id: "beanbag", name: "Bean Bag",       emoji: "🫘", cost: 90,  cosy: 10, rest: 4, set: "cosy" },
     { id: "sofa",    name: "Big Sofa",       emoji: "🛋️", cost: 110, cosy: 12, set: "cosy" },
@@ -1425,7 +1624,7 @@ window.CPData = (function () {
     { id: "wardrobe", name: "Big Wardrobe",  emoji: "🚪", cost: 160, cosy: 12, tidy: 5, set: "cosy" },
     { id: "kitchen", name: "Little Kitchen", emoji: "🍳", cost: 175, cosy: 13, set: "cosy" },
     { id: "tvset",   name: "Story Screen",   emoji: "📺", cost: 190, cosy: 15, rest: 2, set: "cosy" },
-    { id: "window",  name: "Star Window",    emoji: "🪟", cost: 195, cosy: 16, study: 4, set: "cosy" },
+    { id: "window",  name: "Star Window",    emoji: "🪟", cost: 195, cosy: 16, study: 4, hang: true, set: "cosy" },
     { id: "console", name: "Games Console",  emoji: "🎮", cost: 215, cosy: 17, rare: true, set: "cosy" },
 
     /* --- 🪴 Garden Room --- */
@@ -1433,22 +1632,22 @@ window.CPData = (function () {
     { id: "plant",   name: "Potted Plant",   emoji: "🪴", cost: 30,  cosy: 5,  set: "garden" },
     { id: "sunflower", name: "Tall Sunflower", emoji: "🌻", cost: 32, cosy: 5, set: "garden" },
     { id: "tulips",  name: "Tulip Pots",     emoji: "🌷", cost: 38,  cosy: 6,  set: "garden" },
-    { id: "herbs",   name: "Herb Rack",      emoji: "🌿", cost: 45,  cosy: 6,  tidy: 2, set: "garden" },
+    { id: "herbs",   name: "Herb Rack",      emoji: "🌿", cost: 45,  cosy: 6,  tidy: 2, hang: true, set: "garden" },
     { id: "roses",   name: "Rose Bush",      emoji: "🌹", cost: 55,  cosy: 8,  set: "garden" },
     { id: "bonsai",  name: "Bonsai Tree",    emoji: "🎍", cost: 60,  cosy: 7,  study: 2, set: "garden" },
-    { id: "birdcage", name: "Singing Bird",  emoji: "🐦", cost: 95,  cosy: 11, set: "garden" },
-    { id: "butterfly", name: "Butterfly Case", emoji: "🦋", cost: 115, cosy: 9, study: 4, rare: true, set: "garden" },
+    { id: "birdcage", name: "Singing Bird",  emoji: "🐦", cost: 95,  cosy: 11, hang: true, set: "garden" },
+    { id: "butterfly", name: "Butterfly Case", emoji: "🦋", cost: 115, cosy: 9, study: 4, rare: true, hang: true, set: "garden" },
     { id: "beehive", name: "Busy Beehive",   emoji: "🍯", cost: 125, cosy: 10, study: 3, set: "garden" },
     { id: "tree",    name: "Indoor Tree",    emoji: "🎄", cost: 140, cosy: 13, set: "garden" },
     { id: "fountain", name: "Stone Fountain", emoji: "⛲", cost: 190, cosy: 16, tidy: 4, set: "garden" },
 
     /* --- 👑 Royal Rooms (Ellie's wing) --- */
     { id: "goblet",  name: "Gold Goblet",    emoji: "🏆", cost: 165, cosy: 13, set: "royal" },
-    { id: "tiara",   name: "Tiara Stand",    emoji: "👸", cost: 150, cosy: 12, set: "royal" },
-    { id: "banner",  name: "Royal Banners",  emoji: "🎏", cost: 140, cosy: 12, set: "royal" },
-    { id: "swan",    name: "Swan Statue",    emoji: "🦢", cost: 178, cosy: 14, set: "royal" },
+    { id: "tiara",   name: "Tiara Stand",    emoji: "👸", cost: 150, cosy: 12, hang: true, set: "royal" },
+    { id: "banner",  name: "Royal Banners",  emoji: "🎏", cost: 140, cosy: 12, hang: true, set: "royal" },
+    { id: "swan",    name: "Swan Statue",    emoji: "🦢", cost: 178, cosy: 14, hang: true, set: "royal" },
     { id: "ballgown", name: "Ball Gown Stand", emoji: "👗", cost: 205, cosy: 15, set: "royal" },
-    { id: "chandelier", name: "Crystal Chandelier", emoji: "✨", cost: 245, cosy: 18, set: "royal" },
+    { id: "chandelier", name: "Crystal Chandelier", emoji: "✨", cost: 245, cosy: 18, hang: true, set: "royal" },
     { id: "crown",   name: "Crown Stand",    emoji: "👑", cost: 260, cosy: 20, set: "royal" },
     { id: "gemchest", name: "Jewel Chest",   emoji: "💰", cost: 285, cosy: 19, tidy: 3, set: "royal" },
     { id: "throne",  name: "Gold Throne",    emoji: "💺", cost: 340, cosy: 22, rest: 4, rare: true, set: "royal" },
@@ -1457,8 +1656,8 @@ window.CPData = (function () {
     { id: "moonlamp", name: "Moon Lamp",     emoji: "🌙", cost: 90,  cosy: 10, rest: 3, set: "space" },
     { id: "marsrock", name: "Mars Rock",     emoji: "🪨", cost: 125, cosy: 9,  study: 5, rare: true, set: "space" },
     { id: "rocketmodel", name: "Rocket Model", emoji: "🚀", cost: 160, cosy: 13, study: 4, set: "space" },
-    { id: "starmap", name: "Star Map Wall",  emoji: "🌌", cost: 178, cosy: 14, study: 7, set: "space" },
-    { id: "planetmobile", name: "Planet Mobile", emoji: "🪐", cost: 188, cosy: 14, study: 6, set: "space" },
+    { id: "starmap", name: "Star Map Wall",  emoji: "🌌", cost: 178, cosy: 14, study: 7, hang: true, set: "space" },
+    { id: "planetmobile", name: "Planet Mobile", emoji: "🪐", cost: 188, cosy: 14, study: 6, hang: true, set: "space" },
     { id: "alienplant", name: "Alien Fern",  emoji: "👽", cost: 208, cosy: 15, rare: true, set: "space" },
     { id: "telescope", name: "Big Telescope", emoji: "🔭", cost: 215, cosy: 12, study: 8, set: "space" },
     { id: "astrosuit", name: "Spacesuit Stand", emoji: "👨‍🚀", cost: 232, cosy: 16, set: "space" },
@@ -1466,11 +1665,11 @@ window.CPData = (function () {
     { id: "hoverlamp", name: "Hover Lamp",   emoji: "🛸", cost: 310, cosy: 20, rest: 4, rare: true, set: "space" },
 
     /* --- ⛏️ Block Craft (Cory's wing) --- */
-    { id: "torchwall", name: "Wall Torch",   emoji: "🔦", cost: 40,  cosy: 6,  set: "blocks" },
+    { id: "torchwall", name: "Wall Torch",   emoji: "🔦", cost: 40,  cosy: 6, hang: true,  set: "blocks" },
     { id: "blockchest", name: "Block Chest", emoji: "🧰", cost: 72,  cosy: 7,  tidy: 4, set: "blocks" },
     { id: "pickaxe", name: "Pickaxe Rack",   emoji: "⛏️", cost: 88,  cosy: 8,  set: "blocks" },
     { id: "cubelamp", name: "Glow Cube",     emoji: "🟦", cost: 96,  cosy: 11, set: "blocks" },
-    { id: "redlamp", name: "Red Lamp",       emoji: "🔴", cost: 112, cosy: 9,  set: "blocks" },
+    { id: "redlamp", name: "Red Lamp",       emoji: "🔴", cost: 112, cosy: 9, hang: true,  set: "blocks" },
     { id: "anvil",   name: "Anvil Bench",    emoji: "🛠️", cost: 132, cosy: 10, study: 3, set: "blocks" },
     { id: "minecart", name: "Mine Cart",     emoji: "🛒", cost: 148, cosy: 12, set: "blocks" },
     { id: "orevein", name: "Ore Block",      emoji: "💠", cost: 168, cosy: 13, study: 4, set: "blocks" },
@@ -1480,31 +1679,31 @@ window.CPData = (function () {
     { id: "quill",   name: "Quill & Ink",    emoji: "🪶", cost: 65,  cosy: 6,  study: 3, set: "library" },
     { id: "shelf",   name: "Book Shelf",     emoji: "📚", cost: 70,  cosy: 8,  study: 4, set: "library" },
     { id: "readlamp", name: "Reading Lamp",  emoji: "🪔", cost: 78,  cosy: 8,  rest: 2, study: 2, set: "library" },
-    { id: "wordwall", name: "Word Wall",     emoji: "🔤", cost: 108, cosy: 8,  study: 5, set: "library" },
+    { id: "wordwall", name: "Word Wall",     emoji: "🔤", cost: 108, cosy: 8,  study: 5, hang: true, set: "library" },
     { id: "desk",    name: "Writing Desk",   emoji: "🖊️", cost: 122, cosy: 9,  study: 5, set: "library" },
     { id: "atlasstand", name: "Atlas Stand", emoji: "🗺️", cost: 142, cosy: 10, study: 6, set: "library" },
     { id: "storynook", name: "Story Nook",   emoji: "📖", cost: 158, cosy: 13, rest: 3, study: 3, set: "library" },
     { id: "globe",   name: "Spinning Globe", emoji: "🌍", cost: 175, cosy: 12, study: 6, set: "library" },
-    { id: "scroll",  name: "Ancient Scroll", emoji: "📜", cost: 195, cosy: 12, study: 7, rare: true, set: "library" },
+    { id: "scroll",  name: "Ancient Scroll", emoji: "📜", cost: 195, cosy: 12, study: 7, rare: true, hang: true, set: "library" },
     { id: "bigshelf", name: "Wall of Books", emoji: "🗄️", cost: 205, cosy: 14, study: 8, set: "library" },
 
     /* --- 🌊 Under the Sea --- */
-    { id: "lifering", name: "Life Ring",     emoji: "🛟", cost: 70,  cosy: 7,  set: "sea" },
-    { id: "coral",   name: "Coral Fan",      emoji: "🪸", cost: 92,  cosy: 9,  set: "sea" },
+    { id: "lifering", name: "Life Ring",     emoji: "🛟", cost: 70,  cosy: 7, hang: true,  set: "sea" },
+    { id: "coral",   name: "Coral Fan",      emoji: "🪸", cost: 92,  cosy: 9, hang: true,  set: "sea" },
     { id: "anchor",  name: "Old Anchor",     emoji: "⚓", cost: 100, cosy: 9,  set: "sea" },
     { id: "shellchair", name: "Shell Seat",  emoji: "🐚", cost: 118, cosy: 10, rest: 3, set: "sea" },
     { id: "tank",    name: "Fish Tank",      emoji: "🐠", cost: 130, cosy: 12, study: 3, set: "sea" },
-    { id: "wavewall", name: "Wave Mural",    emoji: "🌊", cost: 148, cosy: 12, set: "sea" },
-    { id: "jellylamp", name: "Jellyfish Lamp", emoji: "🪼", cost: 162, cosy: 13, rest: 3, set: "sea" },
+    { id: "wavewall", name: "Wave Mural",    emoji: "🌊", cost: 148, cosy: 12, hang: true, set: "sea" },
+    { id: "jellylamp", name: "Jellyfish Lamp", emoji: "🪼", cost: 162, cosy: 13, rest: 3, hang: true, set: "sea" },
     { id: "seachest", name: "Sea Chest",     emoji: "🧳", cost: 178, cosy: 12, tidy: 4, set: "sea" },
     { id: "octopal", name: "Octopus Friend", emoji: "🐙", cost: 215, cosy: 16, rare: true, set: "sea" },
 
     /* --- 🌴 Jungle --- */
-    { id: "vines",   name: "Hanging Vines",  emoji: "🍃", cost: 55,  cosy: 7,  set: "jungle" },
+    { id: "vines",   name: "Hanging Vines",  emoji: "🍃", cost: 55,  cosy: 7, hang: true,  set: "jungle" },
     { id: "palm",    name: "Palm in a Pot",  emoji: "🌴", cost: 82,  cosy: 8,  set: "jungle" },
     { id: "tiki",    name: "Tiki Statue",    emoji: "🗿", cost: 132, cosy: 11, set: "jungle" },
     { id: "hammock", name: "Jungle Hammock", emoji: "🛌", cost: 152, cosy: 12, rest: 6, set: "jungle" },
-    { id: "monkeyswing", name: "Monkey Swing", emoji: "🐒", cost: 168, cosy: 13, set: "jungle" },
+    { id: "monkeyswing", name: "Monkey Swing", emoji: "🐒", cost: 168, cosy: 13, hang: true, set: "jungle" },
     { id: "parrot",  name: "Perching Parrot", emoji: "🦜", cost: 198, cosy: 15, study: 3, set: "jungle" },
     { id: "waterfall", name: "Little Waterfall", emoji: "💦", cost: 245, cosy: 18, tidy: 5, rare: true, set: "jungle" },
 
@@ -1531,14 +1730,14 @@ window.CPData = (function () {
     { id: "candyjar", name: "Candy Jar",     emoji: "🍬", cost: 60,  cosy: 7,  set: "sweets" },
     { id: "cupcakes", name: "Cupcake Stand", emoji: "🧁", cost: 92,  cosy: 9,  set: "sweets" },
     { id: "lollipop", name: "Giant Lollipop", emoji: "🍭", cost: 122, cosy: 11, set: "sweets" },
-    { id: "gingerwall", name: "Gingerbread Wall", emoji: "🍪", cost: 148, cosy: 12, set: "sweets" },
+    { id: "gingerwall", name: "Gingerbread Wall", emoji: "🍪", cost: 148, cosy: 12, hang: true, set: "sweets" },
     { id: "icecreambar", name: "Ice Cream Bar", emoji: "🍦", cost: 205, cosy: 15, rare: true, set: "sweets" },
     { id: "chocfountain", name: "Chocolate Fountain", emoji: "🍫", cost: 265, cosy: 19, rare: true, set: "sweets" },
 
     /* --- 👻 Spooky --- */
-    { id: "spiderweb", name: "Corner Web",   emoji: "🕸️", cost: 50,  cosy: 6,  set: "spooky" },
+    { id: "spiderweb", name: "Corner Web",   emoji: "🕸️", cost: 50,  cosy: 6, hang: true,  set: "spooky" },
     { id: "pumpkin", name: "Grinning Pumpkin", emoji: "🎃", cost: 68,  cosy: 7,  set: "spooky" },
-    { id: "batbanner", name: "Bat Banner",   emoji: "🦇", cost: 82,  cosy: 8,  set: "spooky" },
+    { id: "batbanner", name: "Bat Banner",   emoji: "🦇", cost: 82,  cosy: 8, hang: true,  set: "spooky" },
     { id: "ghostlamp", name: "Ghost Lamp",   emoji: "👻", cost: 108, cosy: 10, set: "spooky" },
     { id: "cauldron", name: "Bubbling Cauldron", emoji: "🫕", cost: 142, cosy: 11, study: 3, set: "spooky" },
     { id: "crystalball", name: "Crystal Ball", emoji: "🔮", cost: 188, cosy: 14, study: 5, rare: true, set: "spooky" },
@@ -1551,18 +1750,122 @@ window.CPData = (function () {
     { id: "penguin", name: "Penguin Pal",    emoji: "🐧", cost: 168, cosy: 13, rare: true, set: "winter" },
 
     /* --- ⚽ Games Room --- */
-    { id: "goal",    name: "Mini Goal",      emoji: "🥅", cost: 102, cosy: 9,  set: "sport" },
-    { id: "hoop",    name: "Basket Hoop",    emoji: "🏀", cost: 118, cosy: 10, set: "sport" },
+    { id: "goal",    name: "Mini Goal",      emoji: "🥅", cost: 102, cosy: 9, hang: true,  set: "sport" },
+    { id: "hoop",    name: "Basket Hoop",    emoji: "🏀", cost: 118, cosy: 10, hang: true, set: "sport" },
     { id: "chess",   name: "Chess Table",    emoji: "♟️", cost: 128, cosy: 10, study: 6, rare: true, set: "sport" },
-    { id: "trophyshelf", name: "Trophy Shelf", emoji: "🏅", cost: 133, cosy: 11, set: "sport" },
+    { id: "trophyshelf", name: "Trophy Shelf", emoji: "🏅", cost: 133, cosy: 11, hang: true, set: "sport" },
     { id: "skateramp", name: "Skate Ramp",   emoji: "🛹", cost: 148, cosy: 12, set: "sport" },
 
     /* --- 🎨 Art Studio --- */
-    { id: "sketchwall", name: "Crayon Wall", emoji: "🖍️", cost: 70,  cosy: 8,  set: "art" },
+    { id: "sketchwall", name: "Crayon Wall", emoji: "🖍️", cost: 70,  cosy: 8, hang: true,  set: "art" },
     { id: "vase",    name: "Clay Vase",      emoji: "🏺", cost: 85,  cosy: 8,  set: "art" },
     { id: "easel",   name: "Painting Easel", emoji: "🎨", cost: 102, cosy: 9,  study: 4, set: "art" },
-    { id: "photowall", name: "Photo Wall",   emoji: "📷", cost: 112, cosy: 10, set: "art" },
-    { id: "rainbowrug", name: "Rainbow Rug", emoji: "🌈", cost: 158, cosy: 13, rest: 3, rare: true, set: "art" }
+    { id: "photowall", name: "Photo Wall",   emoji: "📷", cost: 112, cosy: 10, hang: true, set: "art" },
+    { id: "rainbowrug", name: "Rainbow Rug", emoji: "🌈", cost: 158, cosy: 13, rest: 3, rare: true, set: "art" },
+
+    /* --- 🍽️ Kitchen & Pantry --- */
+    { id: "kettle",  name: "Whistling Kettle", emoji: "🫖", cost: 34,  cosy: 5,  set: "kitchen" },
+    { id: "mugrack", name: "Mug Rack",     emoji: "☕", cost: 42,  cosy: 6,  hang: true, set: "kitchen" },
+    { id: "fruitbowl", name: "Fruit Bowl", emoji: "🍎", cost: 48,  cosy: 6,  set: "kitchen" },
+    { id: "spicerack", name: "Spice Rack", emoji: "🧂", cost: 58,  cosy: 7,  hang: true, set: "kitchen" },
+    { id: "breadbin", name: "Bread Bin",   emoji: "🍞", cost: 66,  cosy: 7,  tidy: 2, set: "kitchen" },
+    { id: "potshelf", name: "Hanging Pots", emoji: "🍲", cost: 88,  cosy: 9,  hang: true, set: "kitchen" },
+    { id: "fridge",  name: "Humming Fridge", emoji: "🧊", cost: 132, cosy: 11, set: "kitchen" },
+    { id: "bigtable", name: "Kitchen Table", emoji: "🪵", cost: 156, cosy: 13, rest: 2, set: "kitchen" },
+    { id: "bakestove", name: "Baker's Stove", emoji: "🔥", cost: 178, cosy: 15, set: "kitchen" },
+    { id: "cakestand", name: "Glass Cake Stand", emoji: "🎂", cost: 198, cosy: 15, rare: true, set: "kitchen" },
+
+    /* --- 🏕️ Camp & Trail --- */
+    { id: "lantern", name: "Camp Lantern", emoji: "🏮", cost: 38,  cosy: 6,  set: "camp" },
+    { id: "canteen", name: "Water Canteen", emoji: "🧴", cost: 44,  cosy: 5,  set: "camp" },
+    { id: "rucksack", name: "Packed Rucksack", emoji: "🎒", cost: 56,  cosy: 6,  tidy: 3, set: "camp" },
+    { id: "trailmap", name: "Trail Map",   emoji: "🗺️", cost: 72,  cosy: 7,  study: 4, hang: true, set: "camp" },
+    { id: "campfire", name: "Camp Fire",   emoji: "🔥", cost: 98,  cosy: 11, rest: 3, set: "camp" },
+    { id: "tent",    name: "Little Tent",  emoji: "⛺", cost: 124, cosy: 12, rest: 5, set: "camp" },
+    { id: "canoe",   name: "Canoe on Racks", emoji: "🛶", cost: 148, cosy: 12, set: "camp" },
+    { id: "binocs",  name: "Binoculars Stand", emoji: "🔭", cost: 138, cosy: 10, study: 5, set: "camp" },
+    { id: "bearrug", name: "Bear Rug",     emoji: "🐻", cost: 186, cosy: 15, rest: 3, rare: true, set: "camp" },
+
+    /* --- 🌆 City Loft --- */
+    { id: "neonsign", name: "Neon Sign",   emoji: "🈹", cost: 62,  cosy: 8,  hang: true, set: "city" },
+    { id: "streetlamp", name: "Street Lamp", emoji: "🏮", cost: 74,  cosy: 8,  set: "city" },
+    { id: "subwaymap", name: "Subway Map", emoji: "🚇", cost: 86,  cosy: 8,  study: 4, hang: true, set: "city" },
+    { id: "barstool", name: "Bar Stools",  emoji: "🪑", cost: 98,  cosy: 9,  rest: 2, set: "city" },
+    { id: "vinylwall", name: "Vinyl Wall", emoji: "💿", cost: 112, cosy: 11, hang: true, set: "city" },
+    { id: "skylinephoto", name: "Skyline Print", emoji: "🌆", cost: 128, cosy: 12, hang: true, set: "city" },
+    { id: "espresso", name: "Espresso Machine", emoji: "☕", cost: 154, cosy: 13, set: "city" },
+    { id: "loftladder", name: "Loft Ladder", emoji: "🪜", cost: 142, cosy: 11, set: "city" },
+    { id: "rooftopgarden", name: "Rooftop Planter", emoji: "🌿", cost: 176, cosy: 14, tidy: 3, set: "city" },
+    { id: "cityclock", name: "Station Clock", emoji: "🕰️", cost: 205, cosy: 16, hang: true, rare: true, set: "city" },
+
+    /* --- 🪄 Wizard's Study --- */
+    { id: "candlerow", name: "Floating Candles", emoji: "🕯️", cost: 66, cosy: 8, hang: true, set: "wizard" },
+    { id: "spellbook", name: "Spell Book",  emoji: "📕", cost: 84,  cosy: 8,  study: 5, set: "wizard" },
+    { id: "potions", name: "Potion Shelf",  emoji: "🧪", cost: 96,  cosy: 9,  study: 5, hang: true, set: "wizard" },
+    { id: "owlperch", name: "Owl Perch",    emoji: "🦉", cost: 118, cosy: 11, study: 3, set: "wizard" },
+    { id: "staffrack", name: "Staff Rack",  emoji: "🪄", cost: 132, cosy: 11, set: "wizard" },
+    { id: "runestone", name: "Rune Stone",  emoji: "🪧", cost: 148, cosy: 11, study: 6, set: "wizard" },
+    { id: "starcloak", name: "Star Cloak Stand", emoji: "🧙", cost: 172, cosy: 14, set: "wizard" },
+    { id: "orrery",  name: "Brass Orrery",  emoji: "🪐", cost: 218, cosy: 15, study: 9, rare: true, set: "wizard" },
+
+    /* --- 🦕 Dino Dig --- */
+    { id: "fossil",  name: "Fossil Slab",   emoji: "🦴", cost: 74,  cosy: 7,  study: 4, hang: true, set: "dino" },
+    { id: "digkit",  name: "Dig Kit",       emoji: "🧹", cost: 68,  cosy: 6,  study: 3, set: "dino" },
+    { id: "amber",   name: "Amber Chunk",   emoji: "🟡", cost: 92,  cosy: 8,  study: 4, set: "dino" },
+    { id: "trexskull", name: "T-Rex Skull", emoji: "🦖", cost: 168, cosy: 14, study: 6, set: "dino" },
+    { id: "sauropod", name: "Long Neck Model", emoji: "🦕", cost: 152, cosy: 13, study: 5, set: "dino" },
+    { id: "ferncase", name: "Ancient Fern", emoji: "🌿", cost: 88,  cosy: 8,  study: 3, set: "dino" },
+    { id: "meteorite", name: "Meteorite",   emoji: "☄️", cost: 205, cosy: 13, study: 8, rare: true, set: "dino" },
+
+    /* --- 🚜 Farmhouse --- */
+    { id: "milkchurn", name: "Milk Churn",  emoji: "🥛", cost: 46,  cosy: 6,  set: "farmset" },
+    { id: "haybale", name: "Hay Bale",      emoji: "🌾", cost: 52,  cosy: 7,  rest: 3, set: "farmset" },
+    { id: "eggbasket", name: "Egg Basket",  emoji: "🥚", cost: 58,  cosy: 6,  tidy: 2, set: "farmset" },
+    { id: "horseshoe", name: "Lucky Horseshoe", emoji: "🧲", cost: 64, cosy: 7, hang: true, set: "farmset" },
+    { id: "butterchurn", name: "Butter Churn", emoji: "🧈", cost: 82,  cosy: 8,  set: "farmset" },
+    { id: "scarecrow", name: "Indoor Scarecrow", emoji: "🎃", cost: 104, cosy: 10, set: "farmset" },
+    { id: "tractorseat", name: "Tractor Seat", emoji: "🚜", cost: 138, cosy: 12, rest: 3, set: "farmset" },
+    { id: "harvestwreath", name: "Harvest Wreath", emoji: "🌻", cost: 96, cosy: 10, hang: true, set: "farmset" },
+    { id: "prizecow", name: "Prize Cow Portrait", emoji: "🐄", cost: 182, cosy: 14, hang: true, rare: true, set: "farmset" },
+
+    /* --- 🐾 Pet Corner --- */
+    { id: "petbowl", name: "Second Bowl",   emoji: "🥣", cost: 30,  cosy: 4,  set: "pets" },
+    { id: "birdfeeder", name: "Bird Feeder", emoji: "🐦", cost: 48,  cosy: 6,  hang: true, hang: true, set: "pets" },
+    { id: "catbed",  name: "Kitten Basket", emoji: "🐈", cost: 74,  cosy: 8,  rest: 3, set: "pets" },
+    { id: "puppypen", name: "Puppy Pen",    emoji: "🐕", cost: 92,  cosy: 9,  set: "pets" },
+    { id: "hamsterwheel", name: "Hamster Wheel", emoji: "🐹", cost: 86, cosy: 9, set: "pets" },
+    { id: "rabbithutch", name: "Rabbit Hutch", emoji: "🐰", cost: 108, cosy: 10, set: "pets" },
+    { id: "turtlepond", name: "Turtle Pond", emoji: "🐢", cost: 126, cosy: 11, tidy: 3, set: "pets" },
+    { id: "aviary",  name: "Little Aviary", emoji: "🦜", cost: 188, cosy: 15, rare: true, set: "pets" },
+
+    /* --- ✈️ Travel Room --- */
+    { id: "suitcase", name: "Stacked Cases", emoji: "🧳", cost: 54,  cosy: 6,  tidy: 3, set: "travel" },
+    { id: "postcards", name: "Postcard Wall", emoji: "💌", cost: 62,  cosy: 7,  hang: true, set: "travel" },
+    { id: "compassdisplay", name: "Brass Compass", emoji: "🧭", cost: 78,  cosy: 7,  study: 4, set: "travel" },
+    { id: "flagline", name: "Flags of the World", emoji: "🎌", cost: 96,  cosy: 9,  study: 4, hang: true, set: "travel" },
+    { id: "worldclocks", name: "World Clocks", emoji: "🕐", cost: 118, cosy: 10, study: 5, hang: true, set: "travel" },
+    { id: "steamertrunk", name: "Steamer Trunk", emoji: "🗄️", cost: 134, cosy: 11, tidy: 4, set: "travel" },
+    { id: "hotairmodel", name: "Balloon Model", emoji: "🎈", cost: 152, cosy: 13, set: "travel" },
+    { id: "shipwheel", name: "Ship's Wheel", emoji: "☸️", cost: 172, cosy: 13, hang: true, rare: true, set: "travel" },
+
+    /* --- 🎪 Circus --- */
+    { id: "bunting", name: "Paper Bunting", emoji: "🎏", cost: 36,  cosy: 6,  hang: true, set: "circus" },
+    { id: "popcornmachine", name: "Popcorn Machine", emoji: "🍿", cost: 88, cosy: 9, set: "circus" },
+    { id: "clownposter", name: "Circus Poster", emoji: "🤡", cost: 68,  cosy: 7,  hang: true, set: "circus" },
+    { id: "juggleclub", name: "Juggling Clubs", emoji: "🤹", cost: 82,  cosy: 8,  set: "circus" },
+    { id: "tightrope", name: "Practice Rope", emoji: "🪢", cost: 112, cosy: 10, set: "circus" },
+    { id: "ringmaster", name: "Ringmaster Hat", emoji: "🎩", cost: 128, cosy: 11, set: "circus" },
+    { id: "carousel", name: "Mini Carousel", emoji: "🎠", cost: 196, cosy: 16, rare: true, set: "circus" },
+
+    /* --- 🕹️ Arcade --- */
+    { id: "joystick", name: "Joystick Stand", emoji: "🕹️", cost: 76,  cosy: 8,  set: "arcade" },
+    { id: "pinball", name: "Pinball Table",  emoji: "🎯", cost: 148, cosy: 13, set: "arcade" },
+    { id: "highscore", name: "High Score Board", emoji: "🔢", cost: 96,  cosy: 9,  study: 4, hang: true, set: "arcade" },
+    { id: "arcadecab", name: "Arcade Cabinet", emoji: "👾", cost: 188, cosy: 15, set: "arcade" },
+    { id: "beanchair", name: "Gamer Chair",  emoji: "💺", cost: 132, cosy: 12, rest: 4, set: "arcade" },
+    { id: "ledstrip", name: "Glow Strip",    emoji: "🌈", cost: 84,  cosy: 9,  hang: true, set: "arcade" },
+    { id: "retrotv",  name: "Retro TV",      emoji: "📺", cost: 118, cosy: 11, set: "arcade" },
+    { id: "goldenpad", name: "Golden Controller", emoji: "🎮", cost: 225, cosy: 18, rare: true, set: "arcade" }
   ];
 
   /* The name of each themed set, for the House tab's shelves. */
@@ -1581,11 +1884,21 @@ window.CPData = (function () {
     { id: "spooky",  name: "👻 Spooky" },
     { id: "winter",  name: "❄️ Winter" },
     { id: "sport",   name: "⚽ Games Room" },
-    { id: "art",     name: "🎨 Art Studio" }
+    { id: "art",     name: "🎨 Art Studio" },
+    { id: "kitchen", name: "🍽️ Kitchen & Pantry" },
+    { id: "camp",    name: "🏕️ Camp & Trail" },
+    { id: "city",    name: "🌆 City Loft" },
+    { id: "wizard",  name: "🪄 Wizard's Study" },
+    { id: "dino",    name: "🦕 Dino Dig" },
+    { id: "farmset", name: "🚜 Farmhouse" },
+    { id: "pets",    name: "🐾 Pet Corner" },
+    { id: "travel",  name: "✈️ Travel Room" },
+    { id: "circus",  name: "🎪 Circus" },
+    { id: "arcade",  name: "🕹️ Arcade" }
   ];
 
   /* =========================================================
-     YOUR HOUSE — thirty-seven homes, all over the map and off
+     YOUR HOUSE — homes all over the map and off
      it. "slots" is how many pieces of furniture you can have
      out at once; everything else waits in storage.
 
@@ -1739,55 +2052,93 @@ window.CPData = (function () {
      Bought once, kept for ever, and usable in every home you own.
      ========================================================= */
   var WALLS = [
-    { id: "straw",      name: "Straw & Sun",   emoji: "🌾", cost: 0,   a: "#ffe9c9", b: "#fff6e8" },
-    { id: "plainwhite", name: "Fresh White",   emoji: "⬜", cost: 0,   a: "#f2f0fb", b: "#ffffff" },
-    { id: "sky",        name: "Sky Blue",      emoji: "🩵", cost: 0,   a: "#cdeeff", b: "#ecf9ff" },
-    { id: "rose",       name: "Rose Pink",     emoji: "🌸", cost: 60,  a: "#ffd6ec", b: "#fff0f8" },
-    { id: "mint",       name: "Mint Green",    emoji: "🌿", cost: 60,  a: "#d3f6e3", b: "#eefff6" },
-    { id: "butter",     name: "Butter Yellow", emoji: "🧈", cost: 60,  a: "#fff0bf", b: "#fffbe6" },
-    { id: "lilac",      name: "Lilac",         emoji: "💜", cost: 75,  a: "#e6dcff", b: "#f7f2ff" },
-    { id: "peach",      name: "Peach",         emoji: "🍑", cost: 75,  a: "#ffe0cc", b: "#fff4ec" },
-    { id: "earthbrown", name: "Warm Cocoa",    emoji: "🤎", cost: 90,  a: "#e7d3bd", b: "#f7ece0" },
-    { id: "stone",      name: "Grey Stone",    emoji: "🪨", cost: 90,  a: "#dfe3ea", b: "#f2f5f9" },
-    { id: "forest",     name: "Deep Forest",   emoji: "🌲", cost: 120, a: "#b9dcb5", b: "#e2f4de" },
-    { id: "ocean",      name: "Ocean Blue",    emoji: "🌊", cost: 120, a: "#a8dcf0", b: "#dff3fb" },
-    { id: "sunset",     name: "Sunset",        emoji: "🌇", cost: 150, a: "#ffc9a8", b: "#ffe6cf" },
-    { id: "candy",      name: "Candy Stripe",  emoji: "🍬", cost: 180, a: "#ffd4e8", b: "#ffeef6" },
-    { id: "ice",        name: "Ice Blue",      emoji: "🧊", cost: 180, a: "#d6f0ff", b: "#f0fbff" },
-    { id: "lava",       name: "Lava Glow",     emoji: "🌋", cost: 190, a: "#ffb3a0", b: "#ffdcd2" },
-    { id: "jungle",     name: "Jungle Leaf",   emoji: "🍃", cost: 200, a: "#bfe9b0", b: "#e7fadd" },
-    { id: "royalpurple", name: "Royal Purple", emoji: "👑", cost: 240, a: "#d9c2ff", b: "#efe6ff" },
-    { id: "gold",       name: "Gold Leaf",     emoji: "🏅", cost: 280, a: "#ffe6a0", b: "#fff6d8" },
-    { id: "night",      name: "Night Sky",     emoji: "🌌", cost: 300, a: "#2f3763", b: "#59639a" },
-    { id: "mars",       name: "Martian Sky",   emoji: "🪐", cost: 320, a: "#e8bfa0", b: "#ffe3cb" },
-    { id: "rainbowwall", name: "Rainbow Wash", emoji: "🌈", cost: 380, a: "#ffd1dc", b: "#d6f0ff" },
-    { id: "galaxy",     name: "Galaxy Swirl",  emoji: "💫", cost: 420, a: "#3b2a63", b: "#7a5fb0" }
+    { id: "straw",      name: "Straw & Sun",   emoji: "🌾", cost: 0,   a: "#ffe9c9", b: "#fff6e8", tex: "weave" },
+    { id: "plainwhite", name: "Fresh White",   emoji: "⬜", cost: 0,   a: "#f2f0fb", b: "#ffffff", tex: "plain" },
+    { id: "sky",        name: "Sky Blue",      emoji: "🩵", cost: 0,   a: "#cdeeff", b: "#ecf9ff", tex: "plain" },
+    { id: "rose",       name: "Rose Pink",     emoji: "🌸", cost: 60,  a: "#ffd6ec", b: "#fff0f8", tex: "stripe" },
+    { id: "mint",       name: "Mint Green",    emoji: "🌿", cost: 60,  a: "#d3f6e3", b: "#eefff6", tex: "stripe" },
+    { id: "butter",     name: "Butter Yellow", emoji: "🧈", cost: 60,  a: "#fff0bf", b: "#fffbe6", tex: "stripe" },
+    { id: "lilac",      name: "Lilac",         emoji: "💜", cost: 75,  a: "#e6dcff", b: "#f7f2ff", tex: "stripe" },
+    { id: "peach",      name: "Peach",         emoji: "🍑", cost: 75,  a: "#ffe0cc", b: "#fff4ec", tex: "weave" },
+    { id: "earthbrown", name: "Warm Cocoa",    emoji: "🤎", cost: 90,  a: "#e7d3bd", b: "#f7ece0", tex: "plank" },
+    { id: "stone",      name: "Grey Stone",    emoji: "🪨", cost: 90,  a: "#dfe3ea", b: "#f2f5f9", tex: "brick" },
+    { id: "forest",     name: "Deep Forest",   emoji: "🌲", cost: 120, a: "#b9dcb5", b: "#e2f4de", tex: "plank" },
+    { id: "ocean",      name: "Ocean Blue",    emoji: "🌊", cost: 120, a: "#a8dcf0", b: "#dff3fb", tex: "weave" },
+    { id: "sunset",     name: "Sunset",        emoji: "🌇", cost: 150, a: "#ffc9a8", b: "#ffe6cf", tex: "plain" },
+    { id: "candy",      name: "Candy Stripe",  emoji: "🍬", cost: 180, a: "#ffd4e8", b: "#ffeef6", tex: "stripe" },
+    { id: "ice",        name: "Ice Blue",      emoji: "🧊", cost: 180, a: "#d6f0ff", b: "#f0fbff", tex: "facet" },
+    { id: "lava",       name: "Lava Glow",     emoji: "🌋", cost: 190, a: "#ffb3a0", b: "#ffdcd2", tex: "brick" },
+    { id: "jungle",     name: "Jungle Leaf",   emoji: "🍃", cost: 200, a: "#bfe9b0", b: "#e7fadd", tex: "weave" },
+    { id: "royalpurple", name: "Royal Purple", emoji: "👑", cost: 240, a: "#d9c2ff", b: "#efe6ff", tex: "diag" },
+    { id: "gold",       name: "Gold Leaf",     emoji: "🏅", cost: 280, a: "#ffe6a0", b: "#fff6d8", tex: "diag" },
+    { id: "night",      name: "Night Sky",     emoji: "🌌", cost: 300, a: "#2f3763", b: "#59639a", tex: "starry" },
+    { id: "mars",       name: "Martian Sky",   emoji: "🪐", cost: 320, a: "#e8bfa0", b: "#ffe3cb", tex: "dust" },
+    { id: "rainbowwall", name: "Rainbow Wash", emoji: "🌈", cost: 380, a: "#ffd1dc", b: "#d6f0ff", tex: "diag" },
+    { id: "galaxy",     name: "Galaxy Swirl",  emoji: "💫", cost: 420, a: "#3b2a63", b: "#7a5fb0", tex: "starry" },
+    /* --- the second paint chart --- */
+    { id: "cream",      name: "Soft Cream",    emoji: "🥛", cost: 0,   a: "#fdf3e3", b: "#fffaf2", tex: "plain" },
+    { id: "sage",       name: "Sage",          emoji: "🌱", cost: 60,  a: "#d7e6d0", b: "#eef5e9", tex: "plain" },
+    { id: "duckegg",    name: "Duck Egg",      emoji: "🥚", cost: 60,  a: "#cfe8e4", b: "#eaf7f5", tex: "plain" },
+    { id: "coral",      name: "Coral",         emoji: "🪸", cost: 75,  a: "#ffd0c2", b: "#fff0ea", tex: "stripe" },
+    { id: "denim",      name: "Denim",         emoji: "👖", cost: 90,  a: "#b8cbe8", b: "#dfe9f7", tex: "weave" },
+    { id: "brickred",   name: "Red Brick",     emoji: "🧱", cost: 110, a: "#e0a893", b: "#f2d4c6", tex: "brick" },
+    { id: "logcabin",   name: "Log Cabin",     emoji: "🪵", cost: 120, a: "#d8b183", b: "#ecd5b6", tex: "plank" },
+    { id: "tartan",     name: "Tartan",        emoji: "🧣", cost: 140, a: "#d9a0a0", b: "#f0d2d2", tex: "weave" },
+    { id: "circusstripe", name: "Big Top",     emoji: "🎪", cost: 160, a: "#ffc9c9", b: "#fff2ee", tex: "stripe" },
+    { id: "chalkboard", name: "Chalkboard",    emoji: "🏫", cost: 170, a: "#3f5148", b: "#6d857a", tex: "plain" },
+    { id: "wizardblue", name: "Wizard Blue",   emoji: "🪄", cost: 210, a: "#3f3a78", b: "#6f68b0", tex: "starry" },
+    { id: "coppermine", name: "Copper Mine",   emoji: "⛏️", cost: 220, a: "#c98a5c", b: "#e8bb92", tex: "brick" },
+    { id: "reefwall",   name: "Coral Reef",    emoji: "🐠", cost: 240, a: "#8fd8d0", b: "#ccf0ea", tex: "facet" },
+    { id: "dinowall",   name: "Fossil Rock",   emoji: "🦕", cost: 250, a: "#cdbfa8", b: "#e6dccb", tex: "dust" },
+    { id: "neonwall",   name: "Neon Nights",   emoji: "🌃", cost: 300, a: "#241d4a", b: "#5b3f8f", tex: "starry" },
+    { id: "sakura",     name: "Cherry Blossom", emoji: "🌸", cost: 320, a: "#ffd2e6", b: "#fff0f6", tex: "diag" },
+    { id: "emerald",    name: "Emerald",       emoji: "💚", cost: 340, a: "#57b08a", b: "#9fdcc0", tex: "diag" },
+    { id: "aurorawall", name: "Aurora Wash",   emoji: "🌌", cost: 400, a: "#2b4a5e", b: "#66b6a8", tex: "facet" },
+    { id: "nebula",     name: "Nebula",        emoji: "🌠", cost: 460, a: "#33194f", b: "#8a3f8f", tex: "starry" }
   ];
 
   var FLOORS = [
-    { id: "earth",       name: "Packed Earth",  emoji: "🟫", cost: 0,   a: "#d9a86a", b: "#b98549" },
-    { id: "wood",        name: "Wood Boards",   emoji: "🪵", cost: 0,   a: "#cfa06b", b: "#a97c4c" },
-    { id: "grass",       name: "Green Grass",   emoji: "🌱", cost: 0,   a: "#9bd97f", b: "#5fa845" },
-    { id: "rug",         name: "Soft Red Rug",  emoji: "🟥", cost: 60,  a: "#e08c8c", b: "#b95f5f" },
-    { id: "tile",        name: "Chequer Tiles", emoji: "♟️", cost: 60,  a: "#dfe4ec", b: "#a9b2c4" },
-    { id: "sand",        name: "Warm Sand",     emoji: "🏖️", cost: 60,  a: "#f2dcae", b: "#d4b877" },
-    { id: "carpetpink",  name: "Pink Carpet",   emoji: "🩷", cost: 75,  a: "#ffb8d9", b: "#e07eb0" },
-    { id: "carpetblue",  name: "Blue Carpet",   emoji: "💙", cost: 75,  a: "#a9c8f5", b: "#6d92cf" },
-    { id: "stonefloor",  name: "Stone Slabs",   emoji: "🪨", cost: 90,  a: "#c3c7cf", b: "#91959e" },
-    { id: "moss",        name: "Mossy Ground",  emoji: "🍀", cost: 120, a: "#8fc98a", b: "#5c9059" },
-    { id: "marble",      name: "White Marble",  emoji: "🤍", cost: 120, a: "#f0f0f6", b: "#c9cad6" },
-    { id: "water",       name: "Shallow Water", emoji: "💧", cost: 150, a: "#8fe4ff", b: "#4bb8e8" },
-    { id: "snow",        name: "Fresh Snow",    emoji: "❄️", cost: 150, a: "#eef7ff", b: "#c3d8ea" },
-    { id: "lavafloor",   name: "Cooling Lava",  emoji: "🔥", cost: 190, a: "#e8724a", b: "#a83a22" },
-    { id: "cloudfloor",  name: "Cloud Floor",   emoji: "☁️", cost: 200, a: "#ffffff", b: "#dfe8ff" },
-    { id: "candyfloor",  name: "Candy Floor",   emoji: "🍭", cost: 200, a: "#ffc2e0", b: "#f07fb8" },
-    { id: "blockfloor",  name: "Block Tiles",   emoji: "🟩", cost: 220, a: "#7ecb6b", b: "#4d9440" },
-    { id: "goldfloor",   name: "Gold Floor",    emoji: "🪙", cost: 300, a: "#ffd97a", b: "#d2a02f" },
-    { id: "glass",       name: "Glass Deck",    emoji: "🔷", cost: 320, a: "#bfe6ff", b: "#7fb8dd" },
-    { id: "metal",       name: "Steel Deck",    emoji: "🛠️", cost: 340, a: "#c8ccd6", b: "#8b91a0" },
-    { id: "regolith",    name: "Mars Dust",     emoji: "🪐", cost: 360, a: "#d98a5f", b: "#a3552f" },
-    { id: "starfloor",   name: "Star Field",    emoji: "🌠", cost: 420, a: "#2b2450", b: "#10102a" },
-    { id: "rainbowfloor", name: "Rainbow Tiles", emoji: "🌈", cost: 460, a: "#ffb3c6", b: "#9bf6ff" }
+    { id: "earth",       name: "Packed Earth",  emoji: "🟫", cost: 0,   a: "#d9a86a", b: "#b98549", tex: "speck" },
+    { id: "wood",        name: "Wood Boards",   emoji: "🪵", cost: 0,   a: "#cfa06b", b: "#a97c4c", tex: "board" },
+    { id: "grass",       name: "Green Grass",   emoji: "🌱", cost: 0,   a: "#9bd97f", b: "#5fa845", tex: "speck" },
+    { id: "rug",         name: "Soft Red Rug",  emoji: "🟥", cost: 60,  a: "#e08c8c", b: "#b95f5f", tex: "weave" },
+    { id: "tile",        name: "Chequer Tiles", emoji: "♟️", cost: 60,  a: "#dfe4ec", b: "#a9b2c4", tex: "check" },
+    { id: "sand",        name: "Warm Sand",     emoji: "🏖️", cost: 60,  a: "#f2dcae", b: "#d4b877", tex: "speck" },
+    { id: "carpetpink",  name: "Pink Carpet",   emoji: "🩷", cost: 75,  a: "#ffb8d9", b: "#e07eb0", tex: "fluff" },
+    { id: "carpetblue",  name: "Blue Carpet",   emoji: "💙", cost: 75,  a: "#a9c8f5", b: "#6d92cf", tex: "fluff" },
+    { id: "stonefloor",  name: "Stone Slabs",   emoji: "🪨", cost: 90,  a: "#c3c7cf", b: "#91959e", tex: "slab" },
+    { id: "moss",        name: "Mossy Ground",  emoji: "🍀", cost: 120, a: "#8fc98a", b: "#5c9059", tex: "speck" },
+    { id: "marble",      name: "White Marble",  emoji: "🤍", cost: 120, a: "#f0f0f6", b: "#c9cad6", tex: "slab" },
+    { id: "water",       name: "Shallow Water", emoji: "💧", cost: 150, a: "#8fe4ff", b: "#4bb8e8", tex: "ripple" },
+    { id: "snow",        name: "Fresh Snow",    emoji: "❄️", cost: 150, a: "#eef7ff", b: "#c3d8ea", tex: "fluff" },
+    { id: "lavafloor",   name: "Cooling Lava",  emoji: "🔥", cost: 190, a: "#e8724a", b: "#a83a22", tex: "slab" },
+    { id: "cloudfloor",  name: "Cloud Floor",   emoji: "☁️", cost: 200, a: "#ffffff", b: "#dfe8ff", tex: "fluff" },
+    { id: "candyfloor",  name: "Candy Floor",   emoji: "🍭", cost: 200, a: "#ffc2e0", b: "#f07fb8", tex: "check" },
+    { id: "blockfloor",  name: "Block Tiles",   emoji: "🟩", cost: 220, a: "#7ecb6b", b: "#4d9440", tex: "check" },
+    { id: "goldfloor",   name: "Gold Floor",    emoji: "🪙", cost: 300, a: "#ffd97a", b: "#d2a02f", tex: "slab" },
+    { id: "glass",       name: "Glass Deck",    emoji: "🔷", cost: 320, a: "#bfe6ff", b: "#7fb8dd", tex: "slab" },
+    { id: "metal",       name: "Steel Deck",    emoji: "🛠️", cost: 340, a: "#c8ccd6", b: "#8b91a0", tex: "slab" },
+    { id: "regolith",    name: "Mars Dust",     emoji: "🪐", cost: 360, a: "#d98a5f", b: "#a3552f", tex: "speck" },
+    { id: "starfloor",   name: "Star Field",    emoji: "🌠", cost: 420, a: "#2b2450", b: "#10102a", tex: "starrys" },
+    { id: "rainbowfloor", name: "Rainbow Tiles", emoji: "🌈", cost: 460, a: "#ffb3c6", b: "#9bf6ff", tex: "check" },
+    /* --- the second floor plan --- */
+    { id: "strawfloor", name: "Straw Bedding", emoji: "🌾", cost: 0,   a: "#f0dda8", b: "#d9c081", tex: "weave" },
+    { id: "cork",       name: "Cork Tiles",   emoji: "🟤", cost: 60,  a: "#d8b183", b: "#b98f5f", tex: "speck" },
+    { id: "matting",    name: "Sea Grass Mat", emoji: "🧺", cost: 70,  a: "#ded0a8", b: "#bfae83", tex: "weave" },
+    { id: "carpetgreen", name: "Green Carpet", emoji: "💚", cost: 75,  a: "#a8d8a0", b: "#6fae6f", tex: "fluff" },
+    { id: "parquet",    name: "Parquet",      emoji: "🪵", cost: 110, a: "#dbab72", b: "#b58248", tex: "check" },
+    { id: "brickfloor", name: "Brick Path",   emoji: "🧱", cost: 120, a: "#d99a7a", b: "#b06f50", tex: "slab" },
+    { id: "cobbles",    name: "Cobblestones", emoji: "🪨", cost: 130, a: "#c0c4cc", b: "#8c9099", tex: "speck" },
+    { id: "ice_floor",  name: "Polished Ice", emoji: "⛸️", cost: 160, a: "#d6f2ff", b: "#a2d4ec", tex: "slab" },
+    { id: "leaflitter", name: "Leaf Litter",  emoji: "🍂", cost: 170, a: "#e0a86a", b: "#b3743c", tex: "speck" },
+    { id: "sandbar",    name: "Wet Sand",     emoji: "🏝️", cost: 180, a: "#e6d0a0", b: "#c2a87a", tex: "ripple" },
+    { id: "circusring", name: "Circus Ring",  emoji: "🎪", cost: 200, a: "#f0d5b0", b: "#c9a06a", tex: "check" },
+    { id: "arcadefloor", name: "Neon Grid",   emoji: "🕹️", cost: 260, a: "#2a2350", b: "#12102e", tex: "check" },
+    { id: "fossilfloor", name: "Fossil Bed",  emoji: "🦴", cost: 280, a: "#ded2b8", b: "#b3a488", tex: "speck" },
+    { id: "coralfloor", name: "Coral Sand",   emoji: "🐚", cost: 300, a: "#ffe2d0", b: "#e6b39a", tex: "speck" },
+    { id: "obsidian",   name: "Obsidian",     emoji: "🖤", cost: 340, a: "#3a3550", b: "#191728", tex: "slab" },
+    { id: "moonfloor",  name: "Moon Dust",    emoji: "🌕", cost: 380, a: "#cfd0d8", b: "#9a9ba6", tex: "speck" },
+    { id: "nebulafloor", name: "Nebula Glass", emoji: "🌠", cost: 480, a: "#4a2a70", b: "#1b1038", tex: "starrys" }
   ];
 
   /* What you can see from the room. Each is a handful of things pinned
@@ -1835,7 +2186,44 @@ window.CPData = (function () {
     { id: "earthrise",  name: "Earthrise",       emoji: "🌍", cost: 420,
       deco: [["⭐", 14, 84], ["🛰️", 32, 72], ["✨", 46, 88], ["🌍", 74, 80]] },
     { id: "galaxyview", name: "The Whole Galaxy", emoji: "💫", cost: 480,
-      deco: [["✨", 12, 76], ["💫", 32, 84], ["🌌", 60, 88], ["🌠", 84, 74]] }
+      deco: [["✨", 12, 76], ["💫", 32, 84], ["🌌", 60, 88], ["🌠", 84, 74]] },
+
+    /* --- painted with the new scenery: each of these is a real
+       little landscape out of the window, not three floating emoji.
+       (The `deco` list is kept as the plain-text fallback for a
+       browser that will not draw inline SVG.) --- */
+    { id: "blossom",    name: "Cherry Blossom",  emoji: "🌸", cost: 90,
+      deco: [["🌸", 16, 74], ["🌸", 52, 80], ["🌸", 84, 72]] },
+    { id: "farmland",   name: "Open Farmland",   emoji: "🚜", cost: 100,
+      deco: [["🌾", 14, 66], ["🐑", 50, 62], ["🌾", 88, 66]] },
+    { id: "autumn",     name: "Autumn Woods",    emoji: "🍂", cost: 120,
+      deco: [["🍁", 18, 76], ["🌳", 54, 64], ["🍂", 86, 74]] },
+    { id: "desert",     name: "Desert Sun",      emoji: "🌵", cost: 130,
+      deco: [["🌵", 14, 64], ["☀️", 52, 80], ["🌵", 88, 62]] },
+    { id: "harbour",    name: "Busy Harbour",    emoji: "⚓", cost: 150,
+      deco: [["🚢", 20, 70], ["🗼", 60, 66], ["⚓", 88, 62]] },
+    { id: "waterfall",  name: "The Waterfall",   emoji: "💦", cost: 170,
+      deco: [["🏞️", 20, 66], ["💦", 52, 70], ["🌲", 88, 64]] },
+    { id: "savanna",    name: "Savanna Sunset",  emoji: "🦁", cost: 180,
+      deco: [["🌅", 22, 74], ["🦁", 56, 62], ["🌳", 88, 66]] },
+    { id: "canyon",     name: "Red Canyon",      emoji: "🏜️", cost: 190,
+      deco: [["🏜️", 16, 64], ["🦅", 54, 78], ["🏜️", 90, 62]] },
+    { id: "snowfield",  name: "Snow Field",      emoji: "⛄", cost: 200,
+      deco: [["🏔️", 18, 66], ["⛄", 56, 60], ["🌲", 88, 64]] },
+    { id: "stormview",  name: "Thunderstorm",    emoji: "⛈️", cost: 210,
+      deco: [["⛈️", 20, 78], ["⚡", 54, 72], ["🌧️", 86, 76]] },
+    { id: "moonrise",   name: "Moonrise",        emoji: "🌕", cost: 230,
+      deco: [["🌕", 50, 76], ["🌲", 16, 66], ["✨", 88, 80]] },
+    { id: "rooftops",   name: "Over the Rooftops", emoji: "🏘️", cost: 250,
+      deco: [["🏘️", 18, 64], ["🕊️", 54, 78], ["🏠", 88, 62]] },
+    { id: "reefview",   name: "The Coral Reef",  emoji: "🪸", cost: 270,
+      deco: [["🪸", 16, 62], ["🐠", 50, 74], ["🐡", 88, 66]] },
+    { id: "nightcity",  name: "City After Dark", emoji: "🌃", cost: 320,
+      deco: [["🌃", 20, 66], ["🌙", 60, 82], ["✨", 90, 74]] },
+    { id: "marsfield",  name: "The Mars Dome",   emoji: "🛖", cost: 400,
+      deco: [["🛖", 50, 62], ["🌗", 84, 80], ["🚙", 20, 60]] },
+    { id: "deepspace",  name: "Deep Space",      emoji: "🌠", cost: 500,
+      deco: [["🌠", 20, 80], ["🛸", 56, 70], ["✨", 88, 84]] }
   ];
 
   function byId(list, id, fallback) {
@@ -1973,9 +2361,11 @@ window.CPData = (function () {
   }
 
   /* Today's shelves: always some cheap food, plus a rotating handful of
-     treats, soap, toys, books, furniture and a couple of paint brushes.
-     The shelf is deliberately big — with this much stock the shop is a
-     real choice ("what is this worth to me?") rather than a queue. */
+     treats, soap, toys, books, furniture and a few paint brushes.
+     The shelf is deliberately big — with several hundred things in the
+     valley the shop should be a real choice ("what is this worth to
+     me?") rather than a queue, and the Market groups what it deals out
+     into proper labelled shelves so it still reads at a glance. */
   function shopStock(now, whoId) {
     var day = dayNumber(now) + whoSeed(whoId);
     var cheap = FOODS.filter(function (f) { return f.cost <= 12 && notRare(f); });
@@ -1987,22 +2377,22 @@ window.CPData = (function () {
       if (!c.free) brushes.push({ id: "brush:" + c.id, name: c.name + " Brush", emoji: "🖌️", cost: c.cost, kind: "brush", colour: c.id, swatch: c.swatch });
     });
     return []
-      .concat(seededPick(cheap, 4, day * 7 + 1).map(tag("food")))
-      .concat(seededPick(treats, 4, day * 7 + 2).map(tag("food")))
+      .concat(seededPick(cheap, 6, day * 7 + 1).map(tag("food")))
+      .concat(seededPick(treats, 6, day * 7 + 2).map(tag("food")))
       // Something to WASH with, every single day. A Craepet gets grubby on
       // its own whether you have coins or not, so the shelf must never come
       // up all pillows and tonics and no soap.
-      .concat(seededPick(CARE.filter(function (c) { return c.clean && notRare(c); }), 2, day * 7 + 3).map(tag("care")))
-      .concat(seededPick(CARE.filter(function (c) { return !c.clean && notRare(c); }), 2, day * 7 + 10).map(tag("care")))
-      .concat(seededPick(TOYS.filter(notRare), 3, day * 7 + 4).map(tag("toy")))
-      .concat(seededPick(BOOKS.filter(notRare), 2, day * 7 + 5).map(tag("book")))
+      .concat(seededPick(CARE.filter(function (c) { return c.clean && notRare(c); }), 3, day * 7 + 3).map(tag("care")))
+      .concat(seededPick(CARE.filter(function (c) { return !c.clean && notRare(c); }), 3, day * 7 + 10).map(tag("care")))
+      .concat(seededPick(TOYS.filter(notRare), 5, day * 7 + 4).map(tag("toy")))
+      .concat(seededPick(BOOKS.filter(notRare), 4, day * 7 + 5).map(tag("book")))
       // Furniture in three price bands now that there are well over a
       // hundred pieces: something a small purse can afford, something to
       // save a day for, and something to save a week for.
-      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 60 && notRare(f); }), 3, day * 7 + 8).map(tag("decor")))
-      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 60 && f.cost <= 150 && notRare(f); }), 3, day * 7 + 9).map(tag("decor")))
-      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 150 && notRare(f); }), 2, day * 7 + 11).map(tag("decor")))
-      .concat(seededPick(brushes, 2, day * 7 + 6));
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost <= 60 && notRare(f); }), 4, day * 7 + 8).map(tag("decor")))
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 60 && f.cost <= 150 && notRare(f); }), 5, day * 7 + 9).map(tag("decor")))
+      .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 150 && notRare(f); }), 4, day * 7 + 11).map(tag("decor")))
+      .concat(seededPick(brushes, 3, day * 7 + 6));
   }
   function tag(kind) { return function (it) { var c = {}; for (var k in it) c[k] = it[k]; c.kind = kind; return c; }; }
 
@@ -2131,6 +2521,26 @@ window.CPData = (function () {
   };
 
 
+  /* =========================================================
+     HOW BIG IS THE VAULT? Only the HAND-WRITTEN questions can be
+     counted — the sums and the spelling drills are made fresh
+     every time and never run out — so this is what the Trivia Log
+     measures your progress against.
+     ========================================================= */
+  var WRITTEN = {
+    mid:   SCI_MID.length + SPELL_MID.length + SYN_MID.length + RHYMES.length +
+           TINY_WORDS.length + COMPOUNDS.length + vault("word", "mid").length +
+           vault("math", "mid").length,
+    big:   SCI_BIG.length + SPELL_BIG.length + SYN_BIG.length + ANT_BIG.length +
+           HOMOPHONES.length + AFFIX_BIG.length + vault("word", "big").length +
+           vault("math", "big").length,
+    grown: SCI_GROWN.length + VOCAB_GROWN.length + IDIOMS.length + CONFUSED.length +
+           vault("word", "grown").length + vault("math", "grown").length
+  };
+  WRITTEN.tot = 0;
+  WRITTEN.early = 0;
+  WRITTEN.all = WRITTEN.mid + WRITTEN.big + WRITTEN.grown;
+
   return {
     PROFILES: PROFILES,
     TIERS: TIERS,
@@ -2153,6 +2563,8 @@ window.CPData = (function () {
     QUEST_POOL: QUEST_POOL,
 
     ask: ask,
+    qKey: qKey,
+    WRITTEN: WRITTEN,
     reshuffle: reshuffle,
     shopStock: shopStock,
     rareFinds: rareFinds,

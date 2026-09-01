@@ -90,6 +90,9 @@
       today: {},
       /* Questions you got wrong, waiting to come back around. */
       review: [],
+      /* Every question you have ever been asked, so the game can go
+         looking for one you have NOT. See THE QUESTION TRACKER. */
+      seen: {},
       /* A half-filled berry patch should still be there tomorrow. */
       harvest: { farm: [], well: [], pool: [] },
       /* Your own house. `homes` is every home you have ever bought —
@@ -116,7 +119,8 @@
       stats: { correct: 0, wrong: 0, best: 0, streak: 0, farm: 0, well: 0, pool: 0,
                arena: 0, arenaWin: 0, feed: 0, play: 0, wash: 0, read: 0, buy: 0,
                quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {},
-               spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0, styled: 0 },
+               spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0, styled: 0,
+               newq: 0, repeatq: 0 },
       trophies: []
     };
   }
@@ -133,6 +137,7 @@
     // A save written by an older build has no baskets and no review pile —
     // normalise them here so nothing downstream has to keep checking.
     if (!Array.isArray(s.review)) s.review = [];
+    if (!s.seen || typeof s.seen !== "object" || Array.isArray(s.seen)) s.seen = {};
     if (!s.harvest || typeof s.harvest !== "object") s.harvest = { farm: [], well: [], pool: [] };
     ["farm", "well", "pool"].forEach(function (p) {
       if (!Array.isArray(s.harvest[p])) s.harvest[p] = [];
@@ -546,40 +551,108 @@
     case:   { tag: "🏆 Trophy Case",  deco: [["🏆", 12, 10], ["🎖️", 86, 12], ["✨", 50, 74]] }
   };
 
-  /* Where each piece of furniture stands in the room. The middle of the
-     floor is left clear on purpose — that is where the Craepet is.
-     There are enough spots here for the biggest home in the game. */
-  var HOME_SPOTS = [
-    [7, 9], [21, 8], [34, 10], [67, 10], [80, 8], [93, 9],
-    [11, 27], [26, 25], [75, 25], [90, 27],
-    [4, 44], [18, 42], [83, 42], [97, 44],
-    [8, 58], [24, 62], [40, 60], [61, 60], [77, 62], [92, 58],
-    [16, 78], [46, 80], [85, 78],
-    [2, 32], [98, 32], [3, 66], [97, 66], [62, 74]
+  /* =========================================================
+     THE ROOM, DRAWN PROPERLY.
+
+     The old room was a two-colour gradient with a handful of emoji
+     floating at random heights, which is why every home looked like
+     every other home with different crayons. Now it is built in
+     layers, and each layer is drawn the way that layer wants to be:
+
+       · wall and floor  — CSS, because they MUST meet at 55% of the
+                           scene's height (that is where the Craepet's
+                           feet are) whatever shape the screen is, and
+                           each carries a real texture now: bricks,
+                           boards, ice facets, star dust.
+       · the view        — a painted SVG scene seen through a real
+                           window, whose shape follows the house: a
+                           porthole in space, a gothic arch in the
+                           palace, a knot-hole in the nest.
+       · your furniture  — standing on the floor in rows, the far ones
+                           drawn smaller, each with a shadow under it;
+                           and the things that HANG (pictures, mirrors,
+                           banners) up on the wall where they belong.
+
+     All of the painting lives in scenery.js.
+     ========================================================= */
+  var ART = window.CPArt || null;
+
+  /* Floor rows, back to front: [bottom %, size, the x positions on it].
+     The middle of every row is left clear on purpose — that is where
+     the Craepet stands. Further back = smaller = the room has depth. */
+  var FLOOR_ROWS = [
+    { y: 44, s: 0.62, xs: [7, 18, 29, 71, 82, 93] },
+    { y: 31, s: 0.78, xs: [4, 16, 84, 96] },
+    { y: 17, s: 0.96, xs: [6, 19, 81, 94] },
+    { y: 2,  s: 1.16, xs: [11, 27, 73, 89] }
   ];
-  /* The room = what you can see out of the window, and then whatever you
-     have put out standing in front of it. An empty house with no view
-     chosen keeps the starter decorations so it is never a bare box. */
-  function nestDeco() {
+  /* Hanging spots live on the left half of the wall, because the window
+     takes the right — nobody hangs a picture over the window. */
+  var WALL_SPOTS = [
+    [10, 66, 0.85], [23, 56, 0.75], [36, 66, 0.8], [48, 58, 0.7],
+    [10, 48, 0.7], [23, 72, 0.7], [36, 48, 0.65], [48, 72, 0.6]
+  ];
+
+  function decoSpan(emoji, x, y, scale, cls) {
+    return '<span class="deco ' + (cls || "") + '" aria-hidden="true" style="left:' + x +
+      "%;bottom:" + y + "%;--s:" + scale + '">' + emoji + "</span>";
+  }
+
+  /* Everything you have put out, standing where it should stand. */
+  function homeItemsHtml() {
     var mine = placedItems();
-    // The view sits high up, but never so high that it collides with the
-    // room's name badge in the top-left corner of the scene.
-    var out = (viewNow().deco || []).map(function (d) {
-      return [d[0], d[1], Math.min(d[2], 72)];
-    });
-    if (!mine.length && !out.length) return PLACES.nest.deco;
-    mine.forEach(function (it, i) {
-      var sp = HOME_SPOTS[i % HOME_SPOTS.length];
-      out.push([it.emoji, sp[0], sp[1]]);
+    var out = "", floorN = 0, wallN = 0;
+    mine.forEach(function (it) {
+      if (it.hang) {
+        var w = WALL_SPOTS[wallN++ % WALL_SPOTS.length];
+        out += decoSpan(it.emoji, w[0], w[1], w[2], "hung");
+      } else {
+        var row = FLOOR_ROWS[floorN % FLOOR_ROWS.length];
+        var x = row.xs[Math.floor(floorN / FLOOR_ROWS.length) % row.xs.length];
+        floorN++;
+        out += decoSpan(it.emoji, x, row.y, row.s, "furn");
+      }
     });
     return out;
   }
+
+  /* The window, with the view painted inside it. Rendered even in an
+     empty house, so a brand new Straw Nest still has something to look
+     at — which was the whole complaint. */
+  function windowHtml() {
+    var v = viewNow();
+    if (v.id === "none") return "";
+    if (!ART) {
+      // No scenery.js (or a browser that will not draw it): fall back to
+      // the old floating emoji, so the room is never blank.
+      return (v.deco || []).map(function (d) {
+        return decoSpan(d[0], d[1], Math.min(d[2], 72), 1, "");
+      }).join("");
+    }
+    var frame = ART.frame(houseInfo());
+    return '<div class="win win-' + frame + '" aria-hidden="true">' +
+      ART.view(v.id) +
+      '<span class="win-glass"></span><span class="win-bars"></span>' +
+      "</div>";
+  }
+
   /* The walls and the floor, as one background. The join sits at 55%,
      which is where the Craepet's feet are. */
   function homeBackground() {
     var w = wallNow(), f = floorNow();
     return "linear-gradient(180deg," + w.a + " 0%," + w.b + " 55%," +
            f.a + " 55%," + f.b + " 100%)";
+  }
+
+  /* The two texture layers that turn "grey" into "stone". */
+  function textureHtml() {
+    if (!ART) return "";
+    return '<span class="wall-tex" aria-hidden="true" style="background-image:' +
+        ART.wallTexture(wallNow()) + '"></span>' +
+      '<span class="floor-tex" aria-hidden="true" style="background-image:' +
+        ART.floorTexture(floorNow()) + '"></span>' +
+      '<span class="skirting" aria-hidden="true" style="background:' +
+        ART.shade(floorNow().b, -30, 0.55) + '"></span>';
   }
 
   var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -628,16 +701,31 @@
     // repainting shows up the instant you tap it.
     var paint = atHome ? ' style="background:' + homeBackground() + '"' : "";
     var tag = atHome ? houseInfo().emoji + " " + homeName() : pl.tag;
-    var deco = (atHome ? nestDeco() : pl.deco).map(function (d) {
-      return '<span class="deco" aria-hidden="true" style="left:' + d[1] + '%;bottom:' + d[2] + '%">' + d[0] + "</span>";
-    }).join("");
+
+    var body;
+    if (atHome) {
+      // Textures, then the window and the view through it, then your
+      // furniture standing in front of both.
+      body = textureHtml() + windowHtml() + homeItemsHtml() +
+        '<span class="pet-shadow" aria-hidden="true"></span>';
+    } else if (ART && ART.hasPano(place)) {
+      // Everywhere else gets a painted panorama instead of the old
+      // scatter of emoji — same idea, an actual picture of the place.
+      body = '<span class="pano" aria-hidden="true">' + ART.pano(place) + "</span>";
+    } else {
+      body = (pl.deco || []).map(function (d) {
+        return decoSpan(d[0], d[1], d[2], 1, "");
+      }).join("");
+    }
+
     var label = S.pet
       ? S.pet.name + ", a " + P.colour(S.pet.colour).name + " " + P.species(S.pet.species).name +
         ", looking " + mood() + ", at " + tag.replace(/^\S+\s/, "")
       : "your Craepet";
     return '<div class="scene ' + skin + (place === "nest" ? "" : " compact") + '" id="scene"' + paint + " " +
       'role="button" tabindex="0" aria-label="' + esc(label) + '. Tap to say hello.">' +
-      '<span class="place-tag" aria-hidden="true">' + esc(tag) + "</span>" + deco +
+      body +
+      '<span class="place-tag" aria-hidden="true">' + esc(tag) + "</span>" +
       '<canvas id="pet-canvas" aria-hidden="true"></canvas>' +
       '<div id="bubble-slot" role="status" aria-live="polite"></div>' +
     "</div>";
@@ -925,6 +1013,62 @@
      good ("you fixed it"), which is what actually shifts a fact
      from "saw it once" to "know it".
      ========================================================= */
+  /* =========================================================
+     THE QUESTION TRACKER — has this one come up before?
+
+     The game keeps a log of every question it has ever asked YOU.
+     Two things run off it:
+
+       · the asker deals candidate after candidate and stops at the
+         first question you have never met, so the vault gets used
+         properly instead of the same forty facts on a loop;
+       · the card says so out loud — 🆕 for new ground, 👀 with a
+         count for a repeat — because "have I done this one?" is a
+         question children ask constantly, and guessing is horrible.
+
+     Keys are HASHED before they go in the save. The full text of a
+     thousand questions would not fit in localStorage; a thousand
+     short fingerprints will.
+     ========================================================= */
+  var SEEN_MAX = 4000;
+
+  function qhash(str) {
+    var h = 5381;
+    for (var i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  }
+  function seenRow(key) {
+    if (!key || !S.seen) return null;
+    return S.seen[qhash(key)] || null;
+  }
+  /* How many times this player has met this exact question. This is the
+     function handed to the asker, which is what makes it hunt. */
+  function seenTimes(key) { var r = seenRow(key); return r ? r[0] : 0; }
+
+  function keyOf(q) {
+    return (q && q.key) || (D.qKey ? D.qKey(q) : reviewKey(q));
+  }
+
+  function markSeen(q, correct) {
+    if (!q || !q.choices) return;
+    if (!S.seen) S.seen = {};
+    var key = keyOf(q);
+    if (!key) return;
+    var h = qhash(key), row = S.seen[h];
+    if (row) { bump("repeatq"); } else { row = [0, 0]; bump("newq"); }
+    row[0]++;
+    if (correct) row[1]++;
+    S.seen[h] = row;
+    // localStorage is not infinite. If the log ever gets enormous, drop
+    // the oldest slice — a question met once, months ago, is the
+    // cheapest thing in here to forget.
+    var keys = Object.keys(S.seen);
+    if (keys.length > SEEN_MAX) {
+      keys.slice(0, Math.floor(SEEN_MAX / 4)).forEach(function (k) { delete S.seen[k]; });
+    }
+  }
+  function seenCount() { return S.seen ? Object.keys(S.seen).length : 0; }
+
   var REVIEW_MAX = 40;
   var reviewGap = 0;              // questions still to go before a re-ask
 
@@ -994,7 +1138,16 @@
       return q;
     }
     if (reviewGap > 0) reviewGap--;
-    return D.ask(subject, tier());
+    var fresh = D.ask(subject, tier(), seenTimes);
+    if (fresh) {
+      // Snapshot the log now: by the time the card is drawn the answer
+      // has been counted, and "you have seen this once" would be a lie
+      // told about this very moment.
+      var row = seenRow(keyOf(fresh));
+      fresh.seen = row ? row[0] : 0;
+      fresh.seenRight = row ? row[1] : 0;
+    }
+    return fresh;
   }
 
   /* Read the question out for the players who can't read it yet. */
@@ -1071,8 +1224,19 @@
 
     var streakLine = S.stats.streak > 1 ? "🔥 " + S.stats.streak + " in a row" : "";
 
-    var badge = Q.fromReview
-      ? '<p class="second-look">🔁 Second look — you missed this one before</p>' : "";
+    // Have you done this one before? Say so, plainly, every single time.
+    var badge = "";
+    if (Q.fromReview) {
+      badge = '<p class="second-look">🔁 Second look — you missed this one before</p>';
+    } else if (Q.seen > 0) {
+      var times = Q.seen === 1 ? "once before" : Q.seen + " times before";
+      var got = Q.seenRight
+        ? " — you got it right " + (Q.seenRight === 1 ? "that time" : Q.seenRight + " of those times")
+        : " — you have not got it right yet";
+      badge = '<p class="second-look seen-before">👀 You have seen this ' + times + got + "</p>";
+    } else if (Q.seen === 0) {
+      badge = '<p class="second-look brand-new">🆕 Brand new — you have never been asked this one</p>';
+    }
 
     var after = "";
     if (q.state === "done") {
@@ -1137,6 +1301,7 @@
     holder.correct = correct;
     holder.state = "done";
     holder.misses = 0;
+    markSeen(Q, correct);
 
     if (correct) {
       S.stats.streak++;
@@ -1611,8 +1776,9 @@
       "</div>"
       : '<div class="panel"><h2>📦 In storage</h2>' +
         '<p class="sub">Nothing packed away. There are <b>' + D.FURNITURE.length +
-        " pieces of furniture</b> in the valley — the 🏪 Market puts eight different ones " +
-        "on the shelf every morning.</p></div>");
+        " pieces of furniture</b> in the valley, across " + D.FURNITURE_SETS.length +
+        " themed sets — and the 🏪 Market puts a dozen different ones on the shelf " +
+        "every morning.</p></div>");
   }
 
   /* --- 🏘️ tab two: every home in the game, grouped by where it is ---
@@ -1673,8 +1839,13 @@
         var have = ownsStyle(p.kind, x.id);
         var on = x.id === p.now;
         var afford = S.coins >= x.cost;
+        // A view is a picture, so the button shows the PICTURE — painted
+        // at thumbnail size by the same code that paints the window.
+        // Picking a view out of a list of emoji was guesswork.
         var chip = p.kind === "view"
-          ? '<span class="pic">' + x.emoji + "</span>"
+          ? (ART && ART.hasView(x.id)
+              ? '<span class="viewchip">' + ART.view(x.id) + "</span>"
+              : '<span class="pic">' + x.emoji + "</span>")
           : '<span class="paintchip" style="background:linear-gradient(180deg,' + x.a + ',' + x.b + ')"></span>';
         var from = (!x.cost || (S.house[STYLE[p.kind].own] || []).indexOf(x.id) !== -1)
           ? null : styleFrom(p.kind, x.id);
@@ -2246,8 +2417,41 @@
     "</button>";
   }
 
+  /* The Market's shelves. With several hundred things in the valley the
+     stall deals out a lot every morning, so it is sorted into proper
+     labelled shelves — one flat grid of forty cards is a wall, not a
+     shop. Anything that somehow has no shelf still gets shown. */
+  var SHELVES = [
+    { kind: "food",  name: "🍎 Food & treats", note: "Fills the tummy, and the sweet ones lift the mood." },
+    { kind: "care",  name: "🧼 Wash & rest",   note: "Soap, sponges and things to sleep under." },
+    { kind: "toy",   name: "🧸 Toys",          note: "Yours for good, and they keep boredom away all day." },
+    { kind: "book",  name: "📚 Books",         note: "Read once for a real fact and a lump of experience." },
+    { kind: "decor", name: "🏠 Furniture",     note: "Goes to your 🏠 House, to stand where you can see it." },
+    { kind: "brush", name: "🖌️ Paint brushes", note: "A brand new colour for your Craepet." }
+  ];
+
+  function shelvesHtml(stock, extra) {
+    var used = {};
+    var out = SHELVES.map(function (sh) {
+      var mine = stock.filter(function (it) { return it.kind === sh.kind; });
+      if (!mine.length) return "";
+      mine.forEach(function (it) { used[it.id] = true; });
+      return '<h3 class="shelf">' + sh.name +
+        ' <small>' + mine.length + "</small></h3>" +
+        '<p class="sub shelfnote">' + sh.note + "</p>" +
+        '<div class="items">' + mine.map(function (it) { return itemCard(it, extra); }).join("") + "</div>";
+    }).join("");
+    var rest = stock.filter(function (it) { return !used[it.id]; });
+    if (rest.length) {
+      out += '<h3 class="shelf">✨ Odds and ends</h3><div class="items">' +
+        rest.map(function (it) { return itemCard(it, extra); }).join("") + "</div>";
+    }
+    return out;
+  }
+
   function marketHtml() {
-    var cards = D.shopStock(null, who).map(function (it) { return itemCard(it); }).join("");
+    var stock = D.shopStock(null, who);
+    var cards = shelvesHtml(stock);
     var mineRare = D.rareFor(who, null, activePlayers());
     var elsewhere = D.rareElsewhere(who, null, activePlayers());
 
@@ -2274,9 +2478,11 @@
 
     return '<div class="panel">' +
       "<h2>🏪 The Market</h2>" +
-      '<p class="sub">Fresh stock every morning — and <b>everybody\'s shelf is different</b>, so ' +
+      '<p class="sub"><b>' + stock.length + " things on the shelves today</b>, out of the <b>" +
+        (D.FOODS.length + D.TOYS.length + D.CARE.length + D.BOOKS.length + D.FURNITURE.length) +
+        "</b> in the valley — fresh stock every morning, and <b>everybody's shelf is different</b>, so " +
         "what you cannot find here might be sitting in somebody else's shop. You have 🪙 " + S.coins + ".</p>" +
-      '<div class="items">' + cards + "</div>" +
+      cards +
       '<p class="sub" style="margin-top:0.8rem">Everything you buy lands in your 🎒 <b>Bag</b> — ' +
         "food for 🍽️ Feed, toys for 🎾 Play, soap for 🫧 Wash, pillows for 😴 Rest and books for 📖 Read. " +
         "🏠 <b>Furniture</b> goes to your House instead, to put out where you can see it.</p>" +
@@ -2770,11 +2976,47 @@
         "<small>" + ((s.stats && s.stats.correct) || 0) + " right</small></div>";
     }).join("");
 
+    /* --- 🧠 the trivia log ---------------------------------------
+       The tracker's own page: how much of the vault this player has
+       actually met, how much of it they have met more than once, and
+       how much is still out there waiting. */
+    var rows = [];
+    if (S.seen) Object.keys(S.seen).forEach(function (k) { rows.push(S.seen[k]); });
+    var met = rows.length;
+    var again = rows.filter(function (r) { return r[0] > 1; }).length;
+    var cold = rows.filter(function (r) { return r[1] >= 2; }).length;
+    var never = rows.filter(function (r) { return r[1] === 0; }).length;
+    var vaultSize = (D.WRITTEN && D.WRITTEN.all) || 0;
+    var bar = vaultSize ? Math.min(100, Math.round(met / vaultSize * 100)) : 0;
+
+    var log = [
+      ["🧠", met, "different questions met"],
+      ["🆕", S.today.newq || 0, "new ones today"],
+      ["👀", again, "you have met twice or more"],
+      ["🧊", cold, "you know cold"],
+      ["🎯", never, "still not right once"]
+    ].map(function (r) {
+      return '<div class="stat"><b>' + r[0] + " " + r[1] + "</b><small>" + r[2] + "</small></div>";
+    }).join("");
+
+    var logPanel = '<div class="panel"><h2>🧠 Trivia log</h2>' +
+      '<p class="sub">The game remembers every question it has ever asked you, so it can go ' +
+      "looking for one you have <b>never seen</b> — and the card always says which it is: " +
+      '<b>🆕 brand new</b> or <b>👀 seen before</b>.</p>' +
+      '<div class="statgrid">' + log + "</div>" +
+      '<div class="vaultbar" role="img" aria-label="' + met + " of " + vaultSize +
+        ' hand-written questions met"><i style="width:' + bar + '%"></i></div>' +
+      '<p class="sub" style="margin:0.45rem 0 0">There are <b>' + vaultSize +
+      "</b> hand-written questions in the vault — plus sums, spellings and letters that are " +
+      "made fresh every time and never run out. You have met <b>" + met + "</b> different " +
+      "questions so far.</p></div>";
+
     return '<div class="panel"><h2>🏆 Trophy case</h2>' +
       '<p class="sub">' + S.trophies.length + " of " + D.TROPHIES.length + " earned.</p>" +
       '<div class="trophies">' + trophies + "</div></div>" +
     '<div class="panel"><h2>📊 What you have learned</h2>' +
       '<div class="statgrid">' + stats + "</div></div>" +
+    logPanel +
     '<div class="panel"><h2>👨‍👩‍👧‍👦 The family valley</h2>' +
       '<p class="sub">Everyone who plays on this device has their own Craepet.</p>' +
       '<div class="family">' + fam + "</div></div>" +

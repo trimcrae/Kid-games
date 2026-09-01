@@ -73,17 +73,103 @@
     .scene.market { background: linear-gradient(180deg, #ffd9a8 0%, #fff2dd 52%, #c9906a 52%, #a06f4f 100%); }
     .scene.arena  { background: linear-gradient(180deg, #ffc9c9 0%, #ffeaea 52%, #e0b489 52%, #bb8f65 100%); }
     .scene.stall  { background: linear-gradient(180deg, #d8f0ff 0%, #f0faff 52%, #e2b57e 52%, #b9895a 100%); }
-    .scene canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
+    .scene canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; z-index: 3; }
+
+    /* --- the painted scenery (scenery.js) ---------------------------
+       The room is built in layers. Wall texture and floor texture are
+       CSS so the join between them lands on 55% exactly at every screen
+       shape; the view through the window and the outdoor panoramas are
+       inline SVG so circles stay circular. */
+    .scene .wall-tex, .scene .floor-tex {
+      position: absolute; left: 0; right: 0; pointer-events: none;
+      background-repeat: repeat; opacity: 0.85;
+    }
+    .scene .wall-tex  { top: 0; height: 55%; }
+    .scene .floor-tex { bottom: 0; height: 45%; opacity: 0.7; }
+    /* the line where the wall meets the floor — one skirting board is
+       the cheapest depth cue there is */
+    .scene .skirting {
+      position: absolute; left: 0; right: 0; bottom: 45%; height: 3px;
+      pointer-events: none; opacity: 0.7;
+    }
+    /* a soft pool of shade under the Craepet, so it stands on the floor
+       instead of hovering above it */
+    .scene .pet-shadow {
+      position: absolute; left: 50%; bottom: 42%; width: 34%; height: 5%;
+      transform: translateX(-50%); border-radius: 50%; z-index: 2;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.22), rgba(0,0,0,0) 70%);
+      pointer-events: none;
+    }
+    /* the panorama behind the outdoor places */
+    .scene .pano { position: absolute; inset: 0; pointer-events: none; }
+    .scene .pano-art { width: 100%; height: 100%; display: block; }
+
+    /* --- the window, and the view through it ---------------------- */
+    .scene .win {
+      /* Sized from its HEIGHT so the frame keeps its shape on a short
+         compact scene as well as a tall one — a window sized by width
+         turns into an oval the moment the scene gets shorter. */
+      position: absolute; right: 6%; bottom: 58%; height: 38%; width: auto;
+      aspect-ratio: 4 / 3;
+      overflow: hidden; pointer-events: none; z-index: 1;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.28), inset 0 0 0 4px rgba(255,255,255,0.92);
+      border-radius: 6px;
+    }
+    .scene .win .view-art { width: 100%; height: 100%; display: block; }
+    /* a diagonal sheen, so it reads as glass rather than a hole */
+    .scene .win .win-glass {
+      position: absolute; inset: 0;
+      background: linear-gradient(122deg, rgba(255,255,255,0.28) 0 18%, rgba(255,255,255,0) 34%,
+                                          rgba(255,255,255,0.16) 46%, rgba(255,255,255,0) 62%);
+    }
+    /* the glazing bars */
+    .scene .win .win-bars {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(90deg, transparent calc(50% - 1.5px), rgba(255,255,255,0.92) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px)),
+        linear-gradient(0deg,  transparent calc(50% - 1.5px), rgba(255,255,255,0.92) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+    }
+    /* …and the shapes it comes in, which follow the house */
+    .scene .win-arch  { border-radius: 50% 50% 5px 5px / 42% 42% 5px 5px; }
+    .scene .win-arch .win-bars {
+      background: linear-gradient(0deg, transparent calc(42% - 1.5px), rgba(255,255,255,0.9) calc(42% - 1.5px) calc(42% + 1.5px), transparent calc(42% + 1.5px));
+    }
+    .scene .win-round, .scene .win-port { aspect-ratio: 1 / 1; border-radius: 50%; }
+    .scene .win-port {
+      box-shadow: 0 6px 16px rgba(43,36,64,0.35), inset 0 0 0 5px #c9ced9, inset 0 0 0 9px #8f97ad;
+    }
+    .scene .win-port .win-bars, .scene .win-round .win-bars { background: none; }
+    .scene .win-wide { aspect-ratio: 16 / 9; height: 30%; border-radius: 30px 30px 6px 6px / 18px 18px 6px 6px; }
+    .scene .win-hole {
+      aspect-ratio: 1 / 1; border-radius: 52% 48% 46% 54% / 50% 52% 48% 50%;
+      box-shadow: 0 6px 14px rgba(43,36,64,0.25), inset 0 0 0 5px rgba(150,110,60,0.55);
+    }
+    .scene .win-hole .win-bars, .scene .win-hole .win-glass { background: none; }
+    /* the compact scenes are barely a band, so the window shrinks with them */
+    .scene.compact .win { height: 32%; bottom: 61%; }
+
     .scene .deco {
-      position: absolute; font-size: clamp(1.2rem, 4vw, 2rem); opacity: 0.9;
-      pointer-events: none; user-select: none;
+      position: absolute; font-size: calc(clamp(1.3rem, 5vw, 2.3rem) * var(--s, 1));
+      opacity: 0.95; pointer-events: none; user-select: none; z-index: 2;
+      transform: translateX(-50%);
       filter: drop-shadow(0 3px 4px rgba(0,0,0,0.15));
     }
+    /* furniture standing on the floor gets a shadow pooled under it;
+       things that hang on the wall get one thrown down and sideways */
+    .scene .deco.furn::after {
+      content: ""; position: absolute; left: 50%; bottom: -6%; width: 100%; height: 26%;
+      transform: translateX(-50%); border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.3), rgba(0,0,0,0) 70%);
+    }
+    .scene .deco.hung { filter: drop-shadow(3px 5px 4px rgba(0,0,0,0.28)); }
+    /* the compact band is half the height, so everything in it comes down
+       a size — otherwise the furniture swamps the room */
+    .scene.compact .deco { font-size: calc(clamp(1rem, 3.6vw, 1.7rem) * var(--s, 1)); }
     /* The room's name sits ABOVE the scenery: a view with something in the
        top-left corner must never make the label unreadable. */
     .scene .place-tag {
       position: absolute; left: 10px; top: 8px; font-weight: bold; font-size: 0.85rem;
-      background: rgba(255,255,255,0.9); color: var(--ink); z-index: 2;
+      background: rgba(255,255,255,0.9); color: var(--ink); z-index: 5;
       border-radius: 999px; padding: 0.15rem 0.65rem; pointer-events: none;
     }
     .scene.well .place-tag, .scene.arena .place-tag { background: rgba(255,255,255,0.9); }
@@ -206,7 +292,36 @@
       background: #fff2dd; color: #94530b; border-radius: 999px;
       font-size: 0.8rem; font-weight: bold;
     }
+    /* …and the two the question tracker adds: brand new ground, or a
+       question you have met before and the count of how often. */
+    .second-look.brand-new  { background: #e2f8e8; color: #1f7a44; }
+    .second-look.seen-before { background: #eae4ff; color: #5b3fa8; }
     .teach i { font-style: normal; display: block; margin-top: 0.35rem; color: #7a7196; }
+
+    /* how much of the hand-written vault you have met */
+    .vaultbar {
+      height: 10px; background: #ece7f8; border-radius: 999px; overflow: hidden; margin-top: 0.7rem;
+    }
+    .vaultbar i {
+      display: block; height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+    }
+
+    /* the little painted thumbnail on each view in the Decorate tab */
+    .viewchip {
+      display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 10px;
+      overflow: hidden; margin-bottom: 0.35rem;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.8), 0 2px 6px rgba(43,36,64,0.16);
+    }
+    .viewchip svg { width: 100%; height: 100%; display: block; }
+
+    /* the Market's labelled shelves */
+    h3.shelf {
+      margin: 1.1rem 0 0.1rem; font-size: 1rem; color: var(--ink);
+      display: flex; align-items: baseline; gap: 0.4rem;
+    }
+    h3.shelf small { font-weight: normal; color: #8b83a8; font-size: 0.8rem; }
+    .shelfnote { margin: 0 0 0.5rem; font-size: 0.82rem; }
 
     /* the day-streak dots on the quest board */
     .daydots { text-align: center; font-size: 1.05rem; letter-spacing: 0.08em; margin: 0.2rem 0 0.7rem; }
@@ -494,6 +609,8 @@
   </main>
 
   <script src="pets.js"></script>
+  <script src="trivia.js"></script>
+  <script src="scenery.js"></script>
   <script src="data.js"></script>
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
