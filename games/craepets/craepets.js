@@ -108,6 +108,8 @@
     } catch (e) {}
   }
   function speak(text) { narrate([text]); }
+  /* A line's recording if the script has one, else the line itself. */
+  function spoken(text) { return (L && L.spoken) ? L.spoken(text) : text; }
   /* A random word of praise, recorded. */
   function praiseToken() {
     return L ? "p-" + Math.floor(Math.random() * L.PRAISE.length) : "Yes!";
@@ -1881,7 +1883,7 @@
               first: -1, lock: false, flips: 0, found: 0 };
     hush();
     render();
-    narrate([d.rule]);
+    narrate([spoken(d.rule)]);
     sfx("pop");
   }
   function flipCard(i) {
@@ -1901,7 +1903,8 @@
       match.found++;
       [ai, i].forEach(function (k) { var e = document.querySelector('[data-mc="' + k + '"]'); if (e) { e.classList.add("done"); e.disabled = true; } });
       sfx(match.found >= 3 ? "streak" : "good", match.found);
-      if (match.found >= match.pairs.length) { match.lock = true; setTimeout(endMatch, 500); }
+      if (match.found >= match.pairs.length) { match.lock = true; narrate(["g-match-done"]); setTimeout(endMatch, 500); }
+      else if (match.found === 1) narrate(["g-match-found"]);
     } else {
       match.lock = true;
       sfx("nope");
@@ -2014,7 +2017,7 @@
       onEnd: endCatch
     });
     sfx("pop");
-    narrate([CPCatch.state().rule.text]);
+    narrate([spoken(CPCatch.state().rule.text), "g-catch-go"]);
   }
   function stopCatch() {
     if (window.CPCatch) CPCatch.stop();
@@ -2050,6 +2053,7 @@
       '<p class="teach"><b>' + esc(res.rule.text) + "</b> " + esc(res.rule.why) + "</p>" +
       '<p style="margin:0.8rem 0 0"><button class="act" data-catchplay="1" style="--ac:#38b6ff;width:100%"><span class="em">🔁</span>Play again</button></p>'));
     sfx(res.score >= 6 ? "win" : "good");
+    narrate(newBest && res.score > 0 ? ["g-catch-over", "g-new-best"] : ["g-catch-over"]);
     if (res.score >= 6) { try { window.Confetti && Confetti.burst({ count: 60 }); } catch (e) {} }
   }
 
@@ -2196,18 +2200,21 @@
       "Three quests a day, same three for the whole family. Race them.", "The wheel is eight slices, all the same size. One in eight, every time.",
       "Your gift grows every day you come back. Don't break the streak!", "Random events? Oh, they happen on the paths. Keep walking." ] }
   };
-  function npcLine(npc) {
-    var n = ((S.today.correct || 0) + (S.today.buy || 0) + D.dayNumber()) % npc.lines.length;
-    return npc.lines[n];
+  /* The lines live in lines.js (so they are recorded); these are the
+     fallback if the script is missing. */
+  function npcLine(id, npc) {
+    var lines = (L && L.NPC && L.NPC[id]) || npc.lines;
+    var n = ((S.today.correct || 0) + (S.today.buy || 0) + D.dayNumber()) % lines.length;
+    return lines[n];
   }
   function npcHtml(id) {
     var npc = NPCS[id];
     if (!npc) return "";
-    var line = npcLine(npc);
+    var line = npcLine(id, npc);
     return '<div class="npc"><img alt="" src="' + P.chip(npc.species, npc.colour, 48) + '">' +
       '<div class="npcsay"><b>' + esc(npc.name) + '</b> <small>· a ' + esc(P.colour(npc.colour).name) + " " + esc(P.species(npc.species).name) + "</small>" +
       '<i>“' + esc(line) + '”</i></div>' +
-      '<button class="mini" data-say-text="' + esc(npc.name + " says: " + line) + '" aria-label="Hear ' + esc(npc.name) + '">🔊</button></div>';
+      '<button class="mini" data-say-text="' + esc(line) + '" aria-label="Hear ' + esc(npc.name) + '">🔊</button></div>';
   }
 
   /* =========================================================
@@ -2805,7 +2812,11 @@
       if (wx.id === "sunny") extra.push("What a sunny day!");
       if (S.pet.petpet) extra.push(S.pet.petpet.name + " is my best friend.", "Come on, " + S.pet.petpet.name + "!");
       if (S.dayStreak >= 3) extra.push("You came back again! " + S.dayStreak + " days!");
-      if (extra.length) return { text: extra[Math.floor(Math.random() * extra.length)], tok: null };
+      if (extra.length) {
+        var line = extra[Math.floor(Math.random() * extra.length)];
+        var tk = spoken(line);
+        return { text: line, tok: tk === line ? null : tk };
+      }
     }
     return { text: D.MOODS[m][i], tok: "m-" + m + "-" + i };
   }
@@ -5435,7 +5446,7 @@
     var mc = t.closest("[data-mc]");
     if (mc) return flipCard(Number(mc.dataset.mc));
     var sayText = t.closest("[data-say-text]");
-    if (sayText) { narrate([sayText.dataset.sayText], { force: true }); return; }
+    if (sayText) { narrate([spoken(sayText.dataset.sayText)], { force: true }); return; }
 
     // --- the bank ---
     var bankBtn = t.closest("[data-bank]");

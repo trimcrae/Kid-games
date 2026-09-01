@@ -1462,6 +1462,16 @@ const GAMES = {
     if (await page.evaluate(() => Craepets.state().today.events) !== 1) throw new Error("the event was not counted");
     await page.locator(".sheet .close").click();
 
+    // every rule the games room can ask has a line in the script (so it can be recorded)
+    const unspoken = await page.evaluate(() => {
+      const bad = [];
+      Object.keys(CPCatch.RULES).forEach((t) => CPCatch.RULES[t].forEach((r) => { if (CPLines.spoken(r.text) === r.text) bad.push(r.text); }));
+      ["tot", "early", "mid", "big", "grown"].forEach((t) => CPMatch.themes(t, CPData, CPLines).forEach((th) => { if (CPLines.spoken(th.rule) === th.rule) bad.push(th.rule); }));
+      Object.keys(CPData.PAIRS).forEach(() => {});
+      return bad;
+    });
+    if (unspoken.length) throw new Error(`game rules missing from lines.js: ${unspoken.slice(0, 3).join(" | ")}`);
+
     // ---- SKY CATCH: the game runs, a right catch scores, and it pays at the end
     await page.locator('[data-go="games"]').click();
     await page.waitForSelector("[data-catchplay]");
