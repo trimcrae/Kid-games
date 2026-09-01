@@ -73,6 +73,8 @@ window.CRAEPETS_NARRATION = {
   "chat-8": 1,
   "chat-9": 1,
   "diary-intro": 1,
+  "egg-crack": 1,
+  "egg-hello": 1,
   "fact-big-0": 1,
   "fact-big-1": 1,
   "fact-big-2": 1,
