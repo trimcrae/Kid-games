@@ -442,6 +442,83 @@ window.CPPets = (function () {
   ];
   var SLOTS = ["head", "face", "neck"];
 
+  /* =========================================================
+     PETPETS — a pet for your pet.
+
+     Tiny companions, eight pixels wide, that trot along behind
+     the Craepet wherever it wanders, each with a name of its
+     own. Bought at the Market's 🐾 shelf, kept for ever, one out
+     at a time. Their palettes are their own — a duckling is
+     yellow whatever colour the Craepet is.
+     ========================================================= */
+  var PETPETS = [
+    { id: "duckling", name: "Duckling", emoji: "🐥", cost: 60, blurb: "Follows anything bigger than itself.",
+      pal: { O: "#7a5a06", B: "#ffe066", b: "#f0c93a", A: "#ff9f45", W: "#fff", K: "#241f36" },
+      grid: ["..OOO...", ".OBBBO..", "OBWKBBOA", "OBBBBBO.", ".OBbBBO.", "OBBBBBBO", ".OOOOOO.", "..OA.OA."] },
+    { id: "snail", name: "Snail", emoji: "🐌", cost: 45, blurb: "Slow, but never left behind for long.",
+      pal: { O: "#4a3018", B: "#c99a6b", b: "#a2764a", A: "#ff8fd0", a: "#e560ae", W: "#fff", K: "#241f36" },
+      grid: ["......OO", "...OOOOK", "..OAaAOO", ".OAaAaAO", ".OAAaAAO", "OBOAaAOB", "OBBOOOBB", ".OOOOOOO"] },
+    { id: "blobbin", name: "Blobbin", emoji: "🟢", cost: 50, blurb: "A drop of something green and friendly.",
+      pal: { O: "#14522f", B: "#6fdc8c", b: "#3fb469", W: "#fff", K: "#241f36" },
+      grid: ["........", "...OO...", "..OBBO..", ".OBBBBO.", "OBWKBWKO", "OBBBBBBO", "OBbBBbBO", ".OOOOOO."] },
+    { id: "moth", name: "Moth", emoji: "🦋", cost: 55, blurb: "Flutters. Loves a lamp.",
+      pal: { O: "#38215e", B: "#a97dff", b: "#8a5cff", A: "#ffd863", W: "#fff", K: "#241f36" },
+      grid: ["O......O", "OBO..OBO", "OBBOOBBO", ".OBAABO.", ".OBAABO.", "OBbOObBO", "OO....OO", "........"] },
+    { id: "kit", name: "Kit", emoji: "🐱", cost: 70, blurb: "A pocket kitten. Purrs at a level 5.",
+      pal: { O: "#4a3018", B: "#f4b16f", b: "#d9924f", A: "#ffd7db", W: "#fff", K: "#241f36" },
+      grid: ["O.....O.", "OO...OO.", "OBBBBBO.", "OWKBWKO.", "OBBBBBOO", ".OBBBBOB", ".OBbBbOO", ".OO.OO.."] },
+    { id: "hedge", name: "Hedgehog", emoji: "🦔", cost: 65, blurb: "Prickly outside, soft inside.",
+      pal: { O: "#3a2a1a", B: "#8a6a4a", b: "#5a4030", A: "#f4d3b0", W: "#fff", K: "#241f36" },
+      grid: ["...bObOb", "..bObObO", ".ObBBBBB", "OBBBBBBB", "OAWKABBB", "OAAAABBB", ".OAOOBBO", "..OO.OO."] },
+    { id: "wisp", name: "Wisp", emoji: "👻", cost: 90, rare: true, blurb: "Glows in the dark. Not scary. Mostly.",
+      pal: { O: "#5b6bd6", B: "#dfe6ff", b: "#b9c6ff", W: "#fff", K: "#3a2b52" },
+      grid: ["...OO...", "..OBBO..", ".OBBBBO.", ".OWKWKO.", ".OBBBBO.", ".OBbBbO.", ".OBBBBO.", ".O.OO.O."] },
+    { id: "starling", name: "Starling", emoji: "⭐", cost: 120, rare: true, blurb: "A fallen star that decided to stay.",
+      pal: { O: "#8a6200", B: "#ffe27a", b: "#ffc93d", W: "#fff", K: "#241f36" },
+      grid: ["...OO...", "...OBO..", "OOOOBBOO", ".OBBBBBO", "..OWKBO.", "..OBBBBO", ".OBOOOBO", "OO.....O"] }
+  ];
+  function petpetById(id) {
+    for (var i = 0; i < PETPETS.length; i++) if (PETPETS[i].id === id) return PETPETS[i];
+    return null;
+  }
+  function petpetSprite(item, scale) {
+    var key = "pp|" + item.id + "|" + scale;
+    if (cache[key]) return cache[key];
+    var cv = bake(item.grid, item.pal, scale);
+    cache[key] = cv;
+    return cv;
+  }
+  /* Draw a petpet standing on the same floor, its middle at cx. */
+  function drawPetpet(canvas, id, opts) {
+    var it = petpetById(id);
+    if (!it) return;
+    opts = opts || {};
+    var g = canvas.getContext("2d");
+    var scale = opts.scale || 4;
+    var sp = petpetSprite(it, scale);
+    var cx = opts.cx === undefined ? canvas.width / 2 : opts.cx;
+    var x = Math.round(cx - sp.width / 2);
+    var y = Math.round(canvas.height - sp.height - scale) + (opts.bob || 0);
+    g.imageSmoothingEnabled = false;
+    g.globalAlpha = 0.16;
+    g.fillStyle = "#2b2440";
+    g.beginPath();
+    g.ellipse(cx, canvas.height - scale * 0.4, sp.width * 0.4, scale * 0.9, 0, 0, Math.PI * 2);
+    g.fill();
+    g.globalAlpha = 1;
+    g.save();
+    if (opts.flip) { g.translate(2 * cx, 0); g.scale(-1, 1); }
+    g.drawImage(sp, x, y);
+    g.restore();
+  }
+  /* A small picture of a petpet for a shop shelf or a card. */
+  function petpetChip(id, px) {
+    var it = petpetById(id);
+    if (!it) return "";
+    var scale = Math.max(1, Math.round((px || 40) / 8));
+    return petpetSprite(it, scale).toDataURL();
+  }
+
   function wearById(id) {
     for (var i = 0; i < WEAR.length; i++) if (WEAR[i].id === id) return WEAR[i];
     return null;
@@ -584,7 +661,7 @@ window.CPPets = (function () {
     var scale = opts.scale || Math.max(2, Math.floor(Math.min(canvas.width, canvas.height) / 20));
     var body = sprite(speciesId, colourId, opts.frame || "idle", scale);
     g.imageSmoothingEnabled = false;
-    g.clearRect(0, 0, canvas.width, canvas.height);
+    if (!opts.keep) g.clearRect(0, 0, canvas.width, canvas.height);   // keep: draw over a scene
 
     var bob = opts.bob || 0;
     var cx = (opts.cx === undefined || opts.cx === null) ? canvas.width / 2 : opts.cx;
@@ -653,6 +730,10 @@ window.CPPets = (function () {
     COLOURS: COLOURS,
     WEAR: WEAR,
     SLOTS: SLOTS,
+    PETPETS: PETPETS,
+    petpetById: petpetById,
+    drawPetpet: drawPetpet,
+    petpetChip: petpetChip,
     species: species,
     colour: colour,
     wearById: wearById,

@@ -189,13 +189,21 @@
       diary: [],
       /* Presents from the rest of the family, waiting to be opened. */
       mail: [],
+      /* Petpets you own (the one that is OUT lives in pet.petpet). */
+      petpets: [],
+      /* The Valley Bank: what is in, when interest was last paid, and
+         how much interest it has paid in all. See THE BANK. */
+      bank: { balance: 0, day: D.dayNumber(), earned: 0 },
+      /* Sky Catch high scores. */
+      catch: { best: 0, games: 0 },
       stats: { correct: 0, wrong: 0, best: 0, streak: 0, farm: 0, well: 0, pool: 0,
                arena: 0, arenaWin: 0, feed: 0, play: 0, wash: 0, read: 0, buy: 0,
                quests: 0, coinsEarned: 0, fixed: 0, bestDayStreak: 0, bySubject: {},
                spin: 0, placed: 0, stocked: 0, sold: 0, soldCoins: 0, styled: 0,
                newq: 0, repeatq: 0, heat: 0, stepup: 0, crit: 0, quick: 0, tower: 0,
                shadeWin: 0, allyHits: 0, allyWins: 0, bestFloor: 0,
-               wishes: 0, dressed: 0, gifts: 0, received: 0, diary: 0 },
+               wishes: 0, dressed: 0, gifts: 0, received: 0, diary: 0,
+               banked: 0, events: 0, catchGames: 0, visits: 0 },
       trophies: []
     };
   }
@@ -294,6 +302,15 @@
     s.diary = s.diary.filter(function (e) { return e && typeof e.s === "string"; });
     if (!Array.isArray(s.mail)) s.mail = [];
     s.mail = s.mail.filter(function (m) { return m && D.itemById(m.id) && D.PROFILES.some(function (p) { return p.id === m.from; }); });
+    if (!Array.isArray(s.petpets)) s.petpets = [];
+    s.petpets = s.petpets.filter(function (id, i, a) { return P.petpetById(id) && a.indexOf(id) === i; });
+    if (s.pet && s.pet.petpet && (typeof s.pet.petpet !== "object" || !P.petpetById(s.pet.petpet.id) ||
+        s.petpets.indexOf(s.pet.petpet.id) === -1)) s.pet.petpet = null;
+    if (!s.bank || typeof s.bank !== "object") s.bank = { balance: 0, day: D.dayNumber(), earned: 0 };
+    s.bank.balance = Math.max(0, s.bank.balance | 0);
+    s.bank.earned = Math.max(0, s.bank.earned | 0);
+    if (!s.bank.day) s.bank.day = D.dayNumber();
+    if (!s.catch || typeof s.catch !== "object") s.catch = { best: 0, games: 0 };
     return s;
   }
 
@@ -360,7 +377,154 @@
       if (S.dayStreak > (S.stats.bestDayStreak || 0)) S.stats.bestDayStreak = S.dayStreak;
       if (S.pet && S.dayStreak >= 2) diary("📅", "You came back again — that is " + S.dayStreak + " days in a row!");
     }
+    payInterest(day);
     return rolled;
+  }
+
+  /* =========================================================
+     THE BANK — coins you put away grow overnight.
+
+     Three per cent a night, paid on whatever is in the vault,
+     capped so it can't run away. It is the game's one lesson in
+     percentages and compounding, and it is told in the panel in
+     numbers a child can check: "100 becomes 103, then 106, then
+     109 — and a bit". Nothing in the bank can ever be spent by
+     accident, which is the other reason to use it.
+     ========================================================= */
+  var BANK_RATE = 0.03, BANK_CAP = 50, BANK_MAX_NIGHTS = 30;
+  function bank() {
+    if (!S.bank || typeof S.bank !== "object") S.bank = { balance: 0, day: D.dayNumber(), earned: 0 };
+    return S.bank;
+  }
+  function nightInterest(balance) { return Math.min(BANK_CAP, Math.floor(balance * BANK_RATE)); }
+  function payInterest(day) {
+    var b = bank();
+    if (b.day >= day) return 0;
+    var nights = Math.min(BANK_MAX_NIGHTS, day - b.day), total = 0;
+    for (var i = 0; i < nights; i++) {
+      var got = nightInterest(b.balance);
+      b.balance += got;
+      total += got;
+    }
+    b.day = day;
+    if (total > 0) {
+      b.earned += total;
+      S.stats.coinsEarned += total;
+      S.bankNews = (S.bankNews || 0) + total;
+      if (S.pet) diary("🏦", "The bank paid " + total + " coins of interest overnight" + (nights > 1 ? " (" + nights + " nights)" : "") + ". Money that makes money!");
+    }
+    return total;
+  }
+  function bankHtml() {
+    var b = bank(), t = tier();
+    var tonight = nightInterest(b.balance);
+    var lesson;
+    if (t === "tot" || t === "early") {
+      lesson = "Coins in the bank are safe, and every night the bank adds a few more.";
+    } else if (t === "mid") {
+      lesson = "The bank pays <b>3%</b> a night. 3% of 100 is 3, so 🪙 100 becomes 🪙 103 tomorrow — and 3% of 103 is a little more than 3, so it keeps growing faster.";
+    } else {
+      lesson = "<b>3% a night, compounded</b>: 🪙 100 becomes 103, then 106.09, then 109.27… after ten nights it is 🪙 134, " +
+        "because each night's interest is paid on last night's interest too. (Capped at 🪙 " + BANK_CAP + " a night.)";
+    }
+    var news = S.bankNews ? '<p class="teach">🌙 <b>Overnight the bank paid you 🪙 ' + S.bankNews + "</b> in interest.</p>" : "";
+    S.bankNews = 0;
+    return '<div class="panel bank"><h2>🏦 The Valley Bank</h2>' +
+      '<p class="sub">Put coins away and they <b>grow while you sleep</b>. Nothing in the bank can be spent by accident.</p>' +
+      news +
+      '<div class="statgrid">' +
+        '<div class="stat"><b>🪙 ' + b.balance + "</b><small>in the bank</small></div>" +
+        '<div class="stat"><b>+🪙 ' + tonight + "</b><small>tonight's interest</small></div>" +
+        '<div class="stat"><b>🪙 ' + b.earned + "</b><small>earned so far</small></div>" +
+        '<div class="stat"><b>🪙 ' + S.coins + "</b><small>in your purse</small></div>" +
+      "</div>" +
+      '<p class="teach">' + lesson + "</p>" +
+      '<div class="acts" style="margin-top:0.7rem">' +
+        '<button class="act" data-bank="in" style="--ac:var(--green)"' + (S.coins < 10 ? " disabled" : "") + '><span class="em">📥</span>Put coins in</button>' +
+        '<button class="act" data-bank="out" style="--ac:var(--purple)"' + (b.balance <= 0 ? " disabled" : "") + '><span class="em">📤</span>Take coins out</button>' +
+      "</div></div>";
+  }
+  function bankSheet(dir) {
+    var b = bank();
+    var have = dir === "in" ? S.coins : b.balance;
+    var amounts = [10, 25, 50, 100, 250].filter(function (n) { return n < have; });
+    amounts.push(have);
+    return sheet(dir === "in" ? "📥 How much to put in?" : "📤 How much to take out?",
+      '<p class="sub">' + (dir === "in" ? "You have 🪙 " + S.coins + " in your purse." : "There is 🪙 " + b.balance + " in the bank.") +
+      (dir === "in" ? " Every 🪙 100 in the bank earns 🪙 3 a night." : "") + "</p>" +
+      '<div class="swatches">' + amounts.map(function (n) {
+        return '<button class="ghost" data-bankamt="' + dir + ":" + n + '">🪙 ' + n + (n === have ? " (all)" : "") + "</button>";
+      }).join("") + "</div>");
+  }
+  function moveBank(dir, n) {
+    var b = bank();
+    n = Math.max(0, n | 0);
+    if (dir === "in") {
+      n = Math.min(n, S.coins);
+      if (!n) return closeSheet();
+      S.coins -= n;
+      b.balance += n;
+      bump("banked", n);
+      if (!S.everBanked) { S.everBanked = true; diary("🏦", "We opened an account at the Valley Bank and put 🪙 " + n + " in. It grows overnight!"); }
+      toast("🏦 🪙 " + n + " safely in the bank. Tonight it earns 🪙 " + nightInterest(b.balance) + ".");
+    } else {
+      n = Math.min(n, b.balance);
+      if (!n) return closeSheet();
+      b.balance -= n;
+      S.coins += n;
+      toast("🏦 Took 🪙 " + n + " out. 🪙 " + b.balance + " still growing.");
+    }
+    checkTrophies();
+    closeSheet();
+    save();
+    render();
+    sfx("coin");
+  }
+
+  /* =========================================================
+     RANDOM EVENTS — the valley's little surprises.
+     Now and then, walking from one place to another, something
+     happens: a coin on the path, a shower of rain, a passing
+     Snorbit with a spare apple. Never anything bad — the worst
+     that can happen is nothing. A few a day, no more.
+     ========================================================= */
+  var EVENT_CHANCE = 0.09, EVENTS_MAX = 6;
+  var EVENTS = [
+    { emoji: "🪙", w: 4, run: function () { var n = 5 + Math.floor(Math.random() * 21); earn(n); return "You found 🪙 " + n + " lying on the path!"; } },
+    { emoji: "🍎", w: 3, run: function () { var f = D.FOODS[Math.floor(Math.random() * 12)]; addItem(f.id); return "A passing Snorbit hands you a " + f.emoji + " " + f.name + ". \"Spare one,\" it says."; } },
+    { emoji: "🌧️", w: 2, run: function () { S.pet.clean = clamp(S.pet.clean + 15, 0, 100); return "A quick shower of rain! " + S.pet.name + " comes out shinier."; } },
+    { emoji: "🎈", w: 2, run: function () { S.pet.happy = clamp(S.pet.happy + 10, 0, 100); return "A red balloon drifts past. " + S.pet.name + " chases it all the way down the lane."; } },
+    { emoji: "🌠", w: 2, run: function () { giveXp(12); return "A shooting star! " + S.pet.name + " makes a wish and feels a bit wiser."; } },
+    { emoji: "🧼", w: 2, run: function () { addItem("soap"); return "Somebody left a bar of 🧼 Berry Soap on the wall. Finders keepers."; } },
+    { emoji: "🌑", w: 1, run: function () { earn(3); return "One of The Shade's minions tries to trip you up, slips, and drops 🪙 3. It runs off. Nothing lost!"; } },
+    { emoji: "🍯", w: 1, run: function () { S.pet.hunger = clamp(S.pet.hunger + 12, 0, 100); return "Bees! Friendly ones. " + S.pet.name + " gets a lick of honey straight from the comb."; } },
+    { emoji: "📖", w: 1, run: function () { var b = D.BOOKS[Math.floor(Math.random() * 5)]; addItem(b.id); return "A book has fallen off the library cart: " + b.emoji + " " + b.name + ". Yours now."; } },
+    { emoji: "🌈", w: 1, run: function () { earn(15); S.pet.happy = clamp(S.pet.happy + 6, 0, 100); return "A rainbow ends right here, on this exact spot. Under it: 🪙 15."; } }
+  ];
+  var eventsOn = true;           // the play-test robot turns the dice off
+  function maybeEvent() {
+    if (!eventsOn || !S.pet || (S.today.events || 0) >= EVENTS_MAX || Math.random() >= EVENT_CHANCE) return false;
+    randomEvent();
+    return true;
+  }
+  function randomEvent(idx) {
+    var pool = [];
+    EVENTS.forEach(function (e, i) { for (var k = 0; k < e.w; k++) pool.push(i); });
+    var ev = EVENTS[idx === undefined ? pool[Math.floor(Math.random() * pool.length)] : idx];
+    var text = ev.run();
+    bump("events");
+    diary(ev.emoji, text);
+    checkTrophies();
+    save();
+    render();
+    openSheet(sheet("✨ Something happened!",
+      '<p style="text-align:center;font-size:3rem;margin:0.2rem 0;line-height:1">' + ev.emoji + "</p>" +
+      '<p class="sub" style="text-align:center;font-size:1.05rem">' + esc(text) + "</p>" +
+      '<p class="sub" style="text-align:center;font-size:0.8rem">Random events happen on the paths between places — ' +
+      (S.today.events || 0) + " of " + EVENTS_MAX + " today.</p>"));
+    hearts();
+    sfx("win");
+    narrate([text]);
   }
 
   function quests() {
@@ -559,6 +723,7 @@
     if (kind === "toy") return (S.bag[it.id] || 0) > 0;
     if (kind === "decor") return (S.house.owned || []).indexOf(it.id) !== -1;
     if (kind === "wear") return (S.wardrobe || []).indexOf(it.id) !== -1;
+    if (kind === "petpet") return (S.petpets || []).indexOf(it.id) !== -1;
     return false;
   }
 
@@ -572,6 +737,7 @@
     if (kind === "toy") return "+" + it.joy + " 😊 · yours for good";
     if (kind === "book") return "+" + it.xp + " XP · a real fact";
     if (kind === "wear") return "👒 worn on the " + it.slot + " · yours for good";
+    if (kind === "petpet") return "🐾 " + it.blurb + " Follows your Craepet everywhere.";
     if (kind === "decor") {
       var extra = [];
       if (it.rest) extra.push("+" + it.rest + " ⚡/hr");
@@ -592,6 +758,7 @@
     var kind = it.kind || D.kindOf(it.id);
     if (kind === "decor") return "It's in your 🏠 House — go there to put it out where you can see it.";
     if (kind === "wear") return "It's in your 👒 Wardrobe — tap 👒 Dress at the nest to put it on.";
+    if (kind === "petpet") return "It's trotting along behind " + S.pet.name + " already — see the 🐾 Petpets in your 🎒 Bag.";
     if (kind === "toy") return "It's on the 🧸 toy shelf in your 🎒 Bag — play with it any time.";
     if (kind === "book") return "It's in your 🎒 Bag — tap 📖 Read at the nest.";
     if (kind === "food") return "It's in your 🎒 Bag — tap 🍽️ Feed at the nest.";
@@ -648,7 +815,12 @@
       wardrobe: (S.wardrobe || []).length >= 6,
       wish10: (st.wishes || 0) >= 10,
       postie: (st.gifts || 0) >= 5,
-      scribe: (st.diary || 0) >= 5
+      scribe: (st.diary || 0) >= 5,
+      petpet: (S.petpets || []).length >= 1,
+      saver: (bank().earned || 0) >= 50,
+      lucky: (st.events || 0) >= 10,
+      skycatch: ((S.catch && S.catch.best) || 0) >= 15,
+      neighbour: Object.keys(S.visited || {}).length >= 3
     };
     Object.keys(tests).forEach(function (id) {
       if (tests[id] && S.trophies.indexOf(id) === -1) { S.trophies.push(id); got.push(id); }
@@ -1024,6 +1196,7 @@
         (D.profile(id).name) + " has made it very " + (s.house && s.house.placed && s.house.placed.length > 3 ? "cosy" : "tidy") + ".");
     }
     checkWish("visit", id);
+    bump("visits");
     save();
     render();
     sfx("pop");
@@ -1046,6 +1219,7 @@
       '<p class="sub">This is <b>' + esc(pet.name) + "</b>, " + esc(p.name) + "'s " + esc(P.colour(pet.colour).name) + " " + esc(spec(pet).name) +
         ", level " + lv + ", looking " + esc(info.mood) + " " + info.moodFace + ". " +
         (wearing.length ? "Wearing " + esc(wearing.join(", ")) + ". " : "Not wearing anything today. ") +
+        (pet.petpet ? "With <b>" + esc(pet.petpet.name) + "</b> the " + esc(P.petpetById(pet.petpet.id).name) + " trotting behind. " : "") +
         (info.out.length ? info.out.length + " pieces of furniture out, " + info.cosy + " cosy. " : "Nothing out in the room yet. ") +
         rk.emoji + " " + esc(rk.name) + (fl ? " · floor " + fl + " of the tower." : ".") + "</p>" +
       '<div class="acts">' +
@@ -1117,8 +1291,14 @@
     P.draw(tmp, S.pet.species, S.pet.colour, { frame: "idle", level: level(), scale: 11, wear: S.pet.wear });
     g.imageSmoothingEnabled = false;
     g.drawImage(tmp, Math.round(W / 2 - tmp.width / 2), H - tmp.height - 4);
+    if (S.pet.petpet) {
+      var pp = document.createElement("canvas");
+      pp.width = 90; pp.height = 90;
+      P.drawPetpet(pp, S.pet.petpet.id, { scale: 8 });
+      g.drawImage(pp, Math.round(W / 2 + 95), H - pp.height - 4);
+    }
     // the name plate
-    var plate = S.pet.name + "  ·  Lv " + level() + "  ·  " + spec().name;
+    var plate = S.pet.name + "  ·  Lv " + level() + "  ·  " + spec().name + (S.pet.petpet ? "  ·  with " + S.pet.petpet.name : "");
     g.font = "bold 20px sans-serif";
     var pw = g.measureText(plate).width + 34;
     g.fillStyle = "rgba(255,255,255,0.92)";
@@ -1164,7 +1344,10 @@
     arena:  { tag: "⚔️ Quiz Arena",   deco: [["🚩", 6, 40], ["🚩", 90, 40], ["🏆", 50, 74]] },
     bag:    { tag: "🎒 Your Bag",     deco: [["🎒", 84, 8], ["✨", 20, 60]] },
     quests: { tag: "📜 Quest Board",  deco: [["📜", 84, 10], ["🪶", 12, 62]] },
-    case:   { tag: "🏆 Trophy Case",  deco: [["🏆", 12, 10], ["🎖️", 86, 12], ["✨", 50, 74]] }
+    case:   { tag: "🏆 Trophy Case",  deco: [["🏆", 12, 10], ["🎖️", 86, 12], ["✨", 50, 74]] },
+    diary:  { tag: "📔 The Diary",    deco: [["📔", 86, 10], ["🖋️", 12, 60], ["✨", 30, 78]] },
+    catch:  { tag: "⭐ Sky Catch",    deco: [["⭐", 14, 76], ["⭐", 40, 84], ["🌟", 70, 78], ["☁️", 86, 62]] },
+    map:    { tag: "🗺️ The Valley",  deco: [["🗺️", 86, 10], ["🧭", 12, 62]] }
   };
 
   /* =========================================================
@@ -1346,6 +1529,17 @@
     }
     P.draw(cv, pet.species, pet.colour, { frame: frame, level: lv, scale: scale, bob: bob, wear: pet.wear,
                                           cx: Math.round(anim.x * w), flip: anim.face < 0 });
+    // the petpet trots along a little way behind
+    if (pet.petpet && pet.petpet.id) {
+      var want = anim.x - anim.face * 0.13;
+      if (anim.px === undefined) anim.px = want;
+      anim.px += (want - anim.px) * 0.06;
+      var pscale = Math.max(2, Math.round(scale * 0.7));
+      var pbob = calm ? 0 : (walking || Math.abs(want - anim.px) > 0.01)
+        ? Math.round(Math.abs(Math.sin(anim.t / 4)) * pscale * -0.6)
+        : Math.round(Math.sin(anim.t / 14 + 1) * pscale * 0.35);
+      P.drawPetpet(cv, pet.petpet.id, { cx: Math.round(anim.px * w), scale: pscale, bob: sleeping ? 0 : pbob, flip: anim.face < 0 });
+    }
   }
 
   function loop() {
@@ -1534,11 +1728,13 @@
   }
 
   var NAV = [
-    ["nest", "🏡", "Nest"], ["home", "🏠", "House"],
-    ["farm", "🍓", "Farm"], ["well", "📖", "Well"], ["pool", "🌈", "Pool"],
+    ["map", "🗺️", "Map"], ["nest", "🏡", "Nest"], ["home", "🏠", "House"],
+    ["farm", "🍓", "Farm"], ["well", "📖", "Well"], ["pool", "🌈", "Pool"], ["catch", "⭐", "Catch"],
     ["market", "🏪", "Market"], ["stall", "🏬", "Stall"], ["arena", "⚔️", "Arena"],
     ["bag", "🎒", "Bag"], ["quests", "📜", "Daily"], ["diary", "📔", "Diary"], ["case", "🏆", "Case"]
   ];
+  /* The last real PLACE you were at, so the map can put a ring round it. */
+  var lastPlace = "nest";
 
   function navHtml() {
     var ready = quests().filter(function (q) {
@@ -1581,8 +1777,112 @@
       case "diary": return diaryHtml();
       case "case": return caseHtml();
       case "visit": return visitHtml();
+      case "catch": return catchHtml();
+      case "map": return mapHtml();
     }
     return "";
+  }
+
+  /* =========================================================
+     THE VALLEY MAP — every place as a picture you can tap.
+     ========================================================= */
+  function mapHtml() {
+    if (!window.CPMap) return "";
+    var homes = D.PROFILES.map(function (p) {
+      var s = (p.id === who) ? S : readSlot(p.id);
+      if (!s || !s.pet) return null;
+      var hm = D.houseById((s.house && s.house.home) || "nest");
+      return { id: p.id, name: (p.id === who ? "Home" : s.pet.name), emoji: hm.emoji, colour: p.colour,
+               chip: chipOf(s.pet, 16), mine: p.id === who };
+    }).filter(Boolean);
+    return '<div class="panel mappanel"><h2>🗺️ The Valley</h2>' +
+      '<p class="sub">Tap anywhere to go there. Your house is on the lane at the bottom, next to the rest of the family\'s — tap theirs to visit.</p>' +
+      '<div class="mapwrap">' + CPMap.svg({ here: lastPlace, homes: homes }) + "</div>" +
+      '<p class="sub" style="margin-top:0.6rem">🍓 Farm for maths · 📖 Well for words · 🌈 Pool for the wide world · ⭐ Sky Catch for quick fingers · ' +
+      "🏪 Market & Bank · 🏬 your Stall · ⚔️ Arena and 🗼 the Shadow Tower · 📜 the Quest Board and the prize wheel.</p></div>";
+  }
+
+  /* =========================================================
+     SKY CATCH — the arcade game (catch.js does the running).
+     ========================================================= */
+  var catchOn = false;
+  function catchHtml() {
+    var c = S.catch || { best: 0, games: 0 };
+    var rules = (window.CPCatch && CPCatch.RULES[tier()]) || [];
+    if (catchOn) {
+      return '<div class="panel catchpanel"><canvas id="catch-canvas" aria-label="Sky Catch — drag left and right to move ' +
+        esc(S.pet.name) + '" tabindex="0"></canvas>' +
+        '<p class="sub" style="margin:0.5rem 0 0;text-align:center">Drag anywhere on the sky (or use the arrow keys) to run ' +
+        esc(S.pet.name) + " underneath the right ones. " +
+        '<button class="ghost small" data-catchstop="1">Stop</button></p></div>';
+    }
+    return '<div class="panel catchpanel"><h2>⭐ Sky Catch</h2>' +
+      '<p class="sub">Things fall out of the sky and ' + esc(S.pet.name) + " runs about underneath. Catch <b>only the ones the rule asks for</b> " +
+      "— even numbers, vowels, the letter A, the stars. 40 seconds. Every one you get right is a point" +
+      (tier() === "tot" || tier() === "early" ? "." : ", every wrong one costs a point.") + " Points pay 🪙 3 each.</p>" +
+      '<div class="statgrid">' +
+        '<div class="stat"><b>⭐ ' + (c.best || 0) + "</b><small>best score</small></div>" +
+        '<div class="stat"><b>🎮 ' + (c.games || 0) + "</b><small>games played</small></div>" +
+        '<div class="stat"><b>🪙 ' + Math.min(90, (c.best || 0) * 3) + "</b><small>your best pays</small></div>" +
+      "</div>" +
+      '<p style="margin:0.8rem 0 0"><button class="act" data-catchplay="1" style="--ac:#38b6ff;width:100%"><span class="em">⭐</span>Play Sky Catch</button></p>' +
+      '<p class="sub" style="margin-top:0.8rem">Rules at your level: ' + rules.map(function (r) { return "<b>" + esc(r.text.replace(/!$/, "")) + "</b>"; }).join(" · ") + ".</p>" +
+    "</div>";
+  }
+  function startCatch() {
+    if (!window.CPCatch || !S.pet) return;
+    catchOn = true;
+    hush();
+    render();
+    var cv = $("#catch-canvas");
+    if (!cv) { catchOn = false; return; }
+    var pet = S.pet, lv = level();
+    CPCatch.start(cv, {
+      tier: tier(),
+      sfx: sfx,
+      draw: function (canvas, cx, scale) {
+        P.draw(canvas, pet.species, pet.colour, { frame: "idle", level: lv, scale: scale, wear: pet.wear, cx: cx, keep: true });
+      },
+      onEnd: endCatch
+    });
+    sfx("pop");
+    narrate([CPCatch.state().rule.text]);
+  }
+  function stopCatch() {
+    if (window.CPCatch) CPCatch.stop();
+    catchOn = false;
+  }
+  function endCatch(res) {
+    catchOn = false;
+    if (!S.pet) return;
+    var coins = Math.min(90, res.score * 3);
+    earn(coins);
+    giveXp(res.score);
+    bump("catchGames");
+    bestToday("catchScore", res.score);
+    if (!S.catch) S.catch = { best: 0, games: 0 };
+    S.catch.games++;
+    var newBest = res.score > (S.catch.best || 0);
+    if (newBest) {
+      S.catch.best = res.score;
+      diary("⭐", "New Sky Catch record: " + res.score + "! The rule was \"" + res.rule.text + "\"");
+    }
+    S.pet.happy = clamp(S.pet.happy + 6, 0, 100);
+    checkTrophies();
+    save();
+    render();
+    openSheet(sheet("⭐ " + (res.score >= 12 ? "Amazing!" : res.score >= 6 ? "Nice catching!" : "Time's up!"),
+      '<p class="sub" style="text-align:center;font-size:1.3rem"><b>' + res.score + "</b> point" + (res.score === 1 ? "" : "s") +
+        (newBest && res.score > 0 ? " — a new best! 🏆" : "") + "</p>" +
+      '<div class="statgrid">' +
+        '<div class="stat"><b>✅ ' + res.right + "</b><small>right ones caught</small></div>" +
+        '<div class="stat"><b>❌ ' + res.wrong + "</b><small>wrong ones caught</small></div>" +
+        '<div class="stat"><b>🪙 ' + coins + "</b><small>earned</small></div>" +
+      "</div>" +
+      '<p class="teach"><b>' + esc(res.rule.text) + "</b> " + esc(res.rule.why) + "</p>" +
+      '<p style="margin:0.8rem 0 0"><button class="act" data-catchplay="1" style="--ac:#38b6ff;width:100%"><span class="em">🔁</span>Play again</button></p>'));
+    sfx(res.score >= 6 ? "win" : "good");
+    if (res.score >= 6) { try { window.Confetti && Confetti.burst({ count: 60 }); } catch (e) {} }
   }
 
   /* =========================================================
@@ -2302,6 +2602,84 @@
           '<p style="margin:0.8rem 0 0"><button class="ghost" data-go="market" data-close="1">🏪 Go to the Market</button></p>'));
   }
 
+  /* --- 🐾 petpets: owning, choosing which one is out, naming --- */
+  var PETPET_NAMES = ["Pip", "Dot", "Bean", "Tiny", "Button", "Fizz", "Pom", "Nib", "Sprig", "Zip", "Mo", "Bubble"];
+  function adoptPetpet(id) {
+    var it = P.petpetById(id);
+    if (!it) return;
+    if (!S.petpets) S.petpets = [];
+    var first = !S.petpets.length;
+    if (S.petpets.indexOf(id) === -1) S.petpets.push(id);
+    S.pet.petpet = { id: id, name: PETPET_NAMES[Math.floor(Math.random() * PETPET_NAMES.length)] };
+    anim.px = undefined;
+    diary("🐾", "A " + it.name + " came home with us today! " + it.blurb + (first ? " My very own little friend." : ""));
+    checkTrophies();
+    hop();
+    hearts();
+  }
+  function petpetNameSheet() {
+    var pp = S.pet.petpet;
+    if (!pp) return sheet("🐾 Petpets", '<p class="sub">No petpet is out just now.</p>');
+    var it = P.petpetById(pp.id);
+    var little = tier() === "tot" || tier() === "early";
+    return sheet("🐾 Name your " + esc(it.name),
+      '<p style="text-align:center;margin:0"><img alt="" class="ppchip big" src="' + P.petpetChip(pp.id, 96) + '"></p>' +
+      '<p class="sub" style="text-align:center">' + esc(it.blurb) + " It will follow " + esc(S.pet.name) + " everywhere.</p>" +
+      (little
+        ? '<div class="swatches" id="pp-picks">' + PETPET_NAMES.map(function (n) {
+            return '<button class="ghost small' + (n === pp.name ? " on" : "") + '" data-ppname="' + esc(n) + '">' + esc(n) + "</button>";
+          }).join("") + "</div>"
+        : '<div class="name-row"><input id="pp-input" maxlength="12" value="' + esc(pp.name) + '" aria-label="Petpet name">' +
+          '<button class="ghost" id="pp-dice" aria-label="Pick a random name">🎲</button></div>') +
+      '<p style="margin:0.8rem 0 0"><button class="act" id="pp-go" style="--ac:var(--green);width:100%"><span class="em">✅</span>That\'s its name</button></p>');
+  }
+  function namePetpet(name) {
+    if (!S.pet.petpet) return closeSheet();
+    name = (name || "").trim().slice(0, 12);
+    if (!name) { toast("Give it a name first!"); return; }
+    S.pet.petpet.name = name;
+    diary("🐾", "We named the " + P.petpetById(S.pet.petpet.id).name + " " + name + ".");
+    save();
+    closeSheet();
+    render();
+    say(name + "! Come on, " + name + "!", 3000);
+    sfx("win");
+  }
+  function pickPetpet(id) {
+    if ((S.petpets || []).indexOf(id) === -1) return closeSheet();
+    if (S.pet.petpet && S.pet.petpet.id === id) return closeSheet();
+    // each petpet keeps the name you gave it
+    if (!S.petpetNames) S.petpetNames = {};
+    if (S.pet.petpet) S.petpetNames[S.pet.petpet.id] = S.pet.petpet.name;
+    S.pet.petpet = { id: id, name: S.petpetNames[id] || PETPET_NAMES[Math.floor(Math.random() * PETPET_NAMES.length)] };
+    anim.px = undefined;
+    save();
+    closeSheet();
+    render();
+    hop();
+    sfx("pop");
+  }
+  function petpetsHtml() {
+    var mine = (S.petpets || []).map(P.petpetById).filter(Boolean);
+    var out = S.pet.petpet;
+    return '<div class="panel"><h2>🐾 Petpets</h2>' +
+      (mine.length
+        ? '<p class="sub">' + (out ? "<b>" + esc(out.name) + "</b> the " + esc(P.petpetById(out.id).name) + " is out with " + esc(S.pet.name) + " now. " : "") +
+          "Tap one to bring it out instead. " + mine.length + " of " + P.PETPETS.length + " in the valley. " +
+          (out ? '<button class="ghost small" data-ppname-open="1">✏️ Rename ' + esc(out.name) + "</button>" : "") + "</p>" +
+          '<div class="items">' + mine.map(function (it) {
+            var on = out && out.id === it.id;
+            return '<button class="item' + (on ? " here" : "") + '" data-use="petpet:' + it.id + '">' +
+              '<img alt="" class="ppchip" src="' + P.petpetChip(it.id, 40) + '">' +
+              '<span class="nm">' + esc(on ? out.name : it.name) + "</span>" +
+              '<span class="what">' + esc(it.blurb) + "</span>" +
+              '<span class="own">' + (on ? "✔ out with " + esc(S.pet.name) : "tap to bring out") + "</span></button>";
+          }).join("") + "</div>"
+        : '<p class="sub">No petpet yet — a pet for your pet! The 🏪 Market has two on the 🐾 shelf every morning. ' +
+          "It trots along behind " + esc(S.pet.name) + " wherever it wanders, and you give it a name.</p>") +
+    "</div>";
+  }
+
   function wearItem(id) {
     var it = P.wearById(id);
     if (!it || (S.wardrobe || []).indexOf(id) === -1) return closeSheet();
@@ -2507,6 +2885,7 @@
     // the wardrobe: "wear:partyhat" puts it on, "unwear:head" takes it off
     if (id.indexOf("wear:") === 0) return wearItem(id.slice(5));
     if (id.indexOf("unwear:") === 0) return undress(id.slice(7));
+    if (id.indexOf("petpet:") === 0) return pickPetpet(id.slice(7));
 
     var it = D.itemById(id);
     if (!it) return closeSheet();
@@ -3358,6 +3737,8 @@
     var afford = S.coins >= it.cost;
     var pic = it.kind === "brush"
       ? '<span class="brushdot" style="background:' + it.swatch + '"></span>'
+      : it.kind === "petpet"
+      ? '<img alt="" class="ppchip" src="' + P.petpetChip(it.id, 40) + '">'
       : '<span class="pic">' + it.emoji + "</span>";
     var have = !owned && S.bag[it.id] ? '<span class="own">have ' + S.bag[it.id] + "</span>" : "";
     if (it.kind === "food" && loves(it.id)) have += '<span class="own">💛 ' + esc(S.pet.name) + "'s favourite</span>";
@@ -3381,6 +3762,7 @@
     { kind: "book",  name: "📚 Books",         note: "Read once for a real fact and a lump of experience." },
     { kind: "decor", name: "🏠 Furniture",     note: "Goes to your 🏠 House, to stand where you can see it." },
     { kind: "wear",  name: "👒 Dress-up",      note: "Hats, glasses and scarves your Craepet wears everywhere it goes. Yours for good." },
+    { kind: "petpet", name: "🐾 Petpets",      note: "A little friend that follows your Craepet about the room. Give it a name!" },
     { kind: "brush", name: "🖌️ Paint brushes", note: "A brand new colour for your Craepet." }
   ];
 
@@ -3430,7 +3812,7 @@
         : "") +
     "</div>";
 
-    return '<div class="panel">' +
+    return bankHtml() + '<div class="panel">' +
       "<h2>🏪 The Market</h2>" +
       '<p class="sub"><b>' + stock.length + " things on the shelves today</b>, out of the <b>" +
         (D.FOODS.length + D.TOYS.length + D.CARE.length + D.BOOKS.length + D.FURNITURE.length) +
@@ -3587,6 +3969,8 @@
         }
       } else if (sk === "wear") {
         if (S.wardrobe.indexOf(it.id) === -1) S.wardrobe.push(it.id);
+      } else if (sk === "petpet") {
+        adoptPetpet(it.id);
       } else {
         addItem(it.id);
       }
@@ -3617,6 +4001,16 @@
             "Put something else away at 🏠 <b>House</b>, or move somewhere bigger.</p>") +
         '<p style="margin:0.8rem 0 0"><button class="ghost" data-go="home" data-close="1">🏠 Go to your House</button></p>'));
       sfx("coin");
+      return;
+    }
+    // A petpet goes straight out to meet its Craepet, and gets a name.
+    if (it.kind === "petpet") {
+      adoptPetpet(it.id);
+      closeSheet();
+      save();
+      render();
+      openSheet(petpetNameSheet());
+      sfx("win");
       return;
     }
     // Clothes go in the wardrobe, and the shop offers to put them straight on.
@@ -3692,7 +4086,7 @@
           esc(S.pet.name) + ".</p>" + sections
         : '<p class="sub">Your bag is empty. The 🍓 Farm drops food, the 📖 Well turns up books, ' +
           "and the 🏪 Market sells everything else.</p>") +
-    "</div>" +
+    "</div>" + petpetsHtml() +
     '<div class="panel">' +
       "<h2>👒 Wardrobe</h2>" +
       (clothes.length
@@ -4604,8 +4998,10 @@
       var dest = go.dataset.go;
       if (dest !== view) {
         hush();
+        stopCatch();
         if (["farm", "well", "pool"].indexOf(dest) === -1) sess = null;
         if (dest !== "arena") { battle = null; clearTimeout(battleTimer); }
+        if (["nest", "farm", "well", "pool", "market", "stall", "arena", "quests", "catch"].indexOf(dest) !== -1) lastPlace = dest;
         if (dest === "bag") { S.bagNew = {}; save(); }   // you have seen them now
         pendingSale = null;
         pendingPost = null;
@@ -4613,6 +5009,8 @@
         view = dest;
         sfx("pop");
         render();
+        // the paths between places are where things happen
+        if (["farm", "well", "pool", "market", "arena", "stall", "quests", "catch"].indexOf(dest) !== -1) maybeEvent();
       }
       return;
     }
@@ -4738,6 +5136,31 @@
     if (visitBtn) return startVisit(visitBtn.dataset.visit);
     if (t.closest("[data-photo]")) { sfx("pop"); return openSheet(photoSheet()); }
 
+    // --- petpets ---
+    if (t.closest("[data-ppname-open]")) { sfx("pop"); return openSheet(petpetNameSheet()); }
+    var ppn = t.closest("[data-ppname]");
+    if (ppn) return namePetpet(ppn.dataset.ppname);
+    if (t.closest("#pp-dice")) {
+      var pf = $("#pp-input");
+      if (pf) pf.value = PETPET_NAMES[Math.floor(Math.random() * PETPET_NAMES.length)];
+      sfx("pop");
+      return;
+    }
+    if (t.closest("#pp-go")) {
+      var pv = $("#pp-input");
+      return namePetpet(pv ? pv.value : (S.pet.petpet && S.pet.petpet.name));
+    }
+
+    // --- Sky Catch ---
+    if (t.closest("[data-catchplay]")) { closeSheet(); return startCatch(); }
+    if (t.closest("[data-catchstop]")) { stopCatch(); render(); return; }
+
+    // --- the bank ---
+    var bankBtn = t.closest("[data-bank]");
+    if (bankBtn) { sfx("pop"); return openSheet(bankSheet(bankBtn.dataset.bank)); }
+    var bankAmt = t.closest("[data-bankamt]");
+    if (bankAmt) { var ba = bankAmt.dataset.bankamt.split(":"); return moveBank(ba[0], Number(ba[1])); }
+
     // --- the prize wheel ---
     if (t.closest("[data-spin]")) return spinWheel();
 
@@ -4810,7 +5233,7 @@
       if (ev.key === "Enter") {
         ev.preventDefault();
         var go = $("#rename-go") || $("#home-go") || $("#shop-go") || $("[data-postsend]") ||
-                 $("#diary-go") || $("#do-adopt");
+                 $("#pp-go") || $("#diary-go") || $("#do-adopt");
         if (go) go.click();
       }
       return;
@@ -4847,6 +5270,8 @@
     sess = null;
     battle = null;
     visit = null;
+    stopCatch();
+    lastPlace = "nest";
     clearTimeout(battleTimer);
     pendingBuy = null;
     pendingSale = null;
@@ -4889,7 +5314,7 @@
     window.addEventListener("resize", function () { anim.measure = true; });
     window.addEventListener("beforeunload", save);
     document.addEventListener("visibilitychange", function () {
-      if (document.visibilityState === "visible") { passTime(); render(); } else { save(); }
+      if (document.visibilityState === "visible") { passTime(); render(); } else { stopCatch(); save(); }
     });
 
     // needs sag in real time — a gentle nudge once a minute keeps
@@ -4949,6 +5374,11 @@
     timeOfDay: timeOfDay,
     visiting: function () { return visit ? visit.id : null; },
     photo: takePhoto,
+    bank: function () { return bank(); },
+    petpets: function () { return S.petpets; },
+    _event: function (i) { randomEvent(i); },
+    _events: function (on) { eventsOn = !!on; },
+    catching: function () { return catchOn; },
     _anim: function () { return anim; },
     _setHour: function (h) { hourOverride = (h === null || h === undefined) ? null : h; render(); }
   };

@@ -55,7 +55,10 @@ For **every game** (and the landing page), at **each of the three sizes**:
     Zibbit's favourite popcorn is worth more joy than bread and the Farm is
     announced as its favourite place, the pet walks where it is pointed,
     Cory visits Shannon's house without touching her save, and the photo
-    booth makes a real PNG
+    booth makes a real PNG. A petpet is bought, named and follows behind;
+    the bank takes 100, pays 3 overnight and gives 103 back; a random event
+    pays; Sky Catch starts, scores a right catch, ends and pays; and the
+    map's markers really go places (the family's houses included)
   - **Baby Taps** — the targets stay baby-sized (big!) on every screen, a tap
     pops & names a thing, the pit refills, and the count is saved
   - **Landing page** — the kid filter (every kid, baby included, has games)

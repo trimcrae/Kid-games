@@ -2335,9 +2335,10 @@ window.CPData = (function () {
      the list lives there next to the pixels. It is stocked and bought
      here like anything else. */
   function WEAR() { return (window.CPPets && window.CPPets.WEAR) || []; }
+  function PETPETS() { return (window.CPPets && window.CPPets.PETPETS) || []; }
 
   function rarePool() {
-    return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR()).filter(function (it) { return isRare(it) && !it.loot; });
+    return FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR(), PETPETS()).filter(function (it) { return isRare(it) && !it.loot; });
   }
   /* The Shade's own furniture, in the order he gives it up. */
   function hoard() { return FURNITURE.filter(function (f) { return f.loot; }); }
@@ -2412,12 +2413,14 @@ window.CPData = (function () {
       .concat(seededPick(FURNITURE.filter(function (f) { return f.cost > 150 && notRare(f); }), 4, day * 7 + 11).map(tag("decor")))
       // Something to WEAR: a hat, a pair of glasses or a scarf, three a day.
       .concat(seededPick(WEAR().filter(notRare), 3, day * 7 + 12).map(tag("wear")))
+      // …and two petpets, so there is always a little friend for sale.
+      .concat(seededPick(PETPETS().filter(notRare), 2, day * 7 + 13).map(tag("petpet")))
       .concat(seededPick(brushes, 3, day * 7 + 6));
   }
   function tag(kind) { return function (it) { var c = {}; for (var k in it) c[k] = it[k]; c.kind = kind; return c; }; }
 
   function itemById(id) {
-    var all = FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR());
+    var all = FOODS.concat(TOYS, CARE, BOOKS, FURNITURE, WEAR(), PETPETS());
     for (var i = 0; i < all.length; i++) if (all[i].id === id) return all[i];
     if (id.indexOf("brush:") === 0 && window.CPPets) {
       var c = window.CPPets.colour(id.slice(6));
@@ -2433,6 +2436,7 @@ window.CPData = (function () {
     if (BOOKS.some(function (f) { return f.id === id; })) return "book";
     if (FURNITURE.some(function (f) { return f.id === id; })) return "decor";
     if (WEAR().some(function (f) { return f.id === id; })) return "wear";
+    if (PETPETS().some(function (f) { return f.id === id; })) return "petpet";
     return "thing";
   }
 
@@ -2475,7 +2479,11 @@ window.CPData = (function () {
     { id: "wish1",   track: "wishes",  goal: 1, coins: 40, text: "Grant your Craepet a wish" },
     { id: "wish2",   track: "wishes",  goal: 2, coins: 75, text: "Grant your Craepet 2 wishes" },
     { id: "dress1",  track: "dressed", goal: 1, coins: 35, text: "Dress your Craepet up in something" },
-    { id: "post1",   track: "gifts",   goal: 1, coins: 50, text: "Post a present to somebody in the family" }
+    { id: "post1",   track: "gifts",   goal: 1, coins: 50, text: "Post a present to somebody in the family" },
+    { id: "bank1",   track: "banked",  goal: 1, coins: 30, text: "Put some coins in the Valley Bank" },
+    { id: "catch5",  track: "catchScore", goal: 5, coins: 45, text: "Score 5 in one game of Sky Catch" },
+    { id: "catch12", track: "catchScore", goal: 12, coins: 90, text: "Score 12 in one game of Sky Catch" },
+    { id: "visit1",  track: "visits",  goal: 1, coins: 35, text: "Visit somebody's house" }
   ];
   function questsFor(now) { return seededPick(QUEST_POOL, 3, dayNumber(now) * 13 + 5); }
 
@@ -2616,7 +2624,12 @@ window.CPData = (function () {
     { id: "wardrobe", emoji: "🎩", name: "Fashion Icon",    note: "Own 6 things to wear" },
     { id: "wish10",   emoji: "💭", name: "Wish Granter",    note: "Grant 10 of your Craepet's wishes" },
     { id: "postie",   emoji: "🎁", name: "Kind Heart",      note: "Post 5 presents to the family" },
-    { id: "scribe",   emoji: "📔", name: "Diary Keeper",    note: "Write 5 diary entries yourself" }
+    { id: "scribe",   emoji: "📔", name: "Diary Keeper",    note: "Write 5 diary entries yourself" },
+    { id: "petpet",   emoji: "🐾", name: "Little Friend",   note: "Adopt a petpet" },
+    { id: "saver",    emoji: "🏦", name: "Saver",           note: "Earn 50 coins of bank interest" },
+    { id: "lucky",    emoji: "🍀", name: "Lucky",           note: "Meet 10 random events on the paths" },
+    { id: "skycatch", emoji: "⭐", name: "Star Catcher",    note: "Score 15 in one game of Sky Catch" },
+    { id: "neighbour", emoji: "🏘️", name: "Good Neighbour", note: "Visit 3 different houses" }
   ];
 
   /* Names on offer for the kids who can't type yet. */
@@ -2660,6 +2673,7 @@ window.CPData = (function () {
     FURNITURE: FURNITURE,
     FURNITURE_SETS: FURNITURE_SETS,
     WEAR: WEAR,
+    PETPETS: PETPETS,
     HOUSES: HOUSES,
     WALLS: WALLS,
     FLOORS: FLOORS,

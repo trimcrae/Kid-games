@@ -1021,6 +1021,8 @@ const GAMES = {
     await page.evaluate(() => Object.keys(localStorage)
       .filter((k) => k.startsWith("craepets")).forEach((k) => localStorage.removeItem(k)));
     await page.reload({ waitUntil: "networkidle" });
+    // random events are dice; the robot needs the paths quiet (they are tested on their own below)
+    await page.evaluate(() => Craepets._events(false));
 
     // every creature bakes from its pixel grid, in every paint colour
     const art = await page.evaluate(() => {
@@ -1407,7 +1409,92 @@ const GAMES = {
     await page.waitForTimeout(150);
     await page.locator(".sheet .close").click();
 
+    // ---- PETPETS: the Market sells a little friend, it gets a name, and it
+    // trots along behind the pet
+    await page.locator('[data-go="market"]').click();
+    const ppOnShelf = await page.evaluate(() => CPData.shopStock(null, Craepets.who()).filter((i) => i.kind === "petpet").map((i) => i.id));
+    if (ppOnShelf.length < 1) throw new Error("the market has no petpet shelf");
+    await page.locator(`[data-buy="${ppOnShelf[0]}"]`).click();
+    if (await page.locator("[data-change]").count()) {
+      await page.locator(`[data-change="${await page.evaluate(() => Craepets.changeIndex())}"]`).click();
+    }
+    await page.waitForSelector("#pp-go");
+    if (await page.locator("#pp-input").count()) await page.fill("#pp-input", "Bean");
+    await page.locator("#pp-go").click();
+    await page.waitForTimeout(150);
+    const pp = await page.evaluate(() => ({ owned: Craepets.petpets(), out: Craepets.state().pet.petpet }));
+    if (!pp.owned.length || !pp.out || pp.out.id !== ppOnShelf[0] || pp.out.name !== "Bean") throw new Error("the petpet was not adopted and named");
+    if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🐾")))) throw new Error("the petpet was not written in the diary");
+    await page.locator('[data-go="nest"]').click();
+    await page.evaluate(() => { const a = Craepets._anim(); a.x = 0.5; a.tx = 0.3; a.px = undefined; });
+    await page.waitForTimeout(500);
+    const ppAnim = await page.evaluate(() => Craepets._anim());
+    if (typeof ppAnim.px !== "number" || ppAnim.px <= ppAnim.x) throw new Error("the petpet is not following behind");
+
+    // ---- THE BANK: coins in, 3% overnight, coins out
+    await page.locator('[data-go="market"]').click();
+    const purse0 = await page.evaluate(() => Craepets.state().coins);
+    await page.locator('[data-bank="in"]').click();
+    await page.waitForSelector('[data-bankamt="in:100"]');
+    await page.locator('[data-bankamt="in:100"]').click();
+    await page.waitForTimeout(150);
+    let bk = await page.evaluate(() => ({ b: Craepets.bank(), coins: Craepets.state().coins }));
+    if (bk.b.balance !== 100 || bk.coins !== purse0 - 100) throw new Error("the deposit did not move the coins");
+    await page.evaluate(() => { Craepets.bank().day -= 1; Craepets.grant(0); });
+    bk = await page.evaluate(() => ({ b: Craepets.bank() }));
+    if (bk.b.balance !== 103 || bk.b.earned !== 3) throw new Error(`a night in the bank did not pay 3% (${JSON.stringify(bk.b)})`);
+    if (!/paid you 🪙 3/.test(await page.locator(".panel.bank").textContent())) throw new Error("the bank does not announce the interest");
+    await page.locator('[data-bank="out"]').click();
+    await page.waitForSelector('[data-bankamt="out:103"]');
+    await page.locator('[data-bankamt="out:103"]').click();
+    await page.waitForTimeout(150);
+    bk = await page.evaluate(() => ({ b: Craepets.bank(), coins: Craepets.state().coins }));
+    if (bk.b.balance !== 0 || bk.coins !== purse0 + 3) throw new Error("taking the coins out lost some");
+
+    // ---- RANDOM EVENTS: a coin on the path, announced and written down
+    const evCoins = await page.evaluate(() => Craepets.state().coins);
+    await page.evaluate(() => Craepets._event(0));
+    await page.waitForSelector(".sheet");
+    if (!/found 🪙/.test(await page.locator(".sheet").textContent())) throw new Error("the event sheet says nothing");
+    if (await page.evaluate(() => Craepets.state().coins) <= evCoins) throw new Error("the coin on the path was not picked up");
+    if (await page.evaluate(() => Craepets.state().today.events) !== 1) throw new Error("the event was not counted");
+    await page.locator(".sheet .close").click();
+
+    // ---- SKY CATCH: the game runs, a right catch scores, and it pays at the end
+    await page.locator('[data-go="catch"]').click();
+    await page.waitForSelector("[data-catchplay]");
+    await page.locator("[data-catchplay]").click();
+    await page.waitForSelector("#catch-canvas");
+    await page.waitForTimeout(300);
+    if (!(await page.evaluate(() => Craepets.catching() && !!CPCatch.state()))) throw new Error("Sky Catch did not start");
+    // drop a right one straight onto the pet, and a wrong one far away
+    await page.evaluate(() => {
+      const s = CPCatch.state();
+      const good = s.rule.good(), bad = s.rule.bad();
+      s.items.push({ label: good.label, ok: true, x: s.x, y: s.cv.height - s.petH, r: s.scale * 2.2, vy: 0.3, tint: "#fff" });
+      s.items.push({ label: bad.label, ok: false, x: (s.x < s.cv.width / 2 ? s.cv.width - s.scale * 3 : s.scale * 3), y: s.cv.height - s.petH, r: s.scale * 2.2, vy: 0.3, tint: "#fff" });
+    });
+    await page.waitForTimeout(400);
+    const sc = await page.evaluate(() => { const s = CPCatch.state(); return { score: s.score, right: s.right, wrong: s.wrong }; });
+    if (sc.score !== 1 || sc.right !== 1 || sc.wrong !== 0) throw new Error(`a catch did not score properly: ${JSON.stringify(sc)}`);
+    const catchCoins = await page.evaluate(() => Craepets.state().coins);
+    await page.evaluate(() => { CPCatch.state().t0 = performance.now() - CPCatch.DURATION + 300; });
+    await page.waitForSelector(".sheet .teach", { timeout: 4000 });
+    const ended = await page.evaluate(() => ({ coins: Craepets.state().coins, best: Craepets.state().catch.best, games: Craepets.state().catch.games, on: Craepets.catching(), today: Craepets.state().today.catchScore }));
+    if (ended.on || ended.games !== 1 || ended.best < 1 || ended.coins < catchCoins + 3 || !ended.today) throw new Error(`Sky Catch did not finish and pay: ${JSON.stringify(ended)}`);
+    await page.locator(".sheet .close").click();
+
+    // ---- THE MAP: every place is a marker, and tapping one goes there
+    await page.locator('[data-go="map"]').click();
+    await page.waitForSelector(".valley");
+    if (await page.locator(".valley .mp[data-go]").count() < 9) throw new Error("the map is missing places");
+    if (!(await page.locator('.valley .mp.home.mine[data-go="nest"]').count())) throw new Error("your own house is not on the map");
+    await page.locator('.valley [data-map="farm"]').click();
+    await page.waitForSelector(".choice");
+    if (await page.evaluate(() => Craepets.view()) !== "farm") throw new Error("tapping the farm on the map did not go there");
+
     // ---- THE CLOCK: after dark the window fills with stars and the room dims
+    await page.locator('[data-go="nest"]').click();
     await page.evaluate(() => Craepets._setHour(22));
     await page.waitForTimeout(100);
     if (await page.evaluate(() => Craepets.timeOfDay()) !== "night") throw new Error("10pm is not night");
@@ -1581,8 +1668,10 @@ const GAMES = {
     if (opened.mail !== 0 || opened.cookie !== cookies0 + 1 || !opened.wrote || opened.got !== 1) throw new Error("opening the post did not hand over the cookie");
     await page.locator(".sheet .close").click();
 
-    // ---- VISITING: Cory walks round to Shannon's and finds Sable in her room
+    // ---- VISITING: Cory walks round to Shannon's (her house is on the map) and finds Sable in her room
     const herSave = await page.evaluate(() => localStorage.getItem("craepets.v1.shannon"));
+    await page.locator('[data-go="map"]').click();
+    await page.waitForSelector('.valley .mp.home[data-visit="shannon"]');
     await page.locator('[data-go="case"]').click();
     await page.locator('[data-visit="shannon"]').click();
     await page.waitForSelector(".panel.visit");
@@ -1664,7 +1753,9 @@ const GAMES = {
       "buying from it pays Cory; a food wish and a play wish granted; " +
       `${wearArt.n} things to wear all draw on all 7 creatures, a bought hat goes on and comes off; ` +
       "stars in the window at 10pm; the diary fills up and takes an entry; Shannon posts Cory a " +
-      "cookie and he opens it; a Zibbit loves popcorn and the Farm; the pet wanders; Cory visits " +
+      "cookie and he opens it; a Zibbit loves popcorn and the Farm; the pet wanders; a petpet is " +
+      "named and follows; the bank pays 3% overnight; a random event pays; Sky Catch scores and pays; " +
+      "the map goes to the farm; Cory visits " +
       "Shannon's house and takes a photo; quests, trophies, separate saves for Shannon, " +
       `Cory & Kieran; ${clipCheck.total} narration clips (${clipCheck.checked} spot-checked)`;
   },

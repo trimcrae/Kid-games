@@ -66,6 +66,12 @@ no logins.
 > species has **favourite foods and a favourite place** (worth reading the
 > card for), the pet **wanders about its room** and grows with every level,
 > and the **photo booth** makes a picture of it to keep.
+> There is a **painted map** you tap to travel, **petpets** (a pet for your
+> pet, trotting along behind it), a **bank** that pays 3% a night (the
+> compounding lesson, told in numbers a child can check), **random events**
+> on the paths, and **Sky Catch** — a proper arcade mini-game where you run
+> your Craepet under the falling sky and catch only what the rule asks for
+> (even numbers, primes, vowels, the letter A, the stars), at your level.
 
 > **NYT-style games for the kids:** Crossword, Word Strands, Spelling Bee,
 > Connections and Word Guess are friendly versions of the New York Times
