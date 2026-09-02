@@ -1356,9 +1356,120 @@ window.CPArt = (function () {
       'aria-hidden="true" focusable="false">' + paint() + "</svg>";
   }
 
+  /* =========================================================
+     PIXEL ART — the paintings, rasterised at their REAL size.
+     A view is drawn on a 120 x 90 box and a panorama on 240 x 90,
+     so if we paint the SVG onto a canvas exactly that big and let
+     the browser blow it up with no smoothing, every scene becomes
+     pixel art at the same chunkiness as the creatures — and it
+     stays a dozen lines of SVG to author. The colours are snapped
+     back to the painting's own palette with a 2x2 ordered dither,
+     so soft gradients turn into proper pixel-art banding instead
+     of a blur. Rasterising happens once per view and is cached.
+     ========================================================= */
+  var W_VIEW = 120, W_PANO = 240, H_ART = 90;
+  function svgDoc(kind, id) {
+    var paint = kind === "view" ? (V[id] || V.windowsun) : P[id];
+    if (!paint) return "";
+    var w = kind === "view" ? W_VIEW : W_PANO;
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + H_ART +
+      '" viewBox="0 0 ' + w + " " + H_ART + '">' + paint() + "</svg>";
+  }
+  /* Every colour the painting mentions, as [r, g, b]. */
+  function paletteOf(svg) {
+    var seen = {}, out = [];
+    (svg.match(/#[0-9a-fA-F]{3,6}\b/g) || []).forEach(function (c) {
+      if (c.length === 4) c = "#" + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+      if (c.length !== 7) return;
+      c = c.toLowerCase();
+      if (seen[c]) return;
+      seen[c] = 1;
+      out.push([parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]);
+    });
+    return out;
+  }
+  /* Snap every pixel to the nearest palette colour, dithering between
+     the nearest two where the painting was blending them. */
+  function quantise(g, w, h, pal) {
+    if (pal.length < 2) return;
+    var img = g.getImageData(0, 0, w, h), d = img.data;
+    var bayer = [0.22, 0.72, 0.97, 0.47];
+    for (var i = 0, p = 0; i < d.length; i += 4, p++) {
+      if (d[i + 3] < 8) continue;
+      var r = d[i], gg = d[i + 1], b = d[i + 2];
+      var best = 0, bd = 1e12, second = 0, sd = 1e12;
+      for (var k = 0; k < pal.length; k++) {
+        var c = pal[k], dr = c[0] - r, dg = c[1] - gg, db = c[2] - b;
+        var dist = dr * dr * 2 + dg * dg * 3 + db * db;
+        if (dist < bd) { second = best; sd = bd; best = k; bd = dist; }
+        else if (dist < sd) { second = k; sd = dist; }
+      }
+      var t = (bd + sd > 0) ? Math.sqrt(bd) / (Math.sqrt(bd) + Math.sqrt(sd)) : 0;
+      var use = (t > bayer[((p / w) & 1) * 2 + (p % w & 1)]) ? pal[second] : pal[best];
+      d[i] = use[0]; d[i + 1] = use[1]; d[i + 2] = use[2];
+    }
+    g.putImageData(img, 0, 0);
+  }
+  var rasterCache = {}, rasterPending = {};
+  function rasterise(kind, id, done) {
+    var key = kind + ":" + id;
+    if (rasterCache[key]) { done(rasterCache[key]); return; }
+    if (rasterPending[key]) { rasterPending[key].push(done); return; }
+    var svg = svgDoc(kind, id);
+    if (!svg) return;
+    rasterPending[key] = [done];
+    var w = kind === "view" ? W_VIEW : W_PANO;
+    var img = new Image();
+    img.onload = function () {
+      var cv = document.createElement("canvas");
+      cv.width = w; cv.height = H_ART;
+      var g = cv.getContext("2d");
+      g.drawImage(img, 0, 0, w, H_ART);
+      try { quantise(g, w, H_ART, paletteOf(svg)); } catch (e) { /* a tainted canvas just stays smooth */ }
+      rasterCache[key] = cv;
+      var list = rasterPending[key]; delete rasterPending[key];
+      list.forEach(function (f) { f(cv); });
+    };
+    img.onerror = function () { delete rasterPending[key]; };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }
+  /* The markup to drop into the page: a canvas that paintPixels() fills. */
+  function artCanvas(kind, id) {
+    var has = kind === "view" ? (V[id] || V.windowsun) : P[id];
+    if (!has) return "";
+    var w = kind === "view" ? W_VIEW : W_PANO;
+    return '<canvas class="' + (kind === "view" ? "view-art" : "pano-art") + ' px-art" width="' + w +
+      '" height="' + H_ART + '" data-art="' + kind + ":" + id + '" aria-hidden="true"></canvas>';
+  }
+  function paintPixels(root) {
+    var list = (root || document).querySelectorAll("canvas[data-art]");
+    Array.prototype.forEach.call(list, function (cv) {
+      if (cv.dataset.done) return;
+      var parts = cv.getAttribute("data-art").split(":");
+      rasterise(parts[0], parts[1], function (src) {
+        if (!cv.isConnected) return;
+        var g = cv.getContext("2d");
+        g.imageSmoothingEnabled = false;
+        g.clearRect(0, 0, cv.width, cv.height);
+        g.drawImage(src, 0, 0);
+        cv.dataset.done = "1";
+      });
+    });
+  }
+  /* Warm the cache for every place, so a first visit is never blank. */
+  function warm(viewIds) {
+    Object.keys(P).forEach(function (id) { rasterise("pano", id, function () {}); });
+    (viewIds || []).forEach(function (id) { if (V[id]) rasterise("view", id, function () {}); });
+  }
+
   return {
     /* the painted view, ready to drop into a framed window */
     view: viewSvg,
+    /* the same view as pixel art (a canvas filled by paintPixels) */
+    viewArt: function (id) { return artCanvas("view", id); },
+    panoArt: function (id) { return artCanvas("pano", id); },
+    paintPixels: paintPixels,
+    warm: warm,
     /* which frame this home wears */
     frame: frameFor,
     /* the painted panorama for a place that is not home */

@@ -296,24 +296,112 @@ window.CPPets = (function () {
     return blinkGrid(rows).map(function (row) { return row.replace(/MM/g, "BB").replace(/M/g, "B"); });
   }
 
-  function bake(rows, pal, scale) {
+  /* A walking frame: the left foot lifts (its outline row goes, the
+     foot row above it becomes ground-shadow-free), so alternating
+     idle/walk reads as a trot. Works on any creature whose feet are
+     the last two rows, which is all of them. */
+  function walkGrid(rows) {
+    var out = rows.slice();
+    var last = out.length - 1, above = last - 1;
+    var m = /^(\.*)(O+)(\.+)(O+)(\.*)$/.exec(out[last]);   // two separate feet on the floor row
+    if (!m) return out;
+    var lx = m[1].length, lw = m[2].length;
+    // lift the left foot one row: clear it from the floor row, and turn
+    // the row above it into the foot (so it looks raised, not missing)
+    out[last] = m[1] + repeat(".", lw) + m[3] + m[4] + m[5];
+    var ab = out[above].split("");
+    for (var x = lx; x < lx + lw; x++) if (ab[x] !== undefined && ab[x] !== ".") ab[x] = "O";
+    out[above] = ab.join("");
+    return out;
+  }
+  /* A happy frame: each eye becomes a closed, smiling arch (^ ^). */
+  function happyGrid(rows) {
+    var eyeRows = [];
+    rows.forEach(function (r, i) { if (/[WK]/.test(r)) eyeRows.push(i); });
+    if (eyeRows.length < 2) return rows;
+    var top = eyeRows[0];
+    return rows.map(function (row, i) {
+      if (!/[WK]/.test(row)) return row;
+      var out = "", inEye = 0;
+      for (var x = 0; x < row.length; x++) {
+        var ch = row[x];
+        if (ch === "W" || ch === "K") {
+          var col = (row[x - 1] === "W" || row[x - 1] === "K") ? inEye + 1 : 0;   // 0,1,2 across the eye
+          inEye = col;
+          var arch = (i === top && col === 1) || (i === top + 1 && col !== 1);
+          out += arch ? "O" : "B";
+        } else { out += ch; inEye = 0; }
+      }
+      return out;
+    });
+  }
+  function repeat(ch, n) { var s = ""; while (n-- > 0) s += ch; return s; }
+
+  /* Scale2x (a.k.a. EPX): doubles a grid while rounding off the
+     staircase corners, so a 16-pixel creature bakes as a 32-pixel one
+     with the same silhouette and no new art. Compares characters, not
+     colours, so a palette function still sees the ORIGINAL grid. */
+  function scale2x(rows) {
+    var h = rows.length, w = 0, i;
+    for (i = 0; i < h; i++) if (rows[i].length > w) w = rows[i].length;
+    function at(x, y) {
+      if (x < 0 || y < 0 || y >= h || x >= rows[y].length) return ".";
+      return rows[y][x];
+    }
+    var out = [];
+    for (var y = 0; y < h; y++) {
+      var r1 = "", r2 = "";
+      for (var x = 0; x < w; x++) {
+        var P = at(x, y), A = at(x, y - 1), B = at(x + 1, y), C = at(x - 1, y), D = at(x, y + 1);
+        var p1 = P, p2 = P, p3 = P, p4 = P;
+        if (C === A && C !== D && A !== B) p1 = A;
+        if (A === B && A !== C && B !== D) p2 = B;
+        if (D === C && D !== B && C !== A) p3 = C;
+        if (B === D && B !== A && D !== C) p4 = D;
+        r1 += p1 + p2; r2 += p3 + p4;
+      }
+      out.push(r1, r2);
+    }
+    return out;
+  }
+
+  /* Paint a grid into a fresh canvas. `scale` is the size of ONE grid
+     cell in device pixels; the picture is smoothed with Scale2x so each
+     cell is really a 2x2 of half-size pixels. Odd scales can't halve
+     cleanly, so they bake at 1px per sub-cell and stretch (nearest
+     neighbour) — the same thing the CSS does to every chip anyway. */
+  function bake(rows, pal, scale, opts) {
     var w = 0, i;
     for (i = 0; i < rows.length; i++) if (rows[i].length > w) w = rows[i].length;
     var h = rows.length;
+    var smooth = !(opts && opts.raw) && scale >= 2;
+    var grid = smooth ? scale2x(rows) : rows;
+    var div = smooth ? 2 : 1;                       // sub-cells per cell
+    var exact = !smooth || scale % 2 === 0;
+    var unit = exact ? scale / div : 1;             // device px per sub-cell
     var cv = document.createElement("canvas");
-    cv.width = w * scale;
-    cv.height = h * scale;
+    cv.width = exact ? w * scale : w * div;
+    cv.height = exact ? h * scale : h * div;
     var g = cv.getContext("2d");
-    for (var y = 0; y < h; y++) {
-      var row = rows[y];
+    for (var y = 0; y < grid.length; y++) {
+      var row = grid[y];
       for (var x = 0; x < row.length; x++) {
         var ch = row[x];
         var col = FIXED[ch] !== undefined ? FIXED[ch] : pal[ch];
         if (col === undefined) continue;              // "." and unknown = transparent
-        if (typeof col === "function") col = col(x, y, w, h);
+        if (typeof col === "function") col = col(Math.floor(x / div), Math.floor(y / div), w, h);
         g.fillStyle = col;
-        g.fillRect(x * scale, y * scale, scale, scale);
+        g.fillRect(x * unit, y * unit, unit, unit);
       }
+    }
+    if (!exact) {
+      var big = document.createElement("canvas");
+      big.width = w * scale;
+      big.height = h * scale;
+      var gg = big.getContext("2d");
+      gg.imageSmoothingEnabled = false;
+      gg.drawImage(cv, 0, 0, big.width, big.height);
+      cv = big;
     }
     cv.pxW = w;
     cv.pxH = h;
@@ -338,6 +426,9 @@ window.CPPets = (function () {
     var rows = sp.grid;
     if (frame === "blink") rows = blinkGrid(rows);
     else if (frame === "sleep") rows = sleepGrid(rows);
+    else if (frame === "walk") rows = walkGrid(rows);
+    else if (frame === "happy") rows = happyGrid(rows);
+    else if (frame === "happywalk") rows = walkGrid(happyGrid(rows));
     var cv = bake(rows, colour(colourId).pal, scale);
     cache[key] = cv;
     return cv;
