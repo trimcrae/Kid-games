@@ -20,20 +20,42 @@ window.CPMap = (function () {
     return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 
-  /* Where everything is, on a 100 × 64 canvas. */
+  /* Where everything is, on a canvas 100 wide (86 tall, or 94 with a
+     second row of houses). A marker is a dot
+     about 11 wide with a label under it up to ~20 wide, so places
+     on the same row sit at least 22 apart and rows are 18+ apart —
+     nothing overlaps, whatever the labels say. */
+  var W = 100;
   var PLACES = [
     { id: "games",  x: 17, y: 12, emoji: "🎮", label: "Games Room",  go: "games" },
-    { id: "arena",  x: 63, y: 14, emoji: "⚔️", label: "Arena",       go: "arena" },
-    { id: "tower",  x: 88, y: 10, emoji: "🗼", label: "Shadow Tower", go: "arena", dark: true },
-    { id: "farm",   x: 18, y: 31, emoji: "🍓", label: "Berry Farm",  go: "farm" },
-    { id: "well",   x: 46, y: 30, emoji: "📖", label: "Word Well",   go: "well" },
-    { id: "pool",   x: 78, y: 36, emoji: "🌈", label: "Rainbow Pool", go: "pool" },
-    { id: "market", x: 50, y: 50, emoji: "🏪", label: "Market & Bank", go: "market" },
-    { id: "stall",  x: 66, y: 55, emoji: "🏬", label: "Your Stall",  go: "stall" },
-    { id: "quests", x: 34, y: 45, emoji: "📜", label: "Quest Board", go: "quests" }
+    { id: "arena",  x: 60, y: 13, emoji: "⚔️", label: "Arena",       go: "arena" },
+    { id: "tower",  x: 87, y: 10, emoji: "🗼", label: "Shadow Tower", go: "arena", dark: true },
+    { id: "farm",   x: 18, y: 32, emoji: "🍓", label: "Berry Farm",  go: "farm" },
+    { id: "well",   x: 48, y: 31, emoji: "📖", label: "Word Well",   go: "well" },
+    { id: "pool",   x: 80, y: 34, emoji: "🌈", label: "Rainbow Pool", go: "pool" },
+    { id: "quests", x: 30, y: 52, emoji: "📜", label: "Quest Board", go: "quests" },
+    { id: "market", x: 54, y: 53, emoji: "🏪", label: "Market & Bank", go: "market" },
+    { id: "stall",  x: 82, y: 54, emoji: "🏬", label: "Your Stall",  go: "stall" }
   ];
-  /* The family's houses sit along the lane at the bottom left. */
-  var HOME_SPOTS = [[10, 53], [23, 56], [8, 44], [30, 60], [16, 61], [4, 62]];
+  /* The family's houses line the lane at the bottom, spread evenly.
+     Up to three fit in one row; more than that and they take turns on
+     either side of the lane, so neighbours' names are never on the
+     same line (six houses → 16 apart, names 32 apart). */
+  var LANE_GAP = 20, LANE_PAD = 10, LANE_TOP = 73, LANE_BOTTOM = 83;
+  function laneSpots(n) {
+    if (n <= 0) return [];
+    var zig = n > 3;
+    var gap = Math.min(LANE_GAP, (W - 2 * LANE_PAD) / Math.max(1, n - 1));
+    var x0 = W / 2 - gap * (n - 1) / 2;
+    var spots = [];
+    for (var i = 0; i < n; i++) spots.push([Math.round((x0 + gap * i) * 10) / 10, zig && i % 2 ? LANE_BOTTOM : LANE_TOP]);
+    return spots;
+  }
+  /* Pet names can be 14 letters; a house label has room for about 11. */
+  function shortName(name) {
+    name = String(name == null ? "" : name);
+    return name.length > 12 ? name.slice(0, 11).replace(/\s+$/, "") + "…" : name;
+  }
 
   function marker(x, y, emoji, label, attrs, cls) {
     return '<g class="mp ' + (cls || "") + '" ' + attrs + ' transform="translate(' + x + " " + y + ')">' +
@@ -48,14 +70,17 @@ window.CPMap = (function () {
     opts = opts || {};
     var here = opts.here || "nest";
     var homes = opts.homes || [];
-    var out = '<svg class="valley" viewBox="0 0 100 72" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A map of the valley">' +
+    var spots = laneSpots(homes.length);
+    var H = homes.length > 3 ? 94 : 86;      // a second row of houses needs the room
+    var river = "M100 36 C 88 42, 80 44, 70 48 S 65 64, 66 " + H;
+    var out = '<svg class="valley" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A map of the valley">' +
       "<defs>" +
         '<linearGradient id="vm-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd3ff"/><stop offset="1" stop-color="#e8f7ff"/></linearGradient>' +
         '<linearGradient id="vm-far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8e3a5"/><stop offset="1" stop-color="#8fcf7a"/></linearGradient>' +
         '<linearGradient id="vm-near" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bd97f"/><stop offset="1" stop-color="#5fa845"/></linearGradient>' +
         '<linearGradient id="vm-dark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d4478"/><stop offset="1" stop-color="#2b2450"/></linearGradient>' +
       "</defs>" +
-      '<rect width="100" height="72" fill="url(#vm-sky)"/>' +
+      '<rect width="' + W + '" height="' + H + '" fill="url(#vm-sky)"/>' +
       // a sun and some cloud
       '<circle cx="90" cy="7" r="4" fill="#ffe27a"/>' +
       '<g fill="#fff" opacity="0.9"><ellipse cx="30" cy="6" rx="6" ry="2.2"/><ellipse cx="34" cy="5" rx="4" ry="2.4"/><ellipse cx="52" cy="9" rx="5" ry="1.8"/></g>' +
@@ -65,27 +90,27 @@ window.CPMap = (function () {
       '<ellipse cx="20" cy="26" rx="30" ry="10" fill="url(#vm-far)"/>' +
       '<ellipse cx="60" cy="27" rx="34" ry="11" fill="url(#vm-far)"/>' +
       // the valley floor
-      '<rect y="30" width="100" height="42" fill="url(#vm-near)"/>' +
+      '<rect y="30" width="' + W + '" height="' + (H - 30) + '" fill="url(#vm-near)"/>' +
       '<ellipse cx="50" cy="31" rx="60" ry="6" fill="#9bd97f"/>' +
       // the river, from the pool down past the market
-      '<path d="M100 33 C 84 38, 80 42, 72 46 S 60 62, 48 72" fill="none" stroke="#57c4ff" stroke-width="3.2" stroke-linecap="round"/>' +
-      '<path d="M100 33 C 84 38, 80 42, 72 46 S 60 62, 48 72" fill="none" stroke="#9fe0ff" stroke-width="1.2" stroke-linecap="round"/>' +
+      '<path d="' + river + '" fill="none" stroke="#57c4ff" stroke-width="3.2" stroke-linecap="round"/>' +
+      '<path d="' + river + '" fill="none" stroke="#9fe0ff" stroke-width="1.2" stroke-linecap="round"/>' +
       // the paths
-      '<path class="vm-path" d="M16 56 L18 36 M18 36 L46 34 L50 46 M46 34 L78 40 M50 46 L66 53 M34 45 L50 50 M18 36 L20 18 M46 30 L63 18 L86 14 M78 36 L64 18 M16 56 L30 60"/>' +
+      '<path class="vm-path" d="M18 32 L48 31 M48 31 L80 34 M18 32 L17 12 M48 31 L60 13 L87 10 M80 34 L60 13 M18 32 L30 52 L54 53 L82 54 M48 31 L54 53 M30 52 L30 78 M4 78 L96 78"/>' +
       // trees
-      '<g fill="#3fb469"><circle cx="8" cy="36" r="1.8"/><circle cx="30" cy="38" r="1.5"/><circle cx="58" cy="41" r="1.6"/><circle cx="90" cy="50" r="2"/><circle cx="84" cy="58" r="1.6"/><circle cx="38" cy="60" r="1.7"/><circle cx="72" cy="30" r="1.4"/><circle cx="6" cy="42" r="1.4"/></g>' +
-      '<g fill="#2f8f5b"><rect x="7.6" y="37" width="0.8" height="1.6"/><rect x="29.6" y="39" width="0.8" height="1.4"/><rect x="57.6" y="42" width="0.8" height="1.4"/><rect x="89.6" y="51.5" width="0.8" height="1.8"/><rect x="83.6" y="59" width="0.8" height="1.4"/><rect x="37.6" y="61" width="0.8" height="1.6"/></g>' +
+      '<g fill="#3fb469"><circle cx="8" cy="40" r="1.8"/><circle cx="32" cy="40" r="1.5"/><circle cx="64" cy="42" r="1.6"/><circle cx="92" cy="48" r="2"/><circle cx="94" cy="62" r="1.6"/><circle cx="42" cy="64" r="1.7"/><circle cx="70" cy="24" r="1.4"/><circle cx="6" cy="46" r="1.4"/><circle cx="12" cy="62" r="1.6"/><circle cx="4" cy="' + (H - 4) + '" r="1.5"/><circle cx="96" cy="' + (H - 2) + '" r="1.5"/></g>' +
+      '<g fill="#2f8f5b"><rect x="7.6" y="41" width="0.8" height="1.6"/><rect x="31.6" y="41" width="0.8" height="1.4"/><rect x="63.6" y="43" width="0.8" height="1.4"/><rect x="91.6" y="49.5" width="0.8" height="1.8"/><rect x="93.6" y="63" width="0.8" height="1.4"/><rect x="41.6" y="65" width="0.8" height="1.6"/><rect x="11.6" y="63" width="0.8" height="1.4"/></g>' +
       // the farm's field and the pool's water
-      '<rect x="10" y="34" width="12" height="4" rx="1" fill="#c9906a" opacity="0.6"/>' +
-      '<ellipse cx="78" cy="41" rx="6" ry="2.2" fill="#8fe4ff"/>';
+      '<rect x="10" y="36" width="14" height="4" rx="1" fill="#c9906a" opacity="0.6"/>' +
+      '<ellipse cx="80" cy="39" rx="6" ry="2.2" fill="#8fe4ff"/>';
 
     PLACES.forEach(function (p) {
       var attrs = 'data-goto="' + p.go + '" data-map="' + p.id + '" role="button" tabindex="0" aria-label="Go to the ' + esc(p.label) + '"';
-      out += marker(p.x, p.y, p.emoji, p.label, attrs, (p.dark ? "dark " : "") + (here === p.id || (p.id === "tower" && false) ? "here" : ""));
+      out += marker(p.x, p.y, p.emoji, p.label, attrs, (p.dark ? "dark " : "") + (here === p.id ? "here" : ""));
     });
     // the family's houses along the lane
     homes.forEach(function (h, i) {
-      var spot = HOME_SPOTS[i % HOME_SPOTS.length];
+      var spot = spots[i];
       var attrs = h.mine
         ? 'data-goto="nest" data-map="nest" role="button" tabindex="0" aria-label="Go home to ' + esc(h.name) + '"'
         : 'data-visit="' + esc(h.id) + '" role="button" tabindex="0" aria-label="Visit ' + esc(h.name) + '"';
@@ -95,12 +120,12 @@ window.CPMap = (function () {
         '<circle class="mp-dot" r="5.2" style="stroke:' + esc(h.colour) + '"/>' +
         '<text class="mp-emoji" y="1.6" text-anchor="middle">' + h.emoji + "</text>" +
         (h.chip ? '<image href="' + h.chip + '" x="2.6" y="-6.2" width="4.6" height="5.6" style="image-rendering:pixelated"/>' : "") +
-        '<text class="mp-label" y="9" text-anchor="middle">' + esc(h.name) + "</text>" +
+        '<text class="mp-label" y="9" text-anchor="middle">' + esc(shortName(h.name)) + "</text>" +
       "</g>";
     });
     out += "</svg>";
     return out;
   }
 
-  return { svg: svg, PLACES: PLACES };
+  return { svg: svg, PLACES: PLACES, laneSpots: laneSpots };
 })();
