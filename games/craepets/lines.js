@@ -339,6 +339,7 @@ window.CPLines = (function () {
     "hol-easter": "Happy Easter! Eggs everywhere — and you know all about those.", "hol-earthday": "Happy Earth Day! The Rainbow Pool knows all about the wide world.",
     "hol-mothers": "Happy Mother's Day! Post Mum a present.", "hol-fathers": "Happy Father's Day!",
     "hol-july4": "Happy Fourth of July! Fireworks over the valley tonight.", "hol-halloween": "Happy Halloween! The Shade is in a very good mood.",
+    "hol-school": "First day of school! New pencils, new friends, and every right answer pays extra.",
     "hol-spooky": "Spooky Week! Halloween is nearly here.", "hol-thanksgiving": "Happy Thanksgiving! Say thank you to somebody — post them a present.",
     "hol-xmas": "Merry Christmas! There is a present under the tree.", "hol-nye": "Happy New Year's Eve! Stay up late (in the valley, at least).",
     "hol-present": "There's a present for you! Open it!", "hol-hatchday": "Happy hatch-day! It's my birthday!",

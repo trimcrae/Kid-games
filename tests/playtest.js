@@ -1581,6 +1581,21 @@ const GAMES = {
       return { n: ids.length, autumn: ids.every((id) => CPCal.SEASONS.autumn.foods.includes(id)) };
     });
     if (seasonal.n !== 2 || !seasonal.autumn) throw new Error("the seasonal shelf is not autumn's");
+    // the first day of school is the day after Labor Day (the first Monday of September)
+    const school = await page.evaluate(() => {
+      const ids = (s) => { CPCal._setDate(s); return CPCal.holidays().map((h) => h.id); };
+      const out = { labor: ids("2026-09-07"), day: ids("2026-09-08"), after: ids("2026-09-09"), next: ids("2027-09-07") };
+      CPCal._setDate(null);
+      return out;
+    });
+    if (school.labor.includes("school") || !school.day.includes("school") || school.after.includes("school") || !school.next.includes("school")) {
+      throw new Error(`the first day of school is on the wrong day: ${JSON.stringify(school)}`);
+    }
+    await page.locator('[data-go="nest"]').click();
+    await page.evaluate(() => Craepets._setDate("2026-09-08"));
+    await page.waitForTimeout(100);
+    if (!/🎒/.test(await page.locator(".scene .garland").textContent())) throw new Error("no school garland");
+    if (!/first day of school/i.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not say it is the first day of school");
     // Christmas Eve: one sleep to go, and the snow is guaranteed on the day itself
     await page.locator('[data-go="nest"]').click();
     await page.evaluate(() => Craepets._setDate("2026-12-24"));
