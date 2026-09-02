@@ -75,6 +75,13 @@ commits it back:
   (`en_US-lessac-medium`) over the `text:` strings and commits the `.mp3`s.
 - **Story art** → `.github/workflows/generate-art.yml` fetches painterly PNGs.
 
+**Never use image-generation models for Craepets** (or for anything depicting
+creatures or children). Craepets art is code-drawn only: pixel grids in
+`pets.js` (baked with Scale2x), pixel-rasterised SVG scenery in `scenery.js`,
+the WebGL sky in `sky.js`, and crayon pages in `crayon.js`. A free image API
+once returned an inappropriate image for a "blob creature" prompt; that
+route is closed for this game.
+
 Both trigger automatically when their source changes and can be run by hand from
 the Actions tab. So: don't fight the sandbox proxy for these — push and let the
 pipeline (which can reach the internet) generate and commit the asset.

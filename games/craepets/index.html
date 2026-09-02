@@ -9,6 +9,8 @@
   <meta name="theme-color" content="#5ec6a8" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="../../assets/css/style.css" />
+  <!-- the handwriting for the diary and the Quest Board posters (falls back to the system's if offline) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" />
   <style>
     /* ===========================================================
        CRAEPETS — the valley's own styles.
@@ -648,6 +650,18 @@
     .panel.tower .npc { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
     .panel.tower .npc .npcsay i { color: #e9e2ff; }
 
+    /* --- pixel-art scenery, the sky layer, and crayon pages --- */
+    /* both sit in tree order with the weather, season and dusk tints (z-index 0, not the
+       pet canvas's 3), so the tint still falls over the view and the sky over the tint */
+    .scene .px-art { position: absolute; inset: 0; z-index: 0; image-rendering: pixelated; image-rendering: crisp-edges; object-fit: cover; }
+    .scene .sky-layer { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* when the WebGL sky is drawing the rain and snow, the CSS ones step aside */
+    .scene.has-sky .wx-rainy, .scene.has-sky .wx-snowy { display: none; }
+    .crayon-page { display: block; width: 100%; max-width: 520px; margin: 0.2rem auto 0.8rem; border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(43,36,64,0.16); transform: rotate(-0.6deg); }
+    .crayon-poster { display: block; width: min(280px, 78%); margin: 0 auto 0.6rem; border-radius: 4px;
+      box-shadow: 0 4px 14px rgba(43,36,64,0.16); transform: rotate(1.2deg); }
+
     /* --- the weather --- */
     .scene .wx { position: absolute; inset: 0; pointer-events: none; }
     .scene .wx-rainy {
@@ -952,6 +966,8 @@
   <script src="trivia.js"></script>
   <script src="lines.js"></script>
   <script src="scenery.js"></script>
+  <script src="sky.js"></script>
+  <script src="crayon.js"></script>
   <script src="calendar.js"></script>
   <script src="map.js"></script>
   <script src="catch.js"></script>

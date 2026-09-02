@@ -1372,7 +1372,7 @@
   /* =========================================================
      LITTLE REACTIONS — the pet hops, hearts float up.
      ========================================================= */
-  function hop(frames) { if (!calm) anim.hop = frames || 22; }
+  function hop(frames) { if (!calm) anim.hop = frames || 22; anim.happy = 70; }
   function hearts() {
     ["💗", "💕", "💖"].forEach(function (h, i) {
       setTimeout(function () { floaty(h, "#ff8fd0"); }, i * 160);
@@ -1479,7 +1479,7 @@
     }
     var frame = ART.frame(houseInfo());
     return '<div class="win win-' + frame + '" aria-hidden="true">' +
-      ART.view(v.id) + weatherHtml() + seasonHtml("win") + todHtml() +
+      (ART.viewArt ? ART.viewArt(v.id) : ART.view(v.id)) + weatherHtml() + seasonHtml("win") + todHtml() +
       '<span class="win-glass"></span><span class="win-bars"></span>' +
       "</div>";
   }
@@ -1508,7 +1508,7 @@
      tx is where it has decided to wander to next; face is which way it
      is looking. They live outside the render so a redraw never makes
      the pet jump back to the middle. */
-  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0, wobble: 0,
+  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0, wobble: 0, happy: 0,
                x: 0.5, tx: null, face: 1, wanderAt: 0, shadow: null };
 
   function levelOf(pet) { return Math.min(20, 1 + Math.floor(((pet && pet.xp) || 0) / 50)); }
@@ -1561,9 +1561,6 @@
 
     anim.t++;
     var sleeping = pet.energy < 20 || anim.napping;
-    var frame = "idle";
-    if (sleeping) frame = "sleep";
-    else if (anim.t % 150 > 144) frame = "blink";
 
     // A Craepet grows a little with every level — about a sixth bigger by
     // level 20 — so a grown one really is bigger than a hatchling.
@@ -1594,9 +1591,21 @@
     }
     if (anim.shadow) anim.shadow.style.left = (anim.x * 100) + "%";
 
+    // Which picture: asleep; walking (the feet alternate every eight
+    // frames, one step per bounce); happy (^ ^ eyes for a while after a
+    // treat, a game or a hop); or a blink now and then.
+    var step = Math.floor(anim.t / 8) % 2 === 1;
+    if (anim.happy > 0) anim.happy--;
+    var glad = anim.hop > 0 || anim.happy > 0;
+    var frame = sleeping ? "sleep"
+      : glad ? ((walking && step) ? "happywalk" : "happy")
+      : (walking && step) ? "walk"
+      : (anim.t % 150 > 144) ? "blink"
+      : "idle";
+
     var bob = calm ? 0
       : sleeping ? Math.round(Math.sin(anim.t / 40) * scale * 0.35)
-      : walking  ? Math.round(Math.abs(Math.sin(anim.t / 5)) * scale * -0.7)
+      : walking  ? Math.round(Math.abs(Math.sin(anim.t * Math.PI / 8)) * scale * -0.7)
                  : Math.round(Math.sin(anim.t / 16) * scale * 0.6);
     // a little jump for joy: fed, played with, dressed up, a wish granted
     if (anim.hop > 0) {
@@ -1647,7 +1656,7 @@
     } else if (ART && ART.hasPano(skin)) {
       // Everywhere else gets a painted panorama instead of the old
       // scatter of emoji — same idea, an actual picture of the place.
-      body = '<span class="pano" aria-hidden="true">' + ART.pano(skin) + (inTower ? "" : weatherHtml() + seasonHtml("pano") + todHtml()) + "</span>";
+      body = '<span class="pano" aria-hidden="true">' + (ART.panoArt ? ART.panoArt(skin) : ART.pano(skin)) + (inTower ? "" : weatherHtml() + seasonHtml("pano") + todHtml()) + "</span>";
     } else {
       body = (pl.deco || []).map(function (d) {
         return decoSpan(d[0], d[1], d[2], 1, "");
@@ -1747,7 +1756,96 @@
       needsHtml() +
       navHtml() +
       panelHtml();
+    afterRender(g);
     save();
+  }
+
+  /* =========================================================
+     AFTER THE RENDER — the bits of the picture that need a real
+     element to draw into: the pixel-art scenery, the weather in
+     the sky, and the crayon pages.
+     ========================================================= */
+  var sky = null, warmed = false;
+  function afterRender(g) {
+    if (ART && ART.paintPixels) {
+      if (!warmed && ART.warm) { warmed = true; ART.warm([viewNow().id]); }
+      ART.paintPixels(g);
+    }
+    mountSky();
+    paintCrayons(g);
+  }
+  /* Which sky the calendar calls for. */
+  function skyMode() {
+    var wx = weatherToday().id, tod = timeOfDay();
+    var season = (CAL && CAL.season && CAL.season().id) || "";
+    if (wx === "rainy") return "rain";
+    if (wx === "snowy") return "snow";
+    if (tod === "night") return season === "winter" ? "aurora" : "stars";
+    if (tod === "dusk" || tod === "dawn") return "dusk";
+    if (wx === "sunny" && (season === "summer" || season === "spring")) return "motes";
+    return "clear";
+  }
+  /* One WebGL layer for the whole game, moved into whichever window or
+     panorama is on screen. It is only ever made once — a browser has
+     a small number of WebGL contexts to give out. */
+  function mountSky() {
+    if (!window.CPSky) return;
+    var scene = $("#scene");
+    var host = scene && (scene.querySelector(".win") || scene.querySelector(".pano"));
+    if (!host) { if (sky) sky.set("clear"); return; }
+    if (!sky) sky = CPSky.attach(host);
+    var glass = host.querySelector(".win-glass");
+    if (glass) host.insertBefore(sky.canvas, glass); else host.appendChild(sky.canvas);
+    var mode = scene.classList.contains("tower") ? "stars" : skyMode();
+    sky.set(mode, { sky: host.classList.contains("pano") ? 0.62 : 0.6 });
+    scene.classList.toggle("has-sky", !!sky.live && mode !== "clear");
+  }
+  /* Crayon canvases carry their recipe in data-crayon; draw them once. */
+  function paintCrayons(root) {
+    if (!window.CPCrayon) return;
+    var list = root.querySelectorAll("canvas[data-crayon]");
+    if (!list.length) return;
+    Array.prototype.forEach.call(list, function (cv) {
+      if (cv.dataset.done) return;
+      try {
+        var d = JSON.parse(cv.getAttribute("data-crayon"));
+        (d.kind === "poster" ? CPCrayon.poster : CPCrayon.diaryPage)(cv, d);
+        cv.dataset.done = "1";
+      } catch (e) {}
+    });
+    // the handwriting font may still be on its way: draw again when it lands
+    if (document.fonts && document.fonts.status !== "loaded") {
+      document.fonts.ready.then(function () {
+        Array.prototype.forEach.call(list, function (cv) { delete cv.dataset.done; });
+        paintCrayons(root);
+      });
+    }
+  }
+  function placeName(id) { var pl = PLACES[id]; return pl ? pl.tag.replace(/^\S+\s/, "") : "the valley"; }
+  function shorten(s, n) { s = String(s || ""); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, "") + "…" : s; }
+  /* The Craepet's own drawing of today, at the top of its diary. */
+  function crayonDiary(entries) {
+    if (!window.CPCrayon || !S.pet || S.pet.egg) return "";
+    var sp = P.species(S.pet.species);
+    var place = ["farm", "well", "pool", "market", "arena", "stall"].indexOf(lastPlace) !== -1 ? lastPlace : (sp.fav || "nest");
+    var today = entries.filter(function (e) { return e.d === D.dayNumber(); });
+    var latest = today.length ? today[today.length - 1] : (entries.length ? entries[entries.length - 1] : null);
+    var data = { kind: "diary", speciesId: S.pet.species, colourId: S.pet.colour, place: place, food: sp.likes[0],
+      count: Math.min(5, Math.max(1, today.length)),
+      text: ["Went to " + placeName(place) + " today.",
+             latest ? shorten(latest.s, 44) : "Nothing has happened yet. Let's go!"],
+      sign: S.pet.name + ", level " + levelOf(S.pet) + " · " + dayLabel(D.dayNumber()).replace(/^Today · /, ""),
+      seed: D.dayNumber() * 31 + 7 };
+    return '<canvas class="crayon-page" width="720" height="440" data-crayon="' + esc(JSON.stringify(data)) +
+      '" role="img" aria-label="' + esc(S.pet.name) + "'s drawing of today\"></canvas>";
+  }
+  /* A pinned-up poster for the Quest Board. */
+  function crayonPoster() {
+    if (!window.CPCrayon || !S.pet || S.pet.egg) return "";
+    var sp = P.species(S.pet.species);
+    var data = { kind: "poster", speciesId: S.pet.species, colourId: S.pet.colour, title: "HELP WANTED",
+      line: "Quests for " + S.pet.name, food: sp.likes[D.dayNumber() % 3], seed: D.dayNumber() * 17 + 3 };
+    return '<canvas class="crayon-poster" width="360" height="280" data-crayon="' + esc(JSON.stringify(data)) + '" aria-hidden="true"></canvas>';
   }
 
   function renderWho() {
@@ -5214,7 +5312,7 @@
      ========================================================= */
   function questsHtml() {
     var list = quests();
-    var rows = list.map(function (q) {
+    var rows = crayonPoster() + list.map(function (q) {
       var have = S.today[q.track] || 0;
       var done = have >= q.goal;
       var claimed = !!S.claimed[q.id];
@@ -5567,10 +5665,12 @@
       : "";
 
     var todayN = entries.filter(function (e) { return e.d === D.dayNumber(); }).length;
+    var page = crayonDiary(entries);
     return '<div class="panel"><h2>📔 ' + esc(S.pet.name) + "'s diary</h2>" +
       '<p class="sub">' + esc(S.pet.name) + " writes down everything that happens — levelling up, wishes, " +
       "the arena, the post, the house. Tap 🔊 on any line to hear it read out." +
       (entries.length ? " <b>" + entries.length + "</b> " + (entries.length === 1 ? "entry" : "entries") + " so far." : "") + "</p>" +
+      page +
       (todayN ? '<p style="margin:0 0 0.4rem"><button class="ghost small" data-say-today="1">🔊 Read me today\'s ' +
         (todayN === 1 ? "entry" : todayN + " entries") + "</button></p>" : "") +
       (entries.length ? body : '<p class="sub">Nothing written yet — go and do something!</p>') +
