@@ -1596,6 +1596,24 @@ const GAMES = {
     await page.waitForTimeout(100);
     if (!/🎒/.test(await page.locator(".scene .garland").textContent())) throw new Error("no school garland");
     if (!/first day of school/i.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not say it is the first day of school");
+    // Cory and Kieran share a birthday (23 April): as Cory it is YOUR day —
+    // a garland, a bonus, a cake and a party hat — and Kieran's too
+    await page.evaluate(() => Craepets._setDate("2026-04-23"));
+    await page.waitForTimeout(100);
+    if (!/🎂/.test(await page.locator(".scene .garland").textContent())) throw new Error("no birthday garland");
+    const bdays = await page.evaluate(() => Craepets.celebrations().filter((c) => c.kind === "birthday").map((c) => c.key));
+    if (bdays.length !== 2 || !bdays.some((k) => /bday:cory/.test(k)) || !bdays.some((k) => /bday:kieran/.test(k))) throw new Error(`the shared birthday was not noticed: ${bdays}`);
+    if (!/Happy birthday, Cory and Kieran/.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not wish them happy birthday");
+    const bcoins = await page.evaluate(() => Craepets.state().coins);
+    await page.locator(`[data-claimparty="${bdays.find((k) => /cory/.test(k))}"]`).click();
+    await page.waitForSelector(".sheet");
+    const mine = await page.evaluate(() => ({ coins: Craepets.state().coins, cake: Craepets.state().bag.cake || 0, hat: Craepets.state().pet.wear.head }));
+    if (mine.coins < bcoins + 80 || !mine.cake || mine.hat !== "partyhat") throw new Error(`Cory's own birthday present was thin: ${JSON.stringify(mine)}`);
+    await page.locator(".sheet .close").click();
+    // …and the week before Ellie's (11 December) the nest counts the sleeps
+    await page.evaluate(() => Craepets._setDate("2026-12-08"));
+    await page.waitForTimeout(100);
+    if (!/3 sleeps until Ellie's birthday/.test(await page.locator(".panel.party").textContent())) throw new Error("the nest is not counting down to Ellie's birthday");
     // Christmas Eve: one sleep to go, and the snow is guaranteed on the day itself
     await page.locator('[data-go="nest"]').click();
     await page.evaluate(() => Craepets._setDate("2026-12-24"));

@@ -26,7 +26,7 @@ window.CPCal = (function () {
   /* Family birthdays, as "MM-DD". Fill these in and the valley will
      throw a party (a cake, coins and a party hat). Leave any blank. */
   var BIRTHDAYS = {
-    jeannie: "", cory: "", ellie: "", kieran: "", shannon: ""
+    jeannie: "12-15", cory: "04-23", ellie: "12-11", kieran: "04-23", shannon: ""
   };
 
   var override = null;                       // the play-test robot sets a date
@@ -155,6 +155,23 @@ window.CPCal = (function () {
     Object.keys(BIRTHDAYS).forEach(function (who) { if (BIRTHDAYS[who] && BIRTHDAYS[who] === md(d)) out.push(who); });
     return out;
   }
+  /* The next family birthday within a week: { who: [ids], days } or null. */
+  function birthdaySoon(d) {
+    d = d || today();
+    var best = null;
+    Object.keys(BIRTHDAYS).forEach(function (who) {
+      if (!BIRTHDAYS[who]) return;
+      var mm = Number(BIRTHDAYS[who].slice(0, 2)) - 1, dd = Number(BIRTHDAYS[who].slice(3));
+      var t = new Date(d.getFullYear(), mm, dd);
+      if (daysBetween(d, t) < 0) t = new Date(d.getFullYear() + 1, mm, dd);
+      var n = daysBetween(d, t);
+      if (n >= 1 && n <= 7) {
+        if (!best || n < best.days) best = { who: [who], days: n };
+        else if (n === best.days) best.who.push(who);
+      }
+    });
+    return best;
+  }
   /* Is it this Craepet's hatch-day? `born` is a timestamp. Returns the age in
      years (1 and up) on the anniversary, or 0. */
   function hatchdayYears(born, d) {
@@ -185,6 +202,7 @@ window.CPCal = (function () {
     sleepsTo: sleepsTo,
     easter: easter,
     birthdayToday: birthdayToday,
+    birthdaySoon: birthdaySoon,
     BIRTHDAYS: BIRTHDAYS,
     hatchdayYears: hatchdayYears,
     monthsOld: monthsOld,
