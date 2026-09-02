@@ -1596,14 +1596,21 @@ const GAMES = {
     await page.waitForTimeout(100);
     if (!/🎒/.test(await page.locator(".scene .garland").textContent())) throw new Error("no school garland");
     if (!/first day of school/i.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not say it is the first day of school");
-    // Cory and Kieran share a birthday (23 April): as Cory it is YOUR day —
-    // a garland, a bonus, a cake and a party hat — and Kieran's too
+    // Kieran's birthday (22 April) is the day before Cory's (23 April): on
+    // Kieran's day Cory gets a nudge and a small present, and on his own day
+    // it is YOUR day — a garland, a bonus, a cake and a party hat
+    await page.evaluate(() => Craepets._setDate("2026-04-22"));
+    await page.waitForTimeout(100);
+    const kday = await page.evaluate(() => Craepets.celebrations().filter((c) => c.kind === "birthday").map((c) => c.key));
+    if (kday.length !== 1 || !/bday:kieran/.test(kday[0])) throw new Error(`Kieran's birthday was not noticed: ${kday}`);
+    if (!/Happy birthday, Kieran/.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not wish Kieran happy birthday");
+    if (!/1 sleep until YOUR birthday/.test(await page.locator(".panel.party").textContent())) throw new Error("Cory is not told his own birthday is tomorrow");
     await page.evaluate(() => Craepets._setDate("2026-04-23"));
     await page.waitForTimeout(100);
     if (!/🎂/.test(await page.locator(".scene .garland").textContent())) throw new Error("no birthday garland");
     const bdays = await page.evaluate(() => Craepets.celebrations().filter((c) => c.kind === "birthday").map((c) => c.key));
-    if (bdays.length !== 2 || !bdays.some((k) => /bday:cory/.test(k)) || !bdays.some((k) => /bday:kieran/.test(k))) throw new Error(`the shared birthday was not noticed: ${bdays}`);
-    if (!/Happy birthday, Cory and Kieran/.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not wish them happy birthday");
+    if (bdays.length !== 1 || !/bday:cory/.test(bdays[0])) throw new Error(`Cory's birthday was not noticed: ${bdays}`);
+    if (!/Happy birthday, Cory!/.test(await page.locator(".panel.party").textContent())) throw new Error("the nest does not wish Cory happy birthday");
     const bcoins = await page.evaluate(() => Craepets.state().coins);
     await page.locator(`[data-claimparty="${bdays.find((k) => /cory/.test(k))}"]`).click();
     await page.waitForSelector(".sheet");
