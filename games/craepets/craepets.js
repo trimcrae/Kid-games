@@ -605,6 +605,7 @@
     S.pet.xp = (S.pet.xp || 0) + n;
     var after = level();
     if (after > before) {
+      anim.measure = true;               // the room may have grown with the pet
       say("I levelled up! Level " + after + "!");
       sfx("win");
       hop();
@@ -1563,6 +1564,11 @@
                                 bob: calm ? 0 : Math.round(Math.sin(anim.t / 30) * scale * 0.15) });
   }
 
+  /* How much taller than normal a Craepet's room is: nothing until level
+     50, then 0.3% a level up to a third taller at 150, so a big pet gets
+     a big room instead of being cropped by a small one. */
+  function roomGrow(lv) { return 1 + Math.max(0, Math.min(100, (lv || 1) - 50)) * 0.003; }
+
   function drawScene() {
     var cv = $("#pet-canvas");
     // in somebody else's house it is THEIR Craepet in the room
@@ -1586,10 +1592,14 @@
     var sleeping = pet.energy < 20 || anim.napping;
 
     // A Craepet grows a little with every level — about a sixth bigger by
-    // level 20 and a quarter bigger by level 50, where it stops so it still
-    // fits its room — so a grown one really is bigger than a hatchling.
+    // level 20 and a quarter bigger by level 50 — so a grown one really is
+    // bigger than a hatchling. Past 50 it keeps growing: the room itself
+    // gets taller (see roomGrow, up to a third by level 150) and the pet
+    // keeps filling a touch more of it, easing towards a ceiling that
+    // still leaves headroom for a hat.
     var lv = levelOf(pet);
-    var grow = 1 + Math.min(19, lv - 1) * 0.008 + Math.max(0, Math.min(30, lv - 20)) * 0.003;
+    var grow = 1 + Math.min(19, lv - 1) * 0.008 + Math.max(0, Math.min(30, lv - 20)) * 0.003 +
+      (lv > 50 ? 0.06 * (1 - Math.exp(-(lv - 50) / 80)) : 0);
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * grow));
 
     // WANDERING. In the full-height room (the nest, or a house you are
@@ -1667,7 +1677,10 @@
     if (inTower) skin = "tower";
     // At home the room is painted from the wall and floor you chose, so
     // repainting shows up the instant you tap it.
-    var paint = atHome ? ' style="background:' + homeBackground() + '"' : "";
+    var shown = (view === "visit" && visit) ? visit.s.pet : S.pet;
+    var big = roomGrow(shown && !shown.egg ? levelOf(shown) : 1);
+    var paint = ' style="' + (atHome ? "background:" + homeBackground() + ";" : "") +
+      (big > 1 ? "--big:" + big.toFixed(3) : "") + '"';
     var tag = atHome ? houseInfo().emoji + " " + homeName() : pl.tag;
     if (inTower) tag = "🗼 Shadow Tower · floor " + battle.floor;
 
