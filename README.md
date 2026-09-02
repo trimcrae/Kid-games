@@ -74,7 +74,7 @@ no logins.
 > (even numbers, primes, vowels, the letter A, the stars), at your level.
 > The valley also keeps the **real calendar**: seasons change the weather odds,
 > what the Farm grows and what is on the Market's seasonal shelf; holidays
-> (Halloween, Christmas, Easter, Thanksgiving, birthdays and a dozen more,
+> (Halloween, Christmas, Easter, Thanksgiving, the first day of school, birthdays and a dozen more,
 > all in `games/craepets/calendar.js`) hang a garland over the scene, pay a
 > bonus and leave a present to open; Advent counts the sleeps; and every
 > Craepet gets a party on its hatch-day.
