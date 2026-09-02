@@ -56,7 +56,9 @@
     /* --- the scene the pet stands in --- */
     .scene {
       position: relative; border-radius: 22px; overflow: hidden;
-      height: clamp(180px, 38vw, 270px); margin-bottom: 0.5rem;
+      /* --big is set inline by craepets.js: a high-level Craepet's room is
+         taller, so the pet can keep growing without being cropped. */
+      height: calc(clamp(180px, 38vw, 270px) * var(--big, 1)); margin-bottom: 0.5rem;
       transition: height 0.2s ease;
       background: linear-gradient(180deg, #bfe9ff 0%, #e8f7ff 55%, #a8dd8f 55%, #7cc464 100%);
       box-shadow: inset 0 0 0 3px rgba(255,255,255,0.5), 0 8px 22px rgba(43,36,64,0.14);
@@ -65,7 +67,7 @@
     /* The Nest is where you look at your Craepet; everywhere else the
        question is the point, so the scene shrinks to a band and the
        choices come up the screen. */
-    .scene.compact { height: clamp(118px, 26vw, 172px); }
+    .scene.compact { height: calc(clamp(118px, 26vw, 172px) * var(--big, 1)); }
     /* The home scene is painted from the wall and floor the player picked
        (an inline gradient, set in craepets.js), so redecorating and moving
        house are visible the moment you tap — not just a number on a panel.
