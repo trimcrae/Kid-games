@@ -77,7 +77,9 @@ no logins.
 > (Halloween, Christmas, Easter, Thanksgiving, the first day of school, birthdays and a dozen more,
 > all in `games/craepets/calendar.js`) hang a garland over the scene, pay a
 > bonus and leave a present to open; Advent counts the sleeps; and every
-> Craepet gets a party on its hatch-day.
+> Craepet gets a party on its hatch-day. The kids' birthdays are in there too
+> (Cory and Kieran on 23 April, Ellie on 11 December, Jeannie on 15 December):
+> a garland, a bonus and a present on the day, and a countdown the week before.
 > **Memory Match** is the second game in the games room (pairs are a sum
 > and its answer, an animal and its baby, a word and its opposite, a
 > country and its capital), the **weather** changes daily and rains on the

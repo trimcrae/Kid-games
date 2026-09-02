@@ -2379,11 +2379,18 @@
     if (!s || s.id === "summer" && where === "win") return "";
     return '<span class="sea sea-' + s.id + '" aria-hidden="true"></span>';
   }
+  /* Whose birthday it is today (the player's own first). */
+  function birthdaysToday() {
+    if (!CAL) return [];
+    var list = CAL.birthdayToday();
+    return list.filter(function (p) { return p === who; }).concat(list.filter(function (p) { return p !== who; }));
+  }
+  function myBirthday() { return birthdaysToday().indexOf(who) !== -1; }
   function garlandHtml() {
     if (!CAL) return "";
     var hs = CAL.holidays();
-    if (!hs.length) return "";
-    var g = hs[0].garland || [];
+    var g = hs.length ? (hs[0].garland || []) : birthdaysToday().length ? ["🎂", "🎈", "🎉", "🎁"] : [];
+    if (!g.length) return "";
     var reps = [];
     for (var i = 0; i < 8; i++) reps.push(g[i % g.length]);
     return '<span class="garland" aria-hidden="true">' + reps.map(function (e) { return "<span>" + e + "</span>"; }).join("") + "</span>";
@@ -2411,10 +2418,12 @@
                  line: S.pet.name + " is " + months + (months === 1 ? " month" : " months") + " old today. Look how big!",
                  gift: { coins: 15 + months * 2, item: "birthdaypie" } });
     }
-    CAL.birthdayToday(d).forEach(function (pid) {
+    birthdaysToday().forEach(function (pid) {
       var p = D.profile(pid);
-      out.push({ key: "bday:" + pid + ":" + y, kind: "birthday", emoji: "🎂", name: p.name + "'s birthday", tok: "hol-birthday",
-                 line: "Happy birthday, " + p.name + "! " + (pid === who ? "It's YOUR day." : "Post them a present!"),
+      out.push({ key: "bday:" + pid + ":" + y, kind: "birthday", emoji: "🎂", name: (pid === who ? "your" : p.name + "'s") + " birthday", tok: "hol-birthday",
+                 line: pid === who
+                   ? "Happy birthday, " + p.name + "! It's YOUR day — every right answer pays +" + HOLIDAY_BONUS + " 🪙."
+                   : "Happy birthday, " + p.name + " " + p.emoji + "! Post " + (pid === "shannon" ? "her" : "them") + " a present!",
                  gift: { coins: pid === who ? 80 : 30, item: "cake", wear: pid === who ? "partyhat" : null } });
     });
     return out;
@@ -2454,7 +2463,8 @@
     var cs = celebrations();
     var sleeps = CAL.sleepsTo("xmas");
     var spooky = CAL.holidays().some(function (h) { return h.id === "spooky"; });
-    if (!cs.length && !(sleeps !== null && sleeps <= 24 && sleeps > 0) && !spooky) return "";
+    var soon = CAL.birthdaySoon();
+    if (!cs.length && !(sleeps !== null && sleeps <= 24 && sleeps > 0) && !spooky && !soon) return "";
     var body = cs.map(function (c) {
       var done = claimed(c.key);
       return '<div class="quest' + (done ? " done" : "") + '"><div class="qtx"><b>' + c.emoji + " " + esc(c.name.charAt(0).toUpperCase() + c.name.slice(1)) + "</b><br>" + esc(c.line) + "</div>" +
@@ -2465,8 +2475,17 @@
         (sleeps <= 7 ? " — nearly there!" : ".") + "</p>";
     }
     if (spooky) body += '<p class="sub" style="text-align:center">👻 Spooky Week: <b>' + CAL.sleepsTo("halloween") + " sleep" + (CAL.sleepsTo("halloween") === 1 ? "" : "s") + "</b> until Halloween.</p>";
+    if (soon) {
+      var names = soon.who.map(function (p) { return p === who ? "YOUR" : D.profile(p).name + "'s"; }).join(" and ");
+      body += '<p class="sleeps">🎂 <b>' + soon.days + "</b> sleep" + (soon.days === 1 ? "" : "s") + " until " + esc(names) + " birthday" +
+        (soon.who.indexOf(who) === -1 ? " — think about a present!" : "!") + "</p>";
+    }
     var h = holidayNow();
-    return '<div class="panel party"><h2>🎉 ' + (h ? esc("Happy " + (h.name.indexOf("the ") === 0 ? h.name.slice(4) : h.name) + "!") : "Something to celebrate") + "</h2>" +
+    var bdays = birthdaysToday();
+    var title = h ? "Happy " + (h.name.indexOf("the ") === 0 ? h.name.slice(4) : h.name) + "!"
+      : bdays.length ? "Happy birthday, " + bdays.map(function (p) { return D.profile(p).name; }).join(" and ") + "!"
+      : "Something to celebrate";
+    return '<div class="panel party"><h2>🎉 ' + esc(title) + "</h2>" +
       (h ? '<p class="sub">Every right answer pays <b>+' + HOLIDAY_BONUS + " 🪙</b> today, and there is a present to open.</p>" : "") + body + "</div>";
   }
   function weatherHtml() {
@@ -2745,6 +2764,8 @@
     if (holNow) {
       extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">' + holNow.emoji + " <b>" + esc(holNow.name.charAt(0).toUpperCase() + holNow.name.slice(1)) +
         "</b> — <b>+" + HOLIDAY_BONUS + " 🪙</b> on every right answer, everywhere, today.</p>";
+    } else if (myBirthday()) {
+      extra += '<p class="sub" style="margin:-0.35rem 0 0.6rem">🎂 <b>It\'s your birthday!</b> <b>+' + HOLIDAY_BONUS + " 🪙</b> on every right answer, everywhere, today.</p>";
     }
     if (tier() !== "tot") {
       var a = adaptOf(info.subject), h = HEAT[a.rung - 1];
@@ -2958,7 +2979,7 @@
     var wx = weatherToday().place === sess.place;
     if (wx) coins += WEATHER_BONUS;
     var hol = holidayNow();
-    if (hol) coins += HOLIDAY_BONUS;
+    if (hol || myBirthday()) coins += HOLIDAY_BONUS;
     earn(coins);
     // A book shelf, a globe and a star window really do make you learn
     // faster — and so does a hotter question.
@@ -3049,6 +3070,8 @@
       var hol = holidayNow(), sea = seasonNow();
       if (hol) extra.push(hol.line, hol.line);
       if (hol && hol.id === "aprilfool") extra.push("I'm a Snorbit now. No, really.", "The Farm pays in jelly today. Honest.");
+      if (myBirthday()) extra.push("Happy birthday! Let's have cake.", "It's your birthday! Best day ever!");
+      birthdaysToday().forEach(function (p) { if (p !== who) extra.push("It's " + D.profile(p).name + "'s birthday! Did you post a present?"); });
       if (sea) extra.push("It's " + sea.name.toLowerCase() + "! " + sea.line);
       if (CAL && CAL.sleepsTo("xmas") !== null && CAL.sleepsTo("xmas") <= 24 && CAL.sleepsTo("xmas") > 0) extra.push("Only a few more sleeps until Christmas!");
       if (extra.length) {
@@ -3101,6 +3124,9 @@
     });
     var sleeps = CAL ? CAL.sleepsTo("xmas") : null;
     if (sleeps !== null && sleeps > 0 && sleeps <= 24) rows.push(["🎄", "<b>" + sleeps + " sleep" + (sleeps === 1 ? "" : "s") + "</b> until Christmas.", null]);
+    var soonB = CAL ? CAL.birthdaySoon() : null;
+    if (soonB) rows.push(["🎂", "<b>" + soonB.days + " sleep" + (soonB.days === 1 ? "" : "s") + "</b> until " +
+      esc(soonB.who.map(function (p) { return p === who ? "your" : D.profile(p).name + "'s"; }).join(" and ")) + " birthday.", null]);
     var sea = seasonNow();
     if (sea) rows.push([sea.emoji, "<b>" + esc(sea.name) + ".</b> " + esc(sea.line) + " The Farm is growing " + sea.crops.slice(0, 3).join(" ") + " and the Market has a seasonal shelf.", "market"]);
     var wx = weatherToday();
