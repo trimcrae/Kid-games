@@ -541,13 +541,28 @@
   /* =========================================================
      PET MATHS
      ========================================================= */
-  /* Levels: 50 experience each, with no top level — a Craepet keeps growing
-     for as long as its kid keeps playing. One helper, so every screen (the
-     top bar, the family page, allies, the map chips) agrees. */
-  var XP_PER_LEVEL = 50;
-  function levelFor(xp) { return 1 + Math.floor((xp || 0) / XP_PER_LEVEL); }
+  /* Levels: 50 experience each up to level 100, and no top level after that —
+     but past 100 every level costs 10% more than the one before, so the
+     climb gets steeper the higher a Craepet goes (level 110 is ~130, 130 is
+     ~870, 150 is ~5,900). xp on the save stays a plain running total, so
+     old saves need no conversion. One helper, so every screen (the top bar,
+     the family page, allies, the map chips) agrees. */
+  var XP_PER_LEVEL = 50, EASY_LEVELS = 100, XP_GROWTH = 1.1;
+  function xpNeed(lv) {               // experience to climb from lv to lv + 1
+    return lv < EASY_LEVELS ? XP_PER_LEVEL
+      : Math.round(XP_PER_LEVEL * Math.pow(XP_GROWTH, lv - EASY_LEVELS));
+  }
+  function levelInfo(xp) {            // { lv, into: xp earned this level, need: xpNeed(lv) }
+    xp = (typeof xp === "number" && isFinite(xp) && xp > 0) ? xp : 0;
+    var lv = Math.min(EASY_LEVELS, 1 + Math.floor(xp / XP_PER_LEVEL));
+    var into = xp - (lv - 1) * XP_PER_LEVEL;
+    while (into >= xpNeed(lv)) { into -= xpNeed(lv); lv++; }
+    return { lv: lv, into: into, need: xpNeed(lv) };
+  }
+  function levelFor(xp) { return levelInfo(xp).lv; }
   function level() { return S.pet ? levelFor(S.pet.xp) : 1; }
-  function xpInLevel() { return S.pet ? (S.pet.xp || 0) % XP_PER_LEVEL : 0; }
+  function xpInLevel() { return S.pet ? levelInfo(S.pet.xp).into : 0; }
+  function xpToNext() { return S.pet ? levelInfo(S.pet.xp).need : XP_PER_LEVEL; }
 
   function mood() {
     if (!S.pet) return "good";
@@ -596,7 +611,8 @@
       try { window.Confetti && Confetti.burst({ count: 70 }); } catch (e) {}
       toast("🎉 " + S.pet.name + " reached level " + after + "!");
       diary("⭐", "I grew to level " + after + "!" +
-        (after === 5 ? " I got a tiara for it." : after === 12 ? " I got a crown for it!" : ""));
+        (after === 5 ? " I got a tiara for it." : after === 12 ? " I got a crown for it!" :
+         after === EASY_LEVELS ? " From here on every level is a bigger climb than the last." : ""));
     }
   }
 
@@ -1949,8 +1965,8 @@
       voiceBtn +
       '<button class="mini" data-help="1" aria-label="How to play" title="How to play">❓</button>' +
       '<span class="lvl" aria-label="Level ' + lv + '">Lv ' + lv + "</span>" +
-      '<span class="xp" role="img" aria-label="' + xpInLevel() + " of " + XP_PER_LEVEL + ' experience to the next level" title="' +
-        xpInLevel() + "/" + XP_PER_LEVEL + ' to the next level"><i style="width:' + (xpInLevel() / XP_PER_LEVEL * 100) + '%"></i></span>' +
+      '<span class="xp" role="img" aria-label="' + xpInLevel() + " of " + xpToNext() + ' experience to the next level" title="' +
+        xpInLevel() + "/" + xpToNext() + ' to the next level"><i style="width:' + (xpInLevel() / xpToNext() * 100) + '%"></i></span>' +
     "</div>";
   }
 
