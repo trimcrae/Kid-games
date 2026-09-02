@@ -1617,6 +1617,11 @@ const GAMES = {
     const mine = await page.evaluate(() => ({ coins: Craepets.state().coins, cake: Craepets.state().bag.cake || 0, hat: Craepets.state().pet.wear.head }));
     if (mine.coins < bcoins + 80 || !mine.cake || mine.hat !== "partyhat") throw new Error(`Cory's own birthday present was thin: ${JSON.stringify(mine)}`);
     await page.locator(".sheet .close").click();
+    // Mum's birthday (30 September): the kids are told to post her a present
+    await page.evaluate(() => Craepets._setDate("2026-09-30"));
+    await page.waitForTimeout(100);
+    const mum = await page.evaluate(() => Craepets.celebrations().filter((c) => c.kind === "birthday").map((c) => c.line));
+    if (mum.length !== 1 || !/Shannon/.test(mum[0]) || !/Post her a present/.test(mum[0])) throw new Error(`Mum's birthday is not celebrated: ${mum}`);
     // …and the week before Ellie's (11 December) the nest counts the sleeps
     await page.evaluate(() => Craepets._setDate("2026-12-08"));
     await page.waitForTimeout(100);
