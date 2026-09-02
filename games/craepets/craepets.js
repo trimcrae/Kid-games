@@ -541,15 +541,13 @@
   /* =========================================================
      PET MATHS
      ========================================================= */
-  /* Levels: 50 experience each, up to MAX_LEVEL. One helper, so every
-     screen (the top bar, the family page, allies, the map chips) agrees. */
-  var MAX_LEVEL = 100, XP_PER_LEVEL = 50;
-  function levelFor(xp) { return Math.min(MAX_LEVEL, 1 + Math.floor((xp || 0) / XP_PER_LEVEL)); }
+  /* Levels: 50 experience each, with no top level — a Craepet keeps growing
+     for as long as its kid keeps playing. One helper, so every screen (the
+     top bar, the family page, allies, the map chips) agrees. */
+  var XP_PER_LEVEL = 50;
+  function levelFor(xp) { return 1 + Math.floor((xp || 0) / XP_PER_LEVEL); }
   function level() { return S.pet ? levelFor(S.pet.xp) : 1; }
-  function xpInLevel() {
-    if (!S.pet) return 0;
-    return level() >= MAX_LEVEL ? XP_PER_LEVEL : (S.pet.xp || 0) % XP_PER_LEVEL;
-  }
+  function xpInLevel() { return S.pet ? (S.pet.xp || 0) % XP_PER_LEVEL : 0; }
 
   function mood() {
     if (!S.pet) return "good";
@@ -598,8 +596,7 @@
       try { window.Confetti && Confetti.burst({ count: 70 }); } catch (e) {}
       toast("🎉 " + S.pet.name + " reached level " + after + "!");
       diary("⭐", "I grew to level " + after + "!" +
-        (after === 5 ? " I got a tiara for it." : after === 12 ? " I got a crown for it!" :
-         after === MAX_LEVEL ? " That is as big as a Craepet gets!" : ""));
+        (after === 5 ? " I got a tiara for it." : after === 12 ? " I got a crown for it!" : ""));
     }
   }
 
@@ -1952,8 +1949,8 @@
       voiceBtn +
       '<button class="mini" data-help="1" aria-label="How to play" title="How to play">❓</button>' +
       '<span class="lvl" aria-label="Level ' + lv + '">Lv ' + lv + "</span>" +
-      '<span class="xp" role="img" aria-label="' + (lv >= MAX_LEVEL ? "Top level reached" : xpInLevel() + " of " + XP_PER_LEVEL + " experience to the next level") + '" title="' +
-        (lv >= MAX_LEVEL ? "Top level!" : xpInLevel() + "/" + XP_PER_LEVEL + " to the next level") + '"><i style="width:' + (xpInLevel() / XP_PER_LEVEL * 100) + '%"></i></span>' +
+      '<span class="xp" role="img" aria-label="' + xpInLevel() + " of " + XP_PER_LEVEL + ' experience to the next level" title="' +
+        xpInLevel() + "/" + XP_PER_LEVEL + ' to the next level"><i style="width:' + (xpInLevel() / XP_PER_LEVEL * 100) + '%"></i></span>' +
     "</div>";
   }
 
