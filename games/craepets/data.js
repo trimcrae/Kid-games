@@ -2617,6 +2617,8 @@ window.CPData = (function () {
     { id: "week",     emoji: "📅", name: "Every Day",      note: "Play 7 days in a row" },
     { id: "palette",  emoji: "🌈", name: "Full Palette",   note: "Own every paint brush" },
     { id: "level20",  emoji: "🌟", name: "Fully Grown",    note: "Reach level 20" },
+    { id: "level50",  emoji: "💫", name: "Valley Elder",   note: "Reach level 50" },
+    { id: "level100", emoji: "🌠", name: "Legend",         note: "Reach level 100" },
     { id: "homeowner", emoji: "🏡", name: "Homeowner",    note: "Move to a bigger house" },
     { id: "decorator", emoji: "🛋️", name: "Decorator",   note: "Have 8 things out at home" },
     { id: "tower",    emoji: "🏰", name: "Tower Keeper",  note: "Buy the Valley Tower" },

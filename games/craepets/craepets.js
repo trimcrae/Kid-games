@@ -541,8 +541,15 @@
   /* =========================================================
      PET MATHS
      ========================================================= */
-  function level() { return S.pet ? Math.min(20, 1 + Math.floor((S.pet.xp || 0) / 50)) : 1; }
-  function xpInLevel() { return S.pet ? (S.pet.xp || 0) % 50 : 0; }
+  /* Levels: 50 experience each, up to MAX_LEVEL. One helper, so every
+     screen (the top bar, the family page, allies, the map chips) agrees. */
+  var MAX_LEVEL = 100, XP_PER_LEVEL = 50;
+  function levelFor(xp) { return Math.min(MAX_LEVEL, 1 + Math.floor((xp || 0) / XP_PER_LEVEL)); }
+  function level() { return S.pet ? levelFor(S.pet.xp) : 1; }
+  function xpInLevel() {
+    if (!S.pet) return 0;
+    return level() >= MAX_LEVEL ? XP_PER_LEVEL : (S.pet.xp || 0) % XP_PER_LEVEL;
+  }
 
   function mood() {
     if (!S.pet) return "good";
@@ -591,7 +598,8 @@
       try { window.Confetti && Confetti.burst({ count: 70 }); } catch (e) {}
       toast("🎉 " + S.pet.name + " reached level " + after + "!");
       diary("⭐", "I grew to level " + after + "!" +
-        (after === 5 ? " I got a tiara for it." : after === 12 ? " I got a crown for it!" : ""));
+        (after === 5 ? " I got a tiara for it." : after === 12 ? " I got a crown for it!" :
+         after === MAX_LEVEL ? " That is as big as a Craepet gets!" : ""));
     }
   }
 
@@ -794,6 +802,8 @@
       week: (st.bestDayStreak || 0) >= 7,
       palette: S.colours.length >= P.COLOURS.length,
       level20: level() >= 20,
+      level50: level() >= 50,
+      level100: level() >= 100,
       homeowner: (S.house.homes || []).length >= 2,
       decorator: (S.house.placed || []).length >= 8,
       tower: ownsHome("tower"),
@@ -1511,7 +1521,7 @@
   var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0, wobble: 0, happy: 0,
                x: 0.5, tx: null, face: 1, wanderAt: 0, shadow: null };
 
-  function levelOf(pet) { return Math.min(20, 1 + Math.floor(((pet && pet.xp) || 0) / 50)); }
+  function levelOf(pet) { return levelFor(pet && pet.xp); }
 
   /* The egg in the room: it sits in the middle, breathes a little, and
      rocks when it is tapped or when a right answer cracks it. */
@@ -1563,9 +1573,10 @@
     var sleeping = pet.energy < 20 || anim.napping;
 
     // A Craepet grows a little with every level — about a sixth bigger by
-    // level 20 — so a grown one really is bigger than a hatchling.
+    // level 20 and a quarter bigger by level 50, where it stops so it still
+    // fits its room — so a grown one really is bigger than a hatchling.
     var lv = levelOf(pet);
-    var grow = 1 + Math.min(19, lv - 1) * 0.008;
+    var grow = 1 + Math.min(19, lv - 1) * 0.008 + Math.max(0, Math.min(30, lv - 20)) * 0.003;
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * grow));
 
     // WANDERING. In the full-height room (the nest, or a house you are
@@ -1866,8 +1877,7 @@
   /* A pet's face, with whatever it is wearing. */
   function chipOf(pet, px) {
     if (pet.egg) return P.eggChip(pet.colour, px, pet.egg.got);
-    var lv = Math.min(20, 1 + Math.floor((pet.xp || 0) / 50));
-    return P.chip(pet.species, pet.colour, px, pet.wear, lv);
+    return P.chip(pet.species, pet.colour, px, pet.wear, levelFor(pet.xp));
   }
 
   /* =========================================================
@@ -1942,8 +1952,8 @@
       voiceBtn +
       '<button class="mini" data-help="1" aria-label="How to play" title="How to play">❓</button>' +
       '<span class="lvl" aria-label="Level ' + lv + '">Lv ' + lv + "</span>" +
-      '<span class="xp" role="img" aria-label="' + xpInLevel() + ' of 50 experience to the next level" title="' +
-        xpInLevel() + '/50 to the next level"><i style="width:' + (xpInLevel() / 50 * 100) + '%"></i></span>' +
+      '<span class="xp" role="img" aria-label="' + (lv >= MAX_LEVEL ? "Top level reached" : xpInLevel() + " of " + XP_PER_LEVEL + " experience to the next level") + '" title="' +
+        (lv >= MAX_LEVEL ? "Top level!" : xpInLevel() + "/" + XP_PER_LEVEL + " to the next level") + '"><i style="width:' + (xpInLevel() / XP_PER_LEVEL * 100) + '%"></i></span>' +
     "</div>";
   }
 
@@ -4874,7 +4884,7 @@
     return D.PROFILES.filter(function (p) { return p.id !== who; }).map(function (p) {
       var s = readSlot(p.id);
       if (!s || !s.pet) return null;
-      var lv = Math.min(20, 1 + Math.floor((s.pet.xp || 0) / 50));
+      var lv = levelFor(s.pet.xp);
       return { who: p.id, name: s.pet.name, species: s.pet.species, colour: s.pet.colour,
                wear: s.pet.wear, level: lv, owner: p, power: 6 + lv * 2 };
     }).filter(Boolean);
@@ -5441,7 +5451,7 @@
         return '<div class="fam empty"><div style="font-size:2rem">' + p.emoji + "</div>" +
                "<b>" + esc(p.name) + "</b><small>no pet yet</small></div>";
       }
-      var lv = Math.min(20, 1 + Math.floor((s.pet.xp || 0) / 50));
+      var lv = levelFor(s.pet.xp);
       var fl = (s.arena && s.arena.floor) | 0, rk = D.rankFor(fl);
       var post = p.id === who
         ? '<small>that\'s you</small>'
