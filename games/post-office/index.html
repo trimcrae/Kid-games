@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>📮 The Post Office</title>
+  <meta name="description" content="Write real letters to the rest of the family — greeting, message, closing and signature — address the envelope, pick a stamp and post it to their mailbox." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📮</text></svg>" />
+  <meta name="theme-color" content="#e63946" />
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <style>
+    :root {
+      --red: #e63946;
+      --red-dark: #b8202c;
+      --cream: #fffaf0;
+      --hand: "Segoe Print", "Bradley Hand", "Chalkboard SE", "Comic Sans MS", cursive;
+    }
+    body { background: linear-gradient(160deg, #fff4f5 0%, #eafaff 50%, #fffbe6 100%); }
+    .hidden { display: none !important; }
+    :focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; }
+
+    /* ---- shared button look (matches the other games) ---- */
+    .btn {
+      font-family: var(--font);
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, var(--pink), var(--purple));
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 1.7rem;
+      min-height: 48px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(138, 92, 255, 0.3);
+      transition: transform 0.15s ease;
+      touch-action: manipulation;
+    }
+    .btn:hover { transform: scale(1.04); }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: default; transform: none; box-shadow: none; }
+    .btn.ghost { background: var(--paper); color: var(--purple); box-shadow: 0 6px 16px rgba(43, 36, 64, 0.12); }
+    .btn.red { background: linear-gradient(90deg, var(--red), #ff7b54); box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3); }
+    .btn.tiny { font-size: 0.95rem; padding: 0.5rem 1rem; min-height: 40px; }
+
+    .game-stage { max-width: 780px; padding: 0.5rem 1rem 2rem; }
+
+    /* ---- the post box in the hero ---- */
+    .postbox-wrap { display: flex; justify-content: center; align-items: flex-end; gap: 1rem; margin: 0.25rem 0 0.5rem; min-height: 110px; }
+    .postbox { position: relative; width: 76px; height: 96px; margin-right: 22px; flex-shrink: 0; }
+    .postbox .pillar {
+      position: absolute; left: 8px; right: 8px; top: 8px; bottom: 0;
+      background: linear-gradient(90deg, var(--red-dark), var(--red) 40%, #ff6b6b 70%, var(--red-dark));
+      border-radius: 30px 30px 8px 8px;
+      box-shadow: 0 10px 22px rgba(230, 57, 70, 0.35);
+    }
+    .postbox .cap { position: absolute; left: 0; right: 0; top: 0; height: 18px; background: var(--red-dark); border-radius: 12px 12px 4px 4px; }
+    .postbox .slot { position: absolute; left: 22px; right: 22px; top: 32px; height: 8px; background: #2b2440; border-radius: 4px; }
+    .postbox .sign { position: absolute; left: 18px; right: 18px; top: 48px; height: 22px; background: #fff; border-radius: 4px; font-size: 0.6rem; font-weight: bold; color: var(--red-dark); display: flex; align-items: center; justify-content: center; letter-spacing: 1px; }
+    .postbox .flag {
+      position: absolute; left: 62px; top: 22px; width: 6px; height: 40px;
+      background: #2b2440; border-radius: 3px; transform-origin: 3px 37px;
+      transform: rotate(90deg); transition: transform 0.5s cubic-bezier(.34,1.56,.64,1);
+    }
+    .postbox .flag::after {
+      content: ""; position: absolute; left: 6px; top: 0; width: 22px; height: 16px;
+      background: var(--blue); clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+    .postbox.has-mail .flag { transform: rotate(0deg); }
+    .postbox-msg { font-family: var(--font); font-weight: bold; color: var(--purple); font-size: 1.05rem; max-width: 260px; text-align: left; }
+
+    /* ---- who's at the post office? ---- */
+    .who-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.9rem; margin: 0.5rem 0 1rem; }
+    .who-btn {
+      position: relative; font-family: var(--font); background: var(--paper);
+      border: 4px solid var(--accent, var(--purple)); border-radius: 22px; padding: 1rem 0.5rem 0.8rem;
+      cursor: pointer; box-shadow: 0 10px 24px rgba(43, 36, 64, 0.12); transition: transform 0.15s ease;
+      touch-action: manipulation; min-height: 120px;
+    }
+    .who-btn:hover { transform: translateY(-4px) rotate(-1deg); }
+    .who-btn .face { font-size: 2.6rem; line-height: 1; display: block; }
+    .who-btn .nm { display: block; font-size: 1.2rem; font-weight: bold; color: var(--ink); margin-top: 0.4rem; }
+    .who-btn .mailcount {
+      position: absolute; top: -12px; right: -10px; background: var(--red); color: #fff;
+      font-weight: bold; font-size: 0.9rem; border-radius: 999px; padding: 0.25rem 0.6rem;
+      box-shadow: 0 4px 10px rgba(230,57,70,0.4); animation: bounce 1.2s ease-in-out infinite;
+    }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    .who-btn.last { box-shadow: 0 0 0 4px #fff, 0 0 0 8px var(--accent, var(--purple)); }
+
+    /* ---- top bar once you're in ---- */
+    .me-bar { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+    .me-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--paper); border-radius: 999px; padding: 0.4rem 1rem 0.4rem 0.5rem; font-weight: bold; font-size: 1.05rem; box-shadow: 0 6px 16px rgba(43,36,64,0.12); }
+    .me-pill .face { font-size: 1.6rem; line-height: 1; }
+
+    .tabs { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; margin: 0.4rem 0 1rem; }
+    .tab {
+      font-family: var(--font); font-weight: bold; font-size: 1rem; color: var(--purple);
+      background: var(--paper); border: 3px solid var(--purple); border-radius: 999px; padding: 0.5rem 1rem;
+      cursor: pointer; box-shadow: 0 6px 16px rgba(43,36,64,0.12); position: relative; min-height: 44px; touch-action: manipulation;
+    }
+    .tab[aria-selected="true"] { color: #fff; background: linear-gradient(90deg, var(--pink), var(--purple)); border-color: transparent; }
+    .tab .badge { position: absolute; top: -10px; right: -8px; background: var(--red); color: #fff; font-size: 0.8rem; border-radius: 999px; padding: 0.15rem 0.5rem; }
+    .tab .badge:empty { display: none; }
+
+    .panel { background: rgba(255,255,255,0.75); border-radius: 24px; padding: 1rem; box-shadow: 0 10px 30px rgba(43,36,64,0.10); text-align: left; }
+    .panel h2 { margin: 0 0 0.6rem; font-size: 1.3rem; color: var(--purple); }
+    .step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: #fff; font-size: 0.95rem; margin-right: 0.4rem; }
+    .hint { color: #6a6385; font-size: 0.95rem; margin: 0.2rem 0 0.6rem; }
+    .field { margin-bottom: 1rem; }
+    .field label, .field .lbl { display: block; font-weight: bold; margin-bottom: 0.4rem; font-size: 1.05rem; }
+
+    /* ---- recipient chips ---- */
+    .to-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .to-chip {
+      font-family: var(--font); font-size: 1.05rem; font-weight: bold; color: var(--ink); background: var(--paper);
+      border: 3px solid var(--accent, var(--purple)); border-radius: 999px; padding: 0.45rem 0.9rem; cursor: pointer;
+      min-height: 44px; touch-action: manipulation; display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .to-chip[aria-pressed="true"] { background: var(--accent, var(--purple)); color: #fff; }
+
+    /* ---- stationery + stamp pickers ---- */
+    .swatch-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .swatch { width: 54px; height: 54px; border-radius: 12px; border: 3px solid #d9d2ea; cursor: pointer; padding: 0; background-color: #fff; touch-action: manipulation; }
+    .swatch[aria-pressed="true"] { border-color: var(--purple); box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--purple); }
+    .stamp {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      width: 58px; height: 68px; border: 3px dashed #fff; outline: 3px solid var(--sc, var(--blue));
+      background: var(--sc, var(--blue)); color: #fff; border-radius: 4px; font-size: 1.7rem; line-height: 1; margin: 3px;
+      box-sizing: border-box;
+    }
+    .stamp small { font-size: 0.55rem; font-weight: bold; letter-spacing: 1px; font-family: var(--font); }
+    .stamp-btn { background: none; border: none; padding: 4px; cursor: pointer; border-radius: 10px; touch-action: manipulation; }
+    .stamp-btn[aria-pressed="true"] { background: #fff; box-shadow: 0 0 0 3px var(--purple); }
+
+    /* ---- the letter paper ---- */
+    .paper {
+      position: relative; border-radius: 6px; padding: 1.1rem 1.2rem 1.4rem; min-height: 200px;
+      box-shadow: 0 8px 22px rgba(43,36,64,0.16); font-family: var(--hand); font-size: 1.25rem; line-height: 1.5; color: #2b2440;
+      background-color: #fff;
+    }
+    .paper.p-plain { background: #fff; }
+    .paper.p-lined { background: repeating-linear-gradient(#fff 0, #fff 29px, #bcd7ff 29px, #bcd7ff 31px); background-color: #fff; }
+    .paper.p-hearts { background-color: #fff0f6; background-image: radial-gradient(circle at 12px 12px, #ffb3cf 4px, transparent 5px); background-size: 40px 40px; }
+    .paper.p-stars { background-color: #fffbe6; background-image: radial-gradient(circle at 20px 20px, #ffd166 3px, transparent 4px), radial-gradient(circle at 5px 32px, #ffd166 2px, transparent 3px); background-size: 44px 44px; }
+    .paper.p-grid { background-color: #eefbf2; background-image: linear-gradient(#b8ecc7 1px, transparent 1px), linear-gradient(90deg, #b8ecc7 1px, transparent 1px); background-size: 24px 24px; }
+    .paper.p-rainbow { background: linear-gradient(180deg, #ffe0e6, #fff2cc, #e3ffe6, #dff4ff, #efe3ff); }
+    .paper.p-princess { background-color: #f6e9ff; background-image: radial-gradient(circle at 24px 24px, #d8b4ff 5px, transparent 6px), radial-gradient(circle at 0 0, #ffd6f0 3px, transparent 4px); background-size: 48px 48px; }
+    .paper.p-ocean { background-color: #e3f6ff; background-image: repeating-linear-gradient(-30deg, transparent 0 18px, #bde8ff 18px 20px); }
+    .paper .greeting { font-weight: bold; margin: 0 0 0.6rem; }
+    .paper .body { white-space: pre-wrap; word-break: break-word; margin: 0 0 1rem; min-height: 60px; }
+    .paper .closing { margin: 0; }
+    .paper .sig { margin: 0.1rem 0 0 1.5rem; font-size: 1.5rem; font-weight: bold; color: var(--purple); }
+    .paper textarea {
+      width: 100%; min-height: 150px; border: none; background: transparent; resize: vertical;
+      font-family: var(--hand); font-size: 1.25rem; line-height: 1.5; color: #2b2440; padding: 0; outline: none;
+    }
+    .paper textarea::placeholder { color: #a8a0c0; }
+    .paper select {
+      font-family: var(--hand); font-size: 1.15rem; border: 2px dashed #b9b0d6; border-radius: 8px; background: rgba(255,255,255,0.7);
+      padding: 0.25rem 0.5rem; color: var(--ink); min-height: 40px;
+    }
+    .counter { text-align: right; font-size: 0.85rem; color: #8a82a6; font-family: var(--font); }
+
+    /* ---- quick words + sticker trays ---- */
+    .tray-tabs { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+    .tray-tab { font-family: var(--font); font-size: 0.95rem; font-weight: bold; background: #fff; border: 2px solid #d9d2ea; border-radius: 999px; padding: 0.4rem 0.8rem; cursor: pointer; min-height: 40px; touch-action: manipulation; color: var(--ink); }
+    .tray-tab[aria-selected="true"] { border-color: var(--purple); background: #f1e8fe; color: var(--purple); }
+    .tray { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .word-btn {
+      font-family: var(--hand); font-size: 1.1rem; background: var(--paper); border: 2px solid #ffd166; border-radius: 12px;
+      padding: 0.4rem 0.7rem; cursor: pointer; min-height: 44px; touch-action: manipulation; color: var(--ink);
+      box-shadow: 0 3px 8px rgba(43,36,64,0.08);
+    }
+    .word-btn.emo { font-size: 1.6rem; padding: 0.2rem 0.5rem; border-color: #bde8ff; }
+    .word-btn:active { transform: scale(0.95); }
+
+    /* ---- the envelope ---- */
+    .envelope {
+      position: relative; background: linear-gradient(180deg, #fffdf7, #f7efdc); border: 2px solid #e6d9b8; border-radius: 8px;
+      padding: 1rem 1rem 1rem; min-height: 190px; box-shadow: 0 10px 24px rgba(43,36,64,0.16); font-family: var(--hand); overflow: hidden;
+    }
+    .envelope::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 0 48%, rgba(0,0,0,0.04) 50%, transparent 52%); pointer-events: none; }
+    .envelope .from { font-size: 0.95rem; color: #6a6385; line-height: 1.3; }
+    .envelope .to { margin: 1.4rem 0 0 20%; font-size: 1.25rem; line-height: 1.35; }
+    .envelope .to b { font-size: 1.45rem; }
+    .envelope .corner { position: absolute; top: 10px; right: 10px; display: flex; align-items: flex-start; gap: 4px; }
+    .envelope .postmark { position: absolute; top: 4px; right: 66px; width: 84px; height: 84px; opacity: 0.85; pointer-events: none; }
+    .envelope .stickers { position: absolute; left: 12px; bottom: 8px; font-size: 1.5rem; letter-spacing: 4px; }
+    .envelope.sealed { cursor: pointer; }
+    .envelope .flap { position: absolute; left: 0; right: 0; top: 0; height: 55%; background: linear-gradient(180deg, #f3e7c6, #efe0b9); clip-path: polygon(0 0, 100% 0, 50% 100%); transform-origin: top; transition: transform 0.5s ease; pointer-events: none; }
+    .envelope .seal { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff8a8a, var(--red-dark)); box-shadow: 0 4px 10px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; pointer-events: none; }
+    .envelope.opening .flap { transform: rotateX(180deg); }
+
+    /* ---- mailbox lists ---- */
+    .mail-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .mail-item {
+      display: flex; align-items: center; gap: 0.7rem; width: 100%; text-align: left; font-family: var(--font);
+      background: var(--paper); border: 3px solid #eee7fb; border-radius: 18px; padding: 0.7rem 0.9rem; cursor: pointer;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.10); min-height: 64px; touch-action: manipulation; color: var(--ink);
+    }
+    .mail-item.unread { border-color: var(--red); background: #fff7f7; }
+    .mail-item .face { font-size: 2rem; line-height: 1; }
+    .mail-item .lines { flex: 1; min-width: 0; }
+    .mail-item .who, .mail-item .when, .mail-item .peek { display: block; }
+    .mail-item .who { font-weight: bold; font-size: 1.1rem; }
+    .mail-item .when { color: #6a6385; font-size: 0.9rem; }
+    .mail-item .peek { color: #8a82a6; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--hand); }
+    .mail-item .stamp { transform: scale(0.62); transform-origin: right center; margin: -8px -6px -8px -14px; }
+    .mail-item .new { background: var(--red); color: #fff; font-weight: bold; font-size: 0.75rem; border-radius: 999px; padding: 0.15rem 0.5rem; margin-left: 0.4rem; }
+    .empty { text-align: center; color: #6a6385; padding: 1.4rem 0.5rem; font-size: 1.05rem; }
+    .empty .big { font-size: 3rem; display: block; margin-bottom: 0.4rem; }
+
+    /* ---- reading sheet ---- */
+    .sheet-back { position: fixed; inset: 0; background: rgba(43,36,64,0.45); z-index: 50; display: flex; align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto; }
+    .sheet { width: min(560px, 100%); background: var(--paper); border-radius: 24px; padding: 1rem; box-shadow: 0 20px 60px rgba(43,36,64,0.35); text-align: left; margin: auto; }
+    .sheet .row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 0.9rem; }
+    .sheet .meta { color: #6a6385; font-size: 0.95rem; text-align: center; margin: 0.4rem 0 0.6rem; }
+    .flip { perspective: 1000px; }
+    .opening-hint { text-align: center; color: var(--purple); font-weight: bold; margin: 0.6rem 0 0; }
+
+    /* ---- stamp album ---- */
+    .album { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 0.6rem; }
+    .album-slot { text-align: center; background: #fff; border-radius: 14px; padding: 0.5rem 0.2rem; border: 2px solid #eee7fb; }
+    .album-slot .cnt { font-size: 0.85rem; color: #6a6385; font-weight: bold; }
+    .album-slot.locked .stamp { filter: grayscale(1); opacity: 0.35; }
+
+    .stats { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin: 0.8rem 0 0; }
+    .stat { background: var(--paper); border-radius: 14px; padding: 0.5rem 0.9rem; box-shadow: 0 6px 16px rgba(43,36,64,0.10); font-weight: bold; }
+    .stat b { color: var(--purple); font-size: 1.3rem; }
+
+    .tip { background: #fff8e1; border: 2px solid #ffd166; border-radius: 14px; padding: 0.6rem 0.9rem; margin-top: 0.9rem; font-size: 0.98rem; }
+    details.howto { margin: 0.6rem 0 0.8rem; background: #f1e8fe; border-radius: 14px; padding: 0.5rem 0.9rem; }
+    details.howto summary { cursor: pointer; font-weight: bold; color: var(--purple); }
+    details.howto ol { margin: 0.5rem 0 0.2rem; padding-left: 1.3rem; }
+    details.howto li { margin-bottom: 0.25rem; }
+
+    /* ---- flying envelope + toast ---- */
+    .fly { position: fixed; z-index: 60; pointer-events: none; font-size: 3rem; line-height: 1; transition: transform 0.9s cubic-bezier(.4,0,.6,1), opacity 0.3s ease 0.7s; }
+    .toast {
+      position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #fff; font-weight: bold;
+      padding: 0.7rem 1.2rem; border-radius: 999px; box-shadow: 0 10px 24px rgba(0,0,0,0.3); z-index: 70; max-width: 92vw; text-align: center;
+      animation: toast-in 0.3s ease;
+    }
+    @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } }
+
+    .row-center { display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem; }
+    @media (prefers-reduced-motion: reduce) { .who-btn .mailcount { animation: none; } .fly { transition: none; } }
+  </style>
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <a class="back-link" href="../../">← Back to the Arcade</a>
+
+  <header class="hero" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+    <h1 class="title"><span class="emo">📮</span> The Post Office</h1>
+    <p class="subtitle">Write a letter, stick on a stamp, and post it to someone in the family.</p>
+    <div class="postbox-wrap">
+      <div class="postbox" id="postbox" aria-hidden="true">
+        <div class="pillar"></div><div class="cap"></div><div class="slot"></div><div class="sign">POST</div><div class="flag"></div>
+      </div>
+      <div class="postbox-msg" id="postbox-msg">Who's at the Post Office today?</div>
+    </div>
+  </header>
+
+  <main class="game-stage">
+
+    <!-- ===== who are you? ===== -->
+    <section id="who" class="panel">
+      <h2>👋 Who's at the Post Office today?</h2>
+      <p class="hint">Tap your name. Your mailbox is only for you — the red number means you've got mail!</p>
+      <div class="who-grid" id="who-grid"></div>
+    </section>
+
+    <!-- ===== the post office ===== -->
+    <section id="office" class="hidden">
+      <div class="me-bar">
+        <span class="me-pill" id="me-pill"></span>
+        <button class="btn ghost tiny" id="switch-btn">🔄 Someone else</button>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" data-tab="inbox" aria-selected="true">📥 My Mailbox <span class="badge" id="inbox-badge"></span></button>
+        <button class="tab" role="tab" data-tab="write" aria-selected="false">✍️ Write a Letter</button>
+        <button class="tab" role="tab" data-tab="sent" aria-selected="false">📤 Sent</button>
+        <button class="tab" role="tab" data-tab="stamps" aria-selected="false">📒 Stamp Album</button>
+      </div>
+
+      <!-- inbox -->
+      <div class="panel" id="tab-inbox">
+        <h2>📥 My Mailbox</h2>
+        <div class="mail-list" id="inbox-list"></div>
+      </div>
+
+      <!-- write -->
+      <div class="panel hidden" id="tab-write">
+        <h2>✍️ Write a Letter</h2>
+        <details class="howto">
+          <summary>🦉 Postmaster Owl: how a letter works</summary>
+          <ol>
+            <li><b>Greeting</b> — say hello: <i>Dear Cory,</i></li>
+            <li><b>Message</b> — the body of the letter: what you want to tell them.</li>
+            <li><b>Closing</b> — a goodbye: <i>Love,</i> or <i>Your friend,</i></li>
+            <li><b>Signature</b> — your name, so they know who wrote it.</li>
+            <li><b>The envelope</b> — write <b>To</b> (who gets it) and <b>From</b> (you), stick on a <b>stamp</b>, and the Post Office adds a <b>postmark</b> with today's date.</li>
+          </ol>
+        </details>
+
+        <div class="field">
+          <span class="lbl"><span class="step">1</span>Who is it for?</span>
+          <div class="to-row" id="to-row"></div>
+        </div>
+
+        <div class="field">
+          <span class="lbl"><span class="step">2</span>Pick your paper</span>
+          <div class="swatch-row" id="paper-row"></div>
+        </div>
+
+        <div class="field">
+          <span class="lbl"><span class="step">3</span>Write your letter</span>
+          <div class="paper p-plain" id="write-paper">
+            <p class="greeting"><select id="greet-sel" aria-label="Greeting"></select> <span id="greet-name">…</span>,</p>
+            <textarea id="body" placeholder="Type your message here — or tap the quick words below." maxlength="800"></textarea>
+            <div class="counter"><span id="count">0</span> / 800</div>
+            <p class="closing"><select id="close-sel" aria-label="Closing"></select></p>
+            <p class="sig" id="sig"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="lbl">💬 Quick words &amp; stickers <span class="hint" style="display:inline; font-weight:normal;">(tap to add them to your letter)</span></span>
+          <div class="tray-tabs" id="tray-tabs"></div>
+          <div class="tray" id="tray"></div>
+        </div>
+
+        <div class="field">
+          <span class="lbl"><span class="step">4</span>Choose a stamp</span>
+          <div class="swatch-row" id="stamp-row"></div>
+        </div>
+
+        <div class="field">
+          <span class="lbl"><span class="step">5</span>Check the envelope</span>
+          <div class="envelope" id="preview-env"></div>
+        </div>
+
+        <div class="row-center">
+          <button class="btn ghost" id="clear-btn">🗑️ Start again</button>
+          <button class="btn red" id="send-btn">📮 Post it!</button>
+        </div>
+      </div>
+
+      <!-- sent -->
+      <div class="panel hidden" id="tab-sent">
+        <h2>📤 Letters I've Sent</h2>
+        <p class="hint">A ✅ means they've opened it. 📪 means it's still waiting in their mailbox.</p>
+        <div class="mail-list" id="sent-list"></div>
+      </div>
+
+      <!-- stamps -->
+      <div class="panel hidden" id="tab-stamps">
+        <h2>📒 My Stamp Album</h2>
+        <p class="hint">Every letter you get comes with a stamp for your album. Can you collect all of them?</p>
+        <div class="album" id="album"></div>
+        <div class="stats" id="stats"></div>
+        <div class="tip" id="tip"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- reading a letter -->
+  <div class="sheet-back hidden" id="reader">
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="reader-title">
+      <h2 id="reader-title" style="margin:0 0 0.3rem; text-align:center; color: var(--purple);">📬 You've got mail!</h2>
+      <p class="meta" id="reader-meta"></p>
+      <div class="flip" id="reader-env-wrap">
+        <div class="envelope sealed" id="reader-env" tabindex="0" role="button" aria-label="Open the envelope"></div>
+        <p class="opening-hint" id="open-hint">Tap the envelope to open it ✂️</p>
+      </div>
+      <div class="paper hidden" id="reader-paper"></div>
+      <div class="row" id="reader-actions"></div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
+  <script src="post-office.js"></script>
+</body>
+</html>

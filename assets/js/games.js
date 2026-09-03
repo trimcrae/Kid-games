@@ -22,6 +22,17 @@
 
 const GAMES = [
   {
+    title: "The Post Office",
+    emoji:  "📮",
+    blurb:  "Send real mail to the rest of the family! Pick who you are, write a proper letter — greeting, message, closing and signature — choose your paper, stick on a stamp, address the envelope and post it. It lands in their mailbox on this device the moment they pick their name: they open the envelope, read it and write back. Letter-writing, reading, spelling and dates: every letter gets a postmark with the day it was posted. Tap-a-sentence quick words for the little ones, and a stamp album to fill up.",
+    url:    "games/post-office/",
+    ages:   "3+",
+    kids:   ["jeannie","cory","ellie","kieran","shannon"],
+    color:  "#e63946",
+    ready:  true
+  },
+
+  {
     title: "Craepets",
     emoji: "🥚",
     blurb: "Adopt a pixel creature and raise it — the whole economy runs on learning. Five levels from toddler to grown-up, and the questions HEAT UP as you get better: five right in a row turns the heat up a rung (bigger sums, more coins, and at the top a peek at the level above). Climb The Shade's Shadow Tower: his shadow army on six floors, then The Shade himself, darker every time you beat him — with charged critical hits, snacks from your bag, a family Craepet as your ally, tricks, and loot only he can drop. The little levels are now read aloud in a real storyteller's voice: every question, every lesson, the pet's chatter and The Shade's sneers. A whole pet world now: it starts as an EGG that hatches when it hears you learning; a painted valley MAP you tap to travel; a Valley Times front page and a family records board; dress your Craepet up in pixel hats, glasses and scarves; a PETPET that trots along behind it; every species with its own favourite foods and place; it wanders the room, asks for wishes, writes a diary you can add to; visit the family's houses and post them presents; a Bank that pays 3% a night (a real compounding lesson); random events on the paths; a photo booth; the real calendar (seasons change the weather, the crops and the Market, holidays hang garlands and leave presents, Advent counts the sleeps, and every Craepet gets a hatch-day party); a Games Room with two real games — SKY CATCH (run under the falling sky and catch only the even numbers, the vowels, the letter A or the stars) and MEMORY MATCH (pairs are a sum and its answer, an animal and its baby, a word and its opposite); daily weather that rains on the window; a named Craepet behind every counter; and a first-steps list for new players. Over 700 hand-written questions plus endless generated sums, 37 homes, 200+ pieces of furniture, painted views, and a different Market for everyone.",

@@ -2008,6 +2008,72 @@ const GAMES = {
     if (!/solved/i.test(await page.locator("#feedback").textContent())) throw new Error("filled grid was not detected as solved");
     return `${puzzles} puzzles all open cleanly; filled ${n} cells; puzzle solved`;
   },
+
+  async "The Post Office"(page, g, d) {
+    await page.goto(`${BASE}/games/post-office/`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("post-office.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+    if (await page.locator(".who-btn").count() < 5) throw new Error("family picker did not render");
+
+    // Ellie writes to Cory with quick words, a sticker and a typed line
+    await page.locator('.who-btn[data-id="ellie"]').click();
+    await page.locator('.tab[data-tab="write"]').click();
+    if (!(await page.locator("#send-btn").isDisabled())) throw new Error("Post button should be disabled with no recipient or message");
+    await page.locator('.to-chip[data-id="cory"]').click();
+    if (!/Cory/.test(await page.locator("#greet-name").textContent())) throw new Error("greeting did not fill in the recipient's name");
+    await page.locator(".word-btn").first().click();                 // a quick sentence
+    await page.locator('.tray-tab[data-id="stickers"]').click();
+    await page.locator(".word-btn.emo").first().click();               // a sticker
+    await page.locator("#body").press("End");
+    await page.locator("#body").type(" Can we build a castle?");
+    await page.locator('.swatch[data-id="hearts"]').click();
+    await page.locator('.stamp-btn[data-id="dragon"]').click();
+    const envText = await page.locator("#preview-env").textContent();
+    if (!/To:.*Cory/s.test(envText) || !/From:.*Ellie/s.test(envText)) throw new Error("envelope preview is not addressed To Cory / From Ellie");
+    if (await page.locator("#send-btn").isDisabled()) throw new Error("Post button still disabled with a recipient and a message");
+    await page.locator("#send-btn").click();
+    await page.waitForTimeout(300);
+    if (await page.locator("#sent-list .mail-item").count() !== 1) throw new Error("sent letter is not in Ellie's Sent tray");
+    if (!/Not opened yet/.test(await page.locator("#sent-list .mail-item").textContent())) throw new Error("fresh letter should show as not opened yet");
+
+    // Cory finds it waiting, opens the envelope and reads it
+    await page.locator("#switch-btn").click();
+    const badge = await page.locator('.who-btn[data-id="cory"] .mailcount').textContent();
+    if (!/1/.test(badge || "")) throw new Error("Cory's name does not show 1 new letter");
+    await page.locator('.who-btn[data-id="cory"]').click();
+    if (await page.locator("#inbox-list .mail-item.unread").count() !== 1) throw new Error("letter not in Cory's mailbox as unread");
+    if (!(await page.locator("#postbox.has-mail").count())) throw new Error("post box flag did not go up for new mail");
+    await page.locator("#inbox-list .mail-item").first().click();
+    if (!(await page.locator("#reader-paper").isHidden())) throw new Error("letter should stay inside the sealed envelope until it's opened");
+    await page.locator("#reader-env").click();
+    await page.waitForTimeout(700);
+    const letter = await page.locator("#reader-paper").textContent();
+    if (!/Dear Cory,/.test(letter)) throw new Error("greeting missing from the opened letter");
+    if (!/Can we build a castle\?/.test(letter)) throw new Error("typed message missing from the opened letter");
+    if (!/Love,/.test(letter) || !/Ellie/.test(letter)) throw new Error("closing or signature missing from the opened letter");
+    if (!(await page.locator("#reader-paper.p-hearts").count())) throw new Error("chosen stationery was not used");
+    if (!/POSTED/.test(await page.locator("#reader-env").innerHTML())) throw new Error("no postmark on the opened envelope");
+
+    // …and writes straight back
+    await page.locator("#reply-btn").click();
+    if (!(await page.locator('.to-chip[data-id="ellie"][aria-pressed="true"]').count())) throw new Error("Write back did not address the reply to Ellie");
+    await page.fill("#body", "Yes! A big one.");
+    await page.locator("#send-btn").click();
+    await page.waitForTimeout(300);
+    await page.locator('.tab[data-tab="stamps"]').click();
+    if (!/Dragon × 1/.test(await page.locator("#album").textContent())) throw new Error("the dragon stamp was not added to Cory's album");
+
+    // Ellie sees it was opened, and has a reply of her own
+    await page.locator("#switch-btn").click();
+    await page.locator('.who-btn[data-id="ellie"]').click();
+    if (await page.locator("#inbox-list .mail-item.unread").count() !== 1) throw new Error("Cory's reply did not reach Ellie");
+    await page.locator('.tab[data-tab="sent"]').click();
+    if (!/Opened/.test(await page.locator("#sent-list .mail-item").first().textContent())) throw new Error("Ellie's Sent tray does not show Cory opened her letter");
+    // the mailbag survives a reload
+    await page.reload({ waitUntil: "networkidle" });
+    if (!/1/.test(await page.locator('.who-btn[data-id="ellie"] .mailcount').textContent())) throw new Error("mail was lost on reload");
+    return "Ellie posts Cory a letter, he opens it, reads it and writes back; stamp album + read receipts work";
+  },
 };
 
 /* ---------- run everything ---------- */
