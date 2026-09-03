@@ -32,6 +32,11 @@ For **every game** (and the landing page), at **each of the three sizes**:
     works for the pre-readers
   - **Crossword** — every puzzle opens with a real grid and clues, and filling
     every cell with the answer solves it
+  - **The Post Office** — Ellie writes Cory a letter with quick words, a
+    sticker and typed text, posts it, and it's waiting in Cory's mailbox with
+    the flag up; he opens the envelope (greeting, message, closing, signature
+    and a postmark all there), writes back, and the stamp lands in his album;
+    Ellie's Sent tray shows it was opened and the mail survives a reload
   - **Word Strands** — every hunt's grid is fully lettered (catches bad
     generator output before the kids find it)
   - **Music Lab** — a song plays through key-by-key and is remembered, and
