@@ -1640,17 +1640,25 @@
       : (anim.t % 150 > 144) ? "blink"
       : "idle";
 
+    // A Glimmr is a wisp and floats: it drifts up and down on the spot.
+    // Every other Craepet is an animal with its feet on the floor: at rest
+    // it BREATHES (a gentle stretch from the feet) rather than hovering,
+    // and walking is a small bounce — a Snorbit hops, the rest pad along.
+    var floats = pet.species === "glimmr";
     var bob = calm ? 0
-      : sleeping ? Math.round(Math.sin(anim.t / 40) * scale * 0.35)
-      : walking  ? Math.round(Math.abs(Math.sin(anim.t * Math.PI / 8)) * scale * -0.7)
-                 : Math.round(Math.sin(anim.t / 16) * scale * 0.6);
+      : floats   ? Math.round(Math.sin(anim.t / (sleeping ? 40 : 16)) * scale * (sleeping ? 0.35 : 0.6))
+      : walking  ? Math.round(Math.abs(Math.sin(anim.t * Math.PI / 8)) * scale * -(pet.species === "snorbit" ? 0.7 : 0.25))
+                 : 0;
+    var breathe = (calm || floats || walking) ? 0
+      : sleeping ? Math.sin(anim.t / 40) * 0.03
+                 : Math.sin(anim.t / 16) * 0.018;
     // a little jump for joy: fed, played with, dressed up, a wish granted
     if (anim.hop > 0) {
       var k = anim.hop / 22;
       bob -= Math.round(Math.sin(k * Math.PI) * scale * 2.4);
       anim.hop--;
     }
-    P.draw(cv, pet.species, pet.colour, { frame: frame, level: lv, scale: scale, bob: bob, wear: pet.wear,
+    P.draw(cv, pet.species, pet.colour, { frame: frame, level: lv, scale: scale, bob: bob, breathe: breathe, wear: pet.wear,
                                           cx: Math.round(anim.x * w), flip: anim.face < 0 });
     // the petpet trots along a little way behind
     if (pet.petpet && pet.petpet.id) {
@@ -1658,10 +1666,15 @@
       if (anim.px === undefined) anim.px = want;
       anim.px += (want - anim.px) * 0.06;
       var pscale = Math.max(2, Math.round(scale * 0.7));
-      var pbob = calm ? 0 : (walking || Math.abs(want - anim.px) > 0.01)
-        ? Math.round(Math.abs(Math.sin(anim.t / 4)) * pscale * -0.6)
-        : Math.round(Math.sin(anim.t / 14 + 1) * pscale * 0.35);
-      P.drawPetpet(cv, pet.petpet.id, { cx: Math.round(anim.px * w), scale: pscale, bob: sleeping ? 0 : pbob, flip: anim.face < 0 });
+      // the moth, wisp and starling fly; the others walk and breathe
+      var pfloats = /^(moth|wisp|starling)$/.test(pet.petpet.id);
+      var moving = walking || Math.abs(want - anim.px) > 0.01;
+      var pbob = (calm || sleeping) ? 0
+        : pfloats ? Math.round(Math.sin(anim.t / 14 + 1) * pscale * 0.35)
+        : moving  ? Math.round(Math.abs(Math.sin(anim.t / 4)) * pscale * -0.25)
+                  : 0;
+      var pbreathe = (calm || pfloats || moving) ? 0 : Math.sin(anim.t / (sleeping ? 40 : 14) + 1) * 0.02;
+      P.drawPetpet(cv, pet.petpet.id, { cx: Math.round(anim.px * w), scale: pscale, bob: pbob, breathe: pbreathe, flip: anim.face < 0 });
     }
   }
 

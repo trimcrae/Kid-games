@@ -501,6 +501,8 @@ window.CPPets = (function () {
      opts: { frame, level, scale, bob, wear,
              cx   — where the pet's middle is, in pixels (default: centred),
              flip — true to face left,
+             breathe — a little taller (+) or squatter (-), e.g. 0.02,
+                       stretched from the feet so they stay on the floor,
              keep — don't clear the canvas first (draw over a scene) }
      ========================================================= */
   function draw(canvas, speciesId, colourId, opts) {
@@ -531,6 +533,9 @@ window.CPPets = (function () {
     // facing left is the same picture mirrored about its own middle
     g.save();
     if (opts.flip) { g.translate(2 * cx, 0); g.scale(-1, 1); }
+    // breathing: the picture stretches a touch from its feet, never lifts
+    var br = opts.breathe || 0;
+    if (br) { g.translate(cx, y + h); g.scale(1 - br * 0.6, 1 + br); g.translate(-cx, -(y + h)); }
     if (body) g.drawImage(body, x, y, w, h);
     // level 5 earns a tiara and level 12 a crown — unless a hat from the
     // wardrobe is on, which sits in the same place
@@ -651,6 +656,8 @@ window.CPPets = (function () {
     g.globalAlpha = 1;
     g.save();
     if (opts.flip) { g.translate(2 * cx, 0); g.scale(-1, 1); }
+    var br = opts.breathe || 0;
+    if (br) { g.translate(cx, y + h); g.scale(1 - br * 0.6, 1 + br); g.translate(-cx, -(y + h)); }
     drawTile(g, "petpets", it.id, x, y, w, h);
     g.restore();
   }
