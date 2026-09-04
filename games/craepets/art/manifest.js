@@ -933,6 +933,8 @@ window.CPArt = {
   "twiggle": {
    "file": "twiggle.webp",
    "idfile": "twiggle-id.webp",
+   "ref": 0.817,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
