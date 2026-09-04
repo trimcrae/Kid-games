@@ -392,6 +392,8 @@ window.CPArt = {
   "glimmr": {
    "file": "glimmr.webp",
    "idfile": "glimmr-id.webp",
+   "ref": 0.822,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
