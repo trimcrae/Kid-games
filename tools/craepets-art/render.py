@@ -135,7 +135,7 @@ class Scene:
         # render comes out flat.
         light((-1.0, -1.5, 9.5), 480, 5, (1.0, 0.97, 0.92))             # key: big softbox, high and a little left
         light((5.5, -3.0, 2.6), 70, 6, (0.8, 0.88, 1.0))                # fill: dim and cool
-        light((2.8, 4.5, 4.2), 650, 3, (1.0, 0.9, 0.8))                 # rim: warm edge light, behind right
+        light((2.8, 4.5, 4.2), 260, 3, (1.0, 0.9, 0.8))                 # rim: a warm edge light, behind right
         light((0.0, -5.5, 0.35), 80, 7, (1.0, 0.94, 0.86), (0, 0, 0.9))   # floor bounce on the underside
 
     def _floor(self):
@@ -229,29 +229,28 @@ class Scene:
         key = "fur-" + kind + ("" if rgb is None else "-%02x%02x%02x" % tuple(int(c * 255) for c in rgb))
         for m in self.mats:
             if m.name == key: return m
+        # A plain matte (Principled) shader on the strands, not the Hair
+        # BSDF: hair shaders let light straight through, so a white coat
+        # lit from behind glows like a halo. Dense fur is opaque.
         m = bpy.data.materials.new(key); m.use_nodes = True
-        nt = m.node_tree
-        for n in list(nt.nodes): nt.nodes.remove(n)
-        out = nt.nodes.new("ShaderNodeOutputMaterial")
-        h = nt.nodes.new("ShaderNodeBsdfHairPrincipled")
-        h.parametrization = "COLOR"
-        h.inputs["Color"].default_value = (*(rgb if rgb is not None else COL["clay"]), 1)
-        h.inputs["Roughness"].default_value = 0.4
-        h.inputs["Radial Roughness"].default_value = 0.45
-        h.inputs["Coat"].default_value = 0.0
-        h.inputs["Random Roughness"].default_value = 0.2
-        nt.links.new(h.outputs[0], out.inputs[0])
+        b = m.node_tree.nodes["Principled BSDF"]
+        b.inputs["Base Color"].default_value = (*(rgb if rgb is not None else COL["clay"]), 1)
+        b.inputs["Roughness"].default_value = 0.9
+        b.inputs["Specular IOR Level"].default_value = 0.15
         self.mats[m] = kind
         return m
 
-    def fur(self, obj, m, length=0.16, density=110, children=12, down=0.45, clump=0.5,
-            rand=0.25, radius=0.0045, weight=None):
-        """Grow a coat on a mesh: a hair particle system, combed a little
-        downward like fur under gravity, in clumps, with interpolated
-        children for density. `density` is parent strands per unit of
-        surface; `weight(x, y, z) -> 0..1` thins and shortens the coat
-        (round the face, say). The object's scale and rotation are baked
-        into the mesh first so lengths come out in world units."""
+    def fur(self, obj, m, length=0.1, density=170, children=20, down=0.9, clump=0.5,
+            rand=0.15, radius=0.0035, weight=None, curl=0.02, curl_freq=4.0):
+        """Grow a coat on a mesh: a dense hair particle system of SHORT
+        strands, combed down so they lie along the body like real fur,
+        each with a slight curl, in soft clumps, with interpolated
+        children for density. (Long straight strands standing out from the
+        skin read as a fibre-optic lamp, not an animal.) `density` is
+        parent strands per unit of surface; `weight(x, y, z) -> 0..1`
+        thins and shortens the coat (round the face, say). The object's
+        scale and rotation are baked into the mesh first so lengths come
+        out in world units."""
         if obj.type != "MESH": return
         me = obj.data
         M = obj.matrix_world.to_3x3()
@@ -275,8 +274,12 @@ class Scene:
         # it stays small (about 0.1): any bigger and the strands balloon
         st.normal_factor = 0.1; st.object_align_factor = (0, 0, -down * 0.1); st.factor_random = rand * 0.1
         st.child_type = "INTERPOLATED"; st.child_percent = 1; st.rendered_child_count = children
-        st.clump_factor = clump; st.clump_shape = 0.25
-        st.roughness_2 = length * 0.35; st.roughness_2_size = 1.5; st.roughness_endpoint = length * 0.2
+        st.clump_factor = clump; st.clump_shape = 0.3
+        st.roughness_2 = length * 0.15; st.roughness_2_size = 1.5; st.roughness_endpoint = length * 0.08
+        if curl:
+            # a slight wave along each hair, so strands curve like fur
+            # rather than standing straight like fibre-optic filaments
+            st.kink = "CURL"; st.kink_amplitude = curl; st.kink_frequency = curl_freq; st.kink_shape = 0.2
         st.radius_scale = radius; st.root_radius = 1.0; st.tip_radius = 0.0; st.use_close_tip = True
         st.material = len(me.materials)
         if weight is not None:
@@ -456,8 +459,8 @@ class Creature:
     nose = True
     skin_rough = 0.8
     # the coat: hair length per body part (0 or missing = bare skin)
-    fur = {"body": 0.17, "belly": 0.14, "foot": 0.08, "ear": 0.08, "tail": 0.1,
-           "body2": 0.14, "body3": 0.1, "body4": 0.07, "tuft": 0.1, "tuft2": 0.08, "spark": 0.08, "spark2": 0.06}
+    fur = {"body": 0.1, "belly": 0.09, "foot": 0.05, "ear": 0.05, "tail": 0.07,
+           "body2": 0.09, "body3": 0.07, "body4": 0.05, "tuft": 0.07, "tuft2": 0.05, "spark": 0.05, "spark2": 0.04}
 
     def __init__(self, S, frame="idle"):
         self.S, self.frame = S, frame
@@ -619,7 +622,7 @@ class Blorb(Creature):
     """Round, bouncy and permanently pleased. No ears at all — a ball of
     fluff like a chinchilla."""
     iris = "#b8752a"
-    fur = dict(Creature.fur, body=0.2, belly=0.16)
+    fur = dict(Creature.fur, body=0.12, belly=0.1)
 
 
 class Snorbit(Creature):
@@ -661,7 +664,7 @@ class Twiggle(Creature):
     """A leafy little fawn from the deep woods."""
     body_c = (0, 0, 1.55); body_r = (1.4, 1.35, 1.5)
     iris = "#5a3d22"
-    fur = dict(Creature.fur, body=0.13, belly=0.11)
+    fur = dict(Creature.fur, body=0.08, belly=0.07)
     foot_dx = 0.72
 
     def trim(self):
@@ -1021,7 +1024,7 @@ def build_petpet(S, pid):
     """Each petpet in its own colours, standing in an 8 x 8 cell frame."""
     def clay(hexcol, **kw): return S.fixed("pp-" + hexcol, hexcol, rough=0.8, spec=0.2, sss=0.3, sheen=0.3, sheen_rough=0.6, **kw)
     def coat(obj, hexcol, length, **kw):
-        kw.setdefault("radius", 0.003); kw.setdefault("density", 160)
+        kw.setdefault("radius", 0.0025); kw.setdefault("density", 240)
         S.fur(obj, S.fur_mat("fixed", srgb(hexcol)), length, **kw)
     eyeW = S.eye_white("fixed")
     eyeK = S.eye_pupil("fixed")
@@ -1033,8 +1036,8 @@ def build_petpet(S, pid):
             S.sphere("pupil", (x, y - r * 0.5, z + 0.01), r * 0.55, eyeK, scale=(1, 0.5, 1.1))
     if pid == "duckling":
         yel, orange = clay("#ffe066"), clay("#ff9f45")
-        coat(S.sphere("body", (0, 0, 0.55), 0.55, yel, scale=(1, 1.1, 0.95)), "#ffe066", 0.07)
-        coat(S.sphere("head", (0, -0.15, 1.25), 0.42, yel), "#ffe066", 0.04, radius=0.0025)
+        coat(S.sphere("body", (0, 0, 0.55), 0.55, yel, scale=(1, 1.1, 0.95)), "#ffe066", 0.05)
+        coat(S.sphere("head", (0, -0.15, 1.25), 0.42, yel), "#ffe066", 0.03, radius=0.0025)
         face((0, -0.15, 1.25), (0.42, 0.42, 0.42), 0.17, 1.32, 0.09)
         S.cone("beak", (0, -0.62, 1.15), 0.12, 0.28, orange, rot=(math.radians(-90), 0, 0))
         S.sphere("wing", (0.5, 0.05, 0.6), 0.22, yel, scale=(0.5, 1, 0.7))
@@ -1058,7 +1061,7 @@ def build_petpet(S, pid):
                          (0.2, ell_front_y((0, 0, 0.72), (0.72, 0.68, 0.72), 0.2, 0.5) - 0.02, 0.5)], 0.03, eyeK)
     elif pid == "moth":
         purple, gold = clay("#a97dff"), clay("#ffd863")
-        coat(S.sphere("body", (0, 0, 0.75), 0.22, clay("#8a5cff"), scale=(1, 1, 2.2)), "#8a5cff", 0.05)
+        coat(S.sphere("body", (0, 0, 0.75), 0.22, clay("#8a5cff"), scale=(1, 1, 2.2)), "#8a5cff", 0.04)
         for sx in (-1, 1):
             S.sphere("wing", (sx * 0.55, 0.05, 1.05), 0.48, purple, scale=(1, 0.2, 0.85))
             S.sphere("wing2", (sx * 0.45, 0.05, 0.45), 0.34, purple, scale=(1, 0.2, 0.75))
@@ -1067,8 +1070,8 @@ def build_petpet(S, pid):
         face((0, 0, 1.0), (0.22, 0.22, 0.4), 0.09, 1.1, 0.06)
     elif pid == "kit":
         fur, cream = clay("#f4b16f"), clay("#ffd7db")
-        coat(S.sphere("body", (0, 0.1, 0.5), 0.5, fur, scale=(1, 1.2, 0.9)), "#f4b16f", 0.07)
-        coat(S.sphere("head", (0, -0.25, 1.1), 0.45, fur), "#f4b16f", 0.03, radius=0.0025)
+        coat(S.sphere("body", (0, 0.1, 0.5), 0.5, fur, scale=(1, 1.2, 0.9)), "#f4b16f", 0.05)
+        coat(S.sphere("head", (0, -0.25, 1.1), 0.45, fur), "#f4b16f", 0.025, radius=0.0025)
         for sx in (-1, 1):
             S.cone("ear", (sx * 0.28, -0.2, 1.55), 0.15, 0.32, fur, rot=(0, sx * math.radians(15), 0))
         face((0, -0.25, 1.1), (0.45, 0.45, 0.45), 0.18, 1.15, 0.09)
@@ -1076,12 +1079,12 @@ def build_petpet(S, pid):
         S.torus("tail", (0.55, 0.45, 0.45), 0.3, 0.08, fur, rot=(math.radians(90), 0, 0))
     elif pid == "hedge":
         brown, dark, cream = clay("#8a6a4a"), clay("#5a4030"), clay("#f4d3b0")
-        coat(S.sphere("body", (0.1, 0, 0.6), 0.62, dark, scale=(1.05, 0.95, 0.85)), "#5a4030", 0.06)
+        coat(S.sphere("body", (0.1, 0, 0.6), 0.62, dark, scale=(1.05, 0.95, 0.85)), "#5a4030", 0.045)
         for i in range(14):
             a = math.pi * (0.1 + 0.8 * i / 13.0); r = 0.62
             S.cone("spike", (0.1 + math.cos(a) * r * 0.9, 0, 0.6 + math.sin(a) * r * 0.8), 0.07, 0.35, dark,
                    rot=(0, math.pi / 2 - a, 0))
-        coat(S.sphere("face", (-0.45, -0.2, 0.5), 0.36, cream, scale=(1.2, 0.9, 0.85)), "#f4d3b0", 0.035)
+        coat(S.sphere("face", (-0.45, -0.2, 0.5), 0.36, cream, scale=(1.2, 0.9, 0.85)), "#f4d3b0", 0.03)
         S.sphere("nose", (-0.85, -0.25, 0.45), 0.08, eyeK)
         S.sphere("eye", (-0.5, -0.5, 0.62), 0.06, eyeK)
     elif pid == "wisp":
