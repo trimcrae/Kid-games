@@ -338,7 +338,7 @@ window.CPPets = (function () {
       var v = (base[c] + (sh[c] - base[c]) * s) * light;
       if (glow > 0) {
         v = v + (hi[c] - v) * Math.min(1, glow * 2);
-        v = v + (1 - v) * glow * 0.45;
+        v = v + (1 - v) * glow * 0.2;
       }
       out[c] = v;
     }
