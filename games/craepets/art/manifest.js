@@ -224,6 +224,8 @@ window.CPArt = {
   "flarn": {
    "file": "flarn.webp",
    "idfile": "flarn-id.webp",
+   "ref": 0.832,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
