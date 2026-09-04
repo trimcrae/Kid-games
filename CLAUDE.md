@@ -76,11 +76,18 @@ commits it back:
 - **Story art** → `.github/workflows/generate-art.yml` fetches painterly PNGs.
 
 **Never use image-generation models for Craepets** (or for anything depicting
-creatures or children). Craepets art is code-drawn only: pixel grids in
-`pets.js` (baked with Scale2x), pixel-rasterised SVG scenery in `scenery.js`,
-the WebGL sky in `sky.js`, and crayon pages in `crayon.js`. A free image API
-once returned an inappropriate image for a "blob creature" prompt; that
-route is closed for this game.
+creatures or children). Craepets art is code-drawn only: the creatures, egg,
+petpets and wardrobe are **built from spheres, cones and tubes in Blender**
+(`tools/craepets-art/render.py`, run headless via the `bpy` pip package on the
+CPU) and rendered as white-clay sprite sheets + colour-ID masks into
+`games/craepets/art/`; `pets.js` tints them with the player's palette in the
+browser. Scenery is pixel-rasterised SVG in `scenery.js`, the sky is WebGL in
+`sky.js`, and crayon pages are in `crayon.js`. A free image API once returned
+an inappropriate image for a "blob creature" prompt; that route is closed for
+this game. To change a creature or add a hat, edit `render.py` and push —
+`.github/workflows/render-craepets-art.yml` re-renders and commits the
+sheets (or run the script locally: `pip install bpy pillow`, about 20 minutes
+for everything on four cores).
 
 Both trigger automatically when their source changes and can be run by hand from
 the Actions tab. So: don't fight the sandbox proxy for these — push and let the

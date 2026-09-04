@@ -66,3 +66,26 @@ plain files with no dependencies. If you ever see a kid's real answer
 rejected, add the word to `EXTRA` in the script (or straight into
 `data.js`) and re-run — the play-test has a coverage check that guards it.
 
+
+## `craepets-art/render.py` — the Craepets clay art
+
+Every Craepet, its egg, the petpets and all 27 wardrobe items are modelled
+from primitives in Blender and rendered with Cycles on the CPU (no GPU, no
+image model: the shapes are code and the light is physics). Each species gets
+one sprite sheet in `games/craepets/art/`: six expression frames in white
+clay plus a colour-ID mask each (red = body, green = accent), and every hat,
+pair of glasses and scarf rendered ON that species with its body hidden but
+occluding, so a hat sits right on a flat Zibbit head or between a Snorbit's
+ears. `pets.js` paints the white clay through the player's palette at play
+time, which is how one render becomes Berry Red, Rainbow or Starry Night.
+
+```bash
+pip install bpy pillow                       # Blender as a Python module
+python3 tools/craepets-art/render.py         # everything (~20 min, 4 cores)
+python3 tools/craepets-art/render.py --species blorb --frames idle --samples 12
+python3 tools/craepets-art/render.py --only egg,petpets --force
+```
+
+Sheets that already exist are skipped unless `--force`. Pushing a change to
+`render.py` triggers `.github/workflows/render-craepets-art.yml`, which
+renders on a GitHub runner and commits the sheets back.

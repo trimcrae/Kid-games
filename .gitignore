@@ -4,3 +4,8 @@
 /manifest.json
 /tools/voices/
 *.wav
+
+# Craepets clay art — the single rendered tiles are scratch; only the
+# packed sheets in games/craepets/art/ are committed.
+/tools/craepets-art/.tiles/
+__pycache__/

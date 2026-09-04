@@ -1362,7 +1362,7 @@
     tmp.width = 220; tmp.height = 250;
     if (S.pet.egg) P.drawEgg(tmp, S.pet.colour, { scale: 11, crack: S.pet.egg.got >= 2 ? 2 : S.pet.egg.got >= 0.5 ? 1 : 0 });
     else P.draw(tmp, S.pet.species, S.pet.colour, { frame: "idle", level: level(), scale: 11, wear: S.pet.wear });
-    g.imageSmoothingEnabled = false;
+    g.imageSmoothingEnabled = true;
     g.drawImage(tmp, Math.round(W / 2 - tmp.width / 2), H - tmp.height - 4);
     if (S.pet.petpet) {
       var pp = document.createElement("canvas");
@@ -1601,6 +1601,9 @@
     var grow = 1 + Math.min(19, lv - 1) * 0.008 + Math.max(0, Math.min(30, lv - 20)) * 0.003 +
       (lv > 50 ? 0.06 * (1 - Math.exp(-(lv - 50) / 80)) : 0);
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * grow));
+    // the clay creature's picture is 20 cells tall (hat room included), and
+    // a very grown pet must still fit it under the ceiling
+    scale = Math.max(2, Math.min(scale, Math.floor(h / 21.5)));
 
     // WANDERING. In the full-height room (the nest, or a house you are
     // visiting) the pet strolls about now and then, turning to face the
@@ -5014,7 +5017,7 @@
       var need = GATE[r.id] || 1;
       var isOpen = lv >= need;
       return '<button class="item" data-fight="' + r.id + '"' + (isOpen ? "" : " disabled") + ">" +
-        '<img alt="" src="' + P.chip(r.species, r.colour, 56) + '" style="width:56px;image-rendering:pixelated">' +
+        '<img alt="" src="' + P.chip(r.species, r.colour, 56) + '" style="width:56px">' +
         '<span class="nm">' + esc(r.name) + "</span>" +
         '<span class="what">' + r.hp + " HP · asks " + esc(subjectWord(r.subject)) + "</span>" +
         (isOpen ? '<span class="price">🪙 ' + r.coins + "</span>" : '<span class="own">Level ' + need + "</span>") +
@@ -6248,8 +6251,16 @@
     postWaiting();
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  /* The clay creatures are pictures that have to arrive first (pets.js
+     loads them); a slow connection still gets the game after 8 seconds. */
+  function boot() {
+    var started = false;
+    function go() { if (started) return; started = true; init(); }
+    P.ready(go);
+    setTimeout(go, 8000);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+  else boot();
 
   /* A tiny hook the play-test robot uses to look inside. */
   window.Craepets = {
