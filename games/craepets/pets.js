@@ -306,7 +306,9 @@ window.CPPets = (function () {
          paint in shadow) instead of just going dark;
        - past the brightest clay (the glaze's highlight) it lifts through
          the palette's highlight colour towards white.
-     REF is the linear light of fully lit clay in the render (sRGB ~0.91). */
+     REF is the linear light of fully lit clay in the render; each sheet
+     carries its own measured value in the manifest (a furry coat renders
+     darker than smooth skin), and this is the fallback. */
   var REF = 0.80;
   var LIN = new Float32Array(256), ENC = new Uint8ClampedArray(4097);
   (function () {
@@ -356,6 +358,7 @@ window.CPPets = (function () {
     if (!lit || !id) return null;
     var L = pixelsOf(lit), M = pixelsOf(id);
     var w = L.width, h = L.height, d = L.data, m = M.data;
+    var ref = (ART.sheets[sheetId] && ART.sheets[sheetId].ref) || REF;
     var colsB = null, colsA = null, cb = [0, 0, 0], ca = [0, 0, 0];
     var fnB = typeof pal.B === "function" || typeof pal.b === "function" || typeof pal.L === "function";
     var fnA = typeof pal.A === "function" || typeof pal.a === "function";
@@ -371,7 +374,7 @@ window.CPPets = (function () {
         var body = m[i] / ma, acc = m[i + 1] / ma;
         if (body + acc <= 0.002) continue;                // eyes, nose, mouth: as rendered
         var fixed = Math.max(0, 1 - body - acc);
-        var k = (0.2126 * LIN[d[i]] + 0.7152 * LIN[d[i + 1]] + 0.0722 * LIN[d[i + 2]]) / REF;
+        var k = (0.2126 * LIN[d[i]] + 0.7152 * LIN[d[i + 1]] + 0.0722 * LIN[d[i + 2]]) / ref;
         var r = LIN[d[i]] * fixed, g = LIN[d[i + 1]] * fixed, b = LIN[d[i + 2]] * fixed;
         if (body > 0) {
           if (!colsB || fnB) colsB = paintColours(pal, "B", x, y, w, h);

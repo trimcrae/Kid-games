@@ -89,8 +89,14 @@ them with the player's palette in linear light in the browser. Scenery is pixel-
 an inappropriate image for a "blob creature" prompt; that route is closed for
 this game. To change a creature or add a hat, edit `render.py` and push —
 `.github/workflows/render-craepets-art.yml` re-renders and commits the
-sheets (or run the script locally: `pip install bpy pillow`, about 50 minutes
-for everything on four cores; `--repack` re-packs from already rendered tiles).
+sheets. Each sheet records the hash of the script that made it in
+`manifest.js`, so any edit to `render.py` makes every sheet stale and the
+workflow re-renders them all (about 70 minutes on four cores; `--force`
+re-renders sheets the current script already made, `--repack` re-packs from
+already rendered tiles). In this sandbox `pip install bpy pillow` does
+work, so the sheets can also be rendered and committed here: check the
+result in a browser (the tint in `pets.js` reads each sheet's own `ref`
+brightness from the manifest) before merging.
 
 Both trigger automatically when their source changes and can be run by hand from
 the Actions tab. So: don't fight the sandbox proxy for these — push and let the

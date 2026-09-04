@@ -5,8 +5,10 @@ name: Render Craepets art
 # the sprite sheets in games/craepets/art/ back to the repo.
 #
 # The art is entirely code-drawn — spheres, cones and tubes with a coat of
-# Cycles hair, lit like a wildlife photo — so no image model is involved. Sheets that already exist are kept;
-# tick "force" to re-render everything (for instance after changing a shape).
+# Cycles hair, lit like a wildlife photo — so no image model is involved.
+# Every sheet records (in manifest.js) the hash of the render script that
+# made it, so a sheet is only re-rendered when the script has changed since;
+# tick "force" to re-render everything regardless.
 #
 # Run it from the Actions tab ("Run workflow"), or it runs automatically when
 # the render script changes.
@@ -15,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       force:
-        description: "Re-render sheets that already exist"
+        description: "Re-render every sheet, even ones the current script already made"
         type: boolean
         default: false
   push:
@@ -33,7 +35,7 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
 

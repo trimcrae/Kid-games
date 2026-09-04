@@ -30,7 +30,7 @@ Usage:
     python3 tools/craepets-art/render.py --species blorb # one creature
     python3 tools/craepets-art/render.py --only egg,petpets
     python3 tools/craepets-art/render.py --samples 16    # quick & noisy
-    python3 tools/craepets-art/render.py --force         # redo existing
+    python3 tools/craepets-art/render.py --force         # redo sheets this same script already made
     python3 tools/craepets-art/render.py --repack --force # re-pack from rendered tiles
 
 Sheet layout: tiles are CELL px per grid cell; a creature/egg tile is
@@ -38,6 +38,7 @@ Sheet layout: tiles are CELL px per grid cell; a creature/egg tile is
 """
 import argparse, json, math, os, sys, time
 
+import hashlib
 import bpy
 from mathutils import Vector
 from bpy_extras.object_utils import world_to_camera_view
@@ -76,10 +77,11 @@ def srgb(hexstr):
 class Scene:
     """A fresh Blender scene with the shared camera and toy-photo lighting."""
 
-    def __init__(self, cells_w, cells_h, samples):
+    def __init__(self, cells_w, cells_h, samples, floor_y=-1.7):
         bpy.ops.wm.read_factory_settings(use_empty=True)
         self.sc = bpy.context.scene
         self.samples = samples
+        self.floor_y = floor_y      # where the feet touch the floor, in front of the origin
         self.mats = {}          # material -> class ("body"/"accent"/"eye"/"fixed")
         self.objs = []          # everything we made (for holdout toggling)
         self.body_objs = []     # the creature itself (hidden for wear renders)
@@ -154,8 +156,12 @@ class Scene:
 
     def _camera(self):
         """A 60mm lens tilted 12 degrees down. The camera is slid so the
-        floor point (0,-1.7,0) — where the feet touch — sits on the tile's bottom edge and the tile is
-        exactly cells_w cells wide at the creature's depth (y = 0)."""
+        floor point (0, floor_y, 0) — where the feet touch — sits on the
+        tile's bottom edge and the tile is exactly cells_w cells wide at
+        the creature's depth (y = 0). The tilt means the floor under the
+        origin sits a little above that edge, and the further in front
+        the anchor is, the more of the tile's height it uses up: a petpet
+        (a quarter the size) anchors closer so its head is not cropped."""
         tilt = math.radians(12)
         lens, sensor = 60.0, 36.0
         width = self.cells_w * UNIT
@@ -173,7 +179,7 @@ class Scene:
             cam.location = target + dist * Vector((0, -math.cos(tilt), math.sin(tilt)))
             cam.rotation_euler = (target - cam.location).to_track_quat("-Z", "Y").to_euler()
             bpy.context.view_layer.update()
-            return world_to_camera_view(self.sc, cam, Vector((0, -1.7, 0))).y
+            return world_to_camera_view(self.sc, cam, Vector((0, self.floor_y, 0))).y
 
         lo, hi = -2.0, 6.0                       # bisect the aim height
         for _ in range(40):
@@ -223,36 +229,58 @@ class Scene:
                         sheen=0.25, sheen_rough=0.6)
 
     def fur_mat(self, kind="body", rgb=None):
-        """The coat: a Principled Hair BSDF, white (tintable) or a fixed
-        colour. Registered like any other material so the ID pass paints it
-        in its class colour."""
+        """The coat: white (tintable) or a fixed colour. Registered like any
+        other material so the ID pass paints it in its class colour."""
         key = "fur-" + kind + ("" if rgb is None else "-%02x%02x%02x" % tuple(int(c * 255) for c in rgb))
         for m in self.mats:
             if m.name == key: return m
-        # A plain matte (Principled) shader on the strands, not the Hair
-        # BSDF: hair shaders let light straight through, so a white coat
-        # lit from behind glows like a halo. Dense fur is opaque.
+        # A matte (Principled) shader on the strands, not the Hair BSDF:
+        # hair shaders let light straight through, so a white coat lit from
+        # behind glows like a halo. Dense fur is opaque.
         m = bpy.data.materials.new(key); m.use_nodes = True
-        b = m.node_tree.nodes["Principled BSDF"]
+        nt = m.node_tree
+        b = nt.nodes["Principled BSDF"]
         b.inputs["Base Color"].default_value = (*(rgb if rgb is not None else COL["clay"]), 1)
-        b.inputs["Roughness"].default_value = 0.9
-        b.inputs["Specular IOR Level"].default_value = 0.15
+        b.inputs["Roughness"].default_value = 0.8
+        b.inputs["Specular IOR Level"].default_value = 0.2
+        # Cycles shades a strand with a normal that faces the camera, so an
+        # overhead key light only ever grazes the coat and white fur renders
+        # a flat grey. Instead every strand is shaded with the normal of the
+        # body it grows from — the direction out from the object's origin,
+        # which for these spheres and ellipsoids IS the surface normal — so
+        # the coat carries the same light-to-shade sweep as the skin
+        # beneath it. That sweep is what the browser tint paints through.
+        geo = nt.nodes.new("ShaderNodeNewGeometry")
+        obj = nt.nodes.new("ShaderNodeObjectInfo")
+        sub = nt.nodes.new("ShaderNodeVectorMath"); sub.operation = "SUBTRACT"
+        nrm = nt.nodes.new("ShaderNodeVectorMath"); nrm.operation = "NORMALIZE"
+        nt.links.new(geo.outputs["Position"], sub.inputs[0])
+        nt.links.new(obj.outputs["Location"], sub.inputs[1])
+        nt.links.new(sub.outputs[0], nrm.inputs[0])
+        nt.links.new(nrm.outputs[0], b.inputs["Normal"])
         self.mats[m] = kind
         return m
 
-    def fur(self, obj, m, length=0.1, density=170, children=20, down=0.9, clump=0.5,
-            rand=0.15, radius=0.0035, weight=None, curl=0.02, curl_freq=4.0):
-        """Grow a coat on a mesh: a dense hair particle system of SHORT
-        strands, combed down so they lie along the body like real fur,
-        each with a slight curl, in soft clumps, with interpolated
-        children for density. (Long straight strands standing out from the
-        skin read as a fibre-optic lamp, not an animal.) `density` is
-        parent strands per unit of surface; `weight(x, y, z) -> 0..1`
-        thins and shortens the coat (round the face, say). The object's
-        scale and rotation are baked into the mesh first so lengths come
-        out in world units."""
+    def fur(self, obj, m, length=0.35, density=200, children=60, down=0.85, clump=0.15,
+            rand=0.25, radius=0.006, weight=None, curl=0.015, curl_freq=5.0):
+        """Grow a coat on a mesh: a dense hair particle system of strands
+        `length` world units long, combed down so they lie along the body
+        like real fur, each with a slight curl, with interpolated children
+        for density.
+        The strands are kept thick enough to cover a pixel or so at the
+        sheet's scale (80 px per unit): thinner ones anti-alias into grey
+        noise and the coat reads as dust, not plush. Combed flat and dense
+        means the body's own light and shade still show through the coat —
+        that is what makes it look like an animal rather than a hairball.
+        `density` is parent strands per unit of surface; `weight(x, y, z)
+        -> 0..1` thins and shortens the coat (round the face, say). The
+        object's scale and rotation are baked into the mesh first so
+        lengths come out in world units."""
         if obj.type != "MESH": return
         me = obj.data
+        # the world matrix of a freshly made object is stale until the
+        # depsgraph runs (its scale would be silently dropped here)
+        bpy.context.view_layer.update()
         M = obj.matrix_world.to_3x3()
         for v in me.vertices: v.co = M @ v.co
         obj.rotation_euler = (0, 0, 0); obj.scale = (1, 1, 1)
@@ -267,15 +295,21 @@ class Scene:
         me.materials.append(m)
         mod = obj.modifiers.new("fur", "PARTICLE_SYSTEM")
         ps = mod.particle_system; st = ps.settings
-        st.type = "HAIR"; st.count = max(60, int(density * area)); st.hair_length = length
-        st.hair_step = 4; st.use_advanced_hair = True
+        st.type = "HAIR"; st.count = max(60, int(density * area))
+        st.hair_step = 3; st.use_advanced_hair = True
         st.emit_from = "FACE"; st.use_emit_random = True
-        # with advanced hair the velocity only sets the DIRECTION as long as
-        # it stays small (about 0.1): any bigger and the strands balloon
-        st.normal_factor = 0.1; st.object_align_factor = (0, 0, -down * 0.1); st.factor_random = rand * 0.1
+        # With advanced hair a strand grows from its initial velocity and
+        # comes out about FOUR times as long as the velocity is big (the
+        # "hair length" property is that same number times four, so
+        # setting it does nothing once a velocity is given). The velocity
+        # is built as a unit direction — out along the normal, leaning
+        # down by `down` — scaled to a quarter of the length wanted.
+        k = length / 4.0
+        d = math.sqrt(1 + down * down)
+        st.normal_factor = k / d; st.object_align_factor = (0, 0, -down * k / d); st.factor_random = rand * k
         st.child_type = "INTERPOLATED"; st.child_percent = 1; st.rendered_child_count = children
-        st.clump_factor = clump; st.clump_shape = 0.3
-        st.roughness_2 = length * 0.15; st.roughness_2_size = 1.5; st.roughness_endpoint = length * 0.08
+        st.clump_factor = clump; st.clump_shape = 0.2
+        st.roughness_2 = length * 0.2; st.roughness_2_size = 1.2; st.roughness_endpoint = length * 0.1
         if curl:
             # a slight wave along each hair, so strands curve like fur
             # rather than standing straight like fibre-optic filaments
@@ -449,18 +483,18 @@ class Creature:
     Subclasses set the body and add ears/horns/tails in `trim()`."""
     body_c = (0, 0, 1.55)
     body_r = (1.45, 1.38, 1.5)
-    eye_dx, eye_z, eye_r = 0.52, 1.95, 0.3
-    cheek_dx, cheek_z = 0.98, 1.48
+    eye_dx, eye_z, eye_r = 0.54, 1.95, 0.33
+    cheek_dx, cheek_z = 0.95, 1.5
     mouth_z, mouth_w = 1.5, 0.3
     feet = True
-    foot_dx, foot_y, foot_r = 0.75, -0.55, 0.42
+    foot_dx, foot_y, foot_r = 0.78, -0.7, 0.42
     foot_scale = (1, 1.25, 0.55)
     iris = "#c98a2e"              # eye colour (never tinted)
     nose = True
     skin_rough = 0.8
     # the coat: hair length per body part (0 or missing = bare skin)
-    fur = {"body": 0.1, "belly": 0.09, "foot": 0.05, "ear": 0.05, "tail": 0.07,
-           "body2": 0.09, "body3": 0.07, "body4": 0.05, "tuft": 0.07, "tuft2": 0.05, "spark": 0.05, "spark2": 0.04}
+    fur = {"body": 0.34, "belly": 0.3, "foot": 0.15, "ear": 0.1, "tail": 0.25,
+           "body2": 0.3, "body3": 0.25, "body4": 0.2, "tuft": 0.25, "tuft2": 0.2, "spark": 0.2, "spark2": 0.16}
 
     def __init__(self, S, frame="idle"):
         self.S, self.frame = S, frame
@@ -468,6 +502,8 @@ class Creature:
         S.clay_rough = self.skin_rough
         self.build()
         self.coat()
+        bpy.context.view_layer.update()
+        self.rest = {o.name: o.matrix_world.copy() for o in self.body}   # the standing pose
         self.set_frame(frame)
 
     # ---- pieces ------------------------------------------------------------
@@ -483,30 +519,53 @@ class Creature:
         if self.feet: self.make_feet()
 
     def set_frame(self, frame):
-        """Swap in the face for `frame` and pose the feet."""
+        """Swap in the face for `frame`, pose the feet and strike the pose."""
         self.frame = frame
         S = self.S
+        for o in self.body: o.matrix_world = self.rest[o.name]       # back to standing
         if self.face_objs: S.remove(self.face_objs)
         self.face_objs = []
         self.face()
         self.pose_feet()
+        self.pose()
         S.body_objs = self.body + self.face_objs
+
+    hop = 0.06                    # how far a walking step lifts the body
+
+    def pose(self):
+        """The whole creature — coat and all, since a hair system moves
+        with its object — is tilted and lifted for a walking step: it rocks
+        onto the planted foot and the lifted-foot side rises, the way a
+        toddler waddles. The other frames stand still (the game does the
+        breathing and bobbing)."""
+        if self.frame not in ("walk", "happywalk") or not self.feet: return
+        from mathutils import Matrix
+        bpy.context.view_layer.update()
+        pivot = Vector((self.foot_dx, 0, 0))                 # the planted (right) foot
+        T = Matrix.Translation(pivot + Vector((0, 0, self.hop))) @ Matrix.Rotation(math.radians(6), 4, "Y") @ Matrix.Translation(-pivot)
+        for o in self.body + self.face_objs:
+            o.matrix_world = T @ o.matrix_world
 
     def trim(self): pass
 
     # ---- the coat ----------------------------------------------------------
     def face_weight(self, x, y, z):
-        """How much coat grows at a point on the body: full everywhere but
-        the face, where it thins and shortens so the eyes, nose and mouth
-        sit in short fur the way they do on a real animal."""
+        """How much coat grows at a point on the creature: full everywhere
+        but the face, where it thins and shortens so the eyes, nose and
+        mouth sit in short fur the way they do on a real animal. Applied to
+        every coated part, since a belly or a tuft can reach up into the
+        face too."""
         cx, cy, cz = self.body_c; rx, ry, rz = self.body_r
         front = max(0.0, -(y - cy) / ry)                          # 1 at the very front
         lo, hi = self.mouth_z - 0.35, self.eye_z + self.eye_r + 0.25
         fz = 1.0 if lo <= z <= hi else max(0.0, 1 - min(abs(z - lo), abs(z - hi)) / 0.3)
         span = self.eye_dx + self.eye_r + 0.2
         fx = 1.0 if abs(x) <= span else max(0.0, 1 - (abs(x) - span) / 0.3)
-        f = max(0.0, (front - 0.55) / 0.45) * fz * fx
-        return 1 - 0.75 * f
+        f = max(0.0, (front - 0.5) / 0.5) * fz * fx
+        # and it thins towards the floor, so the feet are not lost under
+        # the hem of the coat
+        hem = min(1.0, max(0.0, (z - (cz - rz)) / 0.6))
+        return (1 - 0.9 * f) * (0.4 + 0.6 * hem)
 
     def coat(self):
         S = self.S
@@ -516,7 +575,7 @@ class Creature:
             if not L: continue
             kind = S.mats.get(o.data.materials[0], "fixed")
             if kind not in ("body", "accent"): continue
-            S.fur(o, S.fur_mat(kind), L, weight=self.face_weight if o.name.startswith("body") else None)
+            S.fur(o, S.fur_mat(kind), L, weight=self.face_weight)
 
     def front(self, x, z, inset=0.0):
         return ell_front_y(self.body_c, self.body_r, x, z) + inset
@@ -580,11 +639,20 @@ class Creature:
         if not self.nose: return
         S = self.S
         z = self.mouth_z + (self.eye_z - self.mouth_z) * 0.52
-        self.face_objs.append(S.sphere("nose", (0, self.front(0, z) + 0.05, z), 0.11,
-                                  S.fixed("nose", "#3a2036", rough=0.3), scale=(1.3, 0.6, 0.85)))
+        # a little button nose, sat proud of the coat so no strand crosses it
+        self.face_objs.append(S.sphere("nose", (0, self.front(0, z) - 0.02, z), 0.13,
+                                  S.fixed("nose", "#3a2036", rough=0.3), scale=(1.3, 0.7, 0.85)))
+
+    def cheeks(self):
+        """A blush of pink on each cheek (fixed colour, never tinted)."""
+        S = self.S
+        m = S.fixed("cheek", "#ff9db5", rough=0.7)
+        for sx in (-1, 1):
+            x, z = sx * self.cheek_dx, self.cheek_z
+            self.face_objs.append(S.sphere("cheek", (x, self.front(x, z) - 0.03, z), 0.2, m, scale=(1, 0.4, 0.7)))
 
     def face(self):
-        self.eyes(); self.make_nose(); self.mouth()
+        self.eyes(); self.make_nose(); self.mouth(); self.cheeks()
 
     def make_feet(self):
         S = self.S
@@ -622,14 +690,14 @@ class Blorb(Creature):
     """Round, bouncy and permanently pleased. No ears at all — a ball of
     fluff like a chinchilla."""
     iris = "#b8752a"
-    fur = dict(Creature.fur, body=0.12, belly=0.1)
+    fur = dict(Creature.fur, body=0.4, belly=0.35)
 
 
 class Snorbit(Creature):
     """Two tall ears and enormous back feet."""
     body_c = (0, 0, 1.5); body_r = (1.42, 1.35, 1.42)
     iris = "#6b4a2a"
-    foot_dx, foot_y, foot_r, foot_scale = 0.9, -0.62, 0.55, (1.1, 1.3, 0.5)
+    foot_dx, foot_y, foot_r, foot_scale = 0.92, -0.75, 0.55, (1.1, 1.3, 0.5)
 
     def trim(self):
         S = self.S
@@ -637,7 +705,7 @@ class Snorbit(Creature):
             x = sx * 0.58
             self.body.append(S.sphere("ear", (x, 0.05, 3.25), 0.3, S.clay("body"), scale=(1, 0.8, 2.1),
                                       rot=(0, sx * math.radians(6), 0)))
-            self.body.append(S.sphere("earin", (x, -0.12, 3.25), 0.3, S.clay("accent"), scale=(0.55, 0.55, 1.65),
+            self.body.append(S.sphere("earin", (x, -0.17, 3.25), 0.3, S.clay("accent"), scale=(0.55, 0.55, 1.6),
                                       rot=(0, sx * math.radians(6), 0)))
 
 
@@ -664,7 +732,7 @@ class Twiggle(Creature):
     """A leafy little fawn from the deep woods."""
     body_c = (0, 0, 1.55); body_r = (1.4, 1.35, 1.5)
     iris = "#5a3d22"
-    fur = dict(Creature.fur, body=0.08, belly=0.07)
+    fur = dict(Creature.fur, body=0.28, belly=0.25)
     foot_dx = 0.72
 
     def trim(self):
@@ -760,7 +828,7 @@ class Glimmr(Creature):
 
     def belly(self):
         S = self.S
-        self.body.append(S.sphere("belly", (0, -0.62, 1.4), 1.0, S.clay("accent"), scale=(0.7, 0.55, 0.8)))
+        self.body.append(S.sphere("belly", (0, -0.6, 1.25), 1.0, S.clay("accent"), scale=(0.7, 0.55, 0.72)))
 
     def trim(self):
         S = self.S
@@ -1024,7 +1092,9 @@ def build_petpet(S, pid):
     """Each petpet in its own colours, standing in an 8 x 8 cell frame."""
     def clay(hexcol, **kw): return S.fixed("pp-" + hexcol, hexcol, rough=0.8, spec=0.2, sss=0.3, sheen=0.3, sheen_rough=0.6, **kw)
     def coat(obj, hexcol, length, **kw):
-        kw.setdefault("radius", 0.0025); kw.setdefault("density", 240)
+        # a petpet is a quarter the size of a creature, so its coat is
+        # finer and shorter in proportion (the same 80 px per unit)
+        kw.setdefault("radius", 0.004); kw.setdefault("density", 320)
         S.fur(obj, S.fur_mat("fixed", srgb(hexcol)), length, **kw)
     eyeW = S.eye_white("fixed")
     eyeK = S.eye_pupil("fixed")
@@ -1036,8 +1106,8 @@ def build_petpet(S, pid):
             S.sphere("pupil", (x, y - r * 0.5, z + 0.01), r * 0.55, eyeK, scale=(1, 0.5, 1.1))
     if pid == "duckling":
         yel, orange = clay("#ffe066"), clay("#ff9f45")
-        coat(S.sphere("body", (0, 0, 0.55), 0.55, yel, scale=(1, 1.1, 0.95)), "#ffe066", 0.05)
-        coat(S.sphere("head", (0, -0.15, 1.25), 0.42, yel), "#ffe066", 0.03, radius=0.0025)
+        coat(S.sphere("body", (0, 0, 0.55), 0.55, yel, scale=(1, 1.1, 0.95)), "#ffe066", 0.14)
+        coat(S.sphere("head", (0, -0.15, 1.25), 0.42, yel), "#ffe066", 0.08)
         face((0, -0.15, 1.25), (0.42, 0.42, 0.42), 0.17, 1.32, 0.09)
         S.cone("beak", (0, -0.62, 1.15), 0.12, 0.28, orange, rot=(math.radians(-90), 0, 0))
         S.sphere("wing", (0.5, 0.05, 0.6), 0.22, yel, scale=(0.5, 1, 0.7))
@@ -1061,7 +1131,7 @@ def build_petpet(S, pid):
                          (0.2, ell_front_y((0, 0, 0.72), (0.72, 0.68, 0.72), 0.2, 0.5) - 0.02, 0.5)], 0.03, eyeK)
     elif pid == "moth":
         purple, gold = clay("#a97dff"), clay("#ffd863")
-        coat(S.sphere("body", (0, 0, 0.75), 0.22, clay("#8a5cff"), scale=(1, 1, 2.2)), "#8a5cff", 0.04)
+        coat(S.sphere("body", (0, 0, 0.75), 0.22, clay("#8a5cff"), scale=(1, 1, 2.2)), "#8a5cff", 0.09)
         for sx in (-1, 1):
             S.sphere("wing", (sx * 0.55, 0.05, 1.05), 0.48, purple, scale=(1, 0.2, 0.85))
             S.sphere("wing2", (sx * 0.45, 0.05, 0.45), 0.34, purple, scale=(1, 0.2, 0.75))
@@ -1070,8 +1140,8 @@ def build_petpet(S, pid):
         face((0, 0, 1.0), (0.22, 0.22, 0.4), 0.09, 1.1, 0.06)
     elif pid == "kit":
         fur, cream = clay("#f4b16f"), clay("#ffd7db")
-        coat(S.sphere("body", (0, 0.1, 0.5), 0.5, fur, scale=(1, 1.2, 0.9)), "#f4b16f", 0.05)
-        coat(S.sphere("head", (0, -0.25, 1.1), 0.45, fur), "#f4b16f", 0.025, radius=0.0025)
+        coat(S.sphere("body", (0, 0.1, 0.5), 0.5, fur, scale=(1, 1.2, 0.9)), "#f4b16f", 0.14)
+        coat(S.sphere("head", (0, -0.25, 1.1), 0.45, fur), "#f4b16f", 0.07)
         for sx in (-1, 1):
             S.cone("ear", (sx * 0.28, -0.2, 1.55), 0.15, 0.32, fur, rot=(0, sx * math.radians(15), 0))
         face((0, -0.25, 1.1), (0.45, 0.45, 0.45), 0.18, 1.15, 0.09)
@@ -1079,12 +1149,12 @@ def build_petpet(S, pid):
         S.torus("tail", (0.55, 0.45, 0.45), 0.3, 0.08, fur, rot=(math.radians(90), 0, 0))
     elif pid == "hedge":
         brown, dark, cream = clay("#8a6a4a"), clay("#5a4030"), clay("#f4d3b0")
-        coat(S.sphere("body", (0.1, 0, 0.6), 0.62, dark, scale=(1.05, 0.95, 0.85)), "#5a4030", 0.045)
+        coat(S.sphere("body", (0.1, 0, 0.6), 0.62, dark, scale=(1.05, 0.95, 0.85)), "#5a4030", 0.12)
         for i in range(14):
             a = math.pi * (0.1 + 0.8 * i / 13.0); r = 0.62
             S.cone("spike", (0.1 + math.cos(a) * r * 0.9, 0, 0.6 + math.sin(a) * r * 0.8), 0.07, 0.35, dark,
                    rot=(0, math.pi / 2 - a, 0))
-        coat(S.sphere("face", (-0.45, -0.2, 0.5), 0.36, cream, scale=(1.2, 0.9, 0.85)), "#f4d3b0", 0.03)
+        coat(S.sphere("face", (-0.45, -0.2, 0.5), 0.36, cream, scale=(1.2, 0.9, 0.85)), "#f4d3b0", 0.07)
         S.sphere("nose", (-0.85, -0.25, 0.45), 0.08, eyeK)
         S.sphere("eye", (-0.5, -0.5, 0.62), 0.06, eyeK)
     elif pid == "wisp":
@@ -1168,10 +1238,58 @@ def pack_sheet(tiles, tile_w, tile_h, cols, out_base, ids=None):
     return where
 
 
-def sheet_entry(base, tile_wh, where, masks=True):
-    e = {"file": base + ".webp", "tile": list(tile_wh), "tiles": where}
+def clay_ref(tiles):
+    """The linear light of fully lit clay in these tiles: the 95th
+    percentile of luminance over every body/accent pixel. The browser tint
+    paints the palette colour at exactly this brightness and shades down
+    from it, so a coat that renders darker than smooth skin (fur shades
+    itself) still comes out the colour the player picked. Written into
+    the manifest per sheet."""
+    from PIL import Image
+    lum = []
+    for name, path in tiles:
+        if name.endswith("-id") or name.startswith("wear-"): continue
+        idp = dict(tiles).get(name + "-id")
+        if not idp or not os.path.exists(idp): continue
+        im = Image.open(path).convert("RGB").load(); idm = Image.open(idp).convert("RGBA").load()
+        w, h = Image.open(path).size
+        for y in range(h):
+            for x in range(w):
+                r, g, b, a = idm[x, y]
+                if a < 250 or r + g < 200: continue
+                R, G, B = im[x, y]
+                lum.append(0.2126 * _LIN[R] + 0.7152 * _LIN[G] + 0.0722 * _LIN[B])
+    if not lum: return None
+    lum.sort()
+    return round(lum[int(len(lum) * 0.95)], 3)
+
+
+def _lin1(v):
+    c = v / 255.0
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+_LIN = [_lin1(i) for i in range(256)]
+
+
+def script_hash():
+    """A short hash of this very file: every sheet records the script that
+    rendered it, so a change to a shape here is enough to make the sheet
+    stale (and the workflow re-renders it) without --force."""
+    with open(os.path.abspath(__file__), "rb") as f:
+        return hashlib.sha1(f.read()).hexdigest()[:12]
+
+
+def sheet_entry(base, tile_wh, where, masks=True, ref=None):
+    e = {"file": base + ".webp", "tile": list(tile_wh), "tiles": where, "src": script_hash()}
     if masks: e["idfile"] = base + "-id.webp"
+    if ref: e["ref"] = ref
     return e
+
+
+def up_to_date(manifest, sid, base):
+    return (os.path.exists(base + ".webp") and sid in manifest["sheets"]
+            and manifest["sheets"][sid].get("src") == script_hash())
 
 
 def sheet_size(out_base):
@@ -1232,8 +1350,8 @@ def main():
     if "species" in only:
         for sid in species:
             base = os.path.join(args.out, sid)
-            if os.path.exists(base + ".webp") and not args.force and sid in manifest["sheets"]:
-                print("skip", sid, "(exists)"); continue
+            if up_to_date(manifest, sid, base) and not args.force:
+                print("skip", sid, "(up to date)"); continue
             tiles = []
             S = c = None                      # ONE scene per species: the coat must not change between frames
             def creature(frame):
@@ -1269,14 +1387,14 @@ def main():
                     print(f"  {sid} wear {wid}  ({time.time() - t0:.0f}s)")
             tiles += [("wear-" + wid, tile(f"{sid}-wear-{wid}")) for wid in wear_ids]
             where = pack_sheet(tiles, TW, TH, 8, base)
-            manifest["sheets"][sid] = sheet_entry(sid, (TW, TH), where)
+            manifest["sheets"][sid] = sheet_entry(sid, (TW, TH), where, ref=clay_ref(tiles))
             write_manifest(manifest, manifest_path)
             print("wrote", base + ".webp", sheet_size(base))
 
     if "egg" in only:
         base = os.path.join(args.out, "egg")
-        if os.path.exists(base + ".webp") and not args.force and "egg" in manifest["sheets"]:
-            print("skip egg (exists)")
+        if up_to_date(manifest, "egg", base) and not args.force:
+            print("skip egg (up to date)")
         else:
             tiles = []
             for crack in (0, 1, 2):
@@ -1288,21 +1406,21 @@ def main():
                     print(f"  egg {crack}  ({time.time() - t0:.0f}s)")
                 tiles += [(f"crack{crack}", lit), (f"crack{crack}-id", idp)]
             where = pack_sheet(tiles, TW, TH, 6, base)
-            manifest["sheets"]["egg"] = sheet_entry("egg", (TW, TH), where)
+            manifest["sheets"]["egg"] = sheet_entry("egg", (TW, TH), where, ref=clay_ref(tiles))
             write_manifest(manifest, manifest_path)
             print("wrote", base + ".webp", sheet_size(base))
 
     if "petpets" in only:
         base = os.path.join(args.out, "petpets")
-        if os.path.exists(base + ".webp") and not args.force and "petpets" in manifest["sheets"]:
-            print("skip petpets (exists)")
+        if up_to_date(manifest, "petpets", base) and not args.force:
+            print("skip petpets (up to date)")
         else:
             ids = ["duckling", "snail", "blobbin", "moth", "kit", "hedge", "wisp", "starling"]
             tiles, masks = [], {}
             for pid in ids:
                 lit, masks[pid] = tile(f"pp-{pid}"), tile(f"pp-{pid}-id")
                 if not have(lit, masks[pid]):
-                    S = Scene(PP_W, PP_H, args.samples)
+                    S = Scene(PP_W, PP_H, args.samples, floor_y=-0.3)
                     build_petpet(S, pid)
                     S.render(lit)
                     # an ID pass just to know where the petpet is (for the shadow)
