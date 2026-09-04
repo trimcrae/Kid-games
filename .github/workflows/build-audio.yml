@@ -6,11 +6,18 @@ name: Build story narration audio
 # model from HuggingFace (which sandboxed dev environments cannot reach).
 #
 # Run it from the Actions tab ("Run workflow"), or it runs automatically when
-# the story text or the build script changes. build_audio.py (re)renders every
-# page of every story, so any story missing audio gets it here.
+# the story text or the build script changes. Clips that already exist are
+# kept: build_audio.py only renders a page whose mp3 is missing or whose words
+# have changed (Piper's voice varies a little per render, so a re-render would
+# change how a familiar story sounds). Tick "force" to re-render everything.
 
 on:
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-render every clip, not just the missing/changed ones"
+        type: boolean
+        default: false
   push:
     paths:
       - "games/spooky-stories/storybook.js"
@@ -45,6 +52,8 @@ jobs:
 
       - name: Render narration
         working-directory: games/spooky-stories/audio
+        env:
+          FORCE_RENDER: ${{ inputs.force && '1' || '' }}
         run: python3 build_audio.py
 
       - name: Commit narration audio
