@@ -1601,9 +1601,9 @@
     var grow = 1 + Math.min(19, lv - 1) * 0.008 + Math.max(0, Math.min(30, lv - 20)) * 0.003 +
       (lv > 50 ? 0.06 * (1 - Math.exp(-(lv - 50) / 80)) : 0);
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * grow));
-    // the clay creature's picture is 20 cells tall (hat room included), and
+    // the clay creature's picture is 22 cells tall (hat room included), and
     // a very grown pet must still fit it under the ceiling
-    scale = Math.max(2, Math.min(scale, Math.floor(h / 21.5)));
+    scale = Math.max(2, Math.min(scale, Math.floor(h / 23.5)));
 
     // WANDERING. In the full-height room (the nest, or a house you are
     // visiting) the pet strolls about now and then, turning to face the

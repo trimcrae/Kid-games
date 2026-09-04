@@ -23,7 +23,7 @@
        CPPets.chip("blorb", "grape", 48)   -> a small data-URL face
        CPPets.ready(fn)                    -> fn() once the sheets are in
 
-   A creature tile is 16 x 20 cells (feet on the bottom edge, room for
+   A creature tile is 16 x 22 cells (feet on the bottom edge, room for
    a hat on top); a petpet tile is 8 x 8. `scale` is device px per cell.
    =========================================================== */
 window.CPPets = (function () {
@@ -147,7 +147,7 @@ window.CPPets = (function () {
   /* A deterministic sprinkle of little stars — same pet, same sky, every time. */
   function starry(base, star) {
     return function (x, y) {
-      var cx = Math.floor(x / 5), cy = Math.floor(y / 5);
+      var cx = Math.floor(x / (5 * PX)), cy = Math.floor(y / (5 * PX));
       return ((cx * 7 + cy * 13 + cx * cy * 3) % 17 === 0) ? star : base;
     };
   }
@@ -174,9 +174,9 @@ window.CPPets = (function () {
   }
   /* Round-ish spots on a base colour: one in every `every` grid squares of
      `size` px, placed by a fixed hash so the pattern never flickers. */
-  function spots(base, spot, every, size) {
+  function spots(base, spot, every, px) {
     return function (x, y) {
-      var cx = Math.floor(x / size), cy = Math.floor(y / size);
+      var size = px * PX, cx = Math.floor(x / size), cy = Math.floor(y / size);
       if (scatter(cx, cy) % every !== 0) return base;
       // only the middle of the square, so the spot is round rather than boxy
       var dx = x - (cx + 0.5) * size, dy = y - (cy + 0.5) * size;
@@ -187,7 +187,7 @@ window.CPPets = (function () {
   function sprinkles(base) {
     var cols = ["#ff5d6c", "#57c4ff", "#ffd863", "#6fdc8c", "#ff8fd0", "#8a5cff"];
     return function (x, y) {
-      var size = 7, cx = Math.floor(x / size), cy = Math.floor(y / size);
+      var size = 7 * PX, cx = Math.floor(x / size), cy = Math.floor(y / size);
       if (scatter(cx, cy) % 5 !== 0) return base;
       var dx = x - (cx + 0.5) * size, dy = y - (cy + 0.5) * size;
       // a little oblong, tilted one way or the other
@@ -230,6 +230,7 @@ window.CPPets = (function () {
      ========================================================= */
   var ART = window.CPArt || null;        // art/manifest.js, loaded before us
   var CELL = ART ? ART.cell : 12;
+  var PX = CELL / 12;                    // pattern sizes below were drawn at 12 px cells
   var FRAME = ART ? ART.frame : [16, 20];        // a creature tile, in cells
   var PPFRAME = ART ? ART.petpetFrame : [8, 8];  // a petpet tile, in cells
   var images = {};                       // sheet id -> HTMLImageElement (loaded)
@@ -290,26 +291,58 @@ window.CPPets = (function () {
     return g.getImageData(0, 0, t.w, t.h);
   }
 
-  /* The render's light and shade, read off the white clay, become a
-     position on a three-stop ramp: deep shade -> the palette's shade ->
-     base -> highlight. LO/HI are where white clay sits in that render. */
-  var LO = 0.22, HI = 0.98;
-  function rampColours(pal, key, x, y, w, h) {
+  /* The clay is painted the way light really works: in LINEAR light, the
+     palette colour is multiplied by how much light fell on the white clay
+     at that pixel (the render is plain sRGB, so this is a faithful read).
+     A pixel that got half the light of the brightest clay comes out half
+     as bright — that light-to-shade sweep is what makes a coloured toy
+     look solid. Two touches on top of the physics:
+       - in the shade the colour leans towards the palette's own shade
+         colour (usually deeper and a little more saturated, like real
+         paint in shadow) instead of just going dark;
+       - past the brightest clay (the glaze's highlight) it lifts through
+         the palette's highlight colour towards white.
+     REF is the linear light of fully lit clay in the render (sRGB ~0.91). */
+  var REF = 0.80;
+  var LIN = new Float32Array(256), ENC = new Uint8ClampedArray(4097);
+  (function () {
+    for (var i = 0; i < 256; i++) {
+      var c = i / 255;
+      LIN[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+    for (var j = 0; j <= 4096; j++) {
+      var v = j / 4096;
+      ENC[j] = Math.round(255 * (v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055));
+    }
+  })();
+  function enc(v) { return ENC[Math.max(0, Math.min(4096, Math.round(v * 4096)))]; }
+  function linHex(c) { var a = hex(c); return [LIN[a[0]], LIN[a[1]], LIN[a[2]]]; }
+
+  /* The three linear colours a tint needs: [base, shade, highlight]. */
+  function paintColours(pal, key, x, y, w, h) {
     var base = pal[key], sh = pal[key === "B" ? "b" : "a"], hi = key === "B" ? pal.L : null;
     if (typeof base === "function") base = base(x, y, w, h);
     if (typeof sh === "function") sh = sh(x, y, w, h);
     if (typeof hi === "function") hi = hi(x, y, w, h);
     if (!sh) sh = shade(base, -40);
-    if (!hi) hi = shade(base, 45);
-    return [hex(shade(sh, -30)), hex(sh), hex(base), hex(hi)];
+    if (!hi) hi = shade(base, 60);
+    return [linHex(base), linHex(sh), linHex(hi)];
   }
-  function rampAt(stops, t) {
-    // stops: [deep, shade, base, highlight] at t = 0, .3, .62, 1
-    var p, q, u;
-    if (t < 0.3) { p = stops[0]; q = stops[1]; u = t / 0.3; }
-    else if (t < 0.62) { p = stops[1]; q = stops[2]; u = (t - 0.3) / 0.32; }
-    else { p = stops[2]; q = stops[3]; u = (t - 0.62) / 0.38; }
-    return [p[0] + (q[0] - p[0]) * u, p[1] + (q[1] - p[1]) * u, p[2] + (q[2] - p[2]) * u];
+  /* Paint colours `cols` under `k` (light relative to fully lit clay). */
+  function paintAt(cols, k, out) {
+    var base = cols[0], sh = cols[1], hi = cols[2];
+    var s = Math.max(0, Math.min(1, (1 - k) * 1.3));          // how deep in the shade
+    var light = Math.min(1, k);
+    var glow = k > 1 ? Math.min(1, (k - 1) / 0.3) : 0;        // the glaze highlight
+    for (var c = 0; c < 3; c++) {
+      var v = (base[c] + (sh[c] - base[c]) * s) * light;
+      if (glow > 0) {
+        v = v + (hi[c] - v) * Math.min(1, glow * 2);
+        v = v + (1 - v) * glow * 0.45;
+      }
+      out[c] = v;
+    }
+    return out;
   }
 
   /* Paint one tile of white clay in a palette: returns a canvas the size
@@ -319,7 +352,7 @@ window.CPPets = (function () {
     if (!lit || !id) return null;
     var L = pixelsOf(lit), M = pixelsOf(id);
     var w = L.width, h = L.height, d = L.data, m = M.data;
-    var stopsB = null, stopsA = null, lastKeyB = "", lastKeyA = "";
+    var colsB = null, colsA = null, cb = [0, 0, 0], ca = [0, 0, 0];
     var fnB = typeof pal.B === "function" || typeof pal.b === "function" || typeof pal.L === "function";
     var fnA = typeof pal.A === "function" || typeof pal.a === "function";
     for (var y = 0; y < h; y++) {
@@ -328,22 +361,21 @@ window.CPPets = (function () {
         if (d[i + 3] === 0) continue;
         var body = m[i] / 255, acc = m[i + 1] / 255;
         if (m[i + 3] === 0) { body = 0; acc = 0; }
-        if (body + acc <= 0.002) continue;                // eyes, mouth, cheeks: as rendered
+        if (body + acc <= 0.002) continue;                // eyes, mouth, cheeks, shadow: as rendered
         var fixed = Math.max(0, 1 - body - acc);
-        var lum = (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
-        var t = Math.max(0, Math.min(1, (lum - LO) / (HI - LO)));
-        var r = d[i] * fixed, g = d[i + 1] * fixed, b = d[i + 2] * fixed;
+        var k = (0.2126 * LIN[d[i]] + 0.7152 * LIN[d[i + 1]] + 0.0722 * LIN[d[i + 2]]) / REF;
+        var r = LIN[d[i]] * fixed, g = LIN[d[i + 1]] * fixed, b = LIN[d[i + 2]] * fixed;
         if (body > 0) {
-          if (!stopsB || fnB) stopsB = rampColours(pal, "B", x, y, w, h);
-          var cb = rampAt(stopsB, t);
+          if (!colsB || fnB) colsB = paintColours(pal, "B", x, y, w, h);
+          paintAt(colsB, k, cb);
           r += cb[0] * body; g += cb[1] * body; b += cb[2] * body;
         }
         if (acc > 0) {
-          if (!stopsA || fnA) stopsA = rampColours(pal, "A", x, y, w, h);
-          var ca = rampAt(stopsA, t);
+          if (!colsA || fnA) colsA = paintColours(pal, "A", x, y, w, h);
+          paintAt(colsA, k, ca);
           r += ca[0] * acc; g += ca[1] * acc; b += ca[2] * acc;
         }
-        d[i] = r; d[i + 1] = g; d[i + 2] = b;
+        d[i] = enc(r); d[i + 1] = enc(g); d[i + 2] = enc(b);
       }
     }
     var cv = document.createElement("canvas");
@@ -478,8 +510,9 @@ window.CPPets = (function () {
     var x = Math.round(cx - w / 2);
     var y = Math.round(canvas.height - h - scale) + bob;
 
-    // a soft shadow so the pet sits on the ground instead of floating
-    g.globalAlpha = 0.18;
+    // a soft shadow so the pet sits on the ground instead of floating (the
+    // render carries its own contact shadow, so this is only a faint pool)
+    g.globalAlpha = 0.12;
     g.fillStyle = "#2b2440";
     var sw = w * 0.72, sh = scale * 1.4;
     g.beginPath();

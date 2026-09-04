@@ -31,7 +31,7 @@ Usage:
     python3 tools/craepets-art/render.py --force         # redo existing
 
 Sheet layout: tiles are CELL px per grid cell; a creature/egg tile is
-16 x 20 cells, a petpet tile 8 x 8. Feet stand on the tile's bottom edge.
+16 x 22 cells, a petpet tile 8 x 8. Feet stand on the tile's bottom edge.
 """
 import argparse, json, math, os, sys, time
 
@@ -43,8 +43,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 OUT_DIR = os.path.join(ROOT, "games", "craepets", "art")
 
-CELL = 12                     # device px per grid cell in the sheets
-FRAME_W, FRAME_H = 16, 20     # a creature tile, in cells
+CELL = 20                     # device px per grid cell in the sheets (a phone draws ~25)
+FRAME_W, FRAME_H = 16, 22     # a creature tile, in cells (two cells of extra hat room)
 PP_W, PP_H = 8, 8             # a petpet tile, in cells
 UNIT = 0.25                   # world units per cell  (a creature is ~3.5 wide)
 
@@ -83,6 +83,7 @@ class Scene:
         self.cells_w, self.cells_h = cells_w, cells_h
         self._setup_render()
         self._lights()
+        self._floor()
         self._camera()
 
     # ---- render settings -------------------------------------------------
@@ -100,27 +101,53 @@ class Scene:
         sc.render.image_settings.file_format = "PNG"
         sc.render.image_settings.color_mode = "RGBA"
         sc.render.image_settings.compression = 60
-        sc.view_settings.view_transform = "AgX"
+        # Standard (plain sRGB), not AgX: the browser tint multiplies the
+        # palette colour through the clay's light in LINEAR light, so the
+        # render must encode light faithfully rather than through a
+        # filmic curve that flattens the top of the range.
+        sc.view_settings.view_transform = "Standard"
         sc.view_settings.look = "None"
 
     def _lights(self):
+        """A product-photo studio: one big soft key from high on the left,
+        a dim cool fill, a warm rim from behind and a low cream light in
+        front that stands in for the floor bounce. The ambient is kept low
+        so the underside of the clay really falls into shade — that
+        light-to-dark sweep is what reads as 3D once the tint goes on."""
         w = bpy.data.worlds.new("w"); self.sc.world = w; w.use_nodes = True
         bg = w.node_tree.nodes["Background"]
-        bg.inputs[0].default_value = (0.78, 0.9, 1.0, 1)
-        bg.inputs[1].default_value = 0.55
+        bg.inputs[0].default_value = (0.82, 0.9, 1.0, 1)
+        bg.inputs[1].default_value = 0.08
         self.lights = []
-        def light(loc, energy, size, col=(1, 1, 1)):
+        def light(loc, energy, size, col=(1, 1, 1), aim=(0, 0, 1.6)):
             bpy.ops.object.light_add(type="AREA", location=loc)
             L = bpy.context.object
             L.data.energy, L.data.size, L.data.color = energy, size, col
-            # point it at the creature's middle
-            d = Vector((0, 0, 1.6)) - Vector(loc)
+            d = Vector(aim) - Vector(loc)
             L.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
             self.lights.append(L)
-        light((-3.5, -4.0, 5.5), 1000, 4)                  # key, upper left
-        light((4.5, -2.5, 3.0), 320, 5, (0.85, 0.9, 1.0))   # fill, right
-        light((0.5, 4.0, 3.5), 420, 3, (1.0, 0.86, 0.72))   # rim, warm
-        light((0, -5, -1.5), 120, 6, (1.0, 0.95, 0.9))      # a little bounce from below
+        # The key is nearly overhead: the top of the clay is bright, the
+        # sides roll off and the underside is left to the bounce. A light
+        # in FRONT of the creature lights the whole face we see and the
+        # render comes out flat.
+        light((-1.0, -1.5, 9.5), 480, 5, (1.0, 0.97, 0.92))             # key: big softbox, high and a little left
+        light((5.5, -3.0, 2.6), 70, 6, (0.8, 0.88, 1.0))                # fill: dim and cool
+        light((2.8, 4.5, 4.2), 650, 3, (1.0, 0.9, 0.8))                 # rim: warm edge light, behind right
+        light((0.0, -5.5, 0.35), 80, 7, (1.0, 0.94, 0.86), (0, 0, 0.9))   # floor bounce on the underside
+
+    def _floor(self):
+        """A floor that only shows the creature's shadow: the soft contact
+        shadow under the belly and between the feet is what plants a toy
+        on a table instead of floating on the page."""
+        bpy.ops.mesh.primitive_plane_add(size=40, location=(0, 0, 0))
+        f = bpy.context.object; f.name = "floor"
+        f.is_shadow_catcher = True
+        m = bpy.data.materials.new("floor"); m.use_nodes = True
+        b = m.node_tree.nodes["Principled BSDF"]
+        b.inputs["Base Color"].default_value = (0.9, 0.86, 0.8, 1)
+        b.inputs["Roughness"].default_value = 0.9
+        f.data.materials.append(m)
+        self.floor = f
 
     def _camera(self):
         """A 60mm lens tilted 12 degrees down. The camera is slid so the
@@ -154,7 +181,7 @@ class Scene:
 
     # ---- materials ---------------------------------------------------------
     def mat(self, name, rgb, kind="fixed", rough=0.5, sss=0.0, metallic=0.0,
-            emit=0.0, spec=0.5):
+            emit=0.0, spec=0.5, coat=0.0, coat_rough=0.2):
         m = bpy.data.materials.new(name); m.use_nodes = True
         b = m.node_tree.nodes["Principled BSDF"]
         b.inputs["Base Color"].default_value = (*rgb, 1)
@@ -165,6 +192,10 @@ class Scene:
             b.inputs["Subsurface Weight"].default_value = sss
             b.inputs["Subsurface Radius"].default_value = (0.25, 0.25, 0.25) if kind != "fixed" else (0.3, 0.15, 0.1)
             b.inputs["Subsurface Scale"].default_value = 0.6
+        if coat:
+            # a thin glaze: the soft window-shaped highlight of glazed clay
+            b.inputs["Coat Weight"].default_value = coat
+            b.inputs["Coat Roughness"].default_value = coat_rough
         if emit:
             b.inputs["Emission Color"].default_value = (*rgb, 1)
             b.inputs["Emission Strength"].default_value = emit
@@ -172,14 +203,26 @@ class Scene:
         return m
 
     def clay(self, kind="body"):
-        """The tintable white clay (body or accent — same look, different mask)."""
+        """The tintable white clay (body or accent — same look, different mask):
+        matte and a little waxy, with a faint glaze so the key light leaves
+        one soft highlight on every curve."""
         key = "clay-" + kind
         for m, k in self.mats.items():
             if m.name == key: return m
-        return self.mat(key, COL["clay"], kind, rough=0.55, sss=0.35)
+        return self.mat(key, COL["clay"], kind, rough=0.5, sss=0.4, coat=0.18, coat_rough=0.3)
 
     def fixed(self, name, hexcol, **kw):
         return self.mat(name, srgb(hexcol), "fixed", **kw)
+
+    # glossy toy eyes (class "eye": never tinted, masked blue)
+    def eye_white(self, kind="eye"):
+        return self.mat("eyewhite", COL["white"], kind, rough=0.12, coat=1.0, coat_rough=0.05)
+
+    def eye_pupil(self, kind="eye"):
+        return self.mat("pupil", COL["pupil"], kind, rough=0.08, spec=0.7, coat=1.0, coat_rough=0.03)
+
+    def eye_glint(self, kind="eye"):
+        return self.mat("glint", (1, 1, 1), kind, rough=0.1, emit=3.5)
 
     # ---- primitives ----------------------------------------------------------
     def _finish(self, o, m, name, smooth=True):
@@ -275,6 +318,7 @@ class Scene:
             for l in list(out.inputs[0].links): nt.links.remove(l)
             nt.links.new(em.outputs[0], out.inputs[0])
         for L in self.lights: L.hide_render = True
+        self.floor.hide_render = True
         bg = self.sc.world.node_tree.nodes["Background"]
         bg_strength = bg.inputs[1].default_value; bg.inputs[1].default_value = 0.0
         vt = self.sc.view_settings.view_transform
@@ -287,6 +331,7 @@ class Scene:
         self.sc.view_settings.view_transform = vt
         bg.inputs[1].default_value = bg_strength
         for L in self.lights: L.hide_render = False
+        self.floor.hide_render = False
         for m in self.mats:
             nt = m.node_tree
             nt.nodes.remove(nt.nodes["idpass"])
@@ -326,7 +371,7 @@ class Creature:
     Subclasses set the body and add ears/horns/tails in `trim()`."""
     body_c = (0, 0, 1.55)
     body_r = (1.45, 1.38, 1.5)
-    eye_dx, eye_z, eye_r = 0.52, 1.95, 0.27
+    eye_dx, eye_z, eye_r = 0.52, 1.95, 0.3
     cheek_dx, cheek_z = 0.98, 1.48
     mouth_z, mouth_w = 1.5, 0.3
     feet = True
@@ -366,12 +411,12 @@ class Creature:
             x, z, r = sx * self.eye_dx, self.eye_z, self.eye_r
             y = self.front(x, z)
             if mode == "open":
-                self.body.append(S.sphere("eye", (x, y + 0.02, z), r, S.mat("eyewhite", COL["white"], "eye", rough=0.25),
-                                          scale=(1, 0.55, 1.15)))
-                self.body.append(S.sphere("pupil", (x, y - r * 0.5, z + 0.02), r * 0.6,
-                                          S.mat("pupil", COL["pupil"], "eye", rough=0.2), scale=(1, 0.5, 1.15)))
-                self.body.append(S.sphere("glint", (x - r * 0.22, y - r * 0.78, z + r * 0.35), r * 0.16,
-                                          S.mat("glint", (1, 1, 1), "eye", rough=0.1, emit=4)))
+                # glossy eyes: the softbox reflects in the pupil as one big
+                # soft highlight, plus a pin of light so it always sparkles
+                self.body.append(S.sphere("eye", (x, y + 0.02, z), r, S.eye_white(), scale=(1, 0.55, 1.15)))
+                self.body.append(S.sphere("pupil", (x, y - r * 0.5, z + 0.02), r * 0.62, S.eye_pupil(),
+                                          scale=(1, 0.5, 1.15)))
+                self.body.append(S.sphere("glint", (x - r * 0.24, y - r * 0.8, z + r * 0.36), r * 0.19, S.eye_glint()))
             else:
                 k = S.mat("lid", COL["pupil"], "eye", rough=0.35)
                 pts = []
@@ -527,12 +572,11 @@ class Zibbit(Creature):
         EY = -0.35
         for sx in (-1, 1):
             x, z, r = sx * self.eye_dx, self.eye_z, self.eye_r
-            self.body.append(S.sphere("eyeball", (x, EY, z), r, S.mat("eyewhite", COL["white"], "eye", rough=0.25)))
+            self.body.append(S.sphere("eyeball", (x, EY, z), r, S.eye_white()))
             if mode == "open":
-                self.body.append(S.sphere("pupil", (x, EY - r * 0.7, z + r * 0.2), r * 0.5,
-                                          S.mat("pupil", COL["pupil"], "eye", rough=0.2), scale=(1, 0.6, 1)))
-                self.body.append(S.sphere("glint", (x - r * 0.2, EY - r * 0.92, z + r * 0.42), r * 0.15,
-                                          S.mat("glint", (1, 1, 1), "eye", rough=0.1, emit=4)))
+                self.body.append(S.sphere("pupil", (x, EY - r * 0.7, z + r * 0.2), r * 0.52, S.eye_pupil(),
+                                          scale=(1, 0.6, 1)))
+                self.body.append(S.sphere("glint", (x - r * 0.2, EY - r * 0.92, z + r * 0.42), r * 0.17, S.eye_glint()))
             else:
                 k = S.mat("lid", COL["pupil"], "eye", rough=0.35)
                 pts = []
@@ -589,6 +633,11 @@ class Glimmr(Creature):
     def neck(self):
         return (1.65, 1.15, 1.12)
 
+    def head_top(self):
+        # the tallest head in the valley: hats sit a little deeper so the
+        # wizard's point still fits in the tile
+        return (0, 0, 3.1)
+
 
 SPECIES = {"blorb": Blorb, "snorbit": Snorbit, "flarn": Flarn, "twiggle": Twiggle,
            "puddlepop": Puddlepop, "zibbit": Zibbit, "glimmr": Glimmr}
@@ -618,11 +667,11 @@ def wear_head(S, c, kind):
                               S.fixed("gem" + colr, colr, rough=0.15)))
     elif kind == "partyhat":
         stripe = S.fixed("p1", "#ffd863", rough=0.5)
-        P.append(S.cone("hat", (hx, hy, base + 0.75), 0.62, 1.5, S.fixed("p2", "#ff5d8f", rough=0.5)))
-        for z in (0.32, 0.9):
-            r = 0.62 * (1 - z / 1.5)
-            P.append(S.cylinder("stripe", (hx, hy, base + z), r + 0.012, 0.18, stripe, scale=(1, 1, 1)))
-        P.append(S.sphere("pom", (hx, hy, base + 1.55), 0.16, stripe))
+        P.append(S.cone("hat", (hx, hy, base + 0.65), 0.62, 1.3, S.fixed("p2", "#ff5d8f", rough=0.5)))
+        for z in (0.28, 0.78):
+            r = 0.62 * (1 - z / 1.3)
+            P.append(S.cylinder("stripe", (hx, hy, base + z), r + 0.012, 0.16, stripe, scale=(1, 1, 1)))
+        P.append(S.sphere("pom", (hx, hy, base + 1.35), 0.16, stripe))
     elif kind == "bow":
         pink, dark = S.fixed("bp", "#ff6ec7", rough=0.5), S.fixed("bd", "#e560ae", rough=0.5)
         bx = hx + 0.55
@@ -680,8 +729,8 @@ def wear_head(S, c, kind):
     elif kind == "wizard":
         purple = S.fixed("wp", "#5b3fa8", rough=0.6)
         P.append(S.cylinder("brim", (hx, hy, base + 0.02), 1.15, 0.08, purple))
-        P.append(S.cone("cone", (hx, hy, base + 0.85), 0.72, 1.7, purple, rot=(0, math.radians(-14), 0)))
-        P.append(S.star("star", (hx - 0.25, hy - 0.6, base + 0.8), 0.17, 0.07, 0.06, S.fixed("ws", "#ffd863", rough=0.3, emit=0.4)))
+        P.append(S.cone("cone", (hx, hy, base + 0.72), 0.72, 1.45, purple, rot=(0, math.radians(-14), 0)))
+        P.append(S.star("star", (hx - 0.25, hy - 0.6, base + 0.72), 0.17, 0.07, 0.06, S.fixed("ws", "#ffd863", rough=0.3, emit=0.4)))
     elif kind == "princess":
         pink, ice = S.fixed("tp", "#ff8fd0", rough=0.3, metallic=0.4), S.fixed("ti", "#9bf6ff", rough=0.1)
         P.append(S.torus("band", (hx, hy, base + 0.05), 0.74, 0.07, pink, rot=(math.radians(8), 0, 0)))
@@ -700,8 +749,8 @@ def wear_head(S, c, kind):
     elif kind == "santahat":
         red, white = S.fixed("sr", "#e8384f", rough=0.7), S.fixed("sw", "#ffffff", rough=0.85)
         P.append(S.torus("brim", (hx, hy, base + 0.05), 0.85, 0.18, white))
-        P.append(S.cone("cone", (hx, hy, base + 0.7), 0.82, 1.3, red, rot=(0, math.radians(-25), 0)))
-        P.append(S.sphere("pom", (hx - 0.52, hy, base + 1.15), 0.2, white))
+        P.append(S.cone("cone", (hx, hy, base + 0.62), 0.82, 1.15, red, rot=(0, math.radians(-25), 0)))
+        P.append(S.sphere("pom", (hx - 0.47, hy, base + 1.02), 0.2, white))
     elif kind == "pumpkinhat":
         orange = S.fixed("po", "#ff8c1a", rough=0.6)
         for i in range(6):
@@ -830,8 +879,8 @@ def build_egg(S, crack):
 def build_petpet(S, pid):
     """Each petpet in its own colours, standing in an 8 x 8 cell frame."""
     def clay(hexcol, **kw): return S.fixed("pp-" + hexcol, hexcol, rough=0.55, sss=0.3, **kw)
-    eyeW = S.mat("eyewhite", COL["white"], "fixed", rough=0.25)
-    eyeK = S.mat("pupil", COL["pupil"], "fixed", rough=0.2)
+    eyeW = S.eye_white("fixed")
+    eyeK = S.eye_pupil("fixed")
     def face(c, rad, dx, z, r=0.1, sleepy=False):
         for sx in (-1, 1):
             x = c[0] + sx * dx
@@ -905,14 +954,53 @@ def build_petpet(S, pid):
 # ===========================================================================
 #  Sheets and the manifest
 # ===========================================================================
-def pack_sheet(tiles, tile_w, tile_h, cols, out_png):
-    """Paste rendered tile PNGs into one sheet; returns {name: [col,row]}."""
+SHADOW = 0.55                 # how dark the floor shadow is kept in the sheets
+
+
+def soften_shadow(lit_path, id_path):
+    """The floor shadow is the only thing in a lit tile that the ID pass
+    does not see (the floor is hidden there), so scale the alpha of those
+    pixels: a toy-photo shadow, not a black pool. Returns a PIL image."""
     from PIL import Image
+    im = Image.open(lit_path).convert("RGBA")
+    if not id_path or not os.path.exists(id_path): return im
+    idm = Image.open(id_path).convert("RGBA")
+    from PIL import ImageChops
+    w, h = im.size
+    a = im.getchannel("A"); ma = idm.getchannel("A")
+    # the shadow also fades out towards the sides and bottom of the tile, so
+    # it never ends in a hard line where the tile does
+    fade = Image.new("L", (w, h), 255); fp = fade.load()
+    ex, ey = int(w * 0.16), int(h * 0.06)
+    for y in range(h):
+        fy = min(1.0, (h - 1 - y) / float(ey)) if y > h - 1 - ey else 1.0
+        for x in range(w):
+            fx = min(1.0, x / float(ex), (w - 1 - x) / float(ex))
+            f = fx * fy
+            fp[x, y] = int(round(255 * f * f * (3 - 2 * f)))    # smoothstep
+    # alpha' = alpha * (mask + (1 - mask) * SHADOW * fade)
+    inv = ImageChops.invert(ma)
+    sh = ImageChops.multiply(inv, fade).point(lambda v: int(round(v * SHADOW)))
+    keep = ImageChops.add(ma, sh)
+    im.putalpha(ImageChops.multiply(a, keep))
+    return im
+
+
+def pack_sheet(tiles, tile_w, tile_h, cols, out_png, ids=None):
+    """Paste rendered tile PNGs into one sheet; returns {name: [col,row]}.
+    `ids` maps a tile name to its ID-pass PNG (used to soften the floor
+    shadow); tiles named '<x>-id' find their own."""
+    from PIL import Image
+    ids = dict(ids or {})
+    paths = dict(tiles)
     rows = (len(tiles) + cols - 1) // cols
     sheet = Image.new("RGBA", (cols * tile_w, rows * tile_h), (0, 0, 0, 0))
     where = {}
     for i, (name, path) in enumerate(tiles):
-        im = Image.open(path).convert("RGBA")
+        if name.endswith("-id") or name.startswith("wear-"):
+            im = Image.open(path).convert("RGBA")
+        else:
+            im = soften_shadow(path, ids.get(name) or paths.get(name + "-id"))
         c, r = i % cols, i // cols
         sheet.paste(im, (c * tile_w, r * tile_h))
         where[name] = [c, r]
@@ -979,6 +1067,7 @@ def main():
                 S = Scene(FRAME_W, FRAME_H, max(24, args.samples * 3 // 4))
                 c = SPECIES[sid](S, "idle")
                 S.set_holdout(S.body_objs, True)
+                S.floor.hide_render = True        # the creature's own tile has the floor shadow
                 for wid in wear_ids:
                     parts = WEAR[wid](S, c)
                     p = tile(f"{sid}-wear-{wid}"); S.render(p); tiles.append(("wear-" + wid, p))
@@ -1012,13 +1101,15 @@ def main():
             print("skip petpets (exists)")
         else:
             ids = ["duckling", "snail", "blobbin", "moth", "kit", "hedge", "wisp", "starling"]
-            tiles = []
+            tiles, masks = [], {}
             for pid in ids:
                 S = Scene(PP_W, PP_H, args.samples)
                 build_petpet(S, pid)
                 p = tile(f"pp-{pid}"); S.render(p); tiles.append((pid, p))
+                # an ID pass just to know where the petpet is (for the shadow)
+                masks[pid] = tile(f"pp-{pid}-id"); S.render_id(masks[pid])
                 print(f"  petpet {pid}  ({time.time() - t0:.0f}s)")
-            where = pack_sheet(tiles, PP_W * CELL, PP_H * CELL, 8, sheet_png)
+            where = pack_sheet(tiles, PP_W * CELL, PP_H * CELL, 8, sheet_png, masks)
             manifest["sheets"]["petpets"] = {"file": "petpets.png", "tile": [PP_W * CELL, PP_H * CELL], "tiles": where}
             write_manifest(manifest, manifest_path)
             print("wrote", sheet_png)
