@@ -61,6 +61,8 @@ dependencies, no logins.
 - **Shannon** — mum 👩. She plays too: give grown-ups a real difficulty
   tier where a game has levels (see Craepets), and tag her in `kids:`
   on anything an adult would actually open.
+- **Tristan** — dad 👨, born 12 June 1993 (turns 34 on 12 June 2027). Same
+  grown-up tier as Shannon; tag him in `kids:` alongside her.
 
 ## Generating assets that need the internet (audio & art)
 

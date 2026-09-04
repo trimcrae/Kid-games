@@ -18,7 +18,7 @@
 
    Sorted by subject and by tier:
        mid   — Cory (6)      big — Jeannie (7)
-       grown — Shannon       (genuinely hard, no free passes)
+       grown — Shannon & Tristan (genuinely hard, no free passes)
    =========================================================== */
 window.CPTrivia = (function () {
   "use strict";

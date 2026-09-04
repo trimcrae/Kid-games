@@ -26,7 +26,8 @@ window.CPCal = (function () {
   /* Family birthdays, as "MM-DD". Fill these in and the valley will
      throw a party (a cake, coins and a party hat). Leave any blank. */
   var BIRTHDAYS = {
-    jeannie: "12-15", cory: "04-23", ellie: "12-11", kieran: "04-22", shannon: "09-30"
+    jeannie: "12-15", cory: "04-23", ellie: "12-11", kieran: "04-22", shannon: "09-30",
+    tristan: "06-12"   // born 1993 — 34 on 12 June 2027
   };
 
   var override = null;                       // the play-test robot sets a date

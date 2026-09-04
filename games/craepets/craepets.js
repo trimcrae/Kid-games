@@ -2560,7 +2560,7 @@
       out.push({ key: "bday:" + pid + ":" + y, kind: "birthday", emoji: "🎂", name: (pid === who ? "your" : p.name + "'s") + " birthday", tok: "hol-birthday",
                  line: pid === who
                    ? "Happy birthday, " + p.name + "! It's YOUR day — every right answer pays +" + HOLIDAY_BONUS + " 🪙."
-                   : "Happy birthday, " + p.name + " " + p.emoji + "! Post " + (pid === "shannon" ? "her" : "them") + " a present!",
+                   : "Happy birthday, " + p.name + " " + p.emoji + "! Post " + (pid === "shannon" ? "her" : pid === "tristan" ? "him" : "them") + " a present!",
                  gift: { coins: pid === who ? 80 : 30, item: "cake", wear: pid === who ? "partyhat" : null } });
     });
     return out;

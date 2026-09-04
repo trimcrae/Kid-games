@@ -15,8 +15,8 @@
        early  — Ellie (3). Colours, shapes, letters, counting.
        mid    — Cory (6). Times tables, grids, fractions, logic.
        big    — Jeannie (7). Vocabulary, spelling, science.
-       grown  — Shannon. Real grown-up vocabulary, mental maths
-                and general knowledge — an actual challenge.
+       grown  — Shannon and Tristan. Real grown-up vocabulary, mental
+                maths and general knowledge — an actual challenge.
 
    Questions are MADE, not listed, wherever that is honest
    (arithmetic is generated, so it never runs out); vocabulary,
@@ -35,7 +35,8 @@ window.CPData = (function () {
     { id: "ellie",   name: "Ellie",   emoji: "👑", tier: "early", colour: "#ff8fd0", hello: "Colors and counting!" },
     { id: "kieran",  name: "Kieran",  emoji: "👶", tier: "tot",   colour: "#ffd166", hello: "Tap anything. It's all good." },
     { id: "shannon", name: "Shannon", emoji: "👩", tier: "grown", colour: "#8a5cff", hello: "Grown-up mode. No mercy." },
-    { id: "guest",   name: "Visitor", emoji: "🌈", tier: "mid",   colour: "#3ddc84", hello: "Just visiting the valley." }
+    { id: "tristan", name: "Tristan", emoji: "👨", tier: "grown", colour: "#ff9f45", hello: "Dad mode. Bring it on." },
+    { id: "guest",  name: "Visitor", emoji: "🌈", tier: "mid",   colour: "#3ddc84", hello: "Just visiting the valley." }
   ];
 
   var TIERS = [
