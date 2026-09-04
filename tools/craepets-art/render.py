@@ -181,7 +181,7 @@ class Scene:
 
     # ---- materials ---------------------------------------------------------
     def mat(self, name, rgb, kind="fixed", rough=0.5, sss=0.0, metallic=0.0,
-            emit=0.0, spec=0.5, coat=0.0, coat_rough=0.2):
+            emit=0.0, spec=0.5, coat=0.0, coat_rough=0.2, sheen=0.0, sheen_rough=0.5):
         m = bpy.data.materials.new(name); m.use_nodes = True
         b = m.node_tree.nodes["Principled BSDF"]
         b.inputs["Base Color"].default_value = (*rgb, 1)
@@ -196,6 +196,11 @@ class Scene:
             # a thin glaze: the soft window-shaped highlight of glazed clay
             b.inputs["Coat Weight"].default_value = coat
             b.inputs["Coat Roughness"].default_value = coat_rough
+        if sheen:
+            # velvet: a soft light along the edges, like fuzz on a plush toy
+            b.inputs["Sheen Weight"].default_value = sheen
+            b.inputs["Sheen Roughness"].default_value = sheen_rough
+            b.inputs["Sheen Tint"].default_value = (1, 1, 1, 1)
         if emit:
             b.inputs["Emission Color"].default_value = (*rgb, 1)
             b.inputs["Emission Strength"].default_value = emit
@@ -204,12 +209,13 @@ class Scene:
 
     def clay(self, kind="body"):
         """The tintable white clay (body or accent — same look, different mask):
-        matte and a little waxy, with a faint glaze so the key light leaves
-        one soft highlight on every curve."""
+        matte and soft like a plush toy — no glaze, hardly any specular, a
+        little subsurface so it looks squeezable, and a velvet sheen that
+        lights the edges like fuzz. The eyes are the only shiny thing."""
         key = "clay-" + kind
         for m, k in self.mats.items():
             if m.name == key: return m
-        return self.mat(key, COL["clay"], kind, rough=0.5, sss=0.4, coat=0.18, coat_rough=0.3)
+        return self.mat(key, COL["clay"], kind, rough=0.8, spec=0.2, sss=0.3, sheen=0.3, sheen_rough=0.6)
 
     def fixed(self, name, hexcol, **kw):
         return self.mat(name, srgb(hexcol), "fixed", **kw)
@@ -438,7 +444,7 @@ class Creature:
 
     def cheeks(self):
         S = self.S
-        m = S.fixed("cheek", "#ff9db5", rough=0.6, sss=0.3)
+        m = S.fixed("cheek", "#ff9db5", rough=0.85, spec=0.2, sss=0.3)
         for sx in (-1, 1):
             x, z = sx * self.cheek_dx, self.cheek_z
             self.body.append(S.sphere("cheek", (x, self.front(x, z) + 0.06, z), 0.19, m, scale=(1, 0.35, 0.72)))
@@ -878,7 +884,7 @@ def build_egg(S, crack):
 
 def build_petpet(S, pid):
     """Each petpet in its own colours, standing in an 8 x 8 cell frame."""
-    def clay(hexcol, **kw): return S.fixed("pp-" + hexcol, hexcol, rough=0.55, sss=0.3, **kw)
+    def clay(hexcol, **kw): return S.fixed("pp-" + hexcol, hexcol, rough=0.8, spec=0.2, sss=0.3, sheen=0.3, sheen_rough=0.6, **kw)
     eyeW = S.eye_white("fixed")
     eyeK = S.eye_pupil("fixed")
     def face(c, rad, dx, z, r=0.1, sleepy=False):
