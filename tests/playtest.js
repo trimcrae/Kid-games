@@ -343,7 +343,7 @@ const GAMES = {
       await page.waitForTimeout(250);
     }
 
-    const missing = clips.filter(([s]) => s !== 200).map(([s, f]) => `${f} (${s})`);
+    const missing = clips.filter(([s]) => s !== 200 && s !== 206).map(([s, f]) => `${f} (${s})`);
     if (missing.length) throw new Error(`narration clip(s) missing: ${[...new Set(missing)].join(", ")}`);
     return `${total} stories; narrated ${preReader.length} to the end, ${clips.length} clips played`;
   },
