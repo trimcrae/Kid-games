@@ -599,6 +599,8 @@ window.CPArt = {
   "puddlepop": {
    "file": "puddlepop.webp",
    "idfile": "puddlepop-id.webp",
+   "ref": 0.832,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
