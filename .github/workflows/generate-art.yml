@@ -50,5 +50,8 @@ jobs:
             echo "No new art to commit."
           else
             git commit -m "Add generated story art [skip ci]"
+            # the art and audio bots can both land on this branch at once,
+            # so pick up anything pushed meanwhile before pushing ours
+            git pull --rebase origin "${{ github.ref_name }}"
             git push
           fi

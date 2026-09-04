@@ -103,6 +103,72 @@
       "prompt": "a cozy castle bedroom sleepover at night, friendly kids in sleeping bags with glowing lanterns and stars out the window",
       "width": 512, "height": 384, "seed": 12005,
       "out": "games/spooky-stories/art/castle-sleepover-cover.png"
+    },
+    {
+      "id": "candy-monster-cover",
+      "prompt": "a cheerful Halloween town street at dusk, glowing jack-o-lanterns on every porch, a big wicker basket overflowing with colourful wrapped candy in the foreground, purple sky with a full moon",
+      "width": 512, "height": 384, "seed": 12012,
+      "out": "games/spooky-stories/art/candy-monster-cover.png"
+    },
+    {
+      "id": "floating-tea-party-cover",
+      "prompt": "a whimsical tea party table in a castle at night with pastel teacups floating in mid-air, steam curling up, candles and pumpkins, moonlight through a tall window",
+      "width": 512, "height": 384, "seed": 12013,
+      "out": "games/spooky-stories/art/floating-tea-party-cover.png"
+    },
+    {
+      "id": "witch-broom-cover",
+      "prompt": "a crooked little cottage beside a moonlit pumpkin patch, a witch's broom leaning by the door, warm glowing windows, autumn leaves",
+      "width": 512, "height": 384, "seed": 12014,
+      "out": "games/spooky-stories/art/witch-broom-cover.png"
+    },
+    {
+      "id": "night-sounds-cover",
+      "prompt": "a cosy bedroom window at night with an old oak tree outside swaying under a full moon, stars twinkling, soft purple sky",
+      "width": 512, "height": 384, "seed": 12015,
+      "out": "games/spooky-stories/art/night-sounds-cover.png"
+    },
+    {
+      "id": "pumpkin-parade-cover",
+      "prompt": "a festive parade of glowing jack-o-lantern pumpkins in a row winding down a hill toward a fairytale castle at night, bunting and lanterns",
+      "width": 512, "height": 384, "seed": 12016,
+      "out": "games/spooky-stories/art/pumpkin-parade-cover.png"
+    },
+    {
+      "id": "missing-moon-cover",
+      "prompt": "a dark starry night sky where a big fluffy cloud is slowly uncovering a bright glowing full moon above a fairytale castle",
+      "width": 512, "height": 384, "seed": 12017,
+      "out": "games/spooky-stories/art/missing-moon-cover.png"
+    },
+    {
+      "id": "boos-biggest-boo-cover",
+      "prompt": "a moonlit meadow of pumpkins beside a castle at night with the word BOO spelled in glowing stars in the sky, playful and cheerful",
+      "width": 512, "height": 384, "seed": 12018,
+      "out": "games/spooky-stories/art/boos-biggest-boo-cover.png"
+    },
+    {
+      "id": "spider-dress-cover",
+      "prompt": "a beautiful sparkling silver ballgown made of shimmering spider silk on a dress form in a castle room, surrounded by delicate dewy cobwebs and moonlight",
+      "width": 512, "height": 384, "seed": 12019,
+      "out": "games/spooky-stories/art/spider-dress-cover.png"
+    },
+    {
+      "id": "first-trick-or-treat-cover",
+      "prompt": "a friendly house front door at night decorated for Halloween with a grinning jack-o-lantern on the step and a small candy basket, warm porch light",
+      "width": 512, "height": 384, "seed": 12020,
+      "out": "games/spooky-stories/art/first-trick-or-treat-cover.png"
+    },
+    {
+      "id": "glow-garden-cover",
+      "prompt": "a secret garden at night full of glowing pink, blue, yellow and purple flowers and floating fireflies, a castle in the distance",
+      "width": 512, "height": 384, "seed": 12021,
+      "out": "games/spooky-stories/art/glow-garden-cover.png"
+    },
+    {
+      "id": "wobbly-spell-cover",
+      "prompt": "a wizard's tower room at night filled with pumpkins of every size popping out of a teapot, a sparkling wand on a table, magic sparkles",
+      "width": 512, "height": 384, "seed": 12022,
+      "out": "games/spooky-stories/art/wobbly-spell-cover.png"
     }
   ]
 }
