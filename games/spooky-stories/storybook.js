@@ -2524,13 +2524,15 @@
      ----------------------------------------------------------- */
 
   // audio/manifest.js (written by audio/build_audio.py) lists the clips that
-  // actually exist and how long the voice spends on each sentence. Checking it
+  // actually exist and where the voice sounds in each sentence. Checking it
   // first means we never request an mp3 the audio pipeline has not rendered
   // yet: brand-new story text is simply silent, with no failed requests.
   const CLIPS = window.SPOOKY_NARRATION || null;
   function clipTiming(name) {
     if (!CLIPS) return [];   // no manifest at all — be optimistic and try
-    return Object.prototype.hasOwnProperty.call(CLIPS, name) ? (CLIPS[name] || []) : null;
+    if (!Object.prototype.hasOwnProperty.call(CLIPS, name)) return null;
+    const v = CLIPS[name];
+    return Array.isArray(v) ? v : (v && v.voice) || [];   // {text, voice} or older bare list
   }
   function hasClip(name) { return clipTiming(name) !== null; }
 

@@ -12,9 +12,10 @@ ever fails to load.)
   strings in `../storybook.js`).
 - **`manifest.js`** is generated alongside the clips and loaded by
   `../index.html` *before* the game script. It lists every clip that exists,
-  plus, for each spoken sentence inside it, the stretches of time the voice is
-  actually sounding (found by listening for the pauses in the rendered
-  waveform — see `speech_runs()` in `build_audio.py`). The storybook uses it to
+  a fingerprint of the text it was rendered from, plus, for each spoken
+  sentence inside it, the stretches of time the voice is actually sounding
+  (found by listening for the pauses in the rendered waveform — see
+  `speech_runs()` in `build_audio.py`). The storybook uses it to
   (a) never request an mp3 that has not been rendered yet — new story text is
   simply silent instead of 404-ing, and (b) light up each word in time with the
   narration: a pause in the voice lands after the word that carries the comma
@@ -31,6 +32,12 @@ ever fails to load.)
 runner (open internet — it can download the voice, which the sandbox can't) and
 commits the refreshed `.mp3`s back. You can also run it by hand from the
 Actions tab.
+
+**Existing clips are kept.** The build only renders a line whose mp3 is
+missing or whose words have changed since it was rendered (the manifest's text
+fingerprint says which). Piper's voice varies a little from render to render,
+so this keeps familiar stories sounding the same. To re-render everything on
+purpose, run the workflow with "force" ticked, or set `FORCE_RENDER=1` locally.
 
 To render them locally instead — the clips are generated straight from the
 `text:` strings in `../storybook.js`, so if you change a story's words:
