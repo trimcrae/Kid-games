@@ -22,6 +22,8 @@ window.CPArt = {
   "blorb": {
    "file": "blorb.webp",
    "idfile": "blorb-id.webp",
+   "ref": 0.792,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
