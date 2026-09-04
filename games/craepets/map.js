@@ -119,7 +119,7 @@ window.CPMap = (function () {
         '<ellipse class="mp-shadow" cx="0" cy="4.6" rx="5" ry="1.3"/>' +
         '<circle class="mp-dot" r="5.2" style="stroke:' + esc(h.colour) + '"/>' +
         '<text class="mp-emoji" y="1.6" text-anchor="middle">' + h.emoji + "</text>" +
-        (h.chip ? '<image href="' + h.chip + '" x="2.6" y="-6.2" width="4.6" height="5.6" style="image-rendering:pixelated"/>' : "") +
+        (h.chip ? '<image href="' + h.chip + '" x="2.6" y="-6.2" width="4.6" height="5.6"/>' : "") +
         '<text class="mp-label" y="9" text-anchor="middle">' + esc(shortName(h.name)) + "</text>" +
       "</g>";
     });

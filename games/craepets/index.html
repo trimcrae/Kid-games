@@ -39,7 +39,7 @@
     .who.on { background: var(--wc, var(--purple)); color: #fff; transform: translateY(-2px) scale(1.04); }
     /* the chip can be a little taller than it is wide when the pet has a
        hat on, so only the width is pinned */
-    .who img { width: 22px; height: auto; image-rendering: pixelated; }
+    .who img { width: 22px; height: auto; }
 
     /* --- money / level bar --- */
     .topbar {
@@ -479,7 +479,7 @@
       cursor: pointer; text-align: center; font-family: var(--font); color: var(--ink);
       transition: transform 0.12s ease, border-color 0.12s ease; touch-action: manipulation;
     }
-    .adopt img { width: 100%; max-width: 82px; image-rendering: pixelated; display: block; margin: 0 auto; }
+    .adopt img { width: 100%; max-width: 82px; display: block; margin: 0 auto; }
     .adopt b { display: block; font-size: 0.9rem; }
     .adopt:hover, .adopt.on { transform: translateY(-3px); border-color: var(--purple); }
     .adopt.on { background: #f4f0ff; }
@@ -513,7 +513,7 @@
     /* --- arena --- */
     .fighters { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; }
     .fighter { flex: 1 1 0; min-width: 0; text-align: center; position: relative; }
-    .fighter img { width: clamp(56px, 18vw, 90px); image-rendering: pixelated; }
+    .fighter img { width: clamp(56px, 18vw, 90px); }
     .fighter .hpbar { height: 12px; border-radius: 999px; background: #f0e9ff; overflow: hidden; margin-top: 0.2rem; }
     .fighter .hpbar i { display: block; height: 100%; background: linear-gradient(90deg, #3ddc84, #9ff0a8); transition: width 0.4s ease; }
     .fighter.foe .hpbar i { background: linear-gradient(90deg, #ff5d6c, #ffa1a8); }
@@ -553,7 +553,7 @@
       max-width: 100%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .allychip .dots { letter-spacing: -1px; font-size: 0.6rem; }
-    .allychip img { width: 18px; image-rendering: pixelated; }
+    .allychip img { width: 18px; }
     .trick { display: inline-block; font-size: 0.72rem; font-weight: bold; background: #2b2440; color: #ffd166; border-radius: 999px; padding: 0.1rem 0.55rem; margin-top: 0.25rem; }
     .foesays {
       margin: 0 auto 0.5rem; max-width: 90%; text-align: center; font-style: italic; font-size: 0.9rem;
@@ -579,7 +579,7 @@
       background: rgba(255,255,255,0.18); border-radius: 999px; padding: 0.1rem 0.6rem;
     }
     .foecard { display: flex; align-items: center; gap: 0.7rem; background: rgba(255,255,255,0.1); border-radius: 16px; padding: 0.55rem 0.7rem; }
-    .foecard img { width: 72px; flex: 0 0 auto; image-rendering: pixelated; filter: drop-shadow(0 0 8px rgba(160,120,255,0.6)); }
+    .foecard img { width: 72px; flex: 0 0 auto; filter: drop-shadow(0 0 8px rgba(160,120,255,0.6)); }
     .foecard b { display: block; font-size: 1.05rem; }
     .foecard small { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.3; }
     .foecard .price { display: block; margin-top: 0.15rem; color: #ffd166; font-weight: bold; font-size: 0.85rem; }
@@ -603,8 +603,8 @@
     .wish.done { border-style: solid; border-color: #c9f2d8; background: #f1fff6; color: #46406b; padding-right: 0.8rem; }
 
     /* --- the wardrobe's try-on pictures --- */
-    .item img.try { width: 64px; image-rendering: pixelated; }
-    img.try.big { width: 112px; image-rendering: pixelated; }
+    .item img.try { width: 64px; }
+    img.try.big { width: 112px; }
 
     /* --- the diary --- */
     h3.diaryday { margin: 1rem 0 0.3rem; font-size: 0.9rem; color: var(--purple); }
@@ -645,7 +645,7 @@
       display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.7rem; padding: 0.45rem 0.6rem;
       background: #faf8ff; border: 3px solid #ece6ff; border-radius: 16px;
     }
-    .npc img { width: 44px; height: auto; image-rendering: pixelated; flex: 0 0 auto; }
+    .npc img { width: 44px; height: auto; flex: 0 0 auto; }
     .npc .npcsay { flex: 1 1 auto; min-width: 0; font-size: 0.9rem; line-height: 1.35; }
     .npc .npcsay small { color: #8b83a8; font-weight: normal; }
     .npc .npcsay i { display: block; color: #46406b; }
@@ -787,7 +787,7 @@
     .trow .tgo { color: var(--purple); font-weight: bold; font-size: 1.2rem; flex: 0 0 auto; }
     .trow:focus-visible { outline: 4px solid #2b2440; outline-offset: 2px; }
     /* --- family records --- */
-    .records .recchip { width: 28px; height: auto; image-rendering: pixelated; flex: 0 0 auto; }
+    .records .recchip { width: 28px; height: auto; flex: 0 0 auto; }
 
     /* --- the egg --- */
     .needs.egg { grid-template-columns: 1fr; }
@@ -805,8 +805,8 @@
     }
 
     /* --- petpets --- */
-    .item img.ppchip { width: 40px; image-rendering: pixelated; }
-    img.ppchip.big { width: 96px; image-rendering: pixelated; }
+    .item img.ppchip { width: 40px; }
+    img.ppchip.big { width: 96px; }
     /* --- the bank --- */
     .panel.bank { background: linear-gradient(135deg, #fffbe8, #fff); }
 
@@ -842,7 +842,7 @@
 
     .family { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 0.5rem; }
     .fam { text-align: center; padding: 0.5rem 0.3rem; border-radius: 16px; background: #faf8ff; border: 3px solid #ece6ff; }
-    .fam img { width: 54px; image-rendering: pixelated; }
+    .fam img { width: 54px; }
     .fam b { display: block; font-size: 0.85rem; }
     .fam small { display: block; font-size: 0.72rem; color: #6a6385; }
     .fam.empty { opacity: 0.55; }
@@ -965,6 +965,7 @@
     <div id="game"></div>
   </main>
 
+  <script src="art/manifest.js"></script>
   <script src="pets.js"></script>
   <script src="trivia.js"></script>
   <script src="lines.js"></script>
