@@ -1103,6 +1103,8 @@ window.CPArt = {
   "zibbit": {
    "file": "zibbit.webp",
    "idfile": "zibbit-id.webp",
+   "ref": 0.806,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
