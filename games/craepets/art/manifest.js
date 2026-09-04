@@ -20,172 +20,174 @@ window.CPArt = {
  ],
  "sheets": {
   "blorb": {
-   "file": "blorb.png",
+   "file": "blorb.webp",
+   "idfile": "blorb-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   },
   "egg": {
-   "file": "egg.png",
+   "file": "egg.webp",
+   "idfile": "egg-id.webp",
    "tile": [
     320,
     440
@@ -196,359 +198,361 @@ window.CPArt = {
      0
     ],
     "crack0-id": [
-     1,
+     0,
      0
     ],
     "crack1": [
-     2,
+     1,
      0
     ],
     "crack1-id": [
-     3,
+     1,
      0
     ],
     "crack2": [
-     4,
+     2,
      0
     ],
     "crack2-id": [
-     5,
+     2,
      0
     ]
    }
   },
   "flarn": {
-   "file": "flarn.png",
+   "file": "flarn.webp",
+   "idfile": "flarn-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   },
   "glimmr": {
-   "file": "glimmr.png",
+   "file": "glimmr.webp",
+   "idfile": "glimmr-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   },
   "petpets": {
-   "file": "petpets.png",
+   "file": "petpets.webp",
    "tile": [
     160,
     160
@@ -589,662 +593,666 @@ window.CPArt = {
    }
   },
   "puddlepop": {
-   "file": "puddlepop.png",
+   "file": "puddlepop.webp",
+   "idfile": "puddlepop-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   },
   "snorbit": {
-   "file": "snorbit.png",
+   "file": "snorbit.webp",
+   "idfile": "snorbit-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   },
   "twiggle": {
-   "file": "twiggle.png",
+   "file": "twiggle.webp",
+   "idfile": "twiggle-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   },
   "zibbit": {
-   "file": "zibbit.png",
+   "file": "zibbit.webp",
+   "idfile": "zibbit-id.webp",
    "tile": [
     320,
     440
    ],
    "tiles": {
     "blink": [
-     2,
+     1,
      0
     ],
     "blink-id": [
-     3,
+     1,
      0
     ],
     "happy": [
-     4,
+     2,
      0
     ],
     "happy-id": [
-     5,
+     2,
      0
     ],
     "happywalk": [
-     2,
-     1
+     5,
+     0
     ],
     "happywalk-id": [
-     3,
-     1
+     5,
+     0
     ],
     "idle": [
      0,
      0
     ],
     "idle-id": [
-     1,
+     0,
      0
     ],
     "sleep": [
-     6,
+     3,
      0
     ],
     "sleep-id": [
-     7,
+     3,
      0
     ],
     "walk": [
-     0,
-     1
+     4,
+     0
     ],
     "walk-id": [
-     1,
-     1
+     4,
+     0
     ],
     "wear-beanie": [
-     1,
-     2
+     3,
+     1
     ],
     "wear-bluescarf": [
-     3,
-     4
+     5,
+     3
     ],
     "wear-bow": [
-     7,
+     1,
      1
     ],
     "wear-bowtie": [
-     4,
-     4
+     6,
+     3
     ],
     "wear-bunnyears": [
-     6,
+     0,
      2
     ],
     "wear-chef": [
-     2,
-     2
-    ],
-    "wear-cowboy": [
      4,
-     2
-    ],
-    "wear-crown": [
-     5,
      1
     ],
+    "wear-cowboy": [
+     6,
+     1
+    ],
+    "wear-crown": [
+     7,
+     0
+    ],
     "wear-flowercrown": [
-     0,
-     2
+     2,
+     1
     ],
     "wear-glasses": [
-     6,
+     0,
      3
     ],
     "wear-halo": [
+     4,
+     2
+    ],
+    "wear-heartglasses": [
      2,
      3
     ],
-    "wear-heartglasses": [
-     0,
-     4
-    ],
     "wear-helmet": [
-     3,
-     2
+     5,
+     1
     ],
     "wear-medal": [
-     6,
+     0,
      4
     ],
     "wear-partyhat": [
-     6,
+     0,
      1
     ],
     "wear-pearls": [
-     5,
-     4
+     7,
+     3
     ],
     "wear-pirate": [
-     7,
+     1,
      2
     ],
     "wear-princess": [
-     1,
-     3
+     3,
+     2
     ],
     "wear-pumpkinhat": [
-     5,
-     3
+     7,
+     2
     ],
     "wear-santahat": [
-     4,
-     3
+     6,
+     2
     ],
     "wear-scarf": [
-     2,
-     4
+     4,
+     3
     ],
     "wear-starcrown": [
-     3,
-     3
-    ],
-    "wear-starglasses": [
-     1,
-     4
-    ],
-    "wear-sunglasses": [
-     7,
-     3
-    ],
-    "wear-tiara": [
-     4,
-     1
-    ],
-    "wear-tophat": [
      5,
      2
     ],
-    "wear-wizard": [
-     0,
+    "wear-starglasses": [
+     3,
      3
+    ],
+    "wear-sunglasses": [
+     1,
+     3
+    ],
+    "wear-tiara": [
+     6,
+     0
+    ],
+    "wear-tophat": [
+     7,
+     1
+    ],
+    "wear-wizard": [
+     2,
+     2
     ]
    }
   }

@@ -1,11 +1,11 @@
-name: Render Craepets clay art
+name: Render Craepets art
 
 # Re-renders the Craepets creatures, egg, petpets and wardrobe with Blender
 # (as a Python module, CPU only) from tools/craepets-art/render.py and commits
 # the sprite sheets in games/craepets/art/ back to the repo.
 #
-# The art is entirely code-drawn — spheres, cones and tubes lit like a toy
-# photo — so no image model is involved. Sheets that already exist are kept;
+# The art is entirely code-drawn — spheres, cones and tubes with a coat of
+# Cycles hair, lit like a wildlife photo — so no image model is involved. Sheets that already exist are kept;
 # tick "force" to re-render everything (for instance after changing a shape).
 #
 # Run it from the Actions tab ("Run workflow"), or it runs automatically when
@@ -55,7 +55,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No art changes to commit."
           else
-            git commit -m "Render Craepets clay art [skip ci]"
+            git commit -m "Render Craepets art [skip ci]"
             # other bots can land on this branch at once, so pick up
             # anything pushed meanwhile before pushing ours
             git pull --rebase origin "${{ github.ref_name }}"

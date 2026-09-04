@@ -1,13 +1,13 @@
 /* ===========================================================
    Craepets — THE CREATURES.
    -----------------------------------------------------------
-   Every pet in this game is a little clay toy, rendered by Blender
+   Every pet in this game is a little furry animal, rendered by Blender
    from code (tools/craepets-art/render.py) into the sprite sheets
    in art/. Nothing here is drawn by an image model: the creatures
-   are spheres, cones and tubes lit like a toy photo, and this file
-   is what puts them on the page.
+   are spheres, cones and tubes with a coat of real hair, lit like a
+   wildlife photo, and this file is what puts them on the page.
 
-   The sheets hold each creature in WHITE clay plus a colour-ID mask
+   The sheets hold each creature in WHITE fur plus a colour-ID mask
    (red = body, green = accent), so the SAME render can be painted in
    a dozen different colours — exactly how the Rainbow Pool re-paints
    a pet: a Berry Red Blorb and a Starry Blorb are one picture and
@@ -250,11 +250,15 @@ window.CPPets = (function () {
     if (!ART || !ART.sheets) { finishReady(); return; }
     var base = artBase();
     Object.keys(ART.sheets).forEach(function (id) {
-      pending++;
-      var img = new Image();
-      img.onload = function () { images[id] = img; done(); };
-      img.onerror = function () { done(); };
-      img.src = base + ART.sheets[id].file;
+      // the lit tiles and, for tintable sheets, the colour-ID masks
+      [["", ART.sheets[id].file], ["#id", ART.sheets[id].idfile]].forEach(function (f) {
+        if (!f[1]) return;
+        pending++;
+        var img = new Image();
+        img.onload = function () { images[id + f[0]] = img; done(); };
+        img.onerror = function () { done(); };
+        img.src = base + f[1];
+      });
     });
     if (!pending) finishReady();
     function done() { pending--; if (pending <= 0) finishReady(); }
@@ -272,7 +276,7 @@ window.CPPets = (function () {
   /* Where a tile is on its sheet: { img, sx, sy, w, h } or null. */
   function tileOf(sheetId, name) {
     var sheet = ART && ART.sheets && ART.sheets[sheetId];
-    var img = images[sheetId];
+    var img = images[sheetId + (/-id$/.test(name) ? "#id" : "")];
     if (!sheet || !img || !sheet.tiles[name]) return null;
     var cr = sheet.tiles[name];
     return { img: img, sx: cr[0] * sheet.tile[0], sy: cr[1] * sheet.tile[1], w: sheet.tile[0], h: sheet.tile[1] };
@@ -359,9 +363,13 @@ window.CPPets = (function () {
       for (var x = 0; x < w; x++) {
         var i = (y * w + x) * 4;
         if (d[i + 3] === 0) continue;
-        var body = m[i] / 255, acc = m[i + 1] / 255;
-        if (m[i + 3] === 0) { body = 0; acc = 0; }
-        if (body + acc <= 0.002) continue;                // eyes, mouth, cheeks, shadow: as rendered
+        // the mask's colour says what class a pixel is; its alpha is how
+        // much of the pixel the creature covers (fur tips are wispy), so
+        // the class weights are read relative to that coverage
+        var ma = m[i + 3];
+        if (ma < 24) continue;                             // the floor shadow: as rendered
+        var body = m[i] / ma, acc = m[i + 1] / ma;
+        if (body + acc <= 0.002) continue;                // eyes, nose, mouth: as rendered
         var fixed = Math.max(0, 1 - body - acc);
         var k = (0.2126 * LIN[d[i]] + 0.7152 * LIN[d[i + 1]] + 0.0722 * LIN[d[i + 2]]) / REF;
         var r = LIN[d[i]] * fixed, g = LIN[d[i + 1]] * fixed, b = LIN[d[i + 2]] * fixed;
