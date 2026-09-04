@@ -3,21 +3,23 @@
 Craepets clay art — rendered with Blender, from code.
 
 Every creature, egg, petpet and wardrobe item in Craepets is built here out
-of spheres, cones and tubes, lit like a toy photo and rendered with Blender's
+of spheres, cones and tubes, grown a coat of real hair (a Cycles hair
+particle system), lit like a wildlife photo and rendered with Blender's
 Cycles engine (CPU, headless — no GPU needed). Nothing is drawn by an image
 model: the shapes are code, the light is physics, and the result is
 reproducible from this file alone.
 
 Output (all under games/craepets/art/):
-    <species>.png   one sprite sheet per creature: six expression frames
-                    in WHITE clay + a colour-ID mask for each, and every
-                    wardrobe item rendered ON that creature (body hidden
-                    but occluding) so hats sit right on every head.
-    egg.png         the egg, three crack stages, clay + mask.
-    petpets.png     the eight petpets in their own colours.
-    manifest.js     where every tile is (window.CPArt).
+    <species>.webp     one sprite sheet per creature: six expression frames
+                       in WHITE fur, and every wardrobe item rendered ON
+                       that creature (body hidden but occluding) so hats
+                       sit right on every head.
+    <species>-id.webp  the colour-ID mask for each frame (lossless).
+    egg.webp, egg-id.webp   the egg, three crack stages, + masks.
+    petpets.webp       the eight petpets in their own colours.
+    manifest.js        where every tile is (window.CPArt).
 
-The white clay is tinted in the browser by pets.js: the mask says which
+The white fur is tinted in the browser by pets.js: the mask says which
 pixels are "body" (red) and which are "accent" (green), and the palette the
 player chose is painted through the render's own light and shade. That is
 how one render becomes a Berry Red, a Rainbow and a Starry Night Blorb.
@@ -29,6 +31,7 @@ Usage:
     python3 tools/craepets-art/render.py --only egg,petpets
     python3 tools/craepets-art/render.py --samples 16    # quick & noisy
     python3 tools/craepets-art/render.py --force         # redo existing
+    python3 tools/craepets-art/render.py --repack --force # re-pack from rendered tiles
 
 Sheet layout: tiles are CELL px per grid cell; a creature/egg tile is
 16 x 22 cells, a petpet tile 8 x 8. Feet stand on the tile's bottom edge.
@@ -207,15 +210,78 @@ class Scene:
         self.mats[m] = kind
         return m
 
+    clay_rough = 0.8              # a species can ask for moister skin (a frog)
+
     def clay(self, kind="body"):
-        """The tintable white clay (body or accent — same look, different mask):
-        matte and soft like a plush toy — no glaze, hardly any specular, a
-        little subsurface so it looks squeezable, and a velvet sheen that
-        lights the edges like fuzz. The eyes are the only shiny thing."""
+        """The tintable white skin (body or accent — same look, different
+        mask): matte, with a little subsurface so it looks like flesh under
+        the coat, and a velvet sheen on the edges. Fur grows out of it."""
         key = "clay-" + kind
         for m, k in self.mats.items():
             if m.name == key: return m
-        return self.mat(key, COL["clay"], kind, rough=0.8, spec=0.2, sss=0.3, sheen=0.3, sheen_rough=0.6)
+        return self.mat(key, COL["clay"], kind, rough=self.clay_rough, spec=0.25, sss=0.3,
+                        sheen=0.25, sheen_rough=0.6)
+
+    def fur_mat(self, kind="body", rgb=None):
+        """The coat: a Principled Hair BSDF, white (tintable) or a fixed
+        colour. Registered like any other material so the ID pass paints it
+        in its class colour."""
+        key = "fur-" + kind + ("" if rgb is None else "-%02x%02x%02x" % tuple(int(c * 255) for c in rgb))
+        for m in self.mats:
+            if m.name == key: return m
+        m = bpy.data.materials.new(key); m.use_nodes = True
+        nt = m.node_tree
+        for n in list(nt.nodes): nt.nodes.remove(n)
+        out = nt.nodes.new("ShaderNodeOutputMaterial")
+        h = nt.nodes.new("ShaderNodeBsdfHairPrincipled")
+        h.parametrization = "COLOR"
+        h.inputs["Color"].default_value = (*(rgb if rgb is not None else COL["clay"]), 1)
+        h.inputs["Roughness"].default_value = 0.4
+        h.inputs["Radial Roughness"].default_value = 0.45
+        h.inputs["Coat"].default_value = 0.0
+        h.inputs["Random Roughness"].default_value = 0.2
+        nt.links.new(h.outputs[0], out.inputs[0])
+        self.mats[m] = kind
+        return m
+
+    def fur(self, obj, m, length=0.16, density=110, children=12, down=0.45, clump=0.5,
+            rand=0.25, radius=0.0045, weight=None):
+        """Grow a coat on a mesh: a hair particle system, combed a little
+        downward like fur under gravity, in clumps, with interpolated
+        children for density. `density` is parent strands per unit of
+        surface; `weight(x, y, z) -> 0..1` thins and shortens the coat
+        (round the face, say). The object's scale and rotation are baked
+        into the mesh first so lengths come out in world units."""
+        if obj.type != "MESH": return
+        me = obj.data
+        M = obj.matrix_world.to_3x3()
+        for v in me.vertices: v.co = M @ v.co
+        obj.rotation_euler = (0, 0, 0); obj.scale = (1, 1, 1)
+        me.update()
+        area = sum(p.area for p in me.polygons)
+        if weight is not None:
+            vg = obj.vertex_groups.new(name="coat")
+            loc = obj.location
+            for v in me.vertices:
+                w = weight(loc.x + v.co.x, loc.y + v.co.y, loc.z + v.co.z)
+                vg.add([v.index], max(0.0, min(1.0, w)), "REPLACE")
+        me.materials.append(m)
+        mod = obj.modifiers.new("fur", "PARTICLE_SYSTEM")
+        ps = mod.particle_system; st = ps.settings
+        st.type = "HAIR"; st.count = max(60, int(density * area)); st.hair_length = length
+        st.hair_step = 4; st.use_advanced_hair = True
+        st.emit_from = "FACE"; st.use_emit_random = True
+        # with advanced hair the velocity only sets the DIRECTION as long as
+        # it stays small (about 0.1): any bigger and the strands balloon
+        st.normal_factor = 0.1; st.object_align_factor = (0, 0, -down * 0.1); st.factor_random = rand * 0.1
+        st.child_type = "INTERPOLATED"; st.child_percent = 1; st.rendered_child_count = children
+        st.clump_factor = clump; st.clump_shape = 0.25
+        st.roughness_2 = length * 0.35; st.roughness_2_size = 1.5; st.roughness_endpoint = length * 0.2
+        st.radius_scale = radius; st.root_radius = 1.0; st.tip_radius = 0.0; st.use_close_tip = True
+        st.material = len(me.materials)
+        if weight is not None:
+            ps.vertex_group_density = "coat"; ps.vertex_group_length = "coat"
+        return obj
 
     def fixed(self, name, hexcol, **kw):
         return self.mat(name, srgb(hexcol), "fixed", **kw)
@@ -223,6 +289,9 @@ class Scene:
     # glossy toy eyes (class "eye": never tinted, masked blue)
     def eye_white(self, kind="eye"):
         return self.mat("eyewhite", COL["white"], kind, rough=0.12, coat=1.0, coat_rough=0.05)
+
+    def eye_iris(self, hexcol, kind="eye"):
+        return self.mat("iris", srgb(hexcol), kind, rough=0.3, coat=1.0, coat_rough=0.05)
 
     def eye_pupil(self, kind="eye"):
         return self.mat("pupil", COL["pupil"], kind, rough=0.08, spec=0.7, coat=1.0, coat_rough=0.03)
@@ -315,12 +384,12 @@ class Scene:
         saved = {}
         for m, kind in self.mats.items():
             nt = m.node_tree
-            saved[m] = nt.links[:] and [(l.from_node, l.from_socket, l.to_node, l.to_socket) for l in nt.links]
+            out = nt.nodes["Material Output"]
+            saved[m] = [(l.from_node, l.from_socket) for l in out.inputs[0].links]
             col = {"body": (1, 0, 0), "accent": (0, 1, 0), "eye": (0, 0, 1)}.get(kind, (0, 0, 0))
             em = nt.nodes.new("ShaderNodeEmission")
             em.name = "idpass"
             em.inputs[0].default_value = (*col, 1); em.inputs[1].default_value = 1.0
-            out = nt.nodes["Material Output"]
             for l in list(out.inputs[0].links): nt.links.remove(l)
             nt.links.new(em.outputs[0], out.inputs[0])
         for L in self.lights: L.hide_render = True
@@ -330,7 +399,7 @@ class Scene:
         vt = self.sc.view_settings.view_transform
         self.sc.view_settings.view_transform = "Standard"
         s, d = self.sc.cycles.samples, self.sc.cycles.use_denoising
-        self.sc.cycles.samples, self.sc.cycles.use_denoising = 16, False
+        self.sc.cycles.samples, self.sc.cycles.use_denoising = 32, False
         self.render(path)
         # put everything back
         self.sc.cycles.samples, self.sc.cycles.use_denoising = s, d
@@ -341,8 +410,8 @@ class Scene:
         for m in self.mats:
             nt = m.node_tree
             nt.nodes.remove(nt.nodes["idpass"])
-            b = nt.nodes["Principled BSDF"]; out = nt.nodes["Material Output"]
-            nt.links.new(b.outputs[0], out.inputs[0])
+            out = nt.nodes["Material Output"]
+            for (node, sock) in saved[m]: nt.links.new(sock, out.inputs[0])
 
     def set_holdout(self, objs, on):
         for o in objs: o.is_holdout = on
@@ -383,11 +452,19 @@ class Creature:
     feet = True
     foot_dx, foot_y, foot_r = 0.75, -0.55, 0.42
     foot_scale = (1, 1.25, 0.55)
+    iris = "#c98a2e"              # eye colour (never tinted)
+    nose = True
+    skin_rough = 0.8
+    # the coat: hair length per body part (0 or missing = bare skin)
+    fur = {"body": 0.17, "belly": 0.14, "foot": 0.08, "ear": 0.08, "tail": 0.1,
+           "body2": 0.14, "body3": 0.1, "body4": 0.07, "tuft": 0.1, "tuft2": 0.08, "spark": 0.08, "spark2": 0.06}
 
     def __init__(self, S, frame="idle"):
         self.S, self.frame = S, frame
         self.body = []
+        S.clay_rough = self.skin_rough
         self.build()
+        self.coat()
 
     # ---- pieces ------------------------------------------------------------
     def build(self):
@@ -400,6 +477,30 @@ class Creature:
         S.body_objs = self.body
 
     def trim(self): pass
+
+    # ---- the coat ----------------------------------------------------------
+    def face_weight(self, x, y, z):
+        """How much coat grows at a point on the body: full everywhere but
+        the face, where it thins and shortens so the eyes, nose and mouth
+        sit in short fur the way they do on a real animal."""
+        cx, cy, cz = self.body_c; rx, ry, rz = self.body_r
+        front = max(0.0, -(y - cy) / ry)                          # 1 at the very front
+        lo, hi = self.mouth_z - 0.35, self.eye_z + self.eye_r + 0.25
+        fz = 1.0 if lo <= z <= hi else max(0.0, 1 - min(abs(z - lo), abs(z - hi)) / 0.3)
+        span = self.eye_dx + self.eye_r + 0.2
+        fx = 1.0 if abs(x) <= span else max(0.0, 1 - (abs(x) - span) / 0.3)
+        f = max(0.0, (front - 0.55) / 0.45) * fz * fx
+        return 1 - 0.75 * f
+
+    def coat(self):
+        S = self.S
+        for o in list(self.body):
+            if o.type != "MESH" or not o.data.materials: continue
+            L = self.fur.get(o.name.split(".")[0], 0)
+            if not L: continue
+            kind = S.mats.get(o.data.materials[0], "fixed")
+            if kind not in ("body", "accent"): continue
+            S.fur(o, S.fur_mat(kind), L, weight=self.face_weight if o.name.startswith("body") else None)
 
     def front(self, x, z, inset=0.0):
         return ell_front_y(self.body_c, self.body_r, x, z) + inset
@@ -417,12 +518,15 @@ class Creature:
             x, z, r = sx * self.eye_dx, self.eye_z, self.eye_r
             y = self.front(x, z)
             if mode == "open":
-                # glossy eyes: the softbox reflects in the pupil as one big
-                # soft highlight, plus a pin of light so it always sparkles
+                # animal eyes: a white, a coloured iris, a small dark pupil,
+                # all glossy so the softbox reflects in them, plus a pin of
+                # light so they always catch
                 self.body.append(S.sphere("eye", (x, y + 0.02, z), r, S.eye_white(), scale=(1, 0.55, 1.15)))
-                self.body.append(S.sphere("pupil", (x, y - r * 0.5, z + 0.02), r * 0.62, S.eye_pupil(),
+                self.body.append(S.sphere("iris", (x, y - r * 0.5, z + 0.02), r * 0.66, S.eye_iris(self.iris),
                                           scale=(1, 0.5, 1.15)))
-                self.body.append(S.sphere("glint", (x - r * 0.24, y - r * 0.8, z + r * 0.36), r * 0.19, S.eye_glint()))
+                self.body.append(S.sphere("pupil", (x, y - r * 0.7, z + 0.02), r * 0.36, S.eye_pupil(),
+                                          scale=(1, 0.5, 1.15)))
+                self.body.append(S.sphere("glint", (x - r * 0.24, y - r * 0.86, z + r * 0.36), r * 0.16, S.eye_glint()))
             else:
                 k = S.mat("lid", COL["pupil"], "eye", rough=0.35)
                 pts = []
@@ -442,13 +546,6 @@ class Creature:
                         pts.append((px, self.front(px, pz) - 0.02, pz))
                 self.body.append(S.tube("lid", pts, 0.055 if mode == "happy" else 0.045, k))
 
-    def cheeks(self):
-        S = self.S
-        m = S.fixed("cheek", "#ff9db5", rough=0.85, spec=0.2, sss=0.3)
-        for sx in (-1, 1):
-            x, z = sx * self.cheek_dx, self.cheek_z
-            self.body.append(S.sphere("cheek", (x, self.front(x, z) + 0.06, z), 0.19, m, scale=(1, 0.35, 0.72)))
-
     def mouth(self):
         S = self.S
         m = S.fixed("mouth", "#3a2036", rough=0.4)
@@ -460,11 +557,18 @@ class Creature:
             t = -1 + i / 3.0
             x = t * w
             z = self.mouth_z - (1 - t * t) * w * (0.55 if big else 0.4) + w * 0.35
-            pts.append((x, self.front(x, z) - 0.03, z))
-        self.body.append(S.tube("mouth", pts, 0.06 if big else 0.05, m))
+            pts.append((x, self.front(x, z) - 0.05, z))
+        self.body.append(S.tube("mouth", pts, 0.05 if big else 0.04, m))
+
+    def make_nose(self):
+        if not self.nose: return
+        S = self.S
+        z = self.mouth_z + (self.eye_z - self.mouth_z) * 0.52
+        self.body.append(S.sphere("nose", (0, self.front(0, z) + 0.05, z), 0.11,
+                                  S.fixed("nose", "#3a2036", rough=0.3), scale=(1.3, 0.6, 0.85)))
 
     def face(self):
-        self.eyes(); self.cheeks(); self.mouth()
+        self.eyes(); self.make_nose(); self.mouth()
 
     def make_feet(self):
         S = self.S
@@ -493,12 +597,16 @@ class Creature:
 
 
 class Blorb(Creature):
-    """Round, bouncy and permanently pleased. No ears at all."""
+    """Round, bouncy and permanently pleased. No ears at all — a ball of
+    fluff like a chinchilla."""
+    iris = "#b8752a"
+    fur = dict(Creature.fur, body=0.2, belly=0.16)
 
 
 class Snorbit(Creature):
     """Two tall ears and enormous back feet."""
     body_c = (0, 0, 1.5); body_r = (1.42, 1.35, 1.42)
+    iris = "#6b4a2a"
     foot_dx, foot_y, foot_r, foot_scale = 0.9, -0.62, 0.55, (1.1, 1.3, 0.5)
 
     def trim(self):
@@ -512,8 +620,9 @@ class Snorbit(Creature):
 
 
 class Flarn(Creature):
-    """A pocket dragon: two horns and two folded wings."""
+    """A pocket dragon: two horns and two folded wings. Smooth skin, no coat."""
     body_c = (0, 0, 1.55); body_r = (1.42, 1.35, 1.5)
+    iris = "#8fb63a"; skin_rough = 0.65; fur = {}
 
     def trim(self):
         S = self.S
@@ -532,6 +641,8 @@ class Flarn(Creature):
 class Twiggle(Creature):
     """A leafy little fawn from the deep woods."""
     body_c = (0, 0, 1.55); body_r = (1.4, 1.35, 1.5)
+    iris = "#5a3d22"
+    fur = dict(Creature.fur, body=0.13, belly=0.11)
     foot_dx = 0.72
 
     def trim(self):
@@ -547,6 +658,7 @@ class Twiggle(Creature):
 class Puddlepop(Creature):
     """Half kitten, half raindrop: pointed ears and a curl of tail."""
     body_c = (0, 0, 1.55); body_r = (1.32, 1.3, 1.55)
+    iris = "#63b26a"
     eye_dx, cheek_dx = 0.48, 0.9
     foot_dx = 0.68
 
@@ -563,8 +675,10 @@ class Puddlepop(Creature):
 
 
 class Zibbit(Creature):
-    """A star frog: wide flat head, bulging eyes on top, a huge grin."""
+    """A star frog: wide flat head, bulging eyes on top, a huge grin. Moist
+    smooth skin, no coat, and nostrils rather than a nose."""
     body_c = (0, 0, 1.3); body_r = (1.7, 1.4, 1.28)
+    iris = "#e0a83a"; skin_rough = 0.4; fur = {}; nose = False
     eye_dx, eye_z, eye_r = 0.82, 2.3, 0.36
     cheek_dx, cheek_z = 1.2, 1.35
     mouth_z, mouth_w = 1.3, 0.72
@@ -580,9 +694,11 @@ class Zibbit(Creature):
             x, z, r = sx * self.eye_dx, self.eye_z, self.eye_r
             self.body.append(S.sphere("eyeball", (x, EY, z), r, S.eye_white()))
             if mode == "open":
-                self.body.append(S.sphere("pupil", (x, EY - r * 0.7, z + r * 0.2), r * 0.52, S.eye_pupil(),
+                self.body.append(S.sphere("iris", (x, EY - r * 0.68, z + r * 0.2), r * 0.56, S.eye_iris(self.iris),
                                           scale=(1, 0.6, 1)))
-                self.body.append(S.sphere("glint", (x - r * 0.2, EY - r * 0.92, z + r * 0.42), r * 0.17, S.eye_glint()))
+                self.body.append(S.sphere("pupil", (x, EY - r * 0.82, z + r * 0.2), r * 0.3, S.eye_pupil(),
+                                          scale=(1, 0.6, 1)))
+                self.body.append(S.sphere("glint", (x - r * 0.2, EY - r * 0.98, z + r * 0.42), r * 0.15, S.eye_glint()))
             else:
                 k = S.mat("lid", COL["pupil"], "eye", rough=0.35)
                 pts = []
@@ -605,6 +721,7 @@ class Zibbit(Creature):
 class Glimmr(Creature):
     """A wisp of a sprite that hums when happy. No feet: it floats."""
     body_c = (0, 0, 2.0); body_r = (1.28, 1.25, 1.28)
+    iris = "#6d7fe0"
     eye_dx, eye_z = 0.48, 2.35
     cheek_dx, cheek_z = 0.92, 1.9
     mouth_z, mouth_w = 1.82, 0.28
@@ -885,6 +1002,9 @@ def build_egg(S, crack):
 def build_petpet(S, pid):
     """Each petpet in its own colours, standing in an 8 x 8 cell frame."""
     def clay(hexcol, **kw): return S.fixed("pp-" + hexcol, hexcol, rough=0.8, spec=0.2, sss=0.3, sheen=0.3, sheen_rough=0.6, **kw)
+    def coat(obj, hexcol, length, **kw):
+        kw.setdefault("radius", 0.003); kw.setdefault("density", 160)
+        S.fur(obj, S.fur_mat("fixed", srgb(hexcol)), length, **kw)
     eyeW = S.eye_white("fixed")
     eyeK = S.eye_pupil("fixed")
     def face(c, rad, dx, z, r=0.1, sleepy=False):
@@ -895,8 +1015,8 @@ def build_petpet(S, pid):
             S.sphere("pupil", (x, y - r * 0.5, z + 0.01), r * 0.55, eyeK, scale=(1, 0.5, 1.1))
     if pid == "duckling":
         yel, orange = clay("#ffe066"), clay("#ff9f45")
-        S.sphere("body", (0, 0, 0.55), 0.55, yel, scale=(1, 1.1, 0.95))
-        S.sphere("head", (0, -0.15, 1.25), 0.42, yel)
+        coat(S.sphere("body", (0, 0, 0.55), 0.55, yel, scale=(1, 1.1, 0.95)), "#ffe066", 0.07)
+        coat(S.sphere("head", (0, -0.15, 1.25), 0.42, yel), "#ffe066", 0.04, radius=0.0025)
         face((0, -0.15, 1.25), (0.42, 0.42, 0.42), 0.17, 1.32, 0.09)
         S.cone("beak", (0, -0.62, 1.15), 0.12, 0.28, orange, rot=(math.radians(-90), 0, 0))
         S.sphere("wing", (0.5, 0.05, 0.6), 0.22, yel, scale=(0.5, 1, 0.7))
@@ -920,7 +1040,7 @@ def build_petpet(S, pid):
                          (0.2, ell_front_y((0, 0, 0.72), (0.72, 0.68, 0.72), 0.2, 0.5) - 0.02, 0.5)], 0.03, eyeK)
     elif pid == "moth":
         purple, gold = clay("#a97dff"), clay("#ffd863")
-        S.sphere("body", (0, 0, 0.75), 0.22, clay("#8a5cff"), scale=(1, 1, 2.2))
+        coat(S.sphere("body", (0, 0, 0.75), 0.22, clay("#8a5cff"), scale=(1, 1, 2.2)), "#8a5cff", 0.05)
         for sx in (-1, 1):
             S.sphere("wing", (sx * 0.55, 0.05, 1.05), 0.48, purple, scale=(1, 0.2, 0.85))
             S.sphere("wing2", (sx * 0.45, 0.05, 0.45), 0.34, purple, scale=(1, 0.2, 0.75))
@@ -929,8 +1049,8 @@ def build_petpet(S, pid):
         face((0, 0, 1.0), (0.22, 0.22, 0.4), 0.09, 1.1, 0.06)
     elif pid == "kit":
         fur, cream = clay("#f4b16f"), clay("#ffd7db")
-        S.sphere("body", (0, 0.1, 0.5), 0.5, fur, scale=(1, 1.2, 0.9))
-        S.sphere("head", (0, -0.25, 1.1), 0.45, fur)
+        coat(S.sphere("body", (0, 0.1, 0.5), 0.5, fur, scale=(1, 1.2, 0.9)), "#f4b16f", 0.07)
+        coat(S.sphere("head", (0, -0.25, 1.1), 0.45, fur), "#f4b16f", 0.03, radius=0.0025)
         for sx in (-1, 1):
             S.cone("ear", (sx * 0.28, -0.2, 1.55), 0.15, 0.32, fur, rot=(0, sx * math.radians(15), 0))
         face((0, -0.25, 1.1), (0.45, 0.45, 0.45), 0.18, 1.15, 0.09)
@@ -938,12 +1058,12 @@ def build_petpet(S, pid):
         S.torus("tail", (0.55, 0.45, 0.45), 0.3, 0.08, fur, rot=(math.radians(90), 0, 0))
     elif pid == "hedge":
         brown, dark, cream = clay("#8a6a4a"), clay("#5a4030"), clay("#f4d3b0")
-        S.sphere("body", (0.1, 0, 0.6), 0.62, dark, scale=(1.05, 0.95, 0.85))
+        coat(S.sphere("body", (0.1, 0, 0.6), 0.62, dark, scale=(1.05, 0.95, 0.85)), "#5a4030", 0.06)
         for i in range(14):
             a = math.pi * (0.1 + 0.8 * i / 13.0); r = 0.62
             S.cone("spike", (0.1 + math.cos(a) * r * 0.9, 0, 0.6 + math.sin(a) * r * 0.8), 0.07, 0.35, dark,
                    rot=(0, math.pi / 2 - a, 0))
-        S.sphere("face", (-0.45, -0.2, 0.5), 0.36, cream, scale=(1.2, 0.9, 0.85))
+        coat(S.sphere("face", (-0.45, -0.2, 0.5), 0.36, cream, scale=(1.2, 0.9, 0.85)), "#f4d3b0", 0.035)
         S.sphere("nose", (-0.85, -0.25, 0.45), 0.08, eyeK)
         S.sphere("eye", (-0.5, -0.5, 0.62), 0.06, eyeK)
     elif pid == "wisp":
@@ -992,26 +1112,52 @@ def soften_shadow(lit_path, id_path):
     return im
 
 
-def pack_sheet(tiles, tile_w, tile_h, cols, out_png, ids=None):
-    """Paste rendered tile PNGs into one sheet; returns {name: [col,row]}.
-    `ids` maps a tile name to its ID-pass PNG (used to soften the floor
-    shadow); tiles named '<x>-id' find their own."""
+QUALITY = 92                  # WebP quality for the lit tiles (the masks are lossless)
+
+
+def pack_sheet(tiles, tile_w, tile_h, cols, out_base, ids=None):
+    """Paste rendered tile PNGs into sheets; returns {name: [col,row]}.
+    The lit tiles go to <out_base>.webp (lossy: fur is all fine detail and
+    a PNG of it is four times the size for no visible gain) and the
+    colour-ID masks, if any, to <out_base>-id.webp (lossless, so the tint
+    reads exact classes). `ids` maps a tile name to its ID-pass PNG (used
+    to soften the floor shadow); tiles named '<x>-id' find their own."""
     from PIL import Image
     ids = dict(ids or {})
     paths = dict(tiles)
-    rows = (len(tiles) + cols - 1) // cols
-    sheet = Image.new("RGBA", (cols * tile_w, rows * tile_h), (0, 0, 0, 0))
     where = {}
-    for i, (name, path) in enumerate(tiles):
-        if name.endswith("-id") or name.startswith("wear-"):
-            im = Image.open(path).convert("RGBA")
+    groups = [("", [t for t in tiles if not t[0].endswith("-id")]),
+              ("-id", [t for t in tiles if t[0].endswith("-id")])]
+    for suffix, group in groups:
+        if not group: continue
+        rows = (len(group) + cols - 1) // cols
+        sheet = Image.new("RGBA", (cols * tile_w, rows * tile_h), (0, 0, 0, 0))
+        for i, (name, path) in enumerate(group):
+            if name.endswith("-id") or name.startswith("wear-"):
+                im = Image.open(path).convert("RGBA")
+            else:
+                im = soften_shadow(path, ids.get(name) or paths.get(name + "-id"))
+            c, r = i % cols, i // cols
+            sheet.paste(im, (c * tile_w, r * tile_h))
+            where[name] = [c, r]
+        if suffix:
+            sheet.save(out_base + suffix + ".webp", "WEBP", lossless=True, method=6)
         else:
-            im = soften_shadow(path, ids.get(name) or paths.get(name + "-id"))
-        c, r = i % cols, i // cols
-        sheet.paste(im, (c * tile_w, r * tile_h))
-        where[name] = [c, r]
-    sheet.save(out_png, optimize=True)
+            sheet.save(out_base + ".webp", "WEBP", quality=QUALITY, method=6)
     return where
+
+
+def sheet_entry(base, tile_wh, where, masks=True):
+    e = {"file": base + ".webp", "tile": list(tile_wh), "tiles": where}
+    if masks: e["idfile"] = base + "-id.webp"
+    return e
+
+
+def sheet_size(out_base):
+    tot = 0
+    for f in (out_base + ".webp", out_base + "-id.webp"):
+        if os.path.exists(f): tot += os.path.getsize(f)
+    return f"{tot // 1024} KB"
 
 
 def write_manifest(manifest, path):
@@ -1041,6 +1187,7 @@ def main():
     ap.add_argument("--out", default=OUT_DIR)
     ap.add_argument("--tmp", default=os.path.join(HERE, ".tiles"))
     ap.add_argument("--force", action="store_true", help="re-render sheets that already exist")
+    ap.add_argument("--repack", action="store_true", help="reuse tiles already rendered into --tmp; only render what is missing")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True); os.makedirs(args.tmp, exist_ok=True)
@@ -1057,68 +1204,87 @@ def main():
     def tile(path_name):
         return os.path.join(args.tmp, path_name + ".png")
 
+    def have(*paths):
+        """--repack: reuse tiles already rendered into --tmp."""
+        return args.repack and all(os.path.exists(p) for p in paths)
+
     if "species" in only:
         for sid in species:
-            sheet_png = os.path.join(args.out, sid + ".png")
-            if os.path.exists(sheet_png) and not args.force and sid in manifest["sheets"]:
+            base = os.path.join(args.out, sid)
+            if os.path.exists(base + ".webp") and not args.force and sid in manifest["sheets"]:
                 print("skip", sid, "(exists)"); continue
             tiles = []
             for frame in (args.frames.split(",") if args.frames else FRAMES):
-                S = Scene(FRAME_W, FRAME_H, args.samples)
-                SPECIES[sid](S, frame)
-                p = tile(f"{sid}-{frame}"); S.render(p); tiles.append((frame, p))
-                p = tile(f"{sid}-{frame}-id"); S.render_id(p); tiles.append((frame + "-id", p))
-                print(f"  {sid} {frame}  ({time.time() - t0:.0f}s)")
-            if wear_ids:
+                lit, idp = tile(f"{sid}-{frame}"), tile(f"{sid}-{frame}-id")
+                if not have(lit, idp):
+                    S = Scene(FRAME_W, FRAME_H, args.samples)
+                    SPECIES[sid](S, frame)
+                    S.render(lit); S.render_id(idp)
+                    print(f"  {sid} {frame}  ({time.time() - t0:.0f}s)")
+                tiles += [(frame, lit), (frame + "-id", idp)]
+            todo = [w for w in wear_ids if not have(tile(f"{sid}-wear-{w}"))]
+            if todo:
                 S = Scene(FRAME_W, FRAME_H, max(24, args.samples * 3 // 4))
                 c = SPECIES[sid](S, "idle")
                 S.set_holdout(S.body_objs, True)
                 S.floor.hide_render = True        # the creature's own tile has the floor shadow
-                for wid in wear_ids:
+                # the coat is in the creature's own tile too: a holdout body
+                # still renders its hair, and white strands over a hat would
+                # show on a coloured pet, so the wardrobe is fitted bare
+                for o in S.body_objs:
+                    for mod in o.modifiers:
+                        if mod.type == "PARTICLE_SYSTEM": mod.show_render = False
+                for wid in todo:
                     parts = WEAR[wid](S, c)
-                    p = tile(f"{sid}-wear-{wid}"); S.render(p); tiles.append(("wear-" + wid, p))
+                    S.render(tile(f"{sid}-wear-{wid}"))
                     S.remove(parts)
                     print(f"  {sid} wear {wid}  ({time.time() - t0:.0f}s)")
-            where = pack_sheet(tiles, TW, TH, 8, sheet_png)
-            manifest["sheets"][sid] = {"file": sid + ".png", "tile": [TW, TH], "tiles": where}
+            tiles += [("wear-" + wid, tile(f"{sid}-wear-{wid}")) for wid in wear_ids]
+            where = pack_sheet(tiles, TW, TH, 8, base)
+            manifest["sheets"][sid] = sheet_entry(sid, (TW, TH), where)
             write_manifest(manifest, manifest_path)
-            print("wrote", sheet_png, f"{os.path.getsize(sheet_png) // 1024} KB")
+            print("wrote", base + ".webp", sheet_size(base))
 
     if "egg" in only:
-        sheet_png = os.path.join(args.out, "egg.png")
-        if os.path.exists(sheet_png) and not args.force and "egg" in manifest["sheets"]:
+        base = os.path.join(args.out, "egg")
+        if os.path.exists(base + ".webp") and not args.force and "egg" in manifest["sheets"]:
             print("skip egg (exists)")
         else:
             tiles = []
             for crack in (0, 1, 2):
-                S = Scene(FRAME_W, FRAME_H, args.samples)
-                build_egg(S, crack)
-                p = tile(f"egg-{crack}"); S.render(p); tiles.append((f"crack{crack}", p))
-                p = tile(f"egg-{crack}-id"); S.render_id(p); tiles.append((f"crack{crack}-id", p))
-                print(f"  egg {crack}  ({time.time() - t0:.0f}s)")
-            where = pack_sheet(tiles, TW, TH, 6, sheet_png)
-            manifest["sheets"]["egg"] = {"file": "egg.png", "tile": [TW, TH], "tiles": where}
+                lit, idp = tile(f"egg-{crack}"), tile(f"egg-{crack}-id")
+                if not have(lit, idp):
+                    S = Scene(FRAME_W, FRAME_H, args.samples)
+                    build_egg(S, crack)
+                    S.render(lit); S.render_id(idp)
+                    print(f"  egg {crack}  ({time.time() - t0:.0f}s)")
+                tiles += [(f"crack{crack}", lit), (f"crack{crack}-id", idp)]
+            where = pack_sheet(tiles, TW, TH, 6, base)
+            manifest["sheets"]["egg"] = sheet_entry("egg", (TW, TH), where)
             write_manifest(manifest, manifest_path)
-            print("wrote", sheet_png)
+            print("wrote", base + ".webp", sheet_size(base))
 
     if "petpets" in only:
-        sheet_png = os.path.join(args.out, "petpets.png")
-        if os.path.exists(sheet_png) and not args.force and "petpets" in manifest["sheets"]:
+        base = os.path.join(args.out, "petpets")
+        if os.path.exists(base + ".webp") and not args.force and "petpets" in manifest["sheets"]:
             print("skip petpets (exists)")
         else:
             ids = ["duckling", "snail", "blobbin", "moth", "kit", "hedge", "wisp", "starling"]
             tiles, masks = [], {}
             for pid in ids:
-                S = Scene(PP_W, PP_H, args.samples)
-                build_petpet(S, pid)
-                p = tile(f"pp-{pid}"); S.render(p); tiles.append((pid, p))
-                # an ID pass just to know where the petpet is (for the shadow)
-                masks[pid] = tile(f"pp-{pid}-id"); S.render_id(masks[pid])
-                print(f"  petpet {pid}  ({time.time() - t0:.0f}s)")
-            where = pack_sheet(tiles, PP_W * CELL, PP_H * CELL, 8, sheet_png, masks)
-            manifest["sheets"]["petpets"] = {"file": "petpets.png", "tile": [PP_W * CELL, PP_H * CELL], "tiles": where}
+                lit, masks[pid] = tile(f"pp-{pid}"), tile(f"pp-{pid}-id")
+                if not have(lit, masks[pid]):
+                    S = Scene(PP_W, PP_H, args.samples)
+                    build_petpet(S, pid)
+                    S.render(lit)
+                    # an ID pass just to know where the petpet is (for the shadow)
+                    S.render_id(masks[pid])
+                    print(f"  petpet {pid}  ({time.time() - t0:.0f}s)")
+                tiles.append((pid, lit))
+            where = pack_sheet(tiles, PP_W * CELL, PP_H * CELL, 8, base, masks)
+            manifest["sheets"]["petpets"] = sheet_entry("petpets", (PP_W * CELL, PP_H * CELL), where, masks=False)
             write_manifest(manifest, manifest_path)
-            print("wrote", sheet_png)
+            print("wrote", base + ".webp", sheet_size(base))
 
     print(f"done in {time.time() - t0:.0f}s")
 

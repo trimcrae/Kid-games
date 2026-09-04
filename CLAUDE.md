@@ -81,15 +81,16 @@ commits it back:
 creatures or children). Craepets art is code-drawn only: the creatures, egg,
 petpets and wardrobe are **built from spheres, cones and tubes in Blender**
 (`tools/craepets-art/render.py`, run headless via the `bpy` pip package on the
-CPU) and rendered as white-clay sprite sheets + colour-ID masks into
-`games/craepets/art/`; `pets.js` tints them with the player's palette in the
-browser. Scenery is pixel-rasterised SVG in `scenery.js`, the sky is WebGL in
+CPU), grown a coat of real Cycles hair so they look like small animals rather
+than toys, lit like a wildlife photo, and rendered as white-fur WebP sprite
+sheets + lossless colour-ID masks into `games/craepets/art/`; `pets.js` tints
+them with the player's palette in linear light in the browser. Scenery is pixel-rasterised SVG in `scenery.js`, the sky is WebGL in
 `sky.js`, and crayon pages are in `crayon.js`. A free image API once returned
 an inappropriate image for a "blob creature" prompt; that route is closed for
 this game. To change a creature or add a hat, edit `render.py` and push —
 `.github/workflows/render-craepets-art.yml` re-renders and commits the
-sheets (or run the script locally: `pip install bpy pillow`, about 20 minutes
-for everything on four cores).
+sheets (or run the script locally: `pip install bpy pillow`, about 50 minutes
+for everything on four cores; `--repack` re-packs from already rendered tiles).
 
 Both trigger automatically when their source changes and can be run by hand from
 the Actions tab. So: don't fight the sandbox proxy for these — push and let the
