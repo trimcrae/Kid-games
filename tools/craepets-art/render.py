@@ -461,20 +461,33 @@ class Creature:
 
     def __init__(self, S, frame="idle"):
         self.S, self.frame = S, frame
-        self.body = []
+        self.body, self.face_objs, self.feet_objs = [], [], []
         S.clay_rough = self.skin_rough
         self.build()
         self.coat()
+        self.set_frame(frame)
 
     # ---- pieces ------------------------------------------------------------
     def build(self):
+        """The body — everything that stays put between frames. The face
+        is built by set_frame(), so one creature (and one coat of hair,
+        which Blender lays differently every time a scene is rebuilt)
+        serves every expression: the fur never jumps between frames."""
         S = self.S
         self.body.append(S.sphere("body", self.body_c, 1.0, S.clay("body"), scale=self.body_r))
         self.trim()
         self.belly()
-        self.face()
         if self.feet: self.make_feet()
-        S.body_objs = self.body
+
+    def set_frame(self, frame):
+        """Swap in the face for `frame` and pose the feet."""
+        self.frame = frame
+        S = self.S
+        if self.face_objs: S.remove(self.face_objs)
+        self.face_objs = []
+        self.face()
+        self.pose_feet()
+        S.body_objs = self.body + self.face_objs
 
     def trim(self): pass
 
@@ -521,12 +534,12 @@ class Creature:
                 # animal eyes: a white, a coloured iris, a small dark pupil,
                 # all glossy so the softbox reflects in them, plus a pin of
                 # light so they always catch
-                self.body.append(S.sphere("eye", (x, y + 0.02, z), r, S.eye_white(), scale=(1, 0.55, 1.15)))
-                self.body.append(S.sphere("iris", (x, y - r * 0.5, z + 0.02), r * 0.66, S.eye_iris(self.iris),
+                self.face_objs.append(S.sphere("eye", (x, y + 0.02, z), r, S.eye_white(), scale=(1, 0.55, 1.15)))
+                self.face_objs.append(S.sphere("iris", (x, y - r * 0.5, z + 0.02), r * 0.66, S.eye_iris(self.iris),
                                           scale=(1, 0.5, 1.15)))
-                self.body.append(S.sphere("pupil", (x, y - r * 0.7, z + 0.02), r * 0.36, S.eye_pupil(),
+                self.face_objs.append(S.sphere("pupil", (x, y - r * 0.7, z + 0.02), r * 0.36, S.eye_pupil(),
                                           scale=(1, 0.5, 1.15)))
-                self.body.append(S.sphere("glint", (x - r * 0.24, y - r * 0.86, z + r * 0.36), r * 0.16, S.eye_glint()))
+                self.face_objs.append(S.sphere("glint", (x - r * 0.24, y - r * 0.86, z + r * 0.36), r * 0.16, S.eye_glint()))
             else:
                 k = S.mat("lid", COL["pupil"], "eye", rough=0.35)
                 pts = []
@@ -544,7 +557,7 @@ class Creature:
                         a = math.pi * (1 - i / 6.0)
                         px, pz = x + math.cos(a) * r * 1.05, z - r * 0.35 + math.sin(a) * r * 1.0
                         pts.append((px, self.front(px, pz) - 0.02, pz))
-                self.body.append(S.tube("lid", pts, 0.055 if mode == "happy" else 0.045, k))
+                self.face_objs.append(S.tube("lid", pts, 0.055 if mode == "happy" else 0.045, k))
 
     def mouth(self):
         S = self.S
@@ -558,13 +571,13 @@ class Creature:
             x = t * w
             z = self.mouth_z - (1 - t * t) * w * (0.55 if big else 0.4) + w * 0.35
             pts.append((x, self.front(x, z) - 0.05, z))
-        self.body.append(S.tube("mouth", pts, 0.05 if big else 0.04, m))
+        self.face_objs.append(S.tube("mouth", pts, 0.05 if big else 0.04, m))
 
     def make_nose(self):
         if not self.nose: return
         S = self.S
         z = self.mouth_z + (self.eye_z - self.mouth_z) * 0.52
-        self.body.append(S.sphere("nose", (0, self.front(0, z) + 0.05, z), 0.11,
+        self.face_objs.append(S.sphere("nose", (0, self.front(0, z) + 0.05, z), 0.11,
                                   S.fixed("nose", "#3a2036", rough=0.3), scale=(1.3, 0.6, 0.85)))
 
     def face(self):
@@ -572,13 +585,19 @@ class Creature:
 
     def make_feet(self):
         S = self.S
-        up = self.frame in ("walk", "happywalk")
         for sx in (-1, 1):
-            z = self.foot_r * self.foot_scale[2]
-            y = self.foot_y
+            o = S.sphere("foot", (sx * self.foot_dx, self.foot_y, self.foot_r * self.foot_scale[2]), self.foot_r,
+                         S.clay("body"), scale=self.foot_scale)
+            self.body.append(o); self.feet_objs.append((o, sx))
+
+    def pose_feet(self):
+        """Walking lifts the left foot; the foot object just moves, so its
+        coat stays exactly as it was."""
+        up = self.frame in ("walk", "happywalk")
+        for o, sx in self.feet_objs:
+            z, y = self.foot_r * self.foot_scale[2], self.foot_y
             if up and sx < 0: z += 0.32; y -= 0.18
-            self.body.append(S.sphere("foot", (sx * self.foot_dx, y, z), self.foot_r, S.clay("body"),
-                                      scale=self.foot_scale))
+            o.location = (sx * self.foot_dx, y, z)
 
     # ---- anchors for the wardrobe ----------------------------------------
     def head_top(self):
@@ -692,13 +711,13 @@ class Zibbit(Creature):
         EY = -0.35
         for sx in (-1, 1):
             x, z, r = sx * self.eye_dx, self.eye_z, self.eye_r
-            self.body.append(S.sphere("eyeball", (x, EY, z), r, S.eye_white()))
+            self.face_objs.append(S.sphere("eyeball", (x, EY, z), r, S.eye_white()))
             if mode == "open":
-                self.body.append(S.sphere("iris", (x, EY - r * 0.68, z + r * 0.2), r * 0.56, S.eye_iris(self.iris),
+                self.face_objs.append(S.sphere("iris", (x, EY - r * 0.68, z + r * 0.2), r * 0.56, S.eye_iris(self.iris),
                                           scale=(1, 0.6, 1)))
-                self.body.append(S.sphere("pupil", (x, EY - r * 0.82, z + r * 0.2), r * 0.3, S.eye_pupil(),
+                self.face_objs.append(S.sphere("pupil", (x, EY - r * 0.82, z + r * 0.2), r * 0.3, S.eye_pupil(),
                                           scale=(1, 0.6, 1)))
-                self.body.append(S.sphere("glint", (x - r * 0.2, EY - r * 0.98, z + r * 0.42), r * 0.15, S.eye_glint()))
+                self.face_objs.append(S.sphere("glint", (x - r * 0.2, EY - r * 0.98, z + r * 0.42), r * 0.15, S.eye_glint()))
             else:
                 k = S.mat("lid", COL["pupil"], "eye", rough=0.35)
                 pts = []
@@ -708,7 +727,7 @@ class Zibbit(Creature):
                     pz = z + r * 0.2 + (math.sin(a) * r * (0.6 if mode == "happy" else 0.2) - (0.1 * r if mode != "happy" else 0.05 * r))
                     dy = math.sqrt(max(0.0, r * r - (px - x) ** 2 - (pz - z) ** 2))
                     pts.append((px, EY - dy - 0.02, pz))
-                self.body.append(S.tube("lid", pts, 0.05, k))
+                self.face_objs.append(S.tube("lid", pts, 0.05, k))
 
     def trim(self):
         S = self.S
@@ -734,8 +753,7 @@ class Glimmr(Creature):
         self.body.append(S.sphere("body2", (0, 0.05, 1.05), 0.88, S.clay("body"), scale=(1, 0.95, 1)))
         self.body.append(S.sphere("body3", (0.1, 0.1, 0.45), 0.5, S.clay("body")))
         self.body.append(S.sphere("body4", (0.25, 0.15, 0.12), 0.22, S.clay("body")))
-        self.trim(); self.belly(); self.face()
-        S.body_objs = self.body
+        self.trim(); self.belly()
 
     def belly(self):
         S = self.S
@@ -1214,18 +1232,25 @@ def main():
             if os.path.exists(base + ".webp") and not args.force and sid in manifest["sheets"]:
                 print("skip", sid, "(exists)"); continue
             tiles = []
+            S = c = None                      # ONE scene per species: the coat must not change between frames
+            def creature(frame):
+                nonlocal S, c
+                if S is None:
+                    S = Scene(FRAME_W, FRAME_H, args.samples); c = SPECIES[sid](S, frame)
+                else:
+                    c.set_frame(frame)
+                return S, c
             for frame in (args.frames.split(",") if args.frames else FRAMES):
                 lit, idp = tile(f"{sid}-{frame}"), tile(f"{sid}-{frame}-id")
                 if not have(lit, idp):
-                    S = Scene(FRAME_W, FRAME_H, args.samples)
-                    SPECIES[sid](S, frame)
+                    S, c = creature(frame)
                     S.render(lit); S.render_id(idp)
                     print(f"  {sid} {frame}  ({time.time() - t0:.0f}s)")
                 tiles += [(frame, lit), (frame + "-id", idp)]
             todo = [w for w in wear_ids if not have(tile(f"{sid}-wear-{w}"))]
             if todo:
-                S = Scene(FRAME_W, FRAME_H, max(24, args.samples * 3 // 4))
-                c = SPECIES[sid](S, "idle")
+                S, c = creature("idle")
+                S.sc.cycles.samples = max(24, args.samples * 3 // 4)
                 S.set_holdout(S.body_objs, True)
                 S.floor.hide_render = True        # the creature's own tile has the floor shadow
                 # the coat is in the creature's own tile too: a holdout body
