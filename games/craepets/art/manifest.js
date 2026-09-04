@@ -763,6 +763,8 @@ window.CPArt = {
   "snorbit": {
    "file": "snorbit.webp",
    "idfile": "snorbit-id.webp",
+   "ref": 0.831,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
