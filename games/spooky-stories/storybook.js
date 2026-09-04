@@ -2565,15 +2565,25 @@
   narrator.addEventListener("error", () => paintWord(-1));
 
   /* ---- word highlighting ------------------------------------
-     We know the clip's real length (from the <audio> element) and,
-     once CI has rendered it, the length of every sentence inside
-     it. Time inside a sentence is shared out between its words in
-     proportion to how long they are, which lands each word close
-     enough that a 6-year-old can follow the bouncing highlight.
+     audio/manifest.js tells us, for every sentence in the clip,
+     the stretches of time the voice is actually sounding (the
+     narrator's pauses at commas, dashes and full stops are left
+     out). Words are dealt out across those stretches: a pause
+     lands after the word that carries the comma, and inside a
+     stretch the time is shared out by how long each word is.
+     That keeps the bouncing highlight on the word being spoken,
+     close enough that a 6-year-old can follow along.
      ----------------------------------------------------------- */
   const SENTENCE_GAP = 0.45;              // matches build_audio.py
-  const ENDS_SENTENCE = /[.!?]+["'”’)\]]*$/;
+  // build_audio.py starts a new sentence after . ! ? or an ellipsis, plus any
+  // closing quote/bracket; a decorative emoji stuck on the end doesn't count.
+  const DECOR = /[\u{1F300}-\u{1FAFF}\u2728\u2B50\u2764\uFE0F]/gu;
+  const ENDS_SENTENCE = /(?:[.!?]+|…)["'”’)\]]*$/;
+  // ...and pauses for breath at a comma, colon, semicolon or dash
+  const PAUSE_MARK = /[,;:—–]["'”’)\]]*$/;
+  const DASH = /^[—–-]+$/;
   let wordSpans = [];      // the tappable <span class="w"> words, in order
+  let wordPause = [];      // parallel: does the voice pause after this word?
   let wordTimes = null;    // parallel [{a: startSec, b: endSec}]
   let litWord = -1, rafId = 0;
 
@@ -2585,56 +2595,128 @@
       .replace(/^[^0-9a-zÀ-ɏ]+/, "")
       .replace(/[^0-9a-zÀ-ɏ]+$/, "");
   }
+  function endsSentence(t) { return ENDS_SENTENCE.test(String(t).replace(DECOR, "")); }
+  function pausesAfter(t) { return PAUSE_MARK.test(String(t).replace(DECOR, "")); }
 
-  function buildTiming(dur, sents) {
-    if (!wordSpans.length || !isFinite(dur) || dur <= 0.05) return null;
-    const weights = wordSpans.map(sp => normWord(sp.textContent).length + 1);
-
-    // group the words into sentences the same way build_audio.py does
+  // the words grouped into sentences the same way build_audio.py splits them
+  function sentenceGroups() {
     const groups = [];
     let g = [];
     wordSpans.forEach((sp, i) => {
       g.push(i);
-      if (ENDS_SENTENCE.test(sp.textContent)) { groups.push(g); g = []; }
+      if (endsSentence(sp.textContent)) { groups.push(g); g = []; }
     });
     if (g.length) groups.push(g);
+    return groups;
+  }
 
-    const gw = groups.map(gr => gr.reduce((s, i) => s + weights[i], 0));
-    const starts = [], lens = [];
-    if (sents && sents.length === groups.length) {
-      // exact sentence lengths from the render
-      let t = 0;
-      for (let k = 0; k < groups.length; k++) {
-        starts.push(t); lens.push(sents[k]); t += sents[k] + SENTENCE_GAP;
+  // Deal the words `idx` out over the voiced stretches `runs` ([from, to]
+  // seconds, in order), writing each word's {a, b} into `times`. Every run
+  // gets a block of consecutive words; the block boundaries go where the
+  // voice pauses — after a word the narrator pauses on (`pause[i]`) when
+  // there is one nearby, otherwise wherever the running total of word
+  // lengths says the pause falls. Inside a run, time is shared by length.
+  function dealWords(idx, runs, weights, pause, times) {
+    if (!idx.length || !runs.length) return;
+    runs = runs.map(r => r.slice());
+    // more pauses than words: the shortest gaps aren't between words
+    while (runs.length > idx.length) {
+      let j = 0;
+      for (let k = 1; k < runs.length - 1; k++) {
+        if (runs[k + 1][0] - runs[k][1] < runs[j + 1][0] - runs[j][1]) j = k;
       }
-      const modelled = t - SENTENCE_GAP;
-      if (modelled > 0.05) {           // stretch to the clip's real length
-        const f = dur / modelled;
-        for (let k = 0; k < groups.length; k++) { starts[k] *= f; lens[k] *= f; }
-      }
-    } else {
-      // estimate: take the sentence gaps out, share the rest out by length
-      const gaps = SENTENCE_GAP * (groups.length - 1);
-      const speech = Math.max(dur - gaps, dur * 0.55);
-      const gapEach = groups.length > 1 ? (dur - speech) / (groups.length - 1) : 0;
-      const totalW = gw.reduce((a, b) => a + b, 0) || 1;
-      let t = 0;
-      for (let k = 0; k < groups.length; k++) {
-        const len = speech * gw[k] / totalW;
-        starts.push(t); lens.push(len); t += len + gapEach;
-      }
+      runs[j][1] = runs[j + 1][1]; runs.splice(j + 1, 1);
     }
+    const cum = [0];
+    idx.forEach(i => cum.push(cum[cum.length - 1] + weights[i]));
+    const totalW = cum[cum.length - 1] || 1;
+    const speech = runs.reduce((s, r) => s + (r[1] - r[0]), 0) || 1;
 
-    const times = new Array(wordSpans.length);
-    groups.forEach((gr, k) => {
-      const tw = gw[k] || 1;
-      let t = starts[k];
-      gr.forEach(i => {
-        const d = lens[k] * weights[i] / tw;
+    // cuts[j] = how many of the words have been spoken by the end of run j
+    const cuts = [];
+    let from = 0, spoken = 0;
+    for (let j = 0; j < runs.length - 1; j++) {
+      spoken += runs[j][1] - runs[j][0];
+      const lo = from + 1, hi = idx.length - (runs.length - 1 - j);   // leave a word per run
+      const target = spoken / speech;
+      let e = lo;
+      for (let c = lo; c <= hi; c++) {
+        if (Math.abs(cum[c] / totalW - target) < Math.abs(cum[e] / totalW - target)) e = c;
+      }
+      // snap onto a nearby word that carries a comma/dash
+      const pauseAt = c => c >= lo && c <= hi && pause[idx[c - 1]];
+      if (!pauseAt(e)) {
+        if (pauseAt(e + 1)) e += 1;
+        else if (pauseAt(e - 1)) e -= 1;
+      }
+      cuts.push(e); from = e;
+    }
+    cuts.push(idx.length);
+
+    let s = 0;
+    runs.forEach((r, j) => {
+      const block = idx.slice(s, cuts[j]);
+      const bw = block.reduce((acc, i) => acc + weights[i], 0) || 1;
+      let t = r[0];
+      block.forEach(i => {
+        const d = (r[1] - r[0]) * weights[i] / bw;
         times[i] = { a: t, b: t + d };
         t += d;
       });
+      s = cuts[j];
     });
+  }
+
+  function buildTiming(dur, sents) {
+    if (!wordSpans.length) return null;
+    const weights = wordSpans.map(sp => normWord(sp.textContent).length + 1);
+    const groups = sentenceGroups();
+    const times = new Array(wordSpans.length);
+    const measured = sents && sents.length && Array.isArray(sents[0]);
+
+    if (measured && sents.length === groups.length) {
+      // the real voiced stretches of every sentence, straight from the render
+      groups.forEach((gr, k) => dealWords(gr, sents[k], weights, wordPause, times));
+    } else if (measured) {
+      // the page's sentences don't pair up with the clip's (odd punctuation?):
+      // deal every word over every stretch, pausing at full stops too
+      const all = wordSpans.map((_, i) => i);
+      const pause = wordSpans.map((sp, i) => wordPause[i] || endsSentence(sp.textContent));
+      dealWords(all, [].concat.apply([], sents), weights, pause, times);
+    } else {
+      // older manifest (a length per sentence) or none: we need the clip's
+      // real length, and share each sentence's time out by word length
+      if (!isFinite(dur) || dur <= 0.05) return null;
+      const gw = groups.map(gr => gr.reduce((s, i) => s + weights[i], 0));
+      const starts = [], lens = [];
+      if (sents && sents.length === groups.length) {
+        let t = 0;
+        for (let k = 0; k < groups.length; k++) {
+          starts.push(t); lens.push(sents[k]); t += sents[k] + SENTENCE_GAP;
+        }
+        const modelled = t - SENTENCE_GAP;
+        if (modelled > 0.05) {           // stretch to the clip's real length
+          const f = dur / modelled;
+          for (let k = 0; k < groups.length; k++) { starts[k] *= f; lens[k] *= f; }
+        }
+      } else {
+        // estimate: take the sentence gaps out, share the rest out by length
+        const gaps = SENTENCE_GAP * (groups.length - 1);
+        const speech = Math.max(dur - gaps, dur * 0.55);
+        const gapEach = groups.length > 1 ? (dur - speech) / (groups.length - 1) : 0;
+        const totalW = gw.reduce((a, b) => a + b, 0) || 1;
+        let t = 0;
+        for (let k = 0; k < groups.length; k++) {
+          const len = speech * gw[k] / totalW;
+          starts.push(t); lens.push(len); t += len + gapEach;
+        }
+      }
+      groups.forEach((gr, k) => dealWords(gr, [[starts[k], starts[k] + lens[k]]], weights, wordPause, times));
+    }
+    // the first word lights up the moment the clip starts, not a breath later
+    for (let i = 0; i < times.length; i++) {
+      if (times[i]) { times[i].a = 0; break; }
+    }
     return times;
   }
 
@@ -2870,12 +2952,17 @@
      "big words" also carry a kid-sized meaning. */
   function layoutText(text, defs) {
     textEl.innerHTML = "";
-    wordSpans = []; wordTimes = null; litWord = -1;
+    wordSpans = []; wordPause = []; wordTimes = null; litWord = -1;
     const tokens = String(text || "").trim().split(/\s+/);
     tokens.forEach((tok, i) => {
       if (i) textEl.appendChild(document.createTextNode(" "));
       const norm = normWord(tok);
-      if (!norm) { textEl.appendChild(document.createTextNode(tok)); return; }
+      if (!norm) {
+        // a lone dash is a pause after the word before it; a lone emoji is
+        // just decoration and is never read out
+        if (DASH.test(tok) && wordPause.length) wordPause[wordPause.length - 1] = true;
+        textEl.appendChild(document.createTextNode(tok)); return;
+      }
       const sp = document.createElement("span");
       sp.className = "w";
       sp.textContent = tok;
@@ -2890,6 +2977,7 @@
       }
       textEl.appendChild(sp);
       wordSpans.push(sp);
+      wordPause.push(pausesAfter(tok));
     });
   }
 

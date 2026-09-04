@@ -12,10 +12,14 @@ ever fails to load.)
   strings in `../storybook.js`).
 - **`manifest.js`** is generated alongside the clips and loaded by
   `../index.html` *before* the game script. It lists every clip that exists,
-  plus the length of each spoken sentence inside it. The storybook uses it to
+  plus, for each spoken sentence inside it, the stretches of time the voice is
+  actually sounding (found by listening for the pauses in the rendered
+  waveform — see `speech_runs()` in `build_audio.py`). The storybook uses it to
   (a) never request an mp3 that has not been rendered yet — new story text is
   simply silent instead of 404-ing, and (b) light up each word in time with the
-  narration. **Do not hand-edit it**; `build_audio.py` rewrites it.
+  narration: a pause in the voice lands after the word that carries the comma
+  or dash, and the time inside each stretch is shared out by word length.
+  **Do not hand-edit it**; `build_audio.py` rewrites it.
 - **Voice:** [Piper](https://github.com/rhasspy/piper) `en_US-lessac-medium`.
 - **Format:** MP3, mono, 22.05 kHz, ~56 kbps, loudness-normalised to -15 LUFS.
   MP3 plays everywhere (iOS Safari, Chrome, Firefox, Edge, Chromium).

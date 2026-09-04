@@ -13,6 +13,12 @@ digital silence instead of Piper's --sentence-silence. Every rendered
 page is also checked for that noise signature, so a bad render fails the
 build loudly instead of shipping static to the kids.
 
+Alongside the clips it writes manifest.js: for every sentence of every
+clip, the stretches of time the voice is actually sounding (found by
+listening for the pauses in the rendered waveform). The storybook uses
+those to light up each word in step with the narrator, so the highlight
+waits through commas and dashes exactly where the voice does.
+
 Setup, then run from this folder:
 
     pip install piper-tts==1.5.0 imageio-ffmpeg
@@ -29,6 +35,13 @@ OUT = HERE
 VOICE = os.path.join(HERE, "voices", "en_US-lessac-medium.onnx")
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 SENTENCE_GAP = 0.45  # seconds of silence stitched between sentences
+# Listening for pauses: the voice is "sounding" while a 10 ms window's RMS
+# level is above this fraction of the loudest window in the sentence, and a
+# quiet stretch only counts as a pause once it is this long. Rendered speech
+# has closure gaps inside words of up to ~100 ms (the "p" in "pumpkin"); a
+# real pause at a comma or dash is 150-400 ms. Sentence ends run longer.
+SPEECH_LEVEL = 0.03
+MIN_PAUSE = 0.12
 
 src = open(JS, encoding="utf-8").read()
 
@@ -85,6 +98,40 @@ def piper_sentence(text, wav_path):
                    input=text.encode(), check=True,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
+def speech_runs(pcm, rate):
+    """Where the voice is sounding in one rendered sentence: [[start, end], ...]
+    in seconds, in order, with the pauses (>= MIN_PAUSE of quiet) left out.
+    Leading and trailing silence are dropped too, so the first run starts
+    when the narrator actually begins to speak."""
+    n = len(pcm) // 2
+    samples = struct.unpack("<%dh" % n, pcm[:n * 2])
+    win = max(1, int(rate * 0.01))
+    levels = []
+    for i in range(0, n - win + 1, win):
+        w = samples[i:i + win]
+        levels.append((sum(v * v for v in w) / win) ** 0.5)
+    if not levels:
+        return [[0.0, n / rate]]
+    thr = max(max(levels) * SPEECH_LEVEL, 40.0)
+    step = win / rate
+    runs, on, start = [], False, 0.0
+    for k, lv in enumerate(levels):
+        if lv > thr and not on:
+            on, start = True, k * step
+        elif lv <= thr and on:
+            on = False
+            runs.append([start, k * step])
+    if on:
+        runs.append([start, len(levels) * step])
+    merged = []
+    for r in runs:
+        if merged and r[0] - merged[-1][1] < MIN_PAUSE:
+            merged[-1][1] = r[1]
+        else:
+            merged.append(r)
+    merged = [r for r in merged if r[1] - r[0] >= 0.04] or [[0.0, n / rate]]
+    return [[round(a, 3), round(b, 3)] for a, b in merged]
+
 def assert_not_static(pcm, rate, name):
     """Fail if the clip carries Piper's white-noise failure mode.
 
@@ -110,10 +157,11 @@ def assert_not_static(pcm, rate, name):
             "- refusing to ship broken narration")
 
 total = 0
-timings = {}   # clip name -> [seconds of speech in each sentence]
+timings = {}   # clip name -> per sentence, the [start, end] runs of voice (seconds)
 
 def render(raw, name):
-    """Synthesize one line to <name>.mp3; returns its per-sentence lengths."""
+    """Synthesize one line to <name>.mp3; returns, per sentence, the
+    [start, end] stretches (in clip seconds) where the voice is sounding."""
     global total
     text = clean(raw)
     if not text:
@@ -151,9 +199,13 @@ def render(raw, name):
     sz = os.path.getsize(dst)
     total += sz
     print(f"  {os.path.basename(dst):26s} {sz/1024:5.1f} KB  | {text[:46]}")
-    # how long the voice spends on each sentence, so the storybook can light up
-    # the words in time with the reading
-    return [round(len(c) / 2 / rate, 3) for c in chunks]
+    # where the voice is sounding inside each sentence (clip seconds), so the
+    # storybook can light up the words in time with the reading
+    sents, at = [], 0.0
+    for c in chunks:
+        sents.append([[round(at + a, 3), round(at + b, 3)] for a, b in speech_runs(c, rate)])
+        at += len(c) / 2 / rate + SENTENCE_GAP
+    return sents
 
 
 count = 0
@@ -178,9 +230,10 @@ with open(os.path.join(OUT, "manifest.js"), "w", encoding="utf-8") as f:
         "   Lists the narration clips that exist in this folder, so the storybook only\n"
         "   ever asks for an mp3 that is really there (new story text stays silent, with\n"
         "   no failed requests, until the build-audio workflow renders it).\n"
-        "   Each value is the length in seconds of each spoken sentence in the clip,\n"
-        "   used to line the word highlighting up with the voice; [] = not measured yet,\n"
-        "   in which case the reader estimates from the clip's own duration. */\n"
+        "   Each value has one entry per spoken sentence: the [start, end] stretches\n"
+        "   (in seconds) where the voice is sounding, with its pauses left out. The\n"
+        "   storybook uses them to light each word up in time with the voice;\n"
+        "   [] = not measured yet, so the reader estimates from the clip's own duration. */\n"
         "window.SPOOKY_NARRATION = {\n" + lines + "\n};\n")
 
 print(f"\nClips: {count}  Total: {total/1024:.0f} KB  (+ manifest.js)")

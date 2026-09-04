@@ -67,7 +67,26 @@ function startServer() {
       if (!file.startsWith(ROOT)) { res.writeHead(403).end(); return; }
       fs.readFile(file, (err, data) => {
         if (err) { res.writeHead(404).end("not found"); return; }
-        res.writeHead(200, { "Content-Type": MIME[path.extname(file)] || "application/octet-stream" });
+        const type = MIME[path.extname(file)] || "application/octet-stream";
+        // honour byte ranges like GitHub Pages does: without them Chromium
+        // treats a narration mp3 as unseekable, so "tap a word to hear it
+        // from there" cannot be tested
+        const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || "");
+        if (range && data.length) {
+          const from = range[1] ? Number(range[1]) : Math.max(0, data.length - Number(range[2]));
+          const to = range[1] && range[2] ? Math.min(Number(range[2]), data.length - 1) : data.length - 1;
+          if (from > to || from >= data.length) {
+            res.writeHead(416, { "Content-Range": `bytes */${data.length}` }).end();
+            return;
+          }
+          res.writeHead(206, {
+            "Content-Type": type, "Accept-Ranges": "bytes",
+            "Content-Range": `bytes ${from}-${to}/${data.length}`, "Content-Length": to - from + 1,
+          });
+          res.end(data.subarray(from, to + 1));
+          return;
+        }
+        res.writeHead(200, { "Content-Type": type, "Accept-Ranges": "bytes", "Content-Length": data.length });
         res.end(data);
       });
     });
@@ -336,6 +355,31 @@ const GAMES = {
     await page.waitForTimeout(400);
     if (await page.locator("#reader.active").count() < 1) throw new Error("reader did not open");
     if (!(await page.locator("#prev-btn").isDisabled())) throw new Error("Back should be disabled on page 1");
+    // the read-aloud highlight follows the narrator: a word is lit straight
+    // away, it moves on as the clip plays, and it lands on the spoken word
+    // (its timing comes from the manifest's measured voice stretches, so a
+    // word 2 s in must be lit at 2 s — not the first word, not the last)
+    const litIndex = () => page.evaluate(() => {
+      const w = document.querySelector("#page-text .w.now");
+      return w ? Number(w.dataset.i) : -1;
+    });
+    const words = await page.locator("#page-text .w").count();
+    if (words < 3) throw new Error(`only ${words} tappable words on page 1`);
+    await page.waitForTimeout(300);
+    const first = await litIndex();
+    if (first < 0) throw new Error("no word is highlighted while the page is being read");
+    await page.waitForTimeout(1800);
+    const later = await litIndex();
+    if (later <= first) throw new Error(`highlight did not move on with the voice (word ${first} -> ${later})`);
+    // tapping a word jumps the narrator (and the highlight) to it — both
+    // mid-clip and after the page has finished being read
+    for (const when of ["while it is being read", "after it has been read"]) {
+      await page.locator("#page-text .w").last().click();
+      await page.waitForTimeout(200);
+      const tapped = await litIndex();
+      if (tapped < words - 2) throw new Error(`tapping the last word ${when} lit word ${tapped} of ${words}`);
+      await page.waitForTimeout(1200);   // the clip runs out after the last word
+    }
     // read through to the end
     let reachedEnd = false;
     for (let i = 0; i < 9; i++) {
