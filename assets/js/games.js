@@ -266,7 +266,7 @@ const GAMES = [
   {
     title: "Spooky Princess Stories",
     emoji: "👻",
-    blurb: "Friendly-spooky read-aloud storybooks starring Ellie & her siblings — the words light up as they're read, tap any word to hear it or learn what it means, then answer the story questions. For Ellie & Jeannie!",
+    blurb: "22 friendly-spooky read-aloud storybooks starring Ellie & her siblings — a candy monster, a kind witch, a floating tea party and more, including a story Ellie made up herself! The words light up as they're read, tap any word to hear it or learn what it means, then answer the story questions. For Ellie & Jeannie!",
     url:   "games/spooky-stories/",
     ages:  "3+",
     kids: ["ellie","jeannie"],

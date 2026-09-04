@@ -716,6 +716,317 @@
   }
 
   /* -----------------------------------------------------------
+     1c. Halloween-town toolkit — the extra friends and props the
+     newer stories need: a kindly wizard, grown-ups, a big fuzzy
+     (friendly!) candy monster, caped superheroes, little town
+     houses to knock on, candy baskets, an owl, a spider, a witch's
+     broom and floating teacups. Same 0 0 400 300 space.
+     ----------------------------------------------------------- */
+
+  // A tiny four-point sparkle (static or twinkling) for props.
+  function sparkle(x, y, r, col, tw) {
+    const q = r * 0.3;
+    return `<path transform="translate(${x} ${y})" d="M0 ${-r} Q ${q} ${-q} ${r} 0 Q ${q} ${q} 0 ${r} Q ${-q} ${q} ${-r} 0 Q ${-q} ${-q} 0 ${-r} Z" fill="${col || "#fff"}" opacity="0.9">` +
+      (tw ? `<animate attributeName="opacity" values="0.9;0.2;0.9" dur="${tw}s" repeatCount="indefinite"/>` : "") + `</path>`;
+  }
+
+  // A kindly old wizard: star-spangled robe, long white beard, a
+  // very tall pointy hat and a wand that twinkles. Feet at y≈+12.
+  function wizard(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const robe = o.color || "#4a48c4";
+    const robeL = shade(robe, 34), robeD = shade(robe, -34);
+    const skin = "#ffd9b8";
+    const rg = uid("robe");
+    return `<g transform="translate(${x} ${y}) scale(${o.flip ? -sc : sc} ${sc})"><g class="tap hint-bob" data-sound="magic">` +
+      `<defs><linearGradient id="${rg}" x1="0" y1="0" x2="0" y2="1">` +
+      `<stop offset="0" stop-color="${robeL}"/><stop offset="0.6" stop-color="${robe}"/>` +
+      `<stop offset="1" stop-color="${robeD}"/></linearGradient></defs>` +
+      `<ellipse cx="0" cy="12" rx="27" ry="4.5" fill="#000" opacity="0.25"/>` +
+      // flowing robe with little golden stars and moons
+      `<path d="M -9 -44 L 9 -44 C 14 -30 21 -12 27 6 C 29 10 27 13 23 13 Q 0 17 -23 13 C -27 13 -29 10 -27 6 C -21 -12 -14 -30 -9 -44 Z" fill="url(#${rg})"/>` +
+      `<path d="M -3 -42 C -6 -26 -8 -8 -9 12 Q 0 15 9 12 C 8 -8 6 -26 3 -42 Z" fill="${robeL}" opacity="0.35"/>` +
+      sparkle(-11, -14, 3.2, "#ffd166") + sparkle(12, -4, 2.6, "#ffd166") + sparkle(-4, 4, 2.4, "#ffd166") +
+      `<path d="M 14 -24 a 3.2 3.2 0 1 0 2.4 5.2 a 2.4 2.4 0 1 1 -2.4 -5.2 Z" fill="#ffd166"/>` +
+      // arms: one raises the wand, the other rests
+      `<path d="M -8 -38 Q -20 -32 -27 -44" stroke="${skin}" stroke-width="5" stroke-linecap="round" fill="none"/>` +
+      `<path d="M 8 -38 Q 18 -30 22 -16" stroke="${skin}" stroke-width="5" stroke-linecap="round" fill="none"/>` +
+      `<circle cx="-7.6" cy="-38.6" r="5" fill="${robeL}"/><circle cx="7.6" cy="-38.6" r="5" fill="${robeL}"/>` +
+      `<circle cx="-27" cy="-44" r="3.3" fill="${skin}"/><circle cx="22" cy="-16" r="3.3" fill="${skin}"/>` +
+      // the wand + its twinkling star
+      `<line x1="-27" y1="-44" x2="-37" y2="-62" stroke="#6b4a2a" stroke-width="2.6" stroke-linecap="round"/>` +
+      `<g transform="translate(-38 -64)"><path d="M0 -7 Q 2 -2 7 0 Q 2 2 0 7 Q -2 2 -7 0 Q -2 -2 0 -7 Z" fill="#fff3b0">` +
+      `<animate attributeName="opacity" values="1;0.35;1" dur="1.6s" repeatCount="indefinite"/></path></g>` +
+      // long white beard + moustache, then the face
+      `<path d="M -12 -50 C -15 -38 -9 -24 0 -22 C 9 -24 15 -38 12 -50 Z" fill="#f4f1ff"/>` +
+      `<circle cx="0" cy="-56" r="12.5" fill="${skin}"/>` +
+      `<path d="M -9 -49 Q -4 -46 0 -48 Q 4 -46 9 -49 Q 4 -51.5 0 -50.5 Q -4 -51.5 -9 -49 Z" fill="#ffffff"/>` +
+      `<ellipse cx="-4.6" cy="-58" rx="2.1" ry="2.7" fill="#2b2440">` +
+      `<animate attributeName="ry" values="2.7;2.7;0.4;2.7" keyTimes="0;0.9;0.94;1" dur="5.4s" repeatCount="indefinite"/></ellipse>` +
+      `<ellipse cx="4.6" cy="-58" rx="2.1" ry="2.7" fill="#2b2440">` +
+      `<animate attributeName="ry" values="2.7;2.7;0.4;2.7" keyTimes="0;0.9;0.94;1" dur="5.4s" repeatCount="indefinite"/></ellipse>` +
+      `<circle cx="-3.8" cy="-59" r="0.8" fill="#fff"/><circle cx="5.4" cy="-59" r="0.8" fill="#fff"/>` +
+      `<path d="M -9 -62 Q -5 -64.5 -1 -62.5 M 1 -62.5 Q 5 -64.5 9 -62" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>` +
+      `<circle cx="-9" cy="-53" r="2.4" fill="#ff9ec2" opacity="0.5"/><circle cx="9" cy="-53" r="2.4" fill="#ff9ec2" opacity="0.5"/>` +
+      // the very tall hat, tip flopped over, with a star and a moon
+      `<path d="M -17 -64 C -11 -82 -4 -98 3 -114 C 5 -119 10 -121 14 -118 C 18 -114 15 -109 11 -108 C 9 -95 12 -80 17 -64 Q 0 -70 -17 -64 Z" fill="url(#${rg})"/>` +
+      `<path d="M -11 -70 Q -5 -88 0 -104" stroke="${robeL}" stroke-width="2.2" opacity="0.5" fill="none" stroke-linecap="round"/>` +
+      sparkle(1, -84, 3.4, "#ffd166") +
+      `<path d="M 5 -96 a 2.6 2.6 0 1 0 2 4.3 a 2 2 0 1 1 -2 -4.3 Z" fill="#ffd166"/>` +
+      `<ellipse cx="0" cy="-63" rx="24" ry="5.4" fill="${robeD}"/>` +
+      `<ellipse cx="0" cy="-64.5" rx="24" ry="5" fill="url(#${rg})"/>` +
+      `<path d="M -13 -69 Q 0 -73 13 -69 L 14 -65 Q 0 -70 -14 -65 Z" fill="#ffd166"/>` +
+      `</g></g>`;
+  }
+
+  // A grown-up (mum or dad): the same friendly drawing as the kids,
+  // just taller and without a crown. Mum gets a dress, dad a shirt.
+  function grownup(o) {
+    return kid(Object.assign({ crown: false, sound: "chime" }, o, { scale: (o.scale || 1) * 1.32 }));
+  }
+  const MUM = { dress: "#3aa0d8", hair: "#b8702f" };
+  const DAD = { dress: "#5a6fd8", pants: "#3c3f5c", hair: "#3a2a1a", boy: true };
+
+  // The big fuzzy candy monster — round, purple, one golden horn,
+  // giant friendly eyes and a gap-toothed grin. Feet at y≈+44.
+  function monster(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const col = o.color || "#8e5bd6";
+    const dark = shade(col, -40), lite = shade(col, 34);
+    let fuzz = "";
+    for (let i = 0; i < 14; i++) {
+      const a = (Math.PI * 2 * i) / 14;
+      fuzz += `<circle cx="${(Math.cos(a) * 36).toFixed(1)}" cy="${(Math.sin(a) * 34).toFixed(1)}" r="${i % 2 ? 7.5 : 6}" fill="${col}"/>`;
+    }
+    return `<g transform="translate(${x} ${y}) scale(${o.flip ? -sc : sc} ${sc})"><g class="tap hint-bob" data-sound="growl">` +
+      `<ellipse cx="0" cy="44" rx="42" ry="6" fill="#000" opacity="0.25"/>` +
+      // stompy feet + waving arms behind the body
+      `<ellipse cx="-18" cy="42" rx="13" ry="6" fill="${dark}"/><ellipse cx="18" cy="42" rx="13" ry="6" fill="${dark}"/>` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="0 -30 -2;-12 -30 -2;0 -30 -2" dur="2.6s" repeatCount="indefinite"/>` +
+      `<path d="M -30 -2 Q -52 4 -50 24" stroke="${col}" stroke-width="11" stroke-linecap="round" fill="none"/>` +
+      `<circle cx="-50" cy="25" r="7.5" fill="${col}"/></g>` +
+      `<path d="M 30 -2 Q 52 4 50 24" stroke="${col}" stroke-width="11" stroke-linecap="round" fill="none"/>` +
+      `<circle cx="50" cy="25" r="7.5" fill="${col}"/>` +
+      (o.candy ? candy(50, 22, 0.9, "#ff5d8f") : "") +
+      // fuzzy round body + pale belly
+      fuzz + `<circle cx="0" cy="0" r="37" fill="${col}"/>` +
+      `<ellipse cx="0" cy="14" rx="22" ry="17" fill="${lite}" opacity="0.8"/>` +
+      // one golden horn
+      `<path d="M -5 -34 Q 0 -58 7 -35 Z" fill="#ffd166"/>` +
+      `<path d="M -2 -40 L 4 -41 M -1 -46 L 3 -47" stroke="#e8a92e" stroke-width="1" stroke-linecap="round"/>` +
+      // huge friendly eyes (they blink) and rosy cheeks
+      `<circle cx="-13" cy="-9" r="10" fill="#fff"/><circle cx="13" cy="-9" r="10" fill="#fff"/>` +
+      `<ellipse cx="-11.5" cy="-8" rx="4.6" ry="5.2" fill="#2b2440">` +
+      `<animate attributeName="ry" values="5.2;5.2;0.5;5.2" keyTimes="0;0.9;0.94;1" dur="4.4s" repeatCount="indefinite"/></ellipse>` +
+      `<ellipse cx="14.5" cy="-8" rx="4.6" ry="5.2" fill="#2b2440">` +
+      `<animate attributeName="ry" values="5.2;5.2;0.5;5.2" keyTimes="0;0.9;0.94;1" dur="4.4s" repeatCount="indefinite"/></ellipse>` +
+      `<circle cx="-9.8" cy="-10.5" r="1.6" fill="#fff"/><circle cx="16.2" cy="-10.5" r="1.6" fill="#fff"/>` +
+      `<circle cx="-26" cy="4" r="4" fill="#ff9ec2" opacity="0.55"/><circle cx="26" cy="4" r="4" fill="#ff9ec2" opacity="0.55"/>` +
+      // big happy grin with two square teeth
+      `<path d="M -17 8 Q 0 24 17 8 Q 0 14 -17 8 Z" fill="#5a2a7a"/>` +
+      `<rect x="-8" y="8.5" width="6" height="5" rx="1.4" fill="#fff"/><rect x="2" y="8.5" width="6" height="5" rx="1.4" fill="#fff"/>` +
+      `</g></g>`;
+  }
+
+  // A wrapped sweetie: an oval with twisty ends. Tappable, "yum".
+  function candy(x, y, sc, col) {
+    sc = sc || 1; col = col || "#ff5d8f";
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tap" data-sound="yum">` +
+      `<path d="M -9 -4 L -15 -8 L -14 0 L -15 8 L -9 4 Z" fill="${shade(col, -20)}"/>` +
+      `<path d="M 9 -4 L 15 -8 L 14 0 L 15 8 L 9 4 Z" fill="${shade(col, -20)}"/>` +
+      `<ellipse cx="0" cy="0" rx="9.5" ry="6.5" fill="${col}"/>` +
+      `<path d="M -4 -5.5 L -1 5.5 M 3 -5.5 L 6 5.5" stroke="#fff" stroke-width="1.6" opacity="0.7" stroke-linecap="round"/>` +
+      `</g></g>`;
+  }
+
+  // A trick-or-treat basket: wicker, with a handle. `full` fills it
+  // with sweets; empty shows the bare bottom. Rests on the ground at y≈+12.
+  function basket(x, y, sc, full) {
+    sc = sc || 1;
+    let sweets = "";
+    if (full) {
+      const cols = ["#ff5d8f", "#ffd166", "#4aa3ff", "#4bd07b", "#b98cff"];
+      [[-11, -9], [0, -12], [11, -9], [-5, -5], [6, -5]].forEach((p, i) => {
+        sweets += candy(p[0], p[1], 0.55, cols[i]);
+      });
+    }
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<ellipse cx="0" cy="12" rx="20" ry="3" fill="#000" opacity="0.2"/>` +
+      `<path d="M -17 -8 A 17 15 0 0 1 17 -8" fill="none" stroke="#8a5a30" stroke-width="3" stroke-linecap="round"/>` +
+      `<path d="M -19 -6 L 19 -6 L 15 12 L -15 12 Z" fill="#c98b45"/>` +
+      `<path d="M -19 -6 L 19 -6 L 15 12 L -15 12 Z" fill="none" stroke="#8a5a30" stroke-width="1.4"/>` +
+      `<path d="M -17 0 L 17 0 M -16 6 L 16 6" stroke="#8a5a30" stroke-width="1" opacity="0.6"/>` +
+      `<path d="M -9 -6 L -7 12 M 0 -6 L 0 12 M 9 -6 L 7 12" stroke="#8a5a30" stroke-width="1" opacity="0.5"/>` +
+      `<ellipse cx="0" cy="-6" rx="19" ry="4" fill="#e0a45c"/>` +
+      `<ellipse cx="0" cy="-6" rx="15" ry="2.6" fill="${full ? "#7a4a20" : "#5c3714"}"/>` +
+      sweets + `</g>`;
+  }
+
+  // A caped superhero version of a kid: swishing cape, a little
+  // eye mask and a gold star on the chest. Same feet as kid().
+  function hero(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const cape = o.cape || "#ff5d8f";
+    const capeSvg = `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="0 0 -30;7 0 -30;0 0 -30" dur="2.2s" repeatCount="indefinite"/>` +
+      `<path d="M -9 -31 C -24 -18 -33 4 -33 15 Q -16 8 0 12 Q 16 8 33 15 C 33 4 24 -18 9 -31 Z" fill="${cape}"/>` +
+      `<path d="M -9 -31 C -24 -18 -33 4 -33 15" stroke="${shade(cape, 40)}" stroke-width="1.5" fill="none" opacity="0.6"/>` +
+      `</g></g>`;
+    const extra =
+      `<path d="M -13 -47.5 Q 0 -52 13 -47.5 Q 0 -42.5 -13 -47.5 Z" fill="${cape}"/>` +
+      `<ellipse cx="-5" cy="-46.5" rx="2.6" ry="2.6" fill="#fff"/><ellipse cx="5" cy="-46.5" rx="2.6" ry="2.6" fill="#fff"/>` +
+      `<circle cx="-4.6" cy="-46.3" r="1.6" fill="#2b2440"/><circle cx="5.4" cy="-46.3" r="1.6" fill="#2b2440"/>` +
+      sparkle(0, -20, 5, "#ffd166") + (o.extra || "");
+    return capeSvg + kid(Object.assign({ sound: "whoosh" }, o, { extra: extra }));
+  }
+  const SUPER_JEANNIE = Object.assign({}, JEANNIE, { cape: "#ffd166" });
+  const SUPER_CORY = Object.assign({}, CORY, { cape: "#ff5d8f" });
+
+  // The monster's friend, dressed up like an ordinary trick-or-treater:
+  // long coat, a bowler hat... and a purple tail peeking out the back.
+  function disguise(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const tail = `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="0 12 0;10 12 0;0 12 0" dur="1.8s" repeatCount="indefinite"/>` +
+      `<path d="M 12 0 C 26 -6 32 8 24 14" stroke="#8e5bd6" stroke-width="5" stroke-linecap="round" fill="none"/>` +
+      `<ellipse cx="23" cy="15" rx="5" ry="3.6" fill="#8e5bd6"/></g></g>`;
+    const hat = `<ellipse cx="0" cy="-59" rx="15.5" ry="4" fill="#2b2440"/>` +
+      `<path d="M -10.5 -59 C -10.5 -74 10.5 -74 10.5 -59 Z" fill="#3a3158"/>` +
+      `<path d="M -10 -63 Q 0 -66 10 -63" stroke="#ff5d8f" stroke-width="2" fill="none"/>`;
+    return tail + kid(Object.assign({ crown: false, boy: true, dress: "#8a6a4a", pants: "#4a3a2a", hair: "#3a2a1a", sound: "knock" }, o, { extra: hat + (o.extra || "") })) +
+      basket(x + 24 * sc, y + 2 * sc, 0.62 * sc, o.full);
+  }
+
+  // A little town house: bright walls, dark roof, a chimney, a warm
+  // glowing window and a knockable front door. Doorstep at y≈+10.
+  function house(x, y, sc, col, opts) {
+    sc = sc || 1; col = col || "#c76e9a"; opts = opts || {};
+    const wg = uid("hwin"), roof = shade(col, -55), wallL = shade(col, 24);
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<defs><radialGradient id="${wg}" cx="0.5" cy="0.4" r="0.8">` +
+      `<stop offset="0" stop-color="#fff6c4"/><stop offset="1" stop-color="#ffc94d"/></radialGradient></defs>` +
+      `<ellipse cx="0" cy="11" rx="44" ry="4" fill="#000" opacity="0.2"/>` +
+      `<rect x="16" y="-82" width="11" height="24" rx="2" fill="${roof}"/>` +
+      `<rect x="-32" y="-52" width="64" height="62" rx="4" fill="${col}"/>` +
+      `<rect x="-32" y="-52" width="64" height="8" fill="${wallL}" opacity="0.5"/>` +
+      `<path d="M -40 -50 L 0 -88 L 40 -50 Z" fill="${roof}"/>` +
+      `<path d="M -34 -52 L 0 -84 L 34 -52" fill="none" stroke="${shade(roof, 30)}" stroke-width="2" stroke-linecap="round" opacity="0.6"/>` +
+      // glowing window with a cross frame
+      `<rect x="6" y="-40" width="18" height="18" rx="3" fill="url(#${wg})">` +
+      (opts.flicker ? `<animate attributeName="opacity" values="1;0.75;1" dur="3.1s" repeatCount="indefinite"/>` : "") + `</rect>` +
+      `<path d="M 15 -40 L 15 -22 M 6 -31 L 24 -31" stroke="${roof}" stroke-width="1.6"/>` +
+      // the front door (tap it: knock knock!)
+      `<g class="tap" data-sound="knock">` +
+      `<path d="M -24 10 L -24 -26 Q -13 -40 -2 -26 L -2 10 Z" fill="#3a2a4a"/>` +
+      `<path d="M -24 -26 Q -13 -40 -2 -26" fill="none" stroke="${wallL}" stroke-width="2"/>` +
+      `<circle cx="-6.5" cy="-8" r="1.8" fill="#ffd166"/>` +
+      `</g>` +
+      `<rect x="-28" y="8" width="30" height="4" rx="1.5" fill="${shade(col, -30)}"/>` +
+      (opts.pumpkin !== false ? pumpkin({ x: 30, y: 0, scale: 0.36 }) : "") +
+      `</g>`;
+  }
+
+  // A row of three houses along a lane, for the town scenes.
+  function street(opts) {
+    opts = opts || {};
+    const y = opts.y || 246, sc = opts.scale || 0.82;
+    return `<path d="M 0 ${y + 12} Q 200 ${y + 2} 400 ${y + 12} L 400 300 L 0 300 Z" fill="#2a1d50" opacity="0.7"/>` +
+      house(72, y, sc, "#c76e9a", { flicker: true }) +
+      house(200, y, sc, "#5f8fd8") +
+      house(328, y, sc, "#d9a441", { flicker: true });
+  }
+
+  // A round little owl perched on a branch, blinking slowly. "Hoo-hoo!"
+  function owl(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const col = "#9a7452", lite = "#d9b58a", dark = "#6f4f33";
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      `<path d="M -48 22 Q -20 18 0 20 Q 22 22 50 16" stroke="#3a2a1a" stroke-width="5" stroke-linecap="round" fill="none"/>` +
+      `<path d="M 30 18 Q 36 8 44 6" stroke="#3a2a1a" stroke-width="3" stroke-linecap="round" fill="none"/>` +
+      `<g class="tap hint-bob" data-sound="hoot">` +
+      `<ellipse cx="0" cy="0" rx="19" ry="23" fill="${col}"/>` +
+      `<path d="M -13 -20 L -17 -32 L -6 -24 Z M 13 -20 L 17 -32 L 6 -24 Z" fill="${col}"/>` +
+      `<g><animateTransform attributeName="transform" type="rotate" values="0 -17 -2;-8 -17 -2;0 -17 -2" dur="3s" repeatCount="indefinite"/>` +
+      `<ellipse cx="-19" cy="4" rx="6" ry="14" fill="${dark}"/></g>` +
+      `<ellipse cx="19" cy="4" rx="6" ry="14" fill="${dark}"/>` +
+      `<ellipse cx="0" cy="8" rx="11" ry="12" fill="${lite}"/>` +
+      `<path d="M -7 4 Q -3.5 7 0 4 Q 3.5 7 7 4 M -6 10 Q -3 13 0 10 Q 3 13 6 10" stroke="${col}" stroke-width="1.2" fill="none" stroke-linecap="round"/>` +
+      `<circle cx="-7" cy="-8" r="7.5" fill="#fff"/><circle cx="7" cy="-8" r="7.5" fill="#fff"/>` +
+      `<ellipse cx="-6.5" cy="-7.5" rx="3.6" ry="4" fill="#2b2440">` +
+      `<animate attributeName="ry" values="4;4;0.4;4" keyTimes="0;0.88;0.93;1" dur="5.6s" repeatCount="indefinite"/></ellipse>` +
+      `<ellipse cx="7.5" cy="-7.5" rx="3.6" ry="4" fill="#2b2440">` +
+      `<animate attributeName="ry" values="4;4;0.4;4" keyTimes="0;0.88;0.93;1" dur="5.6s" repeatCount="indefinite"/></ellipse>` +
+      `<circle cx="-5.2" cy="-9" r="1.2" fill="#fff"/><circle cx="8.8" cy="-9" r="1.2" fill="#fff"/>` +
+      `<path d="M -3 -1 L 3 -1 L 0 4 Z" fill="#ffb347"/>` +
+      `<path d="M -8 22 L -8 27 M -5 22 L -5 27 M 5 22 L 5 27 M 8 22 L 8 27" stroke="#ffb347" stroke-width="2" stroke-linecap="round"/>` +
+      `</g></g>`;
+  }
+
+  // Silky the spider: a friendly little spider on a silver thread,
+  // with a pink bow and eight wiggly legs. Body centre at (0,0).
+  function spider(o) {
+    const x = o.x, y = o.y, sc = o.scale || 1;
+    const col = "#4a3a6e", lite = "#6b5a94";
+    let legs = "";
+    [[-1, -6], [-1, 0], [-1, 6], [-1, 12]].forEach((p, i) => {
+      const d = 8 + i * 1.5;
+      legs += `<path d="M -6 ${p[1]} C -12 ${p[1] - 4} -18 ${p[1] - 2} -22 ${p[1] + d}" stroke="${col}" stroke-width="2.2" fill="none" stroke-linecap="round">` +
+        `<animate attributeName="d" values="M -6 ${p[1]} C -12 ${p[1] - 4} -18 ${p[1] - 2} -22 ${p[1] + d};M -6 ${p[1]} C -12 ${p[1] - 6} -18 ${p[1] - 4} -24 ${p[1] + d - 3};M -6 ${p[1]} C -12 ${p[1] - 4} -18 ${p[1] - 2} -22 ${p[1] + d}" dur="${(1.4 + i * 0.3).toFixed(1)}s" repeatCount="indefinite"/></path>` +
+        `<path d="M 6 ${p[1]} C 12 ${p[1] - 4} 18 ${p[1] - 2} 22 ${p[1] + d}" stroke="${col}" stroke-width="2.2" fill="none" stroke-linecap="round">` +
+        `<animate attributeName="d" values="M 6 ${p[1]} C 12 ${p[1] - 4} 18 ${p[1] - 2} 22 ${p[1] + d};M 6 ${p[1]} C 12 ${p[1] - 6} 18 ${p[1] - 4} 24 ${p[1] + d - 3};M 6 ${p[1]} C 12 ${p[1] - 4} 18 ${p[1] - 2} 22 ${p[1] + d}" dur="${(1.6 + i * 0.3).toFixed(1)}s" repeatCount="indefinite"/></path>`;
+    });
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      (o.thread ? `<line x1="0" y1="${-o.thread}" x2="0" y2="-14" stroke="#e8e2ff" stroke-width="1.2" opacity="0.8"/>` : "") +
+      `<g class="tap hint-bob" data-sound="boing">` +
+      legs +
+      `<ellipse cx="0" cy="6" rx="11" ry="10" fill="${col}"/>` +
+      `<ellipse cx="0" cy="8" rx="6" ry="5" fill="${lite}" opacity="0.6"/>` +
+      `<circle cx="0" cy="-6" r="8" fill="${col}"/>` +
+      `<circle cx="-3.4" cy="-7" r="3" fill="#fff"/><circle cx="3.4" cy="-7" r="3" fill="#fff"/>` +
+      `<circle cx="-3" cy="-6.6" r="1.6" fill="#2b2440"/><circle cx="3.8" cy="-6.6" r="1.6" fill="#2b2440"/>` +
+      `<circle cx="-2.5" cy="-7.3" r="0.5" fill="#fff"/><circle cx="4.3" cy="-7.3" r="0.5" fill="#fff"/>` +
+      `<path d="M -2.5 -2 Q 0 0.2 2.5 -2" stroke="#ff9ec2" stroke-width="1.1" fill="none" stroke-linecap="round"/>` +
+      `<path d="M -1 -13 L -8 -17 L -6 -11 Z M 1 -13 L 8 -17 L 6 -11 Z" fill="#ff5d8f"/><circle cx="0" cy="-13" r="1.6" fill="#ff8ec9"/>` +
+      `</g></g>`;
+  }
+
+  // A witch's broom, lying at an angle (deg). Sweeps a little when tapped-at.
+  function broom(x, y, sc, angle) {
+    sc = sc || 1;
+    return `<g transform="translate(${x} ${y}) scale(${sc}) rotate(${angle || 0})"><g class="tap hint-bob" data-sound="whoosh">` +
+      `<line x1="-46" y1="0" x2="16" y2="0" stroke="#8a5a30" stroke-width="4" stroke-linecap="round"/>` +
+      `<path d="M 14 -4 L 22 -4 L 22 4 L 14 4 Z" fill="#ff5d8f"/>` +
+      `<path d="M 20 -5 C 30 -12 44 -10 50 -6 L 52 6 C 44 10 30 12 20 5 Z" fill="#d9a441"/>` +
+      `<path d="M 26 -6 L 48 -7 M 26 0 L 50 0 M 26 6 L 48 7" stroke="#b8862e" stroke-width="1.2" stroke-linecap="round"/>` +
+      `</g></g>`;
+  }
+
+  // A teacup with a curl of steam. `float` makes it bob up in the air.
+  function teacup(x, y, sc, col, float) {
+    sc = sc || 1; col = col || "#ff8ec9";
+    return `<g transform="translate(${x} ${y}) scale(${sc})">` +
+      (float ? `<animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;0 -${8 + (x % 5)};0 0" dur="${(2.4 + (x % 4) * 0.4).toFixed(1)}s" repeatCount="indefinite"/>` : "") +
+      `<g class="tap" data-sound="chime">` +
+      `<ellipse cx="0" cy="10" rx="16" ry="3" fill="#000" opacity="${float ? 0 : 0.2}"/>` +
+      `<path d="M 11 -6 C 20 -8 22 4 12 5" fill="none" stroke="${col}" stroke-width="3"/>` +
+      `<path d="M -13 -8 L 13 -8 C 13 2 8 9 0 9 C -8 9 -13 2 -13 -8 Z" fill="${col}"/>` +
+      `<ellipse cx="0" cy="-8" rx="13" ry="3.5" fill="${shade(col, 40)}"/>` +
+      `<ellipse cx="0" cy="-8" rx="10" ry="2.4" fill="#c9832a"/>` +
+      `<path d="M -3 -14 Q -6 -19 -3 -24 M 3 -13 Q 0 -18 3 -23" stroke="#fff" stroke-width="1.4" fill="none" opacity="0.6" stroke-linecap="round">` +
+      `<animate attributeName="opacity" values="0.6;0.15;0.6" dur="2.6s" repeatCount="indefinite"/></path>` +
+      `</g></g>`;
+  }
+
+  // A soft-glowing night flower for the secret garden.
+  function glowFlower(x, y, sc, col) {
+    sc = sc || 1;
+    const gf = uid("gflow");
+    return `<g transform="translate(${x} ${y}) scale(${sc})"><defs>${glowFilter(gf, 3)}</defs>` +
+      `<circle cx="0" cy="-4" r="12" fill="${col}" opacity="0.25"><animate attributeName="r" values="12;16;12" dur="3s" repeatCount="indefinite"/></circle>` +
+      `<g filter="url(#${gf})">${flower(0, 0, 1.5, col)}</g></g>`;
+  }
+
+  /* -----------------------------------------------------------
      2. The stories
      Each page: { text, art() }  — art returns an inner-SVG string.
      ----------------------------------------------------------- */
@@ -1229,6 +1540,612 @@
         },
         { end: true, text: "The End. 🐱", art: () => endArt("#2e7d5b", [cat({x:200,y:200,scale:1.7}), ghost({x:290,y:150,scale:0.8})]) }
       ]
+    },
+    {
+      id: "candy-monster",
+      sticker: "🍬",
+      title: "The Halloween Candy Monster",
+      by: "Ellie",
+      color: "#7a3fb0",
+      cover: () => svg(nightBg({moonX:330}) + street({y:250, scale:0.7}) +
+        monster({x:120,y:200,scale:1, candy:true}) +
+        hero(Object.assign({x:300, y:238, scale:1.15}, SUPER_JEANNIE))),
+      pages: [
+        {
+          text: "One Halloween day, Princess Ellie went for a walk with her mum and her dad. The leaves went crunch, crunch, crunch.",
+          art: () => svg(dayBg({sunset:true, sunX:330}) +
+            grownup(Object.assign({x:120, y:236, scale:1.1}, MUM)) +
+            kid(Object.assign({x:200, y:248, scale:1.3}, ELLIE)) +
+            grownup(Object.assign({x:285, y:236, scale:1.15}, DAD)) +
+            pumpkin({x:40, y:270, scale:0.6}) + pumpkin({x:365, y:275, scale:0.55}))
+        },
+        {
+          text: "On the way, Ellie met a wizard with a tall pointy hat. “Happy Halloween!” said the wizard. “Something spooky is coming tonight…”",
+          art: () => svg(dayBg({sunset:true, sunX:60}) + castle(330, 245, 0.5) +
+            wizard({x:140, y:240, scale:1.15}) +
+            kid(Object.assign({x:250, y:248, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "STOMP! STOMP! STOMP! A big fuzzy monster came into town. He took ALL the candy in town — every basket and every bowl!",
+          art: () => svg(nightBg({moonX:60}) + street({y:238, scale:0.72}) +
+            monster({x:215, y:212, scale:1.15, candy:true}) +
+            basket(60, 272, 0.8, false) + basket(340, 276, 0.8, false))
+        },
+        {
+          text: "But superheroes saved the day! Super Jeannie and Super Cory zoomed in with their capes. Whoosh!",
+          art: () => svg(nightBg({moonX:330}) + street({y:236, scale:0.62}) +
+            hero(Object.assign({x:130, y:240, scale:1.35}, SUPER_JEANNIE)) +
+            hero(Object.assign({x:270, y:242, scale:1.3}, SUPER_CORY)) +
+            sparkle(60, 150, 8, "#fff3b0", 1.2) + sparkle(340, 130, 7, "#fff3b0", 1.5) + sparkle(200, 110, 6, "#fff3b0", 1.8))
+        },
+        {
+          text: "They found the candy and gave it all back. Every basket was full again. Hooray!",
+          art: () => svg(nightBg({moonX:330}) +
+            hero(Object.assign({x:90, y:240, scale:1.2}, SUPER_JEANNIE)) +
+            kid(Object.assign({x:200, y:246, scale:1.25}, ELLIE)) +
+            hero(Object.assign({x:310, y:242, scale:1.15}, SUPER_CORY)) +
+            basket(145, 272, 0.9, true) + basket(255, 274, 0.9, true))
+        },
+        {
+          text: "The monster came back every Halloween. And every Halloween, the superheroes saved the day!",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:38}) + street({y:236, scale:0.6}) +
+            monster({x:110, y:220, scale:0.95, flip:true}) +
+            hero(Object.assign({x:260, y:246, scale:1.15}, SUPER_JEANNIE)) +
+            hero(Object.assign({x:340, y:250, scale:1.05}, SUPER_CORY)))
+        },
+        {
+          text: "Then one Halloween, the monster brought a spooky friend. The friend knocked on everybody's door. Knock, knock, knock!",
+          art: () => svg(nightBg({moonX:60}) +
+            house(250, 240, 1.15, "#c76e9a", {flicker:true}) +
+            disguise({x:150, y:245, scale:1.25, full:false}) +
+            monster({x:60, y:150, scale:0.5}))
+        },
+        {
+          text: "He looked just like a regular person out trick-or-treating. Nobody could tell — not even the wizard!",
+          art: () => svg(nightBg({moonX:330}) + street({y:236, scale:0.62}) +
+            disguise({x:200, y:250, scale:1.35, full:false}) +
+            wizard({x:80, y:246, scale:0.95, flip:true}) +
+            kid(Object.assign({x:320, y:252, scale:1.1}, ELLIE)))
+        },
+        {
+          text: "But he did not take just one candy. He took the WHOLE basket, for his monster friend!",
+          art: () => svg(nightBg({moonX:60}) + house(300, 240, 1.05, "#5f8fd8") +
+            disguise({x:140, y:246, scale:1.3, full:true}) +
+            monster({x:60, y:120, scale:0.55, candy:true}))
+        },
+        {
+          text: "“Wait!” said Ellie. “I know that tail!” She waved to the superheroes, and the wizard waved his wand. Swish!",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) +
+            kid(Object.assign({x:110, y:246, scale:1.3}, ELLIE)) +
+            wizard({x:230, y:238, scale:1.1}) +
+            hero(Object.assign({x:340, y:250, scale:1.0}, SUPER_JEANNIE)) +
+            sparkle(190, 150, 9, "#fff3b0", 1.1) + sparkle(160, 120, 6, "#fff3b0", 1.6))
+        },
+        {
+          text: "The candy floated home to every basket. The monster and his friend said sorry, and the whole town shared: one for you, one for me. Happy Halloween!",
+          art: () => svg(nightBg({moonX:330}) + street({y:230, scale:0.58}) +
+            monster({x:90, y:216, scale:0.85, candy:true}) +
+            kid(Object.assign({x:200, y:250, scale:1.2}, ELLIE)) +
+            disguise({x:300, y:250, scale:1.05, full:true}) +
+            basket(160, 278, 0.8, true) + basket(245, 280, 0.8, true) +
+            candy(130, 150, 0.9, "#ffd166") + candy(250, 130, 0.8, "#4aa3ff") + candy(340, 160, 0.85, "#4bd07b"))
+        },
+        { end: true, text: "The End. 🍬", art: () => endArt("#7a3fb0", [
+            monster({x:110, y:200, scale:0.9, candy:true}),
+            hero(Object.assign({x:230, y:238, scale:1.1}, SUPER_JEANNIE)),
+            hero(Object.assign({x:320, y:242, scale:1.0}, SUPER_CORY))]) }
+      ]
+    },
+    {
+      id: "floating-tea-party",
+      sticker: "🫖",
+      title: "The Floating Tea Party",
+      color: "#8b2f6e",
+      cover: () => svg(nightBg({moonX:60}) + castle(330, 250, 0.5) +
+        kid(Object.assign({x:120, y:246, scale:1.3}, ELLIE)) +
+        teacup(220, 170, 1.1, "#ff8ec9", true) + teacup(270, 200, 1, "#8ad0ff", true) +
+        ghost({x:300, y:120, scale:0.9})),
+      pages: [
+        {
+          text: "Princess Ellie set the table for a spooky tea party. One cup, two cups, three cups, four cups, five!",
+          art: () => svg(nightBg({moonX:330}) + castle(60, 235, 0.45) +
+            `<rect x="90" y="236" width="240" height="12" rx="6" fill="#8a5a30"/><rect x="100" y="246" width="8" height="30" fill="#6b4a2a"/><rect x="312" y="246" width="8" height="30" fill="#6b4a2a"/>` +
+            teacup(120, 232, 0.9, "#ff8ec9") + teacup(165, 232, 0.9, "#ffd166") + teacup(210, 232, 0.9, "#8ad0ff") +
+            teacup(255, 232, 0.9, "#b98cff") + teacup(300, 232, 0.9, "#4bd07b") +
+            kid(Object.assign({x:200, y:290, scale:1.0}, ELLIE)))
+        },
+        {
+          text: "Ding-dong! Boo the ghost, Midnight the cat, the little bat and the pumpkin all came to tea.",
+          art: () => svg(nightBg({moonX:60}) + castle(310, 245, 0.55) +
+            ghost({x:110, y:150, scale:1}) + bat({x:200, y:110, scale:1}) +
+            cat({x:150, y:250, scale:1.2}) + pumpkin({x:240, y:255, scale:0.9}))
+        },
+        {
+          text: "But when Ellie poured the tea, the cups began to float! Up, up, up went the teacups.",
+          art: () => svg(nightBg({moonX:330}) +
+            teacup(110, 150, 1.1, "#ff8ec9", true) + teacup(170, 110, 1, "#ffd166", true) +
+            teacup(230, 140, 1.1, "#8ad0ff", true) + teacup(290, 100, 1, "#b98cff", true) + teacup(330, 170, 0.9, "#4bd07b", true) +
+            kid(Object.assign({x:150, y:248, scale:1.3}, ELLIE)) + cat({x:280, y:256, scale:1.1}))
+        },
+        {
+          text: "“Boo!” giggled Boo. “It was me!” He was being silly, blowing the cups up into the air with a whoosh of ghostly wind.",
+          art: () => svg(nightBg({moonX:60}) +
+            ghost({x:130, y:140, scale:1.6}) +
+            `<path d="M 175 140 Q 200 130 225 145 M 180 160 Q 210 150 240 165" stroke="#e8e2ff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"><animate attributeName="opacity" values="0.6;0.15;0.6" dur="1.6s" repeatCount="indefinite"/></path>` +
+            teacup(270, 120, 1.1, "#ff8ec9", true) + teacup(320, 170, 1, "#8ad0ff", true) +
+            kid(Object.assign({x:300, y:252, scale:1.15}, ELLIE)))
+        },
+        {
+          text: "“Come down, cups!” laughed Ellie. Boo blew a gentle puff, and down they floated. One, two, three, four, five.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<rect x="90" y="236" width="240" height="12" rx="6" fill="#8a5a30"/><rect x="100" y="246" width="8" height="30" fill="#6b4a2a"/><rect x="312" y="246" width="8" height="30" fill="#6b4a2a"/>` +
+            teacup(120, 232, 0.9, "#ff8ec9") + teacup(165, 232, 0.9, "#ffd166") + teacup(210, 232, 0.9, "#8ad0ff") +
+            teacup(255, 232, 0.9, "#b98cff") + teacup(300, 232, 0.9, "#4bd07b") +
+            ghost({x:80, y:150, scale:0.9}) + kid(Object.assign({x:200, y:290, scale:1.0}, ELLIE)))
+        },
+        {
+          text: "Everyone sipped pumpkin tea and nibbled star cookies. The spookiest tea party ever was also the very best.",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:38}) +
+            ghost({x:80, y:160, scale:0.9}) + bat({x:320, y:110, scale:0.9}) +
+            cat({x:110, y:256, scale:1.1}) + pumpkin({x:300, y:258, scale:0.8}) +
+            kid(Object.assign({x:200, y:248, scale:1.3}, ELLIE)) +
+            teacup(160, 200, 0.8, "#ff8ec9", true) + teacup(245, 200, 0.8, "#8ad0ff", true))
+        },
+        { end: true, text: "The End. 🫖", art: () => endArt("#8b2f6e", [ghost({x:130,y:150,scale:1.2}), teacup(230, 150, 1.4, "#ff8ec9", true), teacup(300, 190, 1.2, "#8ad0ff", true)]) }
+      ]
+    },
+    {
+      id: "witch-broom",
+      sticker: "🧹",
+      title: "The Kind Witch's Lost Broom",
+      color: "#3a6b3f",
+      cover: () => svg(nightBg({moonX:300}) +
+        kid({x:130, y:240, scale:1.35, dress:"#3f8a4a", hair:"#dcdcdc", crown:false, extra: witchHat(0, -60, 1.05, "#2f6b3a")}) +
+        kid(Object.assign({x:260, y:248, scale:1.2}, ELLIE)) + broom(330, 200, 0.9, -30)),
+      pages: [
+        {
+          text: "A kind old witch named Wanda lived in a crooked little house by the pumpkin patch.",
+          art: () => svg(nightBg({moonX:330}) +
+            house(140, 240, 1.1, "#5c8a4a", {flicker:true}) +
+            kid({x:270, y:250, scale:1.25, dress:"#3f8a4a", hair:"#dcdcdc", crown:false, extra: witchHat(0, -60, 1.05, "#2f6b3a")}) +
+            pumpkin({x:340, y:270, scale:0.7}) + pumpkin({x:60, y:275, scale:0.6}))
+        },
+        {
+          text: "One night Wanda knocked on the castle door. “Oh dear, oh dear! I have lost my broom, and I cannot fly without it!”",
+          art: () => svg(nightBg({moonX:60}) + castle(280, 250, 0.85) +
+            kid({x:120, y:250, scale:1.3, dress:"#3f8a4a", hair:"#dcdcdc", crown:false, extra: witchHat(0, -60, 1.05, "#2f6b3a")}) +
+            kid(Object.assign({x:220, y:256, scale:1.05}, ELLIE)))
+        },
+        {
+          text: "Princess Ellie helped her look. Was it under the bed? No. Was it behind the door? No.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<rect x="70" y="200" width="150" height="60" rx="10" fill="#6b49b8"/><rect x="70" y="180" width="150" height="30" rx="8" fill="#8f7ad0"/><rect x="80" y="170" width="50" height="22" rx="6" fill="#fff"/>` +
+            `<rect x="80" y="260" width="10" height="20" fill="#3a2a5a"/><rect x="200" y="260" width="10" height="20" fill="#3a2a5a"/>` +
+            `<path d="M 290 280 L 290 200 Q 320 178 350 200 L 350 280 Z" fill="#3a2a4a"/><circle cx="342" cy="242" r="3" fill="#ffd166"/>` +
+            kid(Object.assign({x:250, y:262, scale:1.2}, ELLIE)) + cat({x:140, y:262, scale:0.9}))
+        },
+        {
+          text: "Was it on top of the tower? No! Only the little bat was up there, fast asleep.",
+          art: () => svg(nightBg({moonX:60}) + castle(200, 262, 1.1) +
+            bat({x:200, y:118, scale:0.9}) +
+            `<text x="230" y="105" font-size="16" fill="#fff3b0" font-family="Trebuchet MS, sans-serif" opacity="0.9">z z z</text>` +
+            kid(Object.assign({x:90, y:262, scale:1.1}, ELLIE)))
+        },
+        {
+          text: "Then Ellie heard a swish-swish-swish in the pumpkin patch. The broom was there, sweeping up leaves all by itself!",
+          art: () => svg(nightBg({moonX:330}) +
+            pumpkin({x:70, y:262, scale:0.9}) + pumpkin({x:330, y:266, scale:0.8}) +
+            `<g><animateTransform attributeName="transform" type="translate" values="0 0;22 0;0 0" dur="1.6s" repeatCount="indefinite"/>` + broom(210, 240, 1.2, -55) + `</g>` +
+            `<ellipse cx="240" cy="272" rx="8" ry="4" fill="#d9a441"/><ellipse cx="262" cy="278" rx="7" ry="3.5" fill="#c2551a"/><ellipse cx="228" cy="282" rx="6" ry="3" fill="#ffb347"/>` +
+            kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "“Naughty broom!” laughed Wanda. She hopped on, Ellie hopped on behind, and off they flew across the moon. Wheee!",
+          art: () => svg(nightBg({moonX:200, moonY:110, moonR:60}) +
+            `<g><animateTransform attributeName="transform" type="translate" values="0 0;0 -10;0 0" dur="3s" repeatCount="indefinite"/>` +
+            broom(200, 160, 1.6, -12) +
+            kid({x:150, y:140, scale:0.95, dress:"#3f8a4a", hair:"#dcdcdc", crown:false, extra: witchHat(0, -60, 1.05, "#2f6b3a")}) +
+            kid(Object.assign({x:215, y:150, scale:0.85}, ELLIE)) + `</g>` +
+            cat({x:330, y:262, scale:1}))
+        },
+        { end: true, text: "The End. 🧹", art: () => endArt("#3a6b3f", [
+            kid({x:150, y:210, scale:1.2, dress:"#3f8a4a", hair:"#dcdcdc", crown:false, extra: witchHat(0, -60, 1.05, "#2f6b3a")}),
+            broom(270, 180, 1.2, -25)]) }
+      ]
+    },
+    {
+      id: "night-sounds",
+      sticker: "🦉",
+      title: "The Spooky Sounds at Night",
+      color: "#2d3f8a",
+      cover: () => svg(nightBg({moonX:300}) + owl({x:130, y:150, scale:1.4}) +
+        kid(Object.assign({x:280, y:248, scale:1.3}, ELLIE))),
+      pages: [
+        {
+          text: "Princess Ellie was tucked up in bed when she heard a sound. Creeeak!",
+          art: () => svg(nightBg({moonX:330}) +
+            `<rect x="60" y="210" width="200" height="60" rx="12" fill="#6b49b8"/><rect x="60" y="190" width="200" height="30" rx="8" fill="#8f7ad0"/>` +
+            `<rect x="72" y="180" width="54" height="24" rx="7" fill="#fff"/>` +
+            kid(Object.assign({x:100, y:230, scale:0.8, extra:""}, ELLIE)) +
+            `<rect x="330" y="120" width="40" height="90" rx="6" fill="#1c1038" stroke="#8f7ad0" stroke-width="3"/>` +
+            `<path d="M 345 120 Q 350 200 345 210" stroke="#8f7ad0" stroke-width="2" fill="none"/>`)
+        },
+        {
+          text: "“Who's there?” she whispered. She peeked out the window. It was only the old tree, waving in the wind.",
+          art: () => svg(nightBg({moonX:60}) +
+            `<g><animateTransform attributeName="transform" type="rotate" values="-2 250 280;2 250 280;-2 250 280" dur="3s" repeatCount="indefinite"/>` +
+            `<path d="M 240 280 L 240 180 Q 235 140 250 120 M 240 200 Q 200 180 190 150 M 240 170 Q 280 150 300 120 M 245 140 Q 220 120 215 100" stroke="#3a2a4a" stroke-width="10" fill="none" stroke-linecap="round"/>` +
+            `</g>` +
+            kid(Object.assign({x:100, y:250, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "Then she heard another sound. Hoo-hoo! Hoo-hoo! Ellie looked up.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<path d="M 230 300 L 230 180 Q 225 140 240 120" stroke="#3a2a4a" stroke-width="10" fill="none" stroke-linecap="round"/>` +
+            owl({x:270, y:150, scale:1.2}) +
+            `<text x="320" y="110" font-size="18" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">Hoo-hoo!</text>` +
+            kid(Object.assign({x:100, y:250, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "It was a round little owl on a branch, blinking her big eyes. “Hoo-hoo means hello,” said the owl.",
+          art: () => svg(nightBg({moonX:60}) + owl({x:200, y:150, scale:1.9}))
+        },
+        {
+          text: "Then came a tap-tap-tap on the glass. Ellie giggled. She knew that sound! It was Boo, come to say goodnight.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<rect x="230" y="110" width="110" height="130" rx="8" fill="#1c1038" stroke="#8f7ad0" stroke-width="4"/>` +
+            ghost({x:285, y:170, scale:1.1}) +
+            kid(Object.assign({x:110, y:250, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "Creak, hoo-hoo, tap-tap-tap. Every spooky sound was really a friend. Ellie snuggled down and fell fast asleep.",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) +
+            `<rect x="60" y="210" width="200" height="60" rx="12" fill="#6b49b8"/><rect x="60" y="190" width="200" height="30" rx="8" fill="#8f7ad0"/>` +
+            `<rect x="72" y="180" width="54" height="24" rx="7" fill="#fff"/>` +
+            `<text x="150" y="175" font-size="16" fill="#fff3b0" font-family="Trebuchet MS, sans-serif" opacity="0.9">z z z</text>` +
+            owl({x:330, y:130, scale:0.8}) + ghost({x:320, y:230, scale:0.7}))
+        },
+        { end: true, text: "The End. 🦉", art: () => endArt("#2d3f8a", [owl({x:150, y:170, scale:1.5}), ghost({x:280, y:160, scale:1.1})]) }
+      ]
+    },
+    {
+      id: "pumpkin-parade",
+      sticker: "🎃",
+      title: "The Great Pumpkin Parade",
+      color: "#c2551a",
+      cover: () => svg(nightBg({moonX:300}) + castle(320, 250, 0.5) +
+        kid(Object.assign({x:90, y:246, scale:1.3}, ELLIE)) +
+        pumpkin({x:170, y:262, scale:0.9}) + pumpkin({x:230, y:266, scale:0.75}) + pumpkin({x:280, y:270, scale:0.6})),
+      pages: [
+        {
+          text: "Every Halloween, the town holds a pumpkin parade. This year, Princess Ellie got to lead it!",
+          art: () => svg(nightBg({moonX:330}) + street({y:230, scale:0.6}) +
+            kid(Object.assign({x:200, y:250, scale:1.4}, ELLIE)) +
+            `<line x1="240" y1="180" x2="240" y2="240" stroke="#8a5a30" stroke-width="3"/><path d="M 240 180 L 275 190 L 240 200 Z" fill="#ff5d8f"/>`)
+        },
+        {
+          text: "First came one big pumpkin, rolling along. Then two more pumpkins, bumping and bouncing.",
+          art: () => svg(nightBg({moonX:60}) +
+            pumpkin({x:100, y:250, scale:1.4}) + pumpkin({x:230, y:258, scale:1.0}) + pumpkin({x:320, y:262, scale:1.0}))
+        },
+        {
+          text: "Then three little pumpkins in a wobbly row. How many pumpkins is that altogether? Six!",
+          art: () => svg(nightBg({moonX:330}) +
+            pumpkin({x:60, y:250, scale:0.9}) + pumpkin({x:130, y:254, scale:0.75}) + pumpkin({x:195, y:256, scale:0.75}) +
+            pumpkin({x:255, y:262, scale:0.55}) + pumpkin({x:305, y:264, scale:0.55}) + pumpkin({x:355, y:266, scale:0.55}))
+        },
+        {
+          text: "Baby Kieran was a pumpkin too, riding in his wagon. Now there were seven!",
+          art: () => svg(nightBg({moonX:60}) +
+            `<rect x="150" y="228" width="100" height="34" rx="8" fill="#c94f4f"/><circle cx="170" cy="266" r="10" fill="#2b2440"/><circle cx="230" cy="266" r="10" fill="#2b2440"/>` +
+            `<line x1="150" y1="240" x2="110" y2="250" stroke="#2b2440" stroke-width="3"/>` +
+            babyPumpkin(200, 218, 1.1) +
+            kid(Object.assign({x:90, y:250, scale:1.2}, ELLIE)) + pumpkin({x:330, y:262, scale:0.8}))
+        },
+        {
+          text: "Boo floated in front, waving a lantern. Midnight the cat marched behind, tail high.",
+          art: () => svg(nightBg({moonX:330}) +
+            ghost({x:100, y:140, scale:1.1}) + pumpkin({x:150, y:150, scale:0.45}) +
+            pumpkin({x:190, y:258, scale:0.8}) + pumpkin({x:250, y:262, scale:0.7}) +
+            cat({x:330, y:258, scale:1.2}))
+        },
+        {
+          text: "Around the castle and down the hill went the parade. Everybody clapped. “Hip-hip-hooray for pumpkins!”",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) + castle(200, 235, 0.9) +
+            kid(Object.assign({x:70, y:262, scale:1.05}, ELLIE)) +
+            pumpkin({x:130, y:272, scale:0.55}) + pumpkin({x:170, y:276, scale:0.5}) + pumpkin({x:210, y:278, scale:0.5}) +
+            pumpkin({x:250, y:276, scale:0.5}) + pumpkin({x:290, y:274, scale:0.5}) + babyPumpkin(335, 262, 0.7))
+        },
+        { end: true, text: "The End. 🎃", art: () => endArt("#c2551a", [pumpkin({x:120,y:200,scale:1.1}), babyPumpkin(210, 205, 1.1), pumpkin({x:300,y:200,scale:1.1})]) }
+      ]
+    },
+    {
+      id: "missing-moon",
+      sticker: "🌙",
+      title: "Where Did the Moon Go?",
+      color: "#1f3a7a",
+      cover: () => svg(nightBg({moon:false}) + cloud(300, 70, 1.3) +
+        kid(Object.assign({x:130, y:248, scale:1.3}, ELLIE)) + ghost({x:250, y:150, scale:1})),
+      pages: [
+        {
+          text: "One night, Princess Ellie looked out her window. The moon was gone! The sky was dark, dark, dark.",
+          art: () => svg(nightBg({moon:false}) + castle(300, 255, 0.7) +
+            kid(Object.assign({x:120, y:250, scale:1.35}, ELLIE)))
+        },
+        {
+          text: "“Boo! Wake up!” she called. “The moon is missing!” Boo rubbed his eyes. “Let's go and find it.”",
+          art: () => svg(nightBg({moon:false}) +
+            kid(Object.assign({x:130, y:250, scale:1.3}, ELLIE)) + ghost({x:260, y:160, scale:1.4}))
+        },
+        {
+          text: "They asked the little bat. “Have you seen the moon?” “Squeak! No,” said the bat. “I bumped into things all night.”",
+          art: () => svg(nightBg({moon:false}) +
+            bat({x:200, y:120, scale:1.5}) +
+            kid(Object.assign({x:110, y:250, scale:1.2}, ELLIE)) + ghost({x:300, y:200, scale:0.9}))
+        },
+        {
+          text: "They asked the owl in the tree. “Hoo-hoo. Look up,” said the owl. “Look very, very carefully.”",
+          art: () => svg(nightBg({moon:false}) +
+            `<path d="M 300 300 L 300 180 Q 295 140 310 120" stroke="#3a2a4a" stroke-width="10" fill="none" stroke-linecap="round"/>` +
+            owl({x:290, y:150, scale:1.2}) +
+            kid(Object.assign({x:110, y:250, scale:1.2}, ELLIE)) + ghost({x:200, y:190, scale:0.9}))
+        },
+        {
+          text: "Ellie looked up. A big fluffy cloud was drifting by. And behind it… a glow!",
+          art: () => svg(nightBg({moonX:210, moonY:80, moonR:36}) + cloud(200, 82, 1.7) +
+            kid(Object.assign({x:120, y:250, scale:1.2}, ELLIE)) + ghost({x:290, y:190, scale:0.9}))
+        },
+        {
+          text: "The wind gave a puff, the cloud slid away, and there was the moon, round and bright. “Found you, Moon!” It was hiding all along.",
+          art: () => svg(nightBg({moonX:200, moonY:80, moonR:44}) + cloud(330, 110, 1.1) +
+            kid(Object.assign({x:120, y:250, scale:1.2}, ELLIE)) + ghost({x:280, y:190, scale:0.9}) + bat({x:70, y:120, scale:0.8}))
+        },
+        { end: true, text: "The End. 🌙", art: () => endArt("#1f3a7a", [ghost({x:140,y:160,scale:1.2}), bat({x:270,y:150,scale:1.2})]) }
+      ]
+    },
+    {
+      id: "boos-biggest-boo",
+      sticker: "📣",
+      title: "Boo's Biggest Boo",
+      color: "#5b3fa0",
+      cover: () => svg(nightBg({moonX:60}) + ghost({x:160, y:150, scale:1.6}) +
+        `<text x="240" y="120" font-size="34" font-weight="bold" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">BOO!</text>` +
+        pumpkin({x:320, y:255, scale:0.9})),
+      pages: [
+        {
+          text: "Boo was a very little ghost with a very little voice. When he said “boo,” it came out as a tiny whisper. “boo.”",
+          art: () => svg(nightBg({moonX:330}) + ghost({x:180, y:170, scale:1.5}) +
+            `<text x="240" y="130" font-size="12" fill="#e8e2ff" font-family="Trebuchet MS, sans-serif">boo</text>`)
+        },
+        {
+          text: "“I want a big BOO!” he sighed. “A boo that makes the pumpkins wobble.”",
+          art: () => svg(nightBg({moonX:60}) + ghost({x:120, y:160, scale:1.3}) +
+            pumpkin({x:260, y:255, scale:1.0}) + pumpkin({x:340, y:262, scale:0.75}))
+        },
+        {
+          text: "Princess Ellie helped him practise. “Take a deep breath. Fill your tummy with air. Now… boo!”",
+          art: () => svg(nightBg({moonX:330}) +
+            kid(Object.assign({x:130, y:250, scale:1.35}, ELLIE)) + ghost({x:270, y:160, scale:1.4}))
+        },
+        {
+          text: "“boo,” said Boo. Then a bit louder: “Boo.” Then louder still: “BOO!” The little bat flapped up in surprise.",
+          art: () => svg(nightBg({moonX:60}) + ghost({x:150, y:170, scale:1.4}) +
+            `<text x="210" y="150" font-size="12" fill="#e8e2ff" font-family="Trebuchet MS, sans-serif">boo</text>` +
+            `<text x="240" y="130" font-size="20" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">Boo</text>` +
+            `<text x="280" y="100" font-size="32" font-weight="bold" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">BOO!</text>` +
+            bat({x:330, y:170, scale:1}))
+        },
+        {
+          text: "Midnight the cat jumped! The pumpkins wobbled! Ellie clapped and clapped. “That was the biggest boo ever!”",
+          art: () => svg(nightBg({moonX:330}) + ghost({x:90, y:150, scale:1.1}) +
+            `<g><animateTransform attributeName="transform" type="rotate" values="-6 250 255;6 250 255;-6 250 255" dur="0.5s" repeatCount="indefinite"/>` + pumpkin({x:250, y:255, scale:1.0}) + `</g>` +
+            `<g><animateTransform attributeName="transform" type="rotate" values="6 340 262;-6 340 262;6 340 262" dur="0.55s" repeatCount="indefinite"/>` + pumpkin({x:340, y:262, scale:0.75}) + `</g>` +
+            cat({x:170, y:220, scale:1.1}) + kid(Object.assign({x:120, y:262, scale:1.0}, ELLIE)))
+        },
+        {
+          text: "Boo was so proud. But at bedtime, he used his tiny voice again. “boo,” he whispered. “Goodnight, Ellie.”",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:38}) +
+            `<rect x="60" y="210" width="200" height="60" rx="12" fill="#6b49b8"/><rect x="60" y="190" width="200" height="30" rx="8" fill="#8f7ad0"/><rect x="72" y="180" width="54" height="24" rx="7" fill="#fff"/>` +
+            ghost({x:320, y:170, scale:1}) +
+            `<text x="300" y="125" font-size="12" fill="#e8e2ff" font-family="Trebuchet MS, sans-serif">boo</text>`)
+        },
+        { end: true, text: "The End. 📣", art: () => endArt("#5b3fa0", [ghost({x:200,y:160,scale:1.6})]) }
+      ]
+    },
+    {
+      id: "spider-dress",
+      sticker: "🕷️",
+      title: "The Spider's Sparkly Dress",
+      color: "#6a2d7a",
+      cover: () => svg(nightBg({moonX:300}) + castle(330, 250, 0.5) +
+        kid(Object.assign({x:150, y:246, scale:1.4}, ELLIE, {dress:"#dcd6ff"})) + spider({x:270, y:120, scale:1.1, thread:120})),
+      pages: [
+        {
+          text: "The Halloween Ball was tonight, and Princess Ellie had nothing to wear. “Oh no!” she said. “All my dresses are too small.”",
+          art: () => svg(nightBg({moonX:330}) + castle(80, 240, 0.5) +
+            kid(Object.assign({x:200, y:250, scale:1.4}, ELLIE)) +
+            `<path d="M 290 200 L 310 200 L 325 250 L 275 250 Z" fill="#ff5d8f"/><path d="M 330 210 L 350 210 L 362 250 L 318 250 Z" fill="#8ad0ff"/>`)
+        },
+        {
+          text: "A tiny voice piped up from the corner. “I can help!” It was Silky, a small friendly spider with eight busy legs.",
+          art: () => svg(nightBg({moonX:60}) + spider({x:260, y:130, scale:1.8, thread:130}) +
+            kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "Silky spun and spun. Silver thread went round and round, up and down, all night long.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<g fill="none" stroke="#e8e2ff" stroke-width="1.2" opacity="0.7"><path d="M 200 90 L 200 250 M 120 130 L 280 210 M 120 210 L 280 130 M 130 170 L 270 170"/>` +
+            `<path d="M 160 130 Q 200 120 240 130 Q 250 170 240 210 Q 200 220 160 210 Q 150 170 160 130 Z M 180 150 Q 200 145 220 150 Q 225 170 220 190 Q 200 195 180 190 Q 175 170 180 150 Z"/></g>` +
+            `<g><animateTransform attributeName="transform" type="rotate" values="0 200 170;360 200 170" dur="6s" repeatCount="indefinite"/>` + spider({x:200, y:110, scale:1.0}) + `</g>` +
+            sparkle(150, 150, 5, "#fff", 1.2) + sparkle(245, 195, 4, "#fff", 1.7) + sparkle(225, 135, 4, "#fff", 2.1))
+        },
+        {
+          text: "By morning, there it was: a dress made of sparkly spider silk, shining like starlight.",
+          art: () => svg(dayBg({sunX:60}) +
+            `<path d="M 180 130 L 220 130 C 235 170 250 210 262 246 Q 200 260 138 246 C 150 210 165 170 180 130 Z" fill="#dcd6ff"/>` +
+            `<path d="M 200 130 Q 200 190 200 250 M 185 150 Q 200 165 215 150 M 175 190 Q 200 210 225 190 M 165 225 Q 200 250 235 225" stroke="#fff" stroke-width="1.4" fill="none" opacity="0.8"/>` +
+            sparkle(185, 170, 5, "#fff", 1.3) + sparkle(222, 200, 5, "#fff", 1.8) + sparkle(200, 235, 4, "#fff", 2.3) +
+            spider({x:280, y:150, scale:1.1, thread:100}))
+        },
+        {
+          text: "Ellie twirled and twirled. The dress floated and shimmered. “It's the most beautiful dress in the whole world!”",
+          art: () => svg(nightBg({moonX:330}) + castle(330, 250, 0.5) +
+            `<g><animateTransform attributeName="transform" type="rotate" values="-6 160 250;6 160 250;-6 160 250" dur="1.4s" repeatCount="indefinite"/>` +
+            kid(Object.assign({x:160, y:250, scale:1.5}, ELLIE, {dress:"#dcd6ff"})) + `</g>` +
+            sparkle(100, 160, 7, "#fff", 1.2) + sparkle(230, 150, 6, "#fff", 1.6) +
+            spider({x:270, y:180, scale:0.9, thread:80}))
+        },
+        {
+          text: "At the ball, everyone asked, “Who made your dress?” Ellie smiled. “My friend Silky.” And Silky waved all eight legs.",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) + castle(200, 190, 0.6) +
+            kid(Object.assign({x:200, y:262, scale:1.3}, ELLIE, {dress:"#dcd6ff"})) +
+            kid(Object.assign({x:90, y:262, scale:1.1}, JEANNIE)) + kid(Object.assign({x:310, y:264, scale:1.05}, CORY)) +
+            ghost({x:60, y:150, scale:0.7}) + spider({x:340, y:150, scale:0.9, thread:80}))
+        },
+        { end: true, text: "The End. 🕷️", art: () => endArt("#6a2d7a", [kid(Object.assign({x:160,y:225,scale:1.4}, ELLIE, {dress:"#dcd6ff"})), spider({x:280, y:150, scale:1.4, thread:90})]) }
+      ]
+    },
+    {
+      id: "first-trick-or-treat",
+      sticker: "👶",
+      title: "Kieran's First Trick-or-Treat",
+      color: "#b8541e",
+      cover: () => svg(nightBg({moonX:300}) + house(300, 240, 0.9, "#c76e9a", {flicker:true}) +
+        kid(Object.assign({x:110, y:248, scale:1.3}, ELLIE)) + babyPumpkin(190, 240, 1.1)),
+      pages: [
+        {
+          text: "It was baby Kieran's very first Halloween. Princess Ellie held his hand tight. “I will show you how,” she said.",
+          art: () => svg(nightBg({moonX:330}) + castle(80, 235, 0.5) +
+            kid(Object.assign({x:200, y:250, scale:1.35}, ELLIE)) + babyPumpkin(275, 242, 1.15) + basket(330, 270, 0.9, false))
+        },
+        {
+          text: "At the first house, Ellie knocked. Knock, knock! “Trick or treat!” One candy for Kieran, one candy for Ellie.",
+          art: () => svg(nightBg({moonX:60}) + house(280, 240, 1.2, "#c76e9a", {flicker:true}) +
+            kid(Object.assign({x:130, y:252, scale:1.25}, ELLIE)) + babyPumpkin(195, 246, 1.05) +
+            candy(150, 180, 1, "#ff5d8f") + candy(200, 190, 1, "#ffd166"))
+        },
+        {
+          text: "At the second house, a jack-o-lantern grinned on the step. Kieran giggled and patted its nose.",
+          art: () => svg(nightBg({moonX:330}) + house(120, 240, 1.1, "#5f8fd8", {pumpkin:false}) +
+            pumpkin({x:200, y:262, scale:1.1}) + babyPumpkin(270, 246, 1.1) + kid(Object.assign({x:340, y:252, scale:1.15}, ELLIE)))
+        },
+        {
+          text: "At the third house, Kieran said his very first Halloween word. “Twick!” Everyone cheered.",
+          art: () => svg(nightBg({moonX:60}) + house(290, 240, 1.15, "#d9a441", {flicker:true}) +
+            babyPumpkin(180, 246, 1.2) + kid(Object.assign({x:100, y:252, scale:1.2}, ELLIE)) +
+            `<text x="150" y="150" font-size="22" font-weight="bold" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">Twick!</text>`)
+        },
+        {
+          text: "Three houses, three candies each. “Say thank you,” whispered Ellie. “Tank oo!” said Kieran.",
+          art: () => svg(nightBg({moonX:330}) + street({y:230, scale:0.6}) +
+            kid(Object.assign({x:150, y:252, scale:1.25}, ELLIE)) + babyPumpkin(240, 246, 1.05) +
+            basket(100, 282, 0.8, true) + basket(300, 284, 0.8, true))
+        },
+        {
+          text: "Back at the castle, Kieran fell asleep with a candy in each hand. “Happy first Halloween, baby brother,” said Ellie.",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) + castle(200, 230, 0.8) +
+            babyPumpkin(200, 258, 1.2) + candy(165, 262, 0.8, "#ff5d8f") + candy(235, 262, 0.8, "#4aa3ff") +
+            `<text x="230" y="215" font-size="14" fill="#fff3b0" font-family="Trebuchet MS, sans-serif" opacity="0.9">z z z</text>` +
+            kid(Object.assign({x:100, y:262, scale:1.05}, ELLIE)))
+        },
+        { end: true, text: "The End. 👶", art: () => endArt("#b8541e", [babyPumpkin(150, 205, 1.4), kid(Object.assign({x:260,y:225,scale:1.3}, ELLIE))]) }
+      ]
+    },
+    {
+      id: "glow-garden",
+      sticker: "🌸",
+      title: "The Glow-in-the-Dark Garden",
+      color: "#2a7a6e",
+      cover: () => svg(nightBg({moonX:300}) +
+        glowFlower(70, 250, 1, "#ff5d8f") + glowFlower(140, 265, 1, "#4aa3ff") + glowFlower(260, 262, 1, "#ffd166") + glowFlower(340, 250, 1, "#b266e0") +
+        kid(Object.assign({x:200, y:240, scale:1.3}, ELLIE))),
+      pages: [
+        {
+          text: "Behind the castle was a secret garden that only glowed at night. Princess Ellie tiptoed in with her lantern.",
+          art: () => svg(nightBg({moonX:330}) + castle(90, 220, 0.5) +
+            `<path d="M 180 300 L 180 210 Q 200 180 220 210 L 220 300" fill="none" stroke="#5a479e" stroke-width="6"/>` +
+            kid(Object.assign({x:280, y:252, scale:1.3}, ELLIE)) + pumpkin({x:330, y:230, scale:0.4}))
+        },
+        {
+          text: "The roses glowed pink. The bluebells glowed blue. The daisies glowed as yellow as the moon.",
+          art: () => svg(nightBg({moonX:60}) +
+            glowFlower(90, 255, 1.3, "#ff5d8f") + glowFlower(200, 262, 1.3, "#4aa3ff") + glowFlower(310, 255, 1.3, "#ffd166") +
+            kid(Object.assign({x:200, y:210, scale:0.95}, ELLIE)))
+        },
+        {
+          text: "Fireflies blinked on and off, on and off, like tiny floating stars.",
+          art: () => svg(nightBg({moonX:330}) +
+            [[80,150],[140,120],[200,170],[260,110],[320,160],[110,200],[290,210]].map((p, i) =>
+              `<g transform="translate(${p[0]} ${p[1]})"><circle r="6" fill="#ffe98a" opacity="0.25"/><circle r="2.2" fill="#fff6c0"><animate attributeName="opacity" values="1;0.1;1" dur="${(1.4 + i * 0.4).toFixed(1)}s" repeatCount="indefinite"/></circle></g>`).join("") +
+            kid(Object.assign({x:200, y:252, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "A purple flower yawned open and hummed a sleepy tune. Ellie hummed along.",
+          art: () => svg(nightBg({moonX:60}) + glowFlower(240, 250, 2.2, "#b266e0") +
+            `<text x="280" y="170" font-size="20" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">♪ ♫</text>` +
+            kid(Object.assign({x:120, y:252, scale:1.3}, ELLIE)))
+        },
+        {
+          text: "Midnight the cat curled up on a glowing green leaf and purred. Boo drifted between the flowers, glowing too.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<ellipse cx="120" cy="262" rx="50" ry="16" fill="#4bd07b" opacity="0.8"/><ellipse cx="120" cy="262" rx="60" ry="22" fill="#4bd07b" opacity="0.2"/>` +
+            cat({x:120, y:240, scale:1.1}) + glowFlower(240, 262, 1.2, "#ff5d8f") + glowFlower(330, 255, 1.2, "#4aa3ff") +
+            ghost({x:280, y:160, scale:1.0}))
+        },
+        {
+          text: "Pink, blue, yellow, purple, green. Ellie picked one glowing flower of every colour to put by her bed. Goodnight, garden.",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) +
+            kid(Object.assign({x:200, y:250, scale:1.3}, ELLIE)) +
+            glowFlower(60, 255, 0.9, "#ff5d8f") + glowFlower(120, 268, 0.9, "#4aa3ff") + glowFlower(280, 268, 0.9, "#ffd166") +
+            glowFlower(340, 255, 0.9, "#b266e0") + glowFlower(200, 130, 0.8, "#4bd07b"))
+        },
+        { end: true, text: "The End. 🌸", art: () => endArt("#2a7a6e", [glowFlower(100, 210, 1.4, "#ff5d8f"), glowFlower(200, 200, 1.4, "#ffd166"), glowFlower(300, 210, 1.4, "#4aa3ff")]) }
+      ]
+    },
+    {
+      id: "wobbly-spell",
+      sticker: "🪄",
+      title: "The Wizard's Wobbly Spell",
+      color: "#4b3aa8",
+      cover: () => svg(nightBg({moonX:300}) + wizard({x:140, y:240, scale:1.2}) +
+        pumpkin({x:270, y:250, scale:0.9}) + pumpkin({x:330, y:200, scale:0.5}) + pumpkin({x:300, y:130, scale:0.4})),
+      pages: [
+        {
+          text: "Wizard Wilbur was practising a brand-new spell. “Pumpkins for everyone!” he said, and waved his wand.",
+          art: () => svg(nightBg({moonX:330}) + castle(320, 250, 0.5) + wizard({x:160, y:240, scale:1.3}))
+        },
+        {
+          text: "Poof! The castle door turned into a pumpkin. Poof! The teapot turned into a pumpkin. Poof! Midnight's bell turned into a tiny pumpkin!",
+          art: () => svg(nightBg({moonX:60}) + castle(200, 262, 1.0) +
+            pumpkin({x:200, y:262, scale:0.55}) + pumpkin({x:80, y:262, scale:0.5}) +
+            cat({x:320, y:262, scale:1.0}) + pumpkin({x:320, y:246, scale:0.15}))
+        },
+        {
+          text: "“Oh dear,” said Wilbur. “That is too many pumpkins.” But the wand was still wobbling and popping.",
+          art: () => svg(nightBg({moonX:330}) +
+            `<g><animateTransform attributeName="transform" type="rotate" values="-4 130 240;4 130 240;-4 130 240" dur="0.4s" repeatCount="indefinite"/>` + wizard({x:130, y:240, scale:1.2}) + `</g>` +
+            pumpkin({x:240, y:262, scale:0.8}) + pumpkin({x:300, y:266, scale:0.6}) + pumpkin({x:350, y:256, scale:0.7}) +
+            pumpkin({x:270, y:180, scale:0.45}) + pumpkin({x:340, y:140, scale:0.4}))
+        },
+        {
+          text: "Princess Ellie had an idea. “Wizard Wilbur, what is the magic word?” Wilbur thought and thought. “Please!”",
+          art: () => svg(nightBg({moonX:60}) +
+            kid(Object.assign({x:120, y:250, scale:1.35}, ELLIE)) + wizard({x:270, y:240, scale:1.2, flip:true}) +
+            `<text x="300" y="100" font-size="22" font-weight="bold" fill="#fff3b0" font-family="Trebuchet MS, sans-serif">Please!</text>`)
+        },
+        {
+          text: "“Pumpkins, please go back!” said Ellie and Wilbur together. The wand gave one last wobble and… poof!",
+          art: () => svg(nightBg({moonX:330}) +
+            kid(Object.assign({x:120, y:250, scale:1.3}, ELLIE)) + wizard({x:250, y:240, scale:1.2}) +
+            sparkle(200, 120, 12, "#fff3b0", 0.9) + sparkle(160, 150, 8, "#fff3b0", 1.3) + sparkle(300, 130, 9, "#fff3b0", 1.1))
+        },
+        {
+          text: "The door was a door. The teapot was a teapot. The bell went ding. And one pumpkin stayed, just for the pumpkin pie.",
+          art: () => svg(nightBg({moonX:200, moonY:66, moonR:36}) + castle(200, 250, 0.9) +
+            teacup(80, 262, 1.1, "#ff8ec9") + cat({x:320, y:262, scale:1.0}) + pumpkin({x:140, y:272, scale:0.55}))
+        },
+        { end: true, text: "The End. 🪄", art: () => endArt("#4b3aa8", [wizard({x:150,y:225,scale:1.3}), pumpkin({x:290,y:220,scale:1.0})]) }
+      ]
     }
   ];
 
@@ -1297,6 +2214,57 @@
     "hide-and-seek": {
       4: { "tip-toed": "walked very quietly on the very tips of your toes" },
       6: { swishy: "swinging quickly from side to side" }
+    },
+    "candy-monster": {
+      1: { wizard: "a person who can do magic spells" },
+      2: { fuzzy: "covered in soft, fluffy fur" },
+      3: { superheroes: "people with special powers who help save the day" },
+      7: { regular: "ordinary, just like everybody else" },
+      10: { floated: "moved gently through the air" }
+    },
+    "floating-tea-party": {
+      3: { silly: "being funny and playful on purpose" },
+      5: { nibbled: "ate something with small, quick little bites" }
+    },
+    "witch-broom": {
+      0: { crooked: "bent and wonky, not straight" },
+      4: { sweeping: "brushing the floor clean with a broom" }
+    },
+    "night-sounds": {
+      0: { tucked: "folded snugly into bed under the covers" },
+      1: { whispered: "spoke in a very soft, quiet voice" },
+      5: { snuggled: "cuddled down warm and cosy" }
+    },
+    "pumpkin-parade": {
+      0: { parade: "a long line of people marching along together for a celebration" },
+      2: { altogether: "everything added up, all of it counted" },
+      4: { lantern: "a little light you can carry in your hand" }
+    },
+    "missing-moon": {
+      2: { bumped: "knocked into something by accident" },
+      4: { drifting: "moving along slowly, carried by the wind" }
+    },
+    "boos-biggest-boo": {
+      2: { practise: "to do something again and again so you get better at it" },
+      5: { proud: "feeling really pleased about something you did" }
+    },
+    "spider-dress": {
+      1: { piped: "spoke up suddenly in a small, high voice" },
+      3: { silk: "a very soft, smooth, shiny thread" },
+      4: { shimmered: "shone with a soft, wobbly, sparkly light" }
+    },
+    "first-trick-or-treat": {
+      2: { "jack-o-lantern": "a pumpkin with a face carved into it and a light inside" },
+      4: { whispered: "spoke in a very soft, quiet voice" }
+    },
+    "glow-garden": {
+      0: { tiptoed: "walked very quietly on the very tips of your toes" },
+      2: { fireflies: "tiny bugs whose bottoms light up at night" },
+      3: { hummed: "sang a tune with your lips closed" }
+    },
+    "wobbly-spell": {
+      0: { practising: "doing something again and again to get better at it" },
+      2: { wobbling: "shaking and wiggling from side to side" }
     }
   };
 
@@ -1376,17 +2344,89 @@
         choices: [["4️⃣","Four friends"], ["2️⃣","Two friends"], ["6️⃣","Six friends"]] },
       { ask: "Who was the very last friend to be found?",
         choices: [["🐱","Midnight the cat"], ["👻","Boo the ghost"], ["🦇","The little bat"]] }
+    ]},
+    { id: "candy-monster", qs: [
+      { ask: "Who took all the candy in town?",
+        choices: [["👾","A big fuzzy monster"], ["🐱","Midnight the cat"], ["🦄","A rainbow unicorn"]] },
+      { ask: "Who saved the day when the candy went missing?",
+        choices: [["🦸","Super Jeannie and Super Cory"], ["👻","Boo the ghost"], ["🎃","The pumpkins"]] }
+    ]},
+    { id: "floating-tea-party", qs: [
+      { ask: "How many teacups did Ellie put on the table?",
+        choices: [["5️⃣","Five cups"], ["2️⃣","Two cups"], ["9️⃣","Nine cups"]] },
+      { ask: "Who made the teacups float up into the air?",
+        choices: [["👻","Boo, being silly"], ["🐱","Midnight the cat"], ["🧙","A wizard"]] }
+    ]},
+    { id: "witch-broom", qs: [
+      { ask: "What had Wanda the witch lost?",
+        choices: [["🧹","Her broom"], ["🎩","Her hat"], ["🐱","Her cat"]] },
+      { ask: "Where did Ellie finally find it?",
+        choices: [["🎃","Sweeping leaves in the pumpkin patch"], ["🛏️","Under the bed"], ["🏰","On top of the tower"]] }
+    ]},
+    { id: "night-sounds", qs: [
+      { ask: "What was making the hoo-hoo sound?",
+        choices: [["🦉","A little owl"], ["🐉","A dragon"], ["🚂","A train"]] },
+      { ask: "Who went tap-tap-tap on the window?",
+        choices: [["👻","Boo, saying goodnight"], ["🌧️","The rain"], ["🦇","The little bat"]] }
+    ]},
+    { id: "pumpkin-parade", qs: [
+      { ask: "Who got to lead the pumpkin parade?",
+        choices: [["👸","Princess Ellie"], ["🐱","Midnight the cat"], ["👻","Boo the ghost"]] },
+      { ask: "How many pumpkins were there after baby Kieran joined in?",
+        choices: [["7️⃣","Seven"], ["3️⃣","Three"], ["🔟","Ten"]] }
+    ]},
+    { id: "missing-moon", qs: [
+      { ask: "Where was the moon hiding?",
+        choices: [["☁️","Behind a big fluffy cloud"], ["🏰","Inside the castle"], ["🎃","Under a pumpkin"]] },
+      { ask: "Who told Ellie to look up very carefully?",
+        choices: [["🦉","The owl"], ["🦇","The little bat"], ["🐱","Midnight the cat"]] }
+    ]},
+    { id: "boos-biggest-boo", qs: [
+      { ask: "What did Boo want more than anything?",
+        choices: [["📣","A big, loud BOO"], ["🍪","A cookie"], ["🎈","A balloon"]] },
+      { ask: "What did Ellie tell Boo to do first?",
+        choices: [["🌬️","Take a deep breath"], ["🏃","Run really fast"], ["😴","Have a nap"]] }
+    ]},
+    { id: "spider-dress", qs: [
+      { ask: "Who made Ellie's new dress?",
+        choices: [["🕷️","Silky the spider"], ["🦄","Sparkle the unicorn"], ["🧙","Wanda the witch"]] },
+      { ask: "What was the dress made of?",
+        choices: [["🕸️","Sparkly spider silk"], ["🍃","Leaves"], ["🧶","Wool"]] }
+    ]},
+    { id: "first-trick-or-treat", qs: [
+      { ask: "What was Kieran's very first Halloween word?",
+        choices: [["🍬","Twick!"], ["🐶","Woof!"], ["🌙","Moon!"]] },
+      { ask: "How many houses did Ellie and Kieran visit?",
+        choices: [["3️⃣","Three houses"], ["1️⃣","One house"], ["8️⃣","Eight houses"]] }
+    ]},
+    { id: "glow-garden", qs: [
+      { ask: "When did the secret garden glow?",
+        choices: [["🌙","Only at night"], ["☀️","Only at lunchtime"], ["🌧️","Only when it rained"]] },
+      { ask: "What colour did the daisies glow?",
+        choices: [["💛","Yellow, like the moon"], ["💙","Blue"], ["🖤","Black"]] }
+    ]},
+    { id: "wobbly-spell", qs: [
+      { ask: "What did the wobbly spell keep turning things into?",
+        choices: [["🎃","Pumpkins"], ["🐸","Frogs"], ["🍦","Ice creams"]] },
+      { ask: "What was the magic word that fixed the spell?",
+        choices: [["🙏","Please"], ["🎉","Hooray"], ["🍪","Cookie"]] }
     ]}
   ];
 
-  // Painterly cover pictures that the art pipeline has already rendered
-  // (games/spooky-stories/art/<id>-cover.png). Stories not listed here keep
-  // their hand-drawn SVG cover, so nothing ever 404s.
+  // Painterly cover pictures rendered by the art pipeline
+  // (games/spooky-stories/art/<id>-cover.png, from assets/art/art-manifest.json).
+  // Stories not listed here keep their hand-drawn SVG cover. A listed cover
+  // whose PNG has not been generated yet falls back to the SVG too (see
+  // buildLibrary), so a freshly added story never shows a broken picture.
   const COVER_ART = {
     "giggly-ghost": 1, "costume-party": 1, "lost-bat": 1,
     "pumpkin-smile": 1, "castle-sleepover": 1,
     "rainbow-unicorn": 1, "dancing-dragon": 1, "sleepy-star": 1,
-    "boo-birthday": 1, "rainbow-dress": 1, "hide-and-seek": 1
+    "boo-birthday": 1, "rainbow-dress": 1, "hide-and-seek": 1,
+    "candy-monster": 1, "floating-tea-party": 1, "witch-broom": 1,
+    "night-sounds": 1, "pumpkin-parade": 1, "missing-moon": 1,
+    "boos-biggest-boo": 1, "spider-dress": 1, "first-trick-or-treat": 1,
+    "glow-garden": 1, "wobbly-spell": 1
   };
 
   // A baby in a round pumpkin costume, little face peeking out.
@@ -1466,7 +2506,13 @@
     neigh:   () => { tone(392,.14,"sawtooth",0,.09); tone(523,.12,"sawtooth",.1,.09); tone(440,.18,"sawtooth",.2,.08); },
     roar:    () => { tone(150,.3,"sawtooth",0,.11); tone(120,.34,"sawtooth",.12,.09); tone(200,.2,"sine",.05,.06); },
     page:    () => { tone(520,.12,"triangle",0,.08); tone(700,.12,"triangle",.06,.07); },
-    yay:     () => { [523,659,784,1047].forEach((f,i)=>tone(f,.3,"triangle",i*0.12,.14)); }
+    yay:     () => { [523,659,784,1047].forEach((f,i)=>tone(f,.3,"triangle",i*0.12,.14)); },
+    magic:   () => { [784,988,1175,1568,1976].forEach((f,i)=>tone(f,.22,"triangle",i*0.06,.1)); },
+    growl:   () => { tone(110,.35,"sawtooth",0,.1); tone(95,.4,"sawtooth",.15,.09); tone(140,.25,"triangle",.3,.07); },
+    knock:   () => { [0,.18,.36].forEach(w=>tone(180,.07,"square",w,.12)); },
+    hoot:    () => { tone(520,.22,"sine",0,.13); tone(440,.3,"sine",.26,.13); },
+    yum:     () => { tone(660,.1,"sine",0,.1); tone(880,.14,"sine",.1,.1); tone(1100,.18,"sine",.2,.08); },
+    whoosh:  () => { [300,500,800,1200,900,600].forEach((f,i)=>tone(f,.09,"triangle",i*0.05,.07)); }
   };
   function playSound(name) { (SOUNDS[name] || SOUNDS.chime)(); }
 
@@ -1771,10 +2817,14 @@
         `${badgeRow ? `<span class="badges" aria-hidden="true">${badgeRow}</span>` : ""}
          <span class="cover-svg">${cover}</span>
          <h2>${story.title}</h2>
+         ${story.by ? `<p class="byline">✍️ A story made up by ${story.by}!</p>` : ""}
          <p>${last} pages • Tap to read</p>
          ${at ? `<span class="bookmark">🔖 Keep reading — page ${at + 1}</span>` : ""}`;
+      // painterly cover not rendered yet? swap in the hand-drawn SVG cover
+      const img = card.querySelector(".cover-img");
+      if (img) img.addEventListener("error", () => { img.outerHTML = story.cover(); });
       card.setAttribute("aria-label",
-        story.title + ", " + last + " pages" +
+        (story.by ? "A story by " + story.by + ": " : "") + story.title + ", " + last + " pages" +
         (at ? ", bookmarked at page " + (at + 1) : "") +
         (done[story.id] ? ", finished" : ""));
       card.addEventListener("click", () => openStory(story));
@@ -1791,6 +2841,12 @@
     const at = marks[story.id];
     if (at > 0 && at < story.pages.length - 1) page = at;
     titleEl.textContent = story.title;
+    if (story.by) {
+      const by = document.createElement("small");
+      by.className = "by";
+      by.textContent = "✍️ by " + story.by;
+      titleEl.appendChild(by);
+    }
     library.style.display = "none";
     reader.classList.add("active");
     audio(); // unlock the chimes on this tap gesture
