@@ -1,7 +1,7 @@
 {
   "name": "The McRae Family Arcade",
   "short_name": "Arcade",
-  "description": "Free educational games for Jeannie, Cory, Ellie & baby Kieran.",
+  "description": "Free educational games for Jeannie, Cory, Ellie & baby Kieran — and Shannon and Tristan too.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#fff5fa",

@@ -23,8 +23,11 @@
     { id: "ellie",   name: "Ellie",   emoji: "👑", color: "#8a5cff" },
     { id: "kieran",  name: "Kieran",  emoji: "👶", color: "#ffd166" },
     { id: "shannon", name: "Mum",     emoji: "👩", color: "#3ddc84" },
-    { id: "dad",     name: "Dad",     emoji: "👨", color: "#ff9f45" },
+    { id: "tristan", name: "Dad",     emoji: "👨", color: "#ff9f45" },
   ];
+  /* Dad used to be filed as "dad"; he is "tristan" everywhere else in the
+     arcade now, so old letters are re-addressed when the mailbag loads. */
+  var OLD_IDS = { dad: "tristan" };
 
   var PAPERS = [
     { id: "plain",    name: "Plain white" },
@@ -96,6 +99,14 @@
     if (!Array.isArray(s.letters)) s.letters = [];
     if (!s.drafts || typeof s.drafts !== "object") s.drafts = {};
     if (!s.last) s.last = null;
+    s.letters.forEach(function (l) {
+      if (l && OLD_IDS[l.from]) l.from = OLD_IDS[l.from];
+      if (l && OLD_IDS[l.to]) l.to = OLD_IDS[l.to];
+    });
+    Object.keys(OLD_IDS).forEach(function (old) {
+      if (s.drafts[old]) { if (!s.drafts[OLD_IDS[old]]) s.drafts[OLD_IDS[old]] = s.drafts[old]; delete s.drafts[old]; }
+      if (s.last === old) s.last = OLD_IDS[old];
+    });
     return s;
   }
   function save() {

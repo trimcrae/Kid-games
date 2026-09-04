@@ -78,7 +78,7 @@ no logins.
 > all in `games/craepets/calendar.js`) hang a garland over the scene, pay a
 > bonus and leave a present to open; Advent counts the sleeps; and every
 > Craepet gets a party on its hatch-day. The kids' birthdays are in there too
-> (Kieran on 22 April, Cory on 23 April, Shannon on 30 September, Ellie on 11 December, Jeannie on 15 December):
+> (Kieran on 22 April, Cory on 23 April, Tristan on 12 June, Shannon on 30 September, Ellie on 11 December, Jeannie on 15 December):
 > a garland, a bonus and a present on the day, and a countdown the week before.
 > **Memory Match** is the second game in the games room (pairs are a sum
 > and its answer, an animal and its baby, a word and its opposite, a
@@ -142,6 +142,8 @@ That's it — every future push to `main` redeploys automatically.
 - **Kieran** — the baby 👶 (here for the snuggles)
 - **Shannon** — mum 👩, and a player in her own right: the grown-up level
   in Craepets is real vocabulary, mental maths and general knowledge
+- **Tristan** — dad 👨 (born 12 June 1993, turns 34 in 2027). Plays at the
+  grown-up level too, and has his own chip on the landing page
 
 Designed with big tap targets, bright colours, and games that work with a finger,
 a mouse, or a trackpad.
