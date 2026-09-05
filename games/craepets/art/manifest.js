@@ -22,6 +22,8 @@ window.CPArt = {
   "blorb": {
    "file": "blorb.webp",
    "idfile": "blorb-id.webp",
+   "ref": 0.792,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -188,6 +190,8 @@ window.CPArt = {
   "egg": {
    "file": "egg.webp",
    "idfile": "egg-id.webp",
+   "ref": 0.84,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -222,6 +226,8 @@ window.CPArt = {
   "flarn": {
    "file": "flarn.webp",
    "idfile": "flarn-id.webp",
+   "ref": 0.832,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -388,6 +394,8 @@ window.CPArt = {
   "glimmr": {
    "file": "glimmr.webp",
    "idfile": "glimmr-id.webp",
+   "ref": 0.822,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -553,6 +561,7 @@ window.CPArt = {
   },
   "petpets": {
    "file": "petpets.webp",
+   "src": "25350b770f3e",
    "tile": [
     160,
     160
@@ -595,6 +604,8 @@ window.CPArt = {
   "puddlepop": {
    "file": "puddlepop.webp",
    "idfile": "puddlepop-id.webp",
+   "ref": 0.832,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -761,6 +772,8 @@ window.CPArt = {
   "snorbit": {
    "file": "snorbit.webp",
    "idfile": "snorbit-id.webp",
+   "ref": 0.831,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -927,6 +940,8 @@ window.CPArt = {
   "twiggle": {
    "file": "twiggle.webp",
    "idfile": "twiggle-id.webp",
+   "ref": 0.817,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -1093,6 +1108,8 @@ window.CPArt = {
   "zibbit": {
    "file": "zibbit.webp",
    "idfile": "zibbit-id.webp",
+   "ref": 0.806,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
