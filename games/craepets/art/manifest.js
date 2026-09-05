@@ -190,6 +190,8 @@ window.CPArt = {
   "egg": {
    "file": "egg.webp",
    "idfile": "egg-id.webp",
+   "ref": 0.84,
+   "src": "25350b770f3e",
    "tile": [
     320,
     440
@@ -559,6 +561,7 @@ window.CPArt = {
   },
   "petpets": {
    "file": "petpets.webp",
+   "src": "25350b770f3e",
    "tile": [
     160,
     160
