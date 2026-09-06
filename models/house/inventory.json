@@ -1,0 +1,1000 @@
+{
+  "status": "work-in-progress; not registered as a game",
+  "generator_sha256": "54dd487734a78f47068d0e07d9b95d4b956f3ac9459e4a6de8be20ff99124fe1",
+  "blender_version": "4.5.3 LTS",
+  "units": "metres; estimated",
+  "objects": 2736,
+  "mesh_objects": 2497,
+  "cameras": [
+    "overview",
+    "sunroom",
+    "kitchen",
+    "living",
+    "family",
+    "stairs",
+    "entry",
+    "plan"
+  ],
+  "external_images": [],
+  "assets": [
+    {
+      "name": "Main level floor",
+      "collection": "01 | Floors and split levels",
+      "photos": "6,7,8",
+      "confidence": "inferred footprint",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Lower family room floor",
+      "collection": "01 | Floors and split levels",
+      "photos": "9,10",
+      "confidence": "inferred footprint",
+      "location_m": [
+        10.989999771118164,
+        1.2999999523162842,
+        0.0
+      ]
+    },
+    {
+      "name": "Sunroom foam flooring",
+      "collection": "01 | Floors and split levels",
+      "photos": "5",
+      "confidence": "photo / estimated 6.6 x 3.4 m",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Main walls",
+      "collection": "02 | Main architectural walls",
+      "photos": "6-10",
+      "confidence": "estimated shell with observed openings",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Front facade with real window openings",
+      "collection": "03 | Cutaway walls - enable for enclosure",
+      "photos": "7,8",
+      "confidence": "window arrangement observed; spacing estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Front living left window",
+      "collection": "04 | Windows and front door",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.399999976158142,
+        -0.04500000178813934,
+        1.4299999475479126
+      ]
+    },
+    {
+      "name": "Front living right window",
+      "collection": "04 | Windows and front door",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.950000047683716,
+        -0.04500000178813934,
+        1.4299999475479126
+      ]
+    },
+    {
+      "name": "Entry side window",
+      "collection": "04 | Windows and front door",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        6.639999866485596,
+        -0.04500000178813934,
+        1.399999976158142
+      ]
+    },
+    {
+      "name": "House rear window visible from sunroom",
+      "collection": "04 | Windows and front door",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.6950000524520874,
+        8.170000076293945,
+        1.440000057220459
+      ]
+    },
+    {
+      "name": "Red three-panel front door",
+      "collection": "04 | Windows and front door",
+      "photos": "7",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        5.599999904632568,
+        -0.029999999329447746,
+        0.0
+      ]
+    },
+    {
+      "name": "Sunroom aluminum frame",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "three glazed sides observed; bay count estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Sunroom rear sliding bay 01",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.350000023841858,
+        11.399999618530273,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom rear sliding bay 02",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.450000047683716,
+        11.399999618530273,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom rear sliding bay 03",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        3.549999952316284,
+        11.399999618530273,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom rear sliding bay 04",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        4.650000095367432,
+        11.399999618530273,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom rear sliding bay 05",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        5.75,
+        11.399999618530273,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom rear sliding bay 06",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        6.849999904632568,
+        11.399999618530273,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom side sliding bay",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.800000011920929,
+        8.680000305175781,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom side sliding bay.001",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.800000011920929,
+        9.760000228881836,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom side sliding bay.002",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.800000011920929,
+        10.84000015258789,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom side sliding bay.003",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        7.400000095367432,
+        8.680000305175781,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom side sliding bay.004",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        7.400000095367432,
+        9.760000228881836,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom side sliding bay.005",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        7.400000095367432,
+        10.84000015258789,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Wooden indoor climbing gym",
+      "collection": "06 | Sunroom furniture",
+      "photos": "1,2,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.799999952316284,
+        9.850000381469727,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Wicker sunroom loveseat",
+      "collection": "06 | Sunroom furniture",
+      "photos": "3,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        6.769999980926514,
+        9.0,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Wicker sunroom armchair",
+      "collection": "06 | Sunroom furniture",
+      "photos": "3,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        6.800000190734863,
+        10.569999694824219,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Wicker side table",
+      "collection": "06 | Sunroom furniture",
+      "photos": "5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        5.829999923706055,
+        10.720000267028809,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Two-cup adjustable sunroom floor lamp",
+      "collection": "06 | Sunroom furniture",
+      "photos": "3,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        7.070000171661377,
+        11.0,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Arched wicker etagere",
+      "collection": "06 | Sunroom furniture",
+      "photos": "4",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        5.829999923706055,
+        8.420000076293945,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Small sunroom playhouse",
+      "collection": "06 | Sunroom furniture",
+      "photos": "1,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.3799999952316284,
+        8.649999618530273,
+        -0.07999999821186066
+      ]
+    },
+    {
+      "name": "Grey and ivory patterned kitchen tiles",
+      "collection": "07 | Kitchen floor and backsplash",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        8.0,
+        -0.05999999865889549,
+        0.0
+      ]
+    },
+    {
+      "name": "White subway tile backsplash",
+      "collection": "07 | Kitchen floor and backsplash",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        8.0,
+        -0.05999999865889549,
+        0.0
+      ]
+    },
+    {
+      "name": "Kitchen rear corner base",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.39000025391578674,
+        5.060000419616699,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Kitchen sink base",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.3900003433227539,
+        6.1700005531311035,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Kitchen slim end base",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.39000043272972107,
+        7.600000381469727,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Kitchen return base",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.860000491142273,
+        4.820000648498535,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Kitchen return counter with butt joint",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        8.0,
+        -0.05999999865889549,
+        0.0
+      ]
+    },
+    {
+      "name": "Kitchen upper corner",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.22000017762184143,
+        5.020000457763672,
+        1.5499999523162842
+      ]
+    },
+    {
+      "name": "Kitchen upper over sink",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.2200002521276474,
+        6.060000419616699,
+        1.6799999475479126
+      ]
+    },
+    {
+      "name": "Kitchen glass cupboard",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.22000034153461456,
+        7.180000305175781,
+        1.5499999523162842
+      ]
+    },
+    {
+      "name": "Kitchen return upper",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.9000004529953003,
+        4.680000305175781,
+        1.559999942779541
+      ]
+    },
+    {
+      "name": "Double basin sink and gooseneck faucet",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.4200005531311035,
+        6.1700005531311035,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Stainless dishwasher",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.3900004029273987,
+        7.12000036239624,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Stainless range and oven",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.7100003957748413,
+        4.850000381469727,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Over-range microwave",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.7100003957748413,
+        4.720000743865967,
+        1.5
+      ]
+    },
+    {
+      "name": "Upper cupboard above microwave",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.7100003957748413,
+        4.690000534057617,
+        1.9199999570846558
+      ]
+    },
+    {
+      "name": "French-door refrigerator",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.6800003051757812,
+        4.930000305175781,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Stored kitchen tableware",
+      "collection": "08 | Kitchen cabinetry and appliances",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.2300005704164505,
+        7.180000305175781,
+        1.5499999523162842
+      ]
+    },
+    {
+      "name": "Main oatmeal three-seat sofa",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.550000011920929,
+        2.549999952316284,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Child-sized blue sofa",
+      "collection": "09 | Living room furniture",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.3499999046325684,
+        0.5199999809265137,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Living upholstered armchair",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.8499999046325684,
+        3.0,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "White tray activity table",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.8200000524520874,
+        2.299999952316284,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Small light wood side table",
+      "collection": "09 | Living room furniture",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        3.5999999046325684,
+        0.5,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Television stand",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.3400000035762787,
+        0.5799999833106995,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Small living room television",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.33000001311302185,
+        0.5799999833106995,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Living table lamp",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.25,
+        0.9100000262260437,
+        0.6100000143051147
+      ]
+    },
+    {
+      "name": "Brass living floor lamp",
+      "collection": "09 | Living room furniture",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        3.5799999237060547,
+        3.0999999046325684,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Large framed living room mirror",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.06499999761581421,
+        2.549999952316284,
+        1.7799999713897705
+      ]
+    },
+    {
+      "name": "Upright wood piano",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "partially visible; instrument form inferred",
+      "location_m": [
+        2.3499999046325684,
+        4.090000152587891,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Piano bench",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.1500000953674316,
+        3.619999885559082,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Living baby swing",
+      "collection": "09 | Living room furniture",
+      "photos": "8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.100000023841858,
+        0.7799999713897705,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Dark wood dining table",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        5.519999980926514,
+        6.380000114440918,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Dining chair rear",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7",
+      "confidence": "dining seating partly obscured; estimated chair design",
+      "location_m": [
+        5.050000190734863,
+        7.130000114440918,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Dining chair front",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7",
+      "confidence": "dining seating partly obscured; estimated chair design",
+      "location_m": [
+        5.050000190734863,
+        5.630000114440918,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Dining chair rear.001",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7",
+      "confidence": "dining seating partly obscured; estimated chair design",
+      "location_m": [
+        5.980000019073486,
+        7.130000114440918,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Dining chair front.001",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7",
+      "confidence": "dining seating partly obscured; estimated chair design",
+      "location_m": [
+        5.980000019073486,
+        5.630000114440918,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Multi-drawer dining storage cabinet",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "7",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        7.519999980926514,
+        6.199999809265137,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Entry tall chest of drawers",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "7",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        4.449999809265137,
+        0.3199999928474426,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Dining playpen",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        4.050000190734863,
+        4.619999885559082,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Gallery wall frame group",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "6,7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        3.4649999141693115,
+        4.71999979019165,
+        0.0
+      ]
+    },
+    {
+      "name": "Parallel split-level stair bay",
+      "collection": "11 | Split-level stairs and iron rails",
+      "photos": "7,9,10",
+      "confidence": "stair pairing observed; 7 risers and levels estimated",
+      "location_m": [
+        12.300000190734863,
+        4.599999904632568,
+        0.0
+      ]
+    },
+    {
+      "name": "White upper stair safety gate",
+      "collection": "11 | Split-level stairs and iron rails",
+      "photos": "9",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        9.800000190734863,
+        4.010000228881836,
+        1.2799999713897705
+      ]
+    },
+    {
+      "name": "Upper landing walls and door",
+      "collection": "11 | Split-level stairs and iron rails",
+      "photos": "9",
+      "confidence": "visible landing only; upper rooms intentionally not modeled",
+      "location_m": [
+        12.300000190734863,
+        4.599999904632568,
+        0.0
+      ]
+    },
+    {
+      "name": "Lower family room walls",
+      "collection": "12 | Lower family room architecture",
+      "photos": "10",
+      "confidence": "visible finishes; inferred room extent",
+      "location_m": [
+        10.989999771118164,
+        3.299999952316284,
+        0.0
+      ]
+    },
+    {
+      "name": "Lower room side window A",
+      "collection": "12 | Lower family room architecture",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        13.269999504089355,
+        -0.060000114142894745,
+        0.36000001430511475
+      ]
+    },
+    {
+      "name": "Lower room side window B",
+      "collection": "12 | Lower family room architecture",
+      "photos": "7,8",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        11.129999160766602,
+        -0.05999995395541191,
+        0.36000001430511475
+      ]
+    },
+    {
+      "name": "Fireplace with white surround and wood mantel",
+      "collection": "12 | Lower family room architecture",
+      "photos": "10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        14.539999961853027,
+        2.299999713897705,
+        -1.0399999618530273
+      ]
+    },
+    {
+      "name": "Lower blue sofa",
+      "collection": "13 | Lower family room furniture",
+      "photos": "9,10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        12.90999984741211,
+        0.4699999988079071,
+        -1.024999976158142
+      ]
+    },
+    {
+      "name": "Lower olive lounge chair",
+      "collection": "13 | Lower family room furniture",
+      "photos": "9,10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        10.819999694824219,
+        0.6900001764297485,
+        -1.024999976158142
+      ]
+    },
+    {
+      "name": "Lower dark recliner",
+      "collection": "13 | Lower family room furniture",
+      "photos": "10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        12.649999618530273,
+        3.239999771118164,
+        -1.024999976158142
+      ]
+    },
+    {
+      "name": "Lower dark wood coffee table",
+      "collection": "13 | Lower family room furniture",
+      "photos": "10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        12.479999542236328,
+        2.2699999809265137,
+        -1.024999976158142
+      ]
+    },
+    {
+      "name": "Lower cubby storage",
+      "collection": "13 | Lower family room furniture",
+      "photos": "10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        14.369999885559082,
+        0.7999998331069946,
+        -1.024999976158142
+      ]
+    },
+    {
+      "name": "Lower shallow storage drawers",
+      "collection": "13 | Lower family room furniture",
+      "photos": "9,10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        13.069999694824219,
+        4.400000095367432,
+        -1.024999976158142
+      ]
+    },
+    {
+      "name": "Lower ceiling fan",
+      "collection": "13 | Lower family room furniture",
+      "photos": "10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        12.239999771118164,
+        2.299999952316284,
+        1.100000023841858
+      ]
+    },
+    {
+      "name": "Lower stair opening white casing",
+      "collection": "11 | Split-level stairs and iron rails",
+      "photos": "9,10",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Main level ceilings",
+      "collection": "14 | Ceilings - hidden for dollhouse",
+      "photos": "",
+      "confidence": "estimated 2.6m ceiling height",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Sloped soffit above descending stairs",
+      "collection": "14 | Ceilings - hidden for dollhouse",
+      "photos": "9,10",
+      "confidence": "visible bulkhead; slope estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Sunroom shallow ceiling panels",
+      "collection": "14 | Ceilings - hidden for dollhouse",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Kitchen recessed light trims",
+      "collection": "14 | Ceilings - hidden for dollhouse",
+      "photos": "6",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}
