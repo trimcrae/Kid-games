@@ -1538,15 +1538,13 @@
   function levelOf(pet) { return levelFor(pet && pet.xp); }
   /* The most CSS pixels one cell of a creature is ever drawn at. */
   var MAX_CELL = 22;
-  /* The desktop layout: the room fills the window and the play card takes
-     the right of it, so the Craepet lives in the left part of the room. */
+  /* The desktop layout: a sidebar of places beside a page that scrolls,
+     with the money bar up in the header strip. */
   var DESK = (window.matchMedia) ? window.matchMedia("(min-width: 1000px)") : null;
   function onDesk() { return !!(DESK && DESK.matches); }
   /* Where the pet may stand, as fractions of the room's width: the range
      it wanders in, and where it settles when it is not wandering. */
-  function petZone() {
-    return onDesk() ? { lo: 0.15, hi: 0.36, rest: 0.26 } : { lo: 0.2, hi: 0.8, rest: 0.5 };
-  }
+  function petZone() { return { lo: 0.2, hi: 0.8, rest: 0.5 }; }
 
   /* The egg in the room: it sits in the middle, breathes a little, and
      rocks when it is tapped or when a right answer cracks it. */
@@ -1568,8 +1566,6 @@
     if (anim.shadow) anim.shadow.style.left = (anim.x * 100) + "%";
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * 0.9));
     scale = Math.min(scale, Math.round(MAX_CELL * Math.min(2, window.devicePixelRatio || 1)));
-    // in the full-window room the egg is a thing in the room, not the room
-    if (onDesk()) scale = Math.min(scale, Math.floor(h * 0.55 / 24));
     var tilt = 0;
     if (anim.wobble > 0 && !calm) { tilt = Math.sin(anim.wobble / 2) * 0.16 * (anim.wobble / 24); anim.wobble--; }
     else if (!calm && anim.t % 240 > 228) tilt = Math.sin(anim.t / 1.5) * 0.06;     // a twitch now and then
@@ -1622,9 +1618,6 @@
     // the size the clay was rendered at, so it stays crisp rather than
     // filling the room as a blur
     scale = Math.min(scale, Math.round(MAX_CELL * Math.min(2, window.devicePixelRatio || 1)));
-    // In the full-window room the pet is a character standing in a room,
-    // about two fifths of the height of it, not a portrait filling a box.
-    if (onDesk()) scale = Math.min(scale, Math.floor(h * 0.62 / 22));
 
     // WANDERING. In the full-height room (the nest, or a house you are
     // visiting) the pet strolls about now and then, turning to face the
@@ -1829,29 +1822,21 @@
     var scene = (view === "visit")
       ? withSave(visit.s, function () { return sceneHtml("nest"); })
       : sceneHtml(view);
-    // Three parts: the stage (the room, with the money bar and the needs
-    // under it), the nav, and the side (the panel for wherever you are).
-    // On a phone they stack down the page. On a desktop the page becomes
-    // a game frame: the room fills the middle, the panel scrolls in a
-    // board beside it, and the nav is a dock of tiles along the bottom.
-    // The board is rebuilt on every render, so keep its scroll position:
-    // a question answered halfway down it must not jump back to the top.
-    var oldSide = $(".cp-side", g), sideTop = oldSide ? oldSide.scrollTop : 0;
+    // On a phone everything stacks down the page: the money bar, the
+    // room, the needs, where to go, and the panel for wherever you are.
+    // On a desktop the money bar moves up into the header strip, where
+    // to go becomes a sidebar menu, and the rest is the page beside it.
     g.className = "split";
     document.body.classList.add("valley");
-    // On a desktop the money bar lives in the header strip, so the room
-    // under it is clear; on a phone it sits over the room as before.
     var hud = $("#hud");
     var desk = onDesk() && hud;
     if (hud) hud.innerHTML = desk ? topbarHtml() : "";
-    g.innerHTML =
-      (desk ? "" : topbarHtml()) + scene + needsHtml() + navHtml() +
-      '<div class="cp-side">' + panelHtml() + "</div>";
-    var newSide = $(".cp-side", g);
-    if (newSide && sideTop) newSide.scrollTop = sideTop;
-    // …and once a question is answered, the way on must be in view
-    if (desk && newSide) {
-      var next = $("[data-next]", newSide);
+    g.innerHTML = desk
+      ? navHtml() + '<div class="cp-main">' + scene + needsHtml() + panelHtml() + "</div>"
+      : topbarHtml() + scene + needsHtml() + navHtml() + panelHtml();
+    // once a question is answered, the way on must be in view
+    if (desk) {
+      var next = $("[data-next]", g);
       if (next && next.scrollIntoView) { try { next.scrollIntoView({ block: "nearest" }); } catch (e) {} }
     }
     afterRender(g);
