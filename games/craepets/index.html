@@ -18,6 +18,7 @@
        =========================================================== */
     .cp-wrap { max-width: 820px; margin: 0 auto; padding: 0 0.75rem 4rem; }
     .cp-head { max-width: 820px; margin: 0 auto; padding: 0 0.75rem; }
+    .hud:empty { display: none; }
     .hero { padding: 0.25rem 1rem 0.3rem; }
     .subtitle { font-size: clamp(0.9rem, 2.6vw, 1.15rem); margin-top: 0.2rem; }
     .title { font-size: clamp(1.5rem, 5vw, 2.6rem); }
@@ -159,6 +160,7 @@
 
     .scene .deco {
       position: absolute; font-size: calc(clamp(1.3rem, 5vw, 2.3rem) * var(--s, 1));
+      left: calc(var(--x, 50) * 1%); bottom: calc(var(--y, 10) * 1%);
       opacity: 0.95; pointer-events: none; user-select: none; z-index: 2;
       transform: translateX(-50%);
       filter: drop-shadow(0 3px 4px rgba(0,0,0,0.15));
@@ -927,128 +929,163 @@
     .ghost.on { background: var(--purple); color: #fff; border-color: var(--purple); }
 
     /* ===========================================================
-       DESKTOP — most of the playing happens on a big screen, and a
-       phone's column of cards is not a game there. From about 1000px the
-       page becomes a game frame the size of the window: a thin header,
-       the room filling the middle with the money bar and the needs as a
-       status strip under it, the panel for wherever you are in a board
-       down the right that scrolls on its own, and where-to-go as a dock
-       of tiles along the bottom. Nothing on the page itself scrolls.
+       DESKTOP — most of the playing happens on a big screen, and there
+       the valley is laid out like a game, not a page. The room, or the
+       place you have walked to, fills the whole window: its weather,
+       its time of day and its garlands set the mood of the screen. A
+       translucent header strip runs along the top with the way back,
+       the title, the money bar and who is playing. The Craepet stands
+       in the left part of the room under its window, with its four
+       needs floating above it. The play card — the question, the shop,
+       the diary, whatever the place offers — is a wide card down the
+       right, big enough to play in, scrolling on its own when a place
+       has a lot to show. Where-to-go is a dock of tiles along the
+       bottom. Nothing on the page itself scrolls.
        =========================================================== */
     @media (min-width: 1000px) {
+      :root { --dock-h: 108px; }
       body.valley { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-      body.valley .cp-head { flex: 0 0 auto; }
-      body.valley .cp-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+      body.valley .bg-blobs { display: none; }
 
-      /* one header row: the way back | the title | who is playing */
-      .cp-head {
-        max-width: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-        gap: 1rem; padding: 0.55rem 1.1rem 0;
+      /* THE ROOM fills the window, behind everything */
+      body.valley .scene, body.valley .scene.compact {
+        position: fixed; inset: 0; height: auto; margin: 0; border-radius: 0; box-shadow: none;
+        z-index: 0; container-type: size;
       }
-      .cp-head .back-link { margin: 0; justify-self: start; padding: 0.45rem 0.95rem; }
-      .cp-head .hero { padding: 0; display: flex; align-items: baseline; gap: 0.7rem; }
-      .cp-head .title { font-size: 1.75rem; }
-      .cp-head .subtitle { font-size: 0.95rem; margin: 0; }
-      .cp-head .who-row { justify-self: end; margin: 0; }
-      .cp-wrap { max-width: none; padding: 0.7rem 1.1rem 0.9rem; }
+      /* the Craepet's feet land just above the dock */
+      .scene canvas { top: 0; bottom: var(--dock-h); height: auto; }
+      .scene .pet-shadow { display: none; }
+      .scene .place-tag { display: none; }
+      /* the window sits on the wall above the pet, clear of the card */
+      .scene .win, .scene.compact .win { right: auto; left: 21%; bottom: 58%; height: 22%; }
+      .scene .win-wide, .scene.compact .win-wide { height: 19%; }
+      /* the floor plan folds into the part of the room the card leaves
+         free, and lifts with the floor above the dock */
+      .scene .deco.furn { left: calc(var(--x, 50) * 0.42%); bottom: calc(var(--dock-h) + var(--y, 10) * 0.55%); }
+      .scene .deco.hung { left: calc(var(--x, 50) * 0.42%); }
+      .scene .deco, .scene.compact .deco { font-size: calc(clamp(1.6rem, 6cqh, 4.4rem) * var(--s, 1)); }
+      .scene .garland, .scene.compact .garland {
+        top: 60px; padding: 4px 58% 0 1%; font-size: clamp(1.1rem, 3.4cqh, 2rem);
+      }
+      .scene .wx-windy::after, .scene .wx-windy::before, .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 1.4rem; }
+      /* the speech bubble hangs over the pet, under the needs */
+      .bubble { left: 26%; top: 150px; font-size: 1.15rem; max-width: 30%; padding: 0.5rem 1rem; }
+      .floaty { font-size: 1.6rem; }
 
-      /* the frame: stage and board across the top, the dock along the bottom */
+      /* THE HEADER STRIP: the way back | the title | the money bar | who */
+      .cp-head {
+        position: relative; z-index: 3; max-width: none; margin: 0;
+        display: flex; align-items: center; gap: 0.9rem; padding: 0.45rem 1.2rem;
+        background: rgba(255,255,255,0.62); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 2px 14px rgba(43,36,64,0.10);
+      }
+      .cp-head .back-link { margin: 0; padding: 0.42rem 0.9rem; }
+      .cp-head .hero { padding: 0; display: flex; align-items: baseline; gap: 0.6rem; margin-right: auto; }
+      .cp-head .title { font-size: 1.6rem; }
+      .cp-head .subtitle { font-size: 0.9rem; margin: 0; }
+      .cp-head .who-row { margin: 0; }
+      .cp-head .back-link, .cp-head .lvl, .cp-head .coins, .cp-head .who { white-space: nowrap; }
+      .hud .topbar { margin: 0; flex-wrap: nowrap; padding: 0.35rem 0.85rem; gap: 0.55rem; }
+      .hud .petname { flex: 0 1 auto; max-width: 160px; }
+      .hud .xp { flex: 0 0 100px; }
+      .hud .mini { min-width: 36px; min-height: 36px; }
+      /* a narrower desktop keeps the strip to one line */
+      @media (max-width: 1320px) {
+        .cp-head .subtitle { display: none; }
+        .cp-head .title { font-size: 1.45rem; }
+        .hud .petname { max-width: 120px; }
+        .hud .xp { flex-basis: 76px; }
+        .cp-head { gap: 0.7rem; }
+      }
+
+      /* THE FRAME over the room */
+      body.valley .cp-wrap {
+        flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+        max-width: none; margin: 0; padding: 0.8rem 1.2rem 0; position: relative; z-index: 1;
+      }
       #game.split {
         flex: 1 1 auto; min-height: 0;
-        display: grid; gap: 0.8rem;
-        grid-template-columns: minmax(0, 1fr) clamp(400px, 37vw, 560px);
-        grid-template-rows: minmax(0, 1fr) auto;
-        grid-template-areas: "stage side" "nav nav";
+        display: grid; column-gap: 1.2rem; row-gap: 0.7rem;
+        grid-template-columns: minmax(0, 1fr) min(800px, 56vw);
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-areas: "needs side" ". side" "nav nav";
       }
-
-      /* THE STAGE: the room, and the status strip under it */
-      .cp-stage {
-        grid-area: stage; min-width: 0; min-height: 0;
-        display: grid; gap: 0.6rem;
-        grid-template-columns: auto minmax(0, 1fr);
-        grid-template-rows: minmax(0, 1fr) auto;
-        grid-template-areas: "scene scene" "bar needs";
-      }
-      .scene, .scene.compact {
-        grid-area: scene; height: auto; min-height: 0; margin: 0;
-        border-radius: 26px; container-type: size;
-        box-shadow: inset 0 0 0 4px rgba(255,255,255,0.6), 0 12px 30px rgba(43,36,64,0.18);
-      }
-      /* the places are not squeezed to a band any more: the question has
-         a board of its own, so the room keeps its full furnishings */
-      .scene.compact .win { height: 38%; bottom: 58%; }
-      .scene.compact .win-wide { height: 30%; }
-      .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 1.1rem; }
-      /* furniture, garlands and the labels grow with the room */
-      .scene .deco, .scene.compact .deco { font-size: calc(clamp(1.3rem, 7cqh, 4.2rem) * var(--s, 1)); }
-      .scene .garland, .scene.compact .garland { font-size: clamp(1rem, 4.5cqh, 2.4rem); }
-      .scene .place-tag { font-size: 1rem; left: 14px; top: 12px; padding: 0.25rem 0.85rem; }
-      .bubble { font-size: 1.1rem; top: 14px; padding: 0.5rem 1rem; max-width: 60%; }
-      .floaty { font-size: 1.5rem; }
-      .topbar {
-        grid-area: bar; margin: 0; flex-wrap: nowrap; padding: 0.45rem 0.9rem; gap: 0.6rem;
-        border-radius: 18px;
-      }
-      .petname { flex: 0 1 auto; max-width: 180px; }
-      .xp { flex: 0 0 110px; }
-      .needs { grid-area: needs; margin: 0; gap: 0.5rem; }
-      .need { padding: 0.3rem 0.5rem; }
+      /* everything in the frame sits above the room */
+      .needs, .cp-side, .nav { position: relative; z-index: 2; }
+      /* the needs float above the pet */
+      .needs { grid-area: needs; justify-self: start; display: flex; gap: 0.45rem; margin: 0; }
+      .need { min-width: 92px; padding: 0.3rem 0.55rem; background: rgba(255,255,255,0.88); box-shadow: 0 6px 16px rgba(43,36,64,0.16); }
       .need b { font-size: 1.15rem; }
-      .need small { font-size: 0.7rem; }
-      .needs.egg .need { padding: 0.55rem 0.9rem; }
+      .need small { font-size: 0.68rem; }
+      .needs.egg { max-width: 440px; }
+      .needs.egg .need { min-width: 0; padding: 0.55rem 0.9rem; font-size: 0.95rem; }
 
-      /* THE BOARD: the panel scrolls here, the page never does */
+      /* THE PLAY CARD: as tall as it needs, scrolling only when a place
+         has more to show than fits */
       .cp-side {
-        grid-area: side; min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain;
-        padding: 0.8rem; border-radius: 24px;
-        background: rgba(255,255,255,0.42);
-        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.75), 0 10px 26px rgba(43,36,64,0.10);
-        scrollbar-width: thin; scrollbar-color: rgba(138,92,255,0.45) transparent;
+        grid-area: side; align-self: start; max-height: 100%; min-height: 0; min-width: 0;
+        overflow-y: auto; overscroll-behavior: contain;
+        /* room for the card's shadow inside the scroll box */
+        padding: 14px 0.35rem 0.6rem 16px; margin: -14px 0 0 -16px;
+        scrollbar-width: thin; scrollbar-color: rgba(43,36,64,0.35) transparent;
       }
-      .cp-side > .panel:last-child { margin-bottom: 0; }
-      .panel { padding: 1rem 1.1rem; }
-      .qprompt { font-size: 1.3rem; }
-      .choice { min-height: 68px; font-size: 1.08rem; }
-      .acts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .sheet { width: min(640px, 100%); max-height: 84vh; }
-      #catch-canvas { height: 400px; }
+      .cp-side > .panel { border-radius: 26px; padding: 1.3rem 1.5rem; box-shadow: 0 18px 44px rgba(43,36,64,0.26); margin-bottom: 0.9rem; }
+      .cp-side > .panel:last-child { margin-bottom: 0.2rem; }
+      .panel h2 { font-size: 1.45rem; }
+      .panel .sub { font-size: 1rem; }
+      .qprompt { font-size: 1.55rem; }
+      .qbig { font-size: 3.9rem; margin-bottom: 0.5rem; }
+      .choices { gap: 0.7rem; }
+      .choice { min-height: 78px; font-size: 1.22rem; border-radius: 20px; }
+      .choice .pic { font-size: 2.8rem; }
+      .teach { font-size: 1.05rem; padding: 0.75rem 0.95rem; }
+      .act { min-height: 66px; font-size: 1.08rem; }
+      .items { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 0.65rem; }
+      .item .pic { font-size: 2.3rem; }
+      .plot { font-size: 1.7rem; }
+      .sheet { width: min(680px, 100%); max-height: 84vh; }
+      #catch-canvas { height: 440px; }
+      .wheelwrap { --r: 320px; }
+      img.photo { max-width: 100%; }
       /* a toast drops in under the header, not on top of the dock */
-      .toast { bottom: auto; top: 64px; font-size: 1.05rem; animation-name: toast-down; }
+      .toast {
+        bottom: auto; top: 138px; left: 21%; max-width: 36vw;
+        font-size: 1.05rem; animation-name: toast-down;
+      }
 
-      /* THE DOCK: every place as a tile, the valley on the left of the
-         divider and your own things on the right */
+      /* THE DOCK: every place as a tile along the bottom, the valley on
+         the left of the divider and your own things on the right */
       .nav {
-        grid-area: nav; flex-direction: row; justify-content: center; align-items: stretch;
-        gap: 0.45rem; margin: 0; padding: 0.5rem 0.8rem;
-        background: rgba(255,255,255,0.55); border-radius: 22px;
-        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.75), 0 10px 26px rgba(43,36,64,0.10);
+        grid-area: nav; justify-self: center; flex-direction: row; align-items: stretch;
+        gap: 0.45rem; margin: 0 0 0.9rem; padding: 0.5rem 0.8rem;
+        background: rgba(255,255,255,0.66); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border-radius: 24px; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.8), 0 12px 30px rgba(43,36,64,0.22);
       }
       .navrow { display: contents; }
       .navlabel { display: none; }
       .navrow + .navrow::before {
         content: ""; width: 3px; border-radius: 3px; margin: 0.3rem 0.5rem;
-        background: rgba(43,36,64,0.12);
+        background: rgba(43,36,64,0.14);
       }
       .nav button {
         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
-        width: clamp(66px, 6.2vw, 92px); min-height: 68px; padding: 0.35rem 0.2rem;
+        width: clamp(64px, 6vw, 88px); min-height: 66px; padding: 0.35rem 0.2rem;
         border-radius: 18px; font-size: 0.76rem; line-height: 1;
         transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
       }
-      .nav button .ic { font-size: 1.65rem; line-height: 1; }
+      .nav button .ic { font-size: 1.6rem; line-height: 1; }
       .nav button:hover { transform: translateY(-3px); border-color: #c9b8ff; }
-      .nav button.on {
-        transform: translateY(-4px); box-shadow: 0 8px 18px rgba(138,92,255,0.35);
-      }
+      .nav button.on { transform: translateY(-4px); box-shadow: 0 8px 18px rgba(138,92,255,0.35); }
       .nav button .dot { top: -6px; right: -6px; min-width: 19px; height: 19px; line-height: 19px; font-size: 0.72rem; }
     }
-    /* a short, wide window (a laptop with the browser's bars taking a slice)
-       trims the strip and the dock so the room keeps most of the height */
+    /* a short window (a laptop with the browser's bars taking a slice)
+       trims the dock so the room keeps its height */
     @media (min-width: 1000px) and (max-height: 760px) {
-      .nav button { min-height: 58px; }
-      .nav button .ic { font-size: 1.4rem; }
-      .cp-head { padding-top: 0.4rem; }
-      .cp-wrap { padding-top: 0.5rem; padding-bottom: 0.6rem; }
+      :root { --dock-h: 92px; }
+      .nav button { min-height: 56px; }
+      .nav button .ic { font-size: 1.35rem; }
+      .nav { margin-bottom: 0.6rem; }
+      .cp-wrap { padding-top: 0.5rem; }
     }
 
     /* On a small phone every pixel above the question counts — but a
@@ -1092,6 +1129,8 @@
       <h1 class="title"><span class="emo">🥚</span> Craepets</h1>
       <p class="subtitle" id="tagline">Adopt a creature. Everything it eats, you learn.</p>
     </header>
+    <!-- on a desktop the money bar is rendered here, in the header strip -->
+    <div id="hud" class="hud"></div>
     <nav class="who-row" id="who-row" aria-label="Who's playing?"></nav>
   </div>
 
