@@ -11,13 +11,13 @@ bpy.ops.wm.open_mainfile(filepath=str(HERE / 'house.blend'))
 scene = bpy.context.scene
 inventory = json.loads((HERE / 'inventory.json').read_text(encoding='utf-8'))
 expected_hash = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in
-    ['build.py', 'upstairs.py', 'extensions.py'])).hexdigest()
+    ['build.py', 'upstairs.py', 'extensions.py', 'basement_garage.py'])).hexdigest()
 assert scene['generator_sha256'] == expected_hash == inventory['generator_sha256'], 'Stale model'
 assert scene.unit_settings.system == 'METRIC'
 assert scene.camera.data.type == 'ORTHO'
 assert len(scene.objects) == inventory['objects']
 assert len({entry['name'] for entry in inventory['assets']}) == len(inventory['assets']), 'Duplicate asset identities'
-assert len([o for o in scene.objects if o.type == 'CAMERA']) == 19
+assert len([o for o in scene.objects if o.type == 'CAMERA']) == 26
 assert 'START HERE - House study' in bpy.data.texts
 assert not bpy.data.libraries, 'Unexpected linked library'
 assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'
@@ -28,7 +28,12 @@ required = ['Wooden indoor climbing gym', 'Wicker sunroom loveseat', 'French-doo
             'White slatted nursery crib', 'Wood nursery rocking chair', 'Primary double bed',
             'End bedroom single bed', 'Green tile bathtub', 'White bathroom vanity',
             'Ensuite toilet', 'Primary open closet', 'Lower bedroom single bed',
-            'Lower bathroom white vanity', 'Covered front porch slab']
+            'Lower bathroom white vanity', 'Covered front porch slab',
+            'Basement return staircase', 'Basement foosball table', 'Basement metal bunk bed',
+            'Basement dual monitors', 'Basement top loading washer', 'Basement front loading dryer',
+            'Basement laundry utility sink', 'Basement furnace and plenum',
+            'Basement wall mounted water heater', 'Garage black SUV', 'Garage burgundy SUV',
+            'Garage glazed side door', 'Pink bedroom double bed']
 for name in required:
     obj = bpy.data.objects.get(name)
     assert obj is not None and obj.type == 'EMPTY', name
@@ -45,6 +50,10 @@ registry = (HERE.parent.parent / 'assets/js/games.js').read_text(encoding='utf-8
 assert 'models/house' not in registry and 'house.blend' not in registry
 
 # Photo-derived spatial constraints, independent of the generator's transforms.
+# Blender does not evaluate world transforms for collections hidden on load.
+# Temporarily expose the detached room for these read-only position checks.
+bpy.data.collections['39 | Pink curtain bedroom - placement pending'].hide_viewport=False
+bpy.data.objects['Basement staircase sloped ceiling'].hide_set(False)
 bpy.context.view_layer.update()
 def position(name):
     return bpy.data.objects[name].matrix_world.translation
@@ -103,6 +112,22 @@ depsgraph = bpy.context.evaluated_depsgraph_get()
 from mathutils import Vector
 hit = scene.ray_cast(depsgraph, Vector((11.05, hall.y, 2.0)), Vector((1, 0, 0)), distance=4.35)
 assert not hit[0], 'Straight upper hall is obstructed by ' + (hit[4].name if hit[0] else '')
+
+# W9: basement return descends beside the stairs up to the main floor.
+basement = sorted([o.matrix_world.translation for o in scene.objects if o.name.startswith('Basement stair tread')], key=lambda p:p.x)
+assert len(basement) == 12
+assert basement[-1].x < 9.69 and basement[0].x < 7.8
+assert all(b.z > a.z for a,b in zip(basement,basement[1:]))
+assert basement[-1].y > lower[0].y, 'Basement flight belongs beside the main-floor return'
+assert basement[-1].z < -1.05 and abs(basement[0].z - (-3.15)) < .04
+for p in basement[:-1]:
+    hit=scene.ray_cast(depsgraph,Vector((p.x,p.y,p.z+.03)),Vector((0,0,1)),distance=1.80)
+    assert not hit[0], 'Basement stair headroom blocked by '+(hit[4].name if hit[0] else '')
+assert position('Basement top loading washer').x > position('Basement laundry utility sink').x > position('Basement front loading dryer').x
+assert abs(position('Basement top loading washer').y-position('Basement front loading dryer').y)<.05
+assert position('Basement metal bunk bed').z < position('Lower bedroom single bed').z-1.5
+assert position('Garage black SUV').x > position('Garage burgundy SUV').x
+assert position('Pink bedroom double bed').x > 16, 'Unconfirmed bedroom should remain a detached study'
 
 for view in inventory['cameras']:
     path = HERE / 'previews' / (view + '.png')
