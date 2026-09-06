@@ -1,29 +1,64 @@
-# Pizza portrait — Blender rendering study
+# Pizza portrait — Blender reconstruction test
 
-Work in progress toward the requested photorealistic portrait and orbit video.
+This study reconstructs an adult eating pizza from a single photograph.
+The Blender camera moves through a modest 24-degree arc over six seconds.
+The visible facial and clothing detail comes from a photographic reference;
+the underlying subject is a custom volumetric mesh. Side views expose imperfect
+inferred geometry, especially around the sunglasses, ear, fingers and food.
+This is a camera test, not a faithful 360-degree scan.
 
-The initial hand-authored geometry and materials are in `build.py`:
-anatomical head, open mouth and teeth, ears, short swept hair and stubble,
-browline sunglasses, charcoal Henley shirt, raised hand, loaded pizza,
-and a sunny plaza. The uploaded photograph is a visual reference only.
-No image-to-3D model, downloaded person, or generated texture is used by that
-draft. Its inspected result is too stylized for the requested final quality.
+## Outputs
 
-The user subsequently authorized model generation and other techniques, with
-the constraint that this is an ordinary desktop without a gaming GPU.
-`hosted_generate.py` therefore tests the official Microsoft TRELLIS.2 hosted
-demo. Only its lightweight API client runs locally; it does not download or
-run neural model weights. Its input is the generated isolated-person reference,
-with a closely matched face, clothing, food and pose from the original photo.
+- [Camera test, H.264 MP4](output/orbit.mp4)
+- [Rendered portrait](output/portrait.png)
+- [Packed Blender scene](output/pizza-scene.blend)
+- [Left camera extreme](output/left.png) and [right camera extreme](output/right.png)
+- [Video metadata](output/video.json)
 
-The generated asset must pass visual review in Blender before a finished
-render or orbit video is claimed. Unseen parts of the person and setting are
-interpretations of the single photograph. The hand-authored draft remains
-available for comparison and for reusable geometry.
+The scene has a roughly 106,000-face person mesh, image textures, a distant
+environment sphere and a small light setup. It uses Blender Cycles on CPU;
+no gaming GPU or local machine-learning installation is required to open it.
+The MP4 plays independently of Blender. Full rendering is slower than playback.
 
-The hosted TRELLIS.2 attempt prepared the reference but was declined by the
-service's anonymous GPU quota. No 3D asset was produced by that attempt.
-`reconstruct_cpu.py` and the GitHub Actions reconstruction workflow test the
-MIT-licensed TripoSR model on a remote CPU runner instead. The resulting GLB
-is inspected at four angles with Blender's Cycles renderer by
-`inspect_generated.py`. These are experiments, not completed deliverables.
+## Reproduction
+
+Use Blender 4.5 or its `bpy` Python package. The reconstruction is already
+provided in `reconstruction/`; rerunning neural inference is unnecessary.
+
+```sh
+python inspect_generated.py --asset reconstruction --output /tmp/person --project-photo --views none
+python compose.py --person-scene /tmp/person/person-inspection.blend --environment environment.jpg --output output --render
+python render_frames.py --scene output/pizza-scene.blend --output frames --part 0 --parts 1
+ffmpeg -framerate 24 -start_number 1 -i frames/%04d.png -c:v libx264 -crf 18 -pix_fmt yuv420p -movflags +faststart output/orbit.mp4
+```
+
+The GitHub Actions workflows perform reconstruction and final rendering on
+remote CPU runners. Local previews used four CPU threads. The final video
+contains 144 individually rendered Blender frames at 24 fps and 960×940 pixels.
+The portrait is rendered at 1920×1880 pixels.
+
+## Method and limitations
+
+`reconstruct_cpu.py` uses the MIT-licensed TripoSR model with a portable CPU
+marching-cubes implementation. `inspect_generated.py` corrects axis and normal
+conventions, converts vertex colors, and projects the reference texture onto
+visible geometry. `compose.py` creates the plaza environment, lighting and
+animated camera. The distant plaza is a generated panorama, so it supplies
+angular background motion rather than the parallax of a fully modeled location.
+
+The source photograph is not stored here. `person-reference.jpg` is an
+AI-generated isolated interpretation of the photographed adult, clothing,
+pose and food. `environment.jpg` is an AI-generated panorama based on the
+setting. Unseen surfaces and surrounding architecture are interpretations.
+The final still and camera frames are rendered in Blender, not generated video.
+
+The earlier `build.py` experiment uses hand-authored geometry and materials;
+its inspected result was too stylized. The user subsequently authorized model
+generation while asking that heavy work stay off the ordinary desktop.
+`hosted_generate.py` tested Microsoft's hosted TRELLIS.2 demo, but anonymous GPU
+quota prevented generation. TripoSR then ran successfully in GitHub Actions.
+`relief.py` preserves a further depth-surface experiment; it was rejected for
+the video because it flattened and stretched the food.
+
+The older `inspection/` PNGs were produced before axis and color corrections
+and are retained as experiment records. Use `output/` for the composed result.

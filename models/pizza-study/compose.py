@@ -29,6 +29,21 @@ for o in list(scene.objects):
     if o.type!='MESH':bpy.data.objects.remove(o,do_unlink=True)
 person=next(o for o in scene.objects if o.type=='MESH')
 person.name='Custom textured person eating pizza'
+# Lighting is already baked into the photo. An emission/alpha material keeps
+# those values intact and avoids expensive, redundant diffuse light sampling.
+for mat in person.data.materials:
+    nodes=mat.node_tree.nodes;links=mat.node_tree.links
+    bsdf=next((n for n in nodes if n.type=='BSDF_PRINCIPLED'),None)
+    if bsdf:
+        color=bsdf.inputs['Base Color'].links[0].from_socket
+        alpha=bsdf.inputs['Alpha'].links[0].from_socket
+        emission=nodes.new('ShaderNodeEmission');links.new(color,emission.inputs[0])
+        transparent=nodes.new('ShaderNodeBsdfTransparent')
+        mix=nodes.new('ShaderNodeMixShader');links.new(alpha,mix.inputs[0])
+        links.new(transparent.outputs[0],mix.inputs[1]);links.new(emission.outputs[0],mix.inputs[2])
+        out=next(n for n in nodes if n.type=='OUTPUT_MATERIAL')
+        links.new(mix.outputs[0],out.inputs['Surface'])
+        nodes.remove(bsdf)
 
 # A spherical distant-environment plate remains consistent during an orbit.
 # It is visible to camera/glossy rays; separate lights control the foreground.
