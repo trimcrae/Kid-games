@@ -269,7 +269,7 @@ asset('Primary woven laundry hamper',(1.67,3.39,0),0,'U8')
 box('Woven hamper body',(0,0,.39),(.43,.40,.78),wicker,.04)
 box('Closed wicker hamper lid',(0,0,.81),(.46,.43,.055),rattan,.025)
 box('Hamper inset grip',(0,-.207,.69),(.12,.007,.035),black)
-asset('Bedside mesh bassinet',(2.63,1.15,0),0,'U8,V1')
+asset('Bedside mesh bassinet',(1.72,2.10,0),90,'U8,V1')
 for x in [-.44,.44]:
     for y in [-.24,.24]:
         rod('Bassinet folding leg',(x*1.12,y*1.2,.03),(x*.90,y*.85,.72),.022,curtainmat)

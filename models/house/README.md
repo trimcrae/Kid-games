@@ -3,6 +3,13 @@
 The [orientation audit](ORIENTATION.md) records the comparison of all 40 photos,
 the corrections, and the relationships that remain estimated.
 
+A separate [first-person walkthrough test](../../house-test/) uses this model.
+It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).
+The visible front/back yards now include lawn, planting beds, trees, a driveway,
+rear shed, trampoline, play equipment and fencing, based on photos 1–5 and V4–V5.
+Their distances and the lot boundary are estimates. See [front yard](previews/front_yard.png)
+and [back yard](previews/back_yard.png).
+
 Open **[house.blend](house.blend)** in Blender 4.5 LTS or newer. It opens with
 an overview camera and an editable model organized into room collections.
 This is an architectural/furniture study, with approximate dimensions;

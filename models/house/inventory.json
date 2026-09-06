@@ -1,16 +1,17 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "39a319c6291e0e47e07aaa78ed2ade65046276c87d280b632d9bbf84edeba420",
+  "generator_sha256": "de67224dca4dd7f7e2260ca967f0ee448dc6bd5f4c171da13f3fc97cebeca060",
   "source_files": [
     "build.py",
     "upstairs.py",
     "extensions.py",
-    "basement_garage.py"
+    "basement_garage.py",
+    "yard.py"
   ],
   "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 6087,
-  "mesh_objects": 5331,
+  "objects": 6805,
+  "mesh_objects": 6005,
   "cameras": [
     "overview",
     "sunroom",
@@ -40,7 +41,9 @@
     "pink_bedroom",
     "lower_entry",
     "kitchen_access",
-    "basement_entry"
+    "basement_entry",
+    "front_yard",
+    "back_yard"
   ],
   "external_images": [],
   "assets": [
@@ -1458,8 +1461,8 @@
       "photos": "U8,V1",
       "confidence": "photo / estimated size",
       "location_m": [
-        13.619999885559082,
-        5.160000324249268,
+        12.710000038146973,
+        6.110000133514404,
         1.2599999904632568
       ]
     },
@@ -2678,6 +2681,358 @@
       "collection": "02 | Main architectural walls",
       "photos": "6,W3; homeowner confirmation",
       "confidence": "door beyond glass cupboard observed; cabinet widths and opening dimensions estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Front lawn and driveway",
+      "collection": "42 | Front and back yards",
+      "photos": "V4,V5",
+      "confidence": "lawn, drive and tree positions visible; boundary and distances estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Back and side lawns",
+      "collection": "42 | Front and back yards",
+      "photos": "1-5",
+      "confidence": "lawn visible through sunroom; extent estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Front large shade tree",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "tree visible; species and size approximate",
+      "location_m": [
+        10.0,
+        -12.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front weeping tree",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "tree visible; species and size approximate",
+      "location_m": [
+        4.199999809265137,
+        -12.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear left shade tree",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2",
+      "confidence": "tree visible; species and size approximate",
+      "location_m": [
+        -3.0,
+        21.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear lawn tree",
+      "collection": "42 | Front and back yards",
+      "photos": "2,5",
+      "confidence": "tree visible; species and size approximate",
+      "location_m": [
+        6.199999809265137,
+        22.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear right screening tree",
+      "collection": "42 | Front and back yards",
+      "photos": "3,4",
+      "confidence": "tree visible; species and size approximate",
+      "location_m": [
+        20.0,
+        20.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front mulched planting beds",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Front garden shrub 00",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        3.9000000953674316,
+        -4.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front garden shrub 01",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        4.800000190734863,
+        -4.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front garden shrub 02",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        3.9000000953674316,
+        -5.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front garden shrub 03",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        4.800000190734863,
+        -5.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front garden shrub 04",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        3.9000000953674316,
+        -6.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front garden shrub 05",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        4.800000190734863,
+        -6.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 00",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        -6.0,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 01",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        -3.200000047683716,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 02",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        -0.4000000059604645,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 03",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        2.4000000953674316,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 04",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        5.199999809265137,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 05",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        8.0,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 06",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        10.800000190734863,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 07",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        13.600000381469727,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 08",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        16.399999618530273,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear fence shrub 09",
+      "collection": "42 | Front and back yards",
+      "photos": "1,2,5",
+      "confidence": "planting observed; shape simplified",
+      "location_m": [
+        19.200000762939453,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary fence",
+      "collection": "42 | Front and back yards",
+      "photos": "1-5",
+      "confidence": "fence visible; lot limits estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Rear garden shed",
+      "collection": "42 | Front and back yards",
+      "photos": "2,5",
+      "confidence": "taupe double-door shed visible; size estimated",
+      "location_m": [
+        12.199999809265137,
+        24.100000381469727,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Backyard trampoline",
+      "collection": "42 | Front and back yards",
+      "photos": "3,4",
+      "confidence": "round blue-edged trampoline with safety net",
+      "location_m": [
+        13.699999809265137,
+        14.100000381469727,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Backyard toddler slide",
+      "collection": "42 | Front and back yards",
+      "photos": "2,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        7.900000095367432,
+        17.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Backyard colorful play cube",
+      "collection": "42 | Front and back yards",
+      "photos": "2,5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        4.400000095367432,
+        18.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear patio table",
+      "collection": "42 | Front and back yards",
+      "photos": "1",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.2000000476837158,
+        13.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear sunroom steps",
+      "collection": "42 | Front and back yards",
+      "photos": "1-5",
+      "confidence": "small grade connection added for walkthrough; tread dimensions estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Front walk continuation to drive",
+      "collection": "42 | Front and back yards",
+      "photos": "V5",
+      "confidence": "walk meets driveway; continuation length estimated",
       "location_m": [
         0.0,
         0.0,

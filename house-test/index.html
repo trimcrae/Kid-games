@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#172c2a">
+  <title>House · Walkthrough test</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f6861' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
+</head>
+<body>
+  <canvas id="view" aria-label="First-person house walkthrough" tabindex="0"></canvas>
+  <header class="topbar">
+    <div class="identity"><span class="mark">⌂</span><div><strong>House walkthrough</strong><small>FAMILY TEST BUILD</small></div></div>
+    <div class="actions"><button id="rooms-button" aria-expanded="false" aria-controls="rooms">Rooms <span>↗</span></button><button id="pause-button" aria-label="Pause and show controls">Ⅱ</button></div>
+  </header>
+  <div id="crosshair" aria-hidden="true"></div>
+  <div class="location"><span class="dot"></span><span id="location">Front entry</span><small id="level">MAIN FLOOR</small></div>
+  <aside id="rooms" hidden>
+    <div class="panel-title"><h2>Go to a room</h2><button id="close-rooms" aria-label="Close rooms">×</button></div>
+    <p>Jump to a starting point, then explore on foot.</p>
+    <div id="room-list"></div>
+    <button id="reset" class="reset">Return to the front entry</button>
+  </aside>
+  <main id="welcome" class="overlay">
+    <section class="welcome-card">
+      <span class="eyebrow">A WALK AROUND HOME</span>
+      <h1>Come on in.</h1>
+      <p class="intro">Explore the house, head upstairs, or step out into the yard.</p>
+      <div class="instructions"><div><b>W A S D</b><span>Walk · arrow keys also work</span></div><div><b>Mouse</b><span>Look around · drag if needed</span></div><div><b>Shift / Esc</b><span>Walk faster / release the mouse</span></div></div>
+      <p class="touch-instructions">Use the left pad to walk. Drag the right side to look around.</p>
+      <button id="start" class="primary" disabled>Loading the house…</button>
+      <p id="loading" role="status" aria-live="polite">Preparing the model</p>
+      <p class="study-note">Photo-based study · room sizes and yard distances are approximate.</p>
+    </section>
+  </main>
+  <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div><span class="look-hint">DRAG TO LOOK</span></div>
+  <footer><span id="hint">Click the view to explore</span><button id="help">Controls</button></footer>
+  <script type="module" src="walkthrough.js"></script>
+</body>
+</html>

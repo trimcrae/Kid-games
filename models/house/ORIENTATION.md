@@ -6,6 +6,17 @@ V1–V10, basement/garage W1–W10. Original photos remain private and are not
 included in this repository. This audit establishes visible relationships;
 it does not establish measured room dimensions or the exterior footprint.
 
+Follow-up: the homeowner reports that the master bathroom is sideways. Its
+attachment to the bedroom is **not confirmed** by this audit; clarification of
+the doorway wall is pending. The earlier statement below describes fixture
+relationships within the room, not proof of its rotation within the house.
+
+Yards were added from photos 1–5 and V4–V5: front walk, lawn, planting beds,
+driveway and shade trees; rear lawn, fence, shed, trampoline and play equipment.
+Lot limits, tree dimensions and distances are approximate. Walking tests also
+identified a bassinet obstructing the master entry; it now sits beside the bed,
+leaving an approach through the doorway.
+
 ## Corrections
 
 | References | Visible evidence | Model correction |
