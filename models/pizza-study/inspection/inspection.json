@@ -1,0 +1,15 @@
+{
+  "blender": "4.5.3 LTS",
+  "engine": "CYCLES",
+  "meshes": 1,
+  "polygons": 105616,
+  "views": [
+    "front",
+    "left",
+    "right",
+    "side"
+  ],
+  "photo_projected": false,
+  "samples": 24,
+  "resolution": 800
+}

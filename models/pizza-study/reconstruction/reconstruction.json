@@ -1,0 +1,21 @@
+{
+  "method": "TripoSR with scikit-image CPU marching cubes",
+  "resolution": 256,
+  "vertices": 52804,
+  "faces": 105616,
+  "bounds": [
+    [
+      -0.2597912549972534,
+      -0.3160632252693176,
+      -0.5147525072097778
+    ],
+    [
+      0.27753424644470215,
+      0.348783016204834,
+      0.49894797801971436
+    ]
+  ],
+  "watertight": true,
+  "input": "person-reference.jpg",
+  "limitation": "Single-view inferred geometry; hidden surfaces are estimates."
+}
