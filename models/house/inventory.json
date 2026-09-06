@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "4ccd89a245ed19f17406adef3a9d961e9ffffdb6a7404ace32eb0cfd10c0722b",
+  "generator_sha256": "6eaf2d3fb34a516d4676d2237356a3bb574a20c4ca9ea4e581ed5cf8b2f8b6e9",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -9,8 +9,8 @@
   ],
   "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 6118,
-  "mesh_objects": 5367,
+  "objects": 6123,
+  "mesh_objects": 5370,
   "cameras": [
     "overview",
     "sunroom",
@@ -1813,12 +1813,12 @@
       ]
     },
     {
-      "name": "Unseen lower room closed dark door",
+      "name": "Pink bedroom shared entry doorway",
       "collection": "26 | Lower hall and additional room architecture",
-      "photos": "V8",
-      "confidence": "dark doorway observed; room beyond not modeled",
+      "photos": "V8,W10; homeowner confirmation",
+      "confidence": "doorway observed; size estimated",
       "location_m": [
-        12.0,
+        12.149999618530273,
         5.699999809265137,
         -1.0499999523162842
       ]
@@ -2507,144 +2507,144 @@
     },
     {
       "name": "Pink curtain bedroom shell",
-      "collection": "39 | Pink curtain bedroom - placement pending",
-      "photos": "W10",
-      "confidence": "detached room study; hallway location not yet confirmed",
+      "collection": "39 | Pink curtain bedroom",
+      "photos": "W10; homeowner confirmation",
+      "confidence": "shared downstairs entry confirmed; room size and doorway offset estimated",
       "location_m": [
-        0.0,
-        0.0,
+        4.65000057220459,
+        25.5,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom side window",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        17.010000228881836,
-        10.574999809265137,
+        15.22499942779541,
+        8.489999771118164,
         0.32999998331069946
       ]
     },
     {
       "name": "Pink bedroom side window curtains",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        17.010000228881836,
-        10.574999809265137,
+        15.22499942779541,
+        8.489999771118164,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom far window",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        18.459999084472656,
-        11.489999771118164,
+        16.139999389648438,
+        7.0400004386901855,
         0.32999998331069946
       ]
     },
     {
       "name": "Pink bedroom far window curtains",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        18.459999084472656,
-        11.489999771118164,
+        16.139999389648438,
+        7.0400004386901855,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom double bed",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        18.350000381469727,
-        9.619999885559082,
+        14.269999504089355,
+        7.149999141693115,
         -1.024999976158142
       ]
     },
     {
       "name": "Pink bedroom dress rail",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        17.65999984741211,
-        11.079999923706055,
+        15.729999542236328,
+        7.839999675750732,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom low pink shelf",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        19.6299991607666,
-        11.199999809265137,
+        15.84999942779541,
+        5.87000036239624,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom small bookcase",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        18.690000534057617,
-        11.239999771118164,
+        15.889999389648438,
+        6.809998989105225,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom wood dresser",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        20.100000381469727,
-        8.539999961853027,
+        13.1899995803833,
+        5.399999141693115,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom wall shelves",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        17.100000381469727,
-        9.069999694824219,
+        13.719999313354492,
+        8.399999618530273,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom empty toy hammock",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        17.43000030517578,
-        11.100000381469727,
+        15.75,
+        8.069998741149902,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom small road rug",
-      "collection": "39 | Pink curtain bedroom - placement pending",
+      "collection": "39 | Pink curtain bedroom",
       "photos": "W10",
       "confidence": "photo / estimated size",
       "location_m": [
-        19.440000534057617,
-        8.149999618530273,
+        12.799999237060547,
+        6.059998989105225,
         -1.0449999570846558
       ]
     },
@@ -2654,8 +2654,8 @@
       "photos": "W10",
       "confidence": "ceiling shown clean; damaged panels omitted",
       "location_m": [
-        0.0,
-        0.0,
+        4.65000057220459,
+        25.5,
         -1.0499999523162842
       ]
     },

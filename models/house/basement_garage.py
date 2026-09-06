@@ -280,15 +280,15 @@ for name,pos,power,size in [
     ('Garage door daylight',(-3.5,.2,1.5),360,4)]:
     area(name,pos,(pos[0],pos[1]+1,pos[2]-2),power,size)
 
-# W10 is a distinct room, not a recolor of V9. Keep its furniture editable as
-# a separate room study until the hallway adjacency is established.
-new_collection('39 | Pink curtain bedroom - placement pending')
-asset('Pink curtain bedroom shell',(0,0,-1.05),photos='W10',confidence='detached room study; hallway location not yet confirmed')
+# W10 is the third room off the same downstairs entry as V9 and the bathroom.
+# Author in room-local coordinates, then rotate the room onto that entry.
+new_collection('39 | Pink curtain bedroom')
+asset('Pink curtain bedroom shell',(0,0,-1.05),photos='W10; homeowner confirmation',confidence='shared downstairs entry confirmed; room size and doorway offset estimated')
 box('Pink bedroom floor',(18.75,9.50,-.04),(3.5,4,.09),walnut)
 partition('Pink bedroom left window wall',(17,7.5),(17,11.5),white,[(2.55,3.60,.72,2.05)],height=2.21)
 partition('Pink bedroom far window wall',(17,11.5),(20.5,11.5),white,[(.92,2.00,.72,2.05)],height=2.21)
 partition('Pink bedroom right wall',(20.5,7.5),(20.5,11.5),white,height=2.21)
-partition('Pink bedroom entry wall',(17,7.5),(20.5,7.5),white,[(.2,1.12,0,2.03)],height=2.21)
+partition('Pink bedroom entry wall',(17,7.5),(20.5,7.5),white,[(2.37,3.23,0,2.05)],height=2.21)
 upper_window('Pink bedroom side window',(17.01,10.575,1.38),1.05,90,'W10')
 upper_window('Pink bedroom far window',(18.46,11.49,1.38),1.08,0,'W10')
 for obj in COLL.objects:
@@ -321,6 +321,14 @@ asset('Pink bedroom ceiling',(0,0,-1.05),photos='W10',confidence='ceiling shown 
 box('Pink bedroom ceiling plane',(18.75,9.5,2.25),(3.5,4,.06),white)
 curve('Pink bedroom exposed service pipe',[(17.22,9.05,0),(17.22,9.05,2.10),(18.35,9.05,2.10)],.055,white)
 
+bpy.context.view_layer.update()
+pink_attachment = (Matrix.Translation((12.15,5.70,0)) @
+                   Matrix.Rotation(-math.pi/2,4,'Z') @ Matrix.Translation((-19.80,-7.50,0)))
+for c in NEW_COLLECTIONS:
+    if c.name[:2] in {'39','40'}:
+        for obj in c.objects:
+            if obj.parent is None:obj.matrix_world=pink_attachment @ obj.matrix_world
+
 # Known kitchen adjacency is recorded above. Until the attachment wall is
 # confirmed, display the garage with a gap rather than cutting an invented
 # doorway through the existing kitchen cabinetry.
@@ -331,4 +339,4 @@ for c in NEW_COLLECTIONS:
 for name in ['Garage ceiling','Garage door daylight']:
     bpy.data.objects[name].location.x-=1.0
 scene['garage_attachment']='Kitchen access observed in W3; garage displayed detached pending attachment-wall confirmation.'
-scene['pink_bedroom_attachment']='W10 room modeled separately; exact relationship to the V9 white-curtain bedroom pending confirmation.'
+scene['pink_bedroom_attachment']='Homeowner confirmed: pink-curtain bedroom is the third room off the shared downstairs entry, alongside the other bedroom and bathroom. Dimensions estimated.'

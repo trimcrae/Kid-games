@@ -1024,7 +1024,7 @@ camera('basement_office',(6.96,5.60,-1.62),(5.58,1.70,-2.28),20)
 camera('basement_laundry',(4.44,5.43,-1.54),(6.51,7.20,-2.14),17)
 camera('basement_plan',(4.7,4,20),(4.7,4,-3),ortho=12.8)
 camera('basement_stairs',(11.65,3.79,.52),(8.18,3.36,-.67),18)
-camera('pink_bedroom',(17.55,8.10,.56),(18.99,10.18,-.35),18)
+camera('pink_bedroom',(12.55,5.70,.56),(14.83,6.51,-.35),18)
 
 # Expose the model from the overview camera without deleting enclosure walls.
 for name in ['Family east wall above windows']:
@@ -1047,6 +1047,7 @@ for label, pos in [
     ('ENTRY', (5.0, .35, 4.0)), ('UP', (8.35, 4.0, 4.0)),
     ('DOWN', (8.05, 2.55, 4.0)), ('LOWER FAMILY', (10.45, 2.2, 4.0)),
     ('LOWER BEDROOM', (8.00, 8.0, 4.0)), ('BATH', (10.90, 7.55, 4.0)),
+    ('PINK BEDROOM', (12.65, 7.35, 4.0)), ('SHARED ENTRY', (10.85, 5.3, 4.0)),
     ('FRONT OF HOUSE', (5.2, -.70, 4.0)),
 ]:
     data = bpy.data.curves.new('Plan label ' + label, 'FONT')
@@ -1116,7 +1117,7 @@ def set_view(name):
                    (n == 31 and name in {'basement_stairs','plan','family','stairs'}) or
                    (35 <= n <= 37 and name in {'overview','garage'}) or
                    (n == 38 and (basement_view or garage_view or name in {'overview','basement_stairs'})) or
-                   (n in {39,40} and pink_view))
+                   (n in {39,40} and (pink_view or name in {'overview','plan','family','lower_bedroom','lower_bathroom'})))
         c.hide_render = c.hide_viewport = not visible
     basement_ceiling.hide_render = basement_ceiling.hide_viewport = not (basement_view or name == 'basement_stairs') or name == 'basement_plan'
     stair_soffit=bpy.data.objects['Basement staircase sloped ceiling']
@@ -1136,7 +1137,7 @@ def set_view(name):
     scene.render.resolution_y = 1250 if name == 'overview' else 1000
 
 
-bpy.context.view_layer.update()  # Resolve transforms before hiding detached room studies.
+bpy.context.view_layer.update()  # Resolve transforms before hiding room collections.
 set_view('overview')
 scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
@@ -1149,7 +1150,7 @@ scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X.
 
 # An embedded guide travels with the native Blender asset.
 guide = bpy.data.texts.new('START HERE - House study')
-guide.write('HOUSE / PHOTO STUDY / v03\n\n')
+guide.write('HOUSE / PHOTO STUDY / v04\n\n')
 guide.write('Editable rooms and furniture from four sets of ten photographs.\n')
 guide.write('Dimensions remain estimates. Upper hall continues straight from stairs; green bath left.\n\n')
 guide.write('Open the Outliner: collections are grouped by room and type. Furniture has a parent empty.\n')
@@ -1157,9 +1158,10 @@ guide.write('Select a furniture parent and its hierarchy to move an entire piece
 guide.write('Collections 03 and 14 are hidden for the dollhouse: enable viewport AND render to enclose rooms.\n')
 guide.write('Named cameras: '+', '.join(CAMERAS)+'.\n')
 guide.write('Upper rooms: collections 17-24; toggle 24 for ceilings. Original lower floor: plan camera.\n')
-guide.write('Basement: 30-34; garage: 35-37; room lights: 38; pink bedroom study: 39-40.\n')
+guide.write('Basement: 30-34; garage: 35-37; room lights: 38; pink bedroom: 39-40.\n')
 guide.write('Basement stairs return beside the living-room steps (W9). Basement -3.15m is estimated.\n')
-guide.write('Garage footprint and pink-bedroom placement need confirmation; see README.\n')
+guide.write('Pink bedroom shares the downstairs entry with the other bedroom and bathroom.\n')
+guide.write('Garage is off the kitchen; exact footprint and door offset remain estimates.\n')
 guide.write('Run the generator with --views upper_plan or --views nursery to render an isolated upper view.\n')
 guide.write('All materials procedural. No external textures or original photos are required.\n')
 guide.write('Source: models/house/build.py; provenance and limitations: models/house/README.md.\n')

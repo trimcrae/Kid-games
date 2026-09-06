@@ -51,8 +51,8 @@ assert 'models/house' not in registry and 'house.blend' not in registry
 
 # Photo-derived spatial constraints, independent of the generator's transforms.
 # Blender does not evaluate world transforms for collections hidden on load.
-# Temporarily expose the detached room for these read-only position checks.
-bpy.data.collections['39 | Pink curtain bedroom - placement pending'].hide_viewport=False
+# Expose the connected bedroom for these read-only position checks.
+bpy.data.collections['39 | Pink curtain bedroom'].hide_viewport=False
 bpy.data.objects['Basement staircase sloped ceiling'].hide_set(False)
 bpy.context.view_layer.update()
 def position(name):
@@ -127,7 +127,19 @@ assert position('Basement top loading washer').x > position('Basement laundry ut
 assert abs(position('Basement top loading washer').y-position('Basement front loading dryer').y)<.05
 assert position('Basement metal bunk bed').z < position('Lower bedroom single bed').z-1.5
 assert position('Garage black SUV').x > position('Garage burgundy SUV').x
-assert position('Pink bedroom double bed').x > 16, 'Unconfirmed bedroom should remain a detached study'
+pink_door = position('Pink bedroom shared entry doorway')
+assert 'Unseen lower room closed dark door' not in bpy.data.objects
+assert position('Pink bedroom double bed').x > pink_door.x
+assert abs(position('Pink bedroom double bed').z-position('Lower bedroom single bed').z)<.01
+assert 5.27 < pink_door.y < 6.13
+# Walk from the common entry into all three rooms at ankle, waist and head height.
+for z in [-.85,-.05,.75]:
+    for start,end in [((11.45,5.70,z),(12.75,5.70,z)),
+                      ((11.45,6.15,z),(10.45,6.15,z)),
+                      ((11.45,6.15,z),(11.45,7.00,z))]:
+        direction=Vector(end)-Vector(start)
+        hit=scene.ray_cast(depsgraph,Vector(start),direction.normalized(),distance=direction.length)
+        assert not hit[0], 'Shared downstairs entry blocked by '+(hit[4].name if hit[0] else '')
 
 for view in inventory['cameras']:
     path = HERE / 'previews' / (view + '.png')

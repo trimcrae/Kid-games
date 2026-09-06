@@ -44,16 +44,15 @@ pink-curtain downstairs bedroom.
 | Basement play area | W4–W5 | Foosball table with rods and players, metal bunk bed with made bedding, toddler slide, dollhouse, floor rocker, saucer chair, open bookcase and hanging fabric screens |
 | Basement office and storage | W6, W8 | Wood desk and dual monitors, black swivel chair, second workstation, storage shelves/cabinet and simplified potted plants |
 | Basement laundry and mechanical area | W7–W8 | Front-loading dryer, utility sink, top-loading washer, dehumidifier, furnace and plenum, wall-mounted water heater, representative overhead pipes and ductwork |
-| Pink-curtain bedroom | W10 | Separate room study with corner windows, rose curtains, made double bed, empty dress rail, pink shelving, bookcase, dresser, wall shelves, empty hammock and small road rug |
+| Pink-curtain bedroom | W10; homeowner confirmation | Third room off the shared downstairs entry, with corner windows, rose curtains, made double bed, empty dress rail, pink shelving, bookcase, dresser, wall shelves, empty hammock and small road rug |
 
-The **garage and pink-curtain bedroom are separate room studies pending
-attachment confirmation**. W3 confirms kitchen access to the garage, but the
-attachment wall is not yet established. The garage is displayed with a gap on
-the kitchen side; no doorway has been cut through an assumed kitchen wall.
-The pink room is available through its named camera and collections 39–40,
-but is omitted from the overall plan and overview so its provisional position
-cannot be mistaken for a confirmed room connection. The existing white-curtain
-bedroom remains in place pending clarification of the downstairs room order.
+The homeowner confirms that the **garage is off the kitchen** and that the
+**pink-curtain bedroom is the third room off the same downstairs entry as the
+other bedroom and bathroom**. The pink room now connects through the previously
+closed third doorway and appears in the overall plan and overview. Room sizes
+and doorway offsets remain estimates. The garage is still displayed with a
+gap on the kitchen side pending the precise door position; the existing sink
+cabinetry must be reconciled with that opening before cutting the kitchen wall.
 
 Furniture is modeled as clean, assembled objects. Counters, dining and activity
 tables are cleared. Loose toys, clothing, packages, papers, food, trash, and
@@ -87,7 +86,7 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Basement laundry and mechanical area](previews/basement_laundry.png)
 - [Basement plan](previews/basement_plan.png)
 - [Basement stairs beside the living-room steps](previews/basement_stairs.png)
-- [Pink-curtain bedroom study](previews/pink_bedroom.png)
+- [Pink-curtain bedroom off the shared downstairs entry](previews/pink_bedroom.png)
 
 The preview images are actual Cycles renders of the committed geometry.
 The `plan` camera shows the original main/lower layout with the upper rooms
@@ -107,9 +106,9 @@ view keep ceiling collections `14`, `24` and `28` hidden. The generator's named
 views automatically isolate the appropriate level and toggle ceilings.
 Collections `30`–`34` contain basement architecture, access, furniture, utilities
 and exposed ceilings. `35`–`37` contain the garage; `38` holds their lights;
-`39`–`40` contain the separate pink bedroom study; `41` holds basement plan labels.
-Hide `34` and `37` to inspect the basement and garage from above. The separately
-modeled rooms can be positioned by transforming their complete collections.
+`39`–`40` contain the connected pink bedroom; `41` holds basement plan labels.
+Hide `34` and `37` to inspect the basement and garage from above. Rooms can be
+positioned by transforming their complete collections.
 Each furniture piece has a named parent empty: move/rotate that empty to move
 the complete piece. Individual components and materials remain editable.
 Reference photo numbers and confidence notes are stored on the parent empties.
@@ -144,8 +143,9 @@ downloaded models, image textures, or required photo files.
 - Upstairs hall direction and the bathroom's side are confirmed. Room ordering
   follows U10, with the ensuite accessed from the main bedroom. Door spacing,
   room depths, closet width and overall exterior envelope need measurements.
-- The lower hall's dark doorway remains closed with no invented room behind
-  it. Lower bedroom/bathroom connections follow V6 and V8; dimensions are estimated.
+- The lower hall's third doorway now opens into the pink-curtain bedroom, as
+  confirmed by the homeowner. Both bedrooms and the bathroom share this entry;
+  dimensions and door spacing remain estimated.
 - Exterior roofs beyond the front porch, unseen rooms, most landscaping and
   neighboring buildings remain unfinished. The lawn is a base for the front
   path; these additions do not establish a surveyed lot plan.
@@ -186,7 +186,8 @@ Additional evidence:
 - U9 and V2: separate shower room off the main bedroom, with vanity, toilet,
   mirror, window and wall baskets visible in the second angle.
 - V6 and V8–V10: piano and hall beside the stair return; lower bathroom ahead,
-  bedroom left and a dark doorway to an unseen room right.
+  bedroom left and the third doorway right. The homeowner identified the third
+  room as the W10 pink-curtain bedroom on September 6, 2026.
 - W9 resolves the narrow doorway directly beside the living-room steps as the
   basement stair. This is distinct from the dark doorway in the lower hallway.
 - W7–W8 show the dryer, utility sink and washer in that order from left to right,

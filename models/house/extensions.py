@@ -1,7 +1,7 @@
 """Third upload V1-V10: front porch and newly visible lower-level spaces.
 
-Use the actual furniture and empty storage. Hidden spaces behind the dark lower
-door are left closed. Footprints beyond the original room remain estimates.
+Use the actual furniture and empty storage. The homeowner identifies the third
+shared-entry room as the pink-curtain bedroom. Footprints remain estimates.
 """
 EXTENSION_COLLECTIONS=[]
 
@@ -81,13 +81,11 @@ asset('Lower rear wall and hall opening',photos='V6,V8')
 partition('Lower rear panel wall',(9.69,4.67),(14.69,4.67),oak,[(1.16,2.31,0,2.08)],height=2.21)
 # This architecture collection is authored with floor Z=0; translate it down later.
 asset('Lower bedroom hall floor',photos='V6,V8')
-box('Hall carpet',(11.42,5.64,.015),(1.15,1.94,.04),carpet)
+box('Hall carpet',(11.50,5.64,.015),(1.30,1.94,.04),carpet)
 asset('Lower side hall walls',photos='V8')
 partition('Hall west wood trim wall',(10.85,4.67),(10.85,6.64),white,[(1.1,1.96,0,2.05)],height=2.21)
-partition('Hall east wood trim wall',(12.0,4.67),(12.0,6.64),white,[(.60,1.46,0,2.05)],height=2.21)
-asset('Unseen lower room closed dark door',(12.0,5.7,0),-90,'V8','dark doorway observed; room beyond not modeled')
-box('Closed dark door',(0,0,1.0),(.84,.06,2.0),walnut)
-sphere('Small dark door knob',(.32,-.05,.94),(.025,.025,.025),brass)
+partition('Hall east wood trim wall',(12.15,4.67),(12.15,6.64),white,[(.60,1.46,0,2.05)],height=2.21)
+upper_door('Pink bedroom shared entry doorway',(12.15,5.70,0),90,'V8,W10; homeowner confirmation')
 asset('Lower bedroom shell',photos='V9,V10',confidence='furniture and two corner windows observed; extent estimated')
 box('Lower bedroom floor',(9.35,7.80,-.045),(3.0,4.40,.09),walnut)
 partition('Lower bedroom back window wall',(7.85,10.0),(10.85,10.0),bed_wall,[(.25,1.6,.78,2.05)],height=2.21)
@@ -161,5 +159,5 @@ asset('Front porch sloping roof underside',photos='V4')
 o=box('Porch sloped white ceiling',(6,-1.44,2.35),(3.48,2.98,.09),white)
 o.rotation_euler.x=.14
 asset('Additional lower room ceilings',photos='V6,V8,V9')
-for x,y,w,d in [(11.42,5.64,1.15,1.94),(9.35,7.80,3,4.40),(11.50,7.84,1.30,2.4)]:
+for x,y,w,d in [(11.50,5.64,1.30,1.94),(9.35,7.80,3,4.40),(11.50,7.84,1.30,2.4)]:
     box('Lower extension ceiling',(x,y,1.20),(w,d,.08),white)
