@@ -78,7 +78,11 @@ depths and doorway locations; stair counts; and reverse-angle room photos.
 
 ## Orientation evidence
 
-The model uses these relationships from the photos:
+Confirmed by the homeowner: standing in the dining area and facing the red
+front door, both stair flights lead into the side wing on the left, and the
+kitchen is on the right. The current model uses this orientation.
+
+The model uses these additional relationships from the photos:
 
 | Reference | Relationship used in the model |
 | --- | --- |
