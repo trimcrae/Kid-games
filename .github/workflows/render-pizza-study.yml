@@ -1,0 +1,98 @@
+name: Render pizza study camera test
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - models/pizza-study/compose.py
+      - models/pizza-study/inspect_generated.py
+      - models/pizza-study/render_frames.py
+      - models/pizza-study/environment.jpg
+      - .github/workflows/render-pizza-study.yml
+permissions:
+  contents: write
+concurrency:
+  group: pizza-study-render
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install --no-cache-dir bpy==4.5.3 numpy==1.26.4
+      - name: Correct and texture the generated person
+        run: python models/pizza-study/inspect_generated.py --asset models/pizza-study/reconstruction --output /tmp/person --project-photo --views none
+      - name: Compose and render the portrait
+        run: python models/pizza-study/compose.py --person-scene /tmp/person/person-inspection.blend --environment models/pizza-study/environment.jpg --output models/pizza-study/output --render --samples 48
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pizza-scene
+          path: models/pizza-study/output/
+          retention-days: 14
+  frames:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install --no-cache-dir bpy==4.5.3
+      - uses: actions/download-artifact@v4
+        with:
+          name: pizza-scene
+          path: /tmp/scene
+      - run: python models/pizza-study/render_frames.py --scene /tmp/scene/pizza-scene.blend --output /tmp/frames --part ${{ matrix.part }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pizza-frames-${{ matrix.part }}
+          path: /tmp/frames
+          retention-days: 7
+  encode:
+    needs: frames
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: pizza-scene
+          path: models/pizza-study/output
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: pizza-frames-*
+          merge-multiple: true
+          path: /tmp/frames
+      - name: Encode and check the camera test
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          test "$(find /tmp/frames -name '*.png' | wc -l)" -eq 144
+          ffmpeg -y -framerate 24 -start_number 1 -i /tmp/frames/%04d.png -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p -movflags +faststart models/pizza-study/output/orbit.mp4
+          ffprobe -v error -show_streams -show_format -of json models/pizza-study/output/orbit.mp4 > models/pizza-study/output/video.json
+          cp /tmp/frames/0037.png models/pizza-study/output/left.png
+          cp /tmp/frames/0091.png models/pizza-study/output/right.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pizza-camera-test
+          path: models/pizza-study/output
+          retention-days: 14
+      - name: Publish the camera test files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add models/pizza-study/output
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish Blender pizza portrait and orbit test [skip ci]'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
