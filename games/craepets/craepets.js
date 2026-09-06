@@ -1466,8 +1466,8 @@
   ];
 
   function decoSpan(emoji, x, y, scale, cls) {
-    return '<span class="deco ' + (cls || "") + '" aria-hidden="true" style="left:' + x +
-      "%;bottom:" + y + "%;--s:" + scale + '">' + emoji + "</span>";
+    return '<span class="deco ' + (cls || "") + '" aria-hidden="true" style="--x:' + x +
+      ";--y:" + y + ";--s:" + scale + '">' + emoji + "</span>";
   }
 
   /* Everything you have put out, standing where it should stand. */
@@ -1538,6 +1538,15 @@
   function levelOf(pet) { return levelFor(pet && pet.xp); }
   /* The most CSS pixels one cell of a creature is ever drawn at. */
   var MAX_CELL = 22;
+  /* The desktop layout: the room fills the window and the play card takes
+     the right of it, so the Craepet lives in the left part of the room. */
+  var DESK = (window.matchMedia) ? window.matchMedia("(min-width: 1000px)") : null;
+  function onDesk() { return !!(DESK && DESK.matches); }
+  /* Where the pet may stand, as fractions of the room's width: the range
+     it wanders in, and where it settles when it is not wandering. */
+  function petZone() {
+    return onDesk() ? { lo: 0.15, hi: 0.36, rest: 0.26 } : { lo: 0.2, hi: 0.8, rest: 0.5 };
+  }
 
   /* The egg in the room: it sits in the middle, breathes a little, and
      rocks when it is tapped or when a right answer cracks it. */
@@ -1555,15 +1564,17 @@
     var w = cv.width, h = cv.height;
     if (!w || !h) return;
     anim.t++;
-    anim.x = 0.5;
-    if (anim.shadow) anim.shadow.style.left = "50%";
+    anim.x = petZone().rest;
+    if (anim.shadow) anim.shadow.style.left = (anim.x * 100) + "%";
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * 0.9));
     scale = Math.min(scale, Math.round(MAX_CELL * Math.min(2, window.devicePixelRatio || 1)));
+    // in the full-window room the egg is a thing in the room, not the room
+    if (onDesk()) scale = Math.min(scale, Math.floor(h * 0.55 / 24));
     var tilt = 0;
     if (anim.wobble > 0 && !calm) { tilt = Math.sin(anim.wobble / 2) * 0.16 * (anim.wobble / 24); anim.wobble--; }
     else if (!calm && anim.t % 240 > 228) tilt = Math.sin(anim.t / 1.5) * 0.06;     // a twitch now and then
     var crack = pet.egg.got >= 2 ? 2 : pet.egg.got >= 0.5 ? 1 : 0;
-    P.drawEgg(cv, pet.colour, { scale: scale, cx: Math.round(w / 2), tilt: tilt, crack: crack,
+    P.drawEgg(cv, pet.colour, { scale: scale, cx: Math.round(anim.x * w), tilt: tilt, crack: crack,
                                 bob: calm ? 0 : Math.round(Math.sin(anim.t / 30) * scale * 0.15) });
   }
 
@@ -1611,6 +1622,9 @@
     // the size the clay was rendered at, so it stays crisp rather than
     // filling the room as a blur
     scale = Math.min(scale, Math.round(MAX_CELL * Math.min(2, window.devicePixelRatio || 1)));
+    // In the full-window room the pet is a character standing in a room,
+    // about two fifths of the height of it, not a portrait filling a box.
+    if (onDesk()) scale = Math.min(scale, Math.floor(h * 0.62 / 22));
 
     // WANDERING. In the full-height room (the nest, or a house you are
     // visiting) the pet strolls about now and then, turning to face the
@@ -1618,9 +1632,10 @@
     // the question can see it.
     var roomy = (view === "nest" || view === "visit") && !calm && !sleeping;
     var walking = false;
+    var zone = petZone();
     if (roomy) {
       if (anim.tx === null && anim.t >= anim.wanderAt) {
-        if (Math.random() < 0.6) anim.tx = 0.2 + Math.random() * 0.6;
+        if (Math.random() < 0.6) anim.tx = zone.lo + Math.random() * (zone.hi - zone.lo);
         anim.wanderAt = anim.t + 160 + Math.random() * 320;
       }
       if (anim.tx !== null) {
@@ -1628,9 +1643,9 @@
         if (Math.abs(d) < 0.004) { anim.tx = null; }
         else { anim.x += (d < 0 ? -1 : 1) * 0.0022; anim.face = d < 0 ? -1 : 1; walking = true; }
       }
-    } else if (anim.x !== 0.5) {
-      anim.x += (0.5 - anim.x) * 0.15;
-      if (Math.abs(anim.x - 0.5) < 0.002) anim.x = 0.5;
+    } else if (anim.x !== zone.rest) {
+      anim.x += (zone.rest - anim.x) * 0.15;
+      if (Math.abs(anim.x - zone.rest) < 0.002) anim.x = zone.rest;
       anim.tx = null;
     }
     if (anim.shadow) anim.shadow.style.left = (anim.x * 100) + "%";
@@ -1775,7 +1790,7 @@
     var f = document.createElement("span");
     f.className = "floaty";
     f.textContent = text;
-    f.style.left = (35 + Math.random() * 30) + "%";
+    f.style.left = (petZone().rest * 100 - 15 + Math.random() * 30) + "%";
     f.style.bottom = "42%";
     if (colour) f.style.color = colour;
     sc.appendChild(f);
@@ -1804,7 +1819,11 @@
     renderWho();
     var g = $("#game");
     if (!g) return;
-    if (!S.pet) { g.className = ""; document.body.classList.remove("valley"); g.innerHTML = adoptHtml(); return; }
+    if (!S.pet) {
+      g.className = ""; document.body.classList.remove("valley");
+      var hud0 = $("#hud"); if (hud0) hud0.innerHTML = "";
+      g.innerHTML = adoptHtml(); return;
+    }
     if (view === "visit" && !visit) view = "case";
     // round at somebody's house, the room is painted from THEIR save
     var scene = (view === "visit")
@@ -1820,12 +1839,21 @@
     var oldSide = $(".cp-side", g), sideTop = oldSide ? oldSide.scrollTop : 0;
     g.className = "split";
     document.body.classList.add("valley");
+    // On a desktop the money bar lives in the header strip, so the room
+    // under it is clear; on a phone it sits over the room as before.
+    var hud = $("#hud");
+    var desk = onDesk() && hud;
+    if (hud) hud.innerHTML = desk ? topbarHtml() : "";
     g.innerHTML =
-      '<div class="cp-stage">' + topbarHtml() + scene + needsHtml() + "</div>" +
-      navHtml() +
+      (desk ? "" : topbarHtml()) + scene + needsHtml() + navHtml() +
       '<div class="cp-side">' + panelHtml() + "</div>";
     var newSide = $(".cp-side", g);
     if (newSide && sideTop) newSide.scrollTop = sideTop;
+    // …and once a question is answered, the way on must be in view
+    if (desk && newSide) {
+      var next = $("[data-next]", newSide);
+      if (next && next.scrollIntoView) { try { next.scrollIntoView({ block: "nearest" }); } catch (e) {} }
+    }
     afterRender(g);
     save();
   }
@@ -6254,6 +6282,13 @@
       reader.readAsText(f.files[0]);
     }, false);
     window.addEventListener("resize", function () { anim.measure = true; });
+    // crossing between the phone and desktop layouts moves the money bar
+    // and repaints the room at the other size
+    if (DESK) {
+      var relayout = function () { anim.measure = true; if (S.pet) render(); };
+      if (DESK.addEventListener) DESK.addEventListener("change", relayout);
+      else if (DESK.addListener) DESK.addListener(relayout);
+    }
     window.addEventListener("beforeunload", save);
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "visible") { passTime(); render(); } else { stopCatch(); save(); }

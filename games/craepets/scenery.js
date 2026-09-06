@@ -1411,15 +1411,15 @@ window.CPArt = (function () {
     g.putImageData(img, 0, 0);
   }
   var rasterCache = {}, rasterPending = {};
-  /* How many pixels a panorama gets. On a desktop the room is a big
-     square and the 240-wide panorama would be seven screen pixels a cell
-     and half cropped away, so it is painted at twice the pixels there:
-     the same picture, the same palette and dither, about as fine on the
-     screen as a phone's. The view through a window stays at one, it is
-     small enough already. */
+  /* How many pixels a panorama gets. On a desktop the place fills the
+     whole window, and the 240-wide panorama would be nine screen pixels
+     a cell, so it is painted at four times the pixels there: the same
+     picture, the same palette and dither, about as fine on the screen as
+     a phone's. The view through a window stays at one, it is small
+     enough already. */
   function detailOf(kind) {
     if (kind === "view") return 1;
-    try { return window.matchMedia("(min-width: 1000px)").matches ? 2 : 1; } catch (e) { return 1; }
+    try { return window.matchMedia("(min-width: 1000px)").matches ? 4 : 1; } catch (e) { return 1; }
   }
   function rasterise(kind, id, done) {
     var detail = detailOf(kind);

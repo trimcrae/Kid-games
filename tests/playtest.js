@@ -1886,7 +1886,10 @@ const GAMES = {
     if (await page.evaluate(() => Craepets.visiting()) !== "shannon") throw new Error("the visit did not start");
     if (!/Sable/.test(await page.locator(".panel.visit").textContent())) throw new Error("the visit does not introduce Shannon's pet");
     if (!/Sable/.test(await page.locator("#scene").getAttribute("aria-label"))) throw new Error("the room is not drawn with Shannon's pet in it");
-    await page.locator("#scene").click();
+    // tap the room where the pet stands: on a desktop the room fills the
+    // window and its middle is under the play card
+    const room = await page.locator("#scene").boundingBox();
+    await page.locator("#scene").click({ position: { x: room.width * 0.15, y: room.height * 0.55 } });
     await page.waitForTimeout(100);
     if (await page.evaluate(() => localStorage.getItem("craepets.v1.shannon")) !== herSave) throw new Error("visiting changed the host's save");
     if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🏡")))) throw new Error("the visit was not written in the diary");
