@@ -48,7 +48,7 @@ for row in range(11):
         x=.22+col*.40+(row%2)*.20
         if x<7.7:box('Foundation vertical mortar seam',(x,7.926,.115+row*.21),(.009,.006,.19),grout,0)
 asset('Basement fabric room divider',(0,0,BASEMENT_Z),photos='W4,W5,W8')
-for xa,xb,ya,yb in [(.15,3.45,7.05,7.05),(3.45,3.45,5.25,7.05)]:
+for xa,xb,ya,yb in [(.15,1.55,7.05,7.05),(3.45,3.45,.15,5.95)]:
     rod('Screen suspension line',(xa,ya,2.32),(xb,yb,2.32),.01,black)
     for i in range(48):
         t=(i+.5)/48
@@ -78,7 +78,7 @@ finish(bpy.data.objects.new('Basement staircase sloped ceiling',mesh),'Basement 
 # The existing family floor ends at X=9.69, so this flight needs no floor cut.
 
 new_collection('32 | Basement playroom furniture')
-asset('Basement foosball table',(1.52,5.60,BASEMENT_Z),0,'W4')
+asset('Basement foosball table',(2.50,5.60,BASEMENT_Z),0,'W4')
 box('Foosball cabinet',(0,0,.77),(1.42,.78,.28),walnut)
 box('Foosball green playfield',(0,0,.925),(1.25,.63,.016),green)
 for y in [-.375,.375]:box('Foosball raised side',(0,y,.98),(1.42,.05,.18),black)
@@ -129,19 +129,20 @@ for x in [-.30,.30]:
     rod('Saucer chair crossed stand',(x,.27,.02),(x,-.22,.64),.016,steel)
 
 new_collection('33 | Basement office laundry and mechanical')
-shelf_unit('Basement metal storage shelving',(4.05,2.80,BASEMENT_Z),1.65,1.98,black,90,'W6')
+shelf_unit('Basement metal storage shelving',(4.50,5.00,BASEMENT_Z),1.65,1.98,black,180,'W6')
 for z in [.20,.67,1.14]:
     for x in [-.52,0,.52]:box('Neatly stored closed bin',(x,0,z),(.46,.32,.27),bluegrey,.02)
-chest('Basement white storage cabinet',(4.0,4.70,BASEMENT_Z),1.15,1.55,90,2,2,'W6')
-table('Basement wood computer desk',(6.21,1.00,BASEMENT_Z),(1.75,.67,.75),walnut,180,'W6,W8')
-asset('Basement dual monitors',(6.21,1.00,BASEMENT_Z),180,'W6,W8')
+chest('Basement white storage cabinet',(5.95,5.00,BASEMENT_Z),1.15,1.55,180,2,2,'W6')
+# W8 shows the monitors continuing along the same wall, left of the dryer.
+table('Basement wood computer desk',(3.80,7.43,BASEMENT_Z),(1.75,.67,.75),walnut,0,'W6,W8')
+asset('Basement dual monitors',(3.80,7.43,BASEMENT_Z),0,'W6,W8')
 for x in [-.40,.40]:
     box('Computer monitor base',(x,0,.79),(.26,.19,.025),black)
     rod('Computer monitor stand',(x,.04,.78),(x,.04,1.0),.025,black)
     box('Computer monitor',(x,.04,1.16),(.69,.055,.43),black,.013)
     box('Computer blank display',(x,.006,1.16),(.65,.009,.39),screen,.004)
 box('Computer keyboard',(0,-.23,.79),(.45,.15,.018),black)
-asset('Basement black office chair',(6.23,2.05,BASEMENT_Z),0,'W6,W8')
+asset('Basement black office chair',(3.90,6.38,BASEMENT_Z),180,'W6,W8')
 rod('Office chair gas lift',(0,0,.10),(0,0,.47),.048,steel)
 for i in range(5):
     a=i*math.tau/5
@@ -152,9 +153,9 @@ box('Black office chair back',(0,.25,.86),(.57,.14,.68),black,.09)
 for x in [-.34,.34]:
     rod('Office chair arm upright',(x,.1,.49),(x,.1,.73),.021,black)
     box('Office chair arm pad',(x,-.02,.75),(.075,.39,.065),black,.025)
-table('Basement second workstation',(4.91,.39,BASEMENT_Z),(.95,.53,.73),pine,180,'W6')
+table('Basement second workstation',(2.25,7.43,BASEMENT_Z),(.95,.53,.73),pine,0,'W6')
 box('Second workstation screen',(0,.10,1.01),(.53,.065,.32),black)
-for x,y in [(4.17,.40),(7.24,.35)]:
+for x,y in [(1.50,7.44),(2.93,7.70)]:
     asset('Basement potted plant',(x,y,BASEMENT_Z),photos='W6')
     cylinder('Plant pot',(0,0,.15),.15,.30,black,24,top=.19)
     for i in range(7):
@@ -213,14 +214,15 @@ box('Garage concrete slab',(-3.5,4.6,-.24),(6.8,7,.16),concrete_new)
 partition('Garage west wall',(-6.9,1.1),(-6.9,8.1),blockmat,[(4.7,5.65,0,2.07)],height=2.68)
 partition('Garage rear wall',(-6.9,8.1),(-.1,8.1),blockmat,height=2.68)
 partition('Garage front opening',(-6.9,1.1),(-.1,1.1),joistmat,[(.42,6.4,0,2.25)],height=2.68)
-partition('Garage house side',(-.10,1.1),(-.10,8.1),blockmat,[(5.70,6.66,0,2.10)],height=2.68)
+partition('Garage house side',(-.10,1.1),(-.10,8.1),blockmat,[(6.06,6.86,0,2.10)],height=2.68)
 framed_opening('Garage overhead vehicle opening',(-3.49,1.10,-.16),5.98,2.42,0,'W1')
 framed_opening('Garage glazed side door',(-6.9,6.275,-.16),.95,2.23,90,'W2,W3')
 box('Side door lower panel',(0,0,.41),(.85,.045,.76),white)
 for x in [-.41,.41]:box('Side door glazed frame',(x,0,1.43),(.06,.045,1.29),white)
 for z in [.82,2.05]:box('Side door glazed crossrail',(0,0,z),(.88,.045,.055),white)
 box('Side door glass',(0,0,1.44),(.75,.014,1.17),glass,0)
-framed_opening('Kitchen garage connecting doorway',(-.1,7.28,0),.96,2.10,90,'W3')
+framed_opening('Kitchen garage connecting doorway',(-.1,7.56,0),.80,2.10,90,'W3; homeowner confirmation')
+box('Kitchen garage threshold',(0,0,-.025),(.80,.30,.05),oak)
 asset('Garage wall tool board',(-6.79,3.10,.15),90,'W1,W2')
 box('Timber tool board',(0,0,1.05),(1.8,.05,1.22),joistmat)
 for x in [-.6,-.2,.2,.6]:
@@ -288,7 +290,7 @@ box('Pink bedroom floor',(18.75,9.50,-.04),(3.5,4,.09),walnut)
 partition('Pink bedroom left window wall',(17,7.5),(17,11.5),white,[(2.55,3.60,.72,2.05)],height=2.21)
 partition('Pink bedroom far window wall',(17,11.5),(20.5,11.5),white,[(.92,2.00,.72,2.05)],height=2.21)
 partition('Pink bedroom right wall',(20.5,7.5),(20.5,11.5),white,height=2.21)
-partition('Pink bedroom entry wall',(17,7.5),(20.5,7.5),white,[(2.37,3.23,0,2.05)],height=2.21)
+partition('Pink bedroom entry wall',(17,7.5),(20.5,7.5),white,[(.23,1.09,0,2.05)],height=2.21)
 upper_window('Pink bedroom side window',(17.01,10.575,1.38),1.05,90,'W10')
 upper_window('Pink bedroom far window',(18.46,11.49,1.38),1.08,0,'W10')
 for obj in COLL.objects:
@@ -296,12 +298,12 @@ for obj in COLL.objects:
 for obj in COLL.objects:
     if obj.type=='MESH' and obj.name.startswith('Hanging curtain panel'):
         obj.data.materials.clear();obj.data.materials.append(pinkcloth)
-bed('Pink bedroom double bed',(18.35,9.62,-1.025),1.40,0,'W10')
-asset('Pink bedroom dress rail',(17.66,11.08,-1.05),0,'W10')
-for x in [-.57,.57]:
+bed('Pink bedroom double bed',(18.38,9.90,-1.025),1.40,90,'W10')
+asset('Pink bedroom dress rail',(17.18,10.79,-1.05),90,'W10')
+for x in [-.47,.47]:
     rod('Clothing rail upright',(x,0,.04),(x,0,1.29),.018,steel)
     rod('Clothing rail foot',(x,-.20,.04),(x,.20,.04),.018,steel)
-rod('Empty clothing rail',(-.57,0,1.29),(.57,0,1.29),.018,steel)
+rod('Empty clothing rail',(-.47,0,1.29),(.47,0,1.29),.018,steel)
 shelf_unit('Pink bedroom low pink shelf',(19.63,11.20,-1.05),1.05,.78,pinkwood,0,'W10')
 shelf_unit('Pink bedroom small bookcase',(18.69,11.24,-1.05),.61,.85,white,0,'W10')
 chest('Pink bedroom wood dresser',(20.10,8.54,-1.05),.83,1.12,-90,4,1,'W10')
@@ -322,21 +324,27 @@ box('Pink bedroom ceiling plane',(18.75,9.5,2.25),(3.5,4,.06),white)
 curve('Pink bedroom exposed service pipe',[(17.22,9.05,0),(17.22,9.05,2.10),(18.35,9.05,2.10)],.055,white)
 
 bpy.context.view_layer.update()
-pink_attachment = (Matrix.Translation((12.15,5.70,0)) @
-                   Matrix.Rotation(-math.pi/2,4,'Z') @ Matrix.Translation((-19.80,-7.50,0)))
+pink_attachment = (Matrix.Translation((10.85,6.20,0)) @
+                   Matrix.Rotation(math.pi/2,4,'Z') @ Matrix.Diagonal((1,.75,1,1)) @
+                   Matrix.Translation((-17.66,-7.50,0)))
 for c in NEW_COLLECTIONS:
     if c.name[:2] in {'39','40'}:
         for obj in c.objects:
-            if obj.parent is None:obj.matrix_world=pink_attachment @ obj.matrix_world
+            if obj.parent is None:
+                original=obj.matrix_world.copy()
+                if obj.name in {'Pink curtain bedroom shell','Pink bedroom ceiling'}:
+                    obj.matrix_world=pink_attachment @ original
+                else:
+                    # Fit the estimated room depth without squashing the furniture.
+                    origin=pink_attachment @ original.translation
+                    original.translation=(0,0,0)
+                    obj.matrix_world=Matrix.Translation(origin) @ Matrix.Rotation(math.pi/2,4,'Z') @ original
 
-# Known kitchen adjacency is recorded above. Until the attachment wall is
-# confirmed, display the garage with a gap rather than cutting an invented
-# doorway through the existing kitchen cabinetry.
-for c in NEW_COLLECTIONS:
-    if c.name[:2] in {'35','36','37'}:
-        for obj in c.objects:
-            if obj.parent is None:obj.location.x-=1.0
-for name in ['Garage ceiling','Garage door daylight']:
-    bpy.data.objects[name].location.x-=1.0
-scene['garage_attachment']='Kitchen access observed in W3; garage displayed detached pending attachment-wall confirmation.'
-scene['pink_bedroom_attachment']='Homeowner confirmed: pink-curtain bedroom is the third room off the shared downstairs entry, alongside the other bedroom and bathroom. Dimensions estimated.'
+# W3 resolves the opening at the end of the sink/glass-cupboard wall.
+# Its clear width and the cabinet widths are estimated within the current shell.
+bpy.data.objects.remove(bpy.data.objects['Kitchen sink wall'],do_unlink=True)
+COLL=bpy.data.collections['02 | Main architectural walls']
+asset('Kitchen sink wall with garage access',photos='6,W3; homeowner confirmation',confidence='door beyond glass cupboard observed; cabinet widths and opening dimensions estimated')
+partition('Kitchen wall beside garage opening',(-.07,4.44),(-.07,8.06),wall,[(2.72,3.52,0,2.10)],height=2.6)
+scene['garage_attachment']='Attached to kitchen at the end of the sink/glass-cupboard wall, as shown in W3 and confirmed by homeowner. Door and cabinet widths estimated.'
+scene['pink_bedroom_attachment']='V8 shows the pink bedroom LEFT of the bathroom; W10 confirms its furnishings. White-curtain bedroom is on the right. Shared entry confirmed by homeowner; dimensions estimated.'

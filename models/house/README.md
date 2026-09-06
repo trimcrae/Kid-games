@@ -1,5 +1,8 @@
 # House model — photo study, including basement and garage
 
+The [orientation audit](ORIENTATION.md) records the comparison of all 40 photos,
+the corrections, and the relationships that remain estimated.
+
 Open **[house.blend](house.blend)** in Blender 4.5 LTS or newer. It opens with
 an overview camera and an editable model organized into room collections.
 This is an architectural/furniture study, with approximate dimensions;
@@ -48,11 +51,12 @@ pink-curtain downstairs bedroom.
 
 The homeowner confirms that the **garage is off the kitchen** and that the
 **pink-curtain bedroom is the third room off the same downstairs entry as the
-other bedroom and bathroom**. The pink room now connects through the previously
-closed third doorway and appears in the overall plan and overview. Room sizes
-and doorway offsets remain estimates. The garage is still displayed with a
-gap on the kitchen side pending the precise door position; the existing sink
-cabinetry must be reconciled with that opening before cutting the kitchen wall.
+other bedroom and bathroom**. Rechecking V8 identifies the pink room on the
+**left**, the bathroom ahead and the white-curtain room on the **right**.
+The earlier placement had the bedrooms reversed. Both rooms now have aligned
+openings into the common entry. W3 identifies the garage door beyond the glass
+cupboard on the kitchen sink wall; the garage is now attached there. Cabinet
+widths, room dimensions and door offsets remain estimates.
 
 Furniture is modeled as clean, assembled objects. Counters, dining and activity
 tables are cleared. Loose toys, clothing, packages, papers, food, trash, and
@@ -87,6 +91,9 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Basement plan](previews/basement_plan.png)
 - [Basement stairs beside the living-room steps](previews/basement_stairs.png)
 - [Pink-curtain bedroom off the shared downstairs entry](previews/pink_bedroom.png)
+- [Shared downstairs entry: pink left, bathroom ahead, white bedroom right](previews/lower_entry.png)
+- [Kitchen access to the garage, matching W3](previews/kitchen_access.png)
+- [Basement entry toward the office and laundry wall, matching W8](previews/basement_entry.png)
 
 The preview images are actual Cycles renders of the committed geometry.
 The `plan` camera shows the original main/lower layout with the upper rooms
@@ -132,8 +139,8 @@ downloaded models, image textures, or required photo files.
   -1.05 m, and upper landing +1.26 m. Stair counts/rises need measurement.
 - Basement floor is provisionally -3.15 m. W9 establishes the return flight
   beside the living-room steps; 12 risers and the basement footprint are estimates.
-  The basement office/laundry share a zone, as shown in W6–W8. Their orientation
-  relative to the play area is provisional; exposed service runs are illustrative.
+  The basement office/laundry share a wall, as shown in W6–W8. Their absolute
+  orientation beneath the house is provisional; exposed service runs are illustrative.
 - The exact footprint, offsets, window widths, ceiling heights and sunroom bay
   count are not established by the photos. Upstairs room rectangles and the
   additional lower rooms are estimates; this is not an exterior footprint survey.
@@ -143,9 +150,9 @@ downloaded models, image textures, or required photo files.
 - Upstairs hall direction and the bathroom's side are confirmed. Room ordering
   follows U10, with the ensuite accessed from the main bedroom. Door spacing,
   room depths, closet width and overall exterior envelope need measurements.
-- The lower hall's third doorway now opens into the pink-curtain bedroom, as
-  confirmed by the homeowner. Both bedrooms and the bathroom share this entry;
-  dimensions and door spacing remain estimated.
+- V8 places the pink bedroom left of the bathroom and the white-curtain bedroom
+  right. Both bedrooms and the bathroom share this entry; room dimensions and
+  the entry's exact offset from the family-room stairs remain estimated.
 - Exterior roofs beyond the front porch, unseen rooms, most landscaping and
   neighboring buildings remain unfinished. The lawn is a base for the front
   path; these additions do not establish a surveyed lot plan.
@@ -186,14 +193,16 @@ Additional evidence:
 - U9 and V2: separate shower room off the main bedroom, with vanity, toilet,
   mirror, window and wall baskets visible in the second angle.
 - V6 and V8–V10: piano and hall beside the stair return; lower bathroom ahead,
-  bedroom left and the third doorway right. The homeowner identified the third
-  room as the W10 pink-curtain bedroom on September 6, 2026.
+  pink bedroom left (its pink shelving is visible in V8), white-curtain bedroom
+  right. The homeowner confirmed these are the two bedrooms off this entry.
 - W9 resolves the narrow doorway directly beside the living-room steps as the
   basement stair. This is distinct from the dark doorway in the lower hallway.
 - W7–W8 show the dryer, utility sink and washer in that order from left to right,
   with mechanical equipment farther right and office furniture in the same open area.
-- W3 establishes a kitchen-to-garage door; W1–W2 establish two parked vehicles,
-  an overhead vehicle opening and a separate glazed exterior door.
+- W3 establishes a kitchen-to-garage door beyond the glass cupboard on the
+  sink wall; W1–W2 establish two parked vehicles, an overhead vehicle opening
+  and a separate glazed exterior door. The kitchen cabinet run now leaves this
+  passage clear; widths are estimated.
 
 Dimensions remain estimates. The named room cameras and the two floor plans
 make the modeled left/right relationships reviewable.

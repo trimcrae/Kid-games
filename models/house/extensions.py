@@ -50,8 +50,8 @@ asset('Clean front porch foam mats',photos='V4')
 for ix in range(4):
     for iy in range(4):
         box('Porch colored foam square',(4.84+ix*.59,-.38-iy*.59,-.045),(.58,.58,.024),[navy,bluegrey,green,red][(ix+iy)%4],.003)
-copy_furniture('Wood nursery rocking chair','Front porch wood rocking chair',(4.80,-1.93,-.05),-90,'V4')
-copy_furniture('Wood nursery rocking chair','Front porch white rocking chair',(4.80,-.88,-.05),-90,'V4')
+copy_furniture('Wood nursery rocking chair','Front porch wood rocking chair',(4.80,-1.93,-.05),90,'V4')
+copy_furniture('Wood nursery rocking chair','Front porch white rocking chair',(4.80,-.88,-.05),90,'V4')
 for o in ROOT.children:
     o.data.materials.clear()
     o.data.materials.append(white)
@@ -84,14 +84,16 @@ asset('Lower bedroom hall floor',photos='V6,V8')
 box('Hall carpet',(11.50,5.64,.015),(1.30,1.94,.04),carpet)
 asset('Lower side hall walls',photos='V8')
 partition('Hall west wood trim wall',(10.85,4.67),(10.85,6.64),white,[(1.1,1.96,0,2.05)],height=2.21)
+upper_door('Pink bedroom shared entry doorway',(10.85,6.20,0),90,'V8,W10')
+asset('Lower hall east partition',photos='V8')
 partition('Hall east wood trim wall',(12.15,4.67),(12.15,6.64),white,[(.60,1.46,0,2.05)],height=2.21)
-upper_door('Pink bedroom shared entry doorway',(12.15,5.70,0),90,'V8,W10; homeowner confirmation')
+upper_door('Lower white bedroom shared entry doorway',(12.15,5.70,0),90,'V8-V10; homeowner confirmation')
 asset('Lower bedroom shell',photos='V9,V10',confidence='furniture and two corner windows observed; extent estimated')
 box('Lower bedroom floor',(9.35,7.80,-.045),(3.0,4.40,.09),walnut)
 partition('Lower bedroom back window wall',(7.85,10.0),(10.85,10.0),bed_wall,[(.25,1.6,.78,2.05)],height=2.21)
 partition('Lower bedroom side window wall',(7.85,5.60),(7.85,10.0),bed_wall,[(2.44,3.84,.78,2.05)],height=2.21)
-partition('Lower bedroom front wall',(7.85,5.60),(10.85,5.60),bed_wall,height=2.21)
-partition('Lower bedroom right wall',(10.85,5.60),(10.85,10.0),bed_wall,[(.17,1.03,0,2.05)],height=2.21)
+partition('Lower bedroom front wall',(7.85,5.60),(10.85,5.60),bed_wall,[(1.87,2.73,0,2.05)],height=2.21)
+partition('Lower bedroom right wall',(10.85,5.60),(10.85,10.0),bed_wall,height=2.21)
 upper_window('Lower bedroom far window',(8.78,9.99,1.415),1.35,0,'V9')
 upper_window('Lower bedroom side window',(7.86,8.74,1.415),1.40,90,'V9,V10')
 asset('Lower bathroom shell',photos='V8')
@@ -131,6 +133,17 @@ for cname in ['26 | Lower hall and additional room architecture','27 | Lower bed
     for obj in bpy.data.collections[cname].objects:
         if obj.parent is None:obj.location.z-=1.05
 
+# V8 visibly shows pink shelving through the LEFT door. The white-curtain room
+# therefore uses the right door. Rotate its complete shell/furniture together;
+# a reflection would reverse the photographed window/bookcase arrangement.
+bpy.context.view_layer.update()
+white_bedroom_attachment = (Matrix.Translation((12.15,5.70,0)) @
+                            Matrix.Rotation(-math.pi/2,4,'Z') @ Matrix.Translation((-10.15,-5.60,0)))
+for cname in ['26 | Lower hall and additional room architecture','27 | Lower bedroom and bathroom furniture']:
+    for obj in bpy.data.collections[cname].objects:
+        if obj.parent is None and obj.name.startswith('Lower bedroom') and obj.name != 'Lower bedroom hall floor':
+            obj.matrix_world=white_bedroom_attachment @ obj.matrix_world
+
 # Reverse family-room view supplies the piano and gymnastics bar near the stairs.
 COLL=bpy.data.collections['27 | Lower bedroom and bathroom furniture']
 # V6 clarifies that the green piece is a low floor cushion, not the upright
@@ -159,5 +172,5 @@ asset('Front porch sloping roof underside',photos='V4')
 o=box('Porch sloped white ceiling',(6,-1.44,2.35),(3.48,2.98,.09),white)
 o.rotation_euler.x=.14
 asset('Additional lower room ceilings',photos='V6,V8,V9')
-for x,y,w,d in [(11.50,5.64,1.30,1.94),(9.35,7.80,3,4.40),(11.50,7.84,1.30,2.4)]:
+for x,y,w,d in [(11.50,5.64,1.30,1.94),(14.35,6.50,4.40,3),(11.50,7.84,1.30,2.4)]:
     box('Lower extension ceiling',(x,y,1.20),(w,d,.08),white)

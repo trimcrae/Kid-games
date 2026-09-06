@@ -17,7 +17,7 @@ assert scene.unit_settings.system == 'METRIC'
 assert scene.camera.data.type == 'ORTHO'
 assert len(scene.objects) == inventory['objects']
 assert len({entry['name'] for entry in inventory['assets']}) == len(inventory['assets']), 'Duplicate asset identities'
-assert len([o for o in scene.objects if o.type == 'CAMERA']) == 26
+assert len([o for o in scene.objects if o.type == 'CAMERA']) == 29
 assert 'START HERE - House study' in bpy.data.texts
 assert not bpy.data.libraries, 'Unexpected linked library'
 assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'
@@ -129,17 +129,45 @@ assert position('Basement metal bunk bed').z < position('Lower bedroom single be
 assert position('Garage black SUV').x > position('Garage burgundy SUV').x
 pink_door = position('Pink bedroom shared entry doorway')
 assert 'Unseen lower room closed dark door' not in bpy.data.objects
-assert position('Pink bedroom double bed').x > pink_door.x
+white_door = position('Lower white bedroom shared entry doorway')
+assert pink_door.x < 11.50 < white_door.x, 'V8: pink left, white-curtain room right'
+assert position('Pink bedroom double bed').x < pink_door.x
+assert position('Lower bedroom single bed').x > white_door.x
 assert abs(position('Pink bedroom double bed').z-position('Lower bedroom single bed').z)<.01
-assert 5.27 < pink_door.y < 6.13
+assert 5.77 < pink_door.y < 6.63
 # Walk from the common entry into all three rooms at ankle, waist and head height.
 for z in [-.85,-.05,.75]:
     for start,end in [((11.45,5.70,z),(12.75,5.70,z)),
-                      ((11.45,6.15,z),(10.45,6.15,z)),
+                      ((11.45,6.15,z),(9.80,6.15,z)),
                       ((11.45,6.15,z),(11.45,7.00,z))]:
         direction=Vector(end)-Vector(start)
         hit=scene.ray_cast(depsgraph,Vector(start),direction.normalized(),distance=direction.length)
         assert not hit[0], 'Shared downstairs entry blocked by '+(hit[4].name if hit[0] else '')
+
+# Orientation audit: constraints read directly from all four photo sets.
+def head_direction(name):
+    return (bpy.data.objects[name].matrix_world.to_3x3() @ Vector((0,1,0))).normalized()
+assert head_direction('Pink bedroom double bed').y < -.99, 'W10: pillows at the left wall on entry'
+assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
+assert head_direction('End bedroom single bed').y < -.99, 'U7: bed projects from the right window wall'
+for name in ['Front porch wood rocking chair','Front porch white rocking chair']:
+    facing=bpy.data.objects[name].matrix_world.to_3x3() @ Vector((0,-1,0))
+    assert facing.x > .99, 'V4: porch chairs must face away from the siding'
+assert screen_x('lower_entry','Pink bedroom shared entry doorway') < screen_x('lower_entry','Lower bathroom white vanity') < screen_x('lower_entry','Lower white bedroom shared entry doorway')
+assert screen_x('nursery','Nursery wood drawer chest') < screen_x('nursery','Nursery window') < screen_x('nursery','Nursery white tall chest')
+assert screen_x('nursery','White slatted nursery crib') > screen_x('nursery','Nursery window')
+assert screen_x('bathroom','White bathroom vanity') < screen_x('bathroom','Green tile bathtub')
+assert screen_x('basement_play','Basement foosball table') < screen_x('basement_play','Basement metal bunk bed')
+assert abs(position('Basement dual monitors').y-position('Basement front loading dryer').y)<.05, 'W8: office continues along laundry wall'
+assert screen_x('basement_entry','Basement dual monitors') < screen_x('basement_entry','Basement front loading dryer')
+assert screen_x('basement_office','Basement metal storage shelving') < screen_x('basement_office','Basement dual monitors')
+hit=scene.ray_cast(depsgraph,Vector((6.50,6.60,-2.05)),Vector((-1,0,0)),distance=4.40)
+assert not hit[0], 'W6 office aisle blocked by '+(hit[4].name if hit[0] else '')
+assert screen_x('kitchen_access','Kitchen glass cupboard') < screen_x('kitchen_access','Kitchen garage connecting doorway')
+# W3 passage is checked at several heights, including where cabinets used to block it.
+for z in [.15,.85,1.65]:
+    hit=scene.ray_cast(depsgraph,Vector((1.00,7.56,z)),Vector((-1,0,0)),distance=1.60)
+    assert not hit[0], 'Kitchen garage passage blocked by '+(hit[4].name if hit[0] else '')
 
 for view in inventory['cameras']:
     path = HERE / 'previews' / (view + '.png')

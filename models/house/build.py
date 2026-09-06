@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--render', action='store_true')
-parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom')
+parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom,lower_entry,kitchen_access,basement_entry')
 parser.add_argument('--samples', type=int, default=48)
 parser.add_argument('--preview-scale', type=int, default=100, help='Render percentage; use 50 for fast layout checks')
 args = parser.parse_args(ARGS)
@@ -570,7 +570,7 @@ asset('White subway tile backsplash', photos='6')
 for row in range(7):
     for i in range(17):
         x = 4.57 + .195 * i + (row % 2) * .095
-        if x < 7.80:
+        if x < 7.05:  # W3: backsplash stops before the garage door.
             box('Rear subway tile', (x, 7.945, 1.0 + row * .087), (.189, .018, .081), tilewhite, .005)
     for i in range(10):
         y = 6.00 + .195 * i + (row % 2) * .095
@@ -619,18 +619,17 @@ def cabinet(name, pos, width, angle=0, upper=False, glassfront=False, top=True, 
         rod('Drawer handle', (-.09, -.38, .76), (.09, -.38, .76), .009, steel)
 
 
-cabinet('Kitchen rear corner base', (5.12, 7.61, .035), .98)
-cabinet('Kitchen sink base', (6.23, 7.61, .035), 1.21, top=False)
-cabinet('Kitchen slim end base', (7.66, 7.61, .035), .24)
+cabinet('Kitchen rear corner base', (4.89, 7.61, .035), .60)
+cabinet('Kitchen sink base', (5.84, 7.61, .035), 1.21, top=False)
 cabinet('Kitchen return base', (4.88, 7.14, .035), .78, 90, top=False)
 asset('Kitchen return counter with butt joint', photos='6')
 box('Non-overlapping return counter', (4.896, 7.006, .925), (.64, .536, .045), counter)
-cabinet('Kitchen upper corner', (5.08, 7.78, 1.55), .95, upper=True)
-cabinet('Kitchen upper over sink', (6.12, 7.78, 1.68), 1.05, upper=True)
-cabinet('Kitchen glass cupboard', (7.24, 7.78, 1.55), 1.08, upper=True, glassfront=True)
+cabinet('Kitchen upper corner', (4.89, 7.78, 1.55), .60, upper=True)
+cabinet('Kitchen upper over sink', (5.84, 7.78, 1.68), 1.05, upper=True)
+cabinet('Kitchen glass cupboard', (6.82, 7.78, 1.55), .64, upper=True, glassfront=True)
 cabinet('Kitchen return upper', (4.74, 7.1, 1.56), .80, 90, True)
 
-asset('Double basin sink and gooseneck faucet', (6.23, 7.58, .035), 0, '6')
+asset('Double basin sink and gooseneck faucet', (5.84, 7.58, .035), 0, '6,W3')
 for y in [-.28, .25]:
     box('Counter around sink front back', (0, y, .89), (1.23, .12, .045), counter)
 for x in [-.56, .56]:
@@ -648,7 +647,7 @@ pts += [(0, -.01, 1.09)]
 curve('Curved stainless faucet', pts, .014, steel)
 rod('Mixer lever', (.09, .25, .91), (.09, .21, 1.04), .008, steel)
 
-asset('Stainless dishwasher', (7.18, 7.61, .035), 0, '6')
+asset('Stainless dishwasher', (6.82, 7.61, .035), 0, '6,W3')
 box('Dishwasher body', (0, 0, .42), (.65, .60, .84), black)
 box('Stainless dishwasher front', (0, -.32, .44), (.625, .045, .76), steel, .018)
 box('Dishwasher top control strip', (0, -.35, .79), (.60, .015, .045), screen)
@@ -684,7 +683,8 @@ box('Water dispenser recess', (-.23, -.455, 1.20), (.22, .012, .28), screen)
 box('Water dispenser shelf', (-.23, -.49, 1.075), (.22, .08, .014), steel)
 
 # A small amount of orderly tableware behind the glass cupboard doors.
-asset('Stored kitchen tableware', (7.24, 7.77, 1.55), 0, '6')
+asset('Stored kitchen tableware', (6.82, 7.77, 1.55), 0, '6,W3')
+ROOT.scale.x=.60
 for z in [.22, .48]:
     box('Cupboard interior shelf', (0, 0, z), (1.0, .30, .02), oak)
     for i in range(5):
@@ -977,7 +977,7 @@ for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
     center = UPPER_ORIGIN + Vector(((x0+x1)/2, (y0+y1)/2, 2.26))
     area(name+' ceiling fill', center, center-Vector((0,0,2)), 100, min(x1-x0,y1-y0)*.65)
 area('Upper hall ceiling light', (13.1,4.01,3.5),(13.1,4.01,1.3),60,1)
-area('Lower bedroom ceiling fill',(9.1,8.3,1.1),(9.1,8.3,-1),90,1.4)
+area('Lower bedroom ceiling fill',(14.35,6.50,1.1),(14.35,6.50,-1),90,1.4)
 area('Lower bathroom ceiling fill',(11.4,7.5,1.1),(11.4,7.5,-1),60,.8)
 
 CAMERAS = {}
@@ -1006,7 +1006,7 @@ camera('living', (6.70, 1.45, 1.70), (.70, 2.30, 1.05), 24)
 camera('family', (9.50, 2.62, .85), (13.75, 2.30, -.05), 23)
 camera('stairs', (6.30, 3.20, 1.65), (9.20, 3.35, 1.05), 20)
 camera('entry', (6.65, 7.72, 1.68), (5.40, .55, 1.02), 20)
-camera('plan', (7.25, 5.5, 24), (7.25, 5.5, 0), ortho=20)
+camera('plan', (4.75, 5.5, 24), (4.75, 5.5, 0), ortho=26)
 camera('upper_overview',(25,-10,19),(14.3,6.0,1.5),ortho=18)
 camera('upper_plan',(14.3,6.0,24),(14.3,6.0,1.26),ortho=18)
 camera('hall',(11.06,4.01,2.88),(15.8,4.01,2.30),24)
@@ -1016,15 +1016,18 @@ camera('bedroom',(15.64,4.01,2.92),(17.80,3.84,2.0),19)
 camera('primary',(14.90,4.72,2.92),(13.83,7.46,2.11),18)
 camera('ensuite',(12.73,8.76,2.91),(13.04,10.9,2.2),16)
 camera('porch',(5.57,-.12,1.65),(5.00,-2.70,.10),19)
-camera('lower_bedroom',(10.65,6.21,.57),(8.58,8.85,-.36),18)
+camera('lower_bedroom',(12.42,5.70,.57),(15.40,7.15,-.36),18)
 camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
-camera('garage',(-1.64,7.54,1.67),(-4.65,3.40,.75),18)
-camera('basement_play',(3.23,6.92,-1.55),(1.30,3.20,-2.30),16)
-camera('basement_office',(6.96,5.60,-1.62),(5.58,1.70,-2.28),20)
+camera('garage',(-.64,7.54,1.67),(-3.65,3.40,.75),18)
+camera('basement_play',(2.20,6.85,-1.55),(2.20,3.20,-2.30),16)
+camera('basement_office',(6.50,6.60,-1.62),(2.10,6.65,-2.28),20)
 camera('basement_laundry',(4.44,5.43,-1.54),(6.51,7.20,-2.14),17)
 camera('basement_plan',(4.7,4,20),(4.7,4,-3),ortho=12.8)
 camera('basement_stairs',(11.65,3.79,.52),(8.18,3.36,-.67),18)
-camera('pink_bedroom',(12.55,5.70,.56),(14.83,6.51,-.35),18)
+camera('pink_bedroom',(10.80,6.20,.56),(8.70,7.12,-.35),17)
+camera('lower_entry',(11.50,4.95,.56),(11.50,7.85,.10),15)
+camera('kitchen_access',(1.50,7.48,1.65),(-1.00,7.56,1.10),24)
+camera('basement_entry',(6.75,4.01,-1.53),(4.55,7.45,-2.20),18)
 
 # Expose the model from the overview camera without deleting enclosure walls.
 for name in ['Family east wall above windows']:
@@ -1046,8 +1049,9 @@ for label, pos in [
     ('DINING', (4.8, 6.6, 4.0)), ('LIVING', (.9, 2.8, 4.0)),
     ('ENTRY', (5.0, .35, 4.0)), ('UP', (8.35, 4.0, 4.0)),
     ('DOWN', (8.05, 2.55, 4.0)), ('LOWER FAMILY', (10.45, 2.2, 4.0)),
-    ('LOWER BEDROOM', (8.00, 8.0, 4.0)), ('BATH', (10.90, 7.55, 4.0)),
-    ('PINK BEDROOM', (12.65, 7.35, 4.0)), ('SHARED ENTRY', (10.85, 5.3, 4.0)),
+    ('WHITE BEDROOM', (12.65, 7.35, 4.0)), ('BATH', (10.90, 7.55, 4.0)),
+    ('PINK BEDROOM', (8.00, 8.0, 4.0)), ('ENTRY', (11.0, 5.05, 4.0)),
+    ('GARAGE', (-4.50, 4.80, 4.0)),
     ('FRONT OF HOUSE', (5.2, -.70, 4.0)),
 ]:
     data = bpy.data.curves.new('Plan label ' + label, 'FONT')
@@ -1072,7 +1076,7 @@ for label,pos in [('GREEN BATH',(-.92,2.1)),('PRIMARY',(1.6,3.2)),('ENSUITE',(1.
 
 
 basement_labels = collection('41 | Basement plan labels')
-for label,pos in [('PLAY / BUNKS',(.40,3.2)),('OFFICE',(4.5,2.75)),('LAUNDRY',(4.80,7.60)),
+for label,pos in [('PLAY / BUNKS',(.40,3.2)),('OFFICE',(3.00,6.90)),('LAUNDRY',(4.80,7.60)),
                   ('MECHANICAL',(6.3,5.8)),('STAIRS UP',(7.5,4.1))]:
     data=bpy.data.curves.new('Basement plan label '+label,'FONT')
     data.body=label
@@ -1115,16 +1119,16 @@ def set_view(name):
         n=int(c.name[:2])
         visible = ((30 <= n <= 34 and (basement_view or name in {'overview','basement_stairs'})) or
                    (n == 31 and name in {'basement_stairs','plan','family','stairs'}) or
-                   (35 <= n <= 37 and name in {'overview','garage'}) or
-                   (n == 38 and (basement_view or garage_view or name in {'overview','basement_stairs'})) or
-                   (n in {39,40} and (pink_view or name in {'overview','plan','family','lower_bedroom','lower_bathroom'})))
+                   (35 <= n <= 37 and name in {'overview','plan','garage','kitchen','kitchen_access'}) or
+                   (n == 38 and (basement_view or garage_view or name in {'overview','basement_stairs','kitchen','kitchen_access'})) or
+                   (n in {39,40} and (pink_view or name in {'overview','plan','family','lower_bedroom','lower_bathroom','lower_entry'})))
         c.hide_render = c.hide_viewport = not visible
     basement_ceiling.hide_render = basement_ceiling.hide_viewport = not (basement_view or name == 'basement_stairs') or name == 'basement_plan'
     stair_soffit=bpy.data.objects['Basement staircase sloped ceiling']
     stair_soffit.hide_render = name in {'basement_plan','plan','overview'}
     stair_soffit.hide_set(stair_soffit.hide_render)
-    garage_ceiling.hide_render = garage_ceiling.hide_viewport = not garage_view
-    pink_ceiling.hide_render = pink_ceiling.hide_viewport = not pink_view
+    garage_ceiling.hide_render = garage_ceiling.hide_viewport = name not in {'garage','kitchen','kitchen_access'}
+    pink_ceiling.hide_render = pink_ceiling.hide_viewport = not (pink_view or name == 'lower_entry')
     basement_labels.hide_render = basement_labels.hide_viewport = name != 'basement_plan'
     if basement_view or garage_view or pink_view:
         for c in scene.collection.children:
@@ -1160,7 +1164,7 @@ guide.write('Named cameras: '+', '.join(CAMERAS)+'.\n')
 guide.write('Upper rooms: collections 17-24; toggle 24 for ceilings. Original lower floor: plan camera.\n')
 guide.write('Basement: 30-34; garage: 35-37; room lights: 38; pink bedroom: 39-40.\n')
 guide.write('Basement stairs return beside the living-room steps (W9). Basement -3.15m is estimated.\n')
-guide.write('Pink bedroom shares the downstairs entry with the other bedroom and bathroom.\n')
+guide.write('V8: pink bedroom LEFT, bathroom ahead, white-curtain bedroom RIGHT off the shared entry.\n')
 guide.write('Garage is off the kitchen; exact footprint and door offset remain estimates.\n')
 guide.write('Run the generator with --views upper_plan or --views nursery to render an isolated upper view.\n')
 guide.write('All materials procedural. No external textures or original photos are required.\n')

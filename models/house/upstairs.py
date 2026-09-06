@@ -235,7 +235,7 @@ upper_collection('20 | End bedroom furniture')
 # Looking through the end door along +X: desk/curtain left (+Y), bed right (-Y).
 asset('End bedroom large cream rug',(6.15,-.1,.035),0,'U7')
 box('Cream area rug',(0,0,0),(2.85,3.65,.025),bedding,.012)
-bed('End bedroom single bed',(6.55,-1.64,.035),1.03,-90,'U7',True)
+bed('End bedroom single bed',(6.25,-1.05,.035),1.03,180,'U7',True)
 chest('End bedroom wooden desk drawers',(5.18,1.95,0),.95,.76,0,3,1,'U7')
 table('End bedroom writing desktop',(5.37,1.91,0),(1.4,.61,.79),oak,photos='U7')
 asset('Tall narrow dark bookcase',(7.51,-.67,0),-90,'U7')
@@ -258,7 +258,8 @@ for x,z in [(-.4,.65),(0,1.05),(.42,1.54)]:
     curve('Green wall grab handle',[(x,-.03,z-.11),(x,-.10,z-.09),(x,-.11,z+.09),(x,-.03,z+.11)],.018,darkmint)
 
 upper_collection('21 | Primary bedroom furniture')
-bed('Primary double bed',(3.63,2.18,.025),1.60,0,'U8')
+# U8: pillows at the right-hand wall; dresser and TV on the adjoining wall.
+bed('Primary double bed',(3.43,2.40,.025),1.60,-90,'U8,V1')
 chest('Primary long wood dresser',(3.66,4.22,0),1.42,1.02,0,3,2,'U8')
 chest('Primary narrow wood chest',(2.56,3.77,0),.63,.82,0,4,1,'U8')
 asset('Primary wall television',(3.65,4.46,1.62),0,'U8')
@@ -268,7 +269,7 @@ asset('Primary woven laundry hamper',(1.67,3.39,0),0,'U8')
 box('Woven hamper body',(0,0,.39),(.43,.40,.78),wicker,.04)
 box('Closed wicker hamper lid',(0,0,.81),(.46,.43,.055),rattan,.025)
 box('Hamper inset grip',(0,-.207,.69),(.12,.007,.035),black)
-asset('Bedside mesh bassinet',(2.28,1.60,0),0,'U8')
+asset('Bedside mesh bassinet',(2.63,1.15,0),0,'U8,V1')
 for x in [-.44,.44]:
     for y in [-.24,.24]:
         rod('Bassinet folding leg',(x*1.12,y*1.2,.03),(x*.90,y*.85,.72),.022,curtainmat)
