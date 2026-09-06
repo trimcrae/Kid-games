@@ -281,6 +281,20 @@ body {
   text-align: center;
 }
 
+/* --- Big screens -----------------------------------------------------
+   Nearly all of the playing happens on a desktop, so a phone-shaped
+   column with a tall banner above it wastes most of the screen. On a
+   wide window the stage gets some more room, a game page's banner gets
+   out of the way sooner, and the arcade's own grid fills the width. */
+@media (min-width: 1024px) {
+  .game-stage { max-width: 840px; }
+  body:has(.back-link) .hero { padding: 1rem 1rem 0.75rem; }
+  body:has(.back-link) .back-link { margin: 1rem 1.25rem 0; }
+}
+@media (min-width: 1280px) {
+  .game-grid { max-width: 1280px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .blob, .title-emoji { animation: none; }
   * { scroll-behavior: auto; }

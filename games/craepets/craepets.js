@@ -1797,18 +1797,20 @@
     renderWho();
     var g = $("#game");
     if (!g) return;
-    if (!S.pet) { g.innerHTML = adoptHtml(); return; }
+    if (!S.pet) { g.className = ""; g.innerHTML = adoptHtml(); return; }
     if (view === "visit" && !visit) view = "case";
     // round at somebody's house, the room is painted from THEIR save
     var scene = (view === "visit")
       ? withSave(visit.s, function () { return sceneHtml("nest"); })
       : sceneHtml(view);
+    // Two halves: the stage (money bar, the room, the needs) and the side
+    // (where to go, and the panel for wherever you are). On a phone they
+    // stack; on a desktop they sit side by side and the stage stays put
+    // while the panel scrolls, so the Craepet is always in view.
+    g.className = "split";
     g.innerHTML =
-      topbarHtml() +
-      scene +
-      needsHtml() +
-      navHtml() +
-      panelHtml();
+      '<div class="cp-stage">' + topbarHtml() + scene + needsHtml() + "</div>" +
+      '<div class="cp-side">' + navHtml() + panelHtml() + "</div>";
     afterRender(g);
     save();
   }
