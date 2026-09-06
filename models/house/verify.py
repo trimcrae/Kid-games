@@ -10,20 +10,25 @@ HERE = Path(__file__).resolve().parent
 bpy.ops.wm.open_mainfile(filepath=str(HERE / 'house.blend'))
 scene = bpy.context.scene
 inventory = json.loads((HERE / 'inventory.json').read_text(encoding='utf-8'))
-expected_hash = hashlib.sha256((HERE / 'build.py').read_bytes()).hexdigest()
+expected_hash = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in
+    ['build.py', 'upstairs.py', 'extensions.py'])).hexdigest()
 assert scene['generator_sha256'] == expected_hash == inventory['generator_sha256'], 'Stale model'
 assert scene.unit_settings.system == 'METRIC'
 assert scene.camera.data.type == 'ORTHO'
 assert len(scene.objects) == inventory['objects']
 assert len({entry['name'] for entry in inventory['assets']}) == len(inventory['assets']), 'Duplicate asset identities'
-assert len([o for o in scene.objects if o.type == 'CAMERA']) == 8
+assert len([o for o in scene.objects if o.type == 'CAMERA']) == 19
 assert 'START HERE - House study' in bpy.data.texts
 assert not bpy.data.libraries, 'Unexpected linked library'
 assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'
 required = ['Wooden indoor climbing gym', 'Wicker sunroom loveseat', 'French-door refrigerator',
             'Double basin sink and gooseneck faucet', 'Dark wood dining table',
             'Main oatmeal three-seat sofa', 'Upright wood piano',
-            'Parallel split-level stair bay', 'Fireplace with white surround and wood mantel']
+            'Parallel split-level stair bay', 'Fireplace with white surround and wood mantel',
+            'White slatted nursery crib', 'Wood nursery rocking chair', 'Primary double bed',
+            'End bedroom single bed', 'Green tile bathtub', 'White bathroom vanity',
+            'Ensuite toilet', 'Primary open closet', 'Lower bedroom single bed',
+            'Lower bathroom white vanity', 'Covered front porch slab']
 for name in required:
     obj = bpy.data.objects.get(name)
     assert obj is not None and obj.type == 'EMPTY', name
@@ -77,8 +82,31 @@ assert screen_x('entry', 'Red three-panel front door') < screen_x('entry', 'Fren
 assert screen_x('living', 'Front living left window') < screen_x('living', 'Large framed living room mirror')
 assert screen_x('living', 'Large framed living room mirror') < screen_x('living', 'Upright wood piano')
 
-for view in ['overview', 'plan', 'entry', 'sunroom', 'kitchen', 'living', 'family', 'stairs']:
+# Homeowner: hallway goes straight from the upper flight, bathroom immediately left.
+hall = position('Upstairs oak hallway')
+assert abs(hall.y - upper[0].y) < .05
+assert hall.x > max(p.x for p in upper)
+assert position('Family bathroom doorway').y > hall.y + .5
+assert position('Family bathroom doorway').x < position('Primary bedroom doorway').x
+assert position('Primary bedroom doorway').y > hall.y
+assert position('Blue nursery doorway').y < hall.y
+assert position('End bedroom doorway').x > position('Blue nursery doorway').x
+assert abs(position('End bedroom doorway').y - hall.y) < .01
+assert abs(position('Green tile bathtub').z - (position('Primary double bed').z - .025)) < .001
+assert position('Ensuite toilet').y > position('Primary double bed').y
+assert position('Lower bedroom single bed').z < 0
+assert position('Covered front porch slab').y == 0  # Group at origin; all porch children are in front.
+assert all(o.matrix_world.translation.y < 0 for o in bpy.data.objects['Covered front porch slab'].children)
+assert 'Upper closed white door' not in bpy.data.objects
+# A straight corridor must not be blocked by the provisional door from v01.
+depsgraph = bpy.context.evaluated_depsgraph_get()
+from mathutils import Vector
+hit = scene.ray_cast(depsgraph, Vector((11.05, hall.y, 2.0)), Vector((1, 0, 0)), distance=4.35)
+assert not hit[0], 'Straight upper hall is obstructed by ' + (hit[4].name if hit[0] else '')
+
+for view in inventory['cameras']:
     path = HERE / 'previews' / (view + '.png')
     assert path.exists() and path.stat().st_size > 10000, 'Missing render: ' + view
 print(f'PASS: reopened model; {len(scene.objects)} objects, {len(inventory["assets"])} asset groups; '
-      '8 cameras; 8 previews; photo orientation checks; no external images/libraries; no game registration.')
+      f'{len(inventory["cameras"])} cameras/previews; confirmed hall/bath orientation and clear corridor; '
+      'no external images/libraries; no game registration.')

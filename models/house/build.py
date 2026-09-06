@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--render', action='store_true')
-parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs')
+parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom')
 parser.add_argument('--samples', type=int, default=48)
 parser.add_argument('--preview-scale', type=int, default=100, help='Render percentage; use 50 for fast layout checks')
 args = parser.parse_args(ARGS)
@@ -827,12 +827,12 @@ for z in [.06, .76]:
     box('Gate horizontal rail', (0, 0, z), (1.05, .04, .04), white)
 for i in range(10):
     rod('Gate vertical bar', (-.46 + i * .102, 0, .07), (-.46 + i * .102, 0, .75), .009, white)
-asset('Upper landing walls and door', photos='9', confidence='visible landing only; upper rooms intentionally not modeled')
+asset('Upper landing walls and door', photos='9,U1,U10', confidence='hall continues straight; green bathroom left, homeowner confirmed')
 wallbox('Landing left wall', (-.06, 1.93, 2.38), (.12, 1.3, 2.24))
 wallbox('Landing right wall', (1.23, 1.93, 2.38), (.12, 1.3, 2.24))
 wallbox('Landing rear header', (.59, 1.30, 3.32), (1.3, .12, .34))
-box('Upper closed white door', (.59, 1.31, 2.27), (.99, .055, 1.99), white)
-sphere('Upper door handle', (.97, 1.36, 2.25), (.029, .029, .029), brass)
+# This was provisionally closed in the first pass; the new hall photos establish
+# an open connection continuing straight from the landing.
 
 collection('12 | Lower family room architecture')
 asset('Lower family room walls', photos='10', confidence='visible finishes; inferred room extent')
@@ -937,6 +937,9 @@ asset('Lower stair opening white casing', photos='9,10')
 for y in [1.99, 3.29]:
     box('Lower doorway upright casing', (7.77, y, 1.06), (.075, .065, 2.12), white)
 
+exec(compile((HERE / 'upstairs.py').read_text(encoding='utf-8'), str(HERE / 'upstairs.py'), 'exec'))
+exec(compile((HERE / 'extensions.py').read_text(encoding='utf-8'), str(HERE / 'extensions.py'), 'exec'))
+
 ceilings = collection('14 | Ceilings - hidden for dollhouse')
 asset('Main level ceilings', confidence='estimated 2.6m ceiling height')
 box('Main rectangular ceiling', (3.9, 4, 2.65), (7.95, 8.1, .10), white)
@@ -967,6 +970,12 @@ area('Kitchen ceiling illumination', (1.6, 6.3, 2.48), (1.6, 6.3, 0), 180, 2.0)
 area('Living ceiling fill', (2.2, 2.2, 2.46), (2.2, 2.2, 0), 100, 2.0)
 area('Dining ceiling fill', (5.5, 6.2, 2.43), (5.5, 6.2, 0), 100, 2.0)
 area('Lower room ceiling fill', (12.29, 2.4, 1.10), (12.29, 2.4, -1), 110, 2.0)
+for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
+    center = UPPER_ORIGIN + Vector(((x0+x1)/2, (y0+y1)/2, 2.26))
+    area(name+' ceiling fill', center, center-Vector((0,0,2)), 100, min(x1-x0,y1-y0)*.65)
+area('Upper hall ceiling light', (13.1,4.01,3.5),(13.1,4.01,1.3),60,1)
+area('Lower bedroom ceiling fill',(9.1,8.3,1.1),(9.1,8.3,-1),90,1.4)
+area('Lower bathroom ceiling fill',(11.4,7.5,1.1),(11.4,7.5,-1),60,.8)
 
 CAMERAS = {}
 
@@ -987,7 +996,7 @@ def camera(name, pos, target, lens=24, ortho=None):
     return obj
 
 
-camera('overview', (24, -23, 27), (7.1, 4.8, .1), ortho=23)
+camera('overview', (30, -28, 32), (9.1, 4.3, .5), ortho=28)
 camera('sunroom', (5.18, 8.2, 1.9), (4.15, 10.2, .85), 14)
 camera('kitchen', (5.7, 7.74, 1.67), (.70, 5.95, 1.1), 26)
 camera('living', (6.70, 1.45, 1.70), (.70, 2.30, 1.05), 24)
@@ -995,6 +1004,17 @@ camera('family', (9.50, 2.62, .85), (13.75, 2.30, -.05), 23)
 camera('stairs', (6.30, 3.20, 1.65), (9.20, 3.35, 1.05), 20)
 camera('entry', (6.65, 7.72, 1.68), (5.40, .55, 1.02), 20)
 camera('plan', (7.25, 5.5, 24), (7.25, 5.5, 0), ortho=20)
+camera('upper_overview',(25,-10,19),(14.3,6.0,1.5),ortho=18)
+camera('upper_plan',(14.3,6.0,24),(14.3,6.0,1.26),ortho=18)
+camera('hall',(11.06,4.01,2.88),(15.8,4.01,2.30),24)
+camera('bathroom',(11.57,4.69,2.88),(10.95,6.9,2.28),17)
+camera('nursery',(12.57,3.26,2.91),(13.05,1.12,2.07),18)
+camera('bedroom',(15.64,4.01,2.92),(17.80,3.84,2.0),19)
+camera('primary',(14.90,4.72,2.92),(13.83,7.46,2.11),18)
+camera('ensuite',(12.73,8.76,2.91),(13.04,10.9,2.2),16)
+camera('porch',(5.57,-.12,1.65),(5.00,-2.70,.10),19)
+camera('lower_bedroom',(10.65,6.21,.57),(8.58,8.85,-.36),18)
+camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
 
 # Expose the model from the overview camera without deleting enclosure walls.
 for name in ['Family east wall above windows']:
@@ -1016,6 +1036,7 @@ for label, pos in [
     ('DINING', (4.8, 6.6, 4.0)), ('LIVING', (.9, 2.8, 4.0)),
     ('ENTRY', (5.0, .35, 4.0)), ('UP', (8.35, 4.0, 4.0)),
     ('DOWN', (8.05, 2.55, 4.0)), ('LOWER FAMILY', (10.45, 2.2, 4.0)),
+    ('LOWER BEDROOM', (8.00, 8.0, 4.0)), ('BATH', (10.90, 7.55, 4.0)),
     ('FRONT OF HOUSE', (5.2, -.70, 4.0)),
 ]:
     data = bpy.data.curves.new('Plan label ' + label, 'FONT')
@@ -1027,17 +1048,43 @@ for label, pos in [
     plan_labels.objects.link(obj)
     obj.location = pos
 
+upper_labels = collection('29 | Upstairs plan labels')
+for label,pos in [('GREEN BATH',(-.92,2.1)),('PRIMARY',(1.6,3.2)),('ENSUITE',(1.3,5.9)),
+                  ('NURSERY',(.95,-2.1)),('BEDROOM',(5.1,.3)),('HALL / STRAIGHT FROM STAIRS',(.02,0))]:
+    data=bpy.data.curves.new('Upstairs plan label '+label,'FONT')
+    data.body=label
+    data.size=.22 if label.startswith('HALL') else .28
+    data.materials.append(plan_ink)
+    obj=bpy.data.objects.new('Upstairs plan label '+label,data)
+    upper_labels.objects.link(obj)
+    obj.location=UPPER_ORIGIN+Vector((*pos,3))
+
 
 def set_view(name):
     scene.camera = CAMERAS[name]
-    exterior = name in {'overview', 'plan'}
+    upper_view = name in {'upper_overview','upper_plan','hall','bathroom','nursery','bedroom','primary','ensuite'}
+    exterior = name in {'overview', 'plan','upper_overview','upper_plan'}
     cutaway.hide_render = exterior
     cutaway.hide_viewport = exterior
     ceilings.hide_render = exterior
     ceilings.hide_viewport = exterior
     plan_labels.hide_render = name != 'plan'
     plan_labels.hide_viewport = name != 'plan'
-    # Keep upstairs enclosure from masking the paired stairs in the overview.
+    upper_labels.hide_render = upper_labels.hide_viewport = name != 'upper_plan'
+    for c in UPPER_COLLECTIONS:
+        c.hide_render = c.hide_viewport = not (upper_view or name in {'overview','stairs'})
+    upper_ceilings.hide_render = upper_ceilings.hide_viewport = not (upper_view or name == 'stairs') or exterior
+    for c in scene.collection.children:
+        if c.name[:2].isdigit() and int(c.name[:2]) <= 13:
+            c.hide_render = c.hide_viewport = upper_view
+    cutaway.hide_render = cutaway.hide_viewport = exterior or upper_view
+    ceilings.hide_render = ceilings.hide_viewport = exterior or upper_view
+    for c in EXTENSION_COLLECTIONS:
+        c.hide_render = c.hide_viewport = upper_view
+    if name == 'plan':
+        bpy.data.collections['25 | Front porch and path'].hide_render = True
+        bpy.data.collections['25 | Front porch and path'].hide_viewport = True
+    extension_ceilings.hide_render = extension_ceilings.hide_viewport = exterior or upper_view
     scene.render.resolution_x = 1700 if name == 'overview' else 1440
     scene.render.resolution_y = 1250 if name == 'overview' else 1000
 
@@ -1045,20 +1092,24 @@ def set_view(name):
 set_view('overview')
 scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
-scene['source_photos'] = 'User Photo 1-10; private references not packed or committed.'
+scene['source_photos'] = 'Three user sets: original 1-10; upstairs U1-U10; additional V1-V10. Private references not packed or committed.'
 scene['content_policy'] = 'Furniture retained; loose clutter, people, readable personal items omitted.'
-scene['generator_sha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+source_files = ['build.py','upstairs.py','extensions.py']
+scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()
+scene['confirmed_upstairs_orientation'] = 'Hall straight from stairs (+X); green bathroom left (+Y). Primary left, nursery right, end bedroom ahead.'
 scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X. Main 0; porch -.10; family -1.05; upper landing +1.26 m.'
 
 # An embedded guide travels with the native Blender asset.
 guide = bpy.data.texts.new('START HERE - House study')
-guide.write('HOUSE / PHOTO STUDY / v01\n\n')
-guide.write('This is an editable first pass from ten interior photographs.\n')
-guide.write('Dimensions and some room connections are estimates. No unseen upper rooms or exterior roof.\n\n')
+guide.write('HOUSE / PHOTO STUDY / v02\n\n')
+guide.write('Editable rooms and furniture from three sets of ten photographs.\n')
+guide.write('Dimensions remain estimates. Upper hall continues straight from stairs; green bath left.\n\n')
 guide.write('Open the Outliner: collections are grouped by room and type. Furniture has a parent empty.\n')
 guide.write('Select a furniture parent and its hierarchy to move an entire piece.\n')
 guide.write('Collections 03 and 14 are hidden for the dollhouse: enable viewport AND render to enclose rooms.\n')
-guide.write('Named cameras: overview, plan, sunroom, kitchen, living, family, stairs, entry.\n')
+guide.write('Named cameras: '+', '.join(CAMERAS)+'.\n')
+guide.write('Upper rooms: collections 17-24; toggle 24 for ceilings. Original lower floor: plan camera.\n')
+guide.write('Run the generator with --views upper_plan or --views nursery to render an isolated upper view.\n')
 guide.write('All materials procedural. No external textures or original photos are required.\n')
 guide.write('Source: models/house/build.py; provenance and limitations: models/house/README.md.\n')
 
@@ -1075,6 +1126,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'house.blend'), compress=True)
 manifest = {
     'status': 'work-in-progress; not registered as a game',
     'generator_sha256': scene['generator_sha256'],
+    'source_files': source_files,
     'blender_version': bpy.app.version_string,
     'units': 'metres; estimated',
     'objects': len(scene.objects),
