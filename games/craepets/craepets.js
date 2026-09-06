@@ -1536,6 +1536,8 @@
                x: 0.5, tx: null, face: 1, wanderAt: 0, shadow: null };
 
   function levelOf(pet) { return levelFor(pet && pet.xp); }
+  /* The most CSS pixels one cell of a creature is ever drawn at. */
+  var MAX_CELL = 22;
 
   /* The egg in the room: it sits in the middle, breathes a little, and
      rocks when it is tapped or when a right answer cracks it. */
@@ -1556,6 +1558,7 @@
     anim.x = 0.5;
     if (anim.shadow) anim.shadow.style.left = "50%";
     var scale = Math.max(2, Math.floor(Math.min(h / 24, w / 26) * 0.9));
+    scale = Math.min(scale, Math.round(MAX_CELL * Math.min(2, window.devicePixelRatio || 1)));
     var tilt = 0;
     if (anim.wobble > 0 && !calm) { tilt = Math.sin(anim.wobble / 2) * 0.16 * (anim.wobble / 24); anim.wobble--; }
     else if (!calm && anim.t % 240 > 228) tilt = Math.sin(anim.t / 1.5) * 0.06;     // a twitch now and then
@@ -1604,6 +1607,10 @@
     // the clay creature's picture is 22 cells tall (hat room included), and
     // a very grown pet must still fit it under the ceiling
     scale = Math.max(2, Math.min(scale, Math.floor(h / 23.5)));
+    // …and in a big desktop room it stops at MAX_CELL CSS px a cell, near
+    // the size the clay was rendered at, so it stays crisp rather than
+    // filling the room as a blur
+    scale = Math.min(scale, Math.round(MAX_CELL * Math.min(2, window.devicePixelRatio || 1)));
 
     // WANDERING. In the full-height room (the nest, or a house you are
     // visiting) the pet strolls about now and then, turning to face the
@@ -1797,20 +1804,28 @@
     renderWho();
     var g = $("#game");
     if (!g) return;
-    if (!S.pet) { g.className = ""; g.innerHTML = adoptHtml(); return; }
+    if (!S.pet) { g.className = ""; document.body.classList.remove("valley"); g.innerHTML = adoptHtml(); return; }
     if (view === "visit" && !visit) view = "case";
     // round at somebody's house, the room is painted from THEIR save
     var scene = (view === "visit")
       ? withSave(visit.s, function () { return sceneHtml("nest"); })
       : sceneHtml(view);
-    // Two halves: the stage (money bar, the room, the needs) and the side
-    // (where to go, and the panel for wherever you are). On a phone they
-    // stack; on a desktop they sit side by side and the stage stays put
-    // while the panel scrolls, so the Craepet is always in view.
+    // Three parts: the stage (the room, with the money bar and the needs
+    // under it), the nav, and the side (the panel for wherever you are).
+    // On a phone they stack down the page. On a desktop the page becomes
+    // a game frame: the room fills the middle, the panel scrolls in a
+    // board beside it, and the nav is a dock of tiles along the bottom.
+    // The board is rebuilt on every render, so keep its scroll position:
+    // a question answered halfway down it must not jump back to the top.
+    var oldSide = $(".cp-side", g), sideTop = oldSide ? oldSide.scrollTop : 0;
     g.className = "split";
+    document.body.classList.add("valley");
     g.innerHTML =
       '<div class="cp-stage">' + topbarHtml() + scene + needsHtml() + "</div>" +
-      '<div class="cp-side">' + navHtml() + panelHtml() + "</div>";
+      navHtml() +
+      '<div class="cp-side">' + panelHtml() + "</div>";
+    var newSide = $(".cp-side", g);
+    if (newSide && sideTop) newSide.scrollTop = sideTop;
     afterRender(g);
     save();
   }
@@ -2053,7 +2068,7 @@
         dot = '<span class="dot">' + S.stall.sales.length + "</span>";
       }
       return '<button data-go="' + n[0] + '"' + (view === n[0] ? ' class="on" aria-current="page"' : "") + ">" +
-             n[1] + " " + n[2] + dot + "</button>";
+             '<span class="ic" aria-hidden="true">' + n[1] + '</span><span class="lb">' + n[2] + "</span>" + dot + "</button>";
     };
     var places = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) !== -1; }).map(btn).join("");
     var mine = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) === -1; }).map(btn).join("");

@@ -1411,21 +1411,32 @@ window.CPArt = (function () {
     g.putImageData(img, 0, 0);
   }
   var rasterCache = {}, rasterPending = {};
+  /* How many pixels a panorama gets. On a desktop the room is a big
+     square and the 240-wide panorama would be seven screen pixels a cell
+     and half cropped away, so it is painted at twice the pixels there:
+     the same picture, the same palette and dither, about as fine on the
+     screen as a phone's. The view through a window stays at one, it is
+     small enough already. */
+  function detailOf(kind) {
+    if (kind === "view") return 1;
+    try { return window.matchMedia("(min-width: 1000px)").matches ? 2 : 1; } catch (e) { return 1; }
+  }
   function rasterise(kind, id, done) {
-    var key = kind + ":" + id;
+    var detail = detailOf(kind);
+    var key = kind + ":" + id + ":" + detail;
     if (rasterCache[key]) { done(rasterCache[key]); return; }
     if (rasterPending[key]) { rasterPending[key].push(done); return; }
     var svg = svgDoc(kind, id);
     if (!svg) return;
     rasterPending[key] = [done];
-    var w = kind === "view" ? W_VIEW : W_PANO;
+    var w = (kind === "view" ? W_VIEW : W_PANO) * detail, h = H_ART * detail;
     var img = new Image();
     img.onload = function () {
       var cv = document.createElement("canvas");
-      cv.width = w; cv.height = H_ART;
+      cv.width = w; cv.height = h;
       var g = cv.getContext("2d");
-      g.drawImage(img, 0, 0, w, H_ART);
-      try { quantise(g, w, H_ART, paletteOf(svg)); } catch (e) { /* a tainted canvas just stays smooth */ }
+      g.drawImage(img, 0, 0, w, h);
+      try { quantise(g, w, h, paletteOf(svg)); } catch (e) { /* a tainted canvas just stays smooth */ }
       rasterCache[key] = cv;
       var list = rasterPending[key]; delete rasterPending[key];
       list.forEach(function (f) { f(cv); });
@@ -1437,9 +1448,10 @@ window.CPArt = (function () {
   function artCanvas(kind, id) {
     var has = kind === "view" ? (V[id] || V.windowsun) : P[id];
     if (!has) return "";
-    var w = kind === "view" ? W_VIEW : W_PANO;
+    var detail = detailOf(kind);
+    var w = (kind === "view" ? W_VIEW : W_PANO) * detail;
     return '<canvas class="' + (kind === "view" ? "view-art" : "pano-art") + ' px-art" width="' + w +
-      '" height="' + H_ART + '" data-art="' + kind + ":" + id + '" aria-hidden="true"></canvas>';
+      '" height="' + (H_ART * detail) + '" data-art="' + kind + ":" + id + '" aria-hidden="true"></canvas>';
   }
   function paintPixels(root) {
     var list = (root || document).querySelectorAll("canvas[data-art]");

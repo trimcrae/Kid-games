@@ -266,6 +266,7 @@
       border-radius: 999px; padding: 0.3rem 0.6rem; cursor: pointer; touch-action: manipulation;
       transition: transform 0.12s ease, border-color 0.12s ease;
       position: relative;
+      display: inline-flex; align-items: center; gap: 0.3rem;
     }
     .nav button:hover { transform: translateY(-2px); }
     .nav button.on { background: var(--purple); border-color: var(--purple); color: #fff; }
@@ -917,6 +918,7 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: toast-in 0.25s ease;
     }
     @keyframes toast-in { from { transform: translate(-50%, 16px); opacity: 0; } }
+    @keyframes toast-down { from { transform: translate(-50%, -16px); opacity: 0; } }
 
     .settings-row { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
     .settings-row .ghost.on { background: var(--purple); color: #fff; }
@@ -925,69 +927,128 @@
     .ghost.on { background: var(--purple); color: #fff; border-color: var(--purple); }
 
     /* ===========================================================
-       DESKTOP — most of the playing happens on a big screen, where a
-       phone-shaped column leaves the pet scrolled out of sight the moment
-       a question comes up. From about 1000px the page splits in two: the
-       stage (money bar, room, needs) on the left, pinned in place while
-       you scroll, and the nav plus whatever panel you are on down the
-       right. The room grows with its column, so the Craepet is drawn big.
+       DESKTOP — most of the playing happens on a big screen, and a
+       phone's column of cards is not a game there. From about 1000px the
+       page becomes a game frame the size of the window: a thin header,
+       the room filling the middle with the money bar and the needs as a
+       status strip under it, the panel for wherever you are in a board
+       down the right that scrolls on its own, and where-to-go as a dock
+       of tiles along the bottom. Nothing on the page itself scrolls.
        =========================================================== */
     @media (min-width: 1000px) {
-      .cp-wrap, .cp-head { max-width: 1360px; padding-left: 1.25rem; padding-right: 1.25rem; }
-      .cp-wrap { padding-bottom: 3rem; }
+      body.valley { height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+      body.valley .cp-head { flex: 0 0 auto; }
+      body.valley .cp-wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+
       /* one header row: the way back | the title | who is playing */
       .cp-head {
-        display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-        gap: 1rem; padding-top: 0.6rem; padding-bottom: 0.35rem;
+        max-width: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+        gap: 1rem; padding: 0.55rem 1.1rem 0;
       }
-      .cp-head .back-link { margin: 0; justify-self: start; }
-      .cp-head .hero { padding: 0; }
-      .cp-head .title { font-size: 2rem; }
-      .cp-head .subtitle { font-size: 1rem; margin-top: 0.1rem; }
+      .cp-head .back-link { margin: 0; justify-self: start; padding: 0.45rem 0.95rem; }
+      .cp-head .hero { padding: 0; display: flex; align-items: baseline; gap: 0.7rem; }
+      .cp-head .title { font-size: 1.75rem; }
+      .cp-head .subtitle { font-size: 0.95rem; margin: 0; }
       .cp-head .who-row { justify-self: end; margin: 0; }
+      .cp-wrap { max-width: none; padding: 0.7rem 1.1rem 0.9rem; }
 
+      /* the frame: stage and board across the top, the dock along the bottom */
       #game.split {
-        display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 13fr);
-        gap: 1.25rem; align-items: start;
+        flex: 1 1 auto; min-height: 0;
+        display: grid; gap: 0.8rem;
+        grid-template-columns: minmax(0, 1fr) clamp(400px, 37vw, 560px);
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas: "stage side" "nav nav";
       }
-      .cp-stage { position: sticky; top: 0.75rem; container-type: inline-size; }
-      .cp-side { min-width: 0; }
-      .topbar { margin-bottom: 0.7rem; padding: 0.5rem 1rem; }
-      .needs { margin-bottom: 0; gap: 0.5rem; }
-      .need b { font-size: 1.2rem; }
-      .need small { font-size: 0.72rem; }
-      /* The room keeps a 4:3 shape from its column (it is not squeezed
-         to a band at the places any more — the question has a column of
-         its own now), capped so a very tall screen still shows the whole
-         stage, and at the size the clay sprites were rendered at. */
+
+      /* THE STAGE: the room, and the status strip under it */
+      .cp-stage {
+        grid-area: stage; min-width: 0; min-height: 0;
+        display: grid; gap: 0.6rem;
+        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr) auto;
+        grid-template-areas: "scene scene" "bar needs";
+      }
       .scene, .scene.compact {
-        height: calc(min(440px, 56vh) * var(--big, 1));
-        height: calc(min(72cqw, 480px, 56vh) * var(--big, 1));
-        border-radius: 26px; margin-bottom: 0.7rem;
+        grid-area: scene; height: auto; min-height: 0; margin: 0;
+        border-radius: 26px; container-type: size;
+        box-shadow: inset 0 0 0 4px rgba(255,255,255,0.6), 0 12px 30px rgba(43,36,64,0.18);
       }
+      /* the places are not squeezed to a band any more: the question has
+         a board of its own, so the room keeps its full furnishings */
       .scene.compact .win { height: 38%; bottom: 58%; }
       .scene.compact .win-wide { height: 30%; }
-      .scene.compact .deco { font-size: calc(clamp(1.3rem, 5vw, 2.3rem) * var(--s, 1)); }
-      .scene.compact .garland { font-size: clamp(1rem, 4vw, 1.5rem); }
       .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 1.1rem; }
-      .scene .place-tag { font-size: 0.95rem; left: 12px; top: 10px; padding: 0.2rem 0.75rem; }
-      .bubble { font-size: 1.05rem; top: 12px; padding: 0.45rem 0.9rem; }
+      /* furniture, garlands and the labels grow with the room */
+      .scene .deco, .scene.compact .deco { font-size: calc(clamp(1.3rem, 7cqh, 4.2rem) * var(--s, 1)); }
+      .scene .garland, .scene.compact .garland { font-size: clamp(1rem, 4.5cqh, 2.4rem); }
+      .scene .place-tag { font-size: 1rem; left: 14px; top: 12px; padding: 0.25rem 0.85rem; }
+      .bubble { font-size: 1.1rem; top: 14px; padding: 0.5rem 1rem; max-width: 60%; }
+      .floaty { font-size: 1.5rem; }
+      .topbar {
+        grid-area: bar; margin: 0; flex-wrap: nowrap; padding: 0.45rem 0.9rem; gap: 0.6rem;
+        border-radius: 18px;
+      }
+      .petname { flex: 0 1 auto; max-width: 180px; }
+      .xp { flex: 0 0 110px; }
+      .needs { grid-area: needs; margin: 0; gap: 0.5rem; }
+      .need { padding: 0.3rem 0.5rem; }
+      .need b { font-size: 1.15rem; }
+      .need small { font-size: 0.7rem; }
+      .needs.egg .need { padding: 0.55rem 0.9rem; }
 
-      .nav { margin-bottom: 0.8rem; }
-      .nav button { font-size: 0.95rem; padding: 0.4rem 0.75rem; min-height: 42px; }
-      .panel { padding: 1.1rem 1.25rem; }
-      .panel h2 { font-size: 1.3rem; }
-      .qprompt { font-size: 1.35rem; }
-      .choice { min-height: 70px; font-size: 1.12rem; }
-      .acts { grid-template-columns: repeat(auto-fit, minmax(98px, 1fr)); }
+      /* THE BOARD: the panel scrolls here, the page never does */
+      .cp-side {
+        grid-area: side; min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain;
+        padding: 0.8rem; border-radius: 24px;
+        background: rgba(255,255,255,0.42);
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.75), 0 10px 26px rgba(43,36,64,0.10);
+        scrollbar-width: thin; scrollbar-color: rgba(138,92,255,0.45) transparent;
+      }
+      .cp-side > .panel:last-child { margin-bottom: 0; }
+      .panel { padding: 1rem 1.1rem; }
+      .qprompt { font-size: 1.3rem; }
+      .choice { min-height: 68px; font-size: 1.08rem; }
+      .acts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .sheet { width: min(640px, 100%); max-height: 84vh; }
-      #catch-canvas { height: 430px; }
-      .wheelwrap { --r: 300px; }
+      #catch-canvas { height: 400px; }
+      /* a toast drops in under the header, not on top of the dock */
+      .toast { bottom: auto; top: 64px; font-size: 1.05rem; animation-name: toast-down; }
+
+      /* THE DOCK: every place as a tile, the valley on the left of the
+         divider and your own things on the right */
+      .nav {
+        grid-area: nav; flex-direction: row; justify-content: center; align-items: stretch;
+        gap: 0.45rem; margin: 0; padding: 0.5rem 0.8rem;
+        background: rgba(255,255,255,0.55); border-radius: 22px;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.75), 0 10px 26px rgba(43,36,64,0.10);
+      }
+      .navrow { display: contents; }
+      .navlabel { display: none; }
+      .navrow + .navrow::before {
+        content: ""; width: 3px; border-radius: 3px; margin: 0.3rem 0.5rem;
+        background: rgba(43,36,64,0.12);
+      }
+      .nav button {
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
+        width: clamp(66px, 6.2vw, 92px); min-height: 68px; padding: 0.35rem 0.2rem;
+        border-radius: 18px; font-size: 0.76rem; line-height: 1;
+        transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+      }
+      .nav button .ic { font-size: 1.65rem; line-height: 1; }
+      .nav button:hover { transform: translateY(-3px); border-color: #c9b8ff; }
+      .nav button.on {
+        transform: translateY(-4px); box-shadow: 0 8px 18px rgba(138,92,255,0.35);
+      }
+      .nav button .dot { top: -6px; right: -6px; min-width: 19px; height: 19px; line-height: 19px; font-size: 0.72rem; }
     }
-    /* A wide, short window (a laptop with the browser's own bars taking
-       a slice) needs a room that still leaves the nav on screen. */
+    /* a short, wide window (a laptop with the browser's bars taking a slice)
+       trims the strip and the dock so the room keeps most of the height */
     @media (min-width: 1000px) and (max-height: 760px) {
-      .scene, .scene.compact { height: calc(min(72cqw, 480px, 50vh) * var(--big, 1)); }
+      .nav button { min-height: 58px; }
+      .nav button .ic { font-size: 1.4rem; }
+      .cp-head { padding-top: 0.4rem; }
+      .cp-wrap { padding-top: 0.5rem; padding-bottom: 0.6rem; }
     }
 
     /* On a small phone every pixel above the question counts — but a
