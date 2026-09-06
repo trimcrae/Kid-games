@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--render', action='store_true')
-parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom')
+parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom')
 parser.add_argument('--samples', type=int, default=48)
 parser.add_argument('--preview-scale', type=int, default=100, help='Render percentage; use 50 for fast layout checks')
 args = parser.parse_args(ARGS)
@@ -788,7 +788,9 @@ asset('Parallel split-level stair bay', photos='7,9,10', confidence='stair pairi
 for i in range(7):
     # Up from the main dining approach toward the front of the house.
     y, z = 4.5 - (i + .5) * .28, (i + 1) * .18
-    box('Upper stair white riser block', (.59, y, z / 2), (1.16, .28, z), white, .003)
+    # W9 reveals the basement return below this flight. Keep the upper stair
+    # structure shallow instead of filling the entire volume down to Z=0.
+    box('Upper stair white riser block', (.59, y, z - .10), (1.16, .28, .20), white, .003)
     box('Upper stair carpet tread', (.59, y - .006, z + .008), (1.16, .29, .027), carpet, .012)
     box('Upper stair carpet riser', (.59, y + .143, z - .084), (1.16, .013, .17), carpet, .003)
 for i in range(7):
@@ -939,6 +941,7 @@ for y in [1.99, 3.29]:
 
 exec(compile((HERE / 'upstairs.py').read_text(encoding='utf-8'), str(HERE / 'upstairs.py'), 'exec'))
 exec(compile((HERE / 'extensions.py').read_text(encoding='utf-8'), str(HERE / 'extensions.py'), 'exec'))
+exec(compile((HERE / 'basement_garage.py').read_text(encoding='utf-8'), str(HERE / 'basement_garage.py'), 'exec'))
 
 ceilings = collection('14 | Ceilings - hidden for dollhouse')
 asset('Main level ceilings', confidence='estimated 2.6m ceiling height')
@@ -996,7 +999,7 @@ def camera(name, pos, target, lens=24, ortho=None):
     return obj
 
 
-camera('overview', (30, -28, 32), (9.1, 4.3, .5), ortho=28)
+camera('overview', (30, -28, 32), (5.8, 4.3, .1), ortho=34)
 camera('sunroom', (5.18, 8.2, 1.9), (4.15, 10.2, .85), 14)
 camera('kitchen', (5.7, 7.74, 1.67), (.70, 5.95, 1.1), 26)
 camera('living', (6.70, 1.45, 1.70), (.70, 2.30, 1.05), 24)
@@ -1015,6 +1018,13 @@ camera('ensuite',(12.73,8.76,2.91),(13.04,10.9,2.2),16)
 camera('porch',(5.57,-.12,1.65),(5.00,-2.70,.10),19)
 camera('lower_bedroom',(10.65,6.21,.57),(8.58,8.85,-.36),18)
 camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
+camera('garage',(-1.64,7.54,1.67),(-4.65,3.40,.75),18)
+camera('basement_play',(3.23,6.92,-1.55),(1.30,3.20,-2.30),16)
+camera('basement_office',(6.96,5.60,-1.62),(5.58,1.70,-2.28),20)
+camera('basement_laundry',(4.44,5.43,-1.54),(6.51,7.20,-2.14),17)
+camera('basement_plan',(4.7,4,20),(4.7,4,-3),ortho=12.8)
+camera('basement_stairs',(11.65,3.79,.52),(8.18,3.36,-.67),18)
+camera('pink_bedroom',(17.55,8.10,.56),(18.99,10.18,-.35),18)
 
 # Expose the model from the overview camera without deleting enclosure walls.
 for name in ['Family east wall above windows']:
@@ -1060,6 +1070,18 @@ for label,pos in [('GREEN BATH',(-.92,2.1)),('PRIMARY',(1.6,3.2)),('ENSUITE',(1.
     obj.location=UPPER_ORIGIN+Vector((*pos,3))
 
 
+basement_labels = collection('41 | Basement plan labels')
+for label,pos in [('PLAY / BUNKS',(.40,3.2)),('OFFICE',(4.5,2.75)),('LAUNDRY',(4.80,7.60)),
+                  ('MECHANICAL',(6.3,5.8)),('STAIRS UP',(7.5,4.1))]:
+    data=bpy.data.curves.new('Basement plan label '+label,'FONT')
+    data.body=label
+    data.size=.24
+    data.materials.append(plan_ink)
+    obj=bpy.data.objects.new('Basement plan label '+label,data)
+    basement_labels.objects.link(obj)
+    obj.location=(*pos,.2)
+
+
 def set_view(name):
     scene.camera = CAMERAS[name]
     upper_view = name in {'upper_overview','upper_plan','hall','bathroom','nursery','bedroom','primary','ensuite'}
@@ -1085,30 +1107,59 @@ def set_view(name):
         bpy.data.collections['25 | Front porch and path'].hide_render = True
         bpy.data.collections['25 | Front porch and path'].hide_viewport = True
     extension_ceilings.hide_render = extension_ceilings.hide_viewport = exterior or upper_view
+    basement_view = name.startswith('basement_') and name != 'basement_stairs'
+    garage_view = name == 'garage'
+    pink_view = name == 'pink_bedroom'
+    for c in NEW_COLLECTIONS:
+        n=int(c.name[:2])
+        visible = ((30 <= n <= 34 and (basement_view or name in {'overview','basement_stairs'})) or
+                   (n == 31 and name in {'basement_stairs','plan','family','stairs'}) or
+                   (35 <= n <= 37 and name in {'overview','garage'}) or
+                   (n == 38 and (basement_view or garage_view or name in {'overview','basement_stairs'})) or
+                   (n in {39,40} and pink_view))
+        c.hide_render = c.hide_viewport = not visible
+    basement_ceiling.hide_render = basement_ceiling.hide_viewport = not (basement_view or name == 'basement_stairs') or name == 'basement_plan'
+    stair_soffit=bpy.data.objects['Basement staircase sloped ceiling']
+    stair_soffit.hide_render = name in {'basement_plan','plan','overview'}
+    stair_soffit.hide_set(stair_soffit.hide_render)
+    garage_ceiling.hide_render = garage_ceiling.hide_viewport = not garage_view
+    pink_ceiling.hide_render = pink_ceiling.hide_viewport = not pink_view
+    basement_labels.hide_render = basement_labels.hide_viewport = name != 'basement_plan'
+    if basement_view or garage_view or pink_view:
+        for c in scene.collection.children:
+            if c.name[:2].isdigit() and int(c.name[:2]) < 30 and int(c.name[:2]) != 15:
+                c.hide_render = c.hide_viewport = True
+    if name == 'basement_stairs':
+        # See both flights from inside the lower family room.
+        ceilings.hide_render = ceilings.hide_viewport = False
     scene.render.resolution_x = 1700 if name == 'overview' else 1440
     scene.render.resolution_y = 1250 if name == 'overview' else 1000
 
 
+bpy.context.view_layer.update()  # Resolve transforms before hiding detached room studies.
 set_view('overview')
 scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
-scene['source_photos'] = 'Three user sets: original 1-10; upstairs U1-U10; additional V1-V10. Private references not packed or committed.'
+scene['source_photos'] = 'Four user sets: original 1-10; upstairs U1-U10; additional V1-V10; basement/garage W1-W10. Private references not packed or committed.'
 scene['content_policy'] = 'Furniture retained; loose clutter, people, readable personal items omitted.'
-source_files = ['build.py','upstairs.py','extensions.py']
+source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py']
 scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()
 scene['confirmed_upstairs_orientation'] = 'Hall straight from stairs (+X); green bathroom left (+Y). Primary left, nursery right, end bedroom ahead.'
 scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X. Main 0; porch -.10; family -1.05; upper landing +1.26 m.'
 
 # An embedded guide travels with the native Blender asset.
 guide = bpy.data.texts.new('START HERE - House study')
-guide.write('HOUSE / PHOTO STUDY / v02\n\n')
-guide.write('Editable rooms and furniture from three sets of ten photographs.\n')
+guide.write('HOUSE / PHOTO STUDY / v03\n\n')
+guide.write('Editable rooms and furniture from four sets of ten photographs.\n')
 guide.write('Dimensions remain estimates. Upper hall continues straight from stairs; green bath left.\n\n')
 guide.write('Open the Outliner: collections are grouped by room and type. Furniture has a parent empty.\n')
 guide.write('Select a furniture parent and its hierarchy to move an entire piece.\n')
 guide.write('Collections 03 and 14 are hidden for the dollhouse: enable viewport AND render to enclose rooms.\n')
 guide.write('Named cameras: '+', '.join(CAMERAS)+'.\n')
 guide.write('Upper rooms: collections 17-24; toggle 24 for ceilings. Original lower floor: plan camera.\n')
+guide.write('Basement: 30-34; garage: 35-37; room lights: 38; pink bedroom study: 39-40.\n')
+guide.write('Basement stairs return beside the living-room steps (W9). Basement -3.15m is estimated.\n')
+guide.write('Garage footprint and pink-bedroom placement need confirmation; see README.\n')
 guide.write('Run the generator with --views upper_plan or --views nursery to render an isolated upper view.\n')
 guide.write('All materials procedural. No external textures or original photos are required.\n')
 guide.write('Source: models/house/build.py; provenance and limitations: models/house/README.md.\n')

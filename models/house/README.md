@@ -1,4 +1,4 @@
-# House model — photo study, including upstairs
+# House model — photo study, including basement and garage
 
 Open **[house.blend](house.blend)** in Blender 4.5 LTS or newer. It opens with
 an overview camera and an editable model organized into room collections.
@@ -32,8 +32,28 @@ The second and third photo sets add:
 | Front porch | V4–V5 | Covered concrete porch, iron railings and steps, two rocking chairs, clean foam mats, mailbox and curved paver walk with a simple lawn base |
 
 Photo numbering preserves the uploads: **1–10** is the original set;
-**U1–U10** is the upstairs set ending with the hallway; **V1–V10** is the latest
+**U1–U10** is the upstairs set ending with the hallway; **V1–V10** is the third
 set starting with the main-bedroom closet and ending with the lower bedroom.
+**W1–W10** is the fourth set, starting in the garage and ending with the
+pink-curtain downstairs bedroom.
+
+| Fourth-set area | References | Included |
+| --- | --- | --- |
+| Garage | W1–W3 | Two simplified parked SUVs, concrete slab, exposed joists, raised sectional door and tracks, glazed exterior door, house-access opening, empty shelving, tool board, wall-hung bicycle and coat hooks |
+| Basement stairs | W8–W9 | Return flight beside the steps up to the main living room, carpeted treads, white side walls, handrail and doorway |
+| Basement play area | W4–W5 | Foosball table with rods and players, metal bunk bed with made bedding, toddler slide, dollhouse, floor rocker, saucer chair, open bookcase and hanging fabric screens |
+| Basement office and storage | W6, W8 | Wood desk and dual monitors, black swivel chair, second workstation, storage shelves/cabinet and simplified potted plants |
+| Basement laundry and mechanical area | W7–W8 | Front-loading dryer, utility sink, top-loading washer, dehumidifier, furnace and plenum, wall-mounted water heater, representative overhead pipes and ductwork |
+| Pink-curtain bedroom | W10 | Separate room study with corner windows, rose curtains, made double bed, empty dress rail, pink shelving, bookcase, dresser, wall shelves, empty hammock and small road rug |
+
+The **garage and pink-curtain bedroom are separate room studies pending
+attachment confirmation**. W3 confirms kitchen access to the garage, but the
+attachment wall is not yet established. The garage is displayed with a gap on
+the kitchen side; no doorway has been cut through an assumed kitchen wall.
+The pink room is available through its named camera and collections 39–40,
+but is omitted from the overall plan and overview so its provisional position
+cannot be mistaken for a confirmed room connection. The existing white-curtain
+bedroom remains in place pending clarification of the downstairs room order.
 
 Furniture is modeled as clean, assembled objects. Counters, dining and activity
 tables are cleared. Loose toys, clothing, packages, papers, food, trash, and
@@ -61,11 +81,20 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Front porch](previews/porch.png)
 - [Lower bedroom](previews/lower_bedroom.png)
 - [Lower bathroom](previews/lower_bathroom.png)
+- [Garage interior](previews/garage.png)
+- [Basement play area](previews/basement_play.png)
+- [Basement office](previews/basement_office.png)
+- [Basement laundry and mechanical area](previews/basement_laundry.png)
+- [Basement plan](previews/basement_plan.png)
+- [Basement stairs beside the living-room steps](previews/basement_stairs.png)
+- [Pink-curtain bedroom study](previews/pink_bedroom.png)
 
 The preview images are actual Cycles renders of the committed geometry.
 The `plan` camera shows the original main/lower layout with the upper rooms
 hidden. `upper_plan` isolates upstairs. The overview includes all levels; the
 upper floor naturally covers part of the lower family room in that view.
+The main floor similarly covers most of the basement in the overview; use
+`basement_plan` or the basement interior cameras to inspect that level.
 
 ## Editing
 
@@ -76,6 +105,11 @@ Collections `17`–`24` hold upstairs rooms and ceilings; `25`–`28` hold the p
 and additional lower rooms; `29` holds upstairs plan labels. For an open top
 view keep ceiling collections `14`, `24` and `28` hidden. The generator's named
 views automatically isolate the appropriate level and toggle ceilings.
+Collections `30`–`34` contain basement architecture, access, furniture, utilities
+and exposed ceilings. `35`–`37` contain the garage; `38` holds their lights;
+`39`–`40` contain the separate pink bedroom study; `41` holds basement plan labels.
+Hide `34` and `37` to inspect the basement and garage from above. The separately
+modeled rooms can be positioned by transforming their complete collections.
 Each furniture piece has a named parent empty: move/rotate that empty to move
 the complete piece. Individual components and materials remain editable.
 Reference photo numbers and confidence notes are stored on the parent empties.
@@ -97,6 +131,10 @@ downloaded models, image textures, or required photo files.
   6.6 × 3.4 m, and the lower room 4.6 × 5.0 m. These are modeling estimates.
 - Main floor elevation is 0 m, sunroom approximately -0.10 m, lower room
   -1.05 m, and upper landing +1.26 m. Stair counts/rises need measurement.
+- Basement floor is provisionally -3.15 m. W9 establishes the return flight
+  beside the living-room steps; 12 risers and the basement footprint are estimates.
+  The basement office/laundry share a zone, as shown in W6–W8. Their orientation
+  relative to the play area is provisional; exposed service runs are illustrative.
 - The exact footprint, offsets, window widths, ceiling heights and sunroom bay
   count are not established by the photos. Upstairs room rectangles and the
   additional lower rooms are estimates; this is not an exterior footprint survey.
@@ -149,6 +187,12 @@ Additional evidence:
   mirror, window and wall baskets visible in the second angle.
 - V6 and V8–V10: piano and hall beside the stair return; lower bathroom ahead,
   bedroom left and a dark doorway to an unseen room right.
+- W9 resolves the narrow doorway directly beside the living-room steps as the
+  basement stair. This is distinct from the dark doorway in the lower hallway.
+- W7–W8 show the dryer, utility sink and washer in that order from left to right,
+  with mechanical equipment farther right and office furniture in the same open area.
+- W3 establishes a kitchen-to-garage door; W1–W2 establish two parked vehicles,
+  an overhead vehicle opening and a separate glazed exterior door.
 
 Dimensions remain estimates. The named room cameras and the two floor plans
 make the modeled left/right relationships reviewable.
@@ -175,8 +219,8 @@ python models/house/verify.py
 top view. `--preview-scale 50 --samples 4` makes quick layout previews.
 Rebuilding **replaces** `house.blend` and `inventory.json`, so
 save manual edits under a different filename before regenerating. The script
-uses a fixed random seed. `build.py` loads `upstairs.py` and `extensions.py`;
-all three files contribute to the generator hash. `inventory.json` records it, Blender
+uses a fixed random seed. `build.py` loads `upstairs.py`, `extensions.py` and
+`basement_garage.py`; all four files contribute to the generator hash. `inventory.json` records it, Blender
 version, object counts, cameras and furniture provenance.
 
 This folder is an offline model asset. It has no game entry point, and nothing
