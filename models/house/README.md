@@ -102,7 +102,7 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Kitchen access to the garage, matching W3](previews/kitchen_access.png)
 - [Basement entry toward the office and laundry wall, matching W8](previews/basement_entry.png)
 
-The preview images are actual Cycles renders of the committed geometry.
+The preview images are actual Cycles renders of the committed geometry, using the photographic finish described below.
 The `plan` camera shows the original main/lower layout with the upper rooms
 hidden. `upper_plan` isolates upstairs. The overview includes all levels; the
 upper floor naturally covers part of the lower family room in that view.
@@ -135,6 +135,39 @@ sets these toggles automatically when rendering its named views.
 
 All materials are procedural Blender materials. There are no linked libraries,
 downloaded models, image textures, or required photo files.
+
+## Photographic finish
+
+`photoreal.py` runs last in the generator and rebuilds every material, light
+and render setting from observations of the homeowner's reference
+photographs (living room from the upper landing, stairs into the family
+room, kitchen, Cory's bedroom and the basement play area). It keeps the
+geometry modules untouched: materials are looked up by name and given real
+procedural shaders, so the browser exporter still reads each material's base
+colour. The photographs themselves stay private and are not committed.
+
+- **Surfaces.** Oak strip flooring with along-board grain, growth-ring bands
+  and a satin polyurethane coat; eggshell wall paint with faint roller
+  texture; semi-gloss white cabinet and trim enamel; glossy subway tile with
+  grey grout; grey-veined white laminate counters; brushed stainless with
+  horizontal streaks; plush carpet with pile sheen (beige downstairs and on
+  the stairs, light grey in Cory's room); woven upholstery and velvet; a
+  translucent linen lampshade; white-painted concrete block with mortar
+  lines, dark stained joists and tan laminate planks in the basement.
+- **Light.** A Nishita sky and a wide, moderate sun replace the studio
+  softbox for interior views, so daylight arrives softly through the windows
+  as in the photographs. Practical lights are real: warm bulbs inside the
+  lamp shades, spot lights under the kitchen's recessed trims, an
+  under-cabinet strip along the backsplash, the family-room fan light and a
+  string of fairy lights along the top of the living-room walls. The
+  softboxes stay on only for the cutaway and plan views.
+- **Camera and render.** Every perspective camera has phone-like depth of
+  field (f/8, focused on its target). Cycles uses the light tree, adaptive
+  sampling, OpenImageDenoise with albedo and normal passes, AgX with the
+  medium-high-contrast look and a small per-view exposure offset.
+
+The pass encodes colours and finishes only. Room dimensions, furniture
+placement and the geometry itself are unchanged and remain estimates.
 
 ## Scale and open questions
 

@@ -1,17 +1,18 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "7a4c3d1c3fc09f9edd4bcbefd9d6e42e713aaf1cdbb066ec7367967f6790698b",
+  "generator_sha256": "65537d43ef7658246d4b4d7138932757ddc6333569603deb67eb0dd0943a1de7",
   "source_files": [
     "build.py",
     "upstairs.py",
     "extensions.py",
     "basement_garage.py",
-    "yard.py"
+    "yard.py",
+    "photoreal.py"
   ],
-  "blender_version": "4.5.13 LTS",
+  "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 6777,
-  "mesh_objects": 5975,
+  "objects": 6787,
+  "mesh_objects": 5976,
   "cameras": [
     "overview",
     "sunroom",
@@ -1313,7 +1314,7 @@
       ]
     },
     {
-      "name": "End bedroom large cream rug",
+      "name": "End bedroom large grey rug",
       "collection": "20 | End bedroom furniture",
       "photos": "U7",
       "confidence": "photo / estimated size",
@@ -3099,6 +3100,17 @@
       "collection": "14 | Ceilings - hidden for dollhouse",
       "photos": "6",
       "confidence": "photo / estimated size",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Living room fairy light strings",
+      "collection": "09 | Living room furniture",
+      "photos": "7,8",
+      "confidence": "visible in photos; run estimated",
       "location_m": [
         0.0,
         0.0,

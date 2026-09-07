@@ -984,6 +984,8 @@ for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
 area('Upper hall ceiling light', (13.1,4.01,3.5),(13.1,4.01,1.3),60,1)
 area('Lower bedroom ceiling fill',(14.35,6.50,1.1),(14.35,6.50,-1),90,1.4)
 area('Lower bathroom ceiling fill',(11.4,7.5,1.1),(11.4,7.5,-1),60,.8)
+# Photographic materials, practical lights, sky and render settings.
+exec(compile((HERE / 'photoreal.py').read_text(encoding='utf-8'), str(HERE / 'photoreal.py'), 'exec'))
 
 CAMERAS = {}
 
@@ -997,6 +999,10 @@ def camera(name, pos, target, lens=24, ortho=None):
     data.lens = lens
     data.clip_start = .04
     data.clip_end = 200
+    # Phone-camera depth of field: nearly everything sharp, foreground softened.
+    data.dof.use_dof = not ortho
+    data.dof.focus_distance = (Vector(target) - Vector(pos)).length
+    data.dof.aperture_fstop = 8
     if ortho:
         data.type = 'ORTHO'
         data.ortho_scale = ortho
@@ -1147,6 +1153,7 @@ def set_view(name):
         ceilings.hide_render = ceilings.hide_viewport = False
     scene.render.resolution_x = 1700 if name == 'overview' else 1440
     scene.render.resolution_y = 1250 if name == 'overview' else 1000
+    photoreal_view(name, exterior)
 
 
 bpy.context.view_layer.update()  # Resolve transforms before hiding room collections.
@@ -1155,7 +1162,7 @@ scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
 scene['source_photos'] = 'Four user sets: original 1-10; upstairs U1-U10; additional V1-V10; basement/garage W1-W10. Private references not packed or committed.'
 scene['content_policy'] = 'Furniture retained; loose clutter, people, readable personal items omitted.'
-source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py']
+source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','photoreal.py']
 scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()
 scene['confirmed_upstairs_orientation'] = 'Hall straight from stairs (+X); green bathroom left (+Y). Primary left, nursery right, end bedroom ahead.'
 scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X. Main 0; porch -.10; family -1.05; upper landing +1.26 m.'
@@ -1175,7 +1182,7 @@ guide.write('Basement stairs return beside the living-room steps (W9). Basement 
 guide.write('V8: pink bedroom LEFT, bathroom ahead, white-curtain bedroom RIGHT off the shared entry.\n')
 guide.write('Garage is off the kitchen; exact footprint and door offset remain estimates.\n')
 guide.write('Run the generator with --views upper_plan or --views nursery to render an isolated upper view.\n')
-guide.write('All materials procedural. No external textures or original photos are required.\n')
+guide.write('All materials procedural (photoreal.py rebuilds them from photo observations). No external textures or original photos are required.\n')
 guide.write('Source: models/house/build.py; provenance and limitations: models/house/README.md.\n')
 
 for screen_data in bpy.data.screens:
