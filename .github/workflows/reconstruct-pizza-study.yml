@@ -2,12 +2,6 @@ name: Reconstruct pizza study person
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - models/pizza-study/reconstruct_cpu.py
-      - models/pizza-study/person-reference.jpg
-      - .github/workflows/reconstruct-pizza-study.yml
 
 permissions:
   contents: write

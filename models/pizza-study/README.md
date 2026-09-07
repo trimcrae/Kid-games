@@ -1,5 +1,15 @@
 # Pizza portrait — Blender reconstruction test
 
+**Paused at the user's request on September 6, 2026.** The current source,
+custom mesh, packed Blender scene, portrait and camera-test video are archived
+here. Automatic workflow triggers are disabled; both workflows now require
+manual dispatch. Local experiment caches and the extra Blender runtime were
+removed to recover disk space.
+
+The photorealistic-quality target remains unmet: the glasses, face silhouette,
+hand and food still show reconstruction defects. The archived video is an
+unfinished test, not a completed photorealistic result.
+
 This study reconstructs an adult eating pizza from a single photograph.
 The Blender camera moves through a modest 24-degree arc over six seconds.
 The visible facial and clothing detail comes from a photographic reference;

@@ -1,14 +1,6 @@
 name: Render pizza study camera test
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - models/pizza-study/compose.py
-      - models/pizza-study/inspect_generated.py
-      - models/pizza-study/render_frames.py
-      - models/pizza-study/environment.jpg
-      - .github/workflows/render-pizza-study.yml
 permissions:
   contents: write
 concurrency:
