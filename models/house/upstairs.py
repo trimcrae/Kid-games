@@ -181,11 +181,11 @@ upper_window('Primary far window',(2.805,4.54,1.42),1.05,0,'U8')
 upper_window('Primary right window',(4.49,3.3,1.42),1.30,-90,'U8')
 upper_door('Ensuite doorway',(1.74,4.55,0),0,'U9')
 asset('End bedroom enclosure',photos='U7,U10')
-partition('End bedroom far wall',(7.85,-2.15),(7.85,2.45),openings=[(2.2,3.5,.77,2.07)])
+partition('End bedroom far wall',(7.85,-2.15),(7.85,2.45),openings=[(2.75,4.05,.77,2.07)])
 partition('End bedroom south wall',(4.5,-2.15),(7.85,-2.15),openings=[(1.7,2.9,.77,2.07)])
 partition('End bedroom north wall',(4.5,2.45),(7.85,2.45))
 # The nursery and primary walls already form these two shared wall segments.
-upper_window('End bedroom trellis window',(7.84,.70,1.42),1.30,-90,'U7,U10',True)
+upper_window('End bedroom trellis window',(7.84,1.25,1.42),1.30,-90,'U7,U10',True)
 upper_window('End bedroom side window',(6.80,-2.14,1.42),1.20,180,'U7')
 
 upper_collection('19 | Blue nursery furniture')
@@ -232,10 +232,12 @@ table('Nursery upholstered footstool',(2.84,-2.44,0),(.49,.41,.36),walnut,photos
 box('Footstool cushion',(0,0,.385),(.52,.44,.075),linen,.055)
 
 upper_collection('20 | End bedroom furniture')
-# Looking through the end door along +X: desk/curtain left (+Y), bed right (-Y).
+# U7: the visible free end of the mattress is beside the ottoman; its long
+# edge follows the right window wall. The head is toward the entrance, hidden
+# by the near door jamb. It does not project across the middle of the rug.
 asset('End bedroom large cream rug',(6.15,-.1,.035),0,'U7')
 box('Cream area rug',(0,0,0),(2.85,3.65,.025),bedding,.012)
-bed('End bedroom single bed',(6.25,-1.05,.035),1.03,180,'U7',True)
+bed('End bedroom single bed',(5.75,-1.55,.035),1.03,90,'U7',True)
 chest('End bedroom wooden desk drawers',(5.18,1.95,0),.95,.76,0,3,1,'U7')
 table('End bedroom writing desktop',(5.37,1.91,0),(1.4,.61,.79),oak,photos='U7')
 asset('Tall narrow dark bookcase',(7.51,-.67,0),-90,'U7')
@@ -253,8 +255,8 @@ asset('Empty corner toy hammock',(7.58,-1.88,1.91),0,'U7')
 for i in range(10):
     t=i/9
     curve('Hammock woven cord',[(0,.72*t,.20),(-.60*(1-t),.70*t,-.22),(-.66,0,.20)],.004,bedding)
-asset('Wall mounted climbing handles',(7.74,1.70,0),-90,'U7')
-for x,z in [(-.4,.65),(0,1.05),(.42,1.54)]:
+asset('Wall mounted climbing handles',(7.74,.05,0),-90,'U7')
+for x,z in [(-.24,.65),(0,1.05),(.24,1.54)]:
     curve('Green wall grab handle',[(x,-.03,z-.11),(x,-.10,z-.09),(x,-.11,z+.09),(x,-.03,z+.11)],.018,darkmint)
 
 upper_collection('21 | Primary bedroom furniture')

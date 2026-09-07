@@ -65,15 +65,21 @@ left play zone. The long fabric divider was removed from the route and storage
 was moved to the perimeter, leaving direct approaches to play and both workstations.
 This supersedes the old foosball single-camera left/right inference.
 
-Cory's bed has been reported in the wrong spot. Its current position is retained
-pending the homeowner's wall/headboard clarification; it is not a confirmed location.
+Cory's bed was corrected by reopening original U7 and cross-checking the doorway
+in U10. U7 shows the free mattress end beside the ottoman and the long edge running
+along the right window wall, toward the entrance. The previous model misread it
+as projecting across the room. The bed now runs along that wall, leaving the rug
+open. Head toward the entrance is inferred from the visible free end; the near
+door jamb hides the head in U7. The climbing handles now sit in the clear wall
+space between the trellis curtain and bookcase. The window opening moves with its
+frame to retain that photographed gap. Dimensions remain estimates.
 
 | References | Visible evidence | Model correction |
 | --- | --- | --- |
 | V8, W10, V9–V10 | Pink shelving, wall art and the road rug are visible through the **left** doorway beside the bathroom in V8. The homeowner confirms exactly two bedrooms and the bathroom share this entry. | Pink bedroom left, bathroom ahead, white-curtain bedroom right. The earlier identification of the dark right doorway as the pink room was wrong. Rotate rooms without reflecting their furniture; align real openings with the common entry. |
 | W10 | Two windows meet in the far-left corner when entering; pink shelving on the far wall, wood dresser near the right side of entry. Head/foot direction remains uncertain. | Place the room on the correct side of the entry. Retain the window/shelving/dresser handedness and clear space inside the doorway; the current bed direction is provisional. |
 | U8, V1 | Main-bed pillows are against the right wall; TV and dresser occupy the adjoining wall. The reverse view shows the bassinet near the entry side. | Turn the bed a quarter turn; move the bassinet clear of its side and the entry furniture. |
-| U7, U10 | Trellis curtain on the far wall, bookcase farther right, second window on the right wall; bed projects into the room from that right side. | Turn the bed to project from the right window wall. Exact head/foot positioning is less certain than the wall relationship because bedding obscures it. |
+| U7, U10 | Trellis curtain on the far wall, handles then bookcase to its right, second window on the right wall; free mattress end beside the ottoman and long edge along the right wall. | Bed runs along the right wall with its foot toward the ottoman. This corrects the previous perpendicular placement and restores open floor in the middle. |
 | 6, W1–W3; homeowner | W3 shows the kitchen glass cupboard to the left of the garage door and coat hooks to its right. W1 shows the black vehicle left of the burgundy one from the kitchen end; W2 shows the glazed outside door on the right wall. | Connect garage at the end of the sink wall. Adjust estimated cabinet widths to leave an actual doorway; remove the inferred end cabinet. Keep vehicle and exterior-door handedness. |
 | W6–W8 | From the basement entrance, monitors continue leftward along the same wall as the dryer, sink and washer. Looking down the office aisle, desks are right and storage left. | Move the office onto the laundry wall, turn the storage to face the aisle, and leave the aisle clear of fabric screens. |
 | W4–W5 | Foosball table at the foreground/left of the bunk bed in W4; slide beside the bunk and bookcase visible in the reverse view W5. | Earlier table placement matched W4 only. The second pass finds the reverse arrangement inconsistent; complete layout remains unresolved. |

@@ -35,7 +35,7 @@ The second and third photo sets add:
 | Upstairs hall | U1, U10; homeowner directions | Straight from the upper landing; green bathroom first left, main bedroom left, nursery right, other bedroom at the end; oak floor and empty coat hooks |
 | Green family bathroom | U3–U5 | Sea-green tub tile, pale accent band, white tap-wall patch, bathtub, chrome fittings, curtain, white vanity, basin, mirror, toilet, linen shelves and patterned floor |
 | Blue nursery | U6 | Blue walls, blind and grey curtains, white crib, cushioned wood rocking chair, footstool, wood chest, white chest and closed drawer organizer |
-| End bedroom | U7, U10 | Made single bed and folded colorful quilt, rug, trellis curtains, desk/drawers, narrow bookcase, ottoman, empty hammock and wall handles |
+| Cory's bedroom (end of upstairs hall) | U7, U10 | Single bed along the right window wall, foot toward the ottoman; open rug, trellis curtains, desk/drawers, narrow bookcase, empty hammock and handles between curtain and bookcase |
 | Main bedroom and ensuite | U8–U9, V1–V2 | Made double bed, bassinet, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; separate shower, vanity, mirror, toilet, window and empty wall baskets |
 | Lower bedroom and bathroom | V6, V8–V10 | Connecting hall, corner-window bedroom, made bed, bookcase, low cabinet, bedside drawers and curtained closet; bathroom with vanity, toilet and window |
 | Lower-room additions | V6–V7 | Second piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |

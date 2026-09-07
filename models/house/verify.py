@@ -150,7 +150,11 @@ def head_direction(name):
 # W10 establishes the window corner; loose bedding does not establish the
 # head/foot direction reliably enough for a photo-confirmation assertion.
 assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
-assert head_direction('End bedroom single bed').y < -.99, 'U7: bed projects from the right window wall'
+assert head_direction('End bedroom single bed').x < -.99, 'U7: long mattress edge follows right wall; free end faces ottoman'
+cory_bed=position('End bedroom single bed')
+assert abs(cory_bed.y-(4.01-2.15)) < .65, 'U7: bed must stay beside right window wall'
+assert position('End bedroom corner ottoman').x > cory_bed.x+1.1, 'U7: ottoman is beyond the foot of the bed'
+assert position('Tall narrow dark bookcase').y < position('Wall mounted climbing handles').y < position('End bedroom trellis window').y, 'U7: climbing handles belong between curtain and bookcase'
 for name in ['Front porch wood rocking chair','Front porch white rocking chair']:
     facing=bpy.data.objects[name].matrix_world.to_3x3() @ Vector((0,-1,0))
     assert facing.x > .99, 'V4: porch chairs must face away from the siding'

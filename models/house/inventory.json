@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "6ac822d4640a74cc11f72e2d20da4efd399fdbe9c39243937191501cbf38f5f0",
+  "generator_sha256": "7a4c3d1c3fc09f9edd4bcbefd9d6e42e713aaf1cdbb066ec7367967f6790698b",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -1209,7 +1209,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         18.829999923706055,
-        4.710000038146973,
+        5.260000228881836,
         2.679999828338623
       ]
     },
@@ -1220,7 +1220,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         18.829999923706055,
-        4.710000038146973,
+        5.260000228881836,
         1.2599999904632568
       ]
     },
@@ -1329,8 +1329,8 @@
       "photos": "U7",
       "confidence": "photo / estimated size",
       "location_m": [
-        17.239999771118164,
-        2.9600002765655518,
+        16.739999771118164,
+        2.4600002765655518,
         1.2949999570846558
       ]
     },
@@ -1396,7 +1396,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         18.729999542236328,
-        5.710000038146973,
+        4.060000419616699,
         1.2599999904632568
       ]
     },
