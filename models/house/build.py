@@ -693,6 +693,10 @@ for z in [.22, .48]:
 collection('09 | Living room furniture')
 sofa('Main oatmeal three-seat sofa', (.55, 2.55, .018), 2.25, linen, 90, '8')
 sofa('Child-sized blue sofa', (2.35, .52, .018), 1.42, navy, 180, '7,8')
+# Photos 8 and V3 show low foam seating beneath the window sill.
+# Keep its observed footprint, but do not give it an adult sofa's height.
+ROOT.scale.z = .52
+ROOT['confidence'] = 'low child seating observed; dimensions estimated'
 sofa('Living upholstered armchair', (2.85, 3.00, .018), .95, linen, 0, '8')
 table('White tray activity table', (1.82, 2.30, .018), (1.36, .82, .49), white, 90, '8')
 for x in [-.66, .66]:

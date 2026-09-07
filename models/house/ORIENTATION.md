@@ -11,6 +11,39 @@ attachment to the bedroom is **not confirmed** by this audit; clarification of
 the doorway wall is pending. The earlier statement below describes fixture
 relationships within the room, not proof of its rotation within the house.
 
+## Second consistency pass
+
+Revisited all 40 originals, including opposite-facing views. The first pass
+overstated certainty about several relationships; a matching review camera
+does not establish that a whole room matches every photograph.
+
+- **Corrected:** the blue child sofa beneath the living-room windows had an
+  adult-height back. Photos 8 and V3 show low foam seating; its height is now
+  reduced, while dimensions remain estimated.
+- **Added:** the narrow high window above the basement dollhouse in W5, with
+  a real opening in the foundation wall. Its relation to the dollhouse is
+  visible; the play area's orientation beneath the house remains estimated.
+- **Master bathroom still unresolved:** U9 and V1 show the same dresser and
+  four-picture group beside the bathroom doorway. This suggests the bathroom
+  opens from the closet/dresser wall, perpendicular to the bedroom entrance
+  wall. The current model instead opens from the TV/window wall. This is a
+  stronger working hypothesis, awaiting confirmation or a connecting photo.
+- **Basement furniture still inconsistent:** the model can reproduce the
+  table/bunk ordering in W4, but its bunk/bookcase/dollhouse arrangement does
+  not reproduce the reverse view W5. W6 also suggests a high office-area
+  window whose wall position needs a connecting view. Do not treat the
+  earlier one-camera checks as confirmation of the complete basement plan.
+- **Pink bedroom bed direction unconfirmed:** W10 clearly shows the two
+  windows meeting at a corner, but loose bedding is insufficient evidence
+  for which end of the bed is the head. Removed the assertion that claimed
+  its head direction was photo-confirmed; no further speculative flip made.
+
+Useful additional references: a wide view from the master bedroom entrance
+showing the closet and bathroom, then its reverse from the bathroom doorway;
+a pink-bedroom view from the window corner back toward the entrance with both
+bed ends visible; and basement views from both ends of the play area showing
+the bunk, dollhouse, bookcase and opening toward the stairs/office together.
+
 Yards were added from photos 1–5 and V4–V5: front walk, lawn, planting beds,
 driveway and shade trees; rear lawn, fence, shed, trampoline and play equipment.
 Lot limits, tree dimensions and distances are approximate. Walking tests also
@@ -22,12 +55,12 @@ leaving an approach through the doorway.
 | References | Visible evidence | Model correction |
 | --- | --- | --- |
 | V8, W10, V9–V10 | Pink shelving, wall art and the road rug are visible through the **left** doorway beside the bathroom in V8. The homeowner confirms exactly two bedrooms and the bathroom share this entry. | Pink bedroom left, bathroom ahead, white-curtain bedroom right. The earlier identification of the dark right doorway as the pink room was wrong. Rotate rooms without reflecting their furniture; align real openings with the common entry. |
-| W10 | Two windows meet in the far-left corner when entering; bed pillows are at the left wall, pink shelving on the far wall, wood dresser near the right side of entry. | Turn the bed toward the left wall and place the room on the correct side of the entry. Retain the window/shelving/dresser handedness and clear space inside the doorway. |
+| W10 | Two windows meet in the far-left corner when entering; pink shelving on the far wall, wood dresser near the right side of entry. Head/foot direction remains uncertain. | Place the room on the correct side of the entry. Retain the window/shelving/dresser handedness and clear space inside the doorway; the current bed direction is provisional. |
 | U8, V1 | Main-bed pillows are against the right wall; TV and dresser occupy the adjoining wall. The reverse view shows the bassinet near the entry side. | Turn the bed a quarter turn; move the bassinet clear of its side and the entry furniture. |
 | U7, U10 | Trellis curtain on the far wall, bookcase farther right, second window on the right wall; bed projects into the room from that right side. | Turn the bed to project from the right window wall. Exact head/foot positioning is less certain than the wall relationship because bedding obscures it. |
 | 6, W1–W3; homeowner | W3 shows the kitchen glass cupboard to the left of the garage door and coat hooks to its right. W1 shows the black vehicle left of the burgundy one from the kitchen end; W2 shows the glazed outside door on the right wall. | Connect garage at the end of the sink wall. Adjust estimated cabinet widths to leave an actual doorway; remove the inferred end cabinet. Keep vehicle and exterior-door handedness. |
 | W6–W8 | From the basement entrance, monitors continue leftward along the same wall as the dryer, sink and washer. Looking down the office aisle, desks are right and storage left. | Move the office onto the laundry wall, turn the storage to face the aisle, and leave the aisle clear of fabric screens. |
-| W4–W5 | Foosball table at the foreground/left of the bunk bed in W4; slide beside the bunk and bookcase visible in the reverse view W5. | Move the table and correct the review camera so table/bunk ordering agrees; keep the main fixed play furniture. |
+| W4–W5 | Foosball table at the foreground/left of the bunk bed in W4; slide beside the bunk and bookcase visible in the reverse view W5. | Earlier table placement matched W4 only. The second pass finds the reverse arrangement inconsistent; complete layout remains unresolved. |
 | V4–V5 | Rocking chairs sit against the siding and face toward the open porch. | Turn both porch chairs away from the siding. Their previous fronts faced the wall. |
 
 ## Relationships retained after review

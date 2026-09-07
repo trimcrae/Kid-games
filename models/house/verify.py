@@ -147,7 +147,8 @@ for z in [-.85,-.05,.75]:
 # Orientation audit: constraints read directly from all four photo sets.
 def head_direction(name):
     return (bpy.data.objects[name].matrix_world.to_3x3() @ Vector((0,1,0))).normalized()
-assert head_direction('Pink bedroom double bed').y < -.99, 'W10: pillows at the left wall on entry'
+# W10 establishes the window corner; loose bedding does not establish the
+# head/foot direction reliably enough for a photo-confirmation assertion.
 assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
 assert head_direction('End bedroom single bed').y < -.99, 'U7: bed projects from the right window wall'
 for name in ['Front porch wood rocking chair','Front porch white rocking chair']:

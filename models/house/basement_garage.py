@@ -37,16 +37,29 @@ new_collection('30 | Basement foundation and partitions')
 asset('Basement slab',(0,0,BASEMENT_Z),photos='W4-W8',confidence='estimated footprint beneath main level')
 box('Basement concrete floor',(3.9,4,-.07),(7.8,8,.14),concrete_new)
 box('Basement clean resilient floor',(3.90,3.94,.018),(7.62,7.75,.025),pine)
-for a,b in [((0,0),(7.8,0)),((0,0),(0,8)),((0,8),(7.8,8))]:
+partition('Basement playroom window wall',(0,0),(7.8,0),blockmat,
+          [( .38,1.88,2.01,2.35)],height=2.55)
+for a,b in [((0,0),(0,8)),((0,8),(7.8,8))]:
     partition('White basement foundation wall',a,b,blockmat,height=2.55)
 partition('Basement east foundation',(7.8,0),(7.8,8),blockmat,[(3.42,4.60,0,2.55)],height=2.55)
 for z in [.22+i*.21 for i in range(11)]:
     box('Foundation horizontal mortar seam',(3.9,7.929,z),(7.75,.006,.009),grout,0)
-    box('Foundation front mortar seam',(3.9,.071,z),(7.75,.006,.009),grout,0)
+    if not 2.01 < z < 2.35:
+        box('Foundation front mortar seam',(3.9,.071,z),(7.75,.006,.009),grout,0)
+    else:
+        for xa,xb in [(.025,.38),(1.88,7.775)]:
+            box('Foundation front mortar seam',((xa+xb)/2,.071,z),(xb-xa,.006,.009),grout,0)
 for row in range(11):
     for col in range(19):
         x=.22+col*.40+(row%2)*.20
         if x<7.7:box('Foundation vertical mortar seam',(x,7.926,.115+row*.21),(.009,.006,.19),grout,0)
+# W5 clearly shows a high horizontal window above the dollhouse. Its
+# relationship to that furniture is observed; this zone's global rotation
+# and reverse-view furniture layout remain provisional (see ORIENTATION.md).
+window('Basement playroom high window',(1.13,.01,BASEMENT_Z+2.18),1.50,.34,180,False,False)
+ROOT['reference_photos'] = 'W5'
+ROOT['confidence'] = 'high window above dollhouse observed; size and global placement estimated'
+ASSETS[-1]['photos'] = 'W5'
 asset('Basement fabric room divider',(0,0,BASEMENT_Z),photos='W4,W5,W8')
 for xa,xb,ya,yb in [(.15,1.55,7.05,7.05),(3.45,3.45,.15,5.95)]:
     rod('Screen suspension line',(xa,ya,2.32),(xb,yb,2.32),.01,black)

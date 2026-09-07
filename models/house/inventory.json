@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "de67224dca4dd7f7e2260ca967f0ee448dc6bd5f4c171da13f3fc97cebeca060",
+  "generator_sha256": "7803ff98e2b01c4683e5413fac123d5b4f0fae6c547d026e7d78ac610151ea16",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -10,8 +10,8 @@
   ],
   "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 6805,
-  "mesh_objects": 6005,
+  "objects": 6817,
+  "mesh_objects": 6016,
   "cameras": [
     "overview",
     "sunroom",
@@ -2069,6 +2069,17 @@
         0.0,
         0.0,
         -3.1500000953674316
+      ]
+    },
+    {
+      "name": "Basement playroom high window",
+      "collection": "30 | Basement foundation and partitions",
+      "photos": "W5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.1299999952316284,
+        0.009999999776482582,
+        -0.9700000286102295
       ]
     },
     {
