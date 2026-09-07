@@ -31,8 +31,8 @@ pinkcloth=material('Rose bedroom curtains',(.48,.17,.16),.97,texture='fabric')
 pinkwood=material('Pink childrens shelving',(.48,.035,.16),.55)
 
 # The basement occupies an estimated rectangle under the main level. Its
-# contents are organized around the reverse view W8: office and laundry share
-# one open zone. Lightweight fabric screens divide the play space.
+# Homeowner clarification: descending toward -X, office is RIGHT (+Y), play
+# is LEFT (-Y). Keep the middle open, with a direct approach to foosball.
 new_collection('30 | Basement foundation and partitions')
 asset('Basement slab',(0,0,BASEMENT_Z),photos='W4-W8',confidence='estimated footprint beneath main level')
 box('Basement concrete floor',(3.9,4,-.07),(7.8,8,.14),concrete_new)
@@ -61,7 +61,7 @@ ROOT['reference_photos'] = 'W5'
 ROOT['confidence'] = 'high window above dollhouse observed; size and global placement estimated'
 ASSETS[-1]['photos'] = 'W5'
 asset('Basement fabric room divider',(0,0,BASEMENT_Z),photos='W4,W5,W8')
-for xa,xb,ya,yb in [(.15,1.55,7.05,7.05),(3.45,3.45,.15,5.95)]:
+for xa,xb,ya,yb in [(.15,.85,7.05,7.05)]:
     rod('Screen suspension line',(xa,ya,2.32),(xb,yb,2.32),.01,black)
     for i in range(48):
         t=(i+.5)/48
@@ -91,7 +91,7 @@ finish(bpy.data.objects.new('Basement staircase sloped ceiling',mesh),'Basement 
 # The existing family floor ends at X=9.69, so this flight needs no floor cut.
 
 new_collection('32 | Basement playroom furniture')
-asset('Basement foosball table',(2.50,5.60,BASEMENT_Z),0,'W4')
+asset('Basement foosball table',(4.75,2.30,BASEMENT_Z),0,'W4; homeowner: direct access from stair landing')
 box('Foosball cabinet',(0,0,.77),(1.42,.78,.28),walnut)
 box('Foosball green playfield',(0,0,.925),(1.25,.63,.016),green)
 for y in [-.375,.375]:box('Foosball raised side',(0,y,.98),(1.42,.05,.18),black)
@@ -117,7 +117,7 @@ for y in [-1.03,1.03]:
     for z in [1.66,1.83]:rod('Upper bunk guard',(-.48,y,z),(.48,y,z),.023,black)
 for x in [.32,.73]:rod('Bunk ladder rail',(x,-1.17,.06),(x,-1.06,1.5),.025,black)
 for i in range(5):rod('Bunk ladder rung',(.32,-1.16+i*.02,.24+i*.27),(.73,-1.16+i*.02,.24+i*.27),.02,black)
-asset('Basement toddler slide',(2.63,3.86,BASEMENT_Z),0,'W4,W5')
+asset('Basement toddler slide',(2.63,1.92,BASEMENT_Z),0,'W4,W5')
 for x in [-.25,.25]:
     box('Slide ladder side',(x,.29,.43),(.06,.14,.86),cream)
     rod('Slide handhold',(x,.25,.65),(x,.25,1.0),.033,cream)
@@ -142,10 +142,10 @@ for x in [-.30,.30]:
     rod('Saucer chair crossed stand',(x,.27,.02),(x,-.22,.64),.016,steel)
 
 new_collection('33 | Basement office laundry and mechanical')
-shelf_unit('Basement metal storage shelving',(4.50,5.00,BASEMENT_Z),1.65,1.98,black,180,'W6')
+shelf_unit('Basement metal storage shelving',(.50,6.02,BASEMENT_Z),1.65,1.98,black,90,'W6')
 for z in [.20,.67,1.14]:
     for x in [-.52,0,.52]:box('Neatly stored closed bin',(x,0,z),(.46,.32,.27),bluegrey,.02)
-chest('Basement white storage cabinet',(5.95,5.00,BASEMENT_Z),1.15,1.55,180,2,2,'W6')
+chest('Basement white storage cabinet',(1.18,5.02,BASEMENT_Z),1.15,1.55,0,2,2,'W6')
 # W8 shows the monitors continuing along the same wall, left of the dryer.
 table('Basement wood computer desk',(3.80,7.43,BASEMENT_Z),(1.75,.67,.75),walnut,0,'W6,W8')
 asset('Basement dual monitors',(3.80,7.43,BASEMENT_Z),0,'W6,W8')
@@ -168,6 +168,13 @@ for x in [-.34,.34]:
     box('Office chair arm pad',(x,-.02,.75),(.075,.39,.065),black,.025)
 table('Basement second workstation',(2.25,7.43,BASEMENT_Z),(.95,.53,.73),pine,0,'W6')
 box('Second workstation screen',(0,.10,1.01),(.53,.065,.32),black)
+asset('Basement second office chair',(2.25,6.45,BASEMENT_Z),180,'Homeowner: Mom and Dad both work here')
+rod('Second office chair lift',(0,0,.08),(0,0,.48),.045,steel)
+box('Second office chair seat',(0,0,.51),(.55,.55,.12),black,.07)
+box('Second office chair back',(0,.23,.83),(.53,.13,.59),black,.07)
+for i in range(5):
+    a=i*math.tau/5
+    rod('Second chair star foot',(0,0,.1),(.30*math.cos(a),.30*math.sin(a),.07),.023,black)
 for x,y in [(1.50,7.44),(2.93,7.70)]:
     asset('Basement potted plant',(x,y,BASEMENT_Z),photos='W6')
     cylinder('Plant pot',(0,0,.15),.15,.30,black,24,top=.19)

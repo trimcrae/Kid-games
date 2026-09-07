@@ -3,8 +3,10 @@ import fs from 'node:fs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {activities} from '../house-test/activities.mjs';
+import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url)));
 const world=new WalkingWorld(data.colliders,{height:1.05});
+world.addBoxes(neighborhoodBoxes);
 const targets=activities.map(a=>{const r=rooms.find(r=>r[1]===a.room);return {...a,point:world.safeSpot(r[2],r[4],-r[3])};});
 assert(targets.every(a=>a.point),'Unsafe activity spawn');
 // Flood the actual collision world from the entry, following floors and steps.

@@ -1,0 +1,39 @@
+name: Rebuild house model and walkthrough
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: house-export-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  house:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install ephemeral Blender runtime
+        run: pip install --no-cache-dir bpy==4.5.3 pillow
+      - name: Build editable model and changed previews
+        run: python models/house/build.py -- --render --views basement_entry,basement_plan,basement_play,basement_office,bedroom --samples 8 --preview-scale 50
+      - name: Export and verify geometry
+        run: |
+          python models/house/export_walkthrough.py
+          python models/house/verify.py
+          node models/house/test_walkthrough.mjs
+          node tests/house-routes.mjs
+      - name: Commit generated assets
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add models/house/house.blend models/house/inventory.json models/house/previews/ house-test/house.json house-test/house.mesh.gz
+          if ! git diff --cached --quiet; then
+            git commit -m 'Rebuild house layout and browser geometry [house-export]'
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

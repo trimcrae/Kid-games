@@ -25,5 +25,6 @@ js=js.replace('case "market": return marketHtml();','case "market": return marke
 js=js.replace('return bankHtml() +', 'return \'<p><button class="ghost" data-goto="bank">🏦 Walk to the bank in the basement office</button></p>\' +');
 js=js.replace('  function takePhoto() {','  function takePhoto() {\n    if (parent.houseBridge) return parent.houseBridge.photo();');
 js=js.replace('  function say(text, ms, tok) {','  function say(text, ms, tok) {\n    if(parent.houseBridge)parent.houseBridge.say(text);');
+js=js.replace('  function resetValley() {','  function resetValley() {\n    localStorage.setItem("craepets.house.reset."+who,"1");');
 js=js.replace('  /* A tiny hook the play-test robot uses to look inside. */',insertion+'\n  /* A tiny hook the play-test robot uses to look inside. */');
 fs.writeFileSync(path.join(here,'engine.js'),'// House edition fork. See make-activity-clone.cjs; original game is unchanged.\n'+js);

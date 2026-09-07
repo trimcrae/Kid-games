@@ -52,6 +52,22 @@ leaving an approach through the doorway.
 
 ## Corrections
 
+### Homeowner room names and basement update (September 2026)
+
+The upper end bedroom is Cory's; the nursery is Kieran's; pink-curtain lower
+bedroom is Ellie's; white-curtain lower bedroom is Jeannie's; the primary bedroom
+belongs to Mom and Dad. Both parents work in the basement.
+
+For the latest basement correction, right/left is interpreted while facing into
+the basement at the bottom of the descending stairs (toward plan -X): office on
+the right (+Y), play on the left (-Y). The foosball table and slide now occupy the
+left play zone. The long fabric divider was removed from the route and storage
+was moved to the perimeter, leaving direct approaches to play and both workstations.
+This supersedes the old foosball single-camera left/right inference.
+
+Cory's bed has been reported in the wrong spot. Its current position is retained
+pending the homeowner's wall/headboard clarification; it is not a confirmed location.
+
 | References | Visible evidence | Model correction |
 | --- | --- | --- |
 | V8, W10, V9–V10 | Pink shelving, wall art and the road rug are visible through the **left** doorway beside the bathroom in V8. The homeowner confirms exactly two bedrooms and the bathroom share this entry. | Pink bedroom left, bathroom ahead, white-curtain bedroom right. The earlier identification of the dark right doorway as the pink room was wrong. Rotate rooms without reflecting their furniture; align real openings with the common entry. |

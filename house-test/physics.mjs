@@ -2,12 +2,15 @@
 // Coordinates match Three: Y up. Movement is split into small steps to prevent tunnelling.
 export class WalkingWorld {
   constructor(boxes,{radius=.17,height=1.70}={}) {
-    this.boxes = boxes;
+    this.boxes = [];
     this.grid = new Map();
     this.radius = radius;
     this.height = height;
-    for (let i = 0; i < boxes.length; i++) {
-      const b = boxes[i];
+    this.addBoxes(boxes);
+  }
+  addBoxes(boxes) {
+    for (const b of boxes) {
+      const i=this.boxes.length;this.boxes.push(b);
       for (let x = Math.floor(b.min[0]/2); x <= Math.floor(b.max[0]/2); x++)
         for (let z = Math.floor(b.min[2]/2); z <= Math.floor(b.max[2]/2); z++) {
           const key = `${x},${z}`;

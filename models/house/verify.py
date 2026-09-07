@@ -158,7 +158,15 @@ assert screen_x('lower_entry','Pink bedroom shared entry doorway') < screen_x('l
 assert screen_x('nursery','Nursery wood drawer chest') < screen_x('nursery','Nursery window') < screen_x('nursery','Nursery white tall chest')
 assert screen_x('nursery','White slatted nursery crib') > screen_x('nursery','Nursery window')
 assert screen_x('bathroom','White bathroom vanity') < screen_x('bathroom','Green tile bathtub')
-assert screen_x('basement_play','Basement foosball table') < screen_x('basement_play','Basement metal bunk bed')
+# Homeowner overrides the earlier single-photo arrangement. From the stairs
+# facing -X, right is +Y and left is -Y. Both desks stay in the right zone.
+assert position('Basement foosball table').y < 3.4
+assert position('Basement dual monitors').y > 4.6
+assert position('Basement second workstation').y > 4.6
+for end in [(4.75,3.15,-2.25),(4.75,5.7,-2.25)]:
+    start=Vector((6.5,4.01,-2.25)); direction=Vector(end)-start
+    hit=scene.ray_cast(depsgraph,start,direction.normalized(),distance=direction.length)
+    assert not hit[0], 'Direct basement approach blocked by '+(hit[4].name if hit[0] else '')
 assert abs(position('Basement dual monitors').y-position('Basement front loading dryer').y)<.05, 'W8: office continues along laundry wall'
 assert screen_x('basement_entry','Basement dual monitors') < screen_x('basement_entry','Basement front loading dryer')
 assert screen_x('basement_office','Basement metal storage shelving') < screen_x('basement_office','Basement dual monitors')

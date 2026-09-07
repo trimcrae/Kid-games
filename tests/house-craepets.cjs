@@ -12,6 +12,8 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     await page.frame({url:/activity.html/}).evaluate(()=>Craepets._events(false));
     console.log('LOADED');
     await page.locator('#start').click();
+    await page.locator('#save-panel').waitFor({state:'visible'});
+    await page.locator('#new-pet-instead').click();
     const f=page.frameLocator('#activity-frame');
     await f.locator('#pet-name').fill('Cory Comet');await f.locator('#do-adopt').click();
     await f.locator('[data-tapegg]').click({clickCount:8,delay:130});
@@ -35,9 +37,9 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     await runtime().evaluate(()=>Craepets._events(false));
     assert.equal(await runtime().evaluate(()=>Craepets.state().pet.name),'Cory Comet');
     await page.locator('#start').click();
-    async function jump(room){await page.locator('#rooms-button').click();await page.getByRole('button',{name:'Jump to '+room,exact:true}).click();await page.waitForTimeout(1100);}
-    async function open(id,room){await jump(room);await page.locator('[data-activity="'+id+'"]').click();await page.waitForTimeout(150);}
-    for(const [id,room] of [['farm','Back yard'],['well','Basement office'],['pool','Sunroom'],['market','Garage'],['bank','Basement office'],['home','Living room'],['games','Basement playroom'],['arena','Front yard'],['bag','Shared bedroom entry'],['quests','Dining room'],['diary','Pink-curtain bedroom'],['case','White-curtain bedroom'],['stall','Front porch'],['feed','Kitchen'],['wash','Green bathroom'],['rest','Nursery'],['dress','Master bedroom'],['play','Family room'],['read','Basement office']]){
+    async function jump(room){if(await page.evaluate(()=>houseTest.state.active))await page.keyboard.press('KeyR');else await page.locator('#welcome-rooms').click();await page.getByRole('button',{name:'Jump to '+room,exact:true}).click();await page.waitForTimeout(1100);}
+    async function open(id,room){await jump(room);await page.keyboard.press('KeyE');if(await page.locator('#activity-choices').isVisible())await page.locator('[data-choice="'+id+'"]').click();await page.waitForTimeout(150);}
+    for(const [id,room] of [['farm','Back yard'],['well',"Mom & Dad's office"],['pool','Sunroom'],['market','Garage'],['bank',"Mom & Dad's office"],['home','Living room'],['games','Basement playroom'],['arena','Front yard'],['bag','Shared bedroom entry'],['quests','Dining room'],['diary',"Ellie's bedroom"],['case',"Jeannie's bedroom"],['stall','Front porch'],['feed','Kitchen'],['wash','Green bathroom'],['rest',"Kieran's bedroom"],['dress',"Mom & Dad's bedroom"],['play','Family room'],['read',"Mom & Dad's office"]]){
       await open(id,room);assert(await f.locator('.panel').count()>0,id+' empty');console.log('OPEN',id);
       if(['farm','well','pool'].includes(id)){
         const before=await runtime().evaluate(()=>({coins:Craepets.state().coins,correct:Craepets.state().stats.correct}));
@@ -93,27 +95,34 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
       }
       await page.locator('#close-activity').click();
     }
+    await open('pet-house-cory',"Cory's Craepet house");assert(await f.locator('[data-hometab="homes"]').count(),'Own house did not open decorating');await page.locator('#close-activity').click();
+    await open('pet-house-ellie',"Ellie's Craepet house");assert.equal(await runtime().evaluate(()=>Craepets.visiting()),'ellie');await page.locator('#close-activity').click();
+    await jump('Craepet street');const aimed=await page.evaluate(()=>houseTest.state.yaw);await page.mouse.move(900,450);await page.mouse.move(980,470);await page.waitForTimeout(100);assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'Mouse without dragging did not aim');
+    await page.screenshot({path:'tests/house-neighborhood.png'});
     // Walk to a room through the model, rather than invoking the jump UI.
     await jump('Front entry');const before=await page.evaluate(()=>houseTest.state.position);
     await page.keyboard.down('KeyW');await page.waitForTimeout(850);await page.keyboard.up('KeyW');await page.waitForTimeout(1100);
     const walking=await page.evaluate(()=>houseTest.state);assert(walking.position.z<before.z-.4,'WASD did not walk');assert(walking.nearby.includes('nest'),'Walking did not reach the living activity');
     assert(walking.appearance.includes('partyhat')&&walking.appearance.includes('bluescarf'),'3D outfit was not updated');assert(walking.furniture>0,'Placed furniture is absent from the house');
-    await page.keyboard.press('KeyE');await page.locator('#activity-panel').waitFor({state:'visible'});
+    await page.keyboard.press('KeyE');await page.locator('[data-choice="nest"]').click();await page.locator('#activity-panel').waitFor({state:'visible'});
     await f.locator('[data-do="wash"]').click();await page.locator('#activity-panel').waitFor({state:'hidden'});
     const guided=await page.evaluate(()=>houseTest.state);assert.equal(guided.destination,'wash');assert(Math.abs(guided.position.x-walking.position.x)<.1,'Directions silently teleported the player');
     const roamed=await page.evaluate(()=>houseTest.state.roamers);assert(roamed.some(r=>r.id==='ellie'),'Family pet did not join the house');assert(roamed.some(r=>r.distance>.15),'Pets do not roam');
-    await page.locator('#family-button').click();await page.locator('[data-profile="ellie"]').click();await page.waitForTimeout(1100);assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Ellie Blossom');
-    await page.locator('#family-button').click();await page.locator('[data-profile="cory"]').click();
+    await page.keyboard.press('KeyF');await page.locator('[data-profile="ellie"]').click();await page.waitForTimeout(1100);assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Ellie Blossom');
+    await page.keyboard.press('KeyF');await page.locator('[data-profile="cory"]').click();
     const saved=await runtime().evaluate(()=>({coins:Craepets.state().coins,correct:Craepets.state().stats.correct}));
     assert.equal(await page.evaluate(()=>localStorage.getItem('craepets.v1.cory')),original,'Original save was changed');
     await page.reload();await page.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});assert.deepEqual(await runtime().evaluate(()=>({coins:Craepets.state().coins,correct:Craepets.state().stats.correct})),saved);
     await page.locator('#start').click();await page.screenshot({path:'tests/house-desktop.png'});
-    await page.locator('#pet-button').click();await page.locator('#pet-speech').waitFor({state:'visible'});
+    await page.keyboard.press('KeyC');await page.locator('#pet-speech').waitFor({state:'visible'});
     console.log('PASS desktop play, walk-up actions, family roaming, migration and reload');
     // Finger controls and activity layout use the same saved pets on an iPhone.
-    const phone=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1,storageState:await context.storageState()});
+    const familyBackup=await runtime().evaluate(()=>HouseSaves.bundle('house'));
+    const phone=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
     const mobile=await phone.newPage();mobile.on('pageerror',e=>errors.push(e.message));
-    await mobile.goto(base+'/house-test/');await mobile.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});await mobile.locator('#start').tap();
+    await mobile.goto(base+'/house-test/');await mobile.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});
+    await mobile.locator('#welcome-saves').tap();await mobile.locator('#save-file').setInputFiles({name:'family.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(familyBackup))});await mobile.locator('#apply-saves').tap();await mobile.locator('#close-saves').tap();
+    assert.equal(await mobile.frame({url:/activity.html/}).evaluate(()=>Craepets.state().pet.name),'Cory Comet');assert.equal(await mobile.frame({url:/activity.html/}).evaluate(()=>HouseActivity.family().filter(p=>p.pet).length),2,'Complete family did not transfer');
     await mobile.locator('#rooms-button').tap();await mobile.getByRole('button',{name:'Jump to Front entry',exact:true}).tap();await mobile.waitForTimeout(1100);
     const pos=await mobile.evaluate(()=>houseTest.state.position),joystick=mobile.locator('#joystick');
     const r=await joystick.boundingBox();

@@ -1032,7 +1032,7 @@ camera('basement_stairs',(11.65,3.79,.52),(8.18,3.36,-.67),18)
 camera('pink_bedroom',(10.80,6.20,.56),(8.70,7.12,-.35),17)
 camera('lower_entry',(11.50,4.95,.56),(11.50,7.85,.10),15)
 camera('kitchen_access',(1.50,7.48,1.65),(-1.00,7.56,1.10),24)
-camera('basement_entry',(6.75,4.01,-1.53),(4.55,7.45,-2.20),18)
+camera('basement_entry',(6.75,4.01,-1.53),(2.5,4.01,-2.20),18)
 camera('front_yard',(6.60,-3.42,1.55),(4.30,-12.5,.55),22)
 camera('back_yard',(4.65,12.70,1.10),(9.2,22.5,.55),20)
 
@@ -1186,6 +1186,7 @@ for screen_data in bpy.data.screens:
             a.spaces.active.shading.type = 'MATERIAL'
 bpy.ops.object.select_all(action='DESELECT')
 scene.render.filepath = '//previews/overview.png'
+bpy.context.preferences.filepaths.save_version = 0
 bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'house.blend'), compress=True)
 
 manifest = {

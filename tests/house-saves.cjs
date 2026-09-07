@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const code=fs.readFileSync('house-test/save-copy.js','utf8');
+const pet=(name)=>({v:1,pet:{name,species:'blorb',colour:'meadow'},coins:456,house:{owned:['bed'],home:'tower'},diary:[{s:'My adventures'}],bank:{balance:123},inventory:{apple:9}});
+const values=new Map(),localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,String(v)),removeItem:k=>values.delete(k)};
+const boot=()=>{const context={window:{},localStorage,console};vm.runInNewContext(code,context);return context.window.HouseSaves;};
+values.set('craepets.house.migrated','1');values.set('craepets.house.v1.cory',JSON.stringify({v:1,pet:null}));values.set('craepets.v1.cory',JSON.stringify(pet('Comet')));values.set('craepets.v1.ellie',JSON.stringify(pet('Blossom')));
+let api=boot();assert.equal(JSON.parse(values.get('craepets.house.v1.cory')).pet.name,'Comet');assert.equal(JSON.parse(values.get('craepets.house.v1.ellie')).pet.name,'Blossom');assert.equal(values.get('craepets.house.who'),'cory');
+const progressed=pet('New progress');progressed.coins=999;values.set('craepets.house.v1.cory',JSON.stringify(progressed));values.set('craepets.v1.jeannie',JSON.stringify(pet('Jeannie')));api=boot();assert.equal(JSON.parse(values.get('craepets.house.v1.cory')).coins,999);assert.equal(JSON.parse(values.get('craepets.house.v1.jeannie')).pet.name,'Jeannie');
+values.set('craepets.house.reset.ellie','1');values.set('craepets.house.v1.ellie',JSON.stringify({v:1,pet:null}));api=boot();assert.equal(JSON.parse(values.get('craepets.house.v1.ellie')).pet,null);
+const originals=[...values].filter(([k])=>k.startsWith('craepets.v1.'));
+const bundle=api.bundle('original');api.restore(JSON.stringify(bundle));assert.deepEqual(JSON.parse(values.get('craepets.house.v1.cory')),pet('Comet'));assert.equal(values.get('craepets.house.reset.ellie'),undefined);assert(JSON.parse(values.get('craepets.house.before-import')).profiles.cory.includes('New progress'));
+const before=JSON.stringify([...values]);assert.throws(()=>api.restore({format:'craepets-family',profiles:{cory:pet('Overwrite'),hacker:pet('Invalid')}}));assert.equal(JSON.stringify([...values]),before);
+api.restore(JSON.stringify(pet('Transferred')),'kieran');assert.equal(JSON.parse(values.get('craepets.house.v1.kieran')).pet.name,'Transferred');assert.deepEqual([...values].filter(([k])=>k.startsWith('craepets.v1.')),originals);
+const beforeFailure=[...values].filter(([k])=>k!=='craepets.house.before-import');const normalSet=localStorage.setItem;let fail=true;
+localStorage.setItem=(k,v)=>{if(k==='craepets.house.v1.ellie'&&fail){fail=false;throw Error('Storage full');}normalSet(k,v);};
+assert.throws(()=>api.restore(bundle),/Storage full/);assert.deepEqual([...values].filter(([k])=>k!=='craepets.house.before-import'),beforeFailure);
+console.log('PASS retry imports, all profiles, complete saves, preserve progress, intentional resets, backup validation, single-pet transfer, originals unchanged');

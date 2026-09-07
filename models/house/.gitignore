@@ -2,3 +2,5 @@
 *.blend2
 __pycache__/
 render.log
+export.log
+verify.log

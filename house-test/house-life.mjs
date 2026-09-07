@@ -2,6 +2,9 @@ import * as THREE from './vendor/three.module.min.js';
 import {activities,destinationFor} from './activities.mjs';
 import {creature,petpet,disposeCreature,labelSprite} from './creatures.mjs';
 import {furnishing} from './furnishings.mjs';
+import {familyRooms} from './rooms.mjs';
+import {setupSaves} from './save-panel.mjs';
+import {createNeighborhood} from './neighborhood.mjs';
 const $=id=>document.getElementById(id);
 export async function createHouseLife(tour){
   const {scene,world,player,rooms,bindButton}=tour;
@@ -16,6 +19,8 @@ export async function createHouseLife(tour){
     await new Promise(resolve=>setTimeout(resolve,100));
   }
   const engine=frame.contentWindow.Craepets;
+  const neighborhood=createNeighborhood(scene,world);
+  const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew:()=>showActivity({id:'adopt',room:'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'})});
   let avatar,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,heading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
   const stations=activities.map(a=>{
@@ -29,9 +34,9 @@ export async function createHouseLife(tour){
     try{const p=JSON.parse(localStorage.getItem(positionKey(id)));if(p&&[p.x,p.y,p.z].every(Number.isFinite)){const safe=world.safeSpot(p.x,p.y,p.z);if(safe){Object.assign(player,safe);return;}}}catch{}
     tour.teleport(rooms[0]);
   }
-  const roomNames=[...new Set(stations.map(s=>s.room))];
+  const roomNames=[...new Set([...stations.map(s=>s.room),...Object.values(familyRooms)])];
   for(const name of roomNames){
-    const a=stations.find(s=>s.room===name),node=new THREE.Group();node.position.set(a.point.x,a.point.y+.025,a.point.z);
+    const room=rooms.find(r=>r[1]===name),a=stations.find(s=>s.room===name)||{icon:'🛏️',point:world.safeSpot(room[2],room[4],-room[3])},node=new THREE.Group();node.position.set(a.point.x,a.point.y+.025,a.point.z);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(.40,.025,6,32),new THREE.MeshBasicMaterial({color:'#d7ec8b'}));ring.rotation.x=-Math.PI/2;node.add(ring);
     const label=labelSprite(a.icon+' '+name);label.position.y=1.35;node.add(label);scene.add(node);markers.push({node,label,name,point:a.point});
   }
@@ -45,6 +50,8 @@ export async function createHouseLife(tour){
   }
   function guide(station){destination=stations.find(a=>a.id===station.id)||station;closeActivity(false);$('family-panel').hidden=true;tour.showRooms(false);tour.resume();}
   function showActivity(station){
+    $('activity-choices').hidden=true;
+    if(station.owner&&!api.family().find(p=>p.id===station.owner)?.pet){recovery.open();return;}
     savePosition();tour.suspend();$('welcome').hidden=true;tour.showRooms(false);tour.suspend();$('family-panel').hidden=true;
     selected=station;api.enter(station);$('activity-title').textContent=station.icon+' '+station.name;$('activity-room').textContent=station.room;
     $('activity-panel').hidden=false;$('nearby').hidden=true;
@@ -57,11 +64,12 @@ export async function createHouseLife(tour){
   window.houseBridge={
     route(view,action){
       if(view==='map'){closeActivity(false);tour.showRooms(true);return;}
-      const station=destinationFor(view,action);if(station)guide(station);
+      const station=view==='home'&&!action?stations.find(s=>s.owner===engine.who()):destinationFor(view,action);if(station)guide(station);
     },close:closeActivity,photo:tour.photo,
     say(text){$('pet-speech').textContent=text;$('pet-speech').hidden=false;clearTimeout(sayTimer);sayTimer=setTimeout(()=>$('pet-speech').hidden=true,3500);}
   };
   bindButton($('close-activity'),()=>closeActivity());
+  bindButton($('close-choices'),()=>{$('activity-choices').hidden=true;tour.resume();});
   bindButton($('pet-button'),()=>{if(engine.state().pet)api.cuddle();});
   bindButton($('cancel-journey'),()=>{destination=null;$('journey').hidden=true;});
   bindButton($('family-button'),()=>{
@@ -89,12 +97,12 @@ export async function createHouseLife(tour){
       {id:'fen',name:'Farmer Fen',pet:{species:'snorbit',colour:'meadow'},room:'Back yard'},
       {id:'dizzy',name:'Dizzy',pet:{species:'glimmr',colour:'bubble'},room:'Basement playroom'},
       {id:'marigold',name:'Mrs Marigold',pet:{species:'blorb',colour:'sunbeam'},room:'Garage'},
-      {id:'moss',name:'Mossbeard',pet:{species:'twiggle',colour:'cocoa'},room:'Basement office'},
+      {id:'moss',name:'Mossbeard',pet:{species:'twiggle',colour:'cocoa'},room:"Mom & Dad's office"},
     ]);
     const key=JSON.stringify(cast.map(p=>[p.id,p.pet.species,p.pet.colour,p.pet.wear,!!p.pet.egg]));if(key===roamKey)return;roamKey=key;
     roamers.forEach(r=>{r.label.material.map.dispose();disposeCreature(r.mesh);});roamers=[];
     cast.forEach((p,i)=>{
-      const home=rooms.find(r=>r[1]===(p.room||['Living room','Dining room','Family room','Nursery','Master bedroom','Sunroom'][i%6]));
+      const home=rooms.find(r=>r[1]===(p.room||familyRooms[p.id]||'Living room'));
       const anchor=world.safeSpot(home[2],home[4],-home[3]);if(!anchor)return;
       const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(.88);
       const label=labelSprite(p.pet.name||p.name);label.scale.set(1.3,.245,1);label.position.y=1.3;mesh.add(label);scene.add(mesh);
@@ -118,11 +126,11 @@ export async function createHouseLife(tour){
   function sync(force=false){
     const s=api.snapshot();
     if(lastWho!==s.who){lastWho=s.who;restorePosition(s.who);}
-    updateAvatar(s);updateRoamers();updateDecor();
+    updateAvatar(s);updateRoamers();updateDecor();neighborhood.update(api.neighborhood());
     const profile=api.profiles().find(p=>p.id===s.who);
     $('pet-status').textContent=s.pet?`${profile.name} · ${s.pet.name} · 🪙 ${s.coins}`:`${profile.name} · Adopt your Craepet`;
     $('pet-needs').textContent=s.pet?(s.pet.egg?'🥚 Walk with your egg · Learn or tap to hatch':`🍽 ${Math.round(s.pet.hunger)}   😊 ${Math.round(s.pet.happy)}   ⚡ ${Math.round(s.pet.energy)}   🫧 ${Math.round(s.pet.clean)}`):'';
-    $('pet-button').textContent=s.pet?.egg?'Tap your egg':'Say hello';
+    $('pet-button').textContent=s.pet?.egg?'Tap your egg (C)':'Say hello (C)';
     $('weather-status').textContent=engine.weather().emoji+' '+engine.weather().name+' · '+engine.timeOfDay();
     for(const b of $('family-list').children)b.setAttribute('aria-pressed',String(b.dataset.profile===s.who));
     if(force)updateNearby(true);
@@ -148,9 +156,17 @@ export async function createHouseLife(tour){
   sync(true);
   return {
     hasPet:()=>!!engine.state().pet,
-    adopt:()=>showActivity({id:'adopt',room:'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'}),
+    adopt:()=>recovery.open(),
+    face(angle){heading=angle;},
     movement(dx,dz){moving=Math.hypot(dx,dz)>.0001;if(moving)heading=Math.atan2(dx,dz);},
-    interact(){if(near.length)showActivity(near.find(s=>destination?.id===s.id)||near[0]);},
+    interact(){
+      if(!near.length)return;
+      const target=near.find(s=>destination?.id===s.id);
+      if(target||near.length===1){showActivity(target||near[0]);return;}
+      tour.suspend();$('activity-choices').hidden=false;$('choices-room').textContent=near[0].room;$('choices-list').replaceChildren();
+      for(const s of near){const b=document.createElement('button');b.dataset.choice=s.id;b.textContent=s.icon+' '+s.name;bindButton(b,()=>showActivity(s));$('choices-list').append(b);}
+      $('choices-list').querySelector('button').focus();
+    },
     tick(dt,time,active){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       if(avatar){avatar.position.set(player.x,player.y,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion);}
