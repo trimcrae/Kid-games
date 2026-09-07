@@ -1,0 +1,14 @@
+{
+  "method": "Blender Cycles; TripoSR custom 3D subject; visibility-aware photographic texture projection; generated spherical plaza environment.",
+  "limitations": "Single-photo reconstruction. Hidden surfaces are inferred. The background is a panorama, not a surveyed plaza mesh.",
+  "status": "Composition preview awaiting visual review.",
+  "blender": "4.5.3 LTS",
+  "frames": 144,
+  "fps": 24,
+  "camera_degrees": [
+    -12,
+    12
+  ],
+  "subject_polygons": 105616,
+  "compose_sha256": "aa33b671935a88f5b0c207822b7e3c4f15a74e0fe12f1f9ab6e3105918ac69d5"
+}
