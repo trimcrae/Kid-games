@@ -11,13 +11,13 @@ bpy.ops.wm.open_mainfile(filepath=str(HERE / 'house.blend'))
 scene = bpy.context.scene
 inventory = json.loads((HERE / 'inventory.json').read_text(encoding='utf-8'))
 expected_hash = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in
-    ['build.py', 'upstairs.py', 'extensions.py', 'basement_garage.py', 'yard.py', 'photoreal.py'])).hexdigest()
+    ['build.py', 'upstairs.py', 'extensions.py', 'basement_garage.py', 'yard.py', 'exterior.py', 'photoreal.py'])).hexdigest()
 assert scene['generator_sha256'] == expected_hash == inventory['generator_sha256'], 'Stale model'
 assert scene.unit_settings.system == 'METRIC'
 assert scene.camera.data.type == 'ORTHO'
 assert len(scene.objects) == inventory['objects']
 assert len({entry['name'] for entry in inventory['assets']}) == len(inventory['assets']), 'Duplicate asset identities'
-assert len([o for o in scene.objects if o.type == 'CAMERA']) == 31
+assert len([o for o in scene.objects if o.type == 'CAMERA']) == 33
 assert 'START HERE - House study' in bpy.data.texts
 assert not bpy.data.libraries, 'Unexpected linked library'
 assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'

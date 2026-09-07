@@ -42,8 +42,8 @@ colliders = []
 depsgraph = bpy.context.evaluated_depsgraph_get()
 source_objects = 0
 for o in scene.objects:
-    if o.type not in {'MESH','CURVE'}:
-        continue
+    if o.type not in {'MESH','CURVE'} or o.get('export') is False:
+        continue  # render-only dense leaves; coarse clusters stand in
     cname = o.users_collection[0].name
     if 'label' in cname.lower() or cname.startswith('15 |'):
         continue

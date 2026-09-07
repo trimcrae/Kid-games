@@ -1,18 +1,19 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "65537d43ef7658246d4b4d7138932757ddc6333569603deb67eb0dd0943a1de7",
+  "generator_sha256": "ec9528efa39987ad3a41afd8acc65fe6332aa9b9d1fd9a51a06726730a00a8d2",
   "source_files": [
     "build.py",
     "upstairs.py",
     "extensions.py",
     "basement_garage.py",
     "yard.py",
+    "exterior.py",
     "photoreal.py"
   ],
   "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 6787,
-  "mesh_objects": 5976,
+  "objects": 6735,
+  "mesh_objects": 5916,
   "cameras": [
     "overview",
     "sunroom",
@@ -44,7 +45,9 @@
     "kitchen_access",
     "basement_entry",
     "front_yard",
-    "back_yard"
+    "back_yard",
+    "street_front",
+    "rear_elevation"
   ],
   "external_images": [],
   "assets": [
@@ -2735,7 +2738,7 @@
     {
       "name": "Front large shade tree",
       "collection": "42 | Front and back yards",
-      "photos": "V5",
+      "photos": "V5,exterior",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         10.0,
@@ -2744,20 +2747,9 @@
       ]
     },
     {
-      "name": "Front weeping tree",
-      "collection": "42 | Front and back yards",
-      "photos": "V5",
-      "confidence": "tree visible; species and size approximate",
-      "location_m": [
-        4.199999809265137,
-        -12.199999809265137,
-        -0.8199999928474426
-      ]
-    },
-    {
       "name": "Rear left shade tree",
       "collection": "42 | Front and back yards",
-      "photos": "1,2",
+      "photos": "1,2,exterior",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         -3.0,
@@ -2768,7 +2760,7 @@
     {
       "name": "Rear lawn tree",
       "collection": "42 | Front and back yards",
-      "photos": "2,5",
+      "photos": "2,5,exterior",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         6.199999809265137,
@@ -2784,6 +2776,17 @@
       "location_m": [
         20.0,
         20.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front tall spruce",
+      "collection": "42 | Front and back yards",
+      "photos": "exterior",
+      "confidence": "conifer visible; species and size approximate",
+      "location_m": [
+        14.600000381469727,
+        -11.399999618530273,
         -0.8199999928474426
       ]
     },
@@ -3056,6 +3059,17 @@
       "collection": "42 | Front and back yards",
       "photos": "V5",
       "confidence": "walk meets driveway; continuation length estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Estimated roofs",
+      "collection": "43 | Exterior roofs and cladding",
+      "photos": "exterior",
+      "confidence": "roof lines read from exterior photographs; pitches and overhangs estimated",
       "location_m": [
         0.0,
         0.0,

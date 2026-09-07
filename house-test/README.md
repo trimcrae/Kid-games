@@ -76,8 +76,9 @@ does not represent the actual neighboring properties.
 The geometry comes from `models/house/house.blend`. The photo-derived furniture
 and layout are retained. Procedural Blender textures and small bevels are
 omitted for browser performance; each surface keeps the base colour of the
-photographic material pass in `models/house/photoreal.py`. Reflections and
-lighting are simplified.
+photographic material pass in `models/house/photoreal.py`, and the roofs,
+siding and procedural trees from `models/house/exterior.py` and `yard.py`
+are included. Reflections and lighting are simplified.
 The source photographs, people, personal pictures, street addresses and
 neighbouring homes are not included. Yard limits and unseen dimensions remain
 estimates. The master bathroom's attachment is awaiting the homeowner's

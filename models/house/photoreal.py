@@ -340,6 +340,128 @@ def translucent_shade(mat, color):
     return mat
 
 
+def siding(mat, color, course=.20):
+    """Vinyl lap siding: horizontal courses with a shadow line under each lap."""
+    nt, bsdf, _ = _principled(mat)
+    tone = _noise(nt, _world_vector(nt, (1, 1, 1)), 3, 3, .5)
+    nt.links.new(_ramp(nt, tone, _scaled(color, .94), _scaled(color, 1.04), .3, .7), bsdf.inputs['Base Color'])
+    bsdf.inputs['Roughness'].default_value = .5
+    bsdf.inputs['Specular IOR Level'].default_value = .4
+    saw = nt.nodes.new('ShaderNodeTexWave')
+    saw.wave_type = 'BANDS'
+    saw.bands_direction = 'Z'
+    saw.wave_profile = 'SAW'
+    saw.inputs['Scale'].default_value = 1 / course
+    nt.links.new(_world_vector(nt, (1, 1, 1)), saw.inputs['Vector'])
+    _bump(nt, bsdf, saw.outputs['Fac'], .6, .012)
+    mat.diffuse_color = _lin(*color)
+    return mat
+
+
+def shake_cladding(mat, light, dark):
+    """Weathered cedar shakes: staggered dark courses with mottled grey-brown."""
+    nt, bsdf, _ = _principled(mat)
+    geo = nt.nodes.new('ShaderNodeNewGeometry')
+    sep = nt.nodes.new('ShaderNodeSeparateXYZ')
+    nt.links.new(geo.outputs['Position'], sep.inputs[0])
+    along = nt.nodes.new('ShaderNodeMath')
+    along.operation = 'ADD'
+    nt.links.new(sep.outputs['X'], along.inputs[0])
+    nt.links.new(sep.outputs['Y'], along.inputs[1])
+    comb = nt.nodes.new('ShaderNodeCombineXYZ')
+    nt.links.new(along.outputs[0], comb.inputs['X'])
+    nt.links.new(sep.outputs['Z'], comb.inputs['Y'])
+    brick = nt.nodes.new('ShaderNodeTexBrick')
+    brick.offset = .5
+    brick.inputs['Scale'].default_value = 1
+    brick.inputs['Mortar Size'].default_value = .006
+    brick.inputs['Mortar Smooth'].default_value = .2
+    brick.inputs['Brick Width'].default_value = .16
+    brick.inputs['Row Height'].default_value = .24
+    brick.inputs['Bias'].default_value = 0
+    nt.links.new(comb.outputs[0], brick.inputs['Vector'])
+    mottle = _noise(nt, _world_vector(nt, (1, 1, 1)), 6, 4, .6)
+    brick.inputs['Color1'].default_value = _lin(*dark)
+    brick.inputs['Color2'].default_value = _lin(*light)
+    brick.inputs['Mortar'].default_value = _lin(*_scaled(dark, .5))
+    mixer = nt.nodes.new('ShaderNodeMix')
+    mixer.data_type = 'RGBA'
+    nt.links.new(mottle, mixer.inputs['Factor'])
+    nt.links.new(brick.outputs['Color'], mixer.inputs[6])
+    nt.links.new(_ramp(nt, _noise(nt, _world_vector(nt, (1, 1, 1)), 1.2, 3, .5), _scaled(dark, .8), _scaled(light, 1.1), .3, .7), mixer.inputs[7])
+    nt.links.new(mixer.outputs[2], bsdf.inputs['Base Color'])
+    bsdf.inputs['Roughness'].default_value = .85
+    bsdf.inputs['Specular IOR Level'].default_value = .25
+    grain = _noise(nt, _world_vector(nt, (1, 1, 30)), 3, 3, .5)
+    both = nt.nodes.new('ShaderNodeMath')
+    both.operation = 'MULTIPLY_ADD'
+    nt.links.new(grain, both.inputs[0])
+    both.inputs[1].default_value = .3
+    nt.links.new(brick.outputs['Fac'], both.inputs[2])
+    _bump(nt, bsdf, both.outputs[0], .5, .004)
+    mat.diffuse_color = _lin(*[(a + b) / 2 for a, b in zip(light, dark)])
+    return mat
+
+
+def shingle_roof(mat, color):
+    """Brown asphalt shingles: granular surface with horizontal course lines."""
+    nt, bsdf, _ = _principled(mat)
+    grit = _noise(nt, _world_vector(nt, (1, 1, 1)), 120, 3, .6)
+    nt.links.new(_ramp(nt, grit, _scaled(color, .75), _scaled(color, 1.25), .3, .7), bsdf.inputs['Base Color'])
+    bsdf.inputs['Roughness'].default_value = .92
+    bsdf.inputs['Specular IOR Level'].default_value = .2
+    saw = nt.nodes.new('ShaderNodeTexWave')
+    saw.wave_type = 'BANDS'
+    saw.bands_direction = 'Z'
+    saw.wave_profile = 'SAW'
+    saw.inputs['Scale'].default_value = 8
+    nt.links.new(_world_vector(nt, (1, 1, 1)), saw.inputs['Vector'])
+    both = nt.nodes.new('ShaderNodeMath')
+    both.operation = 'MULTIPLY_ADD'
+    nt.links.new(grit, both.inputs[0])
+    both.inputs[1].default_value = .35
+    nt.links.new(saw.outputs['Fac'], both.inputs[2])
+    _bump(nt, bsdf, both.outputs[0], .6, .006)
+    mat.diffuse_color = _lin(*color)
+    return mat
+
+
+def lawn(mat, green, straw):
+    """Mown lawn: patchy colour at two scales and a fine blade texture."""
+    nt, bsdf, _ = _principled(mat)
+    vec = _world_vector(nt, (1, 1, 1))
+    patches = _noise(nt, vec, .35, 3, .55)
+    fine = _noise(nt, vec, 9, 4, .6)
+    fac = _mix_fac(nt, patches, fine, .4)
+    nt.links.new(_ramp(nt, fac, green, straw, .3, .75), bsdf.inputs['Base Color'])
+    bsdf.inputs['Roughness'].default_value = .9
+    bsdf.inputs['Specular IOR Level'].default_value = .15
+    blades = _noise(nt, vec, 140, 3, .7)
+    _bump(nt, bsdf, blades, .7, .01)
+    mat.diffuse_color = _lin(*green)
+    return mat
+
+
+def foliage(mat, color):
+    """Leaf clusters: two-sided, slightly translucent, varied per cluster."""
+    nt, bsdf, out = _principled(mat)
+    vec = _world_vector(nt, (1, 1, 1))
+    tone = _noise(nt, vec, 1.5, 2, .5)
+    base = _ramp(nt, tone, _scaled(color, .7), _scaled(color, 1.35), .3, .7)
+    nt.links.new(base, bsdf.inputs['Base Color'])
+    bsdf.inputs['Roughness'].default_value = .55
+    bsdf.inputs['Specular IOR Level'].default_value = .3
+    trans = nt.nodes.new('ShaderNodeBsdfTranslucent')
+    nt.links.new(base, trans.inputs['Color'])
+    mix = nt.nodes.new('ShaderNodeMixShader')
+    mix.inputs['Fac'].default_value = .3
+    nt.links.new(bsdf.outputs[0], mix.inputs[1])
+    nt.links.new(trans.outputs[0], mix.inputs[2])
+    nt.links.new(mix.outputs[0], out.inputs['Surface'])
+    mat.diffuse_color = _lin(*color)
+    return mat
+
+
 def glow(name, color, strength, diffuse):
     mat = bpy.data.materials.get(name) or bpy.data.materials.new(name)
     nt, bsdf, _ = _principled(mat)
@@ -365,7 +487,16 @@ wood(_mat('Climbing frame varnished pine'), (.64, .38, .14), (.36, .18, .06), 'z
 wood(_mat('Dark walnut'), (.20, .085, .038), (.075, .03, .013), 'x', 1.3, .26, .45)
 wood(_mat('Natural wicker'), (.36, .20, .085), (.17, .085, .035), 'x', 6, .7, 0, 1)
 wood(_mat('Exposed timber joists'), (.11, .05, .022), (.045, .02, .008), 'x', 1, .78, 0)
-wood(_mat('Garden tree bark'), (.22, .15, .09), (.08, .05, .028), 'z', 3, .95, 0)
+wood(_mat('Garden tree bark'), (.11, .085, .065), (.028, .022, .017), 'z', 2.0, .95, 0)
+foliage(_mat('Deciduous tree leaves'), (.12, .27, .06))
+foliage(_mat('Spruce needles'), (.04, .11, .05))
+for i in range(4):
+    foliage(_mat('Garden foliage %d' % i), [(.13, .25, .065), (.21, .34, .10), (.29, .37, .12), (.10, .20, .055)][i])
+siding(_mat('Pale blue-grey vinyl lap siding'), (.33, .40, .45))
+siding(_mat('Warm tan vinyl lap siding'), (.46, .39, .28))
+shake_cladding(_mat('Weathered dark cedar shakes'), (.16, .12, .09), (.045, .032, .024))
+shingle_roof(_mat('Brown asphalt roof shingles'), (.16, .105, .07))
+paint(_mat('Driveway charcoal asphalt'), (.11, .12, .13), .95, .4)
 
 # Painted walls, ceilings and trim.
 paint(_mat('Pale sage plaster'), (.58, .61, .51))
@@ -409,8 +540,8 @@ fabric(_mat('Light grey woven curtains'), (.57, .59, .56), .4)
 fabric(_mat('Charcoal patterned bedroom curtains'), (.20, .21, .23), .4)
 fabric(_mat('Rose bedroom curtains'), (.48, .17, .16), .4)
 translucent_shade(_mat('Warm linen lampshade'), (.85, .72, .48))
-carpet(_mat('Yard soft green lawn'), (.17, .30, .07), 0)
-carpet(_mat('Simple front lawn'), (.15, .24, .065), 0)
+lawn(_mat('Yard soft green lawn'), (.09, .23, .035), (.22, .28, .07))
+lawn(_mat('Simple front lawn'), (.09, .23, .035), (.22, .28, .07))
 
 # Basement play floor: the photographs show tan laminate planks, not bare slab.
 laminate = bpy.data.materials.new('Basement tan laminate planks')
@@ -523,7 +654,7 @@ sky.sun_rotation = math.pi
 sky.sun_intensity = 1
 sky.altitude = 120
 sky.air_density = 1
-sky.dust_density = 1.6
+sky.dust_density = .7
 sky.ozone_density = 1.2
 nt.links.new(sky.outputs['Color'], bg.inputs['Color'])
 bg.inputs['Strength'].default_value = 1.4
@@ -534,6 +665,7 @@ backdrop.inputs['Color'].default_value = (.62, .70, .80, 1)
 backdrop.inputs['Strength'].default_value = 1.0
 path = nt.nodes.new('ShaderNodeLightPath')
 mix = nt.nodes.new('ShaderNodeMixShader')
+mix.name = 'Camera backdrop mix'
 nt.links.new(path.outputs['Is Camera Ray'], mix.inputs['Fac'])
 nt.links.new(bg.outputs[0], mix.inputs[1])
 nt.links.new(backdrop.outputs[0], mix.inputs[2])
@@ -572,7 +704,7 @@ scene.view_settings.exposure = 0.0
 scene.view_settings.gamma = 1.0
 
 VIEW_EXPOSURE = {'kitchen': .15, 'kitchen_access': .15, 'overview': -.15, 'plan': -.15, 'upper_plan': -.15,
-                 'basement_plan': -.15, 'upper_overview': -.15, 'front_yard': -.7, 'back_yard': -.7, 'porch': -.5,
+                 'basement_plan': -.15, 'upper_overview': -.15, 'front_yard': -1.2, 'back_yard': -1.2, 'porch': -.8, 'street_front': -1.3, 'rear_elevation': -1.3,
                  'basement_play': .35, 'basement_office': .35, 'basement_laundry': .35,
                  'basement_entry': .35, 'garage': .2}
 
@@ -583,3 +715,6 @@ def photoreal_view(name, exterior):
     for light in STUDIO_LIGHTS:
         bpy.data.objects[light].hide_render = not exterior
     scene.view_settings.exposure = VIEW_EXPOSURE.get(name, 0.0)
+    # Outdoor views see the real sky; everything else gets the neutral backdrop.
+    outdoors = name in {'front_yard', 'back_yard', 'porch', 'street_front', 'rear_elevation'}
+    scene.world.node_tree.nodes['Camera backdrop mix'].mute = outdoors
