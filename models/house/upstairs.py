@@ -24,6 +24,7 @@ bedding = material('Clean ivory cotton bedding', (.84, .81, .71), .92, texture='
 curtainmat = material('Light grey woven curtains', (.57, .59, .56), .95, texture='fabric')
 darkcurtain = material('Charcoal patterned bedroom curtains', (.12, .14, .16), .94, texture='fabric')
 lavender = material('Ensuite muted mauve plaster', (.46, .37, .38), .9)
+greyrug = material('Cory light grey plush carpet', (.44, .43, .40), .95, texture='fabric')
 
 
 def partition(name, a, b, mat=bed_wall, openings=(), height=2.38):
@@ -235,8 +236,8 @@ upper_collection('20 | End bedroom furniture')
 # U7: the visible free end of the mattress is beside the ottoman; its long
 # edge follows the right window wall. The head is toward the entrance, hidden
 # by the near door jamb. It does not project across the middle of the rug.
-asset('End bedroom large cream rug',(6.15,-.1,.035),0,'U7')
-box('Cream area rug',(0,0,0),(2.85,3.65,.025),bedding,.012)
+asset('End bedroom large grey rug',(6.15,-.1,.035),0,'U7')
+box('Grey area rug',(0,0,0),(2.85,3.65,.025),greyrug,.012)
 bed('End bedroom single bed',(5.75,-1.55,.035),1.03,90,'U7',True)
 chest('End bedroom wooden desk drawers',(5.18,1.95,0),.95,.76,0,3,1,'U7')
 table('End bedroom writing desktop',(5.37,1.91,0),(1.4,.61,.79),oak,photos='U7')

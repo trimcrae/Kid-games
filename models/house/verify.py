@@ -11,7 +11,7 @@ bpy.ops.wm.open_mainfile(filepath=str(HERE / 'house.blend'))
 scene = bpy.context.scene
 inventory = json.loads((HERE / 'inventory.json').read_text(encoding='utf-8'))
 expected_hash = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in
-    ['build.py', 'upstairs.py', 'extensions.py', 'basement_garage.py', 'yard.py'])).hexdigest()
+    ['build.py', 'upstairs.py', 'extensions.py', 'basement_garage.py', 'yard.py', 'photoreal.py'])).hexdigest()
 assert scene['generator_sha256'] == expected_hash == inventory['generator_sha256'], 'Stale model'
 assert scene.unit_settings.system == 'METRIC'
 assert scene.camera.data.type == 'ORTHO'
