@@ -1,5 +1,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld} from './physics.mjs';
+import {createHouseLife} from './house-life.mjs';
+import {rooms} from './rooms.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -30,73 +32,51 @@ scene.add(new THREE.HemisphereLight(0xe8f2ff,0x9c8669,2.1));
 const sun=new THREE.DirectionalLight(0xffeed1,2.2);sun.position.set(-10,28,15);scene.add(sun);
 const fill=new THREE.DirectionalLight(0xd9e7ff,.65);fill.position.set(15,8,-15);scene.add(fill);
 
-// Positions are eye-independent floor coordinates in the Blender house plan.
-const rooms=[
-  ['Main floor','Front entry',5.65,.7,0,0],
-  ['Main floor','Living room',5.8,2.0,0,-1.25],
-  ['Main floor','Kitchen',2,6.8,0,1.4],
-  ['Main floor','Dining room',5.6,7.5,0,Math.PI],
-  ['Main floor','Sunroom',5.0,8.6,-.10,0],
-  ['Main floor','Garage',-.7,7.5,-.16,1.4],
-  ['Upstairs','Upstairs hall',11.5,4.01,1.26,-Math.PI/2],
-  ['Upstairs','Master bedroom',13.45,5.1,1.26,0],
-  ['Upstairs','Master bathroom',12.98,8.9,1.26,0],
-  ['Upstairs','Green bathroom',11.57,4.85,1.26,0],
-  ['Upstairs','Nursery',12.5,3.0,1.26,Math.PI],
-  ['Upstairs','End bedroom',15.8,4.1,1.26,-Math.PI/2],
-  ['Downstairs','Family room',10.3,2.7,-1.05,-Math.PI/2],
-  ['Downstairs','Shared bedroom entry',11.5,5.1,-1.05,0],
-  ['Downstairs','Pink-curtain bedroom',10.4,6.2,-1.05,Math.PI/2],
-  ['Downstairs','White-curtain bedroom',12.6,5.75,-1.05,-Math.PI/2],
-  ['Downstairs','Downstairs bathroom',11.5,7.0,-1.05,0],
-  ['Basement','Basement playroom',2.2,6.4,-3.15,Math.PI],
-  ['Basement','Basement office',5.7,6.55,-3.15,Math.PI/2],
-  ['Basement','Laundry',6.3,6.6,-3.15,0],
-  ['Outside','Front porch',6.6,-2.0,-.06,Math.PI],
-  ['Outside','Front yard',6.5,-5.9,-.82,Math.PI],
-  ['Outside','Back yard',5.1,13.5,-.82,0],
-];
-let world,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=0,eyeY=1.63,active=false,ready=false,failed=false;
+let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,eyeY=1.63,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},last=performance.now(),drag=null;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function teleport(room){
   const p=world.safeSpot(room[2],room[4],-room[3]);
   if(!p){$('hint').textContent='That starting point is unavailable. Choose a nearby room.';return false;}
-  player=p;yaw=room[5];pitch=0;eyeY=p.y+1.60;
+  Object.assign(player,p);yaw=room[5];pitch=-.18;eyeY=p.y+1.60;
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
-  $('hint').textContent='WASD to walk · Mouse to look · Esc for controls';
+  $('hint').textContent='WASD to walk · Drag to orbit · E for activities';
   render();return true;
 }
-function pause(){active=false;keys.clear();joy={x:0,y:0};document.exitPointerLock?.();welcome.hidden=false;start.textContent='Continue exploring';$('touch-controls').style.visibility='hidden';}
+function suspend(){active=false;keys.clear();endJoy();drag=null;document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
+function pause(){suspend();welcome.hidden=false;start.textContent='Continue exploring';}
 async function resume(){
-  if(!ready)return;active=true;welcome.hidden=true;$('rooms').hidden=true;
+  if(!ready)return;if(life&&!life.hasPet()){life.adopt();return;}active=true;welcome.hidden=true;$('rooms').hidden=true;
   $('rooms-button').setAttribute('aria-expanded','false');$('touch-controls').style.visibility='visible';canvas.focus();
-  if(matchMedia('(pointer:fine)').matches){try{await canvas.requestPointerLock();}catch{ $('hint').textContent='Drag to look · WASD to walk'; }}
+  $('hint').textContent='WASD to walk · Drag to orbit · E for activities';
 }
 function showRooms(show){
   $('rooms').hidden=!show;$('rooms-button').setAttribute('aria-expanded',String(show));
-  if(show){active=false;keys.clear();document.exitPointerLock?.();welcome.hidden=true;$('touch-controls').style.visibility='hidden';}
+  if(show){suspend();welcome.hidden=true;}
   else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();}
 }
 let section='';
 for(const room of rooms){
   if(room[0]!==section){section=room[0];const h=document.createElement('h3');h.textContent=section.toUpperCase();$('room-list').append(h);}
-  const b=document.createElement('button');b.textContent=room[1];bindButton(b,()=>{if(ready&&teleport(room)){showRooms(false);resume();}});$('room-list').append(b);
+  const row=document.createElement('div');row.className='room-row';row.dataset.room=room[1];
+  const b=document.createElement('button');b.textContent=room[1];b.setAttribute('aria-label','Jump to '+room[1]);bindButton(b,()=>{if(ready&&teleport(room)){showRooms(false);resume();}});row.append(b);$('room-list').append(row);
 }
 bindButton(start,()=>failed?location.reload():resume());bindButton($('pause-button'),pause);bindButton($('help'),pause);
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('reset'),()=>{if(ready){teleport(rooms[0]);resume();}});
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement&&active&&matchMedia('(pointer:fine)').matches)$('hint').textContent='Drag to look · WASD to walk · Controls to pause';});
 document.addEventListener('keydown',e=>{
+  if(!$('activity-panel').hidden||!$('family-panel').hidden)return;
   if(e.code==='Escape'){if(!$('rooms').hidden)showRooms(false);else pause();return;}
   if(!active)return;
+  if(e.code==='KeyE'){e.preventDefault();life?.interact();return;}
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){e.preventDefault();keys.add(e.code);}
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
 window.addEventListener('blur',()=>{keys.clear();joy={x:0,y:0};});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&ready)pause();});
-function look(dx,dy){yaw-=dx*.0026;pitch=THREE.MathUtils.clamp(pitch-dy*.0026,-1.4,1.4);}
+function look(dx,dy){yaw-=dx*.0026;pitch=THREE.MathUtils.clamp(pitch-dy*.0026,-.8,.4);}
 document.addEventListener('mousemove',e=>{if(active&&document.pointerLockElement===canvas)look(e.movementX,e.movementY);});
 canvas.addEventListener('pointerdown',e=>{if(!active)return;if(!document.pointerLockElement){drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);}});
 canvas.addEventListener('pointermove',e=>{if(active&&drag?.id===e.pointerId){look(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY;}});
@@ -107,24 +87,38 @@ joystick.addEventListener('pointerdown',e=>{if(!active)return;joyId=e.pointerId;
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
 function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-function render(){camera.position.set(player.x,eyeY,player.z);camera.rotation.set(pitch,yaw,0,'YXZ');renderer.render(scene,camera);}
+const cameraTarget=new THREE.Vector3(),cameraDesired=new THREE.Vector3();
+function render(){
+  cameraTarget.set(player.x,player.y+.65,player.z);
+  cameraDesired.set(player.x+Math.sin(yaw)*1.9*Math.cos(pitch),player.y+1.15-Math.sin(pitch)*1.9,player.z+Math.cos(yaw)*1.9*Math.cos(pitch));
+  const fraction=world?world.cameraFraction(cameraTarget,cameraDesired):1;
+  camera.position.copy(cameraTarget).lerp(cameraDesired,fraction);camera.lookAt(cameraTarget);
+  renderer.render(scene,camera);
+}
 function updateLocation(){
   let closest=null,d=Infinity;
   for(const r of rooms){const dist=Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12;if(dist<d){d=dist;closest=r;}}
   if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();}
 }
-let frames=0;
+let frames=0,lastDraw=0;
 function animate(now){
-  requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;
+  requestAnimationFrame(animate);
+  // Leave CPU/GPU time for the learning games and touch input. The paused
+  // house needs only a still backdrop; walking is capped at a steady 30 fps.
+  if(now-lastDraw<(active?1000/30:1000))return;lastDraw=now;
+  const dt=Math.min((now-last)/1000,.05);last=now;
   if(active&&world){
     let right=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
     let forward=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
     const n=Math.max(1,Math.hypot(right,forward));right/=n;forward/=n;
     const speed=(keys.has('ShiftLeft')||keys.has('ShiftRight')?3.1:1.9)*dt;
+    const before={x:player.x,z:player.z};
     world.move(player,(right*Math.cos(yaw)-forward*Math.sin(yaw))*speed,(-right*Math.sin(yaw)-forward*Math.cos(yaw))*speed);
+    life?.movement(player.x-before.x,player.z-before.z);
     eyeY=THREE.MathUtils.lerp(eyeY,player.y+1.6,reducedMotion?1:1-Math.exp(-dt*16));
     if(++frames%15===0)updateLocation();
   }
+  life?.tick(dt,now/1000,active);
   render();
 }
 async function load(){
@@ -141,10 +135,13 @@ async function load(){
         side:THREE.DoubleSide,transparent:g.glass,opacity:g.glass?.13:1,depthWrite:!g.glass});
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;scene.add(mesh);
     }
-    world=new WalkingWorld(data.colliders);ready=true;teleport(rooms[0]);
-    start.disabled=false;start.textContent='Start exploring';$('loading').textContent='Ready when you are';
+    world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
+    $('loading').textContent='Welcoming your Craepets…';
+    life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
+    ready=true;
+    start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},yaw,pitch,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();

@@ -1,11 +1,11 @@
 // Capsule-like upright walking against spatially indexed model bounds.
 // Coordinates match Three: Y up. Movement is split into small steps to prevent tunnelling.
 export class WalkingWorld {
-  constructor(boxes) {
+  constructor(boxes,{radius=.17,height=1.70}={}) {
     this.boxes = boxes;
     this.grid = new Map();
-    this.radius = .17;
-    this.height = 1.70;
+    this.radius = radius;
+    this.height = height;
     for (let i = 0; i < boxes.length; i++) {
       const b = boxes[i];
       for (let x = Math.floor(b.min[0]/2); x <= Math.floor(b.max[0]/2); x++)
@@ -68,5 +68,21 @@ export class WalkingWorld {
       }
     }
     return null;
+  }
+  // Swept sightline against the house bounds. Pull the orbit camera in before
+  // walls, ceilings and furniture; it must never show through another room.
+  cameraFraction(from,to) {
+    let fraction=1;
+    const a=[from.x,from.y,from.z],d=[to.x-from.x,to.y-from.y,to.z-from.z];
+    for(const b of this.boxes){
+      let near=0,far=fraction;
+      for(let axis=0;axis<3;axis++){
+        const lo=b.min[axis]-.055,hi=b.max[axis]+.055;
+        if(Math.abs(d[axis])<1e-8){if(a[axis]<lo||a[axis]>hi){far=-1;break;}}
+        else {let t1=(lo-a[axis])/d[axis],t2=(hi-a[axis])/d[axis];near=Math.max(near,Math.min(t1,t2));far=Math.min(far,Math.max(t1,t2));}
+      }
+      if(far>=near&&near>0)fraction=Math.min(fraction,Math.max(.04,near-.035));
+    }
+    return fraction;
   }
 }

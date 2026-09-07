@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="../games/craepets/">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🥚 Craepets</title>
+  <meta name="description" content="Adopt a Craepet and raise it in a painted valley: dress it up, give it a petpet, grant its wishes, read its diary, visit the family's houses and post them presents, bank your coins for interest, play Sky Catch, furnish a house, open a shop, spin the prize wheel and climb The Shade's Shadow Tower. Every coin is earned by learning something, at your own level." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥚</text></svg>" />
+  <meta name="theme-color" content="#5ec6a8" />
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <!-- the handwriting for the diary and the Quest Board posters (falls back to the system's if offline) -->
+  <style>
+    /* ===========================================================
+       CRAEPETS — the valley's own styles.
+       Everything here sits on top of the shared arcade stylesheet.
+       =========================================================== */
+    .cp-wrap { max-width: 820px; margin: 0 auto; padding: 0 0.75rem 4rem; }
+    .cp-head { max-width: 820px; margin: 0 auto; padding: 0 0.75rem; }
+    .hud:empty { display: none; }
+    .hero { padding: 0.25rem 1rem 0.3rem; }
+    .subtitle { font-size: clamp(0.9rem, 2.6vw, 1.15rem); margin-top: 0.2rem; }
+    .title { font-size: clamp(1.5rem, 5vw, 2.6rem); }
+    .back-link { margin: 0.75rem 0 0; }
+    /* before you have adopted, the welcome panels sit in one middling column */
+    #game:not(.split) { max-width: 900px; margin: 0 auto; }
+
+    /* --- who's playing --- */
+    .who-row {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin-bottom: 0.55rem;
+    }
+    .who-row .who small { font-weight: normal; font-size: 0.75rem; }
+    .who {
+      font-family: var(--font); font-weight: bold; font-size: 0.95rem;
+      border: 3px solid var(--wc, var(--purple)); background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 0.35rem 0.85rem; cursor: pointer; min-height: 44px;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.12);
+      transition: transform 0.12s ease; touch-action: manipulation;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem;
+    }
+    .who:hover { transform: translateY(-2px); }
+    .who.on { background: var(--wc, var(--purple)); color: #fff; transform: translateY(-2px) scale(1.04); }
+    /* the chip can be a little taller than it is wide when the pet has a
+       hat on, so only the width is pinned */
+    .who img { width: 22px; height: auto; }
+
+    /* --- money / level bar --- */
+    .topbar {
+      display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+      background: #fff; border-radius: 999px; padding: 0.4rem 0.8rem; margin-bottom: 0.6rem;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.12); font-weight: bold;
+    }
+    .coins { color: #d99000; white-space: nowrap; }
+    .petname { color: var(--purple); flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lvl { background: var(--purple); color: #fff; border-radius: 999px; padding: 0.1rem 0.55rem; font-size: 0.85rem; }
+    .xp { flex: 1 1 90px; height: 9px; min-width: 70px; background: #eee6ff; border-radius: 999px; overflow: hidden; }
+    .xp i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--purple), var(--pink)); transition: width 0.4s ease; }
+
+    /* --- the scene the pet stands in --- */
+    .scene {
+      position: relative; border-radius: 22px; overflow: hidden;
+      /* --big is set inline by craepets.js: a high-level Craepet's room is
+         taller, so the pet can keep growing without being cropped. */
+      height: calc(clamp(180px, 38vw, 270px) * var(--big, 1)); margin-bottom: 0.5rem;
+      transition: height 0.2s ease;
+      background: linear-gradient(180deg, #bfe9ff 0%, #e8f7ff 55%, #a8dd8f 55%, #7cc464 100%);
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.5), 0 8px 22px rgba(43,36,64,0.14);
+      touch-action: manipulation;
+    }
+    /* The Nest is where you look at your Craepet; everywhere else the
+       question is the point, so the scene shrinks to a band and the
+       choices come up the screen. */
+    .scene.compact { height: calc(clamp(118px, 26vw, 172px) * var(--big, 1)); }
+    /* The home scene is painted from the wall and floor the player picked
+       (an inline gradient, set in craepets.js), so redecorating and moving
+       house are visible the moment you tap — not just a number on a panel.
+       This is only the fallback for a save that has no room yet. */
+    .scene.nest   { background: linear-gradient(180deg, #ffe9c9 0%, #fff6e8 55%, #d9a86a 55%, #b98549 100%); }
+    .scene.farm   { background: linear-gradient(180deg, #bfe9ff 0%, #e8f7ff 52%, #9bd97f 52%, #5fa845 100%); }
+    .scene.well   { background: linear-gradient(180deg, #3f4a7a 0%, #6b76ad 50%, #4a5382 50%, #2c3358 100%); }
+    .scene.pool   { background: linear-gradient(180deg, #ffe6fb 0%, #e5f6ff 50%, #8fe4ff 50%, #4bb8e8 100%); }
+    .scene.market { background: linear-gradient(180deg, #ffd9a8 0%, #fff2dd 52%, #c9906a 52%, #a06f4f 100%); }
+    .scene.arena  { background: linear-gradient(180deg, #ffc9c9 0%, #ffeaea 52%, #e0b489 52%, #bb8f65 100%); }
+    .scene.stall  { background: linear-gradient(180deg, #d8f0ff 0%, #f0faff 52%, #e2b57e 52%, #b9895a 100%); }
+    .scene canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; z-index: 3; }
+
+    /* --- the painted scenery (scenery.js) ---------------------------
+       The room is built in layers. Wall texture and floor texture are
+       CSS so the join between them lands on 55% exactly at every screen
+       shape; the view through the window and the outdoor panoramas are
+       inline SVG so circles stay circular. */
+    .scene .wall-tex, .scene .floor-tex {
+      position: absolute; left: 0; right: 0; pointer-events: none;
+      background-repeat: repeat; opacity: 0.85;
+    }
+    .scene .wall-tex  { top: 0; height: 55%; }
+    .scene .floor-tex { bottom: 0; height: 45%; opacity: 0.7; }
+    /* the line where the wall meets the floor — one skirting board is
+       the cheapest depth cue there is */
+    .scene .skirting {
+      position: absolute; left: 0; right: 0; bottom: 45%; height: 3px;
+      pointer-events: none; opacity: 0.7;
+    }
+    /* a soft pool of shade under the Craepet, so it stands on the floor
+       instead of hovering above it */
+    .scene .pet-shadow {
+      position: absolute; left: 50%; bottom: 42%; width: 34%; height: 5%;
+      transform: translateX(-50%); border-radius: 50%; z-index: 2;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.22), rgba(0,0,0,0) 70%);
+      pointer-events: none;
+    }
+    /* the panorama behind the outdoor places */
+    .scene .pano { position: absolute; inset: 0; pointer-events: none; }
+    .scene .pano-art { width: 100%; height: 100%; display: block; }
+
+    /* --- the window, and the view through it ---------------------- */
+    .scene .win {
+      /* Sized from its HEIGHT so the frame keeps its shape on a short
+         compact scene as well as a tall one — a window sized by width
+         turns into an oval the moment the scene gets shorter. */
+      position: absolute; right: 6%; bottom: 58%; height: 38%; width: auto;
+      aspect-ratio: 4 / 3;
+      overflow: hidden; pointer-events: none; z-index: 1;
+      box-shadow: 0 6px 16px rgba(43,36,64,0.28), inset 0 0 0 4px rgba(255,255,255,0.92);
+      border-radius: 6px;
+    }
+    .scene .win .view-art { width: 100%; height: 100%; display: block; }
+    /* a diagonal sheen, so it reads as glass rather than a hole */
+    .scene .win .win-glass {
+      position: absolute; inset: 0;
+      background: linear-gradient(122deg, rgba(255,255,255,0.28) 0 18%, rgba(255,255,255,0) 34%,
+                                          rgba(255,255,255,0.16) 46%, rgba(255,255,255,0) 62%);
+    }
+    /* the glazing bars */
+    .scene .win .win-bars {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(90deg, transparent calc(50% - 1.5px), rgba(255,255,255,0.92) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px)),
+        linear-gradient(0deg,  transparent calc(50% - 1.5px), rgba(255,255,255,0.92) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+    }
+    /* …and the shapes it comes in, which follow the house */
+    .scene .win-arch  { border-radius: 50% 50% 5px 5px / 42% 42% 5px 5px; }
+    .scene .win-arch .win-bars {
+      background: linear-gradient(0deg, transparent calc(42% - 1.5px), rgba(255,255,255,0.9) calc(42% - 1.5px) calc(42% + 1.5px), transparent calc(42% + 1.5px));
+    }
+    .scene .win-round, .scene .win-port { aspect-ratio: 1 / 1; border-radius: 50%; }
+    .scene .win-port {
+      box-shadow: 0 6px 16px rgba(43,36,64,0.35), inset 0 0 0 5px #c9ced9, inset 0 0 0 9px #8f97ad;
+    }
+    .scene .win-port .win-bars, .scene .win-round .win-bars { background: none; }
+    .scene .win-wide { aspect-ratio: 16 / 9; height: 30%; border-radius: 30px 30px 6px 6px / 18px 18px 6px 6px; }
+    .scene .win-hole {
+      aspect-ratio: 1 / 1; border-radius: 52% 48% 46% 54% / 50% 52% 48% 50%;
+      box-shadow: 0 6px 14px rgba(43,36,64,0.25), inset 0 0 0 5px rgba(150,110,60,0.55);
+    }
+    .scene .win-hole .win-bars, .scene .win-hole .win-glass { background: none; }
+    /* the compact scenes are barely a band, so the window shrinks with them */
+    .scene.compact .win { height: 32%; bottom: 61%; }
+
+    .scene .deco {
+      position: absolute; font-size: calc(clamp(1.3rem, 5vw, 2.3rem) * var(--s, 1));
+      left: calc(var(--x, 50) * 1%); bottom: calc(var(--y, 10) * 1%);
+      opacity: 0.95; pointer-events: none; user-select: none; z-index: 2;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 3px 4px rgba(0,0,0,0.15));
+    }
+    /* furniture standing on the floor gets a shadow pooled under it;
+       things that hang on the wall get one thrown down and sideways */
+    .scene .deco.furn::after {
+      content: ""; position: absolute; left: 50%; bottom: -6%; width: 100%; height: 26%;
+      transform: translateX(-50%); border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.3), rgba(0,0,0,0) 70%);
+    }
+    .scene .deco.hung { filter: drop-shadow(3px 5px 4px rgba(0,0,0,0.28)); }
+    /* the compact band is half the height, so everything in it comes down
+       a size — otherwise the furniture swamps the room */
+    .scene.compact .deco { font-size: calc(clamp(1rem, 3.6vw, 1.7rem) * var(--s, 1)); }
+    /* The room's name sits ABOVE the scenery: a view with something in the
+       top-left corner must never make the label unreadable. */
+    .scene .place-tag {
+      position: absolute; left: 10px; top: 8px; font-weight: bold; font-size: 0.85rem;
+      background: rgba(255,255,255,0.9); color: var(--ink); z-index: 5;
+      border-radius: 999px; padding: 0.15rem 0.65rem; pointer-events: none;
+    }
+    .scene.well .place-tag, .scene.arena .place-tag { background: rgba(255,255,255,0.9); }
+
+    /* --- the time of day ----------------------------------------------
+       The view through the window (and the outdoor panoramas) follow the
+       real clock: a warm wash at dusk, a pale one at dawn, and at night a
+       deep blue with a scatter of stars and a moon. At home the whole
+       room dims after dark, except for a pool of lamplight where the
+       Craepet stands. Purely a look — nothing in the game changes. */
+    .scene .tod { position: absolute; inset: 0; pointer-events: none; }
+    .scene .tod-dusk {
+      background: linear-gradient(180deg, rgba(255,140,80,0.28) 0%, rgba(255,90,130,0.18) 45%, rgba(90,40,110,0.22) 100%);
+    }
+    .scene .tod-dawn {
+      background: linear-gradient(180deg, rgba(255,205,150,0.30) 0%, rgba(255,240,220,0.10) 60%, rgba(255,255,255,0) 100%);
+    }
+    .scene .tod-night {
+      background:
+        radial-gradient(circle at 76% 22%, #fff6c8 0 7%, rgba(255,246,200,0.35) 8%, transparent 10%),
+        radial-gradient(circle at 14% 18%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 32% 34%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 52% 14%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 63% 40%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 88% 44%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 24% 52%, #fff 0 1px, transparent 2px),
+        radial-gradient(circle at 44% 28%, #fff 0 1px, transparent 2px),
+        linear-gradient(180deg, rgba(12,16,70,0.72) 0%, rgba(16,20,80,0.62) 55%, rgba(10,10,40,0.55) 100%);
+    }
+    /* the room after dark, lit by one lamp */
+    .scene .roomtint { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+    .scene .roomtint.tod-night {
+      background: radial-gradient(ellipse at 50% 68%, rgba(255,205,120,0.10) 0%, rgba(255,190,110,0) 26%, rgba(18,14,60,0.42) 62%);
+    }
+    .scene .roomtint.tod-dusk {
+      background: radial-gradient(ellipse at 50% 68%, rgba(255,190,110,0) 30%, rgba(120,50,90,0.18) 70%);
+    }
+    .scene .roomtint.tod-dawn { background: linear-gradient(180deg, rgba(255,220,180,0.14), rgba(255,255,255,0)); }
+
+    /* the pet's speech bubble */
+    .bubble {
+      position: absolute; left: 50%; top: 8px; transform: translateX(-50%);
+      max-width: 84%; background: #fff; color: var(--ink); font-weight: bold;
+      border-radius: 14px; padding: 0.35rem 0.7rem; font-size: 0.9rem; text-align: center;
+      box-shadow: 0 6px 14px rgba(43,36,64,0.2); pointer-events: none;
+      animation: pop-in 0.25s ease backwards;
+    }
+    .bubble::after {
+      content: ""; position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%);
+      border: 7px solid transparent; border-top-color: #fff; border-bottom: 0;
+    }
+    @keyframes pop-in { from { opacity: 0; transform: translateX(-50%) scale(0.85); } }
+
+    /* floating "+7 🪙" numbers */
+    .floaty {
+      position: absolute; font-weight: bold; font-size: 1.1rem; color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.45); pointer-events: none;
+      animation: rise 1s ease forwards;
+    }
+    @keyframes rise { to { transform: translateY(-60px); opacity: 0; } }
+
+    /* --- the four needs --- */
+    .needs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin-bottom: 0.6rem; }
+    .need { background: #fff; border-radius: 13px; padding: 0.25rem 0.3rem; box-shadow: 0 4px 12px rgba(43,36,64,0.1); text-align: center; }
+    .need b { display: block; font-size: 1rem; line-height: 1.1; }
+    .need span { display: block; height: 8px; border-radius: 999px; background: #eee; overflow: hidden; margin-top: 0.25rem; }
+    .need i { display: block; height: 100%; width: 50%; border-radius: 999px; transition: width 0.4s ease, background 0.4s ease; }
+    .need small { font-size: 0.62rem; color: #7d7699; }
+    .need span { margin-top: 0.2rem; height: 7px; }
+
+    /* --- where to go: two labelled rows, the valley and your own things --- */
+    .nav { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.65rem; }
+    .navrow { display: flex; flex-wrap: wrap; gap: 0.3rem; justify-content: center; align-items: center; }
+    .navlabel {
+      font-size: 0.62rem; font-weight: bold; letter-spacing: 0.08em; text-transform: uppercase; color: #9d97b5;
+      width: 100%; text-align: center; line-height: 1; margin-top: 0.15rem;
+    }
+    .helprow { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.4rem 0; border-bottom: 2px dashed #efeaff; font-size: 0.9rem; line-height: 1.4; }
+    .helprow:last-of-type { border-bottom: none; }
+    .helprow .em { font-size: 1.4rem; line-height: 1.2; flex: 0 0 auto; }
+    .helprow b { color: var(--purple); }
+    .nav button {
+      font-family: var(--font); font-weight: bold; font-size: 0.88rem;
+      border: 3px solid #dfd6ff; background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 0.3rem 0.6rem; cursor: pointer; touch-action: manipulation;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+      position: relative;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+    .nav button:hover { transform: translateY(-2px); }
+    .nav button.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+    .nav button .dot {
+      position: absolute; top: -4px; right: -4px; min-width: 17px; height: 17px;
+      border-radius: 999px; background: var(--pink); color: #fff;
+      font-size: 0.68rem; line-height: 17px; padding: 0 4px;
+    }
+    .nav button .dot.review { background: #ffb43d; }
+
+    /* --- panels --- */
+    .panel {
+      background: #fff; border-radius: 20px; padding: 0.9rem;
+      box-shadow: 0 8px 24px rgba(43,36,64,0.12); margin-bottom: 0.8rem;
+    }
+    .panel h2 { margin: 0 0 0.15rem; font-size: 1.15rem; }
+    .panel .sub { margin: 0 0 0.7rem; color: #6a6385; font-size: 0.9rem; }
+
+    /* --- the question card (shared by farm, well, pool and arena) --- */
+    .qcard { text-align: center; }
+    .qprompt { font-size: clamp(1rem, 3.4vw, 1.25rem); font-weight: bold; margin: 0 0 0.5rem; }
+    .qbig {
+      font-weight: bold; line-height: 1.05; margin: 0.2rem auto 0.7rem;
+      font-size: clamp(2.4rem, 12vw, 4.2rem); letter-spacing: 0.02em;
+      word-break: break-word;
+    }
+    .qbig.swatch {
+      width: clamp(84px, 26vw, 130px); height: clamp(84px, 26vw, 130px);
+      border-radius: 22px; border: 5px solid #fff; box-shadow: 0 8px 20px rgba(43,36,64,0.2);
+    }
+    .choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+    .choices.one-col { grid-template-columns: 1fr; }
+    .choice {
+      font-family: var(--font); font-weight: bold; font-size: 1.02rem;
+      min-height: 62px; padding: 0.55rem 0.6rem; cursor: pointer; touch-action: manipulation;
+      border: 4px solid #e6dfff; border-radius: 18px; background: #fff; color: var(--ink);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem;
+      transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+      word-break: break-word;
+    }
+    .choice:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--purple); }
+    .choice .pic { font-size: 2.3rem; line-height: 1; }
+    .choice .huge { font-size: 2.6rem; line-height: 1; }
+    .choice .paint { width: 100%; height: 46px; border-radius: 12px; border: 3px solid rgba(0,0,0,0.12); }
+    .choice.right { background: #dcffe8; border-color: var(--green); animation: shake-yes 0.4s ease; }
+    .choice.wrong { background: #ffe4e8; border-color: var(--pink); animation: shake-no 0.4s ease; }
+    .choice:disabled { cursor: default; opacity: 0.95; }
+    /* After two misses at the Tiny level the right one starts to glow,
+       so a toddler is never stuck. */
+    /* The glow pulses, it does NOT move: a target that keeps sliding away
+       is harder for a small finger, not easier. */
+    .choice.hint { border-color: var(--green); animation: nudge 1.1s ease-in-out infinite; }
+    @keyframes nudge {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(61,220,132,0.55); background: #fff; }
+      50%      { box-shadow: 0 0 0 9px rgba(61,220,132,0); background: #e8fff1; }
+    }
+    @keyframes shake-yes { 50% { transform: scale(1.07); } }
+    @keyframes shake-no { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+    /* The number that answers this choice from the keyboard. Only shown
+       where there probably IS a keyboard — it would only clutter a phone. */
+    .choice .keycap { display: none; }
+    @media (hover: hover) and (pointer: fine) {
+      .choice { position: relative; }
+      .choice .keycap {
+        display: block; position: absolute; top: 5px; left: 7px;
+        font-size: 0.68rem; font-weight: bold; color: #a9a2c4;
+        border: 2px solid #ece6ff; border-radius: 6px; min-width: 17px; line-height: 15px;
+      }
+      .choice.right .keycap { color: #2f8f5b; border-color: #a9e9c4; }
+      .choice.wrong .keycap { color: #b3405a; border-color: #ffc2cd; }
+    }
+
+    /* "you have seen this one before" */
+    .second-look {
+      display: inline-block; margin: 0 auto 0.5rem; padding: 0.25rem 0.7rem;
+      background: #fff2dd; color: #94530b; border-radius: 999px;
+      font-size: 0.8rem; font-weight: bold;
+    }
+    /* …and the two the question tracker adds: brand new ground, or a
+       question you have met before and the count of how often. */
+    .second-look.brand-new  { background: #e2f8e8; color: #1f7a44; }
+    .second-look.seen-before { background: #eae4ff; color: #5b3fa8; }
+    /* …and the heat: how hard this one is, and what it pays */
+    .second-look.heat-chip { background: #fff0e0; color: #b3500b; }
+    .second-look.step-up   { background: #e6f0ff; color: #2b57b3; }
+    .heatline b { color: #b3500b; }
+    .teach i { font-style: normal; display: block; margin-top: 0.35rem; color: #7a7196; }
+
+    /* how much of the hand-written vault you have met */
+    .vaultbar {
+      height: 10px; background: #ece7f8; border-radius: 999px; overflow: hidden; margin-top: 0.7rem;
+    }
+    .vaultbar i {
+      display: block; height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--purple), var(--pink));
+    }
+
+    /* the little painted thumbnail on each view in the Decorate tab */
+    .viewchip {
+      display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 10px;
+      overflow: hidden; margin-bottom: 0.35rem;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,0.8), 0 2px 6px rgba(43,36,64,0.16);
+    }
+    .viewchip svg { width: 100%; height: 100%; display: block; }
+
+    /* the Market's labelled shelves */
+    h3.shelf {
+      margin: 1.1rem 0 0.1rem; font-size: 1rem; color: var(--ink);
+      display: flex; align-items: baseline; gap: 0.4rem;
+    }
+    h3.shelf small { font-weight: normal; color: #8b83a8; font-size: 0.8rem; }
+    .shelfnote { margin: 0 0 0.5rem; font-size: 0.82rem; }
+
+    /* the day-streak dots on the quest board */
+    .daydots { text-align: center; font-size: 1.05rem; letter-spacing: 0.08em; margin: 0.2rem 0 0.7rem; }
+    .daydots b { display: block; letter-spacing: normal; font-size: 0.9rem; color: var(--purple); margin-top: 0.2rem; }
+
+    /* the little 🔊 button that lives in the money bar */
+    .mini {
+      font-family: var(--font); font-size: 1rem; line-height: 1;
+      border: 2px solid #ece6ff; background: #fff; border-radius: 12px;
+      min-width: 42px; min-height: 42px; cursor: pointer; touch-action: manipulation;
+      padding: 0.15rem 0.35rem;
+    }
+    .mini[aria-pressed="true"] { background: var(--purple); border-color: var(--purple); }
+
+    .teach {
+      margin: 0.7rem 0 0; padding: 0.6rem 0.75rem; border-radius: 14px; font-size: 0.95rem;
+      background: #f4f0ff; color: #46406b; text-align: left;
+    }
+    .teach b { color: var(--purple); }
+
+    .streak { font-weight: bold; color: #d9600b; font-size: 0.9rem; min-height: 1.1em; }
+
+    /* --- item grids (bag, market) --- */
+    .items { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 0.55rem; }
+    .item {
+      background: #fdfcff; border: 3px solid #ece6ff; border-radius: 16px; padding: 0.5rem 0.35rem;
+      text-align: center; font-family: var(--font); color: var(--ink); cursor: pointer;
+      touch-action: manipulation; transition: transform 0.12s ease, border-color 0.12s ease;
+      display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+    }
+    .item:hover:not(:disabled) { transform: translateY(-3px); border-color: var(--purple); }
+    .item:disabled { opacity: 0.45; cursor: default; }
+    .item .pic { font-size: 2rem; line-height: 1.1; }
+    .item .nm { font-size: 0.8rem; font-weight: bold; line-height: 1.15; }
+    .item .price { font-size: 0.78rem; color: #d99000; font-weight: bold; }
+    .item .own { font-size: 0.72rem; color: #6a6385; }
+    .item .what { font-size: 0.68rem; color: #6a6385; line-height: 1.2; opacity: 0.9; }
+    .item .brushdot { width: 34px; height: 34px; border-radius: 10px; border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+    /* A wall or a floor is a colour, not an emoji: show the actual paint. */
+    .item .paintchip {
+      width: 100%; height: 40px; border-radius: 11px; border: 3px solid #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    }
+    /* The home you live in / the wall you are using. */
+    .item.here { border-color: var(--green); background: #f1fff6; }
+    /* Something only YOUR market is selling today. */
+    .item.rare { border-color: #ffc93d; background: #fffaef; }
+    .item.rare .nm::after { content: " 🌟"; }
+
+    /* --- the little row of tabs inside the House panel --- */
+    .subnav { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.8rem 0 0; }
+    .subnav button {
+      font-family: var(--font); font-weight: bold; font-size: 0.88rem;
+      border: 3px solid #dfd6ff; background: #fff; color: var(--ink);
+      border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer;
+      touch-action: manipulation; min-height: 42px;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+    .subnav button:hover { transform: translateY(-2px); }
+    .subnav button.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+    .subnav button:focus-visible { outline: 4px solid #2b2440; outline-offset: 3px; }
+
+    /* --- big friendly action buttons --- */
+    .acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.5rem; }
+    .act {
+      font-family: var(--font); font-weight: bold; font-size: 1rem; color: #fff;
+      border: none; border-radius: 18px; padding: 0.7rem 0.5rem; cursor: pointer;
+      background: var(--ac, var(--purple)); box-shadow: 0 6px 14px rgba(43,36,64,0.2);
+      touch-action: manipulation; transition: transform 0.12s ease; min-height: 58px;
+    }
+    .act:hover:not(:disabled) { transform: translateY(-3px); }
+    .act:active { transform: scale(0.97); }
+    .act:disabled { opacity: 0.5; cursor: default; }
+    .act .em { display: block; font-size: 1.5rem; line-height: 1.1; }
+
+    .ghost {
+      font-family: var(--font); font-weight: bold; font-size: 0.9rem; color: var(--purple);
+      background: #fff; border: 3px solid var(--purple); border-radius: 999px;
+      padding: 0.35rem 0.95rem; cursor: pointer; touch-action: manipulation;
+      min-height: 44px; min-width: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .ghost:hover { transform: translateY(-2px); }
+    /* Small, but never smaller than a small finger: 40px is the floor. */
+    .ghost.small {
+      font-size: 0.85rem; padding: 0.3rem 0.85rem; border-width: 2px;
+      min-height: 40px; display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* A visible ring for anyone driving this with a keyboard. */
+    .who:focus-visible, .nav button:focus-visible, .choice:focus-visible, .item:focus-visible,
+    .act:focus-visible, .ghost:focus-visible, .sw:focus-visible, .adopt:focus-visible,
+    .mini:focus-visible, .scene:focus-visible {
+      outline: 4px solid #2b2440; outline-offset: 3px;
+    }
+
+    /* --- adoption --- */
+    .adopt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 0.55rem; }
+    .adopt {
+      background: #fdfcff; border: 4px solid #ece6ff; border-radius: 18px; padding: 0.4rem;
+      cursor: pointer; text-align: center; font-family: var(--font); color: var(--ink);
+      transition: transform 0.12s ease, border-color 0.12s ease; touch-action: manipulation;
+    }
+    .adopt img { width: 100%; max-width: 82px; display: block; margin: 0 auto; }
+    .adopt b { display: block; font-size: 0.9rem; }
+    .adopt:hover, .adopt.on { transform: translateY(-3px); border-color: var(--purple); }
+    .adopt.on { background: #f4f0ff; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: center; }
+    .sw {
+      width: 46px; height: 46px; border-radius: 14px; border: 4px solid #fff; cursor: pointer;
+      box-shadow: 0 4px 10px rgba(43,36,64,0.2); touch-action: manipulation;
+      transition: transform 0.12s ease;
+    }
+    .sw:hover, .sw.on { transform: translateY(-3px) scale(1.08); border-color: var(--purple); }
+    .sw.locked { opacity: 0.35; }
+    .name-row { display: flex; gap: 0.4rem; justify-content: center; flex-wrap: wrap; align-items: center; }
+    .name-row input {
+      font-family: var(--font); font-size: 1.05rem; font-weight: bold; text-align: center;
+      border: 3px solid #ddd4ff; border-radius: 14px; padding: 0.45rem 0.6rem; width: min(220px, 70vw);
+      color: var(--ink);
+    }
+
+    /* --- the farm's harvest grid --- */
+    .plots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; margin-bottom: 0.6rem; }
+    .plot {
+      aspect-ratio: 1 / 1; border-radius: 10px; background: #e8f7dd; border: 2px solid #cfe9bd;
+      display: flex; align-items: center; justify-content: center; font-size: clamp(0.85rem, 3.4vw, 1.4rem);
+    }
+    .plot.full { background: #fff3cf; border-color: #ffd166; animation: pop-in 0.3s ease; }
+    .plot.well { background: #e9ecff; border-color: #c9d0f5; color: #9aa2cf; }
+    .plot.well.full { background: #fff3cf; border-color: #ffd166; }
+    .plot.pool { background: #e6f8ff; border-color: #bfe8f7; }
+    .plot.pool.full { background: #fdefff; border-color: #f0c2ff; }
+
+    /* --- arena --- */
+    .fighters { display: flex; align-items: flex-end; justify-content: space-between; gap: 0.5rem; }
+    .fighter { flex: 1 1 0; min-width: 0; text-align: center; position: relative; }
+    .fighter img { width: clamp(56px, 18vw, 90px); }
+    .fighter .hpbar { height: 12px; border-radius: 999px; background: #f0e9ff; overflow: hidden; margin-top: 0.2rem; }
+    .fighter .hpbar i { display: block; height: 100%; background: linear-gradient(90deg, #3ddc84, #9ff0a8); transition: width 0.4s ease; }
+    .fighter.foe .hpbar i { background: linear-gradient(90deg, #ff5d6c, #ffa1a8); }
+    .fighter b { font-size: 0.9rem; display: block; }
+    .fighter small { color: #6a6385; font-size: 0.75rem; }
+    .fighter .hpnum { display: block; font-size: 0.7rem; }
+    .vs { font-weight: bold; color: var(--purple); font-size: 1.1rem; padding-bottom: 1.4rem; }
+    /* the blows: the attacker lunges, the other one reels — once per turn */
+    .fighter.lunge img { animation: lunge 0.45s ease; }
+    .fighter.foe.lunge img { animation: lunge-left 0.45s ease; }
+    .fighter.hit img { animation: hurt 0.5s ease; }
+    .fighter.heal img { animation: heal-glow 0.7s ease; }
+    @keyframes lunge { 30% { transform: translateX(22px) scale(1.08); } }
+    @keyframes lunge-left { 30% { transform: translateX(-22px) scale(1.08); } }
+    @keyframes hurt {
+      20%, 60% { transform: translateX(-6px); filter: brightness(1.7) saturate(0.2); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    @keyframes heal-glow { 40% { filter: drop-shadow(0 0 10px #3ddc84) brightness(1.2); } }
+    .fighter .dmg {
+      position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+      font-weight: bold; color: #ff5d6c; font-size: 1.15rem; pointer-events: none;
+      text-shadow: 0 2px 3px rgba(0,0,0,0.25); animation: rise 1.1s ease forwards;
+    }
+    .fighter .dmg.crit { color: #ff9f1a; font-size: 1.5rem; }
+    .fighter.shade img { filter: drop-shadow(0 0 10px #8a5cff); }
+    .fighter.shade.dark img { filter: drop-shadow(0 0 16px #ff5d8f) brightness(0.8); }
+    /* three right in a row fills the pips; the fourth is a critical */
+    .charge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.72rem; font-weight: bold; color: #d99000; margin-top: 0.2rem; }
+    .charge i { width: 10px; height: 10px; border-radius: 50%; background: #efeaff; border: 2px solid #e0d6ff; }
+    .charge i.on { background: #ffd166; border-color: #ffb43d; }
+    .charge.ready i.on { animation: nudge 0.9s ease-in-out infinite; }
+    .allychip {
+      display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; font-weight: bold;
+      background: #f4f0ff; color: var(--purple); border-radius: 999px; padding: 0.1rem 0.45rem; margin-top: 0.2rem;
+      /* a long pet name must not spill out of the fighter's column on a phone */
+      max-width: 100%; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .allychip .dots { letter-spacing: -1px; font-size: 0.6rem; }
+    .allychip img { width: 18px; }
+    .trick { display: inline-block; font-size: 0.72rem; font-weight: bold; background: #2b2440; color: #ffd166; border-radius: 999px; padding: 0.1rem 0.55rem; margin-top: 0.25rem; }
+    .foesays {
+      margin: 0 auto 0.5rem; max-width: 90%; text-align: center; font-style: italic; font-size: 0.9rem;
+      color: #46406b; background: #f4f0ff; border-radius: 14px; padding: 0.35rem 0.7rem;
+    }
+    .arena-panel.in-tower .foesays { background: #2b2440; color: #e9e2ff; }
+    /* The Shade's Time Squeeze: the bar drains, the timeout lands */
+    .timerbar { height: 10px; border-radius: 999px; background: #ffe4e8; overflow: hidden; margin: 0.2rem 0 0.6rem; }
+    .timerbar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #ff5d6c, #ffb43d); animation: drain linear forwards; }
+    @keyframes drain { from { width: 100%; } to { width: 0%; } }
+
+    /* --- the Shadow Tower --- */
+    .panel.tower { background: linear-gradient(180deg, #2b2440, #3a2f5c); color: #f2eefc; }
+    .panel.tower h2, .panel.tower .sub { color: #f2eefc; }
+    .panel.tower .sub b { color: #ffd166; }
+    .panel.tower .teach { background: rgba(255,255,255,0.12); color: #f2eefc; }
+    .panel.tower .teach b { color: #ffd166; }
+    .panel.tower .who { background: rgba(255,255,255,0.1); color: #fff; }
+    .panel.tower .who.on { background: var(--wc, var(--purple)); }
+    .panel.tower .ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,0.55); }
+    .rankchip {
+      display: inline-block; font-size: 0.8rem; vertical-align: middle; margin-left: 0.4rem;
+      background: rgba(255,255,255,0.18); border-radius: 999px; padding: 0.1rem 0.6rem;
+    }
+    .foecard { display: flex; align-items: center; gap: 0.7rem; background: rgba(255,255,255,0.1); border-radius: 16px; padding: 0.55rem 0.7rem; }
+    .foecard img { width: 72px; flex: 0 0 auto; filter: drop-shadow(0 0 8px rgba(160,120,255,0.6)); }
+    .foecard b { display: block; font-size: 1.05rem; }
+    .foecard small { display: block; font-size: 0.78rem; opacity: 0.85; line-height: 1.3; }
+    .foecard .price { display: block; margin-top: 0.15rem; color: #ffd166; font-weight: bold; font-size: 0.85rem; }
+    .foecard.boss { background: rgba(0,0,0,0.3); box-shadow: inset 0 0 0 2px #8a5cff; }
+    .foecard.boss img { filter: drop-shadow(0 0 12px #8a5cff); }
+    ul.rules { margin: 0; padding-left: 1.2rem; color: #46406b; font-size: 0.92rem; line-height: 1.45; }
+    ul.rules li { margin-bottom: 0.25rem; }
+    .scene.tower { background: linear-gradient(180deg, #120f26 0%, #2b2450 55%, #241f40 55%, #17142c 100%); }
+    .scene.tower .place-tag { background: rgba(43,36,64,0.88); color: #ffd166; }
+
+    /* --- the wish --- */
+    .wish {
+      position: relative; margin: 0; padding: 0.65rem 3rem 0.65rem 0.8rem; border-radius: 16px;
+      background: linear-gradient(135deg, #fff4fb, #f0ecff); border: 3px dashed #e3d4ff;
+      font-size: 0.95rem; line-height: 1.4;
+    }
+    .wish .wtag { color: var(--purple); font-weight: bold; }
+    .wish b { font-size: 1.05rem; }
+    .wish small { display: block; margin-top: 0.3rem; color: #6a6385; font-size: 0.82rem; }
+    .wish .ghost.small { position: absolute; right: 0.5rem; top: 0.5rem; min-width: 40px; padding: 0.2rem 0.4rem; }
+    .wish.done { border-style: solid; border-color: #c9f2d8; background: #f1fff6; color: #46406b; padding-right: 0.8rem; }
+
+    /* --- the wardrobe's try-on pictures --- */
+    .item img.try { width: 64px; }
+    img.try.big { width: 112px; }
+
+    /* --- the diary --- */
+    h3.diaryday { margin: 1rem 0 0.3rem; font-size: 0.9rem; color: var(--purple); }
+    .entry {
+      display: flex; align-items: flex-start; gap: 0.55rem; padding: 0.5rem 0.4rem;
+      border-bottom: 2px dashed #efeaff; font-size: 0.95rem; line-height: 1.4;
+    }
+    .entry:last-child { border-bottom: none; }
+    .entry .em { font-size: 1.35rem; line-height: 1.2; flex: 0 0 auto; }
+    .entry .etx { flex: 1 1 auto; min-width: 0; }
+    .entry small { display: block; color: #8b83a8; font-size: 0.72rem; margin-top: 0.1rem; }
+    .entry.mine { background: #fff8e8; border-radius: 12px; border-bottom: none; margin-bottom: 0.2rem; }
+    .entry .mini { flex: 0 0 auto; }
+
+    /* --- the valley map --- */
+    .mapwrap { border-radius: 18px; overflow: hidden; box-shadow: inset 0 0 0 3px rgba(255,255,255,0.6), 0 8px 22px rgba(43,36,64,0.14); }
+    .valley { display: block; width: 100%; height: auto; }
+    .valley .mp { cursor: pointer; }
+    .valley .mp:focus-visible { outline: none; }
+    .valley .mp:focus-visible .mp-dot { stroke: #2b2440; stroke-width: 1.2; }
+    .valley .mp-shadow { fill: rgba(43,36,64,0.22); }
+    .valley .mp-dot { fill: #fff; stroke: #cdbfff; stroke-width: 0.7; transition: transform 0.12s ease; }
+    .valley .mp:hover .mp-dot { stroke: var(--purple); }
+    .valley .mp-emoji { font-size: 5.6px; pointer-events: none; }
+    .valley .mp-label {
+      font-family: var(--font); font-weight: bold; font-size: 2.7px; fill: #2b2440;
+      paint-order: stroke; stroke: #fff; stroke-width: 0.9px; stroke-linejoin: round; pointer-events: none;
+    }
+    .valley .mp.dark .mp-dot { fill: #2b2450; stroke: #8a5cff; }
+    .valley .mp.here .mp-dot { stroke: var(--green); stroke-width: 1.1; animation: map-here 1.4s ease-in-out infinite; }
+    @keyframes map-here { 50% { stroke-width: 1.8; } }
+    .valley .vm-path { fill: none; stroke: #f3e2bf; stroke-width: 1.3; stroke-dasharray: 1.6 1.2; stroke-linecap: round; }
+    .valley .mp.home .mp-dot { stroke-width: 1; }
+    .valley .mp.home .mp-label { font-size: 2.5px; }
+
+    /* --- the people behind the counters --- */
+    .npc {
+      display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.7rem; padding: 0.45rem 0.6rem;
+      background: #faf8ff; border: 3px solid #ece6ff; border-radius: 16px;
+    }
+    .npc img { width: 44px; height: auto; flex: 0 0 auto; }
+    .npc .npcsay { flex: 1 1 auto; min-width: 0; font-size: 0.9rem; line-height: 1.35; }
+    .npc .npcsay small { color: #8b83a8; font-weight: normal; }
+    .npc .npcsay i { display: block; color: #46406b; }
+    .npc .mini { flex: 0 0 auto; }
+    .panel.tower .npc { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .panel.tower .npc .npcsay i { color: #e9e2ff; }
+
+    /* --- pixel-art scenery, the sky layer, and crayon pages --- */
+    /* both sit in tree order with the weather, season and dusk tints (z-index 0, not the
+       pet canvas's 3), so the tint still falls over the view and the sky over the tint */
+    .scene .px-art { position: absolute; inset: 0; z-index: 0; image-rendering: pixelated; image-rendering: crisp-edges; object-fit: cover; }
+    .scene .sky-layer { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* when the WebGL sky is drawing the rain and snow, the CSS ones step aside */
+    .scene.has-sky .wx-rainy, .scene.has-sky .wx-snowy { display: none; }
+    .crayon-page { display: block; width: 100%; max-width: 520px; margin: 0.2rem auto 0.8rem; border-radius: 8px;
+      box-shadow: 0 4px 14px rgba(43,36,64,0.16); transform: rotate(-0.6deg); }
+    .crayon-poster { display: block; width: min(280px, 78%); margin: 0 auto 0.6rem; border-radius: 4px;
+      box-shadow: 0 4px 14px rgba(43,36,64,0.16); transform: rotate(1.2deg); }
+
+    /* --- the weather --- */
+    .scene .wx { position: absolute; inset: 0; pointer-events: none; }
+    .scene .wx-rainy {
+      background: repeating-linear-gradient(105deg, transparent 0 9px, rgba(255,255,255,0.45) 9px 10.5px);
+      animation: rain 0.55s linear infinite; opacity: 0.8;
+    }
+    @keyframes rain { to { background-position: 0 44px; } }
+    .scene .wx-cloudy { background: linear-gradient(180deg, rgba(120,130,150,0.28), rgba(120,130,150,0.12)); }
+    .scene .wx-snowy {
+      background:
+        radial-gradient(circle at 12% 20%, #fff 0 1.6px, transparent 2.4px),
+        radial-gradient(circle at 40% 60%, #fff 0 1.4px, transparent 2.2px),
+        radial-gradient(circle at 68% 30%, #fff 0 1.8px, transparent 2.6px),
+        radial-gradient(circle at 86% 74%, #fff 0 1.4px, transparent 2.2px),
+        radial-gradient(circle at 26% 84%, #fff 0 1.6px, transparent 2.4px),
+        radial-gradient(circle at 56% 8%, #fff 0 1.3px, transparent 2px);
+      background-size: 90px 90px; animation: snow 5s linear infinite; opacity: 0.9;
+    }
+    @keyframes snow { to { background-position: 14px 90px; } }
+    .scene .wx-windy::after, .scene .wx-windy::before {
+      content: "🍃"; position: absolute; top: 24%; left: -8%; font-size: 1.1rem; animation: blow 3.6s linear infinite;
+    }
+    .scene .wx-windy::before { top: 48%; font-size: 0.85rem; animation-duration: 2.7s; animation-delay: 1.1s; }
+    @keyframes blow { to { transform: translate(120vw, 18px) rotate(400deg); } }
+    .scene .wx-rainbow {
+      background: radial-gradient(circle at 72% 118%, transparent 46%, rgba(255,93,108,0.55) 47% 49.5%, rgba(255,159,69,0.55) 49.5% 52%,
+        rgba(255,216,99,0.55) 52% 54.5%, rgba(111,220,140,0.55) 54.5% 57%, rgba(87,196,255,0.55) 57% 59.5%, rgba(138,92,255,0.55) 59.5% 62%, transparent 62.5%);
+    }
+    .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 0.8rem; }
+    @media (prefers-reduced-motion: reduce) { .scene .wx-rainy, .scene .wx-snowy, .scene .wx-windy::after, .scene .wx-windy::before { animation: none; } }
+
+    /* --- the calendar: a garland for a holiday, the season in the air --- */
+    .scene .garland {
+      position: absolute; left: 0; right: 0; top: 0; z-index: 4; pointer-events: none;
+      display: flex; justify-content: space-around; padding: 4px 8px 0;
+      font-size: clamp(1rem, 4vw, 1.5rem); line-height: 1;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+    }
+    .scene .garland::before {
+      content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 0;
+      border-top: 2px dashed rgba(255,255,255,0.7); z-index: -1;
+    }
+    .scene .garland span { animation: sway 3s ease-in-out infinite; transform-origin: 50% -10px; }
+    .scene .garland span:nth-child(2n) { animation-delay: -1.5s; }
+    @keyframes sway { 50% { transform: rotate(6deg); } }
+    /* compact scenes still get the garland, a size smaller */
+    .scene.compact .garland { font-size: clamp(0.85rem, 3vw, 1.2rem); }
+    /* the place tag sits above the garland, so nudge the garland right of it */
+    .scene .garland { padding-left: 40%; }
+    .scene .sea { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+    .scene .sea-spring::after, .scene .sea-spring::before {
+      content: "🌸"; position: absolute; top: -10%; left: 20%; font-size: 0.9rem; opacity: 0.85;
+      animation: petal 7s linear infinite;
+    }
+    .scene .sea-spring::before { left: 62%; font-size: 0.7rem; animation-duration: 9s; animation-delay: -4s; }
+    @keyframes petal { to { transform: translate(-30px, 120%) rotate(300deg); } }
+    .scene .sea-autumn::after, .scene .sea-autumn::before {
+      content: "🍂"; position: absolute; top: -10%; left: 30%; font-size: 0.95rem; opacity: 0.9;
+      animation: petal 6s linear infinite;
+    }
+    .scene .sea-autumn::before { content: "🍁"; left: 72%; font-size: 0.75rem; animation-duration: 8s; animation-delay: -3s; }
+    /* winter: frost creeping in from the corners of the window, snow lying on the ground outdoors */
+    .scene .win .sea-winter {
+      background:
+        radial-gradient(circle at 0 0, rgba(255,255,255,0.75), rgba(255,255,255,0) 40%),
+        radial-gradient(circle at 100% 100%, rgba(255,255,255,0.6), rgba(255,255,255,0) 38%),
+        radial-gradient(circle at 100% 0, rgba(255,255,255,0.45), rgba(255,255,255,0) 30%);
+    }
+    .scene .pano .sea-winter { background: linear-gradient(180deg, rgba(255,255,255,0) 70%, rgba(255,255,255,0.55) 88%, rgba(255,255,255,0.7) 100%); }
+    .scene .sea-summer { background: linear-gradient(180deg, rgba(255,230,150,0.16), rgba(255,255,255,0) 50%); }
+    @media (prefers-reduced-motion: reduce) { .scene .garland span, .scene .sea-spring::after, .scene .sea-spring::before, .scene .sea-autumn::after, .scene .sea-autumn::before { animation: none; } }
+    /* --- celebrations --- */
+    .panel.party { background: linear-gradient(135deg, #fff0f6, #fff8e6); border: 3px solid #ffd166; }
+    .panel.party h2 { font-size: 1.3rem; }
+    .party .sleeps { font-size: 1.05rem; text-align: center; margin: 0.4rem 0 0; }
+    .party .sleeps b { font-size: 1.6rem; color: var(--purple); }
+
+    /* --- Memory Match --- */
+    .mgrid { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 0.5rem; perspective: 800px; }
+    .mcard {
+      aspect-ratio: 4 / 3.4; border: none; background: transparent; padding: 0; cursor: pointer;
+      font-family: var(--font); color: var(--ink); touch-action: manipulation; position: relative; min-height: 64px;
+    }
+    .mcard .inner {
+      position: absolute; inset: 0; transition: transform 0.35s ease; transform-style: preserve-3d; border-radius: 14px;
+    }
+    .mcard.up .inner, .mcard.done .inner { transform: rotateY(180deg); }
+    .mcard .back, .mcard .face {
+      position: absolute; inset: 0; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 0.2rem; box-sizing: border-box;
+      font-weight: bold; font-size: 0.95rem; text-align: center; line-height: 1.15; word-break: break-word;
+    }
+    .mcard .back { background: linear-gradient(135deg, #8a5cff, #e05fa8); color: #fff; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(43,36,64,0.2); }
+    .mcard .face { background: #fff; border: 3px solid #e6dfff; transform: rotateY(180deg); }
+    .mcard.done .face { background: #dcffe8; border-color: var(--green); }
+    .mcard .face .big { font-size: 1.7rem; }
+    .mcard .face .small { font-size: 0.72rem; }
+    .mcard .swatchcard { width: 70%; height: 70%; border-radius: 10px; border: 3px solid rgba(0,0,0,0.1); }
+    .mcard:focus-visible .inner { outline: 4px solid #2b2440; outline-offset: 2px; }
+    .pairlist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+    .pairlist .pair { background: #f4f0ff; border-radius: 999px; padding: 0.25rem 0.7rem; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 0.3rem; }
+    .pairlist .pair .big { font-size: 1.1rem; }
+    .pairlist .pair .swatchcard { display: inline-block; width: 18px; height: 18px; border-radius: 6px; }
+    .pairlist .eq { color: var(--purple); }
+    @media (prefers-reduced-motion: reduce) { .mcard .inner { transition: none; } }
+
+    /* --- the Valley Times --- */
+    .panel.times { background: linear-gradient(135deg, #fffdf5, #fff); border-top: 6px double #2b2440; }
+    .panel.times h2 small { font-weight: normal; font-size: 0.75rem; color: #8b83a8; margin-left: 0.4rem; }
+    .trow {
+      display: flex; align-items: center; gap: 0.55rem; width: 100%; box-sizing: border-box; text-align: left;
+      padding: 0.45rem 0.3rem; border: none; border-bottom: 2px dashed #efeaff; background: transparent;
+      font-family: var(--font); font-size: 0.9rem; color: var(--ink); line-height: 1.35;
+    }
+    button.trow { cursor: pointer; touch-action: manipulation; border-radius: 10px; }
+    button.trow:hover { background: #f4f0ff; }
+    .trow:last-child { border-bottom: none; }
+    .trow .tem { font-size: 1.3rem; line-height: 1.2; flex: 0 0 auto; }
+    .trow .ttx { flex: 1 1 auto; min-width: 0; }
+    .trow .tgo { color: var(--purple); font-weight: bold; font-size: 1.2rem; flex: 0 0 auto; }
+    .trow:focus-visible { outline: 4px solid #2b2440; outline-offset: 2px; }
+    /* --- family records --- */
+    .records .recchip { width: 28px; height: auto; flex: 0 0 auto; }
+
+    /* --- the egg --- */
+    .needs.egg { grid-template-columns: 1fr; }
+    .needs.egg .need { font-size: 0.9rem; padding: 0.5rem 0.8rem; text-align: left; }
+    .panel.eggpanel { background: linear-gradient(135deg, #fff8e8, #fff); }
+
+    /* --- first steps --- */
+    .panel.steps { background: linear-gradient(135deg, #f1fff6, #fff); }
+
+    /* --- Sky Catch --- */
+    #catch-canvas {
+      display: block; width: 100%; height: clamp(250px, 62vw, 360px); border-radius: 18px;
+      background: #bfe9ff; touch-action: none; cursor: ew-resize;
+      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.6), 0 8px 22px rgba(43,36,64,0.14);
+    }
+
+    /* --- petpets --- */
+    .item img.ppchip { width: 40px; }
+    img.ppchip.big { width: 96px; }
+    /* --- the bank --- */
+    .panel.bank { background: linear-gradient(135deg, #fffbe8, #fff); }
+
+    /* --- the photo booth --- */
+    img.photo {
+      width: 100%; max-width: 480px; border-radius: 14px; image-rendering: auto;
+      box-shadow: 0 8px 22px rgba(43,36,64,0.25); border: 4px solid #fff;
+    }
+    /* --- visiting --- */
+    .panel.visit { background: linear-gradient(135deg, #f4fbff, #fff); }
+    .fam .ghost.small + .ghost.small { margin-left: 0.25rem; }
+
+    /* --- the post --- */
+    .panel.post { background: linear-gradient(135deg, #fff5f9, #fff); box-shadow: 0 8px 24px rgba(255,93,143,0.18); }
+    .fam .ghost.small { margin-top: 0.35rem; font-size: 0.72rem; padding: 0.2rem 0.6rem; min-height: 36px; }
+
+    /* --- quest list --- */
+    .quest { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 2px dashed #efeaff; }
+    .quest:last-child { border-bottom: none; }
+    .quest .qtx { flex: 1 1 auto; min-width: 0; font-size: 0.92rem; }
+    .quest .bar { height: 8px; border-radius: 999px; background: #efeaff; overflow: hidden; margin-top: 0.2rem; }
+    .quest .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--green), #b6f5c9); transition: width 0.4s ease; }
+    .quest .rw { font-weight: bold; color: #d99000; font-size: 0.85rem; white-space: nowrap; }
+    .quest.done .qtx { text-decoration: line-through; color: #9d97b5; }
+
+    /* --- trophies + family board --- */
+    .trophies { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 0.5rem; }
+    .trophy { text-align: center; padding: 0.45rem 0.25rem; border-radius: 14px; background: #faf8ff; border: 3px solid #ece6ff; }
+    .trophy.locked { opacity: 0.35; filter: grayscale(1); }
+    .trophy .em { font-size: 1.7rem; display: block; line-height: 1.1; }
+    .trophy b { font-size: 0.75rem; display: block; }
+    .trophy small { font-size: 0.65rem; color: #6a6385; }
+
+    .family { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 0.5rem; }
+    .fam { text-align: center; padding: 0.5rem 0.3rem; border-radius: 16px; background: #faf8ff; border: 3px solid #ece6ff; }
+    .fam img { width: 54px; }
+    .fam b { display: block; font-size: 0.85rem; }
+    .fam small { display: block; font-size: 0.72rem; color: #6a6385; }
+    .fam.empty { opacity: 0.55; }
+
+    .statgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.45rem; }
+    .stat { background: #faf8ff; border-radius: 14px; padding: 0.45rem; text-align: center; }
+    .stat b { display: block; font-size: 1.2rem; color: var(--purple); }
+    .stat small { font-size: 0.7rem; color: #6a6385; }
+
+    /* --- sheet (feed / play / paint pickers) --- */
+    .sheet-back {
+      position: fixed; inset: 0; background: rgba(43,36,64,0.45); z-index: 40;
+      display: flex; align-items: flex-end; justify-content: center; padding: 0.75rem;
+      animation: fade 0.18s ease;
+    }
+    @keyframes fade { from { opacity: 0; } }
+    .sheet {
+      background: #fff; border-radius: 22px; padding: 0.9rem; width: min(560px, 100%);
+      max-height: 78vh; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+      animation: slide-up 0.22s ease;
+    }
+    @keyframes slide-up { from { transform: translateY(30px); opacity: 0; } }
+    .sheet h3 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+    .sheet .close { display: block; margin: 0.7rem auto 0; }
+    @media (min-width: 700px) { .sheet-back { align-items: center; } }
+
+    /* --- the daily prize wheel ---
+       Eight equal slices painted with one conic-gradient; the labels are
+       rotated out to the rim and then rotated back so they read straight. */
+    .wheelwrap {
+      --r: clamp(210px, 62vw, 280px);
+      position: relative; width: var(--r); height: var(--r);
+      margin: 0.5rem auto 0.2rem;
+    }
+    .wheel {
+      width: 100%; height: 100%; border-radius: 50%;
+      border: 7px solid #fff; box-sizing: border-box;
+      box-shadow: 0 10px 26px rgba(43,36,64,0.25), inset 0 0 0 3px rgba(43,36,64,0.08);
+    }
+    .wheel.spinning { transition: transform 4.1s cubic-bezier(0.15, 0.72, 0.13, 1); }
+    .wlabel {
+      position: absolute; left: 50%; top: 50%;
+      font-weight: bold; font-size: clamp(0.72rem, 2.8vw, 0.92rem); color: #2b2440;
+      white-space: nowrap; pointer-events: none;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .wheelpin {
+      position: absolute; left: 50%; top: -12px; transform: translateX(-50%);
+      font-size: 1.7rem; line-height: 1; color: var(--ink); z-index: 2;
+      filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+    }
+    .wheelhub {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: 46px; height: 46px; border-radius: 50%; background: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+      box-shadow: 0 3px 10px rgba(43,36,64,0.25);
+    }
+
+    /* --- toast --- */
+    .toast {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      background: var(--ink); color: #fff; font-weight: bold; font-size: 0.95rem;
+      padding: 0.55rem 1rem; border-radius: 999px; z-index: 60; max-width: 90vw; text-align: center;
+      /* A toast floats over everything, including an open sheet — and on a
+         phone the sheet's own Close button sits exactly where the toast
+         lands. Nothing ever taps a toast, so let taps go straight through
+         to whatever is underneath, the way the bubble and the floaty do. */
+      pointer-events: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: toast-in 0.25s ease;
+    }
+    @keyframes toast-in { from { transform: translate(-50%, 16px); opacity: 0; } }
+    @keyframes toast-down { from { transform: translate(-50%, -16px); opacity: 0; } }
+
+    .settings-row { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+    .settings-row .ghost.on { background: var(--purple); color: #fff; }
+    /* A picked option is a picked option wherever it is — the price sheet's
+       "how many?" row needs to show which number is chosen too. */
+    .ghost.on { background: var(--purple); color: #fff; border-color: var(--purple); }
+
+    /* ===========================================================
+       DESKTOP — most of the playing happens on a big screen, and there
+       the valley is laid out like a desktop game: a strip along the top
+       with the way back, the title, the money bar and who is playing; a
+       menu of places down the left that stays put; and, beside it, the
+       page for wherever you are. Each page starts with the room or the
+       place as a wide banner with the Craepet standing in it, the needs
+       under that, then everything the place offers laid out in full at
+       page width. The page scrolls like any page: nothing is boxed in,
+       nothing is cut off.
+       =========================================================== */
+    @media (min-width: 1000px) {
+      body.valley { padding-bottom: 2rem; }
+
+      /* THE HEADER STRIP: the way back | the title | the money bar | who */
+      .cp-head {
+        position: sticky; top: 0; z-index: 30; max-width: none; margin: 0;
+        display: flex; align-items: center; gap: 0.9rem; padding: 0.45rem 1.2rem;
+        background: rgba(255,255,255,0.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 2px 14px rgba(43,36,64,0.10);
+      }
+      .cp-head .back-link { margin: 0; padding: 0.42rem 0.9rem; }
+      .cp-head .hero { padding: 0; display: flex; align-items: baseline; gap: 0.6rem; margin-right: auto; }
+      .cp-head .title { font-size: 1.6rem; }
+      .cp-head .subtitle { font-size: 0.9rem; margin: 0; }
+      .cp-head .who-row { margin: 0; }
+      .cp-head .back-link, .cp-head .lvl, .cp-head .coins, .cp-head .who { white-space: nowrap; }
+      .hud .topbar { margin: 0; flex-wrap: nowrap; padding: 0.35rem 0.85rem; gap: 0.55rem; }
+      .hud .petname { flex: 0 1 auto; max-width: 160px; }
+      .hud .xp { flex: 0 0 110px; }
+      .hud .mini { min-width: 36px; min-height: 36px; }
+      @media (max-width: 1320px) {
+        .cp-head .subtitle { display: none; }
+        .cp-head .title { font-size: 1.45rem; }
+        .hud .petname { max-width: 120px; }
+        .hud .xp { flex-basis: 76px; }
+        .cp-head { gap: 0.7rem; }
+      }
+
+      /* THE PAGE: the menu down the left, the place beside it */
+      .cp-wrap { max-width: 1340px; padding: 1.1rem 1.4rem 3rem; }
+      #game.split {
+        display: grid; grid-template-columns: 224px minmax(0, 1fr); column-gap: 1.5rem; align-items: start;
+      }
+      .cp-main { min-width: 0; }
+
+      /* THE MENU: every place, in two groups, staying put as you scroll */
+      .nav {
+        position: sticky; top: 74px; margin: 0; padding: 0.6rem; gap: 0.5rem;
+        background: rgba(255,255,255,0.82); border-radius: 22px;
+        box-shadow: 0 8px 24px rgba(43,36,64,0.12);
+        max-height: calc(100vh - 86px); overflow-y: auto; scrollbar-width: thin;
+      }
+      .navrow { flex-direction: column; align-items: stretch; gap: 0.2rem; }
+      .navlabel { text-align: left; padding: 0.35rem 0.75rem 0.15rem; font-size: 0.66rem; }
+      .nav button {
+        display: flex; align-items: center; justify-content: flex-start; gap: 0.6rem;
+        width: 100%; padding: 0.5rem 0.75rem; min-height: 44px;
+        border: 3px solid transparent; border-radius: 14px; font-size: 0.98rem;
+        background: transparent; text-align: left;
+      }
+      .nav button .ic { font-size: 1.35rem; line-height: 1; width: 1.6rem; text-align: center; }
+      .nav button:hover { transform: none; background: #f4f0ff; border-color: transparent; }
+      .nav button.on { background: var(--purple); border-color: var(--purple); color: #fff; }
+      .nav button .dot { position: static; margin-left: auto; min-width: 20px; height: 20px; line-height: 20px; font-size: 0.74rem; }
+      @media (max-height: 760px) {
+        .nav { top: 66px; padding: 0.4rem; gap: 0.3rem; }
+        .navrow { gap: 0.1rem; }
+        .navlabel { padding: 0.25rem 0.7rem 0.1rem; }
+        .nav button { min-height: 35px; padding: 0.3rem 0.7rem; font-size: 0.9rem; }
+        .nav button .ic { font-size: 1.2rem; }
+      }
+
+      /* THE BANNER: the room or the place, the width of the page */
+      .scene, .scene.compact {
+        height: calc(clamp(300px, 36vh, 400px) * var(--big, 1)); margin-bottom: 0.7rem; border-radius: 26px;
+        box-shadow: inset 0 0 0 4px rgba(255,255,255,0.6), 0 12px 30px rgba(43,36,64,0.16);
+      }
+      /* the Nest is where you look at your Craepet: a little taller */
+      .scene.nest { height: calc(clamp(340px, 42vh, 460px) * var(--big, 1)); }
+      .scene.compact .win { height: 38%; bottom: 58%; }
+      .scene.compact .win-wide { height: 30%; }
+      .scene .deco, .scene.compact .deco { font-size: calc(clamp(1.5rem, 8cqh, 3rem) * var(--s, 1)); }
+      .scene, .scene.compact { container-type: size; }
+      .scene .garland, .scene.compact .garland { font-size: clamp(1.1rem, 5cqh, 1.9rem); }
+      .scene.compact .wx-windy::after, .scene.compact .wx-windy::before { font-size: 1.1rem; }
+      .scene .place-tag { font-size: 1rem; left: 14px; top: 12px; padding: 0.25rem 0.85rem; }
+      .bubble { font-size: 1.1rem; padding: 0.5rem 1rem; }
+      .floaty { font-size: 1.5rem; }
+
+      /* the needs, a strip under the banner */
+      .needs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+      .need { flex: 0 1 200px; padding: 0.35rem 0.6rem; }
+      .need b { font-size: 1.15rem; }
+      .need small { font-size: 0.72rem; }
+      .needs.egg .need { flex: 1 1 auto; padding: 0.6rem 0.9rem; font-size: 1rem; }
+
+      /* THE PAGE'S PANELS, in full, at page width */
+      .panel { border-radius: 26px; padding: 1.3rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 10px 28px rgba(43,36,64,0.12); }
+      .panel h2 { font-size: 1.45rem; }
+      .panel .sub { font-size: 1rem; }
+      .qprompt { font-size: 1.5rem; }
+      .qbig { font-size: 4.2rem; }
+      .choices { gap: 0.7rem; }
+      .choice { min-height: 78px; font-size: 1.22rem; border-radius: 20px; }
+      .choice .pic { font-size: 2.8rem; }
+      .teach { font-size: 1.05rem; padding: 0.75rem 0.95rem; }
+      .act { min-height: 66px; font-size: 1.08rem; }
+      .acts { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+      .items { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 0.65rem; }
+      .item .pic { font-size: 2.3rem; }
+      .plots { grid-template-columns: repeat(8, minmax(0, 88px)); gap: 0.45rem; }
+      .plot { font-size: 1.8rem; }
+      .sheet { width: min(680px, 100%); max-height: 84vh; }
+      #catch-canvas { height: 460px; }
+      .wheelwrap { --r: 320px; }
+      .crayon-page { max-width: 640px; }
+      .toast { font-size: 1.05rem; }
+    }
+
+    /* On a small phone every pixel above the question counts — but a
+       three-year-old's finger still needs something like 40px to land on,
+       so the nav gets shorter text, not a shorter button. */
+    @media (max-width: 430px) {
+      .nav button {
+        font-size: 0.82rem; padding: 0.3rem 0.6rem; border-width: 2px;
+        min-height: 40px; display: inline-flex; align-items: center;
+      }
+      .hero { padding: 0.15rem 1rem 0.2rem; }
+      .back-link { margin: 0.5rem 0.75rem 0; padding: 0.45rem 0.9rem; }
+      .topbar { padding: 0.3rem 0.7rem; }
+      .choice { min-height: 70px; }
+      .sw { width: 52px; height: 52px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bubble, .floaty, .sheet, .sheet-back, .toast, .choice.right, .choice.wrong,
+      .choice.hint, .fighter.lunge img, .fighter.foe.lunge img, .fighter.hit img,
+      .fighter.heal img, .fighter .dmg, .charge.ready i.on { animation: none; }
+      .wheel.spinning { transition: none; }
+      .who:hover, .nav button:hover, .choice:hover:not(:disabled), .item:hover:not(:disabled),
+      .act:hover:not(:disabled), .ghost:hover, .sw:hover, .adopt:hover { transform: none; }
+    }
+  </style>
+<link rel="stylesheet" href="../../house-test/activity.css">
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <!-- On a phone these stack: the way back, the name of the game, who is
+       playing. On a desktop they share one row, so the valley itself starts
+       near the top of the screen. -->
+  <div class="cp-head">
+    <a class="back-link" href="../../">← Back to the Arcade</a>
+    <header class="hero">
+      <h1 class="title"><span class="emo">🥚</span> Craepets</h1>
+      <p class="subtitle" id="tagline">Adopt a creature. Everything it eats, you learn.</p>
+    </header>
+    <!-- on a desktop the money bar is rendered here, in the header strip -->
+    <div id="hud" class="hud"></div>
+    <nav class="who-row" id="who-row" aria-label="Who's playing?"></nav>
+  </div>
+
+  <main class="cp-wrap">
+    <div id="game"></div>
+  </main>
+
+  <script src="art/manifest.js"></script>
+  <script src="pets.js"></script>
+  <script src="trivia.js"></script>
+  <script src="lines.js"></script>
+  <script src="scenery.js"></script>
+  <script src="sky.js"></script>
+  <script src="crayon.js"></script>
+  <script src="calendar.js"></script>
+  <script src="map.js"></script>
+  <script src="catch.js"></script>
+  <script src="match.js"></script>
+  <script src="data.js"></script>
+  <!-- which narration clips exist in audio/ (written by tools/build_audio.py) -->
+  <script src="audio/manifest.js"></script>
+  <script src="../../assets/js/voice.js"></script>
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
+  <script src="../../house-test/save-copy.js"></script>
+  <script src="../../house-test/engine.js"></script>
+</body>
+</html>

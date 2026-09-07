@@ -5,38 +5,43 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta name="theme-color" content="#172c2a">
-  <title>House · Walkthrough test</title>
+  <title>Craepets · At home</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f6861' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
 </head>
 <body>
-  <canvas id="view" aria-label="First-person house walkthrough" tabindex="0"></canvas>
+  <canvas id="view" aria-label="Third-person Craepets house. WASD or arrows to walk, drag to look, E to interact." tabindex="0"></canvas>
   <header class="topbar">
-    <div class="identity"><span class="mark">⌂</span><div><strong>House walkthrough</strong><small>FAMILY TEST BUILD</small></div></div>
-    <div class="actions"><button id="rooms-button" aria-expanded="false" aria-controls="rooms">Rooms <span>↗</span></button><button id="pause-button" aria-label="Pause and show controls">Ⅱ</button></div>
+    <div class="identity"><span class="mark">⌂</span><div><strong>Craepets at home</strong><small id="pet-status">HOUSE EDITION</small></div></div>
+    <div class="actions"><button id="family-button">Family</button><button id="rooms-button" aria-expanded="false" aria-controls="rooms">Rooms <span>↗</span></button><button id="pause-button" aria-label="Pause and show controls">Ⅱ</button></div>
   </header>
-  <div id="crosshair" aria-hidden="true"></div>
+  <div id="journey" hidden><span id="journey-text"></span><button id="cancel-journey" aria-label="Stop directions">×</button></div>
+  <div id="pet-needs" aria-label="Your pet's needs"></div>
+  <div id="pet-speech" role="status" aria-live="polite" hidden></div>
   <div class="location"><span class="dot"></span><span id="location">Front entry</span><small id="level">MAIN FLOOR</small></div>
   <aside id="rooms" hidden>
     <div class="panel-title"><h2>Go to a room</h2><button id="close-rooms" aria-label="Close rooms">×</button></div>
-    <p>Jump to a starting point, then explore on foot.</p>
+    <p>Choose “Walk here” for directions, or “Jump” for a quick trip. Approach a glowing room marker and press E or tap its activity.</p>
     <div id="room-list"></div>
     <button id="reset" class="reset">Return to the front entry</button>
   </aside>
   <main id="welcome" class="overlay">
     <section class="welcome-card">
-      <span class="eyebrow">A WALK AROUND HOME</span>
+      <span class="eyebrow">YOUR CRAEPET. YOUR HOUSE.</span>
       <h1>Come on in.</h1>
-      <p class="intro">Explore the house, head upstairs, or step out into the yard.</p>
-      <div class="instructions"><div><b>W A S D</b><span>Walk · arrow keys also work</span></div><div><b>Mouse</b><span>Look around · drag if needed</span></div><div><b>Shift / Esc</b><span>Walk faster / release the mouse</span></div></div>
-      <p class="touch-instructions">Use the left pad to walk. Drag the right side to look around.</p>
+      <p class="intro">Walk as your Craepet. Grow food in the yard, find words in the library, play downstairs, and meet the family along the way.</p>
+      <div class="instructions"><div><b>W A S D</b><span>Walk · arrow keys also work</span></div><div><b>Mouse</b><span>Orbit your pet · drag to look</span></div><div><b>E / Shift</b><span>Room activity / move faster</span></div></div>
+      <p class="touch-instructions">Use the left pad to walk. Drag the right side to look around. Tap an activity when you reach its room.</p>
       <button id="start" class="primary" disabled>Loading the house…</button>
       <p id="loading" role="status" aria-live="polite">Preparing the model</p>
-      <p class="study-note">Photo-based study · room sizes and yard distances are approximate.</p>
+      <p class="study-note">Learn maths, words, science and everyday care at every age. Existing Craepets saves are copied once; house progress saves separately. The original valley is still yours.</p>
     </section>
   </main>
+  <aside id="nearby" hidden aria-label="Activities in reach"><small id="nearby-room"></small><div id="nearby-actions"></div></aside>
+  <section id="family-panel" class="overlay" hidden><div class="welcome-card"><div class="panel-title"><h2>Who is playing?</h2><button id="close-family" aria-label="Close family">×</button></div><p>Each person controls their own Craepet and keeps their own progress.</p><div id="family-list"></div><p class="study-note" id="save-status">House saves stay separate from the original game.</p><a href="../games/craepets/">Visit the original Craepets valley ↗</a></div></section>
+  <section id="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activity-title" hidden><div class="activity-heading"><div><small id="activity-room"></small><h2 id="activity-title">Welcome</h2></div><button id="close-activity">Back to walking ↩</button></div><iframe id="activity-frame" title="Craepets room activity" src="activity.html"></iframe></section>
   <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div><span class="look-hint">DRAG TO LOOK</span></div>
-  <footer><span id="hint">Click the view to explore</span><button id="help">Controls</button></footer>
+  <footer><span id="hint">Walk to a glowing room marker</span><span id="weather-status"></span><div><button id="pet-button">Say hello</button> <button id="help">Controls</button></div></footer>
   <script type="module" src="walkthrough.js"></script>
 </body>
 </html>
