@@ -3,8 +3,9 @@
 **Paused at the user's request on September 6, 2026.** The current source,
 custom mesh, packed Blender scene, portrait and camera-test video are archived
 here. Automatic workflow triggers are disabled; both workflows now require
-manual dispatch. Local experiment caches and the extra Blender runtime were
-removed to recover disk space.
+manual dispatch. Tracked study assets were excluded from the local checkout.
+Automatic approval review blocked deletion of the local experiment cache and
+extra Blender runtime; those folders still require manual cleanup.
 
 The photorealistic-quality target remains unmet: the glasses, face silhouette,
 hand and food still show reconstruction defects. The archived video is an
