@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--render', action='store_true')
-parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom,lower_entry,kitchen_access,basement_entry,front_yard,back_yard')
+parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom,lower_entry,kitchen_access,basement_entry,front_yard,back_yard,street_front,rear_elevation')
 parser.add_argument('--samples', type=int, default=48)
 parser.add_argument('--preview-scale', type=int, default=100, help='Render percentage; use 50 for fast layout checks')
 args = parser.parse_args(ARGS)
@@ -947,6 +947,7 @@ exec(compile((HERE / 'upstairs.py').read_text(encoding='utf-8'), str(HERE / 'ups
 exec(compile((HERE / 'extensions.py').read_text(encoding='utf-8'), str(HERE / 'extensions.py'), 'exec'))
 exec(compile((HERE / 'basement_garage.py').read_text(encoding='utf-8'), str(HERE / 'basement_garage.py'), 'exec'))
 exec(compile((HERE / 'yard.py').read_text(encoding='utf-8'), str(HERE / 'yard.py'), 'exec'))
+exec(compile((HERE / 'exterior.py').read_text(encoding='utf-8'), str(HERE / 'exterior.py'), 'exec'))
 
 ceilings = collection('14 | Ceilings - hidden for dollhouse')
 asset('Main level ceilings', confidence='estimated 2.6m ceiling height')
@@ -1041,6 +1042,8 @@ camera('kitchen_access',(1.50,7.48,1.65),(-1.00,7.56,1.10),24)
 camera('basement_entry',(6.75,4.01,-1.53),(2.5,4.01,-2.20),18)
 camera('front_yard',(6.60,-3.42,1.55),(4.30,-12.5,.55),22)
 camera('back_yard',(4.65,12.70,1.10),(9.2,22.5,.55),20)
+camera('street_front',(0.0,-21.0,1.7),(8.5,-1.0,2.6),18)
+camera('rear_elevation',(2.0,21.0,1.7),(10.0,7.0,2.6),21)
 
 # Expose the model from the overview camera without deleting enclosure walls.
 for name in ['Family east wall above windows']:
@@ -1111,8 +1114,9 @@ def set_view(name):
     plan_labels.hide_render = name != 'plan'
     plan_labels.hide_viewport = name != 'plan'
     upper_labels.hide_render = upper_labels.hide_viewport = name != 'upper_plan'
+    elevation = name in {'street_front','rear_elevation'}
     for c in UPPER_COLLECTIONS:
-        c.hide_render = c.hide_viewport = not (upper_view or name in {'overview','stairs'})
+        c.hide_render = c.hide_viewport = not (upper_view or elevation or name in {'overview','stairs'})
     upper_ceilings.hide_render = upper_ceilings.hide_viewport = not (upper_view or name == 'stairs') or exterior
     for c in scene.collection.children:
         if c.name[:2].isdigit() and int(c.name[:2]) <= 13:
@@ -1132,9 +1136,9 @@ def set_view(name):
         n=int(c.name[:2])
         visible = ((30 <= n <= 34 and (basement_view or name in {'overview','basement_stairs'})) or
                    (n == 31 and name in {'basement_stairs','plan','family','stairs'}) or
-                   (35 <= n <= 37 and name in {'overview','plan','garage','kitchen','kitchen_access'}) or
+                   (35 <= n <= 37 and (elevation or name in {'overview','plan','garage','kitchen','kitchen_access'})) or
                    (n == 38 and (basement_view or garage_view or name in {'overview','basement_stairs','kitchen','kitchen_access'})) or
-                   (n in {39,40} and (pink_view or name in {'overview','plan','family','lower_bedroom','lower_bathroom','lower_entry'})))
+                   (n in {39,40} and (pink_view or elevation or name in {'overview','plan','family','lower_bedroom','lower_bathroom','lower_entry'})))
         c.hide_render = c.hide_viewport = not visible
     basement_ceiling.hide_render = basement_ceiling.hide_viewport = not (basement_view or name == 'basement_stairs') or name == 'basement_plan'
     stair_soffit=bpy.data.objects['Basement staircase sloped ceiling']
@@ -1144,6 +1148,7 @@ def set_view(name):
     pink_ceiling.hide_render = pink_ceiling.hide_viewport = not (pink_view or name == 'lower_entry')
     basement_labels.hide_render = basement_labels.hide_viewport = name != 'basement_plan'
     yard_collection.hide_render = yard_collection.hide_viewport = name in {'plan','upper_plan','basement_plan'}
+    EXTERIOR.hide_render = EXTERIOR.hide_viewport = exterior or upper_view or basement_view or garage_view or pink_view
     if basement_view or garage_view or pink_view:
         for c in scene.collection.children:
             if c.name[:2].isdigit() and int(c.name[:2]) < 30 and int(c.name[:2]) != 15:
@@ -1162,7 +1167,7 @@ scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
 scene['source_photos'] = 'Four user sets: original 1-10; upstairs U1-U10; additional V1-V10; basement/garage W1-W10. Private references not packed or committed.'
 scene['content_policy'] = 'Furniture retained; loose clutter, people, readable personal items omitted.'
-source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','photoreal.py']
+source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','exterior.py','photoreal.py']
 scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()
 scene['confirmed_upstairs_orientation'] = 'Hall straight from stairs (+X); green bathroom left (+Y). Primary left, nursery right, end bedroom ahead.'
 scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X. Main 0; porch -.10; family -1.05; upper landing +1.26 m.'

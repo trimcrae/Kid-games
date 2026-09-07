@@ -6,7 +6,6 @@ yard_collection = collection('42 | Front and back yards')
 lawn = material('Yard soft green lawn', (.19,.30,.085), .98, texture='fabric')
 leaves = [material('Garden foliage '+str(i), c, .95) for i,c in enumerate([
     (.13,.25,.065),(.21,.34,.10),(.29,.37,.12),(.10,.20,.055)])]
-bark = material('Garden tree bark',(.20,.14,.08),.98,texture='wood')
 mulch = material('Garden dark mulch',(.12,.085,.047),.99,texture='stone')
 asphalt = material('Driveway charcoal asphalt',(.13,.15,.16),.98,texture='stone')
 shedmat = material('Shed taupe resin',(.49,.43,.38),.8)
@@ -28,27 +27,165 @@ box('East side lawn',(21,5,yard_z-.10),(4,14,.20),lawn)
 box('Rear east lawn',(16,10.7,yard_z-.10),(17,2.6,.20),lawn)
 box('Rear west lawn',(-3,10.7,yard_z-.10),(7.6,2.6,.20),lawn)
 
+leafmat = material('Deciduous tree leaves', (.12, .27, .06), .6)
+bark = material('Garden tree bark',(.13,.10,.075),.98,texture='wood')
+
+
+def _leaf_mesh(name, leaves, rng, size, mat, export=True):
+    """One mesh of small diamond leaf clusters with no alpha textures. Trees
+    carry a dense mesh for the render and a coarse stand-in for the browser
+    export (``export=False`` marks the dense one)."""
+    verts, faces = [], []
+    for centre, normal in leaves:
+        n = Vector(normal).normalized()
+        u = n.cross(Vector((0, 0, 1)) if abs(n.z) < .9 else Vector((1, 0, 0))).normalized()
+        v = n.cross(u)
+        r = size * rng.uniform(.7, 1.3)
+        base = len(verts)
+        spin = rng.uniform(0, math.tau)
+        for k in range(4):
+            a = spin + k * math.tau / 4
+            verts.append(tuple(centre + (u * math.cos(a) + v * math.sin(a)) * r * (1 if k % 2 else .7)))
+        faces.append(tuple(range(base, base + 4)))
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    obj = finish(bpy.data.objects.new(name, mesh), name, mat)
+    obj['export'] = export
+    for poly in mesh.polygons:
+        poly.use_smooth = False
+    return obj
+
+
+def _branch_curve(name, splines, mat):
+    data = bpy.data.curves.new(name, 'CURVE')
+    data.dimensions = '3D'
+    data.bevel_depth = 1.0
+    data.bevel_resolution = 3
+    data.use_fill_caps = True
+    for pts in splines:
+        spl = data.splines.new('POLY')
+        spl.points.add(len(pts) - 1)
+        for point, (x, y, z, radius) in zip(spl.points, pts):
+            point.co = (x, y, z, 1)
+            point.radius = radius
+    data.materials.append(mat)
+    obj = bpy.data.objects.new(name, data)
+    COLL.objects.link(obj)
+    obj.parent = ROOT
+    return obj
+
+
 def shrub(name,pos,size,photo):
     asset(name,pos,photos=photo,confidence='planting observed; shape simplified')
-    sphere('Leafy shrub canopy',(0,0,size[2]*.45),size,leaves[len(ASSETS)%len(leaves)])
+    rng = random.Random(name)
+    sphere('Shrub inner mass',(0,0,size[2]*.45),(size[0]*.8,size[1]*.8,size[2]*.8),leaves[3])
+    leaves_out = []
+    count = int(110 * size[0] * size[2] / .2)
+    for _ in range(count):
+        d = Vector((rng.gauss(0, 1), rng.gauss(0, 1), rng.gauss(0, .8))).normalized()
+        c = Vector((d.x * size[0], d.y * size[1], size[2] * .45 + d.z * size[2]))
+        leaves_out.append((c, d + Vector((rng.uniform(-.5,.5), rng.uniform(-.5,.5), rng.uniform(-.3,.5)))))
+    _leaf_mesh('Shrub leaf clusters', leaves_out, rng, .10, leafmat)
 
-def tree(name,pos,height,width,photo,willow=False):
+
+def tree(name,pos,height,width,photo,trunk=.24,willow=False):
+    """Recursive limb tree: a curve of tapered branches and one mesh of leaf
+    clusters around the outer twigs. Species and sizes are approximate."""
     asset(name,pos,photos=photo,confidence='tree visible; species and size approximate')
-    cylinder('Tree trunk',(0,0,height*.32),.19,height*.64,bark,12,top=.10)
-    for i in range(7):
-        a=i*math.tau/7
-        x,y=math.cos(a)*width*.45,math.sin(a)*width*.45
-        rod('Tree branch',(0,0,height*.38),(x,y,height*.67),.065,bark)
-        sphere('Tree leafy crown',(x,y,height*.74+(i%2)*.45),(width*.58,width*.55,height*.23),leaves[i%4])
-        if willow:
-            for j in range(3):
-                sphere('Drooping leafy bough',(x*1.45,y*1.45,height*.50-j*.32),(.35,.35,height*.20),leaves[(i+j)%4])
+    rng = random.Random(name)
+    splines, leaves_out, dense = [], [], []
 
-tree('Front large shade tree',(10,-12,yard_z),7.6,3.3,'V5')
-tree('Front weeping tree',(4.2,-12.2,yard_z),5.6,2.5,'V5',True)
-tree('Rear left shade tree',(-3.0,21,yard_z),7.5,2.7,'1,2')
-tree('Rear lawn tree',(6.2,22,yard_z),7.2,2.5,'2,5')
-tree('Rear right screening tree',(20,20,yard_z),7.0,2.8,'3,4')
+    def branch(start, direction, length, radius, depth):
+        pts, cur, d = [], Vector(start), Vector(direction).normalized()
+        n = 6
+        for i in range(n + 1):
+            pts.append((cur.x, cur.y, cur.z, radius * (1 - .55 * i / n)))
+            wander = .28 if depth else .07
+            d = (d + Vector((rng.uniform(-wander, wander), rng.uniform(-wander, wander),
+                             rng.uniform(-.04, .22) if depth else rng.uniform(-.05, .05)))).normalized()
+            cur = cur + d * length / n
+        splines.append(pts)
+        if depth >= 3:
+            for x, y, z, _r in pts[1:]:
+                for _ in range(7):
+                    c = Vector((x, y, z)) + Vector((rng.uniform(-.5, .5), rng.uniform(-.5, .5), rng.uniform(-.3, .45)))
+                    leaves_out.append((c, Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-.2, 1)))))
+                for _ in range(26):
+                    c = Vector((x, y, z)) + Vector((rng.uniform(-.55, .55), rng.uniform(-.55, .55), rng.uniform(-.35, .5)))
+                    dense.append((c, Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-.2, 1)))))
+        if depth < 4:
+            for _ in range(rng.randint(3, 5) if depth == 0 else rng.randint(3, 4) if depth == 1 else rng.randint(2, 3)):
+                t = rng.uniform(.55, 1.0) if depth == 0 else rng.uniform(.3, 1.0)
+                idx = min(n, int(round(t * n)))
+                base = Vector(pts[idx][:3])
+                side = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(.15, .9))).normalized()
+                nd = (d * .55 + side).normalized()
+                if willow and depth >= 2:
+                    nd = (nd + Vector((0, 0, -.9))).normalized()
+                branch(base, nd, length * rng.uniform(.55, .74), radius * .5, depth + 1)
+
+    branch((0, 0, 0), (0, 0, 1), height * .34, trunk, 0)
+    # Fit the canopy to the observed width and height.
+    top = max(c.z for c, _ in leaves_out)
+    spread = max(math.hypot(c.x, c.y) for c, _ in leaves_out)
+    sx, sz = (width / 2) / spread, height / top
+    splines = [[(x * sx, y * sx, z * sz, r) for x, y, z, r in pts] for pts in splines]
+    leaves_out = [(Vector((c.x * sx, c.y * sx, c.z * sz)), n) for c, n in leaves_out]
+    dense = [(Vector((c.x * sx, c.y * sx, c.z * sz)), n) for c, n in dense]
+    _branch_curve('Tree trunk and limbs', splines, bark)
+    _leaf_mesh('Tree leaf clusters', leaves_out, rng, .21, leafmat).hide_render = True
+    _leaf_mesh('Tree render leaves', dense, rng, .085, leafmat, export=False)
+
+
+tree('Front large shade tree',(10,-12,yard_z),9.5,8.5,'V5,exterior',.42)
+needlemat = material('Spruce needles', (.05, .12, .06), .7)
+
+
+def conifer(name,pos,height,width,photo,trunk=.24):
+    """Spruce: straight trunk, whorls of slightly drooping branches that
+    shorten toward the tip, dense needle clusters (render) over coarse
+    clusters (browser export)."""
+    asset(name,pos,photos=photo,confidence='conifer visible; species and size approximate')
+    rng = random.Random(name)
+    splines, coarse, dense = [], [], []
+    splines.append([(0, 0, 0, trunk), (0, 0, height * .5, trunk * .55), (0, 0, height - .3, .03), (0, 0, height, .01)])
+    z = 1.1
+    while z < height - .7:
+        f = 1 - (z - .8) / (height - .8)
+        length = width / 2 * (.12 + .88 * f)
+        count = rng.randint(6, 8)
+        start = rng.uniform(0, math.tau)
+        for k in range(count):
+            a = start + k * math.tau / count + rng.uniform(-.15, .15)
+            d = Vector((math.cos(a), math.sin(a), 0))
+            pts = []
+            r = trunk * .25 * (.3 + .7 * f)
+            n = 5
+            for i in range(n + 1):
+                t = i / n
+                p = Vector((0, 0, z)) + d * length * t + Vector((0, 0, -.14 * length * math.sin(math.pi * t) + .10 * length * t * t))
+                pts.append((p.x, p.y, p.z, r * (1 - .85 * t)))
+                if i >= 1:
+                    for _ in range(16):
+                        c = p + Vector((rng.uniform(-.26, .26), rng.uniform(-.26, .26), rng.uniform(-.22, .1)))
+                        dense.append((c, Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(.3, 1)))))
+                    for _ in range(2):
+                        c = p + Vector((rng.uniform(-.25, .25), rng.uniform(-.25, .25), rng.uniform(-.2, .1)))
+                        coarse.append((c, Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(.3, 1)))))
+            splines.append(pts)
+        z += .36
+    for _ in range(40):
+        c = Vector((rng.uniform(-.25, .25), rng.uniform(-.25, .25), height - .6 + rng.uniform(0, .6)))
+        dense.append((c, Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 1))))
+    _branch_curve('Spruce trunk and branches', splines, bark)
+    _leaf_mesh('Spruce needle clusters', coarse, rng, .24, needlemat).hide_render = True
+    _leaf_mesh('Spruce render needles', dense, rng, .11, needlemat, export=False)
+
+
+tree('Rear left shade tree',(-3.0,21,yard_z),8.5,6.5,'1,2,exterior',.30)
+tree('Rear lawn tree',(6.2,22,yard_z),9.0,7.0,'2,5,exterior',.36)
+tree('Rear right screening tree',(20,20,yard_z),7.5,5.5,'3,4',.26)
+conifer('Front tall spruce',(14.6,-11.4,yard_z),12.5,5.2,'exterior')
 asset('Front mulched planting beds',photos='V5')
 box('Left front mulch bed',(7.8,-3.6,yard_z+.01),(1.5,1.5,.08),mulch,.08)
 box('Right front mulch bed',(4.4,-5.4,yard_z+.01),(2.0,3.4,.08),mulch,.1)
