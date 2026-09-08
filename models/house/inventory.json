@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "b639ff9f503f0cdb81f43fa9b73d5142ef53b66f99e88761032b35b0cd83aecb",
+  "generator_sha256": "df7feb835986a7db8cbe1884d600fcfa6ad6ba689b0f3bd12ca3502df9b46197",
   "source_files": [
     "build.py",
     "upstairs.py",

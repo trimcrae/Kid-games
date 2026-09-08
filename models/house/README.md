@@ -203,8 +203,9 @@ roof. Both checks fail the build if a later edit reopens the envelope.
 To make the rear wall flush, the ensuite was turned to lie inside the wing
 behind the end bedroom, entered from the primary bedroom's dresser wall (the
 wall U9 and V1 show beside its doorway), with its window on the rear wall.
-Roof pitches, overhangs, the siding/shake split and the ensuite's handedness
-are estimates. Street names, house numbers and neighbouring homes are not
+Two interior photographs later confirmed the ensuite's arrangement and its
+cream walls, taupe vanity and grey floor. Roof pitches, overhangs and the
+siding/shake split remain estimates. Street names, house numbers and neighbouring homes are not
 reproduced.
 
 Two elevation cameras, [`street_front`](previews/street_front.png) and
