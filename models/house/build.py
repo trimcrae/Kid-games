@@ -1026,7 +1026,7 @@ camera('bathroom',(11.57,4.69,2.88),(10.95,6.9,2.28),17)
 camera('nursery',(12.57,3.26,2.91),(13.05,1.12,2.07),18)
 camera('bedroom',(15.64,4.01,2.92),(17.80,3.84,2.0),19)
 camera('primary',(14.90,4.72,2.92),(13.83,7.46,2.11),18)
-camera('ensuite',(12.73,8.76,2.91),(13.04,10.9,2.2),16)
+camera('ensuite',(15.62,7.50,2.86),(18.40,7.95,2.05),16)
 camera('porch',(5.57,-.12,1.65),(5.00,-2.70,.10),19)
 camera('lower_bedroom',(12.42,5.70,.57),(15.40,7.15,-.36),18)
 camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
@@ -1080,7 +1080,7 @@ for label, pos in [
     obj.location = pos
 
 upper_labels = collection('29 | Upstairs plan labels')
-for label,pos in [('GREEN BATH',(-.92,2.1)),('PRIMARY',(1.6,3.2)),('ENSUITE',(1.3,5.9)),
+for label,pos in [('GREEN BATH',(-.92,2.1)),('PRIMARY',(1.6,3.2)),('ENSUITE',(5.4,3.6)),
                   ('NURSERY',(.95,-2.1)),('BEDROOM',(5.1,.3)),('HALL / STRAIGHT FROM STAIRS',(.02,0))]:
     data=bpy.data.curves.new('Upstairs plan label '+label,'FONT')
     data.body=label

@@ -46,6 +46,69 @@ for obj in scene.objects:
 for name in ['03 | Cutaway walls - enable for enclosure', '14 | Ceilings - hidden for dollhouse']:
     assert bpy.data.collections[name].hide_render
     assert bpy.data.collections[name].hide_viewport
+# Physical sense: every outside edge of the upper floor must stand on lower
+# structure, and every ceiling must lie under a roof. Rooms were placed from
+# photographs one at a time; exterior.py closes the envelope and this proves it.
+for c in bpy.data.collections:
+    c.hide_viewport = c.hide_render = False
+bpy.context.view_layer.update()
+from mathutils import Vector
+
+
+def world_box(o):
+    pts = [o.matrix_world @ Vector(b) for b in o.bound_box]
+    return (min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts),
+            max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts))
+
+
+def coll_prefix(o):
+    return o.users_collection[0].name[:2] if o.users_collection else ''
+
+
+structure = [world_box(o) for o in scene.objects if o.type == 'MESH' and 'roof' not in o.name.lower()
+             and coll_prefix(o) in {'02', '03', '05', '11', '12', '26', '30', '35', '39', '43'}]
+slabs = [o for o in scene.objects if o.name.endswith(' slab') and coll_prefix(o) == '17']
+slab_boxes = [world_box(o) for o in slabs]
+envelope = json.loads(scene['envelope_boxes'])  # building volumes written by exterior.py
+
+
+def indoors(x, y, z):
+    return any(lo[0] <= x <= hi[0] and lo[1] <= y <= hi[1] and lo[2] <= z <= hi[2] for lo, hi in envelope)
+unsupported = []
+for o, (x0, y0, z0, x1, y1, z1) in zip(slabs, slab_boxes):
+    for (ax, ay), (bx, by), (nx, ny) in [((x0, y0), (x1, y0), (0, -1)), ((x1, y0), (x1, y1), (1, 0)),
+                                         ((x1, y1), (x0, y1), (0, 1)), ((x0, y1), (x0, y0), (-1, 0))]:
+        n = max(2, int(math.hypot(bx - ax, by - ay) / .5))
+        for i in range(n + 1):
+            px, py = ax + (bx - ax) * i / n, ay + (by - ay) * i / n
+            qx, qy = px + nx * .4, py + ny * .4
+            if indoors(qx, qy, (z0 + z1) / 2) or any(b[0] <= qx <= b[3] and b[1] <= qy <= b[4] for b in slab_boxes):
+                continue  # edge faces another room, the stairwell or the attic, not the outside
+            if not any(b[0] - .3 <= px <= b[3] + .3 and b[1] - .3 <= py <= b[4] + .3
+                       and b[2] <= z0 - 1.0 and b[5] >= z0 - .25 for b in structure):
+                unsupported.append((o.name, round(px, 2), round(py, 2)))
+assert not unsupported, 'Upper floor edge with nothing beneath: %s' % unsupported[:8]
+
+roofs = [world_box(o) for o in scene.objects if o.type == 'MESH' and coll_prefix(o) == '43' and 'roof' in o.name.lower()]
+roofs += [world_box(o) for o in scene.objects if o.name.startswith('Shed pitched roof')]
+uncovered = []
+for o in scene.objects:
+    if o.type != 'MESH' or (coll_prefix(o) not in {'14', '24', '28', '40'} and o.name != 'Garage roof underside'):
+        continue
+    if 'ceiling' not in o.name.lower() and 'panel' not in o.name.lower() and 'roof' not in o.name.lower():
+        continue
+    x0, y0, z0, x1, y1, z1 = world_box(o)
+    px = x0 + .12
+    while px < x1:
+        py = y0 + .12
+        while py < y1:
+            if not any(r[0] <= px <= r[3] and r[1] <= py <= r[4] and r[5] > z1 for r in roofs):
+                uncovered.append((o.name, round(px, 2), round(py, 2)))
+            py += .5
+        px += .5
+assert not uncovered, 'Ceiling with no roof above: %s' % uncovered[:8]
+print('PHYSICAL CHECKS: %d upper slabs supported; %d roofs cover every ceiling' % (len(slabs), len(roofs)))
+
 registry = (HERE.parent.parent / 'assets/js/games.js').read_text(encoding='utf-8')
 assert 'models/house' not in registry and 'house.blend' not in registry
 

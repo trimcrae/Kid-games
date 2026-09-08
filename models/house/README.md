@@ -173,18 +173,39 @@ placement and the interior geometry are unchanged and remain estimates.
 
 ## Exterior envelope and trees
 
-`exterior.py` adds the roofs and cladding read from the homeowner's exterior
-photographs (the front from the street and the rear from the lawn): one long
-brown-shingle roof line over the entry block and garage wing, a two-storey
-wing with its ridge running front to back and its rear gable clad in dark
-weathered cedar shakes over pale lap siding, a low shingle roof on the
-sunroom, and small roofs over the porch, ensuite and the lower rooms that
-extend past the upper floor. No wall geometry is added: the outward-facing
-polygons of the existing wall boxes receive vinyl lap siding (pale blue-grey
-on the house, tan on the garage) or shakes, so doorways, windows and the
-browser collision boxes are unchanged. Roof pitches, overhangs and the split
-between siding and shakes are estimates. Street names, house numbers and
-neighbouring homes are not reproduced.
+`exterior.py` turns the photographed rooms into a building that stands up.
+The rooms were placed one at a time, so their outer walls do not by
+themselves form a closed shell: before this pass the upper floor's edges
+hung in the air and no roof could sit on them. The pass works in three steps:
+
+1. **Shell infill.** The side wing is defined as stacked boxes (lower and
+   upper level, L-shaped because the end bedroom is a corner room set back
+   from the front), plus the space between the entry block and the wing and
+   the stairwell head room. Every face of those boxes that looks at the
+   outdoors and is not already covered by a wall or window receives a plain
+   wall. Those walls enclose unphotographed space; no interior is invented.
+2. **Roofs.** One long gable over the entry block, carried east to meet the
+   wing; a gable over the garage on the same line; a front-to-back gable over
+   the upper wing with pale siding on the street gable and dark cedar shakes
+   on the rear gable, as photographed; a lower cross gable over the set-back
+   end-bedroom block; low shingle roofs over the sunroom, the porch and the
+   half-metre step where the lower level's rear wall stands behind the upper
+   wing's.
+3. **Cladding.** The outward-facing polygons of every wall box, infill
+   included, receive vinyl lap siding (pale blue-grey on the house, tan on
+   the garage) or shakes. No doorway, window or browser collision box
+   changes; roofs never collide.
+
+`verify.py` then proves the result: every outside edge of every upper-floor
+slab must have wall structure beneath it, and every ceiling must lie under a
+roof. Both checks fail the build if a later edit reopens the envelope.
+
+To make the rear wall flush, the ensuite was turned to lie inside the wing
+behind the end bedroom, entered from the primary bedroom's dresser wall (the
+wall U9 and V1 show beside its doorway), with its window on the rear wall.
+Roof pitches, overhangs, the siding/shake split and the ensuite's handedness
+are estimates. Street names, house numbers and neighbouring homes are not
+reproduced.
 
 Two elevation cameras, [`street_front`](previews/street_front.png) and
 [`rear_elevation`](previews/rear_elevation.png), frame the house the way the
