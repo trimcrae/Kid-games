@@ -36,7 +36,7 @@ The second and third photo sets add:
 | Green family bathroom | U3–U5 | Sea-green tub tile, pale accent band, white tap-wall patch, bathtub, chrome fittings, curtain, white vanity, basin, mirror, toilet, linen shelves and patterned floor |
 | Blue nursery | U6 | Blue walls, blind and grey curtains, white crib, cushioned wood rocking chair, footstool, wood chest, white chest and closed drawer organizer |
 | Cory's bedroom (end of upstairs hall) | U7, U10 | Single bed along the right window wall, foot toward the ottoman; open rug, trellis curtains, desk/drawers, narrow bookcase, empty hammock and handles between curtain and bookcase |
-| Main bedroom and ensuite | U8–U9, V1–V2 | Made double bed, bassinet, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; separate shower, vanity, mirror, toilet, window and empty wall baskets |
+| Main bedroom and ensuite | U8–U9, V1–V2, ensuite photos | Made double bed, bassinet, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; ensuite off the closet wall, back to back with the family bathroom: shower ahead, window right, vanity and toilet left, wall baskets |
 | Lower bedroom and bathroom | V6, V8–V10 | Connecting hall, corner-window bedroom, made bed, bookcase, low cabinet, bedside drawers and curtained closet; bathroom with vanity, toilet and window |
 | Lower-room additions | V6–V7 | Second piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |
 | Front porch | V4–V5 | Covered concrete porch, iron railings and steps, two rocking chairs, clean foam mats, mailbox and curved paver walk with a simple lawn base |
@@ -200,12 +200,12 @@ hung in the air and no roof could sit on them. The pass works in three steps:
 slab must have wall structure beneath it, and every ceiling must lie under a
 roof. Both checks fail the build if a later edit reopens the envelope.
 
-To make the rear wall flush, the ensuite was turned to lie inside the wing
-behind the end bedroom, entered from the primary bedroom's dresser wall (the
-wall U9 and V1 show beside its doorway), with its window on the rear wall.
-Two interior photographs later confirmed the ensuite's arrangement and its
-cream walls, taupe vanity and grey floor. Roof pitches, overhangs and the
-siding/shake split remain estimates. Street names, house numbers and neighbouring homes are not
+The ensuite now lies behind the family bathroom, back to back with it,
+entered beside the closet on the primary bedroom's west wall: as the interior
+photographs show, the shower is straight ahead, the window is on the right in
+the wing's flush rear wall and the vanity and toilet are on the left. Its
+cream walls, taupe vanity and grey floor come from the same photographs.
+Roof pitches, overhangs and the siding/shake split remain estimates. Street names, house numbers and neighbouring homes are not
 reproduced.
 
 Two elevation cameras, [`street_front`](previews/street_front.png) and

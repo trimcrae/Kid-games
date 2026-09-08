@@ -158,11 +158,11 @@ for i in range(7):
 
 # Floor rectangles meet the hall openings, with no slab across the stair void.
 UPPER_ROOMS = {
-    'Family bathroom': (-1.15, 1.25, .55, 3.55, tilewhite),
+    'Family bathroom': (-1.15, 1.25, .55, 3.13, tilewhite),
     'Primary bedroom': (1.25, 4.5, .55, 4.55, carpet),
     'Blue nursery': (0, 4.5, -3.65, -.55, carpet),
     'End bedroom': (4.5, 7.85, -2.15, 2.45, oak),
-    'Ensuite shower room': (4.5, 7.6, 3.05, 4.55, ensuite_floor),
+    'Ensuite shower room': (-1.15, 1.25, 3.13, 4.55, ensuite_floor),
 }
 for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
     asset(name+' floor', photos={'Family bathroom':'U3-U5','Primary bedroom':'U8','Blue nursery':'U6',
@@ -177,13 +177,13 @@ partition('Nursery blue left wall', (0,-3.65),(0,-.55),blue_wall)
 partition('Nursery blue right wall', (4.5,-3.65),(4.5,-.55),blue_wall)
 upper_window('Nursery window', (1.77,-3.64,1.42),1.30,180,'U6')
 asset('Primary bedroom enclosure', photos='U8,U9')
-partition('Primary left wall', (1.25,.55),(1.25,4.55))
+# Ensuite doorway beside the closet (U9, V1); the ensuite lies beyond this wall.
+partition('Primary left wall', (1.25,.55),(1.25,4.55),openings=[(3.05,3.91,0,2.06)])
 partition('Primary far wall', (1.25,4.55),(4.5,4.55),openings=[(1.03,2.08,.77,2.07)])
-# The ensuite opens from this dresser-side wall (U9/V1 place the dresser and picture
-# group beside its doorway), so the wing's rear wall stays flush as the exterior photos show.
-partition('Primary right window wall', (4.5,.55),(4.5,4.55),openings=[(2.55,3.41,0,2.06)])
+partition('Primary right window wall', (4.5,.55),(4.5,4.55),openings=[(2.1,3.4,.77,2.07)])
+upper_window('Primary right window',(4.49,3.3,1.42),1.30,-90,'U8')
 upper_window('Primary far window',(2.805,4.54,1.42),1.05,0,'U8')
-upper_door('Ensuite doorway',(4.5,3.53,0),-90,'U9')
+upper_door('Ensuite doorway',(1.25,4.03,0),90,'U9')
 asset('End bedroom enclosure',photos='U7,U10')
 partition('End bedroom far wall',(7.85,-2.15),(7.85,2.45),openings=[(2.75,4.05,.77,2.07)])
 partition('End bedroom south wall',(4.5,-2.15),(7.85,-2.15),openings=[(1.7,2.9,.77,2.07)])
@@ -271,11 +271,11 @@ chest('Primary narrow wood chest',(2.56,3.77,0),.63,.82,0,4,1,'U8')
 asset('Primary wall television',(3.65,4.46,1.62),0,'U8')
 box('Television black case',(0,0,0),(1.05,.07,.64),black)
 box('Television dark screen',(0,-.041,0),(.99,.012,.58),screen)
-asset('Primary woven laundry hamper',(1.67,3.39,0),0,'U8')
+asset('Primary woven laundry hamper',(3.15,3.55,0),0,'U8')  # beside the bassinet, clear of the ensuite doorway
 box('Woven hamper body',(0,0,.39),(.43,.40,.78),wicker,.04)
 box('Closed wicker hamper lid',(0,0,.81),(.46,.43,.055),rattan,.025)
 box('Hamper inset grip',(0,-.207,.69),(.12,.007,.035),black)
-asset('Bedside mesh bassinet',(1.72,2.10,0),90,'U8,V1')
+asset('Bedside mesh bassinet',(3.90,3.55,0),0,'U8,V1')  # beyond the bed's far side, clear of the ensuite doorway
 for x in [-.44,.44]:
     for y in [-.24,.24]:
         rod('Bassinet folding leg',(x*1.12,y*1.2,.03),(x*.90,y*.85,.72),.022,curtainmat)
@@ -297,13 +297,13 @@ for x,y in [(-.10,0),(.10,0),(0,.10)]:
 
 upper_collection('22 | Family bathroom fixtures')
 asset('Family bathroom plaster enclosure',photos='U3-U5')
-partition('Bath left wall',(-1.15,.55),(-1.15,3.55),white)
-partition('Bath back wall',(-1.15,3.55),(1.25,3.55),white)
+partition('Bath left wall',(-1.15,.55),(-1.15,3.13),white)
+partition('Bath back wall',(-1.15,3.13),(1.25,3.13),white)
 # Primary left wall is the shared partition; avoid coincident duplicate surfaces.
 partition('Bath entry return',(-1.15,.55),(0,.55),white)
 asset('Family bathroom patterned tile floor',photos='U3,U4')
 for ix in range(8):
-    for iy in range(10):
+    for iy in range(9):
         x,y=-1.00+ix*.30,.70+iy*.30
         box('Grey bathroom square tile',(x,y,.033),(.294,.294,.012),tilegrey,.002)
         curve('Ivory bathroom quatrefoil',[(x+(.084+.022*math.cos(4*t))*math.cos(t),y+(.084+.022*math.cos(4*t))*math.sin(t),.042)
@@ -349,12 +349,12 @@ for x in [-.12,.12]:
 frame('Large vanity mirror',(0,.27,1.46),1.15,.97,white,mirror)
 asset('Bathroom recessed linen shelves',(-.87,.83,0),90,'U5')
 for z in [.25,.68,1.11,1.54,1.97]:box('Empty linen shelf',(0,0,z),(.40,.42,.035),white)
-asset('Family bathroom toilet',(-.70,2.91,0),90,'U3')
+asset('Family bathroom toilet',(-.70,2.49,0),90,'U3')
 box('Toilet pedestal',(0,0,.20),(.27,.38,.40),tilewhite,.11)
 basin('Toilet bowl',(0,-.07),.39,.56,.43,.27,tilewhite)
 box('Toilet cistern',(0,.26,.67),(.40,.18,.47),tilewhite,.055)
 box('Cistern lid',(0,.26,.92),(.43,.21,.035),tilewhite,.025)
-asset('Green tile bathtub',( .85,2.50,0),0,'U3,U4')
+asset('Green tile bathtub',( .85,2.10,0),0,'U3,U4')
 box('White tub front apron',(-.37,0,.25),(.07,1.80,.50),tilewhite,.035)
 basin('White bathtub',(0,0),.79,1.81,.55,.16,tilewhite)
 # Right wall and far tap wall: sea green tile, ivory repair patch, pale accent band.
@@ -371,51 +371,55 @@ curve('Tub chrome spout',[(0,.86,.81),(0,.72,.81),(0,.67,.75)],.029,steel)
 rod('Chrome shower curtain rail',(-.40,-.95,2.16),(-.40,.96,2.16),.017,steel)
 for i in range(13):
     box('Gathered white shower curtain',(-.41+.027*math.sin(i),-.90+i*.025,1.22),(.03,.034,1.85),bedding,.009)
-asset('Bathroom wall hook strip',(.05,3.46,1.30),0,'U3')
+asset('Bathroom wall hook strip',(.05,3.04,1.30),0,'U3')
 box('White bathroom hook board',(0,0,0),(.93,.035,.09),white)
 for x in [-.36,-.18,0,.18,.36]:
     curve('Empty bathroom hook',[(x,-.03,.02),(x,-.08,-.04),(x,-.11,.02)],.009,steel)
 
 upper_collection('23 | Ensuite shower room')
-asset('Ensuite enclosure',photos='U9',confidence='shower and doorway observed; hidden fixtures not invented')
-partition('Ensuite left wall',(1.25,4.55),(1.25,7.65),ensuite_wall,[(.92,1.72,.90,2.12)])
-partition('Ensuite right wall',(2.75,4.55),(2.75,7.65),ensuite_wall)
-partition('Ensuite far wall',(1.25,7.65),(2.75,7.65),ensuite_wall)
-upper_window('Ensuite window',(1.26,5.87,1.51),.80,90,'V2',with_curtains=False)
-asset('Ensuite shower tray',(2.0,7.16,0),0,'U9')
-basin('Ivory shower tray',(0,0),1.35,.86,.17,.065,tilewhite)
-box('Molded shower back panel',(0,.43,1.16),(1.36,.025,2.17),tilewhite)
-for x in [-.68,.68]:box('Molded shower side',(x,0,1.16),(.025,.86,2.17),tilewhite)
-curve('Ensuite shower neck',[(-.47,.41,1.91),(-.47,.17,2.0),(-.47,.08,1.93)],.016,steel)
-sphere('Round chrome shower head',(-.47,.08,1.91),(.075,.075,.027),steel)
-rod('Ensuite curtain rod',(-.68,-.44,2.15),(.68,-.44,2.15),.014,steel)
-for i in range(12):
-    box('Gathered ivory shower curtain',(-.63+i*.022,-.45+.025*math.cos(i),1.14),(.03,.04,1.92),bedding,.008)
-asset('Ensuite grey bath mat',(2.0,6.48,.034),0,'U9')
-box('Clean rectangular bath mat',(0,0,0),(1.20,.51,.035),curtainmat,.015)
+# Built entry-first along +y, 1.3 m wide: window on the right wall, vanity and
+# toilet on the left wall (back to back with the family bathroom), shower at
+# the far end. Then turned to run west from the primary bedroom's closet wall.
+asset('Ensuite enclosure',photos='U9,V2,ensuite',confidence='shower straight ahead and window right of the doorway observed; width estimated')
+partition('Ensuite right wall',(2.55,4.55),(2.55,6.95),ensuite_wall,[(.45,1.25,.90,2.12)])
+partition('Ensuite far wall',(1.25,6.95),(2.55,6.95),ensuite_wall)
+partition('Ensuite left wall',(1.25,4.55),(1.25,6.95),ensuite_wall)
+upper_window('Ensuite window',(2.54,5.40,1.51),.80,-90,'V2,ensuite',with_curtains=False)
+asset('Ensuite shower tray',(1.9,6.52,0),0,'U9,ensuite')
+basin('Ivory shower tray',(0,0),1.22,.86,.17,.065,tilewhite)
+box('Molded shower back panel',(0,.43,1.16),(1.23,.025,2.17),tilewhite)
+for x in [-.615,.615]:box('Molded shower side',(x,0,1.16),(.025,.86,2.17),tilewhite)
+curve('Ensuite shower neck',[(-.42,.41,1.91),(-.42,.17,2.0),(-.42,.08,1.93)],.016,steel)
+sphere('Round chrome shower head',(-.42,.08,1.91),(.075,.075,.027),steel)
+rod('Ensuite curtain rod',(-.615,-.44,2.15),(.615,-.44,2.15),.014,steel)
+for i in range(11):
+    box('Gathered ivory shower curtain',(-.57+i*.022,-.45+.025*math.cos(i),1.14),(.03,.04,1.92),bedding,.008)
+asset('Ensuite grey bath mat',(1.9,6.12,.034),0,'U9')
+box('Clean rectangular bath mat',(0,0,0),(1.10,.46,.035),curtainmat,.015)
 
-asset('Ensuite small vanity',(2.46,5.24,0),-90,'V2')
+asset('Ensuite small vanity',(1.54,5.20,0),90,'V2,ensuite')
 box('Ensuite vanity base',(0,0,.40),(.62,.48,.80),vanity_taupe)
 panel('Ensuite raised cupboard',0,-.25,.39,.55,.62,vanity_taupe)
 sphere('Ensuite black knob',(.20,-.29,.60),(.018,.018,.018),black)
 basin('Ensuite ivory sink',(0,0),.66,.51,.84,.68,tilewhite)
 curve('Ensuite chrome basin faucet',[(0,.23,.87),(0,.23,.98),(0,.07,1.01),(0,.03,.95)],.016,steel)
 frame('Ensuite vanity mirror',(0,.25,1.48),.63,.98,white,mirror)
-asset('Ensuite toilet',(2.45,6.07,0),-90,'V2')
+asset('Ensuite toilet',(1.55,5.80,0),90,'V2,ensuite')
 box('Ensuite toilet pedestal',(0,0,.19),(.26,.36,.38),tilewhite,.10)
 basin('Ensuite toilet bowl',(0,-.07),.38,.55,.43,.27,tilewhite)
 box('Ensuite toilet tank',(0,.22,.65),(.38,.17,.44),tilewhite,.05)
-asset('Ensuite empty wall storage',(2.68,6.09,1.40),-90,'V2')
+asset('Ensuite empty wall storage',(1.32,5.80,1.40),90,'V2,ensuite')
 for z in [0,.26]:
     box('Wall basket shelf',(0,-.10,z),(.58,.21,.025),black,.005)
     rod('Basket front rail',(-.29,-.21,z+.10),(.29,-.21,z+.10),.009,black)
     for x in [-.28,0,.28]:rod('Basket upright',(x,-.21,z),(x,-.21,z+.10),.005,black)
 
-# Turn the ensuite to lie inside the wing behind the end bedroom, entered from the
-# primary's dresser wall. Its window now faces the rear lawn. The room's handedness is
-# an estimate: V2's window and fixture sides are not confirmed for this placement.
+# Turn the room to run west from the primary bedroom's closet wall, back to
+# back with the family bathroom: entering it, the window is on the right in
+# the wing's rear wall and the fixtures on the left, as the interior
+# photographs show, and the rear wall stays flush as the exterior shows.
 bpy.context.view_layer.update()
-turn = Matrix.Translation((-.05, 5.8, 0)) @ Matrix.Rotation(-math.pi / 2, 4, 'Z')
+turn = Matrix.Translation((5.8, 2.0, 0)) @ Matrix.Rotation(math.pi / 2, 4, 'Z')
 for obj in bpy.data.collections['23 | Ensuite shower room'].objects:
     if obj.parent is None:
         obj.matrix_world = turn @ obj.matrix_world

@@ -11,20 +11,21 @@ attachment to the bedroom is **not confirmed** by this audit; clarification of
 the doorway wall is pending. The earlier statement below describes fixture
 relationships within the room, not proof of its rotation within the house.
 
-## Ensuite placement (September 2026, exterior photographs)
+## Ensuite placement (September 2026, exterior and interior photographs)
 
 The rear exterior photograph shows the two-storey wing's back wall as one
-flush plane under its gable. The earlier model had the ensuite projecting
-2.6 m beyond that wall with nothing beneath it, which no house does. The
-ensuite now lies inside the wing behind the end bedroom and opens from the
-primary bedroom's dresser wall, the wall that U9 and V1 show beside its
-doorway, which also matches the homeowner's report that the bathroom was
-"sideways". Its window faces the rear lawn. Two later interior photographs confirm
-the arrangement: from the bedroom the shower stands straight ahead through
-the curtained doorway beside the picture group, and inside, the vanity and
-toilet share one wall with the window opposite (it reflects in the vanity
-mirror). They also set the finishes: cream walls, a taupe vanity cabinet
-with black knobs and an almond basin, chrome fittings and a grey floor.
+flush plane under its gable, so the ensuite cannot project behind it as the
+earlier model had it. Two interior photographs then fixed its position:
+standing in the doorway, the shower is straight ahead, the window is on the
+right, and the vanity and toilet are on the left (the window reflects in the
+vanity mirror). With the doorway beside the closet on the primary bedroom's
+west wall (U9, V1), that puts the ensuite behind the family bathroom, back
+to back with it, running west along the wing's rear wall with its window in
+that rear wall. The family bathroom is 0.4 m shallower than first estimated
+to make room; its tub, toilet and hook strip moved with its back wall. The
+ensuite is about 1.3 m wide; that width and the family bathroom's depth are
+estimates. Finishes from the photographs: cream walls, a taupe vanity
+cabinet with black knobs and an almond basin, chrome fittings, a grey floor.
 
 ## Second consistency pass
 
