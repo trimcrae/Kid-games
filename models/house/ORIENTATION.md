@@ -19,9 +19,12 @@ flush plane under its gable. The earlier model had the ensuite projecting
 ensuite now lies inside the wing behind the end bedroom and opens from the
 primary bedroom's dresser wall, the wall that U9 and V1 show beside its
 doorway, which also matches the homeowner's report that the bathroom was
-"sideways". Its window faces the rear lawn. Which side the vanity and
-toilet sit on relative to the window is not confirmed for this placement
-and remains an estimate.
+"sideways". Its window faces the rear lawn. Two later interior photographs confirm
+the arrangement: from the bedroom the shower stands straight ahead through
+the curtained doorway beside the picture group, and inside, the vanity and
+toilet share one wall with the window opposite (it reflects in the vanity
+mirror). They also set the finishes: cream walls, a taupe vanity cabinet
+with black knobs and an almond basin, chrome fittings and a grey floor.
 
 ## Second consistency pass
 

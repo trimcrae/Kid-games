@@ -23,7 +23,9 @@ darkmint = material('Bathroom dark green accent tile', (.025, .13, .085), .24)
 bedding = material('Clean ivory cotton bedding', (.84, .81, .71), .92, texture='fabric')
 curtainmat = material('Light grey woven curtains', (.57, .59, .56), .95, texture='fabric')
 darkcurtain = material('Charcoal patterned bedroom curtains', (.12, .14, .16), .94, texture='fabric')
-lavender = material('Ensuite muted mauve plaster', (.46, .37, .38), .9)
+ensuite_wall = material('Ensuite cream plaster', (.80, .75, .60), .9)
+ensuite_floor = material('Ensuite grey vinyl floor', (.30, .30, .29), .45)
+vanity_taupe = material('Ensuite taupe vanity cabinet', (.26, .22, .19), .5)
 greyrug = material('Cory light grey plush carpet', (.44, .43, .40), .95, texture='fabric')
 
 
@@ -160,7 +162,7 @@ UPPER_ROOMS = {
     'Primary bedroom': (1.25, 4.5, .55, 4.55, carpet),
     'Blue nursery': (0, 4.5, -3.65, -.55, carpet),
     'End bedroom': (4.5, 7.85, -2.15, 2.45, oak),
-    'Ensuite shower room': (4.5, 7.6, 3.05, 4.55, tilewhite),
+    'Ensuite shower room': (4.5, 7.6, 3.05, 4.55, ensuite_floor),
 }
 for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
     asset(name+' floor', photos={'Family bathroom':'U3-U5','Primary bedroom':'U8','Blue nursery':'U6',
@@ -376,9 +378,9 @@ for x in [-.36,-.18,0,.18,.36]:
 
 upper_collection('23 | Ensuite shower room')
 asset('Ensuite enclosure',photos='U9',confidence='shower and doorway observed; hidden fixtures not invented')
-partition('Ensuite left wall',(1.25,4.55),(1.25,7.65),white,[(.92,1.72,.90,2.12)])
-partition('Ensuite right wall',(2.75,4.55),(2.75,7.65),lavender)
-partition('Ensuite far wall',(1.25,7.65),(2.75,7.65),white)
+partition('Ensuite left wall',(1.25,4.55),(1.25,7.65),ensuite_wall,[(.92,1.72,.90,2.12)])
+partition('Ensuite right wall',(2.75,4.55),(2.75,7.65),ensuite_wall)
+partition('Ensuite far wall',(1.25,7.65),(2.75,7.65),ensuite_wall)
 upper_window('Ensuite window',(1.26,5.87,1.51),.80,90,'V2',with_curtains=False)
 asset('Ensuite shower tray',(2.0,7.16,0),0,'U9')
 basin('Ivory shower tray',(0,0),1.35,.86,.17,.065,tilewhite)
@@ -393,8 +395,8 @@ asset('Ensuite grey bath mat',(2.0,6.48,.034),0,'U9')
 box('Clean rectangular bath mat',(0,0,0),(1.20,.51,.035),curtainmat,.015)
 
 asset('Ensuite small vanity',(2.46,5.24,0),-90,'V2')
-box('Ensuite vanity base',(0,0,.40),(.62,.48,.80),white)
-panel('Ensuite raised cupboard',0,-.25,.39,.55,.62,white)
+box('Ensuite vanity base',(0,0,.40),(.62,.48,.80),vanity_taupe)
+panel('Ensuite raised cupboard',0,-.25,.39,.55,.62,vanity_taupe)
 sphere('Ensuite black knob',(.20,-.29,.60),(.018,.018,.018),black)
 basin('Ensuite ivory sink',(0,0),.66,.51,.84,.68,tilewhite)
 curve('Ensuite chrome basin faucet',[(0,.23,.87),(0,.23,.98),(0,.07,1.01),(0,.03,.95)],.016,steel)
