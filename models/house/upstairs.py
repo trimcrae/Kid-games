@@ -160,7 +160,7 @@ UPPER_ROOMS = {
     'Primary bedroom': (1.25, 4.5, .55, 4.55, carpet),
     'Blue nursery': (0, 4.5, -3.65, -.55, carpet),
     'End bedroom': (4.5, 7.85, -2.15, 2.45, oak),
-    'Ensuite shower room': (1.25, 2.75, 4.55, 7.65, tilewhite),
+    'Ensuite shower room': (4.5, 7.6, 3.05, 4.55, tilewhite),
 }
 for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
     asset(name+' floor', photos={'Family bathroom':'U3-U5','Primary bedroom':'U8','Blue nursery':'U6',
@@ -176,11 +176,12 @@ partition('Nursery blue right wall', (4.5,-3.65),(4.5,-.55),blue_wall)
 upper_window('Nursery window', (1.77,-3.64,1.42),1.30,180,'U6')
 asset('Primary bedroom enclosure', photos='U8,U9')
 partition('Primary left wall', (1.25,.55),(1.25,4.55))
-partition('Primary far wall', (1.25,4.55),(4.5,4.55),openings=[(.06,.92,0,2.06),(1.03,2.08,.77,2.07)])
-partition('Primary right window wall', (4.5,.55),(4.5,4.55),openings=[(2.1,3.4,.77,2.07)])
+partition('Primary far wall', (1.25,4.55),(4.5,4.55),openings=[(1.03,2.08,.77,2.07)])
+# The ensuite opens from this dresser-side wall (U9/V1 place the dresser and picture
+# group beside its doorway), so the wing's rear wall stays flush as the exterior photos show.
+partition('Primary right window wall', (4.5,.55),(4.5,4.55),openings=[(2.55,3.41,0,2.06)])
 upper_window('Primary far window',(2.805,4.54,1.42),1.05,0,'U8')
-upper_window('Primary right window',(4.49,3.3,1.42),1.30,-90,'U8')
-upper_door('Ensuite doorway',(1.74,4.55,0),0,'U9')
+upper_door('Ensuite doorway',(4.5,3.53,0),-90,'U9')
 asset('End bedroom enclosure',photos='U7,U10')
 partition('End bedroom far wall',(7.85,-2.15),(7.85,2.45),openings=[(2.75,4.05,.77,2.07)])
 partition('End bedroom south wall',(4.5,-2.15),(7.85,-2.15),openings=[(1.7,2.9,.77,2.07)])
@@ -375,10 +376,10 @@ for x in [-.36,-.18,0,.18,.36]:
 
 upper_collection('23 | Ensuite shower room')
 asset('Ensuite enclosure',photos='U9',confidence='shower and doorway observed; hidden fixtures not invented')
-partition('Ensuite left wall',(1.25,4.55),(1.25,7.65),white)
-partition('Ensuite right wall',(2.75,4.55),(2.75,7.65),lavender,[(.92,1.72,.90,2.12)])
+partition('Ensuite left wall',(1.25,4.55),(1.25,7.65),white,[(.92,1.72,.90,2.12)])
+partition('Ensuite right wall',(2.75,4.55),(2.75,7.65),lavender)
 partition('Ensuite far wall',(1.25,7.65),(2.75,7.65),white)
-upper_window('Ensuite window',(2.74,5.87,1.51),.80,-90,'V2',with_curtains=False)
+upper_window('Ensuite window',(1.26,5.87,1.51),.80,90,'V2',with_curtains=False)
 asset('Ensuite shower tray',(2.0,7.16,0),0,'U9')
 basin('Ivory shower tray',(0,0),1.35,.86,.17,.065,tilewhite)
 box('Molded shower back panel',(0,.43,1.16),(1.36,.025,2.17),tilewhite)
@@ -391,22 +392,31 @@ for i in range(12):
 asset('Ensuite grey bath mat',(2.0,6.48,.034),0,'U9')
 box('Clean rectangular bath mat',(0,0,0),(1.20,.51,.035),curtainmat,.015)
 
-asset('Ensuite small vanity',(1.54,5.24,0),90,'V2')
+asset('Ensuite small vanity',(2.46,5.24,0),-90,'V2')
 box('Ensuite vanity base',(0,0,.40),(.62,.48,.80),white)
 panel('Ensuite raised cupboard',0,-.25,.39,.55,.62,white)
 sphere('Ensuite black knob',(.20,-.29,.60),(.018,.018,.018),black)
 basin('Ensuite ivory sink',(0,0),.66,.51,.84,.68,tilewhite)
 curve('Ensuite chrome basin faucet',[(0,.23,.87),(0,.23,.98),(0,.07,1.01),(0,.03,.95)],.016,steel)
 frame('Ensuite vanity mirror',(0,.25,1.48),.63,.98,white,mirror)
-asset('Ensuite toilet',(1.55,6.07,0),90,'V2')
+asset('Ensuite toilet',(2.45,6.07,0),-90,'V2')
 box('Ensuite toilet pedestal',(0,0,.19),(.26,.36,.38),tilewhite,.10)
 basin('Ensuite toilet bowl',(0,-.07),.38,.55,.43,.27,tilewhite)
 box('Ensuite toilet tank',(0,.22,.65),(.38,.17,.44),tilewhite,.05)
-asset('Ensuite empty wall storage',(1.32,6.09,1.40),90,'V2')
+asset('Ensuite empty wall storage',(2.68,6.09,1.40),-90,'V2')
 for z in [0,.26]:
     box('Wall basket shelf',(0,-.10,z),(.58,.21,.025),black,.005)
     rod('Basket front rail',(-.29,-.21,z+.10),(.29,-.21,z+.10),.009,black)
     for x in [-.28,0,.28]:rod('Basket upright',(x,-.21,z),(x,-.21,z+.10),.005,black)
+
+# Turn the ensuite to lie inside the wing behind the end bedroom, entered from the
+# primary's dresser wall. Its window now faces the rear lawn. The room's handedness is
+# an estimate: V2's window and fixture sides are not confirmed for this placement.
+bpy.context.view_layer.update()
+turn = Matrix.Translation((-.05, 5.8, 0)) @ Matrix.Rotation(-math.pi / 2, 4, 'Z')
+for obj in bpy.data.collections['23 | Ensuite shower room'].objects:
+    if obj.parent is None:
+        obj.matrix_world = turn @ obj.matrix_world
 
 # Additional reverse angle V1 reveals the entry-side closet and two drawer units.
 COLL=bpy.data.collections['21 | Primary bedroom furniture']

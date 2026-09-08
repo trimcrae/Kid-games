@@ -59,7 +59,7 @@ for o in scene.objects:
     # These are lightweight internal curtains and do not block a person.
     no_collision = any(s in o.name.lower() for s in [
         'curtain','blind','shade','pleat','sloped ceiling','sloped header','soffit',
-        'leafy','net strand','quilt','pillow','duvet','ceiling fan'])
+        'leafy','net strand','quilt','pillow','duvet','ceiling fan','roof'])
     evaluated = o.evaluated_get(depsgraph)
     mesh = evaluated.to_mesh()
     if not mesh or not mesh.polygons:

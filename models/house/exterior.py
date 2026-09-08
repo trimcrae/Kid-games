@@ -1,17 +1,31 @@
-"""Exterior envelope: roofs, cladding on outward wall faces and elevation cameras.
+"""Exterior envelope: shell infill, roofs, cladding on outward wall faces.
 
 Executed in build.py's Blender namespace after every room and the yard.
 The homeowner's exterior photographs (front from the street, rear from the
 lawn) show a split-level: a single-storey garage wing and entry block under
-one long brown-shingle roof line, a two-storey wing whose rear gable is clad
-in dark weathered cedar shakes over pale lap siding, and a glazed sunroom
-with a low shingle roof. Street names, house numbers and neighbouring homes
-are not reproduced. Roof pitches, overhangs and the split between siding and
-shakes are estimates read from the photographs, not measurements.
+one long brown-shingle roof line, a two-storey wing with its ridge running
+front to back whose rear gable is clad in dark weathered cedar shakes over
+pale lap siding, and a glazed sunroom with a low shingle roof. Street names,
+house numbers and neighbouring homes are not reproduced. Roof pitches,
+overhangs and the split between siding and shakes are estimates read from the
+photographs, not measurements.
 
-No wall geometry is added: the outward-facing polygons of the existing wall
-boxes are given a cladding material, so doorways, windows and the browser
-collision boxes are unchanged.
+The interior rooms were placed from photographs one at a time, so their
+outer walls do not by themselves form a closed building. The envelope is
+made physically coherent in three steps:
+
+1. Shell infill: the side wing is defined as two stacked boxes (lower level
+   and upper level) plus the space between the entry block and the wing.
+   Every face of those boxes that is open to the outside and not already
+   covered by a wall or window gets a plain wall, so the upper floor stands
+   on walls and no room hangs in the air.
+2. Roofs: one gable over the entry block (extended to meet the wing), one
+   over the garage, one front-to-back gable over the whole upper wing, low
+   shed roofs over the sunroom, the porch and the lower level's rear ledge.
+3. Cladding: outward-facing polygons of every wall box, infill included,
+   receive siding or shakes. No doorway, window or browser collision box
+   changes. `verify.py` then checks that every upper-floor edge has
+   structure beneath it and every ceiling sits under a roof.
 """
 
 import bmesh
@@ -24,6 +38,106 @@ shingles = material('Brown asphalt roof shingles', (.16, .105, .07), .9, texture
 fascia = white
 
 ROOF_THICKNESS = .14
+
+# ---------------------------------------------------------------- shell infill
+
+# Building blocks in world metres: (x0, x1, y0, y1, z0, z1).
+# The end bedroom is a corner room with windows on two walls, so its block
+# sits back from the wing's front: the wing is L-shaped on both levels.
+SHELLS = {
+    'Side wing lower level west': (7.8, 15.49, -.23, 9.12, -1.05, 1.26),
+    'Side wing lower level east': (15.49, 18.84, 1.86, 9.12, -1.05, 1.26),
+    'Side wing upper level west': (9.84, 15.49, .29, 8.62, 1.26, 3.70),
+    'Side wing upper level east': (15.49, 18.84, 1.86, 8.62, 1.26, 3.70),
+    'Entry block east infill': (7.8, 9.84, -.23, 9.12, 1.26, 2.72),
+    'Stairwell head room': (7.73, 11.06, 1.96, 4.72, 1.26, 3.70),
+}
+# Volumes that count as "already building" when deciding whether a shell
+# face looks at the outdoors. Rooms modelled elsewhere plus the shells.
+ROOMS = [
+    ((0, 0, -3.4), (7.8, 8, 2.7)),          # main block and basement
+    ((.8, 8, -.4), (7.4, 11.4, 2.5)),       # sunroom
+    ((-6.9, 1.1, -.5), (-.1, 8.1, 2.8)),    # garage
+    ((4.3, -2.9, -.4), (7.7, 0, 2.5)),      # covered porch
+] + [((x0, y0, z0), (x1, y1, z1)) for x0, x1, y0, y1, z0, z1 in SHELLS.values()]
+scene['envelope_boxes'] = json.dumps(ROOMS)  # read back by verify.py
+
+STRUCTURE_COLLECTIONS = ['02 | Main architectural walls', '03 | Cutaway walls - enable for enclosure',
+                         '04 | Windows and front door', '05 | Sunroom glazing and house siding',
+                         '11 | Split-level stairs and iron rails', '12 | Lower family room architecture',
+                         '17 | Upstairs floors and hall', '18 | Upstairs bedroom walls and windows',
+                         '22 | Family bathroom fixtures', '23 | Ensuite shower room',
+                         '26 | Lower hall and additional room architecture', '35 | Garage shell and doors',
+                         '39 | Pink curtain bedroom']
+STRUCTURE_KEYS = ['wall', 'pier', 'header', 'base', 'siding', 'opening', 'foundation', 'return',
+                  'house side', 'slab', 'window', 'pane', 'jamb', 'door', 'casing', 'sidelight', 'glazing', 'frame']
+
+
+def _inside(p):
+    return any(lo[0] <= p.x <= hi[0] and lo[1] <= p.y <= hi[1] and lo[2] <= p.z <= hi[2] for lo, hi in ROOMS)
+
+
+bpy.context.view_layer.update()
+_boxes = []
+for cname in STRUCTURE_COLLECTIONS:
+    for o in bpy.data.collections[cname].objects:
+        if o.type != 'MESH' or not any(k in o.name.lower() for k in STRUCTURE_KEYS):
+            continue
+        pts = [o.matrix_world @ Vector(b) for b in o.bound_box]
+        _boxes.append((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts),
+                       max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
+
+
+def _covered(p, pad=.09):
+    return any(b[0] - pad <= p.x <= b[3] + pad and b[1] - pad <= p.y <= b[4] + pad and b[2] - pad <= p.z <= b[5] + pad
+               for b in _boxes)
+
+
+asset('Exterior shell infill', photos='exterior', confidence='closes gaps between photographed rooms; unphotographed space, no interior invented')
+STEP = .2
+infill = 0
+for shell_name, (x0, x1, y0, y1, z0, z1) in SHELLS.items():
+    faces = [((x0, y0), (x1, y0), (0, -1)), ((x1, y0), (x1, y1), (1, 0)),
+             ((x1, y1), (x0, y1), (0, 1)), ((x0, y1), (x0, y0), (-1, 0))]
+    for (ax, ay), (bx, by), (nx, ny) in faces:
+        length = math.hypot(bx - ax, by - ay)
+        columns = max(1, int(round(length / STEP)))
+        runs = []  # (column index, z start, z end) of open cells, merged along the face
+        for i in range(columns):
+            u = (i + .5) / columns
+            cx, cy = ax + (bx - ax) * u, ay + (by - ay) * u
+            zs = []
+            z = z0 + STEP / 2
+            while z < z1:
+                inside_wall = Vector((cx - nx * .06, cy - ny * .06, z))
+                outdoors = Vector((cx + nx * .35, cy + ny * .35, z))
+                if not _inside(outdoors) and not _covered(inside_wall):
+                    zs.append(z)
+                z += STEP
+            # contiguous z ranges for this column
+            ranges = []
+            for z in zs:
+                if ranges and abs(ranges[-1][1] - (z - STEP)) < 1e-6:
+                    ranges[-1][1] = z
+                else:
+                    ranges.append([z, z])
+            for lo, hi in ranges:
+                lo, hi = lo - STEP / 2, hi + STEP / 2
+                if runs and runs[-1][0] == i - 1 and abs(runs[-1][2] - lo) < 1e-6 and abs(runs[-1][3] - hi) < 1e-6:
+                    runs[-1][0] = i
+                    runs[-1][4] += 1
+                else:
+                    runs.append([i, i, lo, hi, 1])
+        for last, _i, lo, hi, count in runs:
+            first = last - count + 1
+            u0, u1 = first / columns, (last + 1) / columns
+            cx, cy = ax + (bx - ax) * (u0 + u1) / 2, ay + (by - ay) * (u0 + u1) / 2
+            size = (length * (u1 - u0) + .02, .12, hi - lo) if ny else (.12, length * (u1 - u0) + .02, hi - lo)
+            box('Exterior infill wall', (cx - nx * .06, cy - ny * .06, (lo + hi) / 2), size, siding_grey, .004)
+            infill += 1
+print('EXTERIOR: infill walls', infill, flush=True)
+
+# ---------------------------------------------------------------- roofs
 
 
 def _roof_mesh(name, verts, faces, slope_faces, cladding=None, clad_faces=()):
@@ -49,44 +163,36 @@ def _roof_mesh(name, verts, faces, slope_faces, cladding=None, clad_faces=()):
     return obj
 
 
-def gable(name, x0, x1, y0, y1, base, pitch, ridge='x', cladding=siding_grey):
-    """Solid gable roof: ridge along ``ridge`` axis, eaves at ``base``, closed
-    gable ends clad from the eave line down to nothing (the wall below
-    carries its own cladding)."""
+def gable(name, x0, x1, y0, y1, base, pitch, ridge='x', cladding=siding_grey, end_cladding=None):
+    """Solid gable roof: ridge along ``ridge`` axis, eaves at ``base``. The
+    two gable-end triangles are clad (``end_cladding`` overrides the second,
+    +axis, end)."""
     t = base - ROOF_THICKNESS
     if ridge == 'x':
         ym, rise = (y0 + y1) / 2, (y1 - y0) / 2 * pitch
-        top = base + rise
-        # Profile in the YZ plane extruded along X: bottom corners, eaves, ridge.
-        profile = [(y0, t), (y0, base), (ym, top), (y1, base), (y1, t)]
+        profile = [(y0, t), (y0, base), (ym, base + rise), (y1, base), (y1, t)]
         verts = [(x0, y, z) for y, z in profile] + [(x1, y, z) for y, z in profile]
     else:
         xm, rise = (x0 + x1) / 2, (x1 - x0) / 2 * pitch
-        top = base + rise
-        profile = [(x0, t), (x0, base), (xm, top), (x1, base), (x1, t)]
+        profile = [(x0, t), (x0, base), (xm, base + rise), (x1, base), (x1, t)]
         verts = [(x, y0, z) for x, z in profile] + [(x, y1, z) for x, z in profile]
     n = 5
-    faces = [tuple(range(n)), tuple(reversed(range(n, 2 * n)))]  # gable ends
+    faces = [tuple(range(n)), tuple(reversed(range(n, 2 * n)))]  # gable ends: 0 = low axis end
     for i in range(n):
         j = (i + 1) % n
         faces.append((i, n + i, n + j, j) if ridge == 'x' else (j, n + j, n + i, i))
-    # Side faces: 0-1 eave edge, 1-2 slope, 2-3 slope, 3-4 eave edge, 4-0 underside.
-    slope = {3, 4}
-    clad = {0, 1}
-    return _roof_mesh(name, verts, faces, slope, cladding, clad)
+    obj = _roof_mesh(name, verts, faces, {3, 4}, cladding, {0, 1})
+    if end_cladding:
+        obj.data.materials.append(end_cladding)
+        obj.data.polygons[1].material_index = 3
+    return obj
 
 
 def shed(name, x0, x1, y0, y1, z_high, z_low, down='+y'):
     """Single-slope roof falling toward ``down``; closed on all sides."""
     def top(x, y):
-        if down == '+y':
-            f = (y - y0) / (y1 - y0)
-        elif down == '-y':
-            f = (y1 - y) / (y1 - y0)
-        elif down == '+x':
-            f = (x - x0) / (x1 - x0)
-        else:
-            f = (x1 - x) / (x1 - x0)
+        f = {'+y': (y - y0) / (y1 - y0), '-y': (y1 - y) / (y1 - y0),
+             '+x': (x - x0) / (x1 - x0), '-x': (x1 - x) / (x1 - x0)}[down]
         return z_high + (z_low - z_high) * f
     corners = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
     verts = [(x, y, top(x, y) - ROOF_THICKNESS) for x, y in corners] + [(x, y, top(x, y)) for x, y in corners]
@@ -95,47 +201,32 @@ def shed(name, x0, x1, y0, y1, z_high, z_low, down='+y'):
 
 
 asset('Estimated roofs', photos='exterior', confidence='roof lines read from exterior photographs; pitches and overhangs estimated')
-# One long ridge over the entry block and garage wing, seen from the street.
-gable('Main block gable roof', -.5, 8.3, -.5, 8.6, 2.72, .42, 'x')
+# One long ridge over the entry block, carried east to meet the wing so the
+# stair and pink-bedroom infill sits under it; the garage shares the line.
+gable('Main block gable roof', -.5, 9.84, -.5, 9.6, 2.72, .42, 'x')
 gable('Garage wing gable roof', -7.4, .2, .6, 8.6, 2.76, .42, 'x', siding_tan)
-# Two-storey wing: ridge front-to-back, rear gable clad in cedar shakes.
-o = gable('Upper wing gable roof', 9.3, 15.99, -.2, 9.05, 3.75, .55, 'y', shakes)
-o.data.polygons[0].material_index = 2  # front gable end reads as the same shakes
-gable('End bedroom cross gable', 12.65, 19.4, 1.4, 7.0, 3.75, .55, 'x')
-shed('Ensuite shed roof', 11.74, 14.24, 8.9, 12.2, 4.55, 3.78, '+y')
-shed('Sunroom low shingle roof', .3, 7.9, 7.9, 11.9, 2.72, 2.45, '+y')
-shed('Front porch shingle roof', 4.1, 7.9, -3.05, 0, 2.55, 2.15, '-y')
-shed('Pink bedroom low roof', 7.6, 9.95, 5.3, 9.4, 1.38, 1.22, '+y')
-shed('Lower east rooms low roof', 15.9, 17.1, 6.9, 9.5, 1.38, 1.22, '+y')
-shed('Stairwell flat cap', 7.5, 9.45, 1.75, 4.95, 3.76, 3.70, '+x')
+# Two-storey wing: ridge front to back, pale siding on the street gable and
+# cedar shakes on the rear gable as photographed; the set-back end-bedroom
+# block carries a lower cross gable that meets it in valleys.
+gable('Upper wing gable roof', 9.34, 15.99, -.2, 9.12, 3.75, .55, 'y', siding_grey, shakes)
+gable('End bedroom cross gable roof', 13.2, 19.34, 1.36, 9.12, 3.75, .45, 'x')
+shed('Sunroom low shingle roof', .3, 7.9, 7.9, 11.9, 2.62, 2.40, '+y')
+shed('Front porch shingle roof', 4.1, 7.9, -3.05, 0, 2.78, 2.38, '-y')
+# The lower level's rear wall stands half a metre behind the upper wing's;
+# a low shingle ledge covers that step.
+shed('Lower level rear ledge roof', 9.6, 18.94, 8.5, 9.42, 1.40, 1.26, '+y')
 
-# Cladding on outward wall faces. A face is exterior when the point a short
-# distance along its normal lies inside no room volume and above the lawn.
-ROOMS = [
-    ((0, 0, -3.4), (7.8, 8, 2.7)),          # main block and basement
-    ((.8, 8, -.4), (7.4, 11.4, 2.5)),       # sunroom
-    ((-6.9, 1.1, -.5), (-.1, 8.1, 2.8)),    # garage
-    ((9.69, -.23, -1.4), (14.83, 4.67, 1.3)),   # lower family room
-    ((9.69, 4.39, -1.4), (16.63, 9.11, 1.3)),   # lower hall, bedroom, bathroom
-    ((7.79, 5.47, -1.4), (10.91, 9.12, 1.3)),   # pink bedroom
-    ((7.73, 1.96, -1.4), (11.06, 4.72, 3.7)),   # stairwell
-    ((9.84, .29, 1.1), (15.49, 8.7, 3.8)),       # nursery, hall, primary, bath
-    ((15.49, 1.8, 1.1), (18.92, 6.5, 3.8)),      # end bedroom
-    ((12.16, 8.5, 1.1), (13.81, 11.73, 3.8)),    # ensuite
-    ((4.3, -2.9, -.4), (7.7, 0, 2.5)),           # covered porch
-]
+# ---------------------------------------------------------------- cladding
+
 CLAD_COLLECTIONS = ['02 | Main architectural walls', '03 | Cutaway walls - enable for enclosure',
                     '05 | Sunroom glazing and house siding', '11 | Split-level stairs and iron rails',
                     '12 | Lower family room architecture', '18 | Upstairs bedroom walls and windows',
                     '26 | Lower hall and additional room architecture', '35 | Garage shell and doors',
                     '39 | Pink curtain bedroom', '17 | Upstairs floors and hall',
-                    '22 | Family bathroom fixtures', '23 | Ensuite shower room']
+                    '22 | Family bathroom fixtures', '23 | Ensuite shower room',
+                    '43 | Exterior roofs and cladding']
 KEYS = ['wall', 'pier', 'header', 'base', 'siding', 'opening', 'foundation', 'return', 'house side', 'slab']
 SKIP = ['skirting', 'trim', 'architrave', 'casing', 'pane', 'glass', 'door', 'window rail', 'jamb', 'mortar']
-
-
-def _inside(p):
-    return any(lo[0] <= p.x <= hi[0] and lo[1] <= p.y <= hi[1] and lo[2] <= p.z <= hi[2] for lo, hi in ROOMS)
 
 
 def _cladding_for(centre, normal):

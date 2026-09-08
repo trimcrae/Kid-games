@@ -11,6 +11,18 @@ attachment to the bedroom is **not confirmed** by this audit; clarification of
 the doorway wall is pending. The earlier statement below describes fixture
 relationships within the room, not proof of its rotation within the house.
 
+## Ensuite placement (September 2026, exterior photographs)
+
+The rear exterior photograph shows the two-storey wing's back wall as one
+flush plane under its gable. The earlier model had the ensuite projecting
+2.6 m beyond that wall with nothing beneath it, which no house does. The
+ensuite now lies inside the wing behind the end bedroom and opens from the
+primary bedroom's dresser wall, the wall that U9 and V1 show beside its
+doorway, which also matches the homeowner's report that the bathroom was
+"sideways". Its window faces the rear lawn. Which side the vanity and
+toilet sit on relative to the window is not confirmed for this placement
+and remains an estimate.
+
 ## Second consistency pass
 
 Revisited all 40 originals, including opposite-facing views. The first pass
