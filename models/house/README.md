@@ -3,6 +3,11 @@
 The [orientation audit](ORIENTATION.md) records the comparison of all 40 photos,
 the corrections, and the relationships that remain estimated.
 
+For narrated video references, use the [private walkthrough evidence workbench](../../tools/house-evidence/README.md).
+It tracks timestamped observations, narration, room coverage, unresolved questions
+and model targets before changes are made. Original recordings stay outside this
+repository; creating the review framework does not confirm any additional geometry.
+
 A separate [first-person walkthrough test](../../house-test/) uses this model.
 It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).
 The visible front/back yards now include lawn, planting beds, trees, a driveway,

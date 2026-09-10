@@ -9,3 +9,6 @@
 # packed sheets in games/craepets/art/ are committed.
 /tools/craepets-art/.tiles/
 __pycache__/
+
+# Private narrated house references; never publish these to GitHub Pages.
+/House Tours/
