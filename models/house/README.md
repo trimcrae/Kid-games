@@ -28,10 +28,10 @@ it is not a surveyed floor plan or a finished house reconstruction.
 
 | Area | Photo references | Included |
 | --- | --- | --- |
-| Sunroom | 1–5 | Three glazed sides, sliding frames and handles, house siding, ceiling panels, clean foam flooring, wooden climbing gym with monkey bars/ladder/net/holds/swing, green-roof playhouse, wicker loveseat/chair/table, arched shelf, two-cup floor lamp |
-| Kitchen | 6 | L-shaped white raised-panel cabinets, glass cupboard, subway backsplash, patterned floor, stone counters, double sink and gooseneck faucet, French-door refrigerator, range/oven, microwave, dishwasher |
+| Sunroom | 1–5; House Tour 78–84s | Three glazed sides, sliding frames and handles, house siding, ceiling panels, clean foam flooring, wooden climbing gym with monkey bars/ladder/net/holds/swing, green-roof playhouse, wicker loveseat/chair/table, arched shelf, two-cup floor lamp placed houseward between the wicker seats |
+| Kitchen | 6; House Tour 60–63s | L-shaped white raised-panel cabinets, glass cupboard, subway backsplash, patterned floor, stone counters, double sink and gooseneck faucet, French-door refrigerator, range/oven, microwave, dishwasher, window-wall cubby worktop, small wooden drawer unit and tall cream pantry |
 | Dining and entry | 6–7 | Dark dining table, estimated dining chairs, multi-drawer cabinet, entry chest, playpen, simplified gallery frames, thermostat, red three-panel front door |
-| Living room | 7–8; House Tour 51–54s | Oatmeal sofa and armchair, small blue sofa, white activity table, computer desk and white chair, large TV/media cabinet, two-door wood cupboard, lamps, mirror and baby swing |
+| Living room | 7–8; House Tour 48–54s | Taupe sofa with two broad seat cushions and rounded arms, rounded tub chair, low navy child lounge, white activity table, computer desk and white chair, large TV on a dark cabinet with open AV shelving and three broad drawer rows, dark two-door wood cupboard, lamps, mirror and baby swing |
 | Split-level stairs | 7, 9–10 | Parallel up/down flights, beige carpet, black iron rails with twisted details, white upper gate, upper landing and door |
 | Lower family room | 9–10, V6–V7 | Carpet, timber wainscot, fireplace with white surround and mantel, TV, blue sofa, green floor cushion, tan armless seat, dark recliner, coffee table, cubbies and storage drawers, ceiling fan, side windows |
 
@@ -43,8 +43,8 @@ The second and third photo sets add:
 | Green family bathroom | U3–U5 | Sea-green tub tile, pale accent band, white tap-wall patch, bathtub, chrome fittings, curtain, white vanity, basin, mirror, toilet, linen shelves and patterned floor |
 | Blue nursery | U6 | Blue walls, blind and grey curtains, white crib, cushioned wood rocking chair, footstool, wood chest, white chest and closed drawer organizer |
 | Cory's bedroom (end of upstairs hall) | U7, U10; House Tour 123–129s | Single bed beside the front window, wood headboard and recessed closet nook behind it; rug, trellis curtains, desk/drawers, narrow bookcase, hammock and climbing handles |
-| Main bedroom and ensuite | U8–U9, V1–V2, ensuite photos | Made double bed, bassinet, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; ensuite off the closet wall, back to back with the family bathroom: shower ahead, window right, vanity and toilet left, wall baskets |
-| Lower bedroom and bathroom | V6, V8–V10 | Connecting hall, corner-window bedroom, made bed, bookcase, low cabinet, bedside drawers and curtained closet; bathroom with vanity, toilet and window |
+| Main bedroom and ensuite | U8–U9, V1–V2, ensuite photos; House Tour 138–139s | Made double bed with gray upholstered headboard and pale draped duvet, bassinet at the entry half of the bed foot, bedside wall shelves, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; ensuite off the closet wall, back to back with the family bathroom: shower ahead, window right, vanity and toilet left, wall baskets |
+| Lower bedroom and bathroom | V6, V8–V10; House Tour 198–199s | Connecting hall, corner-window bedroom, made bed, bookcase, dark low cabinet with two shallow drawers above two doors, bedside drawers and curtained closet; bathroom with vanity, toilet and window |
 | Lower-room additions | V6–V7 | Upright piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |
 | Front porch | V4–V5 | Covered concrete porch, iron railings and steps, two rocking chairs, clean foam mats, mailbox and curved paver walk with a simple lawn base |
 
@@ -158,8 +158,9 @@ procedural shaders. The browser export carries their linear base colours and
 explicit finish descriptions into a separate real-time shading implementation
 described below. The photographs themselves stay private and are not committed.
 
-- **Surfaces.** Oak strip flooring with along-board grain, growth-ring bands
-  and a satin polyurethane coat; eggshell wall paint with faint roller
+- **Surfaces.** Narrow oak strips with irregular along-board fibres and a satin
+  polyurethane coat. The modeled 75 mm strip pitch is a visual fit to
+  H51.008, not a measured board width. Eggshell wall paint has faint roller
   texture; semi-gloss white cabinet and trim enamel; glossy subway tile with
   grey grout; grey-veined white laminate counters; brushed stainless with
   horizontal streaks; plush carpet with pile sheen (beige downstairs and on
@@ -178,8 +179,11 @@ described below. The photographs themselves stay private and are not committed.
   sampling, OpenImageDenoise with albedo and normal passes, AgX with the
   medium-high-contrast look and a small per-view exposure offset.
 
-The pass encodes colours and finishes only. Room dimensions, furniture
-placement and the interior geometry are unchanged and remain estimates.
+The finish stage adjusts materials and lighting. Furniture and geometry
+corrections are authored in the modeling modules; room dimensions, furniture
+sizes and fitted placements remain estimates. Beds use closed, softly crowned
+mattresses and sewn pillows, with a draped main-bed duvet and Cory's coloured
+quilt. Their clean folds approximate fabric rather than copying loose bedding.
 
 ## Browser export and rendering
 
@@ -240,9 +244,10 @@ attenuates indirect diffuse/specular, coat and sheen only; direct lights and bas
 colours are unchanged. `houseTest.state` reports whether it loaded and its strength.
 The committed export uses `--ao`: eight rays within one metre, a 2 mm normal
 bias and a 0.7 m floor/wall edge target. Added sampling geometry is capped at
-180,000 vertices; this model adds 82,524. Glass and foliage do not occlude the
-bake. Near and back-facing intersections are filtered. The sidecar is about
-1.13 MB compressed; this modest contact effect is separate from the room reflections.
+180,000 vertices; the export manifest records the actual increase and bake
+diagnostics. Glass and foliage do not occlude the bake. Near and back-facing
+intersections are filtered. This modest contact effect is separate from the
+room reflections.
 
 This is a real-time approximation of the photographic materials, not Cycles in
 the browser. AO does not bake bounced illumination; unshadowed fills

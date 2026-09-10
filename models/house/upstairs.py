@@ -387,7 +387,7 @@ headboard=soft_bedding('Primary upholstered headboard',(0,.95,.84),
                       (1.67,.76,.095),primary_headboard,nx=22,ny=12)
 headboard.rotation_euler.x=math.pi/2
 asset('Primary bedside wall shelves',(4.47,1.98,0),-90,'House Tour 139s',
-      confidence='two wall shelves observed; spacing and plain storage contents estimated')
+      confidence='wall shelves observed; count, spacing and plain storage contents estimated')
 for z in [1.47,1.87]:
     box('Primary wall shelf board',(0,-.10,z),(1.08,.24,.03),oak,.009)
     for x in [-.41,.41]:
