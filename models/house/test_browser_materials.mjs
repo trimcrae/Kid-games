@@ -36,6 +36,31 @@ assert.equal(sameShader.uniforms.houseDetailMap.value,panelShader.uniforms.house
 samePanels.dispose();
 panels.dispose();
 
+// Long wood fibres should survive tiling without visible edge lines, and
+// their subtle modulation must preserve each exported board/cabinet colour.
+const wood=createHouseMaterial(group('Oak floor board tone 02',{surface:'wood'}));
+const woodShader={vertexShader:THREE.ShaderLib.physical.vertexShader,
+  fragmentShader:THREE.ShaderLib.physical.fragmentShader,uniforms:{}};
+wood.onBeforeCompile(woodShader);
+const {data:woodPixels,width:woodSize}=woodShader.uniforms.houseDetailMap.value.image;
+const tone=(x,y)=>woodPixels[(y*woodSize+x)*4];
+let along=0,across=0,edgeX=0,edgeY=0;
+for(let y=0;y<woodSize;y++)for(let x=0;x<woodSize;x++){
+  const value=tone(x,y)*2/255;
+  assert(value>.85&&value<1.15,'Grain overwhelms the exported wood colour');
+  if(x)along+=Math.abs(tone(x,y)-tone(x-1,y));
+  if(y)across+=Math.abs(tone(x,y)-tone(x,y-1));
+}
+for(let i=0;i<woodSize;i++){
+  edgeX+=Math.abs(tone(0,i)-tone(woodSize-1,i));
+  edgeY+=Math.abs(tone(i,0)-tone(i,woodSize-1));
+}
+along/=woodSize*(woodSize-1);across/=woodSize*(woodSize-1);
+assert(across>along*3,'Wood fibres lost their elongated direction');
+assert(edgeX/woodSize<along*2+.5&&edgeY/woodSize<across*2+.5,
+  'The repeating wood tile has a visible discontinuity at its boundary');
+wood.dispose();
+
 for(const surface of ['wood','fabric','carpet','blocks','siding','shakes','roof','lawn','mineral','stone','paint','ceramic','brushed','foliage']){
   const material=createHouseMaterial(group(surface,{surface,roughness:.6}));
   const shader={vertexShader:THREE.ShaderLib.physical.vertexShader,
