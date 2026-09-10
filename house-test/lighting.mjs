@@ -64,7 +64,10 @@ export function createHouseLighting(scene,renderer,{mobile=false}={}){
 
   const key=new THREE.SpotLight(0xffdec0,0,8,1.35,.85,2);
   key.castShadow=true;key.shadow.mapSize.setScalar(mobile?512:1024);
-  key.shadow.camera.near=.06;key.shadow.normalBias=.008;key.shadow.bias=-.00015;
+  key.shadow.camera.near=.06;
+  // Wide ceiling cones need enough bias to keep flat appliance panels from
+  // self-shadowing into stripes, especially with the smaller phone map.
+  key.shadow.normalBias=mobile?.05:.025;key.shadow.bias=mobile?-.0006:-.0003;
   key.shadow.autoUpdate=false;scene.add(key,key.target);
   const fills=Array.from({length:1},()=>{
     const light=new THREE.PointLight(0xffdec0,0,7,2);scene.add(light);return light;
