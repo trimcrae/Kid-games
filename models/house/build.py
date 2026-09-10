@@ -899,10 +899,10 @@ box('Cupboard crown',(0,0,2.02),(.88,.63,.065),walnut)
 for x in [-.205,.205]:
     panel('Cupboard raised door',x,-.31,1.03,.397,1.77,walnut)
     sphere('Cupboard brass handle',(x*.20,-.365,1.02),(.019,.018,.025),brass)
-# H48.007/H54.010 resolve an open AV bay over broad drawers, in dark brown
-# wood. Keep the prior overall footprint/TV height; drawer count is estimated.
+# H48.007 resolves three broad lower drawer rows beneath the open AV bay,
+# in dark brown wood. Keep the prior estimated overall footprint/TV height.
 asset('Living television media cabinet',(2.25,4.08,.018),0,'House Tour 48.007s,54.010s',
-      'dark wood, open upper shelving and broad drawers observed; two rows and dimensions estimated')
+      'dark wood, open upper shelving and three broad drawer rows observed; dimensions estimated')
 box('Media cabinet lower carcass',(0,0,.205),(1.72,.43,.37),walnut,.014)
 for x in [-.835,.835]:
     box('Media cabinet side',(x,0,.325),(.05,.43,.61),walnut,.008)
@@ -910,8 +910,8 @@ box('Media cabinet back',(0,.203,.50),(1.62,.025,.22),walnut,.003)
 box('Media cabinet AV shelf',(0,0,.395),(1.65,.44,.025),walnut,.005)
 box('Media cabinet open bay divider',(0,0,.515),(.025,.41,.22),walnut,.003)
 box('Media cabinet overhanging top',(0,0,.64),(1.77,.47,.045),walnut,.012)
-for z in [.115,.285]:
-    box('Broad media cabinet drawer',(0,-.236,z),(1.60,.035,.145),walnut,.008)
+for z in [.09,.205,.32]:
+    box('Broad media cabinet drawer',(0,-.236,z),(1.60,.035,.105),walnut,.008)
     for x in [-.43,.43]:
         for dx in [-.055,.055]:
             rod('Media drawer pull mounting',(x+dx,-.255,z),(x+dx,-.282,z),.005,steel)
