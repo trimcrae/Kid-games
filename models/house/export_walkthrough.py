@@ -1,9 +1,10 @@
 """Export the saved house into a compact, self-contained browser mesh.
 
 Run with the same bpy Python as build.py. Source .blend stays fully editable.
-World-space geometry is grouped by material/room to reduce draw calls. Tiny
-bevels and procedural textures are omitted; furniture, curves and room shells
-are retained. The browser never loads reference photographs.
+World-space geometry is grouped by material/room to reduce draw calls. Selected
+furniture keeps one-segment bevels and corner normals. Explicit finish and
+practical-light descriptions drive code-authored browser shaders; the browser
+never loads reference photographs or footage.
 """
 import array
 import gzip
@@ -11,20 +12,34 @@ import hashlib
 import json
 from pathlib import Path
 import math
+import sys
 import bpy
 from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+from browser_materials import material_finish, keep_bevel, practical_light
 OUT = HERE.parent.parent / 'house-test'
 OUT.mkdir(exist_ok=True)
 bpy.ops.wm.open_mainfile(filepath=str(HERE/'house.blend'))
 scene = bpy.context.scene
 for c in bpy.data.collections:
     c.hide_viewport = c.hide_render = False
+beveled_objects = 0
 for o in scene.objects:
     o.hide_set(False)
+    detail = o.type == 'MESH' and keep_bevel(o.name,
+        o.users_collection[0].name if o.users_collection else '',
+        tuple(o.dimensions), len(o.data.vertices))
+    has_bevel = False
     for modifier in list(o.modifiers):
-        o.modifiers.remove(modifier)
+        if detail and modifier.type == 'BEVEL':
+            modifier.segments = 1
+            modifier.harden_normals = True
+            has_bevel = True
+        elif not (detail and modifier.type == 'WEIGHTED_NORMAL'):
+            o.modifiers.remove(modifier)
+    beveled_objects += int(has_bevel)
     if o.type == 'CURVE':
         o.data.bevel_resolution = 0
         o.data.resolution_u = 2
@@ -35,10 +50,32 @@ def xyz(v):
 
 # Open the entry leaf and a sliding sunroom panel for continuous walking.
 # Frames stay at their doorway; this affects only the testing export.
-hinge = Vector((5.11,-.03,0))
-front_open = Matrix.Translation(hinge) @ Matrix.Rotation(math.pi/2,4,'Z') @ Matrix.Translation(-hinge)
+front_asset = bpy.data.objects['Red three-panel front door']
+local_hinge = Vector((.49, 0, 0))  # half the local-X width of the .98 m slab
+hinge = front_asset.matrix_world @ local_hinge
+hinge_axis = front_asset.matrix_world.to_quaternion() @ Vector((0, 0, 1))
+front_open = (Matrix.Translation(hinge) @ Matrix.Rotation(math.pi/2, 4, hinge_axis)
+              @ Matrix.Translation(-hinge))
 groups = {}
 colliders = []
+lights = []
+sunlight = None
+for obj in scene.objects:
+    if obj.type != 'LIGHT':
+        continue
+    lamp = obj.data
+    direction = obj.matrix_world.to_quaternion() @ Vector((0, 0, -1))
+    if lamp.type == 'SUN' and obj.name == 'Soft daylight sun':
+        sunlight = {'direction': xyz(direction), 'color': list(lamp.color),
+                    'intensity': lamp.energy}
+    elif practical_light(obj.name, lamp.type, lamp.energy):
+        lights.append({'name': obj.name, 'type': lamp.type.lower(),
+                       'position': xyz(obj.matrix_world.translation),
+                       'direction': xyz(direction), 'color': list(lamp.color),
+                       'power': round(lamp.energy, 3),
+                       'size': round(lamp.size if lamp.type == 'AREA' else
+                                     lamp.shadow_soft_size, 3),
+                       'angle': round(lamp.spot_size / 2, 4) if lamp.type == 'SPOT' else 1.35})
 depsgraph = bpy.context.evaluated_depsgraph_get()
 source_objects = 0
 for o in scene.objects:
@@ -73,15 +110,16 @@ for o in scene.objects:
         mat = materials[min(tri.material_index,len(materials)-1)] if materials else None
         matname = mat.name if mat else 'Default'
         color = list(mat.diffuse_color[:3]) if mat else [.65,.65,.6]
-        glass = 'glass' in matname.lower() and 'frosted' not in matname.lower()
         key = (cname,matname)
         if key not in groups:
+            finish = material_finish(mat)
             groups[key] = {'name': cname+' / '+matname,'color':color,
-                           'glass':glass,'values':array.array('f')}
+                           'glass':finish['surface'] == 'glass',
+                           'finish':finish,'values':array.array('f')}
         values = groups[key]['values']
-        smooth = mesh.polygons[tri.polygon_index].use_smooth
-        for i in tri.vertices:
-            n = normal_matrix @ (mesh.vertices[i].normal if smooth else tri.normal)
+        for i, loop in zip(tri.vertices, tri.loops):
+            # Vertex averages erase hard edges and weighted bevel normals.
+            n = normal_matrix @ mesh.corner_normals[loop].vector
             n.normalize()
             values.extend(xyz(verts[i])+xyz(n))
     if o.type == 'MESH' and not no_collision:
@@ -96,8 +134,11 @@ for o in scene.objects:
     evaluated.to_mesh_clear()
 
 blob = bytearray()
-manifest = {'version':1,'generator':scene['generator_sha256'],
+manifest = {'version':2,'generator':scene['generator_sha256'],
+            'exporter':hashlib.sha256((HERE/'export_walkthrough.py').read_bytes() +
+                                      (HERE/'browser_materials.py').read_bytes()).hexdigest(),
             'sourceObjects':source_objects,'groups':[],'colliders':colliders,
+            'lights':lights,'sunlight':sunlight,'beveledObjects':beveled_objects,
             'note':'Estimated photo study. Browser export opens the front door and rear sliding panel.'}
 for group in groups.values():
     values = group.pop('values')

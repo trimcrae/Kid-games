@@ -2,6 +2,8 @@ import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld} from './physics.mjs';
 import {createHouseLife} from './house-life.mjs';
 import {rooms} from './rooms.mjs';
+import {createHouseMaterial} from './materials.mjs';
+import {createHouseLighting} from './lighting.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -21,16 +23,14 @@ try {
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
   renderer.setSize(innerWidth,innerHeight);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.18;
+  renderer.toneMapping=THREE.AgXToneMapping;
+  renderer.toneMappingExposure=1.05;
 } catch(error) {
   $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled.';
   start.textContent='3D graphics unavailable';
   throw error;
 }
-scene.add(new THREE.HemisphereLight(0xe8f2ff,0x9c8669,2.1));
-const sun=new THREE.DirectionalLight(0xffeed1,2.2);sun.position.set(-10,28,15);scene.add(sun);
-const fill=new THREE.DirectionalLight(0xd9e7ff,.65);fill.position.set(15,8,-15);scene.add(fill);
+const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches});
 
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,eyeY=1.63,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},last=performance.now(),drag=null;
@@ -41,6 +41,7 @@ function teleport(room){
   if(!p){$('hint').textContent='That starting point is unavailable. Choose a nearby room.';return false;}
   Object.assign(player,p);yaw=room[5];pitch=-.18;eyeY=p.y+1.60;
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
+  lighting.setRoom(room[1],player);
   $('hint').textContent='WASD to walk · Mouse to aim · E for activities · R for rooms';
   render();return true;
 }
@@ -95,6 +96,7 @@ function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.add
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const cameraTarget=new THREE.Vector3(),cameraDesired=new THREE.Vector3();
 function render(){
+  lighting.tick(player,performance.now());
   cameraTarget.set(player.x,player.y+.65,player.z);
   cameraDesired.set(player.x+Math.sin(yaw)*1.9*Math.cos(pitch),player.y+1.15-Math.sin(pitch)*1.9,player.z+Math.cos(yaw)*1.9*Math.cos(pitch));
   const fraction=world?world.cameraFraction(cameraTarget,cameraDesired):1;
@@ -104,7 +106,7 @@ function render(){
 function updateLocation(){
   let closest=null,d=Infinity;
   for(const r of rooms){const dist=Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12;if(dist<d){d=dist;closest=r;}}
-  if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();}
+  if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
 let frames=0,lastDraw=0;
 function animate(now){
@@ -137,17 +139,19 @@ async function load(){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));
       geometry.computeBoundingSphere();
-      const material=new THREE.MeshStandardMaterial({color:new THREE.Color(...g.color),roughness:.83,metalness:0,
-        side:THREE.DoubleSide,transparent:g.glass,opacity:g.glass?.13:1,depthWrite:!g.glass});
-      const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;scene.add(mesh);
+      const material=createHouseMaterial(g);
+      const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
+      mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
+      mesh.layers.enable(1);scene.add(mesh);
     }
+    lighting.load(data);
     world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...life.diagnostics()};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();
