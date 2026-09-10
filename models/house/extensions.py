@@ -132,9 +132,33 @@ for x in [-.237,.237]:
 for x in [-.045,.045]:
     sphere('Jeannie cupboard brass pull',(x,-.278,.494),(.013,.018,.024),brass)
 chest('Lower bedroom bedside drawer chest',(10.40,8.75,0),.55,.67,-90,3,1,'V9,V10; House Tour 200s')
-asset('Lower bedroom curtained closet',(10.35,9.55,0),-90,'V10')
-box('Closet dark backing',(0,.13,1.04),(.75,.025,2.08),walnut)
-for z in [.33,.79,1.25,1.71]:box('Empty closet shelving',(0,0,z),(.76,.28,.032),white)
+# H201.002 shows a high shelf, dark hanging rail and a pale suspended net
+# basket behind the gold curtain. H200.000 locates the curtained corner;
+# neither image establishes the closet's width, depth or exact fittings.
+asset('Lower bedroom curtained closet',(10.35,9.55,0),-90,'V10; House Tour 200/201.002s',
+      confidence='high shelf, rail and hanging net basket observed; dimensions and clean contents estimated')
+box('Closet pale backing',(0,.13,1.04),(.75,.025,2.08),white)
+box('Jeannie closet high shelf',(0,0,1.94),(.76,.28,.035),white)
+rod('Jeannie closet hanging rail',(-.34,-.04,1.80),(.34,-.04,1.80),.014,walnut)
+# Keep the clean basket entirely behind the existing curtain plane. Its
+# softly bowed net and two suspension cords are an estimated simple fit.
+for x in [-.21,.21]:
+    curve('Jeannie basket suspension cord',[(x*.82,-.04,1.81),
+          (x*.94,-.048,1.59),(x,-.005,1.33)],.005,bedding)
+for z,rx,ry in [(1.33,.21,.095),(1.04,.14,.065)]:
+    curve('Jeannie basket bound rim',[(rx*math.cos(t),-.005+ry*math.sin(t),z)
+          for t in [i*math.tau/40 for i in range(40)]],.006,bedding,True)
+for i in range(14):
+    a=i*math.tau/14
+    curve('Jeannie basket gathered net base',[(.14*math.cos(a),-.005+.065*math.sin(a),1.04),
+          (.07*math.cos(a),-.005+.0325*math.sin(a),1.022),(0,-.005,1.015)],.0025,bedding)
+    for sign in [-1,1]:
+        pts=[]
+        for j in range(5):
+            u=j/4; a=i*math.tau/14+sign*.75*u
+            pts.append(((.14+.07*u)*math.cos(a),
+                        -.005+(.065+.03*u)*math.sin(a),1.04+.29*u))
+        curve('Jeannie basket crossed fabric net',pts,.0025,bedding)
 for i in range(10):box('Gathered golden closet curtain',(-.36+i*.018,-.18+.014*math.cos(i),1.06),(.025,.027,2.12),shade,.006)
 asset('Lower bathroom white vanity',(11.88,7.49,0),-90,'V8')
 box('Lower bath cupboard',(0,0,.39),(.79,.48,.78),white)
