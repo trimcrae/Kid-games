@@ -4,10 +4,10 @@ Executed in build.py's Blender namespace after every room and the yard.
 The homeowner's exterior photographs (front from the street, rear from the
 lawn) show a split-level: a single-storey garage wing and entry block under
 one long brown-shingle roof line, a two-storey wing with its ridge running
-front to back whose rear gable is clad in dark weathered cedar shakes over
+front to back whose rear gable has dark rectangular panels and pale seams over
 pale lap siding, and a glazed sunroom with a low shingle roof. Street names,
 house numbers and neighbouring homes are not reproduced. Roof pitches,
-overhangs and the split between siding and shakes are estimates read from the
+overhangs and the split between siding and panels are estimates read from the
 photographs, not measurements.
 
 The interior rooms were placed from photographs one at a time, so their
@@ -21,9 +21,9 @@ made physically coherent in three steps:
    on walls and no room hangs in the air.
 2. Roofs: one gable over the entry block (extended to meet the wing), one
    over the garage, one front-to-back gable over the whole upper wing, low
-   shed roofs over the sunroom, the porch and the lower level's rear ledge.
+   shed roofs over the sunroom and rear ledges. The porch shares the low roof.
 3. Cladding: outward-facing polygons of every wall box, infill included,
-   receive siding or shakes. No doorway, window or browser collision box
+   receive siding or panels. No doorway, window or browser collision box
    changes. `verify.py` then checks that every upper-floor edge has
    structure beneath it and every ceiling sits under a roof.
 """

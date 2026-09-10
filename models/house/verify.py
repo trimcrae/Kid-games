@@ -17,7 +17,7 @@ assert scene.unit_settings.system == 'METRIC'
 assert scene.camera.data.type == 'ORTHO'
 assert len(scene.objects) == inventory['objects']
 assert len({entry['name'] for entry in inventory['assets']}) == len(inventory['assets']), 'Duplicate asset identities'
-assert len([o for o in scene.objects if o.type == 'CAMERA']) == 33
+assert len([o for o in scene.objects if o.type == 'CAMERA']) == 35
 assert 'START HERE - House study' in bpy.data.texts
 assert not bpy.data.libraries, 'Unexpected linked library'
 assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'
@@ -217,6 +217,7 @@ def head_direction(name):
 # W10 establishes the window corner; loose bedding does not establish the
 # head/foot direction reliably enough for a photo-confirmation assertion.
 assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
+assert head_direction('Lower bedroom single bed').y > .99, 'H199: Jeannie headboard and low cabinet share the rear window wall'
 assert head_direction('End bedroom single bed').x < -.99, 'U7: long mattress edge follows right wall; free end faces ottoman'
 cory_bed=position('End bedroom single bed')
 assert abs(cory_bed.y-position('End bedroom side window').y) < .65, 'U7/video: bed stays beside front window wall'

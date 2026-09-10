@@ -31,7 +31,7 @@ it is not a surveyed floor plan or a finished house reconstruction.
 | Sunroom | 1–5 | Three glazed sides, sliding frames and handles, house siding, ceiling panels, clean foam flooring, wooden climbing gym with monkey bars/ladder/net/holds/swing, green-roof playhouse, wicker loveseat/chair/table, arched shelf, two-cup floor lamp |
 | Kitchen | 6 | L-shaped white raised-panel cabinets, glass cupboard, subway backsplash, patterned floor, stone counters, double sink and gooseneck faucet, French-door refrigerator, range/oven, microwave, dishwasher |
 | Dining and entry | 6–7 | Dark dining table, estimated dining chairs, multi-drawer cabinet, entry chest, playpen, simplified gallery frames, thermostat, red three-panel front door |
-| Living room | 7–8 | Oatmeal sofa and armchair, small blue sofa, white activity table, side table, TV/stand, lamps, large mirror, upright piano/bench, baby swing |
+| Living room | 7–8; House Tour 51–54s | Oatmeal sofa and armchair, small blue sofa, white activity table, computer desk and white chair, large TV/media cabinet, two-door wood cupboard, lamps, mirror and baby swing |
 | Split-level stairs | 7, 9–10 | Parallel up/down flights, beige carpet, black iron rails with twisted details, white upper gate, upper landing and door |
 | Lower family room | 9–10, V6–V7 | Carpet, timber wainscot, fireplace with white surround and mantel, TV, blue sofa, green floor cushion, tan armless seat, dark recliner, coffee table, cubbies and storage drawers, ceiling fan, side windows |
 
@@ -42,10 +42,10 @@ The second and third photo sets add:
 | Upstairs hall | U1, U10; homeowner directions | Straight from the upper landing; green bathroom first left, main bedroom left, nursery right, other bedroom at the end; oak floor and empty coat hooks |
 | Green family bathroom | U3–U5 | Sea-green tub tile, pale accent band, white tap-wall patch, bathtub, chrome fittings, curtain, white vanity, basin, mirror, toilet, linen shelves and patterned floor |
 | Blue nursery | U6 | Blue walls, blind and grey curtains, white crib, cushioned wood rocking chair, footstool, wood chest, white chest and closed drawer organizer |
-| Cory's bedroom (end of upstairs hall) | U7, U10 | Single bed along the right window wall, foot toward the ottoman; open rug, trellis curtains, desk/drawers, narrow bookcase, empty hammock and handles between curtain and bookcase |
+| Cory's bedroom (end of upstairs hall) | U7, U10; House Tour 123–129s | Single bed beside the front window, wood headboard and recessed closet nook behind it; rug, trellis curtains, desk/drawers, narrow bookcase, hammock and climbing handles |
 | Main bedroom and ensuite | U8–U9, V1–V2, ensuite photos | Made double bed, bassinet, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; ensuite off the closet wall, back to back with the family bathroom: shower ahead, window right, vanity and toilet left, wall baskets |
 | Lower bedroom and bathroom | V6, V8–V10 | Connecting hall, corner-window bedroom, made bed, bookcase, low cabinet, bedside drawers and curtained closet; bathroom with vanity, toilet and window |
-| Lower-room additions | V6–V7 | Second piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |
+| Lower-room additions | V6–V7 | Upright piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |
 | Front porch | V4–V5 | Covered concrete porch, iron railings and steps, two rocking chairs, clean foam mats, mailbox and curved paver walk with a simple lawn base |
 
 Photo numbering preserves the uploads: **1–10** is the original set;
@@ -93,6 +93,7 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Green family bathroom](previews/bathroom.png)
 - [Blue nursery](previews/nursery.png)
 - [End bedroom](previews/bedroom.png)
+- [Cory's headboard and closet nook](previews/cory_nook.png)
 - [Main bedroom](previews/primary.png)
 - [Ensuite](previews/ensuite.png)
 - [Front porch](previews/porch.png)
@@ -101,6 +102,7 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Lower bedroom](previews/lower_bedroom.png)
 - [Lower bathroom](previews/lower_bathroom.png)
 - [Garage interior](previews/garage.png)
+- [Garage rear openings](previews/garage_rear.png)
 - [Basement play area](previews/basement_play.png)
 - [Basement office](previews/basement_office.png)
 - [Basement laundry and mechanical area](previews/basement_laundry.png)
@@ -240,21 +242,20 @@ themselves form a closed shell: before this pass the upper floor's edges
 hung in the air and no roof could sit on them. The pass works in three steps:
 
 1. **Shell infill.** The side wing is defined as stacked boxes (lower and
-   upper level, L-shaped because the end bedroom is a corner room set back
-   from the front), plus the space between the entry block and the wing and
+   upper level, with the two front bedroom windows in one plane as shown in
+   House Tour 3s), plus the space between the entry block and the wing and
    the stairwell head room. Every face of those boxes that looks at the
    outdoors and is not already covered by a wall or window receives a plain
    wall. Those walls enclose unphotographed space; no interior is invented.
 2. **Roofs.** One long gable over the entry block, carried east to meet the
    wing; a gable over the garage on the same line; a front-to-back gable over
-   the upper wing with pale siding on the street gable and dark cedar shakes
-   on the rear gable, as photographed; a lower cross gable over the set-back
-   end-bedroom block; low shingle roofs over the sunroom, the porch and the
+   the whole upper wing with pale siding on the street gable and a dark panel
+   grid on the rear gable; low shingle roofs over the sunroom and the
    half-metre step where the lower level's rear wall stands behind the upper
    wing's.
 3. **Cladding.** The outward-facing polygons of every wall box, infill
    included, receive vinyl lap siding (pale blue-grey on the house, tan on
-   the garage) or shakes. No doorway, window or browser collision box
+   the garage) or dark panels. No doorway, window or browser collision box
    changes; roofs never collide.
 
 `verify.py` then proves the result: every outside edge of every upper-floor
@@ -329,7 +330,7 @@ The model uses these additional relationships from the photos:
 | Reference | Relationship used in the model |
 | --- | --- |
 | 7 | Facing the red door from dining, stairs and drawer storage are on the left; the living room and kitchen opening are on the right. The flights leave the side of the main floor. |
-| 8 | Front windows and the child sofa occupy one wall. The main sofa and large mirror occupy the adjoining perpendicular outside wall. The piano sits toward the kitchen partition; the floor lamp is by that partition. |
+| 8, House Tour 51–54s | Front windows and the child sofa occupy one wall. The main sofa, large mirror and tall cupboard occupy the adjoining outside wall. The TV/media cabinet and floor lamp are by the kitchen partition. |
 | 6 | Looking from dining into the kitchen, the fridge and range are on the left/front partition; the sink and dishwasher turn onto the adjoining outside wall. |
 | 9–10 | Facing the flights, upstairs is left and downstairs is right. Both travel into the same side wing. The fireplace is ahead downstairs, with the blue sofa, olive chair and windows along the right side. |
 | 1, 4–5 | From the main-house doorway into the sunroom, the gym/playhouse are left and wicker seating is right. The house-side window sits left of the doorway. The visible exterior split-level extension continues on the right. |

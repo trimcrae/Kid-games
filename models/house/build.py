@@ -18,7 +18,7 @@ HERE = Path(__file__).resolve().parent
 ARGS = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--render', action='store_true')
-parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom,lower_entry,kitchen_access,basement_entry,front_yard,back_yard,street_front,rear_elevation')
+parser.add_argument('--views', default='overview,plan,entry,sunroom,kitchen,living,family,stairs,upper_overview,upper_plan,hall,bathroom,nursery,bedroom,cory_nook,primary,ensuite,porch,lower_bedroom,lower_bathroom,garage,garage_rear,basement_play,basement_office,basement_laundry,basement_plan,basement_stairs,pink_bedroom,lower_entry,kitchen_access,basement_entry,front_yard,back_yard,street_front,rear_elevation')
 parser.add_argument('--samples', type=int, default=48)
 parser.add_argument('--preview-scale', type=int, default=100, help='Render percentage; use 50 for fast layout checks')
 args = parser.parse_args(ARGS)
@@ -1061,12 +1061,14 @@ camera('hall',(11.06,4.01,2.88),(15.8,4.01,2.30),24)
 camera('bathroom',(11.57,4.69,2.88),(10.95,6.9,2.28),17)
 camera('nursery',(12.57,3.26,2.91),(13.05,1.12,2.07),18)
 camera('bedroom',(15.64,4.01,2.92),(17.80,3.84,2.0),19)
+camera('cory_nook',(18.10,2.80,2.90),(15.55,1.02,2.03),24)
 camera('primary',(14.90,4.72,2.92),(13.83,7.46,2.11),18)
 camera('ensuite',(12.50,8.03,2.80),(9.95,7.72,2.05),18)
 camera('porch',(4.78,-.72,1.65),(.52,-1.00,.80),24)
 camera('lower_bedroom',(12.42,5.70,.57),(15.40,7.15,-.36),18)
 camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
 camera('garage',(-.64,7.54,1.67),(-3.65,3.40,.75),18)
+camera('garage_rear',(-3.45,4.80,1.67),(-4.0,8.10,1.05),24)
 camera('basement_play',(2.20,6.85,-1.55),(2.20,3.20,-2.30),16)
 camera('basement_office',(6.50,6.60,-1.62),(2.10,6.65,-2.28),20)
 camera('basement_laundry',(4.44,5.43,-1.54),(6.51,7.20,-2.14),17)
@@ -1141,7 +1143,7 @@ for label,pos in [('PLAY / BUNKS',(.40,3.2)),('OFFICE',(3.00,6.90)),('LAUNDRY',(
 
 def set_view(name):
     scene.camera = CAMERAS[name]
-    upper_view = name in {'upper_overview','upper_plan','hall','bathroom','nursery','bedroom','primary','ensuite'}
+    upper_view = name in {'upper_overview','upper_plan','hall','bathroom','nursery','bedroom','cory_nook','primary','ensuite'}
     exterior = name in {'overview', 'plan','upper_overview','upper_plan'}
     cutaway.hide_render = exterior
     cutaway.hide_viewport = exterior
@@ -1166,13 +1168,13 @@ def set_view(name):
         bpy.data.collections['25 | Front porch and path'].hide_viewport = True
     extension_ceilings.hide_render = extension_ceilings.hide_viewport = exterior or upper_view
     basement_view = name.startswith('basement_') and name != 'basement_stairs'
-    garage_view = name == 'garage'
+    garage_view = name in {'garage','garage_rear'}
     pink_view = name == 'pink_bedroom'
     for c in NEW_COLLECTIONS:
         n=int(c.name[:2])
         visible = ((30 <= n <= 34 and (basement_view or name in {'overview','basement_stairs'})) or
                    (n == 31 and name in {'basement_stairs','plan','family','stairs'}) or
-                   (35 <= n <= 37 and (elevation or name in {'overview','plan','garage','kitchen','kitchen_access'})) or
+                   (35 <= n <= 37 and (elevation or garage_view or name in {'overview','plan','kitchen','kitchen_access'})) or
                    (n == 38 and (basement_view or garage_view or name in {'overview','basement_stairs','kitchen','kitchen_access'})) or
                    (n in {39,40} and (pink_view or elevation or name in {'overview','plan','family','lower_bedroom','lower_bathroom','lower_entry'})))
         c.hide_render = c.hide_viewport = not visible
@@ -1180,7 +1182,7 @@ def set_view(name):
     stair_soffit=bpy.data.objects['Basement staircase sloped ceiling']
     stair_soffit.hide_render = name in {'basement_plan','plan','overview'}
     stair_soffit.hide_set(stair_soffit.hide_render)
-    garage_ceiling.hide_render = garage_ceiling.hide_viewport = name not in {'garage','kitchen','kitchen_access'}
+    garage_ceiling.hide_render = garage_ceiling.hide_viewport = name not in {'garage','garage_rear','kitchen','kitchen_access'}
     pink_ceiling.hide_render = pink_ceiling.hide_viewport = not (pink_view or name == 'lower_entry')
     basement_labels.hide_render = basement_labels.hide_viewport = name != 'basement_plan'
     yard_collection.hide_render = yard_collection.hide_viewport = name in {'plan','upper_plan','basement_plan'}
