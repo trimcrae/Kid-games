@@ -163,7 +163,7 @@ export function validate(s) {
   }
   return errors;
 }
-export function save(location, next, {allowSources = false} = {}) {
+export function save(location, next, {allowSources = false,allowBaseline = false} = {}) {
   const workspace = privateWorkspace(location);
   const errors = validate(next);
   if (errors.length) throw new Error(errors.slice(0,15).join('\n'));
@@ -173,7 +173,7 @@ export function save(location, next, {allowSources = false} = {}) {
   try {
   const current = load(workspace);
   if (current.revision !== next.revision) { const error = new Error('Session changed elsewhere; reload before saving.'); error.status = 409; throw error; }
-  if (JSON.stringify(current.model) !== JSON.stringify(next.model)) throw new Error('The baseline model snapshot is immutable. Start a new session for a new baseline.');
+  if (!allowBaseline && JSON.stringify(current.model) !== JSON.stringify(next.model)) throw new Error('The baseline model snapshot is immutable. Start a new session for a new baseline.');
   if (!allowSources) {
     const sourceIdentity = videos => videos.map(({durationSeconds,transcript,...identity}) => identity);
     if (JSON.stringify(sourceIdentity(current.videos)) !== JSON.stringify(sourceIdentity(next.videos))) throw new Error('Register video sources using the local CLI.');
@@ -195,6 +195,17 @@ export function save(location, next, {allowSources = false} = {}) {
   catch (error) { if (fs.existsSync(temporary)) fs.unlinkSync(temporary); throw error; }
   return result;
   } finally { fs.unlinkSync(lock); }
+}
+export function refreshBaseline(location) {
+  const current=load(location);
+  if (['observations','reviews','reviewedRanges','changes'].some(k => current[k].length) || current.questions.some(q => q.status !== 'open')) throw new Error('Review has begun. Keep this baseline and reconcile it explicitly, or start a new session.');
+  const file=privateArtifact(location,`baseline-${current.model.generatorSha256.slice(0,12)}-r${current.revision}.json`);
+  const original=fs.readFileSync(privateArtifact(location,'session.json'));
+  headroom(location,original.length*4);
+  fs.writeFileSync(file,original,{flag:'wx'});
+  if (digest(fs.readFileSync(file)) !== digest(original)) throw new Error('Baseline recovery copy failed verification.');
+  const next={...current,model:modelSnapshot(),questions:[...structuredClone(initialQuestions),...current.questions.filter(q => !initialQuestions.some(seed => seed.id === q.id))]};
+  return save(location,next,{allowBaseline:true});
 }
 export function coveredRanges(ranges, duration) {
   const merged = [];

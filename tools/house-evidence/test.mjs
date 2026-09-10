@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
-import {init,load,save,validate,report,coveredRanges,repo,privateWorkspace,privateArtifact,addVideo,parseTranscript,hashFile} from './core.mjs';
+import {init,load,save,validate,report,coveredRanges,repo,privateWorkspace,privateArtifact,addVideo,parseTranscript,hashFile,refreshBaseline} from './core.mjs';
 import {byteRange,startServer} from './server.mjs';
 import {extractionPlan} from './extract.mjs';
 
@@ -146,4 +146,13 @@ test('artifact junctions cannot redirect private output into another directory',
   fs.symlinkSync(other,path.join(dir,'frames'),'junction');
   assert.throws(() => privateArtifact(dir,'frames/tour-1/output.jpg'),/symbolic links/);
   assert.throws(() => privateArtifact(dir,'../escaped.json'),/within/);
+});
+test('baseline refresh retains a verified recovery ledger and refuses once review begins',t => {
+  const dir=fixture(t), before=fs.readFileSync(path.join(dir,'session.json'));
+  const next=refreshBaseline(dir);
+  const archive=fs.readdirSync(dir).find(f => f.startsWith('baseline-'));
+  assert(fs.readFileSync(path.join(dir,archive)).equals(before));
+  assert.equal(next.revision,1);
+  source(next); observation(next); save(dir,next,{allowSources:true});
+  assert.throws(() => refreshBaseline(dir),/Review has begun/);
 });

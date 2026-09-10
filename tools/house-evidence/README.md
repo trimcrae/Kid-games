@@ -116,7 +116,8 @@ edits. Do not replace the baseline silently. Coordinates are metres: Blender
 Current room anchors/elevations are estimates, not video-derived measurements.
 
 Edit the source generators (`build.py`, `upstairs.py`, `extensions.py`,
-`basement_garage.py`, `yard.py`), since regeneration replaces the `.blend`.
+`basement_garage.py`, `yard.py`, `exterior.py`, `photoreal.py`), since regeneration
+replaces the `.blend`. The baseline discovers generator files from `inventory.json`.
 The private ledger's optional `changes` list records implementation receipts:
 
 ```json
@@ -138,6 +139,13 @@ revision checks and retain one bounded `session.json.bak` recovery copy.
 An exclusive `session.lock` prevents simultaneous CLI/server writers. If a process
 is interrupted, inspect the ledger, backup and any temporary file before removing
 its leftover lock; locks are never expired by age.
+
+If newer model commits arrive **before any review begins**, stop the local server
+and run `node tools/house-evidence/cli.mjs refresh-baseline`. It preserves a verified
+archive of the old ledger, retains source registrations/transcripts, refreshes the
+model snapshot and seeded questions, and refuses once observations, ranges,
+assessments, resolutions or changes exist. During an active review, reconcile
+baseline warnings explicitly or create a new session instead.
 
 **Browser realism needs its own implementation pass.** The present exporter removes
 modifiers and procedural textures, and exports only diffuse RGB plus a glass flag.

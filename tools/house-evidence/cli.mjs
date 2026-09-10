@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import {defaultWorkspace,init,load,save,validate,report,addVideo,parseTranscript,hashFile} from './core.mjs';
+import {defaultWorkspace,init,load,save,validate,report,addVideo,parseTranscript,hashFile,refreshBaseline} from './core.mjs';
 import {startServer} from './server.mjs';
 import {extract} from './extract.mjs';
 
@@ -16,6 +16,7 @@ const help = `Private house walkthrough evidence (Node, no install)
       [--times 12,23.5] [--interval 15] [--limit 80] [--ffmpeg PATH]
   check [--hash]                Validate links/ranges; optionally rehash originals
   report                       Print room, audio/video coverage and open questions
+  refresh-baseline             Before review only: archive baseline, sync latest model
 
 All commands accept --workspace PATH (must be outside this repository).
 Default: ${defaultWorkspace}
@@ -44,6 +45,8 @@ try {
   } else if (command === 'add-video') {
     const s=await addVideo(workspace,required('file'),required('id'),options);
     console.log(`Registered ${s.videos.at(-1).id} in place. Duration: ${s.videos.at(-1).durationSeconds ?? 'unknown (open in reviewer)'}.`);
+  } else if (command === 'refresh-baseline') {
+    const s=refreshBaseline(workspace);console.log(`Baseline refreshed with ${s.model.sourceFiles.length} source files. Previous baseline archived; ${s.videos.length} original source registrations retained.`);
   } else if (command === 'serve') {
     const port=Number(options.port ?? 8766);
     if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Port must be 1024–65535.');

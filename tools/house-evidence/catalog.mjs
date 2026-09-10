@@ -43,7 +43,7 @@ export const rooms = entries.map(([id,name,cameras]) => {
 });
 
 export const initialQuestions = [
-  ['ensuite-attachment','ensuite','Which bedroom wall contains the ensuite doorway? Follow a continuous path from bedroom entry past the closet/dresser to the bathroom, then reverse it. The current rotation is unconfirmed.'],
+  ['ensuite-attachment','ensuite','Cross-check the latest photo-based placement: doorway on the primary closet wall, ensuite back to back with the family bathroom; shower ahead, window right, vanity/toilet left. Trace the connection continuously and in reverse. Width (about 1.3 m) and shared-wall offsets remain estimated.'],
   ['basement-reverse','basement-play','Reconcile bunk, bookcase, dollhouse, foosball and stairs from both ends. From the bottom stair facing into the basement, homeowner-confirmed office right/play left supersedes older photo interpretations.'],
   ['office-window','office','Locate the high office window and office/laundry wall relative to the stairs and outside footprint; their absolute rotation remains estimated.'],
   ['ellie-bed','ellie','Show both ends of the bed and the doorway/window corner to resolve its head/foot orientation.'],
@@ -53,5 +53,5 @@ export const initialQuestions = [
   ['lower-entry-offset','lower-entry','Trace the family-room stairs into the shared entry: Ellie left, bathroom ahead, Jeannie right. Establish the entry offset and doorway spacing.'],
   ['garage-opening','kitchen','Trace the garage door beyond the glass cupboard on the sink wall; show both sides, cabinet clearance and level change.'],
   ['sunroom-bays','sunroom','Count glazing bays, show the house-side door/window and roof/ceiling, and establish the floor step and connection to the yard.'],
-  ['envelope','front-yard','Relate exterior walls, roof and split levels to interior windows and transitions. Keep unseen roof areas and lot distances explicitly estimated.']
+  ['envelope','front-yard','Cross-check the newly modeled closed exterior walls, gables, roofs and split levels against interior windows and transitions. Keep unseen roof areas and lot distances explicitly estimated.']
 ].map(([id,roomId,question]) => ({id,roomId,question,status:'open',resolutionObservationIds:[]}));
