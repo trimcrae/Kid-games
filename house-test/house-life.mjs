@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {activities,destinationFor} from './activities.mjs';
-import {creature,petpet,disposeCreature,labelSprite} from './creatures.mjs';
+import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs';
 import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
@@ -25,7 +25,7 @@ export async function createHouseLife(tour){
   const engine=frame.contentWindow.Craepets;
   const neighborhood=createNeighborhood(scene,world);
   const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew:()=>showActivity({id:'adopt',room:'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'})});
-  let avatar,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,heading=Math.PI,syncAt=0,lastWho=null,decorKey='';
+  let avatar,avatarSize=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,heading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
   const stations=activities.map(a=>{
     const room=rooms.find(r=>r[1]===a.room),point=world.safeSpot(room[2],room[4],-room[3]);
@@ -92,8 +92,9 @@ export async function createHouseLife(tour){
     if(key===avatarKey)return;avatarKey=key;
     if(avatar)disposeCreature(avatar);avatar=null;
     if(!snapshot.pet)return;
-    avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));scene.add(avatar);
+    avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
     if(snapshot.pet.petpet){const friend=petpet(snapshot.pet.petpet.id);friend.position.set(.4,0,-.3);avatar.add(friend);}
+    avatarSize=new THREE.Box3().setFromObject(avatar).getSize(new THREE.Vector3());
   }
   function updateRoamers(){
     const family=api.family().filter(p=>p.id!==engine.who()&&p.pet);
@@ -108,14 +109,16 @@ export async function createHouseLife(tour){
     cast.forEach((p,i)=>{
       const home=rooms.find(r=>r[1]===(p.room||familyRooms[p.id]||'Living room'));
       const anchor=world.safeSpot(home[2],home[4],-home[3]);if(!anchor)return;
-      const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(.88);
+      const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(PET_SCALE);
       // Cache the body bounds before adding the name sprite. A floor-origin
       // distance misses tall ears/heads even when they intersect the camera.
       const bounds=new THREE.Box3().setFromObject(mesh);
       const cameraBounds={minY:bounds.min.y,maxY:bounds.max.y,
         radius:Math.hypot(Math.max(Math.abs(bounds.min.x),Math.abs(bounds.max.x)),
           Math.max(Math.abs(bounds.min.z),Math.abs(bounds.max.z)))};
-      const label=labelSprite(p.pet.name||p.name);label.scale.set(1.3,.245,1);label.position.y=1.3;mesh.add(label);scene.add(mesh);
+      // The name tag rides on the pet but keeps its readable world size,
+      // floating just above the tallest ears.
+      const label=labelSprite(p.pet.name||p.name);label.scale.set(1.14/PET_SCALE,.215/PET_SCALE,1);label.position.y=.95/PET_SCALE;mesh.add(label);scene.add(mesh);
       roamers.push({id:p.id,mesh,label,cameraBounds,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,distance:0});
     });
   }
@@ -209,6 +212,6 @@ export async function createHouseLife(tour){
         $('journey').hidden=false;$('journey-text').textContent=`${arrow} ${destination.room} · ${Math.round(d)} m${Math.abs(dy)>.6?(dy>0?' · Go upstairs':' · Go downstairs'):''}${inReach(destination)?' · You’re here!':''}`;
       }else $('journey').hidden=true;
     },
-    diagnostics:()=>({pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
+    diagnostics:()=>({pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
   };
 }

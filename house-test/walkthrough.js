@@ -48,18 +48,59 @@ function teleport(room){
   $('hint').textContent='WASD to walk · Mouse to aim · E for activities · R for rooms';
   render();return true;
 }
-function suspend(){active=false;keys.clear();endJoy();drag=null;document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
+// Desktop mouse look. Pointer lock pins the cursor and reports relative
+// movement, so the view keeps turning as long as the mouse keeps moving —
+// past a full turn, not just to the edge of the screen. Some hosts can refuse
+// the lock (some in-app browsers, a sandboxed iframe, or Chrome's short
+// cool-down straight after Escape); we never pretend it worked, we say so and
+// hold-and-drag looking takes over.
+const LOOK_SPEED=.0024,PITCH_MIN=-.8,PITCH_MAX=.42;
+const finePointer=()=>matchMedia('(pointer:fine)').matches;
+const mouseLocked=()=>document.pointerLockElement===canvas;
+let lockWanted=false,lockPending=false,lockDenied=false,lockFair=false,lastUnlock=-Infinity,turned=0;
+const CAPTURED_HINT='Mouse to aim · WASD to walk · E to interact · R for rooms · Esc to release';
+const CLICK_HINT='Click the view to capture the mouse · WASD to walk';
+const DRAG_HINT='Mouse capture was blocked here, so hold the button and drag to look. For full game-style mouse look, open this page in a regular Chrome or Edge tab';
+// Only a refusal of a fair request — made from a click, not straight after an
+// unlock — means the host blocks capture. Anything else just needs a click.
+function lockFailed(){
+  document.body.classList.remove('mouse-look');
+  if(lockFair)lockDenied=true;
+  if(active)$('hint').textContent=lockDenied?DRAG_HINT:CLICK_HINT;
+}
+async function captureMouse(){
+  if(!finePointer()||!active||mouseLocked()||lockPending)return;
+  const gesture=navigator.userActivation?navigator.userActivation.isActive:true;
+  if(!gesture){$('hint').textContent=lockDenied?DRAG_HINT:CLICK_HINT;return;}
+  lockFair=performance.now()-lastUnlock>1500;lockPending=true;
+  try{
+    // Raw deltas keep the sensitivity steady across operating-system pointer
+    // acceleration; not every platform offers them.
+    try{await canvas.requestPointerLock({unadjustedMovement:true});}
+    catch(error){
+      if(error&&(error.name==='NotSupportedError'||error.name==='TypeError'))await canvas.requestPointerLock();
+      else throw error;
+    }
+  }catch{lockFailed();}
+  finally{lockPending=false;}
+}
+function suspend(){active=false;keys.clear();endJoy();drag=null;lockWanted=false;if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
 function pause(){suspend();welcome.hidden=false;start.textContent='Continue exploring';}
 async function resume(){
   if(!ready)return;if(life&&!life.hasPet()){life.adopt();return;}active=true;welcome.hidden=true;$('rooms').hidden=true;
   $('rooms-button').setAttribute('aria-expanded','false');$('touch-controls').style.visibility='visible';canvas.focus();
-  $('hint').textContent='Mouse to aim · WASD to walk · E to interact · R for rooms · Esc to release';
-  if(matchMedia('(pointer:fine)').matches&&!document.pointerLockElement){try{await canvas.requestPointerLock();}catch{$('hint').textContent='Move the mouse to aim · Click the view to capture the mouse';}}
+  $('hint').textContent=finePointer()?CAPTURED_HINT:'Drag to look · left pad to walk · tap an activity';
+  if(!finePointer())return;
+  lockWanted=true;await captureMouse();
+  if(active&&!mouseLocked())$('hint').textContent=lockDenied?DRAG_HINT:CLICK_HINT;
 }
 function showRooms(show){
+  const wasOpen=!$('rooms').hidden;
   $('rooms').hidden=!show;$('rooms-button').setAttribute('aria-expanded',String(show));
   if(show){suspend();welcome.hidden=true;}
-  else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();}
+  // Only closing the open panel returns to walking with the mouse; other
+  // callers just tidy the panel away on the way to an activity.
+  else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();if(wasOpen&&finePointer()){lockWanted=true;captureMouse();}}
 }
 let section='';
 for(const room of rooms){
@@ -71,7 +112,19 @@ bindButton(start,()=>failed?location.reload():resume());bindButton($('pause-butt
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('welcome-rooms'),()=>{if(ready)showRooms(true);});bindButton($('welcome-family'),()=>{if(ready)$('family-button').click();});
 bindButton($('reset'),()=>{if(ready){teleport(rooms[0]);resume();}});
-document.addEventListener('pointerlockchange',()=>{document.body.classList.toggle('mouse-look',document.pointerLockElement===canvas);if(!document.pointerLockElement&&active&&matchMedia('(pointer:fine)').matches)pause();});
+document.addEventListener('pointerlockchange',()=>{
+  // A lock that lands after the house was paused (a panel opened while the
+  // request was in flight) is handed straight back.
+  if(mouseLocked()&&(!active||!lockWanted)){document.exitPointerLock();return;}
+  const captured=mouseLocked();
+  document.body.classList.toggle('mouse-look',captured);
+  if(captured){lockDenied=false;drag=null;if(active)$('hint').textContent=CAPTURED_HINT;return;}
+  lastUnlock=performance.now();
+  // Escape, a tab switch or a lost window all release the lock: park the house
+  // behind the welcome card rather than leaving an invisible cursor walking.
+  if(lockWanted&&active&&finePointer())pause();
+});
+document.addEventListener('pointerlockerror',lockFailed);
 document.addEventListener('keydown',e=>{
   if(!$('activity-choices').hidden){if(e.code==='Escape')$('close-choices').click();return;}
   if(!$('activity-panel').hidden||!$('family-panel').hidden||!$('save-panel').hidden)return;
@@ -86,10 +139,25 @@ document.addEventListener('keydown',e=>{
 document.addEventListener('keyup',e=>keys.delete(e.code));
 window.addEventListener('blur',()=>{keys.clear();joy={x:0,y:0};});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&ready)pause();});
-function look(dx,dy){yaw-=dx*.0026;pitch=THREE.MathUtils.clamp(pitch-dy*.0026,-.8,.4);life?.face(yaw+Math.PI);}
-document.addEventListener('mousemove',e=>{if(active&&document.pointerLockElement===canvas)look(e.movementX,e.movementY);});
-canvas.addEventListener('pointerdown',e=>{if(!active)return;if(e.pointerType==='mouse'){if(!document.pointerLockElement)Promise.resolve(canvas.requestPointerLock?.()).catch(()=>{});return;}drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
-canvas.addEventListener('pointermove',e=>{if(!active)return;if(e.pointerType==='mouse'&&!document.pointerLockElement){look(e.movementX,e.movementY);return;}if(drag?.id===e.pointerId){look(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY;}});
+function look(dx,dy){
+  // Every report counts in full, so a fast flick turns as far as it travelled.
+  const turn=dx*LOOK_SPEED;
+  yaw-=turn;turned+=turn;
+  // Horizontal turning is unlimited; the angle only wraps to stay precise.
+  if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));
+  pitch=THREE.MathUtils.clamp(pitch-dy*LOOK_SPEED,PITCH_MIN,PITCH_MAX);
+  life?.face(yaw+Math.PI);
+}
+document.addEventListener('mousemove',e=>{if(active&&mouseLocked())look(e.movementX,e.movementY);});
+canvas.addEventListener('pointerdown',e=>{
+  if(!active)return;
+  // A mouse press asks for the lock and starts a drag; whichever the browser
+  // allows takes effect, and a granted lock cancels the drag.
+  if(e.pointerType==='mouse'&&!mouseLocked()){lockWanted=true;captureMouse();}
+  if(e.pointerType==='mouse'&&mouseLocked())return;
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove',e=>{if(!active||mouseLocked())return;if(drag?.id===e.pointerId){look(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY;}});
 function endDrag(){drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
 const joystick=$('joystick'),knob=joystick.firstElementChild;let joyId=null;
 function updateJoy(e){const r=joystick.getBoundingClientRect();let x=(e.clientX-r.x-r.width/2)/38,y=(e.clientY-r.y-r.height/2)/38;const n=Math.max(1,Math.hypot(x,y));joy={x:x/n,y:y/n};knob.style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`;}
@@ -178,7 +246,8 @@ async function load(){
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,
+      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();

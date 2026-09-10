@@ -446,6 +446,22 @@ shadow maps and bounded reflection probes:
 node models/house/test_browser_rendering.mjs
 ```
 
+`test_browser_house_controls.mjs` loads the real walkthrough page in Chrome and
+checks the desktop controls: a real click takes pointer lock, relative mouse
+movement turns the view past a full circle with the cursor hidden, fast flicks
+turn in full proportion, pitch stays clamped, menu and activity clicks leave the
+mouse free, Escape releases and a second click captures again. It reads back
+the drawn pet sizes, then loads the page in a sandboxed iframe — a host that
+refuses pointer lock — and checks the walkthrough says so, points to a normal
+browser tab and still turns by hold-and-drag. `tests/house-pet-scale.mjs`
+measures every species against the model's own dining table, chair seat and
+front door:
+
+```sh
+node models/house/test_browser_house_controls.mjs
+node tests/house-pet-scale.mjs
+```
+
 The WebGL fixture and full-game checks reuse an installed `playwright` module.
 The fixture accepts `PLAYWRIGHT_MODULE` as its absolute module directory; the
 full-game suite uses normal Node resolution or the containing `NODE_PATH`.

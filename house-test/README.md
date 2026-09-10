@@ -6,11 +6,15 @@ This page is intentionally absent from the arcade registry and home page. It
 includes `noindex,nofollow,noarchive`; that is a search-engine request, not
 authentication. GitHub Pages and this repository remain public.
 
-Control your own Craepet in third person with WASD or arrows. Move the mouse to aim
-without dragging; starting the game captures the pointer. Hold Shift to move faster,
-press E to choose a nearby activity, R for rooms, and F for family.
-Escape releases the mouse and pauses. Touch devices have a movement pad and
-drag-to-look. The Rooms menu offers directions (without teleporting) and quick
+Control your own Craepet in third person with WASD or arrows. Starting the game
+(or clicking the view) captures the pointer, like any first-person game: the
+cursor disappears and moving the mouse turns the view as far as you like.
+Hold Shift to move faster, press E to choose a nearby activity, R for rooms,
+and F for family. Escape releases the mouse and pauses. If a browser refuses
+capture (some in-app or embedded browsers can), the footer says so, hold-and-drag
+looking takes over, and a normal Chrome or Edge tab gives full mouse look.
+Touch devices have a movement pad and drag-to-look. Every pet is drawn at
+`PET_SCALE` (`creatures.mjs`), dog-sized against the real-size furniture. The Rooms menu offers directions (without teleporting) and quick
 jumps to each floor and yard. Family pets and the activity hosts wander on their
 own, follow collision boundaries and give the player space. Doors and the
 upper stair gate are held open in the browser export. There is no analytics,

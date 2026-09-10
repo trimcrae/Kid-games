@@ -2,6 +2,13 @@ import * as THREE from './vendor/three.module.min.js';
 
 // Live, code-built counterparts of the seven Blender species: spheres, cones
 // and tubes. No generated pictures, downloads, or remote model dependencies.
+// Every pet in the house — yours, the family's and the neighbours' — is drawn
+// at this scale. At 1.0 a hatched Craepet's head stood 0.89 m tall, above the
+// 0.80 m dining table and level with the chair backs, which made the real-size
+// rooms read as a doll's house. At 0.6 the head is ~0.53 m: above a 0.52 m
+// chair seat, below the table, like a big friendly dog. Shapes, eggs and
+// petpets keep their proportions to each other.
+export const PET_SCALE=.6;
 const sphere=new THREE.SphereGeometry(1,16,12);
 const cone=new THREE.ConeGeometry(1,1,12);
 export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'}) {
