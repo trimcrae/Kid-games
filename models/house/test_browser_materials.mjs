@@ -21,10 +21,19 @@ const panels=createHouseMaterial(group('Weathered dark exterior panels',{surface
 const panelShader={vertexShader:THREE.ShaderLib.physical.vertexShader,
   fragmentShader:THREE.ShaderLib.physical.fragmentShader,defines:{},uniforms:{}};
 panels.onBeforeCompile(panelShader);
-assert.equal(panelShader.defines.HOUSE_SURFACE,13);
+assert.equal(panelShader.uniforms.houseSurfaceKind.value,13);
 assert.deepEqual(panelShader.uniforms.housePanelSize.value.toArray(),[1.2,.6,.01]);
 assert.equal(panelShader.uniforms.housePanelOffset.value,0);
 assert.equal(panelShader.uniforms.houseMortarColor.value.r,.48);
+assert.equal(panelShader.uniforms.houseDetailMap.value.generateMipmaps,true);
+assert.equal(panelShader.uniforms.houseDetailMap.value.image.width,256);
+const samePanels=createHouseMaterial(group('Second panel wall',{surface:'panels',panelSize:[1.2,.6,.01]}));
+const sameShader={vertexShader:THREE.ShaderLib.physical.vertexShader,
+  fragmentShader:THREE.ShaderLib.physical.fragmentShader,uniforms:{}};
+samePanels.onBeforeCompile(sameShader);
+assert.equal(sameShader.uniforms.houseDetailMap.value,panelShader.uniforms.houseDetailMap.value,
+  'Repeated room groups must share finish texture memory');
+samePanels.dispose();
 panels.dispose();
 
 for(const surface of ['wood','fabric','carpet','blocks','siding','shakes','roof','lawn','mineral','stone','paint','ceramic','brushed','foliage']){
@@ -34,7 +43,9 @@ for(const surface of ['wood','fabric','carpet','blocks','siding','shakes','roof'
   material.onBeforeCompile(shader);
   assert(shader.vertexShader.includes('vHousePosition=(modelMatrix*vec4(transformed,1.0)).xyz'));
   assert(shader.fragmentShader.includes('normal=houseBump(-vViewPosition,normal,houseDetail.z)'));
-  assert(shader.defines.HOUSE_SURFACE>0);
+  assert(shader.uniforms.houseSurfaceKind.value>0);
+  assert.equal(material.customProgramCacheKey(),panels.customProgramCacheKey(),
+    'Finish families should share programs; the surface selector is a uniform');
   material.dispose();
 }
 

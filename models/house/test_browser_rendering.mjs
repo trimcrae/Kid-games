@@ -41,6 +41,9 @@ lighting.load({colliders:[],lights:[{name:'Fixture ceiling',type:'area',power:55
   position:[0,3,0],direction:[0,-1,0],color:[1,.8,.58]},
   {name:'Fixture lamp',type:'point',power:42,position:[-3,2,0],direction:[0,-1,0],color:[1,.8,.58]}]});
 const position={x:0,y:0,z:4};
+lighting.setRoom('Loading room',position);
+lighting.tick(position,performance.now()+2000,false);
+if(lighting.diagnostics().reflectionProbes!==0)throw Error('Room captures delayed initial controls');
 for(let room=0;room<5;room++){
   lighting.setRoom('Fixture '+room,position);
   lighting.tick(position,performance.now()+2000+room*2000);
@@ -76,7 +79,8 @@ try{
     const result=await page.evaluate(()=>window.rendererResult);
     assert.equal(errors.length,0,errors.map(message=>message.slice(0,900)).join('\n'));
     assert.equal(result.glError,0);
-    assert(result.programs>=14);assert(result.pixelRange>40,'Fixture did not produce shaded pixels');
+    assert(result.programs>0&&result.programs<=30,'Finish families compiled redundant PBR shaders');
+    assert(result.pixelRange>40,'Fixture did not produce shaded pixels');
     assert.equal(result.reflectionProbes,3);assert.equal(result.shadowedLight,'Fixture ceiling');
     assert.equal(result.shadowMapSize,mobile?1024:2048);
     if(process.env.HOUSE_RENDER_CAPTURE&&!mobile)await page.screenshot({path:process.env.HOUSE_RENDER_CAPTURE});

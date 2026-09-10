@@ -56,14 +56,17 @@ export function createHouseLighting(scene,renderer,{mobile=false}={}){
   sun.position.set(-14,35,40);sun.target.position.set(6,0,-3);
   sun.castShadow=true;sun.shadow.mapSize.setScalar(mobile?1024:2048);
   Object.assign(sun.shadow.camera,{left:-30,right:30,top:36,bottom:-36,near:.5,far:110});
-  sun.shadow.camera.updateProjectionMatrix();sun.shadow.normalBias=.018;sun.shadow.bias=-.00015;
+  // The map spans the house and garden: centimetre-scale bias prevents grazing
+  // surfaces from shadowing themselves into stripes across concrete and lawn.
+  sun.shadow.camera.updateProjectionMatrix();
+  sun.shadow.normalBias=mobile?.08:.04;sun.shadow.bias=mobile?-.001:-.0005;
   sun.shadow.autoUpdate=false;sun.shadow.needsUpdate=true;
 
   const key=new THREE.SpotLight(0xffdec0,0,8,1.35,.85,2);
   key.castShadow=true;key.shadow.mapSize.setScalar(mobile?512:1024);
   key.shadow.camera.near=.06;key.shadow.normalBias=.008;key.shadow.bias=-.00015;
   key.shadow.autoUpdate=false;scene.add(key,key.target);
-  const fills=Array.from({length:mobile?2:3},()=>{
+  const fills=Array.from({length:1},()=>{
     const light=new THREE.PointLight(0xffdec0,0,7,2);scene.add(light);return light;
   });
   for(const light of [hemisphere,sun,key,...fills])light.layers.enable(1);
@@ -117,7 +120,8 @@ export function createHouseLighting(scene,renderer,{mobile=false}={}){
   }
 
   function setRoom(name,position){
-    if(name===currentRoom||name===pendingRoom?.name)return;
+    if(name===currentRoom){pendingRoom=null;return;}
+    if(name===pendingRoom?.name)return;
     pendingRoom={name,position:{...position},since:performance.now()};
   }
 
@@ -140,7 +144,9 @@ export function createHouseLighting(scene,renderer,{mobile=false}={}){
     finally{scene.environmentIntensity=previousIntensity;lastProbe=now;}
   }
 
-  return {load,setRoom,tick(position,now){if(loaded){select(position,now);captureRoom(now);}},
+  return {load,setRoom,tick(position,now,allowCapture=true){
+    if(loaded){select(position,now);if(allowCapture)captureRoom(now);}
+  },
     diagnostics(){return {practicalLights:selection.map(light=>light.name),shadowedLight:keyId,
       reflectionRoom:currentRoom,reflectionProbes:probes.size,shadowMapSize:sun.shadow.mapSize.x};},
     dispose(){for(const probe of probes.values())probe.dispose();base.dispose();cubeTarget.dispose();pmrem.dispose();},

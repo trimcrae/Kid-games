@@ -1,10 +1,77 @@
 import * as THREE from './vendor/three.module.min.js';
 
-// The colours in the export are already linear RGB. No photographs, texture
-// downloads or generated pictures: these subtle patterns are evaluated in metres
+// The colours in the export are already linear RGB. No photographs or texture
+// downloads: these code-built patterns are evaluated in metres
 // on the code-built geometry. Geometric board/tile boundaries remain in the mesh.
 const SURFACES={wood:1,fabric:2,carpet:2,blocks:3,siding:4,shakes:5,roof:6,
   lawn:7,mineral:8,stone:9,paint:10,ceramic:10,brushed:11,foliage:12,panels:13};
+
+// Small deterministic data tiles hold relative albedo, roughness and height.
+// They are generated once per finish family, shared by every matching material,
+// mipmapped for distant surfaces, and sampled in world metres rather than UVs.
+const tiles=new Map();
+const tileSettings={
+  0:[1,1,0],1:[3.2,.4,.00055],2:[.12,.12,.0012],3:[.812,.406,.0025],
+  4:[2,.4,.0018],5:[.32,.56,.0025],6:[.68,.29,.0025],7:[4,4,.002],
+  8:[.6,.6,.001],9:[1.6,1.6,0],10:[.1,.1,.00018],11:[.3,.12,.00012],
+  12:[1,1,0],13:[1.2,.6,.0015],
+};
+const seedPixels=new Uint8Array(128*128);
+let seed=173;
+for(let i=0;i<seedPixels.length;i++){
+  seed=(Math.imul(seed,1664525)+1013904223)>>>0;seedPixels[i]=seed>>>24;
+}
+function noise(x,y){
+  const ix=Math.floor(x),iy=Math.floor(y);let fx=x-ix,fy=y-iy;
+  fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);
+  const at=(a,b)=>seedPixels[((b&127)*128)+(a&127)]/255;
+  return (at(ix,iy)*(1-fx)+at(ix+1,iy)*fx)*(1-fy)
+    +(at(ix,iy+1)*(1-fx)+at(ix+1,iy+1)*fx)*fy;
+}
+function detailTile(family){
+  if(tiles.has(family))return tiles.get(family);
+  const size=family?256:1,bytes=new Uint8Array(size*size*4);
+  const wave=(v)=>Math.sin(v*Math.PI*2);
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+    const u=(x+.5)/size,v=(y+.5)/size;
+    let tone=1,rough=0,height=0;
+    if(family===1){
+      const grain=noise(u*4,v*44),bands=wave(v*18+noise(u*4,v*4)*.4);
+      tone=.9+grain*.2+bands*.025;rough=(grain-.5)*.1;height=grain-.5;
+    }else if(family===2){
+      const pile=noise(u*56,v*56),weave=wave(u*64)*wave(v*64);
+      tone=.95+noise(u*12,v*12)*.1+weave*.018;rough=(pile-.5)*.06;height=pile-.5;
+    }else if([3,5,6].includes(family)){
+      const row=Math.floor(v*2),xx=(u*2+row*.5)%1,yy=(v*2)%1;
+      const seam=Math.min(xx,1-xx)<.012||Math.min(yy,1-yy)<.022?1:0;
+      tone=.96+noise(Math.floor(u*2+row*.5)*5,row*5)*.08-seam*.2;
+      rough=seam*.1;height=-seam*.8+(noise(u*24,v*24)-.5)*.2;
+    }else if(family===4){
+      const seam=(v*2)%1<.025?1:0;tone=.99-seam*.17;height=-seam;
+    }else if(family===7){
+      const blade=noise(u*100,v*100);tone=.82+noise(u*5,v*5)*.36+(blade-.5)*.1;height=blade-.5;
+    }else if(family===8){
+      const grain=noise(u*64,v*64);tone=.94+noise(u*5,v*5)*.1+(grain-.5)*.06;
+      rough=(grain-.5)*.06;height=grain-.5;
+    }else if(family===9){
+      const cloud=noise(u*4,v*4),vein=wave((u+v)*3+cloud);
+      tone=.985-Math.max(0,(vein-.87)/.13)*.13;rough=(cloud-.5)*.045;
+    }else if(family===10){height=noise(u*48,v*48)-.5;
+    }else if(family===11){const brush=noise(u*2,v*110);rough=(brush-.5)*.15;height=brush-.5;
+    }else if(family===12){tone=.82+noise(u*6,v*6)*.36;
+    }else if(family===13){tone=.97+noise(u*5,v*5)*.06;}
+    const i=(y*size+x)*4;
+    bytes[i]=Math.round(Math.max(0,Math.min(1,tone*.5))*255);
+    bytes[i+1]=Math.round(Math.max(0,Math.min(1,.5+rough))*255);
+    bytes[i+2]=Math.round(Math.max(0,Math.min(1,.5+height*.5))*255);bytes[i+3]=255;
+  }
+  const texture=new THREE.DataTexture(bytes,size,size);
+  texture.wrapS=texture.wrapT=THREE.RepeatWrapping;
+  texture.magFilter=THREE.LinearFilter;texture.minFilter=THREE.LinearMipmapLinearFilter;
+  texture.generateMipmaps=true;texture.needsUpdate=true;
+  const tile={texture,scale:new THREE.Vector2(...tileSettings[family].slice(0,2)),height:tileSettings[family][2]};
+  tiles.set(family,tile);return tile;
+}
 
 export function finishDescription(group){
   if(group.finish)return group.finish;
@@ -21,20 +88,14 @@ export function finishDescription(group){
 const SURFACE_GLSL=/* glsl */`
 varying vec3 vHousePosition;
 varying vec3 vHouseNormal;
-float houseHash(vec3 p){
-  p=fract(p*.1031);p+=dot(p,p.yzx+33.33);
-  return fract((p.x+p.y)*p.z);
-}
-float houseNoise(vec3 p){
-  vec3 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
-  return mix(mix(mix(houseHash(i),houseHash(i+vec3(1,0,0)),f.x),
-                 mix(houseHash(i+vec3(0,1,0)),houseHash(i+vec3(1,1,0)),f.x),f.y),
-             mix(mix(houseHash(i+vec3(0,0,1)),houseHash(i+vec3(1,0,1)),f.x),
-                 mix(houseHash(i+vec3(0,1,1)),houseHash(i+vec3(1,1,1)),f.x),f.y),f.z);
-}
-float houseFine(vec3 p){
-  return mix(.5,houseNoise(p),clamp(1.0-length(fwidth(p))*.7,0.0,1.0));
-}
+uniform int houseSurfaceKind;
+uniform bool houseVerticalGrain;
+uniform sampler2D houseDetailMap;
+uniform vec2 houseDetailScale;
+uniform float houseHeight;
+uniform vec3 housePanelSize;
+uniform vec3 houseMortarColor;
+uniform float housePanelOffset;
 vec2 housePlane(vec3 p,vec3 n){
   n=abs(n);
   if(n.y>n.x&&n.y>n.z)return p.xz;
@@ -44,10 +105,6 @@ float houseSeam(float p,float course,float width){
   float f=fract(p/course),d=min(f,1.0-f)*course;
   return 1.0-smoothstep(width,width+max(fwidth(p),.0004),d);
 }
-#if HOUSE_SURFACE == 13
-uniform vec3 housePanelSize;
-uniform vec3 houseMortarColor;
-uniform float housePanelOffset;
 float housePanelSeam(vec3 p){
   // The Blender finish projects (X+Y,Z); Three's axes are (X,Z,-Y).
   vec2 uv=vec2(p.x-p.z,p.y);
@@ -55,67 +112,11 @@ float housePanelSeam(vec3 p){
   return max(houseSeam(uv.x,housePanelSize.x,housePanelSize.z),
              houseSeam(uv.y,housePanelSize.y,housePanelSize.z));
 }
-#endif
-// Return relative albedo, roughness variation and surface height in metres.
 vec3 houseSurface(vec3 p,vec3 n){
   vec2 uv=housePlane(p,n);
-  float tone=1.0,rough=0.0,height=0.0;
-#if HOUSE_SURFACE == 1
-  #ifdef HOUSE_VERTICAL_GRAIN
-    p=p.yxz;
-  #endif
-  float grain=houseFine(p*vec3(.65,38.0,38.0));
-  float bands=sin(p.z*72.0+houseNoise(p*1.8)*6.0+p.x*.32);
-  bands*=clamp(1.0-fwidth(p.z*72.0)*.4,0.0,1.0);
-  tone=.89+grain*.22+bands*.035;
-  rough=(grain-.5)*.10;height=(grain-.5)*.00055;
-#elif HOUSE_SURFACE == 2
-  float pile=houseFine(p*210.0),mottle=houseFine(p*38.0);
-  vec2 weave=sin(uv*1500.0)*clamp(vec2(1.0)-fwidth(uv*1500.0)*.4,0.0,1.0);
-  tone=.94+mottle*.12+(weave.x*weave.y)*.018;
-  rough=(pile-.5)*.06;height=(pile-.5)*.0012;
-#elif HOUSE_SURFACE == 3 || HOUSE_SURFACE == 5 || HOUSE_SURFACE == 6
-  #if HOUSE_SURFACE == 3
-    vec2 size=vec2(.406,.203);float joint=.0045;
-  #elif HOUSE_SURFACE == 5
-    vec2 size=vec2(.16,.28);float joint=.002;
-  #else
-    vec2 size=vec2(.34,.145);float joint=.002;
-  #endif
-  uv.x+=mod(floor(uv.y/size.y),2.0)*size.x*.5;
-  float seam=max(houseSeam(uv.x,size.x,joint),houseSeam(uv.y,size.y,joint));
-  float cell=houseHash(vec3(floor(uv/size),0.0));
-  tone=.96+cell*.08-seam*.20;
-  rough=seam*.10;height=-seam*.0025+(houseFine(p*65.0)-.5)*.0006;
-#elif HOUSE_SURFACE == 4
-  float seam=houseSeam(p.y,.20,.003);
-  tone=.98+houseNoise(p*3.0)*.04-seam*.17;
-  height=-seam*.0018;
-#elif HOUSE_SURFACE == 7
-  float lawnTone=houseNoise(p*.8),blade=houseFine(p*85.0);
-  tone=.79+lawnTone*.40+(blade-.5)*.10;
-  height=(blade-.5)*.002;
-#elif HOUSE_SURFACE == 8
-  float grain=houseFine(p*95.0);
-  tone=.94+houseNoise(p*3.0)*.10+(grain-.5)*.06;
-  rough=(grain-.5)*.06;height=(grain-.5)*.001;
-#elif HOUSE_SURFACE == 9
-  float cloud=houseNoise(p*2.0),vein=sin((p.x+p.z)*9.0+cloud*8.0);
-  tone=.985-smoothstep(.87,1.0,vein)*.13+(houseFine(p*40.0)-.5)*.018;
-  rough=(cloud-.5)*.045;
-#elif HOUSE_SURFACE == 10
-  height=(houseFine(p*145.0)-.5)*.00018;
-#elif HOUSE_SURFACE == 11
-  float brush=houseFine(p*vec3(.6,650.0,.6));
-  rough=(brush-.5)*.15;height=(brush-.5)*.00012;
-#elif HOUSE_SURFACE == 12
-  tone=.82+houseNoise(p*3.0)*.36;
-#elif HOUSE_SURFACE == 13
-  float seam=housePanelSeam(p);
-  tone=.97+houseNoise(p*2.0)*.06;
-  rough=seam*.08;height=-seam*.0015;
-#endif
-  return vec3(tone,rough,height);
+  if(houseVerticalGrain)uv=uv.yx;
+  vec3 detail=texture2D(houseDetailMap,uv/houseDetailScale).rgb;
+  return vec3(detail.r*2.0,detail.g-.5,(detail.b*2.0-1.0)*houseHeight);
 }
 vec3 houseBump(vec3 position,vec3 normal,float height){
   vec3 dx=dFdx(position),dy=dFdy(position);
@@ -145,17 +146,22 @@ export function createHouseMaterial(group){
   material.userData.houseFinish={...f};
   // If a new panel shader has no measured/exported grid, retain its matte
   // finish without inventing seams. Brick Texture dimensions supply the grid.
-  const family=f.surface==='panels'&&!f.panelSize?SURFACES.paint:SURFACES[f.surface];
-  if(family){
-    material.customProgramCacheKey=()=>`house-finish-v1-${family}-${f.grainAxis==='y'?'y':'x'}`;
+  const family=(f.surface==='panels'&&!f.panelSize?SURFACES.paint:SURFACES[f.surface])||0;
+  {
+    // Uniform branches are coherent across each draw. A material family or
+    // wood-grain direction must not compile another copy of the PBR shader.
+    material.customProgramCacheKey=()=> 'house-finish-v3';
     material.onBeforeCompile=shader=>{
-      shader.defines.HOUSE_SURFACE=family;
-      if(family===13){
-        shader.uniforms.housePanelSize={value:new THREE.Vector3(...f.panelSize)};
-        shader.uniforms.housePanelOffset={value:f.panelOffset??0};
-        shader.uniforms.houseMortarColor={value:new THREE.Color(...(f.mortarColor||group.color))};
-      }
-      if(f.grainAxis==='y')shader.defines.HOUSE_VERTICAL_GRAIN=1;
+      shader.uniforms??={};
+      shader.uniforms.houseSurfaceKind={value:family};
+      const tile=detailTile(family);
+      shader.uniforms.houseDetailMap={value:tile.texture};
+      shader.uniforms.houseDetailScale={value:tile.scale};
+      shader.uniforms.houseHeight={value:tile.height};
+      shader.uniforms.houseVerticalGrain={value:f.grainAxis==='y'};
+      shader.uniforms.housePanelSize={value:new THREE.Vector3(...(f.panelSize||[1,.6,.01]))};
+      shader.uniforms.housePanelOffset={value:f.panelOffset??0};
+      shader.uniforms.houseMortarColor={value:new THREE.Color(...(f.mortarColor||group.color))};
       shader.vertexShader=shader.vertexShader.replace('#include <common>',
         '#include <common>\nvarying vec3 vHousePosition;\nvarying vec3 vHouseNormal;')
         .replace('#include <worldpos_vertex>',`#include <worldpos_vertex>
@@ -166,13 +172,15 @@ export function createHouseMaterial(group){
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
           diffuseColor.rgb*=houseDetail.x;
-          #if HOUSE_SURFACE == 13
-            diffuseColor.rgb=mix(diffuseColor.rgb,houseMortarColor,housePanelSeam(vHousePosition));
-          #endif`)
+          if(houseSurfaceKind==13){
+            float panelSeam=housePanelSeam(vHousePosition);
+            diffuseColor.rgb=mix(diffuseColor.rgb,houseMortarColor,panelSeam);
+            houseDetail.y+=panelSeam*.08;houseDetail.z-=panelSeam*.0015;
+          }`)
         .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
           roughnessFactor=clamp(roughnessFactor+houseDetail.y,.045,1.0);`)
         .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-          normal=houseBump(-vViewPosition,normal,houseDetail.z);`);
+          if(houseSurfaceKind>0)normal=houseBump(-vViewPosition,normal,houseDetail.z);`);
     };
   }
   return material;

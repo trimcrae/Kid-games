@@ -202,24 +202,29 @@ stays opaque. Selected furniture, cabinetry, doors and trim retain one-segment
 bevels and per-corner normals; repeated floorboards, dense foliage and large
 architectural surfaces retain the smaller browser geometry budget.
 
-`house-test/materials.mjs` adds code-authored detail in world units: wood grain,
+`house-test/materials.mjs` builds shared 256-pixel data tiles in code and samples
+them in world units: wood grain,
 textile pile, paint texture, mineral surfaces, siding, roof courses and lawn
 variation. The dark exterior panel grid reads panel dimensions, offset and pale
 seam colour directly from its Blender Brick Texture node. It does not infer a
-wood finish from that surface. Fine detail fades with pixel footprint to reduce
-shimmer. No reference photographs, video frames, image-generated assets or
+wood finish from that surface. Mipmaps filter distant fine detail to reduce
+shimmer. Finish selection uses uniforms so each family does not compile another
+physical shader. No reference photographs, video frames, image-generated assets or
 texture downloads are included. Old version-1 manifests still load with a
 reduced finish fallback.
 
 `house-test/lighting.mjs` uses AgX display mapping in the walkthrough, a soft
 daylight environment, a cached sun shadow map, one shadowed ceiling spotlight
-and at most three additional nearby light fills (two on phones). Wall/floor
+and one additional nearby light fill. Wall/floor
 occlusion filters the selected lamps. Static room reflections are captured from
 the exported geometry, excluding pets and activity markers, and held in a cache
-of at most three probes. Shadow maps are refreshed when necessary rather than
+of at most three probes; captures wait until the game controls are ready. Shadow maps are refreshed when necessary rather than
 redrawing the complete static house every walking frame. `houseTest.state`
 exposes active lamps, the shadowed lamp, reflection room/cache size, shadow-map
-size, draw calls and triangles for runtime inspection.
+size, pixel ratio, draw calls and triangles for runtime inspection. Walking
+targets 30 fps; resolution adapts between 0.6 and 1.35 device pixels per CSS pixel
+(bounded by the device ratio), with hysteresis and no material recompilation.
+This deliberately trades sharpness for responsiveness on slower graphics.
 
 This is a real-time approximation of the photographic materials, not Cycles in
 the browser. Indirect illumination is not baked or ray traced; unshadowed fills
