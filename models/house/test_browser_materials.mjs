@@ -16,6 +16,16 @@ const lamp=createHouseMaterial(group('Warm glowing bulb',{surface:'plain',roughn
   emissive:[1,.79,.52],emissiveIntensity:3}));
 assert.equal(lamp.emissive.r,1);assert.equal(lamp.emissiveIntensity,3);
 assert.equal(finishDescription(group('New finish',{surface:'fabric',roughness:.94})).roughness,.94);
+const panels=createHouseMaterial(group('Weathered dark exterior panels',{surface:'panels',roughness:.82,
+  panelSize:[1.2,.6,.01],panelOffset:0,mortarColor:[.48,.44,.36]}));
+const panelShader={vertexShader:THREE.ShaderLib.physical.vertexShader,
+  fragmentShader:THREE.ShaderLib.physical.fragmentShader,defines:{},uniforms:{}};
+panels.onBeforeCompile(panelShader);
+assert.equal(panelShader.defines.HOUSE_SURFACE,13);
+assert.deepEqual(panelShader.uniforms.housePanelSize.value.toArray(),[1.2,.6,.01]);
+assert.equal(panelShader.uniforms.housePanelOffset.value,0);
+assert.equal(panelShader.uniforms.houseMortarColor.value.r,.48);
+panels.dispose();
 
 for(const surface of ['wood','fabric','carpet','blocks','siding','shakes','roof','lawn','mineral','stone','paint','ceramic','brushed','foliage']){
   const material=createHouseMaterial(group(surface,{surface,roughness:.6}));

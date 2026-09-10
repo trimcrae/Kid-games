@@ -35,6 +35,8 @@ def finish_for_name(name):
         finish.update(surface='blocks', roughness=.82)
     elif 'vinyl lap siding' in n:
         finish.update(surface='siding', roughness=.52, clearcoat=.1)
+    elif n == 'weathered dark exterior panels':
+        finish.update(surface='panels', roughness=.82)
     elif 'cedar shakes' in n:
         finish.update(surface='shakes', roughness=.87)
     elif 'shingles' in n:
@@ -77,6 +79,14 @@ def material_finish(mat):
                 value = bsdf.inputs.get(socket)
                 if value is not None and not value.is_linked:
                     finish[prop] = round(float(value.default_value), 4)
+        if finish['surface'] == 'panels':
+            brick = next((n for n in mat.node_tree.nodes if n.type == 'TEX_BRICK'), None)
+            if brick:
+                scale = max(.0001, float(brick.inputs['Scale'].default_value))
+                finish['panelSize'] = [round(float(brick.inputs[key].default_value) / scale, 5)
+                    for key in ['Brick Width', 'Row Height', 'Mortar Size']]
+                finish['panelOffset'] = float(brick.offset)
+                finish['mortarColor'] = list(brick.inputs['Mortar'].default_value[:3])
     # Thin window panes use alpha + reflection rather than a costly full-screen
     # transmission pass. Dark display glass deliberately remains opaque.
     if finish['surface'] == 'glass':

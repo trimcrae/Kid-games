@@ -43,6 +43,19 @@ class BrowserMaterials(unittest.TestCase):
         ]:
             self.assertFalse(keep_bevel(name, collection, size, vertices))
 
+    def test_panel_grid_comes_from_the_blender_finish_not_a_wood_assumption(self):
+        values = {'Scale': 1, 'Brick Width': 1.2, 'Row Height': .6,
+                  'Mortar Size': .010, 'Mortar': [.48, .44, .36, 1]}
+        brick = SimpleNamespace(type='TEX_BRICK', offset=0,
+            inputs={key: SimpleNamespace(default_value=value) for key, value in values.items()})
+        mat = SimpleNamespace(name='Weathered dark exterior panels', use_nodes=True,
+                              node_tree=SimpleNamespace(nodes=[brick]))
+        finish = material_finish(mat)
+        self.assertEqual(finish['surface'], 'panels')
+        self.assertEqual(finish['panelSize'], [1.2, .6, .01])
+        self.assertEqual(finish['panelOffset'], 0)
+        self.assertEqual(finish['mortarColor'], [.48, .44, .36])
+
     def test_render_softboxes_are_not_house_lamps(self):
         self.assertFalse(practical_light('Front daylight', 'AREA', 1000))
         self.assertFalse(practical_light('Soft daylight sun', 'SUN', 2.2))

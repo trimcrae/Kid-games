@@ -4,7 +4,7 @@ import * as THREE from './vendor/three.module.min.js';
 // downloads or generated pictures: these subtle patterns are evaluated in metres
 // on the code-built geometry. Geometric board/tile boundaries remain in the mesh.
 const SURFACES={wood:1,fabric:2,carpet:2,blocks:3,siding:4,shakes:5,roof:6,
-  lawn:7,mineral:8,stone:9,paint:10,ceramic:10,brushed:11,foliage:12};
+  lawn:7,mineral:8,stone:9,paint:10,ceramic:10,brushed:11,foliage:12,panels:13};
 
 export function finishDescription(group){
   if(group.finish)return group.finish;
@@ -44,6 +44,18 @@ float houseSeam(float p,float course,float width){
   float f=fract(p/course),d=min(f,1.0-f)*course;
   return 1.0-smoothstep(width,width+max(fwidth(p),.0004),d);
 }
+#if HOUSE_SURFACE == 13
+uniform vec3 housePanelSize;
+uniform vec3 houseMortarColor;
+uniform float housePanelOffset;
+float housePanelSeam(vec3 p){
+  // The Blender finish projects (X+Y,Z); Three's axes are (X,Z,-Y).
+  vec2 uv=vec2(p.x-p.z,p.y);
+  uv.x+=mod(floor(uv.y/housePanelSize.y),2.0)*housePanelOffset*housePanelSize.x;
+  return max(houseSeam(uv.x,housePanelSize.x,housePanelSize.z),
+             houseSeam(uv.y,housePanelSize.y,housePanelSize.z));
+}
+#endif
 // Return relative albedo, roughness variation and surface height in metres.
 vec3 houseSurface(vec3 p,vec3 n){
   vec2 uv=housePlane(p,n);
@@ -98,6 +110,10 @@ vec3 houseSurface(vec3 p,vec3 n){
   rough=(brush-.5)*.15;height=(brush-.5)*.00012;
 #elif HOUSE_SURFACE == 12
   tone=.82+houseNoise(p*3.0)*.36;
+#elif HOUSE_SURFACE == 13
+  float seam=housePanelSeam(p);
+  tone=.97+houseNoise(p*2.0)*.06;
+  rough=seam*.08;height=-seam*.0015;
 #endif
   return vec3(tone,rough,height);
 }
@@ -127,11 +143,18 @@ export function createHouseMaterial(group){
   // the default two-pass physical-glass path on phones.
   material.forceSinglePass=true;
   material.userData.houseFinish={...f};
-  const family=SURFACES[f.surface];
+  // If a new panel shader has no measured/exported grid, retain its matte
+  // finish without inventing seams. Brick Texture dimensions supply the grid.
+  const family=f.surface==='panels'&&!f.panelSize?SURFACES.paint:SURFACES[f.surface];
   if(family){
     material.customProgramCacheKey=()=>`house-finish-v1-${family}-${f.grainAxis==='y'?'y':'x'}`;
     material.onBeforeCompile=shader=>{
       shader.defines.HOUSE_SURFACE=family;
+      if(family===13){
+        shader.uniforms.housePanelSize={value:new THREE.Vector3(...f.panelSize)};
+        shader.uniforms.housePanelOffset={value:f.panelOffset??0};
+        shader.uniforms.houseMortarColor={value:new THREE.Color(...(f.mortarColor||group.color))};
+      }
       if(f.grainAxis==='y')shader.defines.HOUSE_VERTICAL_GRAIN=1;
       shader.vertexShader=shader.vertexShader.replace('#include <common>',
         '#include <common>\nvarying vec3 vHousePosition;\nvarying vec3 vHouseNormal;')
@@ -142,7 +165,10 @@ export function createHouseMaterial(group){
         '#include <common>\n'+SURFACE_GLSL)
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
-          diffuseColor.rgb*=houseDetail.x;`)
+          diffuseColor.rgb*=houseDetail.x;
+          #if HOUSE_SURFACE == 13
+            diffuseColor.rgb=mix(diffuseColor.rgb,houseMortarColor,housePanelSeam(vHousePosition));
+          #endif`)
         .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
           roughnessFactor=clamp(roughnessFactor+houseDetail.y,.045,1.0);`)
         .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
