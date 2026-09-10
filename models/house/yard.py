@@ -151,12 +151,46 @@ def _branch_curve(name, splines, mat):
     return obj
 
 
-def shrub(name,pos,size,photo):
-    asset(name,pos,photos=photo,confidence='planting observed; shape simplified')
+def shrub(name,pos,size,photo,profile='cultivated'):
+    asset(name,pos,photos=photo,confidence=('planting observed; shape simplified' if profile=='cultivated' else
+          'irregular overlapping edge growth observed in B5–14; lobe shapes and stem positions estimated'))
     rng = random.Random(name)
-    sphere('Shrub inner mass',(0,0,size[2]*.45),(size[0]*.8,size[1]*.8,size[2]*.8),leaves[3])
     leaves_out = []
     count = int(110 * size[0] * size[2] / .2)
+    if profile != 'cultivated':
+        # The rear boundary is loose foliage with gaps and visible stems,
+        # not clipped topiary. Mesh leaves provide the actual open silhouette;
+        # no opaque ellipsoid sits behind them in either export or render.
+        sparse = profile == 'edge_stems'
+        along_y = pos[0] < -6.5 and pos[1] < 25
+        lobes, stems = [], []
+        for i in range(4 if sparse else 5):
+            along = (i/((4 if sparse else 5)-1)-.5)*2.0
+            centre = Vector((rng.uniform(-.30,.30)*size[0] if along_y else along*size[0]*.76,
+                             along*size[1]*1.35 if along_y else rng.uniform(-.35,.35)*size[1],
+                             size[2]*rng.uniform(.48,1.02)))
+            radii = Vector((size[0]*(.34 if sparse else .62),size[1]*(.42 if sparse else .70),
+                            size[2]*(.35 if sparse else .57)))
+            lobes.append((centre,radii))
+            foot=Vector((centre.x*.40,centre.y*.40,.035))
+            stems.append([tuple(foot),tuple(centre*.62+Vector((0,0,.12))),tuple(centre+Vector((0,0,radii.z*.5)))])
+            for direction in [-1,1]:
+                stems.append([tuple(centre*.70),tuple(centre+Vector((direction*radii.x*.65,.10,radii.z*.30)))])
+        if sparse:count=int(count*.62)
+        for _ in range(count):
+            centre,radii=rng.choice(lobes)
+            d=Vector((rng.gauss(0,1),rng.gauss(0,1),rng.gauss(0,1))).normalized()
+            spread=rng.uniform(.30,1.0)
+            c=centre+Vector((d.x*radii.x,d.y*radii.y,d.z*radii.z))*spread
+            c.z=max(.06,c.z)
+            leaves_out.append((c,d+Vector((0,0,.35))))
+        _yard_tubes('Rear boundary slender stems',stems,.008,bark,5)
+        _leaf_mesh('Rear boundary leafy growth',leaves_out,rng,.075 if sparse else .10,leafmat).hide_render=True
+        fine=[(c+Vector((rng.uniform(-.04,.04),rng.uniform(-.04,.04),rng.uniform(-.03,.03))),n)
+              for c,n in leaves_out for _ in range(2)]
+        _leaf_mesh('Rear boundary fine leafy growth',fine,rng,.052 if sparse else .071,leafmat,export=False)
+        return
+    sphere('Shrub inner mass',(0,0,size[2]*.45),(size[0]*.8,size[1]*.8,size[2]*.8),leaves[3])
     for _ in range(count):
         d = Vector((rng.gauss(0, 1), rng.gauss(0, 1), rng.gauss(0, .8))).normalized()
         c = Vector((d.x * size[0], d.y * size[1], size[2] * .45 + d.z * size[2]))
@@ -338,7 +372,8 @@ for i,(x,y,w,h) in enumerate([(-7.4,12.4,.75,1.0),(-7.2,14.8,.9,1.3),(-7.6,17.0,
                              (-7.1,23.5,1.1,1.2),(-6,26.2,1.0,1.25),(-3.8,26.3,1.2,1.2),
                              (1.2,26.5,.60,.8),(3.3,26.8,.75,1.0),(7,26.6,.70,.85),
                              (21.7,25.5,1.1,1.35),(22.6,22.8,.85,1.1),(22.3,16,1.0,1.1)]):
-    shrub('Rear boundary planting %02d'%i,(x,y,yard_z),(w,.65,h),'B5–14; irregular edge planting, placement estimated')
+    shrub('Rear boundary planting %02d'%i,(x,y,yard_z),(w,.65,h),'B5–14; irregular edge planting, placement estimated',
+          profile='edge_stems' if 0<x<10 else 'hedge')
 
 asset('Rear boundary fence',photos='B7–11; H69–72',confidence='mixed timber section and low metal fence visible; transition and boundary coordinates estimated')
 for x in [-8,-6,-4,-2,0]:
