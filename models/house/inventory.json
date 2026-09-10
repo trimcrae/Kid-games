@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "6727d00bb33ccdad5374153f74f809298ec13e97d8007f5c58e5bd4d953a7892",
+  "generator_sha256": "810fa2f12e4b83277f9b31b1481212b46456bd7e3fe1c61ed7adf39c30e50718",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -12,8 +12,8 @@
   ],
   "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 7621,
-  "mesh_objects": 6742,
+  "objects": 7665,
+  "mesh_objects": 6740,
   "cameras": [
     "overview",
     "sunroom",
@@ -2124,8 +2124,8 @@
     {
       "name": "Lower bedroom curtained closet",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V10",
-      "confidence": "photo / estimated size",
+      "photos": "V10; House Tour 200/201.002s",
+      "confidence": "high shelf, rail and hanging net basket observed; dimensions and clean contents estimated",
       "location_m": [
         16.100000381469727,
         5.499998569488525,
