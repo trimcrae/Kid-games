@@ -2,7 +2,7 @@
 const $ = id => document.getElementById(id);
 const ASPECTS = ['layout', 'openings', 'dimensions', 'materials', 'furniture', 'lighting'];
 const drafts = new Set();
-let session, report, pending, saving = false, evidenceVideoId = null;
+let session, report, pending, saving = false, evidenceVideoId = null, pendingSeek = null;
 const node = (tag, text, className) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (className) el.className = className; return el; };
 const title = value => value.charAt(0).toUpperCase() + value.slice(1).replaceAll('-', ' ');
 const time = value => { const n = Math.max(0, Number(value) || 0); return `${Math.floor(n / 60)}:${(n % 60).toFixed(1).padStart(4, '0')}`; };
@@ -55,14 +55,18 @@ function range() {
 }
 function seekButton(start, end, videoId) {
   const button = node('button', `${time(start)}–${time(end)}`, 'seek'); button.type = 'button';
-  button.addEventListener('click', () => { if (videoId !== currentVideo()?.id && !selectVideo(videoId)) return; $('video').currentTime = start; });
+  button.addEventListener('click', () => {
+    if (videoId !== currentVideo()?.id && !selectVideo(videoId)) return;
+    if ($('video').readyState >= 1) { pendingSeek = null; $('video').currentTime = start; }
+    else pendingSeek = {videoId, start};
+  });
   return button;
 }
 function selectVideo(id) {
   if (drafts.has('evidence') && evidenceVideoId && evidenceVideoId !== id) {
     message('evidence-error', 'Save or cancel your evidence draft before changing source videos.'); $('video-select').value = evidenceVideoId; return false;
   }
-  $('video-select').value = id; const video = currentVideo();
+  pendingSeek = null; $('video-select').value = id; const video = currentVideo();
   $('video').removeAttribute('src'); $('codec-error').hidden = true;
   if (video) $('video').src = `/media/${encodeURIComponent(video.id)}`;
   $('video').load(); $('start').value = '0'; $('end').value = '0';
@@ -71,9 +75,10 @@ function selectVideo(id) {
 }
 function resetEvidence() {
   $('evidence-form').reset(); $('observation-id').value = ''; $('cancel-edit').hidden = true;
-  $('save-evidence').textContent = 'Add evidence & save'; evidenceVideoId = null; drafts.delete('evidence'); message('evidence-error'); renderChecklist(); status();
+  $('save-evidence').textContent = 'Add evidence & save'; evidenceVideoId = null; drafts.delete('evidence'); message('evidence-error'); renderChecklist(); updateMeasurementFields(); status();
 }
 function renderChecklist() { const prompts = session.model.checklist?.[$('aspect').value]; $('aspect-checklist').textContent = prompts ? `Look for: ${Array.isArray(prompts) ? prompts.join(' · ') : prompts}` : ''; }
+function updateMeasurementFields() { const measured = $('basis').value === 'measurement'; $('measurement-fields').hidden = !measured; $('measurement-fields').disabled = !measured; }
 function editObservation(observation) {
   if (drafts.has('evidence')) { message('evidence-error', 'Save or cancel the current evidence draft before opening another.'); return; }
   if (observation.videoId !== currentVideo()?.id) selectVideo(observation.videoId);
@@ -81,6 +86,8 @@ function editObservation(observation) {
   for (const key of ['roomId', 'aspect', 'basis', 'confidence', 'viewpoint', 'statement', 'relatedRoomId']) $(key === 'roomId' ? 'room' : key === 'relatedRoomId' ? 'related-room' : key).value = observation[key] || '';
   $('start').value = observation.start; $('end').value = observation.end;
   $('target').value = observation.targets?.[0] || ''; $('extra-targets').value = (observation.targets || []).slice(1).join('\n');
+  for (const key of ['value', 'unit', 'method', 'uncertainty']) $(`measurement-${key}`).value = observation.measurement?.[key] ?? (key === 'unit' ? 'ft' : '');
+  updateMeasurementFields();
   $('cancel-edit').hidden = false; $('cancel-edit').textContent = 'Cancel edit'; $('save-evidence').textContent = 'Save evidence edit'; drafts.add('evidence'); renderChecklist(); status(); $('viewpoint').focus();
 }
 function renderEvidence() {
@@ -92,6 +99,7 @@ function renderEvidence() {
     const item = node('article', undefined, 'evidence-item'), meta = node('div', undefined, 'item-meta');
     meta.append(seekButton(o.start, o.end, o.videoId), node('span', `${roomName(o.roomId)} · ${title(o.aspect)} · ${o.basis} · ${o.confidence} confidence`));
     item.append(meta, node('p', o.statement), node('p', `Viewpoint: ${o.viewpoint}`, 'muted'));
+    if (o.measurement) item.append(node('p', `Measurement: ${o.measurement.value} ${o.measurement.unit} · ${o.measurement.method} · Uncertainty: ${o.measurement.uncertainty}`, 'muted'));
     if (o.relatedRoomId) item.append(node('p', `Connected to: ${roomName(o.relatedRoomId)}`, 'muted'));
     if (o.targets?.length) item.append(node('p', o.targets.join(' · '), 'muted'));
     const actions = node('div', undefined, 'actions'), edit = node('button', 'Edit', 'quiet'), remove = node('button', 'Remove', 'danger');
@@ -154,6 +162,7 @@ function renderAssessmentEvidence(selected) {
   if (!relevant.length) $('review-evidence').append(node('p', 'Add evidence for this room and aspect to link it here.', 'hint'));
 }
 $('evidence-form').addEventListener('input', () => { drafts.add('evidence'); evidenceVideoId ??= currentVideo()?.id; $('cancel-edit').hidden = false; $('cancel-edit').textContent = $('observation-id').value ? 'Cancel edit' : 'Clear draft'; renderChecklist(); status(); });
+$('basis').addEventListener('change', updateMeasurementFields);
 $('review-form').addEventListener('input', event => { if (!['review-room', 'review-aspect'].includes(event.target.id)) drafts.add('review'); status(); });
 for (const id of ['review-room', 'review-aspect']) $(id).addEventListener('change', () => {
   if (drafts.has('review')) { message('review-error', 'Save the current assessment before changing its room or aspect.'); const previous = $('review-form').dataset; $('review-room').value = previous.room; $('review-aspect').value = previous.aspect; return; }
@@ -164,6 +173,11 @@ $('evidence-form').onsubmit = async event => {
   try {
     const observation = {...range(), id: $('observation-id').value || crypto.randomUUID(), roomId: $('room').value, aspect: $('aspect').value, basis: $('basis').value, confidence: $('confidence').value, statement: $('statement').value.trim(), viewpoint: $('viewpoint').value.trim(), targets: [$('target').value, ...$('extra-targets').value.split('\n')].map(v => v.trim()).filter(Boolean), relatedRoomId: $('related-room').value || null};
     if (!observation.statement || !observation.viewpoint) throw new Error('Add both a specific observation and a viewpoint.');
+    if (observation.basis === 'measurement') {
+      const measurement = {value: Number($('measurement-value').value), unit: $('measurement-unit').value, method: $('measurement-method').value.trim(), uncertainty: $('measurement-uncertainty').value.trim()};
+      if (!Number.isFinite(measurement.value) || measurement.value <= 0 || !measurement.method || !measurement.uncertainty) throw new Error('Measurements require a value greater than zero, a unit, how it was measured, and its uncertainty.');
+      observation.measurement = measurement;
+    }
     await mutate(next => { const i = next.observations.findIndex(o => o.id === observation.id); if (i < 0) next.observations.push(observation); else next.observations[i] = observation; }, resetEvidence);
   } catch (error) { message('evidence-error', error.message); }
 };
@@ -178,7 +192,11 @@ for (const [id, channel] of [['mark-visual', 'visual'], ['mark-audio', 'audio']]
 for (const part of ['start', 'end']) $(`capture-${part}`).onclick = () => { $(part).value = $('video').currentTime.toFixed(1); };
 $('video-select').onchange = () => selectVideo($('video-select').value);
 $('video').addEventListener('error', () => { if (currentVideo()) $('codec-error').hidden = false; });
-$('video').addEventListener('loadedmetadata', async () => { const video = currentVideo(), duration = $('video').duration; if (video && Number.isFinite(duration) && duration > 0) { $('video-summary').textContent = time(duration); if (video.durationSeconds === null && !pending && !saving) await mutate(next => { next.videos.find(v => v.id === video.id).durationSeconds = duration; }); } });
+$('video').addEventListener('loadedmetadata', async () => {
+  const video = currentVideo(), duration = $('video').duration;
+  if (pendingSeek?.videoId === video?.id) { $('video').currentTime = pendingSeek.start; pendingSeek = null; }
+  if (video && Number.isFinite(duration) && duration > 0) { $('video-summary').textContent = time(duration); if (video.durationSeconds === null && !pending && !saving) await mutate(next => { next.videos.find(v => v.id === video.id).durationSeconds = duration; }); }
+});
 $('transcript-search').oninput = renderTranscript;
 $('cancel-edit').onclick = resetEvidence;
 $('retry-save').onclick = () => { if (pending) persist(pending.next, pending.onSuccess); };
