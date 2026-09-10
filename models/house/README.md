@@ -226,6 +226,15 @@ targets 30 fps; resolution adapts between 0.6 and 1.35 device pixels per CSS pix
 (bounded by the device ratio), with hysteresis and no material recompilation.
 This deliberately trades sharpness for responsiveness on slower graphics.
 
+Optional `ambientOcclusion` metadata can bind a `house.ao.gz` sidecar to the raw
+mesh SHA-256. It contains one normalized byte per exported vertex, with its own
+raw-byte checksum and vertex count. The browser validates both hashes and group
+coverage before attaching it. Missing metadata makes no AO request; a missing,
+stale or invalid optional sidecar is skipped with a console warning. The default
+strength is supplied by the exporter (0.35), capped by the loader at 0.5. It
+attenuates indirect diffuse/specular, coat and sheen only; direct lights and base
+colours are unchanged. `houseTest.state` reports whether it loaded and its strength.
+
 This is a real-time approximation of the photographic materials, not Cycles in
 the browser. Indirect illumination is not baked or ray traced; unshadowed fills
 can still soften room boundaries. Room probes approximate mirror perspective
@@ -398,6 +407,7 @@ then validate the generated geometry and browser contracts:
 python models/house/export_walkthrough.py
 python models/house/test_browser_materials.py
 node models/house/test_browser_materials.mjs
+node models/house/test_browser_ao.mjs
 node models/house/test_browser_ramps.mjs
 node models/house/test_walkthrough.mjs
 node tests/house-routes.mjs

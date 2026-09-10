@@ -127,8 +127,9 @@ vec3 houseBump(vec3 position,vec3 normal,float height){
 }
 `;
 
-export function createHouseMaterial(group){
+export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
   const f=finishDescription(group),glass=f.surface==='glass';
+  const aoStrength=THREE.MathUtils.clamp(ambientOcclusionStrength,0,.5);
   const material=new THREE.MeshPhysicalMaterial({
     color:new THREE.Color(...group.color),roughness:f.roughness??.7,
     metalness:f.metalness??0,clearcoat:f.clearcoat??0,
@@ -150,9 +151,13 @@ export function createHouseMaterial(group){
   {
     // Uniform branches are coherent across each draw. A material family or
     // wood-grain direction must not compile another copy of the PBR shader.
-    material.customProgramCacheKey=()=> 'house-finish-v3';
+    material.customProgramCacheKey=()=> aoStrength>0?'house-finish-v3-ao':'house-finish-v3';
     material.onBeforeCompile=shader=>{
       shader.uniforms??={};
+      if(aoStrength>0){
+        shader.defines??={};shader.defines.HOUSE_AO=1;
+        shader.uniforms.houseOcclusionStrength={value:aoStrength};
+      }
       shader.uniforms.houseSurfaceKind={value:family};
       const tile=detailTile(family);
       shader.uniforms.houseDetailMap={value:tile.texture};
@@ -163,12 +168,22 @@ export function createHouseMaterial(group){
       shader.uniforms.housePanelOffset={value:f.panelOffset??0};
       shader.uniforms.houseMortarColor={value:new THREE.Color(...(f.mortarColor||group.color))};
       shader.vertexShader=shader.vertexShader.replace('#include <common>',
-        '#include <common>\nvarying vec3 vHousePosition;\nvarying vec3 vHouseNormal;')
+        `#include <common>
+          varying vec3 vHousePosition;varying vec3 vHouseNormal;
+          #ifdef HOUSE_AO
+            attribute float houseOcclusion;varying float vHouseOcclusion;
+          #endif`)
         .replace('#include <worldpos_vertex>',`#include <worldpos_vertex>
           vHousePosition=(modelMatrix*vec4(transformed,1.0)).xyz;
-          vHouseNormal=normalize(mat3(modelMatrix)*objectNormal);`);
+          vHouseNormal=normalize(mat3(modelMatrix)*objectNormal);
+          #ifdef HOUSE_AO
+            vHouseOcclusion=houseOcclusion;
+          #endif`);
       shader.fragmentShader=shader.fragmentShader.replace('#include <common>',
-        '#include <common>\n'+SURFACE_GLSL)
+        `#include <common>
+          #ifdef HOUSE_AO
+            varying float vHouseOcclusion;uniform float houseOcclusionStrength;
+          #endif\n`+SURFACE_GLSL)
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
           diffuseColor.rgb*=houseDetail.x;
@@ -180,7 +195,19 @@ export function createHouseMaterial(group){
         .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
           roughnessFactor=clamp(roughnessFactor+houseDetail.y,.045,1.0);`)
         .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-          if(houseSurfaceKind>0)normal=houseBump(-vViewPosition,normal,houseDetail.z);`);
+          if(houseSurfaceKind>0)normal=houseBump(-vViewPosition,normal,houseDetail.z);`)
+        .replace('#include <aomap_fragment>',`#include <aomap_fragment>
+          #ifdef HOUSE_AO
+            float houseAO=mix(1.0,clamp(vHouseOcclusion,0.0,1.0),houseOcclusionStrength);
+            reflectedLight.indirectDiffuse*=houseAO;
+            reflectedLight.indirectSpecular*=houseAO;
+            #ifdef USE_CLEARCOAT
+              clearcoatSpecularIndirect*=houseAO;
+            #endif
+            #ifdef USE_SHEEN
+              sheenSpecularIndirect*=houseAO;
+            #endif
+          #endif`);
     };
   }
   return material;
