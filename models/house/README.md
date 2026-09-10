@@ -238,9 +238,14 @@ stale or invalid optional sidecar is skipped with a console warning. The default
 strength is supplied by the exporter (0.35), capped by the loader at 0.5. It
 attenuates indirect diffuse/specular, coat and sheen only; direct lights and base
 colours are unchanged. `houseTest.state` reports whether it loaded and its strength.
+The committed export uses `--ao`: eight rays within one metre, a 2 mm normal
+bias and a 0.7 m floor/wall edge target. Added sampling geometry is capped at
+180,000 vertices; this model adds 82,524. Glass and foliage do not occlude the
+bake. Near and back-facing intersections are filtered. The sidecar is about
+1.13 MB compressed; this modest contact effect is separate from the room reflections.
 
 This is a real-time approximation of the photographic materials, not Cycles in
-the browser. Indirect illumination is not baked or ray traced; unshadowed fills
+the browser. AO does not bake bounced illumination; unshadowed fills
 can still soften room boundaries. Room probes approximate mirror perspective
 and omit moving pets, and panes use alpha/reflection instead of full refraction.
 Grass and fabric shading do not add individual blade/fibre silhouettes. Full
@@ -406,7 +411,7 @@ After a model rebuild, use the same installed Blender Python runtime for export,
 then validate the generated geometry and browser contracts:
 
 ```sh
-python models/house/export_walkthrough.py
+python models/house/export_walkthrough.py -- --ao
 python models/house/test_browser_materials.py
 node models/house/test_browser_materials.mjs
 node models/house/test_browser_ao.mjs

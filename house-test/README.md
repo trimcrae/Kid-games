@@ -77,7 +77,8 @@ The geometry comes from `models/house/house.blend`, with furniture and layout
 revised against the private narrated walkthroughs. The browser retains selected
 bevels and physical material properties, using shared code-generated finish tiles
 for wood, cloth, stone and other surfaces. Sun shadows, room reflections and a
-bounded set of practical lights provide depth. Adaptive resolution targets 30 fps;
+bounded set of practical lights provide depth. Baked ambient contact shading
+adds gentle separation around furniture and corners. Adaptive resolution targets 30 fps;
 slower hardware trades some sharpness for movement responsiveness. Blender's
 Cycles previews remain the higher-quality rendering reference.
 The source photographs, people, personal pictures, street addresses and
@@ -91,7 +92,7 @@ Run with a Python that has Blender's `bpy` module:
 
 ```sh
 python models/house/build.py
-python models/house/export_walkthrough.py
+python models/house/export_walkthrough.py -- --ao
 node models/house/test_walkthrough.mjs
 python -m http.server 8765
 ```
