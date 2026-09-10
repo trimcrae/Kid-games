@@ -8,7 +8,10 @@ It tracks timestamped observations, narration, room coverage, unresolved questio
 and model targets. Original recordings and extracted frames remain private and
 excluded from Git. The September 10 video pass corrects the porch return,
 garage openings, common upstairs front gable, living furnishings, Cory's nook,
-office window/workstations, and observed yard features. Dimensions remain estimates.
+office window/workstations, and observed yard features. Native-resolution follow-up
+corrects the primary shelf count, long sunroom-side leaves, stair finishes and
+basement dollhouse/bookcase arrangement. The bright playroom strip is LEDs on a
+solid wall, replacing an earlier inferred window. Dimensions remain estimates.
 
 A separate [third-person walkthrough test](../../house-test/) uses this model.
 It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).
@@ -322,8 +325,9 @@ no downloaded tree assets or image textures are used.
   beside the living-room steps; 12 risers and the basement footprint are estimates.
   The basement office/laundry share a wall, as shown in W6–W8. Their absolute
   orientation beneath the house is provisional; exposed service runs are illustrative.
-- The exact footprint, offsets, window widths, ceiling heights and sunroom bay
-  count are not established by the photos. Upstairs room rectangles and the
+- The exact footprint, offsets, window widths, ceiling heights and rear sunroom
+  leaf count are not established. Video confirms four leaves on each long side.
+  Upstairs room rectangles and the
   additional lower rooms are estimates; this is not an exterior footprint survey.
 - The lower room's unseen corners, some chair shapes, dining seating, and
   piano/bench proportions are approximate. Repeated cabinetry and window

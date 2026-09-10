@@ -128,7 +128,8 @@ bpy.data.objects['Basement staircase sloped ceiling'].hide_set(False)
 bpy.context.view_layer.update()
 def position(name):
     return bpy.data.objects[name].matrix_world.translation
-upper = [o.matrix_world.translation for o in scene.objects if o.name.startswith('Upper stair carpet tread')]
+upper = [o.matrix_world.translation for o in scene.objects
+         if o.name.startswith(('Upper stair carpet tread', 'Upper stair oak landing cap'))]
 lower = [o.matrix_world.translation for o in scene.objects if o.name.startswith('Lower stair carpet tread')]
 assert len(upper) == len(lower) == 7
 assert max(p.x for p in upper) - min(p.x for p in upper) > 1.5, 'Upper stairs must run sideways (+X)'
@@ -252,6 +253,13 @@ for end in [(4.75,3.15,-2.25),(4.75,5.7,-2.25)]:
 assert abs(position('Basement dual monitors').y-position('Basement front loading dryer').y)<.05, 'W8: office continues along laundry wall'
 assert screen_x('basement_entry','Basement dual monitors') < screen_x('basement_entry','Basement front loading dryer')
 assert screen_x('basement_office','Basement metal storage shelving') < screen_x('basement_office','Basement dual monitors')
+# H209.707/H217.410: the straight stair view keeps the dollhouse beyond/right
+# of the bunk and the tall bookcase nearer the stair approach. These guard
+# observed relationships, not the fitted metric centers or hidden bed axis.
+assert screen_x('basement_entry','Basement dollhouse') > screen_x('basement_entry','Basement metal bunk bed')
+assert position('Basement dollhouse').x < position('Basement tall open bookcase').x
+assert position('Basement tall open bookcase').y > position('Basement metal bunk bed').y
+assert 'Basement playroom high window' not in bpy.data.objects, 'Video resolves the bright band as LEDs on solid wall'
 hit=scene.ray_cast(depsgraph,Vector((6.50,6.60,-2.05)),Vector((-1,0,0)),distance=4.40)
 assert not hit[0], 'W6 office aisle blocked by '+(hit[4].name if hit[0] else '')
 assert screen_x('kitchen_access','Kitchen glass cupboard') < screen_x('kitchen_access','Kitchen garage connecting doorway')

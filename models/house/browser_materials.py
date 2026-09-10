@@ -29,6 +29,8 @@ def finish_for_name(name):
     elif n in {'warm glowing bulb', 'warm lit diffuser', 'fairy light bulb'}:
         finish.update(roughness=.4, emissive=[1, .79, .52],
                       emissiveIntensity=3.0 if n != 'warm lit diffuser' else 1.2)
+    elif n == 'cool basement led emitters':
+        finish.update(roughness=.4, emissive=[.58, .70, 1.0], emissiveIntensity=3.0)
     elif n == 'warm linen lampshade':
         finish.update(surface='fabric', roughness=.9, emissive=[1, .72, .40],
                       emissiveIntensity=.16, sheen=.4)
