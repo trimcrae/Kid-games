@@ -606,7 +606,8 @@ for x in [-.54, .54]:
 box('Front door white header', (0, -.01, 2.18), (1.14, .10, .07), white)
 
 collection('05 | Sunroom glazing and house siding')
-asset('Sunroom aluminum frame', photos='1-5', confidence='three glazed sides observed; bay count estimated')
+asset('Sunroom aluminum frame', photos='1-5; House Tour 68.017/77.020s',
+      confidence='three glazed sides; four leaves in two paired assemblies on each side observed; rear count, frame dimensions and room footprint remain estimates')
 for x in [.8, 7.4]:
     for y in [8.12, 11.4]:
         box('Corner post', (x, y, 1.08), (.09, .09, 2.36), white)
@@ -614,6 +615,7 @@ for y in [8.12, 11.4]:
     box('Long ceiling beam', (4.1, y, 2.25), (6.68, .12, .20), white)
 for x in [.8, 7.4]:
     box('Side ceiling beam', (x, 9.76, 2.25), (.12, 3.4, .20), white)
+    box('Side glazing paired-unit junction', (x, 9.76, 1.04), (.12, .085, 2.29), white, .003)
 for i in range(13):
     z = .02 + i * .17
     box('House lap siding beside window', (3.655, 8.13, z), (1.97, .045, .18), white, .003)
@@ -625,10 +627,27 @@ for i in range(6):
            1.07, 2.20, 0, False, False)
     if i in [2, 4]:
         box('Black sliding-door handle', (.45, -.08, -.14), (.03, .05, .24), black)
-for x, angle in [(.8, -90), (7.4, 90)]:
-    for j in range(3):
-        window('Sunroom side sliding bay', (x, 8.68 + 1.08 * j, 1.04), 1.045, 2.20,
+# H68.017 traces the garage-side head framing into the rear corner; H77.020
+# traces the opposite side from rear corner to house siding. Each has four
+# glazed leaves in two pairs, not three independent bays. Keep the existing
+# estimated footprint: a panel count does not establish width or depth.
+# H73.518/B18.008/B19.008 show overlap stiles on the rear run; its six-leaf
+# interpretation remains provisional, so do not add structural divisions.
+side_leaf_pitch = (11.4 - 8.12) / 4
+for side, x, angle, source in [('garage', .8, -90, 'House Tour 68.017/69.017/70.517s'),
+                              ('wing', 7.4, 90, 'House Tour 75.018/77.020/78.020/84.023s')]:
+    for j in range(4):
+        leaf_width = side_leaf_pitch - .025
+        window('Sunroom %s-side sliding leaf %02d' % (side, j + 1),
+               (x, 8.12 + side_leaf_pitch * (j + .5), 1.04), leaf_width, 2.20,
                angle, False, False)
+        ROOT['reference_photos'] = ASSETS[-1]['photos'] = source
+        ROOT['confidence'] = ASSETS[-1]['confidence'] = ('four side leaves in two pairs observed; '
+            'widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed')
+        if j % 2 == (1 if side == 'garage' else 0):
+            u = -leaf_width / 2 + .03
+            box('Sunroom sliding pull backplate', (u, .075, -.10), (.052, .025, .30), black, .003)
+            box('Sunroom dark wood sliding pull', (u, .11, -.10), (.032, .025, .28), walnut, .008)
 
 collection('06 | Sunroom furniture')
 asset('Wooden indoor climbing gym', (2.8, 9.85, -.08), 0, '1,2,5')
@@ -1022,21 +1041,29 @@ for i, (x, z, w, h) in enumerate([(-.27, 1.95, .33, .43), (.24, 1.94, .39, .35),
 box('Thermostat', (-.25, -.05, 1.36), (.12, .045, .12), screen)
 
 collection('11 | Split-level stairs and iron rails')
-asset('Parallel split-level stair bay', photos='7,9,10', confidence='stair pairing observed; 7 risers and levels estimated')
+asset('Parallel split-level stair bay', photos='7,9,10; House Tour 92.527/93.027/206.003s',
+      confidence='paired flights, carpeted lower risers and final white upper rise into oak landing observed; total seven rises per run, levels and dimensions remain estimated')
 for i in range(7):
     # Up from the main dining approach toward the front of the house.
     y, z = 4.5 - (i + .5) * .28, (i + 1) * .18
     # W9 reveals the basement return below this flight. Keep the upper stair
     # structure shallow instead of filling the entire volume down to Z=0.
     box('Upper stair white riser block', (.59, y, z - .10), (1.16, .28, .20), white, .003)
-    box('Upper stair carpet tread', (.59, y - .006, z + .008), (1.16, .29, .027), carpet, .012)
-    box('Upper stair carpet riser', (.59, y + .143, z - .084), (1.16, .013, .17), carpet, .003)
+    if i < 6:
+        box('Upper stair carpet tread', (.59, y - .006, z + .008), (1.16, .29, .027), carpet, .012)
+        box('Upper stair carpet riser', (.59, y + .143, z - .084), (1.16, .013, .17), carpet, .003)
+    else:
+        # H92.527/93.027: the carpet finishes below a white final riser and
+        # oak landing. This changes finish only, retaining all seven rises.
+        box('Upper stair oak landing cap', (.59, y - .006, 1.273), (1.16, .29, .026), oak, .003)
 for i in range(7):
     y, z = 4.50 - (i + .5) * .27, -(i + 1) * .15
     height = z + 1.21
     box('Lower stair riser block', (1.98, y, -1.21 + height / 2), (1.20, .27, height), white, .003)
     box('Lower stair carpet tread', (1.98, y, z + .008), (1.20, .283, .025), carpet, .01)
-    box('Lower stair carpet riser', (1.98, y + .14, z - .065), (1.20, .014, .145), carpet, .003)
+    # H206.003 resolves carpet over the exposed riser. This flight descends:
+    # cover the rise ABOVE this tread, not the hidden face one step below it.
+    box('Lower stair carpet riser', (1.98, y + .14, z + .085), (1.20, .014, .145), carpet, .003)
 box('Upper landing', (.59, 1.92, 1.18), (1.18, 1.23, .16), white)
 box('Upper landing oak floor', (.59, 1.92, 1.273), (1.18, 1.23, .026), oak)
 
@@ -1269,7 +1296,9 @@ camera('lower_bedroom',(12.42,5.70,.57),(15.40,7.15,-.36),18)
 camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
 camera('garage',(-.64,7.54,1.67),(-3.65,3.40,.75),18)
 camera('garage_rear',(-3.45,4.80,1.67),(-4.0,8.10,1.05),24)
-camera('basement_play',(2.20,6.85,-1.55),(2.20,3.20,-2.30),16)
+# Estimated inspection pose for the observed play/storage relationships;
+# this is not a recovered source-camera position or lens calibration.
+camera('basement_play',(5.70,4.20,-1.55),(1.15,3.00,-2.10),18)
 camera('basement_office',(6.50,6.60,-1.62),(2.10,6.65,-2.28),20)
 camera('basement_laundry',(4.44,5.43,-1.54),(6.51,7.20,-2.14),17)
 camera('basement_plan',(4.7,4,20),(4.7,4,-3),ortho=12.8)

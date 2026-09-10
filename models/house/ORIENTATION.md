@@ -15,7 +15,10 @@ the original audio. Original recordings, frames and transcripts stay private.
 | H48.007, H51.008, H54.010 | Computer desk at the front-window corner; dark two-door cupboard beside the sofa; separate dark TV cabinet at the kitchen partition with open AV shelving and three broad lower drawer rows. Sofa has two broad seat cushions and rounded arms, with a separate rounded tub chair and low navy child lounge. Narrow floor strips are fitted at 75 mm pitch; wood species, dimensions and concealed construction remain estimates. Retain only the observed downstairs piano. |
 | H60.012, H63.013 | Restore the kitchen window-wall cubby worktop, small drawer unit and tall cream pantry. Bin count, repeated divisions and dimensions remain estimates. |
 | H78.020, H81.022, H84.023 | Move the two-cup sunroom lamp houseward between the wicker seats. Height, offset and arm angle remain estimates. |
-| H123.018, H139.010, H186.025 | Replace slab-like bed covers with thin fitted surfaces, soft pillows and a pale draped main-bed duvet. Refine Cory's quilt palette, the main bed's gray upholstered headboard, bedside shelves and bassinet beside the entry half of the bed foot. Bedding is a clean authored arrangement; shelf count, spacing, contents and dimensions remain estimates. |
+| H68.017, H77.020 | Four glazed leaves in two pairs on each long sunroom side. Rear facade remains provisionally six leaves; narrow slider/screen overlaps do not establish additional fixed bays. Dimensions remain estimates. |
+| H92.527, H206.003 | White final riser onto the upper oak landing, with carpet covering the lower-family flight's risers. Preserve estimated levels and counts; none of the three full flights has a securely counted total from these samples. |
+| H123.018, H139.010, H186.025 | Replace slab-like bed covers with thin fitted surfaces, soft pillows and a pale draped main-bed duvet. Refine Cory's quilt palette, the main bed's gray upholstered headboard and bassinet beside the entry half of the bed foot. Bedding is a clean authored arrangement; dimensions remain estimates. |
+| H138.877, H139.277, H139.510 | Three full-width pale shelf boards beside the main bedroom window, with dark supports at two lateral positions. Tier count is observed; heights, spacing, finish and plain stored contents remain estimates. |
 | H126–129 | Wood headboard with turned posts and curtained closet/nook behind it. Shelves and hanging rail are visible; recess depth and intrusion into the adjoining room are inferred. |
 | H227–234 | Second office desk on the perpendicular end wall. Main workstation has a laptop, one landscape monitor and two portrait displays on the raised right stand. High glass-block window with a central hopper sits toward the end-wall corner on that desk's wall. |
 | H104–116 | Cased linen closet beside the bathroom entrance and a separate nursery-facing wardrobe farther toward the hall on the nursery/Cory shared wall. Closet widths and reciprocal intrusions are estimates. |
@@ -23,6 +26,7 @@ the original audio. Original recordings, frames and transcripts stay private.
 | H197.998, H199.000 | Refine Jeannie's dark low cabinet to two shallow drawers above two doors; dimensions and wood species remain estimates. |
 | H147–158 | Sampled connecting views support the current ensuite attachment on the main bedroom's perpendicular closet-side wall, near the rear corner. Inside, the shower is ahead, toilet/storage left and rear window right. This resolves the earlier rotation question; depth, width and offsets remain estimates. |
 | H212–215; H223–230 | L-shaped white storage curtains leave the play/office approach open; two hooded litter boxes and a pail occupy the utility wall, with an exercise bike near the second desk. Cloth extents and furniture clearances are fitted estimates. |
+| H209.707, H210.007, H217.410, H219.412 | Connected stair and play views put the dollhouse beyond/right of the bunk and the tall bookcase near the stair exit at the play/office boundary. Move dollhouse, bookcase and adjacent seating into that relationship. The bright band above the dollhouse is individual LEDs on solid wall; remove the earlier inferred window. Exact centers, angles and sizes remain estimates. |
 | H0–18; B0–18 | Bus-stop bench, umbrella, sign and dispenser; two young front trees; open central rear lawn, irregular boundaries, shed/swings, corrected netted trampoline and molded play equipment. |
 | B9.003, B11.005, B13.005 | Overlapping perimeter growth and broad rear canopies enclose the open lawn. Increase connected foliage while preserving visible gaps; species, heights, density and boundary coordinates remain estimates. |
 | B0.000, B15.007, B16.007 | Add the trampoline's blue arched upper attachment and darker fine net. Hoop construction, mesh spacing and dimensions are approximations of the visible silhouette. |
@@ -35,6 +39,12 @@ sizes, grade and stair rises still need measured anchors. The office window's
 exact offset and outside-grade relationship remain unresolved.
 Automated frame matching has not calibrated absolute scale or validated room
 proportions.
+
+H87.023 also shows a glazed sliding assembly between the main house and sunroom.
+The current clear opening remains provisional: the full parked/fixed leaf width
+and its relationship to the adjacent pantry still need reconciliation before
+replacing the adjoining opaque wall. Do not interpret the clear passage width
+as the complete two-leaf assembly width.
 
 The clearer H197–200 views resolve Jeannie's furniture ordering; the revised
 global offsets remain estimates. H195 alone is too blurred to justify a bed

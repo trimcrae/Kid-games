@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "510793b3e155a916777de684fdfd800595c6bf39cc96c57bf7b09faf469751da",
+  "generator_sha256": "6727d00bb33ccdad5374153f74f809298ec13e97d8007f5c58e5bd4d953a7892",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -12,8 +12,8 @@
   ],
   "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 7545,
-  "mesh_objects": 6668,
+  "objects": 7621,
+  "mesh_objects": 6742,
   "cameras": [
     "overview",
     "sunroom",
@@ -166,8 +166,8 @@
     {
       "name": "Sunroom aluminum frame",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "three glazed sides observed; bay count estimated",
+      "photos": "1-5; House Tour 68.017/77.020s",
+      "confidence": "three glazed sides; four leaves in two paired assemblies on each side observed; rear count, frame dimensions and room footprint remain estimates",
       "location_m": [
         0.0,
         0.0,
@@ -241,68 +241,90 @@
       ]
     },
     {
-      "name": "Sunroom side sliding bay",
+      "name": "Sunroom garage-side sliding leaf 01",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 68.017/69.017/70.517s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
       "location_m": [
         0.800000011920929,
-        8.680000305175781,
+        8.529999732971191,
         1.0399999618530273
       ]
     },
     {
-      "name": "Sunroom side sliding bay.001",
+      "name": "Sunroom garage-side sliding leaf 02",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 68.017/69.017/70.517s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
       "location_m": [
         0.800000011920929,
-        9.760000228881836,
+        9.350000381469727,
         1.0399999618530273
       ]
     },
     {
-      "name": "Sunroom side sliding bay.002",
+      "name": "Sunroom garage-side sliding leaf 03",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 68.017/69.017/70.517s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
       "location_m": [
         0.800000011920929,
-        10.84000015258789,
+        10.170000076293945,
         1.0399999618530273
       ]
     },
     {
-      "name": "Sunroom side sliding bay.003",
+      "name": "Sunroom garage-side sliding leaf 04",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 68.017/69.017/70.517s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
       "location_m": [
-        7.400000095367432,
-        8.680000305175781,
+        0.800000011920929,
+        10.989999771118164,
         1.0399999618530273
       ]
     },
     {
-      "name": "Sunroom side sliding bay.004",
+      "name": "Sunroom wing-side sliding leaf 01",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 75.018/77.020/78.020/84.023s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
       "location_m": [
         7.400000095367432,
-        9.760000228881836,
+        8.529999732971191,
         1.0399999618530273
       ]
     },
     {
-      "name": "Sunroom side sliding bay.005",
+      "name": "Sunroom wing-side sliding leaf 02",
       "collection": "05 | Sunroom glazing and house siding",
-      "photos": "1-5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 75.018/77.020/78.020/84.023s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
       "location_m": [
         7.400000095367432,
-        10.84000015258789,
+        9.350000381469727,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom wing-side sliding leaf 03",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "House Tour 75.018/77.020/78.020/84.023s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
+      "location_m": [
+        7.400000095367432,
+        10.170000076293945,
+        1.0399999618530273
+      ]
+    },
+    {
+      "name": "Sunroom wing-side sliding leaf 04",
+      "collection": "05 | Sunroom glazing and house siding",
+      "photos": "House Tour 75.018/77.020/78.020/84.023s",
+      "confidence": "four side leaves in two pairs observed; widths, frame depths, handle placement and closed arrangement estimated; no leaf motion observed",
+      "location_m": [
+        7.400000095367432,
+        10.989999771118164,
         1.0399999618530273
       ]
     },
@@ -881,8 +903,8 @@
     {
       "name": "Parallel split-level stair bay",
       "collection": "11 | Split-level stairs and iron rails",
-      "photos": "7,9,10",
-      "confidence": "stair pairing observed; 7 risers and levels estimated",
+      "photos": "7,9,10; House Tour 92.527/93.027/206.003s",
+      "confidence": "paired flights, carpeted lower risers and final white upper rise into oak landing observed; total seven rises per run, levels and dimensions remain estimated",
       "location_m": [
         12.300000190734863,
         4.599999904632568,
@@ -1530,8 +1552,8 @@
     {
       "name": "Primary bedside wall shelves",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "House Tour 139s",
-      "confidence": "wall shelves observed; count, spacing and plain storage contents estimated",
+      "photos": "House Tour 138.877/139.510s",
+      "confidence": "three pale boards and dark supports observed; dimensions, spacing and clean contents estimated",
       "location_m": [
         15.459999084472656,
         5.990000247955322,
@@ -2210,17 +2232,6 @@
       ]
     },
     {
-      "name": "Basement playroom high window",
-      "collection": "30 | Basement foundation and partitions",
-      "photos": "W5",
-      "confidence": "photo / estimated size",
-      "location_m": [
-        1.1299999952316284,
-        0.009999999776482582,
-        -0.9700000286102295
-      ]
-    },
-    {
       "name": "Basement office glass-block window",
       "collection": "30 | Basement foundation and partitions",
       "photos": "House Tour 234.020s",
@@ -2322,44 +2333,55 @@
     {
       "name": "Basement tall open bookcase",
       "collection": "32 | Basement playroom furniture",
-      "photos": "W5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 209.707/217.410/219.412s",
+      "confidence": "bookcase beside stair approach at play-office boundary observed; position and size estimated",
       "location_m": [
-        3.2200000286102295,
-        1.2899999618530273,
+        3.75,
+        4.800000190734863,
         -3.1500000953674316
       ]
     },
     {
       "name": "Basement dollhouse",
       "collection": "32 | Basement playroom furniture",
-      "photos": "W5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 210.007/217.410/219.412s",
+      "confidence": "beyond and right of bunk from stair entry observed; wall offset, size and toy details estimated",
       "location_m": [
-        1.059999942779541,
         0.33000001311302185,
+        4.25,
         -3.1500000953674316
       ]
     },
     {
       "name": "Basement cream floor rocker",
       "collection": "32 | Basement playroom furniture",
-      "photos": "W5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 219.012/219.412s",
+      "confidence": "rocker near bookcase and saucer chair observed; position and angle estimated",
       "location_m": [
         2.490000009536743,
-        1.2999999523162842,
+        4.199999809265137,
         -3.1500000953674316
       ]
     },
     {
       "name": "Basement saucer chair",
       "collection": "32 | Basement playroom furniture",
-      "photos": "W5",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 217.410/219.412s",
+      "confidence": "pale saucer chair in front of dollhouse observed; position and angle estimated",
       "location_m": [
-        2.299999952316284,
-        0.38999998569488525,
+        1.350000023841858,
+        4.25,
+        -3.1500000953674316
+      ]
+    },
+    {
+      "name": "Basement playroom LED strip",
+      "collection": "32 | Basement playroom furniture",
+      "photos": "House Tour 217.410/219.412s",
+      "confidence": "individual cool LED emitters on solid wall above dollhouse observed; length, spacing and height estimated",
+      "location_m": [
+        0.0949999988079071,
+        4.369999885559082,
         -3.1500000953674316
       ]
     },

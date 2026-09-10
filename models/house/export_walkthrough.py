@@ -20,7 +20,7 @@ from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from browser_materials import material_finish, keep_bevel, practical_light, ramp_colliders
+from browser_materials import material_finish, keep_bevel, practical_light, ramp_colliders, oriented_triangle_corners
 from browser_ao import VertexAO, architectural_receiver, benchmark_samples, occludes
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--source', type=Path, default=HERE/'house.blend')
@@ -125,6 +125,7 @@ for o in scene.objects:
     mesh.calc_loop_triangles()
     verts = [matrix @ v.co for v in mesh.vertices]
     normal_matrix = matrix.to_3x3().inverted().transposed()
+    mirrored = matrix.to_3x3().determinant() < 0
     materials = list(o.data.materials)
     occluder_triangles = []
     can_tessellate = bool(ao) and architectural_receiver(o.name, cname)
@@ -140,7 +141,8 @@ for o in scene.objects:
                            'finish':finish,'values':array.array('f')}
         values = groups[key]['values']
         corners = []
-        for i, loop in zip(tri.vertices, tri.loops):
+        triangle_corners = oriented_triangle_corners(tri.vertices, tri.loops, mirrored)
+        for i, loop in triangle_corners:
             # Vertex averages erase hard edges and weighted bevel normals.
             n = normal_matrix @ mesh.corner_normals[loop].vector
             n.normalize()
@@ -152,7 +154,7 @@ for o in scene.objects:
         if ao:
             opaque = occludes(o.name, groups[key]['finish'])
             if opaque:
-                occluder_triangles.append(tuple(tri.vertices))
+                occluder_triangles.append(tuple(i for i, _ in triangle_corners))
             for refined in ao.tessellate(tuple(corners), can_tessellate and opaque):
                 for corner in refined:
                     values.extend(round(v, 5) for v in corner)

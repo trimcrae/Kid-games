@@ -83,31 +83,21 @@ new_collection('30 | Basement foundation and partitions')
 asset('Basement slab',(0,0,BASEMENT_Z),photos='W4-W8',confidence='estimated footprint beneath main level')
 box('Basement concrete floor',(3.9,4,-.07),(7.8,8,.14),concrete_new)
 box('Basement clean resilient floor',(3.90,3.94,.018),(7.62,7.75,.025),pine)
-partition('Basement playroom window wall',(0,0),(7.8,0),blockmat,
-          [( .38,1.88,2.01,2.35)],height=2.55)
+partition('Basement playroom foundation wall',(0,0),(7.8,0),blockmat,height=2.55)
 partition('White basement foundation wall',(0,0),(0,8),blockmat,height=2.55)
 partition('Basement rear window wall',(0,8),(7.8,8),blockmat,[(2.0,3.20,1.92,2.52)],height=2.55)
 partition('Basement east foundation',(7.8,0),(7.8,8),blockmat,[(3.42,4.60,0,2.55)],height=2.55)
 for z in [.22+i*.21 for i in range(11)]:
     for xa,xb in ([(.025,2.0),(3.2,7.775)] if 1.92<z<2.52 else [(.025,7.775)]):
         box('Foundation horizontal mortar seam',((xa+xb)/2,7.929,z),(xb-xa,.006,.009),grout,0)
-    if not 2.01 < z < 2.35:
-        box('Foundation front mortar seam',(3.9,.071,z),(7.75,.006,.009),grout,0)
-    else:
-        for xa,xb in [(.025,.38),(1.88,7.775)]:
-            box('Foundation front mortar seam',((xa+xb)/2,.071,z),(xb-xa,.006,.009),grout,0)
+    box('Foundation front mortar seam',(3.9,.071,z),(7.75,.006,.009),grout,0)
 for row in range(11):
     for col in range(19):
         x=.22+col*.40+(row%2)*.20
         if x<7.7 and not (2.0<x<3.2 and row>=9):
             box('Foundation vertical mortar seam',(x,7.926,.115+row*.21),(.009,.006,.19),grout,0)
-# W5 clearly shows a high horizontal window above the dollhouse. Its
-# relationship to that furniture is observed; this zone's global rotation
-# and reverse-view furniture layout remain provisional (see ORIENTATION.md).
-window('Basement playroom high window',(1.13,.01,BASEMENT_Z+2.18),1.50,.34,180,False,False)
-ROOT['reference_photos'] = 'W5'
-ROOT['confidence'] = 'high window above dollhouse observed; size and global placement estimated'
-ASSETS[-1]['photos'] = 'W5'
+# H217.410/H219.412 resolve the bright band above the dollhouse as individual
+# LEDs on solid wall. The earlier W5 window interpretation was incorrect.
 asset('Basement office glass-block window',(2.6,8.0,BASEMENT_Z),0,'House Tour 234.020s',
       'four by two glass modules with center hopper observed; position and exterior grade estimated')
 for x in [-.65,.65]:box('Deep masonry window reveal',(x,0,2.22),(.10,.40,.70),white)
@@ -187,21 +177,46 @@ for z in [.18,.39,.60]:box('Slide ladder step',(0,.29,z),(.48,.23,.05),cream)
 o=box('Blue sloping slide',(0,-.30,.39),(.51,1.22,.055),bluegrey,.026)
 o.rotation_euler.x=math.radians(33)
 for x in [-.25,.25]:rod('Slide raised side',(x,.23,.78),(x,-.80,.11),.045,bluegrey)
-shelf_unit('Basement tall open bookcase',(3.22,1.29,BASEMENT_Z),1.0,1.91,pine,-90,'W5')
-asset('Basement dollhouse',(1.06,.33,BASEMENT_Z),180,'W5')
+# H209.707/H210.007 preserve the straight stair bearing: the bookcase end is
+# near the right of the stair exit, with the dollhouse beyond/right of the bunk.
+# H217.410/H219.412 tie these landmarks together after the sweep to the cloth.
+# These relationships supersede the incompatible W5-only arrangement; offsets
+# and dimensions are still a fitted plan, not recovered camera measurements.
+shelf_unit('Basement tall open bookcase',(3.75,4.80,BASEMENT_Z),1.0,1.91,pine,0,
+           'House Tour 209.707/217.410/219.412s')
+ROOT['confidence'] = 'bookcase beside stair approach at play-office boundary observed; position and size estimated'
+ASSETS[-1]['confidence'] = ROOT['confidence']
+asset('Basement dollhouse',(.33,4.25,BASEMENT_Z),90,
+      'House Tour 210.007/217.410/219.412s',
+      'beyond and right of bunk from stair entry observed; wall offset, size and toy details estimated')
 for x in [-.48,0,.48]:box('Dollhouse upright',(x,0,.71),(.04,.30,1.4),pinkwood)
 for z in [.05,.49,.95,1.38]:box('Dollhouse floor',(0,0,z),(.99,.34,.04),white)
 box('Dollhouse back',(0,.16,.72),(.99,.025,1.4),pinkwood)
 for x,a in [(-.25,-.48),(.25,.48)]:
     o=box('Dollhouse pitched roof',(x,0,1.50),(.58,.39,.055),white);o.rotation_euler.y=a
-asset('Basement cream floor rocker',(2.49,1.30,BASEMENT_Z),-30,'W5')
+asset('Basement cream floor rocker',(2.49,4.20,BASEMENT_Z),90,
+      'House Tour 219.012/219.412s',
+      'rocker near bookcase and saucer chair observed; position and angle estimated')
 box('Floor rocker seat',(0,0,.18),(.61,.62,.23),linen,.10)
 o=box('Floor rocker back',(0,.25,.54),(.60,.18,.88),linen,.10);o.rotation_euler.x=-.14
-asset('Basement saucer chair',(2.30,.39,BASEMENT_Z),180,'W5')
+asset('Basement saucer chair',(1.35,4.25,BASEMENT_Z),90,
+      'House Tour 217.410/219.412s',
+      'pale saucer chair in front of dollhouse observed; position and angle estimated')
 sphere('Saucer chair fabric seat',(0,0,.52),(.42,.18,.42),bedding)
 for x in [-.30,.30]:
     rod('Saucer chair folding stand',(x,-.27,.02),(x,.22,.64),.016,steel)
     rod('Saucer chair crossed stand',(x,.27,.02),(x,-.22,.64),.016,steel)
+
+ledmat=material('Cool basement LED emitters',(.58,.70,1.0),.4)
+ledbs=ledmat.node_tree.nodes['Principled BSDF']
+ledbs.inputs['Emission Color'].default_value=(.58,.70,1.0,1)
+ledbs.inputs['Emission Strength'].default_value=3.0
+asset('Basement playroom LED strip',(.095,4.37,BASEMENT_Z),90,
+      'House Tour 217.410/219.412s',
+      'individual cool LED emitters on solid wall above dollhouse observed; length, spacing and height estimated')
+box('Playroom LED tape backing',(0,0,2.06),(1.85,.010,.012),white,0)
+for i in range(47):
+    box('Playroom LED emitter',(-.90+i*.039,-.009,2.06),(.006,.006,.006),ledmat,0)
 
 new_collection('33 | Basement office laundry and mechanical')
 shelf_unit('Basement metal storage shelving',(.50,5.70,BASEMENT_Z),1.65,1.98,black,90,'W6')

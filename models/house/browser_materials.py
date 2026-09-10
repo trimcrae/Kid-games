@@ -9,6 +9,16 @@ import re
 import math
 
 
+def oriented_triangle_corners(vertices, loops, mirrored=False):
+    """Keep transformed face winding aligned with inverse-transpose normals.
+
+    Vertex and split-normal loop indices must travel together. Use the same
+    order for the visible mesh and AO occluder faces after a reflected transform.
+    """
+    corners = list(zip(vertices, loops))
+    return corners[::-1] if mirrored else corners
+
+
 def finish_for_name(name):
     n = name.lower()
     finish = dict(surface='plain', roughness=.7, metalness=0.0, clearcoat=0.0,
@@ -29,6 +39,8 @@ def finish_for_name(name):
     elif n in {'warm glowing bulb', 'warm lit diffuser', 'fairy light bulb'}:
         finish.update(roughness=.4, emissive=[1, .79, .52],
                       emissiveIntensity=3.0 if n != 'warm lit diffuser' else 1.2)
+    elif n == 'cool basement led emitters':
+        finish.update(roughness=.4, emissive=[.58, .70, 1.0], emissiveIntensity=3.0)
     elif n == 'warm linen lampshade':
         finish.update(surface='fabric', roughness=.9, emissive=[1, .72, .40],
                       emissiveIntensity=.16, sheen=.4)
