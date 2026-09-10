@@ -21,10 +21,10 @@ let seed=173;
 for(let i=0;i<seedPixels.length;i++){
   seed=(Math.imul(seed,1664525)+1013904223)>>>0;seedPixels[i]=seed>>>24;
 }
-function noise(x,y){
+function noise(x,y,periodX=128,periodY=128){
   const ix=Math.floor(x),iy=Math.floor(y);let fx=x-ix,fy=y-iy;
   fx=fx*fx*(3-2*fx);fy=fy*fy*(3-2*fy);
-  const at=(a,b)=>seedPixels[((b&127)*128)+(a&127)]/255;
+  const at=(a,b)=>seedPixels[(((b%periodY)+periodY)%periodY)*128+((a%periodX)+periodX)%periodX]/255;
   return (at(ix,iy)*(1-fx)+at(ix+1,iy)*fx)*(1-fy)
     +(at(ix,iy+1)*(1-fx)+at(ix+1,iy+1)*fx)*fy;
 }
@@ -36,8 +36,14 @@ function detailTile(family){
     const u=(x+.5)/size,v=(y+.5)/size;
     let tone=1,rough=0,height=0;
     if(family===1){
-      const grain=noise(u*4,v*44),bands=wave(v*18+noise(u*4,v*4)*.4);
-      tone=.9+grain*.2+bands*.025;rough=(grain-.5)*.1;height=grain-.5;
+      // H51.008: fine, irregular fibres on narrow oak strips. Warp periodic
+      // noise rather than drawing repeated sine bands. The tile closes at
+      // both edges and remains shared across all wood groups/programs.
+      const warp=(noise(u*3,v*8,3,8)-.5)*2.2;
+      const grain=noise(u*3,v*64+warp,3,64),ribbon=noise(u*2,v*12+warp*.25,2,12);
+      const pore=Math.max(0,.52-noise(u*5,v*110+warp,5,110))**2;
+      tone=.94+grain*.10+ribbon*.025-pore*.12;
+      rough=(grain-.5)*.065;height=(grain-.5)*.45-pore*.15;
     }else if(family===2){
       const pile=noise(u*56,v*56),weave=wave(u*64)*wave(v*64);
       tone=.95+noise(u*12,v*12)*.1+weave*.018;rough=(pile-.5)*.06;height=pile-.5;

@@ -12,20 +12,29 @@ the original audio. Original recordings, frames and transcripts stay private.
 | H24, H39 | Porch in front of the paired living windows; door on its perpendicular right return; separate small street-facing entry window. Garage front and porch columns share the continuous low roof/eave. |
 | H30–33; B18 | One-car rear sectional opening and adjacent glazed pedestrian door in the garage rear wall. Move the earlier side-door interpretation and clear the rear storage obstruction. |
 | H3; B0, B16 | Both upstairs front windows occupy one flat facade under a common front-to-back gable. Remove the inferred stepped corner-room frontage and cross-gable; add observed shutters and octagonal vent. |
-| H51–54 | Computer desk at the front-window corner; tall two-door cupboard beside the sofa; separate large TV/media cabinet at the kitchen partition. Retain only the observed downstairs piano. |
+| H48.007, H51.008, H54.010 | Computer desk at the front-window corner; dark two-door cupboard beside the sofa; separate dark TV cabinet at the kitchen partition with open AV shelving and three broad lower drawer rows. Sofa has two broad seat cushions and rounded arms, with a separate rounded tub chair and low navy child lounge. Narrow floor strips are fitted at 75 mm pitch; wood species, dimensions and concealed construction remain estimates. Retain only the observed downstairs piano. |
+| H60.012, H63.013 | Restore the kitchen window-wall cubby worktop, small drawer unit and tall cream pantry. Bin count, repeated divisions and dimensions remain estimates. |
+| H78.020, H81.022, H84.023 | Move the two-cup sunroom lamp houseward between the wicker seats. Height, offset and arm angle remain estimates. |
+| H123.018, H139.010, H186.025 | Replace slab-like bed covers with thin fitted surfaces, soft pillows and a pale draped main-bed duvet. Refine Cory's quilt palette, the main bed's gray upholstered headboard, bedside shelves and bassinet beside the entry half of the bed foot. Bedding is a clean authored arrangement; shelf count, spacing, contents and dimensions remain estimates. |
 | H126–129 | Wood headboard with turned posts and curtained closet/nook behind it. Shelves and hanging rail are visible; recess depth and intrusion into the adjoining room are inferred. |
 | H227–234 | Second office desk on the perpendicular end wall. Main workstation has a laptop, one landscape monitor and two portrait displays on the raised right stand. High glass-block window with a central hopper sits toward the end-wall corner on that desk's wall. |
 | H104–116 | Cased linen closet beside the bathroom entrance and a separate nursery-facing wardrobe farther toward the hall on the nursery/Cory shared wall. Closet widths and reciprocal intrusions are estimates. |
 | H197–200 | Jeannie's low cabinet and headboard share the window wall; the cabinet is left of the headboard when facing them, with the tall bookcase farther toward the entry. Rotate the bed, move cabinet/bookcase and adjust estimated window spacing to retain clear furniture footprints. |
+| H197.998, H199.000 | Refine Jeannie's dark low cabinet to two shallow drawers above two doors; dimensions and wood species remain estimates. |
 | H147–158 | Sampled connecting views support the current ensuite attachment on the main bedroom's perpendicular closet-side wall, near the rear corner. Inside, the shower is ahead, toilet/storage left and rear window right. This resolves the earlier rotation question; depth, width and offsets remain estimates. |
 | H212–215; H223–230 | L-shaped white storage curtains leave the play/office approach open; two hooded litter boxes and a pail occupy the utility wall, with an exercise bike near the second desk. Cloth extents and furniture clearances are fitted estimates. |
 | H0–18; B0–18 | Bus-stop bench, umbrella, sign and dispenser; two young front trees; open central rear lawn, irregular boundaries, shed/swings, corrected netted trampoline and molded play equipment. |
+| B9.003, B11.005, B13.005 | Overlapping perimeter growth and broad rear canopies enclose the open lawn. Increase connected foliage while preserving visible gaps; species, heights, density and boundary coordinates remain estimates. |
+| B0.000, B15.007, B16.007 | Add the trampoline's blue arched upper attachment and darker fine net. Hoop construction, mesh spacing and dimensions are approximations of the visible silhouette. |
+| B0.000, B16.007, B19.008 | Replace the earlier navigation-only white stair flight with lawn close to the sunroom sill. The 12 cm nominal lip and local slope are fitted estimates; the recording does not establish metric grade. |
 
 The 1.8 m porch depth, 6.10 m Cory room depth and 0.65 m nook depth are fit
 estimates. Cory's depth follows the corrected facade in the existing coordinate
 system; it is not measured from footage. House/yard scale, roof pitch, opening
 sizes, grade and stair rises still need measured anchors. The office window's
 exact offset and outside-grade relationship remain unresolved.
+Automated frame matching has not calibrated absolute scale or validated room
+proportions.
 
 The clearer H197–200 views resolve Jeannie's furniture ordering; the revised
 global offsets remain estimates. H195 alone is too blurred to justify a bed

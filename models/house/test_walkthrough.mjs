@@ -27,7 +27,8 @@ function route(name,waypoints){
 }
 const routes=[
  ['Front door',[[6.6,.7,0],[6.6,-.95,0],[4.25,-.95,-.06]]],
- ['Kitchen to garage',[[1.2,7.56,0],[-.5,7.56,-.16]]],
+ // Approach around the window-wall worktop restored from H60/H63.
+ ['Kitchen to garage',[[1.5,6.8,0],[.84,7.32,0],[.78,7.56,0],[-.5,7.56,-.16]]],
  ['Upstairs flight',[[7.5,4.01,0],[8.8,4.01,.2],[10.9,4.01,1.26],[13.0,4.01,1.26]]],
  ['Downstairs flight',[[7.5,2.63,0],[9.0,2.63,-.5],[10.3,2.63,-1.05]]],
  ['Lower bedroom entry',[[11.5,4.2,-1.05],[11.5,5.2,-1.05],[11.5,6.2,-1.05],[10.2,6.2,-1.05]]],
@@ -35,11 +36,13 @@ const routes=[
  ['Basement flight',[[10.2,4.01,-1.05],[9.5,4.01,-1.35],[8.5,4.01,-2.3],[6.6,4.01,-3.15]]],
  ['Basement direct play approach',[[6.55,4.01,-3.15],[4.8,3.55,-3.15]]],
  ['Basement direct office approach',[[6.55,4.01,-3.15],[4.7,6.0,-3.15]]],
- ['Sunroom to backyard',[[4.65,10.7,-.10],[4.65,11.7,-.27],[4.65,12.8,-.82]]],
+ ['Sunroom to backyard',[[4.65,10.7,-.10],[4.65,11.7,-.22],[4.65,15.6,-.82]]],
  ['Front porch steps',[[4.25,-.95,-.06],[4.25,-3.3,-.82]]],
  ['Driveway to garage',[[ -3.5,-5.0,-.82],[-3.5,-1.5,-.16]]],
  ['Green bathroom',[[11.57,4.01,1.26],[11.4,4.9,1.26],[11.0,5.2,1.26]]],
- ['Ensuite doorway',[[13.47,5.0,1.26],[13.0,6.2,1.26],[12.7,8.02,1.26],[11.4,8.15,1.26]]],
+ // H139 puts the bassinet at the entry half of the bed foot. Follow the
+ // real aisle around it, including the turn after the entry-side closet.
+ ['Ensuite doorway',[[13.47,5.0,1.26],[13.47,5.38,1.26],[12.56,5.38,1.26],[12.56,6.95,1.26],[12.7,8.02,1.26],[11.4,8.15,1.26]]],
  ['Nursery doorway',[[12.5,4.01,1.26],[12.5,2.7,1.26]]],
  ['Master doorway',[[13.47,4.01,1.26],[13.47,5.0,1.26]]],
  ['End bedroom doorway',[[15.0,4.01,1.26],[16.5,4.01,1.26]]],

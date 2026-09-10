@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "67df9b33188c5c45835916f92b5b2d7a417a439f32be5a7a4f9d6ad2d6a6791b",
+  "generator_sha256": "510793b3e155a916777de684fdfd800595c6bf39cc96c57bf7b09faf469751da",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -12,8 +12,8 @@
   ],
   "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 6864,
-  "mesh_objects": 5998,
+  "objects": 7545,
+  "mesh_objects": 6668,
   "cameras": [
     "overview",
     "sunroom",
@@ -353,11 +353,11 @@
     {
       "name": "Two-cup adjustable sunroom floor lamp",
       "collection": "06 | Sunroom furniture",
-      "photos": "3,5",
-      "confidence": "photo / estimated size",
+      "photos": "3,5; House Tour 78.020/81.022/84.023s",
+      "confidence": "houseward side-glazing position observed; offset, height and arm angle estimated",
       "location_m": [
-        7.070000171661377,
-        11.0,
+        7.119999885559082,
+        9.979999542236328,
         -0.07999999821186066
       ]
     },
@@ -573,8 +573,8 @@
     {
       "name": "Main oatmeal three-seat sofa",
       "collection": "09 | Living room furniture",
-      "photos": "8",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 51.008s",
+      "confidence": "two seat cushions and rounded arms observed; footprint/back structure estimated",
       "location_m": [
         0.550000011920929,
         2.549999952316284,
@@ -584,8 +584,8 @@
     {
       "name": "Child-sized blue sofa",
       "collection": "09 | Living room furniture",
-      "photos": "7,8",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 51.008s",
+      "confidence": "low blue continuous seat, back tufts and short arms observed; dimensions estimated",
       "location_m": [
         2.3499999046325684,
         0.5199999809265137,
@@ -595,8 +595,8 @@
     {
       "name": "Living upholstered armchair",
       "collection": "09 | Living room furniture",
-      "photos": "8",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 51.008s",
+      "confidence": "rounded tub silhouette observed; dimensions and concealed base estimated",
       "location_m": [
         2.8499999046325684,
         3.0,
@@ -705,8 +705,8 @@
     {
       "name": "Living television media cabinet",
       "collection": "09 | Living room furniture",
-      "photos": "House Tour 54.010s",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 48.007s,54.010s",
+      "confidence": "dark wood, open upper shelving and three broad drawer rows observed; dimensions estimated",
       "location_m": [
         2.25,
         4.079999923706055,
@@ -821,6 +821,39 @@
         4.449999809265137,
         0.3199999928474426,
         0.017999999225139618
+      ]
+    },
+    {
+      "name": "Kitchen window cubby worktop",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "House Tour 60.012/63.013s",
+      "confidence": "window-wall worktop and two rows of bins observed; width, height and bin count estimated",
+      "location_m": [
+        1.9700000286102295,
+        7.71999979019165,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Kitchen window-side small drawer unit",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "House Tour 60.012/63.013s",
+      "confidence": "small wood drawer unit at dining end observed; dimensions and drawer divisions estimated",
+      "location_m": [
+        3.130000114440918,
+        7.71999979019165,
+        0.03500000014901161
+      ]
+    },
+    {
+      "name": "Kitchen tall cream paneled pantry",
+      "collection": "10 | Dining and entry furniture",
+      "photos": "House Tour 60.012/63.013s",
+      "confidence": "tall cream paneled cupboard beside sunroom entry observed; size and stacked door divisions estimated",
+      "location_m": [
+        4.0,
+        7.659999847412109,
+        0.03500000014901161
       ]
     },
     {
@@ -1486,12 +1519,23 @@
     {
       "name": "Primary double bed",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "U8,V1",
+      "photos": "U8,V1; House Tour 139s",
       "confidence": "photo / estimated size",
       "location_m": [
         14.420000076293945,
         6.410000324249268,
         1.284999966621399
+      ]
+    },
+    {
+      "name": "Primary bedside wall shelves",
+      "collection": "21 | Primary bedroom furniture",
+      "photos": "House Tour 139s",
+      "confidence": "wall shelves observed; count, spacing and plain storage contents estimated",
+      "location_m": [
+        15.459999084472656,
+        5.990000247955322,
+        1.2599999904632568
       ]
     },
     {
@@ -1541,11 +1585,11 @@
     {
       "name": "Bedside mesh bassinet",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "U8,V1",
-      "confidence": "photo / estimated size",
+      "photos": "U8,V1; House Tour 138/139s",
+      "confidence": "beside entry half of bed foot observed; fitted position preserves narrow foot aisle",
       "location_m": [
-        14.889999389648438,
-        7.560000419616699,
+        13.119999885559082,
+        6.160000324249268,
         1.2599999904632568
       ]
     },
@@ -2036,8 +2080,8 @@
     {
       "name": "Lower bedroom low dark cabinet",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V9; House Tour 199s",
-      "confidence": "photo / estimated size",
+      "photos": "V9; House Tour 197.998/199s",
+      "confidence": "dark cabinet with two shallow drawers above two doors observed; dimensions estimated",
       "location_m": [
         14.75,
         7.679998874664307,
@@ -3004,7 +3048,7 @@
     {
       "name": "Rear left shade tree",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u20139; H72; location estimated",
+      "photos": "B5.002/9.003; broad canopy observed; height, spread and location estimated",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         -5.599999904632568,
@@ -3015,7 +3059,7 @@
     {
       "name": "Rear lawn tree",
       "collection": "42 | Front and back yards",
-      "photos": "B11\u201313; moved to rear perimeter, estimated",
+      "photos": "B11.005/13.005; rear canopy observed; spread and perimeter location estimated",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         16.399999618530273,
@@ -3026,7 +3070,7 @@
     {
       "name": "Rear right screening tree",
       "collection": "42 | Front and back yards",
-      "photos": "B13\u201316; H75\u201378; estimated",
+      "photos": "B13.005/15.007/16.007; broad edge canopy observed; dimensions and placement estimated",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         22.0,
@@ -3125,51 +3169,62 @@
     {
       "name": "Rear boundary planting 00",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        -7.400000095367432,
-        12.399999618530273,
+        -7.199999809265137,
+        12.5,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 01",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        -7.199999809265137,
-        14.800000190734863,
+        -7.400000095367432,
+        15.600000381469727,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 02",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        -7.599999904632568,
-        17.0,
+        -7.300000190734863,
+        18.600000381469727,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 03",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        -7.099999904632568,
-        23.5,
+        -7.0,
+        21.799999237060547,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 04",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        -6.900000095367432,
+        24.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 05",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
         -6.0,
@@ -3178,79 +3233,145 @@
       ]
     },
     {
-      "name": "Rear boundary planting 05",
-      "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
-      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
-      "location_m": [
-        -3.799999952316284,
-        26.299999237060547,
-        -0.8199999928474426
-      ]
-    },
-    {
       "name": "Rear boundary planting 06",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        1.2000000476837158,
-        26.5,
+        -3.200000047683716,
+        26.299999237060547,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 07",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        3.299999952316284,
-        26.799999237060547,
+        -0.5,
+        26.399999618530273,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 08",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        7.0,
-        26.600000381469727,
+        1.5,
+        26.5,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 09",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        21.700000762939453,
-        25.5,
+        4.199999809265137,
+        26.399999618530273,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 10",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        22.600000381469727,
-        22.799999237060547,
+        7.400000095367432,
+        26.5,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary planting 11",
       "collection": "42 | Front and back yards",
-      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
       "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        22.299999237060547,
-        16.0,
+        11.600000381469727,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 12",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        14.800000190734863,
+        26.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 13",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        18.100000381469727,
+        26.200000762939453,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 14",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        21.0,
+        25.799999237060547,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 15",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        22.0,
+        23.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 16",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        22.200000762939453,
+        20.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 17",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        22.0,
+        16.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 18",
+      "collection": "42 | Front and back yards",
+      "photos": "B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        21.799999237060547,
+        13.199999809265137,
         -0.8199999928474426
       ]
     },
@@ -3279,8 +3400,8 @@
     {
       "name": "Backyard trampoline",
       "collection": "42 | Front and back yards",
-      "photos": "B0,15\u201316; H75\u201378",
-      "confidence": "blue pad, curved net poles, yellow entrance and ladder observed; dimensions and pole count estimated",
+      "photos": "B0.000/15.007/16.007; H75\u201378",
+      "confidence": "blue pad, curved poles, dark fine net, blue arched upper attachment, yellow entrance and ladder observed; dimensions, mesh spacing, hoop details and pole count estimated",
       "location_m": [
         13.699999809265137,
         14.100000381469727,
@@ -3398,10 +3519,10 @@
       ]
     },
     {
-      "name": "Rear sunroom steps",
+      "name": "Rear sunroom threshold lawn",
       "collection": "42 | Front and back yards",
-      "photos": "1-5",
-      "confidence": "small grade connection added for walkthrough; tread dimensions estimated",
+      "photos": "B0.000/16.007/18.008/19.008",
+      "confidence": "lawn close to the sunroom sill observed; no four-riser white flight visible; local grade, 12 cm nominal lip and transition extent are route-fit estimates",
       "location_m": [
         0.0,
         0.0,

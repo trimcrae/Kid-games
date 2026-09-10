@@ -44,6 +44,13 @@ for obj in scene.objects:
     assert all(math.isfinite(v) for row in obj.matrix_world for v in row), obj.name
     if obj.type == 'MESH':
         assert obj.data.vertices and obj.data.polygons, 'Empty mesh: ' + obj.name
+        if 'sewn mesh' in obj.data.name:
+            import bmesh
+            sewn = bmesh.new()
+            sewn.from_mesh(obj.data)
+            assert all(edge.is_manifold for edge in sewn.edges), 'Open bedding shell: ' + obj.name
+            assert sewn.calc_volume(signed=True) > 0, 'Inverted bedding shell: ' + obj.name
+            sewn.free()
 for name in ['03 | Cutaway walls - enable for enclosure', '14 | Ceilings - hidden for dollhouse']:
     assert bpy.data.collections[name].hide_render
     assert bpy.data.collections[name].hide_viewport
@@ -217,6 +224,8 @@ def head_direction(name):
 # W10 establishes the window corner; loose bedding does not establish the
 # head/foot direction reliably enough for a photo-confirmation assertion.
 assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
+assert position('Bedside mesh bassinet').x < position('Primary double bed').x-.9, 'H139: bassinet belongs at the bed foot'
+assert position('Bedside mesh bassinet').y < position('Primary double bed').y, 'H139: bassinet is on the entry half of the bed'
 assert head_direction('Lower bedroom single bed').y > .99, 'H199: Jeannie headboard and low cabinet share the rear window wall'
 assert head_direction('End bedroom single bed').x < -.99, 'U7: long mattress edge follows right wall; free end faces ottoman'
 cory_bed=position('End bedroom single bed')

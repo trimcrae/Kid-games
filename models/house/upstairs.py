@@ -111,22 +111,88 @@ def upper_window(name, pos, width, angle, photos, patterned=False, with_curtains
         curtains(name+' curtains', (pos[0], pos[1], 0), width, angle, photos, patterned)
 
 
-def bed(name, pos, width, angle, photos, quilt=False):
+def soft_bedding(name, pos, size, mat, kind='pillow', nx=20, ny=30, palette=None):
+    """Closed sewn forms with a thin edge and gentle, deterministic cloth folds.
+
+    Silhouette is actual geometry, so browser export retains it. This models
+    clean bedding, not the recording-time arrangement of loose blankets.
+    """
+    width, depth, height = size
+    verts, faces = [], []
+    for side in [1, -1]:
+        for j in range(ny+1):
+            v = 2*j/ny-1
+            for i in range(nx+1):
+                u = 2*i/nx-1
+                corner = abs(u*v)**8
+                x, y = width*u/2*(1-.035*corner), depth*v/2*(1-.035*corner)
+                if kind == 'duvet':
+                    side_drop = .18*(max(0, abs(u)-.8)/.2)**2
+                    foot_drop = .20*(max(0, -v-.8)/.2)**2
+                    wave = (.009*math.sin(15*u+3*v)+.007*math.sin(22*v-5*u)
+                            +.012*math.sin(7*u-4*v))*(1-.55*abs(u*v))
+                    z = wave-max(side_drop, foot_drop)+side*height/2
+                else:
+                    power = 10 if kind == 'mattress' else 3
+                    crown = max(0, (1-abs(u)**power)*(1-abs(v)**power))
+                    edge = .66 if kind == 'mattress' else .15
+                    loft = edge+(1-edge)*math.sqrt(crown)
+                    amplitude = .0025 if kind == 'mattress' else .004
+                    wave = amplitude*(math.sin(23*u+7*v)+.5*math.sin(19*v-3*u))*abs(u*v)**2
+                    z = side*height*loft/2+wave
+                verts.append((x, y, z))
+    stride, surface = nx+1, (nx+1)*(ny+1)
+    for j in range(ny):
+        for i in range(nx):
+            a = j*stride+i
+            top = (a, a+1, a+stride+1, a+stride)
+            faces.append(top)
+            faces.append(tuple(surface+k for k in reversed(top)))
+    perimeter = (list(range(nx+1)) + [j*stride+nx for j in range(1,ny+1)]
+                 + [ny*stride+i for i in range(nx-1,-1,-1)]
+                 + [j*stride for j in range(ny-1,0,-1)])
+    for i,a in enumerate(perimeter):
+        b = perimeter[(i+1)%len(perimeter)]
+        faces.append((a, a+surface, b+surface, b))
+    mesh = bpy.data.meshes.new(name+' sewn mesh')
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    obj.location = pos
+    finish(obj, name, mat)
+    for polygon in mesh.polygons:polygon.use_smooth = True
+    if palette:
+        mesh.materials.clear()
+        for color in palette:mesh.materials.append(color)
+        for polygon in mesh.polygons:
+            col = min(5,max(0,int((polygon.center.x/width+.5)*6)))
+            row = min(2,max(0,int((polygon.center.y/depth+.5)*3)))
+            polygon.material_index = (col+row*2)%len(palette)
+    return obj
+
+
+def bed(name, pos, width, angle, photos, quilt=False, duvet=False):
     asset(name, pos, angle, photos)
     box('Simple dark bed base', (0, 0, .27), (width, 2.04, .14), walnut, .035)
     for x in [-width/2+.07, width/2-.07]:
         for y in [-.88, .88]:
             box('Bed leg', (x, y, .13), (.05, .05, .26), black)
-    box('White mattress', (0, 0, .43), (width, 2, .25), bedding, .10)
-    box('Neatly spread duvet', (0, -.27, .585), (width+.045, 1.45, .085), bedding, .07)
+    # H123/H186 show a fitted white surface, not a second mattress-like slab.
+    soft_bedding('White mattress', (0, 0, .43), (width, 2, .25), bedding, 'mattress')
+    if duvet:
+        # H139: the main bed has a loose pale duvet falling over its sides/foot.
+        soft_bedding('Soft draped duvet', (0, -.20, .605), (width+.18, 1.74, .018),
+                     bedding, 'duvet', 26, 38)
     for x in ([0] if width < 1.3 else [-width*.24, width*.24]):
-        box('Made bed pillow', (x, .65, .60), (width*.43 if width>1.3 else .70, .43, .16), bedding, .075)
+        soft_bedding('Made bed pillow', (x, .65, .60),
+                     (width*.43 if width>1.3 else .70, .43, .16), bedding, nx=14, ny=10)
     if quilt:
-        colors = holds + [green, navy]
-        for ix in range(6):
-            for iy in range(3):
-                box('Folded colorful quilt patch', (-width/2+(ix+.5)*width/6, -.80+iy*.13, .64),
-                    (width/6-.003, .127, .018), colors[(ix+iy*2)%len(colors)], .005)
+        colors = [material('Cory quilt cotton '+label, color, .93, texture='fabric')
+                  for label,color in [('crimson',(.42,.06,.045)),('blue',(.04,.09,.20)),
+                                      ('green',(.07,.20,.09)),('ochre',(.55,.30,.06)),
+                                      ('purple',(.18,.055,.14))]]
+        soft_bedding('Folded colorful patchwork quilt', (0,-.62,.573),
+                     (width+.02,.48,.026), colors[0], 'quilt', 24, 12, colors)
 
 
 def white_chest(name, pos, width, height, photos):
@@ -280,11 +346,8 @@ bed('End bedroom single bed',(5.75,-3.05,.035),1.03,90,'U7; House Tour 123/126s'
 cory_pink=material('Cory muted pink cotton pillow',(.48,.27,.29),.94,texture='fabric')
 for obj in list(ROOT.children):
     if obj.name.startswith('Made bed pillow'):bpy.data.objects.remove(obj,do_unlink=True)
-    elif obj.name.startswith('Folded colorful quilt patch'):
-        obj.data.materials.clear()
-        obj.data.materials.append([navy,red,bluegrey][round(obj.location.x*100+obj.location.y*100)%3])
 for x,mat in [(-.23,bedding),(.23,cory_pink)]:
-    box('Cory cream and rose pillows',(x,.66,.62),(.48,.44,.16),mat,.075)
+    soft_bedding('Cory cream and rose pillows',(x,.66,.60),(.48,.44,.16),mat,nx=14,ny=10)
 box('Cory wood headboard',(0,1.01,.79),(1.06,.07,.72),oak,.04)
 for x in [-.55,.55]:
     cylinder('Cory turned bedpost',(x,1.01,.63),.035,1.26,walnut)
@@ -318,17 +381,32 @@ for x,z in [(-.24,.65),(0,1.05),(.24,1.54)]:
 
 upper_collection('21 | Primary bedroom furniture')
 # U8: pillows at the right-hand wall; dresser and TV on the adjoining wall.
-bed('Primary double bed',(3.43,2.40,.025),1.60,-90,'U8,V1')
+bed('Primary double bed',(3.43,2.40,.025),1.60,-90,'U8,V1; House Tour 139s',duvet=True)
+primary_headboard=material('Primary grey cotton headboard',(.23,.25,.235),.94,texture='fabric')
+headboard=soft_bedding('Primary upholstered headboard',(0,.95,.84),
+                      (1.67,.76,.095),primary_headboard,nx=22,ny=12)
+headboard.rotation_euler.x=math.pi/2
+asset('Primary bedside wall shelves',(4.47,1.98,0),-90,'House Tour 139s',
+      confidence='wall shelves observed; count, spacing and plain storage contents estimated')
+for z in [1.47,1.87]:
+    box('Primary wall shelf board',(0,-.10,z),(1.08,.24,.03),oak,.009)
+    for x in [-.41,.41]:
+        box('Primary shelf upright bracket',(x,.007,z-.10),(.025,.025,.22),white,.003)
+        box('Primary shelf support arm',(x,-.09,z-.04),(.025,.21,.025),white,.003)
+for i in range(4):
+    box('Plain bedside shelf storage',(-.38+i*.245,-.10,1.60),(.20,.17,.22),
+        [linen,bluegrey,curtainmat,white][i],.008)
 chest('Primary long wood dresser',(3.66,4.22,0),1.42,1.02,0,3,2,'U8')
 chest('Primary narrow wood chest',(2.56,3.77,0),.63,.82,0,4,1,'U8')
 asset('Primary wall television',(3.65,4.46,1.62),0,'U8')
 box('Television black case',(0,0,0),(1.05,.07,.64),black)
 box('Television dark screen',(0,-.041,0),(.99,.012,.58),screen)
-asset('Primary woven laundry hamper',(3.15,3.55,0),0,'U8')  # beside the bassinet, clear of the ensuite doorway
+asset('Primary woven laundry hamper',(3.15,3.55,0),0,'U8')  # between dresser zones, clear of the ensuite doorway
 box('Woven hamper body',(0,0,.39),(.43,.40,.78),wicker,.04)
 box('Closed wicker hamper lid',(0,0,.81),(.46,.43,.055),rattan,.025)
 box('Hamper inset grip',(0,-.207,.69),(.12,.007,.035),black)
-asset('Bedside mesh bassinet',(3.90,3.55,0),0,'U8,V1')  # beyond the bed's far side, clear of the ensuite doorway
+asset('Bedside mesh bassinet',(2.13,2.15,0),90,'U8,V1; House Tour 138/139s',
+      confidence='beside entry half of bed foot observed; fitted position preserves narrow foot aisle')
 for x in [-.44,.44]:
     for y in [-.24,.24]:
         rod('Bassinet folding leg',(x*1.12,y*1.2,.03),(x*.90,y*.85,.72),.022,curtainmat)
