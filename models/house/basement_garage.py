@@ -29,6 +29,52 @@ burgundy=material('Burgundy vehicle paint',(.12,.022,.027),.22,.35)
 carblack=material('Black vehicle paint',(.015,.021,.024),.20,.50)
 pinkcloth=material('Rose bedroom curtains',(.48,.17,.16),.97,texture='fabric')
 pinkwood=material('Pink childrens shelving',(.48,.035,.16),.55)
+utilityplastic=material('Gray molded utility plastic',(.29,.32,.32),.59)
+bikeblack=material('Exercise bike black finish',(.018,.021,.022),.42,.15)
+
+def basement_mesh(name,verts,faces,mat,smooth=False):
+    mesh=bpy.data.meshes.new(name)
+    mesh.from_pydata(verts,[],faces)
+    mesh.update()
+    obj=finish(bpy.data.objects.new(name,mesh),name,mat)
+    for face in mesh.polygons:face.use_smooth=smooth
+    return obj
+
+def hanging_storage_sheet(start,end,phase):
+    """Closed 3 mm cloth shell: broad sag and irregular folds, not rigid slats."""
+    a,b=Vector((*start,0)),Vector((*end,0))
+    tangent=(b-a).normalized()
+    normal=Vector((-tangent.y,tangent.x,0))
+    cols,rows=32,12
+    verts=[]
+    for side in [-1,1]:
+        for j in range(rows+1):
+            v=j/rows
+            for i in range(cols+1):
+                u=i/cols
+                top=2.31-.13*math.sin(math.pi*u)**2
+                hem=.06+.045*math.sin(2*math.pi*u+phase)**2
+                ripple=(.026*math.sin(7*math.pi*u+phase)+.013*math.sin(19*math.pi*u+v))*math.sin(math.pi*u)
+                bow=.08*math.sin(math.pi*u)*math.sin(math.pi*v)
+                p=a+(b-a)*u+normal*(ripple+bow+side*.0015)
+                verts.append((p.x,p.y,hem+(top-hem)*v))
+    layer=(cols+1)*(rows+1)
+    faces=[]
+    for j in range(rows):
+        for i in range(cols):
+            q=j*(cols+1)+i
+            f=(q,q+1,q+cols+2,q+cols+1)
+            faces.extend([f,tuple(k+layer for k in reversed(f))])
+    border=list(range(cols+1))+[j*(cols+1)+cols for j in range(1,rows+1)]
+    border+=list(range(rows*(cols+1)+cols-1,rows*(cols+1)-1,-1))
+    border+=[j*(cols+1) for j in range(rows-1,0,-1)]
+    for i,q in enumerate(border):
+        r=border[(i+1)%len(border)]
+        faces.append((q,q+layer,r+layer,r))
+    basement_mesh('Sagging off-white storage sheet',verts,faces,bedding,True)
+    for u in [0,.5,1]:
+        p=a+(b-a)*u
+        rod('Sheet ceiling tie',(p.x,p.y,2.31-.13*math.sin(math.pi*u)**2),(p.x,p.y,2.38),.006,white)
 
 # The basement occupies an estimated rectangle under the main level. Its
 # Homeowner clarification: descending toward -X, office is RIGHT (+Y), play
@@ -79,14 +125,11 @@ for x in [-.30,.30]:box('Hopper vent upright',(x,-.06,2.37),(.035,.055,.30),whit
 for z in [2.22,2.52]:box('Hopper vent rail',(0,-.06,z),(.63,.055,.035),white)
 box('Hopper vent glass',(0,-.064,2.37),(.56,.012,.25),glass,.006)
 box('Hopper vent latch',(0,-.105,2.48),(.07,.025,.024),black)
-asset('Basement fabric room divider',(0,0,BASEMENT_Z),photos='W4,W5,W8')
-for xa,xb,ya,yb in [(.15,.85,7.05,7.05)]:
-    rod('Screen suspension line',(xa,ya,2.32),(xb,yb,2.32),.01,black)
-    for i in range(48):
-        t=(i+.5)/48
-        x,y=xa+(xb-xa)*t,ya+(yb-ya)*t
-        size=(abs(xb-xa)/48+.008,.025,2.22) if xa!=xb else (.025,abs(yb-ya)/48+.008,2.22)
-        box('Hanging clean white screen',(x+.018*math.sin(i),y+.025*math.cos(i),1.18),size,bedding,.006)
+asset('Basement fabric room divider',(0,0,BASEMENT_Z),photos='House Tour 212.008-215.010s',
+      confidence='L-shaped sagging white cloth beside play/storage observed; endpoints and hidden storage depth estimated')
+# Tentative placement leaves the foosball rods and the stair exit at Y3.42 clear.
+hanging_storage_sheet((3.5,1.0),(6.9,1.0),.3)
+hanging_storage_sheet((6.9,1.0),(6.9,3.3),1.7)
 asset('Basement support post',(3.60,3.0,BASEMENT_Z),photos='W6,W8')
 rod('Steel basement support',(0,0,0),(0,0,2.52),.06,black)
 
@@ -165,20 +208,48 @@ shelf_unit('Basement metal storage shelving',(.50,5.70,BASEMENT_Z),1.65,1.98,bla
 for z in [.20,.67,1.14]:
     for x in [-.52,0,.52]:box('Neatly stored closed bin',(x,0,z),(.46,.32,.27),bluegrey,.02)
 chest('Basement white storage cabinet',(1.18,5.02,BASEMENT_Z),1.15,1.55,0,2,2,'W6')
-# W8 shows the monitors continuing along the same wall, left of the dryer.
-table('Basement wood computer desk',(3.30,7.43,BASEMENT_Z),(2.70,.75,.75),walnut,0,'W6,W8; House Tour 228/231s')
-asset('Basement dual monitors',(3.80,7.43,BASEMENT_Z),0,'W6,W8; House Tour 228/231s',
-      'one external monitor plus laptop in video; legacy asset identifier retained')
-for x in [.30]:
-    box('Computer monitor base',(x,0,.79),(.26,.19,.025),black)
-    rod('Computer monitor stand',(x,.04,.78),(x,.04,1.0),.025,black)
-    box('Computer monitor',(x,.04,1.16),(.69,.055,.43),black,.013)
-    box('Computer blank display',(x,.006,1.16),(.65,.009,.39),screen,.004)
-box('Computer keyboard',(.30,-.23,.79),(.45,.15,.018),black)
-box('Open laptop keyboard',(-.45,-.16,.785),(.40,.28,.018),steel,.008)
-o=box('Open laptop display',(-.45,-.01,.93),(.40,.025,.27),black,.01)
+# H227 corrects the earlier oblique view: wood drawer desk, laptop and one
+# landscape monitor, with TWO portrait monitors on a separate raised stand.
+asset('Basement wood computer desk',(2.96,7.43,BASEMENT_Z),0,'House Tour 227.017s',
+      'wood drawer desk observed; 1.48 m width and position estimated')
+box('Wood desk top',(0,0,.735),(1.48,.74,.065),oak,.018)
+box('Desk drawer pedestal',(-.485,.005,.365),(.47,.64,.70),oak,.01)
+for z,h in [(.66,.075),(.55,.12),(.41,.13),(.255,.145),(.105,.135)]:
+    box('Wood pedestal drawer',(-.485,-.327,z),(.445,.035,h),oak,.006)
+    sphere('Dark round drawer knob',(-.485,-.359,z),(.018,.016,.018),black)
+box('Desk center shallow drawer',(.225,-.32,.643),(.91,.08,.125),oak,.009)
+sphere('Center drawer knob',(.225,-.373,.643),(.018,.016,.018),black)
+for y in [-.28,.28]:box('Wood desk right leg',(.675,y,.35),(.065,.065,.70),oak,.007)
+box('Desk rear apron',(.23,.30,.63),(.94,.04,.16),oak,.004)
+asset('Basement dual monitors',(2.96,7.43,BASEMENT_Z),0,'House Tour 227.017s',
+      'three external displays (one landscape, two portrait) plus laptop observed; legacy identifier retained; dimensions estimated')
+box('Landscape monitor base',(.23,.06,.785),(.25,.20,.025),black)
+rod('Landscape monitor stand',(.23,.09,.78),(.23,.09,.97),.023,black)
+box('Landscape computer monitor',(.23,.075,1.105),(.65,.052,.39),black,.012)
+box('Landscape blank display',(.23,.044,1.105),(.616,.009,.356),screen,.003)
+for x in [1.015,1.445]:
+    box('Portrait monitor base',(x,.09,1.005),(.28,.24,.025),black,.01)
+    rod('Portrait monitor stand',(x,.12,1.01),(x,.12,1.24),.022,black)
+    box('Portrait computer monitor',(x,.10,1.385),(.405,.055,.70),black,.012)
+    box('Portrait blank display',(x,.067,1.385),(.373,.009,.664),screen,.003)
+box('Open laptop keyboard',(-.48,-.16,.785),(.40,.28,.018),steel,.008)
+box('Laptop inset keyboard',(-.48,-.13,.797),(.33,.15,.006),black,.003)
+box('Laptop trackpad',(-.48,-.245,.797),(.105,.055,.006),utilityplastic,.004)
+o=box('Open laptop display',(-.48,-.01,.93),(.40,.025,.27),black,.01)
 o.rotation_euler.x=math.radians(-12)
-box('Laptop dark display',(-.45,-.027,.93),(.37,.008,.23),screen,.004).rotation_euler.x=math.radians(-12)
+box('Laptop dark display',(-.48,-.027,.93),(.37,.008,.23),screen,.004).rotation_euler.x=math.radians(-12)
+asset('Basement raised monitor stand',(4.20,7.43,BASEMENT_Z),0,'House Tour 227.017s',
+      'separate raised stand and lower keyboard tray observed; size and placement estimated')
+box('Raised stand wood top',(0,.025,.976),(.91,.58,.04),oak,.012)
+for x in [-.38,.38]:
+    for y in [-.20,.24]:rod('Raised stand tubular leg',(x,y,.035),(x,y,.955),.018,steel)
+    rod('Raised stand floor runner',(x,-.31,.035),(x,.29,.035),.02,black)
+    rod('Keyboard tray side support',(x,-.42,.75),(x,.20,.75),.012,steel)
+rod('Raised stand back brace',(-.38,.24,.20),(.38,.24,.90),.012,steel)
+box('Separate keyboard tray',(0,-.23,.759),(.88,.40,.032),oak,.012)
+box('Stand keyboard',(0,-.24,.786),(.48,.16,.027),black,.009)
+box('Keyboard key field',(-.045,-.23,.803),(.33,.12,.007),bikeblack,.003)
+sphere('Stand mouse',(.31,-.23,.797),(.028,.046,.018),black)
 asset('Basement black office chair',(3.90,6.38,BASEMENT_Z),180,'W6,W8')
 rod('Office chair gas lift',(0,0,.10),(0,0,.47),.048,steel)
 for i in range(5):
@@ -198,13 +269,41 @@ for x in [-.21,.21]:
     rod('White metal chair front leg',(x,-.19,.02),(x,-.19,.45),.013,white)
     rod('White metal chair rear frame',(x,.19,.02),(x,.19,.91),.013,white)
 for z in [.64,.76,.88]:rod('White metal chair back rail',(-.21,.19,z),(.21,.19,z),.014,white)
-for x,y in [(1.50,7.44),(2.93,7.70)]:
-    asset('Basement potted plant',(x,y,BASEMENT_Z),photos='W6')
+for x,y in [(1.58,7.62),(1.97,7.55)]:
+    asset('Basement potted plant',(x,y,BASEMENT_Z),photos='W6; House Tour 227.017s',
+          confidence='plants beside office desks observed; positions estimated and clear of wood desktop')
     cylinder('Plant pot',(0,0,.15),.15,.30,black,24,top=.19)
     for i in range(7):
         a=i*math.tau/7
         rod('Plant stem',(0,0,.30),(.19*math.cos(a),.19*math.sin(a),1.18),.012,green)
         sphere('Simplified plant leaf',(.23*math.cos(a),.23*math.sin(a),1.05),(.09,.06,.32),green)
+asset('Basement stationary exercise bike',(1.10,5.98,BASEMENT_Z),0,'House Tour 230.018s',
+      'black exercise bike with red accent between storage and second desk observed; dimensions and axis estimated')
+# Approximate footprint X.82..1.38, Y5.43..6.53 avoids rack/cabinet and desk.
+for y in [-.45,.45]:
+    rod('Exercise bike stabilizer',(-.25,y,.065),(.25,y,.065),.026,bikeblack)
+    for x in [-.25,.25]:box('Exercise bike rubber foot',(x,y,.043),(.07,.12,.05),bikeblack,.012)
+rod('Bike low frame',(0,-.44,.13),(0,.44,.13),.036,bikeblack)
+for a,b in [((0,-.40,.14),(0,-.15,.43)),((0,-.15,.43),(0,.30,.14)),
+            ((0,-.15,.43),(0,.27,.58)),((0,.27,.58),(0,.42,.14))]:
+    rod('Exercise bike main frame',a,b,.038,bikeblack)
+rod('Bike adjustable seat tube',(0,-.16,.37),(0,-.26,.81),.029,steel)
+rod('Bike seat collar',(0,-.19,.46),(0,-.22,.61),.04,bikeblack)
+sphere('Exercise bike saddle',(0,-.29,.855),(.135,.165,.045),bikeblack)
+rod('Bike handlebar mast',(0,.27,.42),(0,.40,1.01),.030,bikeblack)
+curve('Exercise bike handlebars',[(-.22,.30,1.11),(-.22,.46,1.05),(-.15,.48,1.01),(.15,.48,1.01),(.22,.46,1.05),(.22,.30,1.11)],.022,bikeblack)
+box('Exercise bike small console',(0,.39,1.025),(.17,.13,.05),bikeblack,.013).rotation_euler.x=.35
+box('Exercise bike blank console',(0,.37,1.052),(.13,.09,.007),screen,.004).rotation_euler.x=.35
+o=cylinder('Exercise bike red flywheel',(0,.18,.375),.238,.095,red,32);o.rotation_euler.y=math.pi/2
+o=cylinder('Exercise bike flywheel face',(0,.18,.375),.198,.103,bikeblack,32);o.rotation_euler.y=math.pi/2
+for x in [-.057,.057]:
+    o=cylinder('Exercise bike flywheel hub',(x,.18,.375),.07,.012,steel,20);o.rotation_euler.y=math.pi/2
+    rod('Bike drive casing',(x,-.16,.35),(x,.18,.375),.073,bikeblack)
+rod('Exercise bike crank axle',(-.15,-.16,.35),(.15,-.16,.35),.022,steel)
+for x,dy in [(-.14,-.12),(.14,.12)]:
+    rod('Exercise bike crank',(x,-.16,.35),(x,-.16+dy,.35),.018,steel)
+    box('Exercise bike pedal',(x,-.16+dy,.35),(.13,.085,.027),bikeblack,.008)
+    curve('Bike pedal strap',[(x-.045,-.18+dy,.36),(x-.045,-.18+dy,.41),(x+.045,-.18+dy,.41),(x+.045,-.18+dy,.36)],.009,bikeblack)
 asset('Basement top loading washer',(6.94,7.43,BASEMENT_Z),0,'W7,W8')
 box('Washer body',(0,0,.48),(.70,.69,.96),white,.035)
 box('Washer top lid',(0,-.045,.983),(.62,.53,.035),tilewhite,.016)
@@ -239,6 +338,47 @@ box('Water heater control',(0,-.135,1.22),(.09,.015,.14),black)
 for x in [-.13,.13]:rod('Heater connection pipe',(x,0,.67),(x,0,1.04),.017,brass)
 curve('Water heater vent',[(0,0,1.74),(0,0,2.28),(.45,0,2.28)],.043,white)
 
+def hooded_litter_box(name,y,flap):
+    asset(name,(7.43,y,BASEMENT_Z),-90,'House Tour 223.015/225.015s',
+          'gray hooded litter box with aisle-facing entrance observed; size and position estimated')
+    box('Molded litter tray',(0,0,.092),(.46,.55,.15),utilityplastic,.055)
+    box('Litter tray rim',(0,0,.164),(.474,.564,.025),utilityplastic,.035)
+    # A real opening and hollow hood: avoid a dark rectangle pasted on a solid box.
+    profile=[(-.222,.155),(.222,.155),(.228,.29),(.211,.39),(.161,.465),
+             (.08,.49),(-.08,.49),(-.161,.465),(-.211,.39),(-.228,.29)]
+    aperture=[(x*.69,.175+(z-.155)*.77) for x,z in profile]
+    inner=[(x*.95,.163+(z-.155)*.96) for x,z in profile]
+    rings=[[(x,-.274,z) for x,z in profile],[(x,.274,z) for x,z in profile],
+           [(x,-.278,z) for x,z in aperture],[(x,-.253,z) for x,z in inner],
+           [(x,.255,z) for x,z in inner]]
+    verts=[p for ring in rings for p in ring]
+    n=len(profile)
+    faces=[]
+    for i in range(n):
+        j=(i+1)%n
+        faces.extend([(i,i+n,j+n,j),(i,j,j+2*n,i+2*n),
+                      (i+2*n,j+2*n,j+3*n,i+3*n),(i+3*n,j+3*n,j+4*n,i+4*n)])
+    faces.extend([tuple(reversed(range(n,2*n))),tuple(range(4*n,5*n))])
+    hood=basement_mesh('Hollow rounded litter box hood',verts,faces,utilityplastic)
+    for i,face in enumerate(hood.data.polygons):face.use_smooth=i<4*n and i%4 in [0,3]
+    box('Clean litter inside tray',(0,0,.181),(.38,.45,.014),grout,.012)
+    curve('Hood carrying handle',[(-.055,-.015,.485),(-.055,-.015,.515),(.055,-.015,.515),(.055,-.015,.485)],.01,utilityplastic)
+    if flap:
+        pane=[(x*.92,-.285,.183+(z-.175)*.95) for x,z in aperture]
+        basement_mesh('Translucent litter door flap',pane,[tuple(range(n))],glass)
+        rod('Litter flap top hinge',(-.06,-.287,.431),(.06,-.287,.431),.009,utilityplastic)
+
+# Compact pair fits between the existing furnace and washer, under the heater.
+# These centers differ slightly from intake guesses to avoid appliance overlap.
+hooded_litter_box('Basement open hooded litter box',6.31,False)
+hooded_litter_box('Basement flap hooded litter box',6.84,True)
+asset('Basement litter pail',(6.98,6.93,BASEMENT_Z),0,'House Tour 223.015s',
+      'small gray pail beside washer and litter boxes observed; size and location estimated')
+box('Gray litter pail body',(0,0,.22),(.22,.21,.41),utilityplastic,.035)
+box('Gray litter pail lid',(0,0,.435),(.235,.225,.035),utilityplastic,.025)
+box('Pail recessed top',(0,-.005,.456),(.12,.115,.009),bluegrey,.02)
+box('Pail front handle',(0,-.111,.31),(.13,.018,.027),black,.008)
+
 basement_ceiling=new_collection('34 | Basement exposed ceiling - hide for plan')
 asset('Exposed basement floor joists',(0,0,BASEMENT_Z),photos='W4-W8')
 for y in [.12+i*.41 for i in range(20)]:box('Basement timber floor joist',(3.9,y,2.38),(7.8,.06,.22),joistmat,.003)
@@ -253,7 +393,7 @@ rod('Furnace duct branch',(5.3,5.66,2.23),(7.30,5.66,2.23),.15,steel)
 # be adjusted independently; W3 fixes adjacency, not a measured footprint.
 new_collection('35 | Garage shell and doors')
 asset('Two bay garage shell',photos='W1-W3',confidence='two vehicles observed; footprint and door offsets estimated')
-box('Garage concrete slab',(-3.5,3.15,-.24),(6.8,9.9,.16),concrete_new)
+box('Garage concrete slab',(-3.5,3.15,-.49),(6.8,9.9,.66),concrete_new)
 partition('Garage west wall',(-6.9,-1.8),(-6.9,8.1),blockmat,height=2.68)
 # House Tour 30/33s and Backyard tour 18s agree on these rear openings.
 # The sectional is one-car wide; the glazed pedestrian door is beside it.
@@ -261,6 +401,14 @@ partition('Garage rear wall',(-6.9,8.1),(-.1,8.1),blockmat,
           [(0.50,3.30,0,2.10),(3.65,4.60,0,2.07),(5.10,6.10,.80,1.80)],height=2.68)
 partition('Garage front opening',(-6.9,-1.8),(-.1,-1.8),joistmat,[(.42,6.4,0,2.25)],height=2.68)
 partition('Garage house side',(-.10,-1.8),(-.10,8.1),blockmat,[(8.96,9.76,0,2.10)],height=2.68)
+# Wall primitives start at Z0; fill the 16 cm gap to the slab, preserving doors.
+box('Garage west foundation skirt',(-6.9,3.15,-.08),(.14,9.9,.16),blockmat,.004)
+for xa,xb in [(-6.9,-6.4),(-3.6,-3.25),(-2.3,-.1)]:
+    box('Garage rear foundation skirt',((xa+xb)/2,8.1,-.08),(xb-xa,.14,.16),blockmat,.004)
+for xa,xb in [(-6.9,-6.48),(-.5,-.1)]:
+    box('Garage front foundation skirt',((xa+xb)/2,-1.8,-.08),(xb-xa,.14,.16),blockmat,.004)
+for ya,yb in [(-1.8,7.16),(7.96,8.1)]:
+    box('Garage east foundation skirt',(-.1,(ya+yb)/2,-.08),(.14,yb-ya,.16),blockmat,.004)
 framed_opening('Garage overhead vehicle opening',(-3.49,-1.80,-.16),5.98,2.42,0,'W1; House Tour 24s')
 framed_opening('Garage rear sectional opening',(-5.00,8.1,-.16),2.80,2.26,180,'House Tour 30/33s; Backyard tour 18s')
 for i in range(5):
