@@ -393,7 +393,7 @@ asset('Primary bedside wall shelves',(4.47,1.98,0),-90,'House Tour 138.877/139.5
 for z in [1.47,1.79,2.11]:
     box('Primary wall shelf board',(0,-.10,z),(1.08,.24,.03),oak,.009)
     for x in [-.41,.41]:
-        box('Primary shelf upright bracket',(x,.007,z-.10),(.025,.025,.22),black,.003)
+        box('Primary shelf upright bracket',(x,-.04,z-.10),(.025,.025,.22),black,.003)
         box('Primary shelf support arm',(x,-.09,z-.04),(.025,.21,.025),black,.003)
 for z in [1.47,1.79]:
     for i in range(6):
