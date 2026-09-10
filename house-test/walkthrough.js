@@ -18,9 +18,11 @@ scene.fog=new THREE.Fog('#c2d5d5',35,85);
 const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.045,120);
 camera.rotation.order='YXZ';
 let renderer;
+const maxPixelRatio=Math.min(devicePixelRatio,1.35);
+let pixelRatio=Math.min(maxPixelRatio,1),qualitySince=0,qualityFrames=0,lastQualityChange=0;
 try {
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(innerWidth,innerHeight);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.AgXToneMapping;
@@ -96,7 +98,9 @@ function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.add
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const cameraTarget=new THREE.Vector3(),cameraDesired=new THREE.Vector3();
 function render(){
-  lighting.tick(player,performance.now());
+  // A room probe renders six views. It must not hold up the activity iframe
+  // and adoption controls while they are still loading.
+  lighting.tick(player,performance.now(),ready);
   cameraTarget.set(player.x,player.y+.65,player.z);
   cameraDesired.set(player.x+Math.sin(yaw)*1.9*Math.cos(pitch),player.y+1.15-Math.sin(pitch)*1.9,player.z+Math.cos(yaw)*1.9*Math.cos(pitch));
   const fraction=world?world.cameraFraction(cameraTarget,cameraDesired):1;
@@ -109,11 +113,28 @@ function updateLocation(){
   if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
 let frames=0,lastDraw=0;
+function adaptResolution(now){
+  if(!active||!ready){qualitySince=now;qualityFrames=0;return;}
+  qualityFrames++;
+  const elapsed=now-qualitySince;
+  if(elapsed<1800)return;
+  const fps=qualityFrames*1000/elapsed;
+  qualityFrames=0;qualitySince=now;
+  let next=pixelRatio;
+  // Change only render size, never material/shadow shader features mid-walk.
+  // Hysteresis avoids oscillating around the 30 fps cap or a room capture.
+  if(fps<26)next=Math.max(Math.min(.6,maxPixelRatio),pixelRatio*.84);
+  else if(fps>29.5&&now-lastQualityChange>8000)next=Math.min(maxPixelRatio,pixelRatio+.06);
+  if(Math.abs(next-pixelRatio)>.015){pixelRatio=next;renderer.setPixelRatio(pixelRatio);lastQualityChange=now;}
+}
 function animate(now){
   requestAnimationFrame(animate);
   // Leave CPU/GPU time for the learning games and touch input. The paused
   // house needs only a still backdrop; walking is capped at a steady 30 fps.
-  if(now-lastDraw<(active?1000/30:1000))return;lastDraw=now;
+  const interval=active?1000/30:1000,elapsed=now-lastDraw;
+  if(elapsed<interval-.5)return;
+  lastDraw+=Math.floor((elapsed+.5)/interval)*interval;
+  adaptResolution(now);
   const dt=Math.min((now-last)/1000,.05);last=now;
   if(active&&world){
     let right=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
@@ -151,7 +172,7 @@ async function load(){
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,pixelRatio,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();
