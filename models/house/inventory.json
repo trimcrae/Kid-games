@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "e5fa59b043a8e419c4db3be0843579bf352c48ef2454376c58c9fe1ec49f5051",
+  "generator_sha256": "67df9b33188c5c45835916f92b5b2d7a417a439f32be5a7a4f9d6ad2d6a6791b",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -10,10 +10,10 @@
     "exterior.py",
     "photoreal.py"
   ],
-  "blender_version": "4.5.3 LTS",
+  "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 6745,
-  "mesh_objects": 5933,
+  "objects": 6864,
+  "mesh_objects": 5998,
   "cameras": [
     "overview",
     "sunroom",
@@ -29,12 +29,14 @@
     "bathroom",
     "nursery",
     "bedroom",
+    "cory_nook",
     "primary",
     "ensuite",
     "porch",
     "lower_bedroom",
     "lower_bathroom",
     "garage",
+    "garage_rear",
     "basement_play",
     "basement_office",
     "basement_laundry",
@@ -135,8 +137,8 @@
       "confidence": "photo / estimated size",
       "location_m": [
         6.639999866485596,
-        -0.04500000178813934,
-        1.399999976158142
+        -1.8450000286102295,
+        1.649999976158142
       ]
     },
     {
@@ -153,11 +155,11 @@
     {
       "name": "Red three-panel front door",
       "collection": "04 | Windows and front door",
-      "photos": "7",
-      "confidence": "photo / estimated size",
+      "photos": "7; House Tour 24.003/39.005s",
+      "confidence": "perpendicular return confirmed in video; dimensions estimated",
       "location_m": [
-        5.599999904632568,
-        -0.029999999329447746,
+        5.099999904632568,
+        -0.8999999761581421,
         0.0
       ]
     },
@@ -624,36 +626,47 @@
       ]
     },
     {
-      "name": "Television stand",
+      "name": "Living computer desk",
       "collection": "09 | Living room furniture",
-      "photos": "8",
+      "photos": "House Tour 51.008s",
       "confidence": "photo / estimated size",
       "location_m": [
         0.3400000035762787,
-        0.5799999833106995,
+        0.6600000262260437,
         0.017999999225139618
       ]
     },
     {
-      "name": "Small living room television",
+      "name": "Living computer monitor",
       "collection": "09 | Living room furniture",
-      "photos": "8",
+      "photos": "House Tour 51.008s",
       "confidence": "photo / estimated size",
       "location_m": [
         0.33000001311302185,
-        0.5799999833106995,
+        0.6600000262260437,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Living computer chair",
+      "collection": "09 | Living room furniture",
+      "photos": "House Tour 51.008s",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        1.0199999809265137,
+        0.6499999761581421,
         0.017999999225139618
       ]
     },
     {
       "name": "Living table lamp",
       "collection": "09 | Living room furniture",
-      "photos": "8",
+      "photos": "House Tour 51.008s",
       "confidence": "photo / estimated size",
       "location_m": [
         0.25,
-        0.9100000262260437,
-        0.6100000143051147
+        1.0399999618530273,
+        0.7599999904632568
       ]
     },
     {
@@ -679,24 +692,46 @@
       ]
     },
     {
-      "name": "Upright wood piano",
+      "name": "Tall living two-door wood cupboard",
       "collection": "09 | Living room furniture",
-      "photos": "8",
-      "confidence": "partially visible; instrument form inferred",
+      "photos": "House Tour 51.008s",
+      "confidence": "two doors and position on mirror wall observed; dimensions estimated",
       "location_m": [
-        2.3499999046325684,
-        4.090000152587891,
+        0.3400000035762787,
+        3.9600000381469727,
         0.017999999225139618
       ]
     },
     {
-      "name": "Piano bench",
+      "name": "Living television media cabinet",
       "collection": "09 | Living room furniture",
-      "photos": "8",
+      "photos": "House Tour 54.010s",
       "confidence": "photo / estimated size",
       "location_m": [
-        2.1500000953674316,
-        3.619999885559082,
+        2.25,
+        4.079999923706055,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Living large television",
+      "collection": "09 | Living room furniture",
+      "photos": "House Tour 54.010s",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        2.25,
+        4.079999923706055,
+        0.017999999225139618
+      ]
+    },
+    {
+      "name": "Living dollhouse shelf",
+      "collection": "09 | Living room furniture",
+      "photos": "House Tour 54.010s",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.9300000071525574,
+        4.03000020980835,
         0.017999999225139618
       ]
     },
@@ -1108,6 +1143,28 @@
       ]
     },
     {
+      "name": "Cory headboard closet enclosure",
+      "collection": "18 | Upstairs bedroom walls and windows",
+      "photos": "House Tour 126/129s",
+      "confidence": "opening and adjacency observed; .65 m depth estimated",
+      "location_m": [
+        10.989999771118164,
+        4.010000228881836,
+        1.2599999904632568
+      ]
+    },
+    {
+      "name": "Nursery wardrobe enclosure",
+      "collection": "18 | Upstairs bedroom walls and windows",
+      "photos": "House Tour 115/116s",
+      "confidence": "nursery-facing closet on shared sidewall observed; depth .58 m estimated",
+      "location_m": [
+        10.989999771118164,
+        4.010000228881836,
+        1.2599999904632568
+      ]
+    },
+    {
       "name": "Nursery window",
       "collection": "18 | Upstairs bedroom walls and windows",
       "photos": "U6",
@@ -1231,22 +1288,22 @@
     {
       "name": "End bedroom side window",
       "collection": "18 | Upstairs bedroom walls and windows",
-      "photos": "U7",
+      "photos": "U7; House Tour 3/123s",
       "confidence": "photo / estimated size",
       "location_m": [
         17.790000915527344,
-        1.8700001239776611,
+        0.37000012397766113,
         2.679999828338623
       ]
     },
     {
       "name": "End bedroom side window curtains",
       "collection": "18 | Upstairs bedroom walls and windows",
-      "photos": "U7",
+      "photos": "U7; House Tour 3/123s",
       "confidence": "photo / estimated size",
       "location_m": [
         17.790000915527344,
-        1.8700001239776611,
+        0.37000012397766113,
         1.2599999904632568
       ]
     },
@@ -1256,7 +1313,7 @@
       "photos": "U6",
       "confidence": "photo / estimated size",
       "location_m": [
-        14.489999771118164,
+        14.239999771118164,
         0.7100002765655518,
         1.2599999904632568
       ]
@@ -1317,25 +1374,47 @@
       ]
     },
     {
+      "name": "Nursery wardrobe rail and storage",
+      "collection": "19 | Blue nursery furniture",
+      "photos": "House Tour 115/116s",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        15.789999961853027,
+        2.4100003242492676,
+        1.2599999904632568
+      ]
+    },
+    {
       "name": "End bedroom large grey rug",
       "collection": "20 | End bedroom furniture",
-      "photos": "U7",
+      "photos": "U7; House Tour 120/123s",
       "confidence": "photo / estimated size",
       "location_m": [
         17.139999389648438,
-        3.9100003242492676,
+        3.1600003242492676,
         1.2949999570846558
       ]
     },
     {
       "name": "End bedroom single bed",
       "collection": "20 | End bedroom furniture",
-      "photos": "U7",
+      "photos": "U7; House Tour 123/126s",
       "confidence": "photo / estimated size",
       "location_m": [
         16.739999771118164,
-        2.4600002765655518,
+        0.9600002765655518,
         1.2949999570846558
+      ]
+    },
+    {
+      "name": "Cory closet shelves and curtain",
+      "collection": "20 | End bedroom furniture",
+      "photos": "House Tour 126/129s",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        15.170000076293945,
+        0.9850001335144043,
+        1.2599999904632568
       ]
     },
     {
@@ -1378,7 +1457,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         18.25,
-        2.260000228881836,
+        0.7600002288818359,
         1.2599999904632568
       ]
     },
@@ -1389,7 +1468,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         18.56999969482422,
-        2.130000114440918,
+        0.630000114440918,
         3.1700000762939453
       ]
     },
@@ -1517,11 +1596,11 @@
     {
       "name": "Bathroom recessed linen shelves",
       "collection": "22 | Family bathroom fixtures",
-      "photos": "U5",
-      "confidence": "photo / estimated size",
+      "photos": "U5; House Tour 104\u2013106s",
+      "confidence": "cased linen closet beside entrance observed; enclosure dimensions estimated",
       "location_m": [
         10.119999885559082,
-        4.840000152587891,
+        4.87000036239624,
         1.2599999904632568
       ]
     },
@@ -1693,8 +1772,19 @@
     {
       "name": "Covered front porch slab",
       "collection": "25 | Front porch and path",
-      "photos": "V4,V5",
-      "confidence": "photo / estimated size",
+      "photos": "V4,V5; House Tour 24/39s",
+      "confidence": "porch topology observed; footprint estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Entry return concrete foundation",
+      "collection": "25 | Front porch and path",
+      "photos": "House Tour 0/24/39s",
+      "confidence": "enclosed entry requires support to grade; buried foundation construction not observed",
       "location_m": [
         0.0,
         0.0,
@@ -1737,33 +1827,33 @@
     {
       "name": "Front porch wood rocking chair",
       "collection": "25 | Front porch and path",
-      "photos": "V4",
+      "photos": "V4; House Tour 42s",
       "confidence": "photo / estimated size",
       "location_m": [
-        4.800000190734863,
-        -1.9299999475479126,
+        0.5299999713897705,
+        -1.2999999523162842,
         -0.05000000074505806
       ]
     },
     {
       "name": "Front porch white rocking chair",
       "collection": "25 | Front porch and path",
-      "photos": "V4",
+      "photos": "V4; House Tour 42s",
       "confidence": "photo / estimated size",
       "location_m": [
-        4.800000190734863,
-        -0.8799999952316284,
+        0.5299999713897705,
+        -0.41999998688697815,
         -0.05000000074505806
       ]
     },
     {
       "name": "Front mailbox",
       "collection": "25 | Front porch and path",
-      "photos": "V5",
+      "photos": "V5; House Tour 21s",
       "confidence": "photo / estimated size",
       "location_m": [
-        7.139999866485596,
-        -3.819999933242798,
+        4.909999847412109,
+        -2.680000066757202,
         -0.3799999952316284
       ]
     },
@@ -1880,10 +1970,10 @@
     {
       "name": "Lower bedroom side window",
       "collection": "26 | Lower hall and additional room architecture",
-      "photos": "V9,V10",
+      "photos": "V9,V10; House Tour 199s",
       "confidence": "photo / estimated size",
       "location_m": [
-        15.289999961853027,
+        14.84000015258789,
         7.989998817443848,
         0.3649999499320984
       ]
@@ -1891,10 +1981,10 @@
     {
       "name": "Lower bedroom side window curtains",
       "collection": "26 | Lower hall and additional room architecture",
-      "photos": "V9,V10",
+      "photos": "V9,V10; House Tour 199s",
       "confidence": "photo / estimated size",
       "location_m": [
-        15.289999961853027,
+        14.84000015258789,
         7.989998817443848,
         -1.0499999523162842
       ]
@@ -1924,32 +2014,32 @@
     {
       "name": "Lower bedroom single bed",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V9",
+      "photos": "V9; House Tour 197\u2013200s",
       "confidence": "photo / estimated size",
       "location_m": [
-        15.600000381469727,
-        6.929998874664307,
+        15.90000057220459,
+        6.899999141693115,
         -1.0299999713897705
       ]
     },
     {
       "name": "Lower bedroom dark bookcase",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V9,V10",
+      "photos": "V9,V10; House Tour 199s",
       "confidence": "photo / estimated size",
       "location_m": [
-        14.34000015258789,
-        5.259998798370361,
+        13.489999771118164,
+        7.809998989105225,
         -1.0499999523162842
       ]
     },
     {
       "name": "Lower bedroom low dark cabinet",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V9",
+      "photos": "V9; House Tour 199s",
       "confidence": "photo / estimated size",
       "location_m": [
-        14.130000114440918,
+        14.75,
         7.679998874664307,
         -1.0499999523162842
       ]
@@ -1957,11 +2047,11 @@
     {
       "name": "Lower bedroom bedside drawer chest",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V9,V10",
+      "photos": "V9,V10; House Tour 200s",
       "confidence": "photo / estimated size",
       "location_m": [
-        16.1299991607666,
-        5.759998798370361,
+        15.300000190734863,
+        5.4499993324279785,
         -1.0499999523162842
       ]
     },
@@ -2001,7 +2091,7 @@
     {
       "name": "Lower room upright piano",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V6",
+      "photos": "V6; House Tour 171s",
       "confidence": "photo / estimated size",
       "location_m": [
         10.069999694824219,
@@ -2043,9 +2133,9 @@
       ]
     },
     {
-      "name": "Front porch sloping roof underside",
+      "name": "Front porch roof underside",
       "collection": "28 | Extension ceilings - hidden for dollhouse",
-      "photos": "V4",
+      "photos": "V4; House Tour 24/39s",
       "confidence": "photo / estimated size",
       "location_m": [
         0.0,
@@ -2087,10 +2177,21 @@
       ]
     },
     {
+      "name": "Basement office glass-block window",
+      "collection": "30 | Basement foundation and partitions",
+      "photos": "House Tour 234.020s",
+      "confidence": "four by two glass modules with center hopper observed; position and exterior grade estimated",
+      "location_m": [
+        2.5999999046325684,
+        8.0,
+        -3.1500000953674316
+      ]
+    },
+    {
       "name": "Basement fabric room divider",
       "collection": "30 | Basement foundation and partitions",
-      "photos": "W4,W5,W8",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 212.008-215.010s",
+      "confidence": "L-shaped sagging white cloth beside play/storage observed; endpoints and hidden storage depth estimated",
       "location_m": [
         0.0,
         0.0,
@@ -2225,7 +2326,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         0.5,
-        6.019999980926514,
+        5.699999809265137,
         -3.1500000953674316
       ]
     },
@@ -2243,10 +2344,10 @@
     {
       "name": "Basement wood computer desk",
       "collection": "33 | Basement office laundry and mechanical",
-      "photos": "W6,W8",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 227.017s",
+      "confidence": "wood drawer desk observed; 1.48 m width and position estimated",
       "location_m": [
-        3.799999952316284,
+        2.9600000381469727,
         7.429999828338623,
         -3.1500000953674316
       ]
@@ -2254,10 +2355,21 @@
     {
       "name": "Basement dual monitors",
       "collection": "33 | Basement office laundry and mechanical",
-      "photos": "W6,W8",
-      "confidence": "photo / estimated size",
+      "photos": "House Tour 227.017s",
+      "confidence": "three external displays (one landscape, two portrait) plus laptop observed; legacy identifier retained; dimensions estimated",
       "location_m": [
-        3.799999952316284,
+        2.9600000381469727,
+        7.429999828338623,
+        -3.1500000953674316
+      ]
+    },
+    {
+      "name": "Basement raised monitor stand",
+      "collection": "33 | Basement office laundry and mechanical",
+      "photos": "House Tour 227.017s",
+      "confidence": "separate raised stand and lower keyboard tray observed; size and placement estimated",
+      "location_m": [
+        4.199999809265137,
         7.429999828338623,
         -3.1500000953674316
       ]
@@ -2276,44 +2388,55 @@
     {
       "name": "Basement second workstation",
       "collection": "33 | Basement office laundry and mechanical",
-      "photos": "W6",
+      "photos": "House Tour 228/231s",
       "confidence": "photo / estimated size",
       "location_m": [
-        2.25,
-        7.429999828338623,
+        0.4300000071525574,
+        7.199999809265137,
         -3.1500000953674316
       ]
     },
     {
       "name": "Basement second office chair",
       "collection": "33 | Basement office laundry and mechanical",
-      "photos": "Homeowner: Mom and Dad both work here",
+      "photos": "House Tour 228/231s",
       "confidence": "photo / estimated size",
       "location_m": [
-        2.25,
-        6.449999809265137,
+        1.2999999523162842,
+        7.199999809265137,
         -3.1500000953674316
       ]
     },
     {
       "name": "Basement potted plant",
       "collection": "33 | Basement office laundry and mechanical",
-      "photos": "W6",
-      "confidence": "photo / estimated size",
+      "photos": "W6; House Tour 227.017s",
+      "confidence": "plants beside office desks observed; positions estimated and clear of wood desktop",
       "location_m": [
-        1.5,
-        7.440000057220459,
+        1.5800000429153442,
+        7.619999885559082,
         -3.1500000953674316
       ]
     },
     {
       "name": "Basement potted plant.001",
       "collection": "33 | Basement office laundry and mechanical",
-      "photos": "W6",
-      "confidence": "photo / estimated size",
+      "photos": "W6; House Tour 227.017s",
+      "confidence": "plants beside office desks observed; positions estimated and clear of wood desktop",
       "location_m": [
-        2.930000066757202,
-        7.699999809265137,
+        1.9700000286102295,
+        7.550000190734863,
+        -3.1500000953674316
+      ]
+    },
+    {
+      "name": "Basement stationary exercise bike",
+      "collection": "33 | Basement office laundry and mechanical",
+      "photos": "House Tour 230.018s",
+      "confidence": "black exercise bike with red accent between storage and second desk observed; dimensions and axis estimated",
+      "location_m": [
+        1.100000023841858,
+        5.980000019073486,
         -3.1500000953674316
       ]
     },
@@ -2384,6 +2507,39 @@
       ]
     },
     {
+      "name": "Basement open hooded litter box",
+      "collection": "33 | Basement office laundry and mechanical",
+      "photos": "House Tour 223.015/225.015s",
+      "confidence": "gray hooded litter box with aisle-facing entrance observed; size and position estimated",
+      "location_m": [
+        7.429999828338623,
+        6.309999942779541,
+        -3.1500000953674316
+      ]
+    },
+    {
+      "name": "Basement flap hooded litter box",
+      "collection": "33 | Basement office laundry and mechanical",
+      "photos": "House Tour 223.015/225.015s",
+      "confidence": "gray hooded litter box with aisle-facing entrance observed; size and position estimated",
+      "location_m": [
+        7.429999828338623,
+        6.840000152587891,
+        -3.1500000953674316
+      ]
+    },
+    {
+      "name": "Basement litter pail",
+      "collection": "33 | Basement office laundry and mechanical",
+      "photos": "House Tour 223.015s",
+      "confidence": "small gray pail beside washer and litter boxes observed; size and location estimated",
+      "location_m": [
+        6.980000019073486,
+        6.929999828338623,
+        -3.1500000953674316
+      ]
+    },
+    {
       "name": "Exposed basement floor joists",
       "collection": "34 | Basement exposed ceiling - hide for plan",
       "photos": "W4-W8",
@@ -2419,22 +2575,44 @@
     {
       "name": "Garage overhead vehicle opening",
       "collection": "35 | Garage shell and doors",
-      "photos": "W1",
+      "photos": "W1; House Tour 24s",
       "confidence": "photo / estimated size",
       "location_m": [
         -3.490000009536743,
-        1.100000023841858,
+        -1.7999999523162842,
         -0.1599999964237213
+      ]
+    },
+    {
+      "name": "Garage rear sectional opening",
+      "collection": "35 | Garage shell and doors",
+      "photos": "House Tour 30/33s; Backyard tour 18s",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        -5.0,
+        8.100000381469727,
+        -0.1599999964237213
+      ]
+    },
+    {
+      "name": "Garage rear window",
+      "collection": "35 | Garage shell and doors",
+      "photos": "1-5",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        -1.2999999523162842,
+        8.109999656677246,
+        1.2999999523162842
       ]
     },
     {
       "name": "Garage glazed side door",
       "collection": "35 | Garage shell and doors",
-      "photos": "W2,W3",
+      "photos": "W2,W3; House Tour 33s",
       "confidence": "photo / estimated size",
       "location_m": [
-        -6.900000095367432,
-        6.275000095367432,
+        -2.7750000953674316,
+        8.100000381469727,
         -0.1599999964237213
       ]
     },
@@ -2507,11 +2685,11 @@
     {
       "name": "Garage rear storage rack",
       "collection": "36 | Garage vehicles and storage",
-      "photos": "W1",
+      "photos": "W1; moved clear of video-confirmed rear door",
       "confidence": "photo / estimated size",
       "location_m": [
-        -3.450000047683716,
-        7.820000171661377,
+        -6.570000171661377,
+        5.329999923706055,
         -0.1599999964237213
       ]
     },
@@ -2541,6 +2719,17 @@
       "name": "Raised sectional garage door and tracks",
       "collection": "37 | Garage exposed roof and door tracks",
       "photos": "W1,W2",
+      "confidence": "photo / estimated size",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Garage rear sectional tracks",
+      "collection": "37 | Garage exposed roof and door tracks",
+      "photos": "House Tour 30/33s",
       "confidence": "photo / estimated size",
       "location_m": [
         0.0,
@@ -2716,8 +2905,8 @@
     {
       "name": "Front lawn and driveway",
       "collection": "42 | Front and back yards",
-      "photos": "V4,V5",
-      "confidence": "lawn, drive and tree positions visible; boundary and distances estimated",
+      "photos": "H0,21\u201333; V4,V5",
+      "confidence": "lawn and continuous drive-to-slab connection observed; boundary, grading and distances estimated",
       "location_m": [
         0.0,
         0.0,
@@ -2738,7 +2927,7 @@
     {
       "name": "Front large shade tree",
       "collection": "42 | Front and back yards",
-      "photos": "V5,exterior",
+      "photos": "H0\u20136; V5,exterior",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
         10.0,
@@ -2747,42 +2936,108 @@
       ]
     },
     {
+      "name": "Front young fruit tree near driveway",
+      "collection": "42 | Front and back yards",
+      "photos": "H0\u20133",
+      "confidence": "two slender young trees visible; fruit-tree identity follows unverified narration; position and size estimated",
+      "location_m": [
+        6.400000095367432,
+        -7.099999904632568,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front young fruit tree near upper wing",
+      "collection": "42 | Front and back yards",
+      "photos": "H0\u20133",
+      "confidence": "two slender young trees visible; fruit-tree identity follows unverified narration; position and size estimated",
+      "location_m": [
+        12.899999618530273,
+        -4.300000190734863,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front sidewalk and grass verge",
+      "collection": "42 | Front and back yards",
+      "photos": "H9\u201315",
+      "confidence": "sidewalk separates sign pole from bench; width and extent estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Family school bus stop bench",
+      "collection": "42 | Front and back yards",
+      "photos": "H9,18",
+      "confidence": "red-brown molded slotted bench visible; dimensions and placement estimated",
+      "location_m": [
+        -8.0,
+        -13.550000190734863,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Bus stop umbrella",
+      "collection": "42 | Front and back yards",
+      "photos": "H9",
+      "confidence": "open muted red umbrella, black pole and ribbed weighted base; dimensions and placement estimated",
+      "location_m": [
+        -6.75,
+        -13.25,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "School bus stop sign and sanitizer",
+      "collection": "42 | Front and back yards",
+      "photos": "H12\u201315",
+      "confidence": "yellow sign on wood pole and dispenser below directly visible; height and dimensions estimated",
+      "location_m": [
+        -8.25,
+        -15.75,
+        -0.8199999928474426
+      ]
+    },
+    {
       "name": "Rear left shade tree",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,exterior",
+      "photos": "B5\u20139; H72; location estimated",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
-        -3.0,
-        21.0,
+        -5.599999904632568,
+        20.200000762939453,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear lawn tree",
       "collection": "42 | Front and back yards",
-      "photos": "2,5,exterior",
+      "photos": "B11\u201313; moved to rear perimeter, estimated",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
-        6.199999809265137,
-        22.0,
+        16.399999618530273,
+        26.0,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear right screening tree",
       "collection": "42 | Front and back yards",
-      "photos": "3,4",
+      "photos": "B13\u201316; H75\u201378; estimated",
       "confidence": "tree visible; species and size approximate",
       "location_m": [
-        20.0,
-        20.0,
+        22.0,
+        18.700000762939453,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Front tall spruce",
+      "name": "Front tall conifer",
       "collection": "42 | Front and back yards",
-      "photos": "exterior",
+      "photos": "H3\u20136; exact species unverified",
       "confidence": "conifer visible; species and size approximate",
       "location_m": [
         14.600000381469727,
@@ -2868,120 +3123,142 @@
       ]
     },
     {
-      "name": "Rear fence shrub 00",
+      "name": "Rear boundary planting 00",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        -7.400000095367432,
+        12.399999618530273,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 01",
+      "collection": "42 | Front and back yards",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        -7.199999809265137,
+        14.800000190734863,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 02",
+      "collection": "42 | Front and back yards",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        -7.599999904632568,
+        17.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 03",
+      "collection": "42 | Front and back yards",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
+      "location_m": [
+        -7.099999904632568,
+        23.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear boundary planting 04",
+      "collection": "42 | Front and back yards",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
         -6.0,
-        26.399999618530273,
+        26.200000762939453,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 01",
+      "name": "Rear boundary planting 05",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        -3.200000047683716,
-        26.399999618530273,
+        -3.799999952316284,
+        26.299999237060547,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 02",
+      "name": "Rear boundary planting 06",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        -0.4000000059604645,
-        26.399999618530273,
+        1.2000000476837158,
+        26.5,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 03",
+      "name": "Rear boundary planting 07",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        2.4000000953674316,
-        26.399999618530273,
+        3.299999952316284,
+        26.799999237060547,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 04",
+      "name": "Rear boundary planting 08",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        5.199999809265137,
-        26.399999618530273,
+        7.0,
+        26.600000381469727,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 05",
+      "name": "Rear boundary planting 09",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        8.0,
-        26.399999618530273,
+        21.700000762939453,
+        25.5,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 06",
+      "name": "Rear boundary planting 10",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        10.800000190734863,
-        26.399999618530273,
+        22.600000381469727,
+        22.799999237060547,
         -0.8199999928474426
       ]
     },
     {
-      "name": "Rear fence shrub 07",
+      "name": "Rear boundary planting 11",
       "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
+      "photos": "B5\u201314; irregular edge planting, placement estimated",
+      "confidence": "irregular overlapping edge growth observed in B5\u201314; lobe shapes and stem positions estimated",
       "location_m": [
-        13.600000381469727,
-        26.399999618530273,
-        -0.8199999928474426
-      ]
-    },
-    {
-      "name": "Rear fence shrub 08",
-      "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
-      "location_m": [
-        16.399999618530273,
-        26.399999618530273,
-        -0.8199999928474426
-      ]
-    },
-    {
-      "name": "Rear fence shrub 09",
-      "collection": "42 | Front and back yards",
-      "photos": "1,2,5",
-      "confidence": "planting observed; shape simplified",
-      "location_m": [
-        19.200000762939453,
-        26.399999618530273,
+        22.299999237060547,
+        16.0,
         -0.8199999928474426
       ]
     },
     {
       "name": "Rear boundary fence",
       "collection": "42 | Front and back yards",
-      "photos": "1-5",
-      "confidence": "fence visible; lot limits estimated",
+      "photos": "B7\u201311; H69\u201372",
+      "confidence": "mixed timber section and low metal fence visible; transition and boundary coordinates estimated",
       "location_m": [
         0.0,
         0.0,
@@ -2991,8 +3268,8 @@
     {
       "name": "Rear garden shed",
       "collection": "42 | Front and back yards",
-      "photos": "2,5",
-      "confidence": "taupe double-door shed visible; size estimated",
+      "photos": "B10\u201312; H72",
+      "confidence": "beige double-door shed and shallow pale roof visible; size and position estimated",
       "location_m": [
         12.199999809265137,
         24.100000381469727,
@@ -3002,8 +3279,8 @@
     {
       "name": "Backyard trampoline",
       "collection": "42 | Front and back yards",
-      "photos": "3,4",
-      "confidence": "round blue-edged trampoline with safety net",
+      "photos": "B0,15\u201316; H75\u201378",
+      "confidence": "blue pad, curved net poles, yellow entrance and ladder observed; dimensions and pole count estimated",
       "location_m": [
         13.699999809265137,
         14.100000381469727,
@@ -3011,21 +3288,10 @@
       ]
     },
     {
-      "name": "Backyard toddler slide",
-      "collection": "42 | Front and back yards",
-      "photos": "2,5",
-      "confidence": "photo / estimated size",
-      "location_m": [
-        7.900000095367432,
-        17.5,
-        -0.8199999928474426
-      ]
-    },
-    {
       "name": "Backyard colorful play cube",
       "collection": "42 | Front and back yards",
-      "photos": "2,5",
-      "confidence": "photo / estimated size",
+      "photos": "B0,16\u201319; H72\u201375",
+      "confidence": "molded blue orange lime and pink climber observed; size and placement estimated",
       "location_m": [
         4.400000095367432,
         18.5,
@@ -3033,13 +3299,101 @@
       ]
     },
     {
+      "name": "Low tan and lime play piece",
+      "collection": "42 | Front and back yards",
+      "photos": "B0,16\u201319; H72\u201375",
+      "confidence": "broad open tan molded frame and lime curved end visible; purpose uncertain; size and orientation estimated",
+      "location_m": [
+        7.699999809265137,
+        17.200000762939453,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear swing frame",
+      "collection": "42 | Front and back yards",
+      "photos": "B11\u201313",
+      "confidence": "tubular A-frame and hanging swings visible beside shed; dimensions and seat count estimated",
+      "location_m": [
+        16.5,
+        25.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Backyard toddler slide",
+      "collection": "42 | Front and back yards",
+      "photos": "B11\u201313; H72\u201375",
+      "confidence": "molded slide shape visible; dimensions and slope estimated",
+      "location_m": [
+        14.699999809265137,
+        23.799999237060547,
+        -0.8199999928474426
+      ]
+    },
+    {
       "name": "Rear patio table",
       "collection": "42 | Front and back yards",
-      "photos": "1",
-      "confidence": "photo / estimated size",
+      "photos": "H69; B0,18",
+      "confidence": "rectangular table outside garage-side sunroom glazing; dimensions and placement estimated",
       "location_m": [
-        1.2000000476837158,
-        13.5,
+        0.05000000074505806,
+        10.5,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Small patio playhouse",
+      "collection": "42 | Front and back yards",
+      "photos": "H69; B0,18",
+      "confidence": "cream toy house with mint detail and blue roof next to garage-side patio; dimensions estimated",
+      "location_m": [
+        -0.8999999761581421,
+        8.800000190734863,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear lawn pale blue chair one",
+      "collection": "42 | Front and back yards",
+      "photos": "H69\u201372; B5,18",
+      "confidence": "pale blue Adirondack chairs visible on garage-side lawn; size and placement estimated",
+      "location_m": [
+        -3.5,
+        15.300000190734863,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Rear lawn pale blue chair two",
+      "collection": "42 | Front and back yards",
+      "photos": "H69\u201372; B5,18",
+      "confidence": "pale blue Adirondack chairs visible on garage-side lawn; size and placement estimated",
+      "location_m": [
+        -1.399999976158142,
+        16.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Trampoline nearby pale chair",
+      "collection": "42 | Front and back yards",
+      "photos": "H69\u201372; B5,18",
+      "confidence": "pale blue Adirondack chairs visible on garage-side lawn; size and placement estimated",
+      "location_m": [
+        12.0,
+        16.100000381469727,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Lawn firepit and masonry border",
+      "collection": "42 | Front and back yards",
+      "photos": "B0,18\u201319; H72",
+      "confidence": "low circular black firepit in small masonry surround visible; sizes estimated",
+      "location_m": [
+        2.299999952316284,
+        16.0,
         -0.8199999928474426
       ]
     },
@@ -3048,17 +3402,6 @@
       "collection": "42 | Front and back yards",
       "photos": "1-5",
       "confidence": "small grade connection added for walkthrough; tread dimensions estimated",
-      "location_m": [
-        0.0,
-        0.0,
-        0.0
-      ]
-    },
-    {
-      "name": "Front walk continuation to drive",
-      "collection": "42 | Front and back yards",
-      "photos": "V5",
-      "confidence": "walk meets driveway; continuation length estimated",
       "location_m": [
         0.0,
         0.0,
@@ -3081,6 +3424,17 @@
       "collection": "43 | Exterior roofs and cladding",
       "photos": "exterior",
       "confidence": "roof lines read from exterior photographs; pitches and overhangs estimated",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Upper front shutters and gable vent",
+      "collection": "43 | Exterior roofs and cladding",
+      "photos": "House Tour 3.000s",
+      "confidence": "pairs of shutters and octagonal vent observed; sizes estimated",
       "location_m": [
         0.0,
         0.0,

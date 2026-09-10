@@ -161,7 +161,7 @@ UPPER_ROOMS = {
     'Family bathroom': (-1.15, 1.25, .55, 3.13, tilewhite),
     'Primary bedroom': (1.25, 4.5, .55, 4.55, carpet),
     'Blue nursery': (0, 4.5, -3.65, -.55, carpet),
-    'End bedroom': (4.5, 7.85, -2.15, 2.45, oak),
+    'End bedroom': (4.5, 7.85, -3.65, 2.45, oak),
     'Ensuite shower room': (-1.15, 1.25, 3.13, 4.55, ensuite_floor),
 }
 for name, (x0,x1,y0,y1,mat) in UPPER_ROOMS.items():
@@ -174,7 +174,31 @@ upper_collection('18 | Upstairs bedroom walls and windows')
 asset('Blue nursery enclosure', photos='U6')
 partition('Nursery blue rear wall', (0,-3.65),(4.5,-3.65),blue_wall,[(1.12,2.42,.77,2.07)])
 partition('Nursery blue left wall', (0,-3.65),(0,-.55),blue_wall)
-partition('Nursery blue right wall', (4.5,-3.65),(4.5,-.55),blue_wall)
+partition('Nursery blue right wall', (4.5,-3.65),(4.5,-.55),blue_wall,
+          [(.03,1.22,0,2.05),(1.55,2.55,0,2.12)])
+# House Tour 126/129s reveals a closet behind Cory's bed headboard. Its depth
+# into the adjoining room is estimated; the video establishes the opening.
+asset('Cory headboard closet enclosure',photos='House Tour 126/129s',confidence='opening and adjacency observed; .65 m depth estimated')
+partition('Closet recessed back',(3.85,-3.62),(3.85,-2.43),blue_wall)
+partition('Closet south return',(3.85,-3.62),(4.50,-3.62),blue_wall)
+partition('Closet north return',(3.85,-2.43),(4.50,-2.43),blue_wall)
+# The shared partition has blue paint on the nursery side and warm white on
+# Cory's side (H111 versus H126). Keep one physical wall with separate finishes.
+for obj in COLL.objects:
+    if obj.type!='MESH':continue
+    wall_name=obj.name
+    if not wall_name.startswith(('Nursery blue right wall','Closet recessed back','Closet south return','Closet north return')):continue
+    obj.data.materials.append(bed_wall)
+    for face in obj.data.polygons:
+        normal=obj.rotation_euler.to_matrix() @ face.normal
+        inside=(normal.x>.5 or ('Closet south return' in wall_name and normal.y>.5)
+                or ('Closet north return' in wall_name and normal.y<-.5))
+        if inside:face.material_index=len(obj.data.materials)-1
+asset('Nursery wardrobe enclosure',photos='House Tour 115/116s',
+      confidence='nursery-facing closet on shared sidewall observed; depth .58 m estimated')
+partition('Nursery wardrobe back',(5.08,-2.10),(5.08,-1.10),bed_wall,height=2.20)
+partition('Nursery wardrobe south return',(4.50,-2.10),(5.08,-2.10),bed_wall,height=2.20)
+partition('Nursery wardrobe north return',(4.50,-1.10),(5.08,-1.10),bed_wall,height=2.20)
 upper_window('Nursery window', (1.77,-3.64,1.42),1.30,180,'U6')
 asset('Primary bedroom enclosure', photos='U8,U9')
 # Ensuite doorway beside the closet (U9, V1); the ensuite lies beyond this wall.
@@ -185,17 +209,17 @@ upper_window('Primary right window',(4.49,3.3,1.42),1.30,-90,'U8')
 upper_window('Primary far window',(2.805,4.54,1.42),1.05,0,'U8')
 upper_door('Ensuite doorway',(1.25,4.03,0),90,'U9')
 asset('End bedroom enclosure',photos='U7,U10')
-partition('End bedroom far wall',(7.85,-2.15),(7.85,2.45),openings=[(2.75,4.05,.77,2.07)])
-partition('End bedroom south wall',(4.5,-2.15),(7.85,-2.15),openings=[(1.7,2.9,.77,2.07)])
+partition('End bedroom far wall',(7.85,-3.65),(7.85,2.45),openings=[(4.25,5.55,.77,2.07)])
+partition('End bedroom south wall',(4.5,-3.65),(7.85,-3.65),openings=[(1.7,2.9,.77,2.07)])
 partition('End bedroom north wall',(4.5,2.45),(7.85,2.45))
 # The nursery and primary walls already form these two shared wall segments.
 upper_window('End bedroom trellis window',(7.84,1.25,1.42),1.30,-90,'U7,U10',True)
-upper_window('End bedroom side window',(6.80,-2.14,1.42),1.20,180,'U7')
+upper_window('End bedroom side window',(6.80,-3.64,1.42),1.20,180,'U7; House Tour 3/123s')
 
 upper_collection('19 | Blue nursery furniture')
 # Nursery is viewed toward -Y, so camera-left is +X. Wood chest left,
 # white chest right of the window, and crib on the right hand side wall.
-chest('Nursery wood drawer chest',(3.50,-3.30,0),.85,1.25,180,5,1,'U6')
+chest('Nursery wood drawer chest',(3.25,-3.30,0),.85,1.25,180,5,1,'U6')
 white_chest('Nursery white tall chest',(.73,-3.29,0),.86,1.35,'U6')
 ROOT.rotation_euler.z = math.pi
 asset('Nursery drawer organizer',(.73,-3.28,1.38),180,'U6')
@@ -234,14 +258,43 @@ curve('Arched rocking chair back',[(-.33*math.cos(t),.31,1.04+.25*math.sin(t)) f
 box('Tall olive rocker cushion',(0,.24,.86),(.48,.10,.59),linen,.07)
 table('Nursery upholstered footstool',(2.84,-2.44,0),(.49,.41,.36),walnut,photos='U6')
 box('Footstool cushion',(0,0,.385),(.52,.44,.075),linen,.055)
+asset('Nursery wardrobe rail and storage',(4.80,-1.60,0),-90,'House Tour 115/116s')
+box('Nursery wardrobe high shelf',(0,0,1.94),(.94,.50,.035),white)
+rod('Nursery wardrobe clothes rail',(-.45,-.02,1.76),(.45,-.02,1.76),.015,steel)
+for x in [-.23,.23]:
+    for z in [.16,.45]:
+        box('Nursery stacked storage bin',(x,.02,z),(.42,.43,.26),bluegrey,.024)
+        box('Nursery bin lid',(x,.02,z+.14),(.43,.45,.025),white,.006)
+for i in range(5):
+    x=-.33+i*.16
+    curve('Nursery clothes hanger',[(x-.07,-.02,1.63),(x,-.02,1.72),(x+.07,-.02,1.63),(x-.07,-.02,1.63)],.005,white)
+    box('Hanging nursery garment',(x,-.02,1.31),(.145,.055,.60),[bedding,bluegrey,linen][i%3],.035)
 
 upper_collection('20 | End bedroom furniture')
 # U7: the visible free end of the mattress is beside the ottoman; its long
 # edge follows the right window wall. The head is toward the entrance, hidden
 # by the near door jamb. It does not project across the middle of the rug.
-asset('End bedroom large grey rug',(6.15,-.1,.035),0,'U7')
-box('Grey area rug',(0,0,0),(2.85,3.65,.025),greyrug,.012)
-bed('End bedroom single bed',(5.75,-1.55,.035),1.03,90,'U7',True)
+asset('End bedroom large grey rug',(6.15,-.85,.035),0,'U7; House Tour 120/123s')
+box('Grey area rug',(0,0,0),(2.85,5.15,.025),greyrug,.012)
+bed('End bedroom single bed',(5.75,-3.05,.035),1.03,90,'U7; House Tour 123/126s',True)
+cory_pink=material('Cory muted pink cotton pillow',(.48,.27,.29),.94,texture='fabric')
+for obj in list(ROOT.children):
+    if obj.name.startswith('Made bed pillow'):bpy.data.objects.remove(obj,do_unlink=True)
+    elif obj.name.startswith('Folded colorful quilt patch'):
+        obj.data.materials.clear()
+        obj.data.materials.append([navy,red,bluegrey][round(obj.location.x*100+obj.location.y*100)%3])
+for x,mat in [(-.23,bedding),(.23,cory_pink)]:
+    box('Cory cream and rose pillows',(x,.66,.62),(.48,.44,.16),mat,.075)
+box('Cory wood headboard',(0,1.01,.79),(1.06,.07,.72),oak,.04)
+for x in [-.55,.55]:
+    cylinder('Cory turned bedpost',(x,1.01,.63),.035,1.26,walnut)
+    sphere('Cory round bedpost finial',(x,1.01,1.29),(.060,.060,.060),oak)
+asset('Cory closet shelves and curtain',(4.18,-3.025,0),90,'House Tour 126/129s')
+box('Closet high shelf',(0,0,1.80),(1.10,.55,.035),white)
+rod('Closet hanging pole',(-.53,-.09,1.66),(.53,-.09,1.66),.014,steel)
+for z in [.24,.62,1.00,1.38]:box('Closet side shelf',(-.39,0,z),(.30,.55,.025),white)
+for i in range(10):
+    box('Bunched closet curtain',(-.48+i*.018,-.30+.025*math.cos(i),1.02),(.024,.035,1.96),bedding,.007)
 chest('End bedroom wooden desk drawers',(5.18,1.95,0),.95,.76,0,3,1,'U7')
 table('End bedroom writing desktop',(5.37,1.91,0),(1.4,.61,.79),oak,photos='U7')
 asset('Tall narrow dark bookcase',(7.51,-.67,0),-90,'U7')
@@ -250,12 +303,12 @@ for x in [-.44,.44]:
 box('Bookcase back',(0,.115,1.04),(.88,.025,2.08),walnut)
 for i in range(13):
     box('Closely spaced shelf',(0,0,.06+i*.167),(.88,.26,.025),walnut)
-sofa('End bedroom corner ottoman',(7.26,-1.75,0),.55,linen,0,'U7')
+sofa('End bedroom corner ottoman',(7.26,-3.25,0),.55,linen,0,'U7')
 # Ottoman has no back/arms in the source.
 for o in list(ROOT.children):
     if any(token in o.name for token in ['back','Arm']):
         bpy.data.objects.remove(o,do_unlink=True)
-asset('Empty corner toy hammock',(7.58,-1.88,1.91),0,'U7')
+asset('Empty corner toy hammock',(7.58,-3.38,1.91),0,'U7')
 for i in range(10):
     t=i/9
     curve('Hammock woven cord',[(0,.72*t,.20),(-.60*(1-t),.70*t,-.22),(-.66,0,.20)],.004,bedding)
@@ -347,8 +400,15 @@ curve('Chrome vanity faucet',[(0,.23,.86),(0,.23,1.00),(0,.10,1.03),(0,.05,.97)]
 for x in [-.12,.12]:
     cylinder('Vanity faucet handle',(x,.22,.885),.024,.055,steel)
 frame('Large vanity mirror',(0,.27,1.46),1.15,.97,white,mirror)
-asset('Bathroom recessed linen shelves',(-.87,.83,0),90,'U5')
-for z in [.25,.68,1.11,1.54,1.97]:box('Empty linen shelf',(0,0,z),(.40,.42,.035),white)
+asset('Bathroom recessed linen shelves',(-.87,.86,0),90,'U5; House Tour 104–106s',
+      'cased linen closet beside entrance observed; enclosure dimensions estimated')
+for x in [-.25,.25]:
+    box('Linen closet white side',(x,0,1.06),(.035,.48,2.12),white)
+    box('Linen closet casing',(x,-.26,1.06),(.055,.055,2.16),white)
+box('Linen closet back',(0,.225,1.06),(.53,.025,2.12),white)
+box('Linen closet cased header',(0,-.26,2.12),(.56,.055,.065),white)
+for z in [.25,.68,1.11,1.54,1.97]:box('Linen shelf',(0,0,z),(.48,.44,.035),white)
+for z in [.73,.80,1.16,1.23,1.59]:box('Folded linen towel',(0,-.02,z),(.38,.34,.06),bedding,.025)
 asset('Family bathroom toilet',(-.70,2.49,0),90,'U3')
 box('Toilet pedestal',(0,0,.20),(.27,.38,.40),tilewhite,.11)
 basin('Toilet bowl',(0,-.07),.39,.56,.43,.27,tilewhite)

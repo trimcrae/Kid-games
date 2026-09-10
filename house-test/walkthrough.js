@@ -2,6 +2,9 @@ import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld} from './physics.mjs';
 import {createHouseLife} from './house-life.mjs';
 import {rooms} from './rooms.mjs';
+import {createHouseMaterial} from './materials.mjs';
+import {createHouseLighting} from './lighting.mjs';
+import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -16,21 +19,21 @@ scene.fog=new THREE.Fog('#c2d5d5',35,85);
 const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.045,120);
 camera.rotation.order='YXZ';
 let renderer;
+const maxPixelRatio=Math.min(devicePixelRatio,1.35);
+let pixelRatio=Math.min(maxPixelRatio,1),qualitySince=0,qualityFrames=0,lastQualityChange=0;
 try {
   renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(innerWidth,innerHeight);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.18;
+  renderer.toneMapping=THREE.AgXToneMapping;
+  renderer.toneMappingExposure=1.05;
 } catch(error) {
   $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled.';
   start.textContent='3D graphics unavailable';
   throw error;
 }
-scene.add(new THREE.HemisphereLight(0xe8f2ff,0x9c8669,2.1));
-const sun=new THREE.DirectionalLight(0xffeed1,2.2);sun.position.set(-10,28,15);scene.add(sun);
-const fill=new THREE.DirectionalLight(0xd9e7ff,.65);fill.position.set(15,8,-15);scene.add(fill);
+const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches});
 
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,eyeY=1.63,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},last=performance.now(),drag=null;
@@ -41,6 +44,7 @@ function teleport(room){
   if(!p){$('hint').textContent='That starting point is unavailable. Choose a nearby room.';return false;}
   Object.assign(player,p);yaw=room[5];pitch=-.18;eyeY=p.y+1.60;
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
+  lighting.setRoom(room[1],player);
   $('hint').textContent='WASD to walk · Mouse to aim · E for activities · R for rooms';
   render();return true;
 }
@@ -95,6 +99,9 @@ function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.add
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 const cameraTarget=new THREE.Vector3(),cameraDesired=new THREE.Vector3();
 function render(){
+  // A room probe renders six views. It must not hold up the activity iframe
+  // and adoption controls while they are still loading.
+  lighting.tick(player,performance.now(),ready);
   cameraTarget.set(player.x,player.y+.65,player.z);
   cameraDesired.set(player.x+Math.sin(yaw)*1.9*Math.cos(pitch),player.y+1.15-Math.sin(pitch)*1.9,player.z+Math.cos(yaw)*1.9*Math.cos(pitch));
   const fraction=world?world.cameraFraction(cameraTarget,cameraDesired):1;
@@ -104,14 +111,31 @@ function render(){
 function updateLocation(){
   let closest=null,d=Infinity;
   for(const r of rooms){const dist=Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12;if(dist<d){d=dist;closest=r;}}
-  if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();}
+  if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
 let frames=0,lastDraw=0;
+function adaptResolution(now){
+  if(!active||!ready){qualitySince=now;qualityFrames=0;return;}
+  qualityFrames++;
+  const elapsed=now-qualitySince;
+  if(elapsed<1800)return;
+  const fps=qualityFrames*1000/elapsed;
+  qualityFrames=0;qualitySince=now;
+  let next=pixelRatio;
+  // Change only render size, never material/shadow shader features mid-walk.
+  // Hysteresis avoids oscillating around the 30 fps cap or a room capture.
+  if(fps<26)next=Math.max(Math.min(.6,maxPixelRatio),pixelRatio*.84);
+  else if(fps>29.5&&now-lastQualityChange>8000)next=Math.min(maxPixelRatio,pixelRatio+.06);
+  if(Math.abs(next-pixelRatio)>.015){pixelRatio=next;renderer.setPixelRatio(pixelRatio);lastQualityChange=now;}
+}
 function animate(now){
   requestAnimationFrame(animate);
   // Leave CPU/GPU time for the learning games and touch input. The paused
   // house needs only a still backdrop; walking is capped at a steady 30 fps.
-  if(now-lastDraw<(active?1000/30:1000))return;lastDraw=now;
+  const interval=active?1000/30:1000,elapsed=now-lastDraw;
+  if(elapsed<interval-.5)return;
+  lastDraw+=Math.floor((elapsed+.5)/interval)*interval;
+  adaptResolution(now);
   const dt=Math.min((now-last)/1000,.05);last=now;
   if(active&&world){
     let right=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
@@ -133,21 +157,28 @@ async function load(){
     $('loading').textContent='Loading rooms and gardens…';
     const meshResponse=await fetch('./house.mesh.gz');if(!meshResponse.ok)throw new Error('Model geometry unavailable');
     const binary=await new Response(meshResponse.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    let occlusion=null;
+    try{occlusion=await loadHouseOcclusion(data,binary);}
+    catch(error){console.warn('House ambient occlusion skipped:',error.message);}
     for(const g of data.groups){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));
       geometry.computeBoundingSphere();
-      const material=new THREE.MeshStandardMaterial({color:new THREE.Color(...g.color),roughness:.83,metalness:0,
-        side:THREE.DoubleSide,transparent:g.glass,opacity:g.glass?.13:1,depthWrite:!g.glass});
-      const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;scene.add(mesh);
+      if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
+        occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
+      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0});
+      const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
+      mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
+      mesh.layers.enable(1);scene.add(mesh);
     }
+    lighting.load(data);
     world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...life.diagnostics()};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();

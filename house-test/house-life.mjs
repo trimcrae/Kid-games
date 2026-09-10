@@ -6,6 +6,10 @@ import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
 const $=id=>document.getElementById(id);
+export function companionBlocksCamera(point,camera,bounds){
+  const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
+  return Math.hypot(camera.x-point.x,camera.z-point.z,vertical)<bounds.radius+.30;
+}
 export async function createHouseLife(tour){
   const {scene,world,player,rooms,bindButton}=tour;
   const frame=$('activity-frame');
@@ -105,8 +109,14 @@ export async function createHouseLife(tour){
       const home=rooms.find(r=>r[1]===(p.room||familyRooms[p.id]||'Living room'));
       const anchor=world.safeSpot(home[2],home[4],-home[3]);if(!anchor)return;
       const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(.88);
+      // Cache the body bounds before adding the name sprite. A floor-origin
+      // distance misses tall ears/heads even when they intersect the camera.
+      const bounds=new THREE.Box3().setFromObject(mesh);
+      const cameraBounds={minY:bounds.min.y,maxY:bounds.max.y,
+        radius:Math.hypot(Math.max(Math.abs(bounds.min.x),Math.abs(bounds.max.x)),
+          Math.max(Math.abs(bounds.min.z),Math.abs(bounds.max.z)))};
       const label=labelSprite(p.pet.name||p.name);label.scale.set(1.3,.245,1);label.position.y=1.3;mesh.add(label);scene.add(mesh);
-      roamers.push({id:p.id,mesh,label,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,distance:0});
+      roamers.push({id:p.id,mesh,label,cameraBounds,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,distance:0});
     });
   }
   // Furnishing remains the same economy and slots. Display the equipped pieces
@@ -186,10 +196,9 @@ export async function createHouseLife(tour){
           world.move(r.point,Math.sin(r.angle)*(.8-gap),Math.cos(r.angle)*(.8-gap));r.walking=true;
         }
         r.mesh.position.set(r.point.x,r.point.y,r.point.z);r.mesh.rotation.y=r.angle;r.mesh.userData.animate(time,r.walking,tour.reducedMotion);
-        // Companions step aside and fade out of the camera's immediate space.
-        // On a phone, a pet between the camera and player can fill the view.
-        r.mesh.visible=r.mesh.position.distanceTo(tour.camera.position)>.85;
-        r.label.visible=gap>1.6&&gap<5;
+        // Hide a companion only while its body overlaps the camera's space.
+        r.mesh.visible=!companionBlocksCamera(r.point,tour.camera.position,r.cameraBounds);
+        r.label.visible=r.mesh.visible&&gap>1.6&&gap<5;
       }
       for(const m of markers){const distance=Math.hypot(player.x-m.point.x,player.z-m.point.z);m.label.visible=Math.abs(player.y-m.point.y)<.65&&distance>1.8&&distance<6;}
       $('nearby').hidden=!active||!near.length;

@@ -1,15 +1,54 @@
 # Photo orientation audit — September 6, 2026
 
+## Video evidence update — September 10, 2026
+
+This update supersedes conflicting photo interpretations below. `H` identifies
+House Tour seconds and `B` the upright Backyard tour seconds. References identify
+sampled frames, not continuous coverage. Imported ASR remains unverified against
+the original audio. Original recordings, frames and transcripts stay private.
+
+| Evidence | Model correction |
+| --- | --- |
+| H24, H39 | Porch in front of the paired living windows; door on its perpendicular right return; separate small street-facing entry window. Garage front and porch columns share the continuous low roof/eave. |
+| H30–33; B18 | One-car rear sectional opening and adjacent glazed pedestrian door in the garage rear wall. Move the earlier side-door interpretation and clear the rear storage obstruction. |
+| H3; B0, B16 | Both upstairs front windows occupy one flat facade under a common front-to-back gable. Remove the inferred stepped corner-room frontage and cross-gable; add observed shutters and octagonal vent. |
+| H51–54 | Computer desk at the front-window corner; tall two-door cupboard beside the sofa; separate large TV/media cabinet at the kitchen partition. Retain only the observed downstairs piano. |
+| H126–129 | Wood headboard with turned posts and curtained closet/nook behind it. Shelves and hanging rail are visible; recess depth and intrusion into the adjoining room are inferred. |
+| H227–234 | Second office desk on the perpendicular end wall. Main workstation has a laptop, one landscape monitor and two portrait displays on the raised right stand. High glass-block window with a central hopper sits toward the end-wall corner on that desk's wall. |
+| H104–116 | Cased linen closet beside the bathroom entrance and a separate nursery-facing wardrobe farther toward the hall on the nursery/Cory shared wall. Closet widths and reciprocal intrusions are estimates. |
+| H197–200 | Jeannie's low cabinet and headboard share the window wall; the cabinet is left of the headboard when facing them, with the tall bookcase farther toward the entry. Rotate the bed, move cabinet/bookcase and adjust estimated window spacing to retain clear furniture footprints. |
+| H147–158 | Sampled connecting views support the current ensuite attachment on the main bedroom's perpendicular closet-side wall, near the rear corner. Inside, the shower is ahead, toilet/storage left and rear window right. This resolves the earlier rotation question; depth, width and offsets remain estimates. |
+| H212–215; H223–230 | L-shaped white storage curtains leave the play/office approach open; two hooded litter boxes and a pail occupy the utility wall, with an exercise bike near the second desk. Cloth extents and furniture clearances are fitted estimates. |
+| H0–18; B0–18 | Bus-stop bench, umbrella, sign and dispenser; two young front trees; open central rear lawn, irregular boundaries, shed/swings, corrected netted trampoline and molded play equipment. |
+
+The 1.8 m porch depth, 6.10 m Cory room depth and 0.65 m nook depth are fit
+estimates. Cory's depth follows the corrected facade in the existing coordinate
+system; it is not measured from footage. House/yard scale, roof pitch, opening
+sizes, grade and stair rises still need measured anchors. The office window's
+exact offset and outside-grade relationship remain unresolved.
+
+The clearer H197–200 views resolve Jeannie's furniture ordering; the revised
+global offsets remain estimates. H195 alone is too blurred to justify a bed
+rotation. Ellie's bed axis broadly agrees with
+H186, but loose cushions do not prove head direction. Dark rear cladding has a
+rectangular pale seam grid; the earlier cedar-shake identification is withdrawn.
+
+Named reverse views `cory_nook` and `garage_rear` expose the new geometry.
+Structural and route checks establish model consistency, not measured accuracy
+or complete video coverage. The earlier audit below is retained as history.
+
+## Earlier photograph audit
+
 Reviewed all 40 original photographs against the room renders and generator.
 Photo numbers follow README: original 1–10, upstairs U1–U10, additional
 V1–V10, basement/garage W1–W10. Original photos remain private and are not
 included in this repository. This audit establishes visible relationships;
 it does not establish measured room dimensions or the exterior footprint.
 
-Follow-up: the homeowner reports that the master bathroom is sideways. Its
-attachment to the bedroom is **not confirmed** by this audit; clarification of
-the doorway wall is pending. The earlier statement below describes fixture
-relationships within the room, not proof of its rotation within the house.
+Historical follow-up: the homeowner reported that the master bathroom was
+sideways. This photograph audit did not establish its attachment. The September
+10 video update above now supports the corrected attachment from connecting
+views; this earlier uncertainty is retained as audit history.
 
 ## Ensuite placement (September 2026, exterior and interior photographs)
 

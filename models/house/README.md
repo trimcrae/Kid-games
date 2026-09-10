@@ -1,14 +1,16 @@
-# House model — photo study, including basement and garage
+# House model — photograph and walkthrough study
 
-The [orientation audit](ORIENTATION.md) records the comparison of all 40 photos,
+The [orientation audit](ORIENTATION.md) records the photo and video comparisons,
 the corrections, and the relationships that remain estimated.
 
 For narrated video references, use the [private walkthrough evidence workbench](../../tools/house-evidence/README.md).
 It tracks timestamped observations, narration, room coverage, unresolved questions
-and model targets before changes are made. Original recordings stay outside this
-repository; creating the review framework does not confirm any additional geometry.
+and model targets. Original recordings and extracted frames remain private and
+excluded from Git. The September 10 video pass corrects the porch return,
+garage openings, common upstairs front gable, living furnishings, Cory's nook,
+office window/workstations, and observed yard features. Dimensions remain estimates.
 
-A separate [first-person walkthrough test](../../house-test/) uses this model.
+A separate [third-person walkthrough test](../../house-test/) uses this model.
 It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).
 The visible front/back yards now include lawn, planting beds, trees, a driveway,
 rear shed, trampoline, play equipment and fencing, based on photos 1–5 and V4–V5.
@@ -29,7 +31,7 @@ it is not a surveyed floor plan or a finished house reconstruction.
 | Sunroom | 1–5 | Three glazed sides, sliding frames and handles, house siding, ceiling panels, clean foam flooring, wooden climbing gym with monkey bars/ladder/net/holds/swing, green-roof playhouse, wicker loveseat/chair/table, arched shelf, two-cup floor lamp |
 | Kitchen | 6 | L-shaped white raised-panel cabinets, glass cupboard, subway backsplash, patterned floor, stone counters, double sink and gooseneck faucet, French-door refrigerator, range/oven, microwave, dishwasher |
 | Dining and entry | 6–7 | Dark dining table, estimated dining chairs, multi-drawer cabinet, entry chest, playpen, simplified gallery frames, thermostat, red three-panel front door |
-| Living room | 7–8 | Oatmeal sofa and armchair, small blue sofa, white activity table, side table, TV/stand, lamps, large mirror, upright piano/bench, baby swing |
+| Living room | 7–8; House Tour 51–54s | Oatmeal sofa and armchair, small blue sofa, white activity table, computer desk and white chair, large TV/media cabinet, two-door wood cupboard, lamps, mirror and baby swing |
 | Split-level stairs | 7, 9–10 | Parallel up/down flights, beige carpet, black iron rails with twisted details, white upper gate, upper landing and door |
 | Lower family room | 9–10, V6–V7 | Carpet, timber wainscot, fireplace with white surround and mantel, TV, blue sofa, green floor cushion, tan armless seat, dark recliner, coffee table, cubbies and storage drawers, ceiling fan, side windows |
 
@@ -40,10 +42,10 @@ The second and third photo sets add:
 | Upstairs hall | U1, U10; homeowner directions | Straight from the upper landing; green bathroom first left, main bedroom left, nursery right, other bedroom at the end; oak floor and empty coat hooks |
 | Green family bathroom | U3–U5 | Sea-green tub tile, pale accent band, white tap-wall patch, bathtub, chrome fittings, curtain, white vanity, basin, mirror, toilet, linen shelves and patterned floor |
 | Blue nursery | U6 | Blue walls, blind and grey curtains, white crib, cushioned wood rocking chair, footstool, wood chest, white chest and closed drawer organizer |
-| Cory's bedroom (end of upstairs hall) | U7, U10 | Single bed along the right window wall, foot toward the ottoman; open rug, trellis curtains, desk/drawers, narrow bookcase, empty hammock and handles between curtain and bookcase |
+| Cory's bedroom (end of upstairs hall) | U7, U10; House Tour 123–129s | Single bed beside the front window, wood headboard and recessed closet nook behind it; rug, trellis curtains, desk/drawers, narrow bookcase, hammock and climbing handles |
 | Main bedroom and ensuite | U8–U9, V1–V2, ensuite photos | Made double bed, bassinet, dressers, hamper, closet shelf/rail and drawer units, TV and ceiling fan; ensuite off the closet wall, back to back with the family bathroom: shower ahead, window right, vanity and toilet left, wall baskets |
 | Lower bedroom and bathroom | V6, V8–V10 | Connecting hall, corner-window bedroom, made bed, bookcase, low cabinet, bedside drawers and curtained closet; bathroom with vanity, toilet and window |
-| Lower-room additions | V6–V7 | Second piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |
+| Lower-room additions | V6–V7 | Upright piano, adjustable gymnastics bar and green floor cushion, rear-hall opening |
 | Front porch | V4–V5 | Covered concrete porch, iron railings and steps, two rocking chairs, clean foam mats, mailbox and curved paver walk with a simple lawn base |
 
 Photo numbering preserves the uploads: **1–10** is the original set;
@@ -54,10 +56,10 @@ pink-curtain downstairs bedroom.
 
 | Fourth-set area | References | Included |
 | --- | --- | --- |
-| Garage | W1–W3 | Two simplified parked SUVs, concrete slab, exposed joists, raised sectional door and tracks, glazed exterior door, house-access opening, empty shelving, tool board, wall-hung bicycle and coat hooks |
+| Garage | W1–W3; House Tour 30–33s | Two simplified SUVs retained from the photographs (one present in the walkthrough), concrete slab, exposed joists, raised front sectional door and tracks, rear sectional door, rear glazed pedestrian door, house-access opening, shelving, tool board, wall-hung bicycle and coat hooks |
 | Basement stairs | W8–W9 | Return flight beside the steps up to the main living room, carpeted treads, white side walls, handrail and doorway |
 | Basement play area | W4–W5 | Foosball table with rods and players, metal bunk bed with made bedding, toddler slide, dollhouse, floor rocker, saucer chair, open bookcase and hanging fabric screens |
-| Basement office and storage | W6, W8 | Wood desk and dual monitors, black swivel chair, second workstation, storage shelves/cabinet and simplified potted plants |
+| Basement office and storage | W6, W8; House Tour 227s | Wood drawer desk with laptop, landscape display and two portrait displays on a raised stand, black swivel chair, perpendicular second workstation, storage shelves/cabinet and simplified potted plants |
 | Basement laundry and mechanical area | W7–W8 | Front-loading dryer, utility sink, top-loading washer, dehumidifier, furnace and plenum, wall-mounted water heater, representative overhead pipes and ductwork |
 | Pink-curtain bedroom | W10; homeowner confirmation | Third room off the shared downstairs entry, with corner windows, rose curtains, made double bed, empty dress rail, pink shelving, bookcase, dresser, wall shelves, empty hammock and small road rug |
 
@@ -91,6 +93,7 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Green family bathroom](previews/bathroom.png)
 - [Blue nursery](previews/nursery.png)
 - [End bedroom](previews/bedroom.png)
+- [Cory's headboard and closet nook](previews/cory_nook.png)
 - [Main bedroom](previews/primary.png)
 - [Ensuite](previews/ensuite.png)
 - [Front porch](previews/porch.png)
@@ -99,6 +102,7 @@ The source photographs are neither committed nor packed into the Blender file.
 - [Lower bedroom](previews/lower_bedroom.png)
 - [Lower bathroom](previews/lower_bathroom.png)
 - [Garage interior](previews/garage.png)
+- [Garage rear openings](previews/garage_rear.png)
 - [Basement play area](previews/basement_play.png)
 - [Basement office](previews/basement_office.png)
 - [Basement laundry and mechanical area](previews/basement_laundry.png)
@@ -150,8 +154,9 @@ and render setting from observations of the homeowner's reference
 photographs (living room from the upper landing, stairs into the family
 room, kitchen, Cory's bedroom and the basement play area). It keeps the
 geometry modules untouched: materials are looked up by name and given real
-procedural shaders, so the browser exporter still reads each material's base
-colour. The photographs themselves stay private and are not committed.
+procedural shaders. The browser export carries their linear base colours and
+explicit finish descriptions into a separate real-time shading implementation
+described below. The photographs themselves stay private and are not committed.
 
 - **Surfaces.** Oak strip flooring with along-board grain, growth-ring bands
   and a satin polyurethane coat; eggshell wall paint with faint roller
@@ -176,6 +181,78 @@ colour. The photographs themselves stay private and are not committed.
 The pass encodes colours and finishes only. Room dimensions, furniture
 placement and the interior geometry are unchanged and remain estimates.
 
+## Browser export and rendering
+
+`export_walkthrough.py` reads the saved `.blend` and writes version 2 of
+`house-test/house.json` and `house-test/house.mesh.gz`. Geometry remains grouped
+by collection/material, with interleaved world-space position and normal floats.
+Blender `(X, Y, Z)` becomes browser `(X, Z, -Y)`; units remain metres. The manifest
+records the model generator hash, a separate exporter/helper hash, the mesh hash,
+collision boxes, finish descriptions, practical lights and sunlight direction.
+The exporter opens the front door around its parent-relative local hinge and
+opens the selected sunroom panel and upper stair gate for continuous walking.
+It does not modify the saved Blender model.
+An axis-aligned planar rectangle explicitly tagged `browser_walk_ramp = 'x'`
+or `'y'` keeps one visible mesh but receives approximately 0.10 m collision
+strips with interpolated surface heights. The axis is in Blender world space.
+This lets the graded garage apron join the driveway without its full bounding
+box becoming a wall. Ambiguous/nonplanar ramp meshes fail export.
+
+`browser_materials.py` maps named finishes to roughness, metalness, clearcoat,
+sheen, emission and opacity. Unlinked Principled shader values refine that
+description; a linked socket's unused default is not treated as its evaluated
+value. Window panes use transparency, while dark appliance and monitor glass
+stays opaque. Selected furniture, cabinetry, doors and trim retain one-segment
+bevels and per-corner normals; repeated floorboards, dense foliage and large
+architectural surfaces retain the smaller browser geometry budget.
+
+`house-test/materials.mjs` builds shared 256-pixel data tiles in code and samples
+them in world units: wood grain,
+textile pile, paint texture, mineral surfaces, siding, roof courses and lawn
+variation. The dark exterior panel grid reads panel dimensions, offset and pale
+seam colour directly from its Blender Brick Texture node. It does not infer a
+wood finish from that surface. Mipmaps filter distant fine detail to reduce
+shimmer. Finish selection uses uniforms so each family does not compile another
+physical shader. No reference photographs, video frames, image-generated assets or
+texture downloads are included. Old version-1 manifests still load with a
+reduced finish fallback.
+
+`house-test/lighting.mjs` uses AgX display mapping in the walkthrough, a soft
+daylight environment, a cached sun shadow map, one shadowed ceiling spotlight
+and one additional nearby light fill. Wall/floor
+occlusion filters the selected lamps. Static room reflections are captured from
+the exported geometry, excluding pets and activity markers, and held in a cache
+of at most three probes; captures wait until the game controls are ready. Shadow maps are refreshed when necessary rather than
+redrawing the complete static house every walking frame. `houseTest.state`
+exposes active lamps, the shadowed lamp, reflection room/cache size, shadow-map
+size, pixel ratio, draw calls and triangles for runtime inspection. Walking
+targets 30 fps; resolution adapts between 0.6 and 1.35 device pixels per CSS pixel
+(bounded by the device ratio), with hysteresis and no material recompilation.
+This deliberately trades sharpness for responsiveness on slower graphics.
+
+Optional `ambientOcclusion` metadata can bind a `house.ao.gz` sidecar to the raw
+mesh SHA-256. It contains one normalized byte per exported vertex, with its own
+raw-byte checksum and vertex count. The browser validates both hashes and group
+coverage before attaching it. Missing metadata makes no AO request; a missing,
+stale or invalid optional sidecar is skipped with a console warning. The default
+strength is supplied by the exporter (0.35), capped by the loader at 0.5. It
+attenuates indirect diffuse/specular, coat and sheen only; direct lights and base
+colours are unchanged. `houseTest.state` reports whether it loaded and its strength.
+The committed export uses `--ao`: eight rays within one metre, a 2 mm normal
+bias and a 0.7 m floor/wall edge target. Added sampling geometry is capped at
+180,000 vertices; this model adds 82,524. Glass and foliage do not occlude the
+bake. Near and back-facing intersections are filtered. The sidecar is about
+1.13 MB compressed; this modest contact effect is separate from the room reflections.
+
+This is a real-time approximation of the photographic materials, not Cycles in
+the browser. AO does not bake bounced illumination; unshadowed fills
+can still soften room boundaries. Room probes approximate mirror perspective
+and omit moving pets, and panes use alpha/reflection instead of full refraction.
+Grass and fabric shading do not add individual blade/fibre silhouettes. Full
+house startup time, frame performance and visual resemblance must be checked on
+the rebuilt export; a material fixture or passing route tests cannot establish
+photorealism or measured layout accuracy.
+
 ## Exterior envelope and trees
 
 `exterior.py` turns the photographed rooms into a building that stands up.
@@ -184,21 +261,20 @@ themselves form a closed shell: before this pass the upper floor's edges
 hung in the air and no roof could sit on them. The pass works in three steps:
 
 1. **Shell infill.** The side wing is defined as stacked boxes (lower and
-   upper level, L-shaped because the end bedroom is a corner room set back
-   from the front), plus the space between the entry block and the wing and
+   upper level, with the two front bedroom windows in one plane as shown in
+   House Tour 3s), plus the space between the entry block and the wing and
    the stairwell head room. Every face of those boxes that looks at the
    outdoors and is not already covered by a wall or window receives a plain
    wall. Those walls enclose unphotographed space; no interior is invented.
 2. **Roofs.** One long gable over the entry block, carried east to meet the
    wing; a gable over the garage on the same line; a front-to-back gable over
-   the upper wing with pale siding on the street gable and dark cedar shakes
-   on the rear gable, as photographed; a lower cross gable over the set-back
-   end-bedroom block; low shingle roofs over the sunroom, the porch and the
+   the whole upper wing with pale siding on the street gable and a dark panel
+   grid on the rear gable; low shingle roofs over the sunroom and the
    half-metre step where the lower level's rear wall stands behind the upper
    wing's.
 3. **Cladding.** The outward-facing polygons of every wall box, infill
    included, receive vinyl lap siding (pale blue-grey on the house, tan on
-   the garage) or shakes. No doorway, window or browser collision box
+   the garage) or dark panels. No doorway, window or browser collision box
    changes; roofs never collide.
 
 `verify.py` then proves the result: every outside edge of every upper-floor
@@ -206,11 +282,11 @@ slab must have wall structure beneath it, and every ceiling must lie under a
 roof. Both checks fail the build if a later edit reopens the envelope.
 
 The ensuite now lies behind the family bathroom, back to back with it,
-entered beside the closet on the primary bedroom's west wall: as the interior
-photographs show, the shower is straight ahead, the window is on the right in
+entered beside the closet on the primary bedroom's west wall. Sampled connecting
+views at House Tour 147–158s support this attachment: the shower is straight ahead, the window is on the right in
 the wing's flush rear wall and the vanity and toilet are on the left. Its
 cream walls, taupe vanity and grey floor come from the same photographs.
-Roof pitches, overhangs and the siding/shake split remain estimates. Street names, house numbers and neighbouring homes are not
+Roof pitches, overhangs and cladding extents remain estimates. The dark rear panels' material identity is unresolved. Street names, house numbers and neighbouring homes are not
 reproduced.
 
 Two elevation cameras, [`street_front`](previews/street_front.png) and
@@ -250,10 +326,9 @@ no downloaded tree assets or image textures are used.
 - V8 places the pink bedroom left of the bathroom and the white-curtain bedroom
   right. Both bedrooms and the bathroom share this entry; room dimensions and
   the entry's exact offset from the family-room stairs remain estimated.
-- Exterior roofs and cladding are estimates read from two exterior photographs;
-  unseen rooms, most landscaping and neighboring buildings remain unfinished.
-  The lawn is a base for the front path; these additions do not establish a
-  surveyed lot plan.
+- Exterior roofs, cladding and landscaping use photographs and sampled views from
+  both walkthroughs. Unseen areas and boundaries remain estimates; neighboring
+  buildings are omitted. These additions do not establish a surveyed lot plan.
 
 Most useful references for the next pass: a rough floor plan with room widths,
 depths and doorway locations; stair counts; and reverse-angle room photos.
@@ -273,7 +348,7 @@ The model uses these additional relationships from the photos:
 | Reference | Relationship used in the model |
 | --- | --- |
 | 7 | Facing the red door from dining, stairs and drawer storage are on the left; the living room and kitchen opening are on the right. The flights leave the side of the main floor. |
-| 8 | Front windows and the child sofa occupy one wall. The main sofa and large mirror occupy the adjoining perpendicular outside wall. The piano sits toward the kitchen partition; the floor lamp is by that partition. |
+| 8, House Tour 51–54s | Front windows and the child sofa occupy one wall. The main sofa, large mirror and tall cupboard occupy the adjoining outside wall. The TV/media cabinet and floor lamp are by the kitchen partition. |
 | 6 | Looking from dining into the kitchen, the fridge and range are on the left/front partition; the sink and dishwasher turn onto the adjoining outside wall. |
 | 9–10 | Facing the flights, upstairs is left and downstairs is right. Both travel into the same side wing. The fireplace is ahead downstairs, with the blue sofa, olive chair and windows along the right side. |
 | 1, 4–5 | From the main-house doorway into the sunroom, the gym/playhouse are left and wicker seating is right. The house-side window sits left of the doorway. The visible exterior split-level extension continues on the right. |
@@ -327,9 +402,53 @@ python models/house/verify.py
 top view. `--preview-scale 50 --samples 4` makes quick layout previews.
 Rebuilding **replaces** `house.blend` and `inventory.json`, so
 save manual edits under a different filename before regenerating. The script
-uses a fixed random seed. `build.py` loads `upstairs.py`, `extensions.py` and
-`basement_garage.py`; all four files contribute to the generator hash. `inventory.json` records it, Blender
+uses a fixed random seed. The generator hash covers `build.py`, `upstairs.py`,
+`extensions.py`, `basement_garage.py`, `yard.py`, `exterior.py` and `photoreal.py`.
+`inventory.json` records it, Blender
 version, object counts, cameras and furniture provenance.
+
+After a model rebuild, use the same installed Blender Python runtime for export,
+then validate the generated geometry and browser contracts:
+
+```sh
+python models/house/export_walkthrough.py -- --ao
+python models/house/test_browser_materials.py
+node models/house/test_browser_materials.mjs
+node models/house/test_browser_ao.mjs
+node models/house/test_browser_ramps.mjs
+node models/house/test_walkthrough.mjs
+node tests/house-routes.mjs
+node tests/house-saves.cjs
+```
+
+`test_browser_materials.py` checks named finishes, shader-value handling, panel
+metadata and the bevel/light selection contracts without importing Blender.
+The Node material test checks linear colour, opacity, shader hooks and lamp
+occlusion. The ramp test feeds Python-exported strips into the actual walking
+engine and traverses the apron uphill and downhill; `PYTHON` can select its
+installed Python executable. `test_browser_rendering.mjs` serves its own small fixture and compiles
+and renders every finish with actual desktop/phone WebGL settings, including
+shadow maps and bounded reflection probes:
+
+```sh
+node models/house/test_browser_rendering.mjs
+```
+
+The WebGL fixture and full-game checks reuse an installed `playwright` module.
+The fixture accepts `PLAYWRIGHT_MODULE` as its absolute module directory; the
+full-game suite uses normal Node resolution or the containing `NODE_PATH`.
+`CHROMIUM_PATH` can select an installed browser; the
+test's Windows default is `C:/Program Files/Google/Chrome/Application/chrome.exe`.
+`HOUSE_RENDER_CAPTURE` optionally writes a disposable fixture screenshot.
+
+For full-game validation, run `python -m http.server 8765` from the repository
+root in a separate terminal, then run `node tests/house-craepets.cjs`. `HOUSE_BASE`
+can override its default `http://127.0.0.1:8765`. Inspect the actual house on
+desktop and phone, follow the changed entrances and stairs, and compare stable
+camera views to timestamped tour evidence. Check console errors, initial-load
+and frame behaviour, contact shadows, reflections, texture scale and glass
+sorting. Keep private footage and reference screenshots out of Git; remove
+disposable test captures after inspection.
 
 This folder is an offline model asset. It has no game entry point, and nothing
 is added to `assets/js/games.js`, the landing page, or service-worker precache.

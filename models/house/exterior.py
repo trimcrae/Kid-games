@@ -4,10 +4,10 @@ Executed in build.py's Blender namespace after every room and the yard.
 The homeowner's exterior photographs (front from the street, rear from the
 lawn) show a split-level: a single-storey garage wing and entry block under
 one long brown-shingle roof line, a two-storey wing with its ridge running
-front to back whose rear gable is clad in dark weathered cedar shakes over
+front to back whose rear gable has dark rectangular panels and pale seams over
 pale lap siding, and a glazed sunroom with a low shingle roof. Street names,
 house numbers and neighbouring homes are not reproduced. Roof pitches,
-overhangs and the split between siding and shakes are estimates read from the
+overhangs and the split between siding and panels are estimates read from the
 photographs, not measurements.
 
 The interior rooms were placed from photographs one at a time, so their
@@ -21,9 +21,9 @@ made physically coherent in three steps:
    on walls and no room hangs in the air.
 2. Roofs: one gable over the entry block (extended to meet the wing), one
    over the garage, one front-to-back gable over the whole upper wing, low
-   shed roofs over the sunroom, the porch and the lower level's rear ledge.
+   shed roofs over the sunroom and rear ledges. The porch shares the low roof.
 3. Cladding: outward-facing polygons of every wall box, infill included,
-   receive siding or shakes. No doorway, window or browser collision box
+   receive siding or panels. No doorway, window or browser collision box
    changes. `verify.py` then checks that every upper-floor edge has
    structure beneath it and every ceiling sits under a roof.
 """
@@ -33,7 +33,7 @@ import bmesh
 EXTERIOR = collection('43 | Exterior roofs and cladding')
 siding_grey = material('Pale blue-grey vinyl lap siding', (.46, .52, .56), .55)
 siding_tan = material('Warm tan vinyl lap siding', (.60, .52, .40), .55)
-shakes = material('Weathered dark cedar shakes', (.07, .05, .035), .85, texture='wood')
+shakes = material('Weathered dark exterior panels', (.075, .070, .060), .85)
 shingles = material('Brown asphalt roof shingles', (.16, .105, .07), .9, texture='stone')
 fascia = white
 
@@ -42,13 +42,14 @@ ROOF_THICKNESS = .14
 # ---------------------------------------------------------------- shell infill
 
 # Building blocks in world metres: (x0, x1, y0, y1, z0, z1).
-# The end bedroom is a corner room with windows on two walls, so its block
-# sits back from the wing's front: the wing is L-shaped on both levels.
+# House Tour 3s shows both upstairs street windows in one flat facade;
+# Backyard tour 0/16s also shows one continuous gable. Room depths remain
+# estimates: corner windows alone did not establish the former setback.
 SHELLS = {
     'Side wing lower level west': (7.8, 15.49, -.23, 9.12, -1.05, 1.26),
-    'Side wing lower level east': (15.49, 18.84, 1.86, 9.12, -1.05, 1.26),
+    'Side wing lower level east': (15.49, 18.84, -.23, 9.12, -1.05, 1.26),
     'Side wing upper level west': (9.84, 15.49, .29, 8.62, 1.26, 3.70),
-    'Side wing upper level east': (15.49, 18.84, 1.86, 8.62, 1.26, 3.70),
+    'Side wing upper level east': (15.49, 18.84, .29, 8.62, 1.26, 3.70),
     'Entry block east infill': (7.8, 9.84, -.23, 9.12, 1.26, 2.72),
     'Stairwell head room': (7.73, 11.06, 1.96, 4.72, 1.26, 3.70),
 }
@@ -57,8 +58,8 @@ SHELLS = {
 ROOMS = [
     ((0, 0, -3.4), (7.8, 8, 2.7)),          # main block and basement
     ((.8, 8, -.4), (7.4, 11.4, 2.5)),       # sunroom
-    ((-6.9, 1.1, -.5), (-.1, 8.1, 2.8)),    # garage
-    ((4.3, -2.9, -.4), (7.7, 0, 2.5)),      # covered porch
+    ((-6.9, -1.8, -.5), (-.1, 8.1, 2.8)),   # garage
+    ((5.1, -1.8, -.25), (7.8, 0, 2.7)),     # enclosed entry return
 ] + [((x0, y0, z0), (x1, y1, z1)) for x0, x1, y0, y1, z0, z1 in SHELLS.values()]
 scene['envelope_boxes'] = json.dumps(ROOMS)  # read back by verify.py
 
@@ -203,18 +204,39 @@ def shed(name, x0, x1, y0, y1, z_high, z_low, down='+y'):
 asset('Estimated roofs', photos='exterior', confidence='roof lines read from exterior photographs; pitches and overhangs estimated')
 # One long ridge over the entry block, carried east to meet the wing so the
 # stair and pink-bedroom infill sits under it; the garage shares the line.
-gable('Main block gable roof', -.5, 9.84, -.5, 9.6, 2.72, .42, 'x')
-gable('Garage wing gable roof', -7.4, .2, .6, 8.6, 2.76, .42, 'x', siding_tan)
-# Two-storey wing: ridge front to back, pale siding on the street gable and
-# cedar shakes on the rear gable as photographed; the set-back end-bedroom
-# block carries a lower cross gable that meets it in valleys.
-gable('Upper wing gable roof', 9.34, 15.99, -.2, 9.12, 3.75, .55, 'y', siding_grey, shakes)
-gable('End bedroom cross gable roof', 13.2, 19.34, 1.36, 9.12, 3.75, .45, 'x')
+gable('Main block gable roof', -.1, 9.84, -2.3, 8.6, 2.72, (4.50-2.72)/5.45, 'x')
+gable('Garage wing gable roof', -7.4, -.1, -2.3, 8.6, 2.72, (4.50-2.72)/5.45, 'x', siding_tan)
+# One ridge covers nursery and Cory's room. Front/rear gable topology is
+# video-confirmed; width, pitch, overhang and ridge height are fit estimates.
+gable('Upper wing gable roof', 9.34, 19.34, -.2, 9.12, 3.75, .37, 'y', siding_grey, shakes)
 shed('Sunroom low shingle roof', .3, 7.9, 7.9, 11.9, 2.62, 2.40, '+y')
-shed('Front porch shingle roof', 4.1, 7.9, -3.05, 0, 2.78, 2.38, '-y')
+# The porch is under the continuous low-block roof (House Tour 24/39s).
+shed('Entry block rear infill roof', 7.8, 9.84, 8.5, 9.42, 2.74, 2.60, '+y')
 # The lower level's rear wall stands half a metre behind the upper wing's;
 # a low shingle ledge covers that step.
 shed('Lower level rear ledge roof', 9.6, 18.94, 8.5, 9.42, 1.40, 1.26, '+y')
+
+# H3: two separate double-hung windows, each framed by grey louver shutters,
+# and a small pale octagonal vent in the common front gable.
+shutter_mat=material('Exterior grey green shutter enamel',(.12,.18,.18),.55)
+asset('Upper front shutters and gable vent',photos='House Tour 3.000s',
+      confidence='pairs of shutters and octagonal vent observed; sizes estimated')
+for center,width in [(12.76,1.30),(17.79,1.20)]:
+    for side in [-1,1]:
+        x=center+side*(width/2+.22)
+        box('Street window shutter panel',(x,.20,2.68),(.36,.055,1.44),shutter_mat,.005)
+        for dx in [-.158,.158]:box('Shutter stile',(x+dx,.16,2.68),(.035,.035,1.44),shutter_mat,.003)
+        for i in range(21):
+            obj=box('Shutter angled louver',(x,.158,2.05+i*.062),(.28,.035,.055),shutter_mat,.003)
+            obj.rotation_euler.x=math.radians(-18)
+obj=cylinder('Octagonal gable vent surround',(14.34,-.222,4.93),.24,.050,white,8)
+obj.rotation_euler.x=math.pi/2
+obj=cylinder('Octagonal vent dark recess',(14.34,-.253,4.93),.19,.016,shutter_mat,8)
+obj.rotation_euler.x=math.pi/2
+for i in range(7):
+    dz=(i-3)*.047
+    width=2*math.sqrt(.18**2-dz**2)
+    box('Pale gable vent louver',(14.34,-.268,4.93+dz),(width,.023,.023),white,.003)
 
 # ---------------------------------------------------------------- cladding
 
