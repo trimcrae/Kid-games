@@ -1,4 +1,8 @@
-"""Visible landscaping from photos 1–5 and V4–V5; distances are estimates.
+"""Landscaping from private photos and the narrated walkthroughs.
+
+H = house-tour video seconds; B = backyard-tour video seconds. Geometry,
+species, sizes and coordinates remain estimates unless explicitly stated.
+The videos establish silhouettes and adjacency, not a measured site plan.
 
 No neighbouring houses, addresses, people or private photos are reproduced.
 """
@@ -10,14 +14,32 @@ mulch = material('Garden dark mulch',(.12,.085,.047),.99,texture='stone')
 asphalt = material('Driveway charcoal asphalt',(.13,.15,.16),.98,texture='stone')
 shedmat = material('Shed taupe resin',(.49,.43,.38),.8)
 netmat = material('Trampoline netting',(.10,.13,.12),.9)
+bus_red = material('Bus stop red brown molded bench',(.30,.055,.035),.48)
+umbrella_red = material('Bus stop faded raspberry canvas',(.49,.12,.15),.89,texture='fabric')
+sign_yellow = material('Bus stop safety yellow',(.88,.86,.045),.48)
+play_blue = material('Outdoor molded sky blue',(.12,.48,.68),.42)
+play_orange = material('Outdoor molded orange',(.91,.34,.055),.43)
+play_lime = material('Outdoor molded lime',(.60,.77,.16),.44)
+play_pink = material('Outdoor molded magenta',(.61,.08,.29),.42)
+play_tan = material('Outdoor molded sand',(.58,.48,.33),.52)
+chair_blue = material('Outdoor pale blue chairs',(.37,.57,.62),.58)
+shed_trim = material('Shed darker taupe framing',(.31,.29,.20),.78)
+shed_roof = material('Shed pale warm roof',(.62,.60,.49),.81)
 yard_z = -.82
 
 # Keep soil outside the building rectangles, including the below-grade floors.
-asset('Front lawn and driveway',photos='V4,V5',confidence='lawn, drive and tree positions visible; boundary and distances estimated')
+asset('Front lawn and driveway',photos='H0,21–33; V4,V5',confidence='lawn and continuous drive-to-slab connection observed; boundary, grading and distances estimated')
 box('Front lawn',(6,-10.5,yard_z-.10),(30,13,.20),lawn)
 box('Front foundation lawn',(-.1,-2.0,yard_z-.10),(8.8,4,.20),lawn)
 box('Front side lawn',(14,-2.0,yard_z-.10),(12.4,4,.20),lawn)
-box('Asphalt driveway',(-3.35,-4.4,yard_z+.005),(5.8,10.4,.045),asphalt,.015)
+# Garage front threshold is Y=-1.8, Z=-.16. The video shows a continuous
+# asphalt approach, so use an estimated slope instead of a floating slab.
+box('Asphalt driveway',(-3.50,-10.30,yard_z+.005),(6.5,11,.045),asphalt,.015)
+drive_mesh=bpy.data.meshes.new('Driveway graded apron')
+drive_mesh.from_pydata([(-6.75,-4.8,yard_z+.025),(-.25,-4.8,yard_z+.025),
+                       (-.25,-1.8,-.16),(-6.75,-1.8,-.16)],[],[(0,1,2,3)])
+drive_apron=finish(bpy.data.objects.new('Asphalt apron graded to garage threshold',drive_mesh),'Asphalt apron graded to garage threshold',asphalt)
+drive_apron['confidence']='H21–33: continuous drive-to-slab connection observed; grading length and slope estimated'
 box('Street at edge of study',(5.4,-17.6,yard_z-.01),(34,3,.08),asphalt)
 asset('Back and side lawns',photos='1-5',confidence='lawn visible through sunroom; extent estimated')
 box('Rear lawn',(6,20,yard_z-.10),(30,16,.20),lawn)
@@ -29,6 +51,60 @@ box('Rear west lawn',(-3,10.7,yard_z-.10),(7.6,2.6,.20),lawn)
 
 leafmat = material('Deciduous tree leaves', (.12, .27, .06), .6)
 bark = material('Garden tree bark',(.13,.10,.075),.98,texture='wood')
+
+
+def _yard_mesh(name, verts, faces, mat):
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    return finish(bpy.data.objects.new(name, mesh), name, mat)
+
+
+def _yard_tubes(name, paths, radius, mat, sides=6):
+    """Batch thin tubes into one mesh; low sided netting stays inexpensive."""
+    verts, faces = [], []
+    for path in paths:
+        pts = [Vector(p) for p in path]
+        start = len(verts)
+        for i, p in enumerate(pts):
+            tangent = (pts[min(i+1,len(pts)-1)]-pts[max(0,i-1)]).normalized()
+            axis = Vector((0,0,1)) if abs(tangent.z) < .92 else Vector((0,1,0))
+            u = tangent.cross(axis).normalized(); v = tangent.cross(u)
+            verts.extend(tuple(p+radius*(u*math.cos(k*math.tau/sides)+v*math.sin(k*math.tau/sides))) for k in range(sides))
+        for i in range(len(pts)-1):
+            for k in range(sides):
+                a=start+i*sides+k; b=start+i*sides+(k+1)%sides
+                faces.append((a,b,b+sides,a+sides))
+        faces.extend([tuple(start+k for k in reversed(range(sides))),tuple(start+(len(pts)-1)*sides+k for k in range(sides))])
+    obj=_yard_mesh(name,verts,faces,mat)
+    for polygon in obj.data.polygons:
+        polygon.use_smooth=len(polygon.vertices)==4
+    return obj
+
+
+def _yard_prism(name, profile, depth, mat, y=0):
+    """Extruded X/Z silhouette for shaped molded furniture parts."""
+    n=len(profile)
+    verts=[(x,y+d,z) for d in [-depth/2,depth/2] for x,z in profile]
+    faces=[tuple(range(n)),tuple(reversed(range(n,2*n)))]
+    faces += [(i,i+n,(i+1)%n+n,(i+1)%n) for i in range(n)]
+    obj=_yard_mesh(name,verts,faces,mat)
+    bevel=obj.modifiers.new('Rounded molded edges','BEVEL'); bevel.width=.018; bevel.segments=2
+    return obj
+
+
+def _yard_text(name,body,pos,size,mat):
+    """Local Blender font converted to mesh so the browser retains the sign."""
+    data=bpy.data.curves.new(name,'FONT'); data.body=body; data.align_x='CENTER'; data.align_y='CENTER'
+    data.size=size; data.space_line=.86; data.resolution_u=3
+    obj=finish(bpy.data.objects.new(name,data),name,mat)
+    obj.location=pos; obj.rotation_euler=(math.pi/2,0,math.pi)
+    bpy.context.view_layer.update()
+    mesh=bpy.data.meshes.new_from_object(obj.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    lettering=finish(bpy.data.objects.new(name+' mesh',mesh),name+' mesh')
+    lettering.location=obj.location; lettering.rotation_euler=obj.rotation_euler
+    bpy.data.objects.remove(obj,do_unlink=True); bpy.data.curves.remove(data)
+    return lettering
 
 
 def _leaf_mesh(name, leaves, rng, size, mat, export=True):
@@ -137,7 +213,72 @@ def tree(name,pos,height,width,photo,trunk=.24,willow=False):
     _leaf_mesh('Tree render leaves', dense, rng, .085, leafmat, export=False)
 
 
-tree('Front large shade tree',(10,-12,yard_z),9.5,8.5,'V5,exterior',.42)
+tree('Front large shade tree',(10,-12,yard_z),11.5,10.0,'H0–6; V5,exterior',.55)
+
+
+def young_fruit_tree(name,pos,height,width):
+    asset(name,pos,photos='H0–3',confidence='two slender young trees visible; fruit-tree identity follows unverified narration; position and size estimated')
+    rng=random.Random(name); foliage_points=[]
+    _yard_tubes('Slender young tree trunk',[[(0,0,0),(.06,0,.8),(0,.03,height)]],.023,bark,8)
+    branch_paths=[]
+    for i in range(18):
+        angle=i*2.4; z=.65+i*(height-.85)/18; reach=width*.45*(1-.50*i/18)
+        end=Vector((math.cos(angle)*reach,math.sin(angle)*reach,z+.30))
+        branch_paths.append([(0,0,z),tuple(end*.65+Vector((0,0,z*.35))),tuple(end)])
+        for _ in range(30):
+            c=end+Vector((rng.uniform(-.20,.20),rng.uniform(-.20,.20),rng.uniform(-.16,.22)))
+            foliage_points.append((c,Vector((rng.uniform(-1,1),rng.uniform(-1,1),rng.uniform(.2,1)))))
+    _yard_tubes('Young tree lateral branches',branch_paths,.008,bark,5)
+    _leaf_mesh('Young fruit tree leaves',foliage_points,rng,.062,leafmat)
+    cylinder('Small tree mulch circle',(0,0,.016),.40,.025,mulch,24)
+
+
+young_fruit_tree('Front young fruit tree near driveway',(6.4,-7.1,yard_z),2.65,1.5)
+young_fruit_tree('Front young fruit tree near upper wing',(12.9,-4.3,yard_z),2.80,1.4)
+
+# The stop belongs beside the sidewalk to the left of the drive, seen when
+# turning away from the front elevation. No street name or address is drawn.
+asset('Front sidewalk and grass verge',photos='H9–15',confidence='sidewalk separates sign pole from bench; width and extent estimated')
+for x0,x1 in [(-9,-6.75),(-.25,21)]:
+    for i in range(max(1,int((x1-x0)/1.4))):
+        count=max(1,int((x1-x0)/1.4)); width=(x1-x0)/count
+        box('Sidewalk concrete panel',(x0+(i+.5)*width,-14.9,yard_z+.018),(width-.015,1.2,.075),concrete,.006)
+
+asset('Family school bus stop bench',(-8.0,-13.55,yard_z),photos='H9,18',confidence='red-brown molded slotted bench visible; dimensions and placement estimated')
+for x in [-.57,.57]:
+    _yard_prism('Bench molded broad leg',[(x-.065,0),(x+.065,0),(x+.06,.46),(x-.05,.47)],.48,bus_red)
+for i in range(7):
+    x=-.51+i*.17
+    box('Bench molded seat slat',(x,-.005,.43),(.158,.48,.055),bus_red,.025)
+    z=.68+.05*(1-(x/.60)**2)
+    o=box('Bench slotted curved back',(x,.23,z),(.148,.046,.45),bus_red,.021); o.rotation_euler.x=-.10
+_yard_tubes('Bench curved top and arms',[
+    [(-.66,-.26,.61),(-.67,0,.73),(-.58,.22,.87),(0,.27,.91),(.58,.22,.87),(.67,0,.73),(.66,-.26,.61)]
+],.045,bus_red,10)
+
+asset('Bus stop umbrella',(-6.75,-13.25,yard_z),photos='H9',confidence='open muted red umbrella, black pole and ribbed weighted base; dimensions and placement estimated')
+cylinder('Umbrella weighted conical base',(0,0,.085),.32,.17,black,32,top=.095)
+_yard_tubes('Umbrella base ribs',[[ (.09*math.cos(a),.09*math.sin(a),.17),(.32*math.cos(a),.32*math.sin(a),.035)] for a in [i*math.tau/20 for i in range(20)]],.006,black,4)
+cylinder('Umbrella black mast',(0,0,1.23),.025,2.46,black,16)
+canopy_verts=[]
+for radius,z in [(0.035,2.47),(.54,2.31),(1.37,2.05)]:
+    for i in range(32):
+        a=i*math.tau/32; canopy_verts.append((radius*math.cos(a),radius*math.sin(a),z-.04*math.sin(i*math.pi/4)**2))
+canopy_faces=[tuple(reversed(range(32)))]
+for band in range(2):
+    for i in range(32):
+        j=(i+1)%32; canopy_faces.append((band*32+i,band*32+j,(band+1)*32+j,(band+1)*32+i))
+_yard_mesh('Eight panel umbrella canvas',canopy_verts,canopy_faces,umbrella_red)
+_yard_tubes('Umbrella underside ribs',[[ (0,0,2.44),(.54*math.cos(a),.54*math.sin(a),2.29),(1.37*math.cos(a),1.37*math.sin(a),2.03)] for a in [i*math.tau/8 for i in range(8)]],.009,black,5)
+
+asset('School bus stop sign and sanitizer',(-8.25,-15.75,yard_z),photos='H12–15',confidence='yellow sign on wood pole and dispenser below directly visible; height and dimensions estimated')
+cylinder('Bus stop timber utility pole',(0,0,3.5),.15,7,bark,16,top=.105)
+box('Yellow school bus stop sign',(0,.158,1.70),(.58,.035,.37),sign_yellow,.027)
+_yard_text('School bus stop lettering','SCHOOL BUS\nSTOP',(0,.180,1.70),.103,black)
+box('Sanitizer dark mounting holder',(0,.17,1.15),(.13,.06,.30),black,.01)
+box('Sanitizer translucent bottle',(0,.215,1.24),(.13,.068,.17),white,.018)
+box('Sanitizer label',(0,.253,1.24),(.09,.004,.08),cream,.004)
+box('Sanitizer pump head',(0,.22,1.345),(.08,.075,.025),white,.006)
 needlemat = material('Spruce needles', (.05, .12, .06), .7)
 
 
@@ -182,82 +323,167 @@ def conifer(name,pos,height,width,photo,trunk=.24):
     _leaf_mesh('Spruce render needles', dense, rng, .11, needlemat, export=False)
 
 
-tree('Rear left shade tree',(-3.0,21,yard_z),8.5,6.5,'1,2,exterior',.30)
-tree('Rear lawn tree',(6.2,22,yard_z),9.0,7.0,'2,5,exterior',.36)
-tree('Rear right screening tree',(20,20,yard_z),7.5,5.5,'3,4',.26)
-conifer('Front tall spruce',(14.6,-11.4,yard_z),12.5,5.2,'exterior')
+tree('Rear left shade tree',(-5.6,20.2,yard_z),12.0,12.0,'B5–9; H72; location estimated',.64)
+# The broad middle lawn is open in the full backyard pan. Keep the former
+# centre tree with the other perimeter trees behind the shed, not in that lawn.
+tree('Rear lawn tree',(16.4,26.0,yard_z),11.0,8.5,'B11–13; moved to rear perimeter, estimated',.43)
+tree('Rear right screening tree',(22,18.7,yard_z),10.5,8.0,'B13–16; H75–78; estimated',.39)
+conifer('Front tall conifer',(14.6,-11.4,yard_z),13.5,6.0,'H3–6; exact species unverified')
 asset('Front mulched planting beds',photos='V5')
 box('Left front mulch bed',(7.8,-3.6,yard_z+.01),(1.5,1.5,.08),mulch,.08)
 box('Right front mulch bed',(4.4,-5.4,yard_z+.01),(2.0,3.4,.08),mulch,.1)
 for i in range(6):
     shrub('Front garden shrub %02d'%i,(3.9+(i%2)*.9,-4.2-(i//2)*1.0,yard_z),(.43,.46,.47),'V5')
-for i in range(10):
-    shrub('Rear fence shrub %02d'%i,(-6+i*2.8,26.4,yard_z),(.88,.65,.8),'1,2,5')
+for i,(x,y,w,h) in enumerate([(-7.4,12.4,.75,1.0),(-7.2,14.8,.9,1.3),(-7.6,17.0,.9,1.3),
+                             (-7.1,23.5,1.1,1.2),(-6,26.2,1.0,1.25),(-3.8,26.3,1.2,1.2),
+                             (1.2,26.5,.60,.8),(3.3,26.8,.75,1.0),(7,26.6,.70,.85),
+                             (21.7,25.5,1.1,1.35),(22.6,22.8,.85,1.1),(22.3,16,1.0,1.1)]):
+    shrub('Rear boundary planting %02d'%i,(x,y,yard_z),(w,.65,h),'B5–14; irregular edge planting, placement estimated')
 
-asset('Rear boundary fence',photos='1-5',confidence='fence visible; lot limits estimated')
-for x in range(-8,24,2):
-    box('Rear fence timber post',(x,27,yard_z+.85),(.11,.11,1.7),bark)
-for z in [.45,1.3]:
-    box('Rear fence horizontal rail',(7,27,yard_z+z),(30,.08,.10),shedmat)
-for i in range(170):
-    box('Rear fence vertical board',(-8+i*.18,27,yard_z+.85),(.145,.045,1.5),shedmat,.003)
-for x in [-8,23]:
-    for y in range(10,28,2):
-        box('Side fence post',(x,y,yard_z+.65),(.06,.06,1.3),steel)
-    for z in [.22,.60,1.10]:
-        rod('Side wire fence',(x,10,yard_z+z),(x,27,yard_z+z),.006,steel)
+asset('Rear boundary fence',photos='B7–11; H69–72',confidence='mixed timber section and low metal fence visible; transition and boundary coordinates estimated')
+for x in [-8,-6,-4,-2,0]:
+    box('Weathered privacy fence post',(x,27,yard_z+.8),(.10,.10,1.6),bark,.005)
+for z in [.35,1.16]:box('Weathered privacy fence rail',(-4,27,yard_z+z),(8,.07,.10),bark,.004)
+for i in range(45):
+    box('Weathered privacy fence board',(-8+i*.18,27,yard_z+.76),(.15,.045,1.48+(i%3)*.025),shed_trim,.004)
+for x in range(0,24,2):
+    cylinder('Low metal boundary post',(x,27,yard_z+.55),.026,1.1,steel,8)
+_yard_tubes('Low boundary fence rails',[[ (0,27,yard_z+z),(23,27,yard_z+z)] for z in [.1,1.05]],.016,steel,6)
+# Thin diagonal wire conveys the visible chain-link character without a
+# solid fence plane. No reconstruction beyond the property's visible edge.
+wire_paths=[]
+for x in [i*.24 for i in range(96)]:
+    for direction in [-1,1]:
+        pts=[(x+direction*(.12 if i%2 else 0),27,yard_z+.08+i*.12) for i in range(9)]
+        wire_paths.append(pts)
+_yard_tubes('Rear chain link net strands',wire_paths,.0025,steel,3)
 
-asset('Rear garden shed',(12.2,24.1,yard_z),0,'2,5','taupe double-door shed visible; size estimated')
+asset('Rear garden shed',(12.2,24.1,yard_z),0,'B10–12; H72','beige double-door shed and shallow pale roof visible; size and position estimated')
 box('Shed body',(0,0,1.08),(3.2,2.5,2.16),shedmat)
 for x in [-.7,.7]:
-    box('Shed door panel',(x,-1.265,.98),(1.35,.035,1.9),cream)
-    box('Shed door inner frame',(x,-1.29,.98),(1.18,.015,1.72),shedmat)
+    box('Shed door panel',(x,-1.275,1.01),(1.35,.035,1.93),shedmat)
+    for dx in [-.65,.65]:box('Shed door vertical framing',(x+dx,-1.30,1.01),(.047,.035,1.93),shed_trim,.004)
+    for z in [.05,.99,1.97]:box('Shed door cross framing',(x,-1.30,z),(1.33,.035,.045),shed_trim,.004)
     sphere('Shed door handle',(x*.13,-1.33,1.0),(.025,.025,.065),black)
+for x in [-1.56,1.56]:box('Shed corner framing',(x,-1.275,1.08),(.06,.04,2.16),shed_trim,.004)
+for y in [-.95,-.55,-.15,.25,.65,1.05]:
+    for x in [-1.605,1.605]:box('Shed vertical resin joint',(x,y,1.07),(.012,.023,2.1),shed_trim,.002)
+_yard_prism('Shed front gable infill',[(-1.6,2.16),(1.6,2.16),(0,2.43)],.06,shedmat,-1.25)
 for side in [-1,1]:
-    o=box('Shed pitched roof',(side*.83,0,2.31),(1.78,2.72,.10),shedmat)
-    o.rotation_euler.y=side*.24
+    o=box('Shed shallow pale roof',(side*.83,0,2.29),(1.72,2.72,.065),shed_roof,.008)
+    o.rotation_euler.y=side*.165
 
-asset('Backyard trampoline',(13.7,14.1,yard_z),0,'3,4','round blue-edged trampoline with safety net')
+asset('Backyard trampoline',(13.7,14.1,yard_z),0,'B0,15–16; H75–78','blue pad, curved net poles, yellow entrance and ladder observed; dimensions and pole count estimated')
 cylinder('Trampoline jumping mat',(0,0,.79),1.75,.05,black,48)
-for z,r,mat in [(.81,1.87,bluegrey),(2.65,1.87,bluegrey)]:
-    curve('Trampoline circular rim',[(r*math.cos(t*math.tau/64),r*math.sin(t*math.tau/64),z) for t in range(64)],.07,mat,True)
-for i in range(10):
-    a=i*math.tau/10;x,y=1.85*math.cos(a),1.85*math.sin(a)
-    rod('Trampoline support',(x,y,0),(x,y,2.7),.025,steel)
-for i in range(72):
-    a=i*math.tau/72;x,y=1.83*math.cos(a),1.83*math.sin(a)
-    rod('Trampoline vertical net strand',(x,y,.88),(x,y,2.60),.003,netmat)
-for z in [1.0,1.2,1.4,1.6,1.8,2,2.2,2.4]:
-    curve('Trampoline horizontal net strand',[(1.83*math.cos(t*math.tau/72),1.83*math.sin(t*math.tau/72),z) for t in range(72)],.003,netmat,True)
+_yard_tubes('Trampoline blue spring pad',[[ (1.85*math.cos(a),1.85*math.sin(a),.81) for a in [i*math.tau/64 for i in range(65)]]],.09,play_blue,8)
+pole_paths=[]
+for i in range(8):
+    a=i*math.tau/8
+    pole_paths.append([(r*math.cos(a),r*math.sin(a),z) for r,z in [(1.83,.05),(1.87,.82),(1.98,1.66),(1.81,2.52)]])
+_yard_tubes('Trampoline curved padded poles',pole_paths,.025,steel,8)
+def _net_point(a,f):
+    radius=1.82+.14*math.sin(f*math.pi)
+    return (radius*math.cos(a),radius*math.sin(a),.88+f*(1.62-.10*math.sin(4*a)**2))
+net_paths=[]
+for i in range(80):
+    a=i*math.tau/80
+    if abs(a-math.pi/2)<.12:continue  # narrow entrance gap facing the lawn
+    net_paths.append([_net_point(a,f/6) for f in range(7)])
+for band in range(9):
+    net_paths.append([_net_point(a,(band+.5)/9) for a in [math.pi/2+.13+i*(math.tau-.26)/80 for i in range(81)]])
+_yard_tubes('Trampoline net strands',net_paths,.0025,netmat,3)
+_yard_tubes('Trampoline soft upper net seam',[[ _net_point(i*math.tau/80,1) for i in range(81)]],.012,netmat,5)
+_yard_tubes('Trampoline yellow zipper entrance',[[(-.19,1.86,.88),(-.17,1.96,1.25),(-.10,1.94,1.70),(0,1.84,2.12),(.10,1.94,1.70),(.17,1.96,1.25),(.19,1.86,.88)]],.011,sign_yellow,5)
+_yard_tubes('Trampoline access ladder',[[ (x,2.18,.04),(x,1.88,.90)] for x in [-.26,.26]]+
+            [[(-.26,2.18-.30*z/.9,z),(.26,2.18-.30*z/.9,z)] for z in [.18,.39,.60,.81]],.022,steel,6)
 
-asset('Backyard toddler slide',(7.9,17.5,yard_z),45,'2,5')
-for x in [-.38,.38]:
-    rod('Slide ladder upright',(x,.45,0),(x,0,.9),.05,bluegrey)
-for z in [.20,.40,.60,.80]:box('Slide ladder step',(0,.45-z*.5,z),(.77,.16,.05),bluegrey)
-o=box('Pale backyard slide',(0,-.85,.47),(.78,1.9,.055),cream,.035);o.rotation_euler.x=.43
-for x in [-.43,.43]:
-    rod('Slide raised side',(x,-1.7,.13),(x,0,.94),.065,cream)
-asset('Backyard colorful play cube',(4.4,18.5,yard_z),0,'2,5')
-for x in [-.45,.45]:
-    for y in [-.45,.45]:box('Play cube corner',(x,y,.56),(.12,.12,1.12),holds[0],.04)
-for y in [-.45,.45]:box('Play cube top rail',(0,y,1.08),(.95,.13,.13),holds[2],.04)
-for x in [-.45,.45]:
-    box('Play cube side rail',(x,0,.36),(.12,.9,.12),holds[1],.025)
-    box('Play cube side top',(x,0,1.08),(.12,.9,.12),holds[1],.025)
-asset('Rear patio table',(1.2,13.5,yard_z),0,'1')
+
+def molded_slide(name,pos,angle,mat=play_lime):
+    asset(name,pos,angle,'B11–13; H72–75','molded slide shape visible; dimensions and slope estimated')
+    path=[(0,-.02,1.10),(0,-.22,1.07),(0,-.48,.83),(0,-.90,.43),(0,-1.38,.14),(0,-1.58,.13)]
+    verts=[(x,y,z) for _x,y,z in path for x in [-.29,.29]]
+    _yard_mesh('Molded slide chute',verts,[(i*2,i*2+1,i*2+3,i*2+2) for i in range(len(path)-1)],mat)
+    _yard_tubes('Molded slide raised rims',[[(x,y,z+.045) for _,y,z in path] for x in [-.30,.30]],.047,mat,8)
+    for x in [-.27,.27]:_yard_tubes('Slide ladder upright',[[(x,.53,0),(x,0,1.1),(x,-.04,1.27)]],.045,play_blue,8)
+    for z in [.23,.46,.69,.92]:box('Molded slide climbing step',(0,.53*(1-z/1.1),z),(.58,.13,.06),play_blue,.02)
+
+
+asset('Backyard colorful play cube',(4.4,18.5,yard_z),0,'B0,16–19; H72–75','molded blue orange lime and pink climber observed; size and placement estimated')
+for x in [-.55,.55]:
+    for y in [-.49,.49]:box('Climber rounded corner pillar',(x,y,.62),(.14,.15,1.24),play_orange,.055)
+for y in [-.50,.50]:
+    # An open arch with molded jambs, not a solid cuboid approximation.
+    _yard_tubes('Climber arched panel top',[[(.46*math.cos(a),y,.79+.40*math.sin(a)) for a in [math.pi-i*math.pi/16 for i in range(17)]]],.07,play_orange,8)
+    for x in [-.46,.46]:box('Climber arched panel jamb',(x,y,.42),(.13,.09,.76),play_orange,.035)
+    _yard_tubes('Climber magenta overhead bar',[[(-.55,y,1.18),(.55,y,1.18)]],.045,play_pink,8)
+for x in [-.56,.56]:
+    for y in [-.25,.25]:
+        panel=box('Climber shaped blue side panel',(x,y,.66),(.10,.43,.72),play_blue,.095)
+        for z in [.80,.91]:box('Climber molded panel rib',(x+(.057 if x>0 else -.057),y,z),(.026,.37,.032),play_blue,.012)
+box('Climber pink raised platform',(0,0,.43),(.94,.92,.075),play_pink,.025)
+for y in [-.3,-.15,0,.15,.3]:box('Climber platform groove',(0,y,.473),(.85,.012,.007),play_pink,0)
+# Lime exit slide is part of this observed foreground structure.
+verts=[(x,y,z) for y,z in [(-.48,.48),(-.75,.38),(-1.10,.15),(-1.32,.12)] for x in [-.30,.30]]
+_yard_mesh('Climber lime exit slide',verts,[(i*2,i*2+1,i*2+3,i*2+2) for i in range(3)],play_lime)
+_yard_tubes('Climber lime slide edges',[[(x,y,z+.04) for y,z in [(-.48,.48),(-.75,.38),(-1.10,.15),(-1.32,.12)]] for x in [-.3,.3]],.04,play_lime,8)
+
+asset('Low tan and lime play piece',(7.7,17.2,yard_z),24,'B0,16–19; H72–75','broad open tan molded frame and lime curved end visible; purpose uncertain; size and orientation estimated')
+for y in [-.43,.43]:
+    _yard_prism('Tan play frame lower rail',[(-.95,.10),(.85,.10),(.85,.25),(-.95,.25)],.14,play_tan,y)
+    _yard_prism('Tan play frame angled side',[(-.95,.10),(-.72,.13),(-.33,.84),(-.47,.98)],.14,play_tan,y)
+    _yard_prism('Tan play frame top rail',[(-.47,.80),(.85,.52),(.88,.70),(-.43,.98)],.14,play_tan,y)
+    _yard_prism('Tan play frame short end',[(.65,.12),(.86,.12),(.88,.70),(.70,.73)],.14,play_tan,y)
+box('Tan play frame cross support',(.3,0,.23),(.22,.86,.12),play_blue,.025)
+_yard_tubes('Lime molded curved play end',[[(-.96,y,.12),(-.90,y,.37),(-.67,y,.71),(-.46,y,.87)] for y in [-.42,0,.42]],.12,play_lime,8)
+
+asset('Rear swing frame',(16.5,25.0,yard_z),photos='B11–13',confidence='tubular A-frame and hanging swings visible beside shed; dimensions and seat count estimated')
+_yard_tubes('Swing galvanized A frame',[[ (x,-.90,.02),(x,0,2.0),(x,.9,.02)] for x in [-1.45,1.45]]+
+            [[(-1.45,0,2.0),(1.45,0,2.0)]],.036,steel,8)
+for x in [-.65,.65]:
+    _yard_tubes('Swing suspension chains',[[ (x+dx,0,1.98),(x+dx,-.08,.45)] for dx in [-.19,.19]],.009,steel,5)
+    box('Swing curved molded seat',(x,-.08,.44),(.46,.23,.06),play_orange,.06)
+molded_slide('Backyard toddler slide',(14.7,23.8,yard_z),-10,play_orange)
+
+asset('Rear patio table',(.05,10.5,yard_z),0,'H69; B0,18','rectangular table outside garage-side sunroom glazing; dimensions and placement estimated')
 box('Outdoor rectangular tabletop',(0,0,.75),(1.5,.85,.07),walnut)
 for x in [-.58,.58]:
     for y in [-.31,.31]:rod('Outdoor table leg',(x,y,0),(x,y,.73),.025,steel)
+
+asset('Small patio playhouse',(-.9,8.8,yard_z),0,'H69; B0,18','cream toy house with mint detail and blue roof next to garage-side patio; dimensions estimated')
+for x in [-.52,.52]:box('Toy house side wall',(x,0,.55),(.055,.82,1.1),cream,.018)
+for x in [-.39,.39]:box('Toy house front beside doorway',(x,-.41,.55),(.25,.06,1.1),cream,.015)
+box('Toy house front doorway header',(0,-.41,1.04),(.55,.06,.13),cream,.025)
+_yard_prism('Toy house front gable',[(-.55,1.08),(.55,1.08),(0,1.42)],.06,cream,-.41)
+for side in [-1,1]:
+    o=box('Toy house blue roof',(side*.29,0,1.27),(.69,1,.045),play_blue,.02);o.rotation_euler.y=side*.53
+door=box('Toy house mint half door',(0,-.45,.35),(.50,.05,.65),chair_blue,.075)
+
+
+def garden_chair(name,pos,angle):
+    asset(name,pos,angle,'H69–72; B5,18',confidence='pale blue Adirondack chairs visible on garage-side lawn; size and placement estimated')
+    for x in [-.31,.31]:
+        _yard_tubes('Garden chair slanted legs',[[ (x,-.29,0),(x,-.27,.50)],[(x,.41,0),(x,.15,.49)]],.035,chair_blue,6)
+        box('Garden chair broad arm',(x*1.12,0,.60),(.13,.69,.055),chair_blue,.026)
+    for i in range(5):box('Garden chair seat slat',(-.24+i*.12,-.03,.39),(.11,.49,.04),chair_blue,.012)
+    for i in range(6):
+        x=-.27+i*.108; h=.63-.10*(abs(x)/.27)**2
+        o=box('Garden chair rounded fan back',(x,.28,.51+h/2),(.10,.035,h),chair_blue,.035);o.rotation_euler.x=-.18
+garden_chair('Rear lawn pale blue chair one',(-3.5,15.3,yard_z),-20)
+garden_chair('Rear lawn pale blue chair two',(-1.4,16.0,yard_z),35)
+garden_chair('Trampoline nearby pale chair',(12.0,16.1,yard_z),-45)
+
+asset('Lawn firepit and masonry border',(2.3,16.0,yard_z),photos='B0,18–19; H72',confidence='low circular black firepit in small masonry surround visible; sizes estimated')
+for x in [-.65,.65]:
+    for y in [-.65,0,.65]:box('Firepit masonry side block',(x,y,.06),(.24,.58,.12),concrete,.01)
+for y in [-.65,.65]:box('Firepit masonry end block',(0,y,.06),(1.05,.24,.12),concrete,.01)
+cylinder('Firepit dark round bowl',(0,0,.22),.50,.25,black,40,top=.58)
+_yard_tubes('Firepit rolled rim',[[ (.58*math.cos(a),.58*math.sin(a),.35) for a in [i*math.tau/40 for i in range(41)]]],.025,black,6)
+_yard_tubes('Firepit mesh lid ribs',[[ (.52*math.cos(a)*math.cos(t),.52*math.sin(a)*math.cos(t),.36+.22*math.sin(t)) for t in [i*math.pi/16 for i in range(9)]] for a in [i*math.tau/12 for i in range(12)]],.007,black,4)
+_yard_tubes('Firepit lid handle',[[(-.07,0,.59),(-.07,0,.65),(.07,0,.65),(.07,0,.59)]],.013,black,6)
 
 asset('Rear sunroom steps',photos='1-5',confidence='small grade connection added for walkthrough; tread dimensions estimated')
 for i in range(4):
     box('Rear garden step',(4.65,11.55+i*.27,-.18-i*.18),(1.03,.30,.18),concrete)
 
-asset('Front walk continuation to drive',photos='V5',confidence='walk meets driveway; continuation length estimated')
-for i in range(31):
-    t=i/30
-    x,y=4.60-5.4*t,-7.34-1.15*math.sin(t*math.pi/2)
-    for j in range(5):
-        box('Drive approach paver',(x,y+(j-2)*.19,-.79),(.174,.184,.055),brick,.008)
-    for side in [-1,1]:
-        box('Drive approach edging',(x,y+side*.57,-.75),(.19,.20,.13),concrete,.01)
+# Front porch steps and their short curved drive connection are authored
+# together in extensions.py; do not retain the older long forward sweep.
