@@ -381,6 +381,9 @@ def area(name, pos, target, energy, size):
 collection('01 | Floors and split levels')
 asset('Main level floor', photos='6,7,8', confidence='inferred footprint')
 wallbox('Main subfloor', (3.9, 4, -.13), (7.8, 8, .24), walnut)
+# House Tour 24/39s: the entrance faces across the covered porch. Its short
+# enclosed return joins the existing foyer; 1.8 m depth is an estimate.
+wallbox('Entry return subfloor', (6.45, -.90, -.13), (2.7, 1.8, .24), walnut)
 # The paired flights leave the SIDE of the main rectangle (Photo 7).
 planks = [material('Oak floor board tone %02d' % i, (.35 + .024 * i, .18 + .014 * i, .07 + .008 * i),
                     .46, texture='wood') for i in range(8)]
@@ -394,6 +397,10 @@ for row in range(40):
         if x2 > x1:
             box('Individual oak floorboard', ((x1 + x2) / 2, y, .002),
                 (x2 - x1 - .003, .197, .015), random.choice(planks), .001)
+for row in range(9):
+    for col in range(3):
+        box('Entry return oak floorboard', (5.55+col*.90, -1.70+row*.20, .002),
+            (.897, .197, .015), random.choice(planks), .001)
 asset('Lower family room floor', (-.7, 0, 0), photos='9,10', confidence='inferred footprint')
 wallbox('Lower foundation', (1.0, -1.2, -1.2), (4.6, 5, .30), walnut)
 box('Family room fitted carpet', (1.0, -1.2, -1.042), (4.6, 5, .024), carpet, .002)
@@ -410,6 +417,7 @@ wallbox('Living room mirror wall', (-.07, 2.22, 1.3), (.14, 4.44, 2.6))
 wallbox('Kitchen sink wall', (-.07, 6.25, 1.3), (.14, 3.62, 2.6))
 wallbox('Dining storage wall', (7.87, 6.30, 1.3), (.14, 3.4, 2.6), cream)
 wallbox('Foyer side wall', (7.87, .96, 1.3), (.14, 1.92, 2.6), cream)
+wallbox('Entry return east wall', (7.87, -.90, 1.3), (.14, 1.80, 2.6), cream)
 # Rear access is through dining. The house window left of it is visible in Photo 1.
 wallbox('Rear wall window base', (2.32, 8.04, .32), (4.64, .14, .64), cream)
 wallbox('Rear wall window header', (2.32, 8.04, 2.43), (4.64, .14, .34), cream)
@@ -431,18 +439,21 @@ wallbox('Front wall below windows', (2.55, -.06, .30), (5.10, .14, .60))
 wallbox('Front wall above windows', (2.55, -.06, 2.43), (5.10, .14, .34))
 for x, width in [(.35, .70), (2.175, .15), (4.375, 1.45)]:
     wallbox('Front window pier', (x, -.06, 1.43), (width, .14, 1.66))
-wallbox('Entry door header', (5.60, -.06, 2.39), (1.0, .14, .42))
-wallbox('Entry sidelight base', (6.95, -.06, .31), (1.7, .14, .62))
-wallbox('Entry sidelight header', (6.95, -.06, 2.4), (1.7, .14, .4))
-wallbox('Entry sidelight left pier', (6.19, -.06, 1.4), (.18, .14, 1.58))
-wallbox('Entry sidelight right pier', (7.40, -.06, 1.4), (.80, .14, 1.58))
+wallbox('Entry return door header', (5.10, -.90, 2.39), (.14, 1.0, .42))
+for y in [-1.60, -.20]:
+    wallbox('Entry return door pier', (5.10, y, 1.3), (.14, .40, 2.6))
+wallbox('Entry window base', (6.45, -1.86, .645), (2.7, .14, 1.29))
+wallbox('Entry window header', (6.45, -1.86, 2.305), (2.7, .14, .59))
+wallbox('Entry window left pier', (5.69, -1.86, 1.65), (1.18, .14, .72))
+wallbox('Entry window right pier', (7.40, -1.86, 1.65), (.80, .14, .72))
 
 collection('04 | Windows and front door')
 window('Front living left window', (1.40, -.045, 1.43), 1.40, 1.62, 180)
 window('Front living right window', (2.95, -.045, 1.43), 1.40, 1.62, 180)
-window('Entry side window', (6.64, -.045, 1.4), .72, 1.58, 180)
+window('Entry side window', (6.64, -1.845, 1.65), .72, .72, 180)
 window('House rear window visible from sunroom', (1.695, 8.17, 1.44), 1.95, 1.60, 180)
-asset('Red three-panel front door', (5.60, -.03, 0), 180, '7')
+asset('Red three-panel front door', (5.10, -.90, 0), 90, '7; House Tour 24.003/39.005s',
+      'perpendicular return confirmed in video; dimensions estimated')
 box('Red door slab', (0, 0, 1.065), (.98, .07, 2.13), red)
 for z in [.40, 1.04, 1.68]:
     panel('Red raised panel', 0, -.05, z, .76, .49, red)
@@ -450,8 +461,8 @@ for z in [.40, 1.04, 1.68]:
     for i in range(8):
         a = i * math.tau / 8
         sphere('Door rosette petal', (.038 * math.cos(a), -.084, z + .038 * math.sin(a)), (.018, .008, .027), red)
-sphere('Brass entry knob', (.37, -.10, 1.0), (.035, .035, .035), brass)
-cylinder('Deadbolt', (.37, -.09, 1.16), .032, .025, brass).rotation_euler.x = math.pi / 2
+sphere('Brass entry knob', (-.37, -.10, 1.0), (.035, .035, .035), brass)
+cylinder('Deadbolt', (-.37, -.09, 1.16), .032, .025, brass).rotation_euler.x = math.pi / 2
 for x in [-.54, .54]:
     box('Front door white casing', (x, -.01, 1.1), (.07, .10, 2.2), white)
 box('Front door white header', (0, -.01, 2.18), (1.14, .10, .07), white)
@@ -704,13 +715,20 @@ for x in [-.66, .66]:
 for y in [-.4, .4]:
     box('Raised tray end', (0, y, .55), (1.34, .028, .14), white)
 table('Small light wood side table', (3.60, .50, .018), (.61, .59, .55), pine, photos='7,8')
-table('Television stand', (.34, .58, .018), (.85, .46, .59), walnut, 90, '8')
-asset('Small living room television', (.33, .58, .018), 90, '8')
-box('Television base', (0, 0, .62), (.3, .20, .025), black)
-rod('Television pedestal', (0, .02, .62), (0, .02, .78), .025, black)
-box('Television frame', (0, .02, .91), (.75, .065, .44), black)
-box('Television screen', (0, -.018, .91), (.71, .01, .39), screen)
-lamp('Living table lamp', (.25, .91, .61), .61, photos='8')
+table('Living computer desk', (.34, .66, .018), (.85, .56, .74), walnut, 90, 'House Tour 51.008s')
+asset('Living computer monitor', (.33, .66, .018), 90, 'House Tour 51.008s')
+box('Monitor base', (0, 0, .78), (.26, .18, .025), black)
+rod('Monitor pedestal', (0, .02, .78), (0, .02, .92), .020, black)
+box('Monitor frame', (0, .02, 1.05), (.61, .055, .37), black)
+box('Monitor screen', (0, -.013, 1.05), (.57, .008, .33), screen)
+box('Compact keyboard', (0, -.17, .774), (.40, .13, .02), black)
+asset('Living computer chair', (1.02,.65,.018), -90, 'House Tour 51.008s')
+box('Computer chair white seat',(0,0,.46),(.44,.44,.045),white,.035)
+for x in [-.20,.20]:
+    rod('Computer chair front leg',(x,-.18,.02),(x,-.18,.45),.013,white)
+    rod('Computer chair rear frame',(x,.18,.02),(x,.18,.89),.013,white)
+for z in [.64,.76,.88]:rod('Computer chair back rail',(-.2,.18,z),(.2,.18,z),.014,white)
+lamp('Living table lamp', (.25, 1.04, .76), .61, photos='House Tour 51.008s')
 lamp('Brass living floor lamp', (3.58, 3.10, .018), 1.69, photos='7,8')
 asset('Large framed living room mirror', (.065, 2.55, 1.78), 90, '8')
 frame('Dark beveled mirror frame', (0, 0, 0), 1.44, .93, walnut)
@@ -730,6 +748,24 @@ for x in [-.58, .58]:
 for x in [-.07, 0, .07]:
     box('Brass pedal', (x, -.31, .10), (.036, .14, .028), brass)
 table('Piano bench', (2.15, 3.62, .018), (.80, .34, .50), walnut, 0, '8')
+# This provisional piano supplies the lower-room furniture copy below. The
+# video resolves the living-room pieces as a cupboard and a separate TV unit.
+asset('Tall living two-door wood cupboard', (.34,3.96,.018),90,'House Tour 51.008s',
+      'two doors and position on mirror wall observed; dimensions estimated')
+box('Cupboard carcass',(0,0,.99),(.82,.58,1.98),walnut)
+box('Cupboard crown',(0,0,2.02),(.88,.63,.065),oak)
+for x in [-.205,.205]:
+    panel('Cupboard raised door',x,-.31,1.03,.397,1.77,oak)
+    sphere('Cupboard brass handle',(x*.20,-.365,1.02),(.019,.018,.025),brass)
+chest('Living television media cabinet',(2.25,4.08,.018),1.72,.64,0,2,3,'House Tour 54.010s')
+asset('Living large television',(2.25,4.08,.018),0,'House Tour 54.010s')
+box('Large TV bezel',(0,0,1.12),(1.47,.075,.85),black,.018)
+box('Large TV dark screen',(0,-.043,1.12),(1.42,.009,.80),screen,.01)
+for x in [-.50,.50]:rod('TV angled foot',(x,0,.75),(x+.09,-.15,.65),.013,black)
+asset('Living dollhouse shelf',(.93,4.03,.018),0,'House Tour 54.010s')
+for x in [-.37,.37]:box('Dollhouse side',(x,0,.55),(.035,.40,1.10),white)
+for z in [.05,.42,.78,1.11]:box('Dollhouse shelf',(0,0,z),(.77,.42,.03),white)
+box('Dollhouse back',(0,.20,.58),(.76,.025,1.13),cream)
 
 # Permanent baby furniture is retained; loose toys, clothing, food and people
 # are deliberately absent from this clean architectural study.
@@ -1027,7 +1063,7 @@ camera('nursery',(12.57,3.26,2.91),(13.05,1.12,2.07),18)
 camera('bedroom',(15.64,4.01,2.92),(17.80,3.84,2.0),19)
 camera('primary',(14.90,4.72,2.92),(13.83,7.46,2.11),18)
 camera('ensuite',(12.50,8.03,2.80),(9.95,7.72,2.05),18)
-camera('porch',(5.57,-.12,1.65),(5.00,-2.70,.10),19)
+camera('porch',(4.78,-.72,1.65),(.52,-1.00,.80),24)
 camera('lower_bedroom',(12.42,5.70,.57),(15.40,7.15,-.36),18)
 camera('lower_bathroom',(11.42,6.38,.56),(11.40,8.09,-.30),17)
 camera('garage',(-.64,7.54,1.67),(-3.65,3.40,.75),18)
@@ -1165,7 +1201,7 @@ bpy.context.view_layer.update()  # Resolve transforms before hiding room collect
 set_view('overview')
 scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
-scene['source_photos'] = 'Four user sets: original 1-10; upstairs U1-U10; additional V1-V10; basement/garage W1-W10. Private references not packed or committed.'
+scene['source_photos'] = 'Four private photo sets (1-10, U1-U10, V1-V10, W1-W10) and two private narrated walkthroughs (House Tour, Backyard tour). Timestamped visual observations; dimensions remain estimates. References not packed or committed.'
 scene['content_policy'] = 'Furniture retained; loose clutter, people, readable personal items omitted.'
 source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','exterior.py','photoreal.py']
 scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()

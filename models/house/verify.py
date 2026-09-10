@@ -23,7 +23,8 @@ assert not bpy.data.libraries, 'Unexpected linked library'
 assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'
 required = ['Wooden indoor climbing gym', 'Wicker sunroom loveseat', 'French-door refrigerator',
             'Double basin sink and gooseneck faucet', 'Dark wood dining table',
-            'Main oatmeal three-seat sofa', 'Upright wood piano',
+            'Main oatmeal three-seat sofa', 'Tall living two-door wood cupboard', 'Living large television',
+            'Living computer desk', 'Lower room upright piano', 'Cory headboard closet enclosure',
             'Parallel split-level stair bay', 'Fireplace with white surround and wood mantel',
             'White slatted nursery crib', 'Wood nursery rocking chair', 'Primary double bed',
             'End bedroom single bed', 'Green tile bathtub', 'White bathroom vanity',
@@ -133,7 +134,10 @@ assert position('Lower blue sofa').y < position('Fireplace with white surround a
 assert position('Main oatmeal three-seat sofa').x < 1
 assert position('Large framed living room mirror').x < .15, 'Mirror belongs on outside wall perpendicular to front windows'
 assert position('Child-sized blue sofa').y < 1
-assert position('Upright wood piano').y > 3.7, 'Piano belongs at the kitchen partition'
+assert position('Living large television').y > 3.7, 'Video: TV belongs at the kitchen partition'
+assert position('Tall living two-door wood cupboard').x < .7, 'Video: cupboard belongs on mirror wall'
+assert position('Red three-panel front door').y < -.5, 'Video: entrance is on the porch return'
+assert (bpy.data.objects['Red three-panel front door'].matrix_world.to_3x3() @ Vector((0,-1,0))).x > .99
 fridge, stove = position('French-door refrigerator'), position('Stainless range and oven')
 sink, dishwasher = position('Double basin sink and gooseneck faucet'), position('Stainless dishwasher')
 assert abs(fridge.y - stove.y) < .15 and 4.4 < fridge.y < 5.2
@@ -150,9 +154,9 @@ def screen_x(camera_name, object_name):
 assert screen_x('entry', 'Multi-drawer dining storage cabinet') < screen_x('entry', 'Red three-panel front door')
 assert screen_x('entry', 'Red three-panel front door') < screen_x('entry', 'Main oatmeal three-seat sofa')
 assert screen_x('entry', 'Red three-panel front door') < screen_x('entry', 'French-door refrigerator')
-# Photo 8: windows left, main sofa/mirror ahead, piano toward the right.
+# House Tour 51/54s: windows left, sofa/mirror ahead, cupboard toward right.
 assert screen_x('living', 'Front living left window') < screen_x('living', 'Large framed living room mirror')
-assert screen_x('living', 'Large framed living room mirror') < screen_x('living', 'Upright wood piano')
+assert screen_x('living', 'Large framed living room mirror') < screen_x('living', 'Tall living two-door wood cupboard')
 
 # Homeowner: hallway goes straight from the upper flight, bathroom immediately left.
 hall = position('Upstairs oak hallway')
@@ -215,7 +219,8 @@ def head_direction(name):
 assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
 assert head_direction('End bedroom single bed').x < -.99, 'U7: long mattress edge follows right wall; free end faces ottoman'
 cory_bed=position('End bedroom single bed')
-assert abs(cory_bed.y-(4.01-2.15)) < .65, 'U7: bed must stay beside right window wall'
+assert abs(cory_bed.y-position('End bedroom side window').y) < .65, 'U7/video: bed stays beside front window wall'
+assert abs(position('End bedroom side window').y-position('Nursery window').y) < .03, 'House Tour 3s: upstairs front windows share one facade'
 assert position('End bedroom corner ottoman').x > cory_bed.x+1.1, 'U7: ottoman is beyond the foot of the bed'
 assert position('Tall narrow dark bookcase').y < position('Wall mounted climbing handles').y < position('End bedroom trellis window').y, 'U7: climbing handles belong between curtain and bookcase'
 for name in ['Front porch wood rocking chair','Front porch white rocking chair']:

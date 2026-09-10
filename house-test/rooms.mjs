@@ -21,7 +21,7 @@ export const rooms=[
   ['Basement','Basement playroom',4.8,3.55,-3.15,Math.PI],
   ['Basement',"Mom & Dad's office",4.7,6.0,-3.15,0],
   ['Basement','Laundry',6.3,6.6,-3.15,0],
-  ['Outside','Front porch',6.6,-2.0,-.06,Math.PI],
+  ['Outside','Front porch',4.2,-.9,-.06,Math.PI/2],
   ['Outside','Front yard',6.5,-5.9,-.82,Math.PI],
   ['Outside','Back yard',5.1,13.5,-.82,0],
   ...neighborhoodRooms,

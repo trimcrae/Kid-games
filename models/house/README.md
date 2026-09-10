@@ -1,12 +1,14 @@
-# House model — photo study, including basement and garage
+# House model — photograph and walkthrough study
 
-The [orientation audit](ORIENTATION.md) records the comparison of all 40 photos,
+The [orientation audit](ORIENTATION.md) records the photo and video comparisons,
 the corrections, and the relationships that remain estimated.
 
 For narrated video references, use the [private walkthrough evidence workbench](../../tools/house-evidence/README.md).
 It tracks timestamped observations, narration, room coverage, unresolved questions
-and model targets before changes are made. Original recordings stay outside this
-repository; creating the review framework does not confirm any additional geometry.
+and model targets. Original recordings and extracted frames remain private and
+excluded from Git. The September 10 video pass corrects the porch return,
+garage openings, common upstairs front gable, living furnishings, Cory's nook,
+office window/workstations, and observed yard features. Dimensions remain estimates.
 
 A separate [third-person walkthrough test](../../house-test/) uses this model.
 It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).

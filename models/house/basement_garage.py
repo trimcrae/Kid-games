@@ -39,11 +39,12 @@ box('Basement concrete floor',(3.9,4,-.07),(7.8,8,.14),concrete_new)
 box('Basement clean resilient floor',(3.90,3.94,.018),(7.62,7.75,.025),pine)
 partition('Basement playroom window wall',(0,0),(7.8,0),blockmat,
           [( .38,1.88,2.01,2.35)],height=2.55)
-for a,b in [((0,0),(0,8)),((0,8),(7.8,8))]:
-    partition('White basement foundation wall',a,b,blockmat,height=2.55)
+partition('White basement foundation wall',(0,0),(0,8),blockmat,height=2.55)
+partition('Basement rear window wall',(0,8),(7.8,8),blockmat,[(2.0,3.20,1.92,2.52)],height=2.55)
 partition('Basement east foundation',(7.8,0),(7.8,8),blockmat,[(3.42,4.60,0,2.55)],height=2.55)
 for z in [.22+i*.21 for i in range(11)]:
-    box('Foundation horizontal mortar seam',(3.9,7.929,z),(7.75,.006,.009),grout,0)
+    for xa,xb in ([(.025,2.0),(3.2,7.775)] if 1.92<z<2.52 else [(.025,7.775)]):
+        box('Foundation horizontal mortar seam',((xa+xb)/2,7.929,z),(xb-xa,.006,.009),grout,0)
     if not 2.01 < z < 2.35:
         box('Foundation front mortar seam',(3.9,.071,z),(7.75,.006,.009),grout,0)
     else:
@@ -52,7 +53,8 @@ for z in [.22+i*.21 for i in range(11)]:
 for row in range(11):
     for col in range(19):
         x=.22+col*.40+(row%2)*.20
-        if x<7.7:box('Foundation vertical mortar seam',(x,7.926,.115+row*.21),(.009,.006,.19),grout,0)
+        if x<7.7 and not (2.0<x<3.2 and row>=9):
+            box('Foundation vertical mortar seam',(x,7.926,.115+row*.21),(.009,.006,.19),grout,0)
 # W5 clearly shows a high horizontal window above the dollhouse. Its
 # relationship to that furniture is observed; this zone's global rotation
 # and reverse-view furniture layout remain provisional (see ORIENTATION.md).
@@ -60,6 +62,23 @@ window('Basement playroom high window',(1.13,.01,BASEMENT_Z+2.18),1.50,.34,180,F
 ROOT['reference_photos'] = 'W5'
 ROOT['confidence'] = 'high window above dollhouse observed; size and global placement estimated'
 ASSETS[-1]['photos'] = 'W5'
+asset('Basement office glass-block window',(2.6,8.0,BASEMENT_Z),0,'House Tour 234.020s',
+      'four by two glass modules with center hopper observed; position and exterior grade estimated')
+for x in [-.65,.65]:box('Deep masonry window reveal',(x,0,2.22),(.10,.40,.70),white)
+for z in [1.87,2.57]:box('Deep masonry window sill',(0,0,z),(1.40,.40,.10),white)
+for row in range(2):
+    for col in range(4):
+        if row==1 and col in [1,2]:continue
+        x,z=-.45+col*.30,2.07+row*.30
+        box('Glass block mortar surround',(x,0,z),(.30,.11,.30),white,.012)
+        box('Rippled glass block',(x,-.065,z),(.276,.028,.276),glass,.016)
+        # Tiny undulations catch reflections without an external texture.
+        for k in range(3):
+            curve('Glass block ripple',[(x-.125+j*.025,-.082+.004*math.sin(j*1.7+k),z-.07+k*.07) for j in range(11)],.0025,glass)
+for x in [-.30,.30]:box('Hopper vent upright',(x,-.06,2.37),(.035,.055,.30),white)
+for z in [2.22,2.52]:box('Hopper vent rail',(0,-.06,z),(.63,.055,.035),white)
+box('Hopper vent glass',(0,-.064,2.37),(.56,.012,.25),glass,.006)
+box('Hopper vent latch',(0,-.105,2.48),(.07,.025,.024),black)
 asset('Basement fabric room divider',(0,0,BASEMENT_Z),photos='W4,W5,W8')
 for xa,xb,ya,yb in [(.15,.85,7.05,7.05)]:
     rod('Screen suspension line',(xa,ya,2.32),(xb,yb,2.32),.01,black)
@@ -142,19 +161,24 @@ for x in [-.30,.30]:
     rod('Saucer chair crossed stand',(x,.27,.02),(x,-.22,.64),.016,steel)
 
 new_collection('33 | Basement office laundry and mechanical')
-shelf_unit('Basement metal storage shelving',(.50,6.02,BASEMENT_Z),1.65,1.98,black,90,'W6')
+shelf_unit('Basement metal storage shelving',(.50,5.70,BASEMENT_Z),1.65,1.98,black,90,'W6')
 for z in [.20,.67,1.14]:
     for x in [-.52,0,.52]:box('Neatly stored closed bin',(x,0,z),(.46,.32,.27),bluegrey,.02)
 chest('Basement white storage cabinet',(1.18,5.02,BASEMENT_Z),1.15,1.55,0,2,2,'W6')
 # W8 shows the monitors continuing along the same wall, left of the dryer.
-table('Basement wood computer desk',(3.80,7.43,BASEMENT_Z),(1.75,.67,.75),walnut,0,'W6,W8')
-asset('Basement dual monitors',(3.80,7.43,BASEMENT_Z),0,'W6,W8')
-for x in [-.40,.40]:
+table('Basement wood computer desk',(3.30,7.43,BASEMENT_Z),(2.70,.75,.75),walnut,0,'W6,W8; House Tour 228/231s')
+asset('Basement dual monitors',(3.80,7.43,BASEMENT_Z),0,'W6,W8; House Tour 228/231s',
+      'one external monitor plus laptop in video; legacy asset identifier retained')
+for x in [.30]:
     box('Computer monitor base',(x,0,.79),(.26,.19,.025),black)
     rod('Computer monitor stand',(x,.04,.78),(x,.04,1.0),.025,black)
     box('Computer monitor',(x,.04,1.16),(.69,.055,.43),black,.013)
     box('Computer blank display',(x,.006,1.16),(.65,.009,.39),screen,.004)
-box('Computer keyboard',(0,-.23,.79),(.45,.15,.018),black)
+box('Computer keyboard',(.30,-.23,.79),(.45,.15,.018),black)
+box('Open laptop keyboard',(-.45,-.16,.785),(.40,.28,.018),steel,.008)
+o=box('Open laptop display',(-.45,-.01,.93),(.40,.025,.27),black,.01)
+o.rotation_euler.x=math.radians(-12)
+box('Laptop dark display',(-.45,-.027,.93),(.37,.008,.23),screen,.004).rotation_euler.x=math.radians(-12)
 asset('Basement black office chair',(3.90,6.38,BASEMENT_Z),180,'W6,W8')
 rod('Office chair gas lift',(0,0,.10),(0,0,.47),.048,steel)
 for i in range(5):
@@ -166,15 +190,14 @@ box('Black office chair back',(0,.25,.86),(.57,.14,.68),black,.09)
 for x in [-.34,.34]:
     rod('Office chair arm upright',(x,.1,.49),(x,.1,.73),.021,black)
     box('Office chair arm pad',(x,-.02,.75),(.075,.39,.065),black,.025)
-table('Basement second workstation',(2.25,7.43,BASEMENT_Z),(.95,.53,.73),pine,0,'W6')
+table('Basement second workstation',(.43,7.20,BASEMENT_Z),(1.20,.65,.73),pine,90,'House Tour 228/231s')
 box('Second workstation screen',(0,.10,1.01),(.53,.065,.32),black)
-asset('Basement second office chair',(2.25,6.45,BASEMENT_Z),180,'Homeowner: Mom and Dad both work here')
-rod('Second office chair lift',(0,0,.08),(0,0,.48),.045,steel)
-box('Second office chair seat',(0,0,.51),(.55,.55,.12),black,.07)
-box('Second office chair back',(0,.23,.83),(.53,.13,.59),black,.07)
-for i in range(5):
-    a=i*math.tau/5
-    rod('Second chair star foot',(0,0,.1),(.30*math.cos(a),.30*math.sin(a),.07),.023,black)
+asset('Basement second office chair',(1.30,7.20,BASEMENT_Z),-90,'House Tour 228/231s')
+box('Second office chair seat',(0,0,.46),(.46,.45,.045),white,.035)
+for x in [-.21,.21]:
+    rod('White metal chair front leg',(x,-.19,.02),(x,-.19,.45),.013,white)
+    rod('White metal chair rear frame',(x,.19,.02),(x,.19,.91),.013,white)
+for z in [.64,.76,.88]:rod('White metal chair back rail',(-.21,.19,z),(.21,.19,z),.014,white)
 for x,y in [(1.50,7.44),(2.93,7.70)]:
     asset('Basement potted plant',(x,y,BASEMENT_Z),photos='W6')
     cylinder('Plant pot',(0,0,.15),.15,.30,black,24,top=.19)
@@ -230,13 +253,24 @@ rod('Furnace duct branch',(5.3,5.66,2.23),(7.30,5.66,2.23),.15,steel)
 # be adjusted independently; W3 fixes adjacency, not a measured footprint.
 new_collection('35 | Garage shell and doors')
 asset('Two bay garage shell',photos='W1-W3',confidence='two vehicles observed; footprint and door offsets estimated')
-box('Garage concrete slab',(-3.5,4.6,-.24),(6.8,7,.16),concrete_new)
-partition('Garage west wall',(-6.9,1.1),(-6.9,8.1),blockmat,[(4.7,5.65,0,2.07)],height=2.68)
-partition('Garage rear wall',(-6.9,8.1),(-.1,8.1),blockmat,height=2.68)
-partition('Garage front opening',(-6.9,1.1),(-.1,1.1),joistmat,[(.42,6.4,0,2.25)],height=2.68)
-partition('Garage house side',(-.10,1.1),(-.10,8.1),blockmat,[(6.06,6.86,0,2.10)],height=2.68)
-framed_opening('Garage overhead vehicle opening',(-3.49,1.10,-.16),5.98,2.42,0,'W1')
-framed_opening('Garage glazed side door',(-6.9,6.275,-.16),.95,2.23,90,'W2,W3')
+box('Garage concrete slab',(-3.5,3.15,-.24),(6.8,9.9,.16),concrete_new)
+partition('Garage west wall',(-6.9,-1.8),(-6.9,8.1),blockmat,height=2.68)
+# House Tour 30/33s and Backyard tour 18s agree on these rear openings.
+# The sectional is one-car wide; the glazed pedestrian door is beside it.
+partition('Garage rear wall',(-6.9,8.1),(-.1,8.1),blockmat,
+          [(0.50,3.30,0,2.10),(3.65,4.60,0,2.07),(5.10,6.10,.80,1.80)],height=2.68)
+partition('Garage front opening',(-6.9,-1.8),(-.1,-1.8),joistmat,[(.42,6.4,0,2.25)],height=2.68)
+partition('Garage house side',(-.10,-1.8),(-.10,8.1),blockmat,[(8.96,9.76,0,2.10)],height=2.68)
+framed_opening('Garage overhead vehicle opening',(-3.49,-1.80,-.16),5.98,2.42,0,'W1; House Tour 24s')
+framed_opening('Garage rear sectional opening',(-5.00,8.1,-.16),2.80,2.26,180,'House Tour 30/33s; Backyard tour 18s')
+for i in range(5):
+    z=.226+i*.452
+    box('Rear sectional white panel',(0,0,z),(2.70,.045,.438),white,.01)
+    # A vertical stack of small dark glazed insets near one edge.
+    box('Rear sectional inset frame',(-.92,.028,z),(.35,.016,.27),black,.02)
+    box('Rear sectional inset glass',(-.92,.04,z),(.30,.008,.22),glass,.01)
+window('Garage rear window',(-1.30,8.11,1.30),1.00,1.00,180,False,False)
+framed_opening('Garage glazed side door',(-2.775,8.1,-.16),.95,2.23,180,'W2,W3; House Tour 33s',)
 box('Side door lower panel',(0,0,.41),(.85,.045,.76),white)
 for x in [-.41,.41]:box('Side door glazed frame',(x,0,1.43),(.06,.045,1.29),white)
 for z in [.82,2.05]:box('Side door glazed crossrail',(0,0,z),(.88,.045,.055),white)
@@ -272,7 +306,7 @@ def vehicle(name,pos,width,length,paint):
 vehicle('Garage black SUV',(-2.10,4.27,-.16),1.83,4.43,carblack)
 vehicle('Garage burgundy SUV',(-4.62,4.05,-.16),1.78,4.34,burgundy)
 shelf_unit('Garage tall white storage',(-.40,3.05,-.16),1.80,2.08,white,-90,'W1')
-shelf_unit('Garage rear storage rack',(-3.45,7.82,-.16),1.88,1.94,oak,0,'W1')
+shelf_unit('Garage rear storage rack',(-6.57,5.33,-.16),1.88,1.94,oak,90,'W1; moved clear of video-confirmed rear door')
 asset('Garage wall hung bicycle',(-6.78,6.85,.06),90,'W2,W3')
 for z in [.73,1.69]:
     curve('Bicycle tire',[(.30*math.cos(t),-.20,z+.30*math.sin(t)) for t in [i*math.tau/40 for i in range(41)]],.025,black,True)
@@ -284,13 +318,16 @@ for a,b in [((0,.73),(.26,1.2)),((.26,1.2),(0,1.69)),((0,1.69),(-.17,1.14)),((-.
 
 garage_ceiling=new_collection('37 | Garage exposed roof and door tracks')
 asset('Garage exposed rafters',photos='W1,W2')
-for y in [1.2+i*.43 for i in range(17)]:box('Garage exposed joist',(-3.5,y,2.59),(6.8,.055,.20),joistmat,.003)
-box('Garage roof underside',(-3.5,4.6,2.72),(6.9,7.1,.06),pine)
+for y in [-1.7+i*.43 for i in range(23)]:box('Garage exposed joist',(-3.5,y,2.59),(6.8,.055,.20),joistmat,.003)
+box('Garage roof underside',(-3.5,3.15,2.65),(6.9,10.0,.06),pine)
 asset('Raised sectional garage door and tracks',photos='W1,W2')
 for x in [-6.40,-.57]:
-    curve('Garage overhead track',[(x,1.13,.15),(x,1.13,2.07),(x,1.22,2.28),(x,1.43,2.41),(x,3.68,2.41)],.022,steel)
-for i in range(5):box('Raised white garage door panel',(-3.49,1.38+i*.43,2.39),(5.79,.424,.055),white)
-rod('Garage torsion shaft',(-6.5,1.30,2.42),(-.48,1.30,2.42),.025,steel)
+    curve('Garage overhead track',[(x,-1.77,.15),(x,-1.77,2.07),(x,-1.68,2.28),(x,-1.47,2.41),(x,.78,2.41)],.022,steel)
+for i in range(5):box('Raised white garage door panel',(-3.49,-1.52+i*.43,2.39),(5.79,.424,.055),white)
+rod('Garage torsion shaft',(-6.5,-1.60,2.42),(-.48,-1.60,2.42),.025,steel)
+asset('Garage rear sectional tracks',photos='House Tour 30/33s')
+for x in [-6.35,-3.65]:
+    curve('Rear garage overhead track',[(x,8.03,.05),(x,8.03,1.95),(x,7.94,2.16),(x,7.73,2.29),(x,5.65,2.29)],.019,steel)
 
 # Useful room lights remain separately switchable with their architecture.
 new_collection('38 | Basement and garage lighting')

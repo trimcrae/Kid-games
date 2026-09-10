@@ -358,8 +358,12 @@ def siding(mat, color, course=.20):
     return mat
 
 
-def shake_cladding(mat, light, dark):
-    """Weathered cedar shakes: staggered dark courses with mottled grey-brown."""
+def panel_cladding(mat, light, dark):
+    """Video-observed dark rectangular panels with pale, aligned seams.
+
+    Construction material is unknown; preserve the visible finish without
+    asserting that these are cedar shakes. Panel dimensions are estimates.
+    """
     nt, bsdf, _ = _principled(mat)
     geo = nt.nodes.new('ShaderNodeNewGeometry')
     sep = nt.nodes.new('ShaderNodeSeparateXYZ')
@@ -372,31 +376,31 @@ def shake_cladding(mat, light, dark):
     nt.links.new(along.outputs[0], comb.inputs['X'])
     nt.links.new(sep.outputs['Z'], comb.inputs['Y'])
     brick = nt.nodes.new('ShaderNodeTexBrick')
-    brick.offset = .5
+    brick.offset = 0
     brick.inputs['Scale'].default_value = 1
-    brick.inputs['Mortar Size'].default_value = .006
+    brick.inputs['Mortar Size'].default_value = .010
     brick.inputs['Mortar Smooth'].default_value = .2
-    brick.inputs['Brick Width'].default_value = .16
-    brick.inputs['Row Height'].default_value = .24
+    brick.inputs['Brick Width'].default_value = 1.20
+    brick.inputs['Row Height'].default_value = .60
     brick.inputs['Bias'].default_value = 0
     nt.links.new(comb.outputs[0], brick.inputs['Vector'])
     mottle = _noise(nt, _world_vector(nt, (1, 1, 1)), 6, 4, .6)
     brick.inputs['Color1'].default_value = _lin(*dark)
     brick.inputs['Color2'].default_value = _lin(*light)
-    brick.inputs['Mortar'].default_value = _lin(*_scaled(dark, .5))
+    brick.inputs['Mortar'].default_value = _lin(.48, .44, .36)
     mixer = nt.nodes.new('ShaderNodeMix')
     mixer.data_type = 'RGBA'
     nt.links.new(mottle, mixer.inputs['Factor'])
     nt.links.new(brick.outputs['Color'], mixer.inputs[6])
     nt.links.new(_ramp(nt, _noise(nt, _world_vector(nt, (1, 1, 1)), 1.2, 3, .5), _scaled(dark, .8), _scaled(light, 1.1), .3, .7), mixer.inputs[7])
-    nt.links.new(mixer.outputs[2], bsdf.inputs['Base Color'])
+    nt.links.new(brick.outputs['Color'], bsdf.inputs['Base Color'])
     bsdf.inputs['Roughness'].default_value = .85
     bsdf.inputs['Specular IOR Level'].default_value = .25
-    grain = _noise(nt, _world_vector(nt, (1, 1, 30)), 3, 3, .5)
+    grain = _noise(nt, _world_vector(nt, (1, 1, 1)), 90, 2, .5)
     both = nt.nodes.new('ShaderNodeMath')
     both.operation = 'MULTIPLY_ADD'
     nt.links.new(grain, both.inputs[0])
-    both.inputs[1].default_value = .3
+    both.inputs[1].default_value = .08
     nt.links.new(brick.outputs['Fac'], both.inputs[2])
     _bump(nt, bsdf, both.outputs[0], .5, .004)
     mat.diffuse_color = _lin(*[(a + b) / 2 for a, b in zip(light, dark)])
@@ -494,7 +498,7 @@ for i in range(4):
     foliage(_mat('Garden foliage %d' % i), [(.13, .25, .065), (.21, .34, .10), (.29, .37, .12), (.10, .20, .055)][i])
 siding(_mat('Pale blue-grey vinyl lap siding'), (.33, .40, .45))
 siding(_mat('Warm tan vinyl lap siding'), (.46, .39, .28))
-shake_cladding(_mat('Weathered dark cedar shakes'), (.16, .12, .09), (.045, .032, .024))
+panel_cladding(_mat('Weathered dark exterior panels'), (.08, .075, .065), (.065, .06, .052))
 shingle_roof(_mat('Brown asphalt roof shingles'), (.16, .105, .07))
 paint(_mat('Driveway charcoal asphalt'), (.11, .12, .13), .95, .4)
 

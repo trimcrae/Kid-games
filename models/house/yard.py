@@ -40,6 +40,7 @@ drive_mesh.from_pydata([(-6.75,-4.8,yard_z+.025),(-.25,-4.8,yard_z+.025),
                        (-.25,-1.8,-.16),(-6.75,-1.8,-.16)],[],[(0,1,2,3)])
 drive_apron=finish(bpy.data.objects.new('Asphalt apron graded to garage threshold',drive_mesh),'Asphalt apron graded to garage threshold',asphalt)
 drive_apron['confidence']='H21–33: continuous drive-to-slab connection observed; grading length and slope estimated'
+drive_apron['browser_walk_ramp']='y'
 box('Street at edge of study',(5.4,-17.6,yard_z-.01),(34,3,.08),asphalt)
 asset('Back and side lawns',photos='1-5',confidence='lawn visible through sunroom; extent estimated')
 box('Rear lawn',(6,20,yard_z-.10),(30,16,.20),lawn)
