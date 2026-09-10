@@ -9,6 +9,16 @@ import re
 import math
 
 
+def oriented_triangle_corners(vertices, loops, mirrored=False):
+    """Keep transformed face winding aligned with inverse-transpose normals.
+
+    Vertex and split-normal loop indices must travel together. Use the same
+    order for the visible mesh and AO occluder faces after a reflected transform.
+    """
+    corners = list(zip(vertices, loops))
+    return corners[::-1] if mirrored else corners
+
+
 def finish_for_name(name):
     n = name.lower()
     finish = dict(surface='plain', roughness=.7, metalness=0.0, clearcoat=0.0,

@@ -1,10 +1,26 @@
 """Finish/export contracts; no Blender runtime or private reference required."""
 import unittest
 from types import SimpleNamespace
-from browser_materials import finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders
+from browser_materials import finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders, oriented_triangle_corners
 
 
 class BrowserMaterials(unittest.TestCase):
+    def test_reflected_faces_keep_outward_winding_and_split_normal_binding(self):
+        # Nonuniform reflections across each combination of axes. The inverse
+        # transpose normal must face the same way as the transformed triangle,
+        # both for rasterization and BVH backface rejection in the AO bake.
+        import itertools
+        positions = {4: (0, 0, 0), 1: (1, 0, 0), 3: (0, 1, 0)}
+        loop_for_vertex = {4: 12, 1: 13, 3: 14}
+        for signs in itertools.product((-1, 1), repeat=3):
+            scale = tuple(a*b for a,b in zip(signs, (2, 3, 4)))
+            mirrored = scale[0]*scale[1]*scale[2] < 0
+            corners = oriented_triangle_corners((4, 1, 3), (12, 13, 14), mirrored)
+            self.assertTrue(all(loop_for_vertex[v] == loop for v,loop in corners))
+            a,b,c = [tuple(p*s for p,s in zip(positions[v], scale)) for v,_ in corners]
+            geometric_z = (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+            self.assertGreater(geometric_z/scale[2], 0, signs)
+
     def test_displays_are_opaque_and_windows_are_transparent(self):
         screen = finish_for_name('Dark appliance glass')
         window = finish_for_name('Window glass')
