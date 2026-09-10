@@ -18,7 +18,7 @@ from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from browser_materials import material_finish, keep_bevel, practical_light
+from browser_materials import material_finish, keep_bevel, practical_light, ramp_colliders
 OUT = HERE.parent.parent / 'house-test'
 OUT.mkdir(exist_ok=True)
 bpy.ops.wm.open_mainfile(filepath=str(HERE/'house.blend'))
@@ -122,7 +122,11 @@ for o in scene.objects:
             n = normal_matrix @ mesh.corner_normals[loop].vector
             n.normalize()
             values.extend(xyz(verts[i])+xyz(n))
-    if o.type == 'MESH' and not no_collision:
+    if o.type == 'MESH' and o.get('browser_walk_ramp'):
+        # The visual apron remains one sloped plane. A whole-plane AABB would
+        # put its highest elevation across the driveway and act like a wall.
+        colliders.extend(ramp_colliders(o.name, verts, o['browser_walk_ramp']))
+    elif o.type == 'MESH' and not no_collision:
         mn = Vector(tuple(min(v[i] for v in verts) for i in range(3)))
         mx = Vector(tuple(max(v[i] for v in verts) for i in range(3)))
         size = mx-mn
