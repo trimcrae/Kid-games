@@ -1247,7 +1247,9 @@ def camera(name, pos, target, lens=24, ortho=None):
 
 camera('overview', (30, -28, 32), (5.8, 4.3, .1), ortho=34)
 camera('sunroom', (5.18, 8.2, 1.9), (4.15, 10.2, .85), 14)
-camera('kitchen', (5.7, 7.74, 1.67), (.70, 5.95, 1.1), 26)
+# Step forward from the pantry side so this inspection view exposes the
+# appliances and rear worktop. This is an authored view, not a recovered pose.
+camera('kitchen', (5.7, 6.88, 1.67), (.70, 5.95, 1.1), 26)
 camera('living', (6.70, 1.45, 1.70), (.70, 2.30, 1.05), 24)
 camera('family', (9.50, 2.62, .85), (13.75, 2.30, -.05), 23)
 camera('stairs', (6.30, 3.20, 1.65), (9.20, 3.35, 1.05), 20)
