@@ -405,7 +405,7 @@ asset('Primary woven laundry hamper',(3.15,3.55,0),0,'U8')  # between dresser zo
 box('Woven hamper body',(0,0,.39),(.43,.40,.78),wicker,.04)
 box('Closed wicker hamper lid',(0,0,.81),(.46,.43,.055),rattan,.025)
 box('Hamper inset grip',(0,-.207,.69),(.12,.007,.035),black)
-asset('Bedside mesh bassinet',(2.13,1.75,0),90,'U8,V1; House Tour 138/139s',
+asset('Bedside mesh bassinet',(2.13,2.15,0),90,'U8,V1; House Tour 138/139s',
       confidence='beside entry half of bed foot observed; fitted position preserves narrow foot aisle')
 for x in [-.44,.44]:
     for y in [-.24,.24]:

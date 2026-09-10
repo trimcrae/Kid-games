@@ -39,7 +39,9 @@ const routes=[
  ['Front porch steps',[[4.25,-.95,-.06],[4.25,-3.3,-.82]]],
  ['Driveway to garage',[[ -3.5,-5.0,-.82],[-3.5,-1.5,-.16]]],
  ['Green bathroom',[[11.57,4.01,1.26],[11.4,4.9,1.26],[11.0,5.2,1.26]]],
- ['Ensuite doorway',[[13.47,5.0,1.26],[13.0,6.2,1.26],[12.7,8.02,1.26],[11.4,8.15,1.26]]],
+ // H139 puts the bassinet at the entry half of the bed foot. Follow the
+ // real aisle around it, including the turn after the entry-side closet.
+ ['Ensuite doorway',[[13.47,5.0,1.26],[13.47,5.38,1.26],[12.56,5.38,1.26],[12.56,6.95,1.26],[12.7,8.02,1.26],[11.4,8.15,1.26]]],
  ['Nursery doorway',[[12.5,4.01,1.26],[12.5,2.7,1.26]]],
  ['Master doorway',[[13.47,4.01,1.26],[13.47,5.0,1.26]]],
  ['End bedroom doorway',[[15.0,4.01,1.26],[16.5,4.01,1.26]]],
