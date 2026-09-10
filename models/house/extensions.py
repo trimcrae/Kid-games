@@ -116,7 +116,21 @@ for i in range(6):box('Tall bookcase shelf',(0,0,.05+i*.385),(.92,.32,.035),waln
 for row in range(1,4):
     for i in range(8):
         box('Neatly shelved book',(-.35+i*.083,-.02,.07+row*.385+.13),(.057,.18,.25),[walnut,navy,linen,green][(i+row)%4],.003)
-chest('Lower bedroom low dark cabinet',(8.17,8.20,0),.98,.76,90,2,2,'V9; House Tour 199s')
+jeannie_walnut=material('Jeannie dark polished walnut',(.07,.025,.012),.30,texture='wood')
+asset('Lower bedroom low dark cabinet',(8.17,8.20,0),90,'V9; House Tour 197.998/199s',
+      confidence='dark cabinet with two shallow drawers above two doors observed; dimensions estimated')
+box('Jeannie cupboard carcass',(0,0,.407),(.98,.43,.676),jeannie_walnut,.014)
+box('Jeannie cupboard overhanging top',(0,0,.756),(1.025,.475,.036),jeannie_walnut,.012)
+box('Jeannie cupboard base moulding',(0,-.005,.095),(1.005,.45,.055),jeannie_walnut,.01)
+for x in [-.42,.42]:
+    for y in [-.155,.155]:
+        cylinder('Jeannie cupboard short turned foot',(x,y,.047),.031,.094,jeannie_walnut,16,.041)
+for x in [-.237,.237]:
+    panel('Jeannie shallow top drawer',x,-.231,.652,.447,.137,jeannie_walnut)
+    sphere('Jeannie drawer brass pull',(x,-.277,.652),(.014,.018,.023),brass)
+    panel('Jeannie tall lower cupboard door',x,-.231,.335,.447,.462,jeannie_walnut)
+for x in [-.045,.045]:
+    sphere('Jeannie cupboard brass pull',(x,-.278,.494),(.013,.018,.024),brass)
 chest('Lower bedroom bedside drawer chest',(10.40,8.75,0),.55,.67,-90,3,1,'V9,V10; House Tour 200s')
 asset('Lower bedroom curtained closet',(10.35,9.55,0),-90,'V10')
 box('Closet dark backing',(0,.13,1.04),(.75,.025,2.08),walnut)
