@@ -73,16 +73,17 @@ Empty plots lead to save recovery. The common 3D shells are simplified street ho
 the activity preview retains each selected home's specific design. This extension
 does not represent the actual neighboring properties.
 
-The geometry comes from `models/house/house.blend`. The photo-derived furniture
-and layout are retained. Procedural Blender textures and small bevels are
-omitted for browser performance; each surface keeps the base colour of the
-photographic material pass in `models/house/photoreal.py`, and the roofs,
-siding and procedural trees from `models/house/exterior.py` and `yard.py`
-are included. Reflections and lighting are simplified.
+The geometry comes from `models/house/house.blend`, with furniture and layout
+revised against the private narrated walkthroughs. The browser retains selected
+bevels and physical material properties, using shared code-generated finish tiles
+for wood, cloth, stone and other surfaces. Sun shadows, room reflections and a
+bounded set of practical lights provide depth. Adaptive resolution targets 30 fps;
+slower hardware trades some sharpness for movement responsiveness. Blender's
+Cycles previews remain the higher-quality rendering reference.
 The source photographs, people, personal pictures, street addresses and
 neighbouring homes are not included. Yard limits and unseen dimensions remain
-estimates. The master bathroom's attachment is awaiting the homeowner's
-orientation clarification; do not treat its current placement as confirmed.
+estimates. Sampled connecting views from the walkthrough support the master
+bathroom's closet-side attachment and rear window; its dimensions remain estimates.
 
 ## Rebuild
 

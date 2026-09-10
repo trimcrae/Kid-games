@@ -17,6 +17,8 @@ the original audio. Original recordings, frames and transcripts stay private.
 | H227–234 | Second office desk on the perpendicular end wall. Main workstation has a laptop, one landscape monitor and two portrait displays on the raised right stand. High glass-block window with a central hopper sits toward the end-wall corner on that desk's wall. |
 | H104–116 | Cased linen closet beside the bathroom entrance and a separate nursery-facing wardrobe farther toward the hall on the nursery/Cory shared wall. Closet widths and reciprocal intrusions are estimates. |
 | H197–200 | Jeannie's low cabinet and headboard share the window wall; the cabinet is left of the headboard when facing them, with the tall bookcase farther toward the entry. Rotate the bed, move cabinet/bookcase and adjust estimated window spacing to retain clear furniture footprints. |
+| H147–158 | Sampled connecting views support the current ensuite attachment on the main bedroom's perpendicular closet-side wall, near the rear corner. Inside, the shower is ahead, toilet/storage left and rear window right. This resolves the earlier rotation question; depth, width and offsets remain estimates. |
+| H212–215; H223–230 | L-shaped white storage curtains leave the play/office approach open; two hooded litter boxes and a pail occupy the utility wall, with an exercise bike near the second desk. Cloth extents and furniture clearances are fitted estimates. |
 | H0–18; B0–18 | Bus-stop bench, umbrella, sign and dispenser; two young front trees; open central rear lawn, irregular boundaries, shed/swings, corrected netted trampoline and molded play equipment. |
 
 The 1.8 m porch depth, 6.10 m Cory room depth and 0.65 m nook depth are fit
@@ -43,10 +45,10 @@ V1–V10, basement/garage W1–W10. Original photos remain private and are not
 included in this repository. This audit establishes visible relationships;
 it does not establish measured room dimensions or the exterior footprint.
 
-Follow-up: the homeowner reports that the master bathroom is sideways. Its
-attachment to the bedroom is **not confirmed** by this audit; clarification of
-the doorway wall is pending. The earlier statement below describes fixture
-relationships within the room, not proof of its rotation within the house.
+Historical follow-up: the homeowner reported that the master bathroom was
+sideways. This photograph audit did not establish its attachment. The September
+10 video update above now supports the corrected attachment from connecting
+views; this earlier uncertainty is retained as audit history.
 
 ## Ensuite placement (September 2026, exterior and interior photographs)
 

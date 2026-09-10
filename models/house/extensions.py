@@ -46,6 +46,7 @@ for a,b in [((.08,-1.77),(3.71,-1.77)),((4.79,-1.77),(5.08,-1.77))]:
         rod('Porch iron spindle',(x,y,-.07),(x,y,.86),.008,black)
 for x in [3.72,4.78]:rod('Front step handrail',(x,-1.77,.87),(x,-2.86,.34),.023,black)
 asset('Front porch side siding',photos='V4')
+box('Porch siding wall backing',(-.04,-.90,1.275),(.06,1.80,2.70),white)
 for i in range(19):
     box('Porch horizontal lap siding',(-.015,-.90,.03+i*.13),(.08,1.80,.129),white,.003)
 for x in [.06,5.04]:box('White front porch column',(x,-1.77,1.27),(.085,.085,2.66),white)

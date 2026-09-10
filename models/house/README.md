@@ -56,10 +56,10 @@ pink-curtain downstairs bedroom.
 
 | Fourth-set area | References | Included |
 | --- | --- | --- |
-| Garage | W1–W3 | Two simplified parked SUVs, concrete slab, exposed joists, raised sectional door and tracks, glazed exterior door, house-access opening, empty shelving, tool board, wall-hung bicycle and coat hooks |
+| Garage | W1–W3; House Tour 30–33s | Two simplified SUVs retained from the photographs (one present in the walkthrough), concrete slab, exposed joists, raised front sectional door and tracks, rear sectional door, rear glazed pedestrian door, house-access opening, shelving, tool board, wall-hung bicycle and coat hooks |
 | Basement stairs | W8–W9 | Return flight beside the steps up to the main living room, carpeted treads, white side walls, handrail and doorway |
 | Basement play area | W4–W5 | Foosball table with rods and players, metal bunk bed with made bedding, toddler slide, dollhouse, floor rocker, saucer chair, open bookcase and hanging fabric screens |
-| Basement office and storage | W6, W8 | Wood desk and dual monitors, black swivel chair, second workstation, storage shelves/cabinet and simplified potted plants |
+| Basement office and storage | W6, W8; House Tour 227s | Wood drawer desk with laptop, landscape display and two portrait displays on a raised stand, black swivel chair, perpendicular second workstation, storage shelves/cabinet and simplified potted plants |
 | Basement laundry and mechanical area | W7–W8 | Front-loading dryer, utility sink, top-loading washer, dehumidifier, furnace and plenum, wall-mounted water heater, representative overhead pipes and ductwork |
 | Pink-curtain bedroom | W10; homeowner confirmation | Third room off the shared downstairs entry, with corner windows, rose curtains, made double bed, empty dress rail, pink shelving, bookcase, dresser, wall shelves, empty hammock and small road rug |
 
@@ -268,11 +268,11 @@ slab must have wall structure beneath it, and every ceiling must lie under a
 roof. Both checks fail the build if a later edit reopens the envelope.
 
 The ensuite now lies behind the family bathroom, back to back with it,
-entered beside the closet on the primary bedroom's west wall: as the interior
-photographs show, the shower is straight ahead, the window is on the right in
+entered beside the closet on the primary bedroom's west wall. Sampled connecting
+views at House Tour 147–158s support this attachment: the shower is straight ahead, the window is on the right in
 the wing's flush rear wall and the vanity and toilet are on the left. Its
 cream walls, taupe vanity and grey floor come from the same photographs.
-Roof pitches, overhangs and the siding/shake split remain estimates. Street names, house numbers and neighbouring homes are not
+Roof pitches, overhangs and cladding extents remain estimates. The dark rear panels' material identity is unresolved. Street names, house numbers and neighbouring homes are not
 reproduced.
 
 Two elevation cameras, [`street_front`](previews/street_front.png) and
@@ -312,10 +312,9 @@ no downloaded tree assets or image textures are used.
 - V8 places the pink bedroom left of the bathroom and the white-curtain bedroom
   right. Both bedrooms and the bathroom share this entry; room dimensions and
   the entry's exact offset from the family-room stairs remain estimated.
-- Exterior roofs and cladding are estimates read from two exterior photographs;
-  unseen rooms, most landscaping and neighboring buildings remain unfinished.
-  The lawn is a base for the front path; these additions do not establish a
-  surveyed lot plan.
+- Exterior roofs, cladding and landscaping use photographs and sampled views from
+  both walkthroughs. Unseen areas and boundaries remain estimates; neighboring
+  buildings are omitted. These additions do not establish a surveyed lot plan.
 
 Most useful references for the next pass: a rough floor plan with room widths,
 depths and doorway locations; stair counts; and reverse-angle room photos.
