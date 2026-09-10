@@ -532,7 +532,12 @@ for x in [-.62, -.08]:
 sofa('Wicker sunroom loveseat', (6.77, 9.00, -.08), 1.65, bluegrey, -90, '3,5', True)
 sofa('Wicker sunroom armchair', (6.80, 10.57, -.08), .88, bluegrey, -90, '3,5', True)
 table('Wicker side table', (5.83, 10.72, -.08), (.58, .56, .49), wicker, photos='5')
-lamp('Two-cup adjustable sunroom floor lamp', (7.07, 11.0, -.08), 1.68, photos='3,5', double=True)
+# H78/81/84 place the lamp farther toward the house along the side glazing.
+# Fit it between the existing wicker seats; position and height are estimates.
+# Turning the arms along the glazing keeps both cups inside the room.
+lamp('Two-cup adjustable sunroom floor lamp', (7.12, 9.98, -.08), 1.78, 90,
+     photos='3,5; House Tour 78.020/81.022/84.023s', double=True)
+ROOT['confidence'] = ASSETS[-1]['confidence'] = 'houseward side-glazing position observed; offset, height and arm angle estimated'
 asset('Arched wicker etagere', (5.83, 8.42, -.08), 180, '4')
 for x in [-.31, .31]:
     rod('Etagere upright', (x, .13, 0), (x, .13, 1.43), .025, wicker)
@@ -801,6 +806,46 @@ for x in [5.05, 5.98]:
     chair('Dining chair front', (x, 5.63, .018), 180)
 chest('Multi-drawer dining storage cabinet', (7.52, 6.20, .018), 1.80, 1.25, -90, 5, 4, '7')
 chest('Entry tall chest of drawers', (4.45, .32, .018), .70, 1.22, 180, 5, 1, '7')
+
+# H60/H63 show a low cubby/worktop run beneath the kitchen's rear window,
+# then a small drawer unit and tall paneled pantry toward the sunroom door.
+# These are authored in main-floor coordinates, unlike the rotated sink run.
+# Widths, height and the repeated bin pattern are fit estimates. Keep X<1.0
+# clear beside the garage door and stop before the sunroom casing at X=4.58.
+kitchen_bin_ivory = material('Kitchen ivory fabric storage bins', (.75, .75, .69), .88, texture='fabric')
+kitchen_bin_grey = material('Kitchen grey fabric storage bins', (.43, .46, .46), .88, texture='fabric')
+kitchen_pantry_enamel = material('Kitchen cream pantry enamel', (.76, .73, .63), .43)
+asset('Kitchen window cubby worktop', (1.97, 7.72, .035), 0,
+      'House Tour 60.012/63.013s',
+      'window-wall worktop and two rows of bins observed; width, height and bin count estimated')
+for x in [-.82, -.41, 0, .41, .82]:
+    box('Pale wood cubby upright', (x, 0, .37), (.028, .44, .70), pine)
+box('Cubby back panel', (0, .211, .37), (1.67, .018, .70), pine)
+for z in [.035, .37, .705]:
+    box('Pale wood cubby shelf', (0, 0, z), (1.67, .44, .028), pine)
+box('Window storage continuous worktop', (0, -.005, .747), (1.72, .47, .055), pine, .014)
+for row in range(2):
+    for col in range(4):
+        x, z = -.615 + col * .41, .202 + row * .335
+        mat = kitchen_bin_ivory if (row + col) % 3 else kitchen_bin_grey
+        box('Closed fabric storage bin', (x, -.013, z), (.36, .384, .28), mat, .012)
+        box('Bin inset fabric handle', (x, -.210, z + .052), (.095, .008, .025), kitchen_bin_grey, .006)
+asset('Kitchen window-side small drawer unit', (3.13, 7.72, .035), 0,
+      'House Tour 60.012/63.013s', 'small wood drawer unit at dining end observed; dimensions and drawer divisions estimated')
+box('Small drawer-unit wood case', (0, 0, .355), (.53, .44, .71), oak)
+box('Small drawer-unit worktop', (0, -.005, .747), (.57, .47, .055), pine, .014)
+for z in [.15, .37, .59]:
+    panel('Small wood drawer', 0, -.231, z, .475, .196, oak)
+    rod('Small drawer pull', (-.07, -.286, z), (.07, -.286, z), .010, brass)
+asset('Kitchen tall cream paneled pantry', (4.00, 7.66, .035), 0,
+      'House Tour 60.012/63.013s',
+      'tall cream cupboard with three stacked door pairs beside sunroom entry observed; size and divisions estimated')
+box('Pantry cream case', (0, 0, 1.225), (1.00, .56, 2.45), kitchen_pantry_enamel, .012)
+box('Pantry recessed base', (0, -.01, .035), (.94, .48, .07), kitchen_pantry_enamel)
+for x in [-.247, .247]:
+    for z, height in [(.40, .67), (1.18, .82), (2.025, .79)]:
+        panel('Pantry raised panel door', x, -.292, z, .464, height, kitchen_pantry_enamel)
+
 asset('Dining playpen', (4.05, 4.62, .018), 90, '6,7')
 meshmat = material('Playpen translucent mesh', (.65, .65, .57), .9)
 bs = meshmat.node_tree.nodes['Principled BSDF']
