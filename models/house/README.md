@@ -13,8 +13,11 @@ office window/workstations, and observed yard features. Dimensions remain estima
 A separate [third-person walkthrough test](../../house-test/) uses this model.
 It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).
 The visible front/back yards now include lawn, planting beds, trees, a driveway,
-rear shed, trampoline, play equipment and fencing, based on photos 1–5 and V4–V5.
-Their distances and the lot boundary are estimates. See [front yard](previews/front_yard.png)
+rear shed, trampoline, play equipment and fencing, based on photos 1–5, V4–V5
+and both walkthroughs. The backyard pan adds connected perimeter growth,
+the trampoline's blue upper hoop attachment and fine dark net, and a grassy
+approach close to the sunroom sill. Distances, grade and the lot boundary remain
+estimates. See [front yard](previews/front_yard.png)
 and [back yard](previews/back_yard.png).
 
 Open **[house.blend](house.blend)** in Blender 4.5 LTS or newer. It opens with

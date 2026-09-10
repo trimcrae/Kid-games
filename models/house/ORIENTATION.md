@@ -24,6 +24,9 @@ the original audio. Original recordings, frames and transcripts stay private.
 | H147–158 | Sampled connecting views support the current ensuite attachment on the main bedroom's perpendicular closet-side wall, near the rear corner. Inside, the shower is ahead, toilet/storage left and rear window right. This resolves the earlier rotation question; depth, width and offsets remain estimates. |
 | H212–215; H223–230 | L-shaped white storage curtains leave the play/office approach open; two hooded litter boxes and a pail occupy the utility wall, with an exercise bike near the second desk. Cloth extents and furniture clearances are fitted estimates. |
 | H0–18; B0–18 | Bus-stop bench, umbrella, sign and dispenser; two young front trees; open central rear lawn, irregular boundaries, shed/swings, corrected netted trampoline and molded play equipment. |
+| B9.003, B11.005, B13.005 | Overlapping perimeter growth and broad rear canopies enclose the open lawn. Increase connected foliage while preserving visible gaps; species, heights, density and boundary coordinates remain estimates. |
+| B0.000, B15.007, B16.007 | Add the trampoline's blue arched upper attachment and darker fine net. Hoop construction, mesh spacing and dimensions are approximations of the visible silhouette. |
+| B0.000, B16.007, B19.008 | Replace the earlier navigation-only white stair flight with lawn close to the sunroom sill. The 12 cm nominal lip and local slope are fitted estimates; the recording does not establish metric grade. |
 
 The 1.8 m porch depth, 6.10 m Cory room depth and 0.65 m nook depth are fit
 estimates. Cory's depth follows the corrected facade in the existing coordinate
