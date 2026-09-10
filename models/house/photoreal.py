@@ -135,21 +135,17 @@ def _mat(name):
 # ---------------------------------------------------------------- shaders
 
 def wood(mat, light, dark, along='x', scale=1.0, rough=.30, coat=.35, jitter=3.0):
-    """Planed timber: long grain streaks along one axis, growth-ring bands
-    across it, roughness breakup and a thin varnish coat."""
+    """Planed timber: irregular long fibres, restrained pores and a varnish coat.
+
+    H51.008's narrow oak strips have uneven streaks rather than repeated dark
+    sine bands. Keep the named colours while softening that procedural pattern.
+    """
     nt, bsdf, _ = _principled(mat)
-    stretch = {'x': (.16, 5, 5), 'y': (5, .16, 5), 'z': (5, 5, .16)}[along]
+    stretch = {'x': (.20, 18, 18), 'y': (18, .20, 18), 'z': (18, 18, .20)}[along]
     vec = _world_vector(nt, tuple(s * scale for s in stretch), jitter)
-    grain = _noise(nt, vec, 2.2, 8, .65)
-    wave = nt.nodes.new('ShaderNodeTexWave')
-    wave.wave_type = 'BANDS'
-    wave.bands_direction = {'x': 'Y', 'y': 'X', 'z': 'X'}[along]
-    wave.inputs['Scale'].default_value = .9
-    wave.inputs['Distortion'].default_value = 2.4
-    wave.inputs['Detail'].default_value = 3
-    wave.inputs['Detail Scale'].default_value = 1.4
-    nt.links.new(vec, wave.inputs['Vector'])
-    fac = _mix_fac(nt, grain, wave.outputs['Fac'], .3)
+    grain = _noise(nt, vec, 2.2, 5, .6, .35)
+    fibres = _noise(nt, vec, 6.5, 3, .55, .18)
+    fac = _mix_fac(nt, grain, fibres, .18)
     mid = tuple(d * .45 + l * .55 for d, l in zip(dark, light))
     nt.links.new(_ramp(nt, fac, mid, light, .3, .8), bsdf.inputs['Base Color'])
     fine = _noise(nt, _world_vector(nt, (40, 40, 40), jitter), 1, 2, .5)
@@ -157,7 +153,7 @@ def wood(mat, light, dark, along='x', scale=1.0, rough=.30, coat=.35, jitter=3.0
     bsdf.inputs['Coat Weight'].default_value = coat
     bsdf.inputs['Coat Roughness'].default_value = .12
     bsdf.inputs['Specular IOR Level'].default_value = .45
-    _bump(nt, bsdf, wave.outputs['Fac'], .08, .0008)
+    _bump(nt, bsdf, fibres, .055, .0005)
     mat.diffuse_color = _lin(*[(a + b) / 2 for a, b in zip(light, dark)])
     return mat
 
@@ -236,7 +232,7 @@ def carpet(mat, color, sheen=1.0):
     return mat
 
 
-def fabric(mat, color, sheen=.5, rough=.85, velvet=False):
+def fabric(mat, color, sheen=.5, rough=.85, velvet=False, bump_distance=.0015):
     """Woven upholstery and curtains; velvet gets a strong directional sheen."""
     nt, bsdf, _ = _principled(mat)
     vec = _world_vector(nt, (1, 1, 1))
@@ -250,7 +246,7 @@ def fabric(mat, color, sheen=.5, rough=.85, velvet=False):
     if velvet:
         bsdf.inputs['Sheen Tint'].default_value = _lin(*_scaled(color, 1.6))
     weave = _noise(nt, vec, 260, 2, .5)
-    _bump(nt, bsdf, weave, .18, .0015)
+    _bump(nt, bsdf, weave, .18, bump_distance)
     mat.diffuse_color = _lin(*color)
     return mat
 
@@ -483,12 +479,16 @@ def glow(name, color, strength, diffuse):
 # grain differs from its neighbours while the eight tones stay distinct.
 for i in range(8):
     t = i / 7
-    light = (.44 + .16 * t, .21 + .10 * t, .065 + .045 * t)
-    dark = (.17 + .06 * t, .075 + .03 * t, .022 + .012 * t)
+    # Relative honey/tan variation is observed; RGB remains exposure-dependent.
+    light = (.42 + .14 * t, .245 + .09 * t, .11 + .065 * t)
+    dark = (.15 + .075 * t, .075 + .04 * t, .025 + .028 * t)
     wood(_mat('Oak floor board tone %02d' % i), light, dark, 'x', 1, .30, .38)
 wood(_mat('Honey oak grain'), (.50, .27, .095), (.22, .10, .035), 'x', 1.4, .32, .30)
 wood(_mat('Climbing frame varnished pine'), (.64, .38, .14), (.36, .18, .06), 'z', 1.6, .3, .3)
 wood(_mat('Dark walnut'), (.20, .085, .038), (.075, .03, .013), 'x', 1.3, .26, .45)
+# H199: Jeannie's cabinet is near-espresso brown, darker than the bookcase.
+# This dedicated finish does not recolour other walnut furniture.
+wood(_mat('Jeannie dark polished walnut'), (.075, .033, .018), (.025, .010, .006), 'x', 1.3, .31, .30)
 wood(_mat('Natural wicker'), (.36, .20, .085), (.17, .085, .035), 'x', 6, .7, 0, 1)
 wood(_mat('Exposed timber joists'), (.11, .05, .022), (.045, .02, .008), 'x', 1, .78, 0)
 wood(_mat('Garden tree bark'), (.11, .085, .065), (.028, .022, .017), 'z', 2.0, .95, 0)
@@ -538,6 +538,15 @@ glass(_mat('Window glass'))
 carpet(_mat('Clean warm beige carpet'), (.55, .45, .31))
 carpet(_mat('Cory light grey plush carpet'), (.44, .43, .40))
 fabric(_mat('Oatmeal sofa upholstery'), (.52, .48, .40))
+fabric(_mat('Living sofa taupe upholstery'), (.28, .255, .22), .35, .88)
+fabric(_mat('Living tub chair warm taupe upholstery'), (.34, .275, .21), .4, .88)
+fabric(_mat('Living child lounge navy upholstery'), (.018, .030, .075), .35, .90)
+fabric(_mat('Primary grey cotton headboard'), (.30, .305, .30), .4, .88, bump_distance=.0008)
+for mat in bpy.data.materials:
+    if mat.name == 'Cory muted pink cotton pillow' or mat.name.startswith('Cory quilt cotton '):
+        # Preserve the observed patch/pillow colours; replace the coarse base
+        # material's 15 mm bump with sub-millimetre cotton weave.
+        fabric(mat, tuple(mat.diffuse_color[:3]), .3, .93, bump_distance=.0006)
 fabric(_mat('Sunroom blue grey cushions'), (.27, .38, .41))
 fabric(_mat('Small sofa deep teal blue'), (.02, .09, .30), .7, .7)
 fabric(_mat('Family room olive chair'), (.14, .22, .13), velvet=True)

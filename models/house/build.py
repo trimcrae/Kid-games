@@ -296,6 +296,139 @@ def sofa(name, pos, width, upholstery, angle=0, photos='8', woven=False):
                 rod('Horizontal wicker strand', (x, -depth / 2, z), (x, depth / 2, z), .004, rattan)
 
 
+def padded_box(name, loc, size, mat, radius=.06):
+    """Rounded upholstery as a modest closed mesh, retained by browser export.
+
+    Project a sparse cube grid onto an inner box plus a spherical edge radius.
+    Analytic normals keep the broad cushion faces flat and the edges soft;
+    there is no subdivision/bevel modifier for the exporter to discard.
+    """
+    half = [s / 2 for s in size]
+    radius = min(radius, min(half) * .95)
+    inner = [h - radius for h in half]
+    levels = [[-h + radius * t for t in (0, .25, .60, 1)] +
+              [h - radius * t for t in (1, .60, .25, 0)] for h in half]
+    vertices, normals, faces, indices = [], [], [], {}
+    for axis in range(3):
+        u, v = (axis + 1) % 3, (axis + 2) % 3
+        for sign in (-1, 1):
+            grid = []
+            for b in levels[v]:
+                row = []
+                for a in levels[u]:
+                    p = [0, 0, 0]
+                    p[axis], p[u], p[v] = sign * half[axis], a, b
+                    core = Vector([max(-h, min(h, c)) for c, h in zip(p, inner)])
+                    normal = (Vector(p) - core).normalized()
+                    point = core + normal * radius
+                    key = tuple(round(c, 9) for c in point)
+                    if key not in indices:
+                        indices[key] = len(vertices)
+                        vertices.append(tuple(point))
+                        normals.append(tuple(normal))
+                    row.append(indices[key])
+                grid.append(row)
+            for j in range(7):
+                for i in range(7):
+                    face = (grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i])
+                    faces.append(face if sign > 0 else tuple(reversed(face)))
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    obj = bpy.data.objects.new(name, mesh)
+    obj.location = loc
+    finish(obj, name, mat)
+    for face in mesh.polygons:
+        face.use_smooth = True
+    mesh.normals_split_custom_set_from_vertices(normals)
+    return obj
+
+
+def living_sofa(name, pos, width, upholstery, angle=0):
+    # H51.008: two broad seat cushions, rolled arms and a low upholstered base.
+    # The loose cover hides the back construction; a continuous padded back
+    # avoids inventing a cushion count underneath it. Keep the established ID.
+    asset(name, pos, angle, 'House Tour 51.008s',
+          'two seat cushions and rounded arms observed; footprint/back structure estimated')
+    box('Recessed sofa plinth', (0, 0, .035), (width - .18, .69, .05), walnut)
+    padded_box('Low upholstered sofa base', (0, 0, .20), (width, .86, .31), upholstery, .055)
+    padded_box('Continuous sofa back', (0, .325, .635), (width - .10, .21, .57), upholstery, .09)
+    for x in [-(width - .30) / 2, (width - .30) / 2]:
+        padded_box('Rounded sofa arm', (x, -.015, .52), (.30, .83, .36), upholstery, .14)
+    cushion_width = (width - .62) / 2
+    for x in [-(cushion_width + .015) / 2, (cushion_width + .015) / 2]:
+        padded_box('Broad sofa seat cushion', (x, -.085, .405),
+                   (cushion_width, .65, .15), upholstery, .065)
+
+
+def living_tub_chair(name, pos, upholstery, angle=0):
+    """H51.008's continuous horseshoe back/arms within the existing .95 x .70 m footprint."""
+    asset(name, pos, angle, 'House Tour 51.008s',
+          'rounded tub silhouette observed; dimensions and concealed base estimated')
+    padded_box('Tub chair upholstered base', (0, -.015, .205), (.90, .65, .32), upholstery, .12)
+    padded_box('Tub chair single seat', (0, -.065, .40), (.68, .53, .15), upholstery, .07)
+    # Follow straight arm ends around an elliptical back. The shell itself is
+    # curved geometry, including a rounded top and substantial upholstered ends.
+    path = [(.355, -.23, 1, 0, .66), (.355, -.12, 1, 0, .70)]
+    for i in range(21):
+        t = i * math.pi / 20
+        normal = Vector((math.cos(t) / .355, math.sin(t) / .23)).normalized()
+        path.append((.355 * math.cos(t), .23 * math.sin(t), *normal,
+                     .74 + .12 * math.sin(t)))
+    path += [(-.355, -.12, -1, 0, .70), (-.355, -.23, -1, 0, .66)]
+    vertices, faces = [], []
+    for x, y, nx, ny, top in path:
+        section = [(.085, .055), (.12, .12), (.12, top - .105)]
+        section += [(.12 * math.cos(i * math.pi / 6), top - .105 + .105 * math.sin(i * math.pi / 6))
+                    for i in range(1, 7)]
+        section += [(-.10, .12), (-.075, .055)]
+        vertices += [(x + nx * offset, y + ny * offset, z) for offset, z in section]
+    count = len(section)
+    for j in range(len(path) - 1):
+        for i in range(count):
+            a, b = j * count + i, j * count + (i + 1) % count
+            faces.append((a, a + count, b + count, b))
+    # Shallow rolled end caps close the arms softly instead of leaving a
+    # conspicuous flat cut through the upholstery profile.
+    caps = []
+    for start in [0, (len(path) - 1) * count]:
+        original = vertices[start:start + count]
+        previous = list(range(start, start + count))
+        cx = sum(p[0] for p in original) / count
+        cz = (max(p[2] for p in original) + min(p[2] for p in original)) / 2
+        for step in range(1, 4):
+            t = step * math.pi / 6
+            shrink = 1 - math.cos(t)
+            ring = list(range(len(vertices), len(vertices) + count))
+            vertices += [(cx + (x-cx) * (1-.35*shrink), y-.075*math.sin(t),
+                          cz + (z-cz) * (1-.14*shrink)) for x,y,z in original]
+            for i in range(count):
+                j = (i + 1) % count
+                face = (previous[i], previous[j], ring[j], ring[i])
+                faces.append(face if start == 0 else tuple(reversed(face)))
+            previous = ring
+        caps.append(tuple(previous) if start == 0 else tuple(reversed(previous)))
+    faces += caps
+    mesh = bpy.data.meshes.new('Continuous tub upholstery')
+    mesh.from_pydata(vertices, [], faces)
+    obj = bpy.data.objects.new('Curved tub chair back and arms', mesh)
+    finish(obj, obj.name, upholstery)
+    for face in mesh.polygons[:-2]:
+        face.use_smooth = True
+
+
+def child_lounge(name, pos, width, upholstery, angle=0):
+    asset(name, pos, angle, 'House Tour 51.008s',
+          'low blue continuous seat, back tufts and short arms observed; dimensions estimated')
+    padded_box('Child lounge low base', (0, 0, .13), (width, .70, .22), upholstery, .07)
+    padded_box('Child lounge continuous seat', (0, -.07, .245), (width - .12, .55, .11), upholstery, .048)
+    padded_box('Child lounge tufted back', (0, .275, .38), (width, .15, .30), upholstery, .065)
+    for x in [-(width - .13) / 2, (width - .13) / 2]:
+        padded_box('Child lounge low arm', (x, -.02, .265), (.13, .61, .21), upholstery, .06)
+    for x in [-.48, -.16, .16, .48]:
+        button = cylinder('Small upholstered back tuft', (x, .197, .38), .010, .008, upholstery, 12)
+        button.rotation_euler.x = math.pi / 2
+
+
 def lamp(name, pos, height=1.6, angle=0, photos='3,5,7,8', double=False):
     asset(name, pos, angle, photos)
     cylinder('Weighted base', (0, 0, .035), .20 if height > 1 else .12, .07, brass)
@@ -387,20 +520,25 @@ wallbox('Entry return subfloor', (6.45, -.90, -.13), (2.7, 1.8, .24), walnut)
 # The paired flights leave the SIDE of the main rectangle (Photo 7).
 planks = [material('Oak floor board tone %02d' % i, (.35 + .024 * i, .18 + .014 * i, .07 + .008 * i),
                     .46, texture='wood') for i in range(8)]
-for row in range(40):
-    y = .10 + row * .20
-    for col in range(8):
-        x1, x2 = col * 1.15 - (row % 3) * .37, (col + 1) * 1.15 - (row % 3) * .37
-        x1, x2 = max(0, x1), min(7.8, x2)
-        if x2 <= x1:
-            continue
-        if x2 > x1:
-            box('Individual oak floorboard', ((x1 + x2) / 2, y, .002),
-                (x2 - x1 - .003, .197, .015), random.choice(planks), .001)
-for row in range(9):
-    for col in range(3):
-        box('Entry return oak floorboard', (5.55+col*.90, -1.70+row*.20, .002),
-            (.897, .197, .015), random.choice(planks), .001)
+# H51.008 shows narrow strips, not the previous 20 cm planks. 7.5 cm is a
+# visual fit to the number of strips beside the sofa, NOT a measured width.
+# Clipped boundary rows retain the existing floor extents and walking surface.
+floor_rng = random.Random(14)
+board_pitch, board_gap = .075, .001
+for name, xmin, xmax, ymin, ymax in [
+        ('Individual oak floorboard', 0, 7.8, 0, 8),
+        ('Entry return oak floorboard', 5.1, 7.8, -1.8, 0)]:
+    for row in range(math.ceil((ymax - ymin) / board_pitch)):
+        y1, y2 = ymin + row * board_pitch, min(ymax, ymin + (row + 1) * board_pitch)
+        # Stagger end joints irregularly; each strip still has a long grain.
+        x1 = xmin - floor_rng.uniform(.12, 1.10)
+        while x1 < xmax:
+            x2 = x1 + floor_rng.uniform(.85, 1.55)
+            start, end = max(xmin, x1), min(xmax, x2)
+            if end - start > board_gap:
+                box(name, ((start + end) / 2, (y1 + y2) / 2, .002),
+                    (end - start - board_gap, y2 - y1 - board_gap, .015), floor_rng.choice(planks), .0004)
+            x1 = x2
 asset('Lower family room floor', (-.7, 0, 0), photos='9,10', confidence='inferred footprint')
 wallbox('Lower foundation', (1.0, -1.2, -1.2), (4.6, 5, .30), walnut)
 box('Family room fitted carpet', (1.0, -1.2, -1.042), (4.6, 5, .024), carpet, .002)
@@ -702,13 +840,12 @@ for z in [.22, .48]:
         cylinder('Neatly stored glass tumbler', (-.38 + i * .18, -.035, z + .07), .044, .12, glass)
 
 collection('09 | Living room furniture')
-sofa('Main oatmeal three-seat sofa', (.55, 2.55, .018), 2.25, linen, 90, '8')
-sofa('Child-sized blue sofa', (2.35, .52, .018), 1.42, navy, 180, '7,8')
-# Photos 8 and V3 show low foam seating beneath the window sill.
-# Keep its observed footprint, but do not give it an adult sofa's height.
-ROOT.scale.z = .52
-ROOT['confidence'] = 'low child seating observed; dimensions estimated'
-sofa('Living upholstered armchair', (2.85, 3.00, .018), .95, linen, 0, '8')
+living_taupe = material('Living sofa taupe upholstery', (.28, .255, .22), .86, texture='fabric')
+tub_taupe = material('Living tub chair warm taupe upholstery', (.34, .275, .21), .88, texture='fabric')
+child_navy = material('Living child lounge navy upholstery', (.018, .030, .075), .90, texture='fabric')
+living_sofa('Main oatmeal three-seat sofa', (.55, 2.55, .018), 2.25, living_taupe, 90)
+child_lounge('Child-sized blue sofa', (2.35, .52, .018), 1.42, child_navy, 180)
+living_tub_chair('Living upholstered armchair', (2.85, 3.00, .018), tub_taupe)
 table('White tray activity table', (1.82, 2.30, .018), (1.36, .82, .49), white, 90, '8')
 for x in [-.66, .66]:
     box('Raised tray side', (x, 0, .55), (.028, .82, .14), white)
@@ -753,11 +890,27 @@ table('Piano bench', (2.15, 3.62, .018), (.80, .34, .50), walnut, 0, '8')
 asset('Tall living two-door wood cupboard', (.34,3.96,.018),90,'House Tour 51.008s',
       'two doors and position on mirror wall observed; dimensions estimated')
 box('Cupboard carcass',(0,0,.99),(.82,.58,1.98),walnut)
-box('Cupboard crown',(0,0,2.02),(.88,.63,.065),oak)
+box('Cupboard crown',(0,0,2.02),(.88,.63,.065),walnut)
 for x in [-.205,.205]:
-    panel('Cupboard raised door',x,-.31,1.03,.397,1.77,oak)
+    panel('Cupboard raised door',x,-.31,1.03,.397,1.77,walnut)
     sphere('Cupboard brass handle',(x*.20,-.365,1.02),(.019,.018,.025),brass)
-chest('Living television media cabinet',(2.25,4.08,.018),1.72,.64,0,2,3,'House Tour 54.010s')
+# H48.007/H54.010 resolve an open AV bay over broad drawers, in dark brown
+# wood. Keep the prior overall footprint/TV height; drawer count is estimated.
+asset('Living television media cabinet',(2.25,4.08,.018),0,'House Tour 48.007s,54.010s',
+      'dark wood, open upper shelving and broad drawers observed; two rows and dimensions estimated')
+box('Media cabinet lower carcass',(0,0,.205),(1.72,.43,.37),walnut,.014)
+for x in [-.835,.835]:
+    box('Media cabinet side',(x,0,.325),(.05,.43,.61),walnut,.008)
+box('Media cabinet back',(0,.203,.50),(1.62,.025,.22),walnut,.003)
+box('Media cabinet AV shelf',(0,0,.395),(1.65,.44,.025),walnut,.005)
+box('Media cabinet open bay divider',(0,0,.515),(.025,.41,.22),walnut,.003)
+box('Media cabinet overhanging top',(0,0,.64),(1.77,.47,.045),walnut,.012)
+for z in [.115,.285]:
+    box('Broad media cabinet drawer',(0,-.236,z),(1.60,.035,.145),walnut,.008)
+    for x in [-.43,.43]:
+        for dx in [-.055,.055]:
+            rod('Media drawer pull mounting',(x+dx,-.255,z),(x+dx,-.282,z),.005,steel)
+        rod('Media drawer horizontal pull',(x-.055,-.285,z),(x+.055,-.285,z),.006,steel)
 asset('Living large television',(2.25,4.08,.018),0,'House Tour 54.010s')
 box('Large TV bezel',(0,0,1.12),(1.47,.075,.85),black,.018)
 box('Large TV dark screen',(0,-.043,1.12),(1.42,.009,.80),screen,.01)
