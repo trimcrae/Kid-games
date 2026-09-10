@@ -47,11 +47,13 @@ def _principled(mat):
     return nt, bsdf, out
 
 
-def _world_vector(nt, stretch=(1, 1, 1), jitter=0.0):
+def _world_vector(nt, stretch=(1, 1, 1), jitter=0.0, object_space=False):
     """World-space texture coordinates; ``jitter`` offsets them per object so
-    repeated boards and tiles each get their own grain."""
-    geo = nt.nodes.new('ShaderNodeNewGeometry')
-    vec = geo.outputs['Position']
+    repeated boards and tiles each get their own grain. Polished timber can
+    follow its local manufactured axes when the whole furniture asset rotates.
+    """
+    geo = nt.nodes.new('ShaderNodeTexCoord' if object_space else 'ShaderNodeNewGeometry')
+    vec = geo.outputs['Object' if object_space else 'Position']
     if jitter:
         info = nt.nodes.new('ShaderNodeObjectInfo')
         combine = nt.nodes.new('ShaderNodeCombineXYZ')
@@ -141,19 +143,32 @@ def wood(mat, light, dark, along='x', scale=1.0, rough=.30, coat=.35, jitter=3.0
     sine bands. Keep the named colours while softening that procedural pattern.
     """
     nt, bsdf, _ = _principled(mat)
+    polished = coat > 0
     stretch = {'x': (.20, 18, 18), 'y': (18, .20, 18), 'z': (18, 18, .20)}[along]
-    vec = _world_vector(nt, tuple(s * scale for s in stretch), jitter)
+    # World-X grain degenerates into speckles on furniture facing world X.
+    # Use the local timber axes for varnished boards/cabinets, preserving
+    # metre-scale grain and per-object phase through the parent rotation.
+    vec = _world_vector(nt, tuple(s * scale for s in stretch), jitter, polished)
     grain = _noise(nt, vec, 2.2, 5, .6, .35)
     fibres = _noise(nt, vec, 6.5, 3, .55, .18)
     fac = _mix_fac(nt, grain, fibres, .18)
     mid = tuple(d * .45 + l * .55 for d, l in zip(dark, light))
-    nt.links.new(_ramp(nt, fac, mid, light, .3, .8), bsdf.inputs['Base Color'])
-    fine = _noise(nt, _world_vector(nt, (40, 40, 40), jitter), 1, 2, .5)
-    nt.links.new(_range(nt, fine, rough - .07, rough + .07), bsdf.inputs['Roughness'])
+    if polished:
+        # Reduce contrast around the same colour midpoint: indoor varnish
+        # should not look abraded or white-flecked at shelf edges.
+        centre = tuple((a + b) / 2 for a, b in zip(mid, light))
+        low = tuple(c + (a-c) * .35 for a, c in zip(mid, centre))
+        high = tuple(c + (b-c) * .35 for b, c in zip(light, centre))
+    else:
+        low, high = mid, light
+    nt.links.new(_ramp(nt, fac, low, high, .3, .8), bsdf.inputs['Base Color'])
+    fine = _noise(nt, _world_vector(nt, (40, 40, 40), jitter, polished), 1, 2, .5)
+    variation = .025 if polished else .07
+    nt.links.new(_range(nt, fine, rough - variation, rough + variation), bsdf.inputs['Roughness'])
     bsdf.inputs['Coat Weight'].default_value = coat
-    bsdf.inputs['Coat Roughness'].default_value = .12
+    bsdf.inputs['Coat Roughness'].default_value = .24 if polished else .12
     bsdf.inputs['Specular IOR Level'].default_value = .45
-    _bump(nt, bsdf, fibres, .055, .0005)
+    _bump(nt, bsdf, fibres, .015 if polished else .055, .00015 if polished else .0005)
     mat.diffuse_color = _lin(*[(a + b) / 2 for a, b in zip(light, dark)])
     return mat
 
