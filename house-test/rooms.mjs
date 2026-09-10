@@ -23,7 +23,7 @@ export const rooms=[
   ['Basement','Laundry',6.3,6.6,-3.15,0],
   ['Outside','Front porch',4.2,-.9,-.06,Math.PI/2],
   ['Outside','Front yard',6.5,-5.9,-.82,Math.PI],
-  ['Outside','Back yard',5.1,13.5,-.82,0],
+  ['Outside','Back yard',5.1,13.5,-.51,0],
   ...neighborhoodRooms,
 ];
 export const familyRooms={cory:"Cory's bedroom",kieran:"Kieran's bedroom",ellie:"Ellie's bedroom",jeannie:"Jeannie's bedroom",shannon:"Mom & Dad's office",tristan:"Mom & Dad's office",guest:'Living room'};

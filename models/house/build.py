@@ -992,7 +992,7 @@ for z in [.15, .37, .59]:
     rod('Small drawer pull', (-.07, -.286, z), (.07, -.286, z), .010, brass)
 asset('Kitchen tall cream paneled pantry', (4.00, 7.66, .035), 0,
       'House Tour 60.012/63.013s',
-      'tall cream cupboard with three stacked door pairs beside sunroom entry observed; size and divisions estimated')
+      'tall cream paneled cupboard beside sunroom entry observed; size and stacked door divisions estimated')
 box('Pantry cream case', (0, 0, 1.225), (1.00, .56, 2.45), kitchen_pantry_enamel, .012)
 box('Pantry recessed base', (0, -.01, .035), (.94, .48, .07), kitchen_pantry_enamel)
 for x in [-.247, .247]:
