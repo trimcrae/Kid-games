@@ -386,16 +386,23 @@ primary_headboard=material('Primary grey cotton headboard',(.23,.25,.235),.94,te
 headboard=soft_bedding('Primary upholstered headboard',(0,.95,.84),
                       (1.67,.76,.095),primary_headboard,nx=22,ny=12)
 headboard.rotation_euler.x=math.pi/2
-asset('Primary bedside wall shelves',(4.47,1.98,0),-90,'House Tour 139s',
-      confidence='wall shelves observed; count, spacing and plain storage contents estimated')
-for z in [1.47,1.87]:
+asset('Primary bedside wall shelves',(4.47,1.98,0),-90,'House Tour 138.877/139.510s',
+      confidence='three pale boards and dark supports observed; dimensions, spacing and clean contents estimated')
+# Native H139.510 separates three full-width boards from the objects on top.
+# Keep the existing wall/anchor; fitted shelf heights and contents are not measured.
+for z in [1.47,1.79,2.11]:
     box('Primary wall shelf board',(0,-.10,z),(1.08,.24,.03),oak,.009)
     for x in [-.41,.41]:
-        box('Primary shelf upright bracket',(x,.007,z-.10),(.025,.025,.22),white,.003)
-        box('Primary shelf support arm',(x,-.09,z-.04),(.025,.21,.025),white,.003)
-for i in range(4):
-    box('Plain bedside shelf storage',(-.38+i*.245,-.10,1.60),(.20,.17,.22),
-        [linen,bluegrey,curtainmat,white][i],.008)
+        box('Primary shelf upright bracket',(x,.007,z-.10),(.025,.025,.22),black,.003)
+        box('Primary shelf support arm',(x,-.09,z-.04),(.025,.21,.025),black,.003)
+for z in [1.47,1.79]:
+    for i in range(6):
+        h=[.21,.24,.22,.25,.20,.23][i]
+        box('Plain bedside shelf books',(-.425+i*.17,-.10,z+.015+h/2),(.135,.17,h),
+            [linen,bluegrey,curtainmat,walnut,navy,white][i],.004)
+# Upper stored forms stay below Z2.325, clear of the Z2.38 ceiling underside.
+for x,w,h,mat in [(-.33,.26,.20,black),(0,.20,.17,bluegrey),(.31,.24,.18,walnut)]:
+    box('Plain upper bedside shelf storage',(x,-.10,2.125+h/2),(w,.17,h),mat,.008)
 chest('Primary long wood dresser',(3.66,4.22,0),1.42,1.02,0,3,2,'U8')
 chest('Primary narrow wood chest',(2.56,3.77,0),.63,.82,0,4,1,'U8')
 asset('Primary wall television',(3.65,4.46,1.62),0,'U8')
