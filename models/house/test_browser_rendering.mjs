@@ -25,13 +25,17 @@ const mobile=new URLSearchParams(location.search).has('mobile');
 const lighting=createHouseLighting(scene,renderer,{mobile});
 const surfaces=['wood','fabric','carpet','blocks','siding','shakes','roof','lawn','mineral','stone','paint','ceramic','brushed','foliage','glass','screen','metal','panels'];
 const geometry=new THREE.SphereGeometry(.53,24,16);
+const ao=Uint8Array.from({length:geometry.attributes.position.count},(_,i)=>
+  Math.round((geometry.attributes.position.getY(i)/1.06+.5)*255));
+geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(ao,1,true));
 for(const [index,surface] of surfaces.entries()){
   const finish={surface,roughness:surface==='metal'?.04:.48,
     metalness:['metal','brushed'].includes(surface)?1:0,
     clearcoat:['wood','ceramic','screen'].includes(surface)?.5:0,
     sheen:['fabric','carpet'].includes(surface)?.6:0,
     grainAxis:index%2?'y':'x',panelSize:[1.2,.6,.01],panelOffset:0,mortarColor:[.48,.44,.36]};
-  const mat=createHouseMaterial({name:'Fixture / '+surface,color:[.32,.24,.12],finish});
+  const mat=createHouseMaterial({name:'Fixture / '+surface,color:[.32,.24,.12],finish},
+    {ambientOcclusionStrength:index%2?.35:0});
   const mesh=new THREE.Mesh(geometry,mat);mesh.position.set((index%6-2.5)*1.35,.64,(Math.floor(index/6)-1)*1.6);
   mesh.castShadow=mesh.receiveShadow=surface!=='glass';mesh.layers.enable(1);scene.add(mesh);
 }

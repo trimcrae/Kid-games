@@ -4,6 +4,7 @@ import {createHouseLife} from './house-life.mjs';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
+import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -156,11 +157,16 @@ async function load(){
     $('loading').textContent='Loading rooms and gardens…';
     const meshResponse=await fetch('./house.mesh.gz');if(!meshResponse.ok)throw new Error('Model geometry unavailable');
     const binary=await new Response(meshResponse.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    let occlusion=null;
+    try{occlusion=await loadHouseOcclusion(data,binary);}
+    catch(error){console.warn('House ambient occlusion skipped:',error.message);}
     for(const g of data.groups){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));
       geometry.computeBoundingSphere();
-      const material=createHouseMaterial(g);
+      if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
+        occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
+      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0});
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
@@ -172,7 +178,7 @@ async function load(){
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,pixelRatio,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();
