@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Craepets · House evidence</title>
+  <link rel="stylesheet" href="/review.css">
+  <script src="/review.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div><p class="eyebrow">CRAEPETS / HOUSE STUDY</p><h1>Walk through. Look closely.</h1><p class="subtitle">Connect what the house looks like to what the model needs.</p></div>
+    <div class="save-panel"><span class="local-badge">Local review · original files stay here</span><p id="save-state" role="status" aria-live="polite">Loading session…</p><div class="actions"><button id="retry-save" hidden>Retry save</button><button id="cancel-save" class="quiet" hidden>Cancel failed save</button><button id="export" class="quiet" disabled>Download evidence JSON</button></div></div>
+  </header>
+  <main>
+    <p id="fatal" class="notice error" role="alert" hidden></p>
+    <section id="empty" class="card" hidden><h2>Ready for the walkthroughs</h2><p>Register a local video with the house-evidence CLI, then reload this page. The tool streams the original file from this computer.</p><pre id="add-command"></pre><p>Review the full picture and narration separately. Add observations with a timestamp and viewpoint, then connect them to a room and model target.</p></section>
+    <div class="workspace">
+      <div class="study-column">
+        <section class="card playback"><div class="section-top"><h2>01 / Walkthrough</h2><span id="video-summary" class="muted"></span></div>
+          <label for="video-select">Source video</label><select id="video-select" disabled></select>
+          <video id="video" controls preload="metadata" playsinline aria-label="House walkthrough with narrated audio"></video>
+          <p id="codec-error" class="notice error" hidden>This browser cannot play the original codec; use a local compatible proxy.</p>
+          <div class="range-fields"><div><label for="start">In point · seconds</label><div class="input-action"><input id="start" type="number" min="0" step="0.1" value="0"><button id="capture-start" class="quiet">Use current time</button></div></div><div><label for="end">Out point · seconds</label><div class="input-action"><input id="end" type="number" min="0" step="0.1" value="0"><button id="capture-end" class="quiet">Use current time</button></div></div></div>
+          <div class="review-range"><p>Mark only the interval you intentionally reviewed. Playback and observations do not mark coverage.</p><div class="actions"><button id="mark-visual" class="quiet">Mark picture reviewed</button><button id="mark-audio" class="quiet">Mark narration reviewed</button></div><p id="range-error" class="error" role="alert" hidden></p></div>
+          <div id="video-coverage" class="coverage-summary"></div>
+        </section>
+        <section class="card"><div class="section-top"><h2>02 / Evidence notebook</h2><span id="evidence-count" class="muted"></span></div><p class="hint">Separate visible details, spoken descriptions, measurements and inference. A viewpoint helps put each detail in the right place.</p>
+          <form id="evidence-form">
+            <input id="observation-id" type="hidden">
+            <div class="field-grid"><div><label for="room">Room</label><select id="room" required></select></div><div><label for="aspect">Aspect</label><select id="aspect" required></select></div><div><label for="basis">Evidence basis</label><select id="basis"><option value="visual">Visible in video</option><option value="narration">Spoken in narration</option><option value="measurement">Measured reference</option><option value="inference">Inference / estimate</option></select></div><div><label for="confidence">Confidence</label><select id="confidence"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></div></div>
+            <p id="aspect-checklist" class="hint"></p>
+            <label for="viewpoint">Where are you standing, and which way are you facing?</label><input id="viewpoint" required placeholder="At the kitchen doorway, looking toward the back windows">
+            <label for="statement">What does this interval establish?</label><textarea id="statement" rows="3" required placeholder="Describe one specific detail. Include uncertainty or a spoken measurement when relevant."></textarea>
+            <div class="field-grid"><div><label for="related-room">Connected room <span class="muted">(optional)</span></label><select id="related-room"></select></div><div><label for="target">Model target <span class="muted">(optional)</span></label><input id="target" list="model-targets" placeholder="Choose an asset, camera or source file"><datalist id="model-targets"></datalist></div></div>
+            <label for="extra-targets">Additional targets <span class="muted">(one per line, optional)</span></label><textarea id="extra-targets" rows="2" placeholder="asset:Exact asset name&#10;camera:camera_id"></textarea>
+            <p id="evidence-error" class="error" role="alert" hidden></p><div class="actions"><button id="save-evidence" type="submit">Add evidence & save</button><button id="cancel-edit" type="button" class="quiet" hidden>Cancel edit</button></div>
+          </form>
+          <div id="evidence-list" class="item-list"></div>
+        </section>
+      </div>
+      <aside class="reference-column">
+        <section class="card transcript"><div class="section-top"><h2>Narration</h2><span class="tag">Imported transcript</span></div><p class="hint">Transcript text may be wrong. Listen to the original audio to verify details; checked text does not mark an audio interval reviewed.</p><label for="transcript-search">Find in this transcript</label><input id="transcript-search" type="search" placeholder="Doorway, window, feet…"><div id="transcript-list" class="transcript-list"></div></section>
+        <section class="card"><div class="section-top"><h2>Open questions</h2><span id="question-count" class="muted"></span></div><div id="questions" class="item-list"></div><div id="warnings" class="hint"></div></section>
+      </aside>
+    </div>
+    <section class="card"><div class="section-top"><div><h2>03 / Room coverage</h2><p class="hint">Choose a cell to assess its evidence. Supported means direct evidence exists; it does not mean the model has been changed.</p></div></div><div class="table-scroll"><table><caption class="sr-only">Room evidence review status by aspect</caption><thead id="coverage-head"></thead><tbody id="coverage-body"></tbody></table></div>
+      <form id="review-form" class="review-form"><div class="field-grid"><div><label for="review-room">Room</label><select id="review-room" required></select></div><div><label for="review-aspect">Aspect</label><select id="review-aspect"></select></div><div><label for="review-status">Assessment</label><select id="review-status"><option value="partial">Partial</option><option value="supported">Supported by evidence</option><option value="conflict">Conflicting evidence</option><option value="unseen">Not seen in sources</option><option value="not-applicable">Not applicable</option></select></div></div><fieldset><legend>Evidence for this assessment</legend><div id="review-evidence"></div></fieldset><label for="review-note">Reason or remaining uncertainty</label><textarea id="review-note" rows="2"></textarea><p id="review-error" class="error" role="alert" hidden></p><button type="submit">Save room assessment</button></form>
+    </section>
+  </main>
+  <footer>Evidence first. Layout, openings and scale before materials, furniture and light.</footer>
+</body>
+</html>
