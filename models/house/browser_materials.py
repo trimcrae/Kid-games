@@ -6,6 +6,7 @@ are only read when their sockets are unlinked; linked values are represented by
 the named finish's calibrated average, not the unused socket default.
 """
 import re
+import math
 
 
 def finish_for_name(name):
@@ -111,3 +112,49 @@ def keep_bevel(name, collection, dimensions, vertex_count):
 def practical_light(name, kind, energy):
     return kind in {'POINT', 'SPOT', 'AREA'} and energy > 0 and name not in {
         'Large softbox daylight', 'Sunroom daylight', 'Front daylight'}
+
+
+def ramp_colliders(name, vertices, axis, spacing=.10):
+    """Approximate an explicitly marked rectangular planar walking surface.
+
+    Input vertices use world-space Blender axes. The property names the world
+    horizontal slope axis ('x' or 'y'); output uses browser (X,Z,-Y) coordinates.
+    Each strip has a 6 cm collision thickness and a midpoint surface height.
+    The visible mesh is unchanged. Reject ambiguous geometry rather than
+    silently filling a triangle, twisted surface or solid object's whole box.
+    """
+    if axis not in {'x', 'y'} or not 0 < spacing <= .10:
+        raise ValueError(name + ': invalid browser walking ramp axis/spacing')
+    points = [tuple(p) for p in vertices]
+    if len(points) < 4 or any(not math.isfinite(v) for p in points for v in p):
+        raise ValueError(name + ': walking ramp requires finite rectangle vertices')
+    along = 0 if axis == 'x' else 1
+    across = 1 - along
+    lo = [min(p[i] for p in points) for i in range(3)]
+    hi = [max(p[i] for p in points) for i in range(3)]
+    length = hi[along] - lo[along]
+    if length < .001 or hi[across] - lo[across] < .001:
+        raise ValueError(name + ': degenerate walking ramp')
+    start = [p[2] for p in points if abs(p[along] - lo[along]) < 1e-5]
+    end = [p[2] for p in points if abs(p[along] - hi[along]) < 1e-5]
+    z0, z1 = max(start), max(end)
+    height = lambda t: z0 + (z1 - z0) * t
+    if any(abs(p[2] - height((p[along] - lo[along]) / length)) > 1e-5 for p in points):
+        raise ValueError(name + ': walking ramp must be a planar top surface')
+    for x in [lo[0], hi[0]]:
+        for y in [lo[1], hi[1]]:
+            if not any(abs(p[0] - x) < 1e-5 and abs(p[1] - y) < 1e-5 for p in points):
+                raise ValueError(name + ': walking ramp must have a rectangular footprint')
+    count = max(math.ceil(length / spacing), math.ceil(abs(z1 - z0) / .12), 1)
+    if count > 1000:
+        raise ValueError(name + ': walking ramp exceeds 1000 collision strips')
+    boxes = []
+    for i in range(count):
+        bottom, top = lo.copy(), hi.copy()
+        bottom[along] = lo[along] + length * i / count
+        top[along] = lo[along] + length * (i + 1) / count
+        z = height((i + .5) / count)
+        boxes.append({'name': name + ' walk strip %03d' % i,
+                      'min': [bottom[0], z - .06, -top[1]],
+                      'max': [top[0], z, -bottom[1]]})
+    return boxes

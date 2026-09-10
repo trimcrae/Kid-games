@@ -188,6 +188,11 @@ collision boxes, finish descriptions, practical lights and sunlight direction.
 The exporter opens the front door around its parent-relative local hinge and
 opens the selected sunroom panel and upper stair gate for continuous walking.
 It does not modify the saved Blender model.
+An axis-aligned planar rectangle explicitly tagged `browser_walk_ramp = 'x'`
+or `'y'` keeps one visible mesh but receives approximately 0.10 m collision
+strips with interpolated surface heights. The axis is in Blender world space.
+This lets the graded garage apron join the driveway without its full bounding
+box becoming a wall. Ambiguous/nonplanar ramp meshes fail export.
 
 `browser_materials.py` maps named finishes to roughness, metalness, clearcoat,
 sheen, emission and opacity. Unlinked Principled shader values refine that
@@ -388,6 +393,7 @@ then validate the generated geometry and browser contracts:
 python models/house/export_walkthrough.py
 python models/house/test_browser_materials.py
 node models/house/test_browser_materials.mjs
+node models/house/test_browser_ramps.mjs
 node models/house/test_walkthrough.mjs
 node tests/house-routes.mjs
 node tests/house-saves.cjs
@@ -396,7 +402,9 @@ node tests/house-saves.cjs
 `test_browser_materials.py` checks named finishes, shader-value handling, panel
 metadata and the bevel/light selection contracts without importing Blender.
 The Node material test checks linear colour, opacity, shader hooks and lamp
-occlusion. `test_browser_rendering.mjs` serves its own small fixture and compiles
+occlusion. The ramp test feeds Python-exported strips into the actual walking
+engine and traverses the apron uphill and downhill; `PYTHON` can select its
+installed Python executable. `test_browser_rendering.mjs` serves its own small fixture and compiles
 and renders every finish with actual desktop/phone WebGL settings, including
 shadow maps and bounded reflection probes:
 

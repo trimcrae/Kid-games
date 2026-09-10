@@ -1,7 +1,7 @@
 """Finish/export contracts; no Blender runtime or private reference required."""
 import unittest
 from types import SimpleNamespace
-from browser_materials import finish_for_name, material_finish, keep_bevel, practical_light
+from browser_materials import finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders
 
 
 class BrowserMaterials(unittest.TestCase):
@@ -61,6 +61,25 @@ class BrowserMaterials(unittest.TestCase):
         self.assertFalse(practical_light('Soft daylight sun', 'SUN', 2.2))
         self.assertTrue(practical_light('Living ceiling fill', 'AREA', 55))
         self.assertTrue(practical_light('Floor lamp warm bulb', 'POINT', 42))
+
+    def test_apron_ramp_has_bounded_strips_in_browser_coordinates(self):
+        points = [(-6.75,-4.8,-.795),(-.25,-4.8,-.795),
+                  (-.25,-1.8,-.16),(-6.75,-1.8,-.16)]
+        boxes = ramp_colliders('Apron', points, 'y')
+        self.assertEqual(len(boxes), 30)
+        self.assertAlmostEqual(boxes[0]['max'][2], 4.8)
+        self.assertAlmostEqual(boxes[-1]['min'][2], 1.8)
+        self.assertLess(abs(boxes[0]['max'][1] + .795), .012)
+        self.assertLess(abs(boxes[-1]['max'][1] + .16), .012)
+        for previous, box in zip(boxes, boxes[1:]):
+            self.assertAlmostEqual(previous['min'][2], box['max'][2])
+            self.assertLess(box['max'][1] - previous['max'][1], .03)
+
+    def test_ramp_rejects_twisted_or_nonrectangular_meshes(self):
+        with self.assertRaisesRegex(ValueError, 'planar'):
+            ramp_colliders('Twisted', [(0,0,0),(1,0,0),(1,1,1),(0,1,2)], 'y')
+        with self.assertRaisesRegex(ValueError, 'rectangular'):
+            ramp_colliders('Triangle', [(0,0,0),(1,0,0),(.5,.5,.5),(0,1,1)], 'y')
 
 
 if __name__ == '__main__':
