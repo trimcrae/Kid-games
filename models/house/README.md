@@ -8,7 +8,7 @@ It tracks timestamped observations, narration, room coverage, unresolved questio
 and model targets before changes are made. Original recordings stay outside this
 repository; creating the review framework does not confirm any additional geometry.
 
-A separate [first-person walkthrough test](../../house-test/) uses this model.
+A separate [third-person walkthrough test](../../house-test/) uses this model.
 It is not linked from the arcade home page. See its [controls and rebuild notes](../../house-test/README.md).
 The visible front/back yards now include lawn, planting beds, trees, a driveway,
 rear shed, trampoline, play equipment and fencing, based on photos 1–5 and V4–V5.
@@ -150,8 +150,9 @@ and render setting from observations of the homeowner's reference
 photographs (living room from the upper landing, stairs into the family
 room, kitchen, Cory's bedroom and the basement play area). It keeps the
 geometry modules untouched: materials are looked up by name and given real
-procedural shaders, so the browser exporter still reads each material's base
-colour. The photographs themselves stay private and are not committed.
+procedural shaders. The browser export carries their linear base colours and
+explicit finish descriptions into a separate real-time shading implementation
+described below. The photographs themselves stay private and are not committed.
 
 - **Surfaces.** Oak strip flooring with along-board grain, growth-ring bands
   and a satin polyurethane coat; eggshell wall paint with faint roller
@@ -175,6 +176,54 @@ colour. The photographs themselves stay private and are not committed.
 
 The pass encodes colours and finishes only. Room dimensions, furniture
 placement and the interior geometry are unchanged and remain estimates.
+
+## Browser export and rendering
+
+`export_walkthrough.py` reads the saved `.blend` and writes version 2 of
+`house-test/house.json` and `house-test/house.mesh.gz`. Geometry remains grouped
+by collection/material, with interleaved world-space position and normal floats.
+Blender `(X, Y, Z)` becomes browser `(X, Z, -Y)`; units remain metres. The manifest
+records the model generator hash, a separate exporter/helper hash, the mesh hash,
+collision boxes, finish descriptions, practical lights and sunlight direction.
+The exporter opens the front door around its parent-relative local hinge and
+opens the selected sunroom panel and upper stair gate for continuous walking.
+It does not modify the saved Blender model.
+
+`browser_materials.py` maps named finishes to roughness, metalness, clearcoat,
+sheen, emission and opacity. Unlinked Principled shader values refine that
+description; a linked socket's unused default is not treated as its evaluated
+value. Window panes use transparency, while dark appliance and monitor glass
+stays opaque. Selected furniture, cabinetry, doors and trim retain one-segment
+bevels and per-corner normals; repeated floorboards, dense foliage and large
+architectural surfaces retain the smaller browser geometry budget.
+
+`house-test/materials.mjs` adds code-authored detail in world units: wood grain,
+textile pile, paint texture, mineral surfaces, siding, roof courses and lawn
+variation. The dark exterior panel grid reads panel dimensions, offset and pale
+seam colour directly from its Blender Brick Texture node. It does not infer a
+wood finish from that surface. Fine detail fades with pixel footprint to reduce
+shimmer. No reference photographs, video frames, image-generated assets or
+texture downloads are included. Old version-1 manifests still load with a
+reduced finish fallback.
+
+`house-test/lighting.mjs` uses AgX display mapping in the walkthrough, a soft
+daylight environment, a cached sun shadow map, one shadowed ceiling spotlight
+and at most three additional nearby light fills (two on phones). Wall/floor
+occlusion filters the selected lamps. Static room reflections are captured from
+the exported geometry, excluding pets and activity markers, and held in a cache
+of at most three probes. Shadow maps are refreshed when necessary rather than
+redrawing the complete static house every walking frame. `houseTest.state`
+exposes active lamps, the shadowed lamp, reflection room/cache size, shadow-map
+size, draw calls and triangles for runtime inspection.
+
+This is a real-time approximation of the photographic materials, not Cycles in
+the browser. Indirect illumination is not baked or ray traced; unshadowed fills
+can still soften room boundaries. Room probes approximate mirror perspective
+and omit moving pets, and panes use alpha/reflection instead of full refraction.
+Grass and fabric shading do not add individual blade/fibre silhouettes. Full
+house startup time, frame performance and visual resemblance must be checked on
+the rebuilt export; a material fixture or passing route tests cannot establish
+photorealism or measured layout accuracy.
 
 ## Exterior envelope and trees
 
@@ -327,9 +376,49 @@ python models/house/verify.py
 top view. `--preview-scale 50 --samples 4` makes quick layout previews.
 Rebuilding **replaces** `house.blend` and `inventory.json`, so
 save manual edits under a different filename before regenerating. The script
-uses a fixed random seed. `build.py` loads `upstairs.py`, `extensions.py` and
-`basement_garage.py`; all four files contribute to the generator hash. `inventory.json` records it, Blender
+uses a fixed random seed. The generator hash covers `build.py`, `upstairs.py`,
+`extensions.py`, `basement_garage.py`, `yard.py`, `exterior.py` and `photoreal.py`.
+`inventory.json` records it, Blender
 version, object counts, cameras and furniture provenance.
+
+After a model rebuild, use the same installed Blender Python runtime for export,
+then validate the generated geometry and browser contracts:
+
+```sh
+python models/house/export_walkthrough.py
+python models/house/test_browser_materials.py
+node models/house/test_browser_materials.mjs
+node models/house/test_walkthrough.mjs
+node tests/house-routes.mjs
+node tests/house-saves.cjs
+```
+
+`test_browser_materials.py` checks named finishes, shader-value handling, panel
+metadata and the bevel/light selection contracts without importing Blender.
+The Node material test checks linear colour, opacity, shader hooks and lamp
+occlusion. `test_browser_rendering.mjs` serves its own small fixture and compiles
+and renders every finish with actual desktop/phone WebGL settings, including
+shadow maps and bounded reflection probes:
+
+```sh
+node models/house/test_browser_rendering.mjs
+```
+
+The WebGL fixture and full-game checks reuse an installed `playwright` module.
+The fixture accepts `PLAYWRIGHT_MODULE` as its absolute module directory; the
+full-game suite uses normal Node resolution or the containing `NODE_PATH`.
+`CHROMIUM_PATH` can select an installed browser; the
+test's Windows default is `C:/Program Files/Google/Chrome/Application/chrome.exe`.
+`HOUSE_RENDER_CAPTURE` optionally writes a disposable fixture screenshot.
+
+For full-game validation, run `python -m http.server 8765` from the repository
+root in a separate terminal, then run `node tests/house-craepets.cjs`. `HOUSE_BASE`
+can override its default `http://127.0.0.1:8765`. Inspect the actual house on
+desktop and phone, follow the changed entrances and stairs, and compare stable
+camera views to timestamped tour evidence. Check console errors, initial-load
+and frame behaviour, contact shadows, reflections, texture scale and glass
+sorting. Keep private footage and reference screenshots out of Git; remove
+disposable test captures after inspection.
 
 This folder is an offline model asset. It has no game entry point, and nothing
 is added to `assets/js/games.js`, the landing page, or service-worker precache.
