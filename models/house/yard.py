@@ -14,6 +14,8 @@ mulch = material('Garden dark mulch',(.12,.085,.047),.99,texture='stone')
 asphalt = material('Driveway charcoal asphalt',(.13,.15,.16),.98,texture='stone')
 shedmat = material('Shed taupe resin',(.49,.43,.38),.8)
 netmat = material('Trampoline netting',(.10,.13,.12),.9)
+net_fine = material('Trampoline dark fine woven net',(.025,.032,.029),.98)
+hoop_blue = material('Trampoline blue upper attachment',(.025,.07,.25),.65)
 bus_red = material('Bus stop red brown molded bench',(.30,.055,.035),.48)
 umbrella_red = material('Bus stop faded raspberry canvas',(.49,.12,.15),.89,texture='fabric')
 sign_yellow = material('Bus stop safety yellow',(.88,.86,.045),.48)
@@ -163,7 +165,7 @@ def shrub(name,pos,size,photo,profile='cultivated'):
         # not clipped topiary. Mesh leaves provide the actual open silhouette;
         # no opaque ellipsoid sits behind them in either export or render.
         sparse = profile == 'edge_stems'
-        along_y = pos[0] < -6.5 and pos[1] < 25
+        along_y = (pos[0] < -6.5 or pos[0] > 21) and pos[1] < 25
         lobes, stems = [], []
         for i in range(4 if sparse else 5):
             along = (i/((4 if sparse else 5)-1)-.5)*2.0
@@ -177,7 +179,10 @@ def shrub(name,pos,size,photo,profile='cultivated'):
             stems.append([tuple(foot),tuple(centre*.62+Vector((0,0,.12))),tuple(centre+Vector((0,0,radii.z*.5)))])
             for direction in [-1,1]:
                 stems.append([tuple(centre*.70),tuple(centre+Vector((direction*radii.x*.65,.10,radii.z*.30)))])
-        if sparse:count=int(count*.62)
+        # B9.003/11.005/13.005: dense, connected growth with irregular gaps.
+        # Larger overlapping leaf cards keep this bounded in the browser;
+        # never add an opaque core or fill the central lawn with vegetation.
+        count=min(650 if sparse else 850, int(count*(.72 if sparse else 1)))
         for _ in range(count):
             centre,radii=rng.choice(lobes)
             d=Vector((rng.gauss(0,1),rng.gauss(0,1),rng.gauss(0,1))).normalized()
@@ -185,11 +190,11 @@ def shrub(name,pos,size,photo,profile='cultivated'):
             c=centre+Vector((d.x*radii.x,d.y*radii.y,d.z*radii.z))*spread
             c.z=max(.06,c.z)
             leaves_out.append((c,d+Vector((0,0,.35))))
-        _yard_tubes('Rear boundary slender stems',stems,.008,bark,5)
-        _leaf_mesh('Rear boundary leafy growth',leaves_out,rng,.075 if sparse else .10,leafmat).hide_render=True
+        _yard_tubes('Rear boundary leafy slender stems',stems,.008,bark,5)
+        _leaf_mesh('Rear boundary leafy growth',leaves_out,rng,.12 if sparse else .15,leafmat).hide_render=True
         fine=[(c+Vector((rng.uniform(-.04,.04),rng.uniform(-.04,.04),rng.uniform(-.03,.03))),n)
               for c,n in leaves_out for _ in range(2)]
-        _leaf_mesh('Rear boundary fine leafy growth',fine,rng,.052 if sparse else .071,leafmat,export=False)
+        _leaf_mesh('Rear boundary fine leafy growth',fine,rng,.085 if sparse else .106,leafmat,export=False)
         return
     sphere('Shrub inner mass',(0,0,size[2]*.45),(size[0]*.8,size[1]*.8,size[2]*.8),leaves[3])
     for _ in range(count):
@@ -199,7 +204,7 @@ def shrub(name,pos,size,photo,profile='cultivated'):
     _leaf_mesh('Shrub leaf clusters', leaves_out, rng, .10, leafmat)
 
 
-def tree(name,pos,height,width,photo,trunk=.24,willow=False):
+def tree(name,pos,height,width,photo,trunk=.24,willow=False,broad_canopy=False):
     """Recursive limb tree: a curve of tapered branches and one mesh of leaf
     clusters around the outer twigs. Species and sizes are approximate."""
     asset(name,pos,photos=photo,confidence='tree visible; species and size approximate')
@@ -244,8 +249,9 @@ def tree(name,pos,height,width,photo,trunk=.24,willow=False):
     leaves_out = [(Vector((c.x * sx, c.y * sx, c.z * sz)), n) for c, n in leaves_out]
     dense = [(Vector((c.x * sx, c.y * sx, c.z * sz)), n) for c, n in dense]
     _branch_curve('Tree trunk and limbs', splines, bark)
-    _leaf_mesh('Tree leaf clusters', leaves_out, rng, .21, leafmat).hide_render = True
-    _leaf_mesh('Tree render leaves', dense, rng, .085, leafmat, export=False)
+    _leaf_mesh('Tree leafy canopy clusters' if broad_canopy else 'Tree leaf clusters',
+               leaves_out, rng, .24 if broad_canopy else .21, leafmat).hide_render = True
+    _leaf_mesh('Tree render leaves', dense, rng, .11 if broad_canopy else .085, leafmat, export=False)
 
 
 tree('Front large shade tree',(10,-12,yard_z),11.5,10.0,'H0–6; V5,exterior',.55)
@@ -358,22 +364,28 @@ def conifer(name,pos,height,width,photo,trunk=.24):
     _leaf_mesh('Spruce render needles', dense, rng, .11, needlemat, export=False)
 
 
-tree('Rear left shade tree',(-5.6,20.2,yard_z),12.0,12.0,'B5–9; H72; location estimated',.64)
+tree('Rear left shade tree',(-5.6,20.2,yard_z),12.0,13.5,'B5.002/9.003; broad canopy observed; height, spread and location estimated',.64,broad_canopy=True)
 # The broad middle lawn is open in the full backyard pan. Keep the former
 # centre tree with the other perimeter trees behind the shed, not in that lawn.
-tree('Rear lawn tree',(16.4,26.0,yard_z),11.0,8.5,'B11–13; moved to rear perimeter, estimated',.43)
-tree('Rear right screening tree',(22,18.7,yard_z),10.5,8.0,'B13–16; H75–78; estimated',.39)
+tree('Rear lawn tree',(16.4,26.0,yard_z),11.0,11.0,'B11.005/13.005; rear canopy observed; spread and perimeter location estimated',.43,broad_canopy=True)
+tree('Rear right screening tree',(22,18.7,yard_z),10.5,11.0,'B13.005/15.007/16.007; broad edge canopy observed; dimensions and placement estimated',.39,broad_canopy=True)
 conifer('Front tall conifer',(14.6,-11.4,yard_z),13.5,6.0,'H3–6; exact species unverified')
 asset('Front mulched planting beds',photos='V5')
 box('Left front mulch bed',(7.8,-3.6,yard_z+.01),(1.5,1.5,.08),mulch,.08)
 box('Right front mulch bed',(4.4,-5.4,yard_z+.01),(2.0,3.4,.08),mulch,.1)
 for i in range(6):
     shrub('Front garden shrub %02d'%i,(3.9+(i%2)*.9,-4.2-(i//2)*1.0,yard_z),(.43,.46,.47),'V5')
-for i,(x,y,w,h) in enumerate([(-7.4,12.4,.75,1.0),(-7.2,14.8,.9,1.3),(-7.6,17.0,.9,1.3),
-                             (-7.1,23.5,1.1,1.2),(-6,26.2,1.0,1.25),(-3.8,26.3,1.2,1.2),
-                             (1.2,26.5,.60,.8),(3.3,26.8,.75,1.0),(7,26.6,.70,.85),
-                             (21.7,25.5,1.1,1.35),(22.6,22.8,.85,1.1),(22.3,16,1.0,1.1)]):
-    shrub('Rear boundary planting %02d'%i,(x,y,yard_z),(w,.65,h),'B5–14; irregular edge planting, placement estimated',
+# These are fitted masses along the existing property edge, not a surveyed
+# boundary or an inventory of individual plants. The lower fence section
+# retains gaps; the right side has the taller connected growth seen in B13.
+for i,(x,y,w,d,h) in enumerate([(-7.2,12.5,1.05,1.6,1.6),(-7.4,15.6,1.1,1.7,1.85),
+        (-7.3,18.6,1.3,1.8,2.25),(-7.0,21.8,1.4,1.8,2.2),(-6.9,24.5,1.35,1.4,1.9),
+        (-6,26.2,1.6,.9,1.6),(-3.2,26.3,1.5,.85,1.55),(-.5,26.4,1.25,.7,1.35),
+        (1.5,26.5,1.2,.65,.85),(4.2,26.4,1.5,.7,1.05),(7.4,26.5,1.7,.75,1.15),
+        (11.6,26.4,1.5,.8,1.6),(14.8,26.4,1.7,.9,1.9),(18.1,26.2,1.8,.85,2.7),
+        (21.0,25.8,1.3,1.3,2.5),(22.0,23.5,1.2,1.8,2.5),(22.2,20,1.3,2.0,2.8),
+        (22.0,16.5,1.5,2.0,2.6),(21.8,13.2,1.3,1.6,2.2)]):
+    shrub('Rear boundary planting %02d'%i,(x,y,yard_z),(w,d,h),'B5.002/9.003/11.005/13.005; connected edge growth observed; density, height and placement estimated',
           profile='edge_stems' if 0<x<10 else 'hedge')
 
 asset('Rear boundary fence',photos='B7–11; H69–72',confidence='mixed timber section and low metal fence visible; transition and boundary coordinates estimated')
@@ -409,7 +421,7 @@ for side in [-1,1]:
     o=box('Shed shallow pale roof',(side*.83,0,2.29),(1.72,2.72,.065),shed_roof,.008)
     o.rotation_euler.y=side*.165
 
-asset('Backyard trampoline',(13.7,14.1,yard_z),0,'B0,15–16; H75–78','blue pad, curved net poles, yellow entrance and ladder observed; dimensions and pole count estimated')
+asset('Backyard trampoline',(13.7,14.1,yard_z),0,'B0.000/15.007/16.007; H75–78','blue pad, curved poles, dark fine net, blue arched upper attachment, yellow entrance and ladder observed; dimensions, mesh spacing, hoop details and pole count estimated')
 cylinder('Trampoline jumping mat',(0,0,.79),1.75,.05,black,48)
 _yard_tubes('Trampoline blue spring pad',[[ (1.85*math.cos(a),1.85*math.sin(a),.81) for a in [i*math.tau/64 for i in range(65)]]],.09,play_blue,8)
 pole_paths=[]
@@ -420,18 +432,40 @@ _yard_tubes('Trampoline curved padded poles',pole_paths,.025,steel,8)
 def _net_point(a,f):
     radius=1.82+.14*math.sin(f*math.pi)
     return (radius*math.cos(a),radius*math.sin(a),.88+f*(1.62-.10*math.sin(4*a)**2))
-net_paths=[]
-for i in range(80):
-    a=i*math.tau/80
-    if abs(a-math.pi/2)<.12:continue  # narrow entrance gap facing the lawn
-    net_paths.append([_net_point(a,f/6) for f in range(7)])
-for band in range(9):
-    net_paths.append([_net_point(a,(band+.5)/9) for a in [math.pi/2+.13+i*(math.tau-.26)/80 for i in range(81)]])
-_yard_tubes('Trampoline net strands',net_paths,.0025,netmat,3)
+# Literal dark ribbons leave real holes in both render and browser; an alpha
+# sheet would export as opaque with the current material contract. This is a
+# visual average of fine fabric, not a measured weave. About 9k triangles
+# replace the former coarse cylindrical grid, with no alpha sorting cost.
+net_verts,net_faces=[],[]
+def _net_ribbon(points):
+    start=len(net_verts)
+    for left,right in points:net_verts.extend([left,right])
+    net_faces.extend((start+2*i,start+2*i+1,start+2*i+3,start+2*i+2) for i in range(len(points)-1))
+for i in range(160):
+    a=i*math.tau/160
+    if abs(a-math.pi/2)<.13:continue
+    _net_ribbon([(_net_point(a-.0022,f/6),_net_point(a+.0022,f/6)) for f in range(7)])
+for band in range(75):
+    f=(band+.5)/75
+    _net_ribbon([(_net_point(a,f-.0013),_net_point(a,f+.0013))
+                 for a in [math.pi/2+.13+i*(math.tau-.26)/48 for i in range(49)]])
+_yard_mesh('Trampoline fine net strands',net_verts,net_faces,net_fine)
 _yard_tubes('Trampoline soft upper net seam',[[ _net_point(i*math.tau/80,1) for i in range(81)]],.012,netmat,5)
 _yard_tubes('Trampoline yellow zipper entrance',[[(-.19,1.86,.88),(-.17,1.96,1.25),(-.10,1.94,1.70),(0,1.84,2.12),(.10,1.94,1.70),(.17,1.96,1.25),(.19,1.86,.88)]],.011,sign_yellow,5)
 _yard_tubes('Trampoline access ladder',[[ (x,2.18,.04),(x,1.88,.90)] for x in [-.26,.26]]+
             [[(-.26,2.18-.30*z/.9,z),(.26,2.18-.30*z/.9,z)] for z in [.18,.39,.60,.81]],.022,steel,6)
+# B0/15/16 clearly resolves the blue rounded silhouette above the net. The
+# dark inset, plain rim and hanging cords are simple fitted hoop details;
+# no lettering or inferred brand is reproduced. It faces the jumping mat.
+_yard_prism('Trampoline arched upper backboard',[(-.40,2.44),(.40,2.44),(.40,2.68),
+    (.34,2.84),(.20,2.96),(0,3.0),(-.20,2.96),(-.34,2.84),(-.40,2.68)],.065,hoop_blue,-1.66)
+box('Trampoline upper backboard inset',(0,-1.619,2.67),(.54,.015,.25),net_fine,.035)
+_yard_tubes('Trampoline backboard supports',[[ (x,-1.76,2.05),(x,-1.69,2.60)] for x in [-.24,.24]],.018,steel,6)
+_yard_tubes('Trampoline basketball rim',[[ (.19*math.cos(a),-1.38+.19*math.sin(a),2.51)
+    for a in [i*math.tau/24 for i in range(25)]]],.012,hoop_blue,6)
+_yard_tubes('Trampoline rim mounting bracket',[[(0,-1.63,2.51),(0,-1.56,2.51)]],.014,hoop_blue,6)
+_yard_tubes('Trampoline hoop net strands',[[ (.19*math.cos(a),-1.38+.19*math.sin(a),2.51),
+    (.12*math.cos(a+.3),-1.38+.12*math.sin(a+.3),2.30)] for a in [i*math.tau/8 for i in range(8)]],.003,netmat,3)
 
 
 def molded_slide(name,pos,angle,mat=play_lime):
@@ -517,9 +551,29 @@ _yard_tubes('Firepit rolled rim',[[ (.58*math.cos(a),.58*math.sin(a),.35) for a 
 _yard_tubes('Firepit mesh lid ribs',[[ (.52*math.cos(a)*math.cos(t),.52*math.sin(a)*math.cos(t),.36+.22*math.sin(t)) for t in [i*math.pi/16 for i in range(9)]] for a in [i*math.tau/12 for i in range(12)]],.007,black,4)
 _yard_tubes('Firepit lid handle',[[(-.07,0,.59),(-.07,0,.65),(.07,0,.65),(.07,0,.59)]],.013,black,6)
 
-asset('Rear sunroom steps',photos='1-5',confidence='small grade connection added for walkthrough; tread dimensions estimated')
-for i in range(4):
-    box('Rear garden step',(4.65,11.55+i*.27,-.18-i*.18),(1.03,.30,.18),concrete)
+asset('Rear sunroom threshold lawn',photos='B0.000/16.007/18.008/19.008',confidence='lawn close to the sunroom sill observed; no four-riser white flight visible; local grade, 12 cm nominal lip and transition extent are route-fit estimates')
+# The previous four white risers were a navigation invention. Keep the room
+# floor and the yard datum fixed, fitting only the adjoining lawn to a small
+# lip below the sill. No metric grade was recovered from the recording.
+threshold_z=-.22
+def _threshold_grade(y):
+    return threshold_z+(yard_z-threshold_z)*max(0,min(1,(y-11.90)/3.30))
+for name,y0,y1 in [('Sunroom sill grass landing',11.41,11.90),('Sunroom lawn graded approach',11.90,15.20)]:
+    grade=_yard_mesh(name,[(.8,y0,_threshold_grade(y0)),(7.4,y0,_threshold_grade(y0)),
+                          (7.4,y1,_threshold_grade(y1)),(.8,y1,_threshold_grade(y1))],[(0,1,2,3)],lawn)
+    grade['browser_walk_ramp']='y'
+# Small side cells blend the slope to the existing lawn. Separate local
+# collision boxes approximate each surface, avoiding one raised AABB across
+# the whole bank. Adjacent cell tops differ by <=.15 m, below a normal step.
+grade_rows=[11.41,11.90,12.45,13.00,13.55,14.10,14.65,15.20]
+for side,inner,outer in [('west',.8,-.4),('east',7.4,8.6)]:
+    for i in range(4):
+        x0,x1=inner+(outer-inner)*i/4,inner+(outer-inner)*(i+1)/4
+        for j,(y0,y1) in enumerate(zip(grade_rows,grade_rows[1:])):
+            verts=[(x,y,yard_z+(_threshold_grade(y)-yard_z)*(1-t))
+                   for x,y,t in [(x0,y0,i/4),(x1,y0,(i+1)/4),(x1,y1,(i+1)/4),(x0,y1,i/4)]]
+            if side=='west':verts.reverse()
+            _yard_mesh('Sunroom %s lawn bank %02d %02d'%(side,i,j),verts,[(0,1,2),(0,2,3)],lawn)
 
 # Front porch steps and their short curved drive connection are authored
 # together in extensions.py; do not retain the older long forward sweep.
