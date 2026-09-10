@@ -27,7 +27,8 @@ function route(name,waypoints){
 }
 const routes=[
  ['Front door',[[6.6,.7,0],[6.6,-.95,0],[4.25,-.95,-.06]]],
- ['Kitchen to garage',[[1.2,7.56,0],[-.5,7.56,-.16]]],
+ // Approach around the window-wall worktop restored from H60/H63.
+ ['Kitchen to garage',[[1.5,6.8,0],[.84,7.32,0],[.78,7.56,0],[-.5,7.56,-.16]]],
  ['Upstairs flight',[[7.5,4.01,0],[8.8,4.01,.2],[10.9,4.01,1.26],[13.0,4.01,1.26]]],
  ['Downstairs flight',[[7.5,2.63,0],[9.0,2.63,-.5],[10.3,2.63,-1.05]]],
  ['Lower bedroom entry',[[11.5,4.2,-1.05],[11.5,5.2,-1.05],[11.5,6.2,-1.05],[10.2,6.2,-1.05]]],
