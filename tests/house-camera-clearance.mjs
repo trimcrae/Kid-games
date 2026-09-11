@@ -8,7 +8,7 @@ import {gunzipSync} from 'node:zlib';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {createCameraGuard,nearPlaneReach,orbitCamera} from '../house-test/camera-guard.mjs';
+import {createCameraGuard,nearPlaneReach,orbitCamera,arrivalHeading} from '../house-test/camera-guard.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const mesh=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
@@ -33,6 +33,23 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
   }
 }
 assert.equal(failures.length,0,failures.slice(0,12).join('\n'));
+// Arriving in any room (a jump or the first frame) never parks the camera
+// inside the pet: the arrival heading always leaves a real third-person view.
+const cramped=[];
+for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
+  const [ax,ay,heading]=room[6]||[room[2],room[3],room[5]];
+  const player=world.safeSpot(ax,room[4],-ay),station=world.safeSpot(room[2],room[4],-room[3]);
+  const view=orbitCamera(player,arrivalHeading(player,heading,-.18,world,guard,clearance),-.18,world,guard,clearance);
+  const distance=Math.hypot(view.position.x-view.target.x,view.position.y-view.target.y,view.position.z-view.target.z);
+  if(distance<1.2)cramped.push(`${room[1]} ${distance.toFixed(2)} m`);
+  // An arrival spot stays within reach of the room's activity station.
+  assert(Math.abs(player.y-station.y)<.35&&Math.hypot(player.x-station.x,player.z-station.z)<1.45,room[1]+' arrives out of reach of its station');
+  for(let i=0;i<24;i++)for(const pitch of [-.8,-.18,.42]){
+    const v=orbitCamera(player,i/24*Math.PI*2,pitch,world,guard,clearance);
+    assert(!guard.blocked(v.target,v.position)&&guard.clearanceAt(v.position)>=reach,room[1]+' arrival view behind a surface');
+  }
+}
+assert.equal(cramped.length,0,'Arrival camera too close: '+cramped.join(', '));
 distances.sort((a,b)=>a-b);
 const median=distances[distances.length>>1];
 // Open rooms still get a proper third-person view, not a camera jammed into the pet.

@@ -25,7 +25,7 @@ export async function createHouseLife(tour){
   const engine=frame.contentWindow.Craepets;
   const neighborhood=createNeighborhood(scene,world);
   const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew:()=>showActivity({id:'adopt',room:'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'})});
-  let avatar,avatarSize=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,heading=Math.PI,syncAt=0,lastWho=null,decorKey='';
+  let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
   const stations=activities.map(a=>{
     const room=rooms.find(r=>r[1]===a.room),point=world.safeSpot(room[2],room[4],-room[3]);
@@ -94,7 +94,8 @@ export async function createHouseLife(tour){
     if(!snapshot.pet)return;
     avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
     if(snapshot.pet.petpet){const friend=petpet(snapshot.pet.petpet.id);friend.position.set(.4,0,-.3);avatar.add(friend);}
-    avatarSize=new THREE.Box3().setFromObject(avatar).getSize(new THREE.Vector3());
+    const box=new THREE.Box3().setFromObject(avatar);avatarSize=box.getSize(new THREE.Vector3());
+    avatarBounds={minY:box.min.y,maxY:box.max.y,radius:Math.max(avatarSize.x,avatarSize.z)/2};
   }
   function updateRoamers(){
     const family=api.family().filter(p=>p.id!==engine.who()&&p.pet);
@@ -170,8 +171,8 @@ export async function createHouseLife(tour){
   return {
     hasPet:()=>!!engine.state().pet,
     adopt:()=>recovery.open(),
-    face(angle){heading=angle;},
-    movement(dx,dz){moving=Math.hypot(dx,dz)>.0001;if(moving)heading=Math.atan2(dx,dz);},
+    face(angle,instant=false){wantHeading=angle;if(instant)heading=angle;},
+    movement(dx,dz,rate=0){moving=Math.hypot(dx,dz)>.0001;speed=rate;if(moving)wantHeading=Math.atan2(dx,dz);},
     interact(){
       if(!near.length)return;
       const target=near.find(s=>destination?.id===s.id);
@@ -182,7 +183,16 @@ export async function createHouseLife(tour){
     },
     tick(dt,time,active){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
-      if(avatar){avatar.position.set(player.x,player.y,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion);}
+      if(avatar){
+        // Turn along the shorter way at a creature's pace (fast, eased),
+        // never a one-frame about-face.
+        const turn=Math.atan2(Math.sin(wantHeading-heading),Math.cos(wantHeading-heading));
+        heading+=tour.reducedMotion?turn:Math.sign(turn)*Math.min(Math.abs(turn),Math.max(Math.abs(turn)*(1-Math.exp(-dt*10)),dt*2));
+        avatar.position.set(player.x,player.y,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion,speed);
+        // If a tight corner still brings the camera right up to the pet, let
+        // the view see past it rather than fill the screen with fur.
+        avatar.visible=!avatarBounds||!companionBlocksCamera(player,tour.camera.position,{...avatarBounds,radius:avatarBounds.radius-.1});
+      }
       for(const r of roamers){
         r.timer-=dt;
         if(r.timer<=0){r.timer=2+Math.random()*4;r.angle=Math.random()*Math.PI*2;r.walking=Math.random()>.22;}

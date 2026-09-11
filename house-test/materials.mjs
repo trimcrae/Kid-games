@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {styleGroup} from './palette.mjs';
 
 // The colours in the export are already linear RGB. No photographs or texture
 // downloads: these code-built patterns are evaluated in metres
@@ -134,13 +135,13 @@ vec3 houseBump(vec3 position,vec3 normal,float height){
 `;
 
 export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
-  const f=finishDescription(group),glass=f.surface==='glass';
+  const {color,finish:f}=styleGroup(group,finishDescription(group)),glass=f.surface==='glass';
   const aoStrength=THREE.MathUtils.clamp(ambientOcclusionStrength,0,.5);
   const material=new THREE.MeshPhysicalMaterial({
-    color:new THREE.Color(...group.color),roughness:f.roughness??.7,
+    color,roughness:f.roughness??.7,
     metalness:f.metalness??0,clearcoat:f.clearcoat??0,
     clearcoatRoughness:f.clearcoatRoughness??.2,
-    sheen:f.sheen??0,sheenColor:new THREE.Color(...group.color),sheenRoughness:.7,
+    sheen:f.sheen??0,sheenColor:color,sheenRoughness:.7,
     emissive:new THREE.Color(...(f.emissive||[0,0,0])),
     emissiveIntensity:f.emissiveIntensity??0,
     side:THREE.DoubleSide,transparent:glass,opacity:glass?(f.opacity??.2):1,

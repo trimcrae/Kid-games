@@ -113,10 +113,15 @@ export function nearPlaneReach(camera){
   const t=Math.tan(camera.fov*Math.PI/360);
   return camera.near*Math.sqrt(1+t*t*(1+camera.aspect*camera.aspect));
 }
-// Third-person orbit used by the walkthrough, shared with the tests.
-export function orbitCamera(player,yaw,pitch,world,guard,clearance){
-  const target={x:player.x,y:player.y+.65,z:player.z};
-  const desired={x:player.x+Math.sin(yaw)*1.9*Math.cos(pitch),y:player.y+1.15-Math.sin(pitch)*1.9,z:player.z+Math.cos(yaw)*1.9*Math.cos(pitch)};
+// Third-person follow camera: a game framing, a little above and behind the
+// pet so the room and floor around it
+// read, rather than a wide lens at head height (about 35° down by default).
+// Shared with the tests.
+export const CAMERA_RIG={target:.45,boom:2.0,height:1.45};
+// One guarded placement along a single boom direction.
+export function boomCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
+  const target={x:player.x,y:player.y+rig.target,z:player.z};
+  const desired={x:player.x+Math.sin(yaw)*rig.boom*Math.cos(pitch),y:player.y+rig.height-Math.sin(pitch)*rig.boom,z:player.z+Math.cos(yaw)*rig.boom*Math.cos(pitch)};
   // The colliders also cover the neighbourhood's plain boxes; the guard then
   // checks what is left of the sightline against the drawn surfaces.
   let fraction=world?world.cameraFraction(target,desired):1;
@@ -124,5 +129,36 @@ export function orbitCamera(player,yaw,pitch,world,guard,clearance){
     const limit={x:target.x+(desired.x-target.x)*fraction,y:target.y+(desired.y-target.y)*fraction,z:target.z+(desired.z-target.z)*fraction};
     fraction*=guard.fraction(target,limit,clearance);
   }
-  return {target,position:{x:target.x+(desired.x-target.x)*fraction,y:target.y+(desired.y-target.y)*fraction,z:target.z+(desired.z-target.z)*fraction},fraction};
+  const position={x:target.x+(desired.x-target.x)*fraction,y:target.y+(desired.y-target.y)*fraction,z:target.z+(desired.z-target.z)*fraction};
+  return {target,position,fraction,distance:Math.hypot(position.x-target.x,position.y-target.y,position.z-target.z),pitch};
+}
+// In a tight room the camera swings up towards the ceiling before it slides
+// in along the boom, so it looks down on the pet instead of into its back.
+// Every candidate is a full guarded placement; the swing is capped so small
+// rooms never turn into a plan view.
+export const CRANE_STEPS=[0,-.15,-.3,-.45];
+export function craneExtra(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
+  let best=null;
+  for(const extra of CRANE_STEPS){
+    const view=boomCamera(player,yaw,Math.max(-1,pitch+extra),world,guard,clearance,rig);
+    if(!best||view.distance>best.view.distance+.1)best={extra,view};
+    if(view.distance>=1.5)break;
+  }
+  return best;
+}
+export function orbitCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
+  return craneExtra(player,yaw,pitch,world,guard,clearance,rig).view;
+}
+// Arrive looking along the room's authored direction unless the camera would
+// be jammed against a wall or the pet there; then turn to the nearest heading
+// (within a quarter turn either way) that gives the camera room.
+export function arrivalHeading(player,authored,pitch,world,guard,clearance){
+  let best=authored,bestDistance=-1;
+  for(let i=0;i<=24;i++){
+    const heading=authored+(i%2?1:-1)*Math.ceil(i/2)*Math.PI/24;
+    const distance=boomCamera(player,heading,pitch,world,guard,clearance).distance;
+    if(distance>bestDistance+.15){bestDistance=distance;best=heading;}
+    if(distance>1.6)break;
+  }
+  return Math.atan2(Math.sin(best),Math.cos(best));
 }

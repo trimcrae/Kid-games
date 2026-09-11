@@ -5,7 +5,7 @@ import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
-import {createCameraGuard,nearPlaneReach,orbitCamera} from './camera-guard.mjs';
+import {createCameraGuard,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -19,6 +19,15 @@ scene.background=new THREE.Color('#c2d5d5');
 scene.fog=new THREE.Fog('#c2d5d5',35,85);
 const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.045,120);
 camera.rotation.order='YXZ';
+// A game lens rather than an interior-photography one: about 82° across on
+// any screen shape, which is ~57° vertical at 16:10. Portrait phones keep the
+// old 70° cap, so the widest near plane the clearance test assumes still holds.
+function fitLens(){
+  camera.aspect=innerWidth/innerHeight;
+  camera.fov=THREE.MathUtils.clamp(2*Math.atan(Math.tan(41*Math.PI/180)/camera.aspect)*180/Math.PI,50,70);
+  camera.updateProjectionMatrix();
+}
+fitLens();
 let renderer;
 const maxPixelRatio=Math.min(devicePixelRatio,1.35);
 let pixelRatio=Math.min(maxPixelRatio,1),qualitySince=0,qualityFrames=0,lastQualityChange=0;
@@ -37,14 +46,18 @@ try {
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches});
 
 let guard=null,cameraClearance=nearPlaneReach(camera)+.015;
-let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,eyeY=1.63,active=false,ready=false,failed=false;
-const keys=new Set();let joy={x:0,y:0},last=performance.now(),drag=null;
+let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
+const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null;
+// The eased follow-camera state: crane swing and boom length.
+let rigState=null,arrivalYaw=null;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function teleport(room){
-  const p=world.safeSpot(room[2],room[4],-room[3]);
+  const [ax,ay,heading]=room[6]||[room[2],room[3],room[5]];
+  const p=world.safeSpot(ax,room[4],-ay)||world.safeSpot(room[2],room[4],-room[3]);
   if(!p){$('hint').textContent='That starting point is unavailable. Choose a nearby room.';return false;}
-  Object.assign(player,p);yaw=room[5];pitch=-.18;eyeY=p.y+1.60;
+  Object.assign(player,p);pitch=-.18;focusY=p.y;velocity={x:0,z:0};rigState=null;
+  yaw=arrivalYaw=arrivalHeading(player,heading,pitch,world,guard,cameraClearance);life?.face(yaw+Math.PI,true);
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
   lighting.setRoom(room[1],player);
   $('hint').textContent='WASD to walk · Mouse to aim · E for activities · R for rooms';
@@ -148,7 +161,8 @@ function look(dx,dy){
   // Horizontal turning is unlimited; the angle only wraps to stay precise.
   if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));
   pitch=THREE.MathUtils.clamp(pitch-dy*LOOK_SPEED,PITCH_MIN,PITCH_MAX);
-  life?.face(yaw+Math.PI);
+  // The view orbits freely; the pet only turns when it walks, so you can
+  // circle round and see its face.
 }
 document.addEventListener('mousemove',e=>{if(active&&mouseLocked())look(e.movementX,e.movementY);});
 canvas.addEventListener('pointerdown',e=>{
@@ -166,12 +180,34 @@ function updateJoy(e){const r=joystick.getBoundingClientRect();let x=(e.clientX-
 joystick.addEventListener('pointerdown',e=>{if(!active)return;joyId=e.pointerId;joystick.setPointerCapture(e.pointerId);updateJoy(e);});
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
 function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();cameraClearance=nearPlaneReach(camera)+.015;renderer.setSize(innerWidth,innerHeight);});
+window.addEventListener('resize',()=>{fitLens();cameraClearance=nearPlaneReach(camera)+.015;renderer.setSize(innerWidth,innerHeight);});
+// Follow camera. The guard's answer is where the camera may go this frame; it
+// pulls in at once but eases back out and swings up/down smoothly, so walking
+// past a door jamb no longer pops the view by a metre in one frame. Anything
+// shown lies on a guarded boom no further out than the guard allowed.
+function placeCamera(dt){
+  const focus={x:player.x,y:focusY,z:player.z};
+  const pick=craneExtra(focus,yaw,pitch,world,guard,cameraClearance);
+  if(!rigState||reducedMotion)rigState={extra:pick.extra,distance:pick.view.distance};
+  rigState.extra+=(pick.extra-rigState.extra)*(1-Math.exp(-dt*4));
+  if(Math.abs(rigState.extra-pick.extra)<.004)rigState.extra=pick.extra;
+  const view=rigState.extra===pick.extra?pick.view:boomCamera(focus,yaw,Math.max(-1,pitch+rigState.extra),world,guard,cameraClearance);
+  const eased=rigState.distance+(view.distance-rigState.distance)*(1-Math.exp(-dt*3.5));
+  rigState.distance=Math.min(view.distance,eased);
+  if(rigState.distance>=view.distance-1e-4||view.distance<1e-4)return view;
+  const s=rigState.distance/view.distance,t=view.target,p=view.position;
+  const position={x:t.x+(p.x-t.x)*s,y:t.y+(p.y-t.y)*s,z:t.z+(p.z-t.z)*s};
+  // A point inside the guarded boom can still pass close to a jamb edge.
+  if(guard&&guard.clearanceAt(position)<cameraClearance-.015){rigState.distance=view.distance;return view;}
+  return {target:t,position};
+}
+let lastRender=performance.now();
 function render(){
   // A room probe renders six views. It must not hold up the activity iframe
   // and adoption controls while they are still loading.
-  lighting.tick(player,performance.now(),ready);
-  const view=orbitCamera(player,yaw,pitch,world,guard,cameraClearance);
+  const now=performance.now(),dt=Math.min((now-lastRender)/1000,.1);lastRender=now;
+  lighting.tick(player,now,ready);
+  const view=placeCamera(dt);
   camera.position.set(view.position.x,view.position.y,view.position.z);camera.lookAt(view.target.x,view.target.y,view.target.z);
   renderer.render(scene,camera);
 }
@@ -208,11 +244,20 @@ function animate(now){
     let right=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
     let forward=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
     const n=Math.max(1,Math.hypot(right,forward));right/=n;forward/=n;
-    const speed=(keys.has('ShiftLeft')||keys.has('ShiftRight')?3.1:1.9)*dt;
+    const speed=keys.has('ShiftLeft')||keys.has('ShiftRight')?3.1:1.9;
+    // A short ramp (~0.15 s) up to speed and down to a stop, like a creature
+    // with some weight, rather than a cursor. Reduced motion keeps it instant.
+    const want={x:(right*Math.cos(yaw)-forward*Math.sin(yaw))*speed,z:(-right*Math.sin(yaw)-forward*Math.cos(yaw))*speed};
+    const blend=reducedMotion?1:1-Math.exp(-dt*14);
+    velocity.x+=(want.x-velocity.x)*blend;velocity.z+=(want.z-velocity.z)*blend;
+    if(Math.hypot(velocity.x,velocity.z)<.02&&!want.x&&!want.z)velocity={x:0,z:0};
     const before={x:player.x,z:player.z};
-    world.move(player,(right*Math.cos(yaw)-forward*Math.sin(yaw))*speed,(-right*Math.sin(yaw)-forward*Math.cos(yaw))*speed);
-    life?.movement(player.x-before.x,player.z-before.z);
-    eyeY=THREE.MathUtils.lerp(eyeY,player.y+1.6,reducedMotion?1:1-Math.exp(-dt*16));
+    world.move(player,velocity.x*dt,velocity.z*dt);
+    // Keep only the speed the walls actually allowed.
+    if(dt>0){velocity.x=(player.x-before.x)/dt;velocity.z=(player.z-before.z)/dt;}
+    life?.movement(player.x-before.x,player.z-before.z,Math.hypot(velocity.x,velocity.z));
+    // The camera follows a smoothed floor height, so stairs don't jolt it.
+    focusY=THREE.MathUtils.lerp(focusY,player.y,reducedMotion?1:1-Math.exp(-dt*12));
     if(++frames%15===0)updateLocation();
   }
   life?.tick(dt,now/1000,active);
@@ -246,7 +291,7 @@ async function load(){
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
       mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
