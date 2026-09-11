@@ -89,7 +89,16 @@ spheres and flat shapes. It covers:
 - personal cues: Cory's 100-square grid, Ellie's dresses and crown,
   Jeannie's reading nook, Kieran's mobile;
 - a garden: a raised vegetable bed at the Garden & maths spot, a
-  stepping-stone path, flower beds and a chalk hopscotch.
+  stepping-stone path, flower beds and a chalk hopscotch;
+- walls at eye level: kids' drawings and landscapes, clocks, a family height
+  chart on the kitchen pier, shelves with toys and books, bunting, a kitchen
+  calendar and valance, living-room curtains, mirrors and a cork board.
+
+`dressing.py` also paints rooms whose generic plaster read grey. The green
+bathroom gets a sage-mint plaster above its tile. Cory's walls get the warm
+white that H126 documents. Jeannie's undocumented walls get a pale sea-glass
+tint. Only the faces that point into each room change: shared partitions,
+skirting and cladding keep their finish. Kieran's documented blue is kept.
 
 People and readable personal items are still omitted. Picture frames use simple
 code-drawn shapes rather than copies of personal images. The source photographs
@@ -226,8 +235,9 @@ built beneath them.
 
 An object or parent empty tagged `browser_collide = False` never becomes a
 collision box. That covers rugs, wall pieces, shelf and bed props, small toys,
-flowers, stepping stones and the young trees' crowns. The young trees block
-only at their trunk guards. Blocking dressing boxes carry `dressing: true`, and
+flowers, stepping stones and the young trees' crowns and white guards. The
+young trees block only at their three support stakes, which are wide enough
+to keep a pet outside the guard. Blocking dressing boxes carry `dressing: true`, and
 the vegetable bed also carries `stationProp: 'farm'`.
 `tests/house-dressing.mjs` keeps these boxes clear of the walking lanes and of
 every activity station, and checks the dressing triangle and draw budget.

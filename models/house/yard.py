@@ -275,7 +275,12 @@ def young_fruit_tree(name,pos,height,width):
     _yard_tubes('Young tree lateral branches',branch_paths,.008,bark,5)['browser_collide']=False
     _leaf_mesh('Young fruit tree leaves',foliage_points,rng,.062,leafmat)['browser_collide']=False
     cylinder('Small tree mulch circle',(0,0,.016),.40,.025,mulch,24)
-    cylinder('Young tree trunk guard',(0,0,.27),.10,.46,white,12)
+    cylinder('Young tree trunk guard',(0,0,.27),.10,.46,white,12)['browser_collide']=False
+    # Three support stakes tied to the trunk: their joint box is the sapling's
+    # collision volume, wide enough that a pet stops outside the white guard.
+    stakes=[[(.26*math.cos(a),.26*math.sin(a),0),(.26*math.cos(a),.26*math.sin(a),.95)] for a in (0.4,2.5,4.6)]
+    ties=[[(.25*math.cos(a),.25*math.sin(a),.80),(.03*math.cos(a),.03*math.sin(a),.78)] for a in (0.4,2.5,4.6)]
+    _yard_tubes('Young tree support stakes',stakes+ties,.018,bark,6)
 
 
 young_fruit_tree('Front young fruit tree near driveway',(6.4,-7.1,yard_z),2.65,1.5)
