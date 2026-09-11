@@ -19,7 +19,10 @@ const built=performance.now()-began;
 const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(neighborhoodBoxes);
 const inside=p=>world.boxes.some(b=>p.x>b.min[0]+.02&&p.x<b.max[0]-.02&&p.y>b.min[1]+.02&&p.y<b.max[1]-.02&&p.z>b.min[2]+.02&&p.z<b.max[2]-.02);
 // The walkthrough's lens: 70° vertical at the widest common desktop aspect.
-const reach=nearPlaneReach({fov:70,near:.045,aspect:21/9}),clearance=reach+.015;
+// The widest near plane any screen can get: the lens is about 82° across, capped
+// to 50–70° vertical, and eases up to 13° wider (to the 70° cap) in tight spots.
+const lens=a=>Math.min(70,Math.min(70,Math.max(50,2*Math.atan(Math.tan(41*Math.PI/180)/a)*180/Math.PI))+13);
+const reach=Math.max(...[.46,.75,1,1.33,1.6,1.78,2.16,2.33,2.8,3.56].map(aspect=>nearPlaneReach({fov:lens(aspect),near:.045,aspect}))),clearance=reach+.015;
 
 let views=0,placing=0;const failures=[],distances=[];
 for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
