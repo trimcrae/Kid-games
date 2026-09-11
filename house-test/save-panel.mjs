@@ -1,5 +1,7 @@
 const $=id=>document.getElementById(id);
 export function setupSaves({api,engine,tour,refresh,startNew}){
+  // Same touch handling as every other button (acts on pointerup, no ghost click).
+  const on=(id,action)=>tour.bindButton($(id),action);
   const saves=$('activity-frame').contentWindow.HouseSaves;let pending=null;
   function preview(data){
     pending=data;const valid=saves.validate(data,engine.who());$('save-preview').replaceChildren();
@@ -14,11 +16,11 @@ export function setupSaves({api,engine,tour,refresh,startNew}){
     $('single-save-profile').value=engine.who();$('close-saves').focus();
   }
   for(const p of api.profiles()){const option=document.createElement('option');option.value=p.id;option.textContent=p.name;$('single-save-profile').append(option);}
-  $('load-original-saves').addEventListener('click',()=>{try{preview(saves.bundle('original'));}catch(e){$('save-message').textContent=e.message;}});
+  on('load-original-saves',()=>{try{preview(saves.bundle('original'));}catch(e){$('save-message').textContent=e.message;}});
   $('save-file').addEventListener('change',async e=>{try{const file=e.target.files[0];if(!file)return;if(file.size>5000000)throw Error('Choose a Craepets JSON backup smaller than 5 MB.');const parsed=saves.validate(await file.text(),$('single-save-profile').value);preview({format:'craepets-family',profiles:parsed.profiles,who:parsed.who||$('single-save-profile').value});}catch(e){pending=null;$('apply-saves').hidden=true;$('save-message').textContent=e.message;}});
-  $('apply-saves').addEventListener('click',()=>{try{api.leave();const ids=saves.restore(pending,engine.who());api.refreshSaves();refresh();pending=null;$('apply-saves').hidden=true;$('save-message').textContent=`Loaded ${ids.length} complete saved pets. You’re ready to walk home.`;$('close-saves').textContent='Play with my saved pet';}catch(e){$('save-message').textContent=e.message;}});
-  $('close-saves').addEventListener('click',()=>{$('save-panel').hidden=true;if(engine.state().pet)tour.resume();else $('welcome').hidden=false;});
-  $('new-pet-instead').addEventListener('click',()=>{$('save-panel').hidden=true;startNew();});
-  $('load-saves').addEventListener('click',open);$('welcome-saves').addEventListener('click',open);
+  on('apply-saves',()=>{try{api.leave();const ids=saves.restore(pending,engine.who());api.refreshSaves();refresh();pending=null;$('apply-saves').hidden=true;$('save-message').textContent=`Loaded ${ids.length} complete saved pets. You’re ready to walk home.`;$('close-saves').textContent='Play with my saved pet';}catch(e){$('save-message').textContent=e.message;}});
+  on('close-saves',()=>{$('save-panel').hidden=true;if(engine.state().pet)tour.resume();else $('welcome').hidden=false;});
+  on('new-pet-instead',()=>{$('save-panel').hidden=true;startNew();});
+  on('load-saves',open);on('welcome-saves',open);
   return {open};
 }

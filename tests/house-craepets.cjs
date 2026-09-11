@@ -109,7 +109,8 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     await page.keyboard.press('KeyE');await page.locator('[data-choice="nest"]').click();await page.locator('#activity-panel').waitFor({state:'visible'});
     await f.locator('[data-do="wash"]').click();await page.locator('#activity-panel').waitFor({state:'hidden'});
     const guided=await page.evaluate(()=>houseTest.state);assert.equal(guided.destination,'wash');assert(Math.abs(guided.position.x-walking.position.x)<.1,'Directions silently teleported the player');
-    const roamed=await page.evaluate(()=>houseTest.state.roamers);assert(roamed.some(r=>r.id==='ellie'),'Family pet did not join the house');assert(roamed.some(r=>r.distance>.15),'Pets do not roam');
+    const roamed=await page.evaluate(()=>houseTest.state.roamers);assert(roamed.some(r=>r.id==='ellie'),'Family pet did not join the house');// Companions live at their places (a bed, a rug, the veg bed…) doing something there.
+    assert(roamed.length>=8&&roamed.every(r=>r.act&&r.mode),'Companions have no routine');assert(roamed.some(r=>r.mode==='at'),'No companion is at its place');
     await page.keyboard.press('KeyF');await page.locator('[data-profile="ellie"]').click();await page.waitForTimeout(1100);assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Ellie Blossom');
     await page.keyboard.press('KeyF');await page.locator('[data-profile="cory"]').click();
     const saved=await runtime().evaluate(()=>({coins:Craepets.state().coins,correct:Craepets.state().stats.correct}));
@@ -137,6 +138,10 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     const mf=mobile.frameLocator('#activity-frame');await mf.locator('.choice').first().waitFor();
     assert(await mobile.frame({url:/activity.html/}).evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Phone activity overflows horizontally');
     await mobile.screenshot({path:'tests/house-phone-activity.png'});await mobile.locator('#close-activity').tap();
+    // The tap's follow-up click must not fall through to the Rooms button under it.
+    await mobile.waitForTimeout(600);
+    assert(await mobile.locator('#rooms').isHidden(),'Closing an activity by touch opened Rooms (ghost click)');
+    assert(await mobile.evaluate(()=>houseTest.state.active),'Closing an activity by touch did not return to walking');
     await phone.close();console.log('PASS phone touch walking and learning activity');
     console.log('ERRORS',JSON.stringify(errors));assert.deepEqual(errors,[]);
   }catch(e){console.log('ERRORS',JSON.stringify(errors));await page.screenshot({path:'tests/house-failure.png',timeout:10000}).catch(()=>{});throw e;}finally{await browser.close();}

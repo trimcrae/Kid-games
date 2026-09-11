@@ -43,8 +43,9 @@ function detailTile(family){
       const warp=(noise(u*3,v*8,3,8)-.5)*2.2;
       const grain=noise(u*3,v*64+warp,3,64),ribbon=noise(u*2,v*12+warp*.25,2,12);
       const pore=Math.max(0,.52-noise(u*5,v*110+warp,5,110))**2;
-      tone=.94+grain*.10+ribbon*.025-pore*.12;
-      rough=(grain-.5)*.065;height=(grain-.5)*.45-pore*.15;
+      // Pores are kept faint: at game distance they read as dotted lines.
+      tone=.94+grain*.10+ribbon*.025-pore*.05;
+      rough=(grain-.5)*.065;height=(grain-.5)*.45-pore*.05;
     }else if(family===2){
       const pile=noise(u*56,v*56),weave=wave(u*64)*wave(v*64);
       tone=.95+noise(u*12,v*12)*.1+weave*.018;rough=(pile-.5)*.06;height=pile-.5;
@@ -122,8 +123,14 @@ float housePanelSeam(vec3 p){
 vec3 houseSurface(vec3 p,vec3 n){
   vec2 uv=housePlane(p,n);
   if(houseVerticalGrain)uv=uv.yx;
-  vec3 detail=texture2D(houseDetailMap,uv/houseDetailScale).rgb;
-  return vec3(detail.r*2.0,detail.g-.5,(detail.b*2.0-1.0)*houseHeight);
+  vec2 tile=uv/houseDetailScale;
+  vec3 detail=texture2D(houseDetailMap,tile).rgb;
+  // Detail finer than a pixel cannot be shown, only aliased: fade the bump
+  // (the sparkle source) and most of the tone/roughness grain as the tile's
+  // texels shrink below a pixel (low render scale, distance, grazing views).
+  float texels=max(length(dFdx(tile)),length(dFdy(tile)))*256.0;
+  float keep=1.0/(1.0+texels*texels*.12),grain=mix(.45,1.0,keep);
+  return vec3(1.0+(detail.r*2.0-1.0)*grain,(detail.g-.5)*grain,(detail.b*2.0-1.0)*houseHeight*keep);
 }
 vec3 houseBump(vec3 position,vec3 normal,float height){
   vec3 dx=dFdx(position),dy=dFdy(position);
@@ -184,7 +191,15 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
   {
     // Uniform branches are coherent across each draw. A material family or
     // wood-grain direction must not compile another copy of the PBR shader.
-    material.customProgramCacheKey=()=> aoStrength>0?'house-finish-v3-ao':'house-finish-v3';
+    // Foliage gets its own variant (a discard would cost early depth testing
+    // on every house surface): leaves close to the camera dissolve.
+    const foliage=f.surface==='foliage';
+    // Defines live on the material from the start: onBeforeCompile receives
+    // material.defines itself, so adding them only there changed the program
+    // key after the first compile and every house shader was built twice.
+    if(aoStrength>0)material.defines.HOUSE_AO=1;
+    if(foliage)material.defines.HOUSE_FOLIAGE=1;
+    material.customProgramCacheKey=()=>(aoStrength>0?'house-finish-v3-ao':'house-finish-v3')+(foliage?'-leaf':'');
     material.onBeforeCompile=shader=>{
       shader.uniforms??={};
       if(aoStrength>0){
@@ -193,6 +208,7 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
         shader.uniforms.houseOcclusionShape={value:new THREE.Vector3(OCCLUSION.gain,OCCLUSION.curve,OCCLUSION.direct)};
       }
       shader.uniforms.houseSurfaceKind={value:family};
+      if(foliage){shader.defines??={};shader.defines.HOUSE_FOLIAGE=1;}
       const tile=detailTile(family);
       shader.uniforms.houseDetailMap={value:tile.texture};
       shader.uniforms.houseDetailScale={value:tile.scale};
@@ -218,6 +234,14 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
           #ifdef HOUSE_AO
             varying float vHouseOcclusion;uniform float houseOcclusionStrength;uniform vec3 houseOcclusionShape;
           #endif\n`+SURFACE_GLSL)
+        .replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
+          #ifdef HOUSE_FOLIAGE
+            // Big leaf cards in front of the follow camera dissolve with an
+            // ordered screen-space dither (no transparency sorting): gone
+            // within ~1.3 m, fully solid again by ~2 m.
+            float houseLeafFade=smoothstep(1.3,2.0,length(vViewPosition));
+            if(houseLeafFade<1.0&&fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(.06711056,.00583715))))>houseLeafFade)discard;
+          #endif`)
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
           diffuseColor.rgb*=houseDetail.x;
