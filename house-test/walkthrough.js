@@ -288,8 +288,17 @@ function render(){
   renderer.render(scene,camera);
 }
 function updateLocation(){
-  let closest=null,d=Infinity;
-  for(const r of rooms){const dist=Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12;if(dist<d){d=dist;closest=r;}}
+  // The room you're in is the nearest room spot you can actually see — no
+  // wall, floor or window between — not merely the nearest one: on the
+  // living-room rug the porch spot is closer, but through the front wall.
+  // The name, the room lighting and its reflection probe all follow this.
+  const ranked=rooms.map(r=>({r,d:Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12})).sort((a,b)=>a.d-b.d);
+  let closest=ranked[0]?.r;
+  const eye={x:player.x,y:player.y+1.2,z:player.z};
+  for(const {r} of ranked.slice(0,6)){
+    if(Math.abs(r[4]-player.y)>.7)continue;
+    if(!guard||!guard.blocked(eye,{x:r[2],y:r[4]+1.2,z:-r[3]},true)){closest=r;break;}
+  }
   if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
 let frames=0,lastDraw=0;

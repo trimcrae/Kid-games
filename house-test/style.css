@@ -24,7 +24,8 @@ h2{font-size:21px;font-weight:800}
 p{margin:0}
 #view{width:100%;height:100%;display:block;touch-action:none;outline:none}
 #crosshair{position:fixed;top:50%;left:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#ffffff80;pointer-events:none}
-.mouse-look #crosshair{display:block!important;z-index:1}.mouse-look #view{cursor:none}
+/* Third person: nothing to aim at, so no dot sits on the pet while the mouse is captured. */
+.mouse-look #view{cursor:none}
 #fade{position:fixed;inset:0;background:var(--panel);opacity:0;pointer-events:none;z-index:8;transition:opacity .28s ease-out}
 #fade.on{opacity:1;transition:none}
 

@@ -94,12 +94,12 @@ export async function createHouseLife(tour){
   for(const name of roomNames){
     const room=rooms.find(r=>r[1]===name),here=stations.filter(s=>s.room===name),a=here[0]||{icon:'🛏️',point:world.safeSpot(room[2],room[4],-room[3])};
     const icons=here.length?here.map(s=>s.icon).join(''):a.icon;
-    const plain=bubbleTexture(icons,false),keyed=bubbleTexture(icons,true);
+    const plain=bubbleTexture(icons,false);
     const bubble=new THREE.Sprite(new THREE.SpriteMaterial({map:plain.texture,sizeAttenuation:false,transparent:true,depthTest:true}));
     bubble.center.set(.5,0);bubble.position.set(a.point.x,a.point.y+.95,a.point.z);bubble.renderOrder=2;bubble.visible=false;scene.add(bubble);
     const glow=new THREE.Mesh(new THREE.CircleGeometry(.6,32),new THREE.MeshBasicMaterial({map:glowTexture,transparent:true,depthWrite:false,opacity:.9}));
     glow.rotation.x=-Math.PI/2;glow.position.set(a.point.x,a.point.y+.02,a.point.z);glow.renderOrder=1;glow.visible=false;scene.add(glow);
-    markers.push({name,bubble,glow,plain,keyed,point:a.point,stations:here});
+    markers.push({name,bubble,glow,plain,point:a.point,stations:here});
   }
   // Room emoji for cards without an activity of their own.
   const roomIcon=name=>/bedroom/i.test(name)?'🛏️':/bath/i.test(name)?'🛁':/hall|entry/i.test(name)?'🚪':/laundry/i.test(name)?'🧺':/street/i.test(name)?'🏘️':/yard|porch/i.test(name)?'🌳':'🏠';
@@ -476,12 +476,13 @@ export async function createHouseLife(tour){
       // in — not a neighbouring room's glimpsed through an open doorway — plus
       // the "walk there" destination whenever it's in plain sight.
       if(time>roomAt){roomAt=time+.4;whereAmI();}
-      const nearRooms=new Set(near.map(s=>s.room)),keyed=finePointer();
+      const nearRooms=new Set(near.map(s=>s.room));
       for(const m of markers){
         const distance=Math.hypot(player.x-m.point.x,player.z-m.point.z),sameFloor=Math.abs(player.y-m.point.y)<.65,reach=nearRooms.has(m.name);
         const guided=destination?.room===m.name&&m.inSight;
         m.bubble.visible=active&&sameFloor&&(reach||(m.name===hereRoom&&distance>=2&&distance<=5.5)||(guided&&distance<=10));
-        const map=(reach&&keyed?m.keyed:m.plain);if(m.bubble.material.map!==map.texture){m.bubble.material.map=map.texture;m.bubble.material.needsUpdate=true;}
+        // The action pill at the bottom already carries the [E]; the bubble just marks the spot.
+        const map=m.plain;if(m.bubble.material.map!==map.texture){m.bubble.material.map=map.texture;m.bubble.material.needsUpdate=true;}
         const size=reach?.085:.07;m.bubble.scale.set(size*map.aspect,size,1);
         if(reach&&!tour.reducedMotion)m.bubble.position.y=m.point.y+.95+Math.sin(time*3)*.03;
         m.glow.visible=sameFloor&&(reach||destination?.room===m.name)&&distance<8;
