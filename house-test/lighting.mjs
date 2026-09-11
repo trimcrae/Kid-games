@@ -94,7 +94,8 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   let sunAxis=new THREE.Vector3(.27,-.58,-.77).normalize();
 
   const key=new THREE.SpotLight(0xffdec0,0,8,1.35,.85,2);
-  key.castShadow=KEY_SHADOW;key.shadow.mapSize.setScalar(mobile?512:1024);
+  // Phones skip it: the extra shadow lookup measured +16-22 % per frame there.
+  key.castShadow=KEY_SHADOW&&!mobile;key.shadow.mapSize.setScalar(mobile?512:1024);
   key.shadow.camera.near=.06;
   // Ceiling cones are very wide; a narrower shadow frustum keeps texels useful
   // over the room itself (outside it the key simply lights without shadow).
@@ -197,7 +198,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
       m.emissiveIntensity=phase.windows*(room.outdoor?2.2:.12);
       // A 20 %-opaque pane can only add a fifth of its glow: from the garden
       // after dark the panes turn into warm lit squares instead.
-      m.opacity=room.outdoor&&phase.windows>.5?.82:room.outdoor&&phase.windows>.2?.45:m.userData.baseOpacity;
+      m.opacity=room.outdoor&&phase.windows>.5?.6:room.outdoor&&phase.windows>.2?.35:m.userData.baseOpacity;
     }
     petLight.userData.target=phase.pet*(room.outdoor&&phaseName==='day'?0:1);
     hemisphere.userData.target=hemi;
@@ -233,7 +234,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     }
     if((main?.name||'')!==keyId){
       keyId=main?.name||'';
-      if(KEY_SHADOW){key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;}
+      if(key.castShadow){key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;}
     }
   }
 
