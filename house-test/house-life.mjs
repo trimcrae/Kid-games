@@ -7,6 +7,8 @@ import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
 import {stepCompanion} from './companions.mjs';
 import {createGround} from './pet-ground.mjs';
+import {createPetBehaviour,angleTo} from './pet-behaviour.mjs';
+import {createEmotes} from './emotes.mjs';
 const $=id=>document.getElementById(id);
 export function companionBlocksCamera(point,camera,bounds){
   const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
@@ -32,6 +34,9 @@ export async function createHouseLife(tour){
   // Pets stand on the visible floor finish (boards and tile sit above the
   // walking boxes), so their feet and contact shadows aren't buried.
   const ground=createGround(scene);let avatarLift=0;
+  // Your pet's own idle life and needs (pet-behaviour.mjs) and its thought bubble.
+  const emotes=createEmotes(scene);let petLife=null,petNeeds=null,petOut=null,visY=null,stepHop=null,foldIn=0,foldAmount=0;
+  const headAt=new THREE.Vector3();
   const stations=activities.map(a=>{
     const room=rooms.find(r=>r[1]===a.room),point=world.safeSpot(room[2],room[4],-room[3]);
     if(!point)throw Error('Activity has no safe floor: '+a.id);
@@ -79,7 +84,7 @@ export async function createHouseLife(tour){
   };
   bindButton($('close-activity'),()=>closeActivity());
   bindButton($('close-choices'),()=>{$('activity-choices').hidden=true;tour.resume();});
-  bindButton($('pet-button'),()=>{if(engine.state().pet)api.cuddle();});
+  bindButton($('pet-button'),()=>{if(engine.state().pet){api.cuddle();petLife?.react('hello');}});
   bindButton($('cancel-journey'),()=>{destination=null;$('journey').hidden=true;});
   bindButton($('family-button'),()=>{
     closeActivity(false);tour.suspend();$('welcome').hidden=true;$('rooms').hidden=true;$('family-panel').hidden=false;
@@ -93,12 +98,14 @@ export async function createHouseLife(tour){
   }
   try{const probe='craepets.house.storage-check';localStorage.setItem(probe,'1');localStorage.removeItem(probe);}catch{$('save-status').textContent='Saving is unavailable in this browser. Keep this tab open to keep playing.';}
   function updateAvatar(snapshot){
+    petNeeds=snapshot.pet&&!snapshot.pet.egg?snapshot.pet:null;
     const key=JSON.stringify(snapshot.pet&&[snapshot.who,snapshot.pet.species,snapshot.pet.colour,!!snapshot.pet.egg,snapshot.pet.wear,snapshot.pet.petpet]);
     if(key===avatarKey)return;avatarKey=key;
     if(avatar)disposeCreature(avatar);avatar=null;
     if(!snapshot.pet)return;
     avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
-    if(snapshot.pet.petpet){const friend=petpet(snapshot.pet.petpet.id);friend.position.set(.4,0,-.3);avatar.add(friend);}
+    if(snapshot.pet.petpet){const friend=petpet(snapshot.pet.petpet.id);friend.position.set(.4,0,-.3);avatar.add(friend);avatar.userData.petpet=friend;}
+    petLife=createPetBehaviour({egg:!!snapshot.pet.egg});visY=null;stepHop=null;
     const box=new THREE.Box3().setFromObject(avatar);avatarSize=box.getSize(new THREE.Vector3());
     avatarBounds={minY:box.min.y,maxY:box.max.y,radius:Math.max(avatarSize.x,avatarSize.z)/2};
   }
@@ -190,16 +197,39 @@ export async function createHouseLife(tour){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       ground.frame();
       if(avatar){
+        const reduced=tour.reducedMotion,walking=active&&moving,rig=avatar.userData.rig;
+        // What the pet feels like doing: look back at you, sniff, sit, yawn,
+        // doze off when tired… (pet-behaviour.mjs), from its real needs.
+        let friend=null,best=3;
+        for(const r of roamers){const d=Math.hypot(r.point.x-player.x,r.point.z-player.z);if(d<best&&Math.abs(r.point.y-player.y)<.5){best=d;friend={angle:angleTo(player,heading,r.point)};}}
+        petOut=petLife.update(dt,{moving:walking,needs:petNeeds,camera:{angle:angleTo(player,heading,tour.camera.position)},friend,night:engine.timeOfDay?.()==='night',reduced});
+        if(petOut.turnTo!==null&&!walking)wantHeading=heading+petOut.turnTo;
         // Turn along the shorter way at a creature's pace (fast, eased),
         // never a one-frame about-face.
         const turn=Math.atan2(Math.sin(wantHeading-heading),Math.cos(wantHeading-heading));
-        heading+=tour.reducedMotion?turn:Math.sign(turn)*Math.min(Math.abs(turn),Math.max(Math.abs(turn)*(1-Math.exp(-dt*10)),dt*2));
+        heading+=reduced?turn:Math.sign(turn)*Math.min(Math.abs(turn),Math.max(Math.abs(turn)*(1-Math.exp(-dt*(walking?10:5))),dt*2));
         avatarLift=ground.offset(player,avatarLift);
-        avatar.position.set(player.x,player.y+avatarLift,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion,speed);
+        // Stair treads: the walking height steps 18 cm at a time; the body
+        // hops up (or down) each tread in a short arc instead of teleporting.
+        const floorY=player.y+avatarLift;
+        if(visY===null||reduced||Math.abs(floorY-visY)>.6){visY=floorY;stepHop=null;}
+        else if(Math.abs(floorY-(stepHop?stepHop.to:visY))>.06)stepHop={from:visY,to:floorY,t:0};
+        if(stepHop){stepHop.t+=dt/.18;const k=Math.min(1,stepHop.t);visY=stepHop.from+(stepHop.to-stepHop.from)*k*k*(3-2*k)+Math.sin(Math.PI*k)*.045;if(k>=1){visY=stepHop.to;stepHop=null;}}
+        else visY=floorY;
+        avatar.position.set(player.x,visY,player.z);avatar.rotation.y=heading;
+        rig.setExpression(petOut.expression);rig.setPose(petOut.pose);rig.look(...petOut.look);if(petOut.hop)rig.hop(petOut.hop);
+        rig.setGrime(petNeeds&&petNeeds.clean<35?.35+.65*(35-petNeeds.clean)/35:0);
+        // Wings and tails tuck in beside a wall instead of poking through it.
+        if(rig.wings||rig.tail){foldIn-=dt;if(foldIn<=0){foldIn=.2;const s=Math.sin(heading),c=Math.cos(heading);
+          foldAmount=[[c,-s],[-c,s],[-s,-c]].some(([x,z])=>world.blocked(player.x+x*.22,player.z+z*.22,player.y))?1:0;}rig.fold(foldAmount);}
+        avatar.userData.animate(time,walking,reduced,speed);
+        avatar.userData.petpet?.userData.animate(time,walking,reduced,speed);
         // If a tight corner still brings the camera right up to the pet, let
         // the view see past it rather than fill the screen with fur.
         avatar.visible=!avatarBounds||!companionBlocksCamera(player,tour.camera.position,{...avatarBounds,radius:avatarBounds.radius-.1});
-      }
+        avatar.userData.head.getWorldPosition(headAt);headAt.y=avatar.position.y+avatarBounds.maxY+.04;
+        emotes.update(dt,petOut.emote,headAt,avatar.visible,reduced);
+      }else emotes.update(dt,null,null,false,true);
       for(const r of roamers){
         const gap=stepCompanion(r,dt,world,player);
         r.mesh.position.set(r.point.x,r.point.y+ground.offset(r.point,r.mesh.position.y-r.point.y),r.point.z);r.mesh.rotation.y=r.angle;r.mesh.userData.animate(time,r.walking,tour.reducedMotion);
@@ -216,6 +246,8 @@ export async function createHouseLife(tour){
         $('journey').hidden=false;$('journey-text').textContent=`${arrow} ${destination.room} · ${Math.round(d)} m${Math.abs(dy)>.6?(dy>0?' · Go upstairs':' · Go downstairs'):''}${inReach(destination)?' · You’re here!':''}`;
       }else $('journey').hidden=true;
     },
-    diagnostics:()=>({pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
+    // The top of your pet's head (above its ears), for anchoring a speech bubble.
+    petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
+    diagnostics:()=>({petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
   };
 }
