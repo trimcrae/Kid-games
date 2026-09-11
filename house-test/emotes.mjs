@@ -18,7 +18,8 @@ function bubble(name){
 export function createEmotes(scene){
   const textures={};let current=null,opacity=0;
   // Drawn over the scene (never cut by a door frame); callers show it only in plain sight.
-  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false,sizeAttenuation:false,opacity:0,fog:false,toneMapped:false}));
+  // Same sprite settings as the HUD's name pills, so they share one shader program.
+  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false,sizeAttenuation:false,opacity:0}));
   sprite.scale.set(.066,.066,1);sprite.visible=false;sprite.renderOrder=3;sprite.name='pet emote';scene.add(sprite);
   return {
     // name: a GLYPHS key or null; at: world position of the head top.
@@ -37,7 +38,7 @@ export function createEmotes(scene){
 // A shopkeeper's line in a cream speech bubble over their head: one at a
 // time, a few seconds, constant size on screen, wrapped to a short width.
 export function createSpeech(scene){
-  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false,sizeAttenuation:false,opacity:0,fog:false,toneMapped:false}));
+  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false,sizeAttenuation:false,opacity:0}));
   sprite.center.set(.5,0);sprite.renderOrder=4;sprite.visible=false;sprite.name='host speech';scene.add(sprite);
   let left=0,texture=null,anchor=null,opacity=0,text='';
   function draw(words){

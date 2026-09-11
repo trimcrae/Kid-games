@@ -15,13 +15,37 @@ capture (some in-app or embedded browsers can), the footer says so, hold-and-dra
 looking takes over, and a normal Chrome or Edge tab gives full mouse look.
 Touch devices have a movement pad and drag-to-look. Every pet is drawn at
 `PET_SCALE` (`creatures.mjs`), dog-sized against the real-size furniture.
-The orbit camera is kept inside the room by `camera-guard.mjs`, which tests
-the sightline against the drawn triangles rather than only the walking
-colliders, so it cannot slip through wall or ceiling junctions. The Rooms menu offers directions (without teleporting) and quick
-jumps to each floor and yard. Family pets and the activity hosts wander on their
-own, follow collision boundaries and give the player space. Doors and the
-upper stair gate are held open in the browser export. There is no analytics,
-account, network service, or runtime CDN dependency.
+
+The house is presented as a lived-in game world rather than an architectural
+study:
+- **Follow camera** (`camera-guard.mjs`, `walkthrough.js`): a game lens chosen
+  from the screen shape, about 25° above and behind the pet, easing out after
+  walls pull it in and craning up (to a look from above in corners) before it
+  slides into the pet. It still tests its sightline against the drawn
+  triangles, so it never ends up behind a wall, floor, ceiling or window; it
+  may look over low furniture only from well above it. Jumps arrive at a spot
+  inside each room (`rooms.mjs`) with a clear view.
+- **HUD** (`index.html`, `style.css`): a player chip, needs meters, a
+  contextual action pill, one-off tips, a pause sheet, a Rooms travel board and
+  paw-print directions (`wayfinding.mjs`) along a walkable route. Activity
+  spots show small bubbles for the room you're in; there are no floor rings or
+  floating signs.
+- **Pets and neighbours** (`creatures.mjs`, `pet-behaviour.mjs`,
+  `companions.mjs`, `aftermath.mjs`): rigged, furry creatures with faces,
+  moods and needs you can see; family pets and the activity hosts keep
+  routines tied to real furniture (napping on their owners' beds at night),
+  greet you and say their lines.
+- **Lighting** (`lighting.mjs`, `sky.mjs`, `materials.mjs`, `post-aa.mjs`):
+  a game shading tier, warm room light with soft shadows, contact shadows,
+  time of day and weather matching the HUD clock, and FXAA.
+- **Dressing**: rugs, cushions, plants, kids' drawings, toys and wall pieces
+  are code-drawn in `models/house/dressing.py` (walk-past props don't
+  collide); Craepet Street's cottages are code-built in `neighborhood.mjs`.
+
+The Rooms menu offers directions (without teleporting) and quick jumps to each
+floor and yard. Doors and the upper stair gate are held open in the browser
+export. There is no analytics, account, network service, or runtime CDN
+dependency.
 
 ## Activities and save isolation
 
@@ -67,8 +91,8 @@ stay inside the house edition. Backups/import/reset also remain in activity Help
 
 Seven code-built 3D species use each pet's palette (including patterned
 palettes), equipment and petpet. The live models are simplified geometry, not
-the offline Blender fur renders. Equipped furniture appears as pet-sized
-pieces in the living-room collection; changing wall/floor styles also colours
+the offline Blender fur renders. Equipped furniture stands as pet-sized
+pieces in fixed spots around the living room and foyer (`decor-slots.mjs`); changing wall/floor styles also colours
 the main room. All original ownership, home capacity and furniture bonuses
 remain in the activity engine.
 

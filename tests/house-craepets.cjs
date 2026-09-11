@@ -99,7 +99,11 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     }
     await open('pet-house-cory',"Cory's Craepet house");assert(await f.locator('[data-hometab="homes"]').count(),'Own house did not open decorating');await page.locator('#close-activity').click();
     await open('pet-house-ellie',"Ellie's Craepet house");assert.equal(await runtime().evaluate(()=>Craepets.visiting()),'ellie');await page.locator('#close-activity').click();
-    await jump('Craepet street');const aimed=await page.evaluate(()=>houseTest.state.yaw);await page.mouse.move(900,450);await page.mouse.move(980,470);await page.waitForTimeout(100);assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'Mouse without dragging did not aim');
+    await jump('Craepet street');
+    // Chrome can refuse a re-lock straight after the Rooms menu released it; the
+    // game then asks for a click on the view, as a player would give it.
+    if(!(await page.evaluate(()=>houseTest.state.mouseLocked))){await page.mouse.click(680,450);await page.waitForFunction(()=>houseTest.state.mouseLocked,{},{timeout:6000}).catch(()=>{});}
+    const aimed=await page.evaluate(()=>houseTest.state.yaw);await page.mouse.move(900,450);await page.mouse.move(980,470);await page.waitForTimeout(100);assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'Mouse without dragging did not aim');
     await page.screenshot({path:'tests/house-neighborhood.png'});
     // Walk to a room through the model, rather than invoking the jump UI.
     await jump('Front entry');const before=await page.evaluate(()=>houseTest.state.position);

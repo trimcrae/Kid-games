@@ -8,6 +8,7 @@ import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
+import {warmupCast} from './creatures.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
 const $=id=>document.getElementById(id);
@@ -161,7 +162,7 @@ function showRooms(show){
 function jumpTo(room){
   if(!ready)return;
   const veil=$('fade');if(!reducedMotion)veil.classList.add('on');
-  if(teleport(room)){showRooms(false);resume();}
+  if(teleport(room)){life?.pinRoom?.(room[1],room[0]);showRooms(false);resume();}
   requestAnimationFrame(()=>requestAnimationFrame(()=>veil.classList.remove('on')));
 }
 // Rooms travel board: floor sections of room cards. Every card stays in the
@@ -238,9 +239,11 @@ canvas.addEventListener('pointerdown',e=>{
   // A thumb landing low on the left becomes the walking pad right there.
   if(e.pointerType==='touch'&&joyId===null&&e.clientX<innerWidth*.42&&e.clientY>innerHeight*.4){
     const s=joystick.offsetWidth/2;joystick.style.left=(e.clientX-s)+'px';joystick.style.top=(e.clientY-s)+'px';joystick.style.bottom='auto';joystick.classList.add('floating');
-    joyId=e.pointerId;canvas.setPointerCapture(e.pointerId);updateJoy(e);return;
+    joyId=e.pointerId;try{canvas.setPointerCapture(e.pointerId);}catch{}updateJoy(e);return;
   }
-  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};canvas.setPointerCapture(e.pointerId);
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};
+  // A pointer lock landing in the same moment makes capture throw; the lock then drives the view.
+  try{canvas.setPointerCapture(e.pointerId);}catch{}
 });
 canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active||mouseLocked())return;if(drag?.id===e.pointerId){look((e.clientX-drag.x)*drag.gain,(e.clientY-drag.y)*drag.gain);drag.x=e.clientX;drag.y=e.clientY;}});
 function endDrag(e){if(e&&e.pointerId===joyId){endJoy();return;}drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
@@ -273,8 +276,16 @@ function placeCamera(dt){
   if(rigState.distance>=view.distance-1e-4||view.distance<1e-4)return view;
   const s=rigState.distance/view.distance,t=view.target,p=view.position;
   const position={x:t.x+(p.x-t.x)*s,y:t.y+(p.y-t.y)*s,z:t.z+(p.z-t.z)*s};
-  // A point inside the guarded boom can still pass close to a jamb edge.
-  if(guard&&guard.clearanceAt(position)<cameraClearance-.015){rigState.distance=view.distance;return view;}
+  // A point inside the guarded boom can still pass close to a jamb edge. Step
+  // out along the boom only as far as the near plane needs, rather than
+  // jumping to the full length in one frame.
+  if(guard&&guard.clearanceAt(position)<cameraClearance-.015){
+    for(let d=rigState.distance+.08;d<view.distance;d+=.08){
+      const k=d/view.distance,q={x:t.x+(p.x-t.x)*k,y:t.y+(p.y-t.y)*k,z:t.z+(p.z-t.z)*k};
+      if(guard.clearanceAt(q)>=cameraClearance-.015){rigState.distance=d;return {target:t,position:q};}
+    }
+    rigState.distance=view.distance;return view;
+  }
   return {target:t,position};
 }
 let lastRender=performance.now();
@@ -398,12 +409,14 @@ async function load(){
     // background (the welcome card is up) and the first room probe waits
     // for them instead of compiling in-frame.
     performance.mark('house:lights');
+    // The pets' shared fur shader (and their tags') compile alongside the house's.
+    const cast=warmupCast();scene.add(cast);
     const warming=warmShaders();lighting.warm();
     performance.mark('house:compile-issued');
     guard=createCameraGuard(binary,guardGroups(data.groups));
     world=new WalkingWorld(data.colliders,{height:1.05});
     performance.mark('house:guard');
-    await warming;
+    await warming;scene.remove(cast);
     performance.mark('house:shaders');
     teleport(rooms[0]);
     // Capture the first room's reflections while the loading message is up.

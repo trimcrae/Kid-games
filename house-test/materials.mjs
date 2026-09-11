@@ -307,7 +307,9 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
           #ifdef HOUSE_AO
             float houseAO=mix(1.0,pow(clamp(vHouseOcclusion,0.0,1.0),houseOcclusionShape.y),
               min(1.0,houseOcclusionStrength*houseOcclusionShape.x));
-            houseAO=mix(houseAO,1.0,houseSeamFade*.8);
+            // Groove occlusion on cabinet panels and door rails is finer than a
+            // pixel at low render scale and dotted into stitch lines (F1 #4).
+            houseAO=mix(houseAO,1.0,max(houseSeamFade*.8,smoothstep(.0025,.008,length(fwidth(vHousePosition)))*.6));
             reflectedLight.directDiffuse*=mix(1.0,houseAO,houseOcclusionShape.z);
             reflectedLight.indirectDiffuse*=houseAO;
             reflectedLight.indirectSpecular*=houseAO;
