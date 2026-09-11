@@ -47,6 +47,10 @@ p{margin:0}
 @keyframes nudge{50%{transform:scale(1.2) rotate(-8deg)}}
 .egg-note{font-size:14px;padding:0 2px}
 .actions{display:flex;gap:8px;pointer-events:auto}
+/* After a few quiet seconds of play the round buttons step back (A1); any
+   pointer or menu key brings them straight back. */
+.actions button{transition:opacity .6s ease}
+body.hud-quiet .actions button:not(:hover):not(:focus-visible){opacity:.4}
 .actions button{display:flex;align-items:center;gap:7px;height:48px;padding:0 14px;border-radius:999px;background:var(--panel);box-shadow:var(--shadow);font-size:15px}
 .actions button>span[aria-hidden]{font-size:20px;line-height:1}
 .actions kbd{font-size:11px;padding:0 5px;min-width:0;opacity:.75}
@@ -72,8 +76,8 @@ body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden
 #coach:not([hidden])~#hint[data-show]{bottom:176px}
 
 /* --- The pet's speech bubble, anchored above its head by house-life.mjs --- */
-#pet-speech{position:fixed;left:50%;top:30%;transform:translate(-50%,calc(-100% - 14px));background:#fff;color:var(--ink);border:2px solid var(--line);border-radius:20px;padding:12px 18px;max-width:min(360px,80vw);box-shadow:var(--shadow);z-index:3;font-size:16px;font-weight:700;line-height:1.4;pointer-events:none;text-align:center}
-#pet-speech::after{content:"";position:absolute;left:50%;bottom:-11px;width:18px;height:18px;margin-left:-9px;background:#fff;border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:rotate(45deg);border-bottom-right-radius:4px}
+#pet-speech{position:fixed;left:50%;top:30%;transform:translate(-50%,calc(-100% - 14px));background:var(--panel);color:var(--ink);border:2px solid var(--line);border-radius:24px;padding:12px 18px;max-width:min(360px,80vw);box-shadow:0 3px 10px #3b2e251f;z-index:3;font-size:16px;font-weight:700;line-height:1.4;pointer-events:none;text-align:center}
+#pet-speech::after{content:"";position:absolute;left:50%;bottom:-11px;width:18px;height:18px;margin-left:-9px;background:var(--panel);border-right:2px solid var(--line);border-bottom:2px solid var(--line);transform:rotate(45deg);border-bottom-right-radius:4px}
 #pet-speech.free::after{display:none}
 
 /* --- What you can do right here: one bubble at the bottom centre --- */
@@ -156,6 +160,7 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   #nearby{left:auto;right:12px;transform:none;bottom:22px;max-width:calc(100vw - 172px);border-radius:24px}
   #nearby-actions{justify-content:flex-end}
   #coach,#hint{bottom:auto;top:150px}
+  #journey:not([hidden])~#coach{top:196px}
   #coach:not([hidden])~#hint[data-show]{bottom:auto;top:220px}
 }
 @media(max-width:700px){
@@ -189,10 +194,13 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   .actions .label{display:none}
   .actions button{width:48px;padding:0;justify-content:center}
   #rooms{top:70px;bottom:8px}
-  #journey{top:12px}
+  #journey{top:66px;right:12px;left:auto;transform:none;max-width:46vw;font-size:14px}
   .location{top:12px}
-  #coach,#hint,#coach:not([hidden])~#hint[data-show]{top:122px;bottom:auto;max-width:56vw;font-size:15px;padding:8px 14px}
-  #nearby{bottom:12px}
+  #coach,#hint,#coach:not([hidden])~#hint[data-show],#journey:not([hidden])~#coach{top:auto;bottom:12px;max-width:30vw;font-size:14px;padding:8px 12px}
+  /* Keep the action bubble off the pet: a narrow stack at the right edge. */
+  #nearby{bottom:12px;right:12px;left:auto;transform:none;max-width:min(260px,31vw);border-radius:22px;flex-direction:column;align-items:stretch}
+  #nearby-actions{flex-direction:column;align-items:stretch}
+  #nearby-actions button{min-height:46px}
   #activity-panel{inset:0;border-radius:0}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
