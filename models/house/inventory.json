@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "810fa2f12e4b83277f9b31b1481212b46456bd7e3fe1c61ed7adf39c30e50718",
+  "generator_sha256": "bc0ff5fb25323972feee0ebbfb719c023b7f7ec59a5de91243f675c9147b9485",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -10,7 +10,7 @@
     "exterior.py",
     "photoreal.py"
   ],
-  "blender_version": "4.5.13 LTS",
+  "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
   "objects": 7665,
   "mesh_objects": 6740,
