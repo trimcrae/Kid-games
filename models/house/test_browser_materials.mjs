@@ -69,8 +69,16 @@ for(const surface of ['wood','fabric','carpet','blocks','siding','shakes','roof'
   assert(shader.vertexShader.includes('vHousePosition=(modelMatrix*vec4(transformed,1.0)).xyz'));
   assert(shader.fragmentShader.includes('normal=houseBump(-vViewPosition,normal,houseDetail.z)'));
   assert(shader.uniforms.houseSurfaceKind.value>0);
-  assert.equal(material.customProgramCacheKey(),panels.customProgramCacheKey(),
-    'Finish families should share programs; the surface selector is a uniform');
+  // Design change (render pass 2): foliage alone gets a near-camera dissolve
+  // variant, so the discard never touches the shared house program.
+  if(surface==='foliage'){
+    assert.equal(shader.defines.HOUSE_FOLIAGE,1);assert(shader.fragmentShader.includes('houseLeafFade'));
+    assert.notEqual(material.customProgramCacheKey(),panels.customProgramCacheKey());
+  }else{
+    assert.equal(material.customProgramCacheKey(),panels.customProgramCacheKey(),
+      'Finish families should share programs; the surface selector is a uniform');
+    assert.equal(shader.defines.HOUSE_FOLIAGE,undefined,'Only foliage may compile the discard');
+  }
   material.dispose();
 }
 

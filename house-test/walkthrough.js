@@ -6,6 +6,7 @@ import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
+import {installPostPass} from './post-aa.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
@@ -37,12 +38,13 @@ function fitLens(){
   camera.updateProjectionMatrix();
 }
 fitLens();
-// Renderer look and cost. ?aa=0/1 and ?tone=agx/neutral override for QA.
+// Renderer look and cost. ?aa=fxaa|msaa|off and ?tone=agx/neutral for QA.
 const query=new URLSearchParams(location.search);
+const aaMode=({1:'msaa',0:'off',msaa:'msaa',off:'off',fxaa:'fxaa'})[query.get('aa')]||'fxaa';
 const RENDER={
-  // No MSAA: it cost 15-22 % of a frame on integrated graphics, and a sharper,
-  // higher render scale reads better than smoothed edges at a 0.6 scale.
-  antialias:query.has('aa')&&query.get('aa')!=='0',
+  // Edges: an FXAA pass on the finished frame (about 1-2 ms) instead of MSAA,
+  // which cost 15-22 % of a frame on integrated graphics. See post-aa.mjs.
+  aa:aaMode,antialias:aaMode==='msaa',
   // AgX keeps the warm palette from turning orange (Neutral measured sat 0.6+).
   toneMapping:query.get('tone')==='neutral'?THREE.NeutralToneMapping:THREE.AgXToneMapping,
   exposure:query.get('tone')==='neutral'?1:1.22,
@@ -57,13 +59,16 @@ try {
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=RENDER.toneMapping;
   renderer.toneMappingExposure=RENDER.exposure;
+  // The pass also carries the highlight grade, so MSAA keeps a grade-only pass.
+  installPostPass(renderer,camera,{mode:RENDER.aa==='msaa'?'grade':RENDER.aa});
   gpuTimer=createGpuTimer(renderer,camera);
 } catch(error) {
   $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled.';
   start.textContent='3D graphics unavailable';
   throw error;
 }
-const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera});
+const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
+if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 
 let guard=null,cameraClearance=nearPlaneReach(camera)+.015;
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
@@ -362,6 +367,8 @@ async function load(){
     let occlusion=null;
     try{occlusion=await loadHouseOcclusion(data,binary);}
     catch(error){console.warn('House ambient occlusion skipped:',error.message);}
+    // Load milestones for QA (performance.getEntriesByType('mark')).
+    performance.mark('house:occlusion');
     for(const g of data.groups){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));
@@ -373,20 +380,31 @@ async function load(){
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
     }
+    performance.mark('house:meshes');
     lighting.load(data);
     const contact=createContactShadows(scene,data.colliders||[]);
-    // Compile every house shader in parallel before the first frame, so the
-    // first render does not block the page for seconds.
-    await warmShaders();
+    // Compile the house shaders in parallel on the GPU process while the main
+    // thread builds the camera guard and walking world. Only the screen
+    // variants gate Start; the reflection-probe variants finish in the
+    // background (the welcome card is up) and the first room probe waits
+    // for them instead of compiling in-frame.
+    performance.mark('house:lights');
+    const warming=warmShaders();lighting.warm();
+    performance.mark('house:compile-issued');
     guard=createCameraGuard(binary,guardGroups(data.groups));
-    world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
-    // Capture the first room's reflections (and compile the probe path) while
-    // the loading message is still up.
+    world=new WalkingWorld(data.colliders,{height:1.05});
+    performance.mark('house:guard');
+    await warming;
+    performance.mark('house:shaders');
+    teleport(rooms[0]);
+    // Capture the first room's reflections while the loading message is up.
     lighting.prime(player);
+    performance.mark('house:probe');
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     life.face(yaw+Math.PI,true);
-    // The house follows the game's clock and weather (same as the HUD).
+    // The house follows the game's clock and weather (same as the HUD). The
+    // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
     // Pets, labels and markers bring their own materials.
     await warmShaders();render();
@@ -395,7 +413,7 @@ async function load(){
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
-      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.antialias,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
+      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();
