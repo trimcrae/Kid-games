@@ -375,7 +375,7 @@ async function load(){
       geometry.computeBoundingSphere();
       if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
         occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
-      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0});
+      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0,nearFade:query.get('nearfade')==='1'});
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
