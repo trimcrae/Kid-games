@@ -40,9 +40,9 @@ export const PHASES={
   day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.78,
     practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
-    practical:1.15,key:.8,emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
+    practical:1.15,key:.85,indoorFloor:.5,indoorSky:'#a8a0b0',indoorGround:'#6e5436',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
   night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#2a241c',hemi:.34,
-    practical:.95,key:.55,emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
+    practical:.95,key:.75,indoorFloor:.66,indoorSky:'#8e90aa',indoorGround:'#6e5436',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
@@ -194,15 +194,23 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     // Indoors the fill stays low enough for the key and window light to model
     // forms; outdoors the open sky is the fill.
     let hemi=phase.hemi*(room.outdoor?1.9:room.tight?.92:1)*(overcast?1.2:1);
+    // After dark a room is never lit by the moon alone: lamps bounce warm light
+    // round it, so indoors the fill has a floor and warm-bounce colours and
+    // doorways and jambs no longer crush to black (F1: median L* 2-5).
+    const indoorNight=!room.outdoor&&phase.indoorFloor;
+    if(indoorNight)hemi=Math.max(hemi,phase.indoorFloor);
+    hemisphere.color.set(indoorNight?phase.indoorSky:phase.hemiSky);hemisphere.groundColor.set(indoorNight?phase.indoorGround:phase.hemiGround);
     mix.hemi=hemi;
     mix.practical=phase.practical*(room.tight?1.3:1)*(room.outdoor?.6:1);
     // Seen from outside the panes glow (a lived-in house); from inside they
     // stay dark so the night sky shows through.
     for(const m of windows){
-      m.emissiveIntensity=phase.windows*(room.outdoor?2.2:.12);
+      // From inside at night a lamp-lit pane is a milky veil that made the
+      // garden look like daytime (F1): no glow and a thinner pane indoors.
+      m.emissiveIntensity=room.outdoor?phase.windows*2.2:0;
       // A 20 %-opaque pane can only add a fifth of its glow: from the garden
       // after dark the panes turn into warm lit squares instead.
-      m.opacity=room.outdoor&&phase.windows>.5?.6:room.outdoor&&phase.windows>.2?.35:m.userData.baseOpacity;
+      m.opacity=room.outdoor?(phase.windows>.5?.6:phase.windows>.2?.35:m.userData.baseOpacity):phase.windows>.2?m.userData.baseOpacity*.4:m.userData.baseOpacity;
     }
     petLight.userData.target=phase.pet*(room.outdoor&&phaseName==='day'?0:1);
     hemisphere.userData.target=hemi;
