@@ -31,7 +31,7 @@ export async function createHouseLife(tour){
   }
   const engine=frame.contentWindow.Craepets;
   const neighborhood=createNeighborhood(scene,world);
-  const startNew=()=>showActivity({id:'adopt',room:'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'});
+  const startNew=()=>showActivity({id:'adopt',room:$('location').textContent||'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'});
   const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew});
   let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
