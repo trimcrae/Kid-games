@@ -108,6 +108,8 @@ body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden
 .overlay{position:fixed;inset:0;display:grid;place-items:center;background:#3b2e2530;backdrop-filter:blur(5px);padding:20px;z-index:6}
 .welcome-card{width:min(460px,100%);max-height:92vh;overflow:auto;padding:30px;border:2px solid var(--line);border-radius:26px;background:var(--panel);box-shadow:0 26px 80px #3b2e2555;display:grid;gap:14px}
 .intro{font-size:17px;line-height:1.55;color:var(--ink-soft)}
+#welcome-pet{font-size:19px;font-weight:800;color:var(--care);margin:-4px 0 6px}#welcome-pet:empty{display:none}
+.welcome-only{display:grid;gap:8px}
 .primary{width:100%;min-height:58px;background:var(--go);border-color:#63a445;color:var(--go-ink);font-size:19px;font-weight:800;box-shadow:0 4px 0 #5c9a40}
 .primary:hover{background:#8bcc69}
 .welcome-actions{display:flex;gap:10px}.welcome-actions button{flex:1}

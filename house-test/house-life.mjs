@@ -174,7 +174,7 @@ export async function createHouseLife(tour){
       // The name tag rides on the pet but keeps its readable world size,
       // floating just above the tallest ears.
       // A constant on-screen size, so a pet right by the camera doesn't wear a giant tag.
-      const label=labelSprite(p.pet.name||p.name);label.material.sizeAttenuation=false;label.center.set(.5,0);label.scale.set(.036*label.userData.aspect/PET_SCALE,.036/PET_SCALE,1);label.position.y=.78/PET_SCALE;mesh.add(label);scene.add(mesh);
+      const label=labelSprite(p.pet.name||p.name);label.material.sizeAttenuation=false;label.center.set(.5,0);label.scale.set(.044*label.userData.aspect/PET_SCALE,.044/PET_SCALE,1);label.position.y=.78/PET_SCALE;mesh.add(label);scene.add(mesh);
       roamers.push({id:p.id,mesh,label,cameraBounds,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,distance:0});
     });
   }
@@ -204,6 +204,7 @@ export async function createHouseLife(tour){
     $('player-chip').setAttribute('aria-label',`${profile.name} playing${s.pet?` with ${s.pet.name}, ${s.coins} coins`:''}. Open family`);
     const weather=engine.weather();$('weather-status').textContent=weather.emoji;$('weather-status').setAttribute('aria-label',weather.name);$('weather-status').title=weather.name;
     updateNeeds(s.pet);
+    $('welcome-pet').textContent=s.pet?`${s.pet.egg?'Your egg':s.pet.name} is waiting for you inside.`:'';
     $('pet-button').querySelector('.label').textContent=s.pet?.egg?'Tap egg':'Say hello';
     const family=api.family();
     for(const b of $('family-list').children){
@@ -262,7 +263,8 @@ export async function createHouseLife(tour){
   }
   function coach(time,active){
     if(!active||!avatar||!engine.state().pet){showCoach([]);return;}
-    if(lastSpot&&Math.abs(player.y-lastSpot.y)<.5)walked+=Math.hypot(player.x-lastSpot.x,player.z-lastSpot.z);lastSpot={...player};
+    // Count real steps only: a Rooms jump is not the player learning to walk.
+    const step=lastSpot?Math.hypot(player.x-lastSpot.x,player.z-lastSpot.z):0;if(step<.6&&Math.abs(player.y-(lastSpot?.y??player.y))<.5)walked+=step;lastSpot={...player};
     const touch=!finePointer();
     if(!coached.walk){
       if(walked>2.5){coachDone('walk');}
