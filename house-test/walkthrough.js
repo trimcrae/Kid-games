@@ -8,6 +8,7 @@ import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
+import {warmupCast} from './creatures.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
 const $=id=>document.getElementById(id);
@@ -398,12 +399,14 @@ async function load(){
     // background (the welcome card is up) and the first room probe waits
     // for them instead of compiling in-frame.
     performance.mark('house:lights');
+    // The pets' shared fur shader (and their tags') compile alongside the house's.
+    const cast=warmupCast();scene.add(cast);
     const warming=warmShaders();lighting.warm();
     performance.mark('house:compile-issued');
     guard=createCameraGuard(binary,guardGroups(data.groups));
     world=new WalkingWorld(data.colliders,{height:1.05});
     performance.mark('house:guard');
-    await warming;
+    await warming;scene.remove(cast);
     performance.mark('house:shaders');
     teleport(rooms[0]);
     // Capture the first room's reflections while the loading message is up.
