@@ -384,7 +384,7 @@ async function load(){
       geometry.computeBoundingSphere();
       if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
         occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
-      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0});
+      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0,nearFade:query.get('nearfade')==='1'});
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
@@ -411,12 +411,12 @@ async function load(){
     performance.mark('house:probe');
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
-    life.face(yaw+Math.PI,true);
+    life.face(yaw+Math.PI,true);performance.mark('house:life');
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
     // Pets, labels and markers bring their own materials.
-    await warmShaders();render();
+    await warmShaders();performance.mark('house:pets-compiled');render();performance.mark('house:first-frame');
     shading={contactShadows:contact?.count??0};
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';

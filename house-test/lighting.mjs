@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {createSky} from './sky.mjs';
+import {FOLIAGE} from './materials.mjs';
 
 // Slab intersections prevent a lamp on another floor or behind a partition
 // from taking a nearby-light slot. The fills approximate indirect light and
@@ -34,22 +35,23 @@ export function choosePracticalLights(lights,position,occluders,limit=4){
 // sun: [azimuth offset from the exported sun (rad), elevation (rad)].
 export function phaseForHour(h){return h<6||h>=20?'night':h<8?'dawn':h>=18?'dusk':'day';}
 export const PHASES={
-  dawn:{sun:[-1.1,.28],sunColor:'#ffcf9e',sunI:1.9,hemiSky:'#f1e4dc',hemiGround:'#7c6857',hemi:.72,
-    practical:1.5,emissive:1.2,windows:.15,pet:.9,sky:['#86a3d6','#f6d2b2','#6f7a62'],glow:1,exposure:1.02},
-  day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:3.2,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.95,
-    practical:1.35,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1},
+  dawn:{sun:[-1.1,.28],sunColor:'#ffcf9e',sunI:2.4,hemiSky:'#f1e4dc',hemiGround:'#7c6857',hemi:.5,
+    practical:2,emissive:1.2,shadeGlow:.3,leafFill:.02,windows:.15,pet:.9,sky:['#86a3d6','#f6d2b2','#6f7a62'],glow:1,exposure:1.08},
+  day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.7,
+    practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
-    practical:1.15,key:.8,emissive:1.7,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
-  night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#1d1914',hemi:.27,
-    practical:.95,key:.55,emissive:2.3,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
+    practical:1.15,key:.8,emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
+  night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#2a241c',hemi:.34,
+    practical:.95,key:.55,emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
 const TIGHT=/bath|shower|hall|closet|laundry|landing|ensuite|office|garage/i;
-// The spot "key" stands in for a room's ceiling light. Its shadow map cost
-// ~15 % of a frame on integrated graphics; the baked occlusion, the contact
-// decals and the sun map carry furniture grounding instead.
-const KEY_SHADOW=false;
+// The spot "key" stands in for a room's ceiling light and now casts a soft
+// shadow, so furniture reads as sitting under a lamp. Its map is static: it is
+// rendered once when the room's key light changes (a few ms), and the per-pixel
+// lookup is the only standing cost.
+const KEY_SHADOW=true;
 
 function skyEnvironment(pmrem,size){
   // A code-authored sky seeds reflections before the first room probe. It is
@@ -92,8 +94,12 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   let sunAxis=new THREE.Vector3(.27,-.58,-.77).normalize();
 
   const key=new THREE.SpotLight(0xffdec0,0,8,1.35,.85,2);
-  key.castShadow=KEY_SHADOW;key.shadow.mapSize.setScalar(mobile?512:1024);
+  // Phones skip it: the extra shadow lookup measured +16-22 % per frame there.
+  key.castShadow=KEY_SHADOW&&!mobile;key.shadow.mapSize.setScalar(mobile?512:1024);
   key.shadow.camera.near=.06;
+  // Ceiling cones are very wide; a narrower shadow frustum keeps texels useful
+  // over the room itself (outside it the key simply lights without shadow).
+  key.shadow.focus=.62;
   key.shadow.normalBias=mobile?.05:.025;key.shadow.bias=mobile?-.0006:-.0003;
   key.shadow.autoUpdate=false;scene.add(key,key.target);
   // One practical lamp pool beside the ceiling key, plus a soft "character"
@@ -141,7 +147,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
       const m=o.material;if(!o.isMesh||!m||seen.has(m))return;seen.add(m);
       if(m.userData.houseGlossy){m.envMap=environment;glossy.push(m);}
       if(m.userData.houseEmissive>0)emissive.push(m);
-      if(m.userData.houseWindow){windows.push(m);m.emissive.set('#ffd08c');}
+      if(m.userData.houseWindow){windows.push(m);m.emissive.set('#ffc978');m.userData.baseOpacity=m.opacity;}
     });
     loaded=true;applyPhase(true);
   }
@@ -165,7 +171,10 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     if(scene.background?.isColor)scene.background.copy(cool);
     if(scene.fog)scene.fog.color.copy(cool);
     renderer.toneMappingExposure=baseExposure*phase.exposure;
-    for(const m of emissive)m.emissiveIntensity=m.userData.houseEmissive*phase.emissive;
+    // Shades and diffusers are faintly emissive in the export; after dark they
+    // must read as the light source, so they get a floor as well as a scale.
+    FOLIAGE.fill.value=phase.leafFill??0;
+    for(const m of emissive)m.emissiveIntensity=Math.max(m.userData.houseEmissive*phase.emissive,phase.shadeGlow??0);
     applyRoom();
     sun.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;
     if(!force){
@@ -183,7 +192,14 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     let hemi=phase.hemi*(room.outdoor?1.5:room.tight?.8:1)*(overcast?1.2:1);
     mix.hemi=hemi;
     mix.practical=phase.practical*(room.tight?1.3:1)*(room.outdoor?.6:1);
-    for(const m of windows)m.emissiveIntensity=phase.windows*(room.outdoor?1:.12);
+    // Seen from outside the panes glow (a lived-in house); from inside they
+    // stay dark so the night sky shows through.
+    for(const m of windows){
+      m.emissiveIntensity=phase.windows*(room.outdoor?2.2:.12);
+      // A 20 %-opaque pane can only add a fifth of its glow: from the garden
+      // after dark the panes turn into warm lit squares instead.
+      m.opacity=room.outdoor&&phase.windows>.5?.6:room.outdoor&&phase.windows>.2?.35:m.userData.baseOpacity;
+    }
     petLight.userData.target=phase.pet*(room.outdoor&&phaseName==='day'?0:1);
     hemisphere.userData.target=hemi;
   }
@@ -218,14 +234,17 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     }
     if((main?.name||'')!==keyId){
       keyId=main?.name||'';
-      if(KEY_SHADOW){key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;}
+      if(key.castShadow){key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;}
     }
   }
 
   function setRoom(name,position){
     if(name===currentRoom){pendingRoom=null;return;}
     if(name===pendingRoom?.name)return;
-    room={outdoor:OUTDOOR.test(name),tight:TIGHT.test(name)};applyRoom();
+    // Room names come from the nearest station, which can be an outdoor one
+    // while the pet stands inside; a roof or ceiling overhead always wins.
+    const eye=[position.x,position.y+1.2,position.z],covered=segmentBlocked(eye,[eye[0],eye[1]+7,eye[2]],occluders);
+    room={outdoor:OUTDOOR.test(name)&&!covered,tight:TIGHT.test(name)};applyRoom();
     pendingRoom={name,position:{...position},since:performance.now()};
   }
 
