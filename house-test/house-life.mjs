@@ -9,7 +9,7 @@ import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,seenFrom,fre
 import {createGround} from './pet-ground.mjs';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
 import {createEmotes,createSpeech} from './emotes.mjs';
-import {routeSearch,createPawTrail} from './wayfinding.mjs';
+import {createRouter,createPawTrail} from './wayfinding.mjs';
 import {aftermathFor,createAftermath} from './aftermath.mjs';
 import {placeDecor} from './decor-slots.mjs';
 const $=id=>document.getElementById(id);
@@ -112,8 +112,8 @@ export async function createHouseLife(tour){
     const walk=document.createElement('button');walk.className='walk-here';walk.textContent='🐾';walk.title='Walk there';walk.setAttribute('aria-label','Walk to '+room[1]);bindButton(walk,()=>guide(list[0]||{room:room[1],name:room[1],point:world.safeSpot(room[2],room[4],-room[3]),roomData:room}));row.append(walk);
   }
   // "Walk there": a route over the real walking world, shown as paw prints.
-  const trail=createPawTrail(scene);let route=null,replanAt=0,arrivedAt=0;
-  function planRoute(){route=destination?.point?routeSearch(world,{x:player.x,y:player.y,z:player.z},destination.point):null;trail.clear();}
+  const trail=createPawTrail(scene),router=createRouter(world,[stations[0].point,(stations.find(s=>s.id==='games')||stations[0]).point]);let route=null,replanAt=0,arrivedAt=0;
+  function planRoute(){route=destination?.point?router.request({x:player.x,y:player.y,z:player.z},destination.point):null;trail.clear();}
   function stopGuide(){destination=null;route=null;arrivedAt=0;trail.clear();$('journey').hidden=true;}
   function guide(station){destination=stations.find(a=>a.id===station.id)||station;arrivedAt=0;planRoute();closeActivity(false);$('family-panel').hidden=true;tour.showRooms(false);tour.resume();}
   function showActivity(station){
@@ -145,6 +145,11 @@ export async function createHouseLife(tour){
     if(kind)aftermath.start(kind,{pet:{...player},heading,mat:feedMat,world,reduced:tour.reducedMotion});
   }
   function say(text,ms=3500){$('pet-speech').textContent=text;$('pet-speech').hidden=false;clearTimeout(sayTimer);sayTimer=setTimeout(()=>$('pet-speech').hidden=true,ms);}
+  function hush(){clearTimeout(sayTimer);$('pet-speech').hidden=true;}
+  // After a Rooms jump the toast and label name the room you picked, until
+  // you've walked ~1.5 m (the arrival spot can stand closest to a neighbour's
+  // room spot, e.g. Front entry's on the living-room rug).
+  let pinned=null,lastTickSpot=null;
   window.houseBridge={
     route(view,action){
       if(view==='map'){closeActivity(false);tour.showRooms(true);return;}
@@ -181,7 +186,7 @@ export async function createHouseLife(tour){
     const b=document.createElement('button');b.dataset.profile=p.id;
     const face=document.createElement('span');face.className='face';face.setAttribute('aria-hidden','true');face.textContent=p.emoji;
     const text=document.createElement('span');const name=document.createElement('b');name.textContent=p.name;const pet=document.createElement('small');text.append(name,pet);b.append(face,text);
-    bindButton(b,()=>{const switching=p.id!==engine.who();picked=true;savePosition();aftermath.stop();api.select(p.id);if(switching){arrivePop=true;lastWho=p.id;}restorePosition(p.id,switching);stopGuide();sync(true);$('family-panel').hidden=true;tour.resume();});$('family-list').append(b);
+    bindButton(b,()=>{hush();const switching=p.id!==engine.who();picked=true;savePosition();aftermath.stop();api.select(p.id);if(switching){arrivePop=true;lastWho=p.id;}restorePosition(p.id,switching);stopGuide();sync(true);$('family-panel').hidden=true;tour.resume();});$('family-list').append(b);
   }
   try{const probe='craepets.house.storage-check';localStorage.setItem(probe,'1');localStorage.removeItem(probe);}catch{$('save-status').textContent='Saving is unavailable in this browser. Keep this tab open to keep playing.';}
   function updateAvatar(snapshot){
@@ -415,6 +420,8 @@ export async function createHouseLife(tour){
     // The game clock and weather the HUD shows, for the 3D time of day.
     sky:()=>({time:engine.timeOfDay(),weather:engine.weather()?.id}),
     hasPet:()=>!!engine.state().pet,
+    // A Rooms jump names the room you picked (see pinned, above).
+    pinRoom(name,level){pinned={name,level:String(level).toUpperCase(),x:player.x,y:player.y,z:player.z};hush();},
     // First visit asks who is playing; after that, a pet-less profile goes
     // straight to adoption. Bringing saves over is a small link, not a wall.
     adopt:()=>{if(!picked)openFamily(true);else startNew();},
@@ -544,12 +551,14 @@ export async function createHouseLife(tour){
       if(destination){
         // Search a little each frame (a few ms), then lay paw prints along the
         // next few metres of the route; plan again if the pet wanders off it.
-        if(route?.state==='searching'&&route.run(6)==='found')trail.setPath(route.path);
+        // (A worker answers between frames; the in-page fallback inside run().)
+        if(route?.state==='searching')route.run(6);
+        if(route?.state==='found'&&route.shown!==route.path){route.shown=route.path;trail.setPath(route.path);}
         const off=trail.update(player);
         if(route?.state==='found'&&off>1.8&&time>replanAt){replanAt=time+1.5;planRoute();}
         const here=inReach(destination),dy=destination.point.y-player.y,floors=Math.abs(dy)>.6?(dy>0?' · up the stairs':' · down the stairs'):'';
         let text;
-        if(here){text=`🐾 ${destination.room} — you're here!`;if(!arrivedAt)arrivedAt=time;trail.clear();}
+        if(here){text=`🐾 ${destination.room} — you're here!`;if(!arrivedAt)arrivedAt=time;trail.clear();if(route)route.shown=route.path;}
         else if(route?.state==='found')text=innerWidth<700||innerHeight<500?`🐾 ${destination.room}${floors}`:`🐾 Follow the paw prints to ${destination.room}${floors}`;
         else if(route?.state==='searching')text=`🐾 Sniffing out the way to ${destination.room}…`;
         else{const angle=Math.atan2(destination.point.x-player.x,player.z-destination.point.z)+tour.yaw;
@@ -563,11 +572,19 @@ export async function createHouseLife(tour){
       document.body.classList.toggle('hud-quiet',active&&performance.now()-hudWakeAt>4000);
       if(!active)hudWakeAt=performance.now();
       document.body.classList.toggle('overlay-open',overlayIds.some(id=>!$(id).hidden));
+      // Anything the pet was saying about the place it just left (a jump, a
+      // restored spot, a family switch) is no longer true here.
+      if(lastTickSpot&&Math.hypot(player.x-lastTickSpot.x,player.z-lastTickSpot.z,player.y-lastTickSpot.y)>1.2)hush();
+      lastTickSpot={x:player.x,y:player.y,z:player.z};
+      if(pinned){
+        if(Math.hypot(player.x-pinned.x,player.z-pinned.z)>1.5||Math.abs(player.y-pinned.y)>.5)pinned=null;
+        else{if($('location').textContent!==pinned.name)$('location').textContent=pinned.name;if($('level').textContent!==pinned.level)$('level').textContent=pinned.level;}
+      }
       coach(time,active);placeSpeech();roomToast(active);
     },
     // The top of your pet's head (above its ears), for anchoring a speech bubble.
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading})),
+    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading})),
       aftermath:aftermath.active?aftermath.kind+':'+aftermath.phase:null,hostSpeech:hostSpeech.text,
       // Draw calls spent on creatures this frame (their meshes that are drawn, before frustum culling).
       creatureMeshes:[avatar,...roamers.map(r=>r.mesh)].reduce((n,o)=>{if(!o||!o.visible)return n;o.traverse(m=>{if((m.isMesh||m.isSprite)&&m.visible)n++;});return n;},0),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})

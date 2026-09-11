@@ -161,7 +161,7 @@ function showRooms(show){
 function jumpTo(room){
   if(!ready)return;
   const veil=$('fade');if(!reducedMotion)veil.classList.add('on');
-  if(teleport(room)){showRooms(false);resume();}
+  if(teleport(room)){life?.pinRoom?.(room[1],room[0]);showRooms(false);resume();}
   requestAnimationFrame(()=>requestAnimationFrame(()=>veil.classList.remove('on')));
 }
 // Rooms travel board: floor sections of room cards. Every card stays in the
