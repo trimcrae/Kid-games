@@ -1,7 +1,8 @@
 """Finish/export contracts; no Blender runtime or private reference required."""
 import unittest
 from types import SimpleNamespace
-from browser_materials import finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders, oriented_triangle_corners
+from browser_materials import (finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders,
+                               oriented_triangle_corners, group_key, dressing_collection, browser_flag)
 
 
 class BrowserMaterials(unittest.TestCase):
@@ -71,6 +72,33 @@ class BrowserMaterials(unittest.TestCase):
         self.assertEqual(finish['panelSize'], [1.2, .6, .01])
         self.assertEqual(finish['panelOffset'], 0)
         self.assertEqual(finish['mortarColor'], [.48, .44, .36])
+
+    def test_lived_in_dressing_contract(self):
+        # Per-level Blender collections share one browser draw group per finish.
+        self.assertEqual(group_key('44 | Dressing - main floor', 'Dressing coral cotton'),
+                         ('Lived-in dressing', 'Dressing coral cotton'))
+        self.assertEqual(group_key('48 | Dressing - garden', 'Dressing coral cotton'),
+                         group_key('45 | Dressing - upstairs', 'Dressing coral cotton'))
+        self.assertEqual(group_key('09 | Living room furniture', 'Dark walnut'),
+                         ('09 | Living room furniture', 'Dark walnut'))
+        self.assertFalse(dressing_collection('43 | Exterior roofs and cladding'))
+        # Soft matte finishes: fabric accents, double-sided flowers and leaves,
+        # mineral path stones, matte paper; nothing showroom glossy.
+        self.assertEqual(finish_for_name('Dressing coral cotton')['surface'], 'fabric')
+        self.assertEqual(finish_for_name('Garden pink flower foliage')['surface'], 'foliage')
+        self.assertTrue(finish_for_name('Houseplant leaves').get('doubleSided'))
+        self.assertEqual(finish_for_name('Garden stepping stone pavers')['surface'], 'mineral')
+        self.assertEqual(finish_for_name('Garden bed soil mulch')['surface'], 'mineral')
+        for name in ['Dressing paper white', 'Dressing terracotta', 'Dressing kraft cardboard', 'Dressing charcoal ink']:
+            finish = finish_for_name(name)
+            self.assertEqual(finish['surface'], 'plain', name)
+            self.assertGreater(finish['roughness'], .8, name)
+            self.assertEqual(finish['clearcoat'], 0, name)
+        # Explicit no-collision flags come from the object or its parent empty.
+        parent = {'browser_collide': False}
+        child = SimpleNamespace(get=lambda key: None, parent=SimpleNamespace(get=parent.get))
+        self.assertIs(browser_flag(child, 'browser_collide'), False)
+        self.assertIsNone(browser_flag(SimpleNamespace(get=lambda key: None, parent=None), 'browser_collide'))
 
     def test_render_softboxes_are_not_house_lamps(self):
         self.assertFalse(practical_light('Front daylight', 'AREA', 1000))

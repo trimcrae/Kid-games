@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "bc0ff5fb25323972feee0ebbfb719c023b7f7ec59a5de91243f675c9147b9485",
+  "generator_sha256": "5fb6fd758eca25ab4512cc55c0cd1fba7f4da3f879ca3323825240c2bea4451f",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -8,12 +8,13 @@
     "basement_garage.py",
     "yard.py",
     "exterior.py",
+    "dressing.py",
     "photoreal.py"
   ],
-  "blender_version": "4.5.3 LTS",
+  "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 7665,
-  "mesh_objects": 6740,
+  "objects": 7931,
+  "mesh_objects": 6874,
   "cameras": [
     "overview",
     "sunroom",
@@ -3582,6 +3583,1458 @@
         0.0,
         0.0,
         0.0
+      ]
+    },
+    {
+      "name": "Living room coral bordered rug",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.3499999046325684,
+        2.299999952316284,
+        0.010999993421137333
+      ]
+    },
+    {
+      "name": "Living sofa accent cushions",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.4699999988079071,
+        2.5799999237060547,
+        0.0
+      ]
+    },
+    {
+      "name": "Living sofa arm knit throw",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.5600000023841858,
+        3.5299999713897705,
+        0.0
+      ]
+    },
+    {
+      "name": "Living tub chair cushion",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.8499999046325684,
+        3.0799999237060547,
+        0.0
+      ]
+    },
+    {
+      "name": "Living tray table jigsaw and picture book",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.8200000524520874,
+        2.299999952316284,
+        0.5080000162124634
+      ]
+    },
+    {
+      "name": "Living toy basket",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.44999998807907104,
+        1.25,
+        0.009500052779912949
+      ]
+    },
+    {
+      "name": "Living kid drawing sun and house",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.9300000071525574,
+        4.36899995803833,
+        1.7200000286102295
+      ]
+    },
+    {
+      "name": "Living corkboard with pinned drawings",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.0009999925969168544,
+        0.6700000762939453,
+        1.6200000047683716
+      ]
+    },
+    {
+      "name": "Living side table trailing plant",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.5999999046325684,
+        0.5,
+        0.5680000185966492
+      ]
+    },
+    {
+      "name": "Foyer round mustard rug",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.599999904632568,
+        2.0999999046325684,
+        0.01100002322345972
+      ]
+    },
+    {
+      "name": "Entry shoe bench",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.550000190734863,
+        -0.8999999761581421,
+        0.009500022977590561
+      ]
+    },
+    {
+      "name": "Entry pairs of small shoes",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.21999979019165,
+        -0.8999999761581421,
+        0.009500022977590561
+      ]
+    },
+    {
+      "name": "Entry coat hooks with coats and bag",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.798999786376953,
+        -0.8999999761581421,
+        1.5499999523162842
+      ]
+    },
+    {
+      "name": "Entry doormat",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.550000190734863,
+        -0.8999999761581421,
+        0.010999993421137333
+      ]
+    },
+    {
+      "name": "Entry chest top bowl plant and pet picture",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        4.449999809265137,
+        0.3199999928474426,
+        1.2605000734329224
+      ]
+    },
+    {
+      "name": "Entry framed hill landscape",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        4.449999809265137,
+        0.010999994352459908,
+        1.850000023841858
+      ]
+    },
+    {
+      "name": "Kitchen striped runner",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.149999976158142,
+        6.0,
+        0.045411188155412674
+      ]
+    },
+    {
+      "name": "Kitchen pet feeding mat",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.8499999046325684,
+        7.150000095367432,
+        0.04637448862195015
+      ]
+    },
+    {
+      "name": "Kitchen fruit bowl",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.0,
+        4.840000152587891,
+        0.9475000500679016
+      ]
+    },
+    {
+      "name": "Kitchen kettle",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.9299999475479126,
+        4.71999979019165,
+        0.9380000829696655
+      ]
+    },
+    {
+      "name": "Kitchen dish rack",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.4000000059604645,
+        6.760000228881836,
+        0.9474999904632568
+      ]
+    },
+    {
+      "name": "Kitchen utensil crock",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.3499999940395355,
+        4.800000190734863,
+        0.9474999904632568
+      ]
+    },
+    {
+      "name": "Kitchen fridge drawing sun_house",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.929999828338623,
+        5.380000114440918,
+        1.4500000476837158
+      ]
+    },
+    {
+      "name": "Kitchen fridge drawing pet",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.419999837875366,
+        5.380000114440918,
+        1.6200000047683716
+      ]
+    },
+    {
+      "name": "Kitchen fridge drawing rainbow",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.9499998092651367,
+        5.380000114440918,
+        1.0499999523162842
+      ]
+    },
+    {
+      "name": "Kitchen window herb pots",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.75,
+        7.71999979019165,
+        0.809499979019165
+      ]
+    },
+    {
+      "name": "Kitchen treat jar and cookbook",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.130000114440918,
+        7.71999979019165,
+        0.8095000386238098
+      ]
+    },
+    {
+      "name": "Kitchen garage door jackets",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.25,
+        7.968999862670898,
+        1.100000023841858
+      ]
+    },
+    {
+      "name": "Dining teal striped rug",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.519999980926514,
+        6.380000114440918,
+        0.010999993421137333
+      ]
+    },
+    {
+      "name": "Dining table runner and flower jug",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.519999980926514,
+        6.380000114440918,
+        0.7915000319480896
+      ]
+    },
+    {
+      "name": "Dining family quest board",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        6.800000190734863,
+        7.968999862670898,
+        1.4500000476837158
+      ]
+    },
+    {
+      "name": "Dining chest plant and board games",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.519999980926514,
+        6.199999809265137,
+        1.2904999256134033
+      ]
+    },
+    {
+      "name": "Dining playpen blanket and soft toys",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        4.050000190734863,
+        4.619999885559082,
+        0.2030000388622284
+      ]
+    },
+    {
+      "name": "Sunroom rainbow stripe mat",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.849999904632568,
+        9.600000381469727,
+        -0.0769999697804451
+      ]
+    },
+    {
+      "name": "Sunroom kids easel with rainbow painting",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.96999979019165,
+        9.600000381469727,
+        -0.06749997287988663
+      ]
+    },
+    {
+      "name": "Sunroom washing line of paintings",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.6500000953674316,
+        8.1535005569458,
+        1.5499999523162842
+      ]
+    },
+    {
+      "name": "Sunroom etagere shelf baskets books and plant",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.829999923706055,
+        8.460000038146973,
+        0.0
+      ]
+    },
+    {
+      "name": "Sunroom hanging planter",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        6.900000095367432,
+        11.149999618530273,
+        0.0
+      ]
+    },
+    {
+      "name": "Porch corner flower pot",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.3499999940395355,
+        -0.41999998688697815,
+        0.3725000023841858
+      ]
+    },
+    {
+      "name": "Porch rail flower pot",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.4000000953674316,
+        -1.4800000190734863,
+        -0.06000000238418579
+      ]
+    },
+    {
+      "name": "Porch doormat",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        4.71999979019165,
+        -0.8999999761581421,
+        -0.058500003069639206
+      ]
+    },
+    {
+      "name": "Upstairs hall striped runner",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.300000190734863,
+        4.010000228881836,
+        1.2864999771118164
+      ]
+    },
+    {
+      "name": "Upstairs hall pet drawing",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.350000381469727,
+        3.5210001468658447,
+        2.75
+      ]
+    },
+    {
+      "name": "Upstairs hall flower drawing",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.850000381469727,
+        3.5210001468658447,
+        2.5199999809265137
+      ]
+    },
+    {
+      "name": "Upstairs hall rainbow drawing",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.520000457763672,
+        4.499000549316406,
+        2.700000047683716
+      ]
+    },
+    {
+      "name": "Upstairs hall hook jackets and backpack",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.640000343322754,
+        3.5210001468658447,
+        2.450000047683716
+      ]
+    },
+    {
+      "name": "Green bathroom bath mat",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.100000381469727,
+        6.099999904632568,
+        1.3098328113555908
+      ]
+    },
+    {
+      "name": "Green bathroom hook towels",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.039999961853027,
+        7.079000473022461,
+        2.299999952316284
+      ]
+    },
+    {
+      "name": "Green bathroom rubber duck and toy boat",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.489999771118164,
+        6.78000020980835,
+        1.8085808753967285
+      ]
+    },
+    {
+      "name": "Green bathroom stacking bath cups",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.850000381469727,
+        6.550000190734863,
+        1.446058988571167
+      ]
+    },
+    {
+      "name": "Green bathroom toothbrush cup",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.149999618530273,
+        5.179999828338623,
+        2.112499952316284
+      ]
+    },
+    {
+      "name": "Green bathroom soap pump",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.149999618530273,
+        6.119999885559082,
+        2.112499952316284
+      ]
+    },
+    {
+      "name": "Green bathroom linen shelf plant",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.119999885559082,
+        4.869999885559082,
+        3.247499942779541
+      ]
+    },
+    {
+      "name": "Green bathroom whale picture",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        9.9010009765625,
+        6.5,
+        2.4200000762939453
+      ]
+    },
+    {
+      "name": "Primary bedroom rose rug",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.300000190734863,
+        6.400000095367432,
+        1.2880001068115234
+      ]
+    },
+    {
+      "name": "Primary bed cushions",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.779999732971191,
+        6.400000095367432,
+        1.9079468250274658
+      ]
+    },
+    {
+      "name": "Primary bed foot folded throw",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.75,
+        6.409999847412109,
+        1.9095664024353027
+      ]
+    },
+    {
+      "name": "Primary closet hanging garments",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.640000343322754,
+        4.849999904632568,
+        1.2599999904632568
+      ]
+    },
+    {
+      "name": "Primary closet shelf hats",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.640000343322754,
+        4.860000133514404,
+        3.1075000762939453
+      ]
+    },
+    {
+      "name": "Primary chest top mug books and plant",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.859999656677246,
+        4.880000114440918,
+        2.3424999713897705
+      ]
+    },
+    {
+      "name": "Primary bedroom abstract picture",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.301000595092773,
+        6.099999904632568,
+        2.75
+      ]
+    },
+    {
+      "name": "Primary narrow chest plant",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.550000190734863,
+        7.78000020980835,
+        2.1024999618530273
+      ]
+    },
+    {
+      "name": "Kieran nursery round rug",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.850000381469727,
+        2.450000047683716,
+        1.2880001068115234
+      ]
+    },
+    {
+      "name": "Kieran rocker teddy bear",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.09000015258789,
+        1.3600000143051147,
+        1.8399999141693115
+      ]
+    },
+    {
+      "name": "Kieran crib plush bunny",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.5600004196167,
+        2.4000000953674316,
+        1.7400001287460327
+      ]
+    },
+    {
+      "name": "Kieran nursery stacking rings blocks and ball",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.300000190734863,
+        2.5999999046325684,
+        1.2985000610351562
+      ]
+    },
+    {
+      "name": "Kieran flag bunting over the crib",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.051000595092773,
+        2.0999999046325684,
+        2.9200000762939453
+      ]
+    },
+    {
+      "name": "Kieran crib mobile",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.5600004196167,
+        2.0999999046325684,
+        1.2599999904632568
+      ]
+    },
+    {
+      "name": "Kieran moon and stars picture",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.199999809265137,
+        0.42100000381469727,
+        2.950000047683716
+      ]
+    },
+    {
+      "name": "Kieran rocker arm knit blanket",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.369999885559082,
+        1.25,
+        2.0107779502868652
+      ]
+    },
+    {
+      "name": "Kieran chest top plant",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.449999809265137,
+        0.699999988079071,
+        2.5325000286102295
+      ]
+    },
+    {
+      "name": "Cory hundred square number grid mat",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        17.200000762939453,
+        3.200000047683716,
+        1.3089998960494995
+      ]
+    },
+    {
+      "name": "Cory block tower tree and loose blocks",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        17.950000762939453,
+        3.9000000953674316,
+        1.307499885559082
+      ]
+    },
+    {
+      "name": "Cory bookcase books and puzzle cubes",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        18.489999771118164,
+        3.3399999141693115,
+        0.0
+      ]
+    },
+    {
+      "name": "Cory desk maths workbook pencils and abacus",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.360000610351562,
+        5.920000076293945,
+        2.049999952316284
+      ]
+    },
+    {
+      "name": "Cory multiplication grid poster",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.360000610351562,
+        6.39900016784668,
+        2.549999952316284
+      ]
+    },
+    {
+      "name": "Cory hammock plush toys",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        18.270000457763672,
+        0.9800000190734863,
+        2.950000047683716
+      ]
+    },
+    {
+      "name": "Cory ottoman cushion",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        18.25,
+        0.7200000286102295,
+        1.8100000619888306
+      ]
+    },
+    {
+      "name": "Cory toy truck ball and blocks",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.899999618530273,
+        1.899999976158142,
+        1.3075000047683716
+      ]
+    },
+    {
+      "name": "Family room teal geometric rug",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.600000381469727,
+        2.200000047683716,
+        -1.0285000801086426
+      ]
+    },
+    {
+      "name": "Family room board game in progress",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.470000267028809,
+        2.2699999809265137,
+        -0.5549999475479126
+      ]
+    },
+    {
+      "name": "Family sofa throw and cushions",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.850000381469727,
+        0.11999999731779099,
+        -1.0499999523162842
+      ]
+    },
+    {
+      "name": "Family room toy basket with balls",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.800000190734863,
+        2.8499999046325684,
+        -1.0177000761032104
+      ]
+    },
+    {
+      "name": "Family mantel flower vase",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.399999618530273,
+        1.3300000429153442,
+        0.48499995470046997
+      ]
+    },
+    {
+      "name": "Family mantel leaning drawing and candles",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.399999618530273,
+        3.240000009536743,
+        0.4850001633167267
+      ]
+    },
+    {
+      "name": "Family room leaning landscape print",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.069999694824219,
+        4.5,
+        0.29750001430511475
+      ]
+    },
+    {
+      "name": "Family room corner house plant",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.25,
+        3.8499999046325684,
+        -1.03000009059906
+      ]
+    },
+    {
+      "name": "Shared bedroom entry runner",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.5,
+        5.599999904632568,
+        -1.0134999752044678
+      ]
+    },
+    {
+      "name": "Shared entry school backpack",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.989999771118164,
+        6.449999809265137,
+        -1.0149998664855957
+      ]
+    },
+    {
+      "name": "Downstairs bathroom mat",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.300000190734863,
+        7.550000190734863,
+        -1.0409998893737793
+      ]
+    },
+    {
+      "name": "Downstairs bathroom hanging towel",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.911001205444336,
+        8.0,
+        -0.09999999403953552
+      ]
+    },
+    {
+      "name": "Ellie dress up rail dresses and tutu",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        8.380000114440918,
+        5.71999979019165,
+        -1.0499999523162842
+      ]
+    },
+    {
+      "name": "Ellie dresser crown jewellery box and mirror",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.069999694824219,
+        8.640000343322754,
+        0.09250009059906006
+      ]
+    },
+    {
+      "name": "Ellie shelves books unicorn and snow globe",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        9.670000076293945,
+        5.679999828338623,
+        0.0
+      ]
+    },
+    {
+      "name": "Ellie princess bed cushions",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        9.050000190734863,
+        6.599999904632568,
+        -0.4700002670288086
+      ]
+    },
+    {
+      "name": "Ellie bed foot rose throw",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        9.050000190734863,
+        7.599999904632568,
+        -0.4703105688095093
+      ]
+    },
+    {
+      "name": "Ellie princess runner",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.25,
+        6.829999923706055,
+        -1.0434999465942383
+      ]
+    },
+    {
+      "name": "Ellie castle drawing",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.788999557495117,
+        7.800000190734863,
+        0.44999998807907104
+      ]
+    },
+    {
+      "name": "Ellie hammock plush toys",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        8.260000228881836,
+        6.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Ellie pink shelf plush toys and toy castle",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        8.079999923706055,
+        8.170000076293945,
+        -0.2924998998641968
+      ]
+    },
+    {
+      "name": "Ellie small bookcase books",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        8.039999961853027,
+        7.230000019073486,
+        0.0
+      ]
+    },
+    {
+      "name": "Jeannie bedroom teal rug",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.899999618530273,
+        6.300000190734863,
+        -1.0484999418258667
+      ]
+    },
+    {
+      "name": "Jeannie reading beanbag with open book",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.550000190734863,
+        6.949999809265137,
+        -1.0499999523162842
+      ]
+    },
+    {
+      "name": "Jeannie reading cushion",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.850000381469727,
+        7.099999904632568,
+        -1.0499999523162842
+      ]
+    },
+    {
+      "name": "Jeannie book stack",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.449999809265137,
+        7.349999904632568,
+        -1.0499999523162842
+      ]
+    },
+    {
+      "name": "Jeannie trophy cups and certificate",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.75,
+        7.659999847412109,
+        -0.2759999632835388
+      ]
+    },
+    {
+      "name": "Jeannie READ letter garland",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        13.800000190734863,
+        5.060999870300293,
+        0.75
+      ]
+    },
+    {
+      "name": "Jeannie story castle picture",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.600000381469727,
+        7.939000129699707,
+        0.4000000059604645
+      ]
+    },
+    {
+      "name": "Jeannie bed cushions",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.899999618530273,
+        7.300000190734863,
+        -0.47500038146972656
+      ]
+    },
+    {
+      "name": "Jeannie bed foot throw",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.899999618530273,
+        6.199999809265137,
+        -0.4754020571708679
+      ]
+    },
+    {
+      "name": "Jeannie bedside plant",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.300000190734863,
+        5.449999809265137,
+        -0.357499897480011
+      ]
+    },
+    {
+      "name": "Basement games checker rug",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        4.75,
+        3.0,
+        -3.1180002689361572
+      ]
+    },
+    {
+      "name": "Basement word library books and reading basket",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.75,
+        4.800000190734863,
+        0.0
+      ]
+    },
+    {
+      "name": "Basement bunk cushions",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.0499999523162842,
+        3.450000047683716,
+        -2.500000238418579
+      ]
+    },
+    {
+      "name": "Basement bunk teddy bear",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.0499999523162842,
+        2.8499999046325684,
+        -2.5500001907348633
+      ]
+    },
+    {
+      "name": "Basement toys by the slide",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.299999952316284,
+        2.9000000953674316,
+        -3.119500160217285
+      ]
+    },
+    {
+      "name": "Basement family bank piggy bank mug and notebook",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.549999952316284,
+        7.199999809265137,
+        -2.382499933242798
+      ]
+    },
+    {
+      "name": "Basement laundry basket of folded clothes",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.090000152587891,
+        7.300000190734863,
+        -2.190000057220459
+      ]
+    },
+    {
+      "name": "Basement bunk rainbow painting",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.06100019812583923,
+        2.200000047683716,
+        -1.2000000476837158
+      ]
+    },
+    {
+      "name": "Basement bunk pet painting",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.06100015342235565,
+        3.200000047683716,
+        -1.2000000476837158
+      ]
+    },
+    {
+      "name": "Garage shelf bins and boxes",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        -0.4000000059604645,
+        3.049999952316284,
+        0.0
+      ]
+    },
+    {
+      "name": "Garage kid scooter and helmet",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        -0.550000011920929,
+        4.599999904632568,
+        -0.15999996662139893
+      ]
+    },
+    {
+      "name": "Garden stepping stone path",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "Garden sunroom sill west flower bed",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.450000047683716,
+        11.649999618530273,
+        -0.2200000286102295
+      ]
+    },
+    {
+      "name": "Garden sunroom sill east flower bed",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        6.349999904632568,
+        11.649999618530273,
+        -0.2200000286102295
+      ]
+    },
+    {
+      "name": "Garden raised vegetable bed",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        6.150000095367432,
+        15.75,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Garden watering can",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.349999904632568,
+        15.399999618530273,
+        -0.8200001120567322
+      ]
+    },
+    {
+      "name": "Garden ball by the trampoline",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.300000190734863,
+        13.199999809265137,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Garden bucket and spade",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.549999952316284,
+        18.0,
+        -0.8199999928474426
+      ]
+    },
+    {
+      "name": "Front garden planted flower bed",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.800000190734863,
+        -3.5999999046325684,
+        -0.7700000405311584
+      ]
+    },
+    {
+      "name": "Front shrub bed flower edge",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        5.28000020980835,
+        -5.400000095367432,
+        -0.7699999213218689
+      ]
+    },
+    {
+      "name": "Driveway chalk hopscotch one to eight",
+      "collection": "48 | Dressing - garden",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        -3.5,
+        -7.099999904632568,
+        -0.7909998297691345
       ]
     },
     {
