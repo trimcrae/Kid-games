@@ -6,6 +6,7 @@ import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
 import {stepCompanion} from './companions.mjs';
+import {createGround} from './pet-ground.mjs';
 const $=id=>document.getElementById(id);
 export function companionBlocksCamera(point,camera,bounds){
   const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
@@ -28,6 +29,9 @@ export async function createHouseLife(tour){
   const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew:()=>showActivity({id:'adopt',room:'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'})});
   let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
+  // Pets stand on the visible floor finish (boards and tile sit above the
+  // walking boxes), so their feet and contact shadows aren't buried.
+  const ground=createGround(scene);let avatarLift=0;
   const stations=activities.map(a=>{
     const room=rooms.find(r=>r[1]===a.room),point=world.safeSpot(room[2],room[4],-room[3]);
     if(!point)throw Error('Activity has no safe floor: '+a.id);
@@ -184,19 +188,21 @@ export async function createHouseLife(tour){
     },
     tick(dt,time,active){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
+      ground.frame();
       if(avatar){
         // Turn along the shorter way at a creature's pace (fast, eased),
         // never a one-frame about-face.
         const turn=Math.atan2(Math.sin(wantHeading-heading),Math.cos(wantHeading-heading));
         heading+=tour.reducedMotion?turn:Math.sign(turn)*Math.min(Math.abs(turn),Math.max(Math.abs(turn)*(1-Math.exp(-dt*10)),dt*2));
-        avatar.position.set(player.x,player.y,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion,speed);
+        avatarLift=ground.offset(player,avatarLift);
+        avatar.position.set(player.x,player.y+avatarLift,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion,speed);
         // If a tight corner still brings the camera right up to the pet, let
         // the view see past it rather than fill the screen with fur.
         avatar.visible=!avatarBounds||!companionBlocksCamera(player,tour.camera.position,{...avatarBounds,radius:avatarBounds.radius-.1});
       }
       for(const r of roamers){
         const gap=stepCompanion(r,dt,world,player);
-        r.mesh.position.set(r.point.x,r.point.y,r.point.z);r.mesh.rotation.y=r.angle;r.mesh.userData.animate(time,r.walking,tour.reducedMotion);
+        r.mesh.position.set(r.point.x,r.point.y+ground.offset(r.point,r.mesh.position.y-r.point.y),r.point.z);r.mesh.rotation.y=r.angle;r.mesh.userData.animate(time,r.walking,tour.reducedMotion);
         // Hide a companion only while its body overlaps the camera's space.
         r.mesh.visible=!companionBlocksCamera(r.point,tour.camera.position,r.cameraBounds);
         r.label.visible=r.mesh.visible&&gap>1.6&&gap<5;
