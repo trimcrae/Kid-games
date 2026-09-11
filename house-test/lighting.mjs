@@ -106,7 +106,9 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
   const slots=[key,...fills].map(light=>({light,source:null,target:0}));
   const sky=createSky(scene);
 
-  const pmrem=new THREE.PMREMGenerator(renderer),probeSize=mobile?64:128;
+  // 64-px probes: only small glossy things reflect now, and a capture on
+  // entering a room costs ~10 ms less than at 128 px.
+  const pmrem=new THREE.PMREMGenerator(renderer),probeSize=64;
   const base=skyEnvironment(pmrem,probeSize);
   // Only glossy materials sample a reflection map (see materials.mjs).
   scene.environment=null;
