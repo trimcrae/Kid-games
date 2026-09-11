@@ -313,6 +313,8 @@ export async function createHouseLife(tour){
   const overlayIds=['welcome','family-panel','save-panel','activity-choices','rooms','activity-panel'];
   sync(true);
   return {
+    // The game clock and weather the HUD shows, for the 3D time of day.
+    sky:()=>({time:engine.timeOfDay(),weather:engine.weather()?.id}),
     hasPet:()=>!!engine.state().pet,
     // First visit asks who is playing; after that, a pet-less profile goes
     // straight to adoption. Bringing saves over is a small link, not a wall.
