@@ -98,6 +98,7 @@ varying vec3 vHousePosition;
 varying vec3 vHouseNormal;
 uniform int houseSurfaceKind;
 uniform bool houseFloorBoards;
+uniform float houseExteriorDim;
 uniform bool houseVerticalGrain;
 uniform sampler2D houseDetailMap;
 uniform vec2 houseDetailScale;
@@ -159,6 +160,16 @@ export const OCCLUSION={gain:1.7,curve:1.6,direct:.45};
 // Shared by every foliage material: a little light of its own after dark so
 // leaf cards facing away from the lamps do not go black (lighting.mjs sets it).
 export const FOLIAGE={fill:{value:0}};
+// Garden, cladding and roofs share one light scale: lighting.mjs lowers it
+// while you are indoors after dark, so the garden seen through a window is
+// moonlit rather than lit by the room's fill.
+export const EXTERIOR={dim:{value:1}};
+const INTERIOR_DIM={value:1};
+export function exteriorFinish(group,f){
+  return /Front and back yards|Exterior roofs|Garden |Yard /i.test(group.name||'')
+    ||['lawn','roof','shakes','siding'].includes(f.surface)
+    ||(f.surface==='foliage'&&!/Houseplant/i.test(group.name||''));
+}
 
 export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=false}={}){
   const {color,finish:styled}=styleGroup(group,finishDescription(group));
@@ -224,6 +235,7 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
       shader.uniforms.houseSurfaceKind={value:family};
       // Floor boards: their gap walls also flatten out at distance (uniform, so
       // no extra program).
+      shader.uniforms.houseExteriorDim=exteriorFinish(group,f)?EXTERIOR.dim:INTERIOR_DIM;
       shader.uniforms.houseFloorBoards={value:/Oak floor board|laminate planks|^17 \| .*Honey oak grain/.test(group.name||'')};
       if(foliage){shader.defines??={};shader.defines.HOUSE_FOLIAGE=1;shader.uniforms.houseLeafFill=FOLIAGE.fill;}
       const tile=detailTile(family);
@@ -319,7 +331,8 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
             #ifdef USE_SHEEN
               sheenSpecularIndirect*=houseAO;
             #endif
-          #endif`);
+          #endif
+          reflectedLight.directDiffuse*=houseExteriorDim;reflectedLight.indirectDiffuse*=houseExteriorDim;`);
     };
   }
   return material;

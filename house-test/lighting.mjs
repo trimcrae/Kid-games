@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {createSky} from './sky.mjs';
-import {FOLIAGE} from './materials.mjs';
+import {FOLIAGE,EXTERIOR} from './materials.mjs';
 
 // Slab intersections prevent a lamp on another floor or behind a partition
 // from taking a nearby-light slot. The fills approximate indirect light and
@@ -40,9 +40,9 @@ export const PHASES={
   day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.78,
     practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
-    practical:1.15,key:.85,indoorFloor:.5,indoorSky:'#a8a0b0',indoorGround:'#6e5436',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
+    practical:1.15,key:.95,keyCone:.9,warmth:.2,exteriorDim:.6,indoorFloor:.45,indoorSky:'#9296bc',indoorGround:'#5a4632',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
   night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#2a241c',hemi:.34,
-    practical:.95,key:.75,indoorFloor:.66,indoorSky:'#8e90aa',indoorGround:'#6e5436',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
+    practical:1.05,key:1.05,keyCone:.75,warmth:.4,exteriorDim:.3,indoorFloor:.4,indoorSky:'#5e70b4',indoorGround:'#3a3024',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
@@ -176,6 +176,8 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     // Shades and diffusers are faintly emissive in the export; after dark they
     // must read as the light source, so they get a floor as well as a scale.
     FOLIAGE.fill.value=phase.leafFill??0;
+    for(const slot of slots)tint(slot);
+    if(key.castShadow)key.shadow.needsUpdate=true;
     for(const m of emissive)m.emissiveIntensity=Math.max(m.userData.houseEmissive*phase.emissive,phase.shadeGlow??0);
     applyRoom();
     sun.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;
@@ -201,6 +203,10 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     if(indoorNight)hemi=Math.max(hemi,phase.indoorFloor);
     hemisphere.color.set(indoorNight?phase.indoorSky:phase.hemiSky);hemisphere.groundColor.set(indoorNight?phase.indoorGround:phase.hemiGround);
     mix.hemi=hemi;
+    // Indoors after dark the garden, cladding and roofs seen through windows
+    // keep moonlight levels instead of the room's fill, and leaves lose theirs.
+    EXTERIOR.dim.value=!room.outdoor&&phase.exteriorDim?phase.exteriorDim:1;
+    FOLIAGE.fill.value=room.outdoor?(phase.leafFill??0):0;
     mix.practical=phase.practical*(room.tight?1.3:1)*(room.outdoor?.6:1);
     // Seen from outside the panes glow (a lived-in house); from inside they
     // stay dark so the night sky shows through.
@@ -217,6 +223,12 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   }
   let lastPosition={x:0,y:0,z:0};
 
+  // Lamps read warmer after dark (a candle-ish shift toward amber).
+  const AMBER=new THREE.Color('#ffb46a');
+  function tint(slot){
+    if(!slot.source)return;slot.light.color.setRGB(...slot.source.color);
+    const w=PHASES[phaseName]?.warmth??0;if(w)slot.light.color.lerp(AMBER,w);
+  }
   function sourceIntensity(source){
     // The Blender scene stores radiant watts. This exposure-calibrated display
     // conversion is deliberately separate from the physical source metadata.
@@ -232,7 +244,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
       if(source!==slot.source){
         slot.source=source;
         if(source){
-          light.position.set(...source.position);light.color.setRGB(...source.color);
+          light.position.set(...source.position);tint(slot);
           light.distance=source.type==='area'?7:5.5;
           // A new lamp fades in instead of popping.
           light.intensity=0;
@@ -242,7 +254,8 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     });
     if(main){
       key.target.position.copy(key.position).add(new THREE.Vector3(...main.direction));
-      key.angle=Math.min(1.45,Math.max(.65,main.angle||1.35));
+      // After dark the ceiling cone narrows into a pool with darker corners.
+      key.angle=Math.min(1.45,Math.max(.65,main.angle||1.35))*(PHASES[phaseName]?.keyCone??1);
     }
     if((main?.name||'')!==keyId){
       keyId=main?.name||'';
