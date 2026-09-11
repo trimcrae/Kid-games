@@ -17,9 +17,9 @@ const arc=new THREE.TorusGeometry(1,.22,6,14,Math.PI);
 const shared=new Set([sphere,roundSphere,cone,arc]);
 
 // ---------------------------------------------------------------------------
-// Rig. Each creature is two skinned meshes (fur, and everything else) on one
-// small skeleton, plus its contact shadow: three draw calls instead of the ~20
-// separate spheres it used to be, and every part can still move on its own —
+// Rig. Each creature is one skinned mesh on a small skeleton, plus its
+// contact shadow: two draw calls instead of the ~20 separate spheres it used
+// to be, and every part can still move on its own —
 // a head that looks round, eyes that blink or close, ears that droop, feet
 // that step. At rest every vertex sits exactly where the old spheres did, so
 // the measured sizes of every species are unchanged.
@@ -58,12 +58,13 @@ function mergeParts(parts,{surface=false}={}){
     const g=p.geo,P=g.attributes.position,N=g.attributes.normal,U=g.attributes.uv;_nm.getNormalMatrix(p.matrix);
     for(let i=0;i<g.index.count;i++)index[ix++]=g.index.array[i]+v;
     for(let i=0;i<P.count;i++,v++){
-      _v.fromBufferAttribute(P,i).applyMatrix4(p.matrix);pos.set([_v.x,_v.y,_v.z],v*3);
-      _n.fromBufferAttribute(N,i).applyMatrix3(_nm).normalize();nor.set([_n.x,_n.y,_n.z],v*3);
-      if(U)uv.set([U.getX(i),U.getY(i)],v*2);
-      col.set([p.color.r,p.color.g,p.color.b],v*3);
+      _v.fromBufferAttribute(P,i).applyMatrix4(p.matrix);pos[v*3]=_v.x;pos[v*3+1]=_v.y;pos[v*3+2]=_v.z;
+      _n.fromBufferAttribute(N,i).applyMatrix3(_nm).normalize();nor[v*3]=_n.x;nor[v*3+1]=_n.y;nor[v*3+2]=_n.z;
+      if(U){uv[v*2]=U.getX(i);uv[v*2+1]=U.getY(i);}
+      if(p.pattern&&U){const q=p.pattern,row=q[Math.min(q.length-1,Math.max(0,Math.floor((1-U.getY(i))*q.length)))],c=row[Math.min(row.length-1,Math.max(0,Math.floor(U.getX(i)*row.length)))];col.set([c.r,c.g,c.b],v*3);}
+      else{col[v*3]=p.color.r;col[v*3+1]=p.color.g;col[v*3+2]=p.color.b;}
       skinIndex[v*4]=p.bone;skinWeight[v*4]=1;
-      if(surf)surf.set([p.rough,p.emit],v*2);
+      if(surf){surf[v*2]=p.rough;surf[v*2+1]=p.emit;}
     }
   }
   const geo=new THREE.BufferGeometry();
@@ -76,11 +77,11 @@ function mergeParts(parts,{surface=false}={}){
   return geo;
 }
 
-// Soft-real fur, still two draw calls: clumps of fur and fine strands from
+// Soft-real fur: clumps of fur and fine strands from
 // procedural noise (darker roots between clumps, lighter tips, a slightly
 // richer colour like the painted adoption art), the same clumps bumping the
 // normal so light breaks up across the coat, a velvet sheen at grazing angles
-// (MeshPhysical sheen) and a soft textured fringe at the silhouette instead
+// and a soft textured fringe at the silhouette instead
 // of a vinyl highlight. Grime (a dirty pet) shows as mud specks, not a blur.
 const FUR_NOISE=`
 float cpH(vec3 p){p=fract(p*0.3183099+0.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
@@ -104,33 +105,38 @@ const FUR_FRAGMENT=`
 const FUR_NORMAL=`
   {float d=0.35;vec3 g=vec3(cpN(clumpP+vec3(d,0.0,0.0)),cpN(clumpP+vec3(0.0,d,0.0)),cpN(clumpP+vec3(0.0,0.0,d)))-clump;
    normal=normalize(normal-(mat3(viewMatrix)*g)*0.9*furLike);}`;
-function creatureMaterial(kind,map=null,sheenColor='#ffffff'){
-  const detail=kind==='detail';
-  const material=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:1,metalness:0,map,sheen:1,sheenRoughness:.55,
-    sheenColor:new THREE.Color(sheenColor).lerp(new THREE.Color('#ffffff'),.35).multiplyScalar(detail?.6:.85)});
-  const uniforms={uRim:{value:detail?.12:.16},uGrime:{value:0}};
-  material.userData.uniforms=uniforms;
-  material.onBeforeCompile=shader=>{
-    Object.assign(shader.uniforms,uniforms);
-    shader.vertexShader=shader.vertexShader
-      .replace('#include <common>','#include <common>\nvarying vec3 vFur;'+(detail?'\nattribute vec2 aSurf;\nvarying vec2 vSurf;':''))
-      .replace('#include <begin_vertex>','#include <begin_vertex>\nvFur=position;'+(detail?'\nvSurf=aSurf;':''));
-    shader.fragmentShader=shader.fragmentShader
-      .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nuniform float uRim;\nuniform float uGrime;'+(detail?'\nvarying vec2 vSurf;':'')+FUR_NOISE)
-      .replace('#include <color_fragment>','#include <color_fragment>'+FUR_FRAGMENT.replace('FURLIKE',detail?'smoothstep(0.75,0.92,vSurf.x)':'1.0'))
-      .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>'+(detail?'\nroughnessFactor=vSurf.x;':''))
-      .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>'+FUR_NORMAL)
-      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>'+(detail?'\ntotalEmissiveRadiance+=diffuseColor.rgb*vSurf.y;':''))
-      .replace('#include <lights_physical_fragment>','#include <lights_physical_fragment>\n#ifdef USE_SHEEN\nmaterial.sheenColor*=furLike;\n#endif')
-      .replace('#include <opaque_fragment>',`float furF=pow(1.0-clamp(dot(normalize(normal),normalize(vViewPosition)),0.0,1.0),2.2);
+// One coat material for every creature: a MeshStandard shader with the fur
+// added in onBeforeCompile, identical source and defines for all of them, so
+// the whole cast shares a single GPU program (quick to compile at load; the
+// old MeshPhysical sheen took three heavier programs). Per-part surface
+// (roughness, glow, how furry) rides in a vertex attribute; the velvet sheen
+// is an explicit grazing-angle term that follows the light the coat receives.
+const COAT_KEY='craepet-coat-1';
+function coatCompile(shader){
+  Object.assign(shader.uniforms,this.userData.uniforms);
+  shader.vertexShader=shader.vertexShader
+    .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nattribute vec2 aSurf;\nvarying vec2 vSurf;')
+    .replace('#include <begin_vertex>','#include <begin_vertex>\nvFur=position;\nvSurf=aSurf;');
+  shader.fragmentShader=shader.fragmentShader
+    .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nvarying vec2 vSurf;\nuniform float uRim;\nuniform float uGrime;\nuniform vec3 uSheen;'+FUR_NOISE)
+    .replace('#include <color_fragment>','#include <color_fragment>'+FUR_FRAGMENT.replace('FURLIKE','smoothstep(0.75,0.92,vSurf.x)'))
+    .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=vSurf.x;')
+    .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>'+FUR_NORMAL)
+    .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*vSurf.y;')
+    .replace('#include <opaque_fragment>',`float furF=pow(1.0-clamp(dot(normalize(normal),normalize(vViewPosition)),0.0,1.0),2.2);
+  float coatLit=dot(totalDiffuse,vec3(0.3333))/max(dot(diffuseColor.rgb,vec3(0.3333)),0.05);
   outgoingLight*=1.0-0.28*furF*(1.0-fiber)*furLike;
+  outgoingLight+=uSheen*pow(furF,1.4)*coatLit*0.55*furLike;
   outgoingLight+=mix(diffuseColor.rgb,vec3(1.0),0.25)*uRim*furF*furLike*(0.6+0.4*strand);
 #include <opaque_fragment>`);
-  };
-  material.customProgramCacheKey=()=>'craepet-fur2-'+kind;
-  return material;
 }
-// A soft contact shadow: a warm dark core under the feet fading out past the
+function creatureMaterial(sheenColor='#ffffff'){
+  const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0});
+  material.userData.uniforms={uRim:{value:.1},uGrime:{value:0},uSheen:{value:new THREE.Color(sheenColor).lerp(new THREE.Color('#ffffff'),.35).multiplyScalar(.85)}};
+  material.onBeforeCompile=coatCompile;
+  material.customProgramCacheKey=()=>COAT_KEY;
+  return material;
+}// A soft contact shadow: a warm dark core under the feet fading out past the
 // body, so the pet reads as standing on oak, tile, carpet or lawn. One shared
 // texture, built from numbers (it also works outside a browser, in tests).
 let shadowTexture=null;
@@ -175,16 +181,18 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   const root=new THREE.Group();
   const bones=makeSkeleton(),B=Object.fromEntries(bones.map(b=>[b.name,b]));
   root.add(bones[0]);
-  let furMap=null;
-  if(palette.pattern){const cv=document.createElement('canvas');cv.width=16;cv.height=22;const ctx=cv.getContext('2d');palette.pattern.forEach((row,y)=>row.forEach((col,x)=>{ctx.fillStyle=col;ctx.fillRect(x,y,1,1);}));furMap=new THREE.CanvasTexture(cv);furMap.colorSpace=THREE.SRGBColorSpace;}
-  const FUR=furMap?'#ffffff':palette.body,ACCENT=palette.accent;
-  const furParts=[],detailParts=[];
+  // A patterned colour (stripes, spots, rainbow…) is painted into the fur's
+  // vertex colours from the same 16x22 pattern the 2D art uses, so every
+  // creature keeps one shared shader with no texture.
+  const pattern=palette.pattern?palette.pattern.map(row=>row.map(c=>new THREE.Color(c))):null;
+  const FUR=palette.body,ACCENT=palette.accent;
+  const parts=[];
   const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler();
   function place(pos,size,rot){_e.set(rot?.[0]||0,rot?.[1]||0,rot?.[2]||0);return new THREE.Matrix4().compose(new THREE.Vector3(...pos),_q.setFromEuler(_e).clone(),new THREE.Vector3(...size));}
   // part(kind, bone, position, size, {shape, rot, color, rough, emit})
   function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0}={}){
     const fur=kind==='fur';
-    (fur?furParts:detailParts).push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?FUR:(color||ACCENT)),rough,emit});
+    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?FUR:(color||ACCENT)),pattern:fur?pattern:null,rough:fur?1:rough,emit});
   }
   const sp=pet.species,rig={species:sp,egg:!!pet.egg,hopper:sp==='snorbit'&&!pet.egg,floater:sp==='glimmr'&&!pet.egg,
     ears:false,tail:false,wings:false};
@@ -241,15 +249,14 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
       part('detail','torso',[0,.49,.05],[.265,.035,.20],{color,rough:.8});if(wear.neck==='medal')part('detail','torso',[0,.4,.23],[.07,.07,.015],{color,rough:.3});else if(wear.neck==='bowtie')for(const side of [-1,1])part('detail','torso',[side*.055,.49,.23],[.065,.04,.025],{color,rough:.8});}
   }
   for(const x of extras)part('detail',x.bone||'head',x.pos,x.size,{color:x.color,rough:x.rough??.9});
-  // Build the two skinned meshes on one skeleton.
+  // Build the creature: one skinned mesh on its skeleton (plus the shadow).
   root.updateMatrixWorld(true);
   const skeleton=new THREE.Skeleton(bones);
   const meshes=[];
-  for(const [list,kind] of [[furParts,'fur'],[detailParts,'detail']]){
-    if(!list.length)continue;
-    const geo=mergeParts(list,{surface:kind==='detail'});
-    const mesh=new THREE.SkinnedMesh(geo,creatureMaterial(kind,kind==='fur'?furMap:null,furMap?'#ffffff':palette.body));
-    mesh.name='creature '+kind;mesh.bind(skeleton,new THREE.Matrix4());
+  for(const list of [parts]){
+    const geo=mergeParts(list,{surface:true});
+    const mesh=new THREE.SkinnedMesh(geo,creatureMaterial(pattern?'#ffffff':palette.body));
+    mesh.name='creature';mesh.bind(skeleton,new THREE.Matrix4());
     // At rest the skinned body is exactly the merged geometry; animation only
     // ever moves parts a few centimetres, so a padded sphere culls safely.
     // Bounds are measured the way the separate spheres always were (each part's
@@ -370,6 +377,15 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     update(dt,{moving,speed:moving?(speed??.45):0,reduced});
   };
   return root;
+}
+// A stand-in pet carrying the materials every creature uses (the shared coat
+// and the contact shadow), so the page can compile those shaders in parallel
+// with the house's while loading. Take it out of the scene afterwards without
+// disposing it, and the real pets reuse the compiled programs.
+export function warmupCast(){
+  const group=new THREE.Group();group.name='creature shader warm-up';
+  const pet=creature({species:'blorb'});pet.scale.setScalar(PET_SCALE);group.add(pet);
+  return group;
 }
 export function disposeCreature(root){
   const mats=new Set();

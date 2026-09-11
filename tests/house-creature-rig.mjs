@@ -80,9 +80,12 @@ for(const sp of species){
 }
 // Disposal frees every material and geometry, but never the shared shadow.
 {
-  const c=build({species:'flarn',wear:{head:'partyhat',neck:'scarf'}});let freed=0;
-  c.traverse(m=>{if(m.material)m.material.addEventListener('dispose',()=>freed++);});
+  const c=build({species:'flarn',wear:{head:'partyhat',neck:'scarf'}});let freed=0;const mats=new Set();
+  c.traverse(m=>{if(m.material)mats.add(m.material);});mats.forEach(m=>m.addEventListener('dispose',()=>freed++));
   const shadowMap=c.userData.rig.shadow.material.map;let shadowFreed=false;shadowMap.addEventListener('dispose',()=>shadowFreed=true);
-  disposeCreature(c);assert.equal(freed,3,'materials not all disposed');assert(!shadowFreed,'shared shadow texture was disposed');
+  disposeCreature(c);assert.equal(freed,mats.size,'materials not all disposed');assert(!shadowFreed,'shared shadow texture was disposed');
 }
 console.log(`PASS creature rig: ${species.length} bodies + eggs keep their rest bounds, ≤3 draw calls each, every pose under the ${table.toFixed(2)} m table; gait, blink, sleep, float and reduced motion behave`);
+
+// Every creature shares one coat program: the same shader source and cache key.
+{const a=build({species:'zibbit'}),b=build({species:'glimmr',egg:true}),p=petpet('moth');const keys=new Set();for(const c of [a,b,p])c.traverse(m=>{if(m.isSkinnedMesh){keys.add(m.material.customProgramCacheKey()+'|'+m.material.onBeforeCompile.toString().length+'|'+m.material.type);}});assert.equal(keys.size,1,'creatures compile more than one shader program: '+[...keys]);}
