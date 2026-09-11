@@ -49,15 +49,22 @@ let guard=null,cameraClearance=nearPlaneReach(camera)+.015;
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null;
 // The eased follow-camera state: crane swing and boom length.
-let rigState=null,arrivalYaw=null;
+let rigState=null,crane=null,arrivalYaw=null;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// Every way of putting the pet somewhere new — a jump, a family switch, a
+// reload or an imported save — comes through here, so the camera, room name
+// and lighting arrive with the pet instead of sweeping across floors to it.
+function placePlayer(p,heading){
+  Object.assign(player,p);pitch=-.18;focusY=p.y;velocity={x:0,z:0};rigState=null;crane=null;
+  yaw=arrivalYaw=arrivalHeading(player,heading,pitch,world,guard,cameraClearance);life?.face(yaw+Math.PI,true);
+  updateLocation();
+}
 function teleport(room){
   const [ax,ay,heading]=room[6]||[room[2],room[3],room[5]];
   const p=world.safeSpot(ax,room[4],-ay)||world.safeSpot(room[2],room[4],-room[3]);
   if(!p){$('hint').textContent='That starting point is unavailable. Choose a nearby room.';return false;}
-  Object.assign(player,p);pitch=-.18;focusY=p.y;velocity={x:0,z:0};rigState=null;
-  yaw=arrivalYaw=arrivalHeading(player,heading,pitch,world,guard,cameraClearance);life?.face(yaw+Math.PI,true);
+  placePlayer(p,heading);
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
   lighting.setRoom(room[1],player);
   $('hint').textContent='WASD to walk · Mouse to aim · E for activities · R for rooms';
@@ -99,7 +106,7 @@ async function captureMouse(){
   }catch{lockFailed();}
   finally{lockPending=false;}
 }
-function suspend(){active=false;keys.clear();endJoy();drag=null;lockWanted=false;if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
+function suspend(){active=false;keys.clear();endJoy();drag=null;lockWanted=false;velocity={x:0,z:0};if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
 function pause(){suspend();welcome.hidden=false;start.textContent='Continue exploring';}
 async function resume(){
   if(!ready)return;if(life&&!life.hasPet()){life.adopt();return;}active=true;welcome.hidden=true;$('rooms').hidden=true;
@@ -187,11 +194,16 @@ window.addEventListener('resize',()=>{fitLens();cameraClearance=nearPlaneReach(c
 // shown lies on a guarded boom no further out than the guard allowed.
 function placeCamera(dt){
   const focus={x:player.x,y:focusY,z:player.z};
-  const pick=craneExtra(focus,yaw,pitch,world,guard,cameraClearance);
-  if(!rigState||reducedMotion)rigState={extra:pick.extra,distance:pick.view.distance};
-  rigState.extra+=(pick.extra-rigState.extra)*(1-Math.exp(-dt*4));
-  if(Math.abs(rigState.extra-pick.extra)<.004)rigState.extra=pick.extra;
-  const view=rigState.extra===pick.extra?pick.view:boomCamera(focus,yaw,Math.max(-1,pitch+rigState.extra),world,guard,cameraClearance);
+  // The full crane ladder is searched every few frames (or at once when the
+  // chosen swing stops fitting); in between only the chosen swing is placed,
+  // which keeps tight rooms as cheap as open ones.
+  let pick;
+  if(!crane||crane.age++>=3){const c=craneExtra(focus,yaw,pitch,world,guard,cameraClearance);crane={extra:c.extra,age:0};pick=c.view;}
+  else{pick=boomCamera(focus,yaw,Math.max(-1.45,pitch+crane.extra),world,guard,cameraClearance);if(pick.distance<1.2)crane.age=3;}
+  if(!rigState||reducedMotion)rigState={extra:crane.extra,distance:pick.distance};
+  rigState.extra+=(crane.extra-rigState.extra)*(1-Math.exp(-dt*4));
+  if(Math.abs(rigState.extra-crane.extra)<.004)rigState.extra=crane.extra;
+  const view=rigState.extra===crane.extra?pick:boomCamera(focus,yaw,Math.max(-1.45,pitch+rigState.extra),world,guard,cameraClearance);
   const eased=rigState.distance+(view.distance-rigState.distance)*(1-Math.exp(-dt*3.5));
   rigState.distance=Math.min(view.distance,eased);
   if(rigState.distance>=view.distance-1e-4||view.distance<1e-4)return view;
@@ -248,7 +260,8 @@ function animate(now){
     // A short ramp (~0.15 s) up to speed and down to a stop, like a creature
     // with some weight, rather than a cursor. Reduced motion keeps it instant.
     const want={x:(right*Math.cos(yaw)-forward*Math.sin(yaw))*speed,z:(-right*Math.sin(yaw)-forward*Math.cos(yaw))*speed};
-    const blend=reducedMotion?1:1-Math.exp(-dt*14);
+    // Stopping is quicker than starting, so the pet halts where you let go.
+    const blend=reducedMotion?1:1-Math.exp(-dt*(want.x||want.z?14:30));
     velocity.x+=(want.x-velocity.x)*blend;velocity.z+=(want.z-velocity.z)*blend;
     if(Math.hypot(velocity.x,velocity.z)<.02&&!want.x&&!want.z)velocity={x:0,z:0};
     const before={x:player.x,z:player.z};
@@ -287,7 +300,8 @@ async function load(){
     guard=createCameraGuard(binary,guardGroups(data.groups));
     world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
     $('loading').textContent='Welcoming your Craepets…';
-    life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
+    life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
+    life.face(yaw+Math.PI,true);
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.

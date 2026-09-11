@@ -33,9 +33,11 @@ export async function createHouseLife(tour){
     return {...a,point,roomData:room};
   });
   const positionKey=id=>'craepets.house.position.'+id;
-  function savePosition(){try{localStorage.setItem(positionKey(engine.who()),JSON.stringify(player));}catch{}}
+  // The view direction is saved alongside the spot (an additive field; older
+  // saves without it still load), so a reload doesn't stare at a wall.
+  function savePosition(){try{localStorage.setItem(positionKey(engine.who()),JSON.stringify({x:player.x,y:player.y,z:player.z,yaw:tour.yaw}));}catch{}}
   function restorePosition(id){
-    try{const p=JSON.parse(localStorage.getItem(positionKey(id)));if(p&&[p.x,p.y,p.z].every(Number.isFinite)){const safe=world.safeSpot(p.x,p.y,p.z);if(safe){Object.assign(player,safe);return;}}}catch{}
+    try{const p=JSON.parse(localStorage.getItem(positionKey(id)));if(p&&[p.x,p.y,p.z].every(Number.isFinite)){const safe=world.safeSpot(p.x,p.y,p.z);if(safe){tour.place(safe,p.yaw);return;}}}catch{}
     tour.teleport(rooms[0]);
   }
   const roomNames=[...new Set([...stations.map(s=>s.room),...Object.values(familyRooms)])];
@@ -189,9 +191,10 @@ export async function createHouseLife(tour){
         const turn=Math.atan2(Math.sin(wantHeading-heading),Math.cos(wantHeading-heading));
         heading+=tour.reducedMotion?turn:Math.sign(turn)*Math.min(Math.abs(turn),Math.max(Math.abs(turn)*(1-Math.exp(-dt*10)),dt*2));
         avatar.position.set(player.x,player.y,player.z);avatar.rotation.y=heading;avatar.userData.animate(time,active&&moving,tour.reducedMotion,speed);
-        // If a tight corner still brings the camera right up to the pet, let
-        // the view see past it rather than fill the screen with fur.
-        avatar.visible=!avatarBounds||!companionBlocksCamera(player,tour.camera.position,{...avatarBounds,radius:avatarBounds.radius-.1});
+        // Only if the camera is actually inside the pet (the last resort after
+        // the crane has looked down from above) does the pet step aside from view.
+        const eye=tour.camera.position,rise=eye.y-player.y;
+        avatar.visible=!avatarBounds||Math.hypot(eye.x-player.x,eye.z-player.z)>avatarBounds.radius+.06||rise>avatarBounds.maxY+.08||rise<avatarBounds.minY-.05;
       }
       for(const r of roamers){
         r.timer-=dt;

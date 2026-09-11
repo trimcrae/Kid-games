@@ -8,7 +8,7 @@ import {gunzipSync} from 'node:zlib';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,arrivalHeading} from '../house-test/camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,arrivalHeading,SOFT_CLEAR} from '../house-test/camera-guard.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const mesh=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
@@ -17,6 +17,7 @@ let began=performance.now();
 const guard=createCameraGuard(binary,guardGroups(data.groups));
 const built=performance.now()-began;
 const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(neighborhoodBoxes);
+const inside=p=>world.boxes.some(b=>p.x>b.min[0]+.02&&p.x<b.max[0]-.02&&p.y>b.min[1]+.02&&p.y<b.max[1]-.02&&p.z>b.min[2]+.02&&p.z<b.max[2]-.02);
 // The walkthrough's lens: 70° vertical at the widest common desktop aspect.
 const reach=nearPlaneReach({fov:70,near:.045,aspect:21/9}),clearance=reach+.015;
 
@@ -28,7 +29,9 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
     began=performance.now();const {target,position}=orbitCamera(player,yaw,pitch,world,guard,clearance);placing+=performance.now()-began;
     distances.push(Math.hypot(position.x-target.x,position.y-target.y,position.z-target.z));
     const at=`${room[1]} yaw ${yaw.toFixed(2)} pitch ${pitch}`;
-    if(guard.blocked(target,position))failures.push(at+': camera behind a surface');
+    if(guard.blocked(target,position,true))failures.push(at+': camera behind a wall, floor, ceiling, window or tall furniture');
+    else if(guard.blocked(target,position)&&position.y-target.y<SOFT_CLEAR)failures.push(at+': camera looks through low furniture without being above it');
+    else if(inside(position))failures.push(at+': camera inside a collider');
     else{const gap=guard.clearanceAt(position);if(gap<reach)failures.push(`${at}: ${gap.toFixed(3)} m from a surface, near plane reaches ${reach.toFixed(3)} m`);}
   }
 }
@@ -46,7 +49,7 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
   assert(Math.abs(player.y-station.y)<.35&&Math.hypot(player.x-station.x,player.z-station.z)<1.45,room[1]+' arrives out of reach of its station');
   for(let i=0;i<24;i++)for(const pitch of [-.8,-.18,.42]){
     const v=orbitCamera(player,i/24*Math.PI*2,pitch,world,guard,clearance);
-    assert(!guard.blocked(v.target,v.position)&&guard.clearanceAt(v.position)>=reach,room[1]+' arrival view behind a surface');
+    assert(!guard.blocked(v.target,v.position,true)&&guard.clearanceAt(v.position)>=reach&&!inside(v.position),room[1]+' arrival view behind a surface');
   }
 }
 assert.equal(cramped.length,0,'Arrival camera too close: '+cramped.join(', '));
