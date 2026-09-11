@@ -37,7 +37,7 @@ export function phaseForHour(h){return h<6||h>=20?'night':h<8?'dawn':h>=18?'dusk
 export const PHASES={
   dawn:{sun:[-1.1,.28],sunColor:'#ffcf9e',sunI:2.4,hemiSky:'#f1e4dc',hemiGround:'#7c6857',hemi:.5,
     practical:2,emissive:1.2,shadeGlow:.3,leafFill:.02,windows:.15,pet:.9,sky:['#86a3d6','#f6d2b2','#6f7a62'],glow:1,exposure:1.08},
-  day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.7,
+  day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.78,
     practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
     practical:1.15,key:.8,emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
@@ -95,7 +95,9 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
 
   const key=new THREE.SpotLight(0xffdec0,0,8,1.35,.85,2);
   // Phones skip it: the extra shadow lookup measured +16-22 % per frame there.
-  key.castShadow=KEY_SHADOW&&!mobile;key.shadow.mapSize.setScalar(mobile?512:1024);
+  // It starts off: the house loads and compiles without it, and
+  // enableKeyShadow() switches it on once its shader variants are ready.
+  const wantKeyShadow=KEY_SHADOW&&!mobile;key.castShadow=false;key.shadow.mapSize.setScalar(mobile?512:1024);
   key.shadow.camera.near=.06;
   // Ceiling cones are very wide; a narrower shadow frustum keeps texels useful
   // over the room itself (outside it the key simply lights without shadow).
@@ -189,7 +191,9 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     const phase=PHASES[phaseName]||PHASES.day,overcast=OVERCAST.has(weather)&&phaseName!=='night';
     // Outdoors the open sky is the fill; indoors a low hemisphere keeps
     // corners and ceilings darker than lit walls. Overcast days flatten out.
-    let hemi=phase.hemi*(room.outdoor?1.5:room.tight?.8:1)*(overcast?1.2:1);
+    // Indoors the fill stays low enough for the key and window light to model
+    // forms; outdoors the open sky is the fill.
+    let hemi=phase.hemi*(room.outdoor?1.9:room.tight?.92:1)*(overcast?1.2:1);
     mix.hemi=hemi;
     mix.practical=phase.practical*(room.tight?1.3:1)*(room.outdoor?.6:1);
     // Seen from outside the panes glow (a lived-in house); from inside they
@@ -319,6 +323,33 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
       finally{renderer.setRenderTarget(null);}
       return pending.catch(()=>{}).then(()=>{probeReady=true;});
     },
+    // Compile the key-shadow variants (screen and probe) in the background with
+    // a light-only stand-in scene, then switch the shadow on: no load cost and
+    // no in-frame compile. The first key map render is a single frame.
+    // busy(): true while the player is walking; the switch then waits for a
+    // pause, the welcome card or the Rooms menu so play never stutters.
+    enableKeyShadow(busy=()=>false){
+      if(!wantKeyShadow||key.castShadow)return Promise.resolve(false);
+      // three compiles with the lights of both scenes it is given, so the
+      // stand-in holds light copies plus proxies of every lit mesh (sharing
+      // geometry and material), never the live objects.
+      const stand=new THREE.Scene();stand.fog=scene.fog;stand.environment=scene.environment;
+      for(const light of [hemisphere,sun,key,...fills,withPetLight?petLight:null]){
+        if(!light)continue;const copy=light.clone();if(light===key)copy.castShadow=true;stand.add(copy);
+      }
+      scene.traverseVisible(o=>{
+        if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh)return;
+        const m=o.material;if(!m||Array.isArray(m)||!(m.isMeshStandardMaterial||m.isMeshLambertMaterial||m.isMeshPhongMaterial))return;
+        const proxy=new THREE.Mesh(o.geometry,m);proxy.receiveShadow=o.receiveShadow;proxy.castShadow=o.castShadow;proxy.layers.mask=o.layers.mask;stand.add(proxy);
+      });
+      const flip=()=>{key.castShadow=true;key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;return true;};
+      const done=()=>new Promise(resolve=>{const wait=()=>busy()?setTimeout(wait,500):resolve(flip());wait();});
+      if(!renderer.compileAsync)return Promise.resolve(done());
+      const screen=renderer.compileAsync(stand,camera||cube.children[0]);
+      renderer.setRenderTarget(cubeTarget,0);
+      let probe;try{probe=renderer.compileAsync(stand,cube.children[0]);}finally{renderer.setRenderTarget(null);}
+      return Promise.all([screen,probe]).catch(()=>{}).then(done);
+    },
     // Called once while the house is still loading: captures the first room
     // so play never starts on a stall.
     prime(position){
@@ -333,7 +364,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     setPhase(name,w){if(PHASES[name])phaseName=name;if(w)weather=w;if(loaded)applyPhase();},
     diagnostics(){return {practicalLights:selection.map(light=>light.name),shadowedLight:keyId,
       reflectionRoom:currentRoom,reflectionProbes:probes.size,shadowMapSize:sun.shadow.mapSize.x,
-      timeOfDay:phaseName,weather,glossyMaterials:glossy.length,
+      timeOfDay:phaseName,weather,glossyMaterials:glossy.length,keyShadow:key.castShadow,
       lightLevels:{sun:+sun.intensity.toFixed(2),hemisphere:+hemisphere.intensity.toFixed(2),pet:+petLight.intensity.toFixed(2),
         practical:slots.map(s=>+s.light.intensity.toFixed(2))}};},
     dispose(){for(const probe of probes.values())probe.dispose();base.dispose();cubeTarget.dispose();pmrem.dispose();sky.dispose();},
