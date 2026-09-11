@@ -150,9 +150,10 @@ export function nearPlaneReach(camera){
 }
 // Third-person follow camera: a game framing, a little above and behind the
 // pet so the room and floor around it
-// read, rather than a wide lens at head height (about 35° down by default).
+// read, rather than a wide lens at head height: about 25° down by default,
+// low enough to see across the room to its walls; tight spots crane up.
 // Shared with the tests.
-export const CAMERA_RIG={target:.45,boom:2.0,height:1.45};
+export const CAMERA_RIG={target:.5,boom:2.1,height:1.1};
 // One guarded placement along a single boom direction.
 export function boomCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
   const target={x:player.x,y:player.y+rig.target,z:player.z};

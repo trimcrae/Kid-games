@@ -7,7 +7,7 @@
 // view staying inside the room).
 import {neighborhoodRooms} from './neighborhood-layout.mjs';
 export const rooms=[
-  ['Main floor','Front entry',5.65,.7,0,0],
+  ['Main floor','Front entry',5.65,.7,0,0,[6.2,1.0,.3]],
   ['Main floor','Living room',5.8,2.0,0,-1.25],
   ['Main floor','Kitchen',2,6.8,0,1.4],
   ['Main floor','Dining room',5.6,7.5,0,Math.PI,[5.6,7.5,-2.618]],
