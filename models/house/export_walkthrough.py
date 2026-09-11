@@ -20,7 +20,8 @@ from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from browser_materials import material_finish, keep_bevel, practical_light, ramp_colliders, oriented_triangle_corners
+from browser_materials import (material_finish, keep_bevel, practical_light, ramp_colliders,
+                               oriented_triangle_corners, group_key, dressing_collection, browser_flag)
 from browser_ao import VertexAO, architectural_receiver, benchmark_samples, occludes
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--source', type=Path, default=HERE/'house.blend')
@@ -114,9 +115,13 @@ for o in scene.objects:
         hinge = o.parent.matrix_world @ Vector((-.53,0,0))
         matrix = Matrix.Translation(hinge) @ Matrix.Rotation(math.pi/2,4,'Z') @ Matrix.Translation(-hinge) @ matrix
     # These are lightweight internal curtains and do not block a person.
-    no_collision = any(s in o.name.lower() for s in [
+    # An explicit browser_collide=False (object or parent empty) marks props a
+    # pet walks past or through: rugs, wall art, shelf items, canopies.
+    no_collision = browser_flag(o, 'browser_collide') is False or any(s in o.name.lower() for s in [
         'curtain','blind','shade','pleat','sloped ceiling','sloped header','soffit',
         'leafy','net strand','quilt','pillow','duvet','ceiling fan','roof'])
+    dressing = dressing_collection(cname)
+    station_prop = browser_flag(o, 'browser_station_prop')
     evaluated = o.evaluated_get(depsgraph)
     mesh = evaluated.to_mesh()
     if not mesh or not mesh.polygons:
@@ -133,10 +138,10 @@ for o in scene.objects:
         mat = materials[min(tri.material_index,len(materials)-1)] if materials else None
         matname = mat.name if mat else 'Default'
         color = list(mat.diffuse_color[:3]) if mat else [.65,.65,.6]
-        key = (cname,matname)
+        key = group_key(cname, matname)
         if key not in groups:
             finish = material_finish(mat)
-            groups[key] = {'name': cname+' / '+matname,'color':color,
+            groups[key] = {'name': key[0]+' / '+matname,'color':color,
                            'glass':finish['surface'] == 'glass',
                            'finish':finish,'values':array.array('f')}
         values = groups[key]['values']
@@ -170,8 +175,12 @@ for o in scene.objects:
         size = mx-mn
         # Omit cosmetic trim; preserve glass, walls, floors, stairs and furniture.
         if size.z>.018 and max(size.x,size.y)>.18 and min(size.x,size.y)>.023:
-            colliders.append({'name':o.name,'min':[mn.x,mn.z,-mx.y],
-                              'max':[mx.x,mx.z,-mn.y]})
+            box = {'name':o.name,'min':[mn.x,mn.z,-mx.y],'max':[mx.x,mx.z,-mn.y]}
+            if dressing:
+                box['dressing'] = True
+            if station_prop:
+                box['stationProp'] = str(station_prop)
+            colliders.append(box)
     source_objects += 1
     evaluated.to_mesh_clear()
 

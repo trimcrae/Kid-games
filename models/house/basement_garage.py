@@ -290,8 +290,9 @@ for x,y in [(1.58,7.62),(1.97,7.55)]:
     cylinder('Plant pot',(0,0,.15),.15,.30,black,24,top=.19)
     for i in range(7):
         a=i*math.tau/7
-        rod('Plant stem',(0,0,.30),(.19*math.cos(a),.19*math.sin(a),1.18),.012,green)
-        sphere('Simplified plant leaf',(.23*math.cos(a),.23*math.sin(a),1.05),(.09,.06,.32),green)
+        # Only the pot stops a walker; stems and leaves are soft.
+        rod('Plant stem',(0,0,.30),(.19*math.cos(a),.19*math.sin(a),1.18),.012,green)['browser_collide']=False
+        sphere('Simplified plant leaf',(.23*math.cos(a),.23*math.sin(a),1.05),(.09,.06,.32),green)['browser_collide']=False
 asset('Basement stationary exercise bike',(1.10,5.98,BASEMENT_Z),0,'House Tour 230.018s',
       'black exercise bike with red accent between storage and second desk observed; dimensions and axis estimated')
 # Approximate footprint X.82..1.38, Y5.43..6.53 avoids rack/cabinet and desk.

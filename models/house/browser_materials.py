@@ -36,6 +36,11 @@ def finish_for_name(name):
         finish.update(surface='metal', roughness=.32, metalness=1.0)
     elif n == 'black iron':
         finish.update(roughness=.42, metalness=.35)
+    elif n.startswith(('dressing ', 'garden ')) and re.search(r'\b(paper|ink|terracotta|cardboard)\b', n):
+        # Lived-in dressing (dressing.py): matte paper, pots and boxes, never
+        # a showroom gloss. Fabric, foliage, oak and paver names fall through
+        # to the shared families below.
+        finish.update(surface='plain', roughness=.86)
     elif n in {'warm glowing bulb', 'warm lit diffuser', 'fairy light bulb'}:
         finish.update(roughness=.4, emissive=[1, .79, .52],
                       emissiveIntensity=3.0 if n != 'warm lit diffuser' else 1.2)
@@ -119,6 +124,30 @@ def keep_bevel(name, collection, dimensions, vertex_count):
     return bool(re.search(r'cabinet|drawer|counter|table|chair|sofa|bed|dresser|'
                           r'vanity|mantel|piano|door|frame|shelf|shelving|crib|'
                           r'bench|stool|arm|cushion|seat|rail|trim', n))
+
+
+DRESSING_PREFIXES = ('44', '45', '46', '47', '48')
+DRESSING_GROUP = 'Lived-in dressing'
+
+
+def dressing_collection(collection):
+    """Collections 44-48 hold the lived-in dressing from dressing.py."""
+    return collection[:2] in DRESSING_PREFIXES and collection[2:5] == ' | '
+
+
+def group_key(collection, material):
+    """Draw groups: dressing shares one group per material across its
+    per-level Blender collections, so levels stay separable in Blender while
+    the browser pays one draw call per dressing finish, not one per level."""
+    return (DRESSING_GROUP if dressing_collection(collection) else collection, material)
+
+
+def browser_flag(obj, key):
+    """An explicit custom property on the object, else on its parent empty."""
+    value = obj.get(key)
+    if value is None and getattr(obj, 'parent', None) is not None:
+        value = obj.parent.get(key)
+    return value
 
 
 def practical_light(name, kind, energy):

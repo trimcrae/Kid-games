@@ -207,7 +207,8 @@ upper_collection('17 | Upstairs floors and hall')
 asset('Upstairs oak hallway', photos='U10', confidence='hall straight and bathroom left confirmed by homeowner; dimensions estimated')
 box('Hall floor slab', (2.25, 0, -.09), (4.5, 1.1, .18), white)
 for i in range(6):
-    box('Hall oak floorboard', (2.25, -.46+i*.184, .012), (4.5, .18, .026), oak, .001)
+    # Boards butt edge to edge: a 4 mm gap showed the white slab as bright seams.
+    box('Hall oak floorboard', (2.25, -.46+i*.184, .012), (4.5, .184, .026), oak, .001)
 asset('Hall door openings and hooks', photos='U10')
 partition('Hall north partition', (0, .55), (4.5, .55), openings=[(.15, 1.01, 0, 2.06), (2.05, 2.91, 0, 2.06)])
 partition('Hall south partition', (0, -.55), (4.5, -.55), openings=[(1.08, 1.94, 0, 2.06)])

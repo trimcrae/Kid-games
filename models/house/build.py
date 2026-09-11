@@ -142,8 +142,7 @@ def curve(name, pts, radius, mat, cyclic=False):
     return obj
 
 
-def sphere(name, loc, size, mat):
-    n, rings = 20, 12
+def sphere(name, loc, size, mat, n=20, rings=12):
     verts = [(0, 0, 1)]
     verts += [(math.sin(j * math.pi / rings) * math.cos(i * math.tau / n),
                math.sin(j * math.pi / rings) * math.sin(i * math.tau / n),
@@ -680,7 +679,8 @@ for i in range(7):
     z = .18 + i * .25
     rod('Rope grid horizontal', (-.89, .63, z), (-.09, .63, z), .012, rope)
     for j in range(5):
-        sphere('Rope knot', (-.89 + j * .2, .63, z), (.018, .018, .018), rope)
+        # 8 x 5 facets read the same on a 2 cm knot; 35 knots at 20 x 12 cost 15k triangles.
+        sphere('Rope knot', (-.89 + j * .2, .63, z), (.018, .018, .018), rope, 8, 5)
 box('Hanging wooden swing seat', (-.35, -.05, .42), (.62, .30, .04), pine)
 for x in [-.62, -.08]:
     for y in [-.14, .04]:
@@ -1129,8 +1129,9 @@ box('Fireplace hearth', (0, -.34, .035), (1.74, .61, .07), tilegrey)
 for x in [-.52, .52]:
     box('Fire screen brass upright', (x, -.20, .60), (.018, .02, 1.05), brass)
 box('Fire screen brass lintel', (0, -.20, 1.12), (1.06, .02, .018), brass)
-box('Television over fireplace', (0, .015, 1.82), (1.65, .08, .68), black)
-box('Television display', (0, -.03, 1.82), (1.58, .012, .61), screen)
+# The set stands clear of the mantel shelf (top 1.525) and below the ceiling.
+box('Television over fireplace', (0, .015, 1.86), (1.65, .08, .62), black)
+box('Television display', (0, -.03, 1.86), (1.58, .012, .56), screen)
 
 collection('13 | Lower family room furniture')
 sofa('Lower blue sofa', (2.83, -1.92, -1.025), 1.91, bluegrey, -90, '9,10')
@@ -1209,6 +1210,7 @@ exec(compile((HERE / 'extensions.py').read_text(encoding='utf-8'), str(HERE / 'e
 exec(compile((HERE / 'basement_garage.py').read_text(encoding='utf-8'), str(HERE / 'basement_garage.py'), 'exec'))
 exec(compile((HERE / 'yard.py').read_text(encoding='utf-8'), str(HERE / 'yard.py'), 'exec'))
 exec(compile((HERE / 'exterior.py').read_text(encoding='utf-8'), str(HERE / 'exterior.py'), 'exec'))
+exec(compile((HERE / 'dressing.py').read_text(encoding='utf-8'), str(HERE / 'dressing.py'), 'exec'))
 
 ceilings = collection('14 | Ceilings - hidden for dollhouse')
 asset('Main level ceilings', confidence='estimated 2.6m ceiling height')
@@ -1423,6 +1425,7 @@ def set_view(name):
     if name == 'basement_stairs':
         # See both flights from inside the lower family room.
         ceilings.hide_render = ceilings.hide_viewport = False
+    dressing_view(name, upper_view, basement_view, garage_view, pink_view, elevation)
     scene.render.resolution_x = 1700 if name == 'overview' else 1440
     scene.render.resolution_y = 1250 if name == 'overview' else 1000
     photoreal_view(name, exterior)
@@ -1433,8 +1436,9 @@ set_view('overview')
 scene['project_status'] = 'WIP photo-based architectural study; not a game'
 scene['scale_note'] = 'Metres; room dimensions and unseen connections are estimates, not measured.'
 scene['source_photos'] = 'Four private photo sets (1-10, U1-U10, V1-V10, W1-W10) and two private narrated walkthroughs (House Tour, Backyard tour). Timestamped visual observations; dimensions remain estimates. References not packed or committed.'
-scene['content_policy'] = 'Furniture retained; loose clutter, people, readable personal items omitted.'
-source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','exterior.py','photoreal.py']
+scene['content_policy'] = ('Furniture retained. Lived-in dressing (dressing.py) is invented, code-drawn and '
+                           'not photographed; people and readable personal items omitted.')
+source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','exterior.py','dressing.py','photoreal.py']
 scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()
 scene['confirmed_upstairs_orientation'] = 'Hall straight from stairs (+X); green bathroom left (+Y). Primary left, nursery right, end bedroom ahead.'
 scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X. Main 0; porch -.10; family -1.05; upper landing +1.26 m.'

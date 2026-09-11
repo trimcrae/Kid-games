@@ -8,7 +8,7 @@
 import {neighborhoodRooms} from './neighborhood-layout.mjs';
 export const rooms=[
   ['Main floor','Front entry',5.65,.7,0,0,[6.2,1.0,.3]],
-  ['Main floor','Living room',5.8,2.0,0,-1.25],
+  ['Main floor','Living room',5.8,2.0,0,-1.25,[5.8,2.0,.95]],
   ['Main floor','Kitchen',2,6.8,0,1.4],
   ['Main floor','Dining room',5.6,7.5,0,Math.PI,[5.6,7.5,-2.618]],
   ['Main floor','Sunroom',5.0,8.6,-.10,0],
@@ -18,7 +18,7 @@ export const rooms=[
   ['Upstairs',"Mom & Dad's bathroom",11.4,7.85,1.26,Math.PI/2],
   ['Upstairs','Green bathroom',11.1,5.0,1.26,0,[11.1,5.5,.25]],
   ['Upstairs',"Kieran's bedroom",12.5,3.0,1.26,Math.PI,[12.5,2.1,Math.PI]],
-  ['Upstairs',"Cory's bedroom",15.8,4.1,1.26,-Math.PI/2],
+  ['Upstairs',"Cory's bedroom",15.8,4.1,1.26,-Math.PI/2,[16.5,4.1,-Math.PI/2]],
   ['Downstairs','Family room',10.3,2.7,-1.05,-Math.PI/2],
   ['Downstairs','Shared bedroom entry',11.5,5.1,-1.05,0],
   ['Downstairs',"Ellie's bedroom",10.4,6.2,-1.05,Math.PI/2,[9.97,6.2,Math.PI/2]],
@@ -29,7 +29,8 @@ export const rooms=[
   ['Basement','Laundry',6.3,6.6,-3.15,0],
   ['Outside','Front porch',4.2,-.9,-.06,Math.PI/2,[4.2,-1.1,1.833]],
   ['Outside','Front yard',6.5,-5.9,-.82,Math.PI],
-  ['Outside','Back yard',5.1,13.5,-.51,0],
+  // Garden & maths stands on the last stepping stone, facing the raised veg bed.
+  ['Outside','Back yard',6.15,14.75,-.73,0],
   ...neighborhoodRooms,
 ];
 export const familyRooms={cory:"Cory's bedroom",kieran:"Kieran's bedroom",ellie:"Ellie's bedroom",jeannie:"Jeannie's bedroom",shannon:"Mom & Dad's office",tristan:"Mom & Dad's office",guest:'Living room'};
