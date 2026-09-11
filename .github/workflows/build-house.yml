@@ -1,6 +1,11 @@
 name: Rebuild house model and walkthrough
 on:
   workflow_dispatch:
+    inputs:
+      views:
+        description: 'Preview cameras to re-render (comma-separated, e.g. lower_entry,lower_bathroom). Empty renders every preview.'
+        required: false
+        default: ''
 permissions:
   contents: write
 concurrency:
@@ -22,13 +27,22 @@ jobs:
           python -c "import shutil; free=shutil.disk_usage('.').free; budget=3*1024**3; print(f'Free {free/1024**3:.1f} GiB; runtime/output budget 3 GiB'); assert free-budget >= 10*1024**3, 'Insufficient storage headroom'"
           pip install --no-cache-dir bpy==4.5.3 pillow
       - name: Build editable model and changed previews
-        run: python models/house/build.py -- --render --samples 8 --preview-scale 50
+        env:
+          VIEWS: ${{ inputs.views }}
+        run: |
+          extra=()
+          if [ -n "$VIEWS" ]; then
+            [[ "$VIEWS" =~ ^[a-z_]+(,[a-z_]+)*$ ]] || { echo "Invalid views: $VIEWS"; exit 1; }
+            extra=(--views "$VIEWS")
+          fi
+          python models/house/build.py -- --render --samples 8 --preview-scale 50 "${extra[@]}"
       - name: Export and verify geometry
         run: |
           python models/house/export_walkthrough.py -- --ao
           python models/house/verify.py
           node models/house/test_walkthrough.mjs
           node tests/house-routes.mjs
+          node tests/house-camera-clearance.mjs
       - name: Commit generated assets
         run: |
           git config user.name 'github-actions[bot]'
