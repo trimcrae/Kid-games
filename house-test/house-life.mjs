@@ -5,6 +5,7 @@ import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
+import {stepCompanion} from './companions.mjs';
 const $=id=>document.getElementById(id);
 export function companionBlocksCamera(point,camera,bounds){
   const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
@@ -120,7 +121,7 @@ export async function createHouseLife(tour){
       // The name tag rides on the pet but keeps its readable world size,
       // floating just above the tallest ears.
       const label=labelSprite(p.pet.name||p.name);label.scale.set(1.14/PET_SCALE,.215/PET_SCALE,1);label.position.y=.95/PET_SCALE;mesh.add(label);scene.add(mesh);
-      roamers.push({id:p.id,mesh,label,cameraBounds,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,distance:0});
+      roamers.push({id:p.id,mesh,label,cameraBounds,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,egg:!!p.pet.egg,distance:0});
     });
   }
   // Furnishing remains the same economy and slots. Display the equipped pieces
@@ -194,20 +195,7 @@ export async function createHouseLife(tour){
         avatar.visible=!avatarBounds||!companionBlocksCamera(player,tour.camera.position,{...avatarBounds,radius:avatarBounds.radius-.1});
       }
       for(const r of roamers){
-        r.timer-=dt;
-        if(r.timer<=0){r.timer=2+Math.random()*4;r.angle=Math.random()*Math.PI*2;r.walking=Math.random()>.22;}
-        if(r.walking){
-          const before={...r.point};
-          if(Math.hypot(r.point.x-r.anchor.x,r.point.z-r.anchor.z)>2)r.angle=Math.atan2(r.anchor.x-r.point.x,r.anchor.z-r.point.z);
-          world.move(r.point,Math.sin(r.angle)*dt*.4,Math.cos(r.angle)*dt*.4);
-          const dist=Math.hypot(r.point.x-before.x,r.point.z-before.z);r.distance+=dist;
-          if(dist<dt*.06){r.angle+=1.6;r.timer=.5;}
-        }
-        const gap=Math.hypot(r.point.x-player.x,r.point.z-player.z);
-        if(Math.abs(r.point.y-player.y)<.5&&gap<.8){
-          r.angle=Math.atan2(r.point.x-player.x,r.point.z-player.z);
-          world.move(r.point,Math.sin(r.angle)*(.8-gap),Math.cos(r.angle)*(.8-gap));r.walking=true;
-        }
+        const gap=stepCompanion(r,dt,world,player);
         r.mesh.position.set(r.point.x,r.point.y,r.point.z);r.mesh.rotation.y=r.angle;r.mesh.userData.animate(time,r.walking,tour.reducedMotion);
         // Hide a companion only while its body overlaps the camera's space.
         r.mesh.visible=!companionBlocksCamera(r.point,tour.camera.position,r.cameraBounds);
