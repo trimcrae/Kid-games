@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "5fb6fd758eca25ab4512cc55c0cd1fba7f4da3f879ca3323825240c2bea4451f",
+  "generator_sha256": "23773c1f62b80cf156e9362a28f832518cfd925208e30721de56889638027b6f",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -13,8 +13,8 @@
   ],
   "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 7931,
-  "mesh_objects": 6874,
+  "objects": 8015,
+  "mesh_objects": 6917,
   "cameras": [
     "overview",
     "sunroom",
@@ -5035,6 +5035,457 @@
         -3.5,
         -7.099999904632568,
         -0.7909998297691345
+      ]
+    },
+    {
+      "name": "Living family height chart",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.3399999141693115,
+        4.408999919891357,
+        0.800000011920929
+      ]
+    },
+    {
+      "name": "Living clock above the television",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.25,
+        4.36899995803833,
+        2.1500000953674316
+      ]
+    },
+    {
+      "name": "Living front window curtains",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.174999952316284,
+        0.010999994352459908,
+        1.5
+      ]
+    },
+    {
+      "name": "Entry round mirror",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.798999786376953,
+        -0.8999999761581421,
+        2.0
+      ]
+    },
+    {
+      "name": "Kitchen family wall calendar",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        3.0799999237060547,
+        7.968999862670898,
+        1.5499999523162842
+      ]
+    },
+    {
+      "name": "Kitchen clock above the window",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.7000000476837158,
+        7.968999862670898,
+        2.430000066757202
+      ]
+    },
+    {
+      "name": "Kitchen window valance",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        1.7000000476837158,
+        7.968999862670898,
+        2.359999895095825
+      ]
+    },
+    {
+      "name": "Dining room clock",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.519999980926514,
+        7.969000339508057,
+        1.9500000476837158
+      ]
+    },
+    {
+      "name": "Dining wall landscape",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.798999786376953,
+        6.199999809265137,
+        1.850000023841858
+      ]
+    },
+    {
+      "name": "Dining wall flower drawing",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.798999786376953,
+        5.550000190734863,
+        1.7200000286102295
+      ]
+    },
+    {
+      "name": "Dining wall heart drawing",
+      "collection": "44 | Dressing - main floor",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.798999786376953,
+        6.849999904632568,
+        1.7200000286102295
+      ]
+    },
+    {
+      "name": "Upstairs hall landing landscape",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.550000190734863,
+        3.5210001468658447,
+        2.6500000953674316
+      ]
+    },
+    {
+      "name": "Upstairs hall landing pet drawing",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.550000190734863,
+        3.5210001468658447,
+        2.2200000286102295
+      ]
+    },
+    {
+      "name": "Upstairs hall heart drawing",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.350000381469727,
+        4.499000549316406,
+        2.700000047683716
+      ]
+    },
+    {
+      "name": "Upstairs hall house drawing",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.850000381469727,
+        4.499000549316406,
+        2.5
+      ]
+    },
+    {
+      "name": "Upstairs hall bunting over Cory door",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.428998947143555,
+        4.010000228881836,
+        3.4800000190734863
+      ]
+    },
+    {
+      "name": "Green bathroom duck picture",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.199999809265137,
+        7.079000473022461,
+        2.4000000953674316
+      ]
+    },
+    {
+      "name": "Green bathroom shelf with bottles and plant",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        9.901000022888184,
+        6.5,
+        2.8499999046325684
+      ]
+    },
+    {
+      "name": "Kieran nursery pet picture",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.428999900817871,
+        3.1500000953674316,
+        2.5
+      ]
+    },
+    {
+      "name": "Kieran nursery heart picture",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        11.051000595092773,
+        3.0999999046325684,
+        2.450000047683716
+      ]
+    },
+    {
+      "name": "Kieran nursery shelf of soft toys",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.350000381469727,
+        3.399000406265259,
+        2.549999952316284
+      ]
+    },
+    {
+      "name": "Cory learning clock",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        18.779001235961914,
+        4.059999465942383,
+        3.200000047683716
+      ]
+    },
+    {
+      "name": "Cory number bunting over the desk",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.360000610351562,
+        6.39900016784668,
+        3.25
+      ]
+    },
+    {
+      "name": "Cory shelf of block models",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        17.600000381469727,
+        6.39900016784668,
+        2.5999999046325684
+      ]
+    },
+    {
+      "name": "Cory pixel rocket poster",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.299999237060547,
+        0.42100024223327637,
+        2.549999952316284
+      ]
+    },
+    {
+      "name": "Upstairs hall flower drawing by the bedroom door",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.779999732971191,
+        4.499000549316406,
+        2.25
+      ]
+    },
+    {
+      "name": "Parents bedroom north landscape",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.800000190734863,
+        8.49899959564209,
+        2.5999999046325684
+      ]
+    },
+    {
+      "name": "Parents bedroom clock",
+      "collection": "45 | Dressing - upstairs",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.329999923706055,
+        8.003242492675781,
+        2.8499999046325684
+      ]
+    },
+    {
+      "name": "Jeannie shelf of books above the bed",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.0,
+        7.939000129699707,
+        0.30000001192092896
+      ]
+    },
+    {
+      "name": "Jeannie moon picture above the bed",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        16.0,
+        7.939000129699707,
+        0.7200000286102295
+      ]
+    },
+    {
+      "name": "Jeannie flower picture",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        15.300000190734863,
+        5.060999870300293,
+        0.3499999940395355
+      ]
+    },
+    {
+      "name": "Jeannie rainbow picture by the door",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        12.850000381469727,
+        5.060999870300293,
+        0.20000000298023224
+      ]
+    },
+    {
+      "name": "Ellie flower picture by the door",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.40000057220459,
+        5.601001739501953,
+        0.3499999940395355
+      ]
+    },
+    {
+      "name": "Ellie princess bunting",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.896002292633057,
+        8.199999809265137,
+        0.8500000238418579
+      ]
+    },
+    {
+      "name": "Ellie princess dress drawing",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        7.896002292633057,
+        8.199999809265137,
+        0.3499999940395355
+      ]
+    },
+    {
+      "name": "Ellie round mirror above the dresser",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        10.069999694824219,
+        8.97900104522705,
+        0.550000011920929
+      ]
+    },
+    {
+      "name": "Family room landscape above the plant",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.68899917602539,
+        3.8499999046325684,
+        0.5199999809265137
+      ]
+    },
+    {
+      "name": "Family room clock",
+      "collection": "46 | Dressing - lower wing",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        14.68899917602539,
+        3.8499999046325684,
+        0.9599999189376831
+      ]
+    },
+    {
+      "name": "Basement bunting over the bunk",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        0.06100011616945267,
+        2.700000047683716,
+        -0.949999988079071
+      ]
+    },
+    {
+      "name": "Office cork board",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        2.6500000953674316,
+        7.939000129699707,
+        -1.6200000047683716
+      ]
+    },
+    {
+      "name": "Office clock",
+      "collection": "47 | Dressing - basement and garage",
+      "photos": "A4 lived-in dressing",
+      "confidence": "invented lived-in dressing; not photographed",
+      "location_m": [
+        4.199999809265137,
+        7.939000129699707,
+        -1.100000023841858
       ]
     },
     {
