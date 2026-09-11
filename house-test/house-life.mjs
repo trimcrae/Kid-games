@@ -5,11 +5,13 @@ import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
-import {stepCompanion} from './companions.mjs';
+import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan} from './companions.mjs';
 import {createGround} from './pet-ground.mjs';
-import {createPetBehaviour,angleTo} from './pet-behaviour.mjs';
-import {createEmotes} from './emotes.mjs';
+import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
+import {createEmotes,createSpeech} from './emotes.mjs';
 import {routeSearch,createPawTrail} from './wayfinding.mjs';
+import {aftermathFor,createAftermath} from './aftermath.mjs';
+import {placeDecor} from './decor-slots.mjs';
 const $=id=>document.getElementById(id);
 export function companionBlocksCamera(point,camera,bounds){
   const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
@@ -44,13 +46,27 @@ export async function createHouseLife(tour){
     if(!point)throw Error('Activity has no safe floor: '+a.id);
     return {...a,point,roomData:room};
   });
+  // Companions keep 0.9 m clear of every station and arrival spot while idle.
+  const keepClear=[];
+  for(const r of rooms){if(/street|Craepet house/i.test(r[1]))continue;for(const [x,y] of [[r[2],r[3]],...(r[6]?[[r[6][0],r[6][1]]]:[])]){const p=world.safeSpot(x,r[4],-y);if(p)keepClear.push(p);}}
+  // After-activity moments (aftermath.mjs) and their little props.
+  const aftermath=createAftermath();let beforePet=null,arrivePop=false;
+  const feedMat=(()=>{const m=plan(2.85,7.15),f=world.floor(m.x,m.z,0);return Number.isFinite(f)?{x:m.x,y:f,z:m.z}:null;})();
+  const props=new THREE.Group();scene.add(props);
+  const ball=new THREE.Mesh(new THREE.SphereGeometry(.065,16,10),new THREE.MeshStandardMaterial({color:'#f07a5f',roughness:.6}));
+  const bowl=new THREE.Group();{const dish=new THREE.Mesh(new THREE.CylinderGeometry(.11,.08,.06,20),new THREE.MeshStandardMaterial({color:'#3f8f8a',roughness:.5}));dish.position.y=.03;
+    const food=new THREE.Mesh(new THREE.SphereGeometry(.085,14,6,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:'#e0b04a',roughness:.9}));food.scale.y=.35;food.position.y=.05;bowl.add(dish,food);}
+  props.add(ball,bowl);ball.visible=bowl.visible=false;
+  const hostSpeech=createSpeech(scene);
   const positionKey=id=>'craepets.house.position.'+id;
   // The view direction is saved alongside the spot (an additive field; older
   // saves without it still load), so a reload doesn't stare at a wall.
   function savePosition(){try{localStorage.setItem(positionKey(engine.who()),JSON.stringify({x:player.x,y:player.y,z:player.z,yaw:tour.yaw}));}catch{}}
-  function restorePosition(id){
+  function restorePosition(id,switching=false){
     try{const p=JSON.parse(localStorage.getItem(positionKey(id)));if(p&&[p.x,p.y,p.z].every(Number.isFinite)){const safe=world.safeSpot(p.x,p.y,p.z);if(safe){tour.place(safe,p.yaw);return;}}}catch{}
-    tour.teleport(rooms[0]);
+    // Switching to someone who hasn't played here yet: their pet is waiting in
+    // their own room, not back at the front door.
+    tour.teleport((switching&&rooms.find(r=>r[1]===familyRooms[id]))||rooms[0]);
   }
   // In-world cues: no floor rings or floating signs. Each activity spot has a
   // small cream bubble with its emoji, drawn at a constant size on screen and
@@ -110,6 +126,7 @@ export async function createHouseLife(tour){
       return;
     }
     savePosition();tour.suspend();$('welcome').hidden=true;tour.showRooms(false);tour.suspend();$('family-panel').hidden=true;
+    aftermath.stop();beforePet=api.snapshot().pet;
     selected=station;api.enter(station);$('activity-title').textContent=station.icon+' '+station.name;$('activity-room').textContent=station.room;
     $('activity-panel').hidden=false;$('nearby').hidden=true;document.body.classList.add('in-activity');
     if(station.id!=='adopt')coachDone('use');
@@ -123,6 +140,9 @@ export async function createHouseLife(tour){
     // Straight after adopting: turn the new pet round to say hello to you,
     // before the camera settles in behind it.
     if(resume&&wasAdopting&&avatar&&tour.active){heading=wantHeading=tour.yaw;say(`Hi! I'm ${engine.state().pet?.name||'here'}!`,4000);}
+    // Fed, bathed, rested or played with: show it in the house for a moment.
+    const kind=resume&&!wasAdopting&&avatar&&beforePet?aftermathFor(beforePet,api.snapshot().pet):null;beforePet=null;
+    if(kind)aftermath.start(kind,{pet:{...player},heading,mat:feedMat,world,reduced:tour.reducedMotion});
   }
   function say(text,ms=3500){$('pet-speech').textContent=text;$('pet-speech').hidden=false;clearTimeout(sayTimer);sayTimer=setTimeout(()=>$('pet-speech').hidden=true,ms);}
   window.houseBridge={
@@ -161,11 +181,11 @@ export async function createHouseLife(tour){
     const b=document.createElement('button');b.dataset.profile=p.id;
     const face=document.createElement('span');face.className='face';face.setAttribute('aria-hidden','true');face.textContent=p.emoji;
     const text=document.createElement('span');const name=document.createElement('b');name.textContent=p.name;const pet=document.createElement('small');text.append(name,pet);b.append(face,text);
-    bindButton(b,()=>{picked=true;savePosition();api.select(p.id);restorePosition(p.id);stopGuide();sync(true);$('family-panel').hidden=true;tour.resume();});$('family-list').append(b);
+    bindButton(b,()=>{const switching=p.id!==engine.who();picked=true;savePosition();aftermath.stop();api.select(p.id);if(switching){arrivePop=true;lastWho=p.id;}restorePosition(p.id,switching);stopGuide();sync(true);$('family-panel').hidden=true;tour.resume();});$('family-list').append(b);
   }
   try{const probe='craepets.house.storage-check';localStorage.setItem(probe,'1');localStorage.removeItem(probe);}catch{$('save-status').textContent='Saving is unavailable in this browser. Keep this tab open to keep playing.';}
   function updateAvatar(snapshot){
-    petNeeds=snapshot.pet&&!snapshot.pet.egg?snapshot.pet:null;
+    petNeeds=needsOf(snapshot.pet);
     const key=JSON.stringify(snapshot.pet&&[snapshot.who,snapshot.pet.species,snapshot.pet.colour,!!snapshot.pet.egg,snapshot.pet.wear,snapshot.pet.petpet]);
     if(key===avatarKey)return;avatarKey=key;
     if(avatar)disposeCreature(avatar);avatar=null;
@@ -173,23 +193,23 @@ export async function createHouseLife(tour){
     avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
     if(snapshot.pet.petpet){const friend=petpet(snapshot.pet.petpet.id);friend.position.set(.4,0,-.3);avatar.add(friend);avatar.userData.petpet=friend;}
     petLife=createPetBehaviour({egg:!!snapshot.pet.egg});visY=null;stepHop=null;
+    // A family switch: the new pet pops in happy to see you.
+    if(arrivePop){arrivePop=false;petLife.react('hello');}
     const box=new THREE.Box3().setFromObject(avatar);avatarSize=box.getSize(new THREE.Vector3());
     avatarBounds={minY:box.min.y,maxY:box.max.y,radius:Math.max(avatarSize.x,avatarSize.z)/2};
   }
   function updateRoamers(){
     const family=api.family().filter(p=>p.id!==engine.who()&&p.pet);
-    const cast=family.concat([
-      {id:'fen',name:'Farmer Fen',pet:{species:'snorbit',colour:'meadow'},room:'Back yard'},
-      {id:'dizzy',name:'Dizzy',pet:{species:'glimmr',colour:'bubble'},room:'Basement playroom'},
-      {id:'marigold',name:'Mrs Marigold',pet:{species:'blorb',colour:'sunbeam'},room:'Garage'},
-      {id:'moss',name:'Mossbeard',pet:{species:'twiggle',colour:'cocoa'},room:"Mom & Dad's office"},
-    ]);
+    // The family's other pets and the valley's shopkeepers (companions.mjs).
+    const cast=family.concat(HOSTS);
     const key=JSON.stringify(cast.map(p=>[p.id,p.pet.species,p.pet.colour,p.pet.wear,!!p.pet.egg]));if(key===roamKey)return;roamKey=key;
-    roamers.forEach(r=>{r.label.material.map.dispose();disposeCreature(r.mesh);});roamers=[];
+    roamers.forEach(r=>{r.label.material.map.dispose();r.emote?.dispose();disposeCreature(r.mesh);});roamers=[];
     cast.forEach((p,i)=>{
-      const home=rooms.find(r=>r[1]===(p.room||familyRooms[p.id]||'Living room'));
-      const anchor=world.safeSpot(home[2],home[4],-home[3]);if(!anchor)return;
-      const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(PET_SCALE);
+      const homeName=p.room||familyRooms[p.id]||'Living room',home=rooms.find(r=>r[1]===homeName);
+      const where={world,colliders:world.boxes,rooms,avoid:keepClear},routine=ROUTINES[p.id];
+      let day=resolveSpots(routine?.day,where),night=resolveSpots(routine?.night,where);
+      if(!day.length){const f=freeSpot(world,home[2],-home[3],home[4],keepClear);if(!f)return;day=[{room:homeName,act:'look',up:false,...f,stand:f,face:null}];}
+      const mesh=creature(p.pet,api.palette(p.pet.colour),p.extras||[]);mesh.scale.setScalar(PET_SCALE);
       // Cache the body bounds before adding the name sprite. A floor-origin
       // distance misses tall ears/heads even when they intersect the camera.
       const bounds=new THREE.Box3().setFromObject(mesh);
@@ -200,11 +220,15 @@ export async function createHouseLife(tour){
       // floating just above the tallest ears.
       // A constant on-screen size, so a pet right by the camera doesn't wear a giant tag.
       const label=labelSprite(p.pet.name||p.name);label.material.sizeAttenuation=false;label.center.set(.5,0);label.scale.set(.044*label.userData.aspect/PET_SCALE,.044/PET_SCALE,1);label.position.y=.78/PET_SCALE;mesh.add(label);scene.add(mesh);
-      roamers.push({id:p.id,mesh,label,cameraBounds,point:{...anchor},anchor,angle:i*1.7,timer:.5+i*.4,walking:!p.pet.egg,egg:!!p.pet.egg,distance:0});
+      const c=createCompanion({id:p.id,egg:!!p.pet.egg,host:p.view?{view:p.view,name:p.name}:null,day,night});
+      roamers.push({id:p.id,mesh,label,cameraBounds,c,emote:null,animAt:0,shown:true});
     });
   }
-  // Furnishing remains the same economy and slots. Display the equipped pieces
-  // as miniature objects on a dedicated shelf inside the real living room.
+  // A shopkeeper's real line from the 2D game (lines.js NPC), for their station.
+  function hostLine(view){const lines=frame.contentWindow.CPLines?.NPC?.[view];return lines?.length?lines[Math.floor(Math.random()*lines.length)]:null;}
+  // Furnishing remains the same economy and slots. The equipped pieces stand
+  // where they belong in the living room and foyer (decor-slots.mjs): a pet
+  // corner, beside the chair and sofa, under the window, pictures on the wall.
   function updateDecor(){
     const items=api.placed(),style=api.style(),key=JSON.stringify([items.map(i=>i.id),style]);if(key===decorKey)return;decorKey=key;
     scene.traverse(mesh=>{if(!mesh.isMesh)return;if(!mesh.userData.houseBaseColor&&mesh.name)mesh.userData.houseBaseColor=mesh.material.color.clone();if(!style)return;
@@ -212,9 +236,15 @@ export async function createHouseLife(tour){
       if(/Floors and split levels \/ Oak floor/.test(mesh.name))mesh.material.color.copy(mesh.userData.houseBaseColor).lerp(new THREE.Color(style.floor.a),.65);
     });
     [...decor.children].forEach(child=>{child.material?.map?.dispose();disposeCreature(child);});
-    const origin=stations.find(s=>s.id==='home').point;
-    items.slice(0,24).forEach((it,i)=>{
-      const piece=furnishing(it,i);piece.scale.setScalar(.5);piece.position.set(origin.x+.62+(i%4)*.48,origin.y+Math.floor(i/4)*.56,origin.z+.72);decor.add(piece);
+    placeDecor(items).forEach(({item,slot},i)=>{
+      let at=plan(...slot.at);const floor=world.floor(at.x,at.z,0),piece=furnishing(item,i,{label:false});
+      // A picture goes flat against the wall behind its slot.
+      if(slot.hang){const bx=-Math.sin(slot.turn),bz=-Math.cos(slot.turn);for(let d=0;d<.4;d+=.01)if(world.blocked(at.x+bx*d,at.z+bz*d,.9)){at={x:at.x+bx*(d+.14),z:at.z+bz*(d+.14)};break;}}
+      piece.scale.setScalar(slot.hang?.8:.85);piece.rotation.y=slot.turn;
+      // Pictures hang on the wall; everything else stands on the floor finish.
+      piece.position.set(at.x,slot.hang?slot.hang-.46*.8:(Number.isFinite(floor)?floor:0)+ground.offset({x:at.x,y:Number.isFinite(floor)?floor:0,z:at.z},.015),at.z);
+      if(slot.hang)piece.traverse(m=>{if(m.isMesh&&m.position.y<.25)m.visible=false;});
+      decor.add(piece);
     });
   }
   function sync(force=false){
@@ -243,12 +273,12 @@ export async function createHouseLife(tour){
   const NEEDS=[['hunger','Food','🍽️','--hunger'],['happy','Fun','😊','--fun'],['energy','Energy','⚡','--energy'],['clean','Clean','🫧','--clean']];
   let needsKey='';
   function updateNeeds(pet){
-    const key=JSON.stringify(pet&&[pet.egg,...NEEDS.map(([k])=>Math.round(pet[k]??0))]);if(key===needsKey)return;needsKey=key;
+    const key=JSON.stringify(pet&&[pet.egg,...NEEDS.map(([k])=>Math.round(needValue(pet,k)))]);if(key===needsKey)return;needsKey=key;
     const box=$('pet-needs');box.replaceChildren();
     if(!pet)return;
     if(pet.egg){const note=document.createElement('span');note.className='egg-note';note.textContent='🥚 Tap your egg or learn to hatch it';box.append(note);return;}
     for(const [k,label,icon,colour] of NEEDS){
-      const v=Math.max(0,Math.min(100,Math.round(pet[k]??0))),m=document.createElement('span');
+      const v=Math.max(0,Math.min(100,Math.round(needValue(pet,k)))),m=document.createElement('span');
       m.className='meter'+(v<30?' low':'');m.setAttribute('role','meter');m.setAttribute('aria-label',`${label} ${v} of 100`);m.setAttribute('aria-valuenow',v);m.setAttribute('aria-valuemin',0);m.setAttribute('aria-valuemax',100);m.title=`${label} ${v}`;
       const b=document.createElement('b');b.textContent=icon;b.setAttribute('aria-hidden','true');
       const bar=document.createElement('span'),fill=document.createElement('i');fill.style.width=v+'%';fill.style.setProperty('--c',`var(${colour})`);bar.append(fill);
@@ -367,13 +397,24 @@ export async function createHouseLife(tour){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       ground.frame();
       if(avatar){
-        const reduced=tour.reducedMotion,walking=active&&moving,rig=avatar.userData.rig;
+        const reduced=tour.reducedMotion,rig=avatar.userData.rig;let walking=active&&moving,gait=speed;
         // What the pet feels like doing: look back at you, sniff, sit, yawn,
         // doze off when tired… (pet-behaviour.mjs), from its real needs.
         let friend=null,best=3;
-        for(const r of roamers){const d=Math.hypot(r.point.x-player.x,r.point.z-player.z);if(d<best&&Math.abs(r.point.y-player.y)<.5){best=d;friend={angle:angleTo(player,heading,r.point)};}}
+        for(const r of roamers){const p=r.c.point,d=Math.hypot(p.x-player.x,p.z-player.z);if(d<best&&Math.abs(p.y-player.y)<.5){best=d;friend={angle:angleTo(player,heading,p)};}}
         petOut=petLife.update(dt,{moving:walking,needs:petNeeds,camera:{angle:angleTo(player,heading,tour.camera.position)},friend,night:engine.timeOfDay?.()==='night',reduced});
         if(petOut.turnTo!==null&&!walking)wantHeading=heading+petOut.turnTo;
+        // Straight after Feed / Bath / Rest / Play: a short scene in the house
+        // (aftermath.mjs) that any step of yours ends.
+        const after=active?aftermath.update(dt,{moving:walking,pet:player,heading}):null;
+        if(after){
+          if(after.move){world.move(player,after.move.dx,after.move.dz);walking=true;gait=after.speed||1.1;}
+          if(after.face!=null)wantHeading=after.face;
+          petOut={...petOut,expression:after.expression,pose:after.pose,look:after.look||petOut.look,hop:after.hop,emote:after.emote,state:'after-'+after.kind};
+        }
+        const prop=after?.prop;
+        ball.visible=!!prop&&prop.kind==='ball'&&!prop.caught;bowl.visible=!!prop&&prop.kind==='bowl';
+        if(prop){const target=prop.kind==='ball'?ball:bowl,py=world.floor(prop.x,prop.z,player.y);target.position.set(prop.x,(Number.isFinite(py)?py:player.y)+avatarLift+(prop.kind==='ball'?.065:0),prop.z);if(prop.kind==='ball')ball.rotation.x+=dt*8;}
         // Turn along the shorter way at a creature's pace (fast, eased),
         // never a one-frame about-face.
         const turn=Math.atan2(Math.sin(wantHeading-heading),Math.cos(wantHeading-heading));
@@ -392,8 +433,8 @@ export async function createHouseLife(tour){
         // Wings and tails tuck in beside a wall instead of poking through it.
         if(rig.wings||rig.tail){foldIn-=dt;if(foldIn<=0){foldIn=.2;const s=Math.sin(heading),c=Math.cos(heading);
           foldAmount=[[c,-s],[-c,s],[-s,-c]].some(([x,z])=>world.blocked(player.x+x*.22,player.z+z*.22,player.y))?1:0;}rig.fold(foldAmount);}
-        avatar.userData.animate(time,walking,reduced,speed);
-        avatar.userData.petpet?.userData.animate(time,walking,reduced,speed);
+        avatar.userData.animate(time,walking,reduced,gait);
+        avatar.userData.petpet?.userData.animate(time,walking,reduced,gait);
         // Only if the camera is actually inside the pet (the last resort after
         // the crane has looked down from above) does the pet step aside from view.
         const eye=tour.camera.position,rise=eye.y-avatar.position.y;
@@ -401,14 +442,36 @@ export async function createHouseLife(tour){
         avatar.userData.head.getWorldPosition(headAt);headAt.y=avatar.position.y+avatarBounds.maxY+.04;
         emotes.update(dt,petOut.emote,headAt,avatar.visible,reduced);
       }else emotes.update(dt,null,null,false,true);
+      // Companions: their places and routines (companions.mjs). Only the ones
+      // you could see get drawn and animated every frame: pets on another
+      // floor are hidden (floors hide them anyway; nothing culls by occlusion),
+      // far ones animate a few times a second, and their routines keep ticking
+      // slowly so they are where they should be when you arrive.
+      const night=engine.timeOfDay?.()==='night',reduced=tour.reducedMotion;let talking=null;
       for(const r of roamers){
-        const gap=stepCompanion(r,dt,world,player);
-        r.mesh.position.set(r.point.x,r.point.y+ground.offset(r.point,r.mesh.position.y-r.point.y),r.point.z);r.mesh.rotation.y=r.angle;r.mesh.userData.animate(time,r.walking,tour.reducedMotion);
+        const c=r.c,p=c.point,dy=Math.abs(p.y-player.y),dist=Math.hypot(p.x-player.x,p.z-player.z);
+        const inView=dy<1.1?dist<16:dy<2.6&&dist<3.5;
+        r.logicAt=(r.logicAt||0)+dt;
+        if(!inView&&r.logicAt<.5){r.mesh.visible=r.label.visible=false;r.emote?.update(dt,null,null,false,true);continue;}
+        const step=inView?dt:r.logicAt;r.logicAt=0;
+        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:q=>active&&seenFrom(player,q)});
+        const onFurniture=c.up||c.mode==='hop';
+        r.mesh.position.set(p.x,p.y+(onFurniture?0:ground.offset(p,r.mesh.position.y-p.y)),p.z);r.mesh.rotation.y=c.heading;
+        const rig=r.mesh.userData.rig;
+        if(rig&&!c.egg){rig.setExpression(out.expression);rig.setPose(out.pose);rig.look(...out.look);if(out.hop)rig.hop(out.hop);}
+        else if(rig&&c.egg&&gap<1.4&&!r.wobbled){r.wobbled=true;rig.hop(.6);}else if(gap>2.5)r.wobbled=false;
+        // Far away: animate at ~5 Hz; near: every frame.
+        r.animAt+=step;if(!inView||dist<9||r.animAt>.2){r.mesh.userData.animate(time,c.walking,reduced,c.speed);r.animAt=0;}
         // Hide a companion only while its body overlaps the camera's space.
-        r.mesh.visible=!companionBlocksCamera(r.point,tour.camera.position,r.cameraBounds);
+        r.mesh.visible=inView&&!companionBlocksCamera(p,tour.camera.position,r.cameraBounds);
         // Names only for companions you're standing near.
         r.label.visible=r.mesh.visible&&gap>.9&&gap<3.2;
+        if(out.emote||r.emote){r.emote??=createEmotes(scene);headAt.set(p.x,r.mesh.position.y+r.cameraBounds.maxY+.04,p.z);r.emote.update(dt,out.emote,headAt,r.mesh.visible,reduced);}
+        // A shopkeeper greeting you says one of their real lines.
+        if(c.say&&r.mesh.visible&&active){const line=hostLine(c.say.view);if(line){talking={r,line};}}
       }
+      if(talking){const {r,line}=talking;headAt.set(r.c.point.x,r.mesh.position.y+r.cameraBounds.maxY+.12,r.c.point.z);hostSpeech.say(line,headAt.clone());hostSpeech.speaker=r;}
+      {const sp=hostSpeech.speaker;hostSpeech.update(dt,sp?new THREE.Vector3(sp.c.point.x,sp.mesh.position.y+sp.cameraBounds.maxY+.12,sp.c.point.z):null,!!sp?.mesh.visible&&active,tour.reducedMotion);}
       // Activity bubbles: in reach (with [E]), or 2–5 m away in the room you're
       // in — not a neighbouring room's glimpsed through an open doorway — plus
       // the "walk there" destination whenever it's in plain sight.
@@ -450,6 +513,9 @@ export async function createHouseLife(tour){
     },
     // The top of your pet's head (above its ears), for anchoring a speech bubble.
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
+    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading})),
+      aftermath:aftermath.active?aftermath.kind+':'+aftermath.phase:null,hostSpeech:hostSpeech.text,
+      // Draw calls spent on creatures this frame (their meshes that are drawn, before frustum culling).
+      creatureMeshes:[avatar,...roamers.map(r=>r.mesh)].reduce((n,o)=>{if(!o||!o.visible)return n;o.traverse(m=>{if((m.isMesh||m.isSprite)&&m.visible)n++;});return n;},0),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
   };
 }
