@@ -51,6 +51,8 @@ export const PALETTE_RULES=[
   {name:/^Spruce needles$/,color:'#3f6b45'},
   {name:/^Garden dark mulch$/,color:'#6b563d'},
   {name:/^Path warm grey pavers$/,color:'#a79d8e'},
+  // The street and drive: a softer, slightly warm asphalt rather than a flat slab.
+  {name:/^Driveway charcoal asphalt$/,color:'#6e6c68',roughness:.95},
 ];
 
 const scratch=new THREE.Color();

@@ -70,9 +70,10 @@ export function createNeighborhood(scene,world){
   // Street, pavement, curbs and a dashed centre line.
   const ground=neighborhoodBoxes.find(b=>b.name==='Neighborhood ground');
   mesh(new THREE.BoxGeometry(...ground.max.map((v,i)=>v-ground.min[i])),plain('#86ad55')).position.set(...ground.max.map((v,i)=>(v+ground.min[i])/2));
-  props.push(box(47,.015,3,8,GROUND+.009,17.6,'#8c9392'),box(47,.02,1.5,8,GROUND+.019,20.25,'#e5dac4'));
+  // The lane itself is the real street at the edge of the house model (grey
+  // asphalt from the export); this adds its curbs and the cottages' pavement.
+  props.push(box(47,.02,1.5,8,GROUND+.019,20.25,'#e5dac4'));
   for(const z of [16.08,19.12])props.push(box(47,.06,.12,8,GROUND+.03,z,'#d9d4c9'));
-  for(let x=-14;x<=30;x+=2.2)props.push(box(1.1,.004,.12,x,GROUND+.018,17.6,'#f3efe2'));
   const homes=new Map();
   lots.forEach((p,i)=>{
     const {x,z}=p,front=z-2.5,door=DOORS[i%DOORS.length];
@@ -144,8 +145,11 @@ export function createNeighborhood(scene,world){
     const lot=lots.find(l=>l.id===p.id),spots=[];
     for(let k=0;k<5;k++)spots.push([lot.x-1.7+k*.85,lot.z+1.85,Math.PI]);
     for(let k=0;k<4;k++)spots.push([lot.x-1.75,lot.z-1.2+k*.85,Math.PI/2],[lot.x+1.75,lot.z-1.2+k*.85,-Math.PI/2]);
-    (p.items||[]).slice(0,spots.length).forEach((it,k)=>{const m=furnishing(it,k);m.traverse(c=>{if(c.isSprite&&c.position.y>=.99)c.visible=false;});
+    // An empty cottage still looks lived in: a pet bed, a plant, a lamp and a
+    // bookshelf until the resident furnishes it.
+    const items=p.items?.length?p.items:[{id:'bed',name:'Pet bed',emoji:'🛏️'},{id:'plant',name:'Plant',emoji:'🪴'},{id:'lamp',name:'Lamp',emoji:'💡'},{id:'bookshelf',name:'Bookshelf',emoji:'📚'}];
+    items.slice(0,spots.length).forEach((it,k)=>{const m=furnishing(it,k,{label:false});
       const [sx,sz,ry]=spots[k];m.scale.setScalar(.65);m.position.set(sx,GROUND+.03,sz);m.rotation.y=ry;h.decor.add(m);});
-    if(p.pet)h.sign.draw(p.pet.name,p.home||lot.name+"'s house");else h.sign.draw(lot.name+"'s plot",'No saved pet yet');
+    if(p.pet)h.sign.draw(p.pet.name,p.home||lot.name+"'s house");else h.sign.draw(lot.name+"'s cottage",'Waiting for a Craepet');
   }}};
 }
