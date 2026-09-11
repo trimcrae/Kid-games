@@ -420,6 +420,9 @@ async function load(){
     shading={contactShadows:contact?.count??0};
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
+    // The ceiling light's soft shadow compiles in the background while the
+    // welcome card is up, instead of adding to the load.
+    (window.requestIdleCallback||(f=>setTimeout(f,300)))(()=>lighting.enableKeyShadow(),{timeout:1500});
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
       mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
