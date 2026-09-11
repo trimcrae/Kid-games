@@ -14,7 +14,10 @@ and F for family. Escape releases the mouse and pauses. If a browser refuses
 capture (some in-app or embedded browsers can), the footer says so, hold-and-drag
 looking takes over, and a normal Chrome or Edge tab gives full mouse look.
 Touch devices have a movement pad and drag-to-look. Every pet is drawn at
-`PET_SCALE` (`creatures.mjs`), dog-sized against the real-size furniture. The Rooms menu offers directions (without teleporting) and quick
+`PET_SCALE` (`creatures.mjs`), dog-sized against the real-size furniture.
+The orbit camera is kept inside the room by `camera-guard.mjs`, which tests
+the sightline against the drawn triangles rather than only the walking
+colliders, so it cannot slip through wall or ceiling junctions. The Rooms menu offers directions (without teleporting) and quick
 jumps to each floor and yard. Family pets and the activity hosts wander on their
 own, follow collision boundaries and give the player space. Doors and the
 upper stair gate are held open in the browser export. There is no analytics,

@@ -84,7 +84,10 @@ asset('Lower rear wall and hall opening',photos='V6,V8')
 partition('Lower rear panel wall',(9.69,4.67),(14.69,4.67),oak,[(1.16,2.31,0,2.08)],height=2.21)
 # This architecture collection is authored with floor Z=0; translate it down later.
 asset('Lower bedroom hall floor',photos='V6,V8')
-box('Hall carpet',(11.50,5.64,.015),(1.30,1.94,.04),carpet)
+# Run the carpet through the doorway in the 12 cm rear wall (the family room
+# floor stops at Y=4.60) and just under the bathroom floor's edge (Y=6.64);
+# stopping at 4.67 and 6.61 left open slits down to the sky colour.
+box('Hall carpet',(11.50,5.62,.015),(1.30,2.05,.04),carpet)
 asset('Lower side hall walls',photos='V8')
 partition('Hall west wood trim wall',(10.85,4.67),(10.85,6.64),white,[(1.1,1.96,0,2.05)],height=2.21)
 upper_door('Pink bedroom shared entry doorway',(10.85,6.20,0),90,'V8,W10')

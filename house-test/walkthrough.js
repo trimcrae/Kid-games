@@ -5,6 +5,7 @@ import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
+import {createCameraGuard,nearPlaneReach,orbitCamera} from './camera-guard.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -35,6 +36,7 @@ try {
 }
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches});
 
+let guard=null,cameraClearance=nearPlaneReach(camera)+.015;
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,eyeY=1.63,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},last=performance.now(),drag=null;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -164,16 +166,13 @@ function updateJoy(e){const r=joystick.getBoundingClientRect();let x=(e.clientX-
 joystick.addEventListener('pointerdown',e=>{if(!active)return;joyId=e.pointerId;joystick.setPointerCapture(e.pointerId);updateJoy(e);});
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
 function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
-window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-const cameraTarget=new THREE.Vector3(),cameraDesired=new THREE.Vector3();
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();cameraClearance=nearPlaneReach(camera)+.015;renderer.setSize(innerWidth,innerHeight);});
 function render(){
   // A room probe renders six views. It must not hold up the activity iframe
   // and adoption controls while they are still loading.
   lighting.tick(player,performance.now(),ready);
-  cameraTarget.set(player.x,player.y+.65,player.z);
-  cameraDesired.set(player.x+Math.sin(yaw)*1.9*Math.cos(pitch),player.y+1.15-Math.sin(pitch)*1.9,player.z+Math.cos(yaw)*1.9*Math.cos(pitch));
-  const fraction=world?world.cameraFraction(cameraTarget,cameraDesired):1;
-  camera.position.copy(cameraTarget).lerp(cameraDesired,fraction);camera.lookAt(cameraTarget);
+  const view=orbitCamera(player,yaw,pitch,world,guard,cameraClearance);
+  camera.position.set(view.position.x,view.position.y,view.position.z);camera.lookAt(view.target.x,view.target.y,view.target.z);
   renderer.render(scene,camera);
 }
 function updateLocation(){
@@ -240,13 +239,14 @@ async function load(){
       mesh.layers.enable(1);scene.add(mesh);
     }
     lighting.load(data);
+    guard=createCameraGuard(binary,data.groups);
     world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),yaw,pitch,
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,
       mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }

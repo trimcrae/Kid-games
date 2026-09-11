@@ -457,9 +457,15 @@ browser tab and still turns by hold-and-drag. `tests/house-pet-scale.mjs`
 measures every species against the model's own dining table, chair seat and
 front door:
 
+`tests/house-camera-clearance.mjs` replays the walkthrough's orbit camera from
+every room start (24 headings, three pitches) against the exported triangles:
+the camera must never sit behind a drawn surface or within the near plane's
+reach of one, and the lower hall floor must have no slit at its thresholds.
+
 ```sh
 node models/house/test_browser_house_controls.mjs
 node tests/house-pet-scale.mjs
+node tests/house-camera-clearance.mjs
 ```
 
 The WebGL fixture and full-game checks reuse an installed `playwright` module.
