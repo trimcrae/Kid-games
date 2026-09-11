@@ -11,9 +11,11 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     await page.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});
     await page.frame({url:/activity.html/}).evaluate(()=>Craepets._events(false));
     console.log('LOADED');
+    // First visit: "Who's playing?", then straight into adoption (saves are a link).
     await page.locator('#start').click();
-    await page.locator('#save-panel').waitFor({state:'visible'});
-    await page.locator('#new-pet-instead').click();
+    await page.locator('#family-panel').waitFor({state:'visible'});
+    assert(await page.locator('#save-panel').isHidden(),'First visit opened the save transfer form');
+    await page.locator('[data-profile="cory"]').click();
     const f=page.frameLocator('#activity-frame');
     await f.locator('#pet-name').fill('Cory Comet');await f.locator('#do-adopt').click();
     await f.locator('[data-tapegg]').click({clickCount:8,delay:130});
