@@ -76,20 +76,39 @@ function mergeParts(parts,{surface=false}={}){
   return geo;
 }
 
-// Soft-real fur: fully matte, a gentle low-frequency mottle, and a light
-// fringe at the silhouette (light caught in the fluff) instead of a vinyl
-// highlight. Grime (a dirty pet) dulls and smudges it.
+// Soft-real fur, still two draw calls: clumps of fur and fine strands from
+// procedural noise (darker roots between clumps, lighter tips, a slightly
+// richer colour like the painted adoption art), the same clumps bumping the
+// normal so light breaks up across the coat, a velvet sheen at grazing angles
+// (MeshPhysical sheen) and a soft textured fringe at the silhouette instead
+// of a vinyl highlight. Grime (a dirty pet) shows as mud specks, not a blur.
+const FUR_NOISE=`
+float cpH(vec3 p){p=fract(p*0.3183099+0.1);p*=17.0;return fract(p.x*p.y*p.z*(p.x+p.y+p.z));}
+float cpN(vec3 x){vec3 i=floor(x),f=fract(x);f=f*f*(3.0-2.0*f);
+  return mix(mix(mix(cpH(i),cpH(i+vec3(1,0,0)),f.x),mix(cpH(i+vec3(0,1,0)),cpH(i+vec3(1,1,0)),f.x),f.y),
+    mix(mix(cpH(i+vec3(0,0,1)),cpH(i+vec3(1,0,1)),f.x),mix(cpH(i+vec3(0,1,1)),cpH(i+vec3(1,1,1)),f.x),f.y),f.z);}`;
 const FUR_FRAGMENT=`
-  float furN=sin(vFur.x*23.0)*sin(vFur.y*19.0+1.3)*sin(vFur.z*21.0+2.1);
   float furLike=FURLIKE;
-  diffuseColor.rgb*=1.0+0.05*furN*furLike;
-  float smudge=smoothstep(0.35,0.8,sin(vFur.x*9.0+2.0)*sin(vFur.y*7.0)*sin(vFur.z*8.0+1.0)+0.35);
-  diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.76,0.68,0.58),uGrime*0.8*furLike);
-  diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.30,0.23,0.17),uGrime*smudge*0.5*furLike);`;
-function creatureMaterial(kind,map=null){
+  vec3 clumpP=vFur*vec3(15.0,11.0,15.0);
+  float clump=cpN(clumpP);
+  float strand=cpN(vFur*vec3(58.0,21.0,58.0));
+  float fiber=mix(clump,strand,0.45);
+  float baseLum=dot(diffuseColor.rgb,vec3(0.2126,0.7152,0.0722));
+  vec3 furCol=diffuseColor.rgb*mix(mix(0.52,0.8,smoothstep(0.3,0.85,baseLum)),1.04,fiber);
+  float furLum=dot(furCol,vec3(0.2126,0.7152,0.0722));
+  furCol=max(mix(vec3(furLum),furCol,1.28),0.0);
+  diffuseColor.rgb=mix(diffuseColor.rgb,furCol,furLike);
+  float speck=step(0.84,cpH(floor(vFur*34.0)))*step(0.35,clump);
+  diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.86,0.8,0.72),uGrime*0.6*furLike);
+  diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.26,0.19,0.13),uGrime*speck*0.85*furLike);`;
+const FUR_NORMAL=`
+  {float d=0.35;vec3 g=vec3(cpN(clumpP+vec3(d,0.0,0.0)),cpN(clumpP+vec3(0.0,d,0.0)),cpN(clumpP+vec3(0.0,0.0,d)))-clump;
+   normal=normalize(normal-(mat3(viewMatrix)*g)*0.9*furLike);}`;
+function creatureMaterial(kind,map=null,sheenColor='#ffffff'){
   const detail=kind==='detail';
-  const material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1,metalness:0,map});
-  const uniforms={uRim:{value:detail?.26:.34},uGrime:{value:0}};
+  const material=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:1,metalness:0,map,sheen:1,sheenRoughness:.55,
+    sheenColor:new THREE.Color(sheenColor).lerp(new THREE.Color('#ffffff'),.35).multiplyScalar(detail?.6:.85)});
+  const uniforms={uRim:{value:detail?.12:.16},uGrime:{value:0}};
   material.userData.uniforms=uniforms;
   material.onBeforeCompile=shader=>{
     Object.assign(shader.uniforms,uniforms);
@@ -97,18 +116,20 @@ function creatureMaterial(kind,map=null){
       .replace('#include <common>','#include <common>\nvarying vec3 vFur;'+(detail?'\nattribute vec2 aSurf;\nvarying vec2 vSurf;':''))
       .replace('#include <begin_vertex>','#include <begin_vertex>\nvFur=position;'+(detail?'\nvSurf=aSurf;':''));
     shader.fragmentShader=shader.fragmentShader
-      .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nuniform float uRim;\nuniform float uGrime;'+(detail?'\nvarying vec2 vSurf;':''))
+      .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nuniform float uRim;\nuniform float uGrime;'+(detail?'\nvarying vec2 vSurf;':'')+FUR_NOISE)
       .replace('#include <color_fragment>','#include <color_fragment>'+FUR_FRAGMENT.replace('FURLIKE',detail?'smoothstep(0.75,0.92,vSurf.x)':'1.0'))
       .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>'+(detail?'\nroughnessFactor=vSurf.x;':''))
+      .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>'+FUR_NORMAL)
       .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>'+(detail?'\ntotalEmissiveRadiance+=diffuseColor.rgb*vSurf.y;':''))
-      .replace('#include <opaque_fragment>',`float furF=pow(1.0-clamp(dot(normalize(normal),normalize(vViewPosition)),0.0,1.0),2.4);
-  outgoingLight+=diffuseColor.rgb*uRim*furF*furLike;
+      .replace('#include <lights_physical_fragment>','#include <lights_physical_fragment>\n#ifdef USE_SHEEN\nmaterial.sheenColor*=furLike;\n#endif')
+      .replace('#include <opaque_fragment>',`float furF=pow(1.0-clamp(dot(normalize(normal),normalize(vViewPosition)),0.0,1.0),2.2);
+  outgoingLight*=1.0-0.28*furF*(1.0-fiber)*furLike;
+  outgoingLight+=mix(diffuseColor.rgb,vec3(1.0),0.25)*uRim*furF*furLike*(0.6+0.4*strand);
 #include <opaque_fragment>`);
   };
-  material.customProgramCacheKey=()=>'craepet-'+kind;
+  material.customProgramCacheKey=()=>'craepet-fur2-'+kind;
   return material;
 }
-
 // A soft contact shadow: a warm dark core under the feet fading out past the
 // body, so the pet reads as standing on oak, tile, carpet or lawn. One shared
 // texture, built from numbers (it also works outside a browser, in tests).
@@ -227,7 +248,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   for(const [list,kind] of [[furParts,'fur'],[detailParts,'detail']]){
     if(!list.length)continue;
     const geo=mergeParts(list,{surface:kind==='detail'});
-    const mesh=new THREE.SkinnedMesh(geo,creatureMaterial(kind,kind==='fur'?furMap:null));
+    const mesh=new THREE.SkinnedMesh(geo,creatureMaterial(kind,kind==='fur'?furMap:null,furMap?'#ffffff':palette.body));
     mesh.name='creature '+kind;mesh.bind(skeleton,new THREE.Matrix4());
     // At rest the skinned body is exactly the merged geometry; animation only
     // ever moves parts a few centimetres, so a padded sphere culls safely.

@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,KEEP_CLEAR} from '../house-test/companions.mjs';
+import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,KEEP_CLEAR,lineOfSight,callOver,freeSpot} from '../house-test/companions.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(neighborhoodBoxes);
@@ -79,5 +79,24 @@ const far={x:0,y:-50,z:0};
   const e=make('kieran',{egg:true}),start={...e.point};
   for(let i=0;i<30*30;i++)updateCompanion(e,1/30,{world,player:{...start},night:i>450,seen:()=>true});
   assert.equal(Math.hypot(e.point.x-start.x,e.point.z-start.z),0,'egg moved');
+}
+// 6. On a bed or a seat they face into the room, not the wall behind it.
+for(const [id,list] of Object.entries(spots))for(const s of [...list.day,...list.night].filter(s=>s.up&&!ROUTINES[id].day.concat(ROUTINES[id].night).find(q=>q.face&&q.act===s.act))){
+  const room=rooms.find(r=>r[1]===s.room),cx=room[2]-s.x,cz=-room[3]-s.z;
+  assert(Math.abs(wrap(Math.atan2(cx,cz)-s.face))<.2,`${id} ${s.act} on furniture faces away from the room`);
+}
+// 7. Line of sight: clear across a room, blocked through a wall; a pet you
+// can't see from the doorway trots over to say hello (callOver).
+{
+  const cory=rooms.find(r=>r[1]==="Cory's bedroom"),from={x:cory[2],y:cory[4]+1.3,z:-cory[3]};
+  assert(lineOfSight(world.boxes,from,{x:spots.cory.day[0].x,y:spots.cory.day[0].y+.4,z:spots.cory.day[0].z}),'no line of sight across Cory\'s room');
+  const kitchen=rooms.find(r=>r[1]==='Kitchen');assert(!lineOfSight(world.boxes,from,{x:kitchen[2],y:kitchen[4]+.5,z:-kitchen[3]}),'saw the kitchen through the upstairs walls');
+  const c=make('ellie'),room=rooms.find(r=>r[1]==="Ellie's bedroom"),player={x:room[6][0],y:room[4],z:-room[6][1]};
+  const f=freeSpot(world,player.x,player.z,room[4],[{...player}],.75,.8);f.face=Math.atan2(player.x-f.x,player.z-f.z);
+  assert(callOver(c,f),'callOver refused');let greeted=false;
+  for(let i=0;i<30*8;i++){const {out}=updateCompanion(c,1/30,{world,player,night:false,seen:()=>true});if(out.emote==='heart')greeted=true;}
+  assert(greeted&&Math.hypot(c.point.x-f.x,c.point.z-f.z)<.3,'called-over pet did not come and say hello');
+  for(let i=0;i<30*15;i++)updateCompanion(c,1/30,{world,player:{x:0,y:-50,z:0},night:false,seen:()=>true});
+  assert(!c.spot.temp,'called-over pet never went back to its routine');
 }
 console.log(`PASS routines: ${Object.keys(ROUTINES).length} companions' day and night places resolve clear of stations; bedtime naps, calm days, smooth hellos, host lines, stepping aside, eggs stay`);
