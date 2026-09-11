@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {styleGroup} from './palette.mjs';
 
 // The colours in the export are already linear RGB. No photographs or texture
 // downloads: these code-built patterns are evaluated in metres
@@ -133,24 +134,50 @@ vec3 houseBump(vec3 position,vec3 normal,float height){
 }
 `;
 
+// Game shading tier. Measured on an Intel HD 530 (reports/A2): clearcoat and
+// sheen on every wood and fabric group plus image-based light on every pixel
+// cost ~45 % of a frame and washed the rooms out to a milky grey. Only small,
+// genuinely glossy things (metal, glass, screens, glazed tile) keep a
+// reflection map and a clear coat; everything else is a plain rough PBR
+// surface lit by the room lights, the hemisphere and the baked occlusion.
+export function glossyFinish(f){
+  return f.surface==='glass'||f.surface==='screen'||(f.metalness??0)>.5||(f.roughness??.7)<.25;
+}
+// Baked occlusion is soft (8 rays, 1 m); the curve and gain make corners and
+// the ground under furniture read, and a share of it darkens direct light too
+// so things sit in their own shadow (the single sun map cannot reach there).
+export const OCCLUSION={gain:1.7,curve:1.6,direct:.45};
+
 export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
-  const f=finishDescription(group),glass=f.surface==='glass';
+  const {color,finish:styled}=styleGroup(group,finishDescription(group));
+  const f={...styled},glass=f.surface==='glass',glossy=glossyFinish(f);
+  if(!glossy)f.clearcoat=0;
+  if(f.surface==='brushed')f.roughness=Math.max(f.roughness??.3,.38);
   const aoStrength=THREE.MathUtils.clamp(ambientOcclusionStrength,0,.5);
   const material=new THREE.MeshPhysicalMaterial({
-    color:new THREE.Color(...group.color),roughness:f.roughness??.7,
+    color,roughness:f.roughness??.7,
     metalness:f.metalness??0,clearcoat:f.clearcoat??0,
     clearcoatRoughness:f.clearcoatRoughness??.2,
-    sheen:f.sheen??0,sheenColor:new THREE.Color(...group.color),sheenRoughness:.7,
+    // Sheen doubles the fabric shading cost for a rim you cannot see at this
+    // camera distance; rough fabric finishes carry the soft look instead.
+    sheen:0,sheenColor:color,sheenRoughness:.7,
     emissive:new THREE.Color(...(f.emissive||[0,0,0])),
     emissiveIntensity:f.emissiveIntensity??0,
     side:THREE.DoubleSide,transparent:glass,opacity:glass?(f.opacity??.2):1,
-    depthWrite:!glass,envMapIntensity:glass?.8:1,
+    depthWrite:!glass,
+    // Brushed steel reflected the warm floor as streaky bronze; keep it cool.
+    envMapIntensity:glass?.8:f.surface==='brushed'?.45:f.surface==='metal'?.8:1,
   });
+  if((f.surface==='fabric'||f.surface==='carpet')&&styled.sheen)material.roughness=Math.max(material.roughness,.9);
   material.name=group.name;
   // Transparent panes stay a single pass; their closed thin boxes do not need
   // the default two-pass physical-glass path on phones.
   material.forceSinglePass=true;
   material.userData.houseFinish={...f};
+  // lighting.mjs hands glossy materials the current room's reflection probe.
+  material.userData.houseGlossy=glossy;
+  material.userData.houseEmissive=material.emissiveIntensity;
+  material.userData.houseWindow=glass&&/Window glass/i.test(group.name||'');
   // If a new panel shader has no measured/exported grid, retain its matte
   // finish without inventing seams. Brick Texture dimensions supply the grid.
   const family=(f.surface==='panels'&&!f.panelSize?SURFACES.paint:SURFACES[f.surface])||0;
@@ -163,6 +190,7 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
       if(aoStrength>0){
         shader.defines??={};shader.defines.HOUSE_AO=1;
         shader.uniforms.houseOcclusionStrength={value:aoStrength};
+        shader.uniforms.houseOcclusionShape={value:new THREE.Vector3(OCCLUSION.gain,OCCLUSION.curve,OCCLUSION.direct)};
       }
       shader.uniforms.houseSurfaceKind={value:family};
       const tile=detailTile(family);
@@ -188,7 +216,7 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
       shader.fragmentShader=shader.fragmentShader.replace('#include <common>',
         `#include <common>
           #ifdef HOUSE_AO
-            varying float vHouseOcclusion;uniform float houseOcclusionStrength;
+            varying float vHouseOcclusion;uniform float houseOcclusionStrength;uniform vec3 houseOcclusionShape;
           #endif\n`+SURFACE_GLSL)
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
@@ -204,7 +232,9 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
           if(houseSurfaceKind>0)normal=houseBump(-vViewPosition,normal,houseDetail.z);`)
         .replace('#include <aomap_fragment>',`#include <aomap_fragment>
           #ifdef HOUSE_AO
-            float houseAO=mix(1.0,clamp(vHouseOcclusion,0.0,1.0),houseOcclusionStrength);
+            float houseAO=mix(1.0,pow(clamp(vHouseOcclusion,0.0,1.0),houseOcclusionShape.y),
+              min(1.0,houseOcclusionStrength*houseOcclusionShape.x));
+            reflectedLight.directDiffuse*=mix(1.0,houseAO,houseOcclusionShape.z);
             reflectedLight.indirectDiffuse*=houseAO;
             reflectedLight.indirectSpecular*=houseAO;
             #ifdef USE_CLEARCOAT

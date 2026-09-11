@@ -4,48 +4,72 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow,noarchive">
-  <meta name="theme-color" content="#172c2a">
+  <meta name="theme-color" content="#fff8ec">
   <title>Craepets · At home</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f6861' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f7f78' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
 </head>
 <body>
-  <canvas id="view" aria-label="Third-person Craepets house. WASD or arrows to walk, mouse to aim, E to interact, R for rooms, F for family, Escape to release the mouse." tabindex="0"></canvas>
+  <canvas id="view" aria-label="Third-person Craepets house. WASD or arrows to walk, mouse to look, E to use what is nearby, R for rooms, F for family, Escape to pause." tabindex="0"></canvas>
   <div id="crosshair" aria-hidden="true" hidden></div>
+  <div id="fade" aria-hidden="true"></div>
   <header class="topbar">
-    <div class="identity"><span class="mark">⌂</span><div><strong>Craepets at home</strong><small id="pet-status">HOUSE EDITION</small></div></div>
-    <div class="actions"><button id="family-button">Family</button><button id="rooms-button" aria-expanded="false" aria-controls="rooms">Rooms <span>↗</span></button><button id="pause-button" aria-label="Pause and show controls">Ⅱ</button></div>
+    <div class="player">
+      <button id="player-chip" aria-label="Your pet and family">
+        <span id="chip-face" aria-hidden="true">🙂</span>
+        <span class="chip-text"><strong id="pet-status">Craepets at home</strong><small id="chip-coins"></small></span>
+        <span id="weather-status" role="img" aria-label=""></span>
+      </button>
+      <div id="pet-needs" role="group" aria-label="Your pet's needs"></div>
+    </div>
+    <div class="actions">
+      <button id="pet-button" aria-label="Say hello to your pet"><span aria-hidden="true">💬</span><span class="label">Say hello</span><kbd>C</kbd></button>
+      <button id="family-button" aria-label="Family"><span aria-hidden="true">👪</span><span class="label">Family</span><kbd>F</kbd></button>
+      <button id="rooms-button" aria-label="Rooms" aria-expanded="false" aria-controls="rooms"><span aria-hidden="true">🗺️</span><span class="label">Rooms</span><kbd>R</kbd></button>
+      <button id="pause-button" aria-label="Pause and show controls"><span aria-hidden="true">Ⅱ</span></button>
+    </div>
   </header>
+  <div class="location" role="status" aria-live="polite"><span id="location">Front entry</span><small id="level">MAIN FLOOR</small></div>
   <div id="journey" hidden><span id="journey-text"></span><button id="cancel-journey" aria-label="Stop directions">×</button></div>
-  <div id="pet-needs" aria-label="Your pet's needs"></div>
   <div id="pet-speech" role="status" aria-live="polite" hidden></div>
-  <div class="location"><span class="dot"></span><span id="location">Front entry</span><small id="level">MAIN FLOOR</small></div>
-  <aside id="rooms" hidden>
-    <div class="panel-title"><h2>Go to a room</h2><button id="close-rooms" aria-label="Close rooms">×</button></div>
-    <p>Choose “Walk here” for directions, or “Jump” for a quick trip. Approach a glowing room marker and press E or tap its activity.</p>
+  <p id="coach" role="status" aria-live="polite" hidden></p>
+  <p id="hint" role="status" aria-live="polite">Walk to a room to find something to do</p>
+  <aside id="nearby" hidden aria-label="Things to do here"><small id="nearby-room"></small><div id="nearby-actions"></div></aside>
+  <aside id="rooms" hidden aria-label="Rooms">
+    <div class="panel-title"><h2>Where to?</h2><button id="close-rooms" aria-label="Close rooms">×</button></div>
+    <p>Tap a room to go there. Tap 🐾 and your pet shows you the way on foot.</p>
+    <nav id="floor-tabs" aria-label="Floors"></nav>
     <div id="room-list"></div>
-    <button id="reset" class="reset">Return to the front entry</button>
+    <button id="reset" class="reset">Back to the front door</button>
   </aside>
-  <main id="welcome" class="overlay">
+  <main id="welcome" class="overlay" data-mode="welcome">
     <section class="welcome-card">
-      <span class="eyebrow">YOUR CRAEPET. YOUR HOUSE.</span>
-      <h1>Come on in.</h1>
-      <p class="intro">Walk as your Craepet. Grow food in the yard, find words in the library, play downstairs, and meet the family along the way.</p>
-      <div class="instructions"><div><b>W A S D</b><span>Walk · arrow keys also work</span></div><div><b>Mouse</b><span>Move to turn · click the view to capture</span></div><div><b>E / R / F</b><span>Interact / rooms / family</span></div><div><b>Esc / Shift</b><span>Release mouse / move faster</span></div></div>
-      <p class="touch-instructions">Use the left pad to walk. Drag the right side to look around. Tap an activity when you reach its room.</p>
-      <button id="start" class="primary" disabled>Loading the house…</button>
-      <button id="welcome-saves">Load existing saves</button><button id="welcome-rooms">Rooms</button><button id="welcome-family">Family</button>
-      <p id="loading" role="status" aria-live="polite">Preparing the model</p>
-      <p class="study-note">Existing pets in this browser load automatically. Playing in another browser? Use Load existing saves to bring the whole family over. House progress saves separately.</p>
+      <div class="welcome-only">
+        <h1>Come on in.</h1>
+        <p id="welcome-pet"></p>
+        <p class="intro">Walk around the house as your Craepet. Grow food in the yard, find words in the library, play downstairs and meet the family.</p>
+      </div>
+      <div class="pause-only"><h1>Paused</h1><p class="intro">Take a break. Your pet will wait right here.</p></div>
+      <button id="start" class="primary" disabled>Opening the front door…</button>
+      <div class="welcome-actions"><button id="welcome-rooms"><span aria-hidden="true">🗺️</span> Rooms</button><button id="welcome-family"><span aria-hidden="true">👪</span> Family</button></div>
+      <div class="instructions fine-only" aria-label="Controls">
+        <div><kbd>W A S D</kbd><span>walk (arrow keys work too)</span></div>
+        <div><kbd>Mouse</kbd><span>look around</span></div>
+        <div><kbd>Shift</kbd><span>run</span></div>
+        <div><kbd>E</kbd><span>use what's nearby</span></div>
+        <div><kbd>R</kbd> <kbd>F</kbd><span>rooms · family</span></div>
+        <div><kbd>Esc</kbd><span>pause</span></div>
+      </div>
+      <p class="touch-instructions">Drag the pad to walk and swipe to look around. Tap a bubble when you reach it.</p>
+      <p id="loading" role="status" aria-live="polite">Opening the front door…</p>
+      <p class="saves-link"><button id="welcome-saves" class="link">Playing on another device? Bring your saves</button></p>
     </section>
   </main>
-  <aside id="nearby" hidden aria-label="Activities in reach"><small id="nearby-room"></small><div id="nearby-actions"></div></aside>
   <section id="activity-choices" class="overlay" hidden><div class="welcome-card"><h2 id="choices-room">What would you like to do?</h2><div id="choices-list"></div><button id="close-choices">Back to walking</button></div></section>
-  <section id="family-panel" class="overlay" hidden><div class="welcome-card"><div class="panel-title"><h2>Who is playing?</h2><button id="close-family" aria-label="Close family">×</button></div><p>Each person controls their own Craepet and keeps their own progress.</p><div id="family-list"></div><button id="load-saves">Load existing saves</button><p class="study-note" id="save-status">House saves stay separate from the original game.</p><a href="../games/craepets/">Visit the original Craepets valley ↗</a></div></section>
-  <section id="save-panel" class="overlay" hidden><div class="welcome-card"><h2>Bring your saved pets home</h2><p id="save-message" role="status"></p><button id="load-original-saves">Load all original saves from this browser</button><p><a href="saves.html" target="_blank" rel="noopener">Family save transfer page ↗</a></p><p>From another browser or device: export your family on that page, then choose the JSON file here.</p><label for="single-save-profile">For an older single-pet backup, whose save is it?</label><select id="single-save-profile"></select><input type="file" id="save-file" accept=".json,application/json" aria-label="Choose a Craepets backup"><div id="save-preview"></div><button id="apply-saves" class="primary" hidden>Use these complete saves</button><button id="close-saves">Back</button><button id="new-pet-instead">Start a new pet instead</button></div></section>
+  <section id="family-panel" class="overlay" hidden><div class="welcome-card"><div class="panel-title"><h2 id="family-title">Who's playing?</h2><button id="close-family" aria-label="Close family">×</button></div><p id="family-note">Everyone has their own Craepet and their own progress.</p><div id="family-list"></div><p class="saves-link"><button id="load-saves" class="link">Bring saved pets from another device</button></p><p class="study-note" id="save-status">House saves stay separate from the original game.</p><a href="../games/craepets/">Visit the original Craepets valley ↗</a></div></section>
+  <section id="save-panel" class="overlay" hidden><div class="welcome-card"><h2>Bring your saved pets home</h2><p id="save-message" role="status"></p><button id="load-original-saves">Load all original saves from this browser</button><p><a href="saves.html" target="_blank" rel="noopener">Family save transfer page ↗</a></p><p>From another browser or device: export your family on that page, then choose the JSON file here.</p><label for="single-save-profile">For an older single-pet backup, whose save is it?</label><select id="single-save-profile"></select><input type="file" id="save-file" accept=".json,application/json" aria-label="Choose a Craepets backup"><div id="save-preview"></div><button id="apply-saves" class="primary" hidden>Use these complete saves</button><div class="save-actions"><button id="close-saves">Back</button><button id="new-pet-instead">Start a new pet instead</button></div></div></section>
   <section id="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activity-title" hidden><div class="activity-heading"><div><small id="activity-room"></small><h2 id="activity-title">Welcome</h2></div><button id="close-activity">Back to walking ↩</button></div><iframe id="activity-frame" title="Craepets room activity" src="activity.html"></iframe></section>
-  <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div><span class="look-hint">DRAG TO LOOK</span></div>
-  <footer><span id="hint">Walk to a glowing room marker</span><span id="weather-status"></span><div><button id="pet-button">Say hello</button> <button id="help">Controls</button></div></footer>
+  <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div></div>
   <script type="module" src="walkthrough.js"></script>
 </body>
 </html>

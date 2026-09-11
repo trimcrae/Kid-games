@@ -59,7 +59,9 @@ try{
   const page=await browser.newPage({viewport:{width:1100,height:760}});
   const {target,errors}=await houseFrame(page,origin+'/house-test/');
   await page.click('#start');
-  await target.waitForFunction(()=>window.houseTest.state.mouseLocked,null,{timeout:10000});
+  // The lock lands before Chrome dispatches pointerlockchange; wait until the
+  // page has handled it (a page that never hides the cursor still times out).
+  await target.waitForFunction(()=>window.houseTest.state.mouseLocked&&document.body.classList.contains('mouse-look'),null,{timeout:10000});
   assert.equal(await page.evaluate(()=>document.pointerLockElement?.id),'view','Pointer lock is not held by the canvas');
   assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('view')).cursor),'none','Cursor still visible while captured');
   assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('crosshair')).display),'block');

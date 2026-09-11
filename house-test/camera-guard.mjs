@@ -6,11 +6,39 @@
 // sightline against the rendered triangles themselves (glass included, so it
 // never backs out through a window) and keeps the camera far enough from any
 // surface that the near clipping plane cannot cut a hole in it.
+// Leaves are soft: the camera may brush through a canopy (as in any garden
+// game) rather than collapsing into the pet under every tree. Walls, glass,
+// trunks and everything else still stop it.
+export function guardGroups(groups){return groups.filter(g=>g.finish?.surface!=='foliage');}
+// Low furniture — chairs, tables, beds, sofas, counters, bath fixtures, below
+// about 1.25 m — is "soft" for the sightline only: from above, a life-sim
+// camera looks over (or through) a chair back at the pet instead of diving
+// into the pet's back. The camera itself still keeps its near-plane
+// clearance from every surface, and walls, floors, ceilings, glass and tall
+// furniture always stop it.
+const FLOORS=[-3.15,-1.05,-.16,-.1,0,1.26];
+const floorBelow=y=>FLOORS.reduce((best,f)=>f<=y+.08&&f>best?f:best,-Infinity);
+export const SOFT_TOP=1.25,SOFT_CLEAR=.85;
+const softCollection=/furniture|fixtures|appliances|vehicles and storage/i;
+const hardMaterial=/glass|plaster|siding|panels|tile|grout|floor|carpet|mirror|joists|roof|block|concrete/i;
+export function softGroup(group){
+  const [collection='',...rest]=(group.name||'').split(' / ');
+  return softCollection.test(collection)&&!hardMaterial.test(rest.at(-1)||'');
+}
+const hardBox=/floor|slab|foundation|ceiling|roof|wall|stair|tread|riser|landing|step|deck|porch|ground|lawn|terrain|path|drive|sill|threshold|jamb|door|window|partition|grade|curb|joist|beam|header|soffit/i;
+export function softBox(box){
+  const floor=floorBelow(box.min[1]);
+  return !hardBox.test(box.name||'')&&box.max[1]-box.min[1]<SOFT_TOP&&box.max[1]-floor<SOFT_TOP&&box.max[1]-floor>.05;
+}
 export function createCameraGuard(binary,groups,{cell=.5}={}){
   const f=new Float32Array(binary);
   let count=0;for(const g of groups)count+=g.count/3;
-  const first=new Uint32Array(count);
-  let n=0;for(const g of groups){const o=g.offset/4;for(let v=0;v<g.count;v+=3)first[n++]=o+v*6;}
+  const first=new Uint32Array(count),soft=new Uint8Array(count);
+  let n=0;for(const g of groups){const o=g.offset/4,maybe=softGroup(g);for(let v=0;v<g.count;v+=3){
+    const at=o+v*6;
+    if(maybe){const lowY=Math.min(f[at+1],f[at+7],f[at+13]),topY=Math.max(f[at+1],f[at+7],f[at+13]),floor=floorBelow(lowY);
+      soft[n]=topY-floor<SOFT_TOP&&topY-floor>.05?1:0;}
+    first[n++]=at;}}
   const lo=[Infinity,Infinity,Infinity],hi=[-Infinity,-Infinity,-Infinity];
   for(let t=0;t<count;t++)for(let k=0;k<3;k++){const o=first[t]+k*6;for(let a=0;a<3;a++){const v=f[o+a];if(v<lo[a])lo[a]=v;if(v>hi[a])hi[a]=v;}}
   const dim=lo.map((v,a)=>Math.floor((hi[a]-v)/cell)+1);
@@ -91,7 +119,11 @@ export function createCameraGuard(binary,groups,{cell=.5}={}){
       const dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z,len=Math.hypot(dx,dy,dz);
       if(len<1e-6)return 0;
       const list=gather(from.x,from.y,from.z,to.x,to.y,to.z,clearance);
-      let hit=1;for(const t of list){const s=crossing(t,from.x,from.y,from.z,dx,dy,dz);if(s<hit)hit=s;}
+      let hit=1,hard=1;
+      for(const t of list){const s=crossing(t,from.x,from.y,from.z,dx,dy,dz);if(s<hit)hit=s;if(!soft[t]&&s<hard)hard=s;}
+      // Look past low furniture only while the camera still ends up well above
+      // the pet (so above that furniture); otherwise everything blocks.
+      if(hard>hit&&dy*(hard-clearance/len)>=SOFT_CLEAR)hit=hard;
       let s=Math.max(0,Math.min(1,hit-clearance/len));
       // Back towards the player until the near plane has room everywhere.
       for(let i=0;i<60&&s>0;i++){
@@ -102,8 +134,11 @@ export function createCameraGuard(binary,groups,{cell=.5}={}){
       return s;
     },
     // For tests and diagnostics.
-    blocked(from,to){const dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;const list=gather(from.x,from.y,from.z,to.x,to.y,to.z,.01);
-      for(const t of list)if(crossing(t,from.x,from.y,from.z,dx,dy,dz)<1-1e-6)return true;return false;},
+    // hardOnly: ignore low furniture (walls, floors, ceilings, glass and tall
+    // furniture still count).
+    blocked(from,to,hardOnly=false){const dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;const list=gather(from.x,from.y,from.z,to.x,to.y,to.z,.01);
+      for(const t of list)if(!(hardOnly&&soft[t])&&crossing(t,from.x,from.y,from.z,dx,dy,dz)<1-1e-6)return true;return false;},
+    softTriangles:()=>soft.reduce((a,b)=>a+b,0),
     clearanceAt(p,limit=.5){return nearest(gather(p.x,p.y,p.z,p.x,p.y,p.z,limit),p.x,p.y,p.z,limit);}
   };
 }
@@ -113,16 +148,64 @@ export function nearPlaneReach(camera){
   const t=Math.tan(camera.fov*Math.PI/360);
   return camera.near*Math.sqrt(1+t*t*(1+camera.aspect*camera.aspect));
 }
-// Third-person orbit used by the walkthrough, shared with the tests.
-export function orbitCamera(player,yaw,pitch,world,guard,clearance){
-  const target={x:player.x,y:player.y+.65,z:player.z};
-  const desired={x:player.x+Math.sin(yaw)*1.9*Math.cos(pitch),y:player.y+1.15-Math.sin(pitch)*1.9,z:player.z+Math.cos(yaw)*1.9*Math.cos(pitch)};
+// Third-person follow camera: a game framing, a little above and behind the
+// pet so the room and floor around it
+// read, rather than a wide lens at head height: about 25° down by default,
+// low enough to see across the room to its walls; tight spots crane up.
+// Shared with the tests.
+export const CAMERA_RIG={target:.5,boom:2.1,height:1.1};
+// One guarded placement along a single boom direction.
+export function boomCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
+  const target={x:player.x,y:player.y+rig.target,z:player.z};
+  const desired={x:player.x+Math.sin(yaw)*rig.boom*Math.cos(pitch),y:player.y+rig.height-Math.sin(pitch)*rig.boom,z:player.z+Math.cos(yaw)*rig.boom*Math.cos(pitch)};
   // The colliders also cover the neighbourhood's plain boxes; the guard then
   // checks what is left of the sightline against the drawn surfaces.
-  let fraction=world?world.cameraFraction(target,desired):1;
+  // Low furniture boxes may be looked past when the camera stays well above
+  // the pet; if the result would be low after all, everything blocks.
+  let fraction=world?world.cameraFraction(target,desired,softBox):1;
+  if(world&&(desired.y-target.y)*fraction<SOFT_CLEAR)fraction=world.cameraFraction(target,desired);
   if(guard){
     const limit={x:target.x+(desired.x-target.x)*fraction,y:target.y+(desired.y-target.y)*fraction,z:target.z+(desired.z-target.z)*fraction};
     fraction*=guard.fraction(target,limit,clearance);
   }
-  return {target,position:{x:target.x+(desired.x-target.x)*fraction,y:target.y+(desired.y-target.y)*fraction,z:target.z+(desired.z-target.z)*fraction},fraction};
+  const position={x:target.x+(desired.x-target.x)*fraction,y:target.y+(desired.y-target.y)*fraction,z:target.z+(desired.z-target.z)*fraction};
+  return {target,position,fraction,distance:Math.hypot(position.x-target.x,position.y-target.y,position.z-target.z),pitch};
+}
+// In a tight room the camera swings up towards the ceiling before it slides
+// in along the boom, so it looks down on the pet instead of into its back.
+// Every candidate is a full guarded placement; the swing is capped so small
+// rooms never turn into a plan view.
+export const CRANE_STEPS=[0,-.15,-.3,-.45];
+// Backed into a corner, a look down from above still shows the pet, where a
+// camera squeezed against the wall behind it would show only fur or wall.
+export const CORNER_STEPS=[-.65,-.85,-1.25];
+export function craneExtra(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
+  let best=null;
+  for(const extra of CRANE_STEPS){
+    const view=boomCamera(player,yaw,Math.max(-1.45,pitch+extra),world,guard,clearance,rig);
+    if(!best||view.distance>best.view.distance+.1)best={extra,view};
+    if(view.distance>=1.5)return best;
+  }
+  if(best.view.distance<.9)for(const extra of CORNER_STEPS){
+    const view=boomCamera(player,yaw,Math.max(-1.45,pitch+extra),world,guard,clearance,rig);
+    if(view.distance>best.view.distance+.1)best={extra,view};
+    if(view.distance>=1.2)break;
+  }
+  return best;
+}
+export function orbitCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
+  return craneExtra(player,yaw,pitch,world,guard,clearance,rig).view;
+}
+// Arrive looking along the room's authored direction unless the camera would
+// be jammed against a wall or the pet there; then turn to the nearest heading
+// (within a quarter turn either way) that gives the camera room.
+export function arrivalHeading(player,authored,pitch,world,guard,clearance){
+  let best=authored,bestDistance=-1;
+  for(let i=0;i<=24;i++){
+    const heading=authored+(i%2?1:-1)*Math.ceil(i/2)*Math.PI/24;
+    const distance=orbitCamera(player,heading,pitch,world,guard,clearance).distance;
+    if(distance>bestDistance+.15){bestDistance=distance;best=heading;}
+    if(distance>1.45)break;
+  }
+  return Math.atan2(Math.sin(best),Math.cos(best));
 }

@@ -74,10 +74,12 @@ export class WalkingWorld {
   }
   // Swept sightline against the house bounds. Pull the orbit camera in before
   // walls, ceilings and furniture; it must never show through another room.
-  cameraFraction(from,to) {
+  // `skip(box)` lets the camera look past some boxes (low furniture seen from above).
+  cameraFraction(from,to,skip=null) {
     let fraction=1;
     const a=[from.x,from.y,from.z],d=[to.x-from.x,to.y-from.y,to.z-from.z];
     for(const b of this.boxes){
+      if(skip&&(b.cameraSoft??=!!skip(b)))continue;
       let near=0,far=fraction;
       for(let axis=0;axis<3;axis++){
         const lo=b.min[axis]-.055,hi=b.max[axis]+.055;
