@@ -8,6 +8,12 @@
 export const TIRED=25,SLEEPY=20,HUNGRY=35,DIRTY=35,BORED=40;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
+// A need the save doesn't have a number for (an older or hand-made save)
+// counts as content, never as exhausted: it must not put a pet to sleep or
+// show an empty meter.
+export const NEED_DEFAULT=80;
+export function needValue(pet,k){const v=pet?.[k];return typeof v==='number'&&Number.isFinite(v)?v:NEED_DEFAULT;}
+export function needsOf(pet){if(!pet||pet.egg)return null;return {hunger:needValue(pet,'hunger'),happy:needValue(pet,'happy'),energy:needValue(pet,'energy'),clean:needValue(pet,'clean')};}
 export function moodOf(n){
   if(!n)return 'good';
   if(n.energy<TIRED)return 'tired';
