@@ -42,7 +42,9 @@ const routes=[
  ['Green bathroom',[[11.57,4.01,1.26],[11.4,4.9,1.26],[11.0,5.2,1.26]]],
  // H139 puts the bassinet at the entry half of the bed foot. Follow the
  // real aisle around it, including the turn after the entry-side closet.
- ['Ensuite doorway',[[13.47,5.0,1.26],[13.47,5.38,1.26],[12.56,5.38,1.26],[12.56,6.95,1.26],[12.7,8.02,1.26],[11.4,8.15,1.26]]],
+ // The tall chest stands on the closet/ensuite wall (House Tour 137.5/141s), so
+ // the aisle runs between it and the bassinet at the bed's side.
+ ['Ensuite doorway',[[13.47,5.0,1.26],[13.47,5.3,1.26],[12.99,5.35,1.26],[12.99,7.55,1.26],[12.7,8.02,1.26],[11.4,8.15,1.26]]],
  ['Nursery doorway',[[12.5,4.01,1.26],[12.5,2.7,1.26]]],
  ['Master doorway',[[13.47,4.01,1.26],[13.47,5.0,1.26]]],
  ['End bedroom doorway',[[15.0,4.01,1.26],[16.5,4.01,1.26]]],
