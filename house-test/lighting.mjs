@@ -32,15 +32,16 @@ export function choosePracticalLights(lights,position,occluders,limit=4){
 // day, dusk, night). Every phase uses the same lights, so switching never
 // recompiles a shader; only colours, intensities and the sun move.
 // sun: [azimuth offset from the exported sun (rad), elevation (rad)].
+export function phaseForHour(h){return h<6||h>=20?'night':h<8?'dawn':h>=18?'dusk':'day';}
 export const PHASES={
   dawn:{sun:[-1.1,.28],sunColor:'#ffcf9e',sunI:1.9,hemiSky:'#f1e4dc',hemiGround:'#7c6857',hemi:.72,
     practical:1.5,emissive:1.2,windows:.15,pet:.9,sky:['#86a3d6','#f6d2b2','#6f7a62'],glow:1,exposure:1.02},
   day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:3.2,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.95,
     practical:1.35,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
-    practical:1.3,emissive:1.7,windows:.35,pet:1.3,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
+    practical:1.15,key:.8,emissive:1.7,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
   night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#1d1914',hemi:.2,
-    practical:1.2,emissive:2.3,windows:1,pet:2.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
+    practical:.95,key:.55,emissive:2.3,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
@@ -68,7 +69,7 @@ function skyEnvironment(pmrem,size){
   const target=pmrem.fromEquirectangular(texture);texture.dispose();return target;
 }
 
-export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}){
+export function createHouseLighting(scene,renderer,{mobile=false,camera=null,petLight:withPetLight=true}={}){
   renderer.shadowMap.enabled=true;
   // Measured: PCF and PCFSoft cost the same here; keep the softer sun edge.
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -101,7 +102,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
   const fills=Array.from({length:1},()=>{
     const light=new THREE.PointLight(0xffdec0,0,7,2);scene.add(light);return light;
   });
-  const petLight=new THREE.PointLight(0xffe2c2,0,3.4,2);scene.add(petLight);
+  const petLight=new THREE.PointLight(0xffe2c2,0,2.8,2);if(withPetLight)scene.add(petLight);
   for(const light of [hemisphere,sun,key,...fills,petLight])light.layers.enable(1);
   const slots=[key,...fills].map(light=>({light,source:null,target:0}));
   const sky=createSky(scene);
@@ -119,8 +120,10 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
   const probes=new Map();
   let sources=[],occluders=[],loaded=false,lastSelection=-Infinity,lastProbe=-Infinity;
   let keyId='',pendingRoom=null,currentRoom='',selection=[],environment=base.texture;
-  let glossy=[],emissive=[],windows=[],clock=null,lastClock=-Infinity;
-  let phaseName='day',weather='sunny',room={outdoor:false,tight:false},mix={hemi:.46,practical:.62,key:1};
+  let glossy=[],emissive=[],windows=[],clock=null,lastClock=-Infinity,probeReady=true;
+  // Start on the phase the HUD clock will report (same rule as engine.js), so
+  // the clock arriving after load does not throw away the first probe.
+  let phaseName=phaseForHour(new Date().getHours()),weather='sunny',room={outdoor:false,tight:false},mix={hemi:.46,practical:.62,key:1};
   const warm=new THREE.Color(),cool=new THREE.Color();
 
   function setEnvironment(texture){
@@ -227,7 +230,9 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
   }
 
   function captureRoom(now,force=false){
-    if(!pendingRoom)return;
+    // Until the probe shaders have compiled in the background, glossy things
+    // keep the sky reflection; capturing earlier would compile them in-frame.
+    if(!pendingRoom||!probeReady)return;
     if(!force&&(now-pendingRoom.since<300||now-lastProbe<1200))return;
     const target=pendingRoom;pendingRoom=null;currentRoom=target.name;
     if(probes.has(target.name)){setEnvironment(probes.get(target.name).texture);return;}
@@ -250,8 +255,11 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
     if(!clock||now-lastClock<2000)return;lastClock=now;
     let next;try{next=clock();}catch{return;}
     const p=typeof next==='string'?next:next?.time,w=typeof next==='object'?next?.weather:weather;
-    if((p&&PHASES[p]&&p!==phaseName)||(w&&w!==weather)){
-      if(p&&PHASES[p])phaseName=p;if(w)weather=w;applyPhase();
+    const phaseChanged=p&&PHASES[p]&&p!==phaseName,weatherChanged=w&&w!==weather;
+    if(phaseChanged||weatherChanged){
+      if(phaseChanged)phaseName=p;if(w)weather=w;
+      // Weather only dims the sun and greys the sky; reflections can stay.
+      applyPhase(!phaseChanged);
     }
   }
   let lastTick=performance.now();
@@ -259,7 +267,8 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
     const dt=Math.min(.25,Math.max(0,(now-lastTick)/1000));lastTick=now;
     const k=1-Math.exp(-dt*5);
     for(const [i,slot] of slots.entries()){
-      const want=slot.target*mix.practical*(i===0?1:.85);
+      // After dark the ceiling light dims and the lamp pools carry the room.
+      const want=slot.target*mix.practical*(i===0?(PHASES[phaseName]?.key??1):.85);
       slot.light.intensity+=(want-slot.light.intensity)*k;
     }
     hemisphere.intensity+=((hemisphere.userData.target??hemisphere.intensity)-hemisphere.intensity)*k;
@@ -277,12 +286,26 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null}={}
       if(loaded){readClock(now);select(position,now);if(allowCapture)captureRoom(now);}
       placePetLight(position);ease(now);
     },
-    // Called once while the house is still loading: compiles the probe
-    // render path and captures the first room so play never starts on a stall.
+    // Start compiling the reflection-probe variant of every house shader (it
+    // renders to a linear half-float target, so three builds separate
+    // programs) in parallel with the screen variants; the first probe used to
+    // compile them synchronously for ~1.5-2 s during loading.
+    warm(){
+      pmrem.compileCubemapShader?.();
+      if(!renderer.compileAsync)return Promise.resolve();
+      probeReady=false;
+      renderer.setRenderTarget(cubeTarget,0);
+      let pending;
+      try{pending=renderer.compileAsync(scene,cube.children[0]);}
+      finally{renderer.setRenderTarget(null);}
+      return pending.catch(()=>{}).then(()=>{probeReady=true;});
+    },
+    // Called once while the house is still loading: captures the first room
+    // so play never starts on a stall.
     prime(position){
       if(!loaded)return;
       select(position,Infinity);captureRoom(performance.now(),true);
-      for(const slot of slots)slot.light.intensity=slot.target*mix.practical;
+      for(const [i,slot] of slots.entries())slot.light.intensity=slot.target*mix.practical*(i===0?(PHASES[phaseName]?.key??1):.85);
       hemisphere.intensity=hemisphere.userData.target??hemisphere.intensity;
       petLight.intensity=petLight.userData.target??0;
     },
