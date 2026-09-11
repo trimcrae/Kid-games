@@ -5,7 +5,7 @@ import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
-import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan} from './companions.mjs';
+import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs';
 import {createGround} from './pet-ground.mjs';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
 import {createEmotes,createSpeech} from './emotes.mjs';
@@ -220,9 +220,44 @@ export async function createHouseLife(tour){
       // floating just above the tallest ears.
       // A constant on-screen size, so a pet right by the camera doesn't wear a giant tag.
       const label=labelSprite(p.pet.name||p.name);label.material.sizeAttenuation=false;label.center.set(.5,0);label.scale.set(.044*label.userData.aspect/PET_SCALE,.044/PET_SCALE,1);label.position.y=.78/PET_SCALE;mesh.add(label);scene.add(mesh);
+      // Drawn over the scene (a door frame never cuts it in half); it's only
+      // shown while its anchor is in plain sight (see the companion loop).
+      label.material.depthTest=false;label.renderOrder=6;
       const c=createCompanion({id:p.id,egg:!!p.pet.egg,host:p.view?{view:p.view,name:p.name}:null,day,night});
-      roamers.push({id:p.id,mesh,label,cameraBounds,c,emote:null,animAt:0,shown:true});
+      roamers.push({id:p.id,mesh,label,labelY:label.position.y,cameraBounds,c,emote:null,animAt:0,shown:true,los:false,losAt:0});
     });
+  }
+  let lastPlace=null,arriveAt=0;const _ndc=new THREE.Vector3();
+  function inSight(r){const cam=tour.camera,p=r.c.point,h=r.cameraBounds.maxY;_ndc.set(p.x,r.mesh.position.y+h*.6,p.z).project(cam);
+    return _ndc.z<1&&Math.abs(_ndc.x)<.9&&Math.abs(_ndc.y)<.9&&[h*.9,h*.5].some(y=>lineOfSight(world.boxes,cam.position,{x:p.x,y:r.mesh.position.y+y,z:p.z}));}
+  function welcomeParty(){
+    const room=$('location').textContent;
+    const here=roamers.filter(r=>!r.c.egg&&!r.c.sleeping&&r.c.day[0]?.room===room&&Math.abs(r.c.point.y-player.y)<.6&&Math.hypot(r.c.point.x-player.x,r.c.point.z-player.z)<7);
+    const r=here.find(r=>familyRooms[r.id]===room)||here[0];if(!r||inSight(r))return;
+    const cam=tour.camera.position,fx=player.x-cam.x,fz=player.z-cam.z,fl=Math.hypot(fx,fz)||1;
+    for(const d of [1.35,1.1,1.6])for(const a of [0,.35,-.35,.6,-.6,.9,-.9]){
+      const ux=(fx*Math.cos(a)-fz*Math.sin(a))/fl,uz=(fx*Math.sin(a)+fz*Math.cos(a))/fl,x=player.x+ux*d,z=player.z+uz*d;
+      const f=freeSpot(world,x,z,player.y,[],0,0);if(!f)continue;
+      const g=Math.hypot(f.x-player.x,f.z-player.z);if(g<.55||g>2.2)continue;
+      _ndc.set(f.x,f.y+.3,f.z).project(tour.camera);if(_ndc.z>1||Math.abs(_ndc.x)>.8||Math.abs(_ndc.y)>.85)continue;
+      if(!lineOfSight(world.boxes,cam,{x:f.x,y:f.y+.4,z:f.z}))continue;
+      f.face=Math.atan2(player.x-f.x,player.z-f.z);callOver(r.c,f);return;
+    }
+  }
+  // A companion's name pill that would sit on a station's bubble lifts just
+  // clear of it, in screen space (the bubbles belong to the HUD; only read).
+  const _pa=new THREE.Vector3(),_pb=new THREE.Vector3();
+  function clearBubble(r){
+    r.label.position.y=r.labelY;
+    const cam=tour.camera,tanH=Math.tan(cam.fov*Math.PI/360);
+    r.label.getWorldPosition(_pa);const depth=_pa.distanceTo(cam.position);_pa.project(cam);
+    const ph=.044/tanH,pw=ph*(r.label.userData.aspect||4)/cam.aspect;
+    for(const m of markers){
+      if(!m.bubble.visible)continue;
+      _pb.copy(m.bubble.position).project(cam);if(_pb.z>1)continue;
+      const bh=m.bubble.scale.y/tanH,bw=m.bubble.scale.x/tanH/cam.aspect;
+      if(Math.abs(_pa.x-_pb.x)<(pw+bw)/2&&_pa.y<_pb.y+bh&&_pa.y+ph>_pb.y){const lift=_pb.y+bh+.012-_pa.y;r.label.position.y+=lift*tanH*depth/PET_SCALE;_pa.y+=lift;}
+    }
   }
   // A shopkeeper's real line from the 2D game (lines.js NPC), for their station.
   function hostLine(view){const lines=frame.contentWindow.CPLines?.NPC?.[view];return lines?.length?lines[Math.floor(Math.random()*lines.length)]:null;}
@@ -448,6 +483,11 @@ export async function createHouseLife(tour){
       // far ones animate a few times a second, and their routines keep ticking
       // slowly so they are where they should be when you arrive.
       const night=engine.timeOfDay?.()==='night',reduced=tour.reducedMotion;let talking=null;
+      // Just arrived in a room (a jump)? If the pet or shopkeeper who lives
+      // here can't be seen from the arrival view, it trots over to say hello.
+      if(lastPlace&&Math.hypot(player.x-lastPlace.x,player.z-lastPlace.z)>1.5)arriveAt=time+.7;
+      lastPlace={x:player.x,y:player.y,z:player.z};
+      if(arriveAt&&time>arriveAt&&active){arriveAt=0;welcomeParty();}
       for(const r of roamers){
         const c=r.c,p=c.point,dy=Math.abs(p.y-player.y),dist=Math.hypot(p.x-player.x,p.z-player.z);
         const inView=dy<1.1?dist<16:dy<2.6&&dist<3.5;
@@ -459,19 +499,32 @@ export async function createHouseLife(tour){
         r.mesh.position.set(p.x,p.y+(onFurniture?0:ground.offset(p,r.mesh.position.y-p.y)),p.z);r.mesh.rotation.y=c.heading;
         const rig=r.mesh.userData.rig;
         if(rig&&!c.egg){rig.setExpression(out.expression);rig.setPose(out.pose);rig.look(...out.look);if(out.hop)rig.hop(out.hop);}
-        else if(rig&&c.egg&&gap<1.4&&!r.wobbled){r.wobbled=true;rig.hop(.6);}else if(gap>2.5)r.wobbled=false;
+        else if(rig&&c.egg&&gap<3&&Math.abs(p.y-player.y)<.6&&!r.wobbled){r.wobbled=true;rig.hop(.6);}else if(gap>4)r.wobbled=false;
         // Far away: animate at ~5 Hz; near: every frame.
         r.animAt+=step;if(!inView||dist<9||r.animAt>.2){r.mesh.userData.animate(time,c.walking,reduced,c.speed);r.animAt=0;}
         // Hide a companion only while its body overlaps the camera's space.
         r.mesh.visible=inView&&!companionBlocksCamera(p,tour.camera.position,r.cameraBounds);
         // Names only for companions you're standing near.
         r.label.visible=r.mesh.visible&&gap>.9&&gap<3.2;
-        if(out.emote||r.emote){r.emote??=createEmotes(scene);headAt.set(p.x,r.mesh.position.y+r.cameraBounds.maxY+.04,p.z);r.emote.update(dt,out.emote,headAt,r.mesh.visible,reduced);}
+        // Pills and bubbles draw over door frames, so they need a clear line
+        // of sight from the camera (checked a few times a second), and a
+        // pill sitting on a station's bubble lifts clear of it.
+        if(r.label.visible||out.emote||r.emote?.showing||hostSpeech.speaker===r){
+          // Any part of the companion in view (head, middle, either side) is
+          // enough: a pet seen past a door jamb gets its whole pill, drawn over
+          // the jamb; one fully behind a wall gets none.
+          r.losAt-=dt;if(r.losAt<=0){r.losAt=.15;const cam=tour.camera.position,y0=r.mesh.position.y,h=r.cameraBounds.maxY,sx=(p.z-cam.z),sz=-(p.x-cam.x),sl=Math.hypot(sx,sz)||1;
+            r.los=[[0,h*.9],[0,h*.5],[.18,h*.5],[-.18,h*.5]].some(([o,y])=>lineOfSight(world.boxes,cam,{x:p.x+sx/sl*o,y:y0+y,z:p.z+sz/sl*o}));}
+        }
+        // No name pill while it's in plain sight but out of view, or while its speech bubble says who it is.
+        if(r.label.visible&&(!r.los||(hostSpeech.speaker===r&&hostSpeech.text)))r.label.visible=false;
+        if(r.label.visible)clearBubble(r);
+        if(out.emote||r.emote){r.emote??=createEmotes(scene);headAt.set(p.x,r.mesh.position.y+r.cameraBounds.maxY+.04,p.z);r.emote.update(dt,out.emote,headAt,r.mesh.visible&&r.los,reduced);}
         // A shopkeeper greeting you says one of their real lines.
         if(c.say&&r.mesh.visible&&active){const line=hostLine(c.say.view);if(line){talking={r,line};}}
       }
       if(talking){const {r,line}=talking;headAt.set(r.c.point.x,r.mesh.position.y+r.cameraBounds.maxY+.12,r.c.point.z);hostSpeech.say(line,headAt.clone());hostSpeech.speaker=r;}
-      {const sp=hostSpeech.speaker;hostSpeech.update(dt,sp?new THREE.Vector3(sp.c.point.x,sp.mesh.position.y+sp.cameraBounds.maxY+.12,sp.c.point.z):null,!!sp?.mesh.visible&&active,tour.reducedMotion);}
+      {const sp=hostSpeech.speaker;hostSpeech.update(dt,sp?new THREE.Vector3(sp.c.point.x,sp.mesh.position.y+sp.cameraBounds.maxY+.12,sp.c.point.z):null,!!sp?.mesh.visible&&sp.los&&active,tour.reducedMotion);}
       // Activity bubbles: in reach (with [E]), or 2–5 m away in the room you're
       // in — not a neighbouring room's glimpsed through an open doorway — plus
       // the "walk there" destination whenever it's in plain sight.

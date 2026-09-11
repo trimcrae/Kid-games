@@ -48,7 +48,7 @@ export const ROUTINES={
   guest:{day:[s('Living room',2.35,2.3,'play')],night:[s('Living room',2.85,2.93,'nap',{up:true})]},
   fen:{day:[s('Back yard',7.5,15.7,'tend',{face:[6.15,15.75]}),s('Back yard',4.8,15.7,'tend',{face:[6.15,15.75]})],night:[s('Back yard',7.5,15.2,'nap')]},
   dizzy:{day:[s('Basement playroom',4.75,2.6,'play'),s('Basement playroom',2.6,3.0,'play')],night:[s('Basement playroom',2.6,3.0,'nap')]},
-  marigold:{day:[s('Garage',-.7,6.3,'stand',{face:[-.7,7.5]}),s('Garage',-.4,3.7,'arrange',{face:[-.4,3.05]})],night:[s('Garage',-.4,3.7,'nap')]},
+  marigold:{day:[s('Garage',-2.7,7.4,'stand',{face:[-1.39,7.62]}),s('Garage',-.4,3.7,'arrange',{face:[-.4,3.05]})],night:[s('Garage',-.4,3.7,'nap')]},
   moss:{day:[s("Mom & Dad's office",1.3,7.2,'read',{up:true,face:[2.96,7.43]})],night:[s("Mom & Dad's office",1.3,7.2,'nap',{up:true})]},
   splish:{day:[s('Sunroom',5.85,9.6,'play'),s('Sunroom',4.3,9.4,'look')],night:[s('Sunroom',5.85,9.6,'nap')]},
   penny:{day:[s("Mom & Dad's office",3.55,6.6,'stand',{face:[3.55,7.2]})],night:[s("Mom & Dad's office",3.55,6.6,'nap')]},
@@ -88,8 +88,10 @@ export function resolveSpots(list,{world,colliders,rooms,avoid}){
     const top=spec.up?furnitureTop(colliders,d.x,d.z,floor):null;
     if(top!==null){
       const stand=freeSpot(world,d.x,d.z,floor,avoid,.45,.2);
+      // On a bed or a seat they face into the room (toward its station), not the wall.
+      const room0=plan(room[2],room[3]);
       if(stand){out.push({room:spec.room,act:spec.act,up:true,x:d.x,y:top,z:d.z,stand,
-        face:look?Math.atan2(look.x-d.x,look.z-d.z):Math.atan2(d.x-stand.x,d.z-stand.z)});continue;}
+        face:look?Math.atan2(look.x-d.x,look.z-d.z):Math.atan2(room0.x-d.x,room0.z-d.z)});continue;}
     }
     const p=freeSpot(world,d.x,d.z,floor,avoid);if(!p)continue;
     const target=look||(Math.hypot(p.x-d.x,p.z-d.z)>.15?d:null);
@@ -121,14 +123,16 @@ export function updateCompanion(c,dt,ctx){
   if(c.egg){c.walking=false;c.speed=0;c.out=out;return {out,gap};}
   // Which list of places applies now; pick a new place when the time comes.
   const list=(night&&c.night.length?c.night:c.day);
-  if(!list.includes(c.spot)||(!night&&c.dwell<=0&&list.length>1&&c.mode==='at')){
+  const visiting=c.spot?.temp&&c.t<c.spot.until;
+  if(!visiting&&(!list.includes(c.spot)||(!night&&c.dwell<=0&&list.length>1&&c.mode==='at'))){
     const choices=list.filter(p=>p!==c.spot);const next=choices.length?choices[Math.floor(random()*choices.length)]:list[0];
     c.dwell=25+random()*25;
     if(next&&next!==c.spot){c.spot=next;goTo(c,next,seen);}
   }
   const spot=c.spot;
   // Make room for your pet: two smooth steps away rather than a shove.
-  if(!c.up&&sameFloor&&gap<.7&&c.mode!=='aside'&&c.mode!=='hop'){
+  // (A pet that came over to greet you stands close on purpose.)
+  if(!c.up&&sameFloor&&gap<(c.spot?.temp?.45:.7)&&c.mode!=='aside'&&c.mode!=='hop'){
     const away=Math.atan2(c.point.x-player.x,c.point.z-player.z);
     c.aside={angle:away,left:Math.max(.25,1-gap),back:3};c.mode='aside';
   }
@@ -138,14 +142,15 @@ export function updateCompanion(c,dt,ctx){
     const moved=Math.hypot(c.point.x-before.x,c.point.z-before.z);c.distance+=moved;
     c.aside.left-=step;c.face=c.aside.angle;c.walking=moved>1e-4;c.speed=moved/Math.max(dt,1e-4);
     if(c.aside.left<=0||moved<step*.3){c.aside.back-=dt;c.walking=false;c.face=Math.atan2(player.x-c.point.x,player.z-c.point.z);
-      if(c.aside.back<=0&&gap>1.2&&spot)goTo(c,spot,seen);}
+      // Then back to its place once you've moved off, or it just stays here and watches you.
+      if(c.aside.back<=0){if(gap>1.2&&spot)goTo(c,spot,seen);else{c.mode='at';c.aside=null;}}}
   }else if(c.mode==='travel'){
     const tgt=c.target,dx=tgt.x-c.point.x,dz=tgt.z-c.point.z,d=Math.hypot(dx,dz);
     if(!seen&&(d>.1||Math.abs(tgt.y-c.point.y)>.3)){Object.assign(c.point,tgt);arrive(c);}
     else if(d<.06){arrive(c);}
     else{
-      const step=Math.min(d,.55*dt),before={...c.point};world.move(c.point,dx/d*step,dz/d*step);
-      const moved=Math.hypot(c.point.x-before.x,c.point.z-before.z);c.distance+=moved;c.walking=true;c.speed=.55;c.face=Math.atan2(dx,dz);
+      const pace=c.spot?.temp?1.1:.55,step=Math.min(d,pace*dt),before={...c.point};world.move(c.point,dx/d*step,dz/d*step);
+      const moved=Math.hypot(c.point.x-before.x,c.point.z-before.z);c.distance+=moved;c.walking=true;c.speed=pace;c.face=Math.atan2(dx,dz);
       c.stuck=moved<step*.3?c.stuck+dt:0;
       if(c.stuck>.8){c.stuck=0;if(!seen){Object.assign(c.point,tgt);arrive(c);}else{c.mode='at';c.walking=false;c.dwell=4;}}
     }
@@ -200,6 +205,34 @@ function arrive(c){
   const spot=c.spot;c.walking=false;c.speed=0;
   if(spot&&spot.up&&!c.up){c.mode='hop';c.standFrom={...spot.stand};c.hop={t:0,from:{...c.point},to:{x:spot.x,y:spot.y,z:spot.z},up:true,then:'at'};return;}
   c.mode='at';if(spot?.face!=null)c.face=spot.face;
-}// Is a point on screen-relevant ground for the player: the same floor and
+}// You just arrived in its room and it can't be seen from where you stand:
+// it trots over to say hello at point (in front of you) and stays a few
+// seconds before going back to what it was doing. Sleepers stay asleep.
+export function callOver(c,point,seconds=9){
+  if(c.egg||c.sleeping||!point)return false;
+  const spot={room:c.spot?.room,act:'look',up:false,x:point.x,y:point.y,z:point.z,stand:{...point},face:point.face??null,temp:true,until:c.t+seconds};
+  c.spot=spot;c.greetIn=0;goTo(c,spot,true);return true;
+}
+// Is a point on screen-relevant ground for the player: the same floor and
 // near enough to be seen (companions elsewhere move without walking).
 export function seenFrom(player,point,range=9){return Math.abs(point.y-player.y)<1.1&&Math.hypot(point.x-player.x,point.z-player.z)<range;}
+
+// Is the segment from the camera to a point clear of every collision box?
+// Name pills and bubbles draw over door frames (no depth test), so they are
+// shown only when their anchor is in plain sight. `stop` leaves the last bit
+// of the way (the companion's own bed or seat) out of the test.
+export function lineOfSight(boxes,a,b,stop=.9){
+  const d=[b.x-a.x,b.y-a.y,b.z-a.z],o=[a.x,a.y,a.z];
+  for(const box of boxes){
+    // A box the camera itself sits in (a coarse furniture or trim box) can't hide anything.
+    if(a.x>=box.min[0]&&a.x<=box.max[0]&&a.y>=box.min[1]&&a.y<=box.max[1]&&a.z>=box.min[2]&&a.z<=box.max[2])continue;
+    let near=0,far=stop,hit=true;
+    for(let i=0;i<3;i++){
+      if(Math.abs(d[i])<1e-9){if(o[i]<box.min[i]||o[i]>box.max[i]){hit=false;break;}continue;}
+      let t1=(box.min[i]-o[i])/d[i],t2=(box.max[i]-o[i])/d[i];if(t1>t2)[t1,t2]=[t2,t1];
+      near=Math.max(near,t1);far=Math.min(far,t2);if(near>far){hit=false;break;}
+    }
+    if(hit&&far>0)return false;
+  }
+  return true;
+}
