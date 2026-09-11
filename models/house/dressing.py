@@ -586,15 +586,15 @@ g, _ = rug_on('Living room coral bordered rug', 2.35, 2.30, .30, 3.2, 2.8, D['cr
                      + [(diamond(x, y, .16), D['mustard']) for x in (-1.12, 1.12) for y in (-.92, .92)], nx=10, ny=8)
 g.done()
 
-g = prop('Living sofa accent cushions', .47, 2.58, 0)
+g = prop('Living sofa accent cushions', .47, 2.28, 0)  # follows the sofa (build.py)
 for dy, mat in [(-.63, D['coral']), (0, D['mustard']), (.62, D['teal'])]:
     g.soft((0, dy, .70), (.13, .42, .40), mat, .05, (0, -.26, 0))
 g.done()
-g = prop('Living sofa arm knit throw', .56, 3.53, 0)
+g = prop('Living sofa arm knit throw', .56, 3.23, 0)
 g.soft((0, 0, .738), (.62, .34, .032), D['rose'], .012)
 g.soft((0, -.172, .60), (.62, .03, .27), D['rose'], .012)
 g.done()
-g = prop('Living tub chair cushion', 2.85, 3.08, 0)
+g = prop('Living tub chair cushion', .99, 3.86, 0, 90)  # follows the chair
 g.soft((0, 0, .64), (.36, .12, .30), D['mustard'], .05, (-.25, 0, 0))
 g.done()
 
@@ -611,8 +611,9 @@ g.box((-.12 - .09, .35, .016), (.18, .24, .004), D['paper'], (0, .08, 0))
 g.cyl((.23, -.42, .045), .033, .09, D['rose'], 12)
 g.done()
 
-z0 = down(.45, 1.25, .30)
-g = prop('Living toy basket', .45, 1.25, z0, blocking=True)
+# The sofa now starts where this basket stood; beside the swing instead.
+z0 = down(1.35, 1.30, .30)
+g = prop('Living toy basket', 1.35, 1.30, z0, blocking=True)
 for x, y, sx, sy in [(-.16, 0, .02, .26), (.16, 0, .02, .26), (0, -.12, .34, .02), (0, .12, .34, .02)]:
     g.box((x, y, .12), (sx, sy, .24), D['kraft'])
 g.box((0, 0, .015), (.32, .24, .03), D['kraft'])
@@ -813,8 +814,8 @@ for k, motif in enumerate(['rainbow', 'sun_house', 'flower', 'pet', 'heart']):
     art(g, 0, 0, .20, .26, motif, 0, False, at=(x, -.034, -sag - .135), rot=(0, _rng.uniform(-.06, .06), 0))
     g.box((x, -.04, -sag - .005), (.014, .012, .04), D['wood'])
 g.done()
-g = prop('Sunroom etagere shelf baskets books and plant', 5.83, 8.46, 0)
-zs1, zs2, zs3, zs4 = (down(5.83, 8.46, z) for z in (.25, .66, 1.08, 1.47))
+g = prop('Sunroom etagere shelf baskets books and plant', 6.95, 8.38, 0)  # follows the etagere
+zs1, zs2, zs3, zs4 = (down(6.95, 8.38, z) for z in (.25, .66, 1.08, 1.47))
 book_row(g, -.26, .02, zs1, .50, .20, hmin=.16, hmax=.24)
 for dx, mat in [(-.14, D['coral']), (.14, D['teal'])]:
     g.cyl((dx, .02, zs2 + .06), .10, .12, D['kraft'], 12, top=.11, caps=(True, False))
@@ -1117,8 +1118,8 @@ g, zrug = rug_on('Family room teal geometric rug', 12.60, 2.20, -.80, 2.2, 1.6, 
                           (-.93, -.63, -.90, .63, D['cream']), (.90, -.63, .93, .63, D['cream'])],
                  motifs=[(diamond(x, y, .10), D['mustard']) for x in (-.78, .78) for y in (-.47, .47)], nx=8, ny=6)
 g.done()
-zt = down(12.47, 2.27, -.25)
-g = prop('Family room board game in progress', 12.47, 2.27, zt)
+zt = down(12.91, 1.60, -.25)  # on the coffee table, which now stands at the sofa
+g = prop('Family room board game in progress', 12.91, 1.60, zt)
 g.box((0, -.05, .003), (.36, .36, .006), D['paper'])
 for (dx, dy), mat in zip([(-.085, -.135), (.085, -.135), (-.085, .035), (.085, .035)],
                          [D['coral'], D['mustard'], D['teal'], D['corn']]):
@@ -1130,7 +1131,7 @@ for x, y, mat in [(-.17, .30, D['coral']), (.15, .33, D['teal'])]:
     g.cyl((x, y, .045), .038, .09, mat, 12)
     g.box((x + .045, y, .05), (.012, .02, .05), mat)
 g.done()
-g = prop('Family sofa throw and cushions', 12.85, .12, -1.05)
+g = prop('Family sofa throw and cushions', 12.85, .20, -1.05)
 g.soft((0, 0, 1.055), (.90, .20, .03), D['mustard'], .012)
 g.soft((0, .115, .85), (.90, .03, .40), D['mustard'], .012)
 for x, mat in [(-.45, D['coral']), (.55, D['cream'])]:
@@ -1615,7 +1616,7 @@ for h, mat in [(.80, D['corn']), (1.02, D['rose']), (1.17, D['mustard']), (1.27,
     z = h - .80
     g.vflat([(0, z - .018), (.075, z - .018), (.095, z), (.075, z + .018), (0, z + .018)], -.018, mat)
 g.done()
-clock('Living clock above the television', 2.25, 3.60, 2.15, (0, 1, 0), .16)
+clock('Living clock above the television', 2.32, 3.60, 2.15, (0, 1, 0), .16)
 g = wall_prop('Living front window curtains', 2.175, .80, 1.50, (0, -1, 0))
 for x in (-1.595, 1.595):
     g.soft((x, -.14, -.025), (.24, .05, 1.65), D['cream'], .02)

@@ -588,18 +588,30 @@ collection('04 | Windows and front door')
 window('Front living left window', (1.40, -.045, 1.43), 1.40, 1.62, 180)
 window('Front living right window', (2.95, -.045, 1.43), 1.40, 1.62, 180)
 window('Entry side window', (6.64, -1.845, 1.65), .72, .72, 180)
-window('House rear window visible from sunroom', (1.695, 8.17, 1.44), 1.95, 1.60, 180)
-asset('Red three-panel front door', (5.10, -.90, 0), 90, '7; House Tour 24.003/39.005s',
+# House Tour 61.780s: the white shade hangs inside the kitchen. Seat the window
+# in the wall plane (was Y 8.17, 6 cm outside it) facing the kitchen (was 180),
+# and drop only this window's inner sill, which would cut into the cubby worktop.
+window('House rear window visible from sunroom', (1.695, 8.04, 1.44), 1.95, 1.60, 0)
+for _o in list(ROOT.children):
+    if _o.name.startswith('Sill'):
+        bpy.data.objects.remove(_o, do_unlink=True)
+asset('Red three-panel front door', (5.10, -.90, 0), 90, '7; House Tour 24.003/39.005/44.007/90.525s',
       'perpendicular return confirmed in video; dimensions estimated')
 box('Red door slab', (0, 0, 1.065), (.98, .07, 2.13), red)
+# House Tour 44.007s (outside, door ajar) and 90.525s (inside, door open against
+# the entry-window wall) both show the raised panels, rosettes, knob and deadbolt
+# on the face that is OUTSIDE when closed: local +Y here (world -X). The hinge is
+# on the south jamb, so the knob sits at the north edge, local +x.
+# export_walkthrough.py opens the leaf about local x -.49.
 for z in [.40, 1.04, 1.68]:
-    panel('Red raised panel', 0, -.05, z, .76, .49, red)
+    box('Red raised panel', (0, .05, z), (.76, .035, .49), red, .008)
+    box('Red raised panel raised inset', (0, .075, z), (.66, .018, .39), red, .012)
     # Small inset rosette motif in each of the photographed three panels.
     for i in range(8):
         a = i * math.tau / 8
-        sphere('Door rosette petal', (.038 * math.cos(a), -.084, z + .038 * math.sin(a)), (.018, .008, .027), red)
-sphere('Brass entry knob', (-.37, -.10, 1.0), (.035, .035, .035), brass)
-cylinder('Deadbolt', (-.37, -.09, 1.16), .032, .025, brass).rotation_euler.x = math.pi / 2
+        sphere('Door rosette petal', (.038 * math.cos(a), .084, z + .038 * math.sin(a)), (.018, .008, .027), red)
+sphere('Brass entry knob', (.37, .10, 1.0), (.035, .035, .035), brass)
+cylinder('Deadbolt', (.37, .09, 1.16), .032, .025, brass).rotation_euler.x = math.pi / 2
 for x in [-.54, .54]:
     box('Front door white casing', (x, -.01, 1.1), (.07, .10, 2.2), white)
 box('Front door white header', (0, -.01, 2.18), (1.14, .10, .07), white)
@@ -686,16 +698,21 @@ for x in [-.62, -.08]:
     for y in [-.14, .04]:
         rod('Swing rope', (x, y, .44), (x, y, 1.8), .008, rope)
 
-sofa('Wicker sunroom loveseat', (6.77, 9.00, -.08), 1.65, bluegrey, -90, '3,5', True)
-sofa('Wicker sunroom armchair', (6.80, 10.57, -.08), .88, bluegrey, -90, '3,5', True)
-table('Wicker side table', (5.83, 10.72, -.08), (.58, .56, .49), wicker, photos='5')
+# H65.748/H85.523/H86.523: the etagere stands in the east corner against the
+# house wall, a wall strip away from the slider, and the seats begin past it.
+# The seats, side table and lamp move north only as far as that needs (were
+# Y 9.00, 10.57, 10.72 and 9.98). The slider itself is unchanged (unmeasured).
+sofa('Wicker sunroom loveseat', (6.77, 9.37, -.08), 1.65, bluegrey, -90, '3,5', True)
+sofa('Wicker sunroom armchair', (6.80, 10.85, -.08), .88, bluegrey, -90, '3,5', True)
+table('Wicker side table', (5.83, 11.00, -.08), (.58, .56, .49), wicker, photos='5')
 # H78/81/84 place the lamp farther toward the house along the side glazing.
 # Fit it between the existing wicker seats; position and height are estimates.
 # Turning the arms along the glazing keeps both cups inside the room.
-lamp('Two-cup adjustable sunroom floor lamp', (7.12, 9.98, -.08), 1.78, 90,
+lamp('Two-cup adjustable sunroom floor lamp', (7.12, 10.30, -.08), 1.78, 90,
      photos='3,5; House Tour 78.020/81.022/84.023s', double=True)
 ROOT['confidence'] = ASSETS[-1]['confidence'] = 'houseward side-glazing position observed; offset, height and arm angle estimated'
-asset('Arched wicker etagere', (5.83, 8.42, -.08), 180, '4')
+# Was (5.83, 8.42), 1.3 m from the corner and 0.24 m into the doorway width.
+asset('Arched wicker etagere', (6.95, 8.34, -.08), 180, '4; House Tour 77.520/85.523/86.523s')
 for x in [-.31, .31]:
     rod('Etagere upright', (x, .13, 0), (x, .13, 1.43), .025, wicker)
 curve('Arched crown', [(.31 * math.cos(t * math.pi / 32), .13, 1.43 + .31 * math.sin(t * math.pi / 32))
@@ -706,7 +723,10 @@ for i in range(17):
     x = -.28 + i * .035
     rod('Wicker backing', (x, .16, .1), (x, .16, 1.43 + math.sqrt(max(0, .31 ** 2 - x ** 2))), .005, rattan)
 # Large plastic playhouse is permanent play furniture in the references.
-asset('Small sunroom playhouse', (1.38, 8.65, -.08), 0, '1,5')
+# House Tour 64.748/86.523s: its door and arched opening face into the
+# sunroom, with the back against the house siding (angle 180; was 0, which
+# put the doorway 10 cm from the wall). Position is unchanged.
+asset('Small sunroom playhouse', (1.38, 8.65, -.08), 180, '1,5; House Tour 64.748/86.523s')
 playwall = material('Playhouse warm beige plastic', (.68, .61, .44), .6)
 roofgreen = material('Playhouse dark green roof', (.014, .17, .13), .42)
 box('Playhouse left wall', (-.40, 0, .50), (.075, .85, 1), playwall)
@@ -867,9 +887,18 @@ collection('09 | Living room furniture')
 living_taupe = material('Living sofa taupe upholstery', (.28, .255, .22), .86, texture='fabric')
 tub_taupe = material('Living tub chair warm taupe upholstery', (.34, .275, .21), .88, texture='fabric')
 child_navy = material('Living child lounge navy upholstery', (.018, .030, .075), .90, texture='fabric')
-living_sofa('Main oatmeal three-seat sofa', (.55, 2.55, .018), 2.25, living_taupe, 90)
+# House Tour 50.008/53.510s: the computer desk abuts the sofa's left arm and the
+# mirror hangs over the sofa's right half. 30 cm toward the desk (was Y 2.55)
+# also clears the cupboard, which the right arm used to cut into, and opens the
+# corner the tub chair occupies in the video.
+living_sofa('Main oatmeal three-seat sofa', (.55, 2.25, .018), 2.25, living_taupe, 90)
 child_lounge('Child-sized blue sofa', (2.35, .52, .018), 1.42, child_navy, 180)
-living_tub_chair('Living upholstered armchair', (2.85, 3.00, .018), tub_taupe)
+# H50.008/H51.008/H53.510/H54.010: the tub chair stands just past the sofa's
+# right arm in front of the cupboard, facing into the room toward the entry
+# (was mid-room at (2.85, 3.00) facing the windows with its back to the TV).
+# With the TV cabinet kept at 1.77 m there is no room to turn it the observed
+# ~30 degrees toward the windows, so it faces the entry squarely.
+living_tub_chair('Living upholstered armchair', (1.07, 3.86, .018), tub_taupe, 90)
 table('White tray activity table', (1.82, 2.30, .018), (1.36, .82, .49), white, 90, '8')
 for x in [-.66, .66]:
     box('Raised tray side', (x, 0, .55), (.028, .82, .14), white)
@@ -890,7 +919,9 @@ for x in [-.20,.20]:
     rod('Computer chair rear frame',(x,.18,.02),(x,.18,.89),.013,white)
 for z in [.64,.76,.88]:rod('Computer chair back rail',(-.2,.18,z),(.2,.18,z),.014,white)
 lamp('Living table lamp', (.25, 1.04, .76), .61, photos='House Tour 51.008s')
-lamp('Brass living floor lamp', (3.58, 3.10, .018), 1.69, photos='7,8')
+# H47.507/H90.525: beside the TV cabinet at the partition/pier corner (was
+# (3.58, 3.10), 0.9 m out in the room).
+lamp('Brass living floor lamp', (3.42, 4.05, .018), 1.69, photos='7,8; House Tour 47.507/90.525s')
 asset('Large framed living room mirror', (.065, 2.55, 1.78), 90, '8')
 frame('Dark beveled mirror frame', (0, 0, 0), 1.44, .93, walnut)
 frame('Inner brass mirror bead', (0, -.043, 0), 1.31, .80, brass)
@@ -920,7 +951,8 @@ for x in [-.205,.205]:
     sphere('Cupboard brass handle',(x*.20,-.365,1.02),(.019,.018,.025),brass)
 # H48.007 resolves three broad lower drawer rows beneath the open AV bay,
 # in dark brown wood. Keep the prior estimated overall footprint/TV height.
-asset('Living television media cabinet',(2.25,4.08,.018),0,'House Tour 48.007s,54.010s',
+# 7 cm toward the pier end (was X 2.25) to clear the moved tub chair; size kept.
+asset('Living television media cabinet',(2.32,4.08,.018),0,'House Tour 48.007s,54.010s',
       'dark wood, open upper shelving and three broad drawer rows observed; dimensions estimated')
 box('Media cabinet lower carcass',(0,0,.205),(1.72,.43,.37),walnut,.014)
 for x in [-.835,.835]:
@@ -935,18 +967,24 @@ for z in [.09,.205,.32]:
         for dx in [-.055,.055]:
             rod('Media drawer pull mounting',(x+dx,-.255,z),(x+dx,-.282,z),.005,steel)
         rod('Media drawer horizontal pull',(x-.055,-.285,z),(x+.055,-.285,z),.006,steel)
-asset('Living large television',(2.25,4.08,.018),0,'House Tour 54.010s')
+asset('Living large television',(2.32,4.08,.018),0,'House Tour 54.010s')
 box('Large TV bezel',(0,0,1.12),(1.47,.075,.85),black,.018)
 box('Large TV dark screen',(0,-.043,1.12),(1.42,.009,.80),screen,.01)
 for x in [-.50,.50]:rod('TV angled foot',(x,0,.75),(x+.09,-.15,.65),.013,black)
-asset('Living dollhouse shelf',(.93,4.03,.018),0,'House Tour 54.010s')
+# H50.008/H53.510: the dollhouse stands between the tub chair and the TV unit,
+# open side to the room. The 1.77 m TV cabinet (the video unit is narrower)
+# leaves no partition length for it beside the chair, so it keeps that order
+# standing just in front of the cabinet's left end (was (.93, 4.03), which cut
+# into the cupboard and now holds the chair).
+asset('Living dollhouse shelf',(1.82,3.565,.018),0,'House Tour 50.008/53.510/54.010s')
 for x in [-.37,.37]:box('Dollhouse side',(x,0,.55),(.035,.40,1.10),white)
 for z in [.05,.42,.78,1.11]:box('Dollhouse shelf',(0,0,z),(.77,.42,.03),white)
 box('Dollhouse back',(0,.20,.58),(.76,.025,1.13),cream)
 
 # Permanent baby furniture is retained; loose toys, clothing, food and people
 # are deliberately absent from this clean architectural study.
-asset('Living baby swing', (1.10, .78, .018), -20, '8')
+# 10 cm each way (was (1.10, .78)) so its rear foot clears the moved sofa arm.
+asset('Living baby swing', (1.20, .68, .018), -20, '8')
 for x in [-.34, .34]:
     curve('White swing A-frame', [(x, -.40, .03), (x, -.34, .05), (x, .03, 1.07),
                                   (x, .12, 1.11), (x, .45, .03)], .018, white)
@@ -1113,8 +1151,11 @@ for y, d in [(-3.47, .60), (-1.2, .20), (1.0, .60)]:
 for i in range(24):
     box('Vertical timber wainscot', (-1.25 + i * .196, -3.676, -.59), (.19, .025, .91), oak, .002)
 box('Wainscot cap', (1, -3.65, -.12), (4.65, .07, .06), walnut)
-window('Lower room side window A', (3.36, -2.28, .36), 1.85, 1.4, 90, True, True)
-window('Lower room side window B', (3.36, -.14, .36), 1.85, 1.4, 90, True, True)
+# House Tour 168.748/170.250s: the shades hang inside the family room. The
+# sill, sash rails and pleated blind are on window() local -Y, so -90 (was 90)
+# puts them on the room side after the transforms below.
+window('Lower room side window A', (3.36, -2.28, .36), 1.85, 1.4, -90, True, True)
+window('Lower room side window B', (3.36, -.14, .36), 1.85, 1.4, -90, True, True)
 asset('Fireplace with white surround and wood mantel', (1.0, -3.55, -1.04), 180, '10')
 box('Chimney breast', (0, .02, .78), (1.90, .22, 1.57), oak)
 box('Black firebox opening', (0, -.107, .59), (1.16, .02, 1.11), black)
@@ -1134,10 +1175,15 @@ box('Television over fireplace', (0, .015, 1.86), (1.65, .08, .62), black)
 box('Television display', (0, -.03, 1.86), (1.58, .012, .56), screen)
 
 collection('13 | Lower family room furniture')
-sofa('Lower blue sofa', (2.83, -1.92, -1.025), 1.91, bluegrey, -90, '9,10')
+# 8 cm clear of the window sills now that they sit on the room side (local
+# x maps to world -Y here; was 2.83). Its throw in dressing.py moves with it.
+sofa('Lower blue sofa', (2.75, -1.92, -1.025), 1.91, bluegrey, -90, '9,10')
 sofa('Lower olive lounge chair', (2.61, .17, -1.025), 1.04, green, -90, '9,10')
 sofa('Lower dark recliner', (.06, -1.66, -1.025), .86, black, -70, '10')
-table('Lower dark wood coffee table', (1.03, -1.49, -1.025), (.91, .61, .47), walnut, photos='10')
+# H168.748/H174.752: directly in front of the blue sofa. Local (1.70, -1.92)
+# is world (12.91, 1.60) after the transforms below (was world (12.48, 2.27),
+# 1.3 m out from the sofa). Its board game in dressing.py follows.
+table('Lower dark wood coffee table', (1.70, -1.92, -1.025), (.91, .61, .47), walnut, photos='10; House Tour 168.748/174.752s')
 asset('Lower cubby storage', (2.50, -3.38, -1.025), 180, '10')
 for x in [-.53, 0, .53]:
     box('Cubby upright', (x, 0, 1.01), (.05, .35, 2.02), walnut)

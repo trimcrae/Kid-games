@@ -211,14 +211,19 @@ for name in ['Upright wood piano','Piano bench']:
     for child in list(obsolete.children):bpy.data.objects.remove(child,do_unlink=True)
     bpy.data.objects.remove(obsolete,do_unlink=True)
     ASSETS[:]=[entry for entry in ASSETS if entry['name']!=name]
-asset('Lower adjustable gymnastics bar',(11.20,.95,-1.025),0,'V6,V7')
+# House Tour 168.748/170.250/172.517s put the tan chaise beside the piano with
+# its back to the front window wall; the cushion and bar step north-east out of
+# that spot (were at (11.20, .95)). Their axis is unverified and kept.
+asset('Lower adjustable gymnastics bar',(11.30,1.50,-1.025),0,'V6,V7')
 for x in [-.77,.77]:
     rod('Gym bar foot',(x,-.50,.04),(x,.50,.04),.026,bluegrey)
     rod('Gym bar upright',(x,0,.04),(x,0,1.55),.024,bluegrey)
 rod('Gym horizontal practice bar',(-.77,0,1.55),(.77,0,1.55),.022,oak)
-asset('Lower green floor gym cushion',(11.20,.95,-1.0),0,'V6')
+asset('Lower green floor gym cushion',(11.30,1.50,-1.0),0,'V6')
 box('Clean folded green floor cushion',(0,0,.15),(1.38,.75,.30),green,.09)
-asset('Lower tan armless lounge seat',(11.13,1.98,-1.025),90,'V6')
+# Beside the piano, backrest to the front wall, seat facing into the room (was
+# (11.13, 1.98) at the stair foot facing +X). Clears the window sills by 1.5 cm.
+asset('Lower tan armless lounge seat',(10.97,.48,-1.025),180,'V6; House Tour 168.748/170.250/172.517s')
 box('Tan lounge seat cushion',(0,0,.37),(.70,.68,.19),linen,.075)
 box('Tan armless seat back',(0,.29,.64),(.70,.13,.62),linen,.06)
 for x in [-.26,.26]:

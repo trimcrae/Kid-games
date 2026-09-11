@@ -430,9 +430,11 @@ framed_opening('Garage rear sectional opening',(-5.00,8.1,-.16),2.80,2.26,180,'H
 for i in range(5):
     z=.226+i*.452
     box('Rear sectional white panel',(0,0,z),(2.70,.045,.438),white,.01)
-    # A vertical stack of small dark glazed insets near one edge.
-    box('Rear sectional inset frame',(-.92,.028,z),(.35,.016,.27),black,.02)
-    box('Rear sectional inset glass',(-.92,.04,z),(.30,.008,.22),glass,.01)
+    # A vertical stack of small dark glazed insets near one edge: the WEST
+    # edge, away from the pedestrian door (Backyard tour 18.008s; House Tour
+    # 29.505-33.505s). Local +x is world -X at this door's 180 degree turn.
+    box('Rear sectional inset frame',(.92,.028,z),(.35,.016,.27),black,.02)
+    box('Rear sectional inset glass',(.92,.04,z),(.30,.008,.22),glass,.01)
 window('Garage rear window',(-1.30,8.11,1.30),1.00,1.00,180,False,False)
 framed_opening('Garage glazed side door',(-2.775,8.1,-.16),.95,2.23,180,'W2,W3; House Tour 33s',)
 box('Side door lower panel',(0,0,.41),(.85,.045,.76),white)
@@ -445,7 +447,10 @@ asset('Garage wall tool board',(-6.79,3.10,.15),90,'W1,W2')
 box('Timber tool board',(0,0,1.05),(1.8,.05,1.22),joistmat)
 for x in [-.6,-.2,.2,.6]:
     rod('Empty tool hook',(x,-.03,1.4),(x,-.15,1.4),.012,black)
-asset('Kitchen garage coat hooks',(.05,7.90,0),180,'W3')
+# House Tour 61.780s: coats hang on the kitchen's rear wall beside the garage
+# door, hooks pointing into the kitchen. Angle 0 (was 180, hooks into the
+# wall) and X .44 (was .05, which ran the rail into the garage doorway).
+asset('Kitchen garage coat hooks',(.44,7.93,0),0,'W3; House Tour 61.780s')
 for z in [.65,1.20,1.75]:
     box('Timber coat hook rail',(0,0,z),(.88,.04,.08),oak)
     for x in [-.31,0,.31]:curve('Empty coat hook',[(x,-.025,z),(x,-.07,z-.04),(x,-.10,z-.02)],.009,black)
