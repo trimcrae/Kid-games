@@ -33,11 +33,17 @@ camera.rotation.order='YXZ';
 // A game lens rather than an interior-photography one: about 82° across on
 // any screen shape, which is ~57° vertical at 16:10. Portrait phones keep the
 // old 70° cap, so the widest near plane the clearance test assumes still holds.
+// In a tight spot, where the boom is short, the lens eases wider (up to the
+// same 70° cap), so the pet doesn't fill the screen and more of the room shows.
+let baseFov=57,lensFov=57;
 function fitLens(){
   camera.aspect=innerWidth/innerHeight;
-  camera.fov=THREE.MathUtils.clamp(2*Math.atan(Math.tan(41*Math.PI/180)/camera.aspect)*180/Math.PI,50,70);
+  baseFov=THREE.MathUtils.clamp(2*Math.atan(Math.tan(41*Math.PI/180)/camera.aspect)*180/Math.PI,50,70);
+  camera.fov=lensFov=baseFov;
   camera.updateProjectionMatrix();
 }
+// Near-plane clearance for the widest lens the camera may ease to.
+function lensClearance(){const fov=camera.fov;camera.fov=Math.min(70,baseFov+13);const reach=nearPlaneReach(camera);camera.fov=fov;return reach+.015;}
 fitLens();
 // Renderer look and cost. ?aa=fxaa|msaa|off and ?tone=agx/neutral for QA.
 const query=new URLSearchParams(location.search);
@@ -71,7 +77,7 @@ try {
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
 if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 
-let guard=null,cameraClearance=nearPlaneReach(camera)+.015;
+let guard=null,cameraClearance=lensClearance();
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null;
 // The eased follow-camera state: crane swing and boom length.
@@ -254,7 +260,7 @@ joystick.addEventListener('pointerdown',e=>{if(!active)return;joyId=e.pointerId;
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
 function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';if(joystick.classList.contains('floating')){joystick.classList.remove('floating');joystick.style.left=joystick.style.top=joystick.style.bottom='';}}
 joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
-window.addEventListener('resize',()=>{fitLens();cameraClearance=nearPlaneReach(camera)+.015;renderer.setSize(innerWidth,innerHeight);});
+window.addEventListener('resize',()=>{fitLens();cameraClearance=lensClearance();renderer.setSize(innerWidth,innerHeight);});
 // Follow camera. The guard's answer is where the camera may go this frame; it
 // pulls in at once but eases back out and swings up/down smoothly, so walking
 // past a door jamb no longer pops the view by a metre in one frame. Anything
@@ -296,6 +302,10 @@ function render(){
   lighting.tick(player,now,ready);
   const view=placeCamera(dt);
   camera.position.set(view.position.x,view.position.y,view.position.z);camera.lookAt(view.target.x,view.target.y,view.target.z);
+  const boom=Math.hypot(view.position.x-view.target.x,view.position.y-view.target.y,view.position.z-view.target.z);
+  const wantFov=baseFov+THREE.MathUtils.clamp((1.4-boom)/.8,0,1)*(Math.min(70,baseFov+13)-baseFov);
+  lensFov+=(wantFov-lensFov)*(reducedMotion?1:1-Math.exp(-dt*4));
+  if(Math.abs(camera.fov-lensFov)>.05){camera.fov=lensFov;camera.updateProjectionMatrix();}
   renderer.render(scene,camera);
 }
 function updateLocation(){
