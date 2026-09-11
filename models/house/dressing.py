@@ -1128,7 +1128,7 @@ for x, y, mat in [(-.17, .30, D['coral']), (.15, .33, D['teal'])]:
     g.cyl((x, y, .045), .038, .09, mat, 12)
     g.box((x + .045, y, .05), (.012, .02, .05), mat)
 g.done()
-g = prop('Family sofa throw and cushions', 12.85, .12, -1.05)
+g = prop('Family sofa throw and cushions', 12.85, .20, -1.05)
 g.soft((0, 0, 1.055), (.90, .20, .03), D['mustard'], .012)
 g.soft((0, .115, .85), (.90, .03, .40), D['mustard'], .012)
 for x, mat in [(-.45, D['coral']), (.55, D['cream'])]:

@@ -706,7 +706,10 @@ for i in range(17):
     x = -.28 + i * .035
     rod('Wicker backing', (x, .16, .1), (x, .16, 1.43 + math.sqrt(max(0, .31 ** 2 - x ** 2))), .005, rattan)
 # Large plastic playhouse is permanent play furniture in the references.
-asset('Small sunroom playhouse', (1.38, 8.65, -.08), 0, '1,5')
+# House Tour 64.748/86.523s: its door and arched opening face into the
+# sunroom, with the back against the house siding (angle 180; was 0, which
+# put the doorway 10 cm from the wall). Position is unchanged.
+asset('Small sunroom playhouse', (1.38, 8.65, -.08), 180, '1,5; House Tour 64.748/86.523s')
 playwall = material('Playhouse warm beige plastic', (.68, .61, .44), .6)
 roofgreen = material('Playhouse dark green roof', (.014, .17, .13), .42)
 box('Playhouse left wall', (-.40, 0, .50), (.075, .85, 1), playwall)
@@ -1113,8 +1116,11 @@ for y, d in [(-3.47, .60), (-1.2, .20), (1.0, .60)]:
 for i in range(24):
     box('Vertical timber wainscot', (-1.25 + i * .196, -3.676, -.59), (.19, .025, .91), oak, .002)
 box('Wainscot cap', (1, -3.65, -.12), (4.65, .07, .06), walnut)
-window('Lower room side window A', (3.36, -2.28, .36), 1.85, 1.4, 90, True, True)
-window('Lower room side window B', (3.36, -.14, .36), 1.85, 1.4, 90, True, True)
+# House Tour 168.748/170.250s: the shades hang inside the family room. The
+# sill, sash rails and pleated blind are on window() local -Y, so -90 (was 90)
+# puts them on the room side after the transforms below.
+window('Lower room side window A', (3.36, -2.28, .36), 1.85, 1.4, -90, True, True)
+window('Lower room side window B', (3.36, -.14, .36), 1.85, 1.4, -90, True, True)
 asset('Fireplace with white surround and wood mantel', (1.0, -3.55, -1.04), 180, '10')
 box('Chimney breast', (0, .02, .78), (1.90, .22, 1.57), oak)
 box('Black firebox opening', (0, -.107, .59), (1.16, .02, 1.11), black)
@@ -1134,7 +1140,9 @@ box('Television over fireplace', (0, .015, 1.86), (1.65, .08, .62), black)
 box('Television display', (0, -.03, 1.86), (1.58, .012, .56), screen)
 
 collection('13 | Lower family room furniture')
-sofa('Lower blue sofa', (2.83, -1.92, -1.025), 1.91, bluegrey, -90, '9,10')
+# 8 cm clear of the window sills now that they sit on the room side (local
+# x maps to world -Y here; was 2.83). Its throw in dressing.py moves with it.
+sofa('Lower blue sofa', (2.75, -1.92, -1.025), 1.91, bluegrey, -90, '9,10')
 sofa('Lower olive lounge chair', (2.61, .17, -1.025), 1.04, green, -90, '9,10')
 sofa('Lower dark recliner', (.06, -1.66, -1.025), .86, black, -70, '10')
 table('Lower dark wood coffee table', (1.03, -1.49, -1.025), (.91, .61, .47), walnut, photos='10')
