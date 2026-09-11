@@ -90,7 +90,10 @@ asset('Lower bedroom hall floor',photos='V6,V8')
 box('Hall carpet',(11.50,5.62,.015),(1.30,2.05,.04),carpet)
 asset('Lower side hall walls',photos='V8')
 partition('Hall west wood trim wall',(10.85,4.67),(10.85,6.64),white,[(1.1,1.96,0,2.05)],height=2.21)
-upper_door('Pink bedroom shared entry doorway',(10.85,6.20,0),90,'V8,W10')
+# No leaf: the doorway sits 0.2 m from the pink room's front wall, so the
+# folded-back leaf ran through that wall, and House Tour 185.5-186.5s shows no
+# leaf against the entry wall inside; the real swing is not seen.
+upper_door('Pink bedroom shared entry doorway',(10.85,6.20,0),90,'V8,W10; House Tour 185.525/186.025s',leaf=False)
 asset('Lower hall east partition',photos='V8')
 partition('Hall east wood trim wall',(12.15,4.67),(12.15,6.64),white,[(.60,1.46,0,2.05)],height=2.21)
 upper_door('Lower white bedroom shared entry doorway',(12.15,5.70,0),90,'V8-V10; homeowner confirmation')

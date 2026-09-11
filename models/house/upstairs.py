@@ -57,7 +57,7 @@ def partition(name, a, b, mat=bed_wall, openings=(), height=2.38):
     piece(cursor, length, 0, .09, True)
 
 
-def upper_door(name, pos, angle, photos):
+def upper_door(name, pos, angle, photos, leaf=True):
     asset(name, pos, angle, photos, 'doorway observed; size estimated')
     for x in [-.46, .46]:
         box('White door architrave', (x, 0, 1.015), (.065, .17, 2.03), white)
@@ -68,7 +68,7 @@ def upper_door(name, pos, angle, photos):
         for i in range(9):
             box('Tied-back grey doorway curtain',(.31+i*.017,.09+.02*math.cos(i),1.02),
                 (.025,.032,1.99),curtainmat,.008)
-    else:
+    elif leaf:
         # Fold the leaf back against the wall to keep the room view open.
         box('Open white door leaf', (-.89, .08, 1), (.84, .045, 2), white)
         sphere('Brass door knob', (-1.22, .12, .98), (.027, .027, .027), brass)
