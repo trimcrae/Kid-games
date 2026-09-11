@@ -11,10 +11,13 @@ const SURFACES={wood:1,fabric:2,carpet:2,blocks:3,siding:4,shakes:5,roof:6,
 // They are generated once per finish family, shared by every matching material,
 // mipmapped for distant surfaces, and sampled in world metres rather than UVs.
 const tiles=new Map();
+// Paint and glazed ceramic (family 10) carry no bump: at a metre from the lens
+// its millimetre grain turned a door or wall lit at a grazing angle into
+// speckle, and the style plan wants big painted planes smooth.
 const tileSettings={
   0:[1,1,0],1:[3.2,.4,.00055],2:[.12,.12,.0012],3:[.812,.406,.0025],
   4:[2,.4,.0018],5:[.32,.56,.0025],6:[.68,.29,.0025],7:[4,4,.002],
-  8:[.6,.6,.001],9:[1.6,1.6,0],10:[.1,.1,.00018],11:[.3,.12,.00012],
+  8:[.6,.6,.001],9:[1.6,1.6,0],10:[.1,.1,0],11:[.3,.12,.00012],
   12:[1,1,0],13:[1.2,.6,.0015],
 };
 const seedPixels=new Uint8Array(128*128);
