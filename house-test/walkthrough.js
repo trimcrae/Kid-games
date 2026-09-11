@@ -76,17 +76,21 @@ let lockWanted=false,lockPending=false,lockDenied=false,lockFair=false,lastUnloc
 const CAPTURED_HINT='Mouse to aim · WASD to walk · E to interact · R for rooms · Esc to release';
 const CLICK_HINT='Click the view to capture the mouse · WASD to walk';
 const DRAG_HINT='Mouse capture was blocked here, so hold the button and drag to look. For full game-style mouse look, open this page in a regular Chrome or Edge tab';
+// The hint line only shows when it asks for something (a click to capture the
+// mouse, or the drag fallback). Everyday controls are taught by one-off coach
+// marks in house-life.mjs instead of a permanent line of shortcuts.
+function setHint(text,show=false){const h=$('hint');h.textContent=text;h.toggleAttribute('data-show',show);}
 // Only a refusal of a fair request — made from a click, not straight after an
 // unlock — means the host blocks capture. Anything else just needs a click.
 function lockFailed(){
   document.body.classList.remove('mouse-look');
   if(lockFair)lockDenied=true;
-  if(active)$('hint').textContent=lockDenied?DRAG_HINT:CLICK_HINT;
+  if(active)setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);
 }
 async function captureMouse(){
   if(!finePointer()||!active||mouseLocked()||lockPending)return;
   const gesture=navigator.userActivation?navigator.userActivation.isActive:true;
-  if(!gesture){$('hint').textContent=lockDenied?DRAG_HINT:CLICK_HINT;return;}
+  if(!gesture){setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);return;}
   lockFair=performance.now()-lastUnlock>1500;lockPending=true;
   try{
     // Raw deltas keep the sensitivity steady across operating-system pointer
@@ -100,14 +104,16 @@ async function captureMouse(){
   finally{lockPending=false;}
 }
 function suspend(){active=false;keys.clear();endJoy();drag=null;lockWanted=false;if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
-function pause(){suspend();welcome.hidden=false;start.textContent='Continue exploring';}
+// Pause is its own small sheet (the same #welcome overlay in pause mode, so
+// the ids players, tests and tools rely on stay put): no onboarding copy.
+function pause(){suspend();welcome.dataset.mode='pause';welcome.hidden=false;start.textContent='Keep playing';start.focus();}
 async function resume(){
   if(!ready)return;if(life&&!life.hasPet()){life.adopt();return;}active=true;welcome.hidden=true;$('rooms').hidden=true;
   $('rooms-button').setAttribute('aria-expanded','false');$('touch-controls').style.visibility='visible';canvas.focus();
-  $('hint').textContent=finePointer()?CAPTURED_HINT:'Drag to look · left pad to walk · tap an activity';
+  setHint(finePointer()?CAPTURED_HINT:'Drag to look · left pad to walk · tap an activity');
   if(!finePointer())return;
   lockWanted=true;await captureMouse();
-  if(active&&!mouseLocked())$('hint').textContent=lockDenied?DRAG_HINT:CLICK_HINT;
+  if(active&&!mouseLocked())setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);
 }
 function showRooms(show){
   const wasOpen=!$('rooms').hidden;
@@ -117,23 +123,44 @@ function showRooms(show){
   // callers just tidy the panel away on the way to an activity.
   else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();if(wasOpen&&finePointer()){lockWanted=true;captureMouse();}}
 }
-let section='';
-for(const room of rooms){
-  if(room[0]!==section){section=room[0];const h=document.createElement('h3');h.textContent=section.toUpperCase();$('room-list').append(h);}
-  const row=document.createElement('div');row.className='room-row';row.dataset.room=room[1];
-  const b=document.createElement('button');b.textContent=room[1];b.setAttribute('aria-label','Jump to '+room[1]);bindButton(b,()=>{if(ready&&teleport(room)){showRooms(false);resume();}});row.append(b);$('room-list').append(row);
+// A quick soft fade into the new room instead of a hard cut. The jump itself
+// happens at once (inside the click, so the mouse capture still counts as a
+// user gesture); the cream veil then lifts over ~0.3 s.
+function jumpTo(room){
+  if(!ready)return;
+  const veil=$('fade');if(!reducedMotion)veil.classList.add('on');
+  if(teleport(room)){showRooms(false);resume();}
+  requestAnimationFrame(()=>requestAnimationFrame(()=>veil.classList.remove('on')));
 }
-bindButton(start,()=>failed?location.reload():resume());bindButton($('pause-button'),pause);bindButton($('help'),pause);
+// Rooms travel board: floor sections of room cards. Every card stays in the
+// document (the floor chips only scroll), so "Jump to X" is always reachable.
+let section='',floor=null;
+for(const room of rooms){
+  if(room[0]!==section){
+    section=room[0];const id='floor-'+section.toLowerCase().replace(/[^a-z]+/g,'-');
+    const h=document.createElement('h3');h.textContent=section;h.id=id;$('room-list').append(h);
+    floor=document.createElement('div');floor.className='floor';$('room-list').append(floor);
+    const tab=document.createElement('button');tab.textContent=section;tab.dataset.floor=id;
+    bindButton(tab,()=>{for(const t of $('floor-tabs').children)t.setAttribute('aria-current',String(t===tab));h.scrollIntoView({block:'start',behavior:reducedMotion?'auto':'smooth'});});
+    $('floor-tabs').append(tab);
+  }
+  const row=document.createElement('div');row.className='room-row';row.dataset.room=room[1];
+  const b=document.createElement('button');b.setAttribute('aria-label','Jump to '+room[1]);
+  const icons=document.createElement('span');icons.className='room-icons';icons.setAttribute('aria-hidden','true');
+  const name=document.createElement('span');name.className='room-name';name.textContent=room[1];
+  b.append(icons,name);bindButton(b,()=>jumpTo(room));row.append(b);floor.append(row);
+}
+bindButton(start,()=>failed?location.reload():resume());bindButton($('pause-button'),pause);
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('welcome-rooms'),()=>{if(ready)showRooms(true);});bindButton($('welcome-family'),()=>{if(ready)$('family-button').click();});
-bindButton($('reset'),()=>{if(ready){teleport(rooms[0]);resume();}});
+bindButton($('reset'),()=>jumpTo(rooms[0]));
 document.addEventListener('pointerlockchange',()=>{
   // A lock that lands after the house was paused (a panel opened while the
   // request was in flight) is handed straight back.
   if(mouseLocked()&&(!active||!lockWanted)){document.exitPointerLock();return;}
   const captured=mouseLocked();
   document.body.classList.toggle('mouse-look',captured);
-  if(captured){lockDenied=false;drag=null;if(active)$('hint').textContent=CAPTURED_HINT;return;}
+  if(captured){lockDenied=false;drag=null;if(active)setHint(CAPTURED_HINT);return;}
   lastUnlock=performance.now();
   // Escape, a tab switch or a lost window all release the lock: park the house
   // behind the welcome card rather than leaving an invisible cursor walking.
@@ -165,21 +192,33 @@ function look(dx,dy){
   // circle round and see its face.
 }
 document.addEventListener('mousemove',e=>{if(active&&mouseLocked())look(e.movementX,e.movementY);});
+// Fingers need a bigger turn per pixel than a mouse: a full swipe across a
+// phone turns about 140°, whatever the screen width. Mouse dragging (the
+// refused-lock fallback) keeps the desktop rate.
+const touchLookGain=()=>THREE.MathUtils.clamp(2.6*390/innerWidth,1,2.6);
+const joystick=$('joystick'),knob=joystick.firstElementChild;let joyId=null;
 canvas.addEventListener('pointerdown',e=>{
   if(!active)return;
   // A mouse press asks for the lock and starts a drag; whichever the browser
   // allows takes effect, and a granted lock cancels the drag.
   if(e.pointerType==='mouse'&&!mouseLocked()){lockWanted=true;captureMouse();}
   if(e.pointerType==='mouse'&&mouseLocked())return;
-  drag={id:e.pointerId,x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);
+  // A thumb landing low on the left becomes the walking pad right there.
+  if(e.pointerType==='touch'&&joyId===null&&e.clientX<innerWidth*.42&&e.clientY>innerHeight*.4){
+    const s=joystick.offsetWidth/2;joystick.style.left=(e.clientX-s)+'px';joystick.style.top=(e.clientY-s)+'px';joystick.style.bottom='auto';joystick.classList.add('floating');
+    joyId=e.pointerId;canvas.setPointerCapture(e.pointerId);updateJoy(e);return;
+  }
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};canvas.setPointerCapture(e.pointerId);
 });
-canvas.addEventListener('pointermove',e=>{if(!active||mouseLocked())return;if(drag?.id===e.pointerId){look(e.clientX-drag.x,e.clientY-drag.y);drag.x=e.clientX;drag.y=e.clientY;}});
-function endDrag(){drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
-const joystick=$('joystick'),knob=joystick.firstElementChild;let joyId=null;
-function updateJoy(e){const r=joystick.getBoundingClientRect();let x=(e.clientX-r.x-r.width/2)/38,y=(e.clientY-r.y-r.height/2)/38;const n=Math.max(1,Math.hypot(x,y));joy={x:x/n,y:y/n};knob.style.transform=`translate(${joy.x*32}px,${joy.y*32}px)`;}
+canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active||mouseLocked())return;if(drag?.id===e.pointerId){look((e.clientX-drag.x)*drag.gain,(e.clientY-drag.y)*drag.gain);drag.x=e.clientX;drag.y=e.clientY;}});
+function endDrag(e){if(e&&e.pointerId===joyId){endJoy();return;}drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
+// A small dead zone so a resting thumb doesn't creep the pet along.
+function updateJoy(e){const r=joystick.getBoundingClientRect();let x=(e.clientX-r.x-r.width/2)/40,y=(e.clientY-r.y-r.height/2)/40;const m=Math.hypot(x,y),n=Math.max(1,m);
+  joy=m<.15?{x:0,y:0}:{x:x/n,y:y/n};knob.style.transform=`translate(${x/n*34}px,${y/n*34}px)`;}
 joystick.addEventListener('pointerdown',e=>{if(!active)return;joyId=e.pointerId;joystick.setPointerCapture(e.pointerId);updateJoy(e);});
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
-function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';}joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
+function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';if(joystick.classList.contains('floating')){joystick.classList.remove('floating');joystick.style.left=joystick.style.top=joystick.style.bottom='';}}
+joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
 window.addEventListener('resize',()=>{fitLens();cameraClearance=nearPlaneReach(camera)+.015;renderer.setSize(innerWidth,innerHeight);});
 // Follow camera. The guard's answer is where the camera may go this frame; it
 // pulls in at once but eases back out and swings up/down smoothly, so walking
