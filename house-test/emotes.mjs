@@ -17,7 +17,8 @@ function bubble(name){
 }
 export function createEmotes(scene){
   const textures={};let current=null,opacity=0;
-  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,sizeAttenuation:false,opacity:0,fog:false,toneMapped:false}));
+  // Drawn over the scene (never cut by a door frame); callers show it only in plain sight.
+  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false,sizeAttenuation:false,opacity:0,fog:false,toneMapped:false}));
   sprite.scale.set(.066,.066,1);sprite.visible=false;sprite.renderOrder=3;sprite.name='pet emote';scene.add(sprite);
   return {
     // name: a GLYPHS key or null; at: world position of the head top.

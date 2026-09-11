@@ -97,6 +97,7 @@ const SURFACE_GLSL=/* glsl */`
 varying vec3 vHousePosition;
 varying vec3 vHouseNormal;
 uniform int houseSurfaceKind;
+uniform bool houseFloorBoards;
 uniform bool houseVerticalGrain;
 uniform sampler2D houseDetailMap;
 uniform vec2 houseDetailScale;
@@ -155,7 +156,11 @@ export function glossyFinish(f){
 // so things sit in their own shadow (the single sun map cannot reach there).
 export const OCCLUSION={gain:1.7,curve:1.6,direct:.45};
 
-export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
+// Shared by every foliage material: a little light of its own after dark so
+// leaf cards facing away from the lamps do not go black (lighting.mjs sets it).
+export const FOLIAGE={fill:{value:0}};
+
+export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=false}={}){
   const {color,finish:styled}=styleGroup(group,finishDescription(group));
   const f={...styled},glass=f.surface==='glass',glossy=glossyFinish(f);
   if(!glossy)f.clearcoat=0;
@@ -177,6 +182,12 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
   });
   if((f.surface==='fabric'||f.surface==='carpet')&&styled.sheen)material.roughness=Math.max(material.roughness,.9);
   material.name=group.name;
+  // Door casings and trim sit flush on walls in the export; where their faces
+  // coincide the two materials z-fought into a speckled strip down door frames
+  // (worst at night, black against lamp-lit paint). Trim wins consistently.
+  if(/enamel|trim|casing|architrave|jamb|door frame/i.test(group.name||'')){
+    material.polygonOffset=true;material.polygonOffsetFactor=-1;material.polygonOffsetUnits=-2;
+  }
   // Transparent panes stay a single pass; their closed thin boxes do not need
   // the default two-pass physical-glass path on phones.
   material.forceSinglePass=true;
@@ -199,7 +210,10 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
     // key after the first compile and every house shader was built twice.
     if(aoStrength>0)material.defines.HOUSE_AO=1;
     if(foliage)material.defines.HOUSE_FOLIAGE=1;
-    material.customProgramCacheKey=()=>(aoStrength>0?'house-finish-v3-ao':'house-finish-v3')+(foliage?'-leaf':'');
+    // Experimental (QA flag ?nearfade=1): dissolve any house surface within
+    // ~0.65 m of the lens. It adds a discard to the shared program.
+    if(nearFade&&!foliage)material.defines.HOUSE_NEAR_FADE=1;
+    material.customProgramCacheKey=()=>(aoStrength>0?'house-finish-v3-ao':'house-finish-v3')+(foliage?'-leaf':'')+(nearFade&&!foliage?'-near':'');
     material.onBeforeCompile=shader=>{
       shader.uniforms??={};
       if(aoStrength>0){
@@ -208,7 +222,10 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
         shader.uniforms.houseOcclusionShape={value:new THREE.Vector3(OCCLUSION.gain,OCCLUSION.curve,OCCLUSION.direct)};
       }
       shader.uniforms.houseSurfaceKind={value:family};
-      if(foliage){shader.defines??={};shader.defines.HOUSE_FOLIAGE=1;}
+      // Floor boards: their gap walls also flatten out at distance (uniform, so
+      // no extra program).
+      shader.uniforms.houseFloorBoards={value:/Oak floor board|laminate planks|^17 \| .*Honey oak grain/.test(group.name||'')};
+      if(foliage){shader.defines??={};shader.defines.HOUSE_FOLIAGE=1;shader.uniforms.houseLeafFill=FOLIAGE.fill;}
       const tile=detailTile(family);
       shader.uniforms.houseDetailMap={value:tile.texture};
       shader.uniforms.houseDetailScale={value:tile.scale};
@@ -233,6 +250,9 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
         `#include <common>
           #ifdef HOUSE_AO
             varying float vHouseOcclusion;uniform float houseOcclusionStrength;uniform vec3 houseOcclusionShape;
+          #endif
+          #ifdef HOUSE_FOLIAGE
+            uniform float houseLeafFill;
           #endif\n`+SURFACE_GLSL)
         .replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
           #ifdef HOUSE_FOLIAGE
@@ -241,23 +261,53 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0}={}){
             // within ~1.3 m, fully solid again by ~2 m.
             float houseLeafFade=smoothstep(1.3,2.0,length(vViewPosition));
             if(houseLeafFade<1.0&&fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(.06711056,.00583715))))>houseLeafFade)discard;
+          #endif
+          #ifdef HOUSE_NEAR_FADE
+            float houseNear=smoothstep(.3,.65,length(vViewPosition));
+            if(houseNear<1.0&&fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(.06711056,.00583715))))>houseNear)discard;
           #endif`)
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
           diffuseColor.rgb*=houseDetail.x;
+          float houseSeamFade=0.0;
+          if(houseSurfaceKind==7){
+            // Lawn: sunlit and shaded patches at 5-30 m (two lookups of the same
+            // tile at large scales, so nothing repeats at the 4 m tile size),
+            // warmer dry patches, and faint diagonal mowing stripes.
+            vec2 w=vHousePosition.xz;
+            float big=texture2D(houseDetailMap,w/29.0+vec2(.37,.11)).r*2.0-1.0;
+            float mid=texture2D(houseDetailMap,w/9.3+vec2(.71,.53)).r*2.0-1.0;
+            float lawnPatch=clamp(big*2.4+mid*1.3,-1.0,1.0);
+            diffuseColor.rgb*=mix(vec3(1.0),lawnPatch>0.0?vec3(1.09,1.06,.84):vec3(.84,.92,.86),abs(lawnPatch));
+            float stripe=sin((w.x+w.y)*.7071*2.85);
+            diffuseColor.rgb*=1.0+.04*stripe/max(fwidth(stripe)*3.0,1.0);
+          }
           if(houseSurfaceKind==13){
             float panelSeam=housePanelSeam(vHousePosition);
             diffuseColor.rgb=mix(diffuseColor.rgb,houseMortarColor,panelSeam);
             houseDetail.y+=panelSeam*.08;houseDetail.z-=panelSeam*.0015;
           }`)
+        .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
+          #ifdef HOUSE_FOLIAGE
+            totalEmissiveRadiance+=diffuseColor.rgb*houseLeafFill;
+          #endif`)
         .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
           roughnessFactor=clamp(roughnessFactor+houseDetail.y,.045,1.0);`)
         .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-          if(houseSurfaceKind>0)normal=houseBump(-vViewPosition,normal,houseDetail.z);`)
+          if(houseSurfaceKind>0)normal=houseBump(-vViewPosition,normal,houseDetail.z);
+          // Board and tile gaps are real grooves in the mesh. Once a pixel spans
+          // more than a few millimetres they can only alias into dotted lines,
+          // so up-facing surfaces take the floor's own normal (and lose the
+          // groove occlusion) as the pixel footprint grows.
+          if(houseFloorBoards||vHouseNormal.y>.55){
+            houseSeamFade=smoothstep(.0018,.006,length(fwidth(vHousePosition)));
+            normal=normalize(mix(normal,normalize(mat3(viewMatrix)*vec3(0.,1.,0.)),houseSeamFade));
+          }`)
         .replace('#include <aomap_fragment>',`#include <aomap_fragment>
           #ifdef HOUSE_AO
             float houseAO=mix(1.0,pow(clamp(vHouseOcclusion,0.0,1.0),houseOcclusionShape.y),
               min(1.0,houseOcclusionStrength*houseOcclusionShape.x));
+            houseAO=mix(houseAO,1.0,houseSeamFade*.8);
             reflectedLight.directDiffuse*=mix(1.0,houseAO,houseOcclusionShape.z);
             reflectedLight.indirectDiffuse*=houseAO;
             reflectedLight.indirectSpecular*=houseAO;

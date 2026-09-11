@@ -64,7 +64,8 @@ try{
   await target.waitForFunction(()=>window.houseTest.state.mouseLocked&&document.body.classList.contains('mouse-look'),null,{timeout:10000});
   assert.equal(await page.evaluate(()=>document.pointerLockElement?.id),'view','Pointer lock is not held by the canvas');
   assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('view')).cursor),'none','Cursor still visible while captured');
-  assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('crosshair')).display),'block');
+  // Third-person view: no aiming dot over the pet while captured.
+  assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('crosshair')).display),'none');
 
   // Relative motion in one direction keeps turning: over a full circle without
   // the cursor ever leaving the window.

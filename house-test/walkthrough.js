@@ -288,8 +288,17 @@ function render(){
   renderer.render(scene,camera);
 }
 function updateLocation(){
-  let closest=null,d=Infinity;
-  for(const r of rooms){const dist=Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12;if(dist<d){d=dist;closest=r;}}
+  // The room you're in is the nearest room spot you can actually see — no
+  // wall, floor or window between — not merely the nearest one: on the
+  // living-room rug the porch spot is closer, but through the front wall.
+  // The name, the room lighting and its reflection probe all follow this.
+  const ranked=rooms.map(r=>({r,d:Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12})).sort((a,b)=>a.d-b.d);
+  let closest=ranked[0]?.r;
+  const eye={x:player.x,y:player.y+1.2,z:player.z};
+  for(const {r} of ranked.slice(0,6)){
+    if(Math.abs(r[4]-player.y)>.7)continue;
+    if(!guard||!guard.blocked(eye,{x:r[2],y:r[4]+1.2,z:-r[3]},true)){closest=r;break;}
+  }
   if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
 let frames=0,lastDraw=0;
@@ -375,7 +384,7 @@ async function load(){
       geometry.computeBoundingSphere();
       if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
         occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
-      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0});
+      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0,nearFade:query.get('nearfade')==='1'});
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
@@ -402,15 +411,24 @@ async function load(){
     performance.mark('house:probe');
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
-    life.face(yaw+Math.PI,true);
+    life.face(yaw+Math.PI,true);performance.mark('house:life');
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
     // Pets, labels and markers bring their own materials.
-    await warmShaders();render();
+    await warmShaders();performance.mark('house:pets-compiled');render();performance.mark('house:first-frame');
     shading={contactShadows:contact?.count??0};
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
+    // The ceiling light's soft shadow compiles in the background while the
+    // welcome card is up, instead of adding to the load.
+    // On this GPU (ANGLE/D3D11) a background compile still stalls frames for
+    // ~2 s, so it starts only at the first pause, Rooms menu or activity after
+    // play has begun (the scene is behind a panel then), and the switch waits
+    // for a moment when nobody is walking.
+    let playedOnce=false;
+    const keyShadowLater=()=>{playedOnce||=active;if(!playedOnce||active){setTimeout(keyShadowLater,700);return;}lighting.enableKeyShadow(()=>active);};
+    setTimeout(keyShadowLater,700);
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
       mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,...shading,...lighting.diagnostics(),...life.diagnostics()};}};

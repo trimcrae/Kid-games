@@ -459,6 +459,30 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
             for j in range(8):
                 u0, v0 = -.46 + i * .92 / 6, -.46 + j * .92 / 8
                 rect(u0 + .01, v0 + .008, u0 + .92 / 6 - .01, v0 + .92 / 8 - .008, cols[((i + 1) * (j + 1)) % 4])
+    elif motif == 'duck':
+        rect(-.5, -.5, .5, -.18, D['corn'])
+        disc(-.05, -.08, .26, D['mustard'], sx=1.3, sy=.8)
+        disc(.16, .18, .15, D['mustard'])
+        tri((.28, .20), (.28, .12), (.44, .14), D['coral'])
+        disc(.19, .23, .03, D['ink'])
+    elif motif == 'dress':
+        tri((-.30, -.42), (.30, -.42), (0, .10), D['rose'])
+        rect(-.09, .02, .09, .22, D['rose'])
+        for k in range(3):
+            tri((-.08 + k * .08, .26), (-.04 + k * .08, .26), (-.06 + k * .08, .38), D['mustard'])
+        rect(-.09, .24, .09, .27, D['mustard'])
+        for u in (-.16, 0, .16):
+            disc(u, -.30, .035, D['paper'])
+    elif motif == 'pixel':
+        # An 8 x 8 pixel rocket, block-game style (original shapes, no characters).
+        rows = ['...rr...', '..rppr..', '..pbbp..', '..pbbp..', '..pppp..', '.rppppr.', '.r.yy.r.', '...yy...']
+        cmap = {'r': D['coral'], 'p': D['paper'], 'b': D['corn'], 'y': D['mustard']}
+        rect(-.5, -.5, .5, .5, D['ink'])
+        for j, row in enumerate(rows):
+            for i, ch in enumerate(row):
+                if ch in cmap:
+                    u0, v0 = -.44 + i * .11, .44 - (j + 1) * .11
+                    rect(u0, v0, u0 + .105, v0 + .105, cmap[ch])
     if frame:
         fw = .022
         for dx in (-1, 1):
@@ -1456,6 +1480,238 @@ for n, (cx, cy) in enumerate([(0, -1.0), (0, -.58), (0, -.16), (-.20, .26), (.20
     pts, faces = text_mesh(str(n), .22)
     g.raw([(cx + px, cy + py, .0012) for px, py, _pz in pts], faces, chalk[n % 3])
 g.done()
+
+# ================================================================== WALLS AT EYE LEVEL (round 2)
+# Blank paint filled a third of many frames: every room seen from its arrival
+# view gets 2-4 wall pieces chosen for the family member who uses it. All are
+# wall-mounted and walk-past (no collision), at most a shelf's depth proud.
+
+
+def _radial(cx, cz, a, l0, l1, w):
+    d, n = (math.cos(a), math.sin(a)), (-math.sin(a), math.cos(a))
+    return [(cx + d[0] * l0 - n[0] * w, cz + d[1] * l0 - n[1] * w), (cx + d[0] * l1 - n[0] * w, cz + d[1] * l1 - n[1] * w),
+            (cx + d[0] * l1 + n[0] * w, cz + d[1] * l1 + n[1] * w), (cx + d[0] * l0 + n[0] * w, cz + d[1] * l0 + n[1] * w)]
+
+
+def clock(name, x, y, z, direction, r=.14, rim=None, dots=False):
+    """A wall clock at ten past ten: rim, face, twelve ticks, two hands."""
+    g = wall_prop(name, x, y, z, direction)
+    g.cyl((0, -.012, 0), r + .018, .024, rim or D['wood'], 20, rot=(math.pi / 2, 0, 0))
+    g.vflat(ngon(r, 20), -.0255, D['paper'])
+    for k in range(12):
+        a = math.pi / 2 - k * math.tau / 12
+        if dots:
+            g.vflat(ngon(r * .075, 8, .80 * r * math.cos(a), .80 * r * math.sin(a)), -.027,
+                    [D['coral'], D['mustard'], D['teal'], D['corn']][k % 4])
+        else:
+            g.vflat(_radial(0, 0, a, r * (.70 if k % 3 == 0 else .78), r * .88, r * .025), -.027, D['ink'])
+    g.vflat(_radial(0, 0, math.pi / 2 + 2 * math.pi / 6 - math.pi / 36, -.08 * r, .50 * r, r * .045), -.0285, D['ink'])
+    g.vflat(_radial(0, 0, math.pi / 2 - 2 * math.pi / 6, -.08 * r, .76 * r, r * .03), -.0292, D['ink'])
+    g.vflat(ngon(r * .07, 10), -.0300, D['coral'])
+    return g.done()
+
+
+def bunting(g, width, mats, drop=.14, sag=.05, letters=None):
+    """A string of pennants across local x (the wall prop's frame)."""
+    for k in range(3):
+        x0, x1 = -width / 2 + k * width / 3, -width / 2 + (k + 1) * width / 3
+        s0, s1 = sag * math.sin(math.pi * k / 3), sag * math.sin(math.pi * (k + 1) / 3)
+        g.box(((x0 + x1) / 2, -.02, -(s0 + s1) / 2), (width / 3 + .01, .005, .005), D['cream'], (0, (s1 - s0) / (width / 3), 0))
+    n = len(mats)
+    for k, mat in enumerate(mats):
+        x = -width / 2 + (k + .5) * width / n
+        s = sag * math.sin(math.pi * (x + width / 2) / width)
+        half = min(.075, width / n * .42)
+        g.vflat([(x - half, -s), (x, -s - drop), (x + half, -s)], -.024, mat)
+        if letters:
+            pts, faces = text_mesh(letters[k], drop * .42)
+            g.raw([(x + px, -.027, -s - drop * .36 + py) for px, py, _pz in pts], faces, D['paper'])
+
+
+def wall_shelf(name, x, y, z, direction, width=.60, depth=.14):
+    g = wall_prop(name, x, y, z, direction)
+    g.box((0, -depth / 2, 0), (width, depth, .025), D['wood'])
+    for dx in (-width * .35, width * .35):
+        g.box((dx, -.03, -.06), (.02, .06, .10), D['ink'])
+    return g
+
+
+def paint_walls(prefixes, mat, rect, generic):
+    """Room-side faces of the named wall pieces take the room's own paint.
+
+    Only tall vertical faces that face into ``rect`` and still carry one of the
+    ``generic`` finishes change: skirting, the far side of a shared partition
+    and exterior cladding keep theirs, so neighbouring rooms are untouched."""
+    x0, x1, y0, y1 = rect
+    changed = 0
+    for obj in scene.objects:
+        if obj.type != 'MESH' or not obj.name.startswith(prefixes):
+            continue
+        mesh, mw = obj.data, obj.matrix_world
+        nm = mw.to_3x3().inverted().transposed()
+        slots = [m.name if m else '' for m in mesh.materials]
+        if not any(s in generic for s in slots):
+            continue
+        if mat.name not in slots:
+            mesh.materials.append(mat)
+            slots.append(mat.name)
+        for p in mesh.polygons:
+            if slots[p.material_index] not in generic:
+                continue
+            n = (nm @ p.normal).normalized()
+            zs = [(mw @ mesh.vertices[v].co).z for v in p.vertices]
+            if abs(n.z) > .3 or max(zs) - min(zs) < .25:
+                continue
+            c = mw @ p.center
+            ix, iy = c.x + n.x * .25, c.y + n.y * .25
+            if x0 <= ix <= x1 and y0 <= iy <= y1 and x0 - .2 <= c.x <= x1 + .2 and y0 - .2 <= c.y <= y1 + .2:
+                p.material_index = slots.index(mat.name)
+                changed += 1
+    return changed
+
+
+bpy.context.view_layer.update()
+WALL_PAINT = {
+    # A1: the family bathroom reads green (sage-mint above the sea-green tile).
+    'green bath': paint_walls(('Bath left wall', 'Bath back wall', 'Bath entry return', 'Primary left wall'),
+                              material('Green bathroom sage plaster', _lin('#cfe3d2'), .85),
+                              (9.84, 12.24, 4.56, 7.14), {'Warm white enamel', 'Upstairs warm grey plaster'}),
+    # H126 documents Cory's side of the shared partition as warm white, not grey.
+    'cory': paint_walls(('End bedroom far wall', 'End bedroom south wall', 'End bedroom north wall', 'Nursery blue right wall',
+                         'Closet recessed back', 'Closet south return', 'Closet north return', 'Nursery wardrobe',
+                         'Hall end bedroom wall', 'Primary right window wall'),
+                        material('Cory warm white plaster', _lin('#efe6d6'), .85),
+                        (15.49, 18.84, .36, 6.46), {'Upstairs warm grey plaster'}),
+    # Jeannie's walls are undocumented generic plaster: a gentle sea-glass
+    # signature to go with her teal reading corner.
+    'jeannie': paint_walls(('Lower bedroom back window wall', 'Lower bedroom side window wall',
+                            'Lower bedroom front wall', 'Lower bedroom right wall'),
+                           material('Jeannie sea glass plaster', _lin('#d5e6e0'), .85),
+                           (12.15, 16.55, 5.0, 8.0), {'Upstairs warm grey plaster'}),
+}
+# Repainted meshes must be re-evaluated before any further placement ray casts.
+bpy.context.view_layer.update()
+print('WALL PAINT:', WALL_PAINT, flush=True)
+for room, faces in WALL_PAINT.items():
+    if faces < 3:
+        raise RuntimeError('dressing: %s walls were not repainted (%d faces)' % (room, faces))
+
+_use('main')
+g = wall_prop('Living family height chart', 3.34, 3.90, .80, (0, 1, 0))
+g.box((0, -.008, 0), (.11, .016, 1.52), D['cream'])
+for k in range(16):
+    z = .05 + k * .1 - .80
+    g.vflat([(-.055, z - .003), (-.055 + (.07 if k % 5 == 0 else .035), z - .003),
+             (-.055 + (.07 if k % 5 == 0 else .035), z + .003), (-.055, z + .003)], -.0165, D['ink'])
+for h, mat in [(.80, D['corn']), (1.02, D['rose']), (1.17, D['mustard']), (1.27, D['teal'])]:
+    z = h - .80
+    g.vflat([(0, z - .018), (.075, z - .018), (.095, z), (.075, z + .018), (0, z + .018)], -.018, mat)
+g.done()
+clock('Living clock above the television', 2.25, 3.60, 2.15, (0, 1, 0), .16)
+g = wall_prop('Living front window curtains', 2.175, .80, 1.50, (0, -1, 0))
+for x in (-1.595, 1.595):
+    g.soft((x, -.14, -.025), (.24, .05, 1.65), D['cream'], .02)
+    g.soft((x, -.14, -.70), (.245, .056, .10), D['coral'], .01)
+g.box((0, -.14, .82), (3.62, .02, .02), D['ink'])
+for x in (-1.75, 1.75):
+    g.box((x, -.07, .82), (.02, .14, .02), D['ink'])
+    g.ball((x * 1.04, -.14, .82), .025, D['ink'], 8, 5)
+g.done()
+g = wall_prop('Entry round mirror', 7.30, -.90, 2.00, (1, 0, 0))
+g.cyl((0, -.012, 0), .22, .024, D['wood'], 24, rot=(math.pi / 2, 0, 0))
+g.vflat(ngon(.19, 24), -.0255, mirror)
+g.done()
+g = wall_prop('Kitchen family wall calendar', 3.08, 7.50, 1.55, (0, 1, 0))
+g.box((0, -.003, 0), (.30, .006, .44), D['paper'])
+g.vflat([(-.14, .02), (.14, .02), (.14, .20), (-.14, .20)], -.0065, D['corn'])
+g.vflat(ngon(.10, 14, -.02, -.02 + .10, sy=.45), -.0075, D['teal'])
+g.vflat(ngon(.03, 10, .08, .15), -.0075, D['mustard'])
+for i in range(6):
+    g.vflat([(-.13 + i * .052, -.19), (-.127 + i * .052, -.19), (-.127 + i * .052, -.01), (-.13 + i * .052, -.01)], -.0065, D['ink'])
+for j in range(5):
+    g.vflat([(-.13, -.19 + j * .045), (.13, -.19 + j * .045), (.13, -.187 + j * .045), (-.13, -.187 + j * .045)], -.0065, D['ink'])
+for u, v in [(-.05, -.12), (.07, -.06)]:
+    g.vflat(ngon(.016, 10, u, v), -.0072, D['coral'])
+g.box((0, -.01, .225), (.08, .012, .015), D['ink'])
+g.done()
+clock('Kitchen clock above the window', 1.70, 7.50, 2.43, (0, 1, 0), .11, D['teal'])
+g = wall_prop('Kitchen window valance', 1.70, 7.50, 2.36, (0, 1, 0))
+g.soft((0, -.03, -.12), (1.98, .045, .16), D['cream'], .015)
+g.soft((0, -.03, -.19), (1.98, .05, .025), D['teal'], .008)
+g.done()
+clock('Dining room clock', 7.52, 7.40, 1.95, (0, 1, 0), .13)
+framed('Dining wall landscape', 7.20, 6.20, 1.85, (1, 0, 0), .60, .42, 'landscape')
+framed('Dining wall flower drawing', 7.20, 5.55, 1.72, (1, 0, 0), .26, .32, 'flower')
+framed('Dining wall heart drawing', 7.20, 6.85, 1.72, (1, 0, 0), .26, .32, 'heart')
+
+_use('upper')
+framed('Upstairs hall landing landscape', 11.55, 3.95, 2.65, (0, -1, 0), .36, .28, 'landscape')
+framed('Upstairs hall landing pet drawing', 11.55, 3.95, 2.22, (0, -1, 0), .24, .30, 'pet')
+framed('Upstairs hall heart drawing', 14.35, 4.10, 2.70, (0, 1, 0), .26, .32, 'heart')
+framed('Upstairs hall house drawing', 14.85, 4.10, 2.50, (0, 1, 0), .32, .26, 'sun_house')
+g = wall_prop('Upstairs hall bunting over Cory door', 15.00, 4.01, 3.48, (1, 0, 0))
+bunting(g, .74, [D['coral'], D['mustard'], D['teal'], D['corn'], D['rose']], drop=.10, sag=.03)
+g.done()
+framed('Green bathroom duck picture', 10.20, 6.60, 2.40, (0, 1, 0), .30, .26, 'duck')
+g = wall_shelf('Green bathroom shelf with bottles and plant', 10.30, 6.50, 2.85, (-1, 0, 0), .44, .13)
+for x, mat in [(-.14, D['teal']), (-.07, D['coral'])]:
+    g.cyl((x, -.065, .07), .025, .12, mat, 10)
+g.cyl((.02, -.065, .045), .03, .065, D['cream'], 10, rot=(0, math.pi / 2, 0))
+plant(g, .14, -.065, .0125, .045, .07, .14, 10)
+g.done()
+framed('Kieran nursery pet picture', 14.90, 3.15, 2.50, (1, 0, 0), .26, .32, 'pet')
+framed('Kieran nursery heart picture', 11.60, 3.10, 2.45, (-1, 0, 0), .24, .24, 'heart')
+g = wall_shelf('Kieran nursery shelf of soft toys', 14.35, 2.90, 2.55, (0, 1, 0), .60, .14)
+for x, mat in [(-.2, D['rose']), (0, D['corn']), (.2, D['mustard'])]:
+    small_toy(g, x, -.07, .0125, .045, mat)
+g.done()
+clock('Cory learning clock', 18.30, 4.06, 3.20, (1, 0, 0), .16, D['teal'], dots=True)
+g = wall_prop('Cory number bunting over the desk', 16.36, 5.95, 3.25, (0, 1, 0))
+bunting(g, 1.20, [D['coral'], D['mustard'], D['teal'], D['corn'], D['rose']], drop=.16, sag=.05, letters='12345')
+g.done()
+g = wall_shelf('Cory shelf of block models', 17.60, 5.95, 2.60, (0, 1, 0), .56, .14)
+for k, mat in enumerate([D['wood'], D['teal'], D['mustard']]):
+    for j in range(k + 1):
+        g.box((-.18 + k * .18, -.07, .0425 + j * .06), (.06, .06, .06), mat if j == k else D['cream'], (0, 0, .3 * j))
+g.done()
+framed('Cory pixel rocket poster', 16.30, 1.00, 2.55, (0, -1, 0), .44, .44, 'pixel', frame=False)
+framed('Upstairs hall flower drawing by the bedroom door', 12.78, 4.10, 2.25, (0, 1, 0), .26, .30, 'flower')
+framed('Parents bedroom north landscape', 12.80, 8.00, 2.60, (0, 1, 0), .40, .30, 'landscape')
+clock('Parents bedroom clock', 15.33, 8.00, 2.85, (0, 1, 0), .11)
+
+_use('lower')
+g = wall_shelf('Jeannie shelf of books above the bed', 16.00, 7.40, .30, (0, 1, 0), .70, .16)
+book_row(g, -.32, -.08, .0125, .46, .13, 'x', .10, .16)
+g.ball((.25, -.08, .10), .055, D['corn'], 10, 6)
+g.cyl((.25, -.08, .03), .03, .035, D['wood'], 10)
+g.done()
+framed('Jeannie moon picture above the bed', 16.00, 7.40, .72, (0, 1, 0), .34, .26, 'moon')
+framed('Jeannie flower picture', 15.30, 5.60, .35, (0, -1, 0), .26, .26, 'flower')
+framed('Jeannie rainbow picture by the door', 12.85, 5.60, .20, (0, -1, 0), .40, .30, 'rainbow')
+framed('Ellie flower picture by the door', 10.40, 5.95, .35, (0, -1, 0), .26, .32, 'flower')
+g = wall_prop('Ellie princess bunting', 8.60, 8.20, .85, (-1, 0, 0))
+bunting(g, .90, [D['rose'], D['mustard'], D['flilac'], D['paper'], D['rose'], D['mustard']], drop=.13, sag=.04)
+g.done()
+framed('Ellie princess dress drawing', 8.60, 8.20, .35, (-1, 0, 0), .30, .36, 'dress')
+g = wall_prop('Ellie round mirror above the dresser', 10.07, 8.40, .55, (0, 1, 0))
+g.cyl((0, -.012, 0), .20, .024, D['rose'], 24, rot=(math.pi / 2, 0, 0))
+g.vflat(ngon(.17, 24), -.0255, mirror)
+g.done()
+framed('Family room landscape above the plant', 13.90, 3.85, .52, (1, 0, 0), .50, .36, 'landscape')
+clock('Family room clock', 13.90, 3.85, .96, (1, 0, 0), .10)
+
+_use('base')
+g = wall_prop('Basement bunting over the bunk', .90, 2.70, -.95, (-1, 0, 0))
+bunting(g, 1.60, [D['coral'], D['mustard'], D['teal'], D['corn'], D['rose'], D['mustard'], D['teal']], drop=.14, sag=.06)
+g.done()
+g = wall_prop('Office cork board', 2.65, 7.40, -1.62, (0, 1, 0))
+g.box((0, -.006, 0), (.50, .012, .36), D['kraft'])
+for k, (u, v, mat) in enumerate([(-.15, .07, D['paper']), (.02, .09, D['mustard']), (.17, .05, D['corn']), (-.06, -.09, D['rose'])]):
+    g.box((u, -.014, v), (.13, .004, .10), mat, (0, _rng.uniform(-.1, .1), 0))
+    g.box((u, -.02, v + .04), (.012, .006, .012), D['coral'])
+g.done()
+clock('Office clock', 4.20, 7.40, -1.10, (0, 1, 0), .12)
+
 
 print('DRESSING:', len(_made), 'dressing meshes;',
       sum(len(bpy.data.objects[n].data.polygons) for n in _made), 'faces', flush=True)

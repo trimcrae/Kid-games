@@ -1,7 +1,7 @@
 // Lived-in dressing (models/house/dressing.py) must stay out of the way:
 // blocking props keep clear of the walking lanes and of every activity station
 // and arrival spot, the dressing stays inside its triangle and draw-call
-// budget, and the young front-yard trees collide only at their trunk guards.
+// budget, and the young front-yard trees collide only at their staked trunks.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {rooms} from '../house-test/rooms.mjs';
@@ -68,8 +68,11 @@ const tris=groups.reduce((s,g)=>s+g.count/3,0);
 assert(groups.length>0&&groups.length<=30,`Dressing draw groups: ${groups.length}`);
 assert(tris<=60000,`Dressing triangles: ${tris}`);
 assert(!data.groups.some(g=>/^4[4-8] \|/.test(g.name)),'Dressing collections must export through the shared dressing groups');
-// Young trees: crown and twigs never collide; a trunk guard does.
+// Young trees: crown and twigs never collide; the staked trunk does, wide
+// enough (with the 0.17 m walker radius) that a pet stays outside the guard.
 assert(!data.colliders.some(c=>/Young fruit tree leaves|Young tree lateral branches/.test(c.name)),'Sapling canopy still collides');
-assert.equal(data.colliders.filter(c=>/^Young tree trunk guard/.test(c.name)).length,2,'Each young tree needs a trunk guard');
+const stakes=data.colliders.filter(c=>/^Young tree support stakes/.test(c.name));
+assert.equal(stakes.length,2,'Each young tree needs a staked trunk collider');
+for(const s of stakes)assert(s.max[0]-s.min[0]>=.40&&s.max[2]-s.min[2]>=.40,'Sapling stakes collider too narrow');
 console.log(`PASS ${blocking.length} blocking dressing props clear of ${lanes.length} lanes and all stations; `+
   `${groups.length} dressing draw groups, ${tris} triangles; sapling crowns walkable, trunks guarded`);
