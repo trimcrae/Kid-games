@@ -40,9 +40,9 @@ export const PHASES={
   day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.78,
     practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
-    practical:1.15,key:.95,keyCone:.9,warmth:.2,exteriorDim:.6,indoorFloor:.45,indoorSky:'#9296bc',indoorGround:'#5a4632',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
+    practical:1.15,key:.95,keyCone:.9,petReach:[.5,3.6],warmth:.2,exteriorDim:.6,indoorFloor:.45,indoorSky:'#9296bc',indoorGround:'#5a4632',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
   night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#2a241c',hemi:.34,
-    practical:1.05,key:1.05,keyCone:.75,warmth:.4,exteriorDim:.3,indoorFloor:.4,indoorSky:'#5e70b4',indoorGround:'#3a3024',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.1,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
+    practical:1.05,key:1.05,keyCone:.75,petReach:[.6,3.8],warmth:.4,exteriorDim:.3,indoorFloor:.4,indoorSky:'#5e70b4',indoorGround:'#3a3024',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.25,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
@@ -320,8 +320,12 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   }
   function placePetLight(position){
     const p=new THREE.Vector3(position.x,position.y+1.3,position.z);
-    if(camera)p.lerp(camera.position,.3).setY(Math.max(p.y,position.y+1.15));
-    petLight.position.copy(p);
+    // After dark the pet's glow also works as a soft camera-side fill: it sits
+    // further toward the lens and reaches further, so a door frame right by
+    // the camera is lamp-lit instead of a navy slab (no new light, no recompile).
+    const reach=PHASES[phaseName]?.petReach??[.3,2.8];
+    if(camera)p.lerp(camera.position,reach[0]).setY(Math.max(p.y,position.y+1.15));
+    petLight.position.copy(p);petLight.distance=reach[1];
   }
 
   return {load,setRoom,
