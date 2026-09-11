@@ -238,9 +238,11 @@ canvas.addEventListener('pointerdown',e=>{
   // A thumb landing low on the left becomes the walking pad right there.
   if(e.pointerType==='touch'&&joyId===null&&e.clientX<innerWidth*.42&&e.clientY>innerHeight*.4){
     const s=joystick.offsetWidth/2;joystick.style.left=(e.clientX-s)+'px';joystick.style.top=(e.clientY-s)+'px';joystick.style.bottom='auto';joystick.classList.add('floating');
-    joyId=e.pointerId;canvas.setPointerCapture(e.pointerId);updateJoy(e);return;
+    joyId=e.pointerId;try{canvas.setPointerCapture(e.pointerId);}catch{}updateJoy(e);return;
   }
-  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};canvas.setPointerCapture(e.pointerId);
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};
+  // A pointer lock landing in the same moment makes capture throw; the lock then drives the view.
+  try{canvas.setPointerCapture(e.pointerId);}catch{}
 });
 canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active||mouseLocked())return;if(drag?.id===e.pointerId){look((e.clientX-drag.x)*drag.gain,(e.clientY-drag.y)*drag.gain);drag.x=e.clientX;drag.y=e.clientY;}});
 function endDrag(e){if(e&&e.pointerId===joyId){endJoy();return;}drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
