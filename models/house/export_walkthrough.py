@@ -72,10 +72,12 @@ def xyz(v):
 # Open the entry leaf and a sliding sunroom panel for continuous walking.
 # Frames stay at their doorway; this affects only the testing export.
 front_asset = bpy.data.objects['Red three-panel front door']
-local_hinge = Vector((.49, 0, 0))  # half the local-X width of the .98 m slab
+# House Tour 44.007/90.525s: hinged on the south (street-side) jamb, the leaf
+# swings in against the entry-window wall and leaves the foyer side clear.
+local_hinge = Vector((-.49, 0, 0))  # half the local-X width of the .98 m slab
 hinge = front_asset.matrix_world @ local_hinge
 hinge_axis = front_asset.matrix_world.to_quaternion() @ Vector((0, 0, 1))
-front_open = (Matrix.Translation(hinge) @ Matrix.Rotation(math.pi/2, 4, hinge_axis)
+front_open = (Matrix.Translation(hinge) @ Matrix.Rotation(-math.pi/2, 4, hinge_axis)
               @ Matrix.Translation(-hinge))
 groups = {}
 colliders = []
