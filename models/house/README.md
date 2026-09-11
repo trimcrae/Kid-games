@@ -78,11 +78,22 @@ openings into the common entry. W3 identifies the garage door beyond the glass
 cupboard on the kitchen sink wall; the garage is now attached there. Cabinet
 widths, room dimensions and door offsets remain estimates.
 
-Furniture is modeled as clean, assembled objects. Counters, dining and activity
-tables are cleared. Loose toys, clothing, packages, papers, food, trash, and
-people are omitted. Fixed play equipment and baby furniture are retained.
-Picture frames use simple color inserts rather than copies of personal images.
-The source photographs are neither committed nor packed into the Blender file.
+Furniture is modeled as clean, assembled objects from the references. On top of
+it, `dressing.py` adds invented **lived-in dressing** for the game world. It
+is not photographed, and everything is code-drawn from boxes, cylinders,
+spheres and flat shapes. It covers:
+- rugs, cushions and throws, plants, and kids' drawings;
+- in-use clusters: a jigsaw, a fruit bowl, a board game;
+- activity cues: a pet feeding mat, a bath duck, an easel, a quest board,
+  trophies, a piggy bank and a Word-library shelf;
+- personal cues: Cory's 100-square grid, Ellie's dresses and crown,
+  Jeannie's reading nook, Kieran's mobile;
+- a garden: a raised vegetable bed at the Garden & maths spot, a
+  stepping-stone path, flower beds and a chalk hopscotch.
+
+People and readable personal items are still omitted. Picture frames use simple
+code-drawn shapes rather than copies of personal images. The source photographs
+are neither committed nor packed into the Blender file.
 
 ## Views
 
@@ -207,6 +218,19 @@ or `'y'` keeps one visible mesh but receives approximately 0.10 m collision
 strips with interpolated surface heights. The axis is in Blender world space.
 This lets the graded garage apron join the driveway without its full bounding
 box becoming a wall. Ambiguous/nonplanar ramp meshes fail export.
+
+Lived-in dressing (collections `44`–`48`, one per level) exports as a single
+`Lived-in dressing / <material>` draw group per finish. It is placed by
+downward ray casts, so rugs and props sit on the tile, carpet or lawn actually
+built beneath them.
+
+An object or parent empty tagged `browser_collide = False` never becomes a
+collision box. That covers rugs, wall pieces, shelf and bed props, small toys,
+flowers, stepping stones and the young trees' crowns. The young trees block
+only at their trunk guards. Blocking dressing boxes carry `dressing: true`, and
+the vegetable bed also carries `stationProp: 'farm'`.
+`tests/house-dressing.mjs` keeps these boxes clear of the walking lanes and of
+every activity station, and checks the dressing triangle and draw budget.
 
 `browser_materials.py` maps named finishes to roughness, metalness, clearcoat,
 sheen, emission and opacity. Unlinked Principled shader values refine that
@@ -415,7 +439,7 @@ top view. `--preview-scale 50 --samples 4` makes quick layout previews.
 Rebuilding **replaces** `house.blend` and `inventory.json`, so
 save manual edits under a different filename before regenerating. The script
 uses a fixed random seed. The generator hash covers `build.py`, `upstairs.py`,
-`extensions.py`, `basement_garage.py`, `yard.py`, `exterior.py` and `photoreal.py`.
+`extensions.py`, `basement_garage.py`, `yard.py`, `exterior.py`, `dressing.py` and `photoreal.py`.
 `inventory.json` records it, Blender
 version, object counts, cameras and furniture provenance.
 
@@ -430,6 +454,7 @@ node models/house/test_browser_ao.mjs
 node models/house/test_browser_ramps.mjs
 node models/house/test_walkthrough.mjs
 node tests/house-routes.mjs
+node tests/house-dressing.mjs
 node tests/house-saves.cjs
 ```
 

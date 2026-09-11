@@ -269,9 +269,13 @@ def young_fruit_tree(name,pos,height,width):
         for _ in range(30):
             c=end+Vector((rng.uniform(-.20,.20),rng.uniform(-.20,.20),rng.uniform(-.16,.22)))
             foliage_points.append((c,Vector((rng.uniform(-1,1),rng.uniform(-1,1),rng.uniform(.2,1)))))
-    _yard_tubes('Young tree lateral branches',branch_paths,.008,bark,5)
-    _leaf_mesh('Young fruit tree leaves',foliage_points,rng,.062,leafmat)
+    # The sapling's crown and twigs never stop a walker or the camera boom; a
+    # low trunk guard is its one collision volume (a 23 mm trunk is below the
+    # exporter's collision size, and a whole-canopy box blocked the lawn).
+    _yard_tubes('Young tree lateral branches',branch_paths,.008,bark,5)['browser_collide']=False
+    _leaf_mesh('Young fruit tree leaves',foliage_points,rng,.062,leafmat)['browser_collide']=False
     cylinder('Small tree mulch circle',(0,0,.016),.40,.025,mulch,24)
+    cylinder('Young tree trunk guard',(0,0,.27),.10,.46,white,12)
 
 
 young_fruit_tree('Front young fruit tree near driveway',(6.4,-7.1,yard_z),2.65,1.5)
