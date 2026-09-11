@@ -918,13 +918,15 @@ framed('Green bathroom whale picture', 10.40, 6.50, 2.42, (-1, 0, 0), .40, .30, 
 g, _ = rug_on('Primary bedroom rose rug', 13.30, 6.40, 1.60, 1.6, 2.2, D['rose'], D['cream'], .09,
               z=down(12.70, 6.40, 1.50), motifs=[(diamond(x, y, .12), D['cream']) for x, y in [(-.45, -.6), (-.45, .6)]])
 g.done()
-zb = down(14.78, 6.40, 2.5)
-g = prop('Primary bed cushions', 14.78, 6.40, zb)
+# The bed head is on the entry wall (House Tour 138.508/139.577s): cushions in
+# front of the pillows, the throw across the foot toward the TV dresser.
+zb = down(14.63, 5.29, 2.5)
+g = prop('Primary bed cushions', 14.63, 5.29, zb, -90)
 for dy, mat in [(-.35, D['rose']), (.35, D['corn'])]:
     g.soft((0, dy, .18), (.13, .42, .38), mat, .05, (0, .30, 0))
 g.done()
-zf = down(13.75, 6.41, 2.5)
-g = prop('Primary bed foot folded throw', 13.75, 6.41, zf)
+zf = down(14.63, 6.30, 2.5)
+g = prop('Primary bed foot folded throw', 14.63, 6.30, zf, 90)
 g.soft((0, 0, .015), (.45, 1.82, .03), D['rose'], .012)
 for dy in (-.915, .915):
     g.soft((0, dy, -.13), (.45, .03, .30), D['rose'], .012)
@@ -942,8 +944,8 @@ g.cyl((-.17, 0, .025), .077, .018, D['coral'], 14)
 g.ball((.17, 0, .03), (.085, .085, .05), D['corn'], 10, 6)
 g.box((.17, -.10, .006), (.10, .08, .01), D['corn'])
 g.done()
-zc = down(14.86, 4.88, 2.8)
-g = prop('Primary chest top mug books and plant', 14.86, 4.88, zc)
+zc = down(12.525, 6.91, 2.8)
+g = prop('Primary chest top mug books and plant', 12.525, 6.91, zc, 90)
 g.cyl((-.30, -.02, .045), .04, .09, D['rose'], 12)
 g.box((-.35, -.02, .05), (.012, .02, .05), D['rose'])
 for k, mat in enumerate([D['corn'], D['coral'], D['teal']]):
@@ -951,7 +953,7 @@ for k, mat in enumerate([D['corn'], D['coral'], D['teal']]):
 plant(g, .36, .02, 0, .06, .09, .22, 16)
 g.done()
 framed('Primary bedroom abstract picture', 12.80, 6.10, 2.75, (-1, 0, 0), .70, .50, 'abstract')
-g = prop('Primary narrow chest plant', 13.55, 7.78, down(13.55, 7.78, 2.6))
+g = prop('Primary narrow chest plant', 13.55, 8.10, down(13.55, 8.10, 2.6))
 plant(g, 0, 0, 0, .08, .12, .30, 24)
 g.done()
 
@@ -1171,13 +1173,17 @@ g.soft((-.075, 0, .20), (.02, .22, .13), D['corn'], .01, (0, .12, 0))
 g.done()
 g, _ = rug_on('Downstairs bathroom mat', 11.30, 7.55, -.70, .44, .70, D['teal'], D['cream'], .04, nx=2, ny=3)
 g.done()
-g = wall_prop('Downstairs bathroom hanging towel', 11.30, 8.00, -.10, (-1, 0, 0))
+# House Tour 183.523s: the towel bar is on the vanity wall, between it and the door.
+g = wall_prop('Downstairs bathroom hanging towel', 11.80, 6.88, -.10, (1, 0, 0))
 g.box((0, -.02, .12), (.40, .03, .03), D['wood'])
 g.soft((0, -.04, -.15), (.36, .03, .50), D['coral'], .012)
 g.done()
 
 # Ellie's bedroom: dresses on the rail, a crown, filled shelves, princess cushions.
-g = prop('Ellie dress up rail dresses and tutu', 8.38, 5.72, -1.05)
+# Positions follow the video-corrected furniture in basement_garage.py (House
+# Tour 181-191s): rail along the far wall under its window, bed head at the far
+# wall, bookcase and pink shelf on the rear wall, cabinet on the entry wall.
+g = prop('Ellie dress up rail dresses and tutu', 8.13, 8.30, -1.05, 90)
 for k, (x, mat) in enumerate([(-.30, D['rose']), (-.10, D['mustard']), (.10, D['corn']), (.28, D['rose'])]):
     g.box((x, 0, 1.27), (.18, .012, .012), D['ink'])
     g.soft((x, 0, 1.13), (.15, .07, .20), mat, .025)
@@ -1186,8 +1192,8 @@ for k, (x, mat) in enumerate([(-.30, D['rose']), (-.10, D['mustard']), (.10, D['
     else:
         g.cyl((x, 0, .83), .15, .40, mat, 14, top=.075, sy=.5)
 g.done()
-zd = down(10.07, 8.64, .5)
-g = prop('Ellie dresser crown jewellery box and mirror', 10.07, 8.64, zd)
+zd = down(10.555, 8.10, .5)
+g = prop('Ellie dresser crown jewellery box and mirror', 10.555, 8.10, zd, -90)
 g.cyl((-.20, -.02, .02), .065, .04, D['mustard'], 16, caps=(False, False))
 for k in range(5):
     a = k * math.tau / 5
@@ -1198,8 +1204,8 @@ g.box((.20, 0, .077), (.15, .11, .015), D['corn'])
 g.cyl((0, -.06, .005), .05, .01, D['paper'], 14)
 g.box((0, -.14, .004), (.02, .08, .008), D['wood'])
 g.done()
-g = prop('Ellie shelves books unicorn and snow globe', 9.67, 5.68, 0)
-zs1, zs2, zs3 = (down(9.67, 5.68, z) for z in (.25, .60, .95))
+g = prop('Ellie shelves books unicorn and snow globe', 8.01, 6.25, 0, 90)
+zs1, zs2, zs3 = (down(8.01, 6.25, z) for z in (.25, .60, .95))
 book_row(g, -.28, 0, zs1, .30, .11, 'x', .10, .16)
 teddy(g, .18, 0, zs1, D['rose'], s=.45)
 g.ball((0, 0, zs2 + .07), (.09, .055, .065), D['cream'], 8, 5)
@@ -1213,36 +1219,38 @@ for dx in (-.05, .05):
 g.ball((-.12, 0, zs3 + .08), .05, D['paper'], 10, 6)
 g.cyl((-.12, 0, zs3 + .015), .045, .03, D['rose'], 12)
 g.done()
-zb = down(9.05, 6.60, .2)
-g = prop('Ellie princess bed cushions', 9.05, 6.60, zb)
+zb = down(8.63, 7.00, .2)
+g = prop('Ellie princess bed cushions', 8.63, 7.00, zb, -90)
 for x, mat in [(-.33, D['rose']), (0, D['corn']), (.33, D['mustard'])]:
     g.soft((x, 0, .17), (.34, .13, .32), mat, .05, (.30, 0, 0))
 g.done()
-zf = down(9.05, 7.60, .2)
-g = prop('Ellie bed foot rose throw', 9.05, 7.60, zf)
+zf = down(9.62, 7.00, .2)
+g = prop('Ellie bed foot rose throw', 9.62, 7.00, zf, -90)
 g.soft((0, 0, .015), (1.50, .45, .03), D['rose'], .012)
 for dx in (-.72, .72):
     g.soft((dx, 0, -.12), (.03, .45, .28), D['rose'], .012)
 g.done()
-g, _ = rug_on('Ellie princess runner', 10.25, 6.83, -.70, .70, 1.35, D['rose'], D['cream'], .06, nx=2, ny=5,
-              motifs=[(star(.08, .035, cx=0, cy=y), D['mustard']) for y in (-.35, 0, .35)])
+# The video's road rug now lies inside the door, so the (unphotographed)
+# runner moves to the free strip along the front side of the bed.
+g, _ = rug_on('Ellie princess runner', 9.00, 5.96, -.70, .70, 1.35, D['rose'], D['cream'], .06, nx=2, ny=5,
+              motifs=[(star(.08, .035, cx=0, cy=y), D['mustard']) for y in (-.35, 0, .35)], angle=90)
 g.done()
-framed('Ellie castle drawing', 10.40, 7.80, .45, (1, 0, 0), .35, .45, 'castle')
-g = prop('Ellie hammock plush toys', 8.26, 6.00, 0)
+framed('Ellie castle drawing', 10.40, 7.30, .45, (1, 0, 0), .35, .45, 'castle')
+g = prop('Ellie hammock plush toys', 8.22, 8.50, 0)
 for y, mat in [(-.15, D['rose']), (.05, D['corn']), (.20, D['mustard'])]:
     small_toy(g, 0, y, .50, .07, mat)
 g.done()
-zt = down(8.08, 8.17, 0.0)
-g = prop('Ellie pink shelf plush toys and toy castle', 8.08, 8.17, zt, 90)
+zt = down(9.74, 8.77, 0.0)
+g = prop('Ellie pink shelf plush toys and toy castle', 9.74, 8.77, zt)
 teddy(g, -.30, 0, 0, D['rose'], s=.5)
 teddy(g, .30, 0, 0, D['mustard'], s=.5)
 for x in (-.09, 0, .09):
     g.box((x, 0, .07 if x else .05), (.07, .07, .14 if x else .10), D['paper'])
     g.cyl((x, 0, (.16 if x else .12)), .045, .06, D['corn'], 8, top=.001)
 g.done()
-g = prop('Ellie small bookcase books', 8.04, 7.23, 0)
+g = prop('Ellie small bookcase books', 8.66, 8.77, 0, 90)
 for top in (-.62, -.43, -.24):
-    book_row(g, 0, -.27, down(8.04, 7.23, top), .54, .16, 'y', .10, .16)
+    book_row(g, 0, -.27, down(8.66, 8.77, top), .54, .16, 'y', .10, .16)
 g.done()
 
 # Jeannie's bedroom: a reading nook, trophies (Trophies & visits), READ garland.
@@ -1689,11 +1697,14 @@ framed('Jeannie moon picture above the bed', 16.00, 7.40, .72, (0, 1, 0), .34, .
 framed('Jeannie flower picture', 15.30, 5.60, .35, (0, -1, 0), .26, .26, 'flower')
 framed('Jeannie rainbow picture by the door', 12.85, 5.60, .20, (0, -1, 0), .40, .30, 'rainbow')
 framed('Ellie flower picture by the door', 10.40, 5.95, .35, (0, -1, 0), .26, .32, 'flower')
-g = wall_prop('Ellie princess bunting', 8.60, 8.20, .85, (-1, 0, 0))
+# The far wall's window now sits at the rear corner (House Tour 188.527s), so
+# the bunting and the picture hang over the head of the bed instead, where the
+# video has a framed picture; the mirror follows the cabinet to the entry wall.
+g = wall_prop('Ellie princess bunting', 8.60, 7.00, .85, (-1, 0, 0))
 bunting(g, .90, [D['rose'], D['mustard'], D['flilac'], D['paper'], D['rose'], D['mustard']], drop=.13, sag=.04)
 g.done()
-framed('Ellie princess dress drawing', 8.60, 8.20, .35, (-1, 0, 0), .30, .36, 'dress')
-g = wall_prop('Ellie round mirror above the dresser', 10.07, 8.40, .55, (0, 1, 0))
+framed('Ellie princess dress drawing', 8.60, 7.05, .35, (-1, 0, 0), .30, .36, 'dress')
+g = wall_prop('Ellie round mirror above the dresser', 10.40, 8.10, .55, (1, 0, 0))
 g.cyl((0, -.012, 0), .20, .024, D['rose'], 24, rot=(math.pi / 2, 0, 0))
 g.vflat(ngon(.17, 24), -.0255, mirror)
 g.done()
