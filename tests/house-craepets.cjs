@@ -137,6 +137,10 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     const mf=mobile.frameLocator('#activity-frame');await mf.locator('.choice').first().waitFor();
     assert(await mobile.frame({url:/activity.html/}).evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Phone activity overflows horizontally');
     await mobile.screenshot({path:'tests/house-phone-activity.png'});await mobile.locator('#close-activity').tap();
+    // The tap's follow-up click must not fall through to the Rooms button under it.
+    await mobile.waitForTimeout(600);
+    assert(await mobile.locator('#rooms').isHidden(),'Closing an activity by touch opened Rooms (ghost click)');
+    assert(await mobile.evaluate(()=>houseTest.state.active),'Closing an activity by touch did not return to walking');
     await phone.close();console.log('PASS phone touch walking and learning activity');
     console.log('ERRORS',JSON.stringify(errors));assert.deepEqual(errors,[]);
   }catch(e){console.log('ERRORS',JSON.stringify(errors));await page.screenshot({path:'tests/house-failure.png',timeout:10000}).catch(()=>{});throw e;}finally{await browser.close();}

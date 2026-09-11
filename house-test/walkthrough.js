@@ -10,10 +10,17 @@ import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
 const $=id=>document.getElementById(id);
+// Touch buttons act on pointerup, so a finger doesn't wait for the click. The
+// browser's own click for that tap still follows ~0–300 ms later and lands on
+// whatever is now under the finger — once a panel has hidden, that was the
+// HUD button beneath it (tapping "Back to walking" opened Rooms). So after any
+// touch activation, every click for the next moment is swallowed, whichever
+// element it hits.
+let swallowClicksUntil=0;
+document.addEventListener('click',e=>{if(e.isTrusted&&performance.now()<swallowClicksUntil){e.stopPropagation();e.preventDefault();}},true);
 function bindButton(node,action){
-  let lastTouch=-Infinity;
-  node.addEventListener('pointerup',e=>{if(e.pointerType==='touch'&&!node.disabled){lastTouch=performance.now();e.preventDefault();action();}});
-  node.addEventListener('click',()=>{if(performance.now()-lastTouch>500)action();});
+  node.addEventListener('pointerup',e=>{if(e.pointerType==='touch'&&!node.disabled){swallowClicksUntil=performance.now()+450;e.preventDefault();action();}});
+  node.addEventListener('click',()=>{if(performance.now()>=swallowClicksUntil)action();});
 }
 const canvas=$('view'), welcome=$('welcome'), start=$('start');
 const scene=new THREE.Scene();

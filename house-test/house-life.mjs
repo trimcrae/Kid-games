@@ -9,6 +9,7 @@ import {stepCompanion} from './companions.mjs';
 import {createGround} from './pet-ground.mjs';
 import {createPetBehaviour,angleTo} from './pet-behaviour.mjs';
 import {createEmotes} from './emotes.mjs';
+import {routeSearch,createPawTrail} from './wayfinding.mjs';
 const $=id=>document.getElementById(id);
 export function companionBlocksCamera(point,camera,bounds){
   const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
@@ -94,10 +95,20 @@ export async function createHouseLife(tour){
     if(list.length)roomButton.title=list.map(s=>s.name).join(' · ');
     const walk=document.createElement('button');walk.className='walk-here';walk.textContent='🐾';walk.title='Walk there';walk.setAttribute('aria-label','Walk to '+room[1]);bindButton(walk,()=>guide(list[0]||{room:room[1],name:room[1],point:world.safeSpot(room[2],room[4],-room[3]),roomData:room}));row.append(walk);
   }
-  function guide(station){destination=stations.find(a=>a.id===station.id)||station;closeActivity(false);$('family-panel').hidden=true;tour.showRooms(false);tour.resume();}
+  // "Walk there": a route over the real walking world, shown as paw prints.
+  const trail=createPawTrail(scene);let route=null,replanAt=0,arrivedAt=0;
+  function planRoute(){route=destination?.point?routeSearch(world,{x:player.x,y:player.y,z:player.z},destination.point):null;trail.clear();}
+  function stopGuide(){destination=null;route=null;arrivedAt=0;trail.clear();$('journey').hidden=true;}
+  function guide(station){destination=stations.find(a=>a.id===station.id)||station;arrivedAt=0;planRoute();closeActivity(false);$('family-panel').hidden=true;tour.showRooms(false);tour.resume();}
   function showActivity(station){
     $('activity-choices').hidden=true;
-    if(station.owner&&!api.family().find(p=>p.id===station.owner)?.pet){recovery.open();return;}
+    // Someone else's empty plot: say so in the world, don't open the save form.
+    if(station.owner&&!api.family().find(p=>p.id===station.owner)?.pet){
+      const who=api.profiles().find(p=>p.id===station.owner)?.name||'They';
+      $('activity-choices').hidden=true;if(!tour.active)tour.resume();
+      say(station.owner===engine.who()?"You haven't adopted a Craepet yet — let's get you one!":`${who} hasn't adopted a Craepet yet. Pick ${who} in Family to adopt one!`,5000);
+      return;
+    }
     savePosition();tour.suspend();$('welcome').hidden=true;tour.showRooms(false);tour.suspend();$('family-panel').hidden=true;
     selected=station;api.enter(station);$('activity-title').textContent=station.icon+' '+station.name;$('activity-room').textContent=station.room;
     $('activity-panel').hidden=false;$('nearby').hidden=true;document.body.classList.add('in-activity');
@@ -124,7 +135,7 @@ export async function createHouseLife(tour){
   bindButton($('close-activity'),()=>closeActivity());
   bindButton($('close-choices'),()=>{$('activity-choices').hidden=true;tour.resume();});
   bindButton($('pet-button'),()=>{if(engine.state().pet){api.cuddle();petLife?.react('hello');}});
-  bindButton($('cancel-journey'),()=>{destination=null;$('journey').hidden=true;});
+  bindButton($('cancel-journey'),stopGuide);
   // Family doubles as the first-visit "Who's playing?" picker. Until someone
   // has picked a name this visit, a profile with no pet is asked who it is
   // before adopting, instead of silently adopting for whoever was last.
@@ -150,7 +161,7 @@ export async function createHouseLife(tour){
     const b=document.createElement('button');b.dataset.profile=p.id;
     const face=document.createElement('span');face.className='face';face.setAttribute('aria-hidden','true');face.textContent=p.emoji;
     const text=document.createElement('span');const name=document.createElement('b');name.textContent=p.name;const pet=document.createElement('small');text.append(name,pet);b.append(face,text);
-    bindButton(b,()=>{picked=true;savePosition();api.select(p.id);restorePosition(p.id);destination=null;sync(true);$('family-panel').hidden=true;tour.resume();});$('family-list').append(b);
+    bindButton(b,()=>{picked=true;savePosition();api.select(p.id);restorePosition(p.id);stopGuide();sync(true);$('family-panel').hidden=true;tour.resume();});$('family-list').append(b);
   }
   try{const probe='craepets.house.storage-check';localStorage.setItem(probe,'1');localStorage.removeItem(probe);}catch{$('save-status').textContent='Saving is unavailable in this browser. Keep this tab open to keep playing.';}
   function updateAvatar(snapshot){
@@ -298,7 +309,9 @@ export async function createHouseLife(tour){
       headPoint.set(player.x,(avatar?avatar.position.y:player.y)+(avatarSize?.y??.55)+.08,player.z).project(tour.camera);
       if(headPoint.z<1&&Math.abs(headPoint.x)<1.05&&Math.abs(headPoint.y)<1.05){
         const x=(headPoint.x+1)/2*innerWidth,y=(1-headPoint.y)/2*innerHeight,half=Math.min(el.offsetWidth/2+8,innerWidth/2);
-        el.style.left=Math.max(half,Math.min(innerWidth-half,x))+'px';el.style.top=Math.max(el.offsetHeight+100,y)+'px';free=false;
+        // Sit above the thought bubble when the pet is also showing one.
+        const lift=emotes.showing?40:0;
+        el.style.left=Math.max(half,Math.min(innerWidth-half,x))+'px';el.style.top=Math.max(el.offsetHeight+100,y-lift)+'px';free=false;
       }
     }
     if(free){el.style.left='50%';el.style.top='34%';}
@@ -311,6 +324,27 @@ export async function createHouseLife(tour){
     const el=document.querySelector('.location');el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
   }
   const overlayIds=['welcome','family-panel','save-panel','activity-choices','rooms','activity-panel'];
+  // Which room you're in: the nearest room spot on this floor you can see at
+  // head height without looking through a wall. Also notes whether the
+  // "walk there" destination's bubble is in plain sight.
+  let hereRoom=null,roomAt=0;
+  function whereAmI(){
+    const eye={x:player.x,y:player.y+1.2,z:player.z};let best=null,bd=Infinity,any=null,ad=Infinity;
+    for(const r of rooms){
+      if(Math.abs(r[4]-player.y)>.65)continue;const x=r[2],z=-r[3],d=Math.hypot(x-player.x,z-player.z);if(d>11)continue;
+      if(d<ad){ad=d;any=r[1];}
+      if(d<bd&&world.cameraFraction(eye,{x,y:r[4]+1.2,z})>.97){bd=d;best=r[1];}
+    }
+    hereRoom=best||any;
+    for(const m of markers)m.inSight=destination?.room===m.name&&Math.abs(m.point.y-player.y)<.65&&world.cameraFraction(eye,{x:m.point.x,y:m.point.y+1.2,z:m.point.z})>.97;
+  }
+  // Idle fade for the round top-right buttons (A1): a menu key, the cursor
+  // moving over the page, or a tap outside the play area wakes them.
+  let hudWakeAt=performance.now();const wakeHud=()=>{hudWakeAt=performance.now();};
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest?.('#view,#touch-controls'))wakeHud();},true);
+  document.addEventListener('pointermove',e=>{if(!document.pointerLockElement&&e.pointerType==='mouse')wakeHud();},{passive:true});
+  document.addEventListener('keydown',e=>{if(/^(KeyR|KeyF|KeyC|Escape|Tab)$/.test(e.code))wakeHud();});
+  document.addEventListener('focusin',wakeHud);
   sync(true);
   return {
     // The game clock and weather the HUD shows, for the 3D time of day.
@@ -375,11 +409,15 @@ export async function createHouseLife(tour){
         // Names only for companions you're standing near.
         r.label.visible=r.mesh.visible&&gap>.9&&gap<3.2;
       }
-      // Activity bubbles: same floor, 2–5 m away, or in reach (with [E]).
+      // Activity bubbles: in reach (with [E]), or 2–5 m away in the room you're
+      // in — not a neighbouring room's glimpsed through an open doorway — plus
+      // the "walk there" destination whenever it's in plain sight.
+      if(time>roomAt){roomAt=time+.4;whereAmI();}
       const nearRooms=new Set(near.map(s=>s.room)),keyed=finePointer();
       for(const m of markers){
         const distance=Math.hypot(player.x-m.point.x,player.z-m.point.z),sameFloor=Math.abs(player.y-m.point.y)<.65,reach=nearRooms.has(m.name);
-        m.bubble.visible=active&&sameFloor&&(reach||(distance>=2&&distance<=5));
+        const guided=destination?.room===m.name&&m.inSight;
+        m.bubble.visible=active&&sameFloor&&(reach||(m.name===hereRoom&&distance>=2&&distance<=5.5)||(guided&&distance<=10));
         const map=(reach&&keyed?m.keyed:m.plain);if(m.bubble.material.map!==map.texture){m.bubble.material.map=map.texture;m.bubble.material.needsUpdate=true;}
         const size=reach?.085:.07;m.bubble.scale.set(size*map.aspect,size,1);
         if(reach&&!tour.reducedMotion)m.bubble.position.y=m.point.y+.95+Math.sin(time*3)*.03;
@@ -387,17 +425,31 @@ export async function createHouseLife(tour){
       }
       $('nearby').hidden=!active||!near.length;
       if(destination){
-        const d=Math.hypot(player.x-destination.point.x,player.z-destination.point.z),dy=destination.point.y-player.y;
-        const angle=Math.atan2(destination.point.x-player.x,player.z-destination.point.z)+tour.yaw;
-        const arrows=['⬆','⬈','➡','⬊','⬇','⬋','⬅','⬉'];const arrow=arrows[((Math.round(angle/(Math.PI/4))%8)+8)%8];
-        const here=inReach(destination),floors=Math.abs(dy)>.6?(dy>0?' · take the stairs up':' · take the stairs down'):'';
-        $('journey').hidden=!active;$('journey-text').textContent=here?`🐾 ${destination.room} — you're here!`:`${arrow} ${destination.room} · ${Math.max(1,Math.round(d))} m${floors}`;
+        // Search a little each frame (a few ms), then lay paw prints along the
+        // next few metres of the route; plan again if the pet wanders off it.
+        if(route?.state==='searching'&&route.run(6)==='found')trail.setPath(route.path);
+        const off=trail.update(player);
+        if(route?.state==='found'&&off>1.8&&time>replanAt){replanAt=time+1.5;planRoute();}
+        const here=inReach(destination),dy=destination.point.y-player.y,floors=Math.abs(dy)>.6?(dy>0?' · up the stairs':' · down the stairs'):'';
+        let text;
+        if(here){text=`🐾 ${destination.room} — you're here!`;if(!arrivedAt)arrivedAt=time;trail.clear();}
+        else if(route?.state==='found')text=innerWidth<700||innerHeight<500?`🐾 ${destination.room}${floors}`:`🐾 Follow the paw prints to ${destination.room}${floors}`;
+        else if(route?.state==='searching')text=`🐾 Sniffing out the way to ${destination.room}…`;
+        else{const angle=Math.atan2(destination.point.x-player.x,player.z-destination.point.z)+tour.yaw;
+          const arrows=['⬆','⬈','➡','⬊','⬇','⬋','⬅','⬉'];
+          text=`${arrows[((Math.round(angle/(Math.PI/4))%8)+8)%8]} ${destination.room} · ${Math.max(1,Math.round(Math.hypot(player.x-destination.point.x,player.z-destination.point.z)))} m${floors}`;}
+        $('journey').hidden=!active;$('journey-text').textContent=text;
+        // Arrived: the trail has done its job.
+        if(arrivedAt&&time-arrivedAt>2.5)stopGuide();
       }else $('journey').hidden=true;
+      // The round buttons step back after a few quiet seconds of play.
+      document.body.classList.toggle('hud-quiet',active&&performance.now()-hudWakeAt>4000);
+      if(!active)hudWakeAt=performance.now();
       document.body.classList.toggle('overlay-open',overlayIds.some(id=>!$(id).hidden));
       coach(time,active);placeSpeech();roomToast(active);
     },
     // The top of your pet's head (above its ears), for anchoring a speech bubble.
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
+    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.point},distance:r.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY})),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
   };
 }
