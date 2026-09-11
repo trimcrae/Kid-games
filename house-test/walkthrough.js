@@ -4,6 +4,8 @@ import {createHouseLife} from './house-life.mjs';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
+import {createContactShadows} from './contact-shadows.mjs';
+import {createGpuTimer} from './gpu-timer.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {createCameraGuard,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
@@ -28,22 +30,33 @@ function fitLens(){
   camera.updateProjectionMatrix();
 }
 fitLens();
-let renderer;
+// Renderer look and cost. ?aa=0/1 and ?tone=agx/neutral override for QA.
+const query=new URLSearchParams(location.search);
+const RENDER={
+  // No MSAA: it cost 15-22 % of a frame on integrated graphics, and a sharper,
+  // higher render scale reads better than smoothed edges at a 0.6 scale.
+  antialias:query.has('aa')&&query.get('aa')!=='0',
+  // AgX keeps the warm palette from turning orange (Neutral measured sat 0.6+).
+  toneMapping:query.get('tone')==='neutral'?THREE.NeutralToneMapping:THREE.AgXToneMapping,
+  exposure:query.get('tone')==='neutral'?1:1.22,
+};
+let renderer,gpuTimer=null;
 const maxPixelRatio=Math.min(devicePixelRatio,1.35);
 let pixelRatio=Math.min(maxPixelRatio,1),qualitySince=0,qualityFrames=0,lastQualityChange=0;
 try {
-  renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+  renderer=new THREE.WebGLRenderer({canvas,antialias:RENDER.antialias,powerPreference:'high-performance'});
   renderer.setPixelRatio(pixelRatio);
   renderer.setSize(innerWidth,innerHeight);
   renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.AgXToneMapping;
-  renderer.toneMappingExposure=1.05;
+  renderer.toneMapping=RENDER.toneMapping;
+  renderer.toneMappingExposure=RENDER.exposure;
+  gpuTimer=createGpuTimer(renderer,camera);
 } catch(error) {
   $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled.';
   start.textContent='3D graphics unavailable';
   throw error;
 }
-const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches});
+const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera});
 
 let guard=null,cameraClearance=nearPlaneReach(camera)+.015;
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
@@ -217,19 +230,32 @@ function updateLocation(){
   if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
 let frames=0,lastDraw=0;
+// GPU budget per walking frame at the 30 fps cap, leaving room for the page
+// compositor and the activity iframe. Fill cost scales with pixel count.
+const GPU_TARGET_MS=21,GPU_HIGH_MS=27,PIXEL_FLOOR=.6;
 function adaptResolution(now){
+  gpuTimer?.poll();
   if(!active||!ready){qualitySince=now;qualityFrames=0;return;}
   qualityFrames++;
   const elapsed=now-qualitySince;
-  if(elapsed<1800)return;
+  if(elapsed<1200)return;
   const fps=qualityFrames*1000/elapsed;
   qualityFrames=0;qualitySince=now;
+  const floor=Math.min(PIXEL_FLOOR,maxPixelRatio);
   let next=pixelRatio;
   // Change only render size, never material/shadow shader features mid-walk.
-  // Hysteresis avoids oscillating around the 30 fps cap or a room capture.
-  if(fps<26)next=Math.max(Math.min(.6,maxPixelRatio),pixelRatio*.84);
+  const gpu=gpuTimer?.median();
+  if(gpu!=null){
+    // Measured GPU time says how far the ratio can move: step straight toward
+    // the size that fits the budget, down at once, up after a short settle.
+    const fit=pixelRatio*Math.sqrt(GPU_TARGET_MS/Math.max(gpu,1));
+    if(gpu>GPU_HIGH_MS)next=Math.max(floor,Math.min(pixelRatio*.92,fit));
+    else if(gpu<GPU_TARGET_MS*.85&&fps>27&&now-lastQualityChange>2500)next=Math.min(maxPixelRatio,pixelRatio+Math.min(.12,fit-pixelRatio));
+  }
+  // Without a GPU timer, hysteresis avoids oscillating around the 30 fps cap.
+  else if(fps<26)next=Math.max(floor,pixelRatio*.84);
   else if(fps>29.5&&now-lastQualityChange>8000)next=Math.min(maxPixelRatio,pixelRatio+.06);
-  if(Math.abs(next-pixelRatio)>.015){pixelRatio=next;renderer.setPixelRatio(pixelRatio);lastQualityChange=now;}
+  if(Math.abs(next-pixelRatio)>.015){pixelRatio=next;renderer.setPixelRatio(pixelRatio);lastQualityChange=now;gpuTimer?.reset();}
 }
 function animate(now){
   requestAnimationFrame(animate);
@@ -263,6 +289,11 @@ function animate(now){
   life?.tick(dt,now/1000,active);
   render();
 }
+let shading={};
+async function warmShaders(){
+  try{if(renderer.compileAsync)await renderer.compileAsync(scene,camera);}
+  catch(error){console.warn('Shader warm-up skipped:',error.message);}
+}
 async function load(){
   try{
     const response=await fetch('./house.json');if(!response.ok)throw new Error('Model manifest unavailable');const data=await response.json();
@@ -284,15 +315,27 @@ async function load(){
       mesh.layers.enable(1);scene.add(mesh);
     }
     lighting.load(data);
+    const contact=createContactShadows(scene,data.colliders||[]);
+    // Compile every house shader in parallel before the first frame, so the
+    // first render does not block the page for seconds.
+    await warmShaders();
     guard=createCameraGuard(binary,data.groups);
     world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
+    // Capture the first room's reflections (and compile the probe path) while
+    // the loading message is still up.
+    lighting.prime(player);
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
+    // The house follows the game's clock and weather (same as the HUD).
+    if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
+    // Pets, labels and markers bring their own materials.
+    await warmShaders();render();
+    shading={contactShadows:contact?.count??0};
     ready=true;
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
-      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,...lighting.diagnostics(),...life.diagnostics()};}};
+      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.antialias,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();

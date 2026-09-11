@@ -169,6 +169,8 @@ export async function createHouseLife(tour){
   document.addEventListener('visibilitychange',()=>{if(document.hidden){savePosition();if(!$('activity-panel').hidden)closeActivity(false);}});
   sync(true);
   return {
+    // The game clock and weather the HUD shows, for the 3D time of day.
+    sky:()=>({time:engine.timeOfDay(),weather:engine.weather()?.id}),
     hasPet:()=>!!engine.state().pet,
     adopt:()=>recovery.open(),
     face(angle,instant=false){wantHeading=angle;if(instant)heading=angle;},
