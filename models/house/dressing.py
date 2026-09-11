@@ -918,13 +918,15 @@ framed('Green bathroom whale picture', 10.40, 6.50, 2.42, (-1, 0, 0), .40, .30, 
 g, _ = rug_on('Primary bedroom rose rug', 13.30, 6.40, 1.60, 1.6, 2.2, D['rose'], D['cream'], .09,
               z=down(12.70, 6.40, 1.50), motifs=[(diamond(x, y, .12), D['cream']) for x, y in [(-.45, -.6), (-.45, .6)]])
 g.done()
-zb = down(14.78, 6.40, 2.5)
-g = prop('Primary bed cushions', 14.78, 6.40, zb)
+# The bed head is on the entry wall (House Tour 138.508/139.577s): cushions in
+# front of the pillows, the throw across the foot toward the TV dresser.
+zb = down(14.63, 5.29, 2.5)
+g = prop('Primary bed cushions', 14.63, 5.29, zb, -90)
 for dy, mat in [(-.35, D['rose']), (.35, D['corn'])]:
     g.soft((0, dy, .18), (.13, .42, .38), mat, .05, (0, .30, 0))
 g.done()
-zf = down(13.75, 6.41, 2.5)
-g = prop('Primary bed foot folded throw', 13.75, 6.41, zf)
+zf = down(14.63, 6.30, 2.5)
+g = prop('Primary bed foot folded throw', 14.63, 6.30, zf, 90)
 g.soft((0, 0, .015), (.45, 1.82, .03), D['rose'], .012)
 for dy in (-.915, .915):
     g.soft((0, dy, -.13), (.45, .03, .30), D['rose'], .012)
@@ -942,8 +944,8 @@ g.cyl((-.17, 0, .025), .077, .018, D['coral'], 14)
 g.ball((.17, 0, .03), (.085, .085, .05), D['corn'], 10, 6)
 g.box((.17, -.10, .006), (.10, .08, .01), D['corn'])
 g.done()
-zc = down(14.86, 4.88, 2.8)
-g = prop('Primary chest top mug books and plant', 14.86, 4.88, zc)
+zc = down(12.525, 6.91, 2.8)
+g = prop('Primary chest top mug books and plant', 12.525, 6.91, zc, 90)
 g.cyl((-.30, -.02, .045), .04, .09, D['rose'], 12)
 g.box((-.35, -.02, .05), (.012, .02, .05), D['rose'])
 for k, mat in enumerate([D['corn'], D['coral'], D['teal']]):
@@ -951,7 +953,7 @@ for k, mat in enumerate([D['corn'], D['coral'], D['teal']]):
 plant(g, .36, .02, 0, .06, .09, .22, 16)
 g.done()
 framed('Primary bedroom abstract picture', 12.80, 6.10, 2.75, (-1, 0, 0), .70, .50, 'abstract')
-g = prop('Primary narrow chest plant', 13.55, 7.78, down(13.55, 7.78, 2.6))
+g = prop('Primary narrow chest plant', 13.55, 8.10, down(13.55, 8.10, 2.6))
 plant(g, 0, 0, 0, .08, .12, .30, 24)
 g.done()
 
@@ -1171,7 +1173,8 @@ g.soft((-.075, 0, .20), (.02, .22, .13), D['corn'], .01, (0, .12, 0))
 g.done()
 g, _ = rug_on('Downstairs bathroom mat', 11.30, 7.55, -.70, .44, .70, D['teal'], D['cream'], .04, nx=2, ny=3)
 g.done()
-g = wall_prop('Downstairs bathroom hanging towel', 11.30, 8.00, -.10, (-1, 0, 0))
+# House Tour 183.523s: the towel bar is on the vanity wall, between it and the door.
+g = wall_prop('Downstairs bathroom hanging towel', 11.80, 6.88, -.10, (1, 0, 0))
 g.box((0, -.02, .12), (.40, .03, .03), D['wood'])
 g.soft((0, -.04, -.15), (.36, .03, .50), D['coral'], .012)
 g.done()

@@ -169,7 +169,9 @@ for x in [-.19,.19]:panel('Lower bath door',x,-.25,.38,.36,.64,white)
 basin('Lower bath white sink',(0,0),.81,.53,.82,.65,tilewhite)
 curve('Lower bath chrome faucet',[(0,.24,.84),(0,.24,.98),(0,.05,.98),(0,0,.92)],.016,steel)
 frame('Lower bath mirror',(0,.255,1.41),.77,.90,white,mirror)
-asset('Lower bathroom toilet',(11.84,8.48,0),-90,'V8')
+# House Tour 182.523/183.523s: the toilet stands against the window end wall,
+# beyond the vanity, its tank under the window and its bowl facing the door.
+asset('Lower bathroom toilet',(11.55,8.62,0),0,'V8; House Tour 182.523/183.523s')
 box('Lower toilet foot',(0,0,.19),(.27,.35,.38),tilewhite,.10)
 basin('Lower toilet bowl',(0,-.07),.39,.56,.44,.28,tilewhite)
 box('Lower toilet tank',(0,.23,.67),(.40,.18,.46),tilewhite,.06)
