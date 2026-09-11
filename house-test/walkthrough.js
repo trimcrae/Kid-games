@@ -5,7 +5,7 @@ import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
-import {createCameraGuard,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
 
 const $=id=>document.getElementById(id);
 function bindButton(node,action){
@@ -284,7 +284,7 @@ async function load(){
       mesh.layers.enable(1);scene.add(mesh);
     }
     lighting.load(data);
-    guard=createCameraGuard(binary,data.groups);
+    guard=createCameraGuard(binary,guardGroups(data.groups));
     world=new WalkingWorld(data.colliders,{height:1.05});teleport(rooms[0]);
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});

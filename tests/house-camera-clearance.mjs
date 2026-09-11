@@ -8,13 +8,13 @@ import {gunzipSync} from 'node:zlib';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {createCameraGuard,nearPlaneReach,orbitCamera,arrivalHeading} from '../house-test/camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,arrivalHeading} from '../house-test/camera-guard.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const mesh=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
 const binary=mesh.buffer.slice(mesh.byteOffset,mesh.byteOffset+mesh.byteLength);
 let began=performance.now();
-const guard=createCameraGuard(binary,data.groups);
+const guard=createCameraGuard(binary,guardGroups(data.groups));
 const built=performance.now()-began;
 const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(neighborhoodBoxes);
 // The walkthrough's lens: 70° vertical at the widest common desktop aspect.

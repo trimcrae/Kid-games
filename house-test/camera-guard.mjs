@@ -6,6 +6,10 @@
 // sightline against the rendered triangles themselves (glass included, so it
 // never backs out through a window) and keeps the camera far enough from any
 // surface that the near clipping plane cannot cut a hole in it.
+// Leaves are soft: the camera may brush through a canopy (as in any garden
+// game) rather than collapsing into the pet under every tree. Walls, glass,
+// trunks and everything else still stop it.
+export function guardGroups(groups){return groups.filter(g=>g.finish?.surface!=='foliage');}
 export function createCameraGuard(binary,groups,{cell=.5}={}){
   const f=new Float32Array(binary);
   let count=0;for(const g of groups)count+=g.count/3;
