@@ -35,9 +35,14 @@ assert.equal(shader.defines.HOUSE_AO,1);
 assert.equal(shader.uniforms.houseOcclusionStrength.value,.35);
 assert(shader.fragmentShader.includes('reflectedLight.indirectDiffuse*=houseAO'));
 assert(shader.fragmentShader.includes('reflectedLight.indirectSpecular*=houseAO'));
-assert(!/reflectedLight\.direct(?:Diffuse|Specular)\s*\*=\s*houseAO/.test(shader.fragmentShader));
+// Design change (render pass): a bounded share of the occlusion also darkens
+// direct diffuse light so furniture sits in its own shadow; specular stays.
+assert(!/reflectedLight\.direct(?:Diffuse|Specular)\s*\*=\s*houseAO\s*;/.test(shader.fragmentShader),'Direct light must not take full occlusion');
+assert(shader.fragmentShader.includes('reflectedLight.directDiffuse*=mix(1.0,houseAO,houseOcclusionShape.z)'));
+assert(!/reflectedLight\.directSpecular\s*\*=/.test(shader.fragmentShader));
+assert(shader.uniforms.houseOcclusionShape.value.z>0&&shader.uniforms.houseOcclusionShape.value.z<.6);
 const ordinary=createHouseMaterial(group),plainShader={vertexShader:THREE.ShaderLib.physical.vertexShader,
   fragmentShader:THREE.ShaderLib.physical.fragmentShader,uniforms:{},defines:{}};
 ordinary.onBeforeCompile(plainShader);assert.equal(plainShader.defines.HOUSE_AO,undefined);
 material.dispose();ordinary.dispose();
-console.log('PASS optional AO loading, raw mesh binding, payload integrity, normalized values and ambient-only shader hook');
+console.log('PASS optional AO loading, raw mesh binding, payload integrity, normalized values and ambient + partial direct occlusion hook');

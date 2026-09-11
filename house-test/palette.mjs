@@ -28,7 +28,7 @@ export const PALETTE_RULES=[
   {name:/^Clean warm beige carpet$/,color:'#cdb998'},
   {name:/^Cory light grey plush carpet$/,color:'#bdb3a6'},
   // Kitchen and bathroom tile: the motif sits within ~15 L* of its field.
-  {name:/^Muted grey tile pattern$/,color:'#c7bba6',roughness:.55},
+  {name:/^Muted grey tile pattern$/,color:'#d8cdb8',roughness:.6},
   {name:/^Ivory ceramic$/,collection:/Kitchen floor/,color:'#efe8da',roughness:.4,clearcoat:.25},
   {name:/^Ivory ceramic$/,color:'#f4f0e6',roughness:.2,clearcoat:.6},
   {name:/^Warm grey grout$/,color:'#bcb2a2'},
