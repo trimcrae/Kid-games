@@ -433,7 +433,7 @@ export async function createHouseLife(tour){
         const here=inReach(destination),dy=destination.point.y-player.y,floors=Math.abs(dy)>.6?(dy>0?' · up the stairs':' · down the stairs'):'';
         let text;
         if(here){text=`🐾 ${destination.room} — you're here!`;if(!arrivedAt)arrivedAt=time;trail.clear();}
-        else if(route?.state==='found')text=innerWidth<700?`🐾 ${destination.room}${floors}`:`🐾 Follow the paw prints to ${destination.room}${floors}`;
+        else if(route?.state==='found')text=innerWidth<700||innerHeight<500?`🐾 ${destination.room}${floors}`:`🐾 Follow the paw prints to ${destination.room}${floors}`;
         else if(route?.state==='searching')text=`🐾 Sniffing out the way to ${destination.room}…`;
         else{const angle=Math.atan2(destination.point.x-player.x,player.z-destination.point.z)+tour.yaw;
           const arrows=['⬆','⬈','➡','⬊','⬇','⬋','⬅','⬉'];
