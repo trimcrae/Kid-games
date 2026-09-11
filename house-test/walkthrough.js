@@ -273,8 +273,16 @@ function placeCamera(dt){
   if(rigState.distance>=view.distance-1e-4||view.distance<1e-4)return view;
   const s=rigState.distance/view.distance,t=view.target,p=view.position;
   const position={x:t.x+(p.x-t.x)*s,y:t.y+(p.y-t.y)*s,z:t.z+(p.z-t.z)*s};
-  // A point inside the guarded boom can still pass close to a jamb edge.
-  if(guard&&guard.clearanceAt(position)<cameraClearance-.015){rigState.distance=view.distance;return view;}
+  // A point inside the guarded boom can still pass close to a jamb edge. Step
+  // out along the boom only as far as the near plane needs, rather than
+  // jumping to the full length in one frame.
+  if(guard&&guard.clearanceAt(position)<cameraClearance-.015){
+    for(let d=rigState.distance+.08;d<view.distance;d+=.08){
+      const k=d/view.distance,q={x:t.x+(p.x-t.x)*k,y:t.y+(p.y-t.y)*k,z:t.z+(p.z-t.z)*k};
+      if(guard.clearanceAt(q)>=cameraClearance-.015){rigState.distance=d;return {target:t,position:q};}
+    }
+    rigState.distance=view.distance;return view;
+  }
   return {target:t,position};
 }
 let lastRender=performance.now();
