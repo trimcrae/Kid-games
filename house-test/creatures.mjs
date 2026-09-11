@@ -74,9 +74,14 @@ export function petpet(id){
   if(id==='duckling'||id==='snail'){const mat=new THREE.MeshStandardMaterial({color:palette[1]});const detail=new THREE.Mesh(sphere,mat);detail.position.set(0,id==='duckling'?.6:.45,id==='duckling'?.29:-.18);detail.scale.set(id==='duckling'?.10:.29,id==='duckling'?.045:.29,id==='duckling'?.10:.23);root.add(detail);}
   return root;
 }
-export function labelSprite(text,color='#e0ecc1'){
-  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=96;
-  const ctx=canvas.getContext('2d');ctx.fillStyle='#153a32ee';ctx.beginPath();ctx.roundRect(0,0,512,96,22);ctx.fill();ctx.fillStyle=color;ctx.font='bold 30px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,256,48,475);
-  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,depthTest:true}));s.scale.set(1.65,.31,1);return s;
+// A small cream name pill (the HUD's own look), sized to its text.
+export function labelSprite(text,color='#3b2e25'){
+  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+  const font='800 44px ui-rounded,"Nunito","Trebuchet MS",system-ui,sans-serif';ctx.font=font;
+  const w=Math.min(1000,Math.ceil(ctx.measureText(text).width)+64),h=76;canvas.width=w;canvas.height=h;
+  ctx.font=font;ctx.fillStyle='#fff8ec';ctx.strokeStyle='#e8dcc8';ctx.lineWidth=5;
+  ctx.beginPath();ctx.roundRect(3,3,w-6,h-6,(h-6)/2);ctx.fill();ctx.stroke();
+  ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,w/2,h/2+2,w-40);
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,depthTest:true,transparent:true}));s.scale.set(.3*w/h,.3,1);s.userData.aspect=w/h;return s;
 }
