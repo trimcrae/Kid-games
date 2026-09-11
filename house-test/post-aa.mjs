@@ -36,7 +36,7 @@ const FRAGMENT=/* glsl */`
     gl_FragColor=vec4(grade((lB<lMin||lB>lMax)?a:b),1.0);
   }`;
 
-export function installPostPass(renderer,camera,{mode='fxaa',shoulder=.55}={}){
+export function installPostPass(renderer,camera,{mode='fxaa',shoulder=.7}={}){
   if(mode==='off')return null;
   const size=new THREE.Vector2();
   let texture=null;
