@@ -326,7 +326,9 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     // Compile the key-shadow variants (screen and probe) in the background with
     // a light-only stand-in scene, then switch the shadow on: no load cost and
     // no in-frame compile. The first key map render is a single frame.
-    enableKeyShadow(){
+    // busy(): true while the player is walking; the switch then waits for a
+    // pause, the welcome card or the Rooms menu so play never stutters.
+    enableKeyShadow(busy=()=>false){
       if(!wantKeyShadow||key.castShadow)return Promise.resolve(false);
       // three compiles with the lights of both scenes it is given, so the
       // stand-in holds light copies plus proxies of every lit mesh (sharing
@@ -340,7 +342,8 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
         const m=o.material;if(!m||Array.isArray(m)||!(m.isMeshStandardMaterial||m.isMeshLambertMaterial||m.isMeshPhongMaterial))return;
         const proxy=new THREE.Mesh(o.geometry,m);proxy.receiveShadow=o.receiveShadow;proxy.castShadow=o.castShadow;proxy.layers.mask=o.layers.mask;stand.add(proxy);
       });
-      const done=()=>{key.castShadow=true;key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;return true;};
+      const flip=()=>{key.castShadow=true;key.shadow.needsUpdate=true;renderer.shadowMap.needsUpdate=true;return true;};
+      const done=()=>new Promise(resolve=>{const wait=()=>busy()?setTimeout(wait,500):resolve(flip());wait();});
       if(!renderer.compileAsync)return Promise.resolve(done());
       const screen=renderer.compileAsync(stand,camera||cube.children[0]);
       renderer.setRenderTarget(cubeTarget,0);
@@ -361,7 +364,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     setPhase(name,w){if(PHASES[name])phaseName=name;if(w)weather=w;if(loaded)applyPhase();},
     diagnostics(){return {practicalLights:selection.map(light=>light.name),shadowedLight:keyId,
       reflectionRoom:currentRoom,reflectionProbes:probes.size,shadowMapSize:sun.shadow.mapSize.x,
-      timeOfDay:phaseName,weather,glossyMaterials:glossy.length,
+      timeOfDay:phaseName,weather,glossyMaterials:glossy.length,keyShadow:key.castShadow,
       lightLevels:{sun:+sun.intensity.toFixed(2),hemisphere:+hemisphere.intensity.toFixed(2),pet:+petLight.intensity.toFixed(2),
         practical:slots.map(s=>+s.light.intensity.toFixed(2))}};},
     dispose(){for(const probe of probes.values())probe.dispose();base.dispose();cubeTarget.dispose();pmrem.dispose();sky.dispose();},
