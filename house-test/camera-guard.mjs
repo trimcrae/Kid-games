@@ -121,23 +121,31 @@ export function createCameraGuard(binary,groups,{cell=.5}={}){
       const list=gather(from.x,from.y,from.z,to.x,to.y,to.z,clearance);
       let hit=1,hard=1;
       for(const t of list){const s=crossing(t,from.x,from.y,from.z,dx,dy,dz);if(s<hit)hit=s;if(!soft[t]&&s<hard)hard=s;}
-      // Look past low furniture only while the camera still ends up well above
-      // the pet (so above that furniture); otherwise everything blocks.
-      if(hard>hit&&dy*(hard-clearance/len)>=SOFT_CLEAR)hit=hard;
-      let s=Math.max(0,Math.min(1,hit-clearance/len));
       // Back towards the player until the near plane has room everywhere.
-      for(let i=0;i<60&&s>0;i++){
-        const d=nearest(list,from.x+dx*s,from.y+dy*s,from.z+dz*s,clearance);
-        if(d>=clearance)break;
-        s=Math.max(0,s-(clearance-d+.01)/len);
-      }
-      return s;
+      const settle=h=>{
+        let s=Math.max(0,Math.min(1,h-clearance/len));
+        for(let i=0;i<60&&s>0;i++){
+          const d=nearest(list,from.x+dx*s,from.y+dy*s,from.z+dz*s,clearance);
+          if(d>=clearance)break;
+          s=Math.max(0,s-(clearance-d+.01)/len);
+        }
+        return s;
+      };
+      // Look past low furniture only while the camera still ends up well above
+      // the pet (so above that furniture), after the near-plane back-off too;
+      // otherwise everything blocks.
+      if(hard>hit&&dy*(hard-clearance/len)>=SOFT_CLEAR){const s=settle(hard);if(dy*s>=SOFT_CLEAR||s<=hit)return s;}
+      return settle(hit);
     },
     // For tests and diagnostics.
     // hardOnly: ignore low furniture (walls, floors, ceilings, glass and tall
     // furniture still count).
     blocked(from,to,hardOnly=false){const dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;const list=gather(from.x,from.y,from.z,to.x,to.y,to.z,.01);
       for(const t of list)if(!(hardOnly&&soft[t])&&crossing(t,from.x,from.y,from.z,dx,dy,dz)<1-1e-6)return true;return false;},
+    // First crossing of from->to with any drawn surface, low furniture
+    // included, as a fraction (1 when clear).
+    firstHit(from,to){const dx=to.x-from.x,dy=to.y-from.y,dz=to.z-from.z;let hit=1;
+      for(const t of gather(from.x,from.y,from.z,to.x,to.y,to.z,.01)){const s=crossing(t,from.x,from.y,from.z,dx,dy,dz);if(s<hit)hit=s;}return hit;},
     softTriangles:()=>soft.reduce((a,b)=>a+b,0),
     clearanceAt(p,limit=.5){return nearest(gather(p.x,p.y,p.z,p.x,p.y,p.z,limit),p.x,p.y,p.z,limit);}
   };
@@ -173,28 +181,171 @@ export function boomCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG
 }
 // In a tight room the camera swings up towards the ceiling before it slides
 // in along the boom, so it looks down on the pet instead of into its back.
-// Every candidate is a full guarded placement; the swing is capped so small
-// rooms never turn into a plan view.
-export const CRANE_STEPS=[0,-.15,-.3,-.45];
-// Backed into a corner, a look down from above still shows the pet, where a
-// camera squeezed against the wall behind it would show only fur or wall.
-export const CORNER_STEPS=[-.65,-.85,-1.25];
+// Every candidate is a full guarded placement. The swing ("crane") is the
+// smallest that gives the boom a comfortable length; a closer boom (the lens
+// eases wider as it shortens) is preferred to a steep one, and the swing never
+// takes the view past about 60° down: a narrow hall or a corner is seen from
+// above and behind, never as a plan view that is hard to steer by.
+// A settled placement (an arrival, the tests) searches the swing in these
+// steps; the follow rig climbs or lowers it a finer step at a time.
+export const CRANE_STEP=.15,CLIMB_STEP=.1;
+// Total boom pitch floor: about 61° down at the full boom (25° is the default).
+export const PITCH_FLOOR=-.95;
+// A boom this long needs no crane.
+export const CRANE_GOOD=1.35;
+// Crane penalty when nothing reaches CRANE_GOOD: each 0.1 rad of swing must
+// buy this much more boom (m) to be worth it.
+const CRANE_COST=.03;
+// The look-down angle of a boom pitch (camera to target), in radians.
+export function lookDown(pitch,rig=CAMERA_RIG){return Math.atan2(rig.height-rig.target-Math.sin(pitch)*rig.boom,Math.cos(pitch)*rig.boom);}
+const craneFloor=pitch=>Math.min(0,PITCH_FLOOR-pitch);
+const craneCandidates=pitch=>{const floor=craneFloor(pitch),out=[];for(let e=0;e>floor+1e-6;e-=CRANE_STEP)out.push(+e.toFixed(3));if(!out.length||out.at(-1)>floor+1e-6)out.push(floor);return out;};
+const utility=(extra,view)=>Math.min(view.distance,CRANE_GOOD)+extra*CRANE_COST*10;
+// The crane a settled placement (arrival, tests) uses.
 export function craneExtra(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
   let best=null;
-  for(const extra of CRANE_STEPS){
-    const view=boomCamera(player,yaw,Math.max(-1.45,pitch+extra),world,guard,clearance,rig);
-    if(!best||view.distance>best.view.distance+.1)best={extra,view};
-    if(view.distance>=1.5)return best;
-  }
-  if(best.view.distance<.9)for(const extra of CORNER_STEPS){
-    const view=boomCamera(player,yaw,Math.max(-1.45,pitch+extra),world,guard,clearance,rig);
-    if(view.distance>best.view.distance+.1)best={extra,view};
-    if(view.distance>=1.2)break;
+  for(const extra of craneCandidates(pitch)){
+    const view=boomCamera(player,yaw,pitch+extra,world,guard,clearance,rig);
+    if(view.distance>=CRANE_GOOD)return {extra,view};
+    if(!best||utility(extra,view)>utility(best.extra,best.view)+.02)best={extra,view};
   }
   return best;
 }
 export function orbitCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RIG){
   return craneExtra(player,yaw,pitch,world,guard,clearance,rig).view;
+}
+// The walkthrough's follow camera, frame by frame. The guard's answer is where
+// the camera may go this frame: the boom pulls in at once but eases back out,
+// and the crane swings smoothly (eased, and never faster than CRANE_RATE) to a
+// swing chosen with hysteresis, so turning in a tight room reads as one
+// continuous move instead of snapping between levels. Anything shown lies on a
+// guarded boom no further out than the guard allowed.
+export const CRANE_RATE=1.1;   // rad/s: the fastest the crane swings
+const CRANE_EASE=3.2,BOOM_EASE=3.5,PULL_EASE=6,RESCAN=4,JAM=.3,LEAD=.5;
+export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
+  let state=null;
+  // Where the crane should head, a step at a time from where it is heading
+  // now: a swing with a good boom stays until one step lower fits with room
+  // to spare; otherwise it moves to a neighbour with a good boom, or climbs
+  // towards the better trade of boom length against swing. Two or three
+  // placements a search instead of the whole ladder.
+  function choose(focus,yaw,pitch,world,guard,clearance,cur,known){
+    const floor=craneFloor(pitch);cur=Math.max(floor,Math.min(0,cur));
+    const at=e=>known.get(e)??(known.set(e,boomCamera(focus,yaw,pitch+e,world,guard,clearance,rig)),known.get(e));
+    const v=at(cur),lower=Math.min(0,cur+CLIMB_STEP),higher=Math.max(floor,cur-CLIMB_STEP);
+    if(v.distance>=CRANE_GOOD)return lower!==cur&&at(lower).distance>=CRANE_GOOD+.25?lower:cur;
+    const vl=lower!==cur?at(lower):null;
+    if(vl&&vl.distance>=CRANE_GOOD)return lower;
+    const vh=higher!==cur?at(higher):null;
+    if(vh&&vh.distance>=CRANE_GOOD)return higher;
+    let best=cur,score=utility(cur,v)+.02;
+    if(vh&&utility(higher,vh)>score){best=higher;score=utility(higher,vh);}
+    if(vl&&utility(lower,vl)>score){best=lower;score=utility(lower,vl);}
+    // A shallow slope can hide a better view at the top of the swing: head
+    // for it a step at a time.
+    if(best===cur&&higher!==cur&&floor<higher){const vf=at(floor);if(utility(floor,vf)>score+.03)best=higher;}
+    return best;
+  }
+  return {
+    // Frames where the crane had to leave its easing to get out of the pet.
+    escapes:0,
+    reset(){state=null;},
+    get crane(){return state?.extra??0;},
+    place(focus,yaw,pitch,dt,world,guard,clearance){
+      const known=new Map();
+      const floor=craneFloor(pitch);
+      if(!state){const c=craneExtra(focus,yaw,pitch,world,guard,clearance,rig);known.set(c.extra,c.view);state={want:c.extra,extra:c.extra,distance:c.view.distance,age:0,yaw,spin:0,ahead:null};}
+      else{
+        // How fast the view is panning, smoothed over a few frames.
+        const turn=Math.atan2(Math.sin(yaw-state.yaw),Math.cos(yaw-state.yaw));state.yaw=yaw;
+        state.spin+=((dt>0&&Math.abs(turn)<.3?turn/dt:0)-state.spin)*(1-Math.exp(-dt*8));
+        // Panning towards a wall: look a moment ahead along the pan, so the
+        // crane starts rising before the wall arrives rather than after.
+        state.ahead=Math.abs(state.spin)>.3?yaw+Math.max(-.6,Math.min(.6,state.spin*LEAD)):null;
+        // Searched every few frames (every frame while the boom is short); in
+        // between only the current swing is placed, which keeps tight rooms
+        // as cheap as open ones.
+        if(state.age++>=RESCAN){state.want=choose(focus,yaw,pitch,world,guard,clearance,state.want,known);state.age=0;}
+        // (Every few frames while panning.)
+        if(state.ahead!==null&&!(state.aheadWait-->0)){
+          state.aheadWait=RESCAN-1;
+          const here=(known.get(state.want)??boomCamera(focus,yaw,pitch+state.want,world,guard,clearance,rig)).distance;
+          const ahead=boomCamera(focus,state.ahead,pitch+state.want,world,guard,clearance,rig).distance;
+          state.aheadDistance=ahead<here-.3?ahead:Infinity;
+          if(ahead<.9*CRANE_GOOD&&ahead<here-.3){
+            const c=craneExtra(focus,state.ahead,pitch,world,guard,clearance,rig);
+            state.want=Math.min(state.want,c.extra);state.aheadDistance=c.view.distance;
+          }
+        }
+        if(state.ahead===null)state.aheadDistance=Infinity;
+      }
+      state.want=Math.max(floor,Math.min(0,state.want));
+      // Swing towards the chosen crane: eased, and rate-limited.
+      if(reducedMotion)state.extra=state.want;
+      else{
+        const step=(state.want-state.extra)*(1-Math.exp(-dt*CRANE_EASE)),limit=CRANE_RATE*dt;
+        state.extra+=Math.max(-limit,Math.min(limit,step));
+        if(Math.abs(state.extra-state.want)<.004)state.extra=state.want;
+      }
+      state.extra=Math.max(floor,Math.min(0,state.extra));
+      let view=known.get(state.extra)??boomCamera(focus,yaw,pitch+state.extra,world,guard,clearance,rig);
+      // Jammed into the pet (a flick of the mouse can land the boom on a bed
+      // or a wall at once): nothing useful shows from there, so the crane
+      // goes straight to the nearest swing that clears the pet, if any.
+      // (Coarse steps first, then the smallest swing that does it; a spot
+      // where nothing clears waits a few frames before searching again.)
+      let escaped=false;
+      if(view.distance<JAM&&state.extra>floor&&!(state.jamWait>0&&state.jamWait--)){
+        const place=e=>boomCamera(focus,yaw,pitch+e,world,guard,clearance,rig);
+        let hi=state.extra,found=null;
+        for(let e=Math.max(floor,state.extra-CRANE_STEP);;e=Math.max(floor,e-CRANE_STEP)){
+          const v=place(e);if(v.distance>=JAM+.1){found={e,v};break;}
+          hi=e;if(e<=floor)break;
+        }
+        if(found){
+          for(let e=hi-.025;e>found.e+1e-6;e-=.025){const v=place(e);if(v.distance>=JAM+.1){found={e,v};break;}}
+          state.extra=found.e;state.want=Math.min(state.want,found.e);view=found.v;escaped=true;
+        }else state.jamWait=4;
+      }
+      if(escaped)this.escapes++;
+      if(view.distance<.9*CRANE_GOOD)state.age=Math.max(state.age,RESCAN-1);
+      if(reducedMotion)state.distance=view.distance;
+      // Panning towards a wall, the boom glides in ahead of it instead of
+      // snapping in when the wall arrives.
+      const goal=reducedMotion?view.distance:Math.min(view.distance,Math.max(state.aheadDistance??Infinity,JAM+.1));
+      const eased=state.distance+(goal-state.distance)*(1-Math.exp(-dt*(goal<state.distance?PULL_EASE:BOOM_EASE)));
+      state.distance=Math.min(view.distance,eased);
+      if(state.distance>=view.distance-1e-4||view.distance<1e-4)return {...view,escaped};
+      const t=view.target,p=view.position,rise=(p.y-t.y)/view.distance;
+      const along=d=>({x:t.x+(p.x-t.x)*d/view.distance,y:t.y+(p.y-t.y)*d/view.distance,z:t.z+(p.z-t.z)*d/view.distance});
+      // The full boom may look over a chair back or a banister from well above
+      // it. Easing out from below, the camera skips the stretch where it would
+      // be inside it or look through it from its own height.
+      let softAt=Infinity,over=0;
+      if(rise*state.distance<SOFT_CLEAR){
+        const first=guard?guard.firstHit(t,p):1;
+        if(first<1-1e-3){softAt=first*view.distance-clearance;over=rise>0?Math.min(view.distance,SOFT_CLEAR/rise+.01):view.distance;}
+      }
+      const clearOfSoft=d=>d<=softAt||d>=over;
+      if(!clearOfSoft(state.distance))state.distance=over;
+      // (Nor inside a walking box it is looking past, such as a stair rail's.)
+      const inBox=q=>world&&world.nearby(q.x,q.z,.05).some(b=>q.x>b.min[0]&&q.x<b.max[0]&&q.y>b.min[1]&&q.y<b.max[1]&&q.z>b.min[2]&&q.z<b.max[2]);
+      const fits=d=>{const q=along(d);return clearOfSoft(d)&&!inBox(q)&&(!guard||guard.clearanceAt(q)>=clearance-.015);};
+      // A point inside the guarded boom can still pass close to a jamb edge.
+      // Move along the boom (in or out, whichever is nearer) only as far as
+      // the near plane needs, rather than jumping to the full length.
+      if(!fits(state.distance)){
+        for(let k=.08;k<view.distance;k+=.08){
+          const out=state.distance+k,inward=state.distance-k;
+          if(out<view.distance&&fits(out)){state.distance=out;return {target:t,position:along(out),distance:out,escaped};}
+          if(inward>=JAM+.1&&fits(inward)){state.distance=inward;return {target:t,position:along(inward),distance:inward,escaped};}
+          if(out>=view.distance&&inward<JAM+.1)break;
+        }
+        state.distance=view.distance;return {...view,escaped};
+      }
+      return {target:t,position:along(state.distance),distance:state.distance,escaped};
+    },
+  };
 }
 // Arrive looking along the room's authored direction unless the camera would
 // be jammed against a wall or the pet there; then turn to the nearest heading
