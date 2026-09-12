@@ -45,7 +45,7 @@ export const ROUTINES={
   jeannie:{day:[s("Jeannie's bedroom",13.85,7.1,'read'),s("Jeannie's bedroom",14.55,6.95,'read',{up:true})],night:[s("Jeannie's bedroom",15.9,6.9,'nap',{up:true})]},
   shannon:{day:[s('Living room',.64,2.13,'sit',{up:true}),s('Living room',2.35,2.3,'play')],night:[s("Mom & Dad's bedroom",14.25,5.45,'nap',{up:true})]},
   tristan:{day:[s('Living room',.63,2.96,'sit',{up:true}),s('Living room',1.9,1.8,'play')],night:[s("Mom & Dad's bedroom",15.0,5.45,'nap',{up:true})]},
-  guest:{day:[s('Living room',2.35,2.3,'play')],night:[s('Living room',2.85,2.93,'nap',{up:true})]},
+  guest:{day:[s('Living room',2.35,2.3,'play')],night:[s('Living room',1.0,3.86,'nap',{up:true})]},
   fen:{day:[s('Back yard',7.5,15.7,'tend',{face:[6.15,15.75]}),s('Back yard',4.8,15.7,'tend',{face:[6.15,15.75]})],night:[s('Back yard',7.5,15.2,'nap')]},
   dizzy:{day:[s('Basement playroom',4.75,2.6,'play'),s('Basement playroom',2.6,3.0,'play')],night:[s('Basement playroom',2.6,3.0,'nap')]},
   marigold:{day:[s('Garage',-2.7,7.4,'stand',{face:[-1.39,7.62]}),s('Garage',-.4,3.7,'arrange',{face:[-.4,3.05]})],night:[s('Garage',-.4,3.7,'nap')]},

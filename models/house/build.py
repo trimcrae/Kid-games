@@ -896,8 +896,8 @@ child_lounge('Child-sized blue sofa', (2.35, .52, .018), 1.42, child_navy, 180)
 # H50.008/H51.008/H53.510/H54.010: the tub chair stands just past the sofa's
 # right arm in front of the cupboard, facing into the room toward the entry
 # (was mid-room at (2.85, 3.00) facing the windows with its back to the TV).
-# With the TV cabinet kept at 1.77 m there is no room to turn it the observed
-# ~30 degrees toward the windows, so it faces the entry squarely.
+# Between the cupboard and the dollhouse there is no room to turn it the
+# observed ~30 degrees toward the windows, so it faces the entry squarely.
 living_tub_chair('Living upholstered armchair', (1.07, 3.86, .018), tub_taupe, 90)
 table('White tray activity table', (1.82, 2.30, .018), (1.36, .82, .49), white, 90, '8')
 for x in [-.66, .66]:
@@ -950,33 +950,32 @@ for x in [-.205,.205]:
     panel('Cupboard raised door',x,-.31,1.03,.397,1.77,walnut)
     sphere('Cupboard brass handle',(x*.20,-.365,1.02),(.019,.018,.025),brass)
 # H48.007 resolves three broad lower drawer rows beneath the open AV bay,
-# in dark brown wood. Keep the prior estimated overall footprint/TV height.
-# 7 cm toward the pier end (was X 2.25) to clear the moved tub chair; size kept.
-asset('Living television media cabinet',(2.32,4.08,.018),0,'House Tour 48.007s,54.010s',
+# in dark brown wood. H53.510/H54.010: along the partition come the tub chair,
+# the dollhouse against the wall, then this narrow dresser carrying a TV about
+# as wide as itself, with the floor lamp at the pier. The earlier 1.77 m
+# estimate left no wall for the dollhouse; both are now ~1 m (estimates).
+asset('Living television media cabinet',(2.75,4.08,.018),0,'House Tour 48.007s,53.510s,54.010s',
       'dark wood, open upper shelving and three broad drawer rows observed; dimensions estimated')
-box('Media cabinet lower carcass',(0,0,.205),(1.72,.43,.37),walnut,.014)
-for x in [-.835,.835]:
+box('Media cabinet lower carcass',(0,0,.205),(.97,.43,.37),walnut,.014)
+for x in [-.485,.485]:
     box('Media cabinet side',(x,0,.325),(.05,.43,.61),walnut,.008)
-box('Media cabinet back',(0,.203,.50),(1.62,.025,.22),walnut,.003)
-box('Media cabinet AV shelf',(0,0,.395),(1.65,.44,.025),walnut,.005)
+box('Media cabinet back',(0,.203,.50),(.92,.025,.22),walnut,.003)
+box('Media cabinet AV shelf',(0,0,.395),(.95,.44,.025),walnut,.005)
 box('Media cabinet open bay divider',(0,0,.515),(.025,.41,.22),walnut,.003)
-box('Media cabinet overhanging top',(0,0,.64),(1.77,.47,.045),walnut,.012)
+box('Media cabinet overhanging top',(0,0,.64),(1.02,.47,.045),walnut,.012)
 for z in [.09,.205,.32]:
-    box('Broad media cabinet drawer',(0,-.236,z),(1.60,.035,.105),walnut,.008)
-    for x in [-.43,.43]:
+    box('Broad media cabinet drawer',(0,-.236,z),(.90,.035,.105),walnut,.008)
+    for x in [-.22,.22]:
         for dx in [-.055,.055]:
             rod('Media drawer pull mounting',(x+dx,-.255,z),(x+dx,-.282,z),.005,steel)
         rod('Media drawer horizontal pull',(x-.055,-.285,z),(x+.055,-.285,z),.006,steel)
-asset('Living large television',(2.32,4.08,.018),0,'House Tour 54.010s')
-box('Large TV bezel',(0,0,1.12),(1.47,.075,.85),black,.018)
-box('Large TV dark screen',(0,-.043,1.12),(1.42,.009,.80),screen,.01)
-for x in [-.50,.50]:rod('TV angled foot',(x,0,.75),(x+.09,-.15,.65),.013,black)
-# H50.008/H53.510: the dollhouse stands between the tub chair and the TV unit,
-# open side to the room. The 1.77 m TV cabinet (the video unit is narrower)
-# leaves no partition length for it beside the chair, so it keeps that order
-# standing just in front of the cabinet's left end (was (.93, 4.03), which cut
-# into the cupboard and now holds the chair).
-asset('Living dollhouse shelf',(1.82,3.565,.018),0,'House Tour 50.008/53.510/54.010s')
+asset('Living large television',(2.75,4.08,.018),0,'House Tour 53.510s,54.010s')
+box('Large TV bezel',(0,0,.985),(1.00,.075,.58),black,.018)
+box('Large TV dark screen',(0,-.043,.985),(.96,.009,.54),screen,.01)
+for x in [-.36,.36]:rod('TV angled foot',(x,0,.75),(x+.09,-.15,.65),.013,black)
+# H50.008/H53.510/H54.010: the dollhouse stands against the partition between
+# the tub chair and the TV dresser, open side to the room.
+asset('Living dollhouse shelf',(1.825,4.08,.018),0,'House Tour 50.008/53.510/54.010s')
 for x in [-.37,.37]:box('Dollhouse side',(x,0,.55),(.035,.40,1.10),white)
 for z in [.05,.42,.78,1.11]:box('Dollhouse shelf',(0,0,z),(.77,.42,.03),white)
 box('Dollhouse back',(0,.20,.58),(.76,.025,1.13),cream)

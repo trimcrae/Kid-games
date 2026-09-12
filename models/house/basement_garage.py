@@ -549,10 +549,12 @@ rod('Empty clothing rail',(-.47,0,1.29),(.47,0,1.29),.018,steel)
 # H186.525/H187.527: along the rear wall from the window corner come the white
 # bookcase under the window, then the low pink shelf; the pine cabinet stands
 # against the entry (bathroom) wall short of the rear corner, its plain side
-# toward the doorway. Sizes remain the W10 estimates.
+# toward the doorway. Sizes remain the W10 estimates. The cabinet sits as far
+# toward the rear corner as the pink shelf allows so a pet still passes the bed
+# foot into the room's rear half; the bookcase stands just clear of the sill.
 shelf_unit('Pink bedroom low pink shelf',(20.23,8.98,-1.05),1.05,.78,pinkwood,-90,'W10; House Tour 186.025/186.525s')
-shelf_unit('Pink bedroom small bookcase',(20.23,10.42,-1.05),.61,.85,white,-90,'W10; House Tour 186.525/188.527s')
-chest('Pink bedroom wood dresser',(19.56,7.893,-1.05),.83,1.12,180,4,1,'W10; House Tour 186.025/186.525s')
+shelf_unit('Pink bedroom small bookcase',(20.12,10.42,-1.05),.61,.85,white,-90,'W10; House Tour 186.525/188.527s')
+chest('Pink bedroom wood dresser',(19.68,7.893,-1.05),.83,1.12,180,4,1,'W10; House Tour 186.025/186.525s')
 # H188.527/H190.028: three-tier wood shelves on the far wall toward the front
 # corner, above the head of the bed.
 asset('Pink bedroom wall shelves',(17.71,11.287,-1.05),0,'W10; House Tour 188.527/190.028s')
