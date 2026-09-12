@@ -1194,7 +1194,7 @@ for k, (x, mat) in enumerate([(-.30, D['rose']), (-.10, D['mustard']), (.10, D['
         g.cyl((x, 0, .83), .15, .40, mat, 14, top=.075, sy=.5)
 g.done()
 zd = down(10.555, 8.10, .5)
-g = prop('Ellie dresser crown jewellery box and mirror', 10.555, 8.22, zd, -90)
+g = prop('Ellie dresser crown jewellery box and mirror', 10.555, 8.325, zd, -90)
 g.cyl((-.20, -.02, .02), .065, .04, D['mustard'], 16, caps=(False, False))
 for k in range(5):
     a = k * math.tau / 5
@@ -1705,7 +1705,7 @@ g = wall_prop('Ellie princess bunting', 8.60, 7.00, .85, (-1, 0, 0))
 bunting(g, .90, [D['rose'], D['mustard'], D['flilac'], D['paper'], D['rose'], D['mustard']], drop=.13, sag=.04)
 g.done()
 framed('Ellie princess dress drawing', 8.60, 7.05, .35, (-1, 0, 0), .30, .36, 'dress')
-g = wall_prop('Ellie round mirror above the dresser', 10.40, 8.22, .55, (1, 0, 0))
+g = wall_prop('Ellie round mirror above the dresser', 10.40, 8.325, .55, (1, 0, 0))
 g.cyl((0, -.012, 0), .20, .024, D['rose'], 24, rot=(math.pi / 2, 0, 0))
 g.vflat(ngon(.17, 24), -.0255, mirror)
 g.done()
