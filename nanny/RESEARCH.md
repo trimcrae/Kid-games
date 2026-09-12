@@ -1,4 +1,20 @@
-# Nanny's house-color tour — evidence
+# Blue house color tour — evidence
+
+## Current revision: six houses, house-to-house route
+
+User requested less prominent personal naming, more than three houses, and use of the school solely as a search-area guide. Visible personal naming was removed; the existing `/nanny/` URL remains compatible. The old three-stop school loop below is historical evidence, superseded by this revision.
+
+Additional Street View inspections on September 12, 2026, 12:45–12:52 EDT:
+
+- **383 Doewood Lane, Rochester NY 14606**: Google pin 43.1806626,-77.7361972; July 2025 panorama `XYFa-FfZMIKkhe95lTZpfw`, camera 43.1807021,-77.7365415, heading 99.382965. Light muted blue colonial, white trim, two-car garage, tree obscures left side. Camera label is 378. [Listing corroboration](https://www.compass.com/homedetails/383-Doewood-Ln-Greece-NY-14606/3GF17_pid/). Lighter comparison; Favorite Jeans / Smoky Azurite suggestions.
+- **353 Doewood Lane, Rochester NY 14606**: Google pin 43.1802323,-77.7361988; July 2025 panorama `_TioTrbYSTXXWXvCNxr6Lw`, original camera 43.1802281,-77.7365297, heading 88.992226. Deep blue-gray exterior, white garage door and trim; shrubs obscure some central siding. Blustery Sky / Smoky Blue suggestions.
+- **339 Doewood Lane, Rochester NY 14606**: Google pin 43.1800409,-77.7361917; default July 2025 panorama `0gqoLCh4L8h6VBU9iat-JQ` is tree-screened. Verified adjacent lighter blue colonial from the 353 panorama; rotated visibly to heading 117.3984551350036 (camera resolved to 43.1802285,-77.7365651). This angle shows 353 on the left and 339 on the right. The card explicitly identifies the right-hand house and explains the camera label. [Listing reference](https://www.compass.com/homedetails/339-Doewood-Ln-Greece-NY-14606/3ETIF_pid/). Favorite Jeans / Smoky Azurite suggestions.
+
+Expanded route verified in Google Maps, including all six address fields and Details: **26 Picturesque → 1050 Latta → 466 Mt Ridge → 383 Doewood → 353 Doewood → 339 Doewood**. On September 12, 2026 at 12:49 EDT: **28 minutes, 12.4 miles**. Legs: 3 minutes/1.5 miles; 9 minutes/3.8 miles; 14 minutes/7.0 miles; 13 seconds/157 feet; 14 seconds/161 feet. The site rounds to about 30 minutes between houses and allows 60–75 minutes with viewing. Arrival and homeward trips excluded. The school is absent from every driving URL.
+
+Because the full route has four intermediate waypoints, the page includes mobile-friendly Part 1 (houses 1–4; two waypoints) and Part 2 (houses 4–6; one waypoint), plus full-route and per-leg links. First-house directions omit origin so the user can choose their own starting point. The southwest Greece extension is labeled explicitly.
+
+## Original three-house research (superseded route)
 
 Research and visual checks: September 12, 2026, approximately 12:18–12:27 America/New_York.
 This page is a separate static route on the existing GitHub Pages site; the repository's explicit main/push deployment instruction takes precedence over the Sites default hosting workflow. No new hosted project or dependencies were created.
