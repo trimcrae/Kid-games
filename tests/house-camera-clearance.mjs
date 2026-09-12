@@ -11,6 +11,7 @@ import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,craneExtra,arrivalHeading,createFollowRig,lookDown,PITCH_FLOOR,SOFT_CLEAR} from '../house-test/camera-guard.mjs';
 import {glazingBoxes} from '../house-test/glazing.mjs';
 import {routeSearch} from '../house-test/route-search.mjs';
+import {easeRoute} from '../house-test/route-ease.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const mesh=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
@@ -112,15 +113,20 @@ for(const [from,[x,planY,y]] of Object.entries({'Kitchen':[2,6.8,0],'Living room
   const path=search.path;
   for(let i=1;i<path.length;i++){const p=path[i-1],q=path[i];if(p.z>-11.4&&q.z<=-11.4){const k=(-11.4-p.z)/(q.z-p.z),cx=p.x+(q.x-p.x)*k;
     assert(!glazing.some(b=>cx>b.min[0]-.17&&cx<b.max[0]+.17&&b.min[2]<-11.39&&b.max[2]>-11.41),`The ${from} route crosses the sunroom glass at x ${cx.toFixed(2)}`);}}
-  // Walk it at walking pace, the view turning along the route, the focus
-  // height eased as in walkthrough.js.
-  const lengths=[0];for(let i=1;i<path.length;i++)lengths.push(lengths[i-1]+Math.hypot(path[i].x-path[i-1].x,path[i].z-path[i-1].z));
-  const along=d=>{let i=0;while(i<lengths.length-2&&lengths[i+1]<d)i++;const t=Math.min(1,(d-lengths[i])/Math.max(1e-6,lengths[i+1]-lengths[i]));return {x:path[i].x+(path[i+1].x-path[i].x)*t,z:path[i].z+(path[i+1].z-path[i].z)*t};};
-  const rig=createFollowRig(),player={...a};let yaw=null,focusY=a.y;
-  for(let s=0;s<lengths.at(-1);s+=1.9*dt){
-    const ahead=along(Math.min(lengths.at(-1),s+.45)),want=Math.atan2(player.x-ahead.x,player.z-ahead.z);
-    yaw=yaw===null?want:yaw+Math.atan2(Math.sin(want-yaw),Math.cos(want-yaw))*dt*8;
-    const q=along(s);world.move(player,q.x-player.x,q.z-player.z);focusY+=(player.y-focusY)*(1-Math.exp(-dt*12));
+  // Follow the prints as the player sees them (eased at the slider's jamb,
+  // as house-life.mjs shows them) like a player holding W and aiming a
+  // little ahead along them (QA F4's pursuit follower, which wedged on the
+  // jamb before the easing), the focus height eased as in walkthrough.js.
+  const prints=easeRoute(world,path);
+  const lengths=[0];for(let i=1;i<prints.length;i++)lengths.push(lengths[i-1]+Math.hypot(prints[i].x-prints[i-1].x,prints[i].z-prints[i-1].z));
+  const along=d=>{let i=0;while(i<lengths.length-2&&lengths[i+1]<d)i++;const t=Math.min(1,(d-lengths[i])/Math.max(1e-6,lengths[i+1]-lengths[i]));return {x:prints[i].x+(prints[i+1].x-prints[i].x)*t,z:prints[i].z+(prints[i+1].z-prints[i].z)*t};};
+  const onRoute=p=>{let best=Infinity,at=0;for(let i=0;i<prints.length-1;i++){const a=prints[i],b=prints[i+1],dx=b.x-a.x,dz=b.z-a.z,l2=dx*dx+dz*dz||1e-9,k=Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.z-a.z)*dz)/l2)),d=Math.hypot(a.x+dx*k-p.x,a.z+dz*k-p.z)+Math.abs(a.y-p.y)*2;if(d<best){best=d;at=lengths[i]+(lengths[i+1]-lengths[i])*k;}}return at;};
+  const rig=createFollowRig(),player={...a};let yaw=null,focusY=a.y,progress=0,lastProgress=0;
+  for(let f=0;f<1800&&Math.hypot(player.x-yard.x,player.z-yard.z)>=.3;f++){
+    const s=onRoute(player);if(s>progress+.05){progress=s;lastProgress=f;}
+    assert(f-lastProgress<75,`The ${from} walk wedged at (${player.x.toFixed(2)}, ${(-player.z).toFixed(2)})`);
+    if(f%2===0){const ahead=along(Math.min(lengths.at(-1),s+.45));yaw=Math.atan2(player.x-ahead.x,player.z-ahead.z);}
+    world.move(player,-Math.sin(yaw)*1.9*dt,-Math.cos(yaw)*1.9*dt);focusY+=(player.y-focusY)*(1-Math.exp(-dt*12));
     const v=rig.place({x:player.x,y:focusY,z:player.z},yaw,-.18,dt,world,guard,clearance),p=v.position,t=v.target,d=Math.hypot(p.x-t.x,p.y-t.y,p.z-t.z);
     const at=`${from} to the back yard at (${player.x.toFixed(2)}, ${(-player.z).toFixed(2)})`;yardFrames++;
     if(player.z<-10.6&&player.z>-12.2)yardMin=Math.min(yardMin,d);
@@ -128,7 +134,7 @@ for(const [from,[x,planY,y]] of Object.entries({'Kitchen':[2,6.8,0],'Living room
     assert(guard.clearanceAt(p)>=reach,`${at}: camera ${guard.clearanceAt(p).toFixed(3)} m from a surface`);
     assert(d>=.35,`${at}: camera collapsed onto the pet (${d.toFixed(2)} m)`);
   }
-  assert(Math.hypot(player.x-yard.x,player.z-yard.z)<.4,`The ${from} walk did not reach the back yard`);
+  assert(Math.hypot(player.x-yard.x,player.z-yard.z)<.3,`The ${from} walk did not reach the back yard`);
   yardWalks++;
 }
 distances.sort((a,b)=>a-b);

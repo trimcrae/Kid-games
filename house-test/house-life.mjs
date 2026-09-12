@@ -10,6 +10,7 @@ import {createGround} from './pet-ground.mjs';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
 import {createEmotes,createSpeech} from './emotes.mjs';
 import {createRouter,createPawTrail} from './wayfinding.mjs';
+import {easeRoute} from './route-ease.mjs';
 import {aftermathFor,createAftermath} from './aftermath.mjs';
 import {placeDecor} from './decor-slots.mjs';
 const $=id=>document.getElementById(id);
@@ -557,6 +558,8 @@ export async function createHouseLife(tour){
         // next few metres of the route; plan again if the pet wanders off it.
         // (A worker answers between frames; the in-page fallback inside run().)
         if(route?.state==='searching')route.run(6);
+        // Prints get elbow room at jambs and the sunroom slider (route-ease.mjs).
+        if(route?.state==='found'&&!route.eased){route.eased=true;route.path=easeRoute(world,route.path);}
         if(route?.state==='found'&&route.shown!==route.path){route.shown=route.path;trail.setPath(route.path);}
         const off=trail.update(player);
         if(route?.state==='found'&&off>1.8&&time>replanAt){replanAt=time+1.5;planRoute();}
