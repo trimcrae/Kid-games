@@ -160,6 +160,24 @@ export function glossyFinish(f){
 // so things sit in their own shadow (the single sun map cannot reach there).
 export const OCCLUSION={gain:1.7,curve:1.6,direct:.45};
 
+// Trim and enamel parts are drawn this share of their distance nearer the lens
+// (0.5 mm at 1 m): enough depth to win cleanly over the wall a casing sits
+// flush on at any angle, too little to show anything hidden behind a surface.
+// The slope-scaled polygon offset it replaces pulled each face forward by about
+// one pixel of its own depth slope, so every hidden side and top face of every
+// enamel part (siding laps, cabinet rails, door edges) leaked through by about
+// a pixel: dotted lines, worst at low render scale.
+export const TRIM_PULL=.0005;
+const TRIM_OFFSET=typeof location!=='undefined'&&/[?&]trim=offset\b/.test(location.search||'');
+// The oak strips lie over a dark walnut subfloor with 1 mm gaps between them
+// (and the sunroom mats over their foundation with 4 mm gaps). Once a pixel is
+// wider than about two gaps, a gap can only land on a pixel centre now and
+// then: dark dots strung along every board seam. Seen from above at that
+// scale, the subfloor takes a shaded oak tone instead, so seams read as a
+// faint line of board-tone variation, and up close stay dark.
+const UNDERFLOOR=/^01 \| Floors and split levels \/ Dark walnut$/;
+const UNDERFLOOR_TONE=new THREE.Color('#a88560').multiplyScalar(.85);
+
 // Shared by every foliage material: a little light of its own after dark so
 // leaf cards facing away from the lamps do not go black (lighting.mjs sets it).
 export const FOLIAGE={fill:{value:0}};
@@ -198,10 +216,14 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
   material.name=group.name;
   // Door casings and trim sit flush on walls in the export; where their faces
   // coincide the two materials z-fought into a speckled strip down door frames
-  // (worst at night, black against lamp-lit paint). Trim wins consistently.
-  if(/enamel|trim|casing|architrave|jamb|door frame/i.test(group.name||'')){
+  // (worst at night, black against lamp-lit paint). Trim wins consistently:
+  // it is drawn a hair nearer the lens (see TRIM_PULL). ?trim=offset restores
+  // the former slope-scaled polygon offset for QA.
+  const trim=/enamel|trim|casing|architrave|jamb|door frame/i.test(group.name||'');
+  if(trim&&TRIM_OFFSET){
     material.polygonOffset=true;material.polygonOffsetFactor=-1;material.polygonOffsetUnits=-2;
   }
+  material.userData.housePull={value:trim&&!TRIM_OFFSET?TRIM_PULL:0};
   // Transparent panes stay a single pass; their closed thin boxes do not need
   // the default two-pass physical-glass path on phones.
   material.forceSinglePass=true;
@@ -236,6 +258,8 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
         shader.uniforms.houseOcclusionShape={value:new THREE.Vector3(OCCLUSION.gain,OCCLUSION.curve,OCCLUSION.direct)};
       }
       shader.uniforms.houseSurfaceKind={value:family};
+      shader.uniforms.housePull=material.userData.housePull;
+      shader.uniforms.houseUnderfloor={value:new THREE.Vector4(UNDERFLOOR_TONE.r,UNDERFLOOR_TONE.g,UNDERFLOOR_TONE.b,UNDERFLOOR.test(group.name||'')?1:0)};
       // Floor boards: their gap walls also flatten out at distance (uniform, so
       // no extra program).
       shader.uniforms.houseExteriorDim=exteriorFinish(group,f)?EXTERIOR.dim:INTERIOR_DIM;
@@ -251,6 +275,7 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
       shader.uniforms.houseMortarColor={value:new THREE.Color(...(f.mortarColor||group.color))};
       shader.vertexShader=shader.vertexShader.replace('#include <common>',
         `#include <common>
+          uniform float housePull;
           varying vec3 vHousePosition;varying vec3 vHouseNormal;
           #ifdef HOUSE_AO
             attribute float houseOcclusion;varying float vHouseOcclusion;
@@ -260,7 +285,12 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
           vHouseNormal=normalize(mat3(modelMatrix)*objectNormal);
           #ifdef HOUSE_AO
             vHouseOcclusion=houseOcclusion;
-          #endif`);
+          #endif`)
+        // Along its own view ray the vertex keeps its place on screen; only its
+        // depth moves (every other group keeps its exact depth, which the depth
+        // prepass relies on).
+        .replace('#include <project_vertex>',`#include <project_vertex>
+          if(housePull>0.0)gl_Position=projectionMatrix*vec4(mvPosition.xyz*(1.0-housePull),1.0);`);
       shader.fragmentShader=shader.fragmentShader.replace('#include <common>',
         `#include <common>
           #ifdef HOUSE_AO
@@ -268,7 +298,8 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
           #endif
           #ifdef HOUSE_FOLIAGE
             uniform float houseLeafFill;
-          #endif\n`+SURFACE_GLSL)
+          #endif
+          uniform vec4 houseUnderfloor;\n`+SURFACE_GLSL)
         .replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
           #ifdef HOUSE_FOLIAGE
             // Big leaf cards in front of the follow camera dissolve with an
@@ -284,6 +315,8 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
         .replace('#include <color_fragment>',`#include <color_fragment>
           vec3 houseDetail=houseSurface(vHousePosition,normalize(vHouseNormal));
           diffuseColor.rgb*=houseDetail.x;
+          if(houseUnderfloor.w>0.0&&vHouseNormal.y>.55)diffuseColor.rgb=mix(diffuseColor.rgb,houseUnderfloor.rgb,
+            smoothstep(.0008,.002,length(fwidth(vHousePosition))));
           float houseSeamFade=0.0;
           if(houseSurfaceKind==7){
             // Lawn: sunlit and shaded patches at 5-30 m (two lookups of the same

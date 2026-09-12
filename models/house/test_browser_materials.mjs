@@ -82,6 +82,27 @@ for(const surface of ['wood','fabric','carpet','blocks','siding','shakes','roof'
   material.dispose();
 }
 
+// Trim wins over the wall it sits flush on by a depth pull along the view ray,
+// not a slope-scaled polygon offset (which leaked hidden side faces of every
+// enamel part through by about a pixel). Other groups keep their exact depth.
+const compiled=(name,finish)=>{const m=createHouseMaterial({name,color:[.8,.8,.8],finish});
+  const s={vertexShader:THREE.ShaderLib.physical.vertexShader,fragmentShader:THREE.ShaderLib.physical.fragmentShader,defines:{}};
+  m.onBeforeCompile(s);return {m,s};};
+const casing=compiled('02 | Main architectural walls / Warm white enamel',{surface:'paint',roughness:.32});
+assert.equal(casing.m.polygonOffset,false,'Trim must not use a slope-scaled polygon offset');
+assert(casing.s.uniforms.housePull.value>0&&casing.s.uniforms.housePull.value<=.001);
+assert(casing.s.vertexShader.includes('gl_Position=projectionMatrix*vec4(mvPosition.xyz*(1.0-housePull),1.0)'));
+const plaster=compiled('02 | Main architectural walls / Pale sage plaster',{surface:'paint',roughness:.62});
+assert.equal(plaster.s.uniforms.housePull.value,0,'Walls keep their exact depth');
+assert.equal(casing.m.customProgramCacheKey(),plaster.m.customProgramCacheKey(),'The pull is a uniform, not a program');
+// The subfloor under the oak strips takes a shaded oak tone once its 1 mm gaps
+// are sub-pixel (else dark dots along every seam); nothing else does.
+const subfloor=compiled('01 | Floors and split levels / Dark walnut',{surface:'wood',roughness:.3});
+assert.equal(subfloor.s.uniforms.houseUnderfloor.value.w,1);
+assert.equal(compiled('11 | Split-level stairs and iron rails / Dark walnut',{surface:'wood'}).s.uniforms.houseUnderfloor.value.w,0);
+assert(subfloor.s.fragmentShader.includes('houseUnderfloor.w>0.0&&vHouseNormal.y>.55'));
+for(const x of [casing,plaster,subfloor])x.m.dispose();
+
 const wall={min:[-.2,-1,1],max:[.2,4,1.2]};
 assert(segmentBlocked([0,1,0],[0,2,3],[wall]));
 assert(!segmentBlocked([1,1,0],[1,2,3],[wall]));
