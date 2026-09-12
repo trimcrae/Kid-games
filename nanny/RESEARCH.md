@@ -3,6 +3,8 @@
 ## Latest scope: house inventory, no itinerary
 
 The user replaced the tour request with a list of every nearby blue-gray house: Street View photo, estimated color and address. Removed driving links, route order and stop numbers from screen and print layouts. Existing verified records are temporarily shown nearest-first with approximate straight-line distance from the school (Google pin 43.259546,-77.681902, checked September 12 at 13:53 EDT). Distances use panorama camera positions and are rounded to 0.1 mile. A search-radius clarification is pending. The current list is explicitly verified finds so far, not a completed inventory. Do not impose a one-house-per-street restriction on further research.
+
+User set the boundary to **a couple miles** on September 12. The page applies a 2.0-mile straight-line cutoff to the verified candidates found so far. Only **26 Picturesque Drive** (1.27 miles) is inside it. **1050 Latta Road** is 2.18 miles away and is excluded, along with all more distant records. The list now states this boundary and that it contains every verified blue-gray house found within it.
 ## September 12 follow-up: broadened search, six different streets
 
 User challenged the three-house Doewood cluster. At approximately 13:41–13:49 EDT, searched public listing/photo results across Greece 14612, 14616 and 14626, then inspected the strongest new candidates and school-area streets using Google Street View. This is a broader targeted search, not an exhaustive house-by-house survey.
