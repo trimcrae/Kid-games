@@ -287,10 +287,10 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
       }
       state.want=Math.max(floor,Math.min(0,state.want));
       // Swing towards the chosen crane: eased, and rate-limited; a boom
-      // squeezed up against the pet swings up out of it three times faster.
+      // squeezed up against the pet swings up out of it twice as fast.
       if(reducedMotion)state.extra=state.want;
       else{
-        const boost=state.distance<BOOST_BELOW&&state.want<state.extra?3:1;state.boosted=boost>1;
+        const boost=state.distance<BOOST_BELOW&&state.want<state.extra?2:1;state.boosted=boost>1;
         const step=(state.want-state.extra)*(1-Math.exp(-dt*CRANE_EASE*boost)),limit=CRANE_RATE*boost*dt;
         state.extra+=Math.max(-limit,Math.min(limit,step));
         if(Math.abs(state.extra-state.want)<.004)state.extra=state.want;

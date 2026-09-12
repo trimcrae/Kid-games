@@ -91,7 +91,7 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
       else if(Math.hypot(p.x-t.x,p.y-t.y,p.z-t.z)>1e-3&&guard.clearanceAt(p)<reach)rigFailures.push(`${at}: ${guard.clearanceAt(p).toFixed(3)} m from a surface`);
       if(look!==null&&look>MAX_LOOK)rigFailures.push(`${at}: looks ${look.toFixed(0)}° down`);
       // (A boom squeezed against the pet swings up out of it faster, still eased.)
-      if(look!==null&&last!==null&&judged&&Math.abs(look-last)>(v.boosted?3*MAX_LOOK_STEP:MAX_LOOK_STEP))rigFailures.push(`${at}: view tipped ${Math.abs(look-last).toFixed(1)}° in one frame`);
+      if(look!==null&&last!==null&&judged&&Math.abs(look-last)>(v.boosted?2*MAX_LOOK_STEP:MAX_LOOK_STEP))rigFailures.push(`${at}: view tipped ${Math.abs(look-last).toFixed(1)}° in one frame`);
       last=look;
     }
     // Back at the starting heading, the camera settles back down to where a
