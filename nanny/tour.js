@@ -51,13 +51,25 @@ const rye = {address:'113 Rye Road',zip:'14626',title:'Blue-gray beneath mature 
   caveat:'Rye / Latona area. Google Maps and the listing identify 113 Rye Road. Expect the blue to read cooler and darker under the trees.',
   source:'https://www.homes.com/property/113-rye-rd-rochester-ny/spsc5lmkb75ds/',samples:[0,1],
   leg:'From Mt Ridge: Joanne Drive → Mt Read Boulevard → south service road → Ridgeway Avenue → Latona Road → Rye Road. About 7 minutes, 3.2 miles; follow Maps for connecting turns.'};
+const doewood353 = {address:'353 Doewood Lane',zip:'14606',title:'A deeper slate blue',
+  pano:'_TioTrbYSTXXWXvCNxr6Lw',point:'43.1802281,-77.7365297',heading:88.992226,date:'July 2025',
+  note:'A deeper blue-gray house with a white garage door and white trim. It is a useful darker comparison to Smoky Azurite.',
+  look:'The triangular garage gable and the broad wall to the right show the blue on both upper and lower sections.',
+  caveat:'The centered darker blue house is 353. Shrubs obscure some of the central siding, but the color remains visible.',
+  source:'https://www.google.com/maps/search/?api=1&query=353+Doewood+Lane+Rochester+NY+14606',samples:[2,3]};
+const doewood339 = {address:'339 Doewood Lane',zip:'14606',title:'Soft blue beside slate',
+  pano:'_TioTrbYSTXXWXvCNxr6Lw',point:'43.1802285,-77.7365651',heading:117.3984551350036,date:'July 2025',
+  note:'The lighter blue two-story house on the right is a useful comparison to the deeper slate blue at 353. White trim and dark shutters give the softer siding definition.',
+  look:'This Street View angle shows the two blue houses together, making it easy to compare their depth.',
+  caveat:'This view looks toward 339 from outside 353, so Google labels the panorama 353. The default view at 339 is screened by trees; the address was checked separately.',
+  source:'https://www.compass.com/homedetails/339-Doewood-Ln-Greece-NY-14606/3ETIF_pid/',samples:[1,0]};
 const school = [43.259546,-77.681902];
 const distance = point => {
   const [lat,lon]=point.split(',').map(Number), rad=Math.PI/180;
   const a=Math.sin((lat-school[0])*rad/2)**2+Math.cos(lat*rad)*Math.cos(school[0]*rad)*Math.sin((lon-school[1])*rad/2)**2;
   return 3958.8*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 };
-const stops = [houses[0], houses[2], montvale, houses[1], rye, houses[3]]
+const stops = [houses[0], houses[2], montvale, houses[1], rye, houses[3], doewood353, doewood339]
   .map(s=>({...s,miles:distance(s.point)}))
   .sort((a,b)=>a.miles-b.miles);
 const fullAddress = s => `${s.address}, Rochester, NY ${s.zip}`;

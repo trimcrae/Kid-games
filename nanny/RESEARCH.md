@@ -5,6 +5,8 @@
 The user replaced the tour request with a list of every nearby blue-gray house: Street View photo, estimated color and address. Removed driving links, route order and stop numbers from screen and print layouts. Existing verified records are temporarily shown nearest-first with approximate straight-line distance from the school (Google pin 43.259546,-77.681902, checked September 12 at 13:53 EDT). Distances use panorama camera positions and are rounded to 0.1 mile. A search-radius clarification is pending. The current list is explicitly verified finds so far, not a completed inventory. Do not impose a one-house-per-street restriction on further research.
 
 User initially set the boundary to **a couple miles** on September 12, then widened the request to include **all verified blue-gray color fits found so far**. The page now includes all six inspected matches, ordered by approximate straight-line distance from the school. It does not claim an exhaustive inventory of all houses in Greece.
+
+Correction: an earlier route revision mistakenly treated 353 and 339 Doewood as replacements rather than additional verified fits. Restored both on the list when the user asked for all finds, for **eight unique addresses** total: 26 Picturesque; 1050 Latta; 152 Montvale; 466 Mt Ridge; 113 Rye; 383, 353 and 339 Doewood.
 ## September 12 follow-up: broadened search, six different streets
 
 User challenged the three-house Doewood cluster. At approximately 13:41–13:49 EDT, searched public listing/photo results across Greece 14612, 14616 and 14626, then inspected the strongest new candidates and school-area streets using Google Street View. This is a broader targeted search, not an exhaustive house-by-house survey.
