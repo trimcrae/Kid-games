@@ -57,7 +57,7 @@ def partition(name, a, b, mat=bed_wall, openings=(), height=2.38):
     piece(cursor, length, 0, .09, True)
 
 
-def upper_door(name, pos, angle, photos):
+def upper_door(name, pos, angle, photos, leaf=True):
     asset(name, pos, angle, photos, 'doorway observed; size estimated')
     for x in [-.46, .46]:
         box('White door architrave', (x, 0, 1.015), (.065, .17, 2.03), white)
@@ -68,7 +68,7 @@ def upper_door(name, pos, angle, photos):
         for i in range(9):
             box('Tied-back grey doorway curtain',(.31+i*.017,.09+.02*math.cos(i),1.02),
                 (.025,.032,1.99),curtainmat,.008)
-    else:
+    elif leaf:
         # Fold the leaf back against the wall to keep the room view open.
         box('Open white door leaf', (-.89, .08, 1), (.84, .045, 2), white)
         sphere('Brass door knob', (-1.22, .12, .98), (.027, .027, .027), brass)
@@ -382,7 +382,13 @@ for x,z in [(-.24,.65),(0,1.05),(.24,1.54)]:
 
 upper_collection('21 | Primary bedroom furniture')
 # U8: pillows at the right-hand wall; dresser and TV on the adjoining wall.
-bed('Primary double bed',(3.43,2.40,.025),1.60,-90,'U8,V1; House Tour 139s',duvet=True)
+# House Tour 137.508/138.508/139.010/139.577s re-read U8: from the doorway the
+# pillows are near, at the entry wall right of the door, and the foot points
+# at the TV dresser; facing the side window and shelves, the long grey
+# headboard is on the right-hand (entry) wall. So U8 looked at the side wall:
+# the head is on the entry wall and the long edge runs under the shelves.
+# The estimated room leaves the headboard's end a hand's width past the jamb.
+bed('Primary double bed',(3.64,1.64,.025),1.60,180,'U8,V1; House Tour 137.508/138.508/139.577s',duvet=True)
 primary_headboard=material('Primary grey cotton headboard',(.23,.25,.235),.94,texture='fabric')
 headboard=soft_bedding('Primary upholstered headboard',(0,.95,.84),
                       (1.67,.76,.095),primary_headboard,nx=22,ny=12)
@@ -405,7 +411,8 @@ for z in [1.47,1.79]:
 for x,w,h,mat in [(-.33,.26,.20,black),(0,.20,.17,bluegrey),(.31,.24,.18,walnut)]:
     box('Plain upper bedside shelf storage',(x,-.10,2.125+h/2),(w,.17,h),mat,.008)
 chest('Primary long wood dresser',(3.66,4.22,0),1.42,1.02,0,3,2,'U8')
-chest('Primary narrow wood chest',(2.56,3.77,0),.63,.82,0,4,1,'U8')
+# H143.528/H146.030: the narrow chest stands under the rear window, just clear of the curtains.
+chest('Primary narrow wood chest',(2.56,4.09,0),.63,.82,0,4,1,'U8; House Tour 143.528/146.030s')
 asset('Primary wall television',(3.65,4.46,1.62),0,'U8')
 box('Television black case',(0,0,0),(1.05,.07,.64),black)
 box('Television dark screen',(0,-.041,0),(.99,.012,.58),screen)
@@ -413,8 +420,10 @@ asset('Primary woven laundry hamper',(3.15,3.55,0),0,'U8')  # between dresser zo
 box('Woven hamper body',(0,0,.39),(.43,.40,.78),wicker,.04)
 box('Closed wicker hamper lid',(0,0,.81),(.46,.43,.055),rattan,.025)
 box('Hamper inset grip',(0,-.207,.69),(.12,.007,.035),black)
-asset('Bedside mesh bassinet',(2.13,2.15,0),90,'U8,V1; House Tour 138/139s',
-      confidence='beside entry half of bed foot observed; fitted position preserves narrow foot aisle')
+# H137.508/H138.508/H139.010: the bassinet stands against the bed's long side
+# facing the doorway and closet wall, toward the foot.
+asset('Bedside mesh bassinet',(2.53,2.00,0),90,'U8,V1; House Tour 137.508/138.508/139.010s',
+      confidence='along the bed side away from the side window observed; fitted position keeps the entry aisle')
 for x in [-.44,.44]:
     for y in [-.24,.24]:
         rod('Bassinet folding leg',(x*1.12,y*1.2,.03),(x*.90,y*.85,.72),.022,curtainmat)
@@ -580,7 +589,10 @@ box('Closet curtain pole',(0,-.28,2.16),(.84,.03,.03),black)
 chest('Primary closet wood drawers',(1.62,.85,0),.51,1.01,180,4,1,'V1')
 white_chest('Primary closet white drawer tower',(1.88,.87,0),.23,.61,'V1')
 ROOT.rotation_euler.z=math.pi
-chest('Primary entry-side wood chest',(3.87,.87,0),1.0,1.06,180,4,1,'V1')
+# H137.508/H141.010: no chest stands right of the door (the bed head is
+# there); the tall dark chest stands on the closet/ensuite wall between the
+# closet and the ensuite doorway. Size stays the V1 estimate.
+chest('Primary entry-side wood chest',(1.535,2.90,0),1.0,1.06,90,4,1,'V1; House Tour 137.508/141.010s')
 
 upper_ceilings=upper_collection('24 | Upstairs ceilings - hidden for dollhouse')
 asset('Upper room ceilings',photos='U3,U6-U10')

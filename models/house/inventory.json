@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "23773c1f62b80cf156e9362a28f832518cfd925208e30721de56889638027b6f",
+  "generator_sha256": "bd3fe8f44de8bef456e072466ac32449d9d41446923d526076a22a1c619d17a3",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -13,8 +13,8 @@
   ],
   "blender_version": "4.5.13 LTS",
   "units": "metres; estimated",
-  "objects": 8015,
-  "mesh_objects": 6917,
+  "objects": 8012,
+  "mesh_objects": 6914,
   "cameras": [
     "overview",
     "sunroom",
@@ -149,14 +149,14 @@
       "confidence": "photo / estimated size",
       "location_m": [
         1.6950000524520874,
-        8.170000076293945,
+        8.039999961853027,
         1.440000057220459
       ]
     },
     {
       "name": "Red three-panel front door",
       "collection": "04 | Windows and front door",
-      "photos": "7; House Tour 24.003/39.005s",
+      "photos": "7; House Tour 24.003/39.005/44.007/90.525s",
       "confidence": "perpendicular return confirmed in video; dimensions estimated",
       "location_m": [
         5.099999904632568,
@@ -347,7 +347,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         6.769999980926514,
-        9.0,
+        9.369999885559082,
         -0.07999999821186066
       ]
     },
@@ -358,7 +358,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         6.800000190734863,
-        10.569999694824219,
+        10.850000381469727,
         -0.07999999821186066
       ]
     },
@@ -369,7 +369,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         5.829999923706055,
-        10.720000267028809,
+        11.0,
         -0.07999999821186066
       ]
     },
@@ -380,25 +380,25 @@
       "confidence": "houseward side-glazing position observed; offset, height and arm angle estimated",
       "location_m": [
         7.119999885559082,
-        9.979999542236328,
+        10.300000190734863,
         -0.07999999821186066
       ]
     },
     {
       "name": "Arched wicker etagere",
       "collection": "06 | Sunroom furniture",
-      "photos": "4",
+      "photos": "4; House Tour 77.520/85.523/86.523s",
       "confidence": "photo / estimated size",
       "location_m": [
-        5.829999923706055,
-        8.420000076293945,
+        6.949999809265137,
+        8.34000015258789,
         -0.07999999821186066
       ]
     },
     {
       "name": "Small sunroom playhouse",
       "collection": "06 | Sunroom furniture",
-      "photos": "1,5",
+      "photos": "1,5; House Tour 64.748/86.523s",
       "confidence": "photo / estimated size",
       "location_m": [
         1.3799999952316284,
@@ -600,7 +600,7 @@
       "confidence": "two seat cushions and rounded arms observed; footprint/back structure estimated",
       "location_m": [
         0.550000011920929,
-        2.549999952316284,
+        2.25,
         0.017999999225139618
       ]
     },
@@ -621,8 +621,8 @@
       "photos": "House Tour 51.008s",
       "confidence": "rounded tub silhouette observed; dimensions and concealed base estimated",
       "location_m": [
-        2.8499999046325684,
-        3.0,
+        1.0700000524520874,
+        3.859999895095825,
         0.017999999225139618
       ]
     },
@@ -695,11 +695,11 @@
     {
       "name": "Brass living floor lamp",
       "collection": "09 | Living room furniture",
-      "photos": "7,8",
+      "photos": "7,8; House Tour 47.507/90.525s",
       "confidence": "photo / estimated size",
       "location_m": [
-        3.5799999237060547,
-        3.0999999046325684,
+        3.4200000762939453,
+        4.050000190734863,
         0.017999999225139618
       ]
     },
@@ -731,7 +731,7 @@
       "photos": "House Tour 48.007s,54.010s",
       "confidence": "dark wood, open upper shelving and three broad drawer rows observed; dimensions estimated",
       "location_m": [
-        2.25,
+        2.319999933242798,
         4.079999923706055,
         0.017999999225139618
       ]
@@ -742,7 +742,7 @@
       "photos": "House Tour 54.010s",
       "confidence": "photo / estimated size",
       "location_m": [
-        2.25,
+        2.319999933242798,
         4.079999923706055,
         0.017999999225139618
       ]
@@ -750,11 +750,11 @@
     {
       "name": "Living dollhouse shelf",
       "collection": "09 | Living room furniture",
-      "photos": "House Tour 54.010s",
+      "photos": "House Tour 50.008/53.510/54.010s",
       "confidence": "photo / estimated size",
       "location_m": [
-        0.9300000071525574,
-        4.03000020980835,
+        1.8200000524520874,
+        3.565000057220459,
         0.017999999225139618
       ]
     },
@@ -764,8 +764,8 @@
       "photos": "8",
       "confidence": "photo / estimated size",
       "location_m": [
-        1.100000023841858,
-        0.7799999713897705,
+        1.2000000476837158,
+        0.6800000071525574,
         0.017999999225139618
       ]
     },
@@ -985,7 +985,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         12.90999984741211,
-        0.4699999988079071,
+        0.5499999523162842,
         -1.024999976158142
       ]
     },
@@ -1003,11 +1003,11 @@
     {
       "name": "Lower dark wood coffee table",
       "collection": "13 | Lower family room furniture",
-      "photos": "10",
+      "photos": "10; House Tour 168.748/174.752s",
       "confidence": "photo / estimated size",
       "location_m": [
-        12.479999542236328,
-        2.2699999809265137,
+        12.90999984741211,
+        1.5999999046325684,
         -1.024999976158142
       ]
     },
@@ -1542,11 +1542,11 @@
     {
       "name": "Primary double bed",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "U8,V1; House Tour 139s",
+      "photos": "U8,V1; House Tour 137.508/138.508/139.577s",
       "confidence": "photo / estimated size",
       "location_m": [
-        14.420000076293945,
-        6.410000324249268,
+        14.630000114440918,
+        5.650000095367432,
         1.284999966621399
       ]
     },
@@ -1575,11 +1575,11 @@
     {
       "name": "Primary narrow wood chest",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "U8",
+      "photos": "U8; House Tour 143.528/146.030s",
       "confidence": "photo / estimated size",
       "location_m": [
         13.549999237060547,
-        7.78000020980835,
+        8.100000381469727,
         1.2599999904632568
       ]
     },
@@ -1608,11 +1608,11 @@
     {
       "name": "Bedside mesh bassinet",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "U8,V1; House Tour 138/139s",
-      "confidence": "beside entry half of bed foot observed; fitted position preserves narrow foot aisle",
+      "photos": "U8,V1; House Tour 137.508/138.508/139.010s",
+      "confidence": "along the bed side away from the side window observed; fitted position keeps the entry aisle",
       "location_m": [
-        13.119999885559082,
-        6.160000324249268,
+        13.519999504089355,
+        6.010000228881836,
         1.2599999904632568
       ]
     },
@@ -1817,11 +1817,11 @@
     {
       "name": "Primary entry-side wood chest",
       "collection": "21 | Primary bedroom furniture",
-      "photos": "V1",
+      "photos": "V1; House Tour 137.508/141.010s",
       "confidence": "photo / estimated size",
       "location_m": [
-        14.859999656677246,
-        4.880000114440918,
+        12.524999618530273,
+        6.910000324249268,
         1.2599999904632568
       ]
     },
@@ -1971,7 +1971,7 @@
     {
       "name": "Pink bedroom shared entry doorway",
       "collection": "26 | Lower hall and additional room architecture",
-      "photos": "V8,W10",
+      "photos": "V8,W10; House Tour 185.525/186.025s",
       "confidence": "doorway observed; size estimated",
       "location_m": [
         10.850000381469727,
@@ -2147,11 +2147,11 @@
     {
       "name": "Lower bathroom toilet",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V8",
+      "photos": "V8; House Tour 182.523/183.523s",
       "confidence": "photo / estimated size",
       "location_m": [
-        11.84000015258789,
-        8.479999542236328,
+        11.550000190734863,
+        8.619999885559082,
         -1.0499999523162842
       ]
     },
@@ -2172,8 +2172,8 @@
       "photos": "V6,V7",
       "confidence": "photo / estimated size",
       "location_m": [
-        11.199999809265137,
-        0.949999988079071,
+        11.300000190734863,
+        1.5,
         -1.024999976158142
       ]
     },
@@ -2183,19 +2183,19 @@
       "photos": "V6",
       "confidence": "photo / estimated size",
       "location_m": [
-        11.199999809265137,
-        0.949999988079071,
+        11.300000190734863,
+        1.5,
         -1.0
       ]
     },
     {
       "name": "Lower tan armless lounge seat",
       "collection": "27 | Lower bedroom and bathroom furniture",
-      "photos": "V6",
+      "photos": "V6; House Tour 168.748/170.250/172.517s",
       "confidence": "photo / estimated size",
       "location_m": [
-        11.130000114440918,
-        1.9800000190734863,
+        10.970000267028809,
+        0.47999998927116394,
         -1.024999976158142
       ]
     },
@@ -2708,11 +2708,11 @@
     {
       "name": "Kitchen garage coat hooks",
       "collection": "35 | Garage shell and doors",
-      "photos": "W3",
+      "photos": "W3; House Tour 61.780s",
       "confidence": "photo / estimated size",
       "location_m": [
-        0.05000000074505806,
-        7.900000095367432,
+        0.4399999976158142,
+        7.929999828338623,
         0.0
       ]
     },
@@ -2807,8 +2807,8 @@
     {
       "name": "Pink curtain bedroom shell",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10; homeowner confirmation",
-      "confidence": "shared downstairs entry confirmed; room size and doorway offset estimated",
+      "photos": "W10; homeowner confirmation; House Tour 181-191s",
+      "confidence": "shared downstairs entry confirmed; window walls video-confirmed; room size and doorway offset estimated",
       "location_m": [
         16.474998474121094,
         -11.460000038146973,
@@ -2818,132 +2818,132 @@
     {
       "name": "Pink bedroom side window",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 181.023/186.525/188.527s",
       "confidence": "photo / estimated size",
       "location_m": [
-        8.543749809265137,
-        5.5500006675720215,
+        8.539999961853027,
+        9.030000686645508,
         0.32999998331069946
       ]
     },
     {
       "name": "Pink bedroom side window curtains",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 181.023/186.525/188.527s",
       "confidence": "photo / estimated size",
       "location_m": [
-        8.543749809265137,
-        5.5500006675720215,
+        8.539999961853027,
+        9.030000686645508,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom far window",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 187.527/188.527/190.028s",
       "confidence": "photo / estimated size",
       "location_m": [
         7.857499599456787,
-        6.999999523162842,
+        8.400001525878906,
         0.32999998331069946
       ]
     },
     {
       "name": "Pink bedroom far window curtains",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 187.527/188.527/190.028s",
       "confidence": "photo / estimated size",
       "location_m": [
         7.857499599456787,
-        6.999999523162842,
+        8.400001525878906,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom double bed",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 186.525/188.527/190.028s",
       "confidence": "photo / estimated size",
       "location_m": [
-        9.050000190734863,
-        6.919999599456787,
+        8.950249671936035,
+        6.999999523162842,
         -1.024999976158142
       ]
     },
     {
       "name": "Pink bedroom dress rail",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 187.527/190.028s",
       "confidence": "photo / estimated size",
       "location_m": [
-        8.382499694824219,
-        5.720000743865967,
+        8.12975025177002,
+        8.30000114440918,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom low pink shelf",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 186.025/186.525s",
       "confidence": "photo / estimated size",
       "location_m": [
-        8.075000762939453,
-        8.170000076293945,
+        9.74000072479248,
+        8.770000457763672,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom small bookcase",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 186.525/188.527s",
       "confidence": "photo / estimated size",
       "location_m": [
-        8.044999122619629,
-        7.230000972747803,
+        8.65999984741211,
+        8.770000457763672,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom wood dresser",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 186.025/186.525s",
       "confidence": "photo / estimated size",
       "location_m": [
-        10.070000648498535,
-        8.64000129699707,
+        10.55525016784668,
+        8.09999942779541,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom wall shelves",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 188.527/190.028s",
       "confidence": "photo / estimated size",
       "location_m": [
-        9.672499656677246,
-        5.640000820159912,
+        8.009749412536621,
+        6.249999523162842,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom empty toy hammock",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 187.527/188.527s",
       "confidence": "photo / estimated size",
       "location_m": [
-        8.149998664855957,
-        5.970000743865967,
+        8.200250625610352,
+        8.520000457763672,
         -1.0499999523162842
       ]
     },
     {
       "name": "Pink bedroom small road rug",
       "collection": "39 | Pink curtain bedroom",
-      "photos": "W10",
+      "photos": "W10; House Tour 181.023/186.025s",
       "confidence": "photo / estimated size",
       "location_m": [
-        10.362500190734863,
-        7.980000972747803,
+        10.399999618530273,
+        7.0500006675720215,
         -1.0449999570846558
       ]
     },
@@ -3603,7 +3603,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         0.4699999988079071,
-        2.5799999237060547,
+        2.2799999713897705,
         0.0
       ]
     },
@@ -3614,7 +3614,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         0.5600000023841858,
-        3.5299999713897705,
+        3.2300000190734863,
         0.0
       ]
     },
@@ -3624,8 +3624,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        2.8499999046325684,
-        3.0799999237060547,
+        0.9900000095367432,
+        3.859999895095825,
         0.0
       ]
     },
@@ -3646,8 +3646,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        0.44999998807907104,
-        1.25,
+        1.350000023841858,
+        1.2999999523162842,
         0.009500052779912949
       ]
     },
@@ -3987,8 +3987,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        5.829999923706055,
-        8.460000038146973,
+        6.949999809265137,
+        8.380000114440918,
         0.0
       ]
     },
@@ -4196,9 +4196,9 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        14.779999732971191,
-        6.400000095367432,
-        1.9079468250274658
+        14.630000114440918,
+        5.289999961853027,
+        1.908804178237915
       ]
     },
     {
@@ -4207,9 +4207,9 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        13.75,
-        6.409999847412109,
-        1.9095664024353027
+        14.630000114440918,
+        6.300000190734863,
+        1.9092903137207031
       ]
     },
     {
@@ -4240,8 +4240,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        14.859999656677246,
-        4.880000114440918,
+        12.524999618530273,
+        6.909999847412109,
         2.3424999713897705
       ]
     },
@@ -4263,7 +4263,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         13.550000190734863,
-        7.78000020980835,
+        8.100000381469727,
         2.1024999618530273
       ]
     },
@@ -4471,8 +4471,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        12.470000267028809,
-        2.2699999809265137,
+        12.90999984741211,
+        1.600000023841858,
         -0.5549999475479126
       ]
     },
@@ -4483,7 +4483,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         12.850000381469727,
-        0.11999999731779099,
+        0.20000000298023224,
         -1.0499999523162842
       ]
     },
@@ -4581,8 +4581,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        10.911001205444336,
-        8.0,
+        12.088998794555664,
+        6.880000114440918,
         -0.09999999403953552
       ]
     },
@@ -4592,8 +4592,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        8.380000114440918,
-        5.71999979019165,
+        8.130000114440918,
+        8.300000190734863,
         -1.0499999523162842
       ]
     },
@@ -4603,9 +4603,9 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        10.069999694824219,
-        8.640000343322754,
-        0.09250009059906006
+        10.555000305175781,
+        8.100000381469727,
+        0.09250012040138245
       ]
     },
     {
@@ -4614,8 +4614,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        9.670000076293945,
-        5.679999828338623,
+        8.010000228881836,
+        6.25,
         0.0
       ]
     },
@@ -4625,9 +4625,9 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        9.050000190734863,
-        6.599999904632568,
-        -0.4700002670288086
+        8.630000114440918,
+        7.0,
+        -0.47000008821487427
       ]
     },
     {
@@ -4636,9 +4636,9 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        9.050000190734863,
-        7.599999904632568,
-        -0.4703105688095093
+        9.619999885559082,
+        7.0,
+        -0.4702736735343933
       ]
     },
     {
@@ -4647,8 +4647,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        10.25,
-        6.829999923706055,
+        9.0,
+        5.960000038146973,
         -1.0434999465942383
       ]
     },
@@ -4659,7 +4659,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         10.788999557495117,
-        7.800000190734863,
+        7.300000190734863,
         0.44999998807907104
       ]
     },
@@ -4669,8 +4669,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        8.260000228881836,
-        6.0,
+        8.220000267028809,
+        8.5,
         0.0
       ]
     },
@@ -4680,8 +4680,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        8.079999923706055,
-        8.170000076293945,
+        9.739999771118164,
+        8.770000457763672,
         -0.2924998998641968
       ]
     },
@@ -4691,8 +4691,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        8.039999961853027,
-        7.230000019073486,
+        8.65999984741211,
+        8.770000457763672,
         0.0
       ]
     },
@@ -5054,7 +5054,7 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        2.25,
+        2.319999933242798,
         4.36899995803833,
         2.1500000953674316
       ]
@@ -5395,7 +5395,7 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        10.40000057220459,
+        10.399999618530273,
         5.601001739501953,
         0.3499999940395355
       ]
@@ -5406,8 +5406,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        7.896002292633057,
-        8.199999809265137,
+        7.940999984741211,
+        7.0,
         0.8500000238418579
       ]
     },
@@ -5417,9 +5417,9 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        7.896002292633057,
-        8.199999809265137,
-        0.3499999940395355
+        7.940999507904053,
+        7.050000190734863,
+        0.3500000238418579
       ]
     },
     {
@@ -5428,8 +5428,8 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        10.069999694824219,
-        8.97900104522705,
+        10.788999557495117,
+        8.100000381469727,
         0.550000011920929
       ]
     },

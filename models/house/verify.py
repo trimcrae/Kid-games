@@ -222,13 +222,29 @@ for z in [-.85,-.05,.75]:
 # Orientation audit: constraints read directly from all four photo sets.
 def head_direction(name):
     return (bpy.data.objects[name].matrix_world.to_3x3() @ Vector((0,1,0))).normalized()
-# W10 establishes the window corner; loose bedding does not establish the
-# head/foot direction reliably enough for a photo-confirmation assertion.
-assert head_direction('Primary double bed').x > .99, 'U8: pillows at the right wall, not the TV wall'
-assert position('Bedside mesh bassinet').x < position('Primary double bed').x-.9, 'H139: bassinet belongs at the bed foot'
-assert position('Bedside mesh bassinet').y < position('Primary double bed').y, 'H139: bassinet is on the entry half of the bed'
+# W10 alone established neither the window walls nor the head/foot
+# direction; the House Tour checks for the pink bedroom follow below.
+# House Tour 137.508/138.508/139.577s: pillows on the entry wall beside the
+# door, foot toward the TV dresser, long edge under the side-wall shelves.
+assert head_direction('Primary double bed').y < -.99, 'H138: pillows at the entry wall, foot toward the TV wall'
+assert position('Primary bedside wall shelves').x > position('Primary double bed').x+.6, 'H139: shelves above the bed side on the window wall'
+assert position('Bedside mesh bassinet').x < position('Primary double bed').x-.9, 'H139: bassinet along the bed side away from the side window'
+assert abs(position('Bedside mesh bassinet').y-position('Primary double bed').y) < 1.0, 'H138: bassinet beside the bed, not past its foot'
+assert position('Primary entry-side wood chest').x < position('Primary bedroom doorway').x, 'H141: tall chest on the closet/ensuite wall, not beside the bed head'
 assert head_direction('Lower bedroom single bed').y > .99, 'H199: Jeannie headboard and low cabinet share the rear window wall'
 assert head_direction('End bedroom single bed').x < -.99, 'U7: long mattress edge follows right wall; free end faces ottoman'
+# House Tour 181.023/186.525/188.527/190.028s re-read W10: it faces the rear
+# wall from the doorway. Ellie's windows are in the rear wall (in line with
+# the bathroom window) and at the rear end of the far wall; the mattress runs
+# out from the far wall under the shelves, toward the door.
+pink_bed = position('Pink bedroom double bed')
+assert abs(position('Pink bedroom side window').y-position('Lower bathroom window').y) < .05, 'H181: pink rear window shares the bathroom window wall'
+assert position('Pink bedroom far window').x < 7.9 and position('Pink bedroom far window').y > pink_bed.y+.9, 'H188: far-wall window at the rear corner, beyond the bed'
+assert head_direction('Pink bedroom double bed').x < -.99, 'H190: bed head at the far wall, foot toward the door'
+assert min(position('Pink bedroom small bookcase').y, position('Pink bedroom low pink shelf').y) > 8.5, 'H186: bookcase and pink shelf on the rear wall'
+assert position('Pink bedroom small bookcase').x < position('Pink bedroom low pink shelf').x < position('Pink bedroom wood dresser').x, 'H186: bookcase, pink shelf, then cabinet toward the door'
+# H183.523: downstairs toilet under the end window, beyond the vanity, facing the door.
+assert head_direction('Lower bathroom toilet').y > .99 and position('Lower bathroom toilet').y > position('Lower bathroom white vanity').y+.9, 'H183: toilet tank against the window wall'
 cory_bed=position('End bedroom single bed')
 assert abs(cory_bed.y-position('End bedroom side window').y) < .65, 'U7/video: bed stays beside front window wall'
 assert abs(position('End bedroom side window').y-position('Nursery window').y) < .03, 'House Tour 3s: upstairs front windows share one facade'

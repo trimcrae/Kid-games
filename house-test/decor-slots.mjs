@@ -10,7 +10,7 @@ export const DECOR_SLOTS={
   pet:[{at:[7.25,.8],turn:-Math.PI/2},{at:[7.25,1.45],turn:-Math.PI/2}],
   rug:[{at:[7.15,1.3],turn:-Math.PI/2}],
   // A plant by the front window, another at the sofa's end.
-  plant:[{at:[3.8,1.1],turn:Math.PI},{at:[1.3,3.4],turn:Math.PI/2}],
+  plant:[{at:[3.8,1.1],turn:Math.PI},{at:[1.18,3.05],turn:Math.PI/2}],
   // A lamp beside the tub chair.
   lamp:[{at:[3.6,3.35],turn:-Math.PI/2}],
   // Shelves and little tables against the front wall under the window.

@@ -430,9 +430,11 @@ framed_opening('Garage rear sectional opening',(-5.00,8.1,-.16),2.80,2.26,180,'H
 for i in range(5):
     z=.226+i*.452
     box('Rear sectional white panel',(0,0,z),(2.70,.045,.438),white,.01)
-    # A vertical stack of small dark glazed insets near one edge.
-    box('Rear sectional inset frame',(-.92,.028,z),(.35,.016,.27),black,.02)
-    box('Rear sectional inset glass',(-.92,.04,z),(.30,.008,.22),glass,.01)
+    # A vertical stack of small dark glazed insets near one edge: the WEST
+    # edge, away from the pedestrian door (Backyard tour 18.008s; House Tour
+    # 29.505-33.505s). Local +x is world -X at this door's 180 degree turn.
+    box('Rear sectional inset frame',(.92,.028,z),(.35,.016,.27),black,.02)
+    box('Rear sectional inset glass',(.92,.04,z),(.30,.008,.22),glass,.01)
 window('Garage rear window',(-1.30,8.11,1.30),1.00,1.00,180,False,False)
 framed_opening('Garage glazed side door',(-2.775,8.1,-.16),.95,2.23,180,'W2,W3; House Tour 33s',)
 box('Side door lower panel',(0,0,.41),(.85,.045,.76),white)
@@ -445,7 +447,10 @@ asset('Garage wall tool board',(-6.79,3.10,.15),90,'W1,W2')
 box('Timber tool board',(0,0,1.05),(1.8,.05,1.22),joistmat)
 for x in [-.6,-.2,.2,.6]:
     rod('Empty tool hook',(x,-.03,1.4),(x,-.15,1.4),.012,black)
-asset('Kitchen garage coat hooks',(.05,7.90,0),180,'W3')
+# House Tour 61.780s: coats hang on the kitchen's rear wall beside the garage
+# door, hooks pointing into the kitchen. Angle 0 (was 180, hooks into the
+# wall) and X .44 (was .05, which ran the rail into the garage doorway).
+asset('Kitchen garage coat hooks',(.44,7.93,0),0,'W3; House Tour 61.780s')
 for z in [.65,1.20,1.75]:
     box('Timber coat hook rail',(0,0,z),(.88,.04,.08),oak)
     for x in [-.31,0,.31]:curve('Empty coat hook',[(x,-.025,z),(x,-.07,z-.04),(x,-.10,z-.02)],.009,black)
@@ -505,44 +510,71 @@ for name,pos,power,size in [
 
 # W10 is the third room off the same downstairs entry as V9 and the bathroom.
 # Author in room-local coordinates, then rotate the room onto that entry.
+# Local -> world (attachment below): world x = 10.85-.75*(ly-7.5) for the shell
+# (unscaled for furniture), world y = 6.20+(lx-17.66), furniture angle +90.
+# So local lx=17 is the front wall (plan y 5.54), lx=20.5 the rear wall
+# (plan y 9.04, flush with the bathroom window wall), ly=11.5 the far wall
+# (plan x 7.85) and ly=7.5 the entry wall shared with the hall and bathroom.
+# House Tour 181.0/185.5/186.5/188.5/190.0s: W10 was taken from the doorway
+# facing the REAR wall, not the far wall. One window is in the rear wall above
+# the white bookcase (parallel to the bathroom window, seen through the door
+# from the hall), the second in the far wall at the rear corner over the dress
+# rail; the front wall has no window. Window sizes remain the W10 estimates.
 new_collection('39 | Pink curtain bedroom')
-asset('Pink curtain bedroom shell',(0,0,-1.05),photos='W10; homeowner confirmation',confidence='shared downstairs entry confirmed; room size and doorway offset estimated')
+asset('Pink curtain bedroom shell',(0,0,-1.05),photos='W10; homeowner confirmation; House Tour 181-191s',confidence='shared downstairs entry confirmed; window walls video-confirmed; room size and doorway offset estimated')
 box('Pink bedroom floor',(18.75,9.50,-.04),(3.5,4,.09),walnut)
-partition('Pink bedroom left window wall',(17,7.5),(17,11.5),white,[(2.55,3.60,.72,2.05)],height=2.21)
-partition('Pink bedroom far window wall',(17,11.5),(20.5,11.5),white,[(.92,2.00,.72,2.05)],height=2.21)
-partition('Pink bedroom right wall',(20.5,7.5),(20.5,11.5),white,height=2.21)
+partition('Pink bedroom left window wall',(17,7.5),(17,11.5),white,height=2.21)
+partition('Pink bedroom far window wall',(17,11.5),(20.5,11.5),white,[(2.32,3.40,.72,2.05)],height=2.21)
+# The rear wall runs along ly, which the attachment scales by .75: a 1.40
+# local opening is the window's 1.05 m in the world.
+partition('Pink bedroom right wall',(20.5,7.5),(20.5,11.5),white,[(2.38,3.78,.72,2.05)],height=2.21)
 partition('Pink bedroom entry wall',(17,7.5),(20.5,7.5),white,[(.23,1.09,0,2.05)],height=2.21)
-upper_window('Pink bedroom side window',(17.01,10.575,1.38),1.05,90,'W10')
-upper_window('Pink bedroom far window',(18.46,11.49,1.38),1.08,0,'W10')
+upper_window('Pink bedroom side window',(20.49,10.58,1.38),1.05,-90,'W10; House Tour 181.023/186.525/188.527s')
+upper_window('Pink bedroom far window',(19.86,11.49,1.38),1.08,0,'W10; House Tour 187.527/188.527/190.028s')
 for obj in COLL.objects:
     if obj.parent is None and obj.name != 'Pink curtain bedroom shell':obj.location.z-=1.05
 for obj in COLL.objects:
     if obj.type=='MESH' and obj.name.startswith('Hanging curtain panel'):
         obj.data.materials.clear();obj.data.materials.append(pinkcloth)
-bed('Pink bedroom double bed',(18.38,9.90,-1.025),1.40,90,'W10')
-asset('Pink bedroom dress rail',(17.18,10.79,-1.05),90,'W10')
+# H188.527/H190.028: the mattress runs out from the far wall under the pipe
+# shelves and picture, pillows at that wall, foot toward the door; H186.525
+# shows its foot corner and the road rug between the foot and the entry wall.
+bed('Pink bedroom double bed',(18.46,10.033,-1.025),1.40,0,'W10; House Tour 186.525/188.527/190.028s')
+# The rail runs along the far wall beneath its window (H187.527/H190.028).
+asset('Pink bedroom dress rail',(19.76,11.127,-1.05),0,'W10; House Tour 187.527/190.028s')
 for x in [-.47,.47]:
     rod('Clothing rail upright',(x,0,.04),(x,0,1.29),.018,steel)
     rod('Clothing rail foot',(x,-.20,.04),(x,.20,.04),.018,steel)
 rod('Empty clothing rail',(-.47,0,1.29),(.47,0,1.29),.018,steel)
-shelf_unit('Pink bedroom low pink shelf',(19.63,11.20,-1.05),1.05,.78,pinkwood,0,'W10')
-shelf_unit('Pink bedroom small bookcase',(18.69,11.24,-1.05),.61,.85,white,0,'W10')
-chest('Pink bedroom wood dresser',(20.10,8.54,-1.05),.83,1.12,-90,4,1,'W10')
-asset('Pink bedroom wall shelves',(17.10,9.07,-1.05),90,'W10')
+# H186.525/H187.527: along the rear wall from the window corner come the white
+# bookcase under the window, then the low pink shelf; the pine cabinet stands
+# against the entry (bathroom) wall short of the rear corner, its plain side
+# toward the doorway. Sizes remain the W10 estimates.
+shelf_unit('Pink bedroom low pink shelf',(20.23,8.98,-1.05),1.05,.78,pinkwood,-90,'W10; House Tour 186.025/186.525s')
+shelf_unit('Pink bedroom small bookcase',(20.23,10.42,-1.05),.61,.85,white,-90,'W10; House Tour 186.525/188.527s')
+chest('Pink bedroom wood dresser',(19.56,7.893,-1.05),.83,1.12,180,4,1,'W10; House Tour 186.025/186.525s')
+# H188.527/H190.028: three-tier wood shelves on the far wall toward the front
+# corner, above the head of the bed.
+asset('Pink bedroom wall shelves',(17.71,11.287,-1.05),0,'W10; House Tour 188.527/190.028s')
 for z in [1.1,1.45,1.80]:box('Empty wall shelf',(0,0,z),(.63,.20,.025),oak)
-asset('Pink bedroom empty toy hammock',(17.43,11.10,-1.05),0,'W10')
+# H187.527/H188.527: the toy hammock hangs in the corner between the windows,
+# in front of both curtains and above the dress rail and bookcase.
+asset('Pink bedroom empty toy hammock',(19.98,11.033,-1.05),0,'W10; House Tour 187.527/188.527s')
 curve('Hammock front rim',[(-.30,0,1.76),(0,-.20,1.54),(.30,0,1.76)],.015,bedding)
 for i in range(7):
     x=-.28+i*.093
     curve('Hammock net cord',[(x,0,1.75),(x*.55,-.20,1.53),(0,.12,1.77)],.004,bedding)
-asset('Pink bedroom small road rug',(19.44,8.15,-1.045),photos='W10')
+# H181.023/H186.025: the road rug lies lengthwise between the bed foot and the
+# entry wall, just inside the doorway.
+asset('Pink bedroom small road rug',(18.51,8.10,-1.045),-90,photos='W10; House Tour 181.023/186.025s')
 box('Clean green road rug',(0,0,.018),(.73,1.10,.022),green,.025)
 curve('Simple rug road loop',[(.25*math.cos(t),.40*math.sin(t),.034) for t in [i*math.tau/40 for i in range(41)]],.047,tilegrey,True)
 area('Pink bedroom ceiling light',(18.75,9.5,1.02),(18.75,9.5,-1),120,1.7)
 pink_ceiling=new_collection('40 | Pink bedroom ceiling')
 asset('Pink bedroom ceiling',(0,0,-1.05),photos='W10',confidence='ceiling shown clean; damaged panels omitted')
 box('Pink bedroom ceiling plane',(18.75,9.5,2.25),(3.5,4,.06),white)
-curve('Pink bedroom exposed service pipe',[(17.22,9.05,0),(17.22,9.05,2.10),(18.35,9.05,2.10)],.055,white)
+# H188.527/H190.028: the white service pipe rises in the far wall's front corner.
+curve('Pink bedroom exposed service pipe',[(17.14,11.31,0),(17.14,11.31,2.10),(18.76,11.31,2.10)],.055,white)
 
 bpy.context.view_layer.update()
 pink_attachment = (Matrix.Translation((10.85,6.20,0)) @

@@ -90,7 +90,10 @@ asset('Lower bedroom hall floor',photos='V6,V8')
 box('Hall carpet',(11.50,5.62,.015),(1.30,2.05,.04),carpet)
 asset('Lower side hall walls',photos='V8')
 partition('Hall west wood trim wall',(10.85,4.67),(10.85,6.64),white,[(1.1,1.96,0,2.05)],height=2.21)
-upper_door('Pink bedroom shared entry doorway',(10.85,6.20,0),90,'V8,W10')
+# No leaf: the doorway sits 0.2 m from the pink room's front wall, so the
+# folded-back leaf ran through that wall, and House Tour 185.5-186.5s shows no
+# leaf against the entry wall inside; the real swing is not seen.
+upper_door('Pink bedroom shared entry doorway',(10.85,6.20,0),90,'V8,W10; House Tour 185.525/186.025s',leaf=False)
 asset('Lower hall east partition',photos='V8')
 partition('Hall east wood trim wall',(12.15,4.67),(12.15,6.64),white,[(.60,1.46,0,2.05)],height=2.21)
 upper_door('Lower white bedroom shared entry doorway',(12.15,5.70,0),90,'V8-V10; homeowner confirmation')
@@ -169,7 +172,9 @@ for x in [-.19,.19]:panel('Lower bath door',x,-.25,.38,.36,.64,white)
 basin('Lower bath white sink',(0,0),.81,.53,.82,.65,tilewhite)
 curve('Lower bath chrome faucet',[(0,.24,.84),(0,.24,.98),(0,.05,.98),(0,0,.92)],.016,steel)
 frame('Lower bath mirror',(0,.255,1.41),.77,.90,white,mirror)
-asset('Lower bathroom toilet',(11.84,8.48,0),-90,'V8')
+# House Tour 182.523/183.523s: the toilet stands against the window end wall,
+# beyond the vanity, its tank under the window and its bowl facing the door.
+asset('Lower bathroom toilet',(11.55,8.62,0),0,'V8; House Tour 182.523/183.523s')
 box('Lower toilet foot',(0,0,.19),(.27,.35,.38),tilewhite,.10)
 basin('Lower toilet bowl',(0,-.07),.39,.56,.44,.28,tilewhite)
 box('Lower toilet tank',(0,.23,.67),(.40,.18,.46),tilewhite,.06)
@@ -206,14 +211,19 @@ for name in ['Upright wood piano','Piano bench']:
     for child in list(obsolete.children):bpy.data.objects.remove(child,do_unlink=True)
     bpy.data.objects.remove(obsolete,do_unlink=True)
     ASSETS[:]=[entry for entry in ASSETS if entry['name']!=name]
-asset('Lower adjustable gymnastics bar',(11.20,.95,-1.025),0,'V6,V7')
+# House Tour 168.748/170.250/172.517s put the tan chaise beside the piano with
+# its back to the front window wall; the cushion and bar step north-east out of
+# that spot (were at (11.20, .95)). Their axis is unverified and kept.
+asset('Lower adjustable gymnastics bar',(11.30,1.50,-1.025),0,'V6,V7')
 for x in [-.77,.77]:
     rod('Gym bar foot',(x,-.50,.04),(x,.50,.04),.026,bluegrey)
     rod('Gym bar upright',(x,0,.04),(x,0,1.55),.024,bluegrey)
 rod('Gym horizontal practice bar',(-.77,0,1.55),(.77,0,1.55),.022,oak)
-asset('Lower green floor gym cushion',(11.20,.95,-1.0),0,'V6')
+asset('Lower green floor gym cushion',(11.30,1.50,-1.0),0,'V6')
 box('Clean folded green floor cushion',(0,0,.15),(1.38,.75,.30),green,.09)
-asset('Lower tan armless lounge seat',(11.13,1.98,-1.025),90,'V6')
+# Beside the piano, backrest to the front wall, seat facing into the room (was
+# (11.13, 1.98) at the stair foot facing +X). Clears the window sills by 1.5 cm.
+asset('Lower tan armless lounge seat',(10.97,.48,-1.025),180,'V6; House Tour 168.748/170.250/172.517s')
 box('Tan lounge seat cushion',(0,0,.37),(.70,.68,.19),linen,.075)
 box('Tan armless seat back',(0,.29,.64),(.70,.13,.62),linen,.06)
 for x in [-.26,.26]:
