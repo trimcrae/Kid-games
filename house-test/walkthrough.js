@@ -7,6 +7,7 @@ import {createHouseLighting} from './lighting.mjs';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs';
+import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {warmupCast} from './creatures.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
@@ -66,6 +67,8 @@ try {
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=RENDER.toneMapping;
   renderer.toneMappingExposure=RENDER.exposure;
+  // Hidden house surfaces are rejected before shading (?prepass=0 for QA).
+  installDepthPrepass(renderer,camera,{enabled:query.get('prepass')!=='0'});
   // The pass also carries the highlight grade, so MSAA keeps a grade-only pass.
   installPostPass(renderer,camera,{mode:RENDER.aa==='msaa'?'grade':RENDER.aa});
   gpuTimer=createGpuTimer(renderer,camera);
@@ -457,7 +460,7 @@ async function load(){
     setTimeout(keyShadowLater,700);
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
-      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
+      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
 }
 animate(performance.now());load();

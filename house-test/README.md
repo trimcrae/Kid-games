@@ -38,6 +38,10 @@ study:
 - **Lighting** (`lighting.mjs`, `sky.mjs`, `materials.mjs`, `post-aa.mjs`):
   a game shading tier, warm room light with soft shadows, contact shadows,
   time of day and weather matching the HUD clock, and FXAA.
+- **Frame cost** (`depth-prepass.mjs`, `gpu-timer.mjs`): a depth-only draw of
+  the house's big surfaces before each frame, so hidden rooms and floors are
+  never shaded; the GPU-timed resolution controller spends the saving on a
+  sharper render scale (clean bevels and trim instead of dotted lines).
 - **Dressing**: rugs, cushions, plants, kids' drawings, toys and wall pieces
   are code-drawn in `models/house/dressing.py` (walk-past props don't
   collide); Craepet Street's cottages are code-built in `neighborhood.mjs`.
