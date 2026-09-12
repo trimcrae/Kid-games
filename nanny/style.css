@@ -23,3 +23,5 @@
   #print-guide figcaption{margin-top:4pt}
   #print-guide .print-notes{line-height:1.8;color:#555;font-size:9pt;overflow-wrap:anywhere}
 }
+/* Keep the address/photo list ahead of decorative content. */
+.intro{display:block;padding:24px 0 12px}.intro h1{font-size:2.6rem;margin:8px 0}.intro .lead{max-width:none;font-size:18px}.intro .reference,.intro .button,.intro .eyebrow{display:none}.stop h2{font-size:1.8rem}.stop{padding:24px 0}.tags{margin-bottom:16px}

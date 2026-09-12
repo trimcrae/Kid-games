@@ -36,32 +36,37 @@ const houses = [
     caveat:'Southwest Greece extension. Google labels the camera position 378 Doewood; the house facing it is 383, verified against the address pin and listing facade.',
     source:'https://www.compass.com/homedetails/383-Doewood-Ln-Greece-NY-14606/3GF17_pid/',
     samples:[1,0],leg:'From Mt Ridge: Joanne Drive, then the route via Ridgeway Avenue and Elmgrove Road → Cross Gates Road → Doewood Lane. About 14 minutes, 7.0 miles. Follow Maps for the connecting turns.'},
-  {address:'353 Doewood Lane',zip:'14606',title:'A deeper slate blue',
-    pano:'_TioTrbYSTXXWXvCNxr6Lw',point:'43.1802281,-77.7365297',heading:88.992226,date:'July 2025',
-    note:'A deeper blue-gray house with a white garage door and white trim. This is a useful darker comparison to Smoky Azurite, especially beside its lighter blue neighbor.',
-    look:'Look at the triangular garage gable and the broad wall to the right. The blue is visible on both upper and lower sections, despite the shrubs.',
-    caveat:'Southwest Greece extension. The centered darker blue house is 353; the lighter house to its right is the next stop, 339.',
-    source:'https://www.google.com/maps/search/?api=1&query=353+Doewood+Lane+Rochester+NY+14606',
-    samples:[2,3],leg:'Continue south on Doewood Lane for about 157 feet. This stop is just down the street from 383.'},
-  {address:'339 Doewood Lane',zip:'14606',title:'Soft blue beside slate',
-    pano:'_TioTrbYSTXXWXvCNxr6Lw',point:'43.1802285,-77.7365651',heading:117.3984551350036,date:'July 2025',
-    note:'The lighter blue two-story house on the right is a useful side-by-side comparison with the deeper slate blue at 353. White trim and dark shutters give the softer siding definition.',
-    look:'Compare both houses from the street: which depth of blue would work better with your roof and trim?',
-    caveat:'Southwest Greece extension. This view looks toward 339 from outside 353, so Google labels the panorama 353. The default panorama directly at 339 is screened by trees; the address was checked separately.',
-    source:'https://www.compass.com/homedetails/339-Doewood-Ln-Greece-NY-14606/3ETIF_pid/',
-    samples:[1,0],leg:'Continue south on Doewood Lane for about 161 feet. The tour finishes here.'}
 ];
-const stops = [houses[0], houses[2], houses[1], ...houses.slice(3)];
+const montvale = {address:'152 Montvale Lane',zip:'14626',title:'Deep blue with warm brick',
+  pano:'DpjZGR7T0-Jd1yOacGjk8A',point:'43.2252241,-77.7211305',heading:266.9645,date:'August 2025',
+  note:'A deep blue contemporary house with tall gables, white trim and a prominent warm brick chimney. The open front lawn gives a clear view of the siding.',
+  look:'Compare the blue beside the brick chimney and white garage. This is a darker, more saturated comparison to Smoky Azurite.',
+  caveat:'Montvale / Northbridge area. Address and facade checked against Google Maps and the property listing; this is a visual comparison, not a confirmed paint match.',
+  source:'https://www.zillow.com/homedetails/152-Montvale-Ln-Rochester-NY-14626/30936928_zpid/',
+  samples:[3,0],leg:'Start here; navigate from your own starting point.'};
+const rye = {address:'113 Rye Road',zip:'14626',title:'Blue-gray beneath mature trees',
+  pano:'2jlUtXne4_LcN0SCcJNNfA',point:'43.2000521,-77.6843324',heading:195.71706,date:'August 2025',
+  note:'A blue-gray colonial with white shutters and an attached garage on the left. Its shaded setting gives a useful contrast to the open, sunny facades elsewhere on the tour.',
+  look:'Compare the upper siding, white shutters and garage gable. Trees partly screen the house, but the central blue facade is visible.',
+  caveat:'Rye / Latona area. Google Maps and the listing identify 113 Rye Road. Expect the blue to read cooler and darker under the trees.',
+  source:'https://www.homes.com/property/113-rye-rd-rochester-ny/spsc5lmkb75ds/',samples:[0,1],
+  leg:'From Mt Ridge: Joanne Drive → Mt Read Boulevard → south service road → Ridgeway Avenue → Latona Road → Rye Road. About 7 minutes, 3.2 miles; follow Maps for connecting turns.'};
+const school = [43.259546,-77.681902];
+const distance = point => {
+  const [lat,lon]=point.split(',').map(Number), rad=Math.PI/180;
+  const a=Math.sin((lat-school[0])*rad/2)**2+Math.cos(lat*rad)*Math.cos(school[0]*rad)*Math.sin((lon-school[1])*rad/2)**2;
+  return 3958.8*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+};
+const stops = [houses[0], houses[2], montvale, houses[1], rye, houses[3]].map(s=>({...s,miles:distance(s.point)})).sort((a,b)=>a.miles-b.miles);
 const fullAddress = s => `${s.address}, Rochester, NY ${s.zip}`;
-const directions = (origin,destination,waypoints=[]) => 'https://www.google.com/maps/dir/?' + new URLSearchParams({api:'1',...(origin?{origin}:{}),destination,travelmode:'driving',...(waypoints.length?{waypoints:waypoints.join('|')}:{})});
 const streetView = s => 'https://www.google.com/maps/@?' + new URLSearchParams({api:'1',map_action:'pano',pano:s.pano,viewpoint:s.point,heading:String(s.heading),pitch:'0',fov:'75'});
 const thumbnail = s => 'https://streetviewpixels-pa.googleapis.com/v1/thumbnail?' + new URLSearchParams({cb_client:'maps_sv.tactile',w:'900',h:'600',pitch:'0',panoid:s.pano,yaw:String(s.heading)});
-document.querySelector('#route-details').innerHTML = `<ol>${stops.map((s,i)=>`<li><a href="#stop-${i+1}">${s.address}</a> · Rochester, NY ${s.zip}</li>`).join('')}</ol><a class="button" href="${directions(null,fullAddress(stops[0]))}">Directions to first house ↗</a><p>For the drive, open Part 1 first. At 383 Doewood Lane, switch to Part 2 for the final two houses. These shorter links keep every stop on phone versions of Maps.</p><a class="button" href="${directions(fullAddress(stops[0]),fullAddress(stops[3]),stops.slice(1,3).map(fullAddress))}">Part 1: houses 1–4 ↗</a><a class="button" href="${directions(fullAddress(stops[3]),fullAddress(stops[5]),[fullAddress(stops[4])])}">Part 2: houses 4–6 ↗</a><p><a href="${directions(fullAddress(stops[0]),fullAddress(stops.at(-1)),stops.slice(1,-1).map(fullAddress))}">View all six in Google Maps</a> · <button class="button secondary" type="button" id="print">Print the tour</button></p>`;
-document.querySelector('#stops').innerHTML = stops.map((s,i)=>`<article class="stop" id="stop-${i+1}"><figure><a href="${streetView(s)}" aria-label="See ${s.address} in Google Street View"><img src="${thumbnail(s)}" width="900" height="600" loading="lazy" alt="${s.title} at ${s.address}, viewed from the public street"></a><figcaption>Google Street View · Image capture: ${s.date} · © Google<br><a href="${s.source}">Address reference</a></figcaption></figure><div><span class="number">Stop ${i+1} / ${stops.length}</span><h3>${s.title}</h3><p class="address"><strong>${s.address}</strong><br>Rochester, NY ${s.zip}</p><p>${s.note}</p><p>${s.look}</p><p><strong>Sample these for a similar feel:</strong></p><div class="tags">${s.samples.map(n=>`<a class="chip" href="#palette"><span class="dot" style="background:${paints[n].hex}"></span>${paints[n].name} · SW ${paints[n].code}</a>`).join('')}</div><p class="small">${s.caveat}</p><details><summary>Driving leg</summary><p>${s.leg}</p></details><a class="button" href="${streetView(s)}">Street View ↗</a><a class="button secondary" href="${directions(i?fullAddress(stops[i-1]):null,fullAddress(s))}">Drive this leg ↗</a></div></article>`).join('');
-document.querySelector('#print-guide').innerHTML = `<section class="print-page"><h1>Blue house color tour</h1><p>Greece, New York · Six houses · September 12, 2026</p><h2>Your driving plan</h2><p><strong>Start at 26 Picturesque Drive. Finish at 339 Doewood Lane.</strong><br>About 30 minutes / 12.4 miles between houses; allow 60–75 minutes to look. Travel to the first house and home afterward is extra.</p><ol>${stops.map(s=>`<li><strong>${fullAddress(s)}</strong><br>${s === stops[0] ? 'Navigate here from your own starting point.' : s.leg}</li>`).join('')}</ol><h2>Paint samples to compare</h2><div class="print-palette">${paints.map(p=>`<div><span class="dot" style="background:${p.hex}"></span><strong>${p.name}</strong><br>SW ${p.code}</div>`).join('')}</div><p>Reference: Smoky Azurite SW 9148. Suggestions are visual estimates, not confirmed paint matches. Printed colors vary; compare real samples beside your roof and trim in sun and shade.</p><p class="print-footnote">View from public streets; keep driveways clear. Street View images are dated and houses may have changed. Live photos, maps and sources: https://trimcrae.github.io/Kid-games/nanny/</p></section>${[0,2,4].map(start=>`<section class="print-page">${stops.slice(start,start+2).map((s,j)=>`<article class="print-house"><h2>${start+j+1}. ${s.address}</h2><p>Rochester, NY ${s.zip} · ${s.title}</p><div class="print-house-body"><figure><img src="${thumbnail(s)}" width="900" height="600" alt="${s.title} at ${s.address}"><figcaption>Google Street View · ${s.date} · © Google</figcaption></figure><div><p>${s.note}</p><p><strong>Compare:</strong> ${s.samples.map(n=>`${paints[n].name} (SW ${paints[n].code})`).join(' / ')}</p><p class="print-footnote">${s.caveat}</p></div></div><p><strong>Look for:</strong> ${s.look}</p><p class="print-notes">Notes: __________________________________________________________________<br>_________________________________________________________________________</p></article>`).join('')}</section>`).join('')}`;
+const colorGuess = s => s.samples.map(n=>`<span class="chip"><span class="dot" style="background:${paints[n].hex}"></span>${paints[n].name} · SW ${paints[n].code}</span>`).join('');
+document.querySelector('#stops').innerHTML = stops.map((s,i)=>`<article class="stop" id="house-${i+1}"><figure><a href="${streetView(s)}" aria-label="See ${s.address} in Google Street View"><img src="${thumbnail(s)}" width="900" height="600" loading="lazy" alt="${s.title} at ${s.address}"></a><figcaption>Google Street View · ${s.date} · © Google</figcaption></figure><div><h2 class="address">${s.address}</h2><p>Rochester, NY ${s.zip} · about ${s.miles.toFixed(1)} miles from the school</p><p><strong>Color guess</strong> · similar paint samples</p><div class="tags">${colorGuess(s)}</div><p class="small">${s.caveat}</p><a href="${streetView(s)}">Open Street View ↗</a> · <a href="${s.source}">Address reference</a></div></article>`).join('');
+document.querySelector('#print-guide').innerHTML = Array.from({length:Math.ceil(stops.length/2)},(_,page)=>`<section class="print-page"><h1>Nearby blue-gray houses</h1><p>Near Renaissance Academy · Verified finds so far · September 12, 2026</p>${stops.slice(page*2,page*2+2).map(s=>`<article class="print-house"><h2>${s.address}</h2><p>Rochester, NY ${s.zip} · about ${s.miles.toFixed(1)} miles from the school</p><div class="print-house-body"><figure><img src="${thumbnail(s)}" width="900" height="600" alt="${s.title} at ${s.address}"><figcaption>Google Street View · ${s.date} · © Google</figcaption></figure><div><p><strong>Color guess:</strong></p>${colorGuess(s)}<p class="print-footnote">${s.caveat}</p></div></div><p class="print-notes">Notes: __________________________________________________________________</p></article>`).join('')}<p class="print-footnote">Colors are visual estimates, not confirmed paint matches. Photos may be older than the current finish. Live list: https://trimcrae.github.io/Kid-games/nanny/</p></section>`).join('');
 
-async function printTour() {
-  const buttons = document.querySelectorAll('[data-print], #print');
+async function printHouses() {
+  const buttons = document.querySelectorAll('[data-print]');
   buttons.forEach(button=>button.disabled=true);
   const status = document.querySelector('#print-status');
   status.textContent='Preparing photos…';
@@ -72,7 +77,7 @@ async function printTour() {
   buttons.forEach(button=>button.disabled=false);
   window.print();
 }
-document.querySelectorAll('[data-print], #print').forEach(button=>button.addEventListener('click',printTour));
+document.querySelectorAll('[data-print]').forEach(button=>button.addEventListener('click',printHouses));
 document.querySelectorAll('figure img').forEach(img=>img.addEventListener('error',()=>{
   img.hidden=true;
   const message=document.createElement('p');

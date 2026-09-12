@@ -1,6 +1,24 @@
 # Blue house color tour — evidence
 
-## Current revision: six houses, house-to-house route
+## Latest scope: house inventory, no itinerary
+
+The user replaced the tour request with a list of every nearby blue-gray house: Street View photo, estimated color and address. Removed driving links, route order and stop numbers from screen and print layouts. Existing verified records are temporarily shown nearest-first with approximate straight-line distance from the school (Google pin 43.259546,-77.681902, checked September 12 at 13:53 EDT). Distances use panorama camera positions and are rounded to 0.1 mile. A search-radius clarification is pending. The current list is explicitly verified finds so far, not a completed inventory. Do not impose a one-house-per-street restriction on further research.
+## September 12 follow-up: broadened search, six different streets
+
+User challenged the three-house Doewood cluster. At approximately 13:41–13:49 EDT, searched public listing/photo results across Greece 14612, 14616 and 14626, then inspected the strongest new candidates and school-area streets using Google Street View. This is a broader targeted search, not an exhaustive house-by-house survey.
+
+- Selected **152 Montvale Lane**: Google pin 43.2252116,-77.7214623; August 2025 panorama `DpjZGR7T0-Jd1yOacGjk8A`, camera 43.2252241,-77.7211305, heading 266.9645. Clear deep-blue contemporary facade, white trim, brick chimney. Listing corroboration: https://www.zillow.com/homedetails/152-Montvale-Ln-Rochester-NY-14626/30936928_zpid/ . Darker than the reference, labeled accordingly.
+- Selected **113 Rye Road**: Google pin 43.1998184,-77.6844233; August 2025 panorama `2jlUtXne4_LcN0SCcJNNfA`, camera 43.2000521,-77.6843324, heading 195.71706. Blue-gray colonial with white shutters, left garage, partly shaded/screened by trees but central facade visible. Listing corroboration: https://www.homes.com/property/113-rye-rd-rochester-ny/spsc5lmkb75ds/ .
+- Excluded **24 Whisper Creek Court**: available July 2025 panorama on Heather Ridge (`_QOgqhUq1g1Eyb5HDY3Blw`, 43.2347771,-77.722811, heading 105.17002) gives a distant tree-screened view from the entrance. Listing looked blue but available street view was less useful.
+- Excluded **75 Wayfaring Lane**: July 2025 Street View showed a pale neutral facade with dark lower accents, not a strong blue comparison.
+- Excluded **149 Leerie Drive**: July 2025 panorama `EOOoby_SlpCM7yn6wiKhNQ`, 43.2640634,-77.7075153, heading 185.82509. Very pale cool/neutral siding; adjacent streetscape also reviewed, no stronger choice selected.
+- **Taybrook Lane school-area survey**: checked views around camera labels 2, 10 and 82, including both directions at 2. Pale/neutral houses or school surroundings; no candidate selected. These are sampled viewpoints, not a claim that every intermediate house was individually examined.
+- Original three Doewood candidates remain documented below. Only 383 retained; 353 and 339 removed from the page in favor of separate streets.
+
+New route verified in Google Maps Details at 13:48 EDT: **152 Montvale → 26 Picturesque → 1050 Latta → 466 Mt Ridge → 113 Rye → 383 Doewood**. **40 minutes / 18.6 miles**. Legs: 10 min/5.0 mi; 3 min/1.5 mi; 9 min/3.8 mi; 7 min/3.2 mi; 11 min/5.1 mi. Split phone route switches at 466 Mt Ridge (stop 4). Print guide and screen route updated together; school remains only an area reference.
+
+The previous revisions below are historical and their route figures are superseded.
+## Earlier revision: six houses, house-to-house route
 
 User requested less prominent personal naming, more than three houses, and use of the school solely as a search-area guide. Visible personal naming was removed; the existing `/nanny/` URL remains compatible. The old three-stop school loop below is historical evidence, superseded by this revision.
 
