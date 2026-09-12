@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "bd3fe8f44de8bef456e072466ac32449d9d41446923d526076a22a1c619d17a3",
+  "generator_sha256": "6d2057afaaae2e092723970edad56bb7ea548d7d217657167219937859da8b87",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -728,10 +728,10 @@
     {
       "name": "Living television media cabinet",
       "collection": "09 | Living room furniture",
-      "photos": "House Tour 48.007s,54.010s",
+      "photos": "House Tour 48.007s,53.510s,54.010s",
       "confidence": "dark wood, open upper shelving and three broad drawer rows observed; dimensions estimated",
       "location_m": [
-        2.319999933242798,
+        2.75,
         4.079999923706055,
         0.017999999225139618
       ]
@@ -739,10 +739,10 @@
     {
       "name": "Living large television",
       "collection": "09 | Living room furniture",
-      "photos": "House Tour 54.010s",
+      "photos": "House Tour 53.510s,54.010s",
       "confidence": "photo / estimated size",
       "location_m": [
-        2.319999933242798,
+        2.75,
         4.079999923706055,
         0.017999999225139618
       ]
@@ -753,8 +753,8 @@
       "photos": "House Tour 50.008/53.510/54.010s",
       "confidence": "photo / estimated size",
       "location_m": [
-        1.8200000524520874,
-        3.565000057220459,
+        1.8250000476837158,
+        4.079999923706055,
         0.017999999225139618
       ]
     },
@@ -2151,7 +2151,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         11.550000190734863,
-        8.619999885559082,
+        8.529999732971191,
         -1.0499999523162842
       ]
     },
@@ -2899,7 +2899,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         8.65999984741211,
-        8.770000457763672,
+        8.660001754760742,
         -1.0499999523162842
       ]
     },
@@ -2910,7 +2910,7 @@
       "confidence": "photo / estimated size",
       "location_m": [
         10.55525016784668,
-        8.09999942779541,
+        8.324999809265137,
         -1.0499999523162842
       ]
     },
@@ -4604,8 +4604,8 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         10.555000305175781,
-        8.100000381469727,
-        0.09250012040138245
+        8.324999809265137,
+        0.09250009059906006
       ]
     },
     {
@@ -4692,7 +4692,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         8.65999984741211,
-        8.770000457763672,
+        8.65999984741211,
         0.0
       ]
     },
@@ -5054,7 +5054,7 @@
       "photos": "A4 lived-in dressing",
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
-        2.319999933242798,
+        2.75,
         4.36899995803833,
         2.1500000953674316
       ]
@@ -5429,7 +5429,7 @@
       "confidence": "invented lived-in dressing; not photographed",
       "location_m": [
         10.788999557495117,
-        8.100000381469727,
+        8.324999809265137,
         0.550000011920929
       ]
     },

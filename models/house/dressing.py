@@ -1194,7 +1194,7 @@ for k, (x, mat) in enumerate([(-.30, D['rose']), (-.10, D['mustard']), (.10, D['
         g.cyl((x, 0, .83), .15, .40, mat, 14, top=.075, sy=.5)
 g.done()
 zd = down(10.555, 8.10, .5)
-g = prop('Ellie dresser crown jewellery box and mirror', 10.555, 8.10, zd, -90)
+g = prop('Ellie dresser crown jewellery box and mirror', 10.555, 8.325, zd, -90)
 g.cyl((-.20, -.02, .02), .065, .04, D['mustard'], 16, caps=(False, False))
 for k in range(5):
     a = k * math.tau / 5
@@ -1249,7 +1249,7 @@ for x in (-.09, 0, .09):
     g.box((x, 0, .07 if x else .05), (.07, .07, .14 if x else .10), D['paper'])
     g.cyl((x, 0, (.16 if x else .12)), .045, .06, D['corn'], 8, top=.001)
 g.done()
-g = prop('Ellie small bookcase books', 8.66, 8.77, 0, 90)
+g = prop('Ellie small bookcase books', 8.66, 8.66, 0, 90)
 for top in (-.62, -.43, -.24):
     book_row(g, 0, -.27, down(8.66, 8.77, top), .54, .16, 'y', .10, .16)
 g.done()
@@ -1616,7 +1616,7 @@ for h, mat in [(.80, D['corn']), (1.02, D['rose']), (1.17, D['mustard']), (1.27,
     z = h - .80
     g.vflat([(0, z - .018), (.075, z - .018), (.095, z), (.075, z + .018), (0, z + .018)], -.018, mat)
 g.done()
-clock('Living clock above the television', 2.32, 3.60, 2.15, (0, 1, 0), .16)
+clock('Living clock above the television', 2.75, 3.60, 2.15, (0, 1, 0), .16)
 g = wall_prop('Living front window curtains', 2.175, .80, 1.50, (0, -1, 0))
 for x in (-1.595, 1.595):
     g.soft((x, -.14, -.025), (.24, .05, 1.65), D['cream'], .02)
@@ -1705,7 +1705,7 @@ g = wall_prop('Ellie princess bunting', 8.60, 7.00, .85, (-1, 0, 0))
 bunting(g, .90, [D['rose'], D['mustard'], D['flilac'], D['paper'], D['rose'], D['mustard']], drop=.13, sag=.04)
 g.done()
 framed('Ellie princess dress drawing', 8.60, 7.05, .35, (-1, 0, 0), .30, .36, 'dress')
-g = wall_prop('Ellie round mirror above the dresser', 10.40, 8.10, .55, (1, 0, 0))
+g = wall_prop('Ellie round mirror above the dresser', 10.40, 8.325, .55, (1, 0, 0))
 g.cyl((0, -.012, 0), .20, .024, D['rose'], 24, rot=(math.pi / 2, 0, 0))
 g.vflat(ngon(.17, 24), -.0255, mirror)
 g.done()

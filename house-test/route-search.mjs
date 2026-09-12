@@ -1,9 +1,11 @@
 // Route search for the paw-print directions (wayfinding.mjs): A* on a 20 cm
 // grid over the same collision world and walking rules as the pet, so a
-// route only goes where the pet can really walk. No DOM or Three.js here, so
-// it runs the same in the page and in route-worker.mjs.
-const STEP=.2;
-const DIRS=[[STEP,0],[-STEP,0],[0,STEP],[0,-STEP],[STEP,STEP],[-STEP,STEP],[STEP,-STEP],[-STEP,-STEP]];
+// route only goes where the pet can really walk. A gap only a little wider
+// than the pet (the parents' chest and bassinet) can fall between grid
+// columns, so a failed search retries once on a 10 cm grid. No DOM or
+// Three.js here, so it runs the same in the page and in route-worker.mjs.
+const STEP=.2,FINE=.1;
+const dirs=s=>[[s,0],[-s,0],[0,s],[0,-s],[s,s],[-s,s],[s,-s],[-s,-s]];
 class Heap{
   constructor(){this.a=[];}
   get size(){return this.a.length;}
@@ -41,7 +43,20 @@ function walkable(world,p,x,z){
   return {x:cx,y,z:cz};
 }
 export function routeSearch(world,from,to,{maxNodes=90000}={}){
-  const key=(x,y,z)=>Math.round((x-from.x)/STEP)+','+Math.round(y*10)+','+Math.round((z-from.z)/STEP);
+  let search=gridSearch(world,from,to,STEP,maxNodes),fine=false;
+  return {
+    get state(){return search.state==='failed'&&!fine?'searching':search.state;},
+    get path(){return search.path;},get expanded(){return search.expanded;},
+    run(ms=6){
+      const state=search.run(ms);
+      if(state!=='failed'||fine)return state;
+      fine=true;search=gridSearch(world,from,to,FINE,maxNodes);return 'searching';
+    },
+  };
+}
+function gridSearch(world,from,to,step,maxNodes){
+  const DIRS=dirs(step);
+  const key=(x,y,z)=>Math.round((x-from.x)/step)+','+Math.round(y*10)+','+Math.round((z-from.z)/step);
   // Weighted A*: a slightly longer route found in a fraction of the time is
   // fine for directions, and the straightening below tidies it anyway.
   const h=n=>(Math.hypot(n.x-to.x,n.z-to.z)+Math.abs(n.y-to.y)*1.5)*2;
