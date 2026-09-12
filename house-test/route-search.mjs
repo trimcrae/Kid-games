@@ -66,8 +66,17 @@ function gridSearch(world,from,to,step,maxNodes){
   function done(n){
     const raw=[];for(let m=n;m;m=m.parent)raw.push({x:m.x,y:m.y,z:m.z});raw.reverse();raw.push({x:to.x,y:to.y,z:to.z});
     // Soften the grid's zig-zags: each point takes the average of its level
-    // neighbours (a few centimetres of corner cutting is fine for footprints).
-    path=raw.map((p,i)=>{let sx=0,sz=0,n=0;for(let k=Math.max(0,i-2);k<=Math.min(raw.length-1,i+2);k++){if(Math.abs(raw[k].y-p.y)<.05){sx+=raw[k].x;sz+=raw[k].z;n++;}}return i===0||i===raw.length-1?p:{x:sx/n,y:p.y,z:sz/n};});
+    // neighbours, but only where the pet could really walk that softened line
+    // (from the previous point and on to the next grid point); otherwise the
+    // prints keep the grid point, so following them never wedges on a corner.
+    path=[raw[0]];
+    for(let i=1;i<raw.length-1;i++){
+      const p=raw[i];let sx=0,sz=0,n=0;
+      for(let k=Math.max(0,i-2);k<=Math.min(raw.length-1,i+2);k++){if(Math.abs(raw[k].y-p.y)<.05){sx+=raw[k].x;sz+=raw[k].z;n++;}}
+      const soft={x:sx/n,y:p.y,z:sz/n},prev=path[path.length-1];
+      path.push(walkable(world,prev,soft.x,soft.z)&&walkable(world,soft,raw[i+1].x,raw[i+1].z)?soft:p);
+    }
+    if(raw.length>1)path.push(raw[raw.length-1]);
     state='found';
   }
   return {

@@ -136,6 +136,10 @@ export async function createHouseLife(tour){
     const wasAdopting=selected?.id==='adopt';
     if(!$('activity-panel').hidden){api.leave();$('activity-panel').hidden=true;selected=null;sync(true);}
     document.body.classList.remove('in-activity');
+    // Leaving adoption without a pet (e.g. after switching to a pet-less
+    // player) goes back to Family to pick someone else; resuming would only
+    // start adoption again, with no way out but adopting or reloading.
+    if(resume&&wasAdopting&&!engine.state().pet){openFamily(false);return;}
     if(resume)tour.resume();
     // Straight after adopting: turn the new pet round to say hello to you,
     // before the camera settles in behind it.

@@ -10,7 +10,7 @@ export const rooms=[
   ['Main floor','Front entry',5.65,.7,0,0,[6.2,1.4,.35]],
   ['Main floor','Living room',5.8,2.0,0,-1.25,[5.8,2.0,.95]],
   ['Main floor','Kitchen',2,6.8,0,1.4],
-  ['Main floor','Dining room',5.6,7.5,0,Math.PI,[5.6,7.5,-2.618]],
+  ['Main floor','Dining room',5.6,7.5,0,Math.PI,[6.05,7.25,-2.5]],
   ['Main floor','Sunroom',5.0,8.6,-.10,0,[4.85,9.4,-.6]],
   ['Main floor','Garage',-.7,7.5,-.16,1.4,[-1.59,7.65,1.4]],
   ['Upstairs','Upstairs hall',11.5,4.01,1.26,-Math.PI/2],
