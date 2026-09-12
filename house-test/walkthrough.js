@@ -10,7 +10,8 @@ import {installPostPass} from './post-aa.mjs';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {warmupCast} from './creatures.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,boomCamera,craneExtra,arrivalHeading} from './camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs';
+import {glazingBoxes} from './glazing.mjs';
 
 const $=id=>document.getElementById(id);
 // Touch buttons act on pointerup, so a finger doesn't wait for the click. The
@@ -83,15 +84,15 @@ if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 let guard=null,cameraClearance=lensClearance();
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
 const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null;
-// The eased follow-camera state: crane swing and boom length.
-let rigState=null,crane=null,arrivalYaw=null;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// The eased follow camera (crane swing and boom length); see camera-guard.mjs.
+const followRig=createFollowRig({reducedMotion});let arrivalYaw=null;
 
 // Every way of putting the pet somewhere new — a jump, a family switch, a
 // reload or an imported save — comes through here, so the camera, room name
 // and lighting arrive with the pet instead of sweeping across floors to it.
 function placePlayer(p,heading){
-  Object.assign(player,p);pitch=-.18;focusY=p.y;velocity={x:0,z:0};rigState=null;crane=null;
+  Object.assign(player,p);pitch=-.18;focusY=p.y;velocity={x:0,z:0};followRig.reset();
   yaw=arrivalYaw=arrivalHeading(player,heading,pitch,world,guard,cameraClearance);life?.face(yaw+Math.PI,true);
   updateLocation();
 }
@@ -265,37 +266,12 @@ function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';if(joystick.c
 joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
 window.addEventListener('resize',()=>{fitLens();cameraClearance=lensClearance();renderer.setSize(innerWidth,innerHeight);});
 // Follow camera. The guard's answer is where the camera may go this frame; it
-// pulls in at once but eases back out and swings up/down smoothly, so walking
-// past a door jamb no longer pops the view by a metre in one frame. Anything
-// shown lies on a guarded boom no further out than the guard allowed.
+// pulls in at once but eases back out, and in tight spots swings up smoothly
+// (never past about 60° down, never faster than a steady pan) instead of
+// snapping to an overhead view. The rig lives in camera-guard.mjs so the
+// camera tests replay exactly this placement.
 function placeCamera(dt){
-  const focus={x:player.x,y:focusY,z:player.z};
-  // The full crane ladder is searched every few frames (or at once when the
-  // chosen swing stops fitting); in between only the chosen swing is placed,
-  // which keeps tight rooms as cheap as open ones.
-  let pick;
-  if(!crane||crane.age++>=3){const c=craneExtra(focus,yaw,pitch,world,guard,cameraClearance);crane={extra:c.extra,age:0};pick=c.view;}
-  else{pick=boomCamera(focus,yaw,Math.max(-1.45,pitch+crane.extra),world,guard,cameraClearance);if(pick.distance<1.2)crane.age=3;}
-  if(!rigState||reducedMotion)rigState={extra:crane.extra,distance:pick.distance};
-  rigState.extra+=(crane.extra-rigState.extra)*(1-Math.exp(-dt*4));
-  if(Math.abs(rigState.extra-crane.extra)<.004)rigState.extra=crane.extra;
-  const view=rigState.extra===crane.extra?pick:boomCamera(focus,yaw,Math.max(-1.45,pitch+rigState.extra),world,guard,cameraClearance);
-  const eased=rigState.distance+(view.distance-rigState.distance)*(1-Math.exp(-dt*3.5));
-  rigState.distance=Math.min(view.distance,eased);
-  if(rigState.distance>=view.distance-1e-4||view.distance<1e-4)return view;
-  const s=rigState.distance/view.distance,t=view.target,p=view.position;
-  const position={x:t.x+(p.x-t.x)*s,y:t.y+(p.y-t.y)*s,z:t.z+(p.z-t.z)*s};
-  // A point inside the guarded boom can still pass close to a jamb edge. Step
-  // out along the boom only as far as the near plane needs, rather than
-  // jumping to the full length in one frame.
-  if(guard&&guard.clearanceAt(position)<cameraClearance-.015){
-    for(let d=rigState.distance+.08;d<view.distance;d+=.08){
-      const k=d/view.distance,q={x:t.x+(p.x-t.x)*k,y:t.y+(p.y-t.y)*k,z:t.z+(p.z-t.z)*k};
-      if(guard.clearanceAt(q)>=cameraClearance-.015){rigState.distance=d;return {target:t,position:q};}
-    }
-    rigState.distance=view.distance;return view;
-  }
-  return {target:t,position};
+  return followRig.place({x:player.x,y:focusY,z:player.z},yaw,pitch,dt,world,guard,cameraClearance);
 }
 let lastRender=performance.now();
 function render(){
@@ -431,6 +407,8 @@ async function load(){
     performance.mark('house:compile-issued');
     guard=createCameraGuard(binary,guardGroups(data.groups));
     world=new WalkingWorld(data.colliders,{height:1.05});
+    // The sunroom's glass walls block walking too (see glazing.mjs).
+    world.addBoxes(glazingBoxes(binary,data.groups,world));
     performance.mark('house:guard');
     await warming;scene.remove(cast);
     performance.mark('house:shaders');
