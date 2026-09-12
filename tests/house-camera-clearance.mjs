@@ -84,13 +84,14 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
       // Jammed against a wall or bed by the turn, the crane leaves its easing to
       // get out of the pet (counted, and rare).
       if(v.escaped)escapes++;const judged=steadyPan&&!v.escaped;
-      if(look!==null){worstLook=Math.max(worstLook,look);if(last!==null&&judged)worstStep=Math.max(worstStep,Math.abs(look-last));}
+      if(look!==null){worstLook=Math.max(worstLook,look);if(last!==null&&judged&&!v.boosted)worstStep=Math.max(worstStep,Math.abs(look-last));}
       if(guard.blocked(t,p,true))rigFailures.push(at+': camera behind a wall, floor, ceiling, window or tall furniture');
       else if(guard.blocked(t,p)&&p.y-t.y<SOFT_CLEAR)rigFailures.push(at+': camera looks through low furniture without being above it');
       else if(inside(p))rigFailures.push(at+': camera inside a collider');
       else if(Math.hypot(p.x-t.x,p.y-t.y,p.z-t.z)>1e-3&&guard.clearanceAt(p)<reach)rigFailures.push(`${at}: ${guard.clearanceAt(p).toFixed(3)} m from a surface`);
       if(look!==null&&look>MAX_LOOK)rigFailures.push(`${at}: looks ${look.toFixed(0)}° down`);
-      if(look!==null&&last!==null&&judged&&Math.abs(look-last)>MAX_LOOK_STEP)rigFailures.push(`${at}: view tipped ${Math.abs(look-last).toFixed(1)}° in one frame`);
+      // (A boom squeezed against the pet swings up out of it faster, still eased.)
+      if(look!==null&&last!==null&&judged&&Math.abs(look-last)>(v.boosted?3*MAX_LOOK_STEP:MAX_LOOK_STEP))rigFailures.push(`${at}: view tipped ${Math.abs(look-last).toFixed(1)}° in one frame`);
       last=look;
     }
     // Back at the starting heading, the camera settles back down to where a

@@ -221,7 +221,7 @@ export function orbitCamera(player,yaw,pitch,world,guard,clearance,rig=CAMERA_RI
 // continuous move instead of snapping between levels. Anything shown lies on a
 // guarded boom no further out than the guard allowed.
 export const CRANE_RATE=1.1;   // rad/s: the fastest the crane swings
-const CRANE_EASE=3.2,BOOM_EASE=3.5,PULL_EASE=6,RESCAN=4,JAM=.3,LEAD=.5;
+const CRANE_EASE=3.2,BOOM_EASE=3.5,PULL_EASE=6,RESCAN=4,JAM=.3,LEAD=.5,BOOST_BELOW=.65;
 export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
   let state=null;
   // Where the crane should head, a step at a time from where it is heading
@@ -236,6 +236,9 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
     // Room again at the default height (turned back from a wall): head home,
     // even across a stretch where the swing in between is cramped.
     if(cur<0&&at(0).distance>=CRANE_GOOD+.25)return lower;
+    // Squeezed up against the pet (a step past a jamb, a turn into a
+    // corner): head straight for the swing a fresh placement would use.
+    if(v.distance<BOOST_BELOW){const c=craneExtra(focus,yaw,pitch,world,guard,clearance,rig);if(c.view.distance>v.distance+.3)return c.extra;}
     if(v.distance>=CRANE_GOOD)return lower!==cur&&at(lower).distance>=CRANE_GOOD+.25?lower:cur;
     const vl=lower!==cur?at(lower):null;
     if(vl&&vl.distance>=CRANE_GOOD)return lower;
@@ -283,10 +286,12 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
         if(state.ahead===null)state.aheadDistance=Infinity;
       }
       state.want=Math.max(floor,Math.min(0,state.want));
-      // Swing towards the chosen crane: eased, and rate-limited.
+      // Swing towards the chosen crane: eased, and rate-limited; a boom
+      // squeezed up against the pet swings up out of it three times faster.
       if(reducedMotion)state.extra=state.want;
       else{
-        const step=(state.want-state.extra)*(1-Math.exp(-dt*CRANE_EASE)),limit=CRANE_RATE*dt;
+        const boost=state.distance<BOOST_BELOW&&state.want<state.extra?3:1;state.boosted=boost>1;
+        const step=(state.want-state.extra)*(1-Math.exp(-dt*CRANE_EASE*boost)),limit=CRANE_RATE*boost*dt;
         state.extra+=Math.max(-limit,Math.min(limit,step));
         if(Math.abs(state.extra-state.want)<.004)state.extra=state.want;
       }
@@ -310,7 +315,7 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
           state.extra=found.e;state.want=Math.min(state.want,found.e);view=found.v;escaped=true;
         }else state.jamWait=4;
       }
-      if(escaped)this.escapes++;
+      if(escaped)this.escapes++;const flags={escaped,boosted:!!state.boosted};
       if(view.distance<.9*CRANE_GOOD)state.age=Math.max(state.age,RESCAN-1);
       if(reducedMotion)state.distance=view.distance;
       // Panning towards a wall, the boom glides in ahead of it instead of
@@ -318,7 +323,7 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
       const goal=reducedMotion?view.distance:Math.min(view.distance,Math.max(state.aheadDistance??Infinity,JAM+.1));
       const eased=state.distance+(goal-state.distance)*(1-Math.exp(-dt*(goal<state.distance?PULL_EASE:BOOM_EASE)));
       state.distance=Math.min(view.distance,eased);
-      if(state.distance>=view.distance-1e-4||view.distance<1e-4)return {...view,escaped};
+      if(state.distance>=view.distance-1e-4||view.distance<1e-4)return {...view,...flags};
       const t=view.target,p=view.position,rise=(p.y-t.y)/view.distance;
       const along=d=>({x:t.x+(p.x-t.x)*d/view.distance,y:t.y+(p.y-t.y)*d/view.distance,z:t.z+(p.z-t.z)*d/view.distance});
       // The full boom may look over a chair back or a banister from well above
@@ -340,13 +345,13 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
       if(!fits(state.distance)){
         for(let k=.08;k<view.distance;k+=.08){
           const out=state.distance+k,inward=state.distance-k;
-          if(out<view.distance&&fits(out)){state.distance=out;return {target:t,position:along(out),distance:out,escaped};}
-          if(inward>=JAM+.1&&fits(inward)){state.distance=inward;return {target:t,position:along(inward),distance:inward,escaped};}
+          if(out<view.distance&&fits(out)){state.distance=out;return {target:t,position:along(out),distance:out,...flags};}
+          if(inward>=JAM+.1&&fits(inward)){state.distance=inward;return {target:t,position:along(inward),distance:inward,...flags};}
           if(out>=view.distance&&inward<JAM+.1)break;
         }
-        state.distance=view.distance;return {...view,escaped};
+        state.distance=view.distance;return {...view,...flags};
       }
-      return {target:t,position:along(state.distance),distance:state.distance,escaped};
+      return {target:t,position:along(state.distance),distance:state.distance,...flags};
     },
   };
 }
