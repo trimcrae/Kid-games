@@ -22,7 +22,15 @@ const failures=[];let searched=0,longest=0;
 function expect(label,from,to){
   const began=performance.now(),{state,path}=route(from,to);searched++;longest=Math.max(longest,performance.now()-began);
   if(state!=='found')failures.push(`${label}: ${state}`);
-  else{const end=path[path.length-1];if(Math.hypot(end.x-to.x,end.z-to.z)>.05)failures.push(`${label}: ends ${end.x.toFixed(2)},${(-end.z).toFixed(2)}`);}
+  else{
+    const end=path[path.length-1];if(Math.hypot(end.x-to.x,end.z-to.z)>.05)failures.push(`${label}: ends ${end.x.toFixed(2)},${(-end.z).toFixed(2)}`);
+    // The drawn prints stay walkable for the pet all the way (smoothing never
+    // cuts a corner into furniture, so following them exactly never wedges).
+    for(let i=0;i<path.length-1;i++)for(let t=0;t<=1;t+=.1){
+      const p=path[i],q=path[i+1],x=p.x+(q.x-p.x)*t,z=p.z+(q.z-p.z)*t;
+      if(world.blocked(x,z,world.floor(x,z,p.y))){failures.push(`${label}: prints cut into furniture at ${x.toFixed(2)},${(-z).toFixed(2)}`);i=path.length;break;}
+    }
+  }
 }
 // The parents' ensuite is reached only through the slot beside the bassinet.
 const parents=room("Mom & Dad's bedroom"),ensuite=room("Mom & Dad's bathroom");

@@ -326,9 +326,12 @@ let frames=0,lastDraw=0;
 // GPU budget per walking frame at the 30 fps cap, leaving room for the page
 // compositor and the activity iframe. Fill cost scales with pixel count.
 const GPU_TARGET_MS=25,GPU_HIGH_MS=30,PIXEL_FLOOR=.6;
+// ?pr=<ratio> pins the render scale for QA comparisons.
+const PINNED_PR=+query.get('pr')||0;
+if(PINNED_PR){pixelRatio=PINNED_PR;renderer.setPixelRatio(pixelRatio);}
 function adaptResolution(now){
   gpuTimer?.poll();
-  if(!active||!ready){qualitySince=now;qualityFrames=0;return;}
+  if(PINNED_PR||!active||!ready){qualitySince=now;qualityFrames=0;return;}
   qualityFrames++;
   const elapsed=now-qualitySince;
   if(elapsed<1200)return;

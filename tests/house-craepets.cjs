@@ -116,7 +116,13 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     const roamed=await page.evaluate(()=>houseTest.state.roamers);assert(roamed.some(r=>r.id==='ellie'),'Family pet did not join the house');// Companions live at their places (a bed, a rug, the veg bed…) doing something there.
     assert(roamed.length>=8&&roamed.every(r=>r.act&&r.mode),'Companions have no routine');assert(roamed.some(r=>r.mode==='at'),'No companion is at its place');
     await page.keyboard.press('KeyF');await page.locator('[data-profile="ellie"]').click();await page.waitForTimeout(1100);assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Ellie Blossom');
-    await page.keyboard.press('KeyF');await page.locator('[data-profile="cory"]').click();
+    // Switching to someone with no pet offers adoption; leaving it without
+    // adopting goes back to Family, not round into adoption again.
+    await page.keyboard.press('KeyF');await page.locator('[data-profile="jeannie"]').click();await page.locator('#activity-panel').waitFor({state:'visible'});
+    await page.locator('#close-activity').click();await page.locator('#family-panel').waitFor({state:'visible'});
+    assert(await page.locator('#activity-panel').isHidden(),'Leaving adoption without a pet reopened adoption');
+    await page.locator('[data-profile="cory"]').click();await page.waitForTimeout(600);
+    assert(await page.locator('#activity-panel').isHidden()&&(await page.evaluate(()=>houseTest.state)).pet==='Cory Comet','Could not switch back from a pet-less player');
     const saved=await runtime().evaluate(()=>({coins:Craepets.state().coins,correct:Craepets.state().stats.correct}));
     assert.equal(await page.evaluate(()=>localStorage.getItem('craepets.v1.cory')),original,'Original save was changed');
     await page.reload();await page.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});assert.deepEqual(await runtime().evaluate(()=>({coins:Craepets.state().coins,correct:Craepets.state().stats.correct})),saved);
