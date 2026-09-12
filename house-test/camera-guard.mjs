@@ -233,6 +233,9 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
     const floor=craneFloor(pitch);cur=Math.max(floor,Math.min(0,cur));
     const at=e=>known.get(e)??(known.set(e,boomCamera(focus,yaw,pitch+e,world,guard,clearance,rig)),known.get(e));
     const v=at(cur),lower=Math.min(0,cur+CLIMB_STEP),higher=Math.max(floor,cur-CLIMB_STEP);
+    // Room again at the default height (turned back from a wall): head home,
+    // even across a stretch where the swing in between is cramped.
+    if(cur<0&&at(0).distance>=CRANE_GOOD+.25)return lower;
     if(v.distance>=CRANE_GOOD)return lower!==cur&&at(lower).distance>=CRANE_GOOD+.25?lower:cur;
     const vl=lower!==cur?at(lower):null;
     if(vl&&vl.distance>=CRANE_GOOD)return lower;

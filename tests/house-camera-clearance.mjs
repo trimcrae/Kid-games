@@ -8,7 +8,7 @@ import {gunzipSync} from 'node:zlib';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,arrivalHeading,createFollowRig,lookDown,PITCH_FLOOR,SOFT_CLEAR} from '../house-test/camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,craneExtra,arrivalHeading,createFollowRig,lookDown,PITCH_FLOOR,SOFT_CLEAR} from '../house-test/camera-guard.mjs';
 import {glazingBoxes} from '../house-test/glazing.mjs';
 import {routeSearch} from '../house-test/route-search.mjs';
 
@@ -92,6 +92,11 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
       if(look!==null&&last!==null&&judged&&Math.abs(look-last)>MAX_LOOK_STEP)rigFailures.push(`${at}: view tipped ${Math.abs(look-last).toFixed(1)}° in one frame`);
       last=look;
     }
+    // Back at the starting heading, the camera settles back down to where a
+    // fresh arrival would put it (it does not stay craned up after a turn).
+    for(let i=0;i<60;i++)rig.place(player,room[5],pitch,dt,world,guard,clearance);
+    const settled=craneExtra(player,room[5],pitch,world,guard,clearance);
+    if(settled.view.distance>=1.6&&rig.crane<settled.extra-.12)rigFailures.push(`${room[1]} pitch ${pitch}: still craned ${rig.crane.toFixed(2)} after turning back (${settled.extra} would do)`);
   }
 }
 assert.equal(rigFailures.length,0,rigFailures.slice(0,12).join('\n'));
