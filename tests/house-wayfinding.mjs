@@ -4,13 +4,17 @@
 // foot into the back of her room.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {glazingBoxes} from '../house-test/glazing.mjs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {routeSearch} from '../house-test/route-search.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
-const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(neighborhoodBoxes);
+// The game's own walking world: the sunroom's glass walls block walking too.
+const meshBytes=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
+const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(glazingBoxes(meshBytes.buffer.slice(meshBytes.byteOffset,meshBytes.byteOffset+meshBytes.byteLength),data.groups,world));world.addBoxes(neighborhoodBoxes);
 const at=(x,y,floor)=>{const p=world.safeSpot(x,floor,-y);assert(p,`no safe spot at ${x},${y}`);return p;};
 const room=name=>{const r=rooms.find(q=>q[1]===name);assert(r,name);return r;};
 function route(from,to){

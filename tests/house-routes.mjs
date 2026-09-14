@@ -1,11 +1,16 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {glazingBoxes} from '../house-test/glazing.mjs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {activities} from '../house-test/activities.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url)));
+// The game's own walking world: the sunroom's glass walls block walking too.
+const meshBytes=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
 const world=new WalkingWorld(data.colliders,{height:1.05});
+world.addBoxes(glazingBoxes(meshBytes.buffer.slice(meshBytes.byteOffset,meshBytes.byteOffset+meshBytes.byteLength),data.groups,world));
 world.addBoxes(neighborhoodBoxes);
 const targets=activities.map(a=>{const r=rooms.find(r=>r[1]===a.room);return {...a,point:world.safeSpot(r[2],r[4],-r[3])};});
 assert(targets.every(a=>a.point),'Unsafe activity spawn');
