@@ -5,13 +5,17 @@
 // than being shoved; shopkeepers speak; eggs never move.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {glazingBoxes} from '../house-test/glazing.mjs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,KEEP_CLEAR,lineOfSight,callOver,freeSpot} from '../house-test/companions.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
-const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(neighborhoodBoxes);
+// The game's own walking world: the sunroom's glass walls block walking too.
+const meshBytes=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
+const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(glazingBoxes(meshBytes.buffer.slice(meshBytes.byteOffset,meshBytes.byteOffset+meshBytes.byteLength),data.groups,world));world.addBoxes(neighborhoodBoxes);
 const avoid=[];
 for(const r of rooms){if(/street|Craepet house/i.test(r[1]))continue;for(const [x,y] of [[r[2],r[3]],...(r[6]?[[r[6][0],r[6][1]]]:[])]){const p=world.safeSpot(x,r[4],-y);if(p)avoid.push(p);}}
 const where={world,colliders:world.boxes,rooms,avoid};
