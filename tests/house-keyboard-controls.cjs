@@ -12,7 +12,7 @@ const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
 const deg=r=>r*180/Math.PI;
-const S=page=>page.evaluate(()=>{const s=houseTest.state;return {yaw:s.yaw,x:s.position.x,z:s.position.z,locked:s.mouseLocked,active:s.active};});
+const S=page=>page.evaluate(()=>{const s=houseTest.state;return {yaw:s.yaw,pitch:s.pitch,x:s.position.x,z:s.position.z,locked:s.mouseLocked,active:s.active};});
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 async function hold(page,key,ms){await page.keyboard.down(key);await page.waitForTimeout(ms);await page.keyboard.up(key);}
 // Total signed turn while a key is held, sampled so a full circle counts in full.
@@ -70,6 +70,14 @@ async function jump(page,room){await page.keyboard.press('KeyR');await page.loca
       // A and D turn too (no side-step).
       const a0=await S(page);const aTurn=await turnWhileHeld(page,'KeyA',500);const a1=await S(page);
       assert(deg(aTurn)>20&&Math.hypot(a1.x-a0.x,a1.z-a0.z)<.05,'A did not turn on the spot in keys-only mode');
+      // Equivalent keys count once (← with A is no faster), and opposites cancel.
+      const one=await turnWhileHeld(page,'ArrowLeft',800);await page.waitForTimeout(150);
+      await page.keyboard.down('KeyA');const both=await turnWhileHeld(page,'ArrowLeft',800);await page.keyboard.up('KeyA');await page.waitForTimeout(150);
+      assert(Math.abs(both/one-1)<.15,`← with A turned ${(both/one).toFixed(2)}× as fast as ← alone`);
+      const still=async(k1,k2)=>{await page.keyboard.down(k1);await page.keyboard.down(k2);await page.waitForTimeout(120);const x=await S(page);await page.waitForTimeout(500);const y=await S(page);
+        await page.keyboard.up(k1);await page.keyboard.up(k2);await page.waitForTimeout(150);return deg(wrap(y.yaw-x.yaw));};
+      const lr=await still('ArrowLeft','ArrowRight'),ld=await still('ArrowLeft','KeyD');
+      assert(Math.abs(lr)<.5&&Math.abs(ld)<.5,`Opposite turn keys did not cancel (← → ${lr.toFixed(1)}°, ← D ${ld.toFixed(1)}°)`);
       // ↑ walks the way the view faces and stops on release; ↓ backs up.
       const w0=await S(page);await hold(page,'ArrowUp',700);const w1=await S(page);await page.waitForTimeout(400);const w2=await S(page);
       const fwd=(w1.x-w0.x)*-Math.sin(w0.yaw)+(w1.z-w0.z)*-Math.cos(w0.yaw);
@@ -96,7 +104,8 @@ async function jump(page,room){await page.keyboard.press('KeyR');await page.loca
       // Remembered after a reload.
       await page.reload();await startHouse(page);
       assert(await page.evaluate(()=>document.body.classList.contains('keys-only'))&&await page.locator('.keys-steer').isVisible(),'Keys only was not remembered');
-      results.keysOnly={fullLeftDeg:+deg(left).toFixed(0),fullRightDeg:+deg(-right).toFixed(0),tapDeg:+tap.toFixed(1),forwardM:+fwd.toFixed(2),backM:+back.toFixed(2)};
+      results.keysOnly={fullLeftDeg:+deg(left).toFixed(0),fullRightDeg:+deg(-right).toFixed(0),tapDeg:+tap.toFixed(1),forwardM:+fwd.toFixed(2),backM:+back.toFixed(2),
+        leftWithARatio:+(both/one).toFixed(2),leftRightDeg:+lr.toFixed(2),leftDDeg:+ld.toFixed(2)};
       await ctx.close();}
 
     // 2. Mouse look with a captured mouse: relative movement, scaled by look speed; ← → turn; A side-steps.
@@ -118,7 +127,18 @@ async function jump(page,room){await page.keyboard.press('KeyR');await page.loca
       assert(deg(kTurn)>20&&Math.hypot(k1.x-k0.x,k1.z-k0.z)<.05,'← did not turn with mouse look');
       const d0=await S(page);await hold(page,'KeyA',500);const d1=await S(page);
       assert(Math.abs(deg(wrap(d1.yaw-d0.yaw)))<1&&Math.hypot(d1.x-d0.x,d1.z-d0.z)>.3,'A did not side-step with mouse look');
-      results.mouseLook={normalDegPer100px:+normal.toFixed(1),slowDegPer100px:+slow.toFixed(1)};
+      // Mouse look tilted to the floor, then Keys only (which has no tilt key): the view levels out.
+      await page.mouse.move(640,420);await page.mouse.move(640,1420,{steps:10});await page.waitForTimeout(150);
+      const tilted=(await S(page)).pitch;
+      assert(tilted<-.6,`Could not tilt the view down with the mouse (${tilted.toFixed(2)})`);
+      await page.keyboard.press('Escape');await page.locator('#welcome[data-mode="pause"]').waitFor();
+      await page.locator('#welcome [data-controls="keys"]').click();
+      const levelled=(await S(page)).pitch;
+      assert(Math.abs(levelled+.18)<.001,`Switching to Keys only left the view tilted at ${levelled.toFixed(2)}`);
+      await page.locator('#start').click();await page.waitForTimeout(300);
+      const q0=await S(page);await hold(page,'ArrowUp',500);const q1=await S(page);
+      assert(!q1.locked&&Math.hypot(q1.x-q0.x,q1.z-q0.z)>.3&&Math.abs(q1.pitch+.18)<.001,'Keys only after a tilted mouse look did not walk level');
+      results.mouseLook={normalDegPer100px:+normal.toFixed(1),slowDegPer100px:+slow.toFixed(1),tiltedPitch:+tilted.toFixed(2),pitchAfterKeysOnly:+levelled.toFixed(2)};
       await page.keyboard.press('Escape');await ctx.close();}
 
     // 3. Capture refused (as in some in-app browsers): a drag turns once; missed releases and lost windows never drift.

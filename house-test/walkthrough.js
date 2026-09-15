@@ -161,7 +161,12 @@ function showControls(){
   for(const b of document.querySelectorAll('[data-controls]'))b.setAttribute('aria-pressed',String(b.dataset.controls===controls.mode));
   for(const b of document.querySelectorAll('[data-look]'))b.setAttribute('aria-pressed',String(b.dataset.look===controls.look));
 }
-function setControls(change){Object.assign(controls,change);try{localStorage.setItem(CONTROLS_KEY,JSON.stringify(controls));}catch{}showControls();}
+function setControls(change){
+  // Keys only has no tilt control, so switching to it levels the view back to
+  // the usual gentle look-down (the mouse may have left it at floor or ceiling).
+  if(change.mode==='keys'&&controls.mode!=='keys'){pitch=-.18;followRig.reset();}
+  Object.assign(controls,change);try{localStorage.setItem(CONTROLS_KEY,JSON.stringify(controls));}catch{}showControls();
+}
 const CAPTURED_HINT='Mouse to aim · WASD to walk · E to interact · R for rooms · Esc to release';
 const KEYS_HINT='Arrow keys to walk and turn · E to use · R for rooms · Esc to pause';
 const CLICK_HINT='Click the view to capture the mouse · WASD to walk';
@@ -410,7 +415,10 @@ function animate(now){
     // ←/→ turn the view (and A/D too with keys-only steering; with the mouse
     // they side-step). A tap turns a little, holding turns steadily, and it
     // stops the moment the key is let go — no drift after release.
-    const turnKeys=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0)+(keysOnly()?(keys.has('KeyA')?1:0)-(keys.has('KeyD')?1:0):0);
+    // (Either key of a pair counts once: ← with A is no faster than ← alone,
+    // and opposite directions cancel.)
+    const turnLeft=keys.has('ArrowLeft')||keysOnly()&&keys.has('KeyA'),turnRight=keys.has('ArrowRight')||keysOnly()&&keys.has('KeyD');
+    const turnKeys=(turnLeft?1:0)-(turnRight?1:0);
     if(turnKeys){turnRate+=(turnKeys*TURN_SPEED-turnRate)*(reducedMotion?1:1-Math.exp(-dt*10));yaw+=turnRate*dt;
       if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));}
     else turnRate=0;
