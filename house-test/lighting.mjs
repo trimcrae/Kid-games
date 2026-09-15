@@ -362,8 +362,12 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
       for(const light of [hemisphere,sun,key,...fills,withPetLight?petLight:null]){
         if(!light)continue;const copy=light.clone();if(light===key)copy.castShadow=true;stand.add(copy);
       }
+      // Only the house itself (layer 1): pets, eggs, props and decor are rebuilt
+      // and disposed as the family changes, and a material disposed while three
+      // is still polling its compile throws. Their few shadow variants compile
+      // at the switch instead, which happens behind a panel or the pause card.
       scene.traverseVisible(o=>{
-        if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh)return;
+        if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh||!o.layers.isEnabled(1))return;
         const m=o.material;if(!m||Array.isArray(m)||!(m.isMeshStandardMaterial||m.isMeshLambertMaterial||m.isMeshPhongMaterial))return;
         const proxy=new THREE.Mesh(o.geometry,m);proxy.receiveShadow=o.receiveShadow;proxy.castShadow=o.castShadow;proxy.layers.mask=o.layers.mask;stand.add(proxy);
       });

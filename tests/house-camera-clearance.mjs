@@ -8,7 +8,7 @@ import {gunzipSync} from 'node:zlib';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,craneExtra,arrivalHeading,createFollowRig,lookDown,PITCH_FLOOR,SOFT_CLEAR} from '../house-test/camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,arrivalHeading,createFollowRig,lookDown} from '../house-test/camera-guard.mjs';
 import {glazingBoxes} from '../house-test/glazing.mjs';
 import {routeSearch} from '../house-test/route-search.mjs';
 import {easeRoute} from '../house-test/route-ease.mjs';
@@ -38,7 +38,7 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
     distances.push(Math.hypot(position.x-target.x,position.y-target.y,position.z-target.z));
     const at=`${room[1]} yaw ${yaw.toFixed(2)} pitch ${pitch}`;
     if(guard.blocked(target,position,true))failures.push(at+': camera behind a wall, floor, ceiling, window or tall furniture');
-    else if(guard.blocked(target,position)&&position.y-target.y<SOFT_CLEAR)failures.push(at+': camera looks through low furniture without being above it');
+    else if(guard.blocked(target,position)&&!guard.softClear(target,position))failures.push(at+': camera looks through low furniture without being above it, or with the pet hidden behind it');
     else if(inside(position))failures.push(at+': camera inside a collider');
     else{const gap=guard.clearanceAt(position);if(gap<reach)failures.push(`${at}: ${gap.toFixed(3)} m from a surface, near plane reaches ${reach.toFixed(3)} m`);}
   }
@@ -62,43 +62,38 @@ for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
 }
 assert.equal(cramped.length,0,'Arrival camera too close: '+cramped.join(', '));
 // The walkthrough's frame-by-frame follow rig, turning a full circle on the
-// spot (a steady mouse pan and sudden 45° flicks) in every room: every frame
-// stays clear of every surface, the view never tips past about 60° down (no
-// plan-view "overhead pops"), and the crane never jerks the view up or down.
-const MAX_LOOK=lookDown(PITCH_FLOOR)*180/Math.PI+.5,MAX_LOOK_STEP=2.5,dt=1/30;
-let rigFrames=0,rigMs=0,worstLook=0,worstStep=0,escapes=0;const rigFailures=[];
+// spot (a steady pan and sudden 45° flicks) in every room: every frame stays
+// clear of every surface; the camera stays on the player's own sightline to
+// the pet, so it turns exactly with the player (no catch-up) and never tips
+// over the pet to look down on it (September 2026: the family found the old
+// tight-room crane, up to about 60° down, forced the view over the pet).
+const dt=1/30;
+let rigFrames=0,rigMs=0,worstOver=0,worstYaw=0;const rigFailures=[];
 for(const room of rooms.filter(r=>!/street|Craepet house/i.test(r[1]))){
   const [ax,ay]=room[6]||[room[2],room[3]];
   for(const player of [world.safeSpot(room[2],room[4],-room[3]),world.safeSpot(ax,room[4],-ay)])for(const pitch of [-.18,.07]){
-    const rig=createFollowRig(),yaws=[];
+    const rig=createFollowRig(),yaws=[],own=lookDown(pitch)*180/Math.PI;
     for(let i=0;i<120;i++)yaws.push(room[5]+i*Math.PI/60);
     for(let k=0;k<8;k++)for(let i=0;i<12;i++)yaws.push(room[5]-(k+1)*Math.PI/4);
-    let last=null,lastYaw=null;
     for(const yaw of yaws){
-      // A 45° flick is a cut anyway; the crane's own swing is judged on steady pans.
-      const steadyPan=lastYaw!==null&&Math.abs(yaw-lastYaw)<.1;lastYaw=yaw;
       began=performance.now();const v=rig.place(player,yaw,pitch,dt,world,guard,clearance);rigMs+=performance.now()-began;rigFrames++;
-      const at=`${room[1]} rig yaw ${yaw.toFixed(2)} pitch ${pitch}`,p=v.position,t=v.target;
-      // (The angle means nothing with the camera jammed against the pet.)
-      const look=Math.hypot(p.x-t.x,p.y-t.y,p.z-t.z)<.3?null:Math.atan2(p.y-t.y,Math.hypot(p.x-t.x,p.z-t.z))*180/Math.PI;
-      // Jammed against a wall or bed by the turn, the crane leaves its easing to
-      // get out of the pet (counted, and rare).
-      if(v.escaped)escapes++;const judged=steadyPan&&!v.escaped;
-      if(look!==null){worstLook=Math.max(worstLook,look);if(last!==null&&judged&&!v.boosted)worstStep=Math.max(worstStep,Math.abs(look-last));}
+      const at=`${room[1]} rig yaw ${yaw.toFixed(2)} pitch ${pitch}`,p=v.position,t=v.target,h=Math.hypot(p.x-t.x,p.z-t.z);
       if(guard.blocked(t,p,true))rigFailures.push(at+': camera behind a wall, floor, ceiling, window or tall furniture');
-      else if(guard.blocked(t,p)&&p.y-t.y<SOFT_CLEAR)rigFailures.push(at+': camera looks through low furniture without being above it');
+      else if(guard.blocked(t,p)&&!guard.softClear(t,p))rigFailures.push(at+': camera looks through low furniture without being above it, or with the pet hidden behind it');
       else if(inside(p))rigFailures.push(at+': camera inside a collider');
       else if(Math.hypot(p.x-t.x,p.y-t.y,p.z-t.z)>1e-3&&guard.clearanceAt(p)<reach)rigFailures.push(`${at}: ${guard.clearanceAt(p).toFixed(3)} m from a surface`);
-      if(look!==null&&look>MAX_LOOK)rigFailures.push(`${at}: looks ${look.toFixed(0)}° down`);
-      // (A boom squeezed against the pet swings up out of it faster, still eased.)
-      if(look!==null&&last!==null&&judged&&Math.abs(look-last)>(v.boosted?2*MAX_LOOK_STEP:MAX_LOOK_STEP))rigFailures.push(`${at}: view tipped ${Math.abs(look-last).toFixed(1)}° in one frame`);
-      last=look;
+      if(h>1e-3){
+        const look=Math.atan2(p.y-t.y,h)*180/Math.PI,off=Math.abs(Math.atan2(Math.sin(Math.atan2(p.x-t.x,p.z-t.z)-yaw),Math.cos(Math.atan2(p.x-t.x,p.z-t.z)-yaw)))*180/Math.PI;
+        worstOver=Math.max(worstOver,look-own);worstYaw=Math.max(worstYaw,off);
+        if(look>own+.5)rigFailures.push(`${at}: looks ${look.toFixed(0)}° down (the player's own view is ${own.toFixed(0)}°)`);
+        if(off>.01)rigFailures.push(`${at}: camera ${off.toFixed(2)}° off the player's heading`);
+      }
     }
-    // Back at the starting heading, the camera settles back down to where a
-    // fresh arrival would put it (it does not stay craned up after a turn).
+    // Back at the starting heading, the boom eases back out to where a fresh
+    // arrival would put it.
     for(let i=0;i<60;i++)rig.place(player,room[5],pitch,dt,world,guard,clearance);
-    const settled=craneExtra(player,room[5],pitch,world,guard,clearance);
-    if(settled.view.distance>=1.6&&rig.crane<settled.extra-.12)rigFailures.push(`${room[1]} pitch ${pitch}: still craned ${rig.crane.toFixed(2)} after turning back (${settled.extra} would do)`);
+    const settled=orbitCamera(player,room[5],pitch,world,guard,clearance),back=rig.place(player,room[5],pitch,dt,world,guard,clearance);
+    if(back.distance<settled.distance-.05)rigFailures.push(`${room[1]} pitch ${pitch}: boom ${back.distance.toFixed(2)} m after turning back (${settled.distance.toFixed(2)} m would do)`);
   }
 }
 assert.equal(rigFailures.length,0,rigFailures.slice(0,12).join('\n'));
@@ -148,4 +143,4 @@ assert(placing/views<8,`Camera placement took ${(placing/views).toFixed(2)} ms`)
 for(const x of [10.9,11.5,11.95])for(let planY=4.55;planY<=6.70;planY+=.005)
   assert(guard.blocked({x,y:-.7,z:-planY},{x,y:-1.3,z:-planY}),`Floor slit at x ${x}, plan Y ${planY.toFixed(3)}`);
 assert(rigMs/rigFrames<8,`Follow rig took ${(rigMs/rigFrames).toFixed(2)} ms per frame`);
-console.log(`PASS ${views} views clear of every surface (near-plane reach ${reach.toFixed(3)} m); median distance ${median.toFixed(2)} m; ${(placing/views).toFixed(2)} ms per placement; follow rig ${rigFrames} turning frames clear, at most ${worstLook.toFixed(1)}° down, ${worstStep.toFixed(2)}° per frame (${escapes} jam escapes), ${(rigMs/rigFrames).toFixed(2)} ms per frame; ${yardWalks} guided walks to the back yard (${yardFrames} frames) keep the camera ≥ ${yardMin.toFixed(2)} m behind the pet at the sunroom step; guard built in ${built.toFixed(0)} ms over ${guard.triangles} triangles`);
+console.log(`PASS ${views} views clear of every surface (near-plane reach ${reach.toFixed(3)} m); median distance ${median.toFixed(2)} m; ${(placing/views).toFixed(2)} ms per placement; follow rig ${rigFrames} turning frames clear, never steeper than the player's own view (+${worstOver.toFixed(2)}°) nor off their heading (${worstYaw.toFixed(3)}°), ${(rigMs/rigFrames).toFixed(2)} ms per frame; ${yardWalks} guided walks to the back yard (${yardFrames} frames) keep the camera ≥ ${yardMin.toFixed(2)} m behind the pet at the sunroom step; guard built in ${built.toFixed(0)} ms over ${guard.triangles} triangles`);

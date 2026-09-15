@@ -1,16 +1,16 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld} from './physics.mjs';
-import {createHouseLife} from './house-life.mjs?v=20260915-controls';
+import {createHouseLife} from './house-life.mjs?v=20260915-arrows';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
-import {createHouseLighting} from './lighting.mjs';
+import {createHouseLighting} from './lighting.mjs?v=20260915-arrows';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {warmupCast} from './creatures.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs';
+import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-arrows';
 import {glazingBoxes} from './glazing.mjs';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
@@ -53,12 +53,15 @@ camera.rotation.order='YXZ';
 // any screen shape, which is ~57° vertical at 16:10. Portrait phones keep the
 // old 70° cap, so the widest near plane the clearance test assumes still holds.
 // In a tight spot, where the boom is short, the lens eases wider (up to the
-// same 70° cap), so the pet doesn't fill the screen and more of the room shows.
-let baseFov=57,lensFov=57;
+// same 70° cap) and the view tips up past the pet by up to AIM_LIFT, so the
+// pet sits low in the frame and the room ahead shows, rather than the camera
+// craning up to look down on the pet. (lensClose: 0 at the full boom, 1 close.)
+const AIM_LIFT=13*Math.PI/180;
+let baseFov=57,lensClose=0;
 function fitLens(){
   camera.aspect=innerWidth/innerHeight;
   baseFov=THREE.MathUtils.clamp(2*Math.atan(Math.tan(41*Math.PI/180)/camera.aspect)*180/Math.PI,50,70);
-  camera.fov=lensFov=baseFov;
+  camera.fov=baseFov+lensClose*(Math.min(70,baseFov+13)-baseFov);
   camera.updateProjectionMatrix();
 }
 // Near-plane clearance for the widest lens the camera may ease to.
@@ -114,7 +117,7 @@ canvas.addEventListener('webglcontextlost',event=>{
 });
 const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null,turnRate=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-// The eased follow camera (crane swing and boom length); see camera-guard.mjs.
+// The follow camera: on the player's own sightline, walls only shorten the boom; see camera-guard.mjs.
 const followRig=createFollowRig({reducedMotion});let arrivalYaw=null;
 
 // Every way of putting the pet somewhere new — a jump, a family switch, a
@@ -132,97 +135,41 @@ function teleport(room){
   placePlayer(p,heading);
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
   lighting.setRoom(room[1],player);
-  $('hint').textContent='WASD to walk · Mouse to aim · E for activities · R for rooms';
+  $('hint').textContent='Arrow keys to walk and turn · E for activities · R for rooms';
   render();return true;
 }
-// Desktop mouse look. Pointer lock pins the cursor and reports relative
-// movement, so the view keeps turning as long as the mouse keeps moving —
-// past a full turn, not just to the edge of the screen. Some hosts can refuse
-// the lock (some in-app browsers, a sandboxed iframe, or Chrome's short
-// cool-down straight after Escape); we never pretend it worked, we say so and
-// hold-and-drag looking takes over.
+// Steering is the arrow keys: ↑/↓ walk forward and back, ←/→ turn (Shift
+// runs). The mouse is for the buttons and panels only — no pointer capture,
+// nothing to drift. Phones and tablets walk with the pad and swipe to look.
 const LOOK_SPEED=.0024,PITCH_MIN=-.8,PITCH_MAX=.42;
 const finePointer=()=>matchMedia('(pointer:fine)').matches;
-const mouseLocked=()=>document.pointerLockElement===canvas;
-let lockWanted=false,lockPending=false,lockDenied=false,lockFair=false,lastUnlock=-Infinity,turned=0;
-// How the player steers, chosen on the welcome/pause card and remembered.
-// 'mouse': mouse look (a captured mouse, or hold-and-drag where capture is
-// refused) with WASD walking. 'keys': keyboard only — ↑/W and ↓/S walk,
-// ←/→ or A/D turn — and the mouse is never captured. ←/→ turn in both.
-// look scales mouse look (a high-resolution mouse can be twitchy).
-const CONTROLS_KEY='craepets.house.controls',LOOK_SPEEDS={slow:.55,normal:1,fast:1.6};
+let turned=0;
 const TURN_SPEED=1.9;   // rad/s for keyboard turning (about a third of a turn a second)
-const controls={mode:'mouse',look:'normal'};
-try{const saved=JSON.parse(localStorage.getItem(CONTROLS_KEY))||{};
-  if(saved.mode==='mouse'||saved.mode==='keys')controls.mode=saved.mode;if(LOOK_SPEEDS[saved.look])controls.look=saved.look;}catch{}
-const keysOnly=()=>controls.mode==='keys';
-function showControls(){
-  document.body.classList.toggle('keys-only',keysOnly());
-  for(const b of document.querySelectorAll('[data-controls]'))b.setAttribute('aria-pressed',String(b.dataset.controls===controls.mode));
-  for(const b of document.querySelectorAll('[data-look]'))b.setAttribute('aria-pressed',String(b.dataset.look===controls.look));
-}
-function setControls(change){
-  // Keys only has no tilt control, so switching to it levels the view back to
-  // the usual gentle look-down (the mouse may have left it at floor or ceiling).
-  if(change.mode==='keys'&&controls.mode!=='keys'){pitch=-.18;followRig.reset();}
-  Object.assign(controls,change);try{localStorage.setItem(CONTROLS_KEY,JSON.stringify(controls));}catch{}showControls();
-}
-const CAPTURED_HINT='Mouse to aim · WASD to walk · E to interact · R for rooms · Esc to release';
 const KEYS_HINT='Arrow keys to walk and turn · E to use · R for rooms · Esc to pause';
-const CLICK_HINT='Click the view to capture the mouse · WASD to walk';
-const DRAG_HINT='Mouse capture was blocked here, so hold the button and drag to look — or pause and choose Keys only. For full game-style mouse look, open this page in a regular Chrome or Edge tab';
-// The hint line only shows when it asks for something (a click to capture the
-// mouse, or the drag fallback). Everyday controls are taught by one-off coach
-// marks in house-life.mjs instead of a permanent line of shortcuts.
+// Everyday controls are taught by one-off coach marks in house-life.mjs and
+// on the welcome/pause card, not by a permanent line of shortcuts.
 function setHint(text,show=false){const h=$('hint');h.textContent=text;h.toggleAttribute('data-show',show);}
-// Only a refusal of a fair request — made from a click, not straight after an
-// unlock — means the host blocks capture. Anything else just needs a click.
-function lockFailed(){
-  document.body.classList.remove('mouse-look');
-  if(lockFair)lockDenied=true;
-  if(active)setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);
-}
-async function captureMouse(){
-  if(keysOnly()||!finePointer()||!active||mouseLocked()||lockPending)return;
-  const gesture=navigator.userActivation?navigator.userActivation.isActive:true;
-  if(!gesture){setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);return;}
-  lockFair=performance.now()-lastUnlock>1500;lockPending=true;
-  try{
-    // Raw deltas keep the sensitivity steady across operating-system pointer
-    // acceleration; not every platform offers them.
-    try{await canvas.requestPointerLock({unadjustedMovement:true});}
-    catch(error){
-      if(error&&(error.name==='NotSupportedError'||error.name==='TypeError'))await canvas.requestPointerLock();
-      else throw error;
-    }
-  }catch{lockFailed();}
-  finally{lockPending=false;}
-}
 // Every way of stopping (pause, a panel, a lost window) drops all input at once.
 function releaseInput(){keys.clear();endJoy();drag=null;velocity={x:0,z:0};turnRate=0;}
-function suspend(){active=false;releaseInput();lockWanted=false;if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
+function suspend(){active=false;releaseInput();$('touch-controls').style.visibility='hidden';}
 // Pause is its own small sheet (the same #welcome overlay in pause mode, so
 // the ids players, tests and tools rely on stay put): no onboarding copy.
 function pause(){suspend();welcome.dataset.mode='pause';welcome.hidden=false;start.textContent='Keep playing';start.focus();}
 async function resume(){
   if(!ready)return;if(life&&!life.hasPet()){life.adopt();return;}active=true;welcome.hidden=true;$('rooms').hidden=true;
   $('rooms-button').setAttribute('aria-expanded','false');$('touch-controls').style.visibility='visible';canvas.focus();
-  setHint(keysOnly()?KEYS_HINT:finePointer()?CAPTURED_HINT:'Drag to look · left pad to walk · tap an activity');
-  if(!finePointer()||keysOnly())return;
-  lockWanted=true;await captureMouse();
-  if(active&&!mouseLocked())setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);
+  setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · tap an activity');
 }
 function showRooms(show){
   const wasOpen=!$('rooms').hidden;
   $('rooms').hidden=!show;$('rooms-button').setAttribute('aria-expanded',String(show));
   if(show){suspend();welcome.hidden=true;}
-  // Only closing the open panel returns to walking with the mouse; other
-  // callers just tidy the panel away on the way to an activity.
-  else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();if(wasOpen&&finePointer()&&!keysOnly()){lockWanted=true;captureMouse();}}
+  // Closing the panel returns to walking; other callers just tidy it away on
+  // the way to an activity.
+  else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();}
 }
 // A quick soft fade into the new room instead of a hard cut. The jump itself
-// happens at once (inside the click, so the mouse capture still counts as a
-// user gesture); the cream veil then lifts over ~0.3 s.
+// happens at once; the cream veil then lifts over ~0.3 s.
 function jumpTo(room){
   if(!ready)return;
   const veil=$('fade');if(!reducedMotion)veil.classList.add('on');
@@ -251,23 +198,6 @@ bindButton(start,()=>failed||boot.state==='failed'||boot.state==='stalled'?locat
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('welcome-rooms'),()=>{if(ready)showRooms(true);});bindButton($('welcome-family'),()=>{if(ready)$('family-button').click();});
 bindButton($('reset'),()=>jumpTo(rooms[0]));
-// The steering choice on the welcome/pause card (remembered for next time).
-for(const b of document.querySelectorAll('[data-controls]'))bindButton(b,()=>setControls({mode:b.dataset.controls}));
-for(const b of document.querySelectorAll('[data-look]'))bindButton(b,()=>setControls({look:b.dataset.look}));
-showControls();
-document.addEventListener('pointerlockchange',()=>{
-  // A lock that lands after the house was paused (a panel opened while the
-  // request was in flight), or with keys-only steering, is handed straight back.
-  if(mouseLocked()&&(!active||!lockWanted||keysOnly())){document.exitPointerLock();return;}
-  const captured=mouseLocked();
-  document.body.classList.toggle('mouse-look',captured);
-  if(captured){lockDenied=false;drag=null;if(active)setHint(CAPTURED_HINT);return;}
-  lastUnlock=performance.now();
-  // Escape, a tab switch or a lost window all release the lock: park the house
-  // behind the welcome card rather than leaving an invisible cursor walking.
-  if(lockWanted&&active&&finePointer())pause();
-});
-document.addEventListener('pointerlockerror',lockFailed);
 document.addEventListener('keydown',e=>{
   if(!$('activity-choices').hidden){if(e.code==='Escape')$('close-choices').click();return;}
   if(!$('activity-panel').hidden||!$('family-panel').hidden||!$('save-panel').hidden)return;
@@ -277,52 +207,39 @@ document.addEventListener('keydown',e=>{
   if(e.code==='KeyF'){e.preventDefault();$('family-button').click();return;}
   if(e.code==='KeyC'){e.preventDefault();$('pet-button').click();return;}
   if(e.code==='KeyE'){e.preventDefault();life?.interact();return;}
-  if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){e.preventDefault();keys.add(e.code);}
+  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){e.preventDefault();keys.add(e.code);}
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
 // A lost window (alt-tab, a click into another app) stops everything: no key,
 // drag or pad left "held" to walk or turn on its own when you come back.
 window.addEventListener('blur',releaseInput);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&ready)pause();});
+// Touch look: a finger swiping the view turns it (phones and tablets have no
+// arrow keys).
 function look(dx,dy){
-  // Every report counts in full, so a fast flick turns as far as it travelled.
   const turn=dx*LOOK_SPEED;
   yaw-=turn;turned+=turn;
   // Horizontal turning is unlimited; the angle only wraps to stay precise.
   if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));
   pitch=THREE.MathUtils.clamp(pitch-dy*LOOK_SPEED,PITCH_MIN,PITCH_MAX);
-  // The view orbits freely; the pet only turns when it walks, so you can
-  // circle round and see its face.
 }
-const lookGain=()=>LOOK_SPEEDS[controls.look]||1;
-document.addEventListener('mousemove',e=>{if(active&&mouseLocked())look(e.movementX*lookGain(),e.movementY*lookGain());});
-// Fingers need a bigger turn per pixel than a mouse: a full swipe across a
-// phone turns about 140°, whatever the screen width. Mouse dragging (the
-// refused-lock fallback) keeps the desktop rate.
+// Fingers need a bigger turn per pixel: a full swipe across a phone turns
+// about 140°, whatever the screen width.
 const touchLookGain=()=>THREE.MathUtils.clamp(2.6*390/innerWidth,1,2.6);
 const joystick=$('joystick'),knob=joystick.firstElementChild;let joyId=null;
 canvas.addEventListener('pointerdown',e=>{
-  if(!active)return;
-  // A mouse press asks for the lock and starts a drag; whichever the browser
-  // allows takes effect, and a granted lock cancels the drag.
-  if(e.pointerType==='mouse'&&!mouseLocked()&&!keysOnly()){lockWanted=true;captureMouse();}
-  if(e.pointerType==='mouse'&&mouseLocked())return;
+  // The mouse only clicks buttons and panels; it never steers.
+  if(!active||e.pointerType==='mouse')return;
   // A thumb landing low on the left becomes the walking pad right there.
   if(e.pointerType==='touch'&&joyId===null&&e.clientX<innerWidth*.42&&e.clientY>innerHeight*.4){
     const s=joystick.offsetWidth/2;joystick.style.left=(e.clientX-s)+'px';joystick.style.top=(e.clientY-s)+'px';joystick.style.bottom='auto';joystick.classList.add('floating');
     joyId=e.pointerId;try{canvas.setPointerCapture(e.pointerId);}catch{}updateJoy(e);return;
   }
-  drag={id:e.pointerId,x:e.clientX,y:e.clientY,mouse:e.pointerType==='mouse',gain:e.pointerType==='touch'?touchLookGain():1};
-  // A pointer lock landing in the same moment makes capture throw; the lock then drives the view.
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};
   try{canvas.setPointerCapture(e.pointerId);}catch{}
 });
-canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active||mouseLocked())return;if(drag?.id===e.pointerId){
-  // A mouse drag turns only while the button is down. If the release was
-  // missed (let go outside the window or over a button), the drag ends here
-  // instead of turning the view as the mouse merely moves.
-  if(drag.mouse&&!(e.buttons&1)){drag=null;return;}
-  const gain=drag.mouse?lookGain():drag.gain;
-  look((e.clientX-drag.x)*gain,(e.clientY-drag.y)*gain);drag.x=e.clientX;drag.y=e.clientY;}});
+canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active)return;if(drag?.id===e.pointerId){
+  look((e.clientX-drag.x)*drag.gain,(e.clientY-drag.y)*drag.gain);drag.x=e.clientX;drag.y=e.clientY;}});
 function endDrag(e){if(e&&e.pointerId===joyId){endJoy();return;}drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
 // A release anywhere (over the HUD too) or a lost capture ends the drag.
 document.addEventListener('pointerup',e=>{if(drag?.id===e.pointerId)drag=null;});
@@ -335,11 +252,12 @@ joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);
 function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';if(joystick.classList.contains('floating')){joystick.classList.remove('floating');joystick.style.left=joystick.style.top=joystick.style.bottom='';}}
 joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
 window.addEventListener('resize',()=>{fitLens();cameraClearance=lensClearance();renderer.setSize(innerWidth,innerHeight);});
-// Follow camera. The guard's answer is where the camera may go this frame; it
-// pulls in at once but eases back out, and in tight spots swings up smoothly
-// (never past about 60° down, never faster than a steady pan) instead of
-// snapping to an overhead view. The rig lives in camera-guard.mjs so the
-// camera tests replay exactly this placement.
+// Follow camera. The camera stays on the player's own sightline to the pet
+// (their heading and tilt, so it turns exactly with the arrow keys); a wall or
+// cupboard behind the pet only shortens the boom, never swings it up over the
+// pet. It pulls in at once but eases back out. The rig lives in
+// camera-guard.mjs so the camera tests replay exactly this placement.
+let cameraBoom=0;
 function placeCamera(dt){
   return followRig.place({x:player.x,y:focusY,z:player.z},yaw,pitch,dt,world,guard,cameraClearance);
 }
@@ -351,11 +269,63 @@ function render(){
   lighting.tick(player,now,ready);
   const view=placeCamera(dt);
   camera.position.set(view.position.x,view.position.y,view.position.z);camera.lookAt(view.target.x,view.target.y,view.target.z);
-  const boom=Math.hypot(view.position.x-view.target.x,view.position.y-view.target.y,view.position.z-view.target.z);
-  const wantFov=baseFov+THREE.MathUtils.clamp((1.4-boom)/.8,0,1)*(Math.min(70,baseFov+13)-baseFov);
-  lensFov+=(wantFov-lensFov)*(reducedMotion?1:1-Math.exp(-dt*4));
-  if(Math.abs(camera.fov-lensFov)>.05){camera.fov=lensFov;camera.updateProjectionMatrix();}
+  cameraBoom=Math.hypot(view.position.x-view.target.x,view.position.y-view.target.y,view.position.z-view.target.z);
+  // Close in, the lens widens and the view tips up past the pet (eased
+  // together). Only the aim turns: the camera stays where the guard put it, so
+  // its near-plane clearance holds whichever way it looks.
+  lensClose+=(THREE.MathUtils.clamp((1.4-cameraBoom)/.8,0,1)-lensClose)*(reducedMotion?1:1-Math.exp(-dt*4));
+  camera.rotation.x+=lensClose*AIM_LIFT;
+  const fov=baseFov+lensClose*(Math.min(70,baseFov+13)-baseFov);
+  if(Math.abs(camera.fov-fov)>.05){camera.fov=fov;camera.updateProjectionMatrix();}
+  fadePet(dt);
   renderer.render(scene,camera);
+}
+// Close in, your own pet would cover the bottom of the screen: as it covers
+// more of it, the pet fades (eased, with a little hysteresis, so it never
+// flickers) to a see-through ghost, and out of sight as the lens reaches it
+// (house-life.mjs then hides it outright), so a tight spot still shows the
+// room ahead. It is solid again as soon as the camera has room. The pet is
+// found as the creature standing exactly where you are (house-life.mjs puts
+// it there every tick); its coat draws in the transparent pass from then on,
+// opaque until it fades, so fading never compiles a shader mid-walk.
+// (Creatures cast no shadow-map shadows, only their floor decal, which stays.)
+// (Screen shares of the box round the pet: it starts to fade past `from`, is
+// a ghost by `ghost` and gone by `gone`; once it has faded it holds for HOLD
+// seconds before it may come back, so a boom that breathes in and out beside
+// furniture never makes it blink.)
+const PET_FADE={from:.28,ghost:.5,gone:.85,ghostOpacity:.3,hold:.3};
+const pet={avatar:null,coats:[],low:0,high:0,radius:0,opacity:1,cover:0,hold:0},_corner=new THREE.Vector3(),_eye=new THREE.Vector3();
+function playerPet(){
+  if(pet.avatar?.parent===scene)return pet.avatar;
+  pet.avatar=scene.children.find(o=>o.userData.rig&&Math.abs(o.position.x-player.x)<1e-4&&Math.abs(o.position.z-player.z)<1e-4)||null;
+  pet.coats=[];if(!pet.avatar)return null;
+  const a=pet.avatar;a.updateMatrixWorld(true);const box=new THREE.Box3().setFromObject(a),size=box.getSize(new THREE.Vector3());
+  pet.low=box.min.y-a.position.y;pet.high=box.max.y-a.position.y;pet.radius=Math.max(size.x,size.z)/2;
+  a.traverse(m=>{if(m.isMesh&&m.name==='creature'){m.material.transparent=true;m.material.needsUpdate=true;pet.coats.push(m.material);}});
+  pet.opacity=1;pet.hold=0;return a;
+}
+// The share of the screen covered by the box round the pet (all of it once
+// the lens is inside that box).
+function petCover(a){
+  camera.updateMatrixWorld();let x0=1,x1=-1,y0=1,y1=-1;
+  for(let i=0;i<8;i++){
+    _corner.set(a.position.x+(i&1?pet.radius:-pet.radius),a.position.y+(i&2?pet.high:pet.low),a.position.z+(i&4?pet.radius:-pet.radius));
+    if(_eye.copy(_corner).applyMatrix4(camera.matrixWorldInverse).z>-camera.near)return 1;
+    _corner.project(camera);x0=Math.min(x0,_corner.x);x1=Math.max(x1,_corner.x);y0=Math.min(y0,_corner.y);y1=Math.max(y1,_corner.y);
+  }
+  return Math.max(0,Math.min(1,x1)-Math.max(-1,x0))*Math.max(0,Math.min(1,y1)-Math.max(-1,y0))/4;
+}
+function fadePet(dt){
+  const a=playerPet();if(!a)return;
+  const c=pet.cover=petCover(a),S=THREE.MathUtils.smoothstep;
+  const want=1-(1-PET_FADE.ghostOpacity)*S(c,PET_FADE.from,PET_FADE.ghost)-PET_FADE.ghostOpacity*S(c,PET_FADE.ghost+.1,PET_FADE.gone);
+  // Fading out is quick (the pet is in the way now), and immediate once the
+  // lens is inside the pet's box (never a look at the inside of its coat);
+  // coming back waits out the hold.
+  if(want<pet.opacity-.01){pet.hold=PET_FADE.hold;pet.opacity=c>=1?0:pet.opacity+(want-pet.opacity)*(reducedMotion?1:1-Math.exp(-dt*10));}
+  else if((pet.hold-=dt)<=0)pet.opacity+=(want-pet.opacity)*(reducedMotion?1:1-Math.exp(-dt*6));
+  if(pet.opacity>.995)pet.opacity=1;else if(pet.opacity<.005)pet.opacity=0;
+  for(const m of pet.coats){m.opacity=pet.opacity;m.visible=pet.opacity>0;}
 }
 function updateLocation(){
   // The room you're in is the nearest room spot you can actually see — no
@@ -412,18 +382,16 @@ function animate(now){
   adaptResolution(now);
   const dt=Math.min((now-last)/1000,.05);last=now;
   if(active&&world){
-    // ←/→ turn the view (and A/D too with keys-only steering; with the mouse
-    // they side-step). A tap turns a little, holding turns steadily, and it
-    // stops the moment the key is let go — no drift after release.
-    // (Either key of a pair counts once: ← with A is no faster than ← alone,
-    // and opposite directions cancel.)
-    const turnLeft=keys.has('ArrowLeft')||keysOnly()&&keys.has('KeyA'),turnRight=keys.has('ArrowRight')||keysOnly()&&keys.has('KeyD');
-    const turnKeys=(turnLeft?1:0)-(turnRight?1:0);
+    // ←/→ turn the view: a tap turns a little, holding turns steadily, and it
+    // stops the moment the key is let go — no drift after release. Both
+    // together cancel. ↑/↓ walk forward and back.
+    const turnKeys=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
     if(turnKeys){turnRate+=(turnKeys*TURN_SPEED-turnRate)*(reducedMotion?1:1-Math.exp(-dt*10));yaw+=turnRate*dt;
       if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));}
     else turnRate=0;
-    let right=(keysOnly()?0:(keys.has('KeyD')?1:0)-(keys.has('KeyA')?1:0))+joy.x;
-    let forward=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
+    const keyForward=(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0);
+    // (The touch pad still walks in any direction relative to the view.)
+    let right=joy.x,forward=keyForward-joy.y;
     const n=Math.max(1,Math.hypot(right,forward));right/=n;forward/=n;
     const speed=keys.has('ShiftLeft')||keys.has('ShiftRight')?3.1:1.9;
     // A short ramp (~0.15 s) up to speed and down to a stop, like a creature
@@ -438,9 +406,9 @@ function animate(now){
     // Keep only the speed the walls actually allowed.
     if(dt>0){velocity.x=(player.x-before.x)/dt;velocity.z=(player.z-before.z)/dt;}
     life?.movement(player.x-before.x,player.z-before.z,Math.hypot(velocity.x,velocity.z));
-    // Keys-only steering: the pet faces where it is heading — it turns with
-    // the view and backs up facing forward instead of spinning round.
-    if(keysOnly()&&(turnKeys||forward))life?.face(yaw+Math.PI);
+    // Arrow steering: the pet faces where it is heading — it turns with the
+    // view and backs up facing forward instead of spinning round.
+    if(turnKeys||keyForward)life?.face(yaw+Math.PI);
     // The camera follows a smoothed floor height, so stairs don't jolt it.
     focusY=THREE.MathUtils.lerp(focusY,player.y,reducedMotion?1:1-Math.exp(-dt*12));
     if(++frames%15===0)updateLocation();
@@ -521,7 +489,7 @@ async function load(){
     lighting.prime(player);
     performance.mark('house:probe');
     boot.step('your Craepets','Welcoming your Craepets…');
-    life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},get controls(){return controls.mode;},reducedMotion});
+    life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     life.face(yaw+Math.PI,true);performance.mark('house:life');
     leaveHouse=()=>life.leave();
     // The house follows the game's clock and weather (same as the HUD). The
@@ -544,8 +512,8 @@ async function load(){
     const keyShadowLater=()=>{playedOnce||=active;if(!playedOnce||active){setTimeout(keyShadowLater,700);return;}lighting.enableKeyShadow(()=>active);};
     setTimeout(keyShadowLater,700);
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
-      mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:lensClose*AIM_LIFT*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
+      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     boot.fail(error,$('loading').textContent);}
 }
