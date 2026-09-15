@@ -316,8 +316,9 @@
     return s;
   }
 
+  var quietSave = false;          // true while repainting a copy taken from another tab
   function save() {
-    if (!S) return;
+    if (!S || quietSave) return;
     try { localStorage.setItem(slot(who), JSON.stringify(S)); } catch (e) {}
   }
 
@@ -330,6 +331,50 @@
   function writeSlot(id, s) {
     if (id === who) return;                 // never write over the live save
     try { localStorage.setItem(slot(id), JSON.stringify(s)); } catch (e) {}
+  }
+
+  /* The same valley open somewhere else — a second tab, or the walk round
+     the house — saved it. Take that newer copy rather than keep an older
+     one in memory and save it back over the top later. A tab in the
+     background also follows a change of player made elsewhere. */
+  function syncFromElsewhere(ev) {
+    if (!S || !ev || !ev.key || ev.newValue === null) return;
+    if (ev.key === slot(who)) {
+      S = load(who);
+      // Repaint without saving straight back: two open tabs would otherwise
+      // bounce the save between them for ever. The next real change saves.
+      if (!document.hidden) { quietSave = true; try { render(); } finally { quietSave = false; } }
+    } else if (ev.key === WHO_KEY && document.hidden && ev.newValue !== who &&
+               D.PROFILES.some(function (p) { return p.id === ev.newValue; })) {
+      who = ev.newValue;
+      S = load(who);
+      sess = null; battle = null; visit = null; view = "nest";
+    }
+  }
+
+  /* NEW: walking round the family's house in 3D. It is its own page (the
+     3D house only loads when you choose to go), playing on this very
+     valley — the same player, pet, coins and things. */
+  var WALK_URL = "../../house-test/?from=game";
+  var WALK_KEY = "craepets.walk";
+  function walkState() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(WALK_KEY)); } catch (e) { s = null; }
+    return (s && typeof s === "object") ? s : {};
+  }
+  function setWalk(change) {
+    var s = walkState();
+    Object.keys(change).forEach(function (k) { s[k] = change[k]; });
+    try { localStorage.setItem(WALK_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  /* Inside the house walk the same engine runs the activities, so the
+     invitation to go there is left out. */
+  function inHouse() { return !!window.CraepetsSaveMode; }
+  function goWalk() {
+    setWalk({ visited: true });
+    hush(); stopCatch(); stopMatch();
+    save();
+    location.href = WALK_URL;
   }
 
   /* =========================================================
@@ -2084,7 +2129,15 @@
              '<span class="ic" aria-hidden="true">' + n[1] + '</span><span class="lb">' + n[2] + "</span>" + dot + "</button>";
     };
     var places = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) !== -1; }).map(btn).join("");
-    var mine = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) === -1; }).map(btn).join("");
+    // NEW: the walk round the house, right after the nest, flagged until you
+    // have been once.
+    var walkBtn = inHouse() ? "" :
+      '<button data-walk="1" class="walknav" aria-label="Walk around the house in 3D' +
+        (walkState().visited ? "" : " (new)") + '">' +
+        '<span class="ic" aria-hidden="true">🚶</span><span class="lb">Walk</span>' +
+        (walkState().visited ? "" : '<span class="dot new">NEW</span>') + "</button>";
+    var mine = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) === -1; })
+      .map(function (n) { return btn(n) + (n[0] === "nest" ? walkBtn : ""); }).join("");
     return '<nav class="nav" id="nav" aria-label="Where to go">' +
       '<div class="navrow"><span class="navlabel" aria-hidden="true">Valley</span>' + places + "</div>" +
       '<div class="navrow"><span class="navlabel" aria-hidden="true">Mine</span>' + mine + "</div>" +
@@ -3263,13 +3316,30 @@
     return { text: D.MOODS[m][i], tok: "m-" + m + "-" + i };
   }
 
+  /* The NEW card: shown on the nest until you have been for a walk or said
+     "maybe later". The Walk button in the menu is always there. */
+  function walkInviteHtml() {
+    var ws = walkState();
+    if (inHouse() || ws.visited || ws.dismissed) return "";
+    // Its own card class (styled like a panel), so the nest stays the first .panel.
+    return '<div class="walknew" role="region" aria-label="New: walk around the house">' +
+      '<span class="newtag">NEW</span>' +
+      "<h2>🏡 Walk around the house!</h2>" +
+      '<p class="sub">Take ' + esc(S.pet.name) + " for a walk through our house in 3D — every room, the garden " +
+        "and the street. The Farm, the Market, the games and everything else are in their own rooms there, " +
+        "with the same coins and things. Nothing here changes: the valley stays just as it is.</p>" +
+      '<div class="walkbtns"><button class="act walkgo" data-walk="1" style="--ac:#2f7f78"><span class="em">🚶</span>Start walking</button>' +
+      '<button class="ghost small" data-walkhide="1">Maybe later</button></div>' +
+    "</div>";
+  }
+
   function nestHtml() {
     if (S.pet.egg) return eggHtml();
     var age = Math.max(0, Math.floor((Date.now() - (S.pet.born || Date.now())) / 86400000));
     var streakBit = (S.dayStreak || 0) > 1
       ? '<p class="sub" style="margin:0.8rem 0 0">📅 <b>' + S.dayStreak +
         " days in a row!</b> Keep it going — the daily gift grows with the streak.</p>" : "";
-    return '<div class="panel">' +
+    return walkInviteHtml() + '<div class="panel">' +
       "<h2>🏡 " + esc(S.pet.name) + "'s nest</h2>" +
       '<p class="sub">' + esc(nestLine()) + " &nbsp;·&nbsp; " + esc(P.species(S.pet.species).name) +
         ", " + esc(P.colour(S.pet.colour).name) + ", " + age + (age === 1 ? " day" : " days") + " old. " +
@@ -5926,6 +5996,10 @@
       return;
     }
 
+    // NEW: off for a walk round the house (its own page), or not just now
+    if (t.closest("[data-walk]")) { sfx("pop"); return goWalk(); }
+    if (t.closest("[data-walkhide]")) { setWalk({ dismissed: true }); sfx("pop"); return render(); }
+
     var go = t.closest("[data-go],[data-goto]");
     if (go) {
       var dest = go.dataset.go || go.dataset.goto;
@@ -6275,6 +6349,7 @@
       else if (DESK.addListener) DESK.addListener(relayout);
     }
     window.addEventListener("beforeunload", save);
+    window.addEventListener("storage", syncFromElsewhere);
     document.addEventListener("visibilitychange", function () {
       if (document.visibilityState === "visible") { passTime(); render(); } else { stopCatch(); save(); }
     });

@@ -13,6 +13,7 @@ import {createRouter,createPawTrail} from './wayfinding.mjs';
 import {easeRoute} from './route-ease.mjs';
 import {aftermathFor,createAftermath} from './aftermath.mjs';
 import {placeDecor} from './decor-slots.mjs';
+import {GAME_MODE} from './play-mode.mjs';
 const $=id=>document.getElementById(id);
 export function companionBlocksCamera(point,camera,bounds){
   const vertical=Math.max(point.y+bounds.minY-camera.y,camera.y-point.y-bounds.maxY,0);
@@ -169,7 +170,8 @@ export async function createHouseLife(tour){
   // Family doubles as the first-visit "Who's playing?" picker. Until someone
   // has picked a name this visit, a profile with no pet is asked who it is
   // before adopting, instead of silently adopting for whoever was last.
-  let picked=false;
+  // Opened from the Craepets game, the player is already chosen there.
+  let picked=GAME_MODE;
   function openFamily(first=false){
     closeActivity(false);tour.suspend();$('welcome').hidden=true;$('rooms').hidden=true;
     $('family-panel').classList.toggle('first',first);
@@ -425,6 +427,9 @@ export async function createHouseLife(tour){
     // The game clock and weather the HUD shows, for the 3D time of day.
     sky:()=>({time:engine.timeOfDay(),weather:engine.weather()?.id}),
     hasPet:()=>!!engine.state().pet,
+    // Going back to the Craepets game: finish any activity and save the
+    // valley, and remember where the pet was standing in the house.
+    leave(){closeActivity(false);api.leave();savePosition();},
     // A Rooms jump names the room you picked (see pinned, above).
     pinRoom(name,level){pinned={name,level:String(level).toUpperCase(),x:player.x,y:player.y,z:player.z};hush();},
     // First visit asks who is playing; after that, a pet-less profile goes

@@ -1,4 +1,5 @@
-// Retry missing/empty profiles on every visit. Never write original save keys.
+// House edition: retry missing/empty profiles on every visit. Never write
+// original save keys. (In game mode nothing is copied at all; see below.)
 (function(){
   'use strict';
   var ids=['jeannie','cory','ellie','kieran','shannon','tristan','guest'],prefix='craepets.house.v1.';
@@ -35,5 +36,9 @@
     return Object.keys(data.profiles);
   }
   window.HouseSaves={ids:ids,scan:scan,copyMissing:copyMissing,bundle:bundle,validate:validate,restore:restore,valid:valid};
-  try{copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}
+  // Opened from the Craepets game, the house plays on the game's own saves
+  // (save-mode.js): nothing is copied, and the house edition is left alone.
+  var gameMode=!!(window.CraepetsSaveMode&&window.CraepetsSaveMode.id==='game');
+  window.HouseSaves.gameMode=gameMode;
+  if(!gameMode){try{copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
 })();

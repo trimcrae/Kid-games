@@ -21,6 +21,7 @@
         <span id="weather-status" role="img" aria-label=""></span>
       </button>
       <div id="pet-needs" role="group" aria-label="Your pet's needs"></div>
+      <a id="back-to-game" class="game-only" href="../games/craepets/" data-back-to-game><span aria-hidden="true">⬅</span> Back to the Craepets game</a>
     </div>
     <div class="actions">
       <button id="pet-button" aria-label="Say hello to your pet"><span aria-hidden="true">💬</span><span class="label">Say hello</span><kbd>C</kbd></button>
@@ -45,9 +46,11 @@
   <main id="welcome" class="overlay" data-mode="welcome">
     <section class="welcome-card">
       <div class="welcome-only">
+        <p class="new-note game-only"><span class="newtag">NEW</span> Walking around the house</p>
         <h1>Come on in.</h1>
         <p id="welcome-pet"></p>
         <p class="intro">Walk around the house as your Craepet. Grow food in the yard, find words in the library, play downstairs and meet the family.</p>
+        <p class="intro game-only">It's your own Craepets game: the same pet, coins and things, and the valley is still there whenever you want it.</p>
       </div>
       <div class="pause-only"><h1>Paused</h1><p class="intro">Take a break. Your pet will wait right here.</p></div>
       <button id="start" class="primary" disabled>Opening the front door…</button>
@@ -62,11 +65,12 @@
       </div>
       <p class="touch-instructions">Drag the pad to walk and swipe to look around. Tap a bubble when you reach it.</p>
       <p id="loading" role="status" aria-live="polite">Opening the front door…</p>
-      <p class="saves-link"><button id="welcome-saves" class="link">Playing on another device? Bring your saves</button></p>
+      <p class="back-link"><a href="../games/craepets/" data-back-to-game>⬅ Back to the Craepets game</a></p>
+      <p class="saves-link house-only"><button id="welcome-saves" class="link">Playing on another device? Bring your saves</button></p>
     </section>
   </main>
   <section id="activity-choices" class="overlay" hidden><div class="welcome-card"><h2 id="choices-room">What would you like to do?</h2><div id="choices-list"></div><button id="close-choices">Back to walking</button></div></section>
-  <section id="family-panel" class="overlay" hidden><div class="welcome-card"><div class="panel-title"><h2 id="family-title">Who's playing?</h2><button id="close-family" aria-label="Close family">×</button></div><p id="family-note">Everyone has their own Craepet and their own progress.</p><div id="family-list"></div><p class="saves-link"><button id="load-saves" class="link">Bring saved pets from another device</button></p><p class="study-note" id="save-status">House saves stay separate from the original game.</p><a href="../games/craepets/">Visit the original Craepets valley ↗</a></div></section>
+  <section id="family-panel" class="overlay" hidden><div class="welcome-card"><div class="panel-title"><h2 id="family-title">Who's playing?</h2><button id="close-family" aria-label="Close family">×</button></div><p id="family-note">Everyone has their own Craepet and their own progress.</p><div id="family-list"></div><p class="saves-link house-only"><button id="load-saves" class="link">Bring saved pets from another device</button></p><p class="study-note house-only" id="save-status">House saves stay separate from the original game.</p><p class="study-note game-only">These are your Craepets game saves: the same pets, coins and things as in the valley.</p><a class="house-only" href="../games/craepets/">Visit the original Craepets valley ↗</a><a class="game-only" href="../games/craepets/" data-back-to-game>⬅ Back to the Craepets game</a></div></section>
   <section id="save-panel" class="overlay" hidden><div class="welcome-card"><h2>Bring your saved pets home</h2><p id="save-message" role="status"></p><button id="load-original-saves">Load all original saves from this browser</button><p><a href="saves.html" target="_blank" rel="noopener">Family save transfer page ↗</a></p><p>From another browser or device: export your family on that page, then choose the JSON file here.</p><label for="single-save-profile">For an older single-pet backup, whose save is it?</label><select id="single-save-profile"></select><input type="file" id="save-file" accept=".json,application/json" aria-label="Choose a Craepets backup"><div id="save-preview"></div><button id="apply-saves" class="primary" hidden>Use these complete saves</button><div class="save-actions"><button id="close-saves">Back</button><button id="new-pet-instead">Start a new pet instead</button></div></div></section>
   <section id="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activity-title" hidden><div class="activity-heading"><div><small id="activity-room"></small><h2 id="activity-title">Welcome</h2></div><button id="close-activity">Back to walking ↩</button></div><iframe id="activity-frame" title="Craepets room activity" src="activity.html"></iframe></section>
   <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div></div>

@@ -279,6 +279,23 @@
       font-size: 0.68rem; line-height: 17px; padding: 0 4px;
     }
     .nav button .dot.review { background: #ffb43d; }
+    /* NEW: the walk round the house */
+    .nav button .dot.new { background: #2f7f78; font-size: 0.6rem; letter-spacing: 0.04em; }
+    .nav button.walknav { border-color: #9fd6cf; }
+    .walknew {
+      position: relative; border: 3px solid #9fd6cf; border-radius: 20px; padding: 0.9rem;
+      background: linear-gradient(135deg, #f1fbf8 0%, #fff8ec 100%);
+      box-shadow: 0 8px 24px rgba(43,36,64,0.12); margin-bottom: 0.8rem;
+    }
+    .walknew h2 { margin: 0 0 0.15rem; font-size: 1.15rem; padding-right: 3.2rem; }
+    .walknew .sub { margin: 0 0 0.7rem; color: #6a6385; font-size: 0.9rem; }
+    .walknew .newtag {
+      position: absolute; top: 0.7rem; right: 0.8rem;
+      background: #2f7f78; color: #fff; font-weight: bold; font-size: 0.72rem;
+      letter-spacing: 0.08em; border-radius: 999px; padding: 0.15rem 0.55rem;
+    }
+    .walknew .walkbtns { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+    .walknew .walkgo { flex: 1 1 12rem; }
 
     /* --- panels --- */
     .panel {
@@ -1117,6 +1134,7 @@
   <script src="../../assets/js/voice.js"></script>
   <script src="../../assets/js/sfx.js"></script>
   <script src="../../assets/js/confetti.js"></script>
+  <script src="../../house-test/save-mode.js"></script>
   <script src="../../house-test/save-copy.js"></script>
   <script src="../../house-test/engine.js"></script>
 </body>

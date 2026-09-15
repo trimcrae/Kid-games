@@ -75,6 +75,29 @@ dependency.
 | Jeannie's bedroom | Trophies, records, family visits and gifting |
 | Craepet street | Seven family plots: saved homes, decorating, visiting and presents |
 
+### NEW: walking round the house from the Craepets game
+
+The Craepets game (`games/craepets/`) now invites players to walk round the
+house: a NEW card on the nest (until they have been, or tap "Maybe later") and a
+**Walk** button beside Nest in the menu. Both open `house-test/?from=game`.
+Nothing in the game was removed; the 3D house loads only when chosen.
+
+Opened that way (game mode, `play-mode.mjs`, `save-mode.js`) the house plays on
+the game's **own** saves: `craepets.who`, `craepets.v1.<who>` and
+`craepets.voice`. The same player, pet, coins and things go there and back; nothing
+is copied, the house edition's `craepets.house.*` saves are not touched, the
+"Who's playing?" picker is skipped (the game already knows) and the save-transfer
+screens are hidden (the game has its own Help → backups). The top bar (touch, or
+with the mouse released), the pause card and any loading or 3D failure offer
+**Back to the Craepets game**, which finishes the current activity and saves first.
+
+Opened on its own (`house-test/`), it is the separate house edition exactly as
+before, with its own saves; the notes below describe that mode.
+
+Both engines follow a save made in another tab (`syncFromElsewhere` in
+`craepets.js`, inherited by the fork): a tab left open never writes older progress
+over newer, and a repaint after such a sync does not save straight back.
+`tests/house-game-mode.cjs` covers the whole round trip.
 `activity.html` and `engine.js` are a separate fork of the original game. They
 reuse the original read-only content, art and audio. The original HTML, engine,
 registry and saves are untouched. The iframe contains the activity widgets;
