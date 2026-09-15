@@ -57,8 +57,8 @@ body.hud-quiet .actions button:not(:hover):not(:focus-visible){opacity:.4}
 .actions kbd{font-size:11px;padding:0 5px;min-width:0;opacity:.75}
 #pause-button{width:48px;padding:0;justify-content:center;font-size:17px}
 /* Back to the Craepets game (the house opened from the game). */
-#back-to-game{display:flex;align-items:center;gap:7px;height:48px;padding:0 14px;border-radius:999px;background:#e6f5f2;box-shadow:var(--shadow);font-size:15px;font-weight:700;color:#1f5f59;text-decoration:none;border:2px solid #9fd6cf;transition:opacity .6s ease}
-#back-to-game>span[aria-hidden]{font-size:18px;line-height:1}
+#back-to-game{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;background:#e6f5f2;box-shadow:var(--shadow);font-size:14px;font-weight:800;color:#1f5f59;text-decoration:none;border:2px solid #9fd6cf;transition:opacity .6s ease}
+#back-to-game>span[aria-hidden]{font-size:16px;line-height:1}
 #back-to-game:focus-visible{outline:3px solid var(--nav);outline-offset:2px}
 body.hud-quiet #back-to-game:not(:hover):not(:focus-visible){opacity:.4}
 #pet-button{background:#fff1ea;border-color:#f6cdbd}
@@ -178,13 +178,17 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   #coach,#hint{bottom:auto;top:150px}
   #journey:not([hidden])~#coach{top:196px}
   #coach:not([hidden])~#hint[data-show]{bottom:auto;top:220px}
+  /* Room for the "Back to the Craepets game" pill under the needs. */
+  body.from-game #coach,body.from-game #hint{top:196px}
+  body.from-game #journey:not([hidden])~#coach{top:242px}
+  body.from-game #coach:not([hidden])~#hint[data-show]{top:266px}
 }
 @media(max-width:700px){
   h1{font-size:34px}
   .topbar{padding:12px}
   .actions{gap:6px;position:absolute;top:12px;right:12px}
   .actions .label{display:none}
-  .actions button,.actions #back-to-game{width:48px;padding:0;justify-content:center}
+  .actions button{width:48px;padding:0;justify-content:center}
   #pet-button{display:none}
   #player-chip{padding-right:10px}
   #pet-status{font-size:16px}
@@ -197,6 +201,7 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   .activity-heading{padding:8px 10px;gap:8px}.activity-heading h2{font-size:17px}.activity-heading small{font-size:13px}
   #close-activity{padding:8px 12px;font-size:14px}
   #journey{top:132px;font-size:15px}
+  body.from-game #journey{top:178px}
   .location{top:auto;bottom:170px;font-size:16px}
   #nearby-actions button{font-size:15px;padding:6px 14px}
 }
@@ -208,7 +213,7 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   .welcome-card>.welcome-only,.welcome-card>.pause-only{grid-row:1 / span 2}
   h1{font-size:30px}.intro{font-size:15px}
   .actions .label{display:none}
-  .actions button,.actions #back-to-game{width:48px;padding:0;justify-content:center}
+  .actions button{width:48px;padding:0;justify-content:center}
   #rooms{top:70px;bottom:8px}
   #journey{top:66px;right:12px;left:auto;transform:none;max-width:46vw;font-size:14px}
   .location{top:12px}
