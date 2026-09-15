@@ -370,7 +370,9 @@ export async function createHouseLife(tour){
     const touch=!finePointer();
     if(!coached.walk){
       if(walked>2.5){coachDone('walk');}
-      else return showCoach(touch?['Drag the pad to walk · swipe the screen to look around']:['[W]','[A]','[S]','[D]',' to walk · move the mouse to look around']);
+      else return showCoach(touch?['Drag the pad to walk · swipe the screen to look around']
+        :tour.controls==='keys'?['[↑]',' walk · ','[←]','[→]',' turn · no mouse needed']
+        :['[W]','[A]','[S]','[D]',' to walk · move the mouse to look around']);
     }
     if(!coached.use&&near.length)return showCoach(touch?[`Tap ${near[0].icon} ${near[0].name} to play`]:['Press ','[E]',` for ${near[0].icon} ${near[0].name}`]);
     if(coached.use&&!coached.menu&&!touch){if(!menuTipAt)menuTipAt=time;if(time-menuTipAt>7)coachDone('menu');else return showCoach(['[R]',' opens Rooms · ','[F]',' Family · ','[Esc]',' pauses']);}

@@ -8,11 +8,11 @@
   <title>Craepets · At home</title>
   <!-- ?v= revisions: a fresh page never runs with an older cached copy of the
        startup files it was changed together with (Pages caches for 10 min). -->
-  <link rel="stylesheet" href="style.css?v=20260915-loading">
+  <link rel="stylesheet" href="style.css?v=20260915-controls">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f7f78' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
 </head>
 <body>
-  <canvas id="view" aria-label="Third-person Craepets house. WASD or arrows to walk, mouse to look, E to use what is nearby, R for rooms, F for family, Escape to pause." tabindex="0"></canvas>
+  <canvas id="view" aria-label="Third-person Craepets house. WASD to walk, left and right arrows to turn, mouse to look (or choose Keys only), E to use what is nearby, R for rooms, F for family, Escape to pause." tabindex="0"></canvas>
   <div id="crosshair" aria-hidden="true" hidden></div>
   <div id="fade" aria-hidden="true"></div>
   <header class="topbar">
@@ -57,13 +57,29 @@
       <div class="pause-only"><h1>Paused</h1><p class="intro">Take a break. Your pet will wait right here.</p></div>
       <button id="start" class="primary" disabled>Opening the front door…</button>
       <div class="welcome-actions"><button id="welcome-rooms"><span aria-hidden="true">🗺️</span> Rooms</button><button id="welcome-family"><span aria-hidden="true">👪</span> Family</button></div>
-      <div class="instructions fine-only" aria-label="Controls">
-        <div><kbd>W A S D</kbd><span>walk (arrow keys work too)</span></div>
+      <div class="control-mode fine-only" role="group" aria-label="How to steer">
+        <button data-controls="mouse" aria-pressed="true"><span aria-hidden="true">🖱️</span> Mouse look</button>
+        <button data-controls="keys" aria-pressed="false"><span aria-hidden="true">⌨️</span> Keys only</button>
+      </div>
+      <div class="instructions fine-only mouse-steer" aria-label="Controls with mouse look">
+        <div><kbd>W A S D</kbd><span>walk</span></div>
         <div><kbd>Mouse</kbd><span>look around</span></div>
+        <div><kbd>←</kbd> <kbd>→</kbd><span>turn</span></div>
+        <div><kbd>Shift</kbd><span>run</span></div>
+        <div><kbd>E</kbd><span>use what's nearby</span></div>
+        <div><kbd>R</kbd> <kbd>F</kbd><span>rooms · family</span></div>
+        <div class="look-speed" role="group" aria-label="Mouse look speed"><span>Look speed</span><button data-look="slow" aria-pressed="false">Slow</button><button data-look="normal" aria-pressed="true">Normal</button><button data-look="fast" aria-pressed="false">Fast</button></div>
+        <div><kbd>Esc</kbd><span>pause</span></div>
+      </div>
+      <div class="instructions fine-only keys-steer" aria-label="Controls with keys only">
+        <div><kbd>↑</kbd> <kbd>W</kbd><span>walk forward</span></div>
+        <div><kbd>↓</kbd> <kbd>S</kbd><span>back up</span></div>
+        <div><kbd>←</kbd> <kbd>→</kbd><span>turn (A D too)</span></div>
         <div><kbd>Shift</kbd><span>run</span></div>
         <div><kbd>E</kbd><span>use what's nearby</span></div>
         <div><kbd>R</kbd> <kbd>F</kbd><span>rooms · family</span></div>
         <div><kbd>Esc</kbd><span>pause</span></div>
+        <div><span>No mouse needed</span></div>
       </div>
       <p class="touch-instructions">Drag the pad to walk and swipe to look around. Tap a bubble when you reach it.</p>
       <p id="loading" role="status" aria-live="polite">Opening the front door…</p>
@@ -78,7 +94,7 @@
   <section id="save-panel" class="overlay" hidden><div class="welcome-card"><h2>Bring your saved pets home</h2><p id="save-message" role="status"></p><button id="load-original-saves">Load all original saves from this browser</button><p><a href="saves.html" target="_blank" rel="noopener">Family save transfer page ↗</a></p><p>From another browser or device: export your family on that page, then choose the JSON file here.</p><label for="single-save-profile">For an older single-pet backup, whose save is it?</label><select id="single-save-profile"></select><input type="file" id="save-file" accept=".json,application/json" aria-label="Choose a Craepets backup"><div id="save-preview"></div><button id="apply-saves" class="primary" hidden>Use these complete saves</button><div class="save-actions"><button id="close-saves">Back</button><button id="new-pet-instead">Start a new pet instead</button></div></div></section>
   <section id="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activity-title" hidden><div class="activity-heading"><div><small id="activity-room"></small><h2 id="activity-title">Welcome</h2></div><button id="close-activity">Back to walking ↩</button></div><iframe id="activity-frame" title="Craepets room activity" src="activity.html"></iframe></section>
   <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div></div>
-  <script src="boot.js?v=20260915-loading"></script>
-  <script type="module" src="walkthrough.js?v=20260915-loading" onerror="window.houseBoot&amp;&amp;houseBoot.fail(new Error('A part of the house could not be downloaded'),'Part of the house could not be downloaded. Check the connection and try again, or go back to the Craepets game.')"></script>
+  <script src="boot.js?v=20260915-controls"></script>
+  <script type="module" src="walkthrough.js?v=20260915-controls" onerror="window.houseBoot&amp;&amp;houseBoot.fail(new Error('A part of the house could not be downloaded'),'Part of the house could not be downloaded. Check the connection and try again, or go back to the Craepets game.')"></script>
 </body>
 </html>

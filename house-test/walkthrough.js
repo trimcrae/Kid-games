@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld} from './physics.mjs';
-import {createHouseLife} from './house-life.mjs';
+import {createHouseLife} from './house-life.mjs?v=20260915-controls';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs';
@@ -112,7 +112,7 @@ canvas.addEventListener('webglcontextlost',event=>{
   $('loading').textContent='The 3D graphics stopped (the computer\'s graphics reset). Reload the house to carry on — your pet, coins and things are saved.';
   start.textContent='Reload the house';start.disabled=false;document.body.classList.add('house-failed');
 });
-const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null;
+const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null,turnRate=0;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The eased follow camera (crane swing and boom length); see camera-guard.mjs.
 const followRig=createFollowRig({reducedMotion});let arrivalYaw=null;
@@ -145,9 +145,27 @@ const LOOK_SPEED=.0024,PITCH_MIN=-.8,PITCH_MAX=.42;
 const finePointer=()=>matchMedia('(pointer:fine)').matches;
 const mouseLocked=()=>document.pointerLockElement===canvas;
 let lockWanted=false,lockPending=false,lockDenied=false,lockFair=false,lastUnlock=-Infinity,turned=0;
+// How the player steers, chosen on the welcome/pause card and remembered.
+// 'mouse': mouse look (a captured mouse, or hold-and-drag where capture is
+// refused) with WASD walking. 'keys': keyboard only — ↑/W and ↓/S walk,
+// ←/→ or A/D turn — and the mouse is never captured. ←/→ turn in both.
+// look scales mouse look (a high-resolution mouse can be twitchy).
+const CONTROLS_KEY='craepets.house.controls',LOOK_SPEEDS={slow:.55,normal:1,fast:1.6};
+const TURN_SPEED=1.9;   // rad/s for keyboard turning (about a third of a turn a second)
+const controls={mode:'mouse',look:'normal'};
+try{const saved=JSON.parse(localStorage.getItem(CONTROLS_KEY))||{};
+  if(saved.mode==='mouse'||saved.mode==='keys')controls.mode=saved.mode;if(LOOK_SPEEDS[saved.look])controls.look=saved.look;}catch{}
+const keysOnly=()=>controls.mode==='keys';
+function showControls(){
+  document.body.classList.toggle('keys-only',keysOnly());
+  for(const b of document.querySelectorAll('[data-controls]'))b.setAttribute('aria-pressed',String(b.dataset.controls===controls.mode));
+  for(const b of document.querySelectorAll('[data-look]'))b.setAttribute('aria-pressed',String(b.dataset.look===controls.look));
+}
+function setControls(change){Object.assign(controls,change);try{localStorage.setItem(CONTROLS_KEY,JSON.stringify(controls));}catch{}showControls();}
 const CAPTURED_HINT='Mouse to aim · WASD to walk · E to interact · R for rooms · Esc to release';
+const KEYS_HINT='Arrow keys to walk and turn · E to use · R for rooms · Esc to pause';
 const CLICK_HINT='Click the view to capture the mouse · WASD to walk';
-const DRAG_HINT='Mouse capture was blocked here, so hold the button and drag to look. For full game-style mouse look, open this page in a regular Chrome or Edge tab';
+const DRAG_HINT='Mouse capture was blocked here, so hold the button and drag to look — or pause and choose Keys only. For full game-style mouse look, open this page in a regular Chrome or Edge tab';
 // The hint line only shows when it asks for something (a click to capture the
 // mouse, or the drag fallback). Everyday controls are taught by one-off coach
 // marks in house-life.mjs instead of a permanent line of shortcuts.
@@ -160,7 +178,7 @@ function lockFailed(){
   if(active)setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);
 }
 async function captureMouse(){
-  if(!finePointer()||!active||mouseLocked()||lockPending)return;
+  if(keysOnly()||!finePointer()||!active||mouseLocked()||lockPending)return;
   const gesture=navigator.userActivation?navigator.userActivation.isActive:true;
   if(!gesture){setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);return;}
   lockFair=performance.now()-lastUnlock>1500;lockPending=true;
@@ -175,15 +193,17 @@ async function captureMouse(){
   }catch{lockFailed();}
   finally{lockPending=false;}
 }
-function suspend(){active=false;keys.clear();endJoy();drag=null;lockWanted=false;velocity={x:0,z:0};if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
+// Every way of stopping (pause, a panel, a lost window) drops all input at once.
+function releaseInput(){keys.clear();endJoy();drag=null;velocity={x:0,z:0};turnRate=0;}
+function suspend(){active=false;releaseInput();lockWanted=false;if(mouseLocked())document.exitPointerLock?.();$('touch-controls').style.visibility='hidden';}
 // Pause is its own small sheet (the same #welcome overlay in pause mode, so
 // the ids players, tests and tools rely on stay put): no onboarding copy.
 function pause(){suspend();welcome.dataset.mode='pause';welcome.hidden=false;start.textContent='Keep playing';start.focus();}
 async function resume(){
   if(!ready)return;if(life&&!life.hasPet()){life.adopt();return;}active=true;welcome.hidden=true;$('rooms').hidden=true;
   $('rooms-button').setAttribute('aria-expanded','false');$('touch-controls').style.visibility='visible';canvas.focus();
-  setHint(finePointer()?CAPTURED_HINT:'Drag to look · left pad to walk · tap an activity');
-  if(!finePointer())return;
+  setHint(keysOnly()?KEYS_HINT:finePointer()?CAPTURED_HINT:'Drag to look · left pad to walk · tap an activity');
+  if(!finePointer()||keysOnly())return;
   lockWanted=true;await captureMouse();
   if(active&&!mouseLocked())setHint(lockDenied?DRAG_HINT:CLICK_HINT,true);
 }
@@ -193,7 +213,7 @@ function showRooms(show){
   if(show){suspend();welcome.hidden=true;}
   // Only closing the open panel returns to walking with the mouse; other
   // callers just tidy the panel away on the way to an activity.
-  else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();if(wasOpen&&finePointer()){lockWanted=true;captureMouse();}}
+  else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();if(wasOpen&&finePointer()&&!keysOnly()){lockWanted=true;captureMouse();}}
 }
 // A quick soft fade into the new room instead of a hard cut. The jump itself
 // happens at once (inside the click, so the mouse capture still counts as a
@@ -226,10 +246,14 @@ bindButton(start,()=>failed||boot.state==='failed'||boot.state==='stalled'?locat
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('welcome-rooms'),()=>{if(ready)showRooms(true);});bindButton($('welcome-family'),()=>{if(ready)$('family-button').click();});
 bindButton($('reset'),()=>jumpTo(rooms[0]));
+// The steering choice on the welcome/pause card (remembered for next time).
+for(const b of document.querySelectorAll('[data-controls]'))bindButton(b,()=>setControls({mode:b.dataset.controls}));
+for(const b of document.querySelectorAll('[data-look]'))bindButton(b,()=>setControls({look:b.dataset.look}));
+showControls();
 document.addEventListener('pointerlockchange',()=>{
   // A lock that lands after the house was paused (a panel opened while the
-  // request was in flight) is handed straight back.
-  if(mouseLocked()&&(!active||!lockWanted)){document.exitPointerLock();return;}
+  // request was in flight), or with keys-only steering, is handed straight back.
+  if(mouseLocked()&&(!active||!lockWanted||keysOnly())){document.exitPointerLock();return;}
   const captured=mouseLocked();
   document.body.classList.toggle('mouse-look',captured);
   if(captured){lockDenied=false;drag=null;if(active)setHint(CAPTURED_HINT);return;}
@@ -251,7 +275,9 @@ document.addEventListener('keydown',e=>{
   if(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){e.preventDefault();keys.add(e.code);}
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
-window.addEventListener('blur',()=>{keys.clear();joy={x:0,y:0};});
+// A lost window (alt-tab, a click into another app) stops everything: no key,
+// drag or pad left "held" to walk or turn on its own when you come back.
+window.addEventListener('blur',releaseInput);
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&ready)pause();});
 function look(dx,dy){
   // Every report counts in full, so a fast flick turns as far as it travelled.
@@ -263,7 +289,8 @@ function look(dx,dy){
   // The view orbits freely; the pet only turns when it walks, so you can
   // circle round and see its face.
 }
-document.addEventListener('mousemove',e=>{if(active&&mouseLocked())look(e.movementX,e.movementY);});
+const lookGain=()=>LOOK_SPEEDS[controls.look]||1;
+document.addEventListener('mousemove',e=>{if(active&&mouseLocked())look(e.movementX*lookGain(),e.movementY*lookGain());});
 // Fingers need a bigger turn per pixel than a mouse: a full swipe across a
 // phone turns about 140°, whatever the screen width. Mouse dragging (the
 // refused-lock fallback) keeps the desktop rate.
@@ -273,19 +300,28 @@ canvas.addEventListener('pointerdown',e=>{
   if(!active)return;
   // A mouse press asks for the lock and starts a drag; whichever the browser
   // allows takes effect, and a granted lock cancels the drag.
-  if(e.pointerType==='mouse'&&!mouseLocked()){lockWanted=true;captureMouse();}
+  if(e.pointerType==='mouse'&&!mouseLocked()&&!keysOnly()){lockWanted=true;captureMouse();}
   if(e.pointerType==='mouse'&&mouseLocked())return;
   // A thumb landing low on the left becomes the walking pad right there.
   if(e.pointerType==='touch'&&joyId===null&&e.clientX<innerWidth*.42&&e.clientY>innerHeight*.4){
     const s=joystick.offsetWidth/2;joystick.style.left=(e.clientX-s)+'px';joystick.style.top=(e.clientY-s)+'px';joystick.style.bottom='auto';joystick.classList.add('floating');
     joyId=e.pointerId;try{canvas.setPointerCapture(e.pointerId);}catch{}updateJoy(e);return;
   }
-  drag={id:e.pointerId,x:e.clientX,y:e.clientY,gain:e.pointerType==='touch'?touchLookGain():1};
+  drag={id:e.pointerId,x:e.clientX,y:e.clientY,mouse:e.pointerType==='mouse',gain:e.pointerType==='touch'?touchLookGain():1};
   // A pointer lock landing in the same moment makes capture throw; the lock then drives the view.
   try{canvas.setPointerCapture(e.pointerId);}catch{}
 });
-canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active||mouseLocked())return;if(drag?.id===e.pointerId){look((e.clientX-drag.x)*drag.gain,(e.clientY-drag.y)*drag.gain);drag.x=e.clientX;drag.y=e.clientY;}});
+canvas.addEventListener('pointermove',e=>{if(e.pointerId===joyId){updateJoy(e);return;}if(!active||mouseLocked())return;if(drag?.id===e.pointerId){
+  // A mouse drag turns only while the button is down. If the release was
+  // missed (let go outside the window or over a button), the drag ends here
+  // instead of turning the view as the mouse merely moves.
+  if(drag.mouse&&!(e.buttons&1)){drag=null;return;}
+  const gain=drag.mouse?lookGain():drag.gain;
+  look((e.clientX-drag.x)*gain,(e.clientY-drag.y)*gain);drag.x=e.clientX;drag.y=e.clientY;}});
 function endDrag(e){if(e&&e.pointerId===joyId){endJoy();return;}drag=null;}canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
+// A release anywhere (over the HUD too) or a lost capture ends the drag.
+document.addEventListener('pointerup',e=>{if(drag?.id===e.pointerId)drag=null;});
+canvas.addEventListener('lostpointercapture',e=>{if(drag?.id===e.pointerId)drag=null;});
 // A small dead zone so a resting thumb doesn't creep the pet along.
 function updateJoy(e){const r=joystick.getBoundingClientRect();let x=(e.clientX-r.x-r.width/2)/40,y=(e.clientY-r.y-r.height/2)/40;const m=Math.hypot(x,y),n=Math.max(1,m);
   joy=m<.15?{x:0,y:0}:{x:x/n,y:y/n};knob.style.transform=`translate(${x/n*34}px,${y/n*34}px)`;}
@@ -371,7 +407,14 @@ function animate(now){
   adaptResolution(now);
   const dt=Math.min((now-last)/1000,.05);last=now;
   if(active&&world){
-    let right=(keys.has('KeyD')||keys.has('ArrowRight')?1:0)-(keys.has('KeyA')||keys.has('ArrowLeft')?1:0)+joy.x;
+    // ←/→ turn the view (and A/D too with keys-only steering; with the mouse
+    // they side-step). A tap turns a little, holding turns steadily, and it
+    // stops the moment the key is let go — no drift after release.
+    const turnKeys=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0)+(keysOnly()?(keys.has('KeyA')?1:0)-(keys.has('KeyD')?1:0):0);
+    if(turnKeys){turnRate+=(turnKeys*TURN_SPEED-turnRate)*(reducedMotion?1:1-Math.exp(-dt*10));yaw+=turnRate*dt;
+      if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));}
+    else turnRate=0;
+    let right=(keysOnly()?0:(keys.has('KeyD')?1:0)-(keys.has('KeyA')?1:0))+joy.x;
     let forward=(keys.has('KeyW')||keys.has('ArrowUp')?1:0)-(keys.has('KeyS')||keys.has('ArrowDown')?1:0)-joy.y;
     const n=Math.max(1,Math.hypot(right,forward));right/=n;forward/=n;
     const speed=keys.has('ShiftLeft')||keys.has('ShiftRight')?3.1:1.9;
@@ -387,6 +430,9 @@ function animate(now){
     // Keep only the speed the walls actually allowed.
     if(dt>0){velocity.x=(player.x-before.x)/dt;velocity.z=(player.z-before.z)/dt;}
     life?.movement(player.x-before.x,player.z-before.z,Math.hypot(velocity.x,velocity.z));
+    // Keys-only steering: the pet faces where it is heading — it turns with
+    // the view and backs up facing forward instead of spinning round.
+    if(keysOnly()&&(turnKeys||forward))life?.face(yaw+Math.PI);
     // The camera follows a smoothed floor height, so stairs don't jolt it.
     focusY=THREE.MathUtils.lerp(focusY,player.y,reducedMotion?1:1-Math.exp(-dt*12));
     if(++frames%15===0)updateLocation();
@@ -467,7 +513,7 @@ async function load(){
     lighting.prime(player);
     performance.mark('house:probe');
     boot.step('your Craepets','Welcoming your Craepets…');
-    life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
+    life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},get controls(){return controls.mode;},reducedMotion});
     life.face(yaw+Math.PI,true);performance.mark('house:life');
     leaveHouse=()=>life.leave();
     // The house follows the game's clock and weather (same as the HUD). The
