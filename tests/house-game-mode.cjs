@@ -56,9 +56,9 @@ const readSave=(page,key)=>page.evaluate(k=>JSON.parse(localStorage.getItem(k)),
     assert.equal(await page.evaluate(()=>localStorage.getItem('craepets.who')),'jeannie');
     assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Juniper');
     await page.keyboard.press('KeyF');await page.locator('[data-profile="cory"]').click();await page.waitForTimeout(900);
-    // 6. Back to the valley on a desktop: Esc releases the mouse and pauses, and
-    //    the pause card leads back. Same player, pet and coins; the card has done its job.
-    await page.evaluate(()=>document.exitPointerLock());
+    // 6. Back to the valley on a desktop: Esc pauses, and the pause card leads
+    //    back. Same player, pet and coins; the card has done its job.
+    await page.keyboard.press('Escape');
     await page.locator('#welcome[data-mode="pause"]').waitFor();
     await page.locator('#welcome .back-link a').click();
     await page.waitForURL(/\/games\/craepets\/$/);await gameReady(page);

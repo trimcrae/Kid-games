@@ -17,7 +17,7 @@ class Heap{
 // or null if anything stops it on the way. It gathers the nearby boxes once
 // per step instead of once per sub-step, which makes a route search several
 // times faster than calling world.move for every grid edge.
-function walkable(world,p,x,z){
+export function walkable(world,p,x,z){
   const dx=x-p.x,dz=z-p.z,steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.055)),r=world.radius,h=world.height,pad=r+.12;
   const ids=new Set();
   for(let ix=Math.floor((Math.min(p.x,x)-pad)/2);ix<=Math.floor((Math.max(p.x,x)+pad)/2);ix++)

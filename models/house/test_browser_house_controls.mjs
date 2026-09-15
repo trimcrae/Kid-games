@@ -1,9 +1,10 @@
-// Real pointer-lock mouse look in a real browser: the lock has to be granted
-// by a genuine click, relative motion has to turn the view past a full circle,
-// fast flicks have to count in full, pitch has to stay clamped, menu clicks must
-// not capture, Escape has to release cleanly and re-entry has to work. A host
-// that cannot lock has to say so and stay playable. The live pets' drawn sizes
-// are read back from the same page.
+// Desktop steering in a real browser is the arrow keys only (September 15):
+// ↑/↓ walk, ←/→ turn past a full circle. The mouse is for buttons and panels
+// and never steers: no pointer capture on Start or on a click, and moving or
+// dragging it over the view turns nothing. Escape pauses, menus and activities
+// work, and a sandboxed embed (which would refuse a mouse capture anyway)
+// steers just the same. The live pets' drawn sizes are read back from the
+// same page.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
@@ -14,9 +15,7 @@ const require=createRequire(import.meta.url);
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const types={'.html':'text/html','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.json':'application/json'};
-// A host that withholds pointer lock, the way an in-app browser or a sandboxed
-// embed does. (A plain same-origin iframe, as on GitHub Pages, does grant it —
-// only a sandbox without allow-pointer-lock refuses.)
+// A host that withholds pointer lock, the way an in-app browser or a sandboxed embed does.
 const embed='<!doctype html><meta charset="utf-8"><title>Embedded</title><style>html,body,iframe{margin:0;border:0;width:100%;height:100%}</style><iframe id="house" sandbox="allow-scripts allow-same-origin" src="/house-test/"></iframe>';
 
 const server=createServer(async(req,res)=>{
@@ -34,15 +33,20 @@ await new Promise(done=>server.listen(0,'127.0.0.1',done));
 const origin='http://127.0.0.1:'+server.address().port;
 
 const TAU=Math.PI*2;
+const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 async function houseFrame(page,url){
   const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   // A saved pet, so "Come play at home" walks straight in instead of opening
-  // the adoption panel.
+  // the adoption panel — and an old mouse-look preference, which must not
+  // bring mouse steering back.
   await page.addInitScript(()=>{
     localStorage.setItem('craepets.house.who','tristan');
     localStorage.setItem('craepets.house.v1.tristan',JSON.stringify({v:1,pet:{name:'Test',species:'craepet',colour:'blue',egg:false},coins:20}));
+    // Another family pet, so there is a companion to measure.
+    localStorage.setItem('craepets.house.v1.shannon',JSON.stringify({v:1,pet:{name:'Pal',species:'blorb',colour:'berry',egg:false},coins:5}));
+    localStorage.setItem('craepets.house.controls',JSON.stringify({mode:'mouse',look:'fast'}));
   });
   await page.goto(url);
   const target=page.frames().find(f=>f.url().includes('/house-test/'))||page.mainFrame();
@@ -50,6 +54,9 @@ async function houseFrame(page,url){
   return {target,errors};
 }
 const state=target=>target.evaluate(()=>window.houseTest.state);
+// Total signed turn while a key is held, sampled so a full circle counts in full.
+async function turnWhileHeld(page,target,key,ms){let total=0,prev=(await state(target)).yaw;await page.keyboard.down(key);const end=Date.now()+ms;
+  while(Date.now()<end){await page.waitForTimeout(80);const y=(await state(target)).yaw;total+=wrap(y-prev);prev=y;}await page.keyboard.up(key);return total;}
 
 let browser;
 try{
@@ -58,73 +65,43 @@ try{
   // 1. Ordinary desktop hosting.
   const page=await browser.newPage({viewport:{width:1100,height:760}});
   const {target,errors}=await houseFrame(page,origin+'/house-test/');
-  await page.click('#start');
-  // The lock lands before Chrome dispatches pointerlockchange; wait until the
-  // page has handled it (a page that never hides the cursor still times out).
-  await target.waitForFunction(()=>window.houseTest.state.mouseLocked&&document.body.classList.contains('mouse-look'),null,{timeout:10000});
-  assert.equal(await page.evaluate(()=>document.pointerLockElement?.id),'view','Pointer lock is not held by the canvas');
-  assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('view')).cursor),'none','Cursor still visible while captured');
-  // Third-person view: no aiming dot over the pet while captured.
-  assert.equal(await page.evaluate(()=>getComputedStyle(document.getElementById('crosshair')).display),'none');
-
-  // Relative motion in one direction keeps turning: over a full circle without
-  // the cursor ever leaving the window.
-  const before=await state(target);
-  await page.mouse.move(80,380);
-  for(let x=80;x<=4000;x+=160)await page.mouse.move(x,380,{steps:1});
+  assert.equal(await page.locator('[data-controls],[data-look]').count(),0,'A mouse-steering choice is still offered');
+  assert.match(await page.locator('.instructions').textContent(),/walk forward[\s\S]*back up[\s\S]*turn/,'Arrow instructions missing');
+  await page.click('#start');await page.waitForTimeout(500);
+  assert.equal(await page.evaluate(()=>document.pointerLockElement),null,'Start captured the mouse');
+  // The mouse moving, clicking or dragging over the view turns nothing.
+  const still=await state(target);
+  await page.mouse.move(100,380);for(let x=100;x<=1000;x+=150)await page.mouse.move(x,380,{steps:1});
+  await page.mouse.click(550,380);await page.mouse.down();for(let x=550;x>150;x-=50)await page.mouse.move(x,300,{steps:1});await page.mouse.up();
+  await page.waitForTimeout(200);
   let after=await state(target);
-  const swept=Math.abs(after.turned-before.turned);
-  assert(swept>TAU,`Locked mouse turned only ${(swept*57.3).toFixed(0)}°, not a full circle`);
-  assert(after.yaw>=-Math.PI&&after.yaw<=Math.PI,'Yaw did not stay wrapped');
-  assert(after.mouseLocked&&!after.mouseLockDenied);
-
-  // A fast flick counts in full: each report turns in proportion to its size,
-  // with nothing clipped off the top.
-  let x=4000;await page.mouse.move(x,380,{steps:1});
-  for(const dx of [600,1800]){
-    const from=(await state(target)).turned;
-    x+=dx;await page.mouse.move(x,380,{steps:1});
-    const got=(await state(target)).turned-from;
-    assert(Math.abs(got-dx*.0024)<dx*.0024*.02,`A ${dx}px report turned ${got.toFixed(3)} rad, expected ${(dx*.0024).toFixed(3)}`);
-  }
-
-  // Pitch stays clamped however far the mouse travels vertically.
-  for(let i=0;i<30;i++)await page.mouse.move(550,20+((i%2)?0:700),{steps:1});
+  assert.equal(await page.evaluate(()=>document.pointerLockElement),null,'A click captured the mouse');
+  assert(Math.abs(wrap(after.yaw-still.yaw))<1e-6&&Math.abs(after.pitch-still.pitch)<1e-6,'The mouse steered the view');
+  assert.notEqual(await page.evaluate(()=>getComputedStyle(document.getElementById('view')).cursor),'none','The cursor was hidden');
+  // The arrows turn a full circle, and don't tilt the view.
+  const swept=await turnWhileHeld(page,target,'ArrowRight',3800);
   after=await state(target);
-  assert(after.pitch>=-.81&&after.pitch<=.43,'Pitch escaped its clamp: '+after.pitch);
-
-  // Escape releases the mouse and parks the house.
+  assert(-swept>TAU,`The arrows turned only ${(-swept*57.3).toFixed(0)}°, not a full circle`);
+  assert(after.yaw>=-Math.PI&&after.yaw<=Math.PI,'Yaw did not stay wrapped');
+  assert(Math.abs(after.pitch-still.pitch)<1e-6,'Turning tilted the view');
+  // Escape pauses; clicking through menus is fine; Start returns to walking.
   await page.keyboard.press('Escape');
-  await target.waitForFunction(()=>!window.houseTest.state.mouseLocked&&!document.getElementById('welcome').hidden,null,{timeout:10000});
-  assert.equal(await page.evaluate(()=>document.pointerLockElement),null);
-
-  // Clicking through menus never grabs the mouse.
-  await page.click('#welcome-rooms');
-  await page.click('#rooms > p');
-  await page.waitForTimeout(300);
-  let menu=await state(target);
-  assert(!menu.mouseLocked&&!menu.mouseLockDenied,'A menu click captured the mouse');
-  await page.click('#close-rooms');
-  // Back in the house a click on the view captures (again).
-  await page.waitForTimeout(1600);
-  if(!(await state(target)).mouseLocked)await page.mouse.click(550,380);
-  await target.waitForFunction(()=>window.houseTest.state.mouseLocked,null,{timeout:10000});
-
-  // Escape, then re-entry from the welcome card's button.
-  await page.keyboard.press('Escape');
-  await target.waitForFunction(()=>!window.houseTest.state.mouseLocked&&!document.getElementById('welcome').hidden,null,{timeout:10000});
-  await page.click('#start');
-  await target.waitForFunction(()=>window.houseTest.state.mouseLocked,null,{timeout:10000});
-  assert.equal((await state(target)).mouseLockDenied,false);
-  // Choosing an activity from a panel must leave the mouse free for it, even
-  // though the click tidies other panels away on the way.
+  await target.waitForFunction(()=>!document.getElementById('welcome').hidden&&!window.houseTest.state.active,null,{timeout:10000});
+  await page.click('#welcome-rooms');await page.click('#rooms > p');await page.waitForTimeout(300);
+  await page.click('#close-rooms');await page.waitForTimeout(400);
+  assert((await state(target)).active,'Closing Rooms did not return to walking');
+  // An activity keeps the arrows while it is open; closing it walks on.
   await page.keyboard.press('KeyE');
   await page.locator('#choices-list button').first().click();
   await page.waitForTimeout(800);
-  assert(!(await state(target)).mouseLocked&&!(await page.locator('#activity-panel').isHidden()),'Opening an activity captured the mouse');
-  await page.click('#close-activity');
-  await target.waitForFunction(()=>window.houseTest.state.mouseLocked,null,{timeout:10000});
-  console.log('PASS pointer lock capture, %d° sweep, proportional fast flicks, pitch clamp, Escape release, menus, re-entry',Math.round(swept*57.3));
+  assert(!(await page.locator('#activity-panel').isHidden()),'E did not open an activity');
+  const inAct=await state(target);await page.keyboard.down('ArrowUp');await page.waitForTimeout(400);await page.keyboard.up('ArrowUp');
+  const stayed=await state(target);
+  assert(Math.hypot(stayed.position.x-inAct.position.x,stayed.position.z-inAct.position.z)<.01,'The arrows walked the pet behind an open activity');
+  await page.click('#close-activity');await page.waitForTimeout(400);
+  const w0=await state(target);await page.keyboard.down('ArrowUp');await page.waitForTimeout(600);await page.keyboard.up('ArrowUp');const w1=await state(target);
+  assert(Math.hypot(w1.position.x-w0.position.x,w1.position.z-w0.position.z)>.3,'↑ did not walk after the activity closed');
+  console.log('PASS arrows-only desktop steering: no mouse capture or mouse steering, %d° arrow turn, level view, Escape, menus, activity keeps the arrows',Math.round(-swept*57.3));
 
   // Pets are drawn at the shared house scale: yours and every companion.
   const pets=await state(target);
@@ -134,24 +111,13 @@ try{
   assert.equal(errors.length,0,errors.map(m=>m.slice(0,600)).join('\n'));
   await page.close();
 
-  // 2. A host that will not grant pointer lock: no pretending, still playable.
+  // 2. A sandboxed embed: the arrows steer just the same.
   const embedded=await browser.newPage({viewport:{width:1100,height:760}});
   const inner=await houseFrame(embedded,origin+'/embed');
-  const box=await embedded.locator('#house').boundingBox();
-  await embedded.frameLocator('#house').locator('#start').click();
-  await inner.target.waitForFunction(()=>window.houseTest.state.mouseLockDenied,null,{timeout:15000});
-  assert.equal((await state(inner.target)).mouseLocked,false,'Reported a lock the browser refused');
-  const hint=await inner.target.textContent('#hint');
-  assert.match(hint,/drag to look/i,'No usable fallback offered');
-  assert.match(hint,/Chrome or Edge tab/,'Did not say where full mouse look works');
-  const dragFrom=await state(inner.target);
-  await embedded.mouse.move(box.x+700,box.y+380);
-  await embedded.mouse.down();
-  for(let x=700;x>200;x-=25)await embedded.mouse.move(box.x+x,box.y+380,{steps:1});
-  await embedded.mouse.up();
-  const dragged=await state(inner.target);
-  assert(Math.abs(dragged.turned-dragFrom.turned)>.5,'Drag fallback did not turn the view');
-  console.log('PASS refused pointer lock reported honestly, drag fallback turns %d°',Math.round(Math.abs(dragged.turned-dragFrom.turned)*57.3));
+  await embedded.frameLocator('#house').locator('#start').click();await embedded.waitForTimeout(400);
+  const turned=await turnWhileHeld(embedded,inner.target,'ArrowLeft',800);
+  assert(turned>.5,'The arrows did not steer inside an embed');
+  console.log('PASS sandboxed embed steers with the arrows (%d°)',Math.round(turned*57.3));
   await embedded.close();
 }finally{
   await browser?.close();

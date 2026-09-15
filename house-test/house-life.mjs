@@ -5,10 +5,10 @@ import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
-import {HOSTS,ROUTINES,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs';
+import {ROUTINES,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260915-arrows';
 import {createGround} from './pet-ground.mjs';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
-import {createEmotes,createSpeech} from './emotes.mjs';
+import {createEmotes} from './emotes.mjs';
 import {createRouter,createPawTrail} from './wayfinding.mjs';
 import {easeRoute} from './route-ease.mjs';
 import {aftermathFor,createAftermath} from './aftermath.mjs';
@@ -59,7 +59,6 @@ export async function createHouseLife(tour){
   const bowl=new THREE.Group();{const dish=new THREE.Mesh(new THREE.CylinderGeometry(.11,.08,.06,20),new THREE.MeshStandardMaterial({color:'#3f8f8a',roughness:.5}));dish.position.y=.03;
     const food=new THREE.Mesh(new THREE.SphereGeometry(.085,14,6,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:'#e0b04a',roughness:.9}));food.scale.y=.35;food.position.y=.05;bowl.add(dish,food);}
   props.add(ball,bowl);ball.visible=bowl.visible=false;
-  const hostSpeech=createSpeech(scene);
   const positionKey=id=>'craepets.house.position.'+id;
   // The view direction is saved alongside the spot (an additive field; older
   // saves without it still load), so a reload doesn't stare at a wall.
@@ -210,36 +209,56 @@ export async function createHouseLife(tour){
     const box=new THREE.Box3().setFromObject(avatar);avatarSize=box.getSize(new THREE.Vector3());
     avatarBounds={minY:box.min.y,maxY:box.max.y,radius:Math.max(avatarSize.x,avatarSize.z)/2};
   }
+  // The family's other pets, and only theirs (companions.mjs): each family
+  // member's own saved pet except the one you're playing. api.family() reads
+  // every save afresh from this edition's slots (the house's own, or the
+  // game's with ?from=game), so a pet adopted, renamed or dressed in another
+  // tab turns up at the next sync, and a profile with no pet has no
+  // companion. The valley's shopkeepers stay in their own games, and the
+  // Visitor's pet stays with the Visitor. Companions are kept by id: a new
+  // name, outfit, colour or hatching rebuilds only that body (it stays where
+  // it was), a switch of player adds and removes only the pets that changed
+  // hands, and a body that leaves is disposed with its name and bubble.
   function updateRoamers(){
-    const family=api.family().filter(p=>p.id!==engine.who()&&p.pet);
-    // The family's other pets and the valley's shopkeepers (companions.mjs).
-    const cast=family.concat(HOSTS);
-    const key=JSON.stringify(cast.map(p=>[p.id,p.pet.species,p.pet.colour,p.pet.wear,!!p.pet.egg]));if(key===roamKey)return;roamKey=key;
-    roamers.forEach(r=>{r.label.material.map.dispose();r.emote?.dispose();disposeCreature(r.mesh);});roamers=[];
-    cast.forEach((p,i)=>{
-      const homeName=p.room||familyRooms[p.id]||'Living room',home=rooms.find(r=>r[1]===homeName);
+    const family=api.family().filter(p=>isFamily(p.id)&&p.id!==engine.who()&&p.pet&&typeof p.pet==='object');
+    const looks=family.map(p=>JSON.stringify([p.pet.name,p.pet.species,p.pet.colour,p.pet.wear,!!p.pet.egg]));
+    const key=JSON.stringify(family.map((p,i)=>[p.id,looks[i]]));if(key===roamKey)return;roamKey=key;
+    const was=new Map(roamers.map(r=>[r.id,r]));roamers=[];
+    family.forEach((p,i)=>{
+      const old=was.get(p.id);was.delete(p.id);
+      if(old&&old.look===looks[i]){roamers.push(old);return;}
+      if(old)dropRoamer(old);
+      const r=makeRoamer(p,looks[i],old?.c);if(r)roamers.push(r);
+    });
+    was.forEach(dropRoamer);
+  }
+  function dropRoamer(r){r.label.material.map.dispose();r.emote?.dispose();disposeCreature(r.mesh);}
+  function makeRoamer(p,look,c){
+    if(c)c.egg=!!p.pet.egg; // hatched (or dressed) elsewhere: same place, same routine
+    else{
+      const homeName=familyRooms[p.id]||'Living room',home=rooms.find(r=>r[1]===homeName);
       const where={world,colliders:world.boxes,rooms,avoid:keepClear},routine=ROUTINES[p.id];
       let day=resolveSpots(routine?.day,where),night=resolveSpots(routine?.night,where);
-      if(!day.length){const f=freeSpot(world,home[2],-home[3],home[4],keepClear);if(!f)return;day=[{room:homeName,act:'look',up:false,...f,stand:f,face:null}];}
-      const mesh=creature(p.pet,api.palette(p.pet.colour),p.extras||[]);mesh.scale.setScalar(PET_SCALE);
-      // Cache the body bounds before adding the name sprite. A floor-origin
-      // distance misses tall ears/heads even when they intersect the camera.
-      const bounds=new THREE.Box3().setFromObject(mesh);
-      const cameraBounds={minY:bounds.min.y,maxY:bounds.max.y,
-        radius:Math.hypot(Math.max(Math.abs(bounds.min.x),Math.abs(bounds.max.x)),
-          Math.max(Math.abs(bounds.min.z),Math.abs(bounds.max.z)))};
-      // The name tag rides on the pet but keeps its readable world size,
-      // floating just above the tallest ears.
-      // A constant on-screen size, so a pet right by the camera doesn't wear a giant tag.
-      const label=labelSprite(p.pet.name||p.name);label.material.sizeAttenuation=false;label.center.set(.5,0);label.scale.set(.044*label.userData.aspect/PET_SCALE,.044/PET_SCALE,1);label.position.y=.78/PET_SCALE;mesh.add(label);scene.add(mesh);
-      // Drawn over the scene (a door frame never cuts it in half); it's only
-      // shown while its anchor is in plain sight (see the companion loop).
-      label.material.depthTest=false;label.renderOrder=6;
-      const c=createCompanion({id:p.id,egg:!!p.pet.egg,host:p.view?{view:p.view,name:p.name}:null,day,night});
-      roamers.push({id:p.id,mesh,label,labelY:label.position.y,cameraBounds,c,emote:null,animAt:0,shown:true,los:false,losAt:0});
-    });
+      if(!day.length){const f=freeSpot(world,home[2],-home[3],home[4],keepClear);if(!f)return null;day=[{room:homeName,act:'look',up:false,...f,stand:f,face:null}];}
+      c=createCompanion({id:p.id,egg:!!p.pet.egg,day,night});
+    }
+    const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(PET_SCALE);
+    // Cache the body bounds before adding the name sprite. A floor-origin
+    // distance misses tall ears/heads even when they intersect the camera.
+    const bounds=new THREE.Box3().setFromObject(mesh);
+    const cameraBounds={minY:bounds.min.y,maxY:bounds.max.y,
+      radius:Math.hypot(Math.max(Math.abs(bounds.min.x),Math.abs(bounds.max.x)),
+        Math.max(Math.abs(bounds.min.z),Math.abs(bounds.max.z)))};
+    // The name tag rides on the pet but keeps its readable world size,
+    // floating just above the tallest ears.
+    // A constant on-screen size, so a pet right by the camera doesn't wear a giant tag.
+    const label=labelSprite(p.pet.name||p.name);label.material.sizeAttenuation=false;label.center.set(.5,0);label.scale.set(.044*label.userData.aspect/PET_SCALE,.044/PET_SCALE,1);label.position.y=.78/PET_SCALE;mesh.add(label);scene.add(mesh);
+    // Drawn over the scene (a door frame never cuts it in half); it's only
+    // shown while its anchor is in plain sight (see the companion loop).
+    label.material.depthTest=false;label.renderOrder=6;
+    return {id:p.id,name:p.pet.name||p.name,look,mesh,label,labelY:label.position.y,cameraBounds,c,emote:null,los:false,losAt:0,losWas:null,near:false,drawn:false,visY:null};
   }
-  let lastPlace=null,arriveAt=0;const _ndc=new THREE.Vector3();
+  let lastPlace=null,arriveAt=0,lifeClock=0;const _ndc=new THREE.Vector3();
   function inSight(r){const cam=tour.camera,p=r.c.point,h=r.cameraBounds.maxY;_ndc.set(p.x,r.mesh.position.y+h*.6,p.z).project(cam);
     return _ndc.z<1&&Math.abs(_ndc.x)<.9&&Math.abs(_ndc.y)<.9&&[h*.9,h*.5].some(y=>lineOfSight(world.boxes,cam.position,{x:p.x,y:r.mesh.position.y+y,z:p.z}));}
   function welcomeParty(){
@@ -271,8 +290,6 @@ export async function createHouseLife(tour){
       if(Math.abs(_pa.x-_pb.x)<(pw+bw)/2&&_pa.y<_pb.y+bh&&_pa.y+ph>_pb.y){const lift=_pb.y+bh+.012-_pa.y;r.label.position.y+=lift*tanH*depth/PET_SCALE;_pa.y+=lift;}
     }
   }
-  // A shopkeeper's real line from the 2D game (lines.js NPC), for their station.
-  function hostLine(view){const lines=frame.contentWindow.CPLines?.NPC?.[view];return lines?.length?lines[Math.floor(Math.random()*lines.length)]:null;}
   // Furnishing remains the same economy and slots. The equipped pieces stand
   // where they belong in the living room and foyer (decor-slots.mjs): a pet
   // corner, beside the chair and sofa, under the window, pictures on the wall.
@@ -371,8 +388,7 @@ export async function createHouseLife(tour){
     if(!coached.walk){
       if(walked>2.5){coachDone('walk');}
       else return showCoach(touch?['Drag the pad to walk · swipe the screen to look around']
-        :tour.controls==='keys'?['[↑]',' walk · ','[←]','[→]',' turn · no mouse needed']
-        :['[W]','[A]','[S]','[D]',' to walk · move the mouse to look around']);
+        :['[↑]',' walk · ','[↓]',' back up · ','[←]','[→]',' turn']);
     }
     if(!coached.use&&near.length)return showCoach(touch?[`Tap ${near[0].icon} ${near[0].name} to play`]:['Press ','[E]',` for ${near[0].icon} ${near[0].name}`]);
     if(coached.use&&!coached.menu&&!touch){if(!menuTipAt)menuTipAt=time;if(time-menuTipAt>7)coachDone('menu');else return showCoach(['[R]',' opens Rooms · ','[F]',' Family · ','[Esc]',' pauses']);}
@@ -448,6 +464,7 @@ export async function createHouseLife(tour){
       $('choices-list').querySelector('button').focus();
     },
     tick(dt,time,active){
+      lifeClock=time;
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       ground.frame();
       if(avatar){
@@ -489,61 +506,74 @@ export async function createHouseLife(tour){
           foldAmount=[[c,-s],[-c,s],[-s,-c]].some(([x,z])=>world.blocked(player.x+x*.22,player.z+z*.22,player.y))?1:0;}rig.fold(foldAmount);}
         avatar.userData.animate(time,walking,reduced,gait);
         avatar.userData.petpet?.userData.animate(time,walking,reduced,gait);
-        // Only if the camera is actually inside the pet (the last resort after
-        // the crane has looked down from above) does the pet step aside from view.
+        // Only if the camera is actually inside the pet (backed right up to a
+        // wall) does the pet step aside from view; nearer than that it fades
+        // (walkthrough.js).
         const eye=tour.camera.position,rise=eye.y-avatar.position.y;
         avatar.visible=!avatarBounds||Math.hypot(eye.x-player.x,eye.z-player.z)>avatarBounds.radius+.06||rise>avatarBounds.maxY+.08||rise<avatarBounds.minY-.05;
         avatar.userData.head.getWorldPosition(headAt);headAt.y=avatar.position.y+avatarBounds.maxY+.04;
         emotes.update(dt,petOut.emote,headAt,avatar.visible,reduced);
       }else emotes.update(dt,null,null,false,true);
-      // Companions: their places and routines (companions.mjs). Only the ones
-      // you could see get drawn and animated every frame: pets on another
-      // floor are hidden (floors hide them anyway; nothing culls by occlusion),
-      // far ones animate a few times a second, and their routines keep ticking
-      // slowly so they are where they should be when you arrive.
-      const night=engine.timeOfDay?.()==='night',reduced=tour.reducedMotion;let talking=null;
-      // Just arrived in a room (a jump)? If the pet or shopkeeper who lives
-      // here can't be seen from the arrival view, it trots over to say hello.
+      // Companions: their places and routines (companions.mjs). The ones you
+      // could see (seenFrom: this floor within 16 m, or just up or down the
+      // stairs) are drawn, walked and animated every frame; that same test
+      // tells their routine whether it may skip a walk, so a pet on screen
+      // never jumps to its place. The rest are hidden (floors hide them
+      // anyway; nothing culls by occlusion) and their routines tick twice a
+      // second so they are where they should be when you arrive. While the
+      // house is paused behind a menu, the pause card or an activity, the
+      // ones on screen hold still (only breathing), rather than finishing
+      // their walks in a jump the moment nobody is "playing".
+      const night=engine.timeOfDay?.()==='night',reduced=tour.reducedMotion;
+      // Just arrived in a room (a jump)? If the pet who lives here can't be
+      // seen from the arrival view, it trots over to say hello.
       if(lastPlace&&Math.hypot(player.x-lastPlace.x,player.z-lastPlace.z)>1.5)arriveAt=time+.7;
       lastPlace={x:player.x,y:player.y,z:player.z};
       if(arriveAt&&time>arriveAt&&active){arriveAt=0;welcomeParty();}
       for(const r of roamers){
-        const c=r.c,p=c.point,dy=Math.abs(p.y-player.y),dist=Math.hypot(p.x-player.x,p.z-player.z);
-        const inView=dy<1.1?dist<16:dy<2.6&&dist<3.5;
+        const c=r.c,p=c.point;
+        // A little wider once drawn, so one at the edge isn't shown and hidden on alternate frames.
+        const inView=r.drawn=seenFrom(player,p,r.drawn?.5:0);
         r.logicAt=(r.logicAt||0)+dt;
-        if(!inView&&r.logicAt<.5){r.mesh.visible=r.label.visible=false;r.emote?.update(dt,null,null,false,true);continue;}
-        const step=inView?dt:r.logicAt;r.logicAt=0;
-        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:q=>active&&seenFrom(player,q)});
-        const onFurniture=c.up||c.mode==='hop';
-        r.mesh.position.set(p.x,p.y+(onFurniture?0:ground.offset(p,r.mesh.position.y-p.y)),p.z);r.mesh.rotation.y=c.heading;
+        if(!inView&&r.logicAt<.5){r.mesh.visible=r.label.visible=r.near=false;r.emote?.update(dt,null,null,false,true);continue;}
+        const hold=inView&&!active,step=hold?0:inView?dt:r.logicAt;r.logicAt=0;
+        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:()=>inView,camera:tour.camera.position});
+        // Feet on the visible floor finish (found per 25 cm patch): eased over
+        // a rug's edge or a threshold rather than popping a few centimetres
+        // (quicker going up, so feet don't sink into the step); a hop onto
+        // furniture is already its own arc.
+        const onFurniture=c.up||c.mode==='hop',floorY=p.y+(onFurniture?0:ground.offset(p,Math.min(.05,Math.max(0,(r.visY??p.y)-p.y))));
+        r.visY=r.visY===null||reduced||onFurniture||!inView||Math.abs(floorY-r.visY)>.15?floorY:r.visY+(floorY-r.visY)*(1-Math.exp(-step*(floorY>r.visY?30:10)));
+        r.mesh.position.set(p.x,r.visY,p.z);r.mesh.rotation.y=c.heading;
         const rig=r.mesh.userData.rig;
         if(rig&&!c.egg){rig.setExpression(out.expression);rig.setPose(out.pose);rig.look(...out.look);if(out.hop)rig.hop(out.hop);}
         else if(rig&&c.egg&&gap<3&&Math.abs(p.y-player.y)<.6&&!r.wobbled){r.wobbled=true;rig.hop(.6);}else if(gap>4)r.wobbled=false;
-        // Far away: animate at ~5 Hz; near: every frame.
-        r.animAt+=step;if(!inView||dist<9||r.animAt>.2){r.mesh.userData.animate(time,c.walking,reduced,c.speed);r.animAt=0;}
+        // Every frame it's updated (a family's few pets; the 5 Hz pose for far
+        // ones read as a stutter across the open main floor and yard).
+        r.mesh.userData.animate(time,c.walking&&!hold,reduced,c.speed);
         // Hide a companion only while its body overlaps the camera's space.
         r.mesh.visible=inView&&!companionBlocksCamera(p,tour.camera.position,r.cameraBounds);
-        // Names only for companions you're standing near.
-        r.label.visible=r.mesh.visible&&gap>.9&&gap<3.2;
+        // Names only for companions you're standing near, with a margin each
+        // way so pottering about at the edge doesn't blink the pill.
+        r.near=r.mesh.visible&&(r.near?gap>.8&&gap<3.4:gap>.95&&gap<3.2);r.label.visible=r.near;
         // Pills and bubbles draw over door frames, so they need a clear line
-        // of sight from the camera (checked a few times a second), and a
-        // pill sitting on a station's bubble lifts clear of it.
-        if(r.label.visible||out.emote||r.emote?.showing||hostSpeech.speaker===r){
+        // of sight from the camera (checked a few times a second; once shown,
+        // two checks in a row must agree before it changes, so a door jamb
+        // sweeping past doesn't flicker it), and a pill sitting on a station's
+        // bubble lifts clear of it.
+        if(r.label.visible||out.emote||r.emote?.showing){
           // Any part of the companion in view (head, middle, either side) is
           // enough: a pet seen past a door jamb gets its whole pill, drawn over
           // the jamb; one fully behind a wall gets none.
           r.losAt-=dt;if(r.losAt<=0){r.losAt=.15;const cam=tour.camera.position,y0=r.mesh.position.y,h=r.cameraBounds.maxY,sx=(p.z-cam.z),sz=-(p.x-cam.x),sl=Math.hypot(sx,sz)||1;
-            r.los=[[0,h*.9],[0,h*.5],[.18,h*.5],[-.18,h*.5]].some(([o,y])=>lineOfSight(world.boxes,cam,{x:p.x+sx/sl*o,y:y0+y,z:p.z+sz/sl*o}));}
-        }
-        // No name pill while it's in plain sight but out of view, or while its speech bubble says who it is.
-        if(r.label.visible&&(!r.los||(hostSpeech.speaker===r&&hostSpeech.text)))r.label.visible=false;
+            const clear=[[0,h*.9],[0,h*.5],[.18,h*.5],[-.18,h*.5]].some(([o,y])=>lineOfSight(world.boxes,cam,{x:p.x+sx/sl*o,y:y0+y,z:p.z+sz/sl*o}));
+            if(r.losWas===null||clear===r.losWas)r.los=clear;r.losWas=clear;}
+        }else{r.losAt=0;r.losWas=null;}
+        // No name pill while it's in plain sight but out of view.
+        if(r.label.visible&&!r.los)r.label.visible=false;
         if(r.label.visible)clearBubble(r);
         if(out.emote||r.emote){r.emote??=createEmotes(scene);headAt.set(p.x,r.mesh.position.y+r.cameraBounds.maxY+.04,p.z);r.emote.update(dt,out.emote,headAt,r.mesh.visible&&r.los,reduced);}
-        // A shopkeeper greeting you says one of their real lines.
-        if(c.say&&r.mesh.visible&&active){const line=hostLine(c.say.view);if(line){talking={r,line};}}
       }
-      if(talking){const {r,line}=talking;headAt.set(r.c.point.x,r.mesh.position.y+r.cameraBounds.maxY+.12,r.c.point.z);hostSpeech.say(line,headAt.clone());hostSpeech.speaker=r;}
-      {const sp=hostSpeech.speaker;hostSpeech.update(dt,sp?new THREE.Vector3(sp.c.point.x,sp.mesh.position.y+sp.cameraBounds.maxY+.12,sp.c.point.z):null,!!sp?.mesh.visible&&sp.los&&active,tour.reducedMotion);}
       // Activity bubbles: in reach (with [E]), or 2–5 m away in the room you're
       // in — not a neighbouring room's glimpsed through an open doorway — plus
       // the "walk there" destination whenever it's in plain sight.
@@ -598,8 +628,12 @@ export async function createHouseLife(tour){
     },
     // The top of your pet's head (above its ears), for anchoring a speech bubble.
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading})),
-      aftermath:aftermath.active?aftermath.kind+':'+aftermath.phase:null,hostSpeech:hostSpeech.text,
+    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
+        // What a steadiness check samples each frame: where it wants to face, its gait, drawn height, name pill and bubble.
+        face:r.c.face,walking:r.c.walking,speed:r.c.speed,y:r.mesh.position.y,label:r.label.visible,emote:r.emote?.showing??null,egg:r.c.egg})),
+      // The life clock of the last tick, and every creature body in the scene (yours plus companions: no leftovers after a switch).
+      lifeClock,sceneCreatures:scene.children.filter(o=>o.userData.rig).length,
+      aftermath:aftermath.active?aftermath.kind+':'+aftermath.phase:null,
       // Draw calls spent on creatures this frame (their meshes that are drawn, before frustum culling).
       creatureMeshes:[avatar,...roamers.map(r=>r.mesh)].reduce((n,o)=>{if(!o||!o.visible)return n;o.traverse(m=>{if((m.isMesh||m.isSprite)&&m.visible)n++;});return n;},0),stations:stations.map(s=>({id:s.id,room:s.room,point:s.point}))})
   };

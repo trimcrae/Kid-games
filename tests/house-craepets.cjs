@@ -100,21 +100,21 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     await open('pet-house-cory',"Cory's Craepet house");assert(await f.locator('[data-hometab="homes"]').count(),'Own house did not open decorating');await page.locator('#close-activity').click();
     await open('pet-house-ellie',"Ellie's Craepet house");assert.equal(await runtime().evaluate(()=>Craepets.visiting()),'ellie');await page.locator('#close-activity').click();
     await jump('Craepet street');
-    // Chrome can refuse a re-lock straight after the Rooms menu released it; the
-    // game then asks for a click on the view, as a player would give it.
-    if(!(await page.evaluate(()=>houseTest.state.mouseLocked))){await page.mouse.click(680,450);await page.waitForFunction(()=>houseTest.state.mouseLocked,{},{timeout:6000}).catch(()=>{});}
-    const aimed=await page.evaluate(()=>houseTest.state.yaw);await page.mouse.move(900,450);await page.mouse.move(980,470);await page.waitForTimeout(100);assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'Mouse without dragging did not aim');
+    // Steering is the arrow keys: ← turns the view.
+    const aimed=await page.evaluate(()=>houseTest.state.yaw);await page.keyboard.down('ArrowLeft');await page.waitForTimeout(300);await page.keyboard.up('ArrowLeft');assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'The arrow keys did not turn the view');
     await page.screenshot({path:'tests/house-neighborhood.png'});
     // Walk to a room through the model, rather than invoking the jump UI.
     await jump('Front entry');const before=await page.evaluate(()=>houseTest.state.position);
-    await page.keyboard.down('KeyW');await page.waitForTimeout(850);await page.keyboard.up('KeyW');await page.waitForTimeout(1100);
-    const walking=await page.evaluate(()=>houseTest.state);assert(walking.position.z<before.z-.4,'WASD did not walk');assert(walking.nearby.includes('nest'),'Walking did not reach the living activity');
+    await page.keyboard.down('ArrowUp');await page.waitForTimeout(850);await page.keyboard.up('ArrowUp');await page.waitForTimeout(1100);
+    const walking=await page.evaluate(()=>houseTest.state);assert(walking.position.z<before.z-.4,'The arrow keys did not walk');assert(walking.nearby.includes('nest'),'Walking did not reach the living activity');
     assert(walking.appearance.includes('partyhat')&&walking.appearance.includes('bluescarf'),'3D outfit was not updated');assert(walking.furniture>0,'Placed furniture is absent from the house');
     await page.keyboard.press('KeyE');await page.locator('[data-choice="nest"]').click();await page.locator('#activity-panel').waitFor({state:'visible'});
     await f.locator('[data-do="wash"]').click();await page.locator('#activity-panel').waitFor({state:'hidden'});
     const guided=await page.evaluate(()=>houseTest.state);assert.equal(guided.destination,'wash');assert(Math.abs(guided.position.x-walking.position.x)<.1,'Directions silently teleported the player');
     const roamed=await page.evaluate(()=>houseTest.state.roamers);assert(roamed.some(r=>r.id==='ellie'),'Family pet did not join the house');// Companions live at their places (a bed, a rug, the veg bed…) doing something there.
-    assert(roamed.length>=8&&roamed.every(r=>r.act&&r.mode),'Companions have no routine');assert(roamed.some(r=>r.mode==='at'),'No companion is at its place');
+    // Only the family's own pets: Cory plays, so Ellie's is the one companion (no shopkeepers).
+    assert.deepEqual(roamed.map(r=>r.id),['ellie'],'Someone outside the family lives in the house');
+    assert(roamed.every(r=>r.act&&r.mode),'Companions have no routine');
     await page.keyboard.press('KeyF');await page.locator('[data-profile="ellie"]').click();await page.waitForTimeout(1100);assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Ellie Blossom');
     // Switching to someone with no pet offers adoption; leaving it without
     // adopting goes back to Family, not round into adoption again.

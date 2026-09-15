@@ -19,9 +19,11 @@ Touch devices have a movement pad and drag-to-look. Every pet is drawn at
 The house is presented as a lived-in game world rather than an architectural
 study:
 - **Follow camera** (`camera-guard.mjs`, `walkthrough.js`): a game lens chosen
-  from the screen shape, about 25° above and behind the pet, easing out after
-  walls pull it in and craning up (to a look from above in corners) before it
-  slides into the pet. It still tests its sightline against the drawn
+  from the screen shape, about 25° above and behind the pet on the player's own
+  sightline, turning exactly with the arrows. Walls only shorten the boom (it
+  pulls in at once and eases back out); close in, the lens widens, the view
+  tips up past the pet and the pet fades by how much of the screen it would
+  cover. It never cranes up to look down from above. It still tests its sightline against the drawn
   triangles, so it never ends up behind a wall, floor, ceiling or window; it
   may look over low furniture only from well above it. Jumps arrive at a spot
   inside each room (`rooms.mjs`) with a clear view.
@@ -32,9 +34,9 @@ study:
   floating signs.
 - **Pets and neighbours** (`creatures.mjs`, `pet-behaviour.mjs`,
   `companions.mjs`, `aftermath.mjs`): rigged, furry creatures with faces,
-  moods and needs you can see; family pets and the activity hosts keep
-  routines tied to real furniture (napping on their owners' beds at night),
-  greet you and say their lines.
+  moods and needs you can see; the family's other adopted pets (only theirs:
+  no shopkeepers or visitors) keep routines tied to real furniture (napping on
+  their owners' beds at night), walk real routes between them and greet you.
 - **Lighting** (`lighting.mjs`, `sky.mjs`, `materials.mjs`, `post-aa.mjs`):
   a game shading tier, warm room light with soft shadows, contact shadows,
   time of day and weather matching the HUD clock, and FXAA.
@@ -75,20 +77,21 @@ dependency.
 | Jeannie's bedroom | Trophies, records, family visits and gifting |
 | Craepet street | Seven family plots: saved homes, decorating, visiting and presents |
 
-### Steering: mouse look or keys only
+### Steering: the arrow keys
 
-The welcome and pause cards offer **Mouse look** and **Keys only**. The choice is
-remembered in `craepets.house.controls`, a UI preference and not a save.
-- **Keys only:** ↑/W walk forward, ↓/S back up, ←/→ (or A/D) turn at about
-  110° a second. A tap turns a little and turning stops the moment the key is
-  let go. The pet faces where it is heading, and the mouse is never captured.
-- **Mouse look:** as before (captured mouse, raw relative movement, or
-  hold-and-drag where capture is refused), plus a remembered **Look speed**
-  (Slow 0.55×, Normal 1×, Fast 1.6×). ←/→ turn there too; A/D side-step.
-- **Drags:** a mouse drag turns only while its button is down, and ends on any
-  release, a lost capture or a lost window.
-- **A lost window** clears keys, drags, the touch pad and speed.
-- **Tests:** `tests/house-keyboard-controls.cjs` covers all of this.
+On a desktop the pet is steered with the arrow keys only. ↑ walks forward, ↓
+backs up, and ←/→ turn at about 110° a second. A tap turns a little, turning
+stops the moment the key is let go, and ← with → cancels. Shift runs. E, R, F,
+C and Esc work as before.
+
+The mouse clicks buttons and panels and never steers: there is no pointer
+capture, and moving or dragging over the view turns nothing. An old
+`craepets.house.controls` preference from the mouse-look days is ignored.
+Phones and tablets walk with the pad and swipe to look.
+
+A lost window clears keys, the pad and speed. Tests:
+`tests/house-keyboard-controls.cjs` and
+`models/house/test_browser_house_controls.mjs`.
 ### Loading never waits for ever
 
 `boot.js` is a classic script that runs even if the 3D modules never do.
