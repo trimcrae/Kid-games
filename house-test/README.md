@@ -75,6 +75,21 @@ dependency.
 | Jeannie's bedroom | Trophies, records, family visits and gifting |
 | Craepet street | Seven family plots: saved homes, decorating, visiting and presents |
 
+### Loading never waits for ever
+
+`boot.js` is a classic script that runs even if the 3D modules never do.
+`walkthrough.js` reports each loading step to it: the house plan, the rooms
+(with download %), the lights and colours, the Craepets, and ready. If a step
+goes quiet for 25 s the card says it is still working and offers **Try again**
+and **Back to the Craepets game**. After 90 s without progress it says loading
+has stopped. It still opens the house if the step then finishes. A part that
+fails to download or throws while starting is explained straight away, with the
+error kept in `window.houseBoot.errors` and the console. The shader warm-up is
+only a head start, so it is capped at 40 s (then 3 s): three.js's
+`compileAsync` otherwise waits for ever when a driver never reports a finished
+compile. A lost WebGL context (a graphics reset) is explained with a reload
+instead of leaving a blank house. `?bootwatch=fast` shortens the timings for
+`tests/house-loading.cjs`.
 ### NEW: walking round the house from the Craepets game
 
 The Craepets game (`games/craepets/`) now invites players to walk round the

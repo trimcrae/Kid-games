@@ -16,6 +16,10 @@ import {glazingBoxes} from './glazing.mjs';
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
 const $=id=>document.getElementById(id);
+// Loading steps are reported to the watchdog in boot.js, which says so when a
+// step goes quiet and offers "Try again" / "Back to the Craepets game".
+const boot=window.houseBoot||{step(){},alive(){},ready(){},fail(){}};
+boot.step('the 3D house');
 // Opened from the Craepets game, the house is part of the game (its own saves,
 // and a way back from the top bar, the pause card and any loading problem).
 document.body.classList.toggle('from-game',GAME_MODE);
@@ -89,6 +93,7 @@ try {
 } catch(error) {
   $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled — the Craepets game itself still works here.';
   start.textContent='3D graphics unavailable';document.body.classList.add('house-failed');
+  boot.fail(error,$('loading').textContent);
   throw error;
 }
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
@@ -96,6 +101,17 @@ if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 
 let guard=null,cameraClearance=lensClearance();
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
+// A graphics reset (the driver restarting) loses the 3D context: the house
+// would stay blank, or wait for ever on shaders that can no longer finish.
+// Say so and offer a reload instead. Saves are untouched (the game saves as
+// you play).
+canvas.addEventListener('webglcontextlost',event=>{
+  event.preventDefault();console.error('The 3D graphics context was lost.');
+  if(!ready){boot.fail(new Error('WebGL context lost'),'The 3D graphics stopped while the house was opening (the computer\'s graphics reset). Try again, or go back to the Craepets game.');failed=true;return;}
+  failed=true;if(active)pause();
+  $('loading').textContent='The 3D graphics stopped (the computer\'s graphics reset). Reload the house to carry on — your pet, coins and things are saved.';
+  start.textContent='Reload the house';start.disabled=false;document.body.classList.add('house-failed');
+});
 const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now(),drag=null;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The eased follow camera (crane swing and boom length); see camera-guard.mjs.
@@ -379,16 +395,36 @@ function animate(now){
   render();
 }
 let shading={};
+// Warming shaders is only a head start (otherwise they compile on the first
+// frames), so it never holds the house up for long: some graphics drivers
+// are slow to report a finished compile, and three.js would wait for ever.
+// A driver that never reported the first warm-up won't report the next one
+// either, so after one time-out the pets' warm-up waits only briefly.
+const WARM_LIMIT=query.get('bootwatch')==='fast'?3000:40000;
+let warmTimedOut=false;
 async function warmShaders(){
-  try{if(renderer.compileAsync)await renderer.compileAsync(scene,camera);}
+  if(!renderer.compileAsync)return;
+  const limit=warmTimedOut?Math.min(WARM_LIMIT,3000):WARM_LIMIT;
+  let timer;
+  try{await Promise.race([renderer.compileAsync(scene,camera),new Promise(resolve=>{timer=setTimeout(()=>{warmTimedOut=true;
+    console.warn(`Shader warm-up still running after ${limit/1000} s; opening the house without waiting for it.`);resolve();},limit);})]);}
   catch(error){console.warn('Shader warm-up skipped:',error.message);}
+  finally{clearTimeout(timer);}
 }
 async function load(){
   try{
+    boot.step('the house plan','Opening the front door…');
     const response=await fetch('./house.json');if(!response.ok)throw new Error('Model manifest unavailable');const data=await response.json();
-    $('loading').textContent='Loading rooms and gardens…';
+    boot.step('the rooms','Loading rooms and gardens…');
     const meshResponse=await fetch('./house.mesh.gz');if(!meshResponse.ok)throw new Error('Model geometry unavailable');
-    const binary=await new Response(meshResponse.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    // Count the download (8 MB) so a slow connection shows progress, not a stall.
+    const total=Number(meshResponse.headers.get('content-length'))||0;let got=0,shown=-1;
+    const counted=meshResponse.body.pipeThrough(new TransformStream({transform(chunk,out){
+      got+=chunk.byteLength;const pct=total?Math.min(99,Math.floor(got*100/total)):-1;
+      if(total&&pct!==shown){shown=pct;boot.alive(`Loading rooms and gardens… ${pct}%`);}else boot.alive();
+      out.enqueue(chunk);}}));
+    const binary=await new Response(counted.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    boot.step('the light and shade','Loading rooms and gardens…');
     let occlusion=null;
     try{occlusion=await loadHouseOcclusion(data,binary);}
     catch(error){console.warn('House ambient occlusion skipped:',error.message);}
@@ -414,6 +450,7 @@ async function load(){
     // background (the welcome card is up) and the first room probe waits
     // for them instead of compiling in-frame.
     performance.mark('house:lights');
+    boot.step('the lights and colours','Getting the lights and colours ready…');
     // The pets' shared fur shader (and their tags') compile alongside the house's.
     const cast=warmupCast();scene.add(cast);
     const warming=warmShaders();lighting.warm();
@@ -429,7 +466,7 @@ async function load(){
     // Capture the first room's reflections while the loading message is up.
     lighting.prime(player);
     performance.mark('house:probe');
-    $('loading').textContent='Welcoming your Craepets…';
+    boot.step('your Craepets','Welcoming your Craepets…');
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     life.face(yaw+Math.PI,true);performance.mark('house:life');
     leaveHouse=()=>life.leave();
@@ -437,9 +474,11 @@ async function load(){
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
     // Pets, labels and markers bring their own materials.
+    boot.step('your Craepets\' fur');
     await warmShaders();performance.mark('house:pets-compiled');render();performance.mark('house:first-frame');
     shading={contactShadows:contact?.count??0};
-    ready=true;
+    if(failed)return;   // the graphics were lost while opening; boot.js offers a retry
+    ready=true;boot.ready();
     start.disabled=false;start.textContent='Come play at home';$('loading').textContent='Your house is ready';
     // The ceiling light's soft shadow compiles in the background while the
     // welcome card is up, instead of adding to the load.
@@ -453,6 +492,8 @@ async function load(){
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
       mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
-  }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again, or go back to the Craepets game.';start.textContent='Reload the house';start.disabled=false;document.body.classList.add('house-failed');}
+  }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
+    boot.fail(error,$('loading').textContent);}
 }
-animate(performance.now());load();
+// Loading starts before the first frame, so a problem drawing can't stop it.
+load();animate(performance.now());
