@@ -75,6 +75,20 @@ dependency.
 | Jeannie's bedroom | Trophies, records, family visits and gifting |
 | Craepet street | Seven family plots: saved homes, decorating, visiting and presents |
 
+### Steering: mouse look or keys only
+
+The welcome and pause cards offer **Mouse look** and **Keys only**. The choice is
+remembered in `craepets.house.controls`, a UI preference and not a save.
+- **Keys only:** ↑/W walk forward, ↓/S back up, ←/→ (or A/D) turn at about
+  110° a second. A tap turns a little and turning stops the moment the key is
+  let go. The pet faces where it is heading, and the mouse is never captured.
+- **Mouse look:** as before (captured mouse, raw relative movement, or
+  hold-and-drag where capture is refused), plus a remembered **Look speed**
+  (Slow 0.55×, Normal 1×, Fast 1.6×). ←/→ turn there too; A/D side-step.
+- **Drags:** a mouse drag turns only while its button is down, and ends on any
+  release, a lost capture or a lost window.
+- **A lost window** clears keys, drags, the touch pad and speed.
+- **Tests:** `tests/house-keyboard-controls.cjs` covers all of this.
 ### Loading never waits for ever
 
 `boot.js` is a classic script that runs even if the 3D modules never do.
