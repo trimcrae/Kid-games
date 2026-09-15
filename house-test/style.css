@@ -141,7 +141,7 @@ body:not(.from-game):not(.house-failed):not(.house-slow) .back-link{display:none
 .boot-retry{text-align:center;margin:0}.boot-retry:has(#boot-retry[hidden]){display:none}
 .boot-detail{text-align:center;font-size:12px;color:#7a6f63;margin:0;overflow-wrap:anywhere}
 /* If the house cannot open, leave only the message and the ways onward. */
-body.house-failed .welcome-actions,body.house-failed .instructions,body.house-failed .touch-instructions{display:none!important}
+body.house-failed .welcome-actions,body.house-failed .instructions,body.house-failed .touch-instructions,body.house-failed .saves-link{display:none!important}
 .new-note{margin:0 0 6px;font-weight:800;color:var(--nav);font-size:15px}
 .new-note .newtag{display:inline-block;background:#2f7f78;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;letter-spacing:.08em;margin-right:6px;vertical-align:1px}
 .study-note{font-size:13px;line-height:1.5;color:var(--ink-soft)}

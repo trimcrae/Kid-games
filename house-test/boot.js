@@ -52,6 +52,9 @@
   }
   var boot=window.houseBoot={
     get stage(){return stage;},get state(){return state;},errors:errors,
+    // Set by walkthrough.js once it runs the start button (retry included), so
+    // one click never reloads twice.
+    startBound:false,
     // A new loading step (optionally with the words to show).
     step:function(name,words){stage=name;progress(words);},
     // Still making progress (bytes arriving) without a new step.
@@ -73,12 +76,15 @@
   document.addEventListener('click',function(e){
     var t=e.target;if(!t||!t.closest)return;
     if(t.closest('#boot-retry'))retry();
-    else if(t.closest('#start')&&(state==='failed'||state==='stalled'))retry();
+    else if(t.closest('#start')&&!boot.startBound&&(state==='failed'||state==='stalled'))retry();
   });
   // A background tab loads slowly on purpose; only count time it is shown.
   document.addEventListener('visibilitychange',function(){if(!document.hidden)last=Date.now();});
   var timer=setInterval(function(){
     if(state==='ready'||state==='failed'){clearInterval(timer);return;}
+    // An older walkthrough.js (a cached copy) never reports its steps, but it
+    // does publish houseTest once the house is ready: never call that stalled.
+    var t=window.houseTest;if(t&&t.state&&t.state.ready){boot.ready();clearInterval(timer);return;}
     if(document.hidden)return;
     var idle=Date.now()-last;
     if(idle>STUCK&&state!=='stalled'){

@@ -14,6 +14,13 @@ const card=page=>page.evaluate(()=>({loading:document.getElementById('loading').
   ready:!!window.houseTest?.state.ready,boot:{state:houseBoot.state,stage:houseBoot.stage,errors:houseBoot.errors.map(e=>e.message)},
   detail:document.getElementById('boot-detail').hidden?'':document.getElementById('boot-detail').textContent,
   backLink:(()=>{const a=document.querySelector('#welcome .back-link a');return a&&a.offsetParent!==null?a.getAttribute('href'):null;})()}));
+// "Try again" reloads exactly once (boot.js and walkthrough.js must not both reload).
+async function retryOnce(page){
+  let loads=0;const count=f=>{if(f===page.mainFrame())loads++;};page.on('framenavigated',count);
+  await Promise.all([page.waitForNavigation(),page.locator('#start').click()]);
+  await page.waitForTimeout(1500);page.off('framenavigated',count);
+  assert.equal(loads,1,'"Try again" reloaded '+loads+' times');
+}
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
   const results={};
@@ -44,7 +51,7 @@ const card=page=>page.evaluate(()=>({loading:document.getElementById('loading').
       await page.waitForFunction(()=>window.houseBoot?.state==='failed',{},{timeout:30000});const c=await card(page);
       assert(/graphics stopped/.test(c.loading)&&c.failed&&!c.startDisabled&&c.start==='Try again'&&c.backLink,'Lost context not explained: '+JSON.stringify(c));
       assert(c.boot.errors.includes('WebGL context lost'));
-      await Promise.all([page.waitForNavigation(),page.locator('#start').click()]);await settled(page);
+      await retryOnce(page);await settled(page);
       assert((await card(page)).ready,'"Try again" did not open the house');
       results.contextLostWhileOpening=c;await ctx.close();}
     // 4. A part that won't download (opened from the game): says so, with the way back to the game; retry works.
@@ -55,8 +62,9 @@ const card=page=>page.evaluate(()=>({loading:document.getElementById('loading').
       assert(/could not be downloaded/.test(c.loading)&&c.start==='Try again'&&!c.startDisabled,'Missing part not explained: '+JSON.stringify(c));
       assert.equal(c.backLink,'../games/craepets/');
       assert(await page.locator('#welcome-saves').isHidden(),'Game mode shows the house-edition save transfer when the modules never started');
-      block=false;await Promise.all([page.waitForNavigation(),page.locator('#start').click()]);await settled(page);
+      block=false;await retryOnce(page);await settled(page);
       assert((await card(page)).ready,'Retry after a failed download did not open the house');
+      assert(/[?&]from=game\b/.test(page.url()),'Retry lost ?from=game: '+page.url());
       results.missingModule=c;await ctx.close();}
     // 5. A part that throws while starting: says so and keeps the error for diagnosis.
     {const {ctx,page}=await fresh();
@@ -64,6 +72,7 @@ const card=page=>page.evaluate(()=>({loading:document.getElementById('loading').
       await page.goto(`${base}/house-test/?${FAST}`);
       await page.waitForFunction(()=>window.houseBoot?.state==='failed',{},{timeout:30000});const c=await card(page);
       assert(/could not start/.test(c.loading)&&c.start==='Try again'&&/injected start-up failure/.test(c.detail)&&c.backLink,'Start-up error not explained: '+JSON.stringify(c));
+      assert(await page.locator('#welcome-saves').isHidden(),'A failed card offers save transfer, which never started');
       results.moduleThrows=c;await ctx.close();}
     // 6. A stalled download: "still working" with ways out, then "stopped", then it recovers when the data comes.
     {const {ctx,page}=await fresh();let release;const held=new Promise(r=>{release=r;});

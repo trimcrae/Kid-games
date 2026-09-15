@@ -222,7 +222,7 @@ for(const room of rooms){
   const name=document.createElement('span');name.className='room-name';name.textContent=room[1];
   b.append(icons,name);bindButton(b,()=>jumpTo(room));row.append(b);floor.append(row);
 }
-bindButton(start,()=>failed?location.reload():resume());bindButton($('pause-button'),pause);
+bindButton(start,()=>failed||boot.state==='failed'||boot.state==='stalled'?location.reload():resume());boot.startBound=true;bindButton($('pause-button'),pause);
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('welcome-rooms'),()=>{if(ready)showRooms(true);});bindButton($('welcome-family'),()=>{if(ready)$('family-button').click();});
 bindButton($('reset'),()=>jumpTo(rooms[0]));
