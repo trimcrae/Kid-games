@@ -56,6 +56,11 @@ body.hud-quiet .actions button:not(:hover):not(:focus-visible){opacity:.4}
 .actions button>span[aria-hidden]{font-size:20px;line-height:1}
 .actions kbd{font-size:11px;padding:0 5px;min-width:0;opacity:.75}
 #pause-button{width:48px;padding:0;justify-content:center;font-size:17px}
+/* Back to the Craepets game (the house opened from the game). */
+#back-to-game{display:flex;align-items:center;gap:7px;height:48px;padding:0 14px;border-radius:999px;background:#e6f5f2;box-shadow:var(--shadow);font-size:15px;font-weight:700;color:#1f5f59;text-decoration:none;border:2px solid #9fd6cf;transition:opacity .6s ease}
+#back-to-game>span[aria-hidden]{font-size:18px;line-height:1}
+#back-to-game:focus-visible{outline:3px solid var(--nav);outline-offset:2px}
+body.hud-quiet #back-to-game:not(:hover):not(:focus-visible){opacity:.4}
 #pet-button{background:#fff1ea;border-color:#f6cdbd}
 #pet-button .label{display:none}
 
@@ -126,6 +131,16 @@ body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden
 #loading{font-size:14px;color:var(--ink-soft);text-align:center}
 #welcome[data-mode=pause] #loading{display:none}
 .saves-link{text-align:center;font-size:14px}
+/* Opened from the Craepets game (body.from-game) the house plays on the game's
+   saves: the house edition's save-transfer links give way to a way back. */
+body:not(.from-game) .game-only{display:none!important}
+body.from-game .house-only{display:none!important}
+.back-link{text-align:center;font-size:15px;margin:2px 0 0}.back-link a{color:var(--nav);font-weight:800;text-underline-offset:3px}
+body:not(.from-game):not(.house-failed) .back-link{display:none}
+/* If the house cannot open, leave only the message and the ways onward. */
+body.house-failed .welcome-actions,body.house-failed .instructions,body.house-failed .touch-instructions{display:none!important}
+.new-note{margin:0 0 6px;font-weight:800;color:var(--nav);font-size:15px}
+.new-note .newtag{display:inline-block;background:#2f7f78;color:#fff;border-radius:999px;padding:2px 9px;font-size:12px;letter-spacing:.08em;margin-right:6px;vertical-align:1px}
 .study-note{font-size:13px;line-height:1.5;color:var(--ink-soft)}
 .touch-instructions{display:none;font-size:15px;line-height:1.5;color:var(--ink-soft)}
 #family-panel{z-index:9}#family-panel p{font-size:15px;line-height:1.5;color:var(--ink-soft)}#family-panel a{font-size:14px;color:var(--nav);font-weight:700}
@@ -169,7 +184,7 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   .topbar{padding:12px}
   .actions{gap:6px;position:absolute;top:12px;right:12px}
   .actions .label{display:none}
-  .actions button{width:48px;padding:0;justify-content:center}
+  .actions button,.actions #back-to-game{width:48px;padding:0;justify-content:center}
   #pet-button{display:none}
   #player-chip{padding-right:10px}
   #pet-status{font-size:16px}
@@ -189,11 +204,11 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   .topbar{padding:10px 14px}
   .welcome-card{grid-template-columns:1fr 1fr;align-items:center;width:min(760px,100%);padding:18px 22px;gap:10px 18px;max-height:96vh}
   .welcome-card>*{grid-column:1}
-  .welcome-card>#start,.welcome-card>.welcome-actions,.welcome-card>#loading,.welcome-card>.saves-link{grid-column:2}
+  .welcome-card>#start,.welcome-card>.welcome-actions,.welcome-card>#loading,.welcome-card>.saves-link,.welcome-card>.back-link{grid-column:2}
   .welcome-card>.welcome-only,.welcome-card>.pause-only{grid-row:1 / span 2}
   h1{font-size:30px}.intro{font-size:15px}
   .actions .label{display:none}
-  .actions button{width:48px;padding:0;justify-content:center}
+  .actions button,.actions #back-to-game{width:48px;padding:0;justify-content:center}
   #rooms{top:70px;bottom:8px}
   #journey{top:66px;right:12px;left:auto;transform:none;max-width:46vw;font-size:14px}
   .location{top:12px}

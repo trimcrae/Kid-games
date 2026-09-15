@@ -13,7 +13,20 @@ import {warmupCast} from './creatures.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs';
 import {glazingBoxes} from './glazing.mjs';
 
+import {GAME_MODE,GAME_URL} from './play-mode.mjs';
+
 const $=id=>document.getElementById(id);
+// Opened from the Craepets game, the house is part of the game (its own saves,
+// and a way back from the top bar, the pause card and any loading problem).
+document.body.classList.toggle('from-game',GAME_MODE);
+if(GAME_MODE)document.title='Craepets · Walk around the house';
+let leaveHouse=()=>{};
+for(const link of document.querySelectorAll('[data-back-to-game]'))link.addEventListener('click',e=>{
+  e.preventDefault();
+  // Finish any activity and save the valley before the page goes.
+  try{leaveHouse();}catch(error){console.warn(error);}
+  location.href=GAME_URL;
+});
 // Touch buttons act on pointerup, so a finger doesn't wait for the click. The
 // browser's own click for that tap still follows ~0–300 ms later and lands on
 // whatever is now under the finger — once a panel has hidden, that was the
@@ -74,8 +87,8 @@ try {
   installPostPass(renderer,camera,{mode:RENDER.aa==='msaa'?'grade':RENDER.aa});
   gpuTimer=createGpuTimer(renderer,camera);
 } catch(error) {
-  $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled.';
-  start.textContent='3D graphics unavailable';
+  $('loading').textContent='This browser could not start 3D graphics. Try a current browser with WebGL enabled — the Craepets game itself still works here.';
+  start.textContent='3D graphics unavailable';document.body.classList.add('house-failed');
   throw error;
 }
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
@@ -419,6 +432,7 @@ async function load(){
     $('loading').textContent='Welcoming your Craepets…';
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     life.face(yaw+Math.PI,true);performance.mark('house:life');
+    leaveHouse=()=>life.leave();
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
@@ -439,6 +453,6 @@ async function load(){
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
     window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,yaw,pitch,arrivalYaw,fov:camera.fov,
       mouseLocked:mouseLocked(),mouseLockDenied:lockDenied,turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
-  }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again.';start.textContent='Reload the house';start.disabled=false;}
+  }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Refresh to try again, or go back to the Craepets game.';start.textContent='Reload the house';start.disabled=false;document.body.classList.add('house-failed');}
 }
 animate(performance.now());load();
