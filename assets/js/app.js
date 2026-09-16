@@ -27,6 +27,9 @@
 
     card.innerHTML =
       '<span class="emoji" aria-hidden="true">' + (game.emoji || "🎲") + "</span>" +
+      // An optional `flag:` on a game — a short line about something new in
+      // it — rides above the title, where a long blurb would hide it.
+      (game.flag ? '<span class="new-flag">' + escapeHtml(game.flag) + "</span>" : "") +
       "<h2>" + escapeHtml(game.title || "Untitled") + "</h2>" +
       "<p>" + escapeHtml(game.blurb || "") + "</p>" +
       '<span class="age-badge">' + escapeHtml(ageText) + "</span>";

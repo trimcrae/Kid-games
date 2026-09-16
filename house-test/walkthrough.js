@@ -10,7 +10,7 @@ import {installPostPass} from './post-aa.mjs';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {warmupCast} from './creatures.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-arrows';
+import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-mystery';
 import {glazingBoxes} from './glazing.mjs';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
@@ -53,11 +53,11 @@ camera.rotation.order='YXZ';
 // any screen shape, which is ~57° vertical at 16:10. Portrait phones keep the
 // old 70° cap, so the widest near plane the clearance test assumes still holds.
 // In a tight spot, where the boom is short, the lens eases wider (up to the
-// same 70° cap) and the view tips up past the pet by up to AIM_LIFT, so the
-// pet sits low in the frame and the room ahead shows, rather than the camera
-// craning up to look down on the pet. (lensClose: 0 at the full boom, 1 close.)
-const AIM_LIFT=13*Math.PI/180;
-let baseFov=57,lensClose=0;
+// same 70° cap) and the view tips up past the pet by up to AIM_LIFT — never
+// above level (LEVEL_KEEP), so a close view shows the room rather than the
+// ceiling. (lensClose: 0 at the full boom, 1 close.)
+const AIM_LIFT=13*Math.PI/180,LEVEL_KEEP=1.5*Math.PI/180;
+let baseFov=57,lensClose=0,cameraLift=0;
 function fitLens(){
   camera.aspect=innerWidth/innerHeight;
   baseFov=THREE.MathUtils.clamp(2*Math.atan(Math.tan(41*Math.PI/180)/camera.aspect)*180/Math.PI,50,70);
@@ -103,7 +103,7 @@ const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:c
 if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 
 let guard=null,cameraClearance=lensClearance();
-let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=-.18,focusY=.03,active=false,ready=false,failed=false;
+let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=0,focusY=.03,active=false,ready=false,failed=false;
 // A graphics reset (the driver restarting) loses the 3D context: the house
 // would stay blank, or wait for ever on shaders that can no longer finish.
 // Say so and offer a reload instead. Saves are untouched (the game saves as
@@ -124,7 +124,7 @@ const followRig=createFollowRig({reducedMotion});let arrivalYaw=null;
 // reload or an imported save — comes through here, so the camera, room name
 // and lighting arrive with the pet instead of sweeping across floors to it.
 function placePlayer(p,heading){
-  Object.assign(player,p);pitch=-.18;focusY=p.y;velocity={x:0,z:0};followRig.reset();
+  Object.assign(player,p);pitch=0;focusY=p.y;velocity={x:0,z:0};followRig.reset();
   yaw=arrivalYaw=arrivalHeading(player,heading,pitch,world,guard,cameraClearance);life?.face(yaw+Math.PI,true);
   updateLocation();
 }
@@ -274,7 +274,12 @@ function render(){
   // together). Only the aim turns: the camera stays where the guard put it, so
   // its near-plane clearance holds whichever way it looks.
   lensClose+=(THREE.MathUtils.clamp((1.4-cameraBoom)/.8,0,1)-lensClose)*(reducedMotion?1:1-Math.exp(-dt*4));
-  camera.rotation.x+=lensClose*AIM_LIFT;
+  // The lift never takes the view above level (it would show ceiling instead
+  // of the room): it may use up what the view is currently looking down by,
+  // less a shade, and no more than AIM_LIFT.
+  const down=-camera.rotation.x;
+  cameraLift=lensClose*Math.min(AIM_LIFT,Math.max(0,down-LEVEL_KEEP));
+  camera.rotation.x+=cameraLift;
   const fov=baseFov+lensClose*(Math.min(70,baseFov+13)-baseFov);
   if(Math.abs(camera.fov-fov)>.05){camera.fov=fov;camera.updateProjectionMatrix();}
   fadePet(dt);
@@ -512,7 +517,7 @@ async function load(){
     const keyShadowLater=()=>{playedOnce||=active;if(!playedOnce||active){setTimeout(keyShadowLater,700);return;}lighting.enableKeyShadow(()=>active);};
     setTimeout(keyShadowLater,700);
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:lensClose*AIM_LIFT*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
+    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
       turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     boot.fail(error,$('loading').textContent);}
