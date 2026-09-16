@@ -124,8 +124,9 @@ const norm=s=>{const o=JSON.parse(s);o.lastTick=0;return JSON.stringify(o);};
     await p1.locator('#news-box [data-newsopen]').click();
     await p1.locator('#news-box [data-walk]').click();
     await p1.waitForURL(/\/house-test\/\?from=game$/);
+    // (Base-relative: the deployed arcade lives under /Kid-games/.)
     const u=new URL(p1.url());
-    assert.equal(u.pathname+u.search,'/house-test/?from=game');
+    assert.equal(u.href,new URL('../../house-test/?from=game',base+'/games/craepets/').href,'Start walking went somewhere else');
 
     /* 7. A family already playing, who waved the quiet NEW card away long ago,
           still gets this one announcement — exactly once. */
