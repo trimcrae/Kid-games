@@ -171,11 +171,15 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
 #joystick{pointer-events:auto;position:absolute;bottom:28px;left:24px;width:120px;height:120px;border-radius:50%;background:#fff8ec59;border:3px solid #fff8eccc;touch-action:none;display:grid;place-items:center;box-shadow:0 4px 18px #3b2e2533}
 #joystick span{width:50px;height:50px;border-radius:50%;background:var(--panel);border:2px solid var(--line);pointer-events:none;box-shadow:0 3px 0 var(--line)}
 #joystick.floating{opacity:.95}
+/* The jump paw sits under the walking thumb's opposite hand. */
+#jump{pointer-events:auto;position:absolute;bottom:40px;right:26px;width:92px;height:92px;padding:0;border-radius:50%;font-size:38px;line-height:1;background:#fff8ecdd;border:3px solid var(--line);color:var(--ink);touch-action:none;box-shadow:0 4px 0 var(--line),0 6px 18px #3b2e2533}
+#jump:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line),0 3px 10px #3b2e2533}
 @media(pointer:coarse){
   #touch-controls{display:block}
   .fine-only,kbd{display:none!important}
   .touch-instructions{display:block}
-  #nearby{left:auto;right:12px;transform:none;bottom:22px;max-width:calc(100vw - 172px);border-radius:24px}
+  /* Above the walking pad and the jump paw, not behind them. */
+  #nearby{left:auto;right:12px;transform:none;bottom:146px;max-width:calc(100vw - 172px);border-radius:24px}
   #nearby-actions{justify-content:flex-end}
   #coach,#hint{bottom:auto;top:150px}
   #journey:not([hidden])~#coach{top:196px}

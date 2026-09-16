@@ -9,12 +9,22 @@ authentication. GitHub Pages and this repository remain public.
 Control your own Craepet in third person with WASD or arrows. Starting the game
 (or clicking the view) captures the pointer, like any first-person game: the
 cursor disappears and moving the mouse turns the view as far as you like.
-Hold Shift to move faster, press E to choose a nearby activity, R for rooms,
+Hold Shift to move faster, press Space to jump, E to choose a nearby activity, R for rooms,
 and F for family. Escape releases the mouse and pauses. If a browser refuses
 capture (some in-app or embedded browsers can), the footer says so, hold-and-drag
 looking takes over, and a normal Chrome or Edge tab gives full mouse look.
-Touch devices have a movement pad and drag-to-look. Every pet is drawn at
-`PET_SCALE` (`creatures.mjs`), dog-sized against the real-size furniture.
+Touch devices have a movement pad, a 🐾 jump button and drag-to-look. Every pet
+is drawn at `PET_SCALE` (`creatures.mjs`), dog-sized against the real-size
+furniture.
+
+**Jumping** (`Body` in `physics.mjs`) clears about 89 cm, so the pet hops up
+onto every bed, couch and table in the house but not the kitchen worktops, and
+steers in the air so a kid can aim at the cushions. Walking off the edge of the
+table it climbed drops it back to the floor; it will only walk off a drop of up
+to 1.2 m of its own accord, and a jump won't carry it over a storey-high drop,
+past the edge of the lawn or through a seam in the exported floor.
+`models/house/test_walkthrough.mjs` replays those hops against the real
+colliders at the same 30 fps the browser runs.
 
 The house is presented as a lived-in game world rather than an architectural
 study:

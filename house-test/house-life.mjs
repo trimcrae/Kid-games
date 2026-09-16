@@ -35,7 +35,7 @@ export async function createHouseLife(tour){
   const neighborhood=createNeighborhood(scene,world);
   const startNew=()=>showActivity({id:'adopt',room:$('location').textContent||'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'});
   const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew});
-  let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
+  let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,inAir=false,hopNow=0,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
   // Pets stand on the visible floor finish (boards and tile sit above the
   // walking boxes), so their feet and contact shadows aren't buried.
@@ -372,7 +372,7 @@ export async function createHouseLife(tour){
   // Coach marks: one short tip at a time, only until the player has done it
   // once (remembered per browser), replacing the old permanent shortcut line.
   const coachKey='craepets.house.coach';let coached={};try{coached=JSON.parse(localStorage.getItem(coachKey))||{};}catch{}
-  let walked=0,lastSpot=null,menuTipAt=0,coachText='';
+  let walked=0,lastSpot=null,menuTipAt=0,jumpTipAt=0,coachText='';
   function coachDone(step){if(coached[step])return;coached[step]=1;try{localStorage.setItem(coachKey,JSON.stringify(coached));}catch{}}
   function showCoach(parts){
     const text=parts.join('');if(text===coachText)return;coachText=text;const el=$('coach');el.replaceChildren();
@@ -390,6 +390,11 @@ export async function createHouseLife(tour){
       else return showCoach(touch?['Drag the pad to walk · swipe the screen to look around']
         :['[↑]',' walk · ','[↓]',' back up · ','[←]','[→]',' turn']);
     }
+    // Jumping is the one control nothing else teaches, and the whole point of
+    // it is the furniture — so say so once, until they try it.
+    if(!coached.jump){if(!jumpTipAt)jumpTipAt=time;if(time-jumpTipAt>12)coachDone('jump');
+      else return showCoach(touch?['Tap 🐾 to jump — up onto the beds, couches and tables']
+        :['[Space]',' jumps — up onto the beds, couches and tables']);}
     if(!coached.use&&near.length)return showCoach(touch?[`Tap ${near[0].icon} ${near[0].name} to play`]:['Press ','[E]',` for ${near[0].icon} ${near[0].name}`]);
     if(coached.use&&!coached.menu&&!touch){if(!menuTipAt)menuTipAt=time;if(time-menuTipAt>7)coachDone('menu');else return showCoach(['[R]',' opens Rooms · ','[F]',' Family · ','[Esc]',' pauses']);}
     showCoach([]);
@@ -455,6 +460,12 @@ export async function createHouseLife(tour){
     adopt:()=>{if(!picked)openFamily(true);else startNew();},
     face(angle,instant=false){wantHeading=angle;if(instant)heading=angle;},
     movement(dx,dz,rate=0){moving=Math.hypot(dx,dz)>.0001;speed=rate;if(moving)wantHeading=Math.atan2(dx,dz);},
+    // Off the ground (a jump, or a fall off the table it climbed onto): the
+    // paws stop padding, and the body follows the walking height exactly
+    // instead of easing to it a tread at a time.
+    airborne(flag){if(flag&&!inAir)coachDone('jump');inAir=!!flag;},
+    // A squash of the body on take-off and again as the paws touch down.
+    hop(strength=1){hopNow=Math.max(hopNow,strength);},
     interact(){
       if(!near.length)return;
       const target=near.find(s=>destination?.id===s.id);
@@ -468,7 +479,8 @@ export async function createHouseLife(tour){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       ground.frame();
       if(avatar){
-        const reduced=tour.reducedMotion,rig=avatar.userData.rig;let walking=active&&moving,gait=speed;
+        const reduced=tour.reducedMotion,rig=avatar.userData.rig;let walking=active&&moving&&!inAir,gait=speed;
+        if(hopNow){rig.hop(hopNow);hopNow=0;}
         // What the pet feels like doing: look back at you, sniff, sit, yawn,
         // doze off when tired… (pet-behaviour.mjs), from its real needs.
         let friend=null,best=3;
@@ -494,7 +506,7 @@ export async function createHouseLife(tour){
         // Stair treads: the walking height steps 18 cm at a time; the body
         // hops up (or down) each tread in a short arc instead of teleporting.
         const floorY=player.y+avatarLift;
-        if(visY===null||reduced||Math.abs(floorY-visY)>.6){visY=floorY;stepHop=null;}
+        if(visY===null||reduced||inAir||Math.abs(floorY-visY)>.6){visY=floorY;stepHop=null;}
         else if(Math.abs(floorY-(stepHop?stepHop.to:visY))>.06)stepHop={from:visY,to:floorY,t:0};
         if(stepHop){stepHop.t+=dt/.18;const k=Math.min(1,stepHop.t);visY=stepHop.from+(stepHop.to-stepHop.from)*k*k*(3-2*k)+Math.sin(Math.PI*k)*.045;if(k>=1){visY=stepHop.to;stepHop=null;}}
         else visY=floorY;
