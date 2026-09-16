@@ -377,7 +377,11 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
         put([P(*a), P(*b), P(*c)], mat)
 
     def arcs(u, v, radii, mats, n=12):
-        m = min(w, h)
+        # Fit the biggest arc to the paper: its span sideways is twice the
+        # outer radius, and its top rises above the arc's own centre line. On
+        # min(w, h) alone a rainbow ran off both edges of every wide sheet.
+        outer = max(r1 for _, r1 in radii)
+        m = min(.5 * w / outer, (.5 - v) * h / outer) * .92
         for (r0, r1), mat in zip(radii, mats):
             for k in range(n):
                 a, b = k * math.pi / n, (k + 1) * math.pi / n

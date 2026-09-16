@@ -31,7 +31,19 @@ export const ROUTINES={
   jeannie:{day:[s("Jeannie's bedroom",13.85,7.1,'read'),s("Jeannie's bedroom",14.55,6.95,'read',{up:true})],night:[s("Jeannie's bedroom",15.9,6.9,'nap',{up:true})]},
   shannon:{day:[s('Living room',.64,2.13,'sit',{up:true}),s('Living room',2.35,2.3,'play')],night:[s("Mom & Dad's bedroom",14.25,5.45,'nap',{up:true})]},
   tristan:{day:[s('Living room',.63,2.96,'sit',{up:true}),s('Living room',1.9,1.8,'play')],night:[s("Mom & Dad's bedroom",15.0,5.45,'nap',{up:true})]},
+  // The house cats. By day they sit side by side on the mat at the sunroom's
+  // back door watching the garden (as in the photo), or potter about — Bubba
+  // to the kitchen window, Beebs up on a sunroom wicker chair; at night Bubba
+  // curls up at the foot of the big bed and Beebs at the foot of Cory's.
+  bubba:{day:[s('Sunroom',4.30,11.0,'sit',{face:[4.4,15]}),s('Kitchen',1.0,7.0,'look',{face:[.2,7.2]})],night:[s("Mom & Dad's bedroom",14.2,6.3,'nap',{up:true})]},
+  beebs:{day:[s('Sunroom',4.95,11.0,'sit',{face:[4.9,15]}),s('Sunroom',6.7,9.67,'sit',{up:true})],night:[s("Cory's bedroom",17.3,1.1,'nap',{up:true})]},
 };
+// Bubba and Beebs live here whoever is playing: real cats, not Craepets, so
+// they have no save slot, no owner and no egg — a coat colour and a name.
+export const HOUSE_CATS=[
+  {id:'bubba',name:'Bubba',pet:{species:'cat',name:'Bubba'},palette:{body:'#d98a3d',accent:'#fff6e8',eyes:'#e0b23a'}},
+  {id:'beebs',name:'Beebs',pet:{species:'cat',name:'Beebs'},palette:{body:'#2a2629',accent:'#fff6e8',eyes:'#8fc24c'}},
+];
 // The top of the furniture at a spot: the highest collision box containing
 // it whose top is a pet's hop above the floor (a bed, a seat, a beanbag).
 export function furnitureTop(colliders,x,z,floor){

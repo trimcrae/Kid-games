@@ -555,6 +555,11 @@ wallbox('Kitchen sink wall', (-.07, 6.25, 1.3), (.14, 3.62, 2.6))
 wallbox('Dining storage wall', (7.87, 6.30, 1.3), (.14, 3.4, 2.6), cream)
 wallbox('Foyer side wall', (7.87, .96, 1.3), (.14, 1.92, 2.6), cream)
 wallbox('Entry return east wall', (7.87, -.90, 1.3), (.14, 1.80, 2.6), cream)
+# The stair bay's front wall: between the foyer side wall and the lower family
+# room's front wall, beside the flight down to the family room. Without it the
+# bay stood open to the front lawn from the family room floor up to the main
+# ceiling (you looked out past the lower flight's railing at the sky).
+wallbox('Stair bay front wall', (8.78, -.035, .70), (1.86, .14, 3.80), cream)
 # Rear access is through dining. The house window left of it is visible in Photo 1.
 wallbox('Rear wall window base', (2.32, 8.04, .32), (4.64, .14, .64), cream)
 wallbox('Rear wall window header', (2.32, 8.04, 2.43), (4.64, .14, .34), cream)
@@ -1261,6 +1266,9 @@ ceilings = collection('14 | Ceilings - hidden for dollhouse')
 asset('Main level ceilings', confidence='estimated 2.6m ceiling height')
 box('Main rectangular ceiling', (3.9, 4, 2.65), (7.95, 8.1, .10), white)
 box('Upper stairwell ceiling', (9.40, 4.01, 3.58), (3.3, 1.30, .10), white)
+# Over the stair bay beside the descending flight, which the main ceiling
+# (ending at X 7.875) and the lower room's ceiling (from X 9.64) both miss.
+box('Stair bay ceiling', (8.78, .95, 2.65), (1.90, 2.10, .10), white)
 asset('Sloped soffit above descending stairs', photos='9,10', confidence='visible bulkhead; slope estimated')
 profile = [(7.78, 2.12), (9.70, 1.16), (9.70, 2.66), (7.78, 2.66)]
 mesh = bpy.data.meshes.new('Stair soffit solid wedge')

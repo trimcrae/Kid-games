@@ -5,7 +5,7 @@ import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
 import {createNeighborhood} from './neighborhood.mjs';
-import {ROUTINES,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260915-arrows';
+import {ROUTINES,HOUSE_CATS,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260916-cats';
 import {createGround} from './pet-ground.mjs';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
 import {createEmotes} from './emotes.mjs';
@@ -220,7 +220,8 @@ export async function createHouseLife(tour){
   // it was), a switch of player adds and removes only the pets that changed
   // hands, and a body that leaves is disposed with its name and bubble.
   function updateRoamers(){
-    const family=api.family().filter(p=>isFamily(p.id)&&p.id!==engine.who()&&p.pet&&typeof p.pet==='object');
+    // …and the house cats, who are always home (companions.mjs HOUSE_CATS).
+    const family=[...api.family().filter(p=>isFamily(p.id)&&p.id!==engine.who()&&p.pet&&typeof p.pet==='object'),...HOUSE_CATS];
     const looks=family.map(p=>JSON.stringify([p.pet.name,p.pet.species,p.pet.colour,p.pet.wear,!!p.pet.egg]));
     const key=JSON.stringify(family.map((p,i)=>[p.id,looks[i]]));if(key===roamKey)return;roamKey=key;
     const was=new Map(roamers.map(r=>[r.id,r]));roamers=[];
@@ -242,7 +243,7 @@ export async function createHouseLife(tour){
       if(!day.length){const f=freeSpot(world,home[2],-home[3],home[4],keepClear);if(!f)return null;day=[{room:homeName,act:'look',up:false,...f,stand:f,face:null}];}
       c=createCompanion({id:p.id,egg:!!p.pet.egg,day,night});
     }
-    const mesh=creature(p.pet,api.palette(p.pet.colour));mesh.scale.setScalar(PET_SCALE);
+    const mesh=creature(p.pet,p.palette||api.palette(p.pet.colour));mesh.scale.setScalar(PET_SCALE);
     // Cache the body bounds before adding the name sprite. A floor-origin
     // distance misses tall ears/heads even when they intersect the camera.
     const bounds=new THREE.Box3().setFromObject(mesh);
@@ -256,7 +257,7 @@ export async function createHouseLife(tour){
     // Drawn over the scene (a door frame never cuts it in half); it's only
     // shown while its anchor is in plain sight (see the companion loop).
     label.material.depthTest=false;label.renderOrder=6;
-    return {id:p.id,name:p.pet.name||p.name,look,mesh,label,labelY:label.position.y,cameraBounds,c,emote:null,los:false,losAt:0,losWas:null,near:false,drawn:false,visY:null};
+    return {id:p.id,name:p.pet.name||p.name,kind:p.pet.species==='cat'?'cat':'pet',look,mesh,label,labelY:label.position.y,cameraBounds,c,emote:null,los:false,losAt:0,losWas:null,near:false,drawn:false,visY:null};
   }
   let lastPlace=null,arriveAt=0,lifeClock=0;const _ndc=new THREE.Vector3();
   function inSight(r){const cam=tour.camera,p=r.c.point,h=r.cameraBounds.maxY;_ndc.set(p.x,r.mesh.position.y+h*.6,p.z).project(cam);
@@ -295,7 +296,7 @@ export async function createHouseLife(tour){
   // corner, beside the chair and sofa, under the window, pictures on the wall.
   function updateDecor(){
     const items=api.placed(),style=api.style(),key=JSON.stringify([items.map(i=>i.id),style]);if(key===decorKey)return;decorKey=key;
-    scene.traverse(mesh=>{if(!mesh.isMesh)return;if(!mesh.userData.houseBaseColor&&mesh.name)mesh.userData.houseBaseColor=mesh.material.color.clone();if(!style)return;
+    scene.traverse(mesh=>{if(!mesh.isMesh||!mesh.material?.color)return;if(!mesh.userData.houseBaseColor&&mesh.name)mesh.userData.houseBaseColor=mesh.material.color.clone();if(!style)return;
       if(/architectural walls|Cutaway walls/.test(mesh.name)&&/Pale sage/.test(mesh.name))mesh.material.color.set(style.wall.a);
       if(/Floors and split levels \/ Oak floor/.test(mesh.name))mesh.material.color.copy(mesh.userData.houseBaseColor).lerp(new THREE.Color(style.floor.a),.65);
     });
@@ -423,7 +424,7 @@ export async function createHouseLife(tour){
     const name=$('location').textContent;if(!active||name===roomShown)return;roomShown=name;
     const el=document.querySelector('.location');el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
   }
-  const overlayIds=['welcome','family-panel','save-panel','activity-choices','rooms','activity-panel'];
+  const overlayIds=['welcome','family-panel','save-panel','activity-choices','rooms','activity-panel','map'];
   // Which room you're in: the nearest room spot on this floor you can see at
   // head height without looking through a wall. Also notes whether the
   // "walk there" destination's bubble is in plain sight.
@@ -639,6 +640,15 @@ export async function createHouseLife(tour){
       coach(time,active);placeSpeech();roomToast(active);
     },
     // The top of your pet's head (above its ears), for anchoring a speech bubble.
+    // Everyone in the house for the Marauder's Map: you (your pet), the
+    // family's pets and the cats — where they are, which way they face and
+    // whether they're on the move or asleep.
+    everyone(){
+      const list=[],pet=engine.state().pet;
+      if(pet)list.push({id:'you',name:pet.egg?'Your egg':pet.name,kind:'you',x:player.x,y:player.y,z:player.z,heading,walking:moving&&tour.active,sleeping:false});
+      for(const r of roamers)list.push({id:r.id,name:r.name,kind:r.kind,x:r.c.point.x,y:r.c.point.y,z:r.c.point.z,heading:r.c.heading,walking:r.c.walking,sleeping:!!r.c.sleeping});
+      return list;
+    },
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
     diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
         // What a steadiness check samples each frame: where it wants to face, its gait, drawn height, name pill and bubble.

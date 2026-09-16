@@ -73,6 +73,20 @@ for(const sp of species){
   const g=build({species:'glimmr'});run(g,1);assert(g.userData.rig.bones.body.position.y>.02,'glimmr does not float');
   assert(g.userData.rig.shadow.material.opacity<build({species:'blorb'}).userData.rig.shadow.material.opacity,'floating shadow not lighter');
 }
+// The house cats: four legs on the same bones, ears and a tail that animate,
+// below every family pet's head, and never up on their hind legs in any pose.
+{
+  for(const [name,body] of [['Bubba','#d98a3d'],['Beebs','#2a2629']]){
+    const c=creature({species:'cat',name},{body,accent:'#fff6e8'});c.scale.setScalar(PET_SCALE);c.updateMatrixWorld(true);const rig=c.userData.rig;
+    assert(rig.cat&&rig.ears&&rig.tail,`${name} is not rigged as a cat`);
+    assert(draws(c)<=3,`${name} costs ${draws(c)} draw calls`);
+    const b=bounds(c,true),size=b.getSize(new THREE.Vector3());
+    assert(size.y>.3&&size.y<.42&&size.z>size.y,`${name} is not cat-shaped: ${size.toArray().map(v=>v.toFixed(2))}`);
+    const rest=b.max.y;
+    for(const pose of [{},{sit:1},{lie:1},{stretch:1}]){rig.setPose(pose);run(c,.8,{moving:true,speed:1});run(c,.4);assert(bounds(c,true).max.y<=rest+.03,`${name} ${JSON.stringify(pose)} reared up`);}
+    assert(bounds(c,true).max.y<LEGACY.craepet[4],`${name} stands taller than a Craepet`);
+  }
+}
 // A petpet rides at its own tiny scale on the same three draw calls.
 {
   const owner=build({species:'blorb'}),p=petpet('duckling');assert(draws(p)<=3,'petpet draw calls');
@@ -85,7 +99,7 @@ for(const sp of species){
   const shadowMap=c.userData.rig.shadow.material.map;let shadowFreed=false;shadowMap.addEventListener('dispose',()=>shadowFreed=true);
   disposeCreature(c);assert.equal(freed,mats.size,'materials not all disposed');assert(!shadowFreed,'shared shadow texture was disposed');
 }
-console.log(`PASS creature rig: ${species.length} bodies + eggs keep their rest bounds, ≤3 draw calls each, every pose under the ${table.toFixed(2)} m table; gait, blink, sleep, float and reduced motion behave`);
+console.log(`PASS creature rig: ${species.length} bodies + eggs + 2 cats keep their rest bounds, ≤3 draw calls each, every pose under the ${table.toFixed(2)} m table; gait, blink, sleep, float and reduced motion behave`);
 
 // Every creature shares one coat program: the same shader source and cache key.
 {const a=build({species:'zibbit'}),b=build({species:'glimmr',egg:true}),p=petpet('moth');const keys=new Set();for(const c of [a,b,p])c.traverse(m=>{if(m.isSkinnedMesh){keys.add(m.material.customProgramCacheKey()+'|'+m.material.onBeforeCompile.toString().length+'|'+m.material.type);}});assert.equal(keys.size,1,'creatures compile more than one shader program: '+[...keys]);}

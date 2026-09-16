@@ -35,11 +35,26 @@ const BONES=[
   ['legL','root',[-.16,.12,.07]],['legR','root',[.16,.12,.07]],
 ];
 const boneIndex=Object.fromEntries(BONES.map((b,i)=>[b[0],i]));
-function makeSkeleton(){
-  const bones=BONES.map(([name])=>{const b=new THREE.Bone();b.name=name;return b;});
-  BONES.forEach(([name,parent,pos],i)=>{
+// The house cats stand on four legs, so their skeleton has the same bones in
+// the same order (the animation only knows the names) at a cat's rest
+// positions: the head out in front, shoulders (the 'leg' bones, which step)
+// and hips (the 'arm' bones, which swing) at either end of a long body, the
+// tail out behind. Creature units; PET_SCALE makes a cat ~28 cm at the
+// shoulder, a little smaller than the family's pets.
+const CAT_BONES=[
+  ['root',null,[0,0,0]],['body','root',[0,0,0]],['torso','body',[0,0,0]],['head','body',[0,.42,.24]],
+  ['earL','head',[-.08,.58,.26]],['earR','head',[.08,.58,.26]],
+  ['eyes','head',[0,.505,.41]],['sleepEyes','head',[0,.505,.415]],['happyEyes','head',[0,.50,.415]],
+  ['mouth','head',[0,.42,.45]],['mouthOpen','head',[0,.41,.44]],
+  ['armL','body',[-.09,.32,-.20]],['armR','body',[.09,.32,-.20]],
+  ['tail','body',[0,.36,-.30]],['wingL','body',[-.1,.4,-.2]],['wingR','body',[.1,.4,-.2]],
+  ['legL','root',[-.075,.30,.16]],['legR','root',[.075,.30,.16]],
+];
+function makeSkeleton(layout=BONES){
+  const bones=layout.map(([name])=>{const b=new THREE.Bone();b.name=name;return b;});
+  layout.forEach(([name,parent,pos],i)=>{
     const b=bones[i];
-    if(parent){const p=BONES[boneIndex[parent]][2];b.position.set(pos[0]-p[0],pos[1]-p[1],pos[2]-p[2]);bones[boneIndex[parent]].add(b);}
+    if(parent){const p=layout[boneIndex[parent]][2];b.position.set(pos[0]-p[0],pos[1]-p[1],pos[2]-p[2]);bones[boneIndex[parent]].add(b);}
   });
   bones.forEach(b=>{b.userData.rest=b.position.clone();b.rotation.order='YXZ';});
   return bones;
@@ -179,7 +194,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]) {
   const root=new THREE.Group();
-  const bones=makeSkeleton(),B=Object.fromEntries(bones.map(b=>[b.name,b]));
+  const bones=makeSkeleton(pet.species==='cat'?CAT_BONES:BONES),B=Object.fromEntries(bones.map(b=>[b.name,b]));
   root.add(bones[0]);
   // A patterned colour (stripes, spots, rainbow…) is painted into the fur's
   // vertex colours from the same 16x22 pattern the 2D art uses, so every
@@ -192,7 +207,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   // part(kind, bone, position, size, {shape, rot, color, rough, emit})
   function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0}={}){
     const fur=kind==='fur';
-    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?FUR:(color||ACCENT)),pattern:fur?pattern:null,rough:fur?1:rough,emit});
+    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?1:rough,emit});
   }
   const sp=pet.species,rig={species:sp,egg:!!pet.egg,hopper:sp==='snorbit'&&!pet.egg,floater:sp==='glimmr'&&!pet.egg,
     ears:false,tail:false,wings:false};
@@ -200,6 +215,40 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   if(pet.egg){
     part('detail','body',[0,.30,0],[.24,.32,.24],{shape:roundSphere,rough:.7});
     for(let i=0;i<7;i++){let a=i*2.4;part('fur','body',[Math.sin(a)*.225,.22+(i%3)*.09,Math.cos(a)*.225],[.045,.045,.025]);}
+  }else if(sp==='cat'){
+    // A house cat: a long body on four legs, pointed ears, a whiskery muzzle
+    // and a tail held up. The coat is palette.body; the bib, belly, muzzle
+    // and paws are white (an orange-and-white or a black-and-white cat).
+    rig.ears=rig.tail=true;rig.cat=true;
+    const white={color:WHITE},eye=palette.eyes||'#8fc24c';
+    part('fur','torso',[0,.36,-.02],[.17,.16,.32],{shape:roundSphere});
+    part('fur','torso',[0,.38,.14],[.15,.15,.14],{shape:roundSphere});
+    part('fur','torso',[0,.37,-.20],[.16,.15,.14],{shape:roundSphere});
+    part('fur','torso',[0,.29,-.02],[.13,.10,.27],{shape:roundSphere,...white});
+    part('fur','torso',[0,.37,.20],[.10,.10,.07],white);
+    part('fur','head',[0,.48,.30],[.135,.125,.13],{shape:roundSphere});
+    for(const side of [-1,1]){
+      const L=side<0?'L':'R';
+      part('fur','head',[side*.07,.44,.36],[.06,.05,.05]);
+      part('fur','ear'+L,[side*.075,.60,.27],[.045,.10,.035],{shape:cone,rot:[0,0,-side*.15]});
+      part('detail','ear'+L,[side*.075,.595,.285],[.022,.06,.01],{shape:cone,rot:[0,0,-side*.15],color:'#f0a8b0',rough:.8});
+      part('detail','eyes',[side*.055,.505,.405],[.03,.034,.018],{color:eye,rough:.3});
+      part('detail','eyes',[side*.055,.505,.42],[.011,.03,.008],{color:'#1a120e',rough:.25});
+      part('detail','eyes',[side*.055+.012,.515,.424],[.008,.009,.005],{color:WHITE,rough:.2,emit:.55});
+      part('detail','sleepEyes',[side*.055,.505,.418],[.032,.02,.032],{shape:arc,rot:[0,0,Math.PI],color:DARK,rough:.6});
+      part('detail','happyEyes',[side*.055,.50,.418],[.03,.035,.03],{shape:arc,color:DARK,rough:.6});
+      // Front legs step (shoulders); hind legs swing (hips).
+      part('fur','leg'+L,[side*.075,.17,.16],[.05,.17,.055]);
+      part('fur','leg'+L,[side*.075,.035,.17],[.055,.035,.06],white);
+      part('fur','arm'+L,[side*.09,.20,-.20],[.065,.18,.085]);
+      part('fur','arm'+L,[side*.09,.035,-.16],[.058,.035,.065],white);
+    }
+    part('fur','head',[0,.435,.40],[.075,.055,.06],white);
+    part('detail','head',[0,.45,.445],[.018,.014,.012],{color:'#e8899a',rough:.5});
+    part('detail','mouth',[0,.42,.45],[.02,.014,.02],{shape:arc,rot:[.2,0,Math.PI],color:DARK,rough:.6});
+    part('detail','mouthOpen',[0,.41,.44],[.02,.018,.01],{color:'#5a2a33',rough:.5});
+    part('fur','tail',[0,.44,-.42],[.035,.035,.24],{rot:[.9,0,0]});
+    part('fur','tail',[0,.55,-.53],[.03,.03,.05],white);
   }else{
     part('fur','torso',[0,.36,0],[.26,.30,.22],{shape:roundSphere});
     part('detail','torso',[0,.35,.182],[.17,.21,.055]);
@@ -332,7 +381,8 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     st.lean=approach(st.lean,reduced?0:v*.035*walkW,k);
     st.roll=approach(st.roll,reduced?0:clamp(-turnRate*.06,-.2,.2)*walkW,k);
     const shake=reduced?0:Math.sin(st.t*30)*.32*st.shake;
-    B.body.rotation.set(st.lean+.22*st.sniff+.3*st.stretch,shake,st.roll);
+    // (A cat stretches long and low, not up on its hind legs.)
+    B.body.rotation.set(st.lean+.22*st.sniff+.3*st.stretch*(rig.cat?.15:1),shake,st.roll);
     // Head: look, sniff the floor, droop when tired or asleep, tilt to scratch.
     const nod=reduced?0:Math.sin(st.t*14)*.05*st.sniff;
     B.head.rotation.set(-st.lookPitch+.4*st.sniff+.3*st.lie+.12*st.expr.tired-.25*st.expr.yawn+nod-.3*st.stretch,st.lookYaw-shake*1.4,(reduced?0:Math.sin(st.t*9))*.05*st.scratch+.1*st.scratch);

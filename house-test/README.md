@@ -10,7 +10,7 @@ Control your own Craepet in third person with WASD or arrows. Starting the game
 (or clicking the view) captures the pointer, like any first-person game: the
 cursor disappears and moving the mouse turns the view as far as you like.
 Hold Shift to move faster, press Space to jump, E to choose a nearby activity, R for rooms,
-and F for family. Escape releases the mouse and pauses. If a browser refuses
+M for the Marauder's Map and F for family. Escape releases the mouse and pauses. If a browser refuses
 capture (some in-app or embedded browsers can), the footer says so, hold-and-drag
 looking takes over, and a normal Chrome or Edge tab gives full mouse look.
 Touch devices have a movement pad, a 🐾 jump button and drag-to-look. Every pet
@@ -47,6 +47,20 @@ study:
   moods and needs you can see; the family's other adopted pets (only theirs:
   no shopkeepers or visitors) keep routines tied to real furniture (napping on
   their owners' beds at night), walk real routes between them and greet you.
+  The house cats, **Bubba** (orange and white) and **Beebs** (black and
+  white), live here whoever is playing (`HOUSE_CATS`): a four-legged body on
+  the same rig, by day sitting side by side on the mat at the sunroom's back
+  door watching the garden, at night curled up on the family's beds.
+- **The Marauder's Map** (`marauders-map.mjs`, `M` or the 📜 button): a
+  parchment plan of each floor drawn in ink from the walking boxes (floors,
+  walls, furniture, room names), with everyone in the house — your pet, the
+  family's pets and the cats — as paw prints that pad along where they've
+  walked, under a name banner. It opens with the oath and closes with
+  "Mischief managed".
+- **The living-room computer** (`monitor.mjs`) is playing Craepets: its
+  screen shows the very frame you are looking at, one frame behind, so the
+  screen is on the screen and so on into the glow (the post pass's own frame
+  texture on one quad; no second render).
 - **Lighting** (`lighting.mjs`, `sky.mjs`, `materials.mjs`, `post-aa.mjs`):
   a game shading tier, warm room light with soft shadows, contact shadows,
   time of day and weather matching the HUD clock, and FXAA.

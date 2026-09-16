@@ -12,7 +12,7 @@ import {glazingBoxes} from '../house-test/glazing.mjs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
-import {ROUTINES,isFamily,resolveSpots,createCompanion,updateCompanion,KEEP_CLEAR,lineOfSight,callOver,freeSpot} from '../house-test/companions.mjs';
+import {ROUTINES,HOUSE_CATS,isFamily,resolveSpots,createCompanion,updateCompanion,KEEP_CLEAR,lineOfSight,callOver,freeSpot} from '../house-test/companions.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 // The game's own walking world: the sunroom's glass walls block walking too.
@@ -42,10 +42,13 @@ for(const [id,rt] of Object.entries(ROUTINES)){
   }
 }
 for(const id of ['cory','ellie','jeannie','shannon','tristan'])assert(spots[id].night.every(s=>s.act==='nap'&&s.up),`${id} does not nap on a bed at night`);
-// Only the family's own pets live here: a routine for each family member,
-// none for the valley's shopkeepers, and the Visitor's pet isn't family.
-assert.deepEqual(Object.keys(ROUTINES).sort(),['cory','ellie','jeannie','kieran','shannon','tristan'],'a routine for someone outside the family');
+// Only the family's own pets live here — a routine for each family member,
+// none for the valley's shopkeepers, and the Visitor's pet isn't family —
+// plus the two house cats, who nap on the family's beds at night.
+assert.deepEqual(Object.keys(ROUTINES).sort(),['beebs','bubba','cory','ellie','jeannie','kieran','shannon','tristan'],'a routine for someone outside the family');
 assert(Object.keys(ROUTINES).every(isFamily)&&!isFamily('guest'),'the Visitor counted as family');
+assert.deepEqual(HOUSE_CATS.map(c=>c.id),['bubba','beebs'],'the house cats');
+for(const id of ['bubba','beebs'])assert(spots[id].night.every(s=>s.act==='nap'&&s.up)&&spots[id].day.some(s=>s.room==='Sunroom'),`${id} does not sit in the sunroom by day and nap on a bed at night`);
 const make=(id,o={})=>createCompanion({id,day:spots[id].day,night:spots[id].night,random:seeded(3),...o});
 const far={x:0,y:-50,z:0};
 // 2. By day a companion mostly stays at its places, doing its thing.

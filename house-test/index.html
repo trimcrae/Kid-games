@@ -8,11 +8,11 @@
   <title>Craepets · At home</title>
   <!-- ?v= revisions: a fresh page never runs with an older cached copy of the
        startup files it was changed together with (Pages caches for 10 min). -->
-  <link rel="stylesheet" href="style.css?v=20260916-jump">
+  <link rel="stylesheet" href="style.css?v=20260916-map">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f7f78' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
 </head>
 <body>
-  <canvas id="view" aria-label="Third-person Craepets house. Up and down arrows walk, left and right arrows turn, Space jumps up onto the furniture, E to use what is nearby, R for rooms, F for family, Escape to pause." tabindex="0"></canvas>
+  <canvas id="view" aria-label="Third-person Craepets house. Up and down arrows walk, left and right arrows turn, Space jumps up onto the furniture, E to use what is nearby, R for rooms, M for the map, F for family, Escape to pause." tabindex="0"></canvas>
   <div id="crosshair" aria-hidden="true" hidden></div>
   <div id="fade" aria-hidden="true"></div>
   <header class="topbar">
@@ -29,6 +29,7 @@
       <button id="pet-button" aria-label="Say hello to your pet"><span aria-hidden="true">💬</span><span class="label">Say hello</span><kbd>C</kbd></button>
       <button id="family-button" aria-label="Family"><span aria-hidden="true">👪</span><span class="label">Family</span><kbd>F</kbd></button>
       <button id="rooms-button" aria-label="Rooms" aria-expanded="false" aria-controls="rooms"><span aria-hidden="true">🗺️</span><span class="label">Rooms</span><kbd>R</kbd></button>
+      <button id="map-button" aria-label="The Marauder's Map: where everyone is" aria-expanded="false" aria-controls="map"><span aria-hidden="true">📜</span><span class="label">Map</span><kbd>M</kbd></button>
       <button id="pause-button" aria-label="Pause and show controls"><span aria-hidden="true">Ⅱ</span></button>
     </div>
   </header>
@@ -65,6 +66,7 @@
         <div><kbd>Space</kbd><span>jump — hop onto beds, couches and tables</span></div>
         <div><kbd>E</kbd><span>use what's nearby</span></div>
         <div><kbd>R</kbd> <kbd>F</kbd><span>rooms · family</span></div>
+        <div><kbd>M</kbd><span>the Marauder's Map — where everyone is</span></div>
         <div><kbd>C</kbd><span>say hello</span></div>
         <div><kbd>Esc</kbd><span>pause</span></div>
       </div>
@@ -76,12 +78,24 @@
       <p class="saves-link house-only"><button id="welcome-saves" class="link">Playing on another device? Bring your saves</button></p>
     </section>
   </main>
+  <section id="map" class="overlay" hidden aria-label="The Marauder's Map" role="dialog" aria-modal="true">
+    <div class="parchment">
+      <button id="close-map" aria-label="Mischief managed: close the map">×</button>
+      <p class="map-oath" aria-hidden="true">I solemnly swear that I am up to no good.</p>
+      <h2 class="map-title">The Marauder's Map</h2>
+      <p class="map-sub">Messrs Bubba &amp; Beebs, purveyors of aids to mischief-makers, are proud to present <em>the McRae house</em></p>
+      <nav id="map-floors" aria-label="Floors"></nav>
+      <canvas id="map-canvas" role="img" aria-label="A map of this floor with everyone's paw prints"></canvas>
+      <p id="map-elsewhere" role="status" aria-live="polite"></p>
+      <button id="map-done">Mischief managed</button>
+    </div>
+  </section>
   <section id="activity-choices" class="overlay" hidden><div class="welcome-card"><h2 id="choices-room">What would you like to do?</h2><div id="choices-list"></div><button id="close-choices">Back to walking</button></div></section>
   <section id="family-panel" class="overlay" hidden><div class="welcome-card"><div class="panel-title"><h2 id="family-title">Who's playing?</h2><button id="close-family" aria-label="Close family">×</button></div><p id="family-note">Everyone has their own Craepet and their own progress.</p><div id="family-list"></div><p class="saves-link house-only"><button id="load-saves" class="link">Bring saved pets from another device</button></p><p class="study-note house-only" id="save-status">House saves stay separate from the original game.</p><p class="study-note game-only">These are your Craepets game saves: the same pets, coins and things as in the valley.</p><a class="house-only" href="../games/craepets/">Visit the original Craepets valley ↗</a><a class="game-only" href="../games/craepets/" data-back-to-game>⬅ Back to the Craepets game</a></div></section>
   <section id="save-panel" class="overlay" hidden><div class="welcome-card"><h2>Bring your saved pets home</h2><p id="save-message" role="status"></p><button id="load-original-saves">Load all original saves from this browser</button><p><a href="saves.html" target="_blank" rel="noopener">Family save transfer page ↗</a></p><p>From another browser or device: export your family on that page, then choose the JSON file here.</p><label for="single-save-profile">For an older single-pet backup, whose save is it?</label><select id="single-save-profile"></select><input type="file" id="save-file" accept=".json,application/json" aria-label="Choose a Craepets backup"><div id="save-preview"></div><button id="apply-saves" class="primary" hidden>Use these complete saves</button><div class="save-actions"><button id="close-saves">Back</button><button id="new-pet-instead">Start a new pet instead</button></div></div></section>
   <section id="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activity-title" hidden><div class="activity-heading"><div><small id="activity-room"></small><h2 id="activity-title">Welcome</h2></div><button id="close-activity">Back to walking ↩</button></div><iframe id="activity-frame" title="Craepets room activity" src="activity.html"></iframe></section>
   <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div><button id="jump" type="button" aria-label="Jump"><span aria-hidden="true">🐾</span></button></div>
   <script src="boot.js?v=20260915-arrows"></script>
-  <script type="module" src="walkthrough.js?v=20260916-jump" onerror="window.houseBoot&amp;&amp;houseBoot.fail(new Error('A part of the house could not be downloaded'),'Part of the house could not be downloaded. Check the connection and try again, or go back to the Craepets game.')"></script>
+  <script type="module" src="walkthrough.js?v=20260916-map" onerror="window.houseBoot&amp;&amp;houseBoot.fail(new Error('A part of the house could not be downloaded'),'Part of the house could not be downloaded. Check the connection and try again, or go back to the Craepets game.')"></script>
 </body>
 </html>
