@@ -41,14 +41,17 @@ export function createMonitor(scene,renderer,{x,y,z,w,h,facing=[1,0,0]}={}){
   mesh.lookAt(x+facing[0],y+facing[1],z+facing[2]);
   scene.add(mesh);
   const size=new THREE.Vector2();
+  let on=true;
   return {
     mesh,
+    // A television is switched on and off (the computer is always on).
+    setOn(v){on=!!v;},get on(){return on;},
     // Once a frame, before the next render: pick up the post pass's frame
     // texture (it is made on the first render) and the canvas shape.
     tick(){
       const pass=renderer.render.postPass,tex=pass?.material?.uniforms?.frame?.value||null;
       if(tex!==material.uniforms.frame.value)material.uniforms.frame.value=tex;
-      material.uniforms.on.value=tex?1:0;
+      material.uniforms.on.value=tex&&on?1:0;
       renderer.getDrawingBufferSize(size);material.uniforms.canvasAspect.value=size.x/Math.max(1,size.y);
     },
   };

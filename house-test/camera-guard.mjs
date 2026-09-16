@@ -257,6 +257,8 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
   let state=null;
   return {
     reset(){state=null;},
+    // Another boom for a while (driving the car: further back and higher).
+    setRig(r){rig=r||CAMERA_RIG;state=null;},
     place(focus,yaw,pitch,dt,world,guard,clearance){
       const view=boomCamera(focus,yaw,pitch,world,guard,clearance,rig);
       if(!state)state={distance:view.distance,yaw,spin:0,ahead:Infinity,wait:0};

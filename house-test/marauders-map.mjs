@@ -56,7 +56,7 @@ export function createMaraudersMap({world,rooms,everyone,bindButton,reducedMotio
     const L=FLOORS.find(f=>f[0]===name)[1],boxes=[],outside=name==='Outside';
     // The page shows the house (or, outside, the house and its yards): the
     // street beyond the front lawn and stray boxes far off don't stretch it.
-    const lim=outside?{x0:-12,x1:24,y0:-9,y1:20}:{x0:-4,x1:19,y0:-3,y1:12};
+    const lim=outside?{x0:-12,x1:24,y0:-9,y1:28}:{x0:-4,x1:19,y0:-3,y1:12};
     let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
     for(const b of world.boxes){
       const kind=classify(b,L);if(!kind)continue;

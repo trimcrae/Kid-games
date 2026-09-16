@@ -57,6 +57,16 @@ study:
   family's pets and the cats — as paw prints that pad along where they've
   walked, under a name banner. It opens with the oath and closes with
   "Mischief managed".
+- **Things to use** (`interactions.mjs`, `E`): a pill says what E does
+  here. Swing on the back-yard swings, bounce on the trampoline (hold ↓ to
+  stop), get in the burgundy car and drive it out of the garage (arrows
+  drive and steer, Space honks, E gets out; it parks where you leave it),
+  open the fridge (both doors swing out on the snacks), play the piano in
+  the family room (1–8 or A–K play C to C, with the note named), switch the
+  televisions and ceiling fans on, rock in the rocking chairs and flush the
+  toilets. The parts that move come out of the export as their own draw
+  groups and collision boxes tagged with a prop key (`props` in
+  `house.json`); sounds are a tiny WebAudio synth, nothing downloaded.
 - **The living-room computer** (`monitor.mjs`) is playing Craepets: its
   screen shows the very frame you are looking at, one frame behind, so the
   screen is on the screen and so on into the glow (the post pass's own frame

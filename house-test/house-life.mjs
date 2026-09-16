@@ -35,7 +35,7 @@ export async function createHouseLife(tour){
   const neighborhood=createNeighborhood(scene,world);
   const startNew=()=>showActivity({id:'adopt',room:$('location').textContent||'Living room',icon:'🥚',name:'Welcome to the family',view:'nest'});
   const recovery=setupSaves({api,engine,tour,refresh:()=>sync(true),startNew});
-  let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,inAir=false,hopNow=0,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
+  let avatar,avatarSize=null,avatarBounds=null,avatarKey='',roamKey='',roamers=[],near=[],selected=null,destination=null,moving=false,inAir=false,ride=null,hopNow=0,speed=0,heading=Math.PI,wantHeading=Math.PI,syncAt=0,lastWho=null,decorKey='';
   const markers=[],decor=new THREE.Group();scene.add(decor);let sayTimer;
   // Pets stand on the visible floor finish (boards and tile sit above the
   // walking boxes), so their feet and contact shadows aren't buried.
@@ -465,6 +465,10 @@ export async function createHouseLife(tour){
     // paws stop padding, and the body follows the walking height exactly
     // instead of easing to it a tread at a time.
     airborne(flag){if(flag&&!inAir)coachDone('jump');inAir=!!flag;},
+    // Riding something (interactions.mjs): the body sits where it's told —
+    // offset from the walking position, tilted along — instead of standing.
+    ride(v){ride=v||null;},
+    say(text,ms){say(text,ms);},
     // A squash of the body on take-off and again as the paws touch down.
     hop(strength=1){hopNow=Math.max(hopNow,strength);},
     interact(){
@@ -480,7 +484,7 @@ export async function createHouseLife(tour){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       ground.frame();
       if(avatar){
-        const reduced=tour.reducedMotion,rig=avatar.userData.rig;let walking=active&&moving&&!inAir,gait=speed;
+        const reduced=tour.reducedMotion,rig=avatar.userData.rig;let walking=active&&moving&&!inAir&&!ride,gait=speed;
         if(hopNow){rig.hop(hopNow);hopNow=0;}
         // What the pet feels like doing: look back at you, sniff, sit, yawn,
         // doze off when tired… (pet-behaviour.mjs), from its real needs.
@@ -511,7 +515,9 @@ export async function createHouseLife(tour){
         else if(Math.abs(floorY-(stepHop?stepHop.to:visY))>.06)stepHop={from:visY,to:floorY,t:0};
         if(stepHop){stepHop.t+=dt/.18;const k=Math.min(1,stepHop.t);visY=stepHop.from+(stepHop.to-stepHop.from)*k*k*(3-2*k)+Math.sin(Math.PI*k)*.045;if(k>=1){visY=stepHop.to;stepHop=null;}}
         else visY=floorY;
-        avatar.position.set(player.x,visY,player.z);avatar.rotation.y=heading;
+        avatar.position.set(player.x,visY,player.z);avatar.rotation.y=heading;avatar.rotation.x=0;
+        if(ride){avatar.position.set(player.x+(ride.dx||0),player.y+(ride.dy||0),player.z+(ride.dz||0));avatar.rotation.x=ride.tilt||0;visY=avatar.position.y;stepHop=null;
+          if(ride.pose)petOut={...petOut,pose:ride.pose,expression:ride.expression||petOut.expression};}
         rig.setExpression(petOut.expression);rig.setPose(petOut.pose);rig.look(...petOut.look);if(petOut.hop)rig.hop(petOut.hop);
         rig.setGrime(petNeeds&&petNeeds.clean<35?.35+.65*(35-petNeeds.clean)/35:0);
         // Wings and tails tuck in beside a wall instead of poking through it.

@@ -3444,7 +3444,8 @@
       "<h2>🏡 Walk around the house!</h2>" +
       '<p class="sub">Take ' + esc(S.pet.name) + " for a walk through our house in 3D — every room, the garden " +
         "and the street. Press Space to jump up onto the beds, the couches and the tables, say hello to " +
-        "Bubba and Beebs the cats, and open the Marauder's Map to see where everyone is. " +
+        "Bubba and Beebs the cats, open the Marauder's Map to see where everyone is, swing on the swings, " +
+        "bounce on the trampoline, play the piano and even drive the car. " +
         "The Farm, the Market, the games and everything else are in their own rooms there, " +
         "with the same coins and things. Nothing here changes: the valley stays just as it is.</p>" +
       '<div class="walkbtns"><button class="act walkgo" data-walk="1" style="--ac:#2f7f78"><span class="em">🚶</span>Start walking</button>' +
