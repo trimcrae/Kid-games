@@ -65,7 +65,9 @@ try{
   const state=await page.evaluate(()=>window.houseTest.state);
   assert(state.depthPrepass.enabled,'prepass on by default');
   assert(state.depthPrepass.triangles>50000&&state.depthPrepass.triangles<250000,'occluder mesh size '+state.depthPrepass.triangles);
-  assert(state.programs<=32,'program count '+state.programs);
+  // 32 until the use-with-E props, the monitor and the house cats (e234ba9) added their own;
+  // the baked-light variants replace the unbaked ones one for one.
+  assert(state.programs<=37,'program count '+state.programs);
   const compare=await page.evaluate(async()=>{
     const {renderer,scene,camera}=window.__prepassTest,gl=renderer.getContext(),control=renderer.houseDepthPrepass,out=[];
     const grab=()=>{renderer.render(scene,camera);const w=gl.drawingBufferWidth,h=gl.drawingBufferHeight,p=new Uint8Array(w*h*4);gl.readPixels(0,0,w,h,gl.RGBA,gl.UNSIGNED_BYTE,p);return p;};
