@@ -1,9 +1,8 @@
 {
-  "title": null,
-  "date": null,
-  "audio": null,
-  "link": null,
-  "duration": null,
-  "fetched": null,
-  "note": "Filled in once a day by .github/workflows/yoto-daily.yml (the newest Yoto Daily episode). Placeholder so the page never 404s."
+  "title": "Games with Pema",
+  "date": "Sun, 13 Sep 2026 10:24:49 GMT",
+  "audio": "https://sphinx.acast.com/p/open/s/62cebd180ce17d0012d3347b/e/6aa679f148975e97950dbc92/media.mp3",
+  "link": "https://yoto.space/yoto-daily",
+  "duration": "17:32",
+  "fetched": "2026-09-16T20:56:49Z"
 }
