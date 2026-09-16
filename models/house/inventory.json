@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "6d2057afaaae2e092723970edad56bb7ea548d7d217657167219937859da8b87",
+  "generator_sha256": "beeeb80060124fca7854d7e8ed6d3129c6f9ecc5c89a8e4d58479df7967d7f90",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -11,10 +11,10 @@
     "dressing.py",
     "photoreal.py"
   ],
-  "blender_version": "4.5.13 LTS",
+  "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 8012,
-  "mesh_objects": 6914,
+  "objects": 8010,
+  "mesh_objects": 6912,
   "cameras": [
     "overview",
     "sunroom",
@@ -4506,7 +4506,7 @@
       "location_m": [
         14.399999618530273,
         1.3300000429153442,
-        0.48499995470046997
+        0.48499998450279236
       ]
     },
     {
@@ -4517,7 +4517,7 @@
       "location_m": [
         14.399999618530273,
         3.240000009536743,
-        0.4850001633167267
+        0.4850001335144043
       ]
     },
     {

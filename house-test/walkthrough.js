@@ -12,6 +12,8 @@ import {loadHouseOcclusion} from './ambient-occlusion.mjs';
 import {warmupCast} from './creatures.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-mystery';
 import {glazingBoxes} from './glazing.mjs';
+import {createMonitor} from './monitor.mjs';
+import {createMaraudersMap} from './marauders-map.mjs';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
@@ -102,7 +104,7 @@ try {
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
 if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 
-let guard=null,cameraClearance=lensClearance();
+let guard=null,cameraClearance=lensClearance(),monitor=null,map=null;
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=0,focusY=.03,active=false,ready=false,failed=false;
 // A graphics reset (the driver restarting) loses the 3D context: the house
 // would stay blank, or wait for ever on shaders that can no longer finish.
@@ -149,7 +151,7 @@ function teleport(room){
   placePlayer(p,heading);
   $('location').textContent=room[1];$('level').textContent=room[0].toUpperCase();
   lighting.setRoom(room[1],player);
-  $('hint').textContent='Arrow keys to walk and turn · Space to jump · E for activities · R for rooms';
+  $('hint').textContent='Arrow keys to walk and turn · Space to jump · E for activities · R rooms · M map';
   render();return true;
 }
 // Steering is the arrow keys: ↑/↓ walk forward and back, ←/→ turn (Shift
@@ -159,7 +161,7 @@ const LOOK_SPEED=.0024,PITCH_MIN=-.8,PITCH_MAX=.42;
 const finePointer=()=>matchMedia('(pointer:fine)').matches;
 let turned=0;
 const TURN_SPEED=1.9;   // rad/s for keyboard turning (about a third of a turn a second)
-const KEYS_HINT='Arrow keys to walk and turn · Space to jump · E to use · R for rooms · Esc to pause';
+const KEYS_HINT='Arrow keys to walk and turn · Space to jump · E to use · R rooms · M map · Esc to pause';
 // Everyday controls are taught by one-off coach marks in house-life.mjs and
 // on the welcome/pause card, not by a permanent line of shortcuts.
 function setHint(text,show=false){const h=$('hint');h.textContent=text;h.toggleAttribute('data-show',show);}
@@ -215,9 +217,12 @@ bindButton($('reset'),()=>jumpTo(rooms[0]));
 document.addEventListener('keydown',e=>{
   if(!$('activity-choices').hidden){if(e.code==='Escape')$('close-choices').click();return;}
   if(!$('activity-panel').hidden||!$('family-panel').hidden||!$('save-panel').hidden)return;
+  // The Marauder's Map: M (or Escape) folds it away again; nothing else while it's open.
+  if(map?.isOpen){if(e.code==='Escape'||e.code==='KeyM'){e.preventDefault();map.close();}return;}
   if(e.code==='Escape'){if(!$('rooms').hidden)showRooms(false);else pause();return;}
   if(!active)return;
   if(e.code==='KeyR'){e.preventDefault();showRooms(true);return;}
+  if(e.code==='KeyM'){e.preventDefault();map?.open();return;}
   if(e.code==='KeyF'){e.preventDefault();$('family-button').click();return;}
   if(e.code==='KeyC'){e.preventDefault();$('pet-button').click();return;}
   if(e.code==='KeyE'){e.preventDefault();life?.interact();return;}
@@ -307,6 +312,7 @@ function render(){
   const fov=baseFov+lensClose*(Math.min(70,baseFov+13)-baseFov);
   if(Math.abs(camera.fov-fov)>.05){camera.fov=fov;camera.updateProjectionMatrix();}
   fadePet(dt);
+  monitor?.tick();
   renderer.render(scene,camera);
 }
 // Close in, your own pet would cover the bottom of the screen: as it covers
@@ -499,6 +505,10 @@ async function load(){
     }
     performance.mark('house:meshes');
     lighting.load(data);
+    // The living-room computer, playing Craepets (monitor.mjs). Its screen is
+    // the 'Monitor screen' box in build.py: on the desk in the front-window
+    // corner, facing +x into the room.
+    monitor=createMonitor(scene,renderer,{x:.352,y:1.05,z:-.66,w:.56,h:.32,facing:[1,0,0]});
     const contact=createContactShadows(scene,data.colliders||[]);
     // Compile the house shaders in parallel on the GPU process while the main
     // thread builds the camera guard and walking world. Only the screen
@@ -527,6 +537,12 @@ async function load(){
     life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     life.face(yaw+Math.PI,true);performance.mark('house:life');
     leaveHouse=()=>life.leave();
+    // The Marauder's Map (marauders-map.mjs): where everyone in the house is.
+    // Open, it takes over like the Rooms board; closed, walking carries on.
+    map=createMaraudersMap({world,rooms,everyone:()=>life.everyone(),bindButton,reducedMotion,
+      onOpen(){if(!$('rooms').hidden)showRooms(false);suspend();welcome.hidden=true;$('map-button').setAttribute('aria-expanded','true');},
+      onClose(){$('map-button').setAttribute('aria-expanded','false');if(ready)resume();}});
+    bindButton($('map-button'),()=>map.toggle());
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
@@ -547,8 +563,15 @@ async function load(){
     const keyShadowLater=()=>{playedOnce||=active;if(!playedOnce||active){setTimeout(keyShadowLater,700);return;}lighting.enableKeyShadow(()=>active);};
     setTimeout(keyShadowLater,700);
     // Read-only diagnostic snapshot for repeatable local QA and family testing.
-    window.houseTest={get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
+    // QA: jump to a room and look a given way (yaw/pitch in radians), so a
+    // headless browser can photograph any corner of the house.
+    window.houseTest={go(where,y=null,p=0){
+        if(typeof where==='string'){const room=rooms.find(r=>r[1]===where);if(!room||!teleport(room))return false;}
+        else{const spot=world.safeSpot(where.x,where.y,where.z);if(!spot)return false;placePlayer(spot,y??yaw);}
+        if(y!==null)yaw=y;pitch=p;followRig.reset();render();return true;},
+      get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
       airborne:!!body?.airborne,verticalSpeed:body?.vy??0,jumps:body?.jumps??0,standingOn:standingOn(),
+      map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),
       turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     boot.fail(error,$('loading').textContent);}
