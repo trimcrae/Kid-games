@@ -73,7 +73,8 @@ body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden
 #journey{position:fixed;top:84px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px;border-radius:999px;background:var(--nav);color:#fff;font-size:16px;font-weight:800;box-shadow:var(--shadow);max-width:92vw;z-index:3}
 #journey-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #journey button{background:#ffffff26;border:0;box-shadow:none;color:#fff;min-width:44px;border-radius:999px;font-size:20px;padding:0 10px}
-#coach,#hint{position:fixed;left:50%;transform:translateX(-50%);max-width:min(560px,92vw);padding:12px 18px;border-radius:16px;background:var(--panel);border:2px solid var(--line);box-shadow:var(--shadow);font-size:16px;font-weight:700;text-align:center;line-height:1.45;pointer-events:none;z-index:3}
+/* (max-content: centred with left:50%, a tip would otherwise shrink to half the screen.) */
+#coach,#hint{position:fixed;left:50%;transform:translateX(-50%);width:max-content;max-width:min(560px,92vw);padding:12px 18px;border-radius:16px;background:var(--panel);border:2px solid var(--line);box-shadow:var(--shadow);font-size:16px;font-weight:700;text-align:center;line-height:1.45;pointer-events:none;z-index:3}
 #coach{bottom:112px}
 #coach kbd{margin:0 2px}
 #hint{bottom:112px;display:none}
@@ -178,7 +179,9 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   #touch-controls{display:block}
   .fine-only,kbd{display:none!important}
   .touch-instructions{display:block}
-  /* Above the walking pad and the jump paw, not behind them. */
+  /* Above the walking pad and the jump paw, not behind them. (In #here, below,
+     these places give way to the stack; they remain for a page cached from
+     before it.) */
   #nearby{left:auto;right:12px;transform:none;bottom:146px;max-width:calc(100vw - 172px);border-radius:24px}
   #nearby-actions{justify-content:flex-end}
   #coach,#hint{bottom:auto;top:150px}
@@ -263,7 +266,44 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
 @media(prefers-reduced-motion:reduce){#map .map-oath,#map-canvas{transition:none}}
 
 /* --- Use what's here (interactions.mjs): one pill above the action bubble --- */
-#interact{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 18px 6px 10px;border-radius:999px;background:#fff1ea;border:2px solid #f6cdbd;color:var(--ink);font-size:17px;box-shadow:var(--shadow);z-index:2}
-#interact kbd{font-size:13px}
-#nearby:not([hidden])~#interact{bottom:96px}
-@media(pointer:coarse){#interact{bottom:auto;top:150px;left:auto;right:12px;transform:none}#interact kbd{display:none!important}}
+#interact{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;min-height:52px;height:auto;max-width:94vw;padding:6px 18px 6px 10px;border-radius:999px;background:#fff1ea;border:2px solid #f6cdbd;color:var(--ink);font-size:17px;line-height:1.25;text-align:left;box-shadow:var(--shadow);z-index:2;-webkit-appearance:none;appearance:none}
+#interact kbd{font-size:13px;flex-shrink:0}
+#interact-label{min-width:0;overflow-wrap:break-word}
+/* On a keyboard screen the bubble and the pill keep their own places (#here
+   is only a box on touch screens, below). */
+#here{display:contents}
+@media(pointer:fine) and (min-height:501px){
+  /* The tip and the directions step up over the pill instead of hiding it. */
+  body:has(#interact:not([hidden])) :is(#coach,#hint){bottom:160px}
+  body:has(#interact:not([hidden])) #coach:not([hidden])~#hint[data-show]{bottom:224px}
+}
+@media(pointer:coarse){
+  /* One stack at the right, above the jump paw and clear of the walking pad's
+     corner: the things to do here, with the pill on top. Each keeps its own
+     size, so a long label wraps inside the column instead of stretching. */
+  #here{position:fixed;right:12px;bottom:146px;display:flex;flex-direction:column-reverse;align-items:flex-end;gap:8px;max-width:calc(100vw - 172px);z-index:2;pointer-events:none}
+  #here>*{pointer-events:auto;position:static;transform:none;max-width:100%}
+  #here #nearby{padding:6px;gap:6px}
+  #here #nearby-actions{gap:6px}
+  #here #nearby-actions button{min-height:46px;padding:4px 12px;font-size:14px;line-height:1.2}
+  #interact{left:auto;right:12px;bottom:226px;transform:none;max-width:calc(100vw - 172px);min-height:48px;padding:6px 14px 6px 10px;border-radius:24px;font-size:15px}
+  #interact kbd{display:none!important}
+}
+@media(pointer:coarse) and (max-width:340px){
+  /* The smallest phones: a little more room for the stack, and a tip that
+     takes two lines rather than four. */
+  #here{max-width:calc(100vw - 158px)}
+  #interact{max-width:calc(100vw - 158px);min-height:44px;padding:4px 12px 4px 8px;font-size:14px;line-height:1.2}
+  #here #nearby-actions button{min-height:44px}
+  #coach,#hint{font-size:14px;padding:8px 12px;max-width:calc(100vw - 16px)}
+  body.from-game #coach{top:174px}
+}
+@media(pointer:coarse) and (max-height:500px){
+  /* Sideways: the stack sits low, just left of the paw; the tip moves beside
+     the walking pad so the two never meet in the middle. */
+  #here{bottom:12px;right:130px;max-width:min(240px,calc(50vw - 160px))}
+  #here>*{max-width:100%}
+  #coach,#hint,#coach:not([hidden])~#hint[data-show],#journey:not([hidden])~#coach{left:156px;transform:none;max-width:min(30vw,calc(50vw - 168px))}
+  /* (The game edition's upright top:196px would otherwise stretch the tip from there to the bottom.) */
+  body.from-game :is(#coach,#hint),body.from-game #coach:not([hidden])~#hint[data-show],body.from-game #journey:not([hidden])~#coach{top:auto}
+}
