@@ -1115,8 +1115,15 @@ const GAMES = {
     if (await page.locator(".plot.full").count() < 1) throw new Error("no berries ripened");
     if (await page.evaluate(() => !!Craepets.state().pet.egg)) throw new Error("three right answers did not hatch the egg");
     if (!(await page.evaluate(() => Craepets.diary().some((e) => e.e === "🐣")))) throw new Error("hatching was not written in the diary");
-    // and the front page of the nest says what is new today
+    // The release announcement knocks once, as it should: a player taps
+    // "Later" and carries on (its own test covers the reveal itself).
     await page.locator('[data-go="nest"]').click();
+    await page.waitForTimeout(300);
+    if (await page.locator("#news-back").count()) {
+      await page.locator("[data-newslater]").click();
+      if (await page.locator("#news-back").count()) throw new Error("the what's-new door would not close");
+    }
+    // and the front page of the nest says what is new today
     if (!(await page.locator(".panel.times .trow").count())) throw new Error("the Valley Times is blank");
     if (!/today/.test(await page.locator(".panel.times").textContent())) throw new Error("the Valley Times has no weather");
 

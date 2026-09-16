@@ -5,7 +5,12 @@ const here=__dirname, source=path.join(here,'../games/craepets');
 let html=fs.readFileSync(path.join(source,'index.html'),'utf8');
 html=html.replace('<head>','<head>\n  <base href="../games/craepets/">\n  <meta name="robots" content="noindex,nofollow,noarchive">');
 html=html.replace(/  <link rel="stylesheet" href="https:\/\/fonts.googleapis[^\n]+\n/,'');
-html=html.replace('<script src="craepets.js"></script>','<script src="../../house-test/save-mode.js"></script>\n  <script src="../../house-test/save-copy.js"></script>\n  <script src="../../house-test/engine.js"></script>');
+// The game's own script tag carries a ?v= cache version, so match it loosely
+// — and fail loudly rather than silently ship an activity page that loads the
+// original engine with none of the house's save plumbing.
+const gameTag=/<script src="craepets\.js(?:\?[^"]*)?"><\/script>/;
+if(!gameTag.test(html))throw Error('Game script tag changed');
+html=html.replace(gameTag,'<script src="../../house-test/save-mode.js"></script>\n  <script src="../../house-test/save-copy.js"></script>\n  <script src="../../house-test/engine.js"></script>');
 html=html.replace('</head>','<link rel="stylesheet" href="../../house-test/activity.css">\n</head>');
 fs.writeFileSync(path.join(here,'activity.html'),html);
 let js=fs.readFileSync(path.join(source,'craepets.js'),'utf8');

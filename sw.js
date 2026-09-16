@@ -17,9 +17,9 @@ const CACHE = "arcade-" + VERSION;
 
 const CORE = [
   "./",
-  "assets/css/style.css",
-  "assets/js/games.js",
-  "assets/js/app.js",
+  "assets/css/style.css?v=20260915-mystery",
+  "assets/js/games.js?v=20260915-mystery",
+  "assets/js/app.js?v=20260915-mystery",
   "manifest.webmanifest",
   "assets/icons/icon-192.png",
 ];
@@ -59,7 +59,10 @@ function warmPage(cache, url) {
     cache.put(pageUrl, res.clone());
     return res.text().then((html) => {
       const subs = [];
-      const re = /(?:src|href)="([^"]+\.(?:js|css))"/g;
+      // A page may ask for a script or style with a version query
+      // (…/craepets.js?v=2026…): warm that exact URL, or offline would
+      // fall back to a copy the page never asks for.
+      const re = /(?:src|href)="([^"]+\.(?:js|css)(?:\?[^"]*)?)"/g;
       let m;
       while ((m = re.exec(html))) {
         if (!/^https?:/.test(m[1])) subs.push(new URL(m[1], pageUrl).href);

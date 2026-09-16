@@ -378,6 +378,118 @@
   }
 
   /* =========================================================
+     ✨ WHAT'S NEW — the mystery door.
+     The quiet NEW card on the nest is easy to walk straight past, so a
+     big release also knocks once: a wrapped-up door that opens, on a
+     tap, onto the thing it was hiding. It knocks ONCE per browser and
+     then lives behind the ✨ What's new button in the menu, which is
+     how you open it again on purpose.
+
+     This is furniture, not progress: it is kept under its own key and
+     NOTHING about it ever touches a valley's save. The id is a version
+     — the next big thing gets a new one and knocks again, whatever the
+     player did with this one.
+     ========================================================= */
+  var NEWS_KEY = "craepets.news";
+  var NEWS_ID = "walk3d-1";
+  var newsOn = null;                 // null = shut; false = door; true = opened
+  var newsReturn = null;             // where the keyboard was before it knocked
+  /* A browser with storage switched off (a private window, a full disk) would
+     otherwise be knocked on at every single render. Remember it here too, so
+     the worst case is once per page rather than for ever. */
+  var newsToldHere = false;
+  function newsState() {
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(NEWS_KEY)); } catch (e) { s = null; }
+    return (s && typeof s === "object") ? s : {};
+  }
+  function newsSeen() { return newsToldHere || newsState().seen === NEWS_ID; }
+  function markNews() {
+    newsToldHere = true;
+    var s = newsState();
+    s.seen = NEWS_ID;
+    try { localStorage.setItem(NEWS_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+
+  /* The door itself, and then what was behind it. Same rounded card, same
+     cream-and-purple, same big buttons as everything else in the valley. */
+  function newsHtml(open) {
+    var body = open
+      ? '<div class="newsdoor open" aria-hidden="true">🏡<span class="spark">✨</span></div>' +
+        '<h3 id="news-title">🏡 Walk around the house in 3D!</h3>' +
+        '<p class="sub">TA-DA! You can walk right inside our real house now — and you go as ' +
+          esc(S.pet.name) + " yourself! Every room, up the stairs, out to the garden and off down " +
+          "the street. The Farm, the Market, the games and everything else are in their own rooms " +
+          "there, with the very same coins and things. Your valley stays exactly as it is.</p>" +
+        '<div class="newsbtns">' +
+          '<button class="act newsgo" data-walk="1" style="--ac:#2f7f78"><span class="em">🚶</span>Start walking</button>' +
+          '<button class="ghost small" data-newslater="1">Maybe later</button>' +
+        "</div>"
+      : '<div class="newsdoor" aria-hidden="true">🚪<span class="key">🔑</span></div>' +
+        '<h3 id="news-title">✉️ A secret door appeared!</h3>' +
+        '<p class="sub">Something brand new is hiding behind this door. Turn the key and see what it is…</p>' +
+        '<div class="newsbtns">' +
+          '<button class="act newsgo" data-newsopen="1" style="--ac:#8a5cff"><span class="em">🔑</span>Open the door</button>' +
+          '<button class="ghost small" data-newslater="1">Later</button>' +
+        "</div>";
+    return '<div class="news-back" id="news-back"><div class="newsbox" id="news-box" role="dialog" ' +
+      'aria-modal="true" aria-labelledby="news-title">' +
+      '<span class="newstag">NEW</span>' + body +
+    "</div></div>";
+  }
+  function dropNews() {
+    var n = $("#news-back");
+    if (n && n.parentNode) n.parentNode.removeChild(n);
+  }
+  /* Opening it counts as having been told, whichever way it was opened —
+     so a player who shuts the tab on the door still never gets knocked
+     on twice. */
+  function openNews(open) {
+    var box = $("#news-box");
+    if (!box) newsReturn = document.activeElement;
+    newsOn = !!open;
+    markNews();
+    var wrap = document.createElement("div");
+    wrap.innerHTML = newsHtml(newsOn);
+    // Turning the key opens the DOOR: swap what is inside the card and leave
+    // the card and the backdrop where they are, so the whole screen doesn't
+    // flash on the very beat the surprise lands.
+    var next = $(".newsbox", wrap);
+    if (box && next) box.innerHTML = next.innerHTML;
+    else document.body.appendChild(wrap.firstChild);
+    var first = $(".newsbox .act");
+    if (first && first.focus) { try { first.focus(); } catch (e) {} }
+  }
+  function closeNews() {
+    dropNews();
+    newsOn = null;
+    if (newsReturn && newsReturn.focus && document.contains(newsReturn)) {
+      try { newsReturn.focus(); } catch (e) {}
+    }
+    newsReturn = null;
+  }
+  /* Knock only when the valley is genuinely idle: never inside the house
+     (the same engine runs the rooms there), never before there is a pet,
+     never over a sheet, a question, a mini-game or a box someone is
+     typing in — and never twice. */
+  function newsBusy() {
+    if (inHouse() || !S || !S.pet || S.pet.egg) return true;
+    // Only on the nest, where the valley opens and where nobody is in the
+    // middle of anything — never on the way into a room or an activity.
+    // ("What's new" in the menu still opens it anywhere.)
+    if (view !== "nest") return true;
+    if ($("#sheet-back") || $("#news-back")) return true;
+    if (catchOn || match || sess || battle || pendingBuy || spinning || visit) return true;
+    var el = document.activeElement;
+    if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA")) return true;
+    return !!$("#game input, #game textarea");
+  }
+  function maybeNews() {
+    if (newsSeen() || newsBusy()) return;
+    openNews(false);
+  }
+
+  /* =========================================================
      TIME PASSING — needs sag while you're away, energy comes back.
      Nothing ever falls below FLOOR: a Craepet cannot be harmed by
      a week at Grandma's.
@@ -1885,6 +1997,7 @@
       if (next && next.scrollIntoView) { try { next.scrollIntoView({ block: "nearest" }); } catch (e) {} }
     }
     afterRender(g);
+    maybeNews();
     save();
   }
 
@@ -2136,8 +2249,12 @@
         (walkState().visited ? "" : " (new)") + '">' +
         '<span class="ic" aria-hidden="true">🚶</span><span class="lb">Walk</span>' +
         (walkState().visited ? "" : '<span class="dot new">NEW</span>') + "</button>";
+    // …and the way to open the ✨ What's new door again, on purpose.
+    var newsBtn = inHouse() ? "" :
+      '<button data-news="1" class="newsnav" aria-label="What\'s new in Craepets">' +
+        '<span class="ic" aria-hidden="true">✨</span><span class="lb">What\'s new</span></button>';
     var mine = NAV.filter(function (n) { return PLACES_ROW.indexOf(n[0]) === -1; })
-      .map(function (n) { return btn(n) + (n[0] === "nest" ? walkBtn : ""); }).join("");
+      .map(function (n) { return btn(n) + (n[0] === "nest" ? walkBtn + newsBtn : ""); }).join("");
     return '<nav class="nav" id="nav" aria-label="Where to go">' +
       '<div class="navrow"><span class="navlabel" aria-hidden="true">Valley</span>' + places + "</div>" +
       '<div class="navrow"><span class="navlabel" aria-hidden="true">Mine</span>' + mine + "</div>" +
@@ -5931,6 +6048,17 @@
       return;
     }
 
+    // ✨ What's new — the mystery door. The reveal's own "Start walking"
+    // is a plain [data-walk] button, so it goes exactly where the nest
+    // card's does. Nothing here ever navigates by itself.
+    if (t.closest("[data-newsopen]")) {
+      sfx("win");
+      try { window.Confetti && Confetti.burst({ count: 80 }); } catch (e) {}
+      return openNews(true);
+    }
+    if (t.closest("[data-newslater]") || t.id === "news-back") { sfx("pop"); return closeNews(); }
+    if (t.closest("[data-news]")) { sfx("pop"); return openNews(false); }
+
     if (t.closest("[data-tapegg]") && S.pet && S.pet.egg) return tapEgg();
     var partyBtn = t.closest("[data-claimparty]");
     if (partyBtn) return claimParty(partyBtn.dataset.claimparty);
@@ -6245,7 +6373,27 @@
 
     if (ev.key === "Escape") {
       hush();
+      // the ✨ What's new door is on top of everything: Escape is "Later"
+      if ($("#news-back")) { ev.preventDefault(); closeNews(); return; }
       if ($("#sheet-back")) { ev.preventDefault(); closeSheet(); }
+      return;
+    }
+    // While the door is open it is the only thing on the page. Keep the
+    // keyboard inside it rather than let Tab wander off behind the backdrop,
+    // and let NOTHING else through: a 3 pressed over the door must not answer
+    // the question waiting underneath it. Its own buttons still work, because
+    // Enter and Space on a focused button are the browser's business.
+    if ($("#news-back")) {
+      if (ev.key === "Tab") {
+        var keep = document.querySelectorAll("#news-box button");
+        if (keep.length) {
+          var edge = keep[ev.shiftKey ? 0 : keep.length - 1];
+          if (document.activeElement === edge || !$("#news-box").contains(document.activeElement)) {
+            ev.preventDefault();
+            try { keep[ev.shiftKey ? keep.length - 1 : 0].focus(); } catch (e) {}
+          }
+        }
+      }
       return;
     }
 
@@ -6423,6 +6571,7 @@
     petpets: function () { return S.petpets; },
     _event: function (i) { randomEvent(i); },
     _events: function (on) { eventsOn = !!on; },
+    news: function () { return { id: NEWS_ID, seen: newsSeen(), open: newsOn }; },
     catching: function () { return catchOn; },
     match: function () { return match; },
     weather: weatherToday,

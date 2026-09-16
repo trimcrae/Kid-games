@@ -219,6 +219,18 @@ body {
   font-size: 1.35rem;
   margin: 0 0 0.35rem;
 }
+/* "NEW · …": a game's optional flag, so something new isn't lost in the blurb. */
+.game-card .new-flag {
+  display: inline-block;
+  margin: 0 0 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent, #8a5cff);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+}
 .game-card p {
   font-size: 0.95rem;
   margin: 0;

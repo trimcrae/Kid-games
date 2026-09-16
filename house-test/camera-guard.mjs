@@ -190,11 +190,12 @@ export function nearPlaneReach(camera){
   const t=Math.tan(camera.fov*Math.PI/360);
   return camera.near*Math.sqrt(1+t*t*(1+camera.aspect*camera.aspect));
 }
-// Third-person follow camera: a game framing, a little above and behind the
-// pet so the room and floor around it
-// read, rather than a wide lens at head height: about 25° down by default,
-// low enough to see across the room to its walls. Shared with the tests.
-export const CAMERA_RIG={target:.5,boom:2.1,height:1.1};
+// Third-person follow camera: a near eye-level game framing. It sits a little
+// over a metre up — just above the kitchen worktops, so it still sees over
+// them — and aims at a point above the pet's head, which puts the sightline
+// about 9° below level: the room and its far wall read, the pet sits low in
+// the frame, and nothing looks down on it. Shared with the tests.
+export const CAMERA_RIG={target:.7,boom:2.1,height:1.02};
 // Low furniture boxes (walking colliders) the sightline from a to b crosses
 // before `fraction`: the camera may only look past one from above it, so it
 // stops in front of the first one it would be below.

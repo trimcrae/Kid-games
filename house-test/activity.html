@@ -10,7 +10,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥚</text></svg>" />
   <meta name="theme-color" content="#5ec6a8" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="../../assets/css/style.css?v=20260915-mystery" />
   <!-- the handwriting for the diary and the Quest Board posters (falls back to the system's if offline) -->
   <style>
     /* ===========================================================
@@ -296,6 +296,42 @@
     }
     .walknew .walkbtns { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
     .walknew .walkgo { flex: 1 1 12rem; }
+    /* ✨ What's new — the mystery door that knocks once for a big release
+       and then lives behind the What's new button in the menu. Same rounded
+       card, same cream-and-purple, same big buttons as the rest of the valley. */
+    .nav button.newsnav { border-color: #ffd0e2; }
+    .news-back {
+      position: fixed; inset: 0; background: rgba(43,36,64,0.55); z-index: 60;
+      display: flex; align-items: center; justify-content: center; padding: 0.9rem;
+      animation: fade 0.18s ease;
+    }
+    .newsbox {
+      position: relative; text-align: center; width: min(460px, 100%);
+      background: linear-gradient(135deg, #fff8ec 0%, #f4efff 100%);
+      border: 4px solid #d8c9ff; border-radius: 24px; padding: 1.15rem 0.9rem 0.9rem;
+      max-height: 88vh; overflow-y: auto;
+      box-shadow: 0 18px 48px rgba(43,36,64,0.35);
+      animation: news-in 0.26s ease backwards;
+    }
+    @keyframes news-in { from { opacity: 0; transform: scale(0.86); } }
+    .newsbox h3 { margin: 0.35rem 0 0.2rem; font-size: 1.2rem; }
+    .newsbox .sub { margin: 0 0 0.85rem; color: #6a6385; font-size: 0.92rem; }
+    .newsbox .newstag {
+      position: absolute; top: 0.7rem; left: 0.8rem;
+      background: var(--pink); color: #fff; font-weight: bold; font-size: 0.7rem;
+      letter-spacing: 0.08em; border-radius: 999px; padding: 0.15rem 0.55rem;
+    }
+    /* the door: it rocks on its hinges until you turn the key */
+    .newsdoor {
+      position: relative; display: inline-block; font-size: 3.6rem; line-height: 1.15;
+      animation: news-rock 1.7s ease-in-out infinite;
+    }
+    .newsdoor .key, .newsdoor .spark { position: absolute; right: -0.5em; bottom: 0.05em; font-size: 0.45em; }
+    .newsdoor.open { animation: news-tada 0.5s ease; }
+    @keyframes news-rock { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg) scale(1.05); } }
+    @keyframes news-tada { from { transform: scale(0.4) rotate(-14deg); opacity: 0; } }
+    .newsbtns { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: center; }
+    .newsbox .newsgo { flex: 1 1 12rem; }
 
     /* --- panels --- */
     .panel {
@@ -1084,7 +1120,8 @@
     @media (prefers-reduced-motion: reduce) {
       .bubble, .floaty, .sheet, .sheet-back, .toast, .choice.right, .choice.wrong,
       .choice.hint, .fighter.lunge img, .fighter.foe.lunge img, .fighter.hit img,
-      .fighter.heal img, .fighter .dmg, .charge.ready i.on { animation: none; }
+      .fighter.heal img, .fighter .dmg, .charge.ready i.on,
+      .news-back, .newsbox, .newsdoor, .newsdoor.open { animation: none; }
       .wheel.spinning { transition: none; }
       .who:hover, .nav button:hover, .choice:hover:not(:disabled), .item:hover:not(:disabled),
       .act:hover:not(:disabled), .ghost:hover, .sw:hover, .adopt:hover { transform: none; }
