@@ -14,6 +14,7 @@ import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHead
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs';
 import {createMaraudersMap} from './marauders-map.mjs';
+import {createInteractions} from './interactions.mjs';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
@@ -104,7 +105,9 @@ try {
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
 if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 
-let guard=null,cameraClearance=lensClearance(),monitor=null,map=null;
+let guard=null,cameraClearance=lensClearance(),monitor=null,map=null,interactions=null;
+// The movable parts of the house (export_walkthrough.py props), by key.
+const propMeshes={};
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=0,focusY=.03,active=false,ready=false,failed=false;
 // A graphics reset (the driver restarting) loses the 3D context: the house
 // would stay blank, or wait for ever on shaders that can no longer finish.
@@ -140,7 +143,7 @@ const followRig=createFollowRig({reducedMotion});let arrivalYaw=null;
 function placePlayer(p,heading){
   // A new spot always starts standing still on solid ground, never mid-jump.
   Object.assign(player,p);pitch=0;focusY=p.y;velocity={x:0,z:0};followRig.reset();
-  body?.reset(player);life?.airborne?.(false);
+  body?.reset(player);life?.airborne?.(false);interactions?.stop();
   yaw=arrivalYaw=arrivalHeading(player,heading,pitch,world,guard,cameraClearance);life?.face(yaw+Math.PI,true);
   updateLocation();
 }
@@ -167,7 +170,7 @@ const KEYS_HINT='Arrow keys to walk and turn · Space to jump · E to use · R r
 function setHint(text,show=false){const h=$('hint');h.textContent=text;h.toggleAttribute('data-show',show);}
 // Every way of stopping (pause, a panel, a lost window) drops all input at once.
 function releaseInput(){keys.clear();endJoy();drag=null;velocity={x:0,z:0};turnRate=0;body?.reset(player);}
-function suspend(){active=false;releaseInput();$('touch-controls').style.visibility='hidden';}
+function suspend(){active=false;releaseInput();interactions?.stop();$('touch-controls').style.visibility='hidden';}
 // Pause is its own small sheet (the same #welcome overlay in pause mode, so
 // the ids players, tests and tools rely on stay put): no onboarding copy.
 function pause(){suspend();welcome.dataset.mode='pause';welcome.hidden=false;start.textContent='Keep playing';start.focus();}
@@ -219,13 +222,19 @@ document.addEventListener('keydown',e=>{
   if(!$('activity-panel').hidden||!$('family-panel').hidden||!$('save-panel').hidden)return;
   // The Marauder's Map: M (or Escape) folds it away again; nothing else while it's open.
   if(map?.isOpen){if(e.code==='Escape'||e.code==='KeyM'){e.preventDefault();map.close();}return;}
-  if(e.code==='Escape'){if(!$('rooms').hidden)showRooms(false);else pause();return;}
+  if(e.code==='Escape'&&!interactions?.active){if(!$('rooms').hidden)showRooms(false);else pause();return;}
   if(!active)return;
   if(e.code==='KeyR'){e.preventDefault();showRooms(true);return;}
   if(e.code==='KeyM'){e.preventDefault();map?.open();return;}
   if(e.code==='KeyF'){e.preventDefault();$('family-button').click();return;}
   if(e.code==='KeyC'){e.preventDefault();$('pet-button').click();return;}
-  if(e.code==='KeyE'){e.preventDefault();life?.interact();return;}
+  // E uses what's here: gets you off whatever you're on, on to what's in
+  // reach (interactions.mjs), or into the room's activity.
+  if(interactions?.active){
+    if(e.code==='KeyE'||e.code==='Escape'){e.preventDefault();interactions.stop();return;}
+    if(interactions.key(e.code)){e.preventDefault();return;}
+  }
+  if(e.code==='KeyE'){e.preventDefault();if(!interactions?.start())life?.interact();return;}
   // Space jumps. The browser's own key repeat comes through while it is held,
   // which simply hops again on landing — exactly what a held key should do.
   if(e.code==='Space'){e.preventDefault();requestJump();return;}
@@ -420,7 +429,10 @@ function animate(now){
     // ←/→ turn the view: a tap turns a little, holding turns steadily, and it
     // stops the moment the key is let go — no drift after release. Both
     // together cancel. ↑/↓ walk forward and back.
-    const turnKeys=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
+    // On something (a swing, the car, the piano) the interaction moves the
+    // pet and may steer the view; the walking below is skipped.
+    const riding=interactions?.controls();
+    const turnKeys=riding?0:(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
     if(turnKeys){turnRate+=(turnKeys*TURN_SPEED-turnRate)*(reducedMotion?1:1-Math.exp(-dt*10));yaw+=turnRate*dt;
       if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));}
     else turnRate=0;
@@ -437,17 +449,23 @@ function animate(now){
     velocity.x+=(want.x-velocity.x)*blend;velocity.z+=(want.z-velocity.z)*blend;
     if(Math.hypot(velocity.x,velocity.z)<.02&&!want.x&&!want.z)velocity={x:0,z:0};
     const before={x:player.x,z:player.z};
-    // Walk, jump and fall (physics.mjs). Take-off and touchdown bounce the body.
-    const bounce=body.step(player,velocity.x*dt,velocity.z*dt,dt);
-    if(bounce)life?.hop?.(bounce==='jump'?.6:.45);
-    if(body.lost(player)){const safe=world.safeSpot(before.x,0,before.z)||world.safeSpot(player.x,0,player.z);if(safe)placePlayer(safe,yaw);}
+    const steer=interactions?.tick(dt,now/1000);
+    if(riding){
+      velocity={x:0,z:0};if(steer&&Number.isFinite(steer.yaw)){yaw=steer.yaw;}
+    }else{
+      // Walk, jump and fall (physics.mjs). Take-off and touchdown bounce the body.
+      const bounce=body.step(player,velocity.x*dt,velocity.z*dt,dt);
+      if(bounce)life?.hop?.(bounce==='jump'?.6:.45);
+      interactions?.landed(bounce);
+      if(body.lost(player)){const safe=world.safeSpot(before.x,0,before.z)||world.safeSpot(player.x,0,player.z);if(safe)placePlayer(safe,yaw);}
+    }
     life?.airborne?.(body.airborne);
     // Keep only the speed the walls actually allowed.
     if(dt>0){velocity.x=(player.x-before.x)/dt;velocity.z=(player.z-before.z)/dt;}
     life?.movement(player.x-before.x,player.z-before.z,Math.hypot(velocity.x,velocity.z));
     // Arrow steering: the pet faces where it is heading — it turns with the
     // view and backs up facing forward instead of spinning round.
-    if(turnKeys||keyForward)life?.face(yaw+Math.PI);
+    if(!riding&&(turnKeys||keyForward))life?.face(yaw+Math.PI);
     // The camera follows a smoothed floor height, so stairs don't jolt it; a
     // jump is quick and deliberate, so it keeps up more closely with that.
     focusY=THREE.MathUtils.lerp(focusY,player.y,reducedMotion?1:1-Math.exp(-dt*(body.airborne?20:12)));
@@ -502,6 +520,9 @@ async function load(){
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
+      // A movable part: never frustum-culled by its old bounds, and left out of
+      // the depth prepass, whose merged depth would stay where it was modelled.
+      if(g.prop){(propMeshes[g.prop]??=[]).push(mesh);mesh.frustumCulled=false;material.userData.houseFinish=false;}
     }
     performance.mark('house:meshes');
     lighting.load(data);
@@ -543,6 +564,9 @@ async function load(){
       onOpen(){if(!$('rooms').hidden)showRooms(false);suspend();welcome.hidden=true;$('map-button').setAttribute('aria-expanded','true');},
       onClose(){$('map-button').setAttribute('aria-expanded','false');if(ready)resume();}});
     bindButton($('map-button'),()=>map.toggle());
+    // Things to use with E (interactions.mjs): swings, the car, the fridge…
+    interactions=createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,bindButton,reducedMotion,
+      tour:{setCameraRig(r){followRig.setRig(r);},hint(text,show){if(text)setHint(text,show);else setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · 🐾 to jump · tap an activity');}}});
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
@@ -571,7 +595,7 @@ async function load(){
         if(y!==null)yaw=y;pitch=p;followRig.reset();render();return true;},
       get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
       airborne:!!body?.airborne,verticalSpeed:body?.vy??0,jumps:body?.jumps??0,standingOn:standingOn(),
-      map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),
+      map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),interactions:interactions?.state??null,
       turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     boot.fail(error,$('loading').textContent);}

@@ -8,7 +8,7 @@
   <title>Craepets · At home</title>
   <!-- ?v= revisions: a fresh page never runs with an older cached copy of the
        startup files it was changed together with (Pages caches for 10 min). -->
-  <link rel="stylesheet" href="style.css?v=20260916-map">
+  <link rel="stylesheet" href="style.css?v=20260916-use">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%232f7f78' d='M4 28L32 5l28 23v31H39V40H25v19H4z'/%3E%3C/svg%3E">
 </head>
 <body>
@@ -39,6 +39,7 @@
   <p id="coach" role="status" aria-live="polite" hidden></p>
   <p id="hint" role="status" aria-live="polite">Walk to a room to find something to do</p>
   <aside id="nearby" hidden aria-label="Things to do here"><small id="nearby-room"></small><div id="nearby-actions"></div></aside>
+  <button id="interact" class="fine-hint" hidden aria-label="Use what is here"><kbd>E</kbd><span id="interact-label"></span></button>
   <aside id="rooms" hidden aria-label="Rooms">
     <div class="panel-title"><h2>Where to?</h2><button id="close-rooms" aria-label="Close rooms">×</button></div>
     <p>Tap a room to go there. Tap 🐾 and your pet shows you the way on foot.</p>
@@ -64,7 +65,7 @@
         <div><kbd>←</kbd> <kbd>→</kbd><span>turn</span></div>
         <div><kbd>Shift</kbd><span>run</span></div>
         <div><kbd>Space</kbd><span>jump — hop onto beds, couches and tables</span></div>
-        <div><kbd>E</kbd><span>use what's nearby</span></div>
+        <div><kbd>E</kbd><span>use what's nearby — swing, drive the car, open the fridge, play the piano…</span></div>
         <div><kbd>R</kbd> <kbd>F</kbd><span>rooms · family</span></div>
         <div><kbd>M</kbd><span>the Marauder's Map — where everyone is</span></div>
         <div><kbd>C</kbd><span>say hello</span></div>
@@ -96,6 +97,6 @@
   <section id="activity-panel" role="dialog" aria-modal="true" aria-labelledby="activity-title" hidden><div class="activity-heading"><div><small id="activity-room"></small><h2 id="activity-title">Welcome</h2></div><button id="close-activity">Back to walking ↩</button></div><iframe id="activity-frame" title="Craepets room activity" src="activity.html"></iframe></section>
   <div id="touch-controls"><div id="joystick" aria-label="Drag to walk"><span></span></div><button id="jump" type="button" aria-label="Jump"><span aria-hidden="true">🐾</span></button></div>
   <script src="boot.js?v=20260915-arrows"></script>
-  <script type="module" src="walkthrough.js?v=20260916-map" onerror="window.houseBoot&amp;&amp;houseBoot.fail(new Error('A part of the house could not be downloaded'),'Part of the house could not be downloaded. Check the connection and try again, or go back to the Craepets game.')"></script>
+  <script type="module" src="walkthrough.js?v=20260916-use" onerror="window.houseBoot&amp;&amp;houseBoot.fail(new Error('A part of the house could not be downloaded'),'Part of the house could not be downloaded. Check the connection and try again, or go back to the Craepets game.')"></script>
 </body>
 </html>

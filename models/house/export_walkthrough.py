@@ -79,6 +79,30 @@ hinge = front_asset.matrix_world @ local_hinge
 hinge_axis = front_asset.matrix_world.to_quaternion() @ Vector((0, 0, 1))
 front_open = (Matrix.Translation(hinge) @ Matrix.Rotation(-math.pi/2, 4, hinge_axis)
               @ Matrix.Translation(-hinge))
+# Things the browser moves on their own (interactions.mjs): each gets its own
+# draw group(s) and collision boxes tagged with a prop key, so the page can
+# swing a seat, open a fridge door, spin a fan or drive the burgundy car
+# without touching the rest of the baked house.
+def prop_key(o, verts):
+    # `verts` are the evaluated world-space vertices: an object's origin may
+    # sit at its parent's (curves, tubes), so which side it is on is read
+    # from where its geometry actually is.
+    parent = o.parent.name if o.parent else ''
+    n = o.name
+    if parent == 'Garage burgundy SUV':
+        return 'car'
+    centre_x = sum(v.x for v in verts) / max(1, len(verts))
+    if parent == 'French-door refrigerator' and n.startswith(('French door', 'Curved vertical fridge handle')):
+        # Turned with the kitchen, the two doors end up side by side along X.
+        return 'fridge-' + ('a' if centre_x < o.parent.matrix_world.translation.x else 'b')
+    if parent == 'Rear swing frame' and n.startswith(('Swing suspension chains', 'Swing curved molded seat')):
+        return 'swing-' + ('a' if centre_x < o.parent.matrix_world.translation.x else 'b')
+    if parent == 'Lower ceiling fan' and n.startswith('Fan blade'):
+        return 'fan-family'
+    if parent == 'Primary white ceiling fan' and n.startswith('White fan blade'):
+        return 'fan-primary'
+    return None
+props = {}
 groups = {}
 colliders = []
 lights = []
@@ -121,7 +145,12 @@ for o in scene.objects:
     # pet walks past or through: rugs, wall art, shelf items, canopies.
     no_collision = browser_flag(o, 'browser_collide') is False or any(s in o.name.lower() for s in [
         'curtain','blind','shade','pleat','sloped ceiling','sloped header','soffit',
-        'leafy','net strand','quilt','pillow','duvet','ceiling fan','roof'])
+        'leafy','net strand','quilt','pillow','duvet','ceiling fan','roof',
+        # The trampoline's thin tubes (poles, seams, zipper, hoop) boxed the
+        # whole mat off, and the pad ring stood 8 cm proud of the mat, just out
+        # of a jump's reach; only the mat, the ladder and the backboard are solid.
+        'trampoline curved padded poles','trampoline blue spring pad','trampoline soft upper net seam','trampoline yellow zipper',
+        'trampoline basketball rim','trampoline hoop net','trampoline backboard supports','trampoline rim mounting'])
     dressing = dressing_collection(cname)
     station_prop = browser_flag(o, 'browser_station_prop')
     evaluated = o.evaluated_get(depsgraph)
@@ -131,6 +160,7 @@ for o in scene.objects:
         continue
     mesh.calc_loop_triangles()
     verts = [matrix @ v.co for v in mesh.vertices]
+    prop = prop_key(o, verts)
     normal_matrix = matrix.to_3x3().inverted().transposed()
     mirrored = matrix.to_3x3().determinant() < 0
     materials = list(o.data.materials)
@@ -140,12 +170,14 @@ for o in scene.objects:
         mat = materials[min(tri.material_index,len(materials)-1)] if materials else None
         matname = mat.name if mat else 'Default'
         color = list(mat.diffuse_color[:3]) if mat else [.65,.65,.6]
-        key = group_key(cname, matname)
+        key = ('prop:' + prop, matname) if prop else group_key(cname, matname)
         if key not in groups:
             finish = material_finish(mat)
             groups[key] = {'name': key[0]+' / '+matname,'color':color,
                            'glass':finish['surface'] == 'glass',
                            'finish':finish,'values':array.array('f')}
+            if prop:
+                groups[key]['prop'] = prop
         values = groups[key]['values']
         corners = []
         triangle_corners = oriented_triangle_corners(tri.vertices, tri.loops, mirrored)
@@ -165,6 +197,13 @@ for o in scene.objects:
             for refined in ao.tessellate(tuple(corners), can_tessellate and opaque):
                 for corner in refined:
                     values.extend(round(v, 5) for v in corner)
+    if prop:
+        # The prop's extent, in browser coordinates, for its pivot.
+        lo = [min(xyz(v)[i] for v in verts) for i in range(3)]
+        hi = [max(xyz(v)[i] for v in verts) for i in range(3)]
+        entry = props.setdefault(prop, {'min': lo, 'max': hi})
+        entry['min'] = [min(a, b) for a, b in zip(entry['min'], lo)]
+        entry['max'] = [max(a, b) for a, b in zip(entry['max'], hi)]
     if ao:
         ao.add_occluder_mesh((xyz(v) for v in verts), occluder_triangles)
     if o.type == 'MESH' and o.get('browser_walk_ramp'):
@@ -182,6 +221,8 @@ for o in scene.objects:
                 box['dressing'] = True
             if station_prop:
                 box['stationProp'] = str(station_prop)
+            if prop:
+                box['prop'] = prop
             colliders.append(box)
     source_objects += 1
     evaluated.to_mesh_clear()
@@ -205,7 +246,7 @@ manifest = {'version':2,'generator':scene['generator_sha256'],
             'exporter':hashlib.sha256((HERE/'export_walkthrough.py').read_bytes() +
                                       (HERE/'browser_materials.py').read_bytes() +
                                       (HERE/'browser_ao.py').read_bytes()).hexdigest(),
-            'sourceObjects':source_objects,'groups':[],'colliders':colliders,
+            'sourceObjects':source_objects,'groups':[],'colliders':colliders,'props':props,
             'lights':lights,'sunlight':sunlight,'beveledObjects':beveled_objects,
             'note':'Estimated photo study. Browser export opens the front door and rear sliding panel.'}
 for group in groups.values():

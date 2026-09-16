@@ -69,7 +69,7 @@ body.hud-quiet #back-to-game:not(:hover):not(:focus-visible){opacity:.4}
 .location small{font-size:14px;font-weight:700;color:var(--ink-soft);text-transform:lowercase}
 .location small::first-letter{text-transform:uppercase}
 /* Anything modal takes over at once: no tips, bubbles or actions peeking out. */
-body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden])) :is(#coach,#nearby,#pet-speech,.location){visibility:hidden}
+body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden])) :is(#coach,#nearby,#interact,#pet-speech,.location){visibility:hidden}
 #journey{position:fixed;top:84px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px;border-radius:999px;background:var(--nav);color:#fff;font-size:16px;font-weight:800;box-shadow:var(--shadow);max-width:92vw;z-index:3}
 #journey-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #journey button{background:#ffffff26;border:0;box-shadow:none;color:#fff;min-width:44px;border-radius:999px;font-size:20px;padding:0 10px}
@@ -261,3 +261,9 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
 #map-done:hover{background:#5a3a18;border-color:#5a3a18}
 #close-map{position:absolute;top:10px;right:12px;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;background:#f6e9c8cc;border:1.5px solid #8a6231;color:#3d2510;font-size:22px;line-height:1;box-shadow:none}
 @media(prefers-reduced-motion:reduce){#map .map-oath,#map-canvas{transition:none}}
+
+/* --- Use what's here (interactions.mjs): one pill above the action bubble --- */
+#interact{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;min-height:52px;padding:6px 18px 6px 10px;border-radius:999px;background:#fff1ea;border:2px solid #f6cdbd;color:var(--ink);font-size:17px;box-shadow:var(--shadow);z-index:2}
+#interact kbd{font-size:13px}
+#nearby:not([hidden])~#interact{bottom:96px}
+@media(pointer:coarse){#interact{bottom:auto;top:150px;left:auto;right:12px;transform:none}#interact kbd{display:none!important}}
