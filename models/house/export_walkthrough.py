@@ -130,6 +130,10 @@ def prop_key(o, verts):
     if parent == 'French-door refrigerator' and n.startswith(('French door', 'Curved vertical fridge handle')):
         # Turned with the kitchen, the two doors end up side by side along X.
         return 'fridge-' + ('a' if centre_x < o.parent.matrix_world.translation.x else 'b')
+    if n.startswith('Kitchen fridge drawing'):
+        # The kids' drawings magneted to the doors swing open with them.
+        fridge = bpy.data.objects['French-door refrigerator']
+        return 'fridge-' + ('a' if centre_x < fridge.matrix_world.translation.x else 'b')
     if parent == 'Rear swing frame' and n.startswith(('Swing suspension chains', 'Swing curved molded seat')):
         return 'swing-' + ('a' if centre_x < o.parent.matrix_world.translation.x else 'b')
     if parent == 'Lower ceiling fan' and n.startswith('Fan blade'):

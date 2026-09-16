@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
-import {WalkingWorld,Body} from './physics.mjs?v=20260916-jump';
-import {createHouseLife} from './house-life.mjs?v=20260916-jump';
+import {WalkingWorld,Body} from './physics.mjs?v=20260916-use2';
+import {createHouseLife} from './house-life.mjs?v=20260916-use2';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
 import {createHouseLighting} from './lighting.mjs?v=20260916-light';
@@ -10,12 +10,12 @@ import {installPostPass} from './post-aa.mjs';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs?v=20260916-light';
 import {loadBakedLight,UNBAKED} from './baked-light.mjs?v=20260916-light';
-import {warmupCast} from './creatures.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-mystery';
+import {warmupCast} from './creatures.mjs?v=20260916-use2';
+import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260916-use2';
 import {glazingBoxes} from './glazing.mjs';
-import {createMonitor} from './monitor.mjs';
-import {createMaraudersMap} from './marauders-map.mjs';
-import {createInteractions} from './interactions.mjs';
+import {createMonitor} from './monitor.mjs?v=20260916-use2';
+import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
+import {createInteractions} from './interactions.mjs?v=20260916-use2';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
@@ -111,7 +111,7 @@ if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 // The export's data files are cached by content: the manifest by release, and
 // the mesh, AO and lightmaps by their own hashes from that manifest, so a new
 // manifest never meets an old mesh from a browser or offline cache.
-const DATA_VERSION='20260916-light';
+const DATA_VERSION='20260916-use3';
 // How long a ready house waits for a bake still downloading (?bakegrace= ms).
 const BAKE_GRACE=THREE.MathUtils.clamp(Number(query.get('bakegrace'))||3000,0,15000);
 // Calibrated against the matched captures (September 16): the day bake at 0.75,
