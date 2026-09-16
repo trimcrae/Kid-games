@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {createMonitor} from './monitor.mjs?v=20260916-use2';
+import {createMonitor} from './monitor.mjs?v=20260916-use3';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play

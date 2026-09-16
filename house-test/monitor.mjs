@@ -49,7 +49,7 @@ export function createMonitor(scene,renderer,{x,y,z,w,h,facing=[1,0,0]}={}){
     // Once a frame, before the next render: pick up the post pass's frame
     // texture (it is made on the first render) and the canvas shape.
     tick(){
-      const pass=renderer.render.postPass,tex=pass?.material?.uniforms?.frame?.value||null;
+      const pass=renderer.housePostPass||renderer.render.postPass,tex=pass?.material?.uniforms?.frame?.value||null;
       if(tex!==material.uniforms.frame.value)material.uniforms.frame.value=tex;
       material.uniforms.on.value=tex&&on?1:0;
       renderer.getDrawingBufferSize(size);material.uniforms.canvasAspect.value=size.x/Math.max(1,size.y);

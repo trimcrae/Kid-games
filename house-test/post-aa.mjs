@@ -68,6 +68,10 @@ export function installPostPass(renderer,camera,{mode='fxaa',shoulder=.7}={}){
     raw(post,view);
     renderer.autoClear=autoClear;renderer.info.autoReset=autoReset;
   };
-  renderer.render.postPass=pass;
+  // On the renderer itself as well: the GPU timer (gpu-timer.mjs) wraps
+  // renderer.render again on machines with a timer extension, and a property
+  // hung on the old function would be lost there (the computer and TV
+  // screens, which show this pass's frame texture, went black on real GPUs).
+  renderer.render.postPass=pass;renderer.housePostPass=pass;
   return pass;
 }

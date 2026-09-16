@@ -6,14 +6,14 @@ import {createHouseMaterial} from './materials.mjs?v=20260916-light';
 import {createHouseLighting} from './lighting.mjs?v=20260916-light';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
-import {installPostPass} from './post-aa.mjs';
+import {installPostPass} from './post-aa.mjs?v=20260916-use3';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs?v=20260916-light';
 import {loadBakedLight,UNBAKED} from './baked-light.mjs?v=20260916-light';
 import {warmupCast} from './creatures.mjs?v=20260916-use2';
 import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260916-use2';
 import {glazingBoxes} from './glazing.mjs';
-import {createMonitor} from './monitor.mjs?v=20260916-use2';
+import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
 import {createInteractions} from './interactions.mjs?v=20260916-use2';
 
