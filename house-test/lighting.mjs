@@ -1,6 +1,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import {createSky} from './sky.mjs';
-import {FOLIAGE,EXTERIOR} from './materials.mjs';
+// (The same URL as walkthrough.js, so both share one copy and its uniforms.)
+import {FOLIAGE,EXTERIOR} from './materials.mjs?v=20260916-light';
 
 // Slab intersections prevent a lamp on another floor or behind a partition
 // from taking a nearby-light slot. The fills approximate indirect light and
@@ -45,6 +46,8 @@ export const PHASES={
     practical:1.05,key:1.05,keyCone:.75,petReach:[.6,3.8],warmth:.4,exteriorDim:.3,indoorFloor:.4,indoorSky:'#5e70b4',indoorGround:'#3a3024',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.25,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
+// Day-bake weight per phase (the rest is the night bake).
+const BAKED_DAY={day:1,dawn:.6,dusk:.4,night:0};
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
 const TIGHT=/bath|shower|hall|closet|laundry|landing|ensuite|office|garage/i;
 // The spot "key" stands in for a room's ceiling light and now casts a soft
@@ -160,8 +163,18 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     const az=Math.atan2(sunAxis.x,sunAxis.z)+phase.sun[0],el=phase.sun[1];
     return new THREE.Vector3(Math.sin(az)*Math.cos(el),-Math.sin(el),Math.cos(az)*Math.cos(el));
   }
+  // Baked bounce light (walkthrough.js/baked-light.mjs): x = how much of the
+  // day bake shows against the night one, y = gain. Dawn and dusk sit between;
+  // an overcast day bounces a little less.
+  let baked=null;
+  function applyBaked(){
+    if(!baked)return;
+    baked.blend.x=BAKED_DAY[phaseName]??1;
+    baked.blend.y=baked.gain*(OVERCAST.has(weather)&&phaseName!=='night'?.8:1);
+  }
   function applyPhase(force=false){
     const phase=PHASES[phaseName]||PHASES.day,overcast=OVERCAST.has(weather)&&phaseName!=='night';
+    applyBaked();
     const dir=sunDirection(phase);
     sun.color.set(phase.sunColor);sun.intensity=phase.sunI*(overcast?.45:1);
     sun.position.copy(sun.target.position).addScaledVector(dir,-54);
@@ -390,6 +403,8 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     },
     // clock() returns engine.timeOfDay() or {time,weather}; polled every 2 s.
     setClock(fn){clock=fn;lastClock=-Infinity;readClock(performance.now());},
+    // The shared blend uniform of a loaded bake: follows the phase from now on.
+    useBakedLight(blend){baked={blend,gain:blend.y};applyBaked();},
     setPhase(name,w){if(PHASES[name])phaseName=name;if(w)weather=w;if(loaded)applyPhase();},
     diagnostics(){return {practicalLights:selection.map(light=>light.name),shadowedLight:keyId,
       reflectionRoom:currentRoom,reflectionProbes:probes.size,shadowMapSize:sun.shadow.mapSize.x,

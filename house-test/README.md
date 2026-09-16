@@ -126,6 +126,33 @@ Phones and tablets walk with the pad and swipe to look.
 A lost window clears keys, the pad and speed. Tests:
 `tests/house-keyboard-controls.cjs` and
 `models/house/test_browser_house_controls.mjs`.
+### Baked bounce light (first iteration)
+
+The Kitchen, Living room, Dining room and Ellie's bedroom carry Cycles-baked
+bounce light: day and night lightmaps plus a lightmap UV per vertex. The
+format and bake are described in `models/house/README.md`.
+
+- **Loader.** `baked-light.mjs` checks the manifest's `bakedLight` block, the
+  mesh hash, the vertex count, the file hashes and the image sizes. Its files
+  download alongside the mesh. A ready house waits at most 3 s more for them
+  (`?bakegrace=`); a missing, stale or broken bake just means the usual light,
+  with a console warning. Any failure stops the other downloads and releases
+  decoded images.
+- **Shader.** In `materials.mjs` (`HOUSE_BAKED`), a baked fragment's
+  bounce-light term replaces the ambient sky/fill guess, and the house AO
+  isn't applied a second time there. Direct sun, sky and lamps stay live.
+  Moving parts, the overlapping wall pairs, metals and the visible main
+  ceiling stay unbaked, like every other room.
+- **Time of day.** `lighting.mjs` blends day and night by phase and dims the
+  day bake a little when overcast. Gains are calibrated from matched captures:
+  day 0.75, night half of that again. For QA, `?bake=0` turns the bake off and
+  `?bakegain=`, `?bakenight=`, `?phase=` and `?weather=` override the
+  settings.
+- **Caching.** The manifest is fetched by release, and the mesh, AO and
+  lightmaps by their own hashes, so a new manifest never meets an old file
+  from a browser or offline cache.
+- **Tests.** `tests/house-baked-light.mjs`, `house-baked-light-data.mjs`,
+  `house-baked-light-browser.cjs` and `models/house/test_browser_lightmap.mjs`.
 ### Loading never waits for ever
 
 `boot.js` is a classic script that runs even if the 3D modules never do.

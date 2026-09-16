@@ -192,7 +192,10 @@ export function exteriorFinish(group,f){
     ||(f.surface==='foliage'&&!/Houseplant/i.test(group.name||''));
 }
 
-export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=false}={}){
+// bakedLight: the shared uniforms of a loaded lightmap bake (baked-light.mjs),
+// or null. With a bake, every house group carries the lightmap UV attribute
+// (unbaked vertices hold a sentinel), so the house stays one program family.
+export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=false,bakedLight=null}={}){
   const {color,finish:styled}=styleGroup(group,finishDescription(group));
   const f={...styled},glass=f.surface==='glass',glossy=glossyFinish(f);
   if(!glossy)f.clearcoat=0;
@@ -249,9 +252,11 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
     // Experimental (QA flag ?nearfade=1): dissolve any house surface within
     // ~0.65 m of the lens. It adds a discard to the shared program.
     if(nearFade&&!foliage)material.defines.HOUSE_NEAR_FADE=1;
-    material.customProgramCacheKey=()=>(aoStrength>0?'house-finish-v3-ao':'house-finish-v3')+(foliage?'-leaf':'')+(nearFade&&!foliage?'-near':'');
+    if(bakedLight)material.defines.HOUSE_BAKED=1;
+    material.customProgramCacheKey=()=>(aoStrength>0?'house-finish-v3-ao':'house-finish-v3')+(foliage?'-leaf':'')+(nearFade&&!foliage?'-near':'')+(bakedLight?'-baked':'');
     material.onBeforeCompile=shader=>{
       shader.uniforms??={};
+      if(bakedLight){shader.defines??={};shader.defines.HOUSE_BAKED=1;Object.assign(shader.uniforms,bakedLight);}
       if(aoStrength>0){
         shader.defines??={};shader.defines.HOUSE_AO=1;
         shader.uniforms.houseOcclusionStrength={value:aoStrength};
@@ -279,12 +284,18 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
           varying vec3 vHousePosition;varying vec3 vHouseNormal;
           #ifdef HOUSE_AO
             attribute float houseOcclusion;varying float vHouseOcclusion;
+          #endif
+          #ifdef HOUSE_BAKED
+            attribute vec2 houseLightUV;varying vec2 vHouseLightUV;
           #endif`)
         .replace('#include <worldpos_vertex>',`#include <worldpos_vertex>
           vHousePosition=(modelMatrix*vec4(transformed,1.0)).xyz;
           vHouseNormal=normalize(mat3(modelMatrix)*objectNormal);
           #ifdef HOUSE_AO
             vHouseOcclusion=houseOcclusion;
+          #endif
+          #ifdef HOUSE_BAKED
+            vHouseLightUV=houseLightUV;
           #endif`)
         // Along its own view ray the vertex keeps its place on screen; only its
         // depth moves (every other group keeps its exact depth, which the depth
@@ -298,6 +309,13 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
           #endif
           #ifdef HOUSE_FOLIAGE
             uniform float houseLeafFill;
+          #endif
+          #ifdef HOUSE_BAKED
+            varying vec2 vHouseLightUV;
+            uniform sampler2D houseLightDay,houseLightNight;
+            // scale: day and night decode scales; blend: x = day weight,
+            // y = gain (pi x calibration), z = how much of the ambient it replaces.
+            uniform vec2 houseLightScale;uniform vec3 houseLightBlend;
           #endif
           uniform vec4 houseUnderfloor;\n`+SURFACE_GLSL)
         .replace('#include <clipping_planes_fragment>',`#include <clipping_planes_fragment>
@@ -351,6 +369,19 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
             houseSeamFade=smoothstep(.0018,.006,length(fwidth(vHousePosition)));
             normal=normalize(mix(normal,normalize(mat3(viewMatrix)*vec3(0.,1.,0.)),houseSeamFade));
           }`)
+        // Baked bounce light (Cycles, indirect only, no albedo): where a surface
+        // has it, it replaces the ambient sky/fill guess before the albedo is
+        // applied. Direct lights and reflections are untouched.
+        .replace('#include <lights_fragment_maps>',`#include <lights_fragment_maps>
+          float houseBakedHere=0.0;
+          #ifdef HOUSE_BAKED
+            if(vHouseLightUV.x<.99998||vHouseLightUV.y<.99998){
+              vec3 houseDay=pow(texture2D(houseLightDay,vHouseLightUV).rgb,vec3(2.2))*houseLightScale.x;
+              vec3 houseNight=pow(texture2D(houseLightNight,vHouseLightUV).rgb,vec3(2.2))*houseLightScale.y;
+              houseBakedHere=houseLightBlend.z;
+              irradiance=mix(irradiance,mix(houseNight,houseDay,houseLightBlend.x)*houseLightBlend.y,houseBakedHere);
+            }
+          #endif`)
         .replace('#include <aomap_fragment>',`#include <aomap_fragment>
           #ifdef HOUSE_AO
             float houseAO=mix(1.0,pow(clamp(vHouseOcclusion,0.0,1.0),houseOcclusionShape.y),
@@ -359,7 +390,8 @@ export function createHouseMaterial(group,{ambientOcclusionStrength=0,nearFade=f
             // pixel at low render scale and dotted into stitch lines (F1 #4).
             houseAO=mix(houseAO,1.0,max(houseSeamFade*.8,smoothstep(.0025,.008,length(fwidth(vHousePosition)))*.6));
             reflectedLight.directDiffuse*=mix(1.0,houseAO,houseOcclusionShape.z);
-            reflectedLight.indirectDiffuse*=houseAO;
+            // (The bake already holds its own occlusion: no second darkening.)
+            reflectedLight.indirectDiffuse*=mix(houseAO,1.0,houseBakedHere);
             reflectedLight.indirectSpecular*=houseAO;
             #ifdef USE_CLEARCOAT
               clearcoatSpecularIndirect*=houseAO;

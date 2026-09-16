@@ -76,7 +76,7 @@ async function retryOnce(page){
       results.moduleThrows=c;await ctx.close();}
     // 6. A stalled download: "still working" with ways out, then "stopped", then it recovers when the data comes.
     {const {ctx,page}=await fresh();let release;const held=new Promise(r=>{release=r;});
-      await page.route('**/house-test/house.json',async r=>{await held;await r.continue();});
+      await page.route(/\/house-test\/house\.json(\?.*)?$/,async r=>{await held;await r.continue();});
       await page.goto(`${base}/house-test/?${FAST}`);
       await page.waitForFunction(()=>document.body.classList.contains('house-slow'),{},{timeout:15000});
       const slow=await card(page);
