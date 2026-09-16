@@ -3443,7 +3443,8 @@
       '<span class="newtag">NEW</span>' +
       "<h2>🏡 Walk around the house!</h2>" +
       '<p class="sub">Take ' + esc(S.pet.name) + " for a walk through our house in 3D — every room, the garden " +
-        "and the street. The Farm, the Market, the games and everything else are in their own rooms there, " +
+        "and the street. Press Space to jump up onto the beds, the couches and the tables. " +
+        "The Farm, the Market, the games and everything else are in their own rooms there, " +
         "with the same coins and things. Nothing here changes: the valley stays just as it is.</p>" +
       '<div class="walkbtns"><button class="act walkgo" data-walk="1" style="--ac:#2f7f78"><span class="em">🚶</span>Start walking</button>' +
       '<button class="ghost small" data-walkhide="1">Maybe later</button></div>' +
