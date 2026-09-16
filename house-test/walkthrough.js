@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
-import {WalkingWorld,Body} from './physics.mjs?v=20260916-jump';
-import {createHouseLife} from './house-life.mjs?v=20260916-jump';
+import {WalkingWorld,Body} from './physics.mjs?v=20260916-use2';
+import {createHouseLife} from './house-life.mjs?v=20260916-use2';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs';
 import {createHouseLighting} from './lighting.mjs?v=20260915-arrows';
@@ -9,12 +9,12 @@ import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs';
-import {warmupCast} from './creatures.mjs';
-import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-mystery';
+import {warmupCast} from './creatures.mjs?v=20260916-use2';
+import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260916-use2';
 import {glazingBoxes} from './glazing.mjs';
-import {createMonitor} from './monitor.mjs';
-import {createMaraudersMap} from './marauders-map.mjs';
-import {createInteractions} from './interactions.mjs';
+import {createMonitor} from './monitor.mjs?v=20260916-use2';
+import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
+import {createInteractions} from './interactions.mjs?v=20260916-use2';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 

@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {createMonitor} from './monitor.mjs';
+import {createMonitor} from './monitor.mjs?v=20260916-use2';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
@@ -191,7 +191,10 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
         // (The old entries stay in the grid but their boxes now sit here.)
       }
       const door=()=>corner(-1.35,.3);
-      list.push({id:'car',icon:'🚗',name:'Drive the car',kind:'drive',radius:1.3,
+      // In reach from any side of the car, not just the driver's door.
+      function beside(p){const s=Math.sin(car.heading),c=Math.cos(car.heading),dx=p.x-car.x,dz=p.z-car.z;
+        const lx=dx*c+dz*s,lz=-dx*s+dz*c;return Math.hypot(Math.max(0,Math.abs(lx)-halfW),Math.max(0,Math.abs(lz)-halfL));}
+      list.push({id:'car',icon:'🚗',name:'Drive the car',kind:'drive',radius:1.0,distance:beside,
         get at(){const d=door();return {x:d.x,y:car.y,z:d.z};},
         hint:'↑ ↓ drive · ← → steer · Space honks · E to get out',
         start(){
@@ -235,7 +238,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   // Which one is in reach: the nearest on this floor within its radius.
   function findNear(){
     let best=null,bd=Infinity;
-    for(const it of list){const a=it.at;if(!a||Math.abs(a.y-player.y)>.8)continue;const d=Math.hypot(a.x-player.x,a.z-player.z);if(d<it.radius&&d<bd){bd=d;best=it;}}
+    for(const it of list){const a=it.at;if(!a||Math.abs(a.y-player.y)>.8)continue;const d=it.distance?it.distance(player):Math.hypot(a.x-player.x,a.z-player.z);if(d<it.radius&&d<bd){bd=d;best=it;}}
     return best;
   }
   function showPill(text){if(!text){pill.hidden=true;return;}if(label.textContent!==text)label.textContent=text;pill.hidden=false;}
