@@ -15,7 +15,7 @@ import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHead
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
-import {createInteractions} from './interactions.mjs?v=20260916-use2';
+import {createInteractions} from './interactions.mjs?v=20260916-use3';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
@@ -488,7 +488,9 @@ function animate(now){
     // The camera follows a smoothed floor height, so stairs don't jolt it; a
     // jump is quick and deliberate, so it keeps up more closely with that.
     focusY=THREE.MathUtils.lerp(focusY,player.y,reducedMotion?1:1-Math.exp(-dt*(body.airborne?20:12)));
-    if(++frames%15===0)updateLocation();
+    // (Not while riding something: hanging from the bars a metre up would
+    // read as the floor above.)
+    if(++frames%15===0&&!riding)updateLocation();
   }
   life?.tick(dt,now/1000,active);
   render();

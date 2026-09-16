@@ -1,5 +1,8 @@
 import * as THREE from './vendor/three.module.min.js';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
+import {hangBarInteractions} from './hang-bar.mjs?v=20260916-use3';
+import {roombaInteractions} from './roomba.mjs?v=20260916-use3';
+import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
@@ -156,85 +159,102 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       key(code){const i=codes[code];if(i===undefined)return false;const [name,f]=notes[i];sounds.note(f);life.hop(.35);life.say(`♪ ${name}`,700);return true;},
       stop(){life.ride(null);}});
   }
-  // ----- the burgundy car: get in and drive it out of the garage.
-  {
-    const b=info.car;
-    if(b){
-      const home={x:(b.min[0]+b.max[0])/2,y:b.min[1]+.08,z:(b.min[2]+b.max[2])/2};
-      // It stands on the garage floor (its tyres were modelled a touch below it).
-      {const f=world.floor(home.x,home.z,b.min[1]+.3);if(Number.isFinite(f))home.y=f;}
-      const halfW=.92,halfL=2.2;
-      const car={x:home.x,y:home.y,z:home.z,heading:0,speed:0,parked:true,lastFit:null};
-      debug.car=car;
-      const boxes=propBoxes.car||[],saved=boxes.map(x=>({min:[...x.min],max:[...x.max]}));
-      // Glass you can see the driver through.
-      for(const m of meshesOf('car'))if(/glass/i.test(m.name))m.material=new THREE.MeshPhysicalMaterial({color:'#1e2b33',roughness:.12,metalness:.1,transparent:true,opacity:.45});
-      // Turned about where it was modelled, then moved by how far it has gone.
-      function place(){pose('car',_m.makeTranslation(car.x-home.x,car.y-home.y,car.z-home.z).multiply(_a.makeTranslation(home.x,home.y,home.z)).multiply(_b.makeRotationY(car.heading)).multiply(new THREE.Matrix4().makeTranslation(-home.x,-home.y,-home.z)));}
-      function corner(dx,dz){const s=Math.sin(car.heading),c=Math.cos(car.heading);return {x:car.x+dx*c-dz*s,z:car.z+dx*s+dz*c};}
-      // Can the car stand here? Ground under every corner within a kerb's
-      // height, and nothing solid in the way at body height.
-      function fits(x,z,heading){
-        const s=Math.sin(heading),c=Math.cos(heading);
-        for(const [dx,dz] of [[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL]]){
-          const px=x+dx*c-dz*s,pz=z+dx*s+dz*c,f=world.floor(px,pz,car.y);
-          if(!Number.isFinite(f)||Math.abs(f-car.y)>.45||world.blocked(px,pz,f,.32))return false;
-        }
-        return true;
+  // ----- the cars: get in either and drive it out of the garage.
+  debug.cars={};
+  for(const [key,colour,glass] of [['car','burgundy','#1e2b33'],['car2','black','#171d22']]){
+    const b=info[key];if(!b)continue;
+    const home={x:(b.min[0]+b.max[0])/2,y:b.min[1]+.08,z:(b.min[2]+b.max[2])/2};
+    // It stands on the garage floor (its tyres were modelled a touch below it).
+    {const f=world.floor(home.x,home.z,b.min[1]+.3);if(Number.isFinite(f))home.y=f;}
+    const halfW=(b.max[0]-b.min[0])/2-.05,halfL=(b.max[2]-b.min[2])/2-.05;
+    const car={x:home.x,y:home.y,z:home.z,heading:0,speed:0,parked:true,lastFit:null};
+    debug.cars[key]=car;
+    const boxes=propBoxes[key]||[],saved=boxes.map(x=>({min:[...x.min],max:[...x.max]}));
+    // Glass you can see the driver through.
+    for(const m of meshesOf(key))if(/glass/i.test(m.name))m.material=new THREE.MeshPhysicalMaterial({color:glass,roughness:.12,metalness:.1,transparent:true,opacity:.45});
+    // Turned about where it was modelled, then moved by how far it has gone.
+    function place(){pose(key,_m.makeTranslation(car.x-home.x,car.y-home.y,car.z-home.z).multiply(_a.makeTranslation(home.x,home.y,home.z)).multiply(_b.makeRotationY(car.heading)).multiply(new THREE.Matrix4().makeTranslation(-home.x,-home.y,-home.z)));}
+    function corner(dx,dz,h=car.heading){const s=Math.sin(h),c=Math.cos(h);return {x:car.x+dx*c-dz*s,z:car.z+dx*s+dz*c};}
+    const SAMPLES=[[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL]];
+    // The ground under one point of the car: the highest top not far above
+    // the body (a kerb), however far below (the driveway falls away under the
+    // back of a car nosing out of the garage; the old walking-step test saw
+    // "no floor" there and the car stuck at the threshold).
+    const groundAt=(px,pz)=>{const g=world.support(px,pz,car.y+.45,0);return Number.isFinite(g)&&g>=car.y-1.2?g:null;};
+    // How badly the car would sit at (x,z,heading): each sample point with no
+    // ground under it, or something solid at body height there, counts one.
+    // A move is allowed when it makes things no worse — so a car that has
+    // somehow ended up badly placed can always be driven out again.
+    function trouble(x,z,h){
+      const s=Math.sin(h),c=Math.cos(h);let n=0,sum=0,k=0;
+      for(const [dx,dz] of SAMPLES){
+        const px=x+dx*c-dz*s,pz=z+dx*s+dz*c,g=groundAt(px,pz);
+        if(g===null){n++;continue;}
+        sum+=g;k++;
+        if(world.blocked(px,pz,g,.34))n++;
       }
-      function parkBoxes(){
-        // The car's boxes move with it: one box round the parked car.
-        const cs=[corner(halfW,halfL),corner(-halfW,halfL),corner(halfW,-halfL),corner(-halfW,-halfL)];
-        const minX=Math.min(...cs.map(c=>c.x)),maxX=Math.max(...cs.map(c=>c.x)),minZ=Math.min(...cs.map(c=>c.z)),maxZ=Math.max(...cs.map(c=>c.z));
-        boxes.forEach((bx,i)=>{const dy0=saved[i].min[1]-home.y,dy1=saved[i].max[1]-home.y;bx.min=[minX,car.y+dy0,minZ];bx.max=[maxX,car.y+dy1,maxZ];});
-        world.addBoxes(boxes.map(bx=>({name:bx.name,min:bx.min,max:bx.max,prop:'car'})));
-        // (The old entries stay in the grid but their boxes now sit here.)
-      }
-      const door=()=>corner(-1.35,.3);
-      // In reach from any side of the car, not just the driver's door.
-      function beside(p){const s=Math.sin(car.heading),c=Math.cos(car.heading),dx=p.x-car.x,dz=p.z-car.z;
-        const lx=dx*c+dz*s,lz=-dx*s+dz*c;return Math.hypot(Math.max(0,Math.abs(lx)-halfW),Math.max(0,Math.abs(lz)-halfL));}
-      list.push({id:'car',icon:'🚗',name:'Drive the car',kind:'drive',radius:1.0,distance:beside,
-        get at(){const d=door();return {x:d.x,y:car.y,z:d.z};},
-        hint:'↑ ↓ drive · ← → steer · Space honks · E to get out',
-        start(){
-          car.speed=0;car.parked=false;
-          for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
-          // The view looks down on the car from over its roof (a boom aimed
-          // at the driver would start inside the car's own baked panels).
-          tour.setCameraRig({target:1.75,boom:5.0,height:2.5});
-          sounds.engine(0);life.say('Vroom!',1500);
-        },
-        tick(dt){
-          const fwd=(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0),steer=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
-          const top=fwd>=0?4.5:2.2;
-          car.speed+=((fwd*top)-car.speed)*(1-Math.exp(-dt*(fwd?1.6:3)));
-          if(Math.abs(car.speed)<.03&&!fwd)car.speed=0;
-          if(car.speed){
-            const turn=steer*Math.min(1.4,Math.abs(car.speed)*.55)*Math.sign(car.speed)*dt;
-            const h=wrap(car.heading+turn),step=car.speed*dt,nx=car.x-Math.sin(h)*step,nz=car.z-Math.cos(h)*step;
-            if(fits(nx,nz,h)){car.lastFit=true;car.x=nx;car.z=nz;car.heading=h;const f=world.floor(car.x,car.z,car.y);if(Number.isFinite(f))car.y+=(f-car.y)*Math.min(1,dt*6);}
-            else{car.lastFit=false;car.speed=0;sounds.click();}
-          }
-          place();
-          player.x=car.x;player.y=car.y;player.z=car.z;
-          const s=Math.sin(car.heading),c=Math.cos(car.heading);
-          life.face(car.heading+Math.PI);life.ride({dx:-.42*c-.15*s,dy:.62,dz:-.42*s+.15*c,pose:{sit:.8}});
-          sounds.engine(Math.abs(car.speed)/4.5);
-          return {yaw:car.heading};
-        },
-        key(code){if(code==='Space'){sounds.horn();return true;}return false;},
-        stop(){
-          car.speed=0;car.parked=true;sounds.engine(null);place();parkBoxes();tour.setCameraRig(null);life.ride(null);
-          // Out by the driver's door — the other side if that's against a wall.
-          for(const side of [-1.35,1.35]){const d=corner(side,.3),spot=world.safeSpot(d.x,car.y,d.z);if(spot&&Math.hypot(spot.x-d.x,spot.z-d.z)<1){player.x=spot.x;player.y=spot.y;player.z=spot.z;break;}}
-        }});
+      return {n,ground:k?sum/k:null};
     }
+    function parkBoxes(){
+      // The car's boxes move with it: one box round the parked car.
+      const cs=[corner(halfW,halfL),corner(-halfW,halfL),corner(halfW,-halfL),corner(-halfW,-halfL)];
+      const minX=Math.min(...cs.map(c=>c.x)),maxX=Math.max(...cs.map(c=>c.x)),minZ=Math.min(...cs.map(c=>c.z)),maxZ=Math.max(...cs.map(c=>c.z));
+      boxes.forEach((bx,i)=>{const dy0=saved[i].min[1]-home.y,dy1=saved[i].max[1]-home.y;bx.min=[minX,car.y+dy0,minZ];bx.max=[maxX,car.y+dy1,maxZ];});
+      world.addBoxes(boxes.map(bx=>({name:bx.name,min:bx.min,max:bx.max,prop:key})));
+      // (The old entries stay in the grid but their boxes now sit here.)
+    }
+    const door=()=>corner(-(halfW+.45),.3);
+    // In reach from any side of the car, not just the driver's door.
+    function beside(p){const s=Math.sin(car.heading),c=Math.cos(car.heading),dx=p.x-car.x,dz=p.z-car.z;
+      const lx=dx*c+dz*s,lz=-dx*s+dz*c;return Math.hypot(Math.max(0,Math.abs(lx)-halfW),Math.max(0,Math.abs(lz)-halfL));}
+    list.push({id:key,icon:'🚗',name:`Drive the ${colour} car`,kind:'drive',radius:1.0,distance:beside,
+      get at(){const d=door();return {x:d.x,y:car.y,z:d.z};},
+      hint:'↑ ↓ drive · ← → steer · Space honks · E to get out',
+      start(){
+        car.speed=0;car.parked=false;
+        for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
+        // The view looks down on the car from over its roof (a boom aimed
+        // at the driver would start inside the car's own baked panels).
+        tour.setCameraRig({target:1.75,boom:5.0,height:2.5});
+        sounds.engine(0);life.say('Vroom!',1500);
+      },
+      tick(dt){
+        const fwd=(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0),steer=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
+        const top=fwd>=0?4.5:2.2;
+        car.speed+=((fwd*top)-car.speed)*(1-Math.exp(-dt*(fwd?1.6:3)));
+        if(Math.abs(car.speed)<.03&&!fwd)car.speed=0;
+        if(car.speed){
+          const turn=steer*Math.min(1.4,Math.abs(car.speed)*.55)*Math.sign(car.speed)*dt;
+          const h=wrap(car.heading+turn),step=car.speed*dt,nx=car.x-Math.sin(h)*step,nz=car.z-Math.cos(h)*step;
+          const now=trouble(car.x,car.z,car.heading),next=trouble(nx,nz,h);
+          if(next.n<=now.n){car.lastFit=true;car.x=nx;car.z=nz;car.heading=h;if(next.ground!==null)car.y+=(next.ground-car.y)*Math.min(1,dt*6);}
+          else{car.lastFit=false;car.speed=0;sounds.click();}
+        }
+        place();
+        player.x=car.x;player.y=car.y;player.z=car.z;
+        const s=Math.sin(car.heading),c=Math.cos(car.heading);
+        life.face(car.heading+Math.PI);life.ride({dx:-.42*c-.15*s,dy:.62,dz:-.42*s+.15*c,pose:{sit:.8}});
+        sounds.engine(Math.abs(car.speed)/4.5);
+        return {yaw:car.heading};
+      },
+      key(code){if(code==='Space'){sounds.horn();return true;}return false;},
+      stop(){
+        car.speed=0;car.parked=true;sounds.engine(null);place();parkBoxes();tour.setCameraRig(null);life.ride(null);
+        // Out by the driver's door — the other side if that's against a wall.
+        for(const side of [-(halfW+.45),halfW+.45]){const d=corner(side,.3),spot=world.safeSpot(d.x,car.y,d.z);if(spot&&Math.hypot(spot.x-d.x,spot.z-d.z)<1){player.x=spot.x;player.y=spot.y;player.z=spot.z;break;}}
+      }});
   }
   // ----- the trampoline bounces you (hold ↓ to stop).
   const trampoline={boxes:data.colliders.filter(b=>/Trampoline jumping mat/.test(b.name)),bounces:0};
   function onMat(){return trampoline.boxes.some(b=>player.x>=b.min[0]&&player.x<=b.max[0]&&player.z>=b.min[2]&&player.z<=b.max[2]&&Math.abs(player.y-b.max[1])<.15);}
 
+  // ----- more things, each in its own module (hang-bar.mjs, roomba.mjs,
+  // yoto.mjs): given the same tools, they push their own entries onto `list`
+  // (an interaction: {id, icon, name, kind:'toggle'|'ride'|'play'|'drive',
+  // at:{x,y,z}, radius, face?, label?(), hint?, start(), tick?(dt), key?(code),
+  // stop()}) and per-frame work onto `ticking` (dt=>{}).
+  const ctx={THREE,scene,world,renderer,data,player,keys,life,body,tour,reducedMotion,list,ticking,sounds,propMeshes,meshesOf,pose,hinge};
+  for(const extend of [hangBarInteractions,roombaInteractions,yotoInteractions]){try{extend(ctx);}catch(error){console.warn('An interaction module failed to load:',error);}}
   // Which one is in reach: the nearest on this floor within its radius.
   function findNear(){
     let best=null,bd=Infinity;
@@ -274,7 +294,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       if(!body.airborne&&onMat()&&!keys.has('ArrowDown')){body.vy=7;body.airborne=true;trampoline.bounces++;sounds.boing();life.hop(.9);if(trampoline.bounces===1)life.say('Boing!',1200);}
     },
     // For QA.
-    get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],car:debug.car&&{x:+debug.car.x.toFixed(2),y:+debug.car.y.toFixed(2),z:+debug.car.z.toFixed(2),heading:+debug.car.heading.toFixed(2),speed:+debug.car.speed.toFixed(2),lastFit:debug.car.lastFit}};},
+    get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
   };
   bindButton(pill,()=>{if(active)api.stop();else api.start();});
   return api;

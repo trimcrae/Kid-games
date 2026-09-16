@@ -126,6 +126,8 @@ def prop_key(o, verts):
     n = o.name
     if parent == 'Garage burgundy SUV':
         return 'car'
+    if parent == 'Garage black SUV':
+        return 'car2'
     centre_x = sum(v.x for v in verts) / max(1, len(verts))
     if parent == 'French-door refrigerator' and n.startswith(('French door', 'Curved vertical fridge handle')):
         # Turned with the kitchen, the two doors end up side by side along X.

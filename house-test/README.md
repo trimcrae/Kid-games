@@ -59,8 +59,10 @@ study:
   "Mischief managed".
 - **Things to use** (`interactions.mjs`, `E`): a pill says what E does
   here. Swing on the back-yard swings, bounce on the trampoline (hold ↓ to
-  stop), get in the burgundy car and drive it out of the garage (arrows
-  drive and steer, Space honks, E gets out; it parks where you leave it),
+  stop), get in either car and drive it out of the garage and down the
+  street (arrows drive and steer, Space honks, E gets out; it parks where
+  you leave it, and each corner reads its own ground, so the graded
+  driveway and the lawn are fine),
   open the fridge (both doors swing out on the snacks), play the piano in
   the family room (1–8 or A–K play C to C, with the note named), switch the
   televisions and ceiling fans on, rock in the rocking chairs and flush the

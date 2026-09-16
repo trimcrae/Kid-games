@@ -1,0 +1,113 @@
+name: Fetch today's Yoto Daily
+
+# The Yoto players in the Craepets house (house-test/yoto.mjs) play the newest
+# episode of the "Yoto Daily" podcast. A page served from GitHub Pages may not
+# read the podcast's RSS itself (it lives on another host, and there is no CORS
+# header on it), so this runner — which has real internet — looks the feed up
+# through the iTunes search API once a day, takes the newest item and commits
+# it to house-test/yoto-daily.json. The browser only ever reads that one small
+# file; the mp3 itself plays cross-origin in an <audio> element, which is fine.
+#
+# Run it from the Actions tab ("Run workflow") to pick up today's episode at
+# once. Nothing is committed when the newest episode has not changed.
+
+on:
+  schedule:
+    # 06:20 UTC, after the day's episode has gone out.
+    - cron: "20 6 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/yoto-daily.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yoto-daily
+  cancel-in-progress: false
+
+jobs:
+  episode:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Look up the feed and take the newest episode
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, urllib.request, xml.etree.ElementTree as ET
+          from datetime import datetime, timezone
+
+          UA = {"User-Agent": "kid-games-yoto-daily (+https://github.com/trimcrae/kid-games)"}
+          ITUNES = "itunes:"
+          NS = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd"}
+
+          def get(url):
+              req = urllib.request.Request(url, headers=UA)
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  return r.read()
+
+          # 1. the feed URL, from the iTunes search API (no key, no npm).
+          search = json.loads(get("https://itunes.apple.com/search?term=yoto+daily&entity=podcast&limit=25"))
+          feed = None
+          for r in search.get("results", []):
+              if (r.get("collectionName") or "").strip().lower() == "yoto daily" and r.get("feedUrl"):
+                  feed = r["feedUrl"]
+                  break
+          if not feed:
+              raise SystemExit('No podcast called "Yoto Daily" came back from the search API.')
+          print("feed:", feed)
+
+          # 2. the newest item in it (RSS lists them newest first).
+          root = ET.fromstring(get(feed))
+          channel = root.find("channel")
+          item = channel.find("item") if channel is not None else None
+          if item is None:
+              raise SystemExit("That feed has no episodes in it.")
+
+          def text(tag):
+              el = item.find(tag, NS) if ":" in tag else item.find(tag)
+              return (el.text or "").strip() if el is not None and el.text else None
+
+          enclosure = item.find("enclosure")
+          audio = enclosure.get("url").strip() if enclosure is not None and enclosure.get("url") else None
+          if not audio:
+              raise SystemExit("The newest episode has no audio enclosure.")
+
+          episode = {
+              "title": text("title"),
+              "date": text("pubDate"),
+              "audio": audio,
+              "link": text("link"),
+              "duration": text(ITUNES + "duration"),
+              "fetched": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+          }
+          print("episode:", episode["title"], "-", episode["date"])
+
+          out = pathlib.Path("house-test/yoto-daily.json")
+          old = {}
+          try:
+              old = json.loads(out.read_text())
+          except Exception:
+              pass
+          # `fetched` changes every run; only the episode itself decides a commit.
+          if {k: old.get(k) for k in ("title", "date", "audio", "link")} == {k: episode[k] for k in ("title", "date", "audio", "link")}:
+              print("Same episode as last time; leaving the file alone.")
+          else:
+              out.write_text(json.dumps(episode, indent=2, ensure_ascii=False) + "\n")
+          PY
+
+      - name: Commit the episode
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add house-test/yoto-daily.json
+          if git diff --cached --quiet; then
+            echo "No new Yoto Daily episode to commit."
+          else
+            git commit -m "Today's Yoto Daily episode [skip ci]"
+            # other bots land on this branch too, so pick up their work first
+            git pull --rebase origin "${{ github.ref_name }}"
+            git push
+          fi
