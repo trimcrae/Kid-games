@@ -90,10 +90,11 @@ async function jump(page,room){await page.keyboard.press('KeyR');await page.loca
       await page.keyboard.press('Escape');await page.locator('#welcome[data-mode="pause"]').waitFor();
       assert(await page.locator('#welcome .instructions').isVisible(),'The paused card lacks the controls');
       await page.locator('#start').click();await page.waitForTimeout(300);
-      // E opens an activity; while it is open the arrows stay with it.
+      // An activity (opened from its on-screen button — E uses the fridge here first,
+      // interactions.mjs): while it is open the arrows stay with it.
       await jump(page,'Kitchen');
-      await page.keyboard.press('KeyE');await page.waitForTimeout(700);
-      if(await page.locator('#activity-choices').isVisible())await page.locator('#choices-list button').first().click();
+      // (A real click: the button must be visible and not covered.)
+      await page.locator('#nearby-actions [data-activity]').first().click();
       await page.locator('#activity-panel').waitFor();
       const e0=await S(page);await hold(page,'ArrowUp',400);const e1=await S(page);
       assert(moved(e0,e1)<.01&&!e1.active,'The arrows moved the pet behind an open activity');

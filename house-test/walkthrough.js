@@ -2,13 +2,14 @@ import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260916-jump';
 import {createHouseLife} from './house-life.mjs?v=20260916-jump';
 import {rooms} from './rooms.mjs';
-import {createHouseMaterial} from './materials.mjs';
-import {createHouseLighting} from './lighting.mjs?v=20260915-arrows';
+import {createHouseMaterial} from './materials.mjs?v=20260916-light';
+import {createHouseLighting} from './lighting.mjs?v=20260916-light';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs';
 import {installDepthPrepass} from './depth-prepass.mjs';
-import {loadHouseOcclusion} from './ambient-occlusion.mjs';
+import {loadHouseOcclusion} from './ambient-occlusion.mjs?v=20260916-light';
+import {loadBakedLight,UNBAKED} from './baked-light.mjs?v=20260916-light';
 import {warmupCast} from './creatures.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260915-mystery';
 import {glazingBoxes} from './glazing.mjs';
@@ -104,6 +105,21 @@ try {
 }
 const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
 if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
+// Baked bounce light: ?bakegain= scales it and ?bakemix= sets how much of the
+// ambient it replaces (QA). ?phase=day|dawn|dusk|night and ?weather= pin the
+// sky for matched before/after captures.
+// The export's data files are cached by content: the manifest by release, and
+// the mesh, AO and lightmaps by their own hashes from that manifest, so a new
+// manifest never meets an old mesh from a browser or offline cache.
+const DATA_VERSION='20260916-light';
+// How long a ready house waits for a bake still downloading (?bakegrace= ms).
+const BAKE_GRACE=THREE.MathUtils.clamp(Number(query.get('bakegrace'))||3000,0,15000);
+// Calibrated against the matched captures (September 16): the day bake at 0.75,
+// and the night bake at half of that again, so evenings keep their mood.
+// ?bakegain= and ?bakenight= override them for QA.
+const BAKE_NIGHT=Number(query.get('bakenight'))||.5;
+const BAKE_GAIN=Number(query.get('bakegain'))||.75,BAKE_REPLACE=THREE.MathUtils.clamp(Number(query.get('bakemix')??1)||0,0,1);
+const PINNED_SKY=query.get('phase')?{time:query.get('phase'),weather:query.get('weather')||'sunny'}:null;
 
 let guard=null,cameraClearance=lensClearance(),monitor=null,map=null,interactions=null;
 // The movable parts of the house (export_walkthrough.py props), by key.
@@ -385,7 +401,9 @@ function updateLocation(){
   }
   if(closest){$('location').textContent=closest[1];$('level').textContent=closest[0].toUpperCase();lighting.setRoom(closest[1],player);}
 }
-let frames=0,lastDraw=0;
+// framesDrawn: frames the house actually drew (walking is capped at 30 fps; the
+// browser's own animation callbacks run faster). Read-only QA diagnostic.
+let frames=0,lastDraw=0,framesDrawn=0;
 // GPU budget per walking frame at the 30 fps cap, leaving room for the page
 // compositor and the activity iframe. Fill cost scales with pixel count.
 const GPU_TARGET_MS=25,GPU_HIGH_MS=30,PIXEL_FLOOR=.6;
@@ -423,6 +441,7 @@ function animate(now){
   const interval=active?1000/30:1000,elapsed=now-lastDraw;
   if(elapsed<interval-.5)return;
   lastDraw+=Math.floor((elapsed+.5)/interval)*interval;
+  framesDrawn++;
   adaptResolution(now);
   const dt=Math.min((now-last)/1000,.05);last=now;
   if(active&&world){
@@ -494,29 +513,54 @@ async function warmShaders(){
 async function load(){
   try{
     boot.step('the house plan','Opening the front door…');
-    const response=await fetch('./house.json');if(!response.ok)throw new Error('Model manifest unavailable');const data=await response.json();
+    const response=await fetch('./house.json?v='+DATA_VERSION);if(!response.ok)throw new Error('Model manifest unavailable');const data=await response.json();
     boot.step('the rooms','Loading rooms and gardens…');
-    const meshResponse=await fetch('./house.mesh.gz');if(!meshResponse.ok)throw new Error('Model geometry unavailable');
+    const meshResponse=await fetch('./house.mesh.gz?v='+data.meshSha256.slice(0,16));if(!meshResponse.ok)throw new Error('Model geometry unavailable');
     // Count the download (8 MB) so a slow connection shows progress, not a stall.
     const total=Number(meshResponse.headers.get('content-length'))||0;let got=0,shown=-1;
     const counted=meshResponse.body.pipeThrough(new TransformStream({transform(chunk,out){
       got+=chunk.byteLength;const pct=total?Math.min(99,Math.floor(got*100/total)):-1;
       if(total&&pct!==shown){shown=pct;boot.alive(`Loading rooms and gardens… ${pct}%`);}else boot.alive();
       out.enqueue(chunk);}}));
-    const binary=await new Response(counted.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    const binaryPromise=new Response(counted.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+    // Baked bounce light (baked-light.mjs; ?bake=0 turns it off for A/B) starts
+    // downloading alongside the mesh. It is optional: once the house is ready
+    // it waits at most BAKE_GRACE more, and any problem means the usual light.
+    const bakeAbort=new AbortController();
+    const bakedPending=query.get('bake')!=='0'&&data.bakedLight
+      ?loadBakedLight(data,binaryPromise,{signal:bakeAbort.signal,timeoutMs:30000}).catch(error=>{console.warn('Baked lighting skipped:',error.message);return null;})
+      :Promise.resolve(null);
+    const binary=await binaryPromise;
     boot.step('the light and shade','Loading rooms and gardens…');
     let occlusion=null;
     try{occlusion=await loadHouseOcclusion(data,binary);}
     catch(error){console.warn('House ambient occlusion skipped:',error.message);}
     // Load milestones for QA (performance.getEntriesByType('mark')).
     performance.mark('house:occlusion');
+    let bakedLight=null,baked=await Promise.race([bakedPending,new Promise(resolve=>setTimeout(resolve,BAKE_GRACE,'late'))]);
+    if(baked==='late'){bakeAbort.abort();baked=null;}
+    if(baked){
+      // No mipmaps: the atlas packs thousands of islands a few texels apart, and
+      // smaller mip levels would average neighbouring islands into each other.
+      // Bounce light is soft, so plain bilinear filtering holds up at distance.
+      const page=p=>{const t=new THREE.Texture(p.image);t.colorSpace=THREE.NoColorSpace;t.flipY=false;
+        t.minFilter=THREE.LinearFilter;t.magFilter=THREE.LinearFilter;t.generateMipmaps=false;t.needsUpdate=true;return t;};
+      bakedLight={houseLightDay:{value:page(baked.pages.day)},houseLightNight:{value:page(baked.pages.night)},
+        houseLightScale:{value:new THREE.Vector2(baked.pages.day.scale,baked.pages.night.scale*BAKE_NIGHT)},
+        houseLightBlend:{value:new THREE.Vector3(1,Math.PI*BAKE_GAIN,BAKE_REPLACE)}};
+      lighting.useBakedLight(bakedLight.houseLightBlend.value);
+    }
+    performance.mark('house:baked-light');
     for(const g of data.groups){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));
       geometry.computeBoundingSphere();
       if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
         occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
-      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0,nearFade:query.get('nearfade')==='1'});
+      // Moving parts (doors, swings) keep live light: their bake would stay put.
+      if(baked)geometry.setAttribute('houseLightUV',new THREE.BufferAttribute(g.prop?new Uint16Array(g.count*2).fill(UNBAKED)
+        :baked.uv.subarray(g.offset/12,g.offset/12+g.count*2),2,true));
+      const material=createHouseMaterial(g,{ambientOcclusionStrength:occlusion?.strength??0,nearFade:query.get('nearfade')==='1',bakedLight});
       const mesh=new THREE.Mesh(geometry,material);mesh.name=g.name;
       mesh.castShadow=!material.transparent;mesh.receiveShadow=!material.transparent;
       mesh.layers.enable(1);scene.add(mesh);
@@ -569,7 +613,7 @@ async function load(){
       tour:{setCameraRig(r){followRig.setRig(r);},hint(text,show){if(text)setHint(text,show);else setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · 🐾 to jump · tap an activity');}}});
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
-    if(life.sky){lighting.setClock(()=>life.sky());lighting.prime(player);}
+    if(life.sky){lighting.setClock(()=>PINNED_SKY||life.sky());lighting.prime(player);}
     // Pets, labels and markers bring their own materials.
     boot.step('your Craepets\' fur');
     await warmShaders();performance.mark('house:pets-compiled');render();performance.mark('house:first-frame');
@@ -596,7 +640,7 @@ async function load(){
       get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
       airborne:!!body?.airborne,verticalSpeed:body?.vy??0,jumps:body?.jumps??0,standingOn:standingOn(),
       map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),interactions:interactions?.state??null,
-      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
+      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,framesDrawn,bakedLight:baked?{vertices:baked.bakedVertices,blend:bakedLight.houseLightBlend.value.toArray()}:null,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     boot.fail(error,$('loading').textContent);}
 }

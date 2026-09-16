@@ -289,7 +289,112 @@ diagnostics. Glass and foliage do not occlude the bake. Near and back-facing
 intersections are filtered. This modest contact effect is separate from the
 room reflections.
 
-This is a real-time approximation of the photographic materials, not Cycles in
+**Baked indirect light (first iteration: four rooms).** The optional `bakedLight` block (`--lightmap`, `browser_lightmap.py`) binds
+two things to the same raw mesh SHA-256 as the AO sidecar:
+- **`house.lightuv.gz`:** two normalized uint16 per exported vertex, in mesh
+  order. `65535, 65535` means the vertex is not baked, and v = 0 is the bottom
+  row of the pages.
+- **`house.light.day.png` and `house.light.night.png`:** one shared 2048²
+  atlas. Each stores Cycles *Diffuse Indirect* (Color off) as raw 8-bit RGB,
+  `v = (L / scale)^(1/2.2)`, with no colour-management chunks.
+
+The browser uses it instead of its fill/ambient light on baked fragments
+only. Direct sun, sky and lamps stay live, and everything unbaked keeps
+today's lighting.
+
+**Rooms.** The Kitchen, Living room, Dining room and Ellie's bedroom (the
+pink-curtain bedroom, collections 39/40) are baked; every other room is
+unbaked. A receiver is any exportable mesh in those rooms' collections, plus
+architecture and dressing whose bounding-box centre is inside the room
+region.
+- **Joined receiver.** All receivers are joined into one temporary mesh. It
+  keeps each face's material and the walkthrough pose (open front door, slid
+  sunroom panel, open gate). The mesh is unwrapped with Smart UV Project and
+  repacked with an exact 4 px gap. The result has 13,189 islands, fills 33% of
+  the atlas and gives about 39 texels/m.
+- **Floors.** Thin level floor pieces (boards, rugs) are projected from above
+  onto one proxy plane per room. The proxy is visible to the bake only, never
+  to bounce or shadow rays. Flat rugs are hidden while baking.
+- **Bake scene.** Everything else the export draws stays visible and posed.
+  Ceilings are on, and label text and the studio softboxes are off.
+  - While baking, window glass is a 92 % Transparent BSDF, because
+    photoreal.py's refractive-caustics setting would otherwise block daylight.
+  - Persistent render data is off during the bake.
+
+**Lighting.**
+- **Day** matches photoreal.py's interior views:
+  - the Nishita sky world and "Soft daylight sun";
+  - all 26 practical, fill and window-area lamps;
+  - the bulb, diffuser and fairy-light emitters.
+
+  Only the three studio softboxes are off.
+- **Night** keeps the 25 practical lamps and the emitters. The sun and
+  "Garage door daylight" are off, and the sky is a flat
+  (0.0012, 0.0016, 0.0030).
+
+**Denoise.** Denoising uses a Cycles-baked island-id map, so it never mixes
+two UV islands: 2 passes of a Gaussian with sigma 2 texels. Gutters are then
+dilated and filled for mipmaps.
+
+**Left unbaked.** These keep live light, and the manifest lists each group:
+- moving props, glass, foliage and emitters, parts under 4 cm or 40 cm², and
+  slabs under the floor;
+- receivers inside a similar-sized solid (the three pink entry walls, a
+  tub-chair base and the fairy-light wire). Their partners, and both
+  partly-overlapping walls ("Pink bedroom far window wall" / "Dining storage
+  wall"), are unbaked wherever an AO-refined triangle lies in the overlap;
+- triangles whose UV centroid or inset corners miss a texel of their own
+  object's island in the id map;
+- the 214 receivers that bake dark in both states. Most are metals, which have
+  no diffuse lobe.
+
+**Produced the staged first iteration** (Blender 4.5.13, 4 CPU cores) in two
+steps: a 128-sample bake, then a re-encode of the saved raw bake with the
+final exclusion rules. The island-id map was checked identical before reuse.
+
+```sh
+blender --background --factory-startup --python models/house/export_walkthrough.py -- \
+  --ao --output <private>/proto1 --lightmap --lightmap-samples 128 \
+  --lightmap-preview <private>/captures --lightmap-raw <private>/raw-proto1
+blender --background --factory-startup --python models/house/export_walkthrough.py -- \
+  --ao --output <private>/proto1b --lightmap --lightmap-samples 128 \
+  --lightmap-reuse-raw <private>/raw-proto1 \
+  --lightmap-probe "Main rectangular ceiling|Refrigerator cabinet|Pink bedroom far window wall|Living room mirror wall"
+```
+
+**Cost.**
+- **Time:** selection and unwrap took 27 s and the export with AO about 1.5 min.
+  Each lighting state took about 11 min: the day bake was 578 s for receivers
+  plus 87 s for the floor proxy, and night took 651 s in total. Encoding took
+  34 s per page, and the whole bake run about 27 min.
+- **Memory:** peak working set 2.7 GiB.
+- **Sizes:** day page 2.14 MB, night page 1.94 MB, UV sidecar 0.44 MB. Of
+  1,903,854 exported vertices, 222,225 are baked.
+
+**Known limits.**
+- The main-floor ceiling you see is the underside of "Main block gable roof",
+  2–3 cm below "Main rectangular ceiling" (confirmed by `--lightmap-probe`).
+  That roof isn't a receiver, so the visible ceiling stays on live light.
+- Overlaps found only after the bake (dark receivers) are not paired.
+- Thin trims often fall back to live light next to baked neighbours.
+- A whole-house bake at this density would need several 2048² pages or one
+  4096² page, roughly 4 × the atlas area and bake time.
+
+**Debugging options** (write private files only; keep them out of Git):
+- `--lightmap-preview` saves tone-mapped raw bakes.
+- `--lightmap-debug-cameras kitchen,pink_bedroom` renders low-res frames of
+  the bake scene.
+- `--lightmap-raw` saves the float bakes and the id map.
+- `--lightmap-prepare-only` stops after the unwrap.
+
+**Tests.**
+- `node models/house/test_browser_lightmap.mjs [export dir]` checks the
+  sidecar contract (counts, sentinels, hashes, PNG chunks).
+- `models/house/test_browser_lightmap.py`, run with Blender's Python because
+  it needs numpy, checks the encoding, interpolation, island-exact denoise,
+  PNG writer and the post-bake island check.
+
+**Rendering limits.** This is a real-time approximation of the photographic materials, not Cycles in
 the browser. AO does not bake bounced illumination; unshadowed fills
 can still soften room boundaries. Room probes approximate mirror perspective
 and omit moving pets, and panes use alpha/reflection instead of full refraction.
@@ -461,6 +566,7 @@ python models/house/export_walkthrough.py -- --ao
 python models/house/test_browser_materials.py
 node models/house/test_browser_materials.mjs
 node models/house/test_browser_ao.mjs
+node models/house/test_browser_lightmap.mjs
 node models/house/test_browser_ramps.mjs
 node models/house/test_walkthrough.mjs
 node tests/house-routes.mjs

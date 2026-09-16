@@ -33,7 +33,10 @@ const shader={vertexShader:THREE.ShaderLib.physical.vertexShader,
 material.onBeforeCompile(shader);
 assert.equal(shader.defines.HOUSE_AO,1);
 assert.equal(shader.uniforms.houseOcclusionStrength.value,.35);
-assert(shader.fragmentShader.includes('reflectedLight.indirectDiffuse*=houseAO'));
+// (Indirect diffuse takes the AO everywhere a baked lightmap doesn't already
+// carry its own occlusion; houseBakedHere is 0 without a bake.)
+assert(shader.fragmentShader.includes('reflectedLight.indirectDiffuse*=mix(houseAO,1.0,houseBakedHere)'));
+assert(shader.fragmentShader.includes('float houseBakedHere=0.0;'));
 assert(shader.fragmentShader.includes('reflectedLight.indirectSpecular*=houseAO'));
 // Design change (render pass): a bounded share of the occlusion also darkens
 // direct diffuse light so furniture sits in its own shadow; specular stays.

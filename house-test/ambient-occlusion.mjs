@@ -23,7 +23,8 @@ export async function loadHouseOcclusion(data,binary,fetcher=globalThis.fetch){
     throw Error('Ambient occlusion vertex count does not match mesh');
   if(await sha256(binary)!==d.meshSha256)
     throw Error('Ambient occlusion belongs to a different mesh');
-  const response=await fetcher('./'+d.url);
+  // (Keyed by its hash, so a cached copy of another bake is never used.)
+  const response=await fetcher('./'+d.url+'?v='+d.sha256.slice(0,16));
   if(!response.ok||!response.body)throw Error('Ambient occlusion sidecar unavailable');
   const bytes=new Uint8Array(await new Response(response.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
   if(bytes.length!==count)throw Error('Ambient occlusion byte count does not match mesh');

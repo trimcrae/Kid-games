@@ -40,7 +40,12 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     assert.equal(await runtime().evaluate(()=>Craepets.state().pet.name),'Cory Comet');
     await page.locator('#start').click();
     async function jump(room){if(await page.evaluate(()=>houseTest.state.active))await page.keyboard.press('KeyR');else await page.locator('#welcome-rooms').click();await page.getByRole('button',{name:'Jump to '+room,exact:true}).click();await page.waitForTimeout(1100);}
-    async function open(id,room){await jump(room);await page.keyboard.press('KeyE');if(await page.locator('#activity-choices').isVisible())await page.locator('[data-choice="'+id+'"]').click();await page.waitForTimeout(150);}
+    // E now uses a thing in reach first (the fridge, the swings…; interactions.mjs), so the
+    // room's activity is opened with its own on-screen button, as a player would there.
+    async function open(id,room){await jump(room);const button=page.locator('#nearby-actions [data-activity="'+id+'"]');
+      // (A real click: the button must be visible and not covered.)
+      if(await button.count())await button.click();
+      else{await page.keyboard.press('KeyE');if(await page.locator('#activity-choices').isVisible())await page.locator('[data-choice="'+id+'"]').click();}await page.waitForTimeout(150);}
     for(const [id,room] of [['farm','Back yard'],['well',"Mom & Dad's office"],['pool','Sunroom'],['market','Garage'],['bank',"Mom & Dad's office"],['home','Living room'],['games','Basement playroom'],['arena','Front yard'],['bag','Shared bedroom entry'],['quests','Dining room'],['diary',"Ellie's bedroom"],['case',"Jeannie's bedroom"],['stall','Front porch'],['feed','Kitchen'],['wash','Green bathroom'],['rest',"Kieran's bedroom"],['dress',"Mom & Dad's bedroom"],['play','Family room'],['read',"Mom & Dad's office"]]){
       await open(id,room);assert(await f.locator('.panel').count()>0,id+' empty');console.log('OPEN',id);
       if(['farm','well','pool'].includes(id)){
@@ -112,8 +117,9 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     await f.locator('[data-do="wash"]').click();await page.locator('#activity-panel').waitFor({state:'hidden'});
     const guided=await page.evaluate(()=>houseTest.state);assert.equal(guided.destination,'wash');assert(Math.abs(guided.position.x-walking.position.x)<.1,'Directions silently teleported the player');
     const roamed=await page.evaluate(()=>houseTest.state.roamers);assert(roamed.some(r=>r.id==='ellie'),'Family pet did not join the house');// Companions live at their places (a bed, a rug, the veg bed…) doing something there.
-    // Only the family's own pets: Cory plays, so Ellie's is the one companion (no shopkeepers).
-    assert.deepEqual(roamed.map(r=>r.id),['ellie'],'Someone outside the family lives in the house');
+    // Only the family's own pets: Cory plays, so Ellie's is the one Craepet companion (no shopkeepers).
+    // The family's real cats, Bubba and Beebs (companions.mjs HOUSE_CATS), live there too.
+    assert.deepEqual(roamed.map(r=>r.id).filter(id=>!['bubba','beebs'].includes(id)),['ellie'],'Someone outside the family lives in the house: '+roamed.map(r=>r.id));
     assert(roamed.every(r=>r.act&&r.mode),'Companions have no routine');
     await page.keyboard.press('KeyF');await page.locator('[data-profile="ellie"]').click();await page.waitForTimeout(1100);assert.equal((await page.evaluate(()=>houseTest.state)).pet,'Ellie Blossom');
     // Switching to someone with no pet offers adoption; leaving it without

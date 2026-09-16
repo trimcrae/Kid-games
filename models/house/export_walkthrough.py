@@ -22,7 +22,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from browser_materials import (material_finish, keep_bevel, practical_light, ramp_colliders,
                                oriented_triangle_corners, group_key, dressing_collection, browser_flag)
-from browser_ao import VertexAO, architectural_receiver, benchmark_samples, occludes
+from browser_ao import VertexAO, architectural_receiver, benchmark_samples, occludes, peak_memory_mib
+from browser_lightmap import Lightmap, DEFAULT_ROOMS, log as lightmap_log
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--source', type=Path, default=HERE/'house.blend')
 parser.add_argument('--output', type=Path, default=HERE.parent.parent/'house-test')
@@ -33,6 +34,27 @@ parser.add_argument('--ao-edge', type=float, default=.7, help='Floor/wall sample
 parser.add_argument('--ao-max-extra-vertices', type=int, default=180000)
 parser.add_argument('--ao-benchmark-samples', type=int, default=0,
                     help='With --ao, cast only 1..10000 deterministic samples and write no assets')
+parser.add_argument('--lightmap', action='store_true',
+                    help='Opt-in Cycles indirect-diffuse lightmaps (day/night) for --lightmap-rooms')
+parser.add_argument('--lightmap-rooms', default=','.join(DEFAULT_ROOMS))
+parser.add_argument('--lightmap-size', type=int, default=2048)
+parser.add_argument('--lightmap-samples', type=int, default=128)
+parser.add_argument('--lightmap-margin', type=int, default=4)
+parser.add_argument('--lightmap-blur', type=int, default=2,
+                    help='Island-aware denoise passes (0 = raw bake)')
+parser.add_argument('--lightmap-sigma', type=float, default=2.0, help='Denoise radius in texels')
+parser.add_argument('--lightmap-raw', type=Path, default=None,
+                    help='Private directory for raw float bakes and the island id map (.npy)')
+parser.add_argument('--lightmap-preview', type=Path, default=None,
+                    help='Private directory for tone-mapped sanity previews of each raw bake')
+parser.add_argument('--lightmap-debug-cameras', default='',
+                    help='With --lightmap-preview: low-res renders of these named views in the bake scene')
+parser.add_argument('--lightmap-reuse-raw', type=Path, default=None,
+                    help='Encode the raw bakes saved by --lightmap-raw instead of baking (layout must match)')
+parser.add_argument('--lightmap-probe', default='',
+                    help='Debug: "|"-separated receiver names to ray-probe (logged) in the bake scene')
+parser.add_argument('--lightmap-prepare-only', action='store_true',
+                    help='Select and unwrap, print diagnostics, write nothing')
 args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 if args.ao_benchmark_samples and (not args.ao or not 1 <= args.ao_benchmark_samples <= 10000):
     parser.error('--ao-benchmark-samples requires --ao and a count from 1 to 10000')
@@ -40,6 +62,19 @@ OUT = args.output.resolve()
 OUT.mkdir(exist_ok=True)
 if args.ao and shutil.disk_usage(OUT).free < 10 * 2**30 + 128 * 2**20:
     raise RuntimeError('AO export needs 10 GiB free plus a 128 MiB output allowance')
+if args.lightmap and shutil.disk_usage(OUT).free < 10 * 2**30 + 512 * 2**20:
+    raise RuntimeError('Lightmap export needs 10 GiB free plus a 512 MiB working allowance')
+lightmap = Lightmap([r.strip() for r in args.lightmap_rooms.split(',') if r.strip()],
+                    args.lightmap_size, args.lightmap_samples, args.lightmap_margin,
+                    args.lightmap_blur) if args.lightmap else None
+if lightmap:
+    lightmap.sigma = args.lightmap_sigma
+    lightmap.raw_dir = args.lightmap_raw.resolve() if args.lightmap_raw else None
+    lightmap.reuse_raw = args.lightmap_reuse_raw.resolve() if args.lightmap_reuse_raw else None
+if lightmap and args.lightmap_preview:
+    lightmap.preview_dir = args.lightmap_preview.resolve()
+    lightmap.preview_tag = OUT.name
+    lightmap.debug_cameras = tuple(c for c in args.lightmap_debug_cameras.split(',') if c)
 ao = VertexAO(rays=args.ao_rays, radius=args.ao_radius, edge=args.ao_edge,
               max_extra_vertices=args.ao_max_extra_vertices) if args.ao else None
 bpy.ops.wm.open_mainfile(filepath=str(args.source.resolve()))
@@ -123,14 +158,13 @@ for obj in scene.objects:
                        'size': round(lamp.size if lamp.type == 'AREA' else
                                      lamp.shadow_soft_size, 3),
                        'angle': round(lamp.spot_size / 2, 4) if lamp.type == 'SPOT' else 1.35})
-depsgraph = bpy.context.evaluated_depsgraph_get()
-source_objects = 0
-for o in scene.objects:
-    if o.type not in {'MESH','CURVE'} or o.get('export') is False:
-        continue  # render-only dense leaves; coarse clusters stand in
-    cname = o.users_collection[0].name
-    if 'label' in cname.lower() or cname.startswith('15 |'):
-        continue
+def exportable(o):
+    if o.type not in {'MESH','CURVE'} or o.get('export') is False or o.get('lightmap_copy'):
+        return False  # render-only dense leaves; coarse clusters stand in
+    cname = o.users_collection[0].name if o.users_collection else ''
+    return not ('label' in cname.lower() or cname.startswith('15 |'))
+
+def export_matrix(o):
     parent = o.parent.name if o.parent else ''
     matrix = o.matrix_world.copy()
     if parent == 'Red three-panel front door' and 'white' not in o.name.lower():
@@ -140,6 +174,23 @@ for o in scene.objects:
     if parent == 'White upper stair safety gate':
         hinge = o.parent.matrix_world @ Vector((-.53,0,0))
         matrix = Matrix.Translation(hinge) @ Matrix.Rotation(math.pi/2,4,'Z') @ Matrix.Translation(-hinge) @ matrix
+    return matrix
+
+if lightmap:
+    lightmap_log('blend opened and export modifiers prepared')
+    lightmap.prepare(scene, bpy.context.evaluated_depsgraph_get(), export_matrix, exportable,
+                     prop_key, material_finish)
+    if args.lightmap_prepare_only:
+        # Private debugging aid: the joined receiver and floor proxy only.
+        bpy.data.libraries.write(str(OUT/'lightmap-receivers.blend'), {lightmap.joined, lightmap.proxy})
+        sys.exit(0)
+depsgraph = bpy.context.evaluated_depsgraph_get()
+source_objects = 0
+for o in list(scene.objects):
+    if not exportable(o):
+        continue
+    cname = o.users_collection[0].name
+    matrix = export_matrix(o)
     # These are lightweight internal curtains and do not block a person.
     # An explicit browser_collide=False (object or parent empty) marks props a
     # pet walks past or through: rugs, wall art, shelf items, canopies.
@@ -161,6 +212,9 @@ for o in scene.objects:
     mesh.calc_loop_triangles()
     verts = [matrix @ v.co for v in mesh.vertices]
     prop = prop_key(o, verts)
+    # Moving props keep live light: a bake would stay where they started.
+    lm_uv = lightmap.object_uvs(o, mesh, verts) if lightmap and not prop else None
+    lm_oid = lightmap.oid.get(o.name, 0) if lightmap else 0
     normal_matrix = matrix.to_3x3().inverted().transposed()
     mirrored = matrix.to_3x3().determinant() < 0
     materials = list(o.data.materials)
@@ -178,6 +232,9 @@ for o in scene.objects:
                            'finish':finish,'values':array.array('f')}
             if prop:
                 groups[key]['prop'] = prop
+            if lightmap:
+                groups[key]['lightuv'] = array.array('H')
+                groups[key]['lightowner'] = array.array('I')
         values = groups[key]['values']
         corners = []
         triangle_corners = oriented_triangle_corners(tri.vertices, tri.loops, mirrored)
@@ -186,17 +243,30 @@ for o in scene.objects:
             n = normal_matrix @ mesh.corner_normals[loop].vector
             n.normalize()
             corner = xyz(verts[i])+xyz(n)
-            if ao:
+            if ao or lightmap:
                 corners.append(tuple(corner))
-            else:
+            if not ao:
                 values.extend(corner)
+        if lightmap:
+            light, owner = groups[key]['lightuv'], groups[key]['lightowner']
+            finish = groups[key]['finish']
+            positions = [c[:3] for c in corners]
+            tri_uvs = lightmap.triangle_uvs(lm_uv, triangle_corners, occludes(o.name, finish)
+                                            and finish.get('emissiveIntensity', 0) <= .5)
+            if not ao:
+                kept_uvs = lightmap.clip_overlap(o.name, corners, tri_uvs)
+                for corner in corners:
+                    lightmap.extend(light, owner, lm_oid, corner, positions, kept_uvs)
         if ao:
             opaque = occludes(o.name, groups[key]['finish'])
             if opaque:
                 occluder_triangles.append(tuple(i for i, _ in triangle_corners))
             for refined in ao.tessellate(tuple(corners), can_tessellate and opaque):
+                kept_uvs = lightmap.clip_overlap(o.name, refined, tri_uvs) if lightmap else None
                 for corner in refined:
                     values.extend(round(v, 5) for v in corner)
+                    if lightmap:
+                        lightmap.extend(light, owner, lm_oid, corner, positions, kept_uvs)
     if prop:
         # The prop's extent, in browser coordinates, for its pivot.
         lo = [min(xyz(v)[i] for v in verts) for i in range(3)]
@@ -240,17 +310,32 @@ if ao:
               estimatedFullBakeSeconds=round(ao.bake_seconds*unique/max(1,len(sample_bytes)),2))), flush=True)
         sys.exit(0)
 
+if lightmap:
+    lightmap_log('export loop done: %d objects' % source_objects)
+    lightmap.probe_names = tuple(n for n in args.lightmap_probe.split('|') if n)
+    lightmap.bake(scene, export_matrix, exportable, practical_light)
+
 blob = bytearray()
 ao_blob = bytearray()
+uv_blob = bytearray()
 manifest = {'version':2,'generator':scene['generator_sha256'],
             'exporter':hashlib.sha256((HERE/'export_walkthrough.py').read_bytes() +
                                       (HERE/'browser_materials.py').read_bytes() +
-                                      (HERE/'browser_ao.py').read_bytes()).hexdigest(),
+                                      (HERE/'browser_ao.py').read_bytes() +
+                                      (HERE/'browser_lightmap.py').read_bytes()).hexdigest(),
             'sourceObjects':source_objects,'groups':[],'colliders':colliders,'props':props,
             'lights':lights,'sunlight':sunlight,'beveledObjects':beveled_objects,
             'note':'Estimated photo study. Browser export opens the front door and rear sliding panel.'}
 for group in groups.values():
     values = group.pop('values')
+    light = group.pop('lightuv', None)
+    if light is not None:
+        light = lightmap.finalize(light, group.pop('lightowner'))
+        if len(light) != len(values)//3:
+            raise RuntimeError('Lightmap UVs and vertices disagree in ' + group['name'])
+        if sys.byteorder != 'little':
+            light.byteswap()
+        uv_blob.extend(light.tobytes())
     if ao:
         ao_blob.extend(ao.bake_group(values, receive=occludes('', group['finish'])))
     group['offset'] = len(blob)
@@ -267,6 +352,11 @@ if ao:
     with gzip.GzipFile(filename=str(OUT/'house.ao.gz'),mode='wb',mtime=0) as f:
         f.write(ao_blob)
     print('AO_BAKE', json.dumps(ao.stats), flush=True)
+if lightmap:
+    manifest['bakedLight'] = lightmap.write(OUT, manifest['meshSha256'], len(blob)//24, bytes(uv_blob),
+                                            peak_memory_mib())
+    lightmap.cleanup()
+    print('LIGHTMAP', json.dumps({k: v for k, v in manifest['bakedLight'].items() if k != 'bake'}), flush=True)
 with gzip.GzipFile(filename=str(OUT/'house.mesh.gz'),mode='wb',mtime=0) as f:
     f.write(blob)
 (OUT/'house.json').write_text(json.dumps(manifest,separators=(',',':'))+'\n',encoding='utf-8')
