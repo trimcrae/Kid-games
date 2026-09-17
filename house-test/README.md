@@ -69,6 +69,16 @@ study:
   toilets. The parts that move come out of the export as their own draw
   groups and collision boxes tagged with a prop key (`props` in
   `house.json`); sounds are a tiny WebAudio synth, nothing downloaded.
+  Swing on the sunroom monkey bars (`hang-bar.mjs`), set the Roomba going by
+  the family-room fireplace (`roomba.mjs`), play today's Yoto Daily on the
+  Yoto player in each kid's room (`yoto.mjs`).
+- **Sleep in any bed** (`beds.mjs`, `E` beside or on a bed, including the
+  crib, the bassinet and both bunks): the pet climbs on, curls up and sleeps
+  under dimmed lights while its energy fills a little each second (through
+  `HouseActivity.rest` in `engine.js`, so the game's save and its Rest wish
+  see it); it wakes by itself once rested, or on E or any arrow, and lands
+  back beside the bed. The Marauder's Map shows it asleep. Beds are found
+  from the export's mattress boxes, so a new bed in `build.py` is a bed here.
 - **The living-room computer** (`monitor.mjs`) is playing Craepets: its
   screen shows the very frame you are looking at, one frame behind, so the
   screen is on the screen and so on into the glow (the post pass's own frame

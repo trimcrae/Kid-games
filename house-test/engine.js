@@ -6556,6 +6556,10 @@
     select: function(id){if(D.PROFILES.some(function(p){return p.id===id;}))switchTo(id);},
     refreshSaves: function(){hush();stopCatch();stopMatch();sess=null;battle=null;clearTimeout(battleTimer);closeSheet();who=localStorage.getItem(WHO_KEY)||who;S=load(who);view='nest';render();},
     cuddle: function(){if(!S.pet)return;if(S.pet.egg){tapEgg();return;}S.pet.happy=clamp(S.pet.happy+1,0,100);var line=moodSay();say(line.text,2600,line.tok);sfx('pop');save();},
+    /* Asleep in one of the house's beds: `amount` energy back now (a little
+       every second while it sleeps); `done` at the end counts as a Rest for
+       its wishes, like a nap at the nest. Returns the energy it has now. */
+    rest: function(amount,done){if(!S.pet||S.pet.egg)return null;S.pet.energy=clamp(S.pet.energy+(amount||0),0,100);if(done){S.pet.happy=clamp(S.pet.happy+2,0,100);checkWish('act','rest');}save();return S.pet.energy;},
     family: function(){return D.PROFILES.map(function(p){var s=p.id===who?S:readSlot(p.id);return {id:p.id,name:p.name,pet:s&&s.pet};});},
     neighborhood: function(){return D.PROFILES.map(function(p){var s=p.id===who?S:load(p.id);return withSave(s,function(){return {id:p.id,pet:S.pet,home:S.pet?homeName():null,house:S.pet?houseInfo():null,items:S.pet?placedItems():[],style:S.pet?{wall:wallNow(),floor:floorNow()}:null};});});},
     palette: function(id){var c=P.colour(id),pattern=null;if(typeof c.pal.B==='function'){pattern=[];for(var y=0;y<22;y++){var row=[];for(var x=0;x<16;x++)row.push(c.pal.B(x,y,16,22));pattern.push(row);}}return {body:typeof c.pal.B==='function'?c.pal.B(8,10,16,22):c.pal.B,accent:typeof c.pal.A==='function'?c.pal.A(8,10,16,22):c.pal.A,pattern:pattern};},

@@ -27,6 +27,10 @@ p{margin:0}
 /* Third person: nothing to aim at, so no dot sits on the pet while the mouse is captured. */
 #fade{position:fixed;inset:0;background:var(--panel);opacity:0;pointer-events:none;z-index:8;transition:opacity .28s ease-out}
 #fade.on{opacity:1;transition:none}
+/* Asleep in a bed (beds.mjs): the lights go down round the edges. Under the
+   top bar and the speech bubble, so the energy bar can be watched filling. */
+#sleep{position:fixed;inset:0;background:radial-gradient(ellipse at 50% 45%,#0a0e2a33 0%,#06081899 60%,#060818d9 100%);opacity:0;pointer-events:none;z-index:2;transition:opacity 1.4s ease}
+#sleep.on{opacity:1}
 
 /* --- Top bar: the pet badge on the left, round buttons on the right --- */
 .topbar{position:fixed;top:0;left:0;right:0;padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none;z-index:4}
