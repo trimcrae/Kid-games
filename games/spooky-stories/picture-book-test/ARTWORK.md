@@ -1,0 +1,20 @@
+# Picture-book art trial
+
+Created 2026-09-17 with the built-in OpenAI image generation tool in Codex (no API key or CLI generation). Original PNGs are preserved in the account's generated_images directory; project copies are in art/page-1.png through art/page-3.png. Each is 1448 × 1086. Total project image storage is approximately 7.4 MiB.
+
+The user explicitly requested this OpenAI illustration trial for Spooky Princess Stories, superseding the older repo restriction on generated child/creature art for this trial. Craepets is outside its scope.
+
+Page 2 used page 1 as a visual reference; page 3 used page 2. The accompanying story was adjusted to match the resulting illustrations. This is a read-together art sample with no generated narration. The existing stories and their Piper narration are unchanged.
+
+## Page 1
+
+Use case: illustration-story. Create a landscape 4:3 children's picture-book illustration for the opening of 'Princess Ellie and the Shy Shadow'. Rich watercolor and gouache on textured paper, beautifully composed, soft edges, expressive and cozy, suitable for preschool children, gentle mystery without anything frightening. Princess Ellie is a fictional little princess with a wavy auburn bob, small gold crown, long lavender dress with tiny embroidered stars, and brown boots. At twilight she stands in a cozy castle hallway holding a small warm golden lantern. On the wall a surprisingly tall soft shadow appears behind a potted fern. Ellie looks curious and kindly, not scared. Arched windows, violet blue dusk, warm amber light, a glimpse of a moonlit garden. The shadow is clearly soft and harmless. Full bleed art, no text, lettering, panels, borders, logo or watermark.
+
+## Page 2
+
+Use case: illustration-story. Create the second full-page landscape 4:3 illustration of the same picture book. Use the previous image ONLY as a character and visual style reference. Preserve the little fictional princess Ellie's wavy auburn bob, tiny gold crown, lavender star-embroidered dress, brown boots, rich watercolor/gouache textures, castle corridor and violet/amber palette. NEW SCENE: Ellie has set the glowing golden lantern on the stone floor to her left, away from the wall, and stands between the lantern and the wall. She raises one hand in a big playful wave; her large soft shadow on the wall raises the matching hand. She smiles in delighted recognition: the mysterious shadow is her own! The potted fern is at the far side, not obscuring the shadow. Strong readable composition for a preschool picture book. Harmless, cozy mystery, no fear, no extra people, no text, no panels, no borders, no watermark.
+
+## Page 3
+
+Use case: illustration-story. Third and final full-page landscape 4:3 picture-book illustration for 'Princess Ellie and the Shy Shadow'. Use the previous illustration only as character and style reference; make a new distinct closing composition. Preserve fictional little princess Ellie's wavy auburn bob, small gold crown, lavender star-embroidered dress, brown boots and watercolor/gouache paper texture. Ellie sits on a cushion beside a castle corridor wall and holds both hands up in a simple rabbit shadow-puppet pose. A golden lantern on the floor in front of her hands casts one large clear rabbit-shaped hand shadow on the warm stone wall. Ellie laughs warmly at her playful shadow rabbit. A closed storybook and the fern nearby, moon visible through an arched window. Cozy, safe bedtime mood, lavender, deep twilight blue and golden amber. Focus on the princess and rabbit hand shadow; readable and charming, no frightening creatures, no text, no panels, no border or watermark.
+

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#241d3b">
+  <title>Princess Ellie and the Shy Shadow · Picture-book sample</title>
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="story.css">
+  <script src="story.js" defer></script>
+</head>
+<body>
+  <main class="sample">
+    <header class="sample-header">
+      <a href="../">← All stories</a>
+      <span>Spooky Princess Stories · Picture-book sample</span>
+    </header>
+    <h1>Princess Ellie and the <em>Shy Shadow</em></h1>
+    <p class="intro">A little mystery about light, shadows, and looking closely.</p>
+    <article class="book" aria-label="Three-page picture book">
+      <div class="picture">
+        <img id="illustration" src="art/page-1.png" width="1448" height="1086" alt="Princess Ellie holds a lantern and notices a tall crowned shadow beside a fern in the castle hallway.">
+        <p id="image-error" hidden>The picture could not load. You can still read the story below.</p>
+      </div>
+      <div class="page-copy">
+        <div id="page-content" aria-live="polite" aria-atomic="true">
+          <p class="eyebrow" id="page-count">01 / 03</p>
+          <h2 id="page-title">Who’s there?</h2>
+          <p id="story-text">At bedtime, Princess Ellie carried her lantern through the castle. Beside the fern, a tall shadow wore a pointy crown. Ellie stopped. “Hello?” she whispered. The shadow was very quiet.</p>
+          <p class="wonder" id="wonder">Look closely. What does the shadow’s crown remind you of?</p>
+        </div>
+        <nav class="page-controls" aria-label="Story pages">
+          <button id="previous" type="button" disabled>← Back</button>
+          <button id="next" type="button">Next page →</button>
+        </nav>
+      </div>
+    </article>
+    <section id="question" class="question" hidden aria-labelledby="question-title">
+      <p class="eyebrow">A little thinking moment</p>
+      <h2 id="question-title">What made Ellie’s shadow?</h2>
+      <div class="answers">
+        <button type="button" data-correct="false">A hidden ghost</button>
+        <button type="button" data-correct="true">Ellie blocking the lantern’s light</button>
+      </div>
+      <p id="answer-feedback" role="status"></p>
+    </section>
+    <details class="grownups">
+      <summary>For grown-ups: artwork and narration</summary>
+      <p>These three illustrations were generated with OpenAI’s built-in image tool in Codex, without an API key. This is a small art trial before changing the other stories.</p>
+      <p>This sample is for reading together and has no recorded narration. OpenAI narration export is not available through the tools in this Pro session. The documented speech-file route uses a separately billed API key.</p>
+      <p><a href="https://learn.chatgpt.com/docs/pricing">Plan and image usage</a> · <a href="https://developers.openai.com/api/docs/guides/text-to-speech">OpenAI speech documentation</a></p>
+    </details>
+    <footer>Made for a cozy read together · 3 pages · OpenAI-generated illustrations</footer>
+    <noscript><p>Enable JavaScript to turn the pages.</p></noscript>
+  </main>
+</body>
+</html>
