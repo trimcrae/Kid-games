@@ -91,5 +91,109 @@ window.SPOOKY_PAINTED_ART = {
       "src": "art/openai/rainbow-unicorn-5.webp",
       "alt": "Story illustration: Back home for tea, Sparkle promised to visit every single sunny day. Yay!"
     }
+  ],
+  "sleepy-star": [
+    {
+      "src": "art/openai/sleepy-star-0.webp",
+      "alt": "Story illustration: When the sky grew dark, all the little stars twinkled awake — all but one."
+    },
+    {
+      "src": "art/openai/sleepy-star-1.webp",
+      "alt": "Story illustration: “I'm so sleepy,” yawned the littlest star, “but the sky is far too bright to nap.”"
+    },
+    {
+      "src": "art/openai/sleepy-star-2.webp",
+      "alt": "Story illustration: The kind moon smiled. “I will help you, little one,” she whispered warmly."
+    },
+    {
+      "src": "art/openai/sleepy-star-3.webp",
+      "alt": "Story illustration: One by one, the stars tucked a soft, cozy cloud around their sleepy friend."
+    },
+    {
+      "src": "art/openai/sleepy-star-4.webp",
+      "alt": "Story illustration: The little star closed her eyes and floated off into the coziest dream."
+    },
+    {
+      "src": "art/openai/sleepy-star-5.webp",
+      "alt": "Story illustration: Goodnight, little star. Goodnight, moon. Goodnight, you too. Sweet dreams."
+    }
+  ],
+  "boo-birthday": [
+    {
+      "src": "art/openai/boo-birthday-0.webp",
+      "alt": "Story illustration: Guess what? Tonight is Boo the ghost's birthday, and the castle is ready to party!"
+    },
+    {
+      "src": "art/openai/boo-birthday-1.webp",
+      "alt": "Story illustration: Princess Ellie hung purple streamers while Midnight the cat chased a balloon."
+    },
+    {
+      "src": "art/openai/boo-birthday-2.webp",
+      "alt": "Story illustration: The little bats flew in with a big cake lit by flickering pumpkin candles. Yum!"
+    },
+    {
+      "src": "art/openai/boo-birthday-3.webp",
+      "alt": "Story illustration: “Surprise!” Everyone popped out. Boo giggled so hard he did a loop-the-loop!"
+    },
+    {
+      "src": "art/openai/boo-birthday-4.webp",
+      "alt": "Story illustration: They sang the spooky birthday song, and Boo blew out every candle. Whoosh!"
+    },
+    {
+      "src": "art/openai/boo-birthday-5.webp",
+      "alt": "Story illustration: “Best. Birthday. EVER!” said Boo, hugging all his friends goodnight. 💜"
+    }
+  ],
+  "floating-tea-party": [
+    {
+      "src": "art/openai/floating-tea-party-0.webp",
+      "alt": "Story illustration: Princess Ellie set the table for a spooky tea party. One cup, two cups, three cups, four cups, five!"
+    },
+    {
+      "src": "art/openai/floating-tea-party-1.webp",
+      "alt": "Story illustration: Ding-dong! Boo the ghost, Midnight the cat, the little bat and the pumpkin all came to tea."
+    },
+    {
+      "src": "art/openai/floating-tea-party-2.webp",
+      "alt": "Story illustration: But when Ellie poured the tea, the cups began to float! Up, up, up went the teacups."
+    },
+    {
+      "src": "art/openai/floating-tea-party-3.webp",
+      "alt": "Story illustration: “Boo!” giggled Boo. “It was me!” He was being silly, blowing the cups up into the air with a whoosh of ghostly wind."
+    },
+    {
+      "src": "art/openai/floating-tea-party-4.webp",
+      "alt": "Story illustration: “Come down, cups!” laughed Ellie. Boo blew a gentle puff, and down they floated. One, two, three, four, five."
+    },
+    {
+      "src": "art/openai/floating-tea-party-5.webp",
+      "alt": "Story illustration: Everyone sipped pumpkin tea and nibbled star cookies. The spookiest tea party ever was also the very best."
+    }
+  ],
+  "witch-broom": [
+    {
+      "src": "art/openai/witch-broom-0.webp",
+      "alt": "Story illustration: A kind old witch named Wanda lived in a crooked little house by the pumpkin patch."
+    },
+    {
+      "src": "art/openai/witch-broom-1.webp",
+      "alt": "Story illustration: One night Wanda knocked on the castle door. “Oh dear, oh dear! I have lost my broom, and I cannot fly without it!”"
+    },
+    {
+      "src": "art/openai/witch-broom-2.webp",
+      "alt": "Story illustration: Princess Ellie helped her look. Was it under the bed? No. Was it behind the door? No."
+    },
+    {
+      "src": "art/openai/witch-broom-3.webp",
+      "alt": "Story illustration: Was it on top of the tower? No! Only the little bat was up there, fast asleep."
+    },
+    {
+      "src": "art/openai/witch-broom-4.webp",
+      "alt": "Story illustration: Then Ellie heard a swish-swish-swish in the pumpkin patch. The broom was there, sweeping up leaves all by itself!"
+    },
+    {
+      "src": "art/openai/witch-broom-5.webp",
+      "alt": "Story illustration: “Naughty broom!” laughed Wanda. She hopped on, Ellie hopped on behind, and off they flew across the moon. Wheee!"
+    }
   ]
 };
