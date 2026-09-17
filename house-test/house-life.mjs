@@ -469,6 +469,9 @@ export async function createHouseLife(tour){
     // offset from the walking position, tilted along — instead of standing.
     ride(v){ride=v||null;},
     say(text,ms){say(text,ms);},
+    // Asleep in a bed (beds.mjs): energy back, a little at a time; `done`
+    // marks the end of the sleep for the pet's wishes. Returns the energy now.
+    rest(amount,done=false){if(!engine.state().pet)return null;const e=api.rest?.(amount,done);if(done)sync(true);return typeof e==='number'?e:null;},
     // A squash of the body on take-off and again as the paws touch down.
     hop(strength=1){hopNow=Math.max(hopNow,strength);},
     interact(){
@@ -517,7 +520,7 @@ export async function createHouseLife(tour){
         else visY=floorY;
         avatar.position.set(player.x,visY,player.z);avatar.rotation.y=heading;avatar.rotation.x=0;
         if(ride){avatar.position.set(player.x+(ride.dx||0),player.y+(ride.dy||0),player.z+(ride.dz||0));avatar.rotation.x=ride.tilt||0;visY=avatar.position.y;stepHop=null;
-          if(ride.pose)petOut={...petOut,pose:ride.pose,expression:ride.expression||petOut.expression};}
+          if(ride.pose)petOut={...petOut,pose:ride.pose,expression:ride.expression||petOut.expression,emote:ride.emote===undefined?petOut.emote:ride.emote};}
         rig.setExpression(petOut.expression);rig.setPose(petOut.pose);rig.look(...petOut.look);if(petOut.hop)rig.hop(petOut.hop);
         rig.setGrime(petNeeds&&petNeeds.clean<35?.35+.65*(35-petNeeds.clean)/35:0);
         // Wings and tails tuck in beside a wall instead of poking through it.
@@ -651,7 +654,7 @@ export async function createHouseLife(tour){
     // whether they're on the move or asleep.
     everyone(){
       const list=[],pet=engine.state().pet;
-      if(pet)list.push({id:'you',name:pet.egg?'Your egg':pet.name,kind:'you',x:player.x,y:player.y,z:player.z,heading,walking:moving&&tour.active,sleeping:false});
+      if(pet)list.push({id:'you',name:pet.egg?'Your egg':pet.name,kind:'you',x:player.x,y:player.y,z:player.z,heading,walking:moving&&tour.active&&!ride,sleeping:!!ride?.sleeping});
       for(const r of roamers)list.push({id:r.id,name:r.name,kind:r.kind,x:r.c.point.x,y:r.c.point.y,z:r.c.point.z,heading:r.c.heading,walking:r.c.walking,sleeping:!!r.c.sleeping});
       return list;
     },

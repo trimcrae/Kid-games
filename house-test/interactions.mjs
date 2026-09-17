@@ -3,11 +3,12 @@ import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {hangBarInteractions} from './hang-bar.mjs?v=20260916-use3';
 import {roombaInteractions} from './roomba.mjs?v=20260916-use3';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
+import {bedInteractions} from './beds.mjs?v=20260917-bed';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
 // the piano, switch the televisions and the ceiling fans on, rock in the
-// rocking chairs, flush the toilets. The parts that move (fridge doors, car,
+// rocking chairs, flush the toilets, sleep in any bed. The parts that move (fridge doors, car,
 // swings, fan blades) come out of the export as their own draw groups and
 // collision boxes tagged with a prop key (export_walkthrough.py); everything
 // else is a spot in the house and a bit of behaviour. A prompt pill shows
@@ -249,12 +250,14 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   function onMat(){return trampoline.boxes.some(b=>player.x>=b.min[0]&&player.x<=b.max[0]&&player.z>=b.min[2]&&player.z<=b.max[2]&&Math.abs(player.y-b.max[1])<.15);}
 
   // ----- more things, each in its own module (hang-bar.mjs, roomba.mjs,
-  // yoto.mjs): given the same tools, they push their own entries onto `list`
-  // (an interaction: {id, icon, name, kind:'toggle'|'ride'|'play'|'drive',
-  // at:{x,y,z}, radius, face?, label?(), hint?, start(), tick?(dt), key?(code),
-  // stop()}) and per-frame work onto `ticking` (dt=>{}).
+  // yoto.mjs, beds.mjs): given the same tools, they push their own entries
+  // onto `list` (an interaction: {id, icon, name, kind:'toggle'|'ride'|'play'|
+  // 'drive', at:{x,y,z}, radius, face?, label?(), hint?, off?, start(),
+  // tick?(dt) → null | {yaw?, done?}, key?(code), stop()}) and per-frame work
+  // onto `ticking` (dt=>{}). `off` is what the pill says while you're on it;
+  // a tick returning {done:true} gets off by itself.
   const ctx={THREE,scene,world,renderer,data,player,keys,life,body,tour,reducedMotion,list,ticking,sounds,propMeshes,meshesOf,pose,hinge};
-  for(const extend of [hangBarInteractions,roombaInteractions,yotoInteractions]){try{extend(ctx);}catch(error){console.warn('An interaction module failed to load:',error);}}
+  for(const extend of [hangBarInteractions,roombaInteractions,yotoInteractions,bedInteractions]){try{extend(ctx);}catch(error){console.warn('An interaction module failed to load:',error);}}
   // Which one is in reach: the nearest on this floor within its radius.
   function findNear(){
     let best=null,bd=Infinity;
@@ -270,7 +273,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       if(it.face)life.face(Math.atan2(it.face.x-player.x,it.face.z-player.z));
       if(it.kind==='toggle'){it.start();return true;}
       active=it;it.start?.();body.reset(player);life.airborne(false);
-      showPill(it.kind==='drive'?'Get out':it.kind==='play'?'Stop playing':'Get off');
+      showPill(it.off||(it.kind==='drive'?'Get out':it.kind==='play'?'Stop playing':'Get off'));
       if(it.hint)tour.hint(it.hint,true);
       return true;
     },
@@ -283,7 +286,9 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
         // A ride ends the moment you try to walk off it.
         if(active.kind==='ride'&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].some(k=>keys.has(k))){api.stop();return null;}
         if(active.kind==='play'&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].some(k=>keys.has(k))){api.stop();return null;}
-        return active.tick?active.tick(dt):null;
+        const out=active.tick?active.tick(dt):null;
+        if(out?.done){api.stop();return null;}
+        return out;
       }
       if(now-nearAt>.12){nearAt=now;near=findNear();showPill(near?`${near.icon} ${near.label?near.label():near.name}`:null);}
       return null;
