@@ -2893,7 +2893,10 @@
       card.className = "story-card";
       card.style.background = `linear-gradient(160deg, ${shade(story.color, 25)}, ${shade(story.color, -40)})`;
       const at = marks[story.id];
-      const cover = COVER_ART[story.id]
+      const painted = (window.SPOOKY_PAINTED_ART || {})[story.id];
+      const cover = painted
+        ? `<img class="cover-img" src="${painted[0].src}" alt="" loading="lazy" decoding="async">`
+        : COVER_ART[story.id]
         ? `<img class="cover-img" src="art/${story.id}-cover.png" alt="" loading="lazy">`
         : story.cover();
       const badgeRow = (done[story.id] ? "⭐" : "") + (badges[story.id] ? "🧠" : "");
@@ -2988,10 +2991,25 @@
     hideWordCard();
     closeQuiz();
 
-    // art — a page may carry a generated image (img) or an art() function
-    // (the art is hand-authored vector SVG, drawn directly).
-    if (p.img) {
-      artEl.innerHTML = '<img class="scene-img" src="' + p.img + '" alt="" onerror="this.style.display=\'none\'">';
+    // Published OpenAI illustrations use the existing reader and narration.
+    // End pages reuse the closing illustration; SVG remains a load-error fallback.
+    const paintings = (window.SPOOKY_PAINTED_ART || {})[current.id];
+    const painting = paintings && paintings[Math.min(page, paintings.length - 1)];
+    artEl.setAttribute("aria-label", painting ? painting.alt : "story picture");
+    if (painting || p.img) {
+      const img = document.createElement("img");
+      img.className = "scene-img";
+      img.alt = ""; // The enclosing image region supplies the description.
+      img.decoding = "async";
+      img.addEventListener("error", () => {
+        if (current && current.pages[page] === p && img.parentNode === artEl) {
+          artEl.innerHTML = p.art();
+          artEl.setAttribute("aria-label", "story picture");
+          wireTaps();
+        }
+      }, { once: true });
+      img.src = painting ? painting.src : p.img;
+      artEl.replaceChildren(img);
     } else {
       artEl.innerHTML = p.art();
     }
@@ -3014,8 +3032,10 @@
 
     // hint only when there are tappable things
     const hasTaps = artEl.querySelector(".tap");
-    hintEl.style.visibility = (hasTaps || p.end) ? "visible" : "hidden";
-    hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : "✨ Tap the picture to play — or tap a word to hear it! ✨";
+    hintEl.style.visibility = (hasTaps || painting || p.end) ? "visible" : "hidden";
+    hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : painting
+      ? "✨ Tap a word to hear it! ✨"
+      : "✨ Tap the picture to play — or tap a word to hear it! ✨";
 
     // buttons
     prevBtn.disabled = page === 0;

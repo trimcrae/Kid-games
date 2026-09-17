@@ -5,7 +5,7 @@
       title: "Who’s there?",
       text: "At bedtime, Princess Ellie carried her lantern through the castle. Beside the fern, a tall shadow wore a pointy crown. Ellie stopped. “Hello?” she whispered. The shadow was very quiet.",
       wonder: "Look closely. What does the shadow’s crown remind you of?",
-      alt: "Princess Ellie holds a lantern and notices a tall crowned shadow beside a fern in the castle hallway."
+      alt: "Princess Ellie, with her brown bob and blue-jeweled silver tiara, notices her shadow beside a fern and lantern in the castle hallway."
     },
     {
       title: "A familiar wave",
@@ -29,7 +29,7 @@
     const current = pages[page];
     illustration.hidden = false;
     byId("image-error").hidden = true;
-    illustration.src = `art/page-${page + 1}.png`;
+    illustration.src = `art/ellie-${page + 1}.webp`;
     illustration.alt = current.alt;
     byId("page-count").textContent = `0${page + 1} / 03`;
     byId("page-title").textContent = current.title;

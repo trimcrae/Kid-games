@@ -1,6 +1,6 @@
 # Picture-book art trial
 
-Created 2026-09-17 with the built-in OpenAI image generation tool in Codex (no API key or CLI generation). Original PNGs are preserved in the account's generated_images directory; project copies are in art/page-1.png through art/page-3.png. Each is 1448 × 1086. Total project image storage is approximately 7.4 MiB.
+Created 2026-09-17 with the built-in OpenAI image generation tool in Codex (no API key or CLI generation). Revised the same day after the user confirmed that Ellie is the child wearing the tiara in their private reference photograph. Current web images are art/ellie-1.webp through art/ellie-3.webp, each 1448 × 1086, totaling approximately 1.0 MiB. Original generated PNGs remain in the account's generated_images directory; earlier illustrations are also recoverable from git history. The source photograph is private and is not included in this repository.
 
 The user explicitly requested this OpenAI illustration trial for Spooky Princess Stories, superseding the older repo restriction on generated child/creature art for this trial. Craepets is outside its scope.
 
@@ -17,4 +17,3 @@ Use case: illustration-story. Create the second full-page landscape 4:3 illustra
 ## Page 3
 
 Use case: illustration-story. Third and final full-page landscape 4:3 picture-book illustration for 'Princess Ellie and the Shy Shadow'. Use the previous illustration only as character and style reference; make a new distinct closing composition. Preserve fictional little princess Ellie's wavy auburn bob, small gold crown, lavender star-embroidered dress, brown boots and watercolor/gouache paper texture. Ellie sits on a cushion beside a castle corridor wall and holds both hands up in a simple rabbit shadow-puppet pose. A golden lantern on the floor in front of her hands casts one large clear rabbit-shaped hand shadow on the warm stone wall. Ellie laughs warmly at her playful shadow rabbit. A closed storybook and the fern nearby, moon visible through an arched window. Cozy, safe bedtime mood, lavender, deep twilight blue and golden amber. Focus on the princess and rabbit hand shadow; readable and charming, no frightening creatures, no text, no panels, no border or watermark.
-
