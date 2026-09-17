@@ -1,6 +1,7 @@
 // The arcade card says what is new (September 15): a game may carry a short
 // `flag:` in assets/js/games.js, and the landing page shows it as a pill above
-// the title, where a long blurb would bury it. Craepets carries the house walk.
+// the title. Craepets carries the house walk. The cards are titles only —
+// no paragraph descriptions.
 const {chromium}=require('playwright');
 const assert=require('node:assert/strict');
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
@@ -22,19 +23,16 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
       // It sits above the title, not buried in the blurb.
       const [flagBox,titleBox]=[await flag.boundingBox(),await card.locator('h2').boundingBox()];
       assert(flagBox.y<titleBox.y,label+': the flag is not above the title');
-      // The card still teaches what the game is, and the blurb is not doubled up.
-      // The game's own description (what it teaches) is untouched, and the
-      // new line is not repeated there as well.
-      const blurb=await card.locator('p').textContent();
-      assert(/clay creature/.test(blurb)&&/learning/.test(blurb),label+': the blurb lost its description');
-      assert(!/NEW/.test(blurb)&&!/walk around our (own )?house/i.test(blurb),label+': the new line is duplicated in the blurb');
+      // No paragraph descriptions on any card — the cards are emoji, title,
+      // optional flag and the age badge.
+      assert.equal(await page.locator('.game-card p').count(),0,label+': a card still shows a paragraph description');
       // Every other card is unchanged: no stray flags.
       assert.equal(await page.locator('.new-flag').count(),1,label+': another card grew a flag');
       assert((await page.locator('.game-card').count())>20,label+': the arcade lost cards');
       await ctx.close();
     }
     assert.deepEqual(errors,[]);
-    console.log('PASS arcade: the Craepets card shows "NEW · Walk around our house in 3D" above the title on desktop and phone, with its description intact and no other card changed');
+    console.log('PASS arcade: the Craepets card shows "NEW · Walk around our house in 3D" above the title on desktop and phone, no card carries a paragraph description, and no other card changed');
   }catch(e){console.error(e);console.log('ERRORS',errors);process.exitCode=1;}
   finally{await browser.close();}
 })();

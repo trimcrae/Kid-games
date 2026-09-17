@@ -2,14 +2,16 @@
    GAME LIST  —  this is the ONLY file you edit to add a game!
    -----------------------------------------------------------
    Every game should TEACH something — counting, letters, spelling,
-   shapes, music, geography, logic, etc. Put that in the "blurb".
+   shapes, music, geography, logic, etc. Say that in the "blurb" — it is
+   a note for us about what the game teaches; the arcade cards show only
+   the emoji, title, optional flag and age badge.
 
    To add a new game, copy one block and fill it in:
 
      {
        title:  "My Cool Game",      // shown on the card
        emoji:  "🚀",                // a fun icon
-       blurb:  "Learn X by doing Y",// what it teaches, one sentence
+       blurb:  "Learn X by doing Y",// what it teaches (not shown on the card)
        url:    "games/my-game/",    // folder with its index.html
        ages:   "7+",                // who it's good for
        kids:   ["jeannie","cory"],  // whose "Who's playing?" tab shows it
