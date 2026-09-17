@@ -195,5 +195,135 @@ window.SPOOKY_PAINTED_ART = {
       "src": "art/openai/witch-broom-5.webp",
       "alt": "Story illustration: “Naughty broom!” laughed Wanda. She hopped on, Ellie hopped on behind, and off they flew across the moon. Wheee!"
     }
+  ],
+  "night-sounds": [
+    {
+      "src": "art/openai/night-sounds-0.webp",
+      "alt": "Story illustration: Princess Ellie was tucked up in bed when she heard a sound. Creeeak!"
+    },
+    {
+      "src": "art/openai/night-sounds-1.webp",
+      "alt": "Story illustration: “Who's there?” she whispered. She peeked out the window. It was only the old tree, waving in the wind."
+    },
+    {
+      "src": "art/openai/night-sounds-2.webp",
+      "alt": "Story illustration: Then she heard another sound. Hoo-hoo! Hoo-hoo! Ellie looked up."
+    },
+    {
+      "src": "art/openai/night-sounds-3.webp",
+      "alt": "Story illustration: It was a round little owl on a branch, blinking her big eyes. “Hoo-hoo means hello,” said the owl."
+    },
+    {
+      "src": "art/openai/night-sounds-4.webp",
+      "alt": "Story illustration: Then came a tap-tap-tap on the glass. Ellie giggled. She knew that sound! It was Boo, come to say goodnight."
+    },
+    {
+      "src": "art/openai/night-sounds-5.webp",
+      "alt": "Story illustration: Creak, hoo-hoo, tap-tap-tap. Every spooky sound was really a friend. Ellie snuggled down and fell fast asleep."
+    }
+  ],
+  "missing-moon": [
+    {
+      "src": "art/openai/missing-moon-0.webp",
+      "alt": "Story illustration: One night, Princess Ellie looked out her window. The moon was gone! The sky was dark, dark, dark."
+    },
+    {
+      "src": "art/openai/missing-moon-1.webp",
+      "alt": "Story illustration: “Boo! Wake up!” she called. “The moon is missing!” Boo rubbed his eyes. “Let's go and find it.”"
+    },
+    {
+      "src": "art/openai/missing-moon-2.webp",
+      "alt": "Story illustration: They asked the little bat. “Have you seen the moon?” “Squeak! No,” said the bat. “I bumped into things all night.”"
+    },
+    {
+      "src": "art/openai/missing-moon-3.webp",
+      "alt": "Story illustration: They asked the owl in the tree. “Hoo-hoo. Look up,” said the owl. “Look very, very carefully.”"
+    },
+    {
+      "src": "art/openai/missing-moon-4.webp",
+      "alt": "Story illustration: Ellie looked up. A big fluffy cloud was drifting by. And behind it… a glow!"
+    },
+    {
+      "src": "art/openai/missing-moon-5.webp",
+      "alt": "Story illustration: The wind gave a puff, the cloud slid away, and there was the moon, round and bright. “Found you, Moon!” It was hiding all along."
+    }
+  ],
+  "boos-biggest-boo": [
+    {
+      "src": "art/openai/boos-biggest-boo-0.webp",
+      "alt": "Story illustration: Boo was a very little ghost with a very little voice. When he said “boo,” it came out as a tiny whisper. “boo.”"
+    },
+    {
+      "src": "art/openai/boos-biggest-boo-1.webp",
+      "alt": "Story illustration: “I want a big BOO!” he sighed. “A boo that makes the pumpkins wobble.”"
+    },
+    {
+      "src": "art/openai/boos-biggest-boo-2.webp",
+      "alt": "Story illustration: Princess Ellie helped him practise. “Take a deep breath. Fill your tummy with air. Now… boo!”"
+    },
+    {
+      "src": "art/openai/boos-biggest-boo-3.webp",
+      "alt": "Story illustration: “boo,” said Boo. Then a bit louder: “Boo.” Then louder still: “BOO!” The little bat flapped up in surprise."
+    },
+    {
+      "src": "art/openai/boos-biggest-boo-4.webp",
+      "alt": "Story illustration: Midnight the cat jumped! The pumpkins wobbled! Ellie clapped and clapped. “That was the biggest boo ever!”"
+    },
+    {
+      "src": "art/openai/boos-biggest-boo-5.webp",
+      "alt": "Story illustration: Boo was so proud. But at bedtime, he used his tiny voice again. “boo,” he whispered. “Goodnight, Ellie.”"
+    }
+  ],
+  "glow-garden": [
+    {
+      "src": "art/openai/glow-garden-0.webp",
+      "alt": "Story illustration: Behind the castle was a secret garden that only glowed at night. Princess Ellie tiptoed in with her lantern."
+    },
+    {
+      "src": "art/openai/glow-garden-1.webp",
+      "alt": "Story illustration: The roses glowed pink. The bluebells glowed blue. The daisies glowed as yellow as the moon."
+    },
+    {
+      "src": "art/openai/glow-garden-2.webp",
+      "alt": "Story illustration: Fireflies blinked on and off, on and off, like tiny floating stars."
+    },
+    {
+      "src": "art/openai/glow-garden-3.webp",
+      "alt": "Story illustration: A purple flower yawned open and hummed a sleepy tune. Ellie hummed along."
+    },
+    {
+      "src": "art/openai/glow-garden-4.webp",
+      "alt": "Story illustration: Midnight the cat curled up on a glowing green leaf and purred. Boo drifted between the flowers, glowing too."
+    },
+    {
+      "src": "art/openai/glow-garden-5.webp",
+      "alt": "Story illustration: Pink, blue, yellow, purple, green. Ellie picked one glowing flower of every colour to put by her bed. Goodnight, garden."
+    }
+  ],
+  "wobbly-spell": [
+    {
+      "src": "art/openai/wobbly-spell-0.webp",
+      "alt": "Story illustration: Wizard Wilbur was practising a brand-new spell. “Pumpkins for everyone!” he said, and waved his wand."
+    },
+    {
+      "src": "art/openai/wobbly-spell-1.webp",
+      "alt": "Story illustration: Poof! The castle door turned into a pumpkin. Poof! The teapot turned into a pumpkin. Poof! Midnight's bell turned into a tiny pumpkin!"
+    },
+    {
+      "src": "art/openai/wobbly-spell-2.webp",
+      "alt": "Story illustration: “Oh dear,” said Wilbur. “That is too many pumpkins.” But the wand was still wobbling and popping."
+    },
+    {
+      "src": "art/openai/wobbly-spell-3.webp",
+      "alt": "Story illustration: Princess Ellie had an idea. “Wizard Wilbur, what is the magic word?” Wilbur thought and thought. “Please!”"
+    },
+    {
+      "src": "art/openai/wobbly-spell-4.webp",
+      "alt": "Story illustration: “Pumpkins, please go back!” said Ellie and Wilbur together. The wand gave one last wobble and… poof!"
+    },
+    {
+      "src": "art/openai/wobbly-spell-5.webp",
+      "alt": "Story illustration: The door was a door. The teapot was a teapot. The bell went ding. And one pumpkin stayed, just for the pumpkin pie."
+    }
   ]
 };
