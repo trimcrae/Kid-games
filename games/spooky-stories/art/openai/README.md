@@ -1,6 +1,6 @@
 # OpenAI picture-book illustrations
 
-Completed collection: all 22 library stories, with 136 illustrated content pages. The three-page Shy Shadow sample also uses the corrected Ellie reference.
+Completed collection: all 25 library stories, with 165 illustrated content pages. The three-page Shy Shadow sample also uses the corrected Ellie reference. The three classic retellings add 29 illustrations; their story sources, page briefs and generation recipe are documented in [the classics guide](../../classics/README.md).
 
 The 2026-09-17 style review checked all 136 content illustrations against the earlier Ellie painting and repainted 40 inconsistent family scenes. The other 96 already followed that direction. Revised image URLs include content hashes so returning readers receive the corrected artwork.
 
@@ -8,7 +8,7 @@ Generated with the built-in OpenAI image tool in Codex, using the user's account
 
 Ellie's character reference has a straight dark-brown bob, side-swept fringe, silver tiara with blue jewels, lavender dress and brown boots. Story-specific outfits follow the text. The style is a luminous, dimensional fairy-tale painting with fine hair detail, softly modeled faces, violet twilight and amber light; daytime stories use a sunny palette. The private source photo is never committed. Original generated PNGs and per-image generation receipts remain outside the checkout.
 
-Each numbered WebP corresponds to the same zero-based page in storybook.js. Each cover reuses the first scene, and each ending reuses its story's closing scene. WebP quality 88 preserves the generated composition while reducing transfer size. The manifest enables only fully illustrated stories, so a partially generated story keeps its earlier art until all its pages are ready.
+Each numbered WebP corresponds to the same zero-based page in storybook.js or classics.js. Each cover reuses the first scene, and each ending reuses its story's closing scene. WebP quality 88 preserves the generated composition while reducing transfer size. The manifest enables only fully illustrated stories, so a partially generated story keeps its earlier art until all its pages are ready.
 
 The reader retains existing Piper recordings, narration timing, tappable words, definitions, comprehension questions, bookmarks and stickers. Painted illustrations are static; the hint describes the remaining word interaction. Original SVG art remains as a fallback if an image cannot load.
 

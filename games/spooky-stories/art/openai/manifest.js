@@ -587,5 +587,127 @@ window.SPOOKY_PAINTED_ART = {
       "src": "art/openai/wobbly-spell-5.webp",
       "alt": "Story illustration: The door was a door. The teapot was a teapot. The bell went ding. And one pumpkin stayed, just for the pumpkin pie."
     }
+  ],
+  "ellie-three-bears": [
+    {
+      "src": "art/openai/ellie-three-bears-0.webp?v=b9dcf3d526e2",
+      "alt": "Story illustration: Once upon a time, Ellie followed a butterfly along a woodland path. Her yellow dress brushed the daisies. Beyond a bend stood a little cottage, with three coats by the door: a great big coat, a middle-sized coat, and a tiny little coat."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-1.webp?v=afab26ed1eee",
+      "alt": "Story illustration: Ellie knocked. Nobody answered. But the door was open a crack, and a delicious smell drifted out. She peeped inside. Three bowls of porridge waited on the table. Her tummy rumbled. She knew she ought to wait. Instead, she picked up a spoon."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-2.webp?v=c53ed5e930c4",
+      "alt": "Story illustration: The big bowl was too hot. The middle-sized bowl was too cold. But the little bowl was just right. Ellie tried one spoonful, then another, then another. When she looked down, the little bowl was empty. Oh dear. That had been somebody else's breakfast."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-3.webp?v=ee8e85933fa6",
+      "alt": "Story illustration: Next she tried the chairs. The big chair was too hard. The middle-sized chair was too soft. The little chair was just right. Ellie gave a happy wriggle. CRACK! Its seat broke, and she landed on the rug. Now she had something else to put right."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-4.webp?v=91147722c96c",
+      "alt": "Story illustration: Upstairs were three beds. The big bed was too hard. The middle-sized bed was too soft. The little bed was just right. Ellie meant to rest for only a moment. Her eyes closed. Downstairs, the front door creaked. The owners of the cottage were home."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-5.webp?v=4928f5ea97fe",
+      "alt": "Story illustration: “Someone has tasted my porridge,” rumbled Papa Bear. “Someone has tasted mine,” said Mama Bear. “Someone has eaten ALL of mine!” cried Baby Bear. Then they saw the chairs. “Someone has broken my chair, too!” Baby Bear's small voice began to wobble."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-6.webp?v=58d8b69508ef",
+      "alt": "Story illustration: Upstairs, Papa Bear found his rumpled bed. Mama Bear found hers. Baby Bear stood on tiptoe. “Someone is sleeping in MY bed, and here she is!” Ellie woke with a gasp. Three bears! She wanted to run. Then she saw Baby Bear's face."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-7.webp?v=203e4c5ded0f",
+      "alt": "Story illustration: “I'm sorry,” Ellie said. “I ate your breakfast. I broke your chair. I should have waited outside.” Mama Bear gave her a steady look. “Then let's start by making things right.” Ellie measured fresh oats. Papa repaired the chair while she held the seat still."
+    },
+    {
+      "src": "art/openai/ellie-three-bears-8.webp?v=e4a768499ce9",
+      "alt": "Story illustration: Mama Bear walked Ellie back to the path. The next Saturday, Ellie returned with Dad and a basket of berries. This time she knocked and waited. Baby Bear opened the door. “Come in!” he said. He pointed to the mended little chair. “This one's just right.”"
+    }
+  ],
+  "ellie-beanstalk": [
+    {
+      "src": "art/openai/ellie-beanstalk-0.webp?v=eef2d14c3bcd",
+      "alt": "Story illustration: Once upon a time, Ellie and Mom lived in a cottage beside a very empty garden. Their cow, Buttercup, had stopped giving milk. “We must sell her for food,” Mom said. Ellie hugged Buttercup's soft neck. Then they set off for the market together."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-1.webp?v=217ae21b316f",
+      "alt": "Story illustration: While Mom spoke to the baker, a little man showed Ellie five shining beans. “Plant these, and see what grows.” Ellie traded Buttercup for them. Mom hurried over. “Five beans won't buy our supper!” Ellie looked at her closed hand. The beans suddenly felt very small."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-2.webp?v=5bea33cd5c87",
+      "alt": "Story illustration: At home, Ellie planted the beans by the kitchen window. That night came a rustle, a creak, a WHOOOOSH. By morning, a beanstalk thicker than the chimney reached right into the clouds. Ellie pulled on her boots. “I'll find out what's up there,” she said."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-3.webp?v=9f2a324ffec3",
+      "alt": "Story illustration: Up she climbed, past sparrows, past swallows, through a cool white cloud. Above it stood a castle with a door as tall as a church. A giant woman opened it. “Quick, little one. My husband doesn't like visitors.” She hid Ellie behind a flour barrel."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-4.webp?v=2b2911d19640",
+      "alt": "Story illustration: BOOM. BOOM. BOOM. In came the giant. “Fee-fi-fo-fum! Who has come to my house?” He sat down with a golden hen. “Lay!” he ordered. Out popped a golden egg. Then he called for his harp. It sang such a sleepy song that soon he was snoring."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-5.webp?v=bec3421fb692",
+      "alt": "Story illustration: “Please take us down,” whispered the hen. “We belong in the village. He carried us up here!” Ellie crept out. The hen tucked under her arm; the little harp slipped into her satchel. Step by careful step, she carried them toward the door."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-6.webp?v=0d4895181c7c",
+      "alt": "Story illustration: At the threshold, the harp bumped a stone. TWANG! The giant opened one eye. Then both. “Come back!” Ellie ran. Her green skirt flashed between the enormous leaves. She held her satchel close and began to climb down. Above her, the beanstalk shook."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-7.webp?v=01b2cc38606e",
+      "alt": "Story illustration: “Mom!” called Ellie. Mom reached up and caught the hen, then the harp, then Ellie. Far above, the giant put one enormous boot on a leaf. It bent. It buckled. “Too small!” he grumbled, pulling his foot back onto the cloud. Ellie had an idea."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-8.webp?v=cbfc47e23d15",
+      "alt": "Story illustration: “It grew from beans,” she said. “Perhaps we can ask it to go back.” She touched the root. “Down, please!” The leaves folded like umbrellas. The stalk curled smaller and smaller until five beans lay in the earth. The giant stayed safely on his cloud."
+    },
+    {
+      "src": "art/openai/ellie-beanstalk-9.webp?v=80902336a0a9",
+      "alt": "Story illustration: They returned the hen and harp to the village. That evening, the harp played in the square, and the hen's golden egg bought supper for everyone. The little man brought Buttercup home. Ellie kept the five beans in a jar. Some things were better planted with Mom."
+    }
+  ],
+  "ellie-glass-slipper": [
+    {
+      "src": "art/openai/ellie-glass-slipper-0.webp?v=fc8bdccb71d1",
+      "alt": "Story illustration: Once upon a time, Ellie stayed in a tall old house with two grand cousins. One morning, an invitation arrived: every child was welcome at the palace ball. Ellie imagined the music, the lanterns, the swishing dresses. “May I come too?” she asked. Her cousins barely looked up."
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-1.webp?v=872bd2047dda",
+      "alt": "Story illustration: “After you tidy all this,” they said, leaving ribbons and shoes everywhere. Ellie worked until the floor shone. But the carriage was already rattling away. Her cousins had gone without her. She sat by the hearth in her dusty-rose dress. One tear made a dark little spot on her apron."
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-2.webp?v=f32a8025b1f8",
+      "alt": "Story illustration: “A clean floor is lovely,” said a warm voice. “But you were invited too.” Her fairy godmother stood in the doorway. “Fetch me a pumpkin.” Ellie blinked. A pumpkin? Outside, the fairy tapped it with her wand. Its orange sides swelled into a magnificent golden carriage."
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-3.webp?v=7c1b87514038",
+      "alt": "Story illustration: Mice became little white horses. A lizard became a coachman. Then the wand brushed Ellie's dress. Pearl-lavender silk shimmered around her; silver leaves climbed the hem. On her feet glittered two glass slippers. “Be home before midnight,” said the fairy. “Then everything but the slippers becomes ordinary again.”"
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-4.webp?v=fcfd3bb90e25",
+      "alt": "Story illustration: At the palace, Ellie stopped beneath a thousand shining lights. Nobody asked her to tidy anything. The young prince bowed and held out his hand. “Will you join our dance?” Round went the children, their ribbons flying. Ellie laughed so hard she forgot to watch the clock."
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-5.webp?v=27f884454a0a",
+      "alt": "Story illustration: DONG. Ellie froze. DONG. The clock was striking midnight! She hurried through the ballroom, down the stairs, past the astonished guards. One glass slipper slipped from her heel. She reached back, then heard another DONG. There wasn't time. She ran on with one bare foot."
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-6.webp?v=3b15316307d9",
+      "alt": "Story illustration: Just outside her garden, the last chime sounded. The carriage shrank into a pumpkin. The horses scurried away as mice. Ellie stood in her dusty-rose dress again. But in her hand was the other glass slipper, still shining. “It really happened,” she whispered. Then she tucked it safely away."
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-7.webp?v=8bb867e81ca6",
+      "alt": "Story illustration: The next morning, the palace messenger knocked at every door. He carried the lost slipper on a cushion. “Who danced with us last night?” At Ellie's house, both cousins tried it. One foot was too wide; the other was too long. Ellie stepped forward. “May I try?”"
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-8.webp?v=4b62d8a001a0",
+      "alt": "Story illustration: Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Ellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”"
+    },
+    {
+      "src": "art/openai/ellie-glass-slipper-9.webp?v=3b0cd26d1d82",
+      "alt": "Story illustration: Her cousins looked at the polished floor, then at Ellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Ellie dress. She took their hands and led them into the dance. No one was left behind."
+    }
   ]
 };

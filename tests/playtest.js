@@ -348,7 +348,7 @@ const GAMES = {
     return `${total} stories; narrated ${preReader.length} to the end, ${clips.length} clips played`;
   },
 
-  async "Spooky Princess Stories"(page, g, d) {
+  async "Ellie's Storybook"(page, g, d) {
     await page.goto(`${BASE}/games/spooky-stories/`, { waitUntil: "networkidle" });
     if (await page.locator(".story-card").count() < 1) throw new Error("no story cards in the library");
     await page.locator(".story-card").first().click();
@@ -382,7 +382,7 @@ const GAMES = {
     }
     // read through to the end
     let reachedEnd = false;
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 16; i++) {
       const label = await page.locator("#next-btn").textContent();
       if (/More stories/.test(label)) { reachedEnd = true; break; }
       await page.locator("#next-btn").click();

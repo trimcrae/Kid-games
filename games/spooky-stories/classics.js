@@ -92,7 +92,7 @@ window.ELLIE_CLASSICS = [
       },
       {
         text: "BOOM. BOOM. BOOM. In came the giant. “Fee-fi-fo-fum! Who has come to my house?” He sat down with a golden hen. “Lay!” he ordered. Out popped a golden egg. Then he called for his harp. It sang such a sleepy song that soon he was snoring.",
-        scene: "Huge castle table. Burly sleepy giant with reddish beard in brown tunic rests in his chair, a golden-feathered hen beside exactly one golden egg, ornate golden harp nearby. Ellie peeks safely behind flour barrel. Giant comical and gruff, no weapons, teeth or menace.",
+        scene: "Huge castle table. Burly sleepy giant with reddish beard in brown tunic rests in his chair, a golden-feathered hen beside exactly one golden egg. Beside the hen is a tiny ornate golden harp, only the size of Ellie's hand, small enough to fit her satchel; it is a magical self-playing instrument, not a giant-sized harp. Ellie peeks safely behind flour barrel. Giant comical and gruff, no weapons, teeth or menace.",
         vocab: { harp: "a musical instrument with strings you pluck with your fingers" }
       },
       {
@@ -134,7 +134,7 @@ window.ELLIE_CLASSICS = [
     classic: "Cinderella",
     sticker: "🥿",
     color: "#7160aa",
-    outfit: "Before and after magic: a pretty dusty-rose dress with small embroidered flowers and a cream apron, brown flats, no crown. At the ball: a magnificent pearl-lavender gown with silver vine embroidery, sheer puff sleeves and layered luminous silk, a small silver hair comb, transparent magical glass flats (no heels). Always Ellie age three, never an adult bride.",
+    outfit: "Before and after magic: a pretty dusty-rose dress with small embroidered flowers and a cream apron, brown flats, no crown. At the ball: a magnificent pearl-lavender gown with silver vine embroidery, sheer puff sleeves and layered luminous silk, a small silver hair comb, delicate transparent magical glass slippers. Always Ellie age three, never an adult bride.",
     pages: [
       {
         text: "Once upon a time, Ellie stayed in a tall old house with two grand cousins. One morning, an invitation arrived: every child was welcome at the palace ball. Ellie imagined the music, the lanterns, the swishing dresses. “May I come too?” she asked. Her cousins barely looked up.",
@@ -153,7 +153,7 @@ window.ELLIE_CLASSICS = [
       },
       {
         text: "Mice became little white horses. A lizard became a coachman. Then the wand brushed Ellie's dress. Pearl-lavender silk shimmered around her; silver leaves climbed the hem. On her feet glittered two glass slippers. “Be home before midnight,” said the fairy. “Then everything but the slippers becomes ordinary again.”",
-        scene: "Fairy garden reveal. Ellie now wears exquisite pearl-lavender silk gown, silver vine embroidery, sheer puff sleeves, silver hair comb, two transparent glass flat slippers. Fairy godmother smiles beside her. Golden pumpkin coach, two small white horses and whimsical green-coated coachman behind. No pumpkin on ground or mice now.",
+        scene: "Fairy garden reveal. Ellie now wears exquisite pearl-lavender silk gown, silver vine embroidery, sheer puff sleeves, silver hair comb, two transparent glass slippers. Fairy godmother smiles beside her. Golden pumpkin coach, two small white horses and whimsical green-coated coachman behind. No pumpkin on ground or mice now.",
         vocab: { shimmered: "shone with a soft, gently changing light" }
       },
       {
@@ -163,7 +163,7 @@ window.ELLIE_CLASSICS = [
       },
       {
         text: "DONG. Ellie froze. DONG. The clock was striking midnight! She hurried through the ballroom, down the stairs, past the astonished guards. One glass slipper slipped from her heel. She reached back, then heard another DONG. There wasn't time. She ran on with one bare foot.",
-        scene: "Ellie hurries down wide palace steps under moonlight, still in lavender gown, one foot barefoot and the other wearing glass flat. Exactly one abandoned glass slipper on a step behind her. Kind surprised guards at distant doorway. Urgent but safe, no fall. Golden coach waits below.",
+        scene: "Ellie hurries down wide palace steps under moonlight, still in lavender gown, one foot barefoot and the other wearing a glass slipper. Exactly one abandoned glass slipper on a step behind her. Kind surprised guards at distant doorway. Urgent but safe, no fall. Golden coach waits below.",
         vocab: { astonished: "very surprised by something you did not expect" }
       },
       {
@@ -173,17 +173,17 @@ window.ELLIE_CLASSICS = [
       },
       {
         text: "The next morning, the palace messenger knocked at every door. He carried the lost slipper on a cushion. “Who danced with us last night?” At Ellie's house, both cousins tried it. One foot was too wide; the other was too long. Ellie stepped forward. “May I try?”",
-        scene: "House sitting room daylight. Kindly palace messenger in navy velvet holds cushion with one tiny glass flat. Older auburn cousin and dark-haired cousin look frustrated beside a chair, their feet clearly too large. Little Ellie in dusty-rose dress politely steps forward. No fairy or prince present.",
+        scene: "House sitting room daylight. Kindly palace messenger in navy velvet holds cushion with exactly one tiny glass slipper. Older auburn cousin and dark-haired cousin look frustrated beside a chair, their bare feet clearly too large. Neither cousin wears a glass slipper; the only glass shoe visible is on the cushion. Little Ellie in dusty-rose dress politely steps forward. No fairy or prince present.",
         vocab: { messenger: "someone who carries news or a message to another person" }
       },
       {
         text: "Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Ellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”",
-        scene: "Recognition scene: messenger kneels offering tiny glass flat, which fits Ellie's foot perfectly. Ellie in simple dusty-rose dress proudly holds its matching slipper. Two older cousins look surprised behind. Exactly two glass slippers total, one worn and one held. Ellie remains preschool age, no adult glamour.",
+        scene: "Recognition scene: messenger kneels offering tiny glass slipper, which fits Ellie's foot perfectly. Ellie in simple dusty-rose dress proudly holds its matching slipper. Two older cousins look surprised behind. Exactly two glass slippers total, one worn and one held. Ellie remains preschool age, no adult glamour.",
         vocab: { merry: "cheerful and full of fun" }
       },
       {
         text: "Her cousins looked at the polished floor, then at Ellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Ellie dress. She took their hands and led them into the dance. No one was left behind.",
-        scene: "Happy ending at second palace children's ball. Ellie in exquisite pearl-lavender silver-leaf gown and both glass flats leads her two older cousins, auburn coral dress and dark-haired teal dress, by their hands into a dance. Silver-haired fairy godmother in plum cape smiles from doorway. Warm inclusive scene, no wedding, no romantic couple.",
+        scene: "Happy ending at second palace children's ball. Ellie in exquisite pearl-lavender silver-leaf gown and both glass slippers leads her two older cousins, auburn coral dress and dark-haired teal dress, by their hands into a dance. Silver-haired fairy godmother in plum cape smiles from doorway. Warm inclusive scene, no wedding, no romantic couple.",
         vocab: { polished: "rubbed until smooth and shiny" }
       }
     ],

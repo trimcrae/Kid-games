@@ -1,15 +1,14 @@
 /* ===========================================================
-   Spooky Princess Stories — a read-aloud, tap-to-play storybook
+   Ellie's Storybook — classic tales and friendly-spooky adventures
    for Ellie (3) and her siblings.
 
    What it teaches: listening & early literacy (hear words read
    aloud while seeing the picture), story sequencing (turning the
-   page), and cause-and-effect (tap a character → it reacts).
+   page), vocabulary and comprehension (what happened and why).
 
-   Friendly-spooky only: giggly ghosts, sweet bats, glowing
-   pumpkins — nothing scary. Pure HTML/CSS/vanilla JS, no assets:
-   every illustration is smooth vector art drawn with inline SVG —
-   gradient night skies, glowing moons and gentle SMIL animation.
+   Classic retellings live in classics.js. Painted illustrations and
+   recorded narration accompany the stories; inline SVG remains a
+   load-error fallback. Pure HTML/CSS/vanilla JS.
    =========================================================== */
 
 (function () {
@@ -2413,6 +2412,25 @@
     ]}
   ];
 
+  // Classic retellings share the same bookmarks, narration, word cards and
+  // quizzes as the original collection. Their literal source is also read by
+  // audio/build_audio.py, so displayed words and narration stay together.
+  const classics = window.ELLIE_CLASSICS || [];
+  STORIES.unshift(...classics.map(story => {
+    const fallback = () => endArt(story.color,
+      [kid(Object.assign({ x: 200, y: 240, scale: 1.25 }, ELLIE))]);
+    VOCAB[story.id] = {};
+    story.pages.forEach((p, i) => { VOCAB[story.id][i] = p.vocab || {}; });
+    QUIZZES.push({ id: story.id, qs: story.questions });
+    return {
+      id: story.id, title: story.title, classic: story.classic,
+      sticker: story.sticker, color: story.color, cover: fallback,
+      pages: story.pages.map(p => ({ text: p.text, art: fallback })).concat([
+        { end: true, text: story.ending, art: fallback }
+      ])
+    };
+  }));
+
   // Painterly cover pictures rendered by the art pipeline
   // (games/spooky-stories/art/<id>-cover.png, from assets/art/art-manifest.json).
   // Stories not listed here keep their hand-drawn SVG cover. A listed cover
@@ -2904,6 +2922,7 @@
         `${badgeRow ? `<span class="badges" aria-hidden="true">${badgeRow}</span>` : ""}
          <span class="cover-svg">${cover}</span>
          <h2>${story.title}</h2>
+         ${story.classic ? `<p class="byline">✨ A retelling of ${story.classic}</p>` : ""}
          ${story.by ? `<p class="byline">✍️ A story made up by ${story.by}!</p>` : ""}
          <p>${last} pages • Tap to read</p>
          ${at ? `<span class="bookmark">🔖 Keep reading — page ${at + 1}</span>` : ""}`;
