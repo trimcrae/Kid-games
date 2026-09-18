@@ -591,9 +591,13 @@ const GAMES = {
         total: n.reduce((a, b) => a + b, 0),
         dupes: WB_QUESTIONS.map((q) => q.q).filter((q, i, a) => a.indexOf(q) !== i).length,
         tap: WB_QUESTIONS.filter((q) => (q.pics || []).length >= 3).length,
+        icons: WB_QUESTIONS.filter((q) => q.icon).length,
+        hard: WB_QUESTIONS.filter((q) => q.hard).length,
       };
     });
-    if (bank.cats < 60) throw new Error(`only ${bank.cats} categories — races would repeat`);
+    if (bank.cats < 85) throw new Error(`only ${bank.cats} categories — races would repeat`);
+    if (bank.icons !== bank.cats) throw new Error(`${bank.cats - bank.icons} categories have no icon`);
+    if (bank.hard < 8) throw new Error(`only ${bank.hard} grown-up categories`);
     if (bank.thinnest < 15) throw new Error(`a category has only ${bank.thinnest} answers`);
     if (bank.dupes) throw new Error(`${bank.dupes} duplicate categories`);
     if (bank.tap < 15) throw new Error(`only ${bank.tap} categories work in Tap mode`);
@@ -639,6 +643,21 @@ const GAMES = {
         ["pizza", "pepperoni"], ["ice cream", "mint chocolate chip"], ["sandwich", "peanut butter"],
         ["birthday", "pinata"], ["holiday", "halloween"], ["season", "autumn"],
         ["breakfast", "scrambled eggs"], ["forest", "toadstool"], ["machine", "excavator"],
+        // the newer categories
+        ["number in words", "seventeen"], ["number in words", "a hundred"], ["maths word", "fraction"],
+        ["magical creature", "unicorn"], ["magical creature", "loch ness monster"],
+        ["fairy tale", "goldilocks"], ["fairy tale", "big bad wolf"],
+        ["princess might have", "tiara"], ["princess might have", "glass slipper"],
+        ["herb or spice", "cinnamon"], ["herb or spice", "corriander"],
+        ["pasta or noodle", "spaghetti"], ["pasta or noodle", "mac and cheese"],
+        ["room in a house", "living room"], ["room in a house", "conservatory"],
+        ["in a garden", "trampoline"], ["in a garden", "wheelbarrow"],
+        ["capital city", "paris"], ["capital city", "reykjavik"],
+        ["famous landmark", "eiffel tower"], ["famous landmark", "big ben"],
+        ["with your body", "cartwheel"], ["with your body", "star jump"],
+        ["means big", "enormous"], ["means small", "teeny"], ["means happy", "cheerful"], ["means fast", "speedy"],
+        ["Minecraft block", "obsidian"], ["Minecraft block", "crafting table"],
+        ["in the sky", "rainbow"], ["in the sky", "hot air balloon"],
       ];
       const out = [];
       want.forEach(([needle, answer]) => {
@@ -653,12 +672,23 @@ const GAMES = {
     });
     if (misses.length) throw new Error(`${misses.length} coverage gaps: ` + misses.slice(0, 4).join("; "));
 
-    // the hand-drawn sprite sheet must bake into real pixels
+    // the hand-drawn sprite sheet must bake into real pixels — every kid,
+    // every bot, every skin in the shop
     const art = await page.evaluate(() => {
       const h = WBSprites.get("hero.jeannie.walk"), p = WBSprites.get("plank.wood");
-      return { frames: h.length, heroW: h[0].width, plankW: p.width };
+      const kids = ["jeannie", "cory", "ellie", "shannon", "tristan"].filter((k) => !WBSprites.get("hero." + k + ".walk"));
+      const bots = ["gentle", "speedy", "pro"].filter((b) => !WBSprites.get("bot." + b + ".walk"));
+      const skins = Array.from(document.querySelectorAll(".skin-card")).map((c) => c.dataset.skin)
+        .filter((id) => !WBSprites.get("plank." + id));
+      return { frames: h.length, heroW: h[0].width, plankW: p.width, kids, bots, skins,
+               shop: document.querySelectorAll(".skin-card").length, flag: !!WBSprites.get("flag") };
     });
     if (art.frames < 3 || art.heroW < 8 || art.plankW < 8) throw new Error("sprites did not bake");
+    if (art.kids.length) throw new Error(`no sprite for ${art.kids.join(", ")}`);
+    if (art.bots.length) throw new Error(`no bot sprite for ${art.bots.join(", ")}`);
+    if (art.skins.length) throw new Error(`shop sells skins with no art: ${art.skins.join(", ")}`);
+    if (art.shop < 10 || !art.flag) throw new Error(`shop has ${art.shop} skins / flag ${art.flag}`);
+    if (await page.locator(".pick[data-kid]").count() !== 5) throw new Error("not every family member can play");
 
     // the prompt arrives as a modal
     if (await page.locator("#modal[hidden]").count()) throw new Error("no prompt modal on the first round");
@@ -692,20 +722,37 @@ const GAMES = {
              !!document.getElementById("answer-input") &&
              Number(card.dataset.round) !== prev;
     }, seen, { timeout: 40000 });
-    let rounds = 0;
+    let rounds = 0, letterRounds = 0;
     for (let round = 0; round < 30; round++) {
       await ready();
       if (await page.locator("#again-btn").count()) break;
       seen = await page.evaluate(() => Number(document.getElementById("modal-card").dataset.round));
       // Answer the way a kid would — a normal 5-9 letter word, not the
       // longest one in the list — so this also checks the crossing takes
-      // a proper handful of answers.
-      const word = await page.evaluate(() => {
-        const ok = WB_QUESTIONS[+document.getElementById("modal-card").dataset.q].ok;
-        const mid = ok.filter((w) => { const n = w.replace(/[^a-z]/gi, "").length; return n >= 5 && n <= 9; });
-        return (mid.length ? mid : ok)[0];
+      // a proper handful of answers. On a "starting with P" round, play
+      // by the rule (and first check the game enforces it).
+      const pick = await page.evaluate(() => {
+        const card = document.getElementById("modal-card");
+        const q = WB_QUESTIONS[+card.dataset.q];
+        const m = /starting with (\w)\b/.exec(card.querySelector(".q-text").textContent || "");
+        const letter = m ? m[1].toLowerCase() : null;
+        const first = (w) => w.toLowerCase().replace(/[^a-z]/g, "")[0];
+        const fits = q.ok.filter((w) => !letter || first(w) === letter);
+        const mid = fits.filter((w) => { const n = w.replace(/[^a-z]/gi, "").length; return n >= 5 && n <= 9; });
+        const wrong = letter ? q.top.find((w) => first(w) !== letter) : null;
+        return { word: (mid.length ? mid : fits)[0], letter, wrong };
       });
-      await page.locator("#answer-input").fill(word);
+      if (pick.letter) {
+        letterRounds++;
+        if (!pick.word) throw new Error(`letter round asked for ${pick.letter} with nothing to answer`);
+        if (pick.wrong) {
+          await page.locator("#answer-input").fill(pick.wrong);
+          await page.locator("#answer-form button[type=submit]").click();
+          await page.waitForTimeout(150);
+          if (!/starting with/i.test(await page.locator("#feedback").textContent())) throw new Error("a letter round accepted the wrong letter");
+        }
+      }
+      await page.locator("#answer-input").fill(pick.word);
       await page.locator("#answer-form button[type=submit]").click();
       rounds++;
       await page.waitForTimeout(120);
@@ -718,10 +765,17 @@ const GAMES = {
     if (rounds < 6) throw new Error(`the canyon was crossed in only ${rounds} answers`);
     const won = /reached the island first/.test(await page.locator("#modal-card").textContent());
 
-    // coins were paid, and everything survives a reload
+    // the finish screen is a proper report card
+    const report = await page.locator("#modal-card").textContent();
+    if (!/longest word/i.test(report) || !/Zippy/.test(report)) throw new Error("the finish screen is missing its stats");
+
+    // coins were paid, the Word Book filled up, and everything survives a reload
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("wordBridge.v1")));
     if (!saved || !saved.jeannie || saved.jeannie.races < 1) throw new Error("the race was not saved");
     if (!(saved.jeannie.coins > 0)) throw new Error("no coins were earned");
+    const booked = Object.values(saved.jeannie.book || {}).reduce((a, b) => a + b.length, 0);
+    if (booked < rounds) throw new Error(`the Word Book holds ${booked} words after ${rounds} answers`);
+    if (!(saved.jeannie.badges || []).length) throw new Error("no badge was earned after a race");
 
     // the shop sells a skin once there are enough coins
     await page.evaluate(() => {
@@ -730,6 +784,12 @@ const GAMES = {
       localStorage.setItem("wordBridge.v1", JSON.stringify(s));
     });
     await page.reload({ waitUntil: "networkidle" });
+    // the Word Book and badge panels show what was earned
+    await page.locator("#book-btn").click();
+    if (await page.locator("#book .book-cat:not(.empty)").count() < 1) throw new Error("the Word Book panel shows nothing");
+    await page.locator("#badges-btn").click();
+    if (await page.locator("#badges .badge").count() < 15) throw new Error("badges panel is empty");
+    if (await page.locator("#badges .badge.got").count() < 1) throw new Error("earned badges are not shown");
     await page.locator("#shop-btn").click();
     await page.locator('.skin-card[data-skin="candy"]').click();
     await page.waitForTimeout(150);
@@ -744,7 +804,7 @@ const GAMES = {
     await page.locator('.tap[data-ok="1"]').first().click();
     await page.waitForFunction(() => WBStage.world.you.planks.length > 0, null, { timeout: 10000 });
 
-    return `${bank.cats} categories / ${bank.total} answers all accepted; ${won ? "won" : "lost"} a ${rounds}-word race, ${letters}-letter word = ${letters} planks, shop + tap mode work`;
+    return `${bank.cats} categories / ${bank.total} answers all accepted; ${won ? "won" : "lost"} a ${rounds}-word race, ${letters}-letter word = ${letters} planks, ${booked} words booked, ${letterRounds} letter round(s), shop + Word Book + badges + tap mode work`;
   },
 
   async "Word Strands — every hunt"(page, g, d) {

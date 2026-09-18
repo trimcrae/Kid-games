@@ -60,6 +60,18 @@
     .prog i { display: block; height: 100%; width: 0; border-radius: 999px; transition: width 0.5s ease; }
     .prog .you i { background: linear-gradient(90deg, var(--pink), var(--yellow)); }
     .prog .bot i { background: #d7e3ec; }
+    /* the racers' faces ride along their bars, and the island waits at the end */
+    .prog span { position: relative; overflow: visible; }
+    .prog .mark {
+      position: absolute; top: 50%; left: 0; transform: translate(-50%, -62%);
+      transition: left 0.5s ease; line-height: 0;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.45));
+    }
+    .prog .mark canvas { image-rendering: pixelated; width: 22px; height: auto; }
+    .prog .isle {
+      position: absolute; right: -4px; top: 50%; transform: translateY(-50%);
+      font-size: 0.95rem; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4));
+    }
 
     /* ===========================================================
        THE PROMPT MODAL
@@ -90,6 +102,14 @@
       touch-action: manipulation;
     }
     .pause-btn:hover { background: #f1ebff; }
+    .say-btn {
+      position: absolute; top: 0.45rem; left: 0.45rem;
+      width: 44px; height: 44px; border-radius: 50%;
+      font-size: 1.25rem; line-height: 1; cursor: pointer;
+      border: 3px solid #bfe9e0; background: #e9fbf7; color: #12a594;
+      touch-action: manipulation;
+    }
+    .say-btn:hover { background: #dff7f1; }
     .round-line { margin: 0 2.6rem 0.1rem; font-size: 0.85rem; color: #8d86a5; font-weight: bold; }
     .round-line .streak { color: #e0761a; }
 
@@ -102,8 +122,27 @@
     .pause-bar[hidden] { display: none; }
     @keyframes modal-in { from { opacity: 0; transform: translateY(18px) scale(0.95); } }
 
-    .q-emoji { font-size: 2.3rem; line-height: 1.1; }
-    .q-text { font-size: clamp(1.05rem, 4.4vw, 1.5rem); font-weight: 900; color: var(--purple); margin: 0.1rem 0 0.15rem; }
+    .q-head { display: flex; align-items: center; justify-content: center; gap: 0.55rem; margin: 0.2rem 0 0.1rem; }
+    .q-icon {
+      flex: none; width: 3.1rem; height: 3.1rem; border-radius: 16px;
+      display: grid; place-items: center; font-size: 1.9rem; line-height: 1;
+      background: linear-gradient(135deg, #f3edff, #ffe9f2);
+      box-shadow: inset 0 0 0 2px rgba(138,92,255,0.25);
+    }
+    .q-text { font-size: clamp(1.05rem, 4.4vw, 1.5rem); font-weight: 900; color: var(--purple); margin: 0; text-align: left; }
+    .q-letter {
+      display: inline-block; margin-left: 0.2rem; padding: 0.05rem 0.5rem; border-radius: 999px;
+      background: var(--yellow); color: var(--ink); font-size: 0.85em; white-space: nowrap;
+    }
+    .tag-row { margin: 0.25rem 0 0; }
+    .tag {
+      display: inline-block; padding: 0.2rem 0.7rem; border-radius: 999px;
+      font-weight: bold; font-size: 0.85rem;
+    }
+    .tag.letter { background: #fff3c4; color: #8a5a00; border: 2px solid var(--yellow); }
+    .tag.golden { background: linear-gradient(90deg, #ffe58a, #ffcf3f); color: #6b4a00; border: 2px solid #e5b31f; }
+    .modal-card.is-golden { box-shadow: 0 0 0 4px var(--yellow), 0 22px 50px rgba(43,36,64,0.4); }
+    .modal-card.is-letter .q-icon { background: linear-gradient(135deg, #fff3c4, #ffe9a8); }
     .q-hint { color: #6a6385; font-size: 0.9rem; margin: 0 0 0.5rem; }
 
     .timer { height: 10px; border-radius: 999px; background: #eee7fb; overflow: hidden; margin: 0.4rem 0 0.7rem; }
@@ -131,6 +170,10 @@
       position: absolute; top: 4px; left: 6px; font-size: 0.7rem;
       color: #9fb9c9; font-weight: bold;
     }
+    .tap .len {
+      position: absolute; top: 4px; right: 6px; font-size: 0.7rem;
+      color: #fff; background: var(--blue); border-radius: 999px; padding: 0 0.4rem;
+    }
     .tap:hover { transform: translateY(-3px); }
     .tap.used { opacity: 0.45; }
     .tap:disabled { cursor: default; }
@@ -157,10 +200,15 @@
     .bar .coin canvas { display: block; image-rendering: pixelated; }
     .win-panel .big canvas { image-rendering: pixelated; }
 
-    /* --- shop --- */
-    .shop { display: none; background: #fffdf5; border: 3px dashed var(--yellow); border-radius: 18px; padding: 0.8rem; margin-top: 0.7rem; }
-    .shop.open { display: block; }
-    .shop h3 { margin: 0 0 0.5rem; color: #e08b1a; }
+    /* --- the panels under the scene: shop, word book, badges --- */
+    .panel { display: none; background: #fffdf5; border: 3px dashed var(--yellow); border-radius: 18px; padding: 0.8rem; margin-top: 0.7rem; }
+    .panel.open { display: block; }
+    .panel h3 { margin: 0 0 0.5rem; color: #e08b1a; }
+    .panel p.lead { margin: 0 0 0.6rem; color: #6a6385; font-size: 0.9rem; }
+    .panel.book { border-color: var(--blue); }
+    .panel.book h3 { color: #1f8fd0; }
+    .panel.badges-panel { border-color: var(--pink); }
+    .panel.badges-panel h3 { color: var(--pink); }
     .skins { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem; }
     .skin-card {
       font-family: var(--font); font-weight: bold; font-size: 0.95rem; color: var(--ink);
@@ -169,6 +217,8 @@
     }
     .skin-card .swatch { display: block; width: 100%; height: 16px; border-radius: 4px; margin-bottom: 0.35rem;
       object-fit: cover; image-rendering: pixelated; }
+    .skin-card small { color: #8d86a5; font-size: 0.8rem; }
+    .skin-card.locked small { color: #e08b1a; }
     .skin-card.owned { border-color: var(--green); }
     .skin-card.on { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(138,92,255,0.25); }
     .skin-card.locked { opacity: 0.75; }
@@ -179,6 +229,64 @@
     .win-panel .words { font-size: 0.9rem; line-height: 1.7; }
     .win-panel .words i { font-style: normal; color: var(--blue); }
     .win-panel .rank-line { color: var(--purple); font-size: 0.95rem; }
+    .win-panel .medal { font-size: 1rem; color: var(--ink); margin: 0.1rem 0 0.5rem; }
+    .win-panel .medal-icon { font-size: 1.6rem; vertical-align: -0.3rem; }
+    .win-panel .stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; margin: 0.2rem 0 0.6rem;
+    }
+    .win-panel .stat {
+      background: #f7f3ff; border-radius: 12px; padding: 0.4rem 0.2rem;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .win-panel .stat b { font-size: 1.25rem; color: var(--purple); line-height: 1.1; }
+    .win-panel .stat span { font-size: 0.72rem; color: #8d86a5; font-weight: bold; }
+    .win-panel .stat.wide { grid-column: 1 / -1; }
+    .win-panel .bot-words { color: #8d86a5; }
+    .win-panel .bot-words i { color: #a9b9c6; }
+    .win-panel .learned { font-size: 0.9rem; color: #1f8fd0; background: #eaf6ff; border-radius: 12px; padding: 0.4rem 0.6rem; }
+    .new-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; margin: 0.2rem 0 0.5rem; }
+    .badge-pill {
+      background: #fff3c4; border: 2px solid var(--yellow); border-radius: 999px;
+      padding: 0.25rem 0.7rem; font-size: 0.85rem; color: var(--ink);
+      animation: pill-in 0.5s ease;
+    }
+    @keyframes pill-in { from { transform: scale(0.6); opacity: 0; } }
+
+    /* --- the word book --- */
+    .book-sum { margin: 0 0 0.6rem; color: #6a6385; font-size: 0.9rem; }
+    .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.4rem; }
+    .book-cat { background: #fff; border: 2px solid #d7e9f6; border-radius: 12px; padding: 0.3rem 0.5rem; }
+    .book-cat.empty { opacity: 0.6; }
+    .book-cat.full { border-color: var(--yellow); background: #fffae6; }
+    .book-cat summary {
+      display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto;
+      align-items: center; column-gap: 0.45rem; cursor: pointer; list-style: none; font-weight: bold; font-size: 0.9rem;
+    }
+    .book-cat summary::-webkit-details-marker { display: none; }
+    .bc-icon { grid-row: 1 / 3; font-size: 1.4rem; }
+    .bc-name { color: var(--ink); }
+    .bc-name em { font-style: normal; color: #e08b1a; }
+    .bc-count { color: #1f8fd0; }
+    .bc-bar { grid-column: 2 / 4; display: block; height: 5px; border-radius: 999px; background: #e6eef5; overflow: hidden; margin-top: 3px; }
+    .bc-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); }
+    .bc-words { margin: 0.4rem 0 0.1rem; font-size: 0.8rem; line-height: 1.9; }
+    .bc-words span { background: #eaf6ff; border-radius: 6px; padding: 0.1rem 0.35rem; white-space: nowrap; }
+    .bc-words i { color: #8d86a5; }
+
+    /* --- badges --- */
+    .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.45rem; }
+    .badge {
+      position: relative; background: #fff; border: 2px solid #eee7fb; border-radius: 14px; padding: 0.5rem 0.4rem;
+      display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0.55;
+      filter: grayscale(1);
+    }
+    .badge.got { opacity: 1; filter: none; border-color: var(--pink); background: #fff5f9; }
+    .badge .be { font-size: 1.8rem; line-height: 1.1; }
+    .badge b { font-size: 0.85rem; color: var(--ink); margin-top: 0.15rem; }
+    .badge small { font-size: 0.72rem; color: #8d86a5; }
+    .badge .tick {
+      position: absolute; top: 4px; right: 6px; color: var(--green); font-weight: 900;
+    }
     .skin-card.shake { animation: shake 0.36s ease; }
     @keyframes shake {
       25% { transform: translateX(-5px); } 75% { transform: translateX(5px); }
@@ -190,9 +298,12 @@
       .subtitle { display: none; }
       .pick { font-size: 0.88rem; padding: 0.4rem 0.7rem; }
       .bar { font-size: 0.92rem; gap: 0.5rem; }
+      .win-panel .stats { grid-template-columns: repeat(2, 1fr); }
+      .q-icon { width: 2.5rem; height: 2.5rem; font-size: 1.5rem; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .modal-card, .skin-card.shake { animation: none; }
+      .modal-card, .skin-card.shake, .badge-pill { animation: none; }
+      .prog .mark { transition: none; }
       .prog i { transition: none; }
       .pick, .tap, .btn { transition: none; }
       .pick:hover, .tap:hover, .btn:hover { transform: none; }
@@ -208,7 +319,7 @@
 
   <header class="hero">
     <h1 class="title"><span class="emo">🌉</span> Word Bridge</h1>
-    <p class="subtitle">Every letter you answer with is another plank — walk it to the island!</p>
+    <p class="subtitle">Every letter you answer with is another plank — walk it to the island before the bot does!</p>
   </header>
 
   <main class="wb-wrap">
@@ -219,8 +330,8 @@
       <canvas id="stage" aria-hidden="true"></canvas>
       <div class="hud" id="hud"></div>
       <div class="prog" aria-hidden="true">
-        <span class="you"><i id="prog-you"></i></span>
-        <span class="bot"><i id="prog-bot"></i></span>
+        <span class="you"><i id="prog-you"></i><span class="mark" id="mark-you"></span><span class="isle">🏝️</span></span>
+        <span class="bot"><i id="prog-bot"></i><span class="mark" id="mark-bot"></span></span>
       </div>
     </section>
 
@@ -228,13 +339,30 @@
 
     <div class="pick-row">
       <button class="btn ghost small" id="shop-btn" type="button"
-              aria-expanded="false" aria-controls="shop">Bridge shop</button>
+              aria-expanded="false" aria-controls="shop">🛒 Bridge shop</button>
+      <button class="btn ghost small" id="book-btn" type="button"
+              aria-expanded="false" aria-controls="book">📖 Word Book</button>
+      <button class="btn ghost small" id="badges-btn" type="button"
+              aria-expanded="false" aria-controls="badges">🎖️ Badges</button>
       <button class="btn ghost small" id="restart-btn" type="button">New race</button>
     </div>
 
-    <section class="shop" id="shop">
+    <section class="panel shop" id="shop">
       <h3>Bridge shop</h3>
+      <p class="lead">Every plank you lay earns a coin. Spend them on a bridge to be proud of.</p>
       <div class="skins" id="skins"></div>
+    </section>
+
+    <section class="panel book" id="book">
+      <h3>Word Book</h3>
+      <p class="lead">Every word you've ever answered, sorted by category — a sticker album of words. ★ marks the grown-up categories.</p>
+      <div id="book-body"></div>
+    </section>
+
+    <section class="panel badges-panel" id="badges">
+      <h3>Badges</h3>
+      <p class="lead">Milestones worth bragging about. Grey ones tell you how to earn them.</p>
+      <div class="badge-grid" id="badge-grid"></div>
     </section>
   </main>
 

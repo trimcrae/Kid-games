@@ -122,6 +122,13 @@ window.WBSprites = (function () {
       "...OHHHHO...",
       "...OHHHHO...",
       "....OOOO...."
+    ],
+    // Dad's bobble hat
+    beanie: [
+      ".....WW.....",
+      "..GGGGGGGG..",
+      ".GGGGGGGGGG.",
+      "gggggggggggg"
     ]
   };
 
@@ -138,10 +145,14 @@ window.WBSprites = (function () {
     // Mum plays too — same body, her own colours and a hair bun.
     shannon: { O: "#2b2440", H: "#5d3a26", h: "#42281a", S: "#f4c8a2",
                C: "#12a594", c: "#0d7d70", P: "#f2a03d", p: "#c97c26",
-               B: "#4a4455", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#3aa84a", g: "#2c7d38" }
+               B: "#4a4455", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#3aa84a", g: "#2c7d38" },
+    // Dad too — navy jumper, a grey bobble hat and a big rucksack.
+    tristan: { O: "#2b2440", H: "#3a2a1e", h: "#261a12", S: "#f0c29a",
+               C: "#3457c4", c: "#27429a", P: "#6b7280", p: "#4b5563",
+               B: "#3d3a45", W: "#ffffff", R: "#e8544a", Y: "#ffcf3f", G: "#8d99a4", g: "#6b7683" }
   };
 
-  var KID_HATS = { jeannie: "band", cory: "cap", ellie: "crown", shannon: "bun" };
+  var KID_HATS = { jeannie: "band", cory: "cap", ellie: "crown", shannon: "bun", tristan: "beanie" };
 
   function heroFrames(kidId) {
     var pal = KID_PALETTES[kidId] || KID_PALETTES.jeannie;
@@ -194,13 +205,21 @@ window.WBSprites = (function () {
     ]
   ];
 
-  var BOT_PALETTE = {
-    O: "#2b2440", M: "#b9c3cc", m: "#8d99a4", V: "#2b8cff",
-    W: "#dff2ff", R: "#e8544a", Y: "#ffcf3f"
+  /* Three rivals, one body: Rusty (gentle) is a friendly orange tin can,
+     Zippy (speedy) is the classic silver bot, and Volt (pro) is a sleek
+     purple-and-gold machine. */
+  var BOT_PALETTES = {
+    gentle: { O: "#2b2440", M: "#e5935a", m: "#b8693a", V: "#7fd0f0",
+              W: "#ffffff", R: "#3ddc84", Y: "#ffcf3f" },
+    speedy: { O: "#2b2440", M: "#b9c3cc", m: "#8d99a4", V: "#2b8cff",
+              W: "#dff2ff", R: "#e8544a", Y: "#ffcf3f" },
+    pro:    { O: "#2b2440", M: "#6a4bb8", m: "#4b338a", V: "#ffcf3f",
+              W: "#fff3c4", R: "#ff5d8f", Y: "#ffe58a" }
   };
 
-  function botFrames() {
-    return BOT_TREADS.map(function (t) { return bake(BOT_BODY.concat(t), BOT_PALETTE); });
+  function botFrames(paceId) {
+    var pal = BOT_PALETTES[paceId] || BOT_PALETTES.speedy;
+    return BOT_TREADS.map(function (t) { return bake(BOT_BODY.concat(t), pal); });
   }
 
   /* =========================================================
@@ -227,7 +246,13 @@ window.WBSprites = (function () {
     candy:   { O: "#a33468", A: "#ff9ec9", W: "#ffd1e6", B: "#f07fb2", C: "#c9538c" },
     ice:     { O: "#2f6f8f", A: "#9fe4ff", W: "#e2f7ff", B: "#7fd0f0", C: "#4f9cc0" },
     rainbow: { O: "#5a3f8f", A: "#ff8fbf", W: "#ffe38f", B: "#8fd7ff", C: "#7a5bb5" },
-    gold:    { O: "#8a6410", A: "#ffcf3f", W: "#fff0b0", B: "#e5b31f", C: "#b58a12" }
+    gold:    { O: "#8a6410", A: "#ffcf3f", W: "#fff0b0", B: "#e5b31f", C: "#b58a12" },
+    // the newer shelf
+    grass:   { O: "#3b2a1c", A: "#5cb843", W: "#7fd35f", B: "#8a5a33", C: "#6b4527" },
+    bamboo:  { O: "#3d5a1e", A: "#c9d95a", W: "#eef7a8", B: "#a3b83e", C: "#6f8a25" },
+    lava:    { O: "#2a1414", A: "#3c2a2a", W: "#ff9a3c", B: "#ff6a1f", C: "#b8301a" },
+    princess:{ O: "#a33468", A: "#ffd1ea", W: "#ffffff", B: "#e29bd6", C: "#b05cc2" },
+    galaxy:  { O: "#141033", A: "#2c2466", W: "#fff6c8", B: "#4c5bd6", C: "#1b163f" }
   };
 
   /* =========================================================
@@ -258,6 +283,52 @@ window.WBSprites = (function () {
   ];
   var CLOUD_PAL = { W: "#ffffff" };
 
+  // the finish flag, two frames so it can flap
+  var FLAG = [
+    [
+      "OYYYYYYY..",
+      "OYRRRRYY..",
+      "OYRRRRRYY.",
+      "OYYYYYYY..",
+      "O.........",
+      "O.........",
+      "O.........",
+      "O.........",
+      "O.........",
+      "O........."
+    ],
+    [
+      "OYYYYYYYY.",
+      "OYRRRRRYY.",
+      "OYRRRRYY..",
+      "OYYYYYY...",
+      "O.........",
+      "O.........",
+      "O.........",
+      "O.........",
+      "O.........",
+      "O........."
+    ]
+  ];
+  var FLAG_PAL = { O: "#5a3a22", Y: "#ffd166", R: "#ff5d8f" };
+
+  // a gull, wings up / wings down
+  var BIRD = [
+    [
+      "O.....O",
+      ".O...O.",
+      "..OOO..",
+      "......."
+    ],
+    [
+      ".......",
+      "..OOO..",
+      ".O...O.",
+      "O.....O"
+    ]
+  ];
+  var BIRD_PAL = { O: "#2b2440" };
+
   var COIN = [
     "..OOOO..",
     ".OYYYYO.",
@@ -281,13 +352,18 @@ window.WBSprites = (function () {
     Object.keys(KID_PALETTES).forEach(function (k) {
       CACHE["hero." + k + ".walk"] = heroFrames(k);
     });
-    CACHE["bot.walk"] = botFrames();
+    Object.keys(BOT_PALETTES).forEach(function (p) {
+      CACHE["bot." + p + ".walk"] = botFrames(p);
+    });
+    CACHE["bot.walk"] = CACHE["bot.speedy.walk"];
     Object.keys(PLANK_SKINS).forEach(function (s) {
       CACHE["plank." + s] = bake(PLANK, PLANK_SKINS[s]);
     });
     CACHE["island"] = bake(ISLAND, ISLAND_PAL);
     CACHE["cloud"] = bake(CLOUD, CLOUD_PAL);
     CACHE["coin"] = bake(COIN, COIN_PAL);
+    CACHE["flag"] = FLAG.map(function (f) { return bake(f, FLAG_PAL); });
+    CACHE["bird"] = BIRD.map(function (f) { return bake(f, BIRD_PAL); });
     return CACHE;
   }
 
