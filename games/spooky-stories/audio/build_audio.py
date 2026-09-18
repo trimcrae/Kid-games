@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pre-render the storybook narration with Piper (neural TTS) -> .mp3.
 
-Parses the exact `text:` strings out of ../storybook.js (grouped by each
+Parses the exact `text:` strings out of ../storybook.js and ../classics.js (grouped by each
 story's `id:`) so the audio always matches what's on screen, synthesizes
 each line with the Piper en_US-lessac-medium voice, and encodes to MP3
 (plays on every browser, incl. all iOS Safari).
@@ -37,7 +37,7 @@ import hashlib, json, os, re, struct, subprocess, sys, tempfile, wave
 import imageio_ffmpeg
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-JS = os.path.join(HERE, "..", "storybook.js")
+SOURCES = [os.path.join(HERE, "..", name) for name in ("storybook.js", "classics.js")]
 OUT = HERE
 VOICE = os.path.join(HERE, "voices", "en_US-lessac-medium.onnx")
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
@@ -66,19 +66,20 @@ if os.path.exists(MANIFEST):
 def fingerprint(text):
     return hashlib.sha1(text.encode("utf-8")).hexdigest()[:12]
 
-src = open(JS, encoding="utf-8").read()
+src = "\n".join(open(source, encoding="utf-8").read() for source in SOURCES)
 
 # Walk id:/text:/ask: tokens in document order, bucketing them under the current
-# story id. `text:` is a story page (-> "<id>-<n>.mp3"); `ask:` is one of the
+# story id. `text:` is a story page and `ending:` is its final page
+# (-> "<id>-<n>.mp3"); `ask:` is one of the
 # comprehension questions that follow the pages (-> "<id>-q<n>.mp3").
 stories, cur = [], None
-for m in re.finditer(r'\b(id|text|ask):\s*"((?:[^"\\]|\\.)*)"', src):
+for m in re.finditer(r'\b(id|text|ending|ask):\s*"((?:[^"\\]|\\.)*)"', src):
     key, val = m.group(1), m.group(2)
     if key == "id":
         cur = {"id": val, "texts": [], "asks": []}
         stories.append(cur)
     elif cur is not None:
-        cur["texts" if key == "text" else "asks"].append(val)
+        cur["asks" if key == "ask" else "texts"].append(val)
 
 # Words the page SHOUTS for emphasis. espeak (Piper's phonemizer) reads an
 # all-caps word out letter by letter — "RED" comes out "R-E-D" — so the

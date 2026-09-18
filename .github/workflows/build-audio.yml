@@ -21,6 +21,7 @@ on:
   push:
     paths:
       - "games/spooky-stories/storybook.js"
+      - "games/spooky-stories/classics.js"
       - "games/spooky-stories/audio/build_audio.py"
       - ".github/workflows/build-audio.yml"
 
