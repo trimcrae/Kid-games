@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "blue",
+  "style": "R3",
+  "sourceHash": "3e8a2412e25ba91d876820bc5da0f8cf0fef0aa796b9f127c26ce2223447f40a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4398a72b-7bfc-4560-aa20-a6b198897132.png",
+  "originalSha256": "c998022907be095552899bd63a5804615cef0512a2b3480c02429ac733575c38",
+  "file": "rainbow-blue.webp",
+  "sha256": "c54b7d43bafed53dbf106906d553d0f0a99d41be38f62aeabe972c8432f2b7c6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 illustration for Ellie & the Rainbow Dragon. Input image is the authoritative STYLE AND CHARACTER reference from the opening page, not the scene to copy. Match its vivid wax-crayon and oil-pastel marks, cream paper tooth, loose colorful flat forms and cheerful handmade drawing. Keep exactly the same Ellie: preschool, dark-brown chin-length bob and side fringe, silver tiara, pink dress, brown boots. Same rounded gentle dragon with four short legs, two little horns, small wings, curved tail, expressive small eyes. Change colors ONLY as specified by this page. No writing, typography, panels, borders, speech bubbles or watermark. No smooth digital painting, felt, paper collage or 3D. Keep main bodies and faces comfortably inside the frame.\nILLUSTRATE ONLY THIS PAGE:\nPage text: They find a bush of blueberries. Count them: one… two… three! Munch munch — the dragon's tail turns deep BLUE! What colour next? Ellie kneels by a blueberry bush, showing exactly THREE oversized individually countable deep-blue blueberries on a broad green leaf in front of the dragon. Dragon smiles and curls its newly deep-BLUE TAIL so it is unmistakably visible. All remaining body and wings stay GREY. Bush has foliage but NO additional berries. No other fruit. Show before all berries are swallowed so the learning count remains visible.",
+  "references": [
+    "art/generated/rainbow-meet.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly three blueberries on leaf, deep-blue curled tail and otherwise grey dragon; same Ellie and crayon medium."
+}

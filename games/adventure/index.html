@@ -73,7 +73,7 @@
       width: 100%; aspect-ratio: 4 / 3; border-radius: 20px; overflow: hidden;
       background: #120a2a; display: block; line-height: 0;
     }
-    .scene-art .scene-img { display:block; width:100%; height:100%; object-fit:cover; }
+    .scene-art .scene-img { display:block; width:100%; height:100%; object-fit:contain; }
     .scene-art canvas { display:block; width:100%; height:100%; image-rendering:pixelated; }
     .scene-art.turning { animation: pageTurn .5s ease; }
     @keyframes pageTurn {
@@ -271,6 +271,7 @@
   <script src="glossary.js"></script>
   <script src="story-data.js"></script>
   <script src="stories-long.js"></script>
+  <script src="art/generated/manifest.js"></script>
   <script src="adventure.js"></script>
 </body>
 </html>

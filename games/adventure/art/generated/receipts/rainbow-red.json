@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "red",
+  "style": "R3",
+  "sourceHash": "deeab51d26a2506db0ce1b1d7e64c3f40fe92c70b3a4de6561a0f5f6c656d5dc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7aff2389-7f13-45c5-97e7-27b395a8841e.png",
+  "originalSha256": "6bec4297554b61130b3ab5b8b581082b092c01a22ae83cf95a5c651a365260cc",
+  "file": "rainbow-red.webp",
+  "sha256": "584056ee5ed6f4c6520eaedb580083bce1c8c1df952e411aa371dea3e73bf87c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 illustration for Ellie & the Rainbow Dragon. Input image is the authoritative STYLE AND CHARACTER reference from the opening page, not the scene to copy. Match its vivid wax-crayon and oil-pastel marks, cream paper tooth, loose colorful flat forms and cheerful handmade drawing. Keep exactly the same Ellie: preschool, dark-brown chin-length bob and side fringe, silver tiara, pink dress, brown boots. Same rounded gentle dragon with four short legs, two little horns, small wings, curved tail, expressive small eyes. Change colors ONLY as specified by this page. No writing, typography, panels, borders, speech bubbles or watermark. No smooth digital painting, felt, paper collage or 3D. Keep main bodies and faces comfortably inside the frame.\nILLUSTRATE ONLY THIS PAGE:\nPage text: They find shiny red apples. Count with Ellie: one… two… three! The dragon gobbles them up and its WINGS turn bright RED! What next? Under an apple tree, Ellie points to exactly THREE separate big red apples lying clearly countable in a row on the grass, dragon leans toward them, delighted, with two bright RED wings unfurling. Its head and main body remain grey. Hide its tail naturally behind body or out of view because prior branch colors differ. No extra apples on tree or elsewhere. Avoid other fruit. Illustrate discovery and beginning of eating, leaving exactly three apples visible.",
+  "references": [
+    "art/generated/rainbow-meet.webp"
+  ],
+  "reviewed": true,
+  "review": "Three individually visible red apples, two red wings and grey head/body; tail not shown, preserving compatibility with incoming paths; chosen crayon style."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "campout",
+  "nodeId": "camp",
+  "style": "C2",
+  "sourceHash": "2ae4e2301070a207604c0ebee43746331c6ccf19e9aa883dba448bd776cf0ed9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cbd9b0b9-7b2a-4cef-ab44-a4aaf9ccbe82.png",
+  "originalSha256": "3bb1ee069b3aa130382235cb5ae009f5b731d0da7bfc5b4bcd3fe98c67c3ab36",
+  "file": "campout-camp.webp",
+  "sha256": "0dc990a0ab166330e314955c553588225f35740c28f3621da1561bf9933472e1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Finished single landscape 4:3 illustration, The Great Family Campout, opening page.\nSTYLE REFERENCE: match ONLY the MIDDLE C2 Field-journal adventure panel of the provided comparison sheet: fine lively ink lines, crosshatching and earthy colored-pencil shading on cream paper. Intricate pine needles, canvas tents, wooded nighttime setting, expressive gently illustrated human faces. No park-poster shapes, no stop-motion, no crayon, no fantasy glow, no realistic photographic people. Reference is a medium reference; its generic adult is NOT the intended family identity.\nPAGE: \"Under a million stars, the whole family sits by the campfire. Suddenly — a tiny WHIMPER comes from the dark woods. Baby Kieran points. What should they do?\"\nCAST: exactly six family members. Dad: adult man short light-brown hair clean-shaven, tan outdoor jacket. Mom: adult woman grey-streaked dark bob and round glasses, olive outdoor jacket; holds infant Kieran securely. Kieran: baby, pale blue sleeper, visibly pointing a tiny hand toward dark woods. Jeannie: seven-year-old girl shoulder-length brown hair, pink camping sweater and trousers. Cory: six-year-old boy short brown hair rectangular glasses, green camping sweater and trousers. Ellie: preschool girl straight dark-brown chin-length bob, side fringe, lavender camping sweater and trousers. No crowns or princess gowns on this camping trip.\nSCENE: family seated around small campfire under a richly drawn starry sky; two small tents (rust-red and blue). Pine woods visible to the right where baby is pointing. Family turning to listen with curious gentle expressions. The lost puppy is OFFSCREEN in the woods and must NOT appear on this opening page. No owls, food, foxes or shooting star yet. Clear readable staging and separate distinct faces. No text, lettering, border, panels, labels, watermark.",
+  "references": [
+    "art/direction/campout-options.png (middle/C2)"
+  ],
+  "reviewed": true,
+  "review": "Full image checked: six distinct family members, Kieran held by Mom and pointing toward woods, two tents and night campfire; no premature puppy. Chosen detailed ink and colored-pencil medium with consistent family age differences."
+}

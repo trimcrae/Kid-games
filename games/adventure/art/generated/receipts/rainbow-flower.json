@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "flower",
+  "style": "R3",
+  "sourceHash": "0c7c3516db554cfcb56f65d0ad31d2a052720191dd33168b244450254723295e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-97884c9f-8a48-4546-8e97-56eaf6db5372.png",
+  "originalSha256": "237b4aa1c51b54c6be7123c124706d495f0fedac6140f9af6eefa185248d748a",
+  "file": "rainbow-flower.webp",
+  "sha256": "63ff80f43fda62e7b4bdca54c80cacd3d0b889be0c1b07e75becad3d3e2204d2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 illustration for Ellie & the Rainbow Dragon. Input image is the authoritative STYLE AND CHARACTER reference from the opening page, not the scene to copy. Match its vivid wax-crayon and oil-pastel marks, cream paper tooth, loose colorful flat forms and cheerful handmade drawing. Keep exactly the same Ellie: preschool, dark-brown chin-length bob and side fringe, silver tiara, pink dress, brown boots. Same rounded gentle dragon with four short legs, two little horns, small wings, curved tail, expressive small eyes. Change colors ONLY as specified by this page. No writing, typography, panels, borders, speech bubbles or watermark. No smooth digital painting, felt, paper collage or 3D. Keep main bodies and faces comfortably inside the frame.\nILLUSTRATE ONLY THIS PAGE:\nPage text: Ellie picks a pink flower and holds it out. The dragon sniffs it and smiles a tiny smile. \"Thank you,\" it whispers. Depict Ellie kneeling and extending exactly one pink flower to the wholly GREY dragon's nose. Dragon smiles shyly as it sniffs. Same meadow, with a different closer composition than opening, distant trees. No food or changed body colors.",
+  "references": [
+    "art/generated/rainbow-meet.webp"
+  ],
+  "reviewed": true,
+  "review": "Same crayon characters; Ellie offers one pink flower; wholly grey dragon sniffs and smiles; no premature fruit or colors."
+}

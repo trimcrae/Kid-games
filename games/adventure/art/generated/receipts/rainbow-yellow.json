@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "yellow",
+  "style": "R3",
+  "sourceHash": "b877bcbd832b79353cfb8baccbd892b97cdfb5f8152fd1d7c9d4b5ca992f5b1e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2e0e19e3-7c2b-48ea-85be-53e41134e8c1.png",
+  "originalSha256": "c7ec34e1b61d6360b4b03631ac9a819a5401d361d4825ddaa7c50e5ceec2444f",
+  "file": "rainbow-yellow.webp",
+  "sha256": "19d69ee77aa385f6ea6392e46e5a8228a7e6a95966a6e9e13bd074835566af9e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 illustration for Ellie & the Rainbow Dragon. Input image is the authoritative STYLE AND CHARACTER reference from the opening page, not the scene to copy. Match its vivid wax-crayon and oil-pastel marks, cream paper tooth, loose colorful flat forms and cheerful handmade drawing. Keep exactly the same Ellie: preschool, dark-brown chin-length bob and side fringe, silver tiara, pink dress, brown boots. Same rounded gentle dragon with four short legs, two little horns, small wings, curved tail, expressive small eyes. Change colors ONLY as specified by this page. No writing, typography, panels, borders, speech bubbles or watermark. No smooth digital painting, felt, paper collage or 3D. Keep main bodies and faces comfortably inside the frame.\nILLUSTRATE ONLY THIS PAGE:\nPage text: Sweet yellow bananas! One, two! The dragon's tummy glows sunny YELLOW. Just one more colour to go — let's get green! Show Ellie holding a broad leaf with exactly TWO clearly separate peeled-back yellow bananas. The dragon sits FRONT-ON delighted, one paw near its new bright-YELLOW BELLY, grey head and feet. Frame the body so its folded wings and tail are naturally hidden behind it, since their colors depend on prior choices. The warm yellow belly is the focus. No other fruit or bananas. Same cheerful meadow; no rainbow yet.",
+  "references": [
+    "art/generated/rainbow-meet.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly two bananas and a bright yellow tummy, grey head and feet; wings/tail hidden for branch compatibility; matching crayon Ellie."
+}

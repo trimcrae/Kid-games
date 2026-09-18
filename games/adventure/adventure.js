@@ -420,13 +420,20 @@
     quizEl.hidden = true;
     quizEl.innerHTML = "";
 
-    // a node may carry a generated image (img), an art() function, or a scene
+    // Keep the original illustration while a generated page loads or fails.
+    // A late image must not replace a newer page.
+    const inner = typeof node.art === "function" ? node.art()
+                : node.scene ? ART.scene(node.scene) : "";
+    artEl.innerHTML = wrapSvg(inner);
     if (node.img) {
-      artEl.innerHTML = '<img class="scene-img" src="' + node.img + '" alt="" onerror="this.style.display=\'none\'">';
-    } else {
-      const inner = typeof node.art === "function" ? node.art()
-                  : node.scene ? ART.scene(node.scene) : "";
-      artEl.innerHTML = wrapSvg(inner);
+      const pageStory = current;
+      const picture = new Image();
+      picture.className = "scene-img";
+      picture.alt = "";
+      picture.onload = () => {
+        if (current === pageStory && nodeId === id) artEl.replaceChildren(picture);
+      };
+      picture.src = node.img;
     }
     if (!reduceMotion) {
       artEl.classList.remove("turning"); void artEl.offsetWidth; artEl.classList.add("turning");

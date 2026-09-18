@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "meet",
+  "style": "R3",
+  "sourceHash": "7c8c6c2a654a3aadc0bc1e72ec2a921dbae3195479f6299a4dd8fc247fcd2399",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-669b08e9-14e7-462b-a3ba-ab7208ae57e6.png",
+  "originalSha256": "ca67d2dcc7b4c78d9196530a81d1a2a2c3b233bb7fed4d7170aca5f93fa753ef",
+  "file": "rainbow-meet.webp",
+  "sha256": "37d830a26ff6c95b5a170c7431fc2e695be5a83dc841c7631e0746dcaf6fec6d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. A finished single landscape 4:3 page illustration for \"Ellie & the Rainbow Dragon\".\nREFERENCE ROLE: attached comparison sheet is a STYLE and CHARACTER reference. Match ONLY its RIGHTMOST panel labeled R3 Wax-crayon wonder. Ignore felt and paper-cut panels completely. Render a complete new single scene with NO panels, lettering, labels, borders, watermark or typography.\nSTYLE LOCK: vivid wax-crayon and oil-pastel on textured cream paper; chunky confident handmade crayon marks, grain and paper tooth; loose charming flat storybook shapes. No smooth digital gradient, no watercolor, no realistic painting, no 3D.\nCHARACTER LOCK: preschool Ellie has straight chin-length dark-brown bob, side-swept fringe, silver tiara, pink short-sleeved princess dress and brown boots. Her friendly little dragon has four short legs, a curved tail, two small wings, two little horns, a rounded muzzle and small expressive eyes. It is wholly grey in this scene.\nILLUSTRATE ONLY THIS PAGE: \"Princess Ellie skips through the meadow. A little dragon sits all alone — and it is grey all over! It looks sad.\"\nComposition: Ellie arriving from left with a curious concerned expression, arms relaxed (no flower yet); the sad grey dragon seated at right in a green meadow. Colorful small meadow flowers and distant modest castle, blue crayon sky. Full bodies large and clear, faces well inside frame. This is the first encounter; no food, rainbow, riding or extra characters. Finished illustration should establish repeatable designs for these two characters.",
+  "references": [
+    "art/direction/rainbow-options.png (right/R3)"
+  ],
+  "reviewed": true,
+  "review": "Checked full image: chosen crayon medium, pink-dress Ellie arriving, sad wholly grey dragon, meadow and distant castle; no premature fruit, flower-giving or rainbow."
+}

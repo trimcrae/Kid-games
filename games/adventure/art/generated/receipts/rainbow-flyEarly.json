@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "flyEarly",
+  "style": "R3",
+  "sourceHash": "86f943f33703a65e7361105c6d6f526881f8c40f082072fa3a5cfb145ed73264",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-27f0247b-a1c7-411d-b059-ec91fe701339.png",
+  "originalSha256": "d7250a425a56419c0f1ee9af44ab6488130013c1c01909a99b8d7b669c296a5f",
+  "file": "rainbow-flyEarly.webp",
+  "sha256": "2bce3e69047d92275e12a55c468b41a398ac4e9b92a4dfb4f4a3b3bf309c7a0c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 illustration for Ellie & the Rainbow Dragon. Input image is the authoritative STYLE AND CHARACTER reference from the opening page, not the scene to copy. Match its vivid wax-crayon and oil-pastel marks, cream paper tooth, loose colorful flat forms and cheerful handmade drawing. Keep exactly the same Ellie: preschool, dark-brown chin-length bob and side fringe, silver tiara, pink dress, brown boots. Same rounded gentle dragon with four short legs, two little horns, small wings, curved tail, expressive small eyes. Change colors ONLY as specified by this page. No writing, typography, panels, borders, speech bubbles or watermark. No smooth digital painting, felt, paper collage or 3D. Keep main bodies and faces comfortably inside the frame.\nILLUSTRATE ONLY THIS PAGE:\nPage text: Ellie hops on and the red dragon soars over the clouds! It isn't a whole rainbow yet — but flying with a friend is the best feeling in the world. Show the same Ellie in pink riding happily on the same dragon, now RED, soaring above fluffy white crayon clouds. Dragon's full four legs, long tail and two spread wings are clearly readable, red with subtle tonal variation, not rainbow colors. Ellie holds its neck securely with delighted expression; keep rider distinct from wings. Entire dragon and rider inside frame, blue crayon sky, no ground figures, no fruit, no rainbow.",
+  "references": [
+    "art/generated/rainbow-meet.webp"
+  ],
+  "reviewed": true,
+  "review": "Ellie rides the red dragon above clouds; full dragon and rider visible, no rainbow colors; matching designs and medium."
+}

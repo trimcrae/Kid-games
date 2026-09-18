@@ -1,6 +1,6 @@
 # Approved adventure illustration styles
 
-The user selected **M1, R3, C2, P2, S1, L1** on September 17, 2026, after reviewing six generated comparison sheets. These are the approved directions for Choose Your Own Adventure. The sheets are concept references, not finished story pages. The reader still uses its existing artwork.
+The user selected **M1, R3, C2, P2, S1, L1** on September 17, 2026, after reviewing six generated comparison sheets, and subsequently requested illustrations for every page. These are the approved directions for Choose Your Own Adventure. The sheets are concept references, not finished story pages. Reviewed production illustrations are integrated through [the generated-art manifest](../generated/manifest.js); remaining pages retain their original artwork while production continues.
 
 | Story / family | Selected style | Authoritative sample |
 | --- | --- | --- |

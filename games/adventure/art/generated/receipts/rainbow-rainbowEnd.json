@@ -1,0 +1,22 @@
+{
+  "storyId": "rainbow",
+  "nodeId": "rainbowEnd",
+  "style": "R3",
+  "sourceHash": "22c1a0259d911406ced2df46f72a3980aa597f0c7575c4c718e7aa565a78ea97",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ef6b320b-b267-49bf-a588-c5a298a79ac6.png",
+  "originalSha256": "f21f086b0b514c7e9d3e8b8a31729e04100fe1d6e9597003658a2a51ffc841fe",
+  "file": "rainbow-rainbowEnd.webp",
+  "sha256": "735e1e11d76432fd4059011462cedda26507e8303d4a82f47b31ec084ddea15e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 illustration for Ellie & the Rainbow Dragon. Input image is the authoritative STYLE AND CHARACTER reference from the opening page, not the scene to copy. Match its vivid wax-crayon and oil-pastel marks, cream paper tooth, loose colorful flat forms and cheerful handmade drawing. Keep exactly the same Ellie: preschool, dark-brown chin-length bob and side fringe, silver tiara, pink dress, brown boots. Same rounded gentle dragon with four short legs, two little horns, small wings, curved tail, expressive small eyes. Change colors ONLY as specified by this page. No writing, typography, panels, borders, speech bubbles or watermark. No smooth digital painting, felt, paper collage or 3D. Keep main bodies and faces comfortably inside the frame.\nILLUSTRATE ONLY THIS PAGE:\nPage text: WHOOSH! Every colour swirls together and the dragon shines like a RAINBOW! Ellie rides it over the castle while everyone cheers. What a sparkly day! Show same Ellie in pink dress and silver tiara riding the same dragon above the familiar pale castle with pink turret roofs. The dragon is now beautifully multicolored: red and orange wings, yellow tummy, green and blue tail, violet head accents; rainbow crayon color patches cover body. A large rainbow arches through sky BEHIND dragon and castle, never painted over faces. Below, Cory (young school-age boy, short brown hair, rectangular glasses, green shirt) and Jeannie (older school-age girl, shoulder-length brown hair, orange dress) stand fully visible on grassy foreground cheering upward. Exactly one Ellie on dragon and two siblings on ground. Bright joyful handmade wax-crayon ending, full bodies well inside edges.",
+  "references": [
+    "art/generated/rainbow-meet.webp"
+  ],
+  "reviewed": true,
+  "review": "Rainbow-colored dragon carrying Ellie above castle; exactly Cory and Jeannie cheering below; rainbow behind cast; bodies visible and matched crayon medium."
+}
