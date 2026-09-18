@@ -63,6 +63,38 @@ function leafGeometry(length,width,droop,segments=4){
 }
 const ball=(r,sy=1)=>{const g=new THREE.SphereGeometry(r,8,6);if(sy!==1)g.scale(1,sy,1);return g;};
 
+// Open, leafy crowns replace the old smooth green spheres. Each crown is a
+// cluster of small folded blades with an uneven outline and glimpses through
+// to the next tree. The local seed leaves the planting layout and bird perches
+// unchanged, and all blades still merge into the existing foliage draw call.
+function leafyCrown(radius,sy=1){
+  const r=rng(Math.round(radius*10007+sy*7919)),pos=[];
+  const rotation=new THREE.Quaternion(),center=new THREE.Vector3();
+  const lobes=Array.from({length:5},(_,i)=>{
+    const a=i*2.39996;return new THREE.Vector3(Math.cos(a)*.46,(r()-.5)*.5,Math.sin(a)*.46);
+  });
+  for(let i=0;i<112;i++){
+    const lobe=lobes[i%5],a=r()*Math.PI*2,y=r()*2-1,spread=Math.sqrt(1-y*y);
+    center.set(lobe.x+Math.cos(a)*spread*.62,lobe.y+y*.66,lobe.z+Math.sin(a)*spread*.62);
+    center.multiplyScalar(radius);center.y*=sy;
+    rotation.setFromEuler(new THREE.Euler((r()-.5)*1.4,r()*Math.PI*2,(r()-.5)*1.3));
+    const length=radius*(.22+r()*.14),width=length*(.38+r()*.15);
+    const blade=[[0,0,-length],[-width,0,0],[0,length*.12,0],[width,0,0],[0,0,length]]
+      .map(p=>new THREE.Vector3(...p).applyQuaternion(rotation).add(center));
+    for(const j of [0,1,2,0,2,3,1,4,2,2,4,3])pos.push(...blade[j].toArray());
+  }
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  geo.computeVertexNormals();return geo;
+}
+
+// Feathered palm edges, with narrow gaps down to the central rib, instead of
+// solid paddle-shaped fronds. The existing droop and wind bend are preserved.
+function palmFrond(length,width,droop){
+  const geo=leafGeometry(length,width,droop,24),p=geo.attributes.position;
+  for(let i=1;i<24;i+=2){p.setX(i*3,p.getX(i*3)*.08);p.setX(i*3+2,p.getX(i*3+2)*.08);}
+  geo.computeVertexNormals();return geo;
+}
+
 // Merge parts into one geometry: position, normal, colour and sway per vertex.
 // shade: [dark,light] tints a part by how much each vertex faces up (a cheap
 // canopy self-shadow: bright tops, dark undersides).
@@ -99,7 +131,7 @@ function palm(x,z,h,r){
     // Fronds leave the crown between level and 45° up, then arc down.
     const yaw=start+k*Math.PI*2/fronds+(r()-.5)*.3,tilt=-(.25+r()*.5)+(k%2)*.22;
     const len=h*.34+r()*.8;
-    leaf.push(part(leafGeometry(len,len*.3,len*.6,5),top.x,top.y-.05,top.z,k%2?'#4f9c48':'#3c8340',{yaw,tilt,sway:1}));
+    leaf.push(part(palmFrond(len,len*.38,len*.6),top.x,top.y-.05,top.z,k%2?'#4f9c48':'#3c8340',{yaw,tilt,sway:1}));
   }
   for(let k=0;k<3;k++){const a=k*2.1;solid.push(part(ball(.13),top.x+Math.cos(a)*.16,top.y-.22,top.z+Math.sin(a)*.16,'#6b4a2b'));}
   return {solid,leaf,perch:new THREE.Vector3(top.x,top.y+.1,top.z)};
@@ -107,21 +139,24 @@ function palm(x,z,h,r){
 function canopyTree(x,z,h,w,r,{deep=false}={}){
   const solid=[],leaf=[],trunk=TRUNK[Math.floor(r()*TRUNK.length)];
   const base=new THREE.Vector3(x,GROUND-.05,z),fork=new THREE.Vector3(x+(r()-.5)*.4,GROUND+h*.42,z+(r()-.5)*.4);
-  solid.push(limb(base,fork,.32*w/9+.08,.22*w/9+.06,trunk));
+  const bend=base.clone().lerp(fork,.52).add(new THREE.Vector3(.14*Math.sin(x),0,.14*Math.cos(z)));
+  solid.push(limb(base,bend,.32*w/9+.08,.25*w/9+.06,trunk));
+  solid.push(limb(bend,fork,.25*w/9+.06,.18*w/9+.06,trunk));
   const branches=3+Math.floor(r()*3),greens=deep?DEEP:GREENS,start=r()*Math.PI*2;
   let perch=null;
   for(let k=0;k<branches;k++){
     const a=start+k*Math.PI*2/branches+(r()-.5)*.6,reach=w*(.18+r()*.14);
     const tip=new THREE.Vector3(fork.x+Math.cos(a)*reach,fork.y+h*(.22+r()*.2),fork.z+Math.sin(a)*reach);
-    solid.push(limb(fork,tip,.11,.05,trunk,6));
+    const elbow=fork.clone().lerp(tip,.55);elbow.y-=.25;
+    solid.push(limb(fork,elbow,.12,.08,trunk,6),limb(elbow,tip,.08,.025,trunk,5));
     if(!perch&&k===1)perch=tip.clone().add(new THREE.Vector3(0,.12,0));
     const g=greens[Math.floor(r()*greens.length)],g2=deep?'#1f4a28':'#2c5e2f';
-    leaf.push(part(ball(w*(.2+r()*.1),.72),tip.x,tip.y+w*.06,tip.z,g,{sway:.45,shade:[g2,g]}));
+    leaf.push(part(leafyCrown(w*(.2+r()*.1),.72),tip.x,tip.y+w*.06,tip.z,g,{sway:.45,shade:[g2,g]}));
   }
-  // A crown over the branches and one lower blob so the shape reads as a tree.
+  // Offset sprays above and below the forks break up the silhouette.
   const g=greens[Math.floor(r()*greens.length)];
-  leaf.push(part(ball(w*.27,.6),fork.x,fork.y+h*.42,fork.z,g,{sway:.5,shade:[deep?'#1f4a28':'#2c5e2f',g]}));
-  leaf.push(part(ball(w*.2,.7),fork.x+(r()-.5)*w*.3,fork.y+h*.16,fork.z+(r()-.5)*w*.3,greens[0],{sway:.4,shade:['#2c5e2f',greens[1]]}));
+  leaf.push(part(leafyCrown(w*.27,.6),fork.x,fork.y+h*.42,fork.z,g,{sway:.5,shade:[deep?'#1f4a28':'#2c5e2f',g]}));
+  leaf.push(part(leafyCrown(w*.2,.7),fork.x+(r()-.5)*w*.3,fork.y+h*.16,fork.z+(r()-.5)*w*.3,greens[0],{sway:.4,shade:['#2c5e2f',greens[1]]}));
   return {solid,leaf,perch};
 }
 function emergent(x,z,h,w,r){
@@ -136,9 +171,9 @@ function emergent(x,z,h,w,r){
     const tip=new THREE.Vector3(top.x+Math.cos(a)*reach,top.y+h*.14+r()*1.5,top.z+Math.sin(a)*reach);
     solid.push(limb(top,tip,.15,.06,'#5e4733',6));
     const g=DEEP[Math.floor(r()*DEEP.length)];
-    leaf.push(part(ball(w*.24,.5),tip.x,tip.y+.4,tip.z,g,{sway:.35,shade:['#1b4224',g]}));
+    leaf.push(part(leafyCrown(w*.24,.5),tip.x,tip.y+.4,tip.z,g,{sway:.35,shade:['#1b4224',g]}));
   }
-  leaf.push(part(ball(w*.3,.45),top.x,top.y+h*.2,top.z,'#357a38',{sway:.4,shade:['#1b4224','#3f8a3c']}));
+  leaf.push(part(leafyCrown(w*.3,.45),top.x,top.y+h*.2,top.z,'#357a38',{sway:.4,shade:['#1b4224','#3f8a3c']}));
   return {solid,leaf};
 }
 function bananaPlant(x,z,r){
@@ -160,9 +195,9 @@ function fern(x,z,r,scale=1){
 }
 function flowerBush(x,z,r){
   const leaf=[],solid=[],s=.6+r()*.5,g=GREENS[Math.floor(r()*GREENS.length)],flower=FLOWERS[Math.floor(r()*FLOWERS.length)];
-  leaf.push(part(ball(s,.8),x,GROUND+s*.6,z,g,{sway:.3,shade:['#2c5e2f',g]}));
-  leaf.push(part(ball(s*.7,.8),x+s*.6,GROUND+s*.45,z+(r()-.5)*s,g,{sway:.3,shade:['#2c5e2f',g]}));
-  leaf.push(part(ball(s*.6,.8),x-s*.55,GROUND+s*.4,z-(r()-.5)*s,g,{sway:.3,shade:['#2c5e2f',g]}));
+  leaf.push(part(leafyCrown(s,.8),x,GROUND+s*.6,z,g,{sway:.3,shade:['#2c5e2f',g]}));
+  leaf.push(part(leafyCrown(s*.7,.8),x+s*.6,GROUND+s*.45,z+(r()-.5)*s,g,{sway:.3,shade:['#2c5e2f',g]}));
+  leaf.push(part(leafyCrown(s*.6,.8),x-s*.55,GROUND+s*.4,z-(r()-.5)*s,g,{sway:.3,shade:['#2c5e2f',g]}));
   const blooms=5+Math.floor(r()*5);
   for(let k=0;k<blooms;k++){const a=r()*Math.PI*2,d=s*(.5+r()*.6),y=GROUND+s*(.5+r()*.7);
     solid.push(part(new THREE.SphereGeometry(.09,6,4),x+Math.cos(a)*d,y,z+Math.sin(a)*d,flower));}

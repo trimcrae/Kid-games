@@ -109,8 +109,11 @@ study:
   flowering bushes, hanging lianas and five parrots on the crowns nearest
   the garden; a thinner scatter beside the front lawn and behind the
   cottages, misty hills on the horizon all round, and a ground plane so no
-  direction ends in the void. Everything is merged into four
-  vertex-coloured draw calls (about 128k triangles), casts and takes the
+  direction ends in the void. Tree crowns and flowering bushes use clusters
+  of individual folded leaves with open, irregular silhouettes; palms have
+  feathered fronds and the canopy trees have bent, tapered branches.
+  Everything is merged into four vertex-coloured draw calls (about 511k
+  triangles), casts and takes the
   sun's shadow, follows the exterior dim and leaf fill after dark, and the
   leaves sway in the vertex shader. Nothing in it collides or is walkable;
   routes, the Marauder's Map and the camera guard are untouched. It is not

@@ -4,7 +4,7 @@ import {createHouseLife} from './house-life.mjs?v=20260918-petpet';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
 import {createHouseLighting} from './lighting.mjs?v=20260918-sky';
-import {createJungle} from './jungle.mjs?v=20260918-sky';
+import {createJungle} from './jungle.mjs?v=20260918-leaves';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs?v=20260916-use3';
