@@ -1491,7 +1491,7 @@ scene['scale_note'] = 'Metres; room dimensions and unseen connections are estima
 scene['source_photos'] = 'Four private photo sets (1-10, U1-U10, V1-V10, W1-W10) and two private narrated walkthroughs (House Tour, Backyard tour). Timestamped visual observations; dimensions remain estimates. References not packed or committed.'
 scene['content_policy'] = ('Furniture retained. Lived-in dressing (dressing.py) is invented, code-drawn and '
                            'not photographed; people and readable personal items omitted.')
-source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','yard.py','exterior.py','dressing.py','photoreal.py']
+source_files = ['build.py','upstairs.py','extensions.py','basement_garage.py','vehicles.py','yard.py','exterior.py','dressing.py','photoreal.py']
 scene['generator_sha256'] = hashlib.sha256(b''.join((HERE / name).read_bytes() for name in source_files)).hexdigest()
 scene['confirmed_upstairs_orientation'] = 'Hall straight from stairs (+X); green bathroom left (+Y). Primary left, nursery right, end bedroom ahead.'
 scene['coordinate_system'] = 'Z up, front -Y, rear +Y, split-level side wing +X. Main 0; porch -.10; family -1.05; upper landing +1.26 m.'

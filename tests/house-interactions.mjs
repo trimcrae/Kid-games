@@ -19,7 +19,8 @@ for(const key of ['fridge-a','fridge-b','swing-a','swing-b','fan-family','fan-pr
 assert(props['fridge-a'].max[0]<props['fridge-b'].min[0]+.02&&props['fridge-a'].max[0]-props['fridge-a'].min[0]<.6,'the fridge doors are not split into left and right');
 assert(props['swing-a'].max[0]<props['swing-b'].min[0]&&props['swing-a'].max[1]>1&&props['swing-b'].max[1]>1,'each swing does not have its own seat and chains');
 // Nothing but the car is tagged as the car, and it is car-sized.
-const car=props.car;assert(car.max[0]-car.min[0]<2.2&&car.max[2]-car.min[2]>4&&car.max[2]-car.min[2]<4.8,'the car prop is not the burgundy car');
+// (Its extent takes in the door mirrors, so it is a little wider than the body.)
+const car=props.car;assert(car.max[0]-car.min[0]<2.4&&car.max[2]-car.min[2]>4&&car.max[2]-car.min[2]<4.8,'the car prop is not the burgundy crossover');
 // Spots to use things from: standable, on that floor.
 const spots={fridge:[2.68,0,-6.23],'fan-family':[12.24,-1.05,-2.3],'tv-living':[2.75,0,-3.05],'tv-family':[13.3,-1.05,-2.3],'flush-up':[10.66,1.26,-5.9],'flush-down':[11.41,-1.05,-7.66],
   'swing-a':[15.85,-.82,-23.95],'swing-b':[17.15,-.82,-23.95],'rocker-nursery':[12.5,1.26,-1.33],'rocker-porch-a':[1.05,-.06,1.4],'rocker-porch-b':[1.0,-.06,.6],piano:[10.8,-1.05,-1.6],car:[-5.97,-.16,-3.77]};

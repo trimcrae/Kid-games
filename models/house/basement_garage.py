@@ -456,24 +456,12 @@ for z in [.65,1.20,1.75]:
     for x in [-.31,0,.31]:curve('Empty coat hook',[(x,-.025,z),(x,-.07,z-.04),(x,-.10,z-.02)],.009,black)
 
 new_collection('36 | Garage vehicles and storage')
-def vehicle(name,pos,width,length,paint):
-    asset(name,pos,0,'W1,W2','simplified parked SUV; no badges or license details')
-    box('Vehicle lower body',(0,0,.64),(width,length,.68),paint,.19)
-    box('Vehicle passenger cabin',(0,-.17,1.19),(width*.88,length*.55,.69),paint,.18)
-    box('Vehicle dark windshield',(0,length*.235,1.34),(width*.77,.035,.44),screen,.055)
-    box('Vehicle rear glass',(0,-length*.30,1.34),(width*.74,.035,.40),screen,.045)
-    for x in [-width*.449,width*.449]:
-        for y in [-.63,.38]:box('Vehicle side glass',(x,y,1.33),(.025,.84,.40),screen,.045)
-        box('Vehicle side mirror',(x*1.09,.88,1.14),(.16,.22,.11),paint,.04)
-    for x in [-width*.48,width*.48]:
-        for y in [-length*.30,length*.29]:
-            o=cylinder('Vehicle rubber tire',(x,y,.42),.34,.21,black,32);o.rotation_euler.y=math.pi/2
-            o=cylinder('Vehicle wheel hub',(x*1.026,y,.42),.22,.22,steel,24);o.rotation_euler.y=math.pi/2
-    box('Vehicle grille',(0,length/2+.015,.68),(width*.68,.04,.26),black,.03)
-    for x in [-width*.34,width*.34]:box('Vehicle headlamp',(x,length/2+.025,.93),(width*.23,.04,.12),tilewhite,.025)
-    box('Vehicle lower bumper',(0,length/2+.028,.41),(width*.84,.04,.12),steel,.03)
-vehicle('Garage black SUV',(-2.10,4.27,-.16),1.83,4.43,carblack)
-vehicle('Garage burgundy SUV',(-4.62,4.05,-.16),1.78,4.34,burgundy)
+# The cars themselves: lofted bodies, cut wheel arches, glass and a cabin
+# (vehicles.py). The black minivan takes the bay by the house, the burgundy
+# crossover the far bay; both nose in.
+exec(compile((HERE / 'vehicles.py').read_text(encoding='utf-8'), str(HERE / 'vehicles.py'), 'exec'))
+vehicle('Garage black SUV',(-2.10,4.27,-.16),dict(MINIVAN,paint=carblack))
+vehicle('Garage burgundy SUV',(-4.62,4.05,-.16),dict(CROSSOVER,paint=burgundy))
 shelf_unit('Garage tall white storage',(-.40,3.05,-.16),1.80,2.08,white,-90,'W1')
 shelf_unit('Garage rear storage rack',(-6.57,5.33,-.16),1.88,1.94,oak,90,'W1; moved clear of video-confirmed rear door')
 asset('Garage wall hung bicycle',(-6.78,6.85,.06),90,'W2,W3')
