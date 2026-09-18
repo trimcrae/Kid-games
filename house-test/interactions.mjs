@@ -48,11 +48,19 @@ function createSounds(){
     flush(){noise(1.6,.14,2200,200);tone(180,{type:'sine',dur:1.2,gain:.06,slide:60});},
     horn(){tone(392,{type:'sawtooth',dur:.35,gain:.09});tone(494,{type:'sawtooth',dur:.35,gain:.09});},
     boing(){tone(220,{type:'sine',dur:.35,gain:.08,slide:440});},
+    // A soft, low hum: a triangle wave through a low-pass filter, silent
+    // while the car stands still and never more than a murmur at full speed.
+    // (The old raw sawtooth buzzed for the whole drive.)
     engine(rpm){
       const c=ac();if(!c)return;
-      if(rpm===null){if(engine){engine.g.gain.linearRampToValueAtTime(0,c.currentTime+.2);engine.o.stop(c.currentTime+.3);engine=null;}return;}
-      if(!engine){const o=c.createOscillator(),g=c.createGain();o.type='sawtooth';g.gain.value=0;o.connect(g).connect(c.destination);o.start();engine={o,g};}
-      engine.o.frequency.setTargetAtTime(45+rpm*70,c.currentTime,.1);engine.g.gain.setTargetAtTime(.02+rpm*.03,c.currentTime,.1);
+      if(rpm===null){if(engine){engine.g.gain.setTargetAtTime(0,c.currentTime,.08);engine.o.stop(c.currentTime+.5);engine=null;}return;}
+      if(!engine){
+        const o=c.createOscillator(),f=c.createBiquadFilter(),g=c.createGain();
+        o.type='triangle';f.type='lowpass';f.frequency.value=180;f.Q.value=.4;g.gain.value=0;
+        o.connect(f).connect(g).connect(c.destination);o.start();engine={o,f,g};
+      }
+      engine.o.frequency.setTargetAtTime(38+rpm*50,c.currentTime,.15);
+      engine.g.gain.setTargetAtTime(rpm<.02?0:.004+rpm*.012,c.currentTime,.2);
     },
   };
 }
@@ -176,26 +184,76 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // Turned about where it was modelled, then moved by how far it has gone.
     function place(){pose(key,_m.makeTranslation(car.x-home.x,car.y-home.y,car.z-home.z).multiply(_a.makeTranslation(home.x,home.y,home.z)).multiply(_b.makeRotationY(car.heading)).multiply(new THREE.Matrix4().makeTranslation(-home.x,-home.y,-home.z)));}
     function corner(dx,dz,h=car.heading){const s=Math.sin(h),c=Math.cos(h);return {x:car.x+dx*c-dz*s,z:car.z+dx*s+dz*c};}
-    const SAMPLES=[[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL]];
-    // The ground under one point of the car: the highest top not far above
-    // the body (a kerb), however far below (the driveway falls away under the
+    // Where the car is tested against the world: the corners, the middle of
+    // each end, the centre and halfway along each side (so a wall's end cannot
+    // slip between two samples when the car swings round).
+    const SAMPLES=[[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL],[halfW,halfL/2],[-halfW,halfL/2],[halfW,-halfL/2],[-halfW,-halfL/2]];
+    // What the car drives over. It is a toy car in a kids' game, so it is
+    // generous: anything flat up to CLIMB above its wheels it simply rides up
+    // onto (kerbs, the graded apron, the porch, a garden bed, a bush, the
+    // bus-stop bench), and any *thing* lower than CLEAR it barrels straight
+    // over (garden chairs, the front steps, the toy house, tree stakes,
+    // bins). Walls are still walls, though: a thin, long box that stands
+    // tall or floats above the ground — a wall, a sill, a fence or porch rail
+    // — is solid from kerb height (KERB) up, so the car can never mount a
+    // window sill and drive into the living room. Tall things (the mailbox,
+    // the swing frame, poles, trees, the other car) stop it too.
+    const CLIMB=.8,CLEAR=1.1,KERB=.3;
+    const shape=b=>b.carShape??=(()=>{const w=b.max[0]-b.min[0],d=b.max[2]-b.min[2],h=b.max[1]-b.min[1];return {thin:Math.min(w,d)<=.35&&Math.max(w,d)>=1.2,tall:h>=.3,broad:Math.min(w,d)>=.5,slab:h<=.12};})();
+    // Ground is anything broad, or a thin slab lying about the car's level
+    // (the strips of a graded ramp): never a rail floating above it.
+    const ground=b=>{const s=shape(b);return s.broad||(s.slab&&b.min[1]<=car.y+KERB);};
+    const wall=(b,y)=>{const s=shape(b);return s.thin&&(s.tall||b.min[1]>y+KERB);};
+    // The ground under one point of the car: the highest such top not far
+    // above the body, however far below (the driveway falls away under the
     // back of a car nosing out of the garage; the old walking-step test saw
     // "no floor" there and the car stuck at the threshold).
-    const groundAt=(px,pz)=>{const g=world.support(px,pz,car.y+.45,0);return Number.isFinite(g)&&g>=car.y-1.2?g:null;};
-    // How badly the car would sit at (x,z,heading): each sample point with no
-    // ground under it, or something solid at body height there, counts one.
-    // A move is allowed when it makes things no worse — so a car that has
-    // somehow ended up badly placed can always be driven out again.
+    const groundAt=(px,pz)=>{
+      let top=-Infinity;
+      for(const b of world.nearby(px,pz,.1)){
+        if(b.max[1]>car.y+CLIMB||b.max[1]<car.y-1.5||!ground(b))continue;
+        if(px>=b.min[0]-.10&&px<=b.max[0]+.10&&pz>=b.min[2]-.10&&pz<=b.max[2]+.10)top=Math.max(top,b.max[1]);
+      }
+      return Number.isFinite(top)?top:null;
+    };
+    // How far one point of the car is pushed into anything solid at body
+    // height: the overlap with each box (the walking radius outside it, and
+    // deeper still inside), so pressing further in always reads worse and
+    // easing out always reads better.
+    const R=world.radius;
+    function squeeze(px,pz,y){
+      let d=0;
+      for(const b of world.nearby(px,pz,R)){
+        if(b.max[1]<=y+(wall(b,y)?KERB:CLEAR)||b.min[1]>=y+world.height)continue;
+        const ix=Math.min(px-b.min[0],b.max[0]-px),iz=Math.min(pz-b.min[2],b.max[2]-pz);
+        const sd=ix>=0&&iz>=0?-Math.min(ix,iz):Math.hypot(Math.max(0,-ix),Math.max(0,-iz));
+        if(sd<R)d+=R-sd;
+      }
+      return d;
+    }
+    // How badly the car would sit at (x,z,heading): the sample points' total
+    // squeeze against walls and such. A point over nothing at all is a seam
+    // between the exported lawn pieces or the brink of the world: fine while
+    // most of the car is still on something (it may hang over an edge but
+    // not drive off into the void). A move is allowed when it makes things
+    // no worse — so the car can always slide along a wall it has met at an
+    // angle, and one that has somehow ended up in a wall can always back out
+    // (the old blocked-corner count let it grind on through instead, or
+    // pinned it where no move changed the count).
     function trouble(x,z,h){
-      const s=Math.sin(h),c=Math.cos(h);let n=0,sum=0,k=0;
+      const s=Math.sin(h),c=Math.cos(h);let n=0,off=0,sum=0,k=0;
       for(const [dx,dz] of SAMPLES){
         const px=x+dx*c-dz*s,pz=z+dx*s+dz*c,g=groundAt(px,pz);
-        if(g===null){n++;continue;}
-        sum+=g;k++;
-        if(world.blocked(px,pz,g,.34))n++;
+        if(g===null){off++;continue;}
+        sum+=g;k++;n+=squeeze(px,pz,g);
       }
+      if(off>SAMPLES.length/2)n+=off;
       return {n,ground:k?sum/k:null};
     }
+    // The knock of meeting something, at most a couple of times a second
+    // rather than every frame the car leans on a wall.
+    let lastBump=-1;
+    function bump(){const t=performance.now();if(t-lastBump<600)return;lastBump=t;sounds.click();}
     function parkBoxes(){
       // The car's boxes move with it: one box round the parked car.
       const cs=[corner(halfW,halfL),corner(-halfW,halfL),corner(halfW,-halfL),corner(-halfW,-halfL)];
@@ -226,10 +284,21 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
         if(Math.abs(car.speed)<.03&&!fwd)car.speed=0;
         if(car.speed){
           const turn=steer*Math.min(1.4,Math.abs(car.speed)*.55)*Math.sign(car.speed)*dt;
-          const h=wrap(car.heading+turn),step=car.speed*dt,nx=car.x-Math.sin(h)*step,nz=car.z-Math.cos(h)*step;
-          const now=trouble(car.x,car.z,car.heading),next=trouble(nx,nz,h);
-          if(next.n<=now.n){car.lastFit=true;car.x=nx;car.z=nz;car.heading=h;if(next.ground!==null)car.y+=(next.ground-car.y)*Math.min(1,dt*6);}
-          else{car.lastFit=false;car.speed=0;sounds.click();}
+          const h=wrap(car.heading+turn),step=car.speed*dt;
+          const now=trouble(car.x,car.z,car.heading);
+          // Straight on; failing that, glance off to either side, so a wall
+          // met at an angle slides the car along it instead of stopping it
+          // dead; failing that, at least turn on the spot so the steering
+          // can always work the car free.
+          let moved=false;
+          for(const [dir,scale] of [[h,1],[h+.6,.7],[h-.6,.7],[h,0]]){
+            const nx=car.x-Math.sin(dir)*step*scale,nz=car.z-Math.cos(dir)*step*scale,next=trouble(nx,nz,h);
+            if(next.n>now.n+1e-9)continue;
+            car.x=nx;car.z=nz;car.heading=h;if(next.ground!==null)car.y+=(next.ground-car.y)*Math.min(1,dt*6);
+            moved=scale>0;break;
+          }
+          car.lastFit=moved;
+          if(!moved){car.speed*=.3;if(Math.abs(car.speed)<.3)car.speed=0;bump();}
         }
         place();
         player.x=car.x;player.y=car.y;player.z=car.z;

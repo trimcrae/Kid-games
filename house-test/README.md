@@ -61,8 +61,14 @@ study:
   here. Swing on the back-yard swings, bounce on the trampoline (hold ↓ to
   stop), get in either car and drive it out of the garage and down the
   street (arrows drive and steer, Space honks, E gets out; it parks where
-  you leave it, and each corner reads its own ground, so the graded
-  driveway and the lawn are fine),
+  you leave it). It is a toy car, so it rides up onto anything flat up to
+  80 cm — kerbs, the porch, bushes, the bus-stop bench — and drives
+  straight over any *thing* lower than 110 cm (chairs, steps, bins, the
+  toy house); only walls, sills, fences and rails, tall things (poles,
+  trees, the mailbox, the swing frame, the other car) and the brink of the
+  world stop it. Meeting a wall at an angle slides it along instead of
+  stopping it dead, and it can always back out of whatever it hit. The
+  engine is a quiet low hum that is silent while it stands still.
   open the fridge (both doors swing out on the snacks), play the piano in
   the family room (1–8 or A–K play C to C, with the note named), switch the
   televisions and ceiling fans on, rock in the rocking chairs and flush the
