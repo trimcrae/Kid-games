@@ -1,0 +1,22 @@
+{
+  "storyId": "campout",
+  "nodeId": "smores",
+  "style": "C2",
+  "sourceHash": "258afb3b3087b986894c8e4099092defb6a0609c57fb0c845c72e6df7293c992",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-508ce211-9990-40e1-9907-b65ee33170ac.png",
+  "originalSha256": "ef0f4e6f97102f8d32847813ae8f55f11f3fc4dce5925daebf87bca32cdd758c",
+  "file": "campout-smores.webp",
+  "sha256": "c53ca94ddee822b573a5b803e5c756363b7ab0983fe6729320c6de1f0eafde6a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nMarshmallows toast to golden brown — squish them with chocolate! Cory counts the stars: 1, 2, 3… too many! An owl hoots (owls are awake at night). Then the puppy trots right into camp.\nShow ONLY Cory and Jeannie at the small campfire. Jeannie holds a marshmallow on a long roasting stick; a s'more with chocolate and graham crackers sits on a nearby log. Cory points up toward many stars. One small owl perches in pine at upper left; Biscuit the tan-and-white blue-collared puppy trots in from right. Red and blue tents behind. Nighttime, warm careful pencil shading. Do not show any other family members, no fox or shooting star.",
+  "references": [
+    "art/generated/campout-camp.webp"
+  ],
+  "reviewed": true,
+  "review": "Jeannie roasting marshmallow, Cory pointing to stars, one owl and one arriving puppy; s'more visible on log; same campsite and style."
+}

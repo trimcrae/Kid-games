@@ -1,0 +1,22 @@
+{
+  "storyId": "campout",
+  "nodeId": "wish",
+  "style": "C2",
+  "sourceHash": "83000d175c982fdb453eb876a94ca0bc1b8ee8b99373389a3630fd1cb58bfdbb",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d3a812bd-b90f-4234-9f95-618ebcb1a0fb.png",
+  "originalSha256": "a1babd986d771726f188d8b514c072c084c272a4c4d237a34d2495386c8c9b7e",
+  "file": "campout-wish.webp",
+  "sha256": "da377da901228c90024ea63e13c568d5bb2427be29b08c1e29bb2fedcbb53c15",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nA shooting star streaks across the sky! Everyone squeezes their eyes shut and wishes together. Cory wishes the puppy finds its home — and in the morning, it does. Some wishes really do come true.\nIllustrate the nighttime wish moment only, not the future morning. All SIX family members at campfire: Dad, Mom holding Kieran, Cory, Jeannie and Ellie. All eyes CLOSED as they make wishes; Cory has hands clasped. Exactly ONE shooting star with bright head and long fine tapered trail crosses rich navy sky above them. No puppy (it is offscreen), fox, owl or extra people. Two tents, pine woods, visible age and clothing differences consistent with opening.",
+  "references": [
+    "art/generated/campout-camp.webp"
+  ],
+  "reviewed": true,
+  "review": "Six family members, all eyes closed, Kieran held by Mom, one shooting star with thin trail; consistent night campsite and clothing."
+}

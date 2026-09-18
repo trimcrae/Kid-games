@@ -1,0 +1,22 @@
+{
+  "storyId": "campout",
+  "nodeId": "explore",
+  "style": "C2",
+  "sourceHash": "b0b8bcc4db9d84f3aded745cdc93bbba6a7ed3db2d0f85ee9f7285ceae20c0bc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d82ec182-cb88-4a40-af5d-b15e293838ad.png",
+  "originalSha256": "bc0295e84faed881dc9a0dc57e0e6382a4d8ca90e620e25e1de115805ab3c89d",
+  "file": "campout-explore.webp",
+  "sha256": "48b4e1d9c4151725cd10f891b0460f2517f6e7952d7b880822106a7c1a00b08f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nFlashlights on! Jeannie and Cory tip-toe between the trees. In a beam of light they find a shivering little PUPPY, all alone. Its big eyes look up at them.\nShow ONLY Jeannie and Cory in pine woods at night, tiptoeing together with a flashlight; its soft light reveals tiny shivering Biscuit by a tree root. Children look concerned and gentle. Cast of exactly two children and one puppy; no parent, other sibling, baby, fox, owl or tents. Night woods detailed but not frightening.",
+  "references": [
+    "art/generated/campout-camp.webp"
+  ],
+  "reviewed": true,
+  "review": "Jeannie and Cory only, appropriate flashlight action, one tan-and-white puppy with blue collar; ink and colored-pencil medium."
+}

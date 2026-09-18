@@ -13,7 +13,15 @@
     "rainbowEnd": "art/generated/rainbow-rainbowEnd.webp"
   },
   "campout": {
-    "camp": "art/generated/campout-camp.webp"
+    "camp": "art/generated/campout-camp.webp",
+    "explore": "art/generated/campout-explore.webp",
+    "smores": "art/generated/campout-smores.webp",
+    "follow": "art/generated/campout-follow.webp",
+    "warm": "art/generated/campout-warm.webp",
+    "tag": "art/generated/campout-tag.webp",
+    "wish": "art/generated/campout-wish.webp",
+    "foxEnd": "art/generated/campout-foxEnd.webp",
+    "reuniteEnd": "art/generated/campout-reuniteEnd.webp"
   }
 };
   for (const story of window.STORIES || []) {

@@ -1,0 +1,22 @@
+{
+  "storyId": "campout",
+  "nodeId": "reuniteEnd",
+  "style": "C2",
+  "sourceHash": "b175b5b65c8fc9cf097a84bfe0c4ec6108038824fe6acf3da11790a81268ef44",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1fd7e2ed-b710-47cf-beca-a00da2a869c8.png",
+  "originalSha256": "cc35b9c8cfb8301bfb55554753c3fd9032ca9fa6661a180c16d5762632f6b463",
+  "file": "campout-reuniteEnd.webp",
+  "sha256": "2158d8bc90e57b65b817433e324ad122eda72bbb38f999db1289a6fc59e658a0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nBiscuit is safely home, and the family heads back to camp for pancakes. Cory, Jeannie, Ellie and baby Kieran all agree: the best part of any adventure is doing it TOGETHER. The End — for now!\nSunny morning at the same campsite, red and blue tents and pines. SIX family members sharing pancake breakfast at a low picnic table: Dad, Mom holding Kieran, Cory in green, Jeannie in pink, Ellie in lavender. Pancakes and simple breakfast plates on table, happy expressions, no puppy because Biscuit has returned home. No fox or owl. Keep same refined ink and colored-pencil medium, adapted to fresh morning sunlight, no campfire flames necessary. All four children clearly separate and correct ages, no writing.",
+  "references": [
+    "art/generated/campout-camp.webp"
+  ],
+  "reviewed": true,
+  "review": "Six family members and pancake breakfast at familiar sunny campsite; no puppy, consistent identities and pencil rendering."
+}

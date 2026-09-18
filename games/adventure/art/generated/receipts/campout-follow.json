@@ -1,0 +1,23 @@
+{
+  "storyId": "campout",
+  "nodeId": "follow",
+  "style": "C2",
+  "sourceHash": "685c9b15d710b7c80ec24cb91fc8ce6525d3b9a34bf4058bd6732433c8758ba5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-33ac6c5b-9a36-4a61-adcb-ec8f0df27ada.png",
+  "originalSha256": "85b67c8b379fb6715bc35e36aa38348530f9c396a4d45874d3e965f990949ff3",
+  "file": "campout-follow.webp",
+  "sha256": "6cb4adb496b9fd9028ed823227edb114bb54481ccc4bb5705f64d6ee3dba3270",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nThe puppy leads them to a cosy den where a gentle FOX family lives! The fox isn't scary at all — it had been keeping the lost puppy safe and warm all night. What kind neighbours!\nScene in night pine woods: ONLY Jeannie and Cory, following Biscuit along a pine-needle path to a cozy earth den beneath tree roots. Exactly two foxes at den: one gentle russet adult fox and one smaller kit, white throats and dark ears and paws, anatomically foxlike (pointed muzzles and bushy tails), both welcoming. Biscuit stands between children and den. Five figures total: two kids, puppy, adult fox and kit. Soft flashlight light, kind expressions. Use second reference for Biscuit and children's exact designs; no tents, campfire, food or extra people.",
+  "references": [
+    "art/generated/campout-camp.webp",
+    "art/generated/campout-explore.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly Jeannie, Cory, Biscuit, adult fox and one kit at root den; friendly interaction, same puppy/cast and selected pencil medium."
+}

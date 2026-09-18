@@ -1,0 +1,23 @@
+{
+  "storyId": "campout",
+  "nodeId": "foxEnd",
+  "style": "C2",
+  "sourceHash": "b2ecc51141ce47882465b08cae2e8beb285a9510b5164eafbee4c9a21320998b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-25ad6500-f0df-4039-85ed-a8ffc5222b53.png",
+  "originalSha256": "dc382c2ab79ec22d43dc50da52a6d0e3b71e131e00c13cd1d9f17a212939cd03",
+  "file": "campout-foxEnd.webp",
+  "sha256": "32aca95cdfc3c5d29c3a399dc5db89b69558f46bd140b52e56d3e005a9d54afe",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nBack at camp, the family tells the tale of the kind woodland fox over breakfast. They learned that wild animals can be gentle and that helping each other is what families — and forests — do best.\nSUNNY MORNING at the familiar red/blue-tent campsite. Cory in green and Jeannie in pink sharing breakfast at a picnic table and animatedly recalling the fox; Cory gestures and Jeannie smiles. In the background at the woodland edge a single friendly russet fox watches quietly, separate from picnic food. ONLY these two children and one adult fox appear. Clear breakfast bowls and toast, no puppy required. Same ink and fine colored pencil, natural morning light. No thought bubbles, no extra people, no writing.",
+  "references": [
+    "art/generated/campout-camp.webp",
+    "art/generated/campout-explore.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory and Jeannie sharing breakfast at sunny original campsite, one fox at woodland edge away from food; no puppy or extra cast."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "campout",
+  "nodeId": "warm",
+  "style": "C2",
+  "sourceHash": "5685fe2a03f9d75e76408a13e3d0fcff7457e65840eac6605542945116f54639",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e6565aa0-c30b-4eb9-bbf1-a5344eba5037.png",
+  "originalSha256": "64c4b639a86a861916e6da7531de260fe2ffca2a129eb28ccbcbb5e6a7fe6593",
+  "file": "campout-warm.webp",
+  "sha256": "c980fb33f5a12f6c12c7d2e0055a96b26ac01548a93d114f9a0a5f0b29c897bd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 page illustration, The Great Family Campout. Use provided opening illustration as authoritative medium, family designs and campsite reference. Same fine ink outlines, intricate crosshatching and earthy colored pencil on cream paper; richly drawn foliage, tactile canvas, warm campfire light when night. Never photographic, crayon, flat poster, clay or 3D.\nRECURRING CAST: Jeannie is the older girl with shoulder-length brown hair, pink camping sweater and trousers. Cory has short brown hair, rectangular glasses, green camping sweater/trousers. Preschool Ellie has dark-brown chin-length bob, side fringe, lavender sweater/trousers. Mom has grey-streaked dark bob, round glasses, olive jacket. Dad light-brown short hair, clean-shaven, tan jacket. Baby Kieran wears pale blue sleeper. Use ONLY characters listed in current scene; do not copy whole family into every scene.\nPUPPY DESIGN when present: Biscuit is a tiny tan-and-white puppy, white muzzle and chest, floppy tan ears, black nose, dark eyes, blue collar with small oval brass tag. Consistent natural puppy anatomy. NO text, labels, writing, panels, borders or watermark unless tag lettering is expressly requested. One coherent illustration; all important figures clear inside frame.\nILLUSTRATE ONLY THIS PAGE:\nThey wrap the puppy in a soft blanket by the fire. It stops shivering and licks Jeannie's nose! There's a little collar with a name tag. Should they check it?\nA close tender scene: ONLY Jeannie seated safely beside the campfire holding Biscuit wrapped in a soft PURPLE blanket on her lap. Puppy leans up and visibly licks her nose with a tiny tongue, Jeannie smiling with eyes partly closed. Its blue collar and oval brass name tag remain visible but lettering too small to read in this scene. Same campsite at night, warm light, tent faintly behind. No extra humans, fox or owl. Use second reference for exact Jeannie and puppy design.",
+  "references": [
+    "art/generated/campout-camp.webp",
+    "art/generated/campout-explore.webp"
+  ],
+  "reviewed": true,
+  "review": "Jeannie holding puppy in purple blanket; tongue visibly licking nose; blue collar and brass tag, night campfire, correct cast."
+}
