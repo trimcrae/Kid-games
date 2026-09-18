@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_meadow",
+  "style": "L1",
+  "sourceHash": "bd9154a01eb1ae1b1de7d726af3368d9921553164cb3c3b06f33a9101f14a3c1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0848e541-1d98-425b-bb7f-15c6ad3129d2.png",
+  "originalSha256": "e04b7ea206bd49485d4f443af1ba736f791b4105c66f67c358a8ff69b14fda45",
+  "file": "library-ft_meadow.webp",
+  "sha256": "3de9a1988064f6481b633614cfc0cd1c77d9673f236f9e1bffe094f98706702a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. In a sunny fairy meadow of cut-paper clover and honey-yellow flowers, an orange-red fox wearing a little WAISTCOAT MADE OF YELLOW BUTTERCUP FLOWERS has just bowed and tripped over his own white-tipped bushy tail. He lies comically sprawled harmlessly in grass, looking up with a sheepish friendly smile. Jeannie smiles kindly at him, tiny grumpy Inkwell peeking from her dress pocket. A few small paper bees hover over flowers. Establish charming recurring Welcome Fox: orange paper fur, cream muzzle/chest/tailtip, dark paws, long bushy tail, buttercup waistcoat; no hat. No other visitors.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed four-limbed orange fox fallen over white-tipped tail, buttercup waistcoat, Jeannie and pocket Inkwell, sunny paper meadow."
+}

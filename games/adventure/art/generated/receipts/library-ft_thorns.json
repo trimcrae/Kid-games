@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_thorns",
+  "style": "L1",
+  "sourceHash": "ea89b211eefadb6aef2a26f558701760eea72d3dfbefa5cc066e8b1de457faa2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e5290469-7bb8-4bd7-8573-e9f1bba45083.png",
+  "originalSha256": "a31ae37248a9425ce64ff6468b7c1657b91c9023623089995fad07bd7ecc885a",
+  "file": "library-ft_thorns.webp",
+  "sha256": "1a9e4836f5c6fc057287ec036a054f1986de6c756567aeaf3c616e77085b52d2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie stands outside a ROSE-GOLD stone fairy castle wrapped in enormous dark briars as thick as her arm, sunset illuminating cream-pink folded-paper battlements and round pointed towers. A small low HOLE in the wall is the entrance. On wall beside it struts Sir Reginald Pigeon with a pompous puffed chest and beak raised: round blue-grey paper bird, cream-grey breast, iridescent teal/purple neck papers, orange eye, little red feet; no clothing or crown. Inkwell peeks from Jeannie's pocket, unimpressed. Establish recurring castle and pigeon, no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed rose-gold thorn-wrapped castle, small wall entrance, pompous blue-grey pigeon with teal/purple neck, Jeannie and Inkwell."
+}

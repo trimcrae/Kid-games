@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_godmother_intro",
+  "style": "L1",
+  "sourceHash": "69c65bf932dff8dab14630aeb927f311e47d04bac7c83232006f211aa43df943",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-309d47a9-a1d3-4a0e-ae5a-d6e558b52e7a.png",
+  "originalSha256": "2972debef124eb62ccf1c12bff52159d96a388760ad82c4be5eb00275c6e06fb",
+  "file": "library-ft_godmother_intro.webp",
+  "sha256": "89b0e1def6591f3eac424a1d95304850192421a8e4e5144aede38d8b550e5f81",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. In a ring of glowing cut-paper flowers stands a SMALL elderly Fairy Godmother, smiling warmly at Jeannie and tiny Inkwell in her pocket. Fairy has silver-white layered paper hair in a soft bun with gold star-dust, round spectacles, flowing TEAL robe with cream shawl and gold star trim, small translucent cream folded-paper wings. Her wand has accidentally become a FEATHER DUSTER with gold handle, which she holds in one hand. Establish kindly funny fairy design, elderly but lively. Inkwell puffs up proudly. Enchanted forest grove, warm gold glow; exactly girl, tiny quill and fairy.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed elderly silver-haired fairy, spectacles teal robe cream shawl gold stars, wings and feather duster, Jeannie and pocket quill."
+}

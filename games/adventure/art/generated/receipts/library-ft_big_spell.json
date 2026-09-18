@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_big_spell",
+  "style": "L1",
+  "sourceHash": "648f248ce8f83975ad69f6ed1a2722a358cd735ade406040ebbbc324eddb8d99",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-13c1d0da-00d3-4346-a816-7ee8920cf58c.png",
+  "originalSha256": "0a3c047ffabe327cedaa7479d5c2a28d3ea393c360d4cd2bbb62ef598cf1f6f5",
+  "file": "library-ft_big_spell.webp",
+  "sha256": "5f698f45f062a91d9bd74267b980e1c5553d64ab4b42d43ca678005c0c1b9fa6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie excitedly swishes a slim gold star-tipped wand and accidentally fills the whole sunny meadow with a RIOT of singing paper DAISIES. Their yellow centers have tiny faces with mouths open in song, many daisies all around, music-note paper cutouts floating. The same silver-haired Fairy Godmother tealrobe/creamshawl ducks ONE flying pink tulip, laughing. Sir Reginald Pigeon lands puffed-up and indignant, same round blue-greybody teal/purpleneck orangeeye redfeet from secondref. Inkwell floats by Jeannie's shoulder laughing and leaks ONE small ink drop. Whimsical chaotic singing scene, only these four story characters plus singing flowers. Preserve tiny quill scale.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed singing daisies, wand, fairy ducking flying tulip, indignant Reginald and laughing Inkwell leaking ink."
+}

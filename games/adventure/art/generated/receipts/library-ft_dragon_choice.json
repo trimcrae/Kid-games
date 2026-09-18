@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_dragon_choice",
+  "style": "L1",
+  "sourceHash": "b31a2310ac8e3431f05ecddea3eef5cefeb8061f282096e28cbb0df201227430",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-620177db-4985-4880-a174-497a1f0fa32c.png",
+  "originalSha256": "261ee0044915e8d325d04de309e67491e7e8793e1752f573d6a0268bba0863f3",
+  "file": "library-ft_dragon_choice.webp",
+  "sha256": "24d9ea0b264374d20afaf86b03d06617e2e69024504839ee0b4d28bb3e68ce64",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie joyfully chooses the SAME huge grassgreen gentle dragon, reaching one hand lovingly toward his cheek. Dragon's whole green body sparkles with tiny golden lights and he accidentally SNEEZES a vivid RAINBOW across the upper cave, formed from layered translucent paper ribbons and glitter. His eyes squeeze partly shut in a funny happy sneeze, rainbow pointed away from the friends. Same Fairy Godmother silverhair/glasses tealrobe creamshawl smiles nearby. Tiny Inkwell in Jeannie's dress pocket has a small tear and leans goldnib against pocket edge. Only girl/quill/fairy/dragon, warm teacup cave, matching scales/horns/eyes and fully paper-built scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed happy dragon rainbow sneeze directed away from friends, Jeannie reaching, fairy smiling and pocket quill, same paper medium."
+}

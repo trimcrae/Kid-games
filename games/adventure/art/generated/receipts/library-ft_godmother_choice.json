@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_godmother_choice",
+  "style": "L1",
+  "sourceHash": "9fa3a73f6ed9a3f8a411ae7d2235de846a34ded330fe2d14f3595436acff9e25",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5b95bf6e-f5fb-46c2-89bd-778a8ff90183.png",
+  "originalSha256": "ea9625903db3581b170f53a3455ed9e83368adbe1aa1fb9fa5380cd9d67e57c9",
+  "file": "library-ft_godmother_choice.webp",
+  "sha256": "9ed1491e85b709788b14db50b59aa45b8777f55dd00e4ea9db68cc99b58900ba",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie chooses gentle magic. Same silverhaired elderly Fairy Godmother with roundglasses tealrobe creamshawl goldstars gently places a slim GOLD STAR-TIPPED WAND into Jeannie's TWO open hands. Jeannie looks quietly certain and happy. Huge grassgreen paper dragon lowers his head nearby with an approving nod, same amber eyes creamjaw goldcurvedhorns. Tiny Inkwell peeks from Jeannie's dress pocket proudly. Glowing flower-ring grove at castle edge, soft warm light. No chicken prop, no extra gem to occupy hands, no additional characters. Clear respectful wand handover, correct two arms on each human.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed star-wand handover, correct human arms, approving same green dragon, tiny pocket Inkwell and coherent grove."
+}

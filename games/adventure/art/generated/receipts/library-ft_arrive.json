@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_arrive",
+  "style": "L1",
+  "sourceHash": "050c237c534345a133ca53084e1a1b934da78729b040cc3f159a1e8d31259eba",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7afd2058-96c9-40a2-890e-5db49f8ef7d3.png",
+  "originalSha256": "d167c4c7fd11a59a553ab59643c106b87690fbe12559ec8e620563e871607950",
+  "file": "library-ft_arrive.webp",
+  "sha256": "4e6d17354927ca8fa55c207ad53fbb3bf61868b52df0a6d177b64e71baaaa0de",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie has just tumbled into a lush emerald-green fairy forest and landed sitting in a soft pile of layered shredded-paper moss. Tiny Inkwell has flown from her pocket and is stuck GOLD NIB POINT DOWN in a small mushroom beside her, his cream feather shaft trembling with an outraged face. Ahead, forest path forks THREE ways: sunny meadow, distant castle-tower shrouded in black thorns, deep whispering trees. Whimsical intricate cut-paper plants, shafts of sunlight. Only Jeannie and Inkwell; no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Jeannie seated in moss, Inkwell nib-first in mushroom, three distinct forest routes; consistent folded-paper medium."
+}

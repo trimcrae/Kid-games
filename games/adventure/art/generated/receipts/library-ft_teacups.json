@@ -1,0 +1,25 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_teacups",
+  "style": "L1",
+  "sourceHash": "f8f0a03e1a36bceed74a0a93570f6af0e7af61901b5ca8d160c8853a33c33bbc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-567eba6a-ab58-4b2b-93e8-d6c27af6f68e.png",
+  "originalSha256": "72835d221690b6f1e86ebe58bdf7a5aa18ceaadad09bba47c037f6660ce8fc86",
+  "file": "library-ft_teacups.webp",
+  "sha256": "3b451aab363073dc57f56c59eb010b2939f5a33d4a758e0bf5695029ee8b23cf",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Grand sunny meadow TEA PARTY! Same enormous grassgreen paper dragon towers gently behind a long low picnic tea-table covered in cream/teal/rose gold-rim teacups, teapots and scones. He dabs happy tears with one comically TINY cream napkin held in his big paw. Jeannie sits center smiling with pocket Inkwell. Welcome Fox orangefur cream muzzle white tailtip yellow buttercup waistcoat pours tea from a teapot and spills a little. Round brown/cream sleepy owl inspects a scone. Pompous blue-grey pigeon teal/purpleneck redfeet tastes a biscuit. EXACTLY these six characters total: girl, tiny quill, dragon, fox, owl, pigeon. All distinct and matching refs. Scale dragon enormous, owl/pigeon small table guests, fox child-waist height. Lush sunny folded-paper meadow, no extra guests and no fairy.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_meadow.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_owl.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed all six specified cast members, consistent paper designs, dragon's tiny napkin, fox pouring, owl inspecting scone and pigeon tasting, rich teacup table."
+}

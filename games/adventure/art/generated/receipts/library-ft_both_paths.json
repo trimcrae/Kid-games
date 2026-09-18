@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_both_paths",
+  "style": "L1",
+  "sourceHash": "851ebc2cf0275325a1870a10f29057e61e4daee2b45b4a11be9c29e74b066cdd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d82187cd-1b96-406c-8c26-1a88a81ffa2f.png",
+  "originalSha256": "7d6bfe7962d3e5c14143cee7586785a30a06e4291a623c5f0b101b0c825792e6",
+  "file": "library-ft_both_paths.webp",
+  "sha256": "57d5a6823d79ec88751825923c806a9bd03a16487be2beffe20d08c1d84a323c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. At the warm dragon cave mouth beside a twinkling forest grove, Jeannie gently leans into a hug with the SAME huge green dragon and glows faintly with golden gentle magic. She has EXACTLY TWO arms: one touches dragon, other holds ONE golden HEART-shaped gem in palm. Same elderly silver-haired Fairy Godmother tealrobe creamshawl goldstars glasses arrives and CLAPS with her TWO empty hands. Her wand has turned into a little GOLD KAZOO floating beside her: a short paper tube with flared end and small side resonator, unmistakably tiny instrument. Inkwell peeks from Jeannie's dress pocket. Reflective deciding moment, forest glow left and warm friendly dragon right. Only girl/quill/fairy/dragon; no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_reveal.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed two-arm Jeannie hugging dragon and holding Heart-Stone, fairy clapping with two hands, floating gold kazoo, pocket Inkwell."
+}

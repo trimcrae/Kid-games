@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_chest",
+  "style": "L1",
+  "sourceHash": "9e849d6d28d7e72c6bc7ddf8cd02371ebeb6b6a8c74de613dae8a35006cd56c5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-04a4ce6f-2f75-42f1-87e1-979e25c05eed.png",
+  "originalSha256": "1e2597cf2020587941125b7c28c5cddc93f700b8a967dd148bd3c0a8949d1756",
+  "file": "library-ft_chest.webp",
+  "sha256": "8fdfdb2ce5c53367132e996dd6301caf748a214edd805905ecdc1ae95a702351",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie kneels beside SAME oak iron-bound dungeon chest as first reference, its rounded lid now wide OPEN. Inside lie EXACTLY ONE glowing warm GOLDEN HEART-SHAPED faceted gemstone and ONE folded cream parchment scroll, nothing else. Gem shines like a tiny sun and sends a narrow warm beam toward the dark back wall, where an indistinct enormous green curve is barely visible, not yet the dragon's face. Same Fairy Godmother from secondreference has just appeared behind Jeannie, silverhair/glasses tealrobe creamshawl goldstars, smiling gently. Sir Reginald stands aside near chest, tiny Inkwell hovers beside Jeannie. Single wall torch plus gemlight, folded paper dungeon. Clear unobscured view of one heart-stone and one scroll; no coins.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dungeon.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed one golden heart-shaped gem and one scroll inside open chest, fairy behind, pigeon aside, Inkwell hovering, subtle green curve in darkness."
+}

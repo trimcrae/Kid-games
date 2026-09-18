@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_owl",
+  "style": "L1",
+  "sourceHash": "66f7e24594b2913950f533be4302ce43f9495fbf82581f6ee63d23eedf20fab2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7f343337-7dcc-4749-94ee-8190d1bea038.png",
+  "originalSha256": "ff95220d84ebba2e8f49b8e4a26077438f0ca43ce1df039a1f9de60459228d52",
+  "file": "library-ft_owl.webp",
+  "sha256": "45b21d8e51ac5805b1dc81de20815f9f1196769016eee4111a162bcb7715c467",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Deep in a green folded-paper forest, Jeannie looks UP at a very ROUND sleepy owl on a low curving branch. Owl is warm brown and cream layered-paper feathers, broad round face, one golden eye half-open and other asleep, little golden beak. Tiny floating cream feather-quill Inkwell writes in the air with his gold nib the small words 'dithering, see also: Jeannie' in gold cursive, no other text. Gentle funny scene. Tree paths recede toward light. Only girl, quill, owl; no other people.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed round brown/cream sleepy owl with one eye open, floating Inkwell writes correct words, coherent Jeannie/paper forest."
+}

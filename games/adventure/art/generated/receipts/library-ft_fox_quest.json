@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_fox_quest",
+  "style": "L1",
+  "sourceHash": "bb4190bc7b9d95359477b75ee609f290fd5301cab2599e7806d627c00a2cdbd2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-dd6d6a3b-f400-451a-aceb-d7b825916967.png",
+  "originalSha256": "06fe29628883cde4cf4599588b7291eb67c699601faf2afca0a46547a09aa48a",
+  "file": "library-ft_fox_quest.webp",
+  "sha256": "644b70dceb46d569c807fdeba95ecff522339f8afe4f20a66825c439498681ac",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Remove ONLY the extra acorn on the ground in the bottom-left foreground under the turned-up brown leaf, filling its location with ordinary moss/grass and leaf. Preserve the acorn Jeannie is putting into the fox's waistcoat, her hands, both characters and Inkwell, and all composition/lighting. Exactly ONE acorn in entire image: the one at the fox's pocket. Everything else unchanged.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46/exec-f353ad8c-e87f-47d9-b878-e15ee8492125.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected one acorn being returned to buttercup waistcoat, extra ground acorn removed, consistent fox and Jeannie."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_rest",
+  "style": "L1",
+  "sourceHash": "c0bf46fd7dc121522573ea4ee7b11b2765d754722d491ff4ddd4a24c7e0574c2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-960e5780-03c4-4144-b3cc-463d09106de0.png",
+  "originalSha256": "5e57561af1d2a807d6f5ac2847034a7a3a0a68652daccd19846a723c743877ae",
+  "file": "library-ft_rest.webp",
+  "sha256": "ee7d11b04b1a049dcdf0ccb92f2ac941e9142057ea5297af6615ad0a30fadd7f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Remove ONLY the extra horizontal fountain pen sitting on the branch under the upright talking feather-quill. Replace that horizontal pen including its gold nib at right with a simple plain brown twig branch. Keep the upright cream feather-quill with its face and its own single downward gold nib, resting on that plain twig. Exactly ONE quill/pen character total. Preserve Jeannie, fox, mushroom, fire and everything else unchanged.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46/exec-8cd5234b-6288-4aa1-8500-3cb16234e58e.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected single Inkwell balanced on plain twig, fox toasts one mushroom at small paper campfire, Jeannie seated."
+}

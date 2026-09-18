@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_pigeon_help",
+  "style": "L1",
+  "sourceHash": "2f04cce012deb549a2e141a4f269f6c6d833921563d76efc287f73b0b9762e71",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f4b2b3ee-c83a-4bd6-8fdc-e128095b3365.png",
+  "originalSha256": "4deb3da4a6273f02b03c5b0c352988dbb723b43bb3cbcffa2e476c85ac996212",
+  "file": "library-ft_pigeon_help.webp",
+  "sha256": "99d25d6049a00f3e55b5d08bfc24d14117e386af65e015a0eff470c39ce2144c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Same pompous Sir Reginald Pigeon struts along the ground leading Jeannie toward a LOW GAP in dark castle briars. ONE thorn-vine curls into a doorknob-like loop above gap. Pigeon chest puffed, beak high, redfeet stepping grandly; Jeannie follows crouching slightly with tiny Inkwell in dress pocket looking skeptical. Two small breadcrumbs on a stone near pigeon hint consultation fee. Same rose-gold castle wall and sunset as ref, no other characters. Show approach to gap, thorns still dark and closed around sides, no fully opened rose arch yet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed strutting pigeon leads toward low briar gap with looped vine and two breadcrumbs, coherent castle and cast."
+}

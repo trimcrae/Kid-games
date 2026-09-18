@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_explore_deeper",
+  "style": "L1",
+  "sourceHash": "7c3847b7a74c799e4cee3a511dd380d23a15aa2a2d0701ed65f09f735c188f6c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f00bbfa0-1de8-4a63-8261-c87055c6d44d.png",
+  "originalSha256": "1ca4cb34df4d31772fd66a443f53ebbf63221d99a5e089f728b31436ad8889f5",
+  "file": "library-ft_explore_deeper.webp",
+  "sha256": "3ccacfb625a9ba86200a65135266dded6cc7bb67a87ce9d13842ca1f7da474d2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie wanders deeper through a whimsical paper forest where bent old trees lean close together as though whispering jokes. A line of glowing cut-paper toadstools marks TWO trails, left toward a twinkling meadow and right toward a warm hidden glade. Tiny Inkwell floats beside her shoulder complaining with comically grumpy face, NO feet or legs, just cream feather shaft and gold nib. The same round brown/cream owl sleeps on a branch nearby with both eyes closed, beak slightly smiling. No writing, no extra characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_owl.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed two mushroom-lit trails, leaning joking trees, sleeping owl and floating footless Inkwell, consistent Jeannie."
+}

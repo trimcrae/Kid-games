@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_godmother_castle",
+  "style": "L1",
+  "sourceHash": "21344533ca04e10511973c2bba45168810b0ce3277544c01b2639caee28a72e2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b273a73d-65aa-4584-bbc9-7d6875bfb6a7.png",
+  "originalSha256": "cbfadec1d4b0603544ae2757672b33e6f53a366074a35afdb5273d46040e07c6",
+  "file": "library-ft_godmother_castle.webp",
+  "sha256": "10de8c0c7f5650f943f46b695aa1b750ab75be47ba2eb363608ac8d1f8d43739",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie raises a slim gold star-tipped wand toward the thorn-wrapped rose-gold castle at raspberry-pink sunset. Before her, thick black briars RELAX into a curtain of soft pink ROSES, curling aside to reveal a dark doorway. Same small elderly silverhair Fairy Godmother tealrobe/creamshawl goldstars watches proudly beside Jeannie, empty hands. Inkwell tucked in dress pocket. Show clear transformation from remaining thorny outer vines to open flowering center. Castle matches secondref, exactly girl/quill/fairy, no pigeon or dragon in this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed thorn-to-rose transformation and open castle doorway, consistent fairy and Jeannie with wand and pocket Inkwell."
+}

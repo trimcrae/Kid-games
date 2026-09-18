@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_thorn_gap",
+  "style": "L1",
+  "sourceHash": "05ca8cf43736521b909a4ce406040f990591c1b92e0f1299c7548f415c68d9e9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a92a8d1a-56b9-4b16-bd44-03c514fb65ac.png",
+  "originalSha256": "14a0330fe47cc14fe45554d67441ad609cd42782531a1f21322e2ddacbdda1b8",
+  "file": "library-ft_thorn_gap.webp",
+  "sha256": "e79b2a27542dd546058f5a58addba04c8343cd477a59c1b80732af9920255a32",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie gently PATS the side of one thick thorny vine with her open hand, rather than pulling. The briar hedge SHIVERS and peels back into a ROSY ARCHWAY with soft pink paper roses, revealing a cool dark stone doorway with descending stairs beyond. Tiny Inkwell peeks from her pocket with impressed wide eyes. Focus on kindness and transformation. Match rose-gold castle in ref, no wand in her hands, only Jeannie and quill; omit pigeon from ref. Dark sharp outer briars become smooth rose-covered inner arch.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Jeannie's gentle pat opens rose arch, no wand or extra companions, Inkwell impressed."
+}

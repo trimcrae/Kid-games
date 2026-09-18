@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_first_spell",
+  "style": "L1",
+  "sourceHash": "381a02e159086098fc721aaab0a1fa44f86802f583825aaf2031daf93ddf53f8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b099abf1-f0b7-417d-ac04-553308e1a999.png",
+  "originalSha256": "aecc2ecd163ea8bacbf09dab2f26a9c69cd6b3ca4a16a5cec7884419b7094aff",
+  "file": "library-ft_first_spell.webp",
+  "sha256": "c0fa5552d3ba6c5848c0af0f9fb6ff6527815111629ad55fdf3e56f1cd65e319",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie's FIRST gentle spell in the same glowing flower-ring grove. She holds a small comical YELLOW RUBBER-CHICKEN-shaped wand, depicted as a folded-paper chicken prop, pointing outward; EXACTLY ONE tiny golden firefly-light glows at its tip. She looks astonished and proud. The same silver-haired bespectacled Fairy Godmother in teal/cream/gold watches beaming, both her hands empty. Tiny Inkwell floats beside Jeannie drawing ONE little gold star beside the handwritten name 'Jeannie' in the air. No additional child or creatures. Paper-engineered magical scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed paper rubber-chicken wand, single tiny light at tip, Inkwell writing Jeannie and gold star, fairy beaming empty-handed."
+}

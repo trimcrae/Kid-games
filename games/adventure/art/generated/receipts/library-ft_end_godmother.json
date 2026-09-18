@@ -1,0 +1,24 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_end_godmother",
+  "style": "L1",
+  "sourceHash": "4b5a834e216e9dbf3a08cfdcc5529cf36aba058c727e46c4c8a36a3f49cd5bec",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fe81ed30-cd11-4732-93bf-ea1ba46b366d.png",
+  "originalSha256": "81c1486be7d7a420c389a2668f8fc1bf4eea9e9d37f49efc581c28cac5541761",
+  "file": "library-ft_end_godmother.webp",
+  "sha256": "1a69c9377dac6afdc88f3d0ecb5e86c7a29ea8e790ecb5c485bb050d3ab9a392",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Happy Fairy Godmother's Heir ending. Jeannie stands confidently in a once-sad meadow now blossoming around her, gently sweeping her GOLD STAR-TIPPED WAND to turn dark anxious thorn branches into soft pink roses and fresh white daisies. She keeps her original purple dress cream trims, no crown or different outfit. Tiny Inkwell rides in dress pocket, grumbling proudly. Sir Reginald Pigeon struts alongside puffed with importance, matching bluegrey/teal/purple feathers. In middle distance the same huge green dragon smiles at a little tea table under a tree, teacup in paw, welcome and content. Warm bright paper forest and rose-gold castle, celebratory golden evening. Exactly girl/quill/pigeon/dragon, no extra fairy or guests; medium-wide ending composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_godmother_castle.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_teacups.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Jeannie in original dress mending thorns with star wand, proud pigeon and pocket Inkwell, dragon welcome at tea in background."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_dragon_hug",
+  "style": "L1",
+  "sourceHash": "758bf1284f6fbd6ae00f4ebb9903817c0ae4c5d4f490bfae0c8ff920518d1d4c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d017d6ac-5e44-4b99-ab8f-ecb601def9ff.png",
+  "originalSha256": "47f8c39bb90a8e0cea910ba29a15f17bd6448312d9f89066fad072b16accd683",
+  "file": "library-ft_dragon_hug.webp",
+  "sha256": "315a4ea72c1453ff193471d9c29b6498cea7a5894e05912ee934d0796070c374",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie throws BOTH arms as far around the same enormous green dragon's lower NECK as they can reach; dragon gently curls his long body and tail around her like a cozy protective blanket. His giant head lowers beside her, eyes happy with tiny tears. Tiny cream feather-quill Inkwell RIDES ON A SCALY RIDGE of dragon's back, clearly visible and tiny, no feet. A tiny curl of gold glitter-smoke from dragon's nostrils toasts ONE pale marshmallow floating in midair nearby. Warm stone cave/castle room with paper teacups at edge. Same barn-sized dragon green scales cream belly curved gold horns, folded-paper everything. Tender clear hug, no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed warm Jeannie/dragon embrace, dragon curled protectively, Inkwell rides scale ridge, one marshmallow in glitter breath."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_pigeon_fail",
+  "style": "L1",
+  "sourceHash": "1a0092cacf88a2893cd6a89a479a2214973b80d51fec1e3eba49d57f5df20e44",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6bcafb7e-f1ed-4146-a23a-7572b570143d.png",
+  "originalSha256": "c770f891b368e5655f242f888d551d783ec73a8721e960d07cce12fc2ffe8680",
+  "file": "library-ft_pigeon_fail.webp",
+  "sha256": "2ca7075cf288a4d7afc99c1b1c392fc60632644ab3293dc6c5569c43598d7d4d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. NEW moment in SAME dungeon as reference. Sir Reginald Pigeon has just PECKED the chest's lock and hops backward with ruffled feathers, indignant shocked expression and wings raised slightly. The chest remains firmly CLOSED, inscription 'Only the kind-hearted may open me.' preserved. A tiny comical puff of air curls from the keyhole suggesting a polite raspberry sound, no actual fruit or tongue. Jeannie watches amused and tiny hovering Inkwell laughs. Exactly one wall torch. Same paper chest, stone room, pigeon colors and character sizes. No other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dungeon.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed closed chest and exact inscription, pigeon recoils with ruffled wings, paper puff from keyhole, Jeannie and laughing Inkwell, one torch."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_end_dragon",
+  "style": "L1",
+  "sourceHash": "bdea980579331b0ffa03c754f8f5f65eafe74e2d666d649b40f46ad8d05f0567",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ef8d8c01-199f-4ff9-a629-756d88149948.png",
+  "originalSha256": "7c05aba4f00f6a2cc72d5a3a3ca0f651c1b7da3e645e395b939f49bc18e6e99b",
+  "file": "library-ft_end_dragon.webp",
+  "sha256": "c5cef7c1060b7e49e6ca530a133319ae10581dee2f550108623c3bbe48e6aa52",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Happy Dragon's Best Friend ending: Jeannie rides securely at base of the SAME enormous grassgreen dragon's neck as he FLIES above a layered paper forest and distant rose-gold castle at SUNSET. She beams into the breeze holding a natural ridge, original purple dress cream trims and brown layered hair. Tiny cream quill Inkwell rides nestled between dragon's TWO scaly ear-fins near head, proud content face, goldnib nofeet. Dragon has same friendly amber eyes, cream belly, THREE large curved gold horns as reference, small cheekspikes, FOUR limbs tucked beneath body, TWO broad green folded-paper wings spread, ONE longtail curling behind. Gold glitter breath gently toasts ONE floating marshmallow off to side. Whole scene paper engineered, peach/rose sky clouds, joyful sweeping aerial view, correct anatomy, no other characters or distant people.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_dragon_hug.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed sunset flight over paper forest/castle, Jeannie riding neck, Inkwell between scaly head fins, three gold horns, two wings, tucked limbs and one curling tail, single marshmallow in glitter breath."
+}
