@@ -50,7 +50,8 @@ const GAMES = [
   {
     title: "Word Bridge",
     emoji: "🌉",
-    blurb: "Our own Word Bridge! \"Name an animal that lives in the ocean\" — every LETTER of your answer becomes a plank, so JELLYFISH gets you twice as far as CRAB. Race the bot across the canyon, build streaks and spend your coins on bridge skins. Get one wrong and it tells you why. Vocabulary, spelling & word length. Ellie taps pictures in 58 categories; Mum gets the Pro bot.",
+    flag:  "BIGGER · Letter rounds, Word Book & badges",
+    blurb: "Our own Word Bridge! \"Name an animal that lives in the ocean\" — every LETTER of your answer becomes a plank, so JELLYFISH gets you twice as far as CRAB. Race one of three bots (Rusty, Zippy or Volt) across a canyon with rope handrails, a finish flag and gulls overhead. Now 87 categories, from numbers-in-words and maths words for Cory, to synonyms for big, small, happy and fast for Jeannie, to princess things, magical creatures and actions for Ellie — plus capital cities and landmarks for the grown-ups. Speedy and Pro races throw in 'starting with P' letter rounds, golden rounds pay double, quick answers earn a bonus, and every word you answer goes into your own WORD BOOK. Eighteen badges, eleven bridge skins, and a 🔊 read-aloud button so Ellie can play without a reader. Vocabulary, spelling, phonics & word length.",
     url:   "games/word-bridge/",
     ages:  "3+",
     kids:  ["jeannie","cory","ellie","shannon","tristan"],
