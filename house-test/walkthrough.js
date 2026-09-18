@@ -15,7 +15,7 @@ import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHead
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
-import {createInteractions} from './interactions.mjs?v=20260917-bed';
+import {createInteractions} from './interactions.mjs?v=20260918-car';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
