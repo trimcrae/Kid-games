@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_enter",
+  "style": "L1",
+  "sourceHash": "cb3570cc1e96a9354a8fb7879a37a18557e75aae9a85d50a750264969c7ceaf1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-07fd58fc-9f3f-48df-8403-7b9f849b0b36.png",
+  "originalSha256": "3ac5c7b61f63e73326412918030e7a839348d7ab9682e093238e00a85a56a873",
+  "file": "library-dn_enter.webp",
+  "sha256": "ebfdb1311934177fbe3ab2f147f24593a197914990de5f1176916f52bee6cfd4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. Jeannie tumbles out of open ochre dinosaur book onto soft warm swamp bank, sitting and laughing in surprise; little folded paper mud splashes by shoes. Giant green intricately cut fern fronds arch overhead. Far away a paper volcano puffs two circular smoke rings. Inkwell pops out of her dress pocket trembling anxiously. No visible dinosaurs yet; adventure discovery. Layered sage/teal paper swamp water, ochre bank, folded lush plants, miniature textured paper craft, full cast same Jeannie and quill.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Jeannie has landed by open dinosaur book in paper swamp, ferns and volcano smoke rings; no premature dinosaur cast."
+}

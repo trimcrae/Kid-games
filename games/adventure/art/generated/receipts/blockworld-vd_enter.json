@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_enter",
+  "style": "M1",
+  "sourceHash": "99e1791bbe4effa23569edc793d961f0f759e0e0b456f2f0af55fcf5eadf9f96",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-665d232d-0d69-4bb3-b1e4-e7963395e6c7.png",
+  "originalSha256": "6095560145348a4e89eb714fa709a7765dce3733c06a1fd259678f330c85e3e6",
+  "file": "blockworld-vd_enter.webp",
+  "sha256": "9a129993b1c3e086854d6e44240a34636ae77073dcb127057bf0357c23345d43",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 illustration. Match referenced Block World opening EXACTLY: cinematic 3D voxel forms, subtle pixel textures, cubical character anatomy, warm detailed dimensional lighting and atmospheric depth. Same young Cory: brown square-cut hair, black rectangular glasses, blue short-sleeve shirt, darkblue pants, brown boots/backpack. Every object and creature is built of blocky forms. No UI, border or caption. Child-friendly, expressive, readable staging. At mountain summit Cory foreground left meets enormous hill-sized friendly purple Voider dragon. Voider has chunky voxel purple head and body, lavender belly, exactly four legs with blunt claws, two enormous folded purple wings, one long thick tail, two short rounded lilac horns, HUGE sad lonely expressive eyes. It sits clumsily, never frightening, no sharp teeth. One claw gently holds a small whole voxel tree toward its mouth like a popcorn snack; a square gap behind where tree was. Lonely purple creature much larger than Cory. Soft twilight glowing mountains, sympathetic emotional first meeting. Full dragon silhouette fits composition; no other creatures.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Large gentle purple dragon Voider has sad eyes, lavender belly, two horns, wings and tail; holds tree snack, scale contrasts Cory."
+}

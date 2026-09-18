@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_enter",
+  "style": "L1",
+  "sourceHash": "f08668597df60a67e7b0360255b534017ef4b1a3bca92665bad1242bc9ecc3b1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-10d02dfe-c3ac-4d7c-a8f0-f22affefea87.png",
+  "originalSha256": "c8c6429ae77397202e82ff8ebecb6686d47aba248efa46d99a76299c21640593",
+  "file": "library-mt_enter.webp",
+  "sha256": "fd0f3ddc19f1bfeb6edb7ee98a159e259ed0bab7662805383f46a6848728a6e5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. Jeannie arrives at foot of Mount Mythos, huge layered cut-paper mountain reaching cloud hat, distant cream Greek temple. Beside her, a wood-look folded cardstock sign legibly reads 'MOUNT MYTHOS' then 'GODS, MONSTERS' then '& QUESTIONABLE SNACKS'. Inkwell has hopped OUT of pocket onto a low paper rock, inspecting a tiny unfurled grocery scroll that clearly says 'BUY MILK'. Jeannie looks amused at pen mistaking grocery list for prophecy. Warm sun, olive trees, wildflowers, ingenious paper stairs winding mountain, entire environment richly crafted.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Paper Mount Mythos, exact three-part sign and BUY MILK scroll, amused Jeannie and grumpy quill."
+}

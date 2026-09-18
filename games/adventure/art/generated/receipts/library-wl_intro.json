@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "wl_intro",
+  "style": "L1",
+  "sourceHash": "144ed2193d2a8189d6379fa13d29af94cf8c3eb67104b23769d5e3ed8214d664",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ac7641d4-59cd-4ab4-af62-96a35c274579.png",
+  "originalSha256": "2cd3da2f40c7f941d697e219f75a9a8dcb58835dca512f0555fd4e888e059c8a",
+  "file": "library-wl_intro.webp",
+  "sha256": "c0eb5d58199be12ee96a5c20671a1f68ebea75fe71f4d105f7a7c3bdbd3528e0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Create ONE finished full-bleed landscape 4:3 story-page illustration for The Whispering Library. Use ONLY the LEFT L1 Paper-theatre worlds panel of the reference. Entire world is an exquisite handmade paper-engineered pop-up theatre: real folded paper surfaces, fine cut edges, layered cardstock scenery, miniature paper architecture, soft dimensional shadows, cream antique paper with teal, gold and purple accents, warmly lit and tactile. No other sample styles, labels, frames or written text. Jeannie is the same seven-year-old girl from LEFT reference, shoulder-length layered brown paper hair, expressive brown eyes, purple dress with cream collar, brown shoes; stylized paper sculpted face. Inkwell must be a TINY anthropomorphic QUILL PEN: one long cream feather tapering to a gold writing nib, tiny expressive eyebrows/eyes on feather shaft near nib, tiny paper feet, visibly a pen rather than a winged human. He perches on Jeannie's shoulder with an amusing grumpy face. She discovers a dusty secluded library corner at night, gazing with fascinated smile at a warm glowing closed book tilted out of the shelf. A few surrounding closed books glow/hum subtly via curled paper sound ribbons. Elaborate layered cream paper arches and bookcases, teal night beyond arched window with cut-paper crescent moon. Both Jeannie and Inkwell clearly visible in a medium-wide composition. Capture the quiet thrilling discovery before choosing a book; no pirate, dinosaur or spaceship models on this page. Paper-built characters as well as scenery, never photoreal people or smooth plastic. Beautiful sharp craft detail.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/direction/library-options.png"
+  ],
+  "reviewed": true,
+  "review": "Layered paper craft matches L1; Jeannie wears purple and Inkwell is a small grumpy feather pen on shoulder; glowing book discovery clearly shown."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_enter",
+  "style": "M1",
+  "sourceHash": "30308d0bfd533dfbe4f0e8957aadc287f8a8a84691623609a16a90fcebec9b72",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8e6da2c0-770c-4c8b-982b-6a98e83af220.png",
+  "originalSha256": "59d285bdd9cc80b1c32f55c77827f3fa7ba505712b82aed7dd652aa02f251841",
+  "file": "blockworld-rs_enter.webp",
+  "sha256": "b175b17587f7bc2b309881b135729653217cf0fb58f26fe275132e760dff546d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 illustration. Match referenced Block World opening EXACTLY: cinematic 3D voxel forms, subtle pixel textures, cubical character anatomy, warm detailed dimensional lighting and atmospheric depth. Same young Cory: brown square-cut hair, black rectangular glasses, blue short-sleeve shirt, darkblue pants, brown boots/backpack. Every object and creature is built of blocky forms. No UI, border or caption. Child-friendly, expressive, readable staging. Cory discovers dusty stone-and-timber workshop. He gasps delightedly at glowing crimson redstone dust on a workbench, levers, square buttons and loose redstone blocks. A wobbly wooden sign clearly reads 'BUILD SOMETHING CLEVER'. Through large open workshop door, a HUGE empty unfinished roller-coaster track curves outside in sunlight. One wall torch warms interior; cool red glow and dusty rays. Exactly Cory, no companions yet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Redstone workbench and switches in workshop, correct sign and unfinished coaster visible outside."
+}

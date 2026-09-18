@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "bw_intro",
+  "style": "M1",
+  "sourceHash": "d4745034386ff246fb5c99774cec69b66c6beaa5b47e8eedc952ed75416e423d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-aa196227-7a8c-46e5-ba84-71a574893640.png",
+  "originalSha256": "8399341d30ca696ccb721b2f7f23a5079e3609727696dda75d88006a8172cd53",
+  "file": "blockworld-bw_intro.webp",
+  "sha256": "ccbfac96256dc3d3259b88f52db5318403feff199732a484ee13ff7c27b95dbf",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Create ONE finished full-bleed landscape 4:3 story-page illustration for Block World. Use ONLY the LEFT M1 cinematic voxel panel of the reference as the selected art direction: dimensional square-block-built scenery and character geometry, rich subtle pixel textures on cubic forms, magical warm sunlight, layered atmospheric perspective, lovely detailed adventure-game cinema. Do not use other panels, titles, labels, borders, text or UI. Establish the SAME Cory as M1: young six-year-old boy, short brown block-cut hair, large black rectangular glasses, blue short-sleeve shirt, dark blue trousers, brown boots and small brown backpack; friendly expressive cuboid face. Show Cory foreground left, smiling and cracking his knuckles in readiness, whole body visible. The brand-new world materializes as small square cubes snapping into a wide verdant landscape: grass-topped stepped blocks, cubical trees, distant towering stone mountains, sparkling broad sea, stepped clouds and a high floating island. A few cubes hover into place, with one little missing-square gap subtly suggesting the story mystery. Cory is the ONLY character on this first page: no sheep yet. Exciting, sunny, safe child adventure. Clear uncluttered foreground silhouette, gorgeous 3D voxel depth. Story: A brand-new block world pops into being, one pixel at a time! Cory cracks his knuckles. Mountains to mine, seas to sail, skies to build; blocks mysteriously going missing.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/direction/blockworld-options.png"
+  ],
+  "reviewed": true,
+  "review": "Cory matches selected M1 cuboid character, with glasses and blue shirt; mountain, sea, sky island and assembling blocks clearly visible."
+}

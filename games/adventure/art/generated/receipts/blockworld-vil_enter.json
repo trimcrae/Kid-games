@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_enter",
+  "style": "M1",
+  "sourceHash": "e6e94a839f9ba0963a121a51ef2de84b998a0abcadb28cdd48ea7a6f5edf0668",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-83cf3a55-e321-4430-84a9-30f2c172101e.png",
+  "originalSha256": "ca73a026dfed37c37eb48b827eef75494d45d16a9fd2c117524b84c29cfad429",
+  "file": "blockworld-vil_enter.webp",
+  "sha256": "b01034f2b745d13f6ce879cf79df334f0b5f33fa0cef506cb99afa2ee9d34af8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 illustration. Match referenced Block World opening EXACTLY: cinematic 3D voxel forms, subtle pixel textures, cubical character anatomy, warm detailed dimensional lighting and atmospheric depth. Same young Cory: brown square-cut hair, black rectangular glasses, blue short-sleeve shirt, darkblue pants, brown boots/backpack. Every object and creature is built of blocky forms. No UI, border or caption. Child-friendly, expressive, readable staging. Cory enters sunny Blockville village of voxel timber-and-stone cottages with peaked roofs and flower boxes. A welcoming stout adult villager approaches: rounded overall silhouette made of cuboid forms, bald cubic head, long rectangular nose, thick eyebrows, brown robe with tan apron, hands open greeting. One wooden sign clearly reads exactly 'TRADES, QUESTS' on top line and '& ONE VERY LOUD SHEEP' below. No visible sheep yet, focus exactly Cory and villager. Friendly bustling architecture, no extra crowd.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Welcoming villager and Cory, readable exact story sign, coherent voxel village."
+}

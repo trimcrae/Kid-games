@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_enter",
+  "style": "M1",
+  "sourceHash": "629e72bcee4bdbe985c47036bca04732100ff9fea69a46f95b26522eaf0463f5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b9ffe143-0033-4b1a-bf39-59ac0a18755a.png",
+  "originalSha256": "db19654bf1d2ef2fcc579c2278f7d97e9997e2f7a9cd951a6008b757aaf05130",
+  "file": "blockworld-sk_enter.webp",
+  "sha256": "c5899f631e2314318828c7acb880ece5f1f35d2afb0a798c0438ec9a3e706fbc",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 illustration. Match referenced Block World opening EXACTLY: cinematic 3D voxel forms, subtle pixel textures, cubical character anatomy, warm detailed dimensional lighting and atmospheric depth. Same young Cory: brown square-cut hair, black rectangular glasses, blue short-sleeve shirt, darkblue pants, brown boots/backpack. Every object and creature is built of blocky forms. No UI, border or caption. Child-friendly, expressive, readable staging. Cory stands on broad grassy ground looking UP at grass-topped floating islands among giant fluffy cubical clouds. One bird Captain Featherbottom flutters beside Cory at head level, wings out in silly teaching pose: small plump blue voxel bird, white chest, yellow square beak, small raised blue crest and comically self-important eyes, no hat. Cory raises one arm imagining a tower; few spare stone blocks beside him but no tower built yet. Ground visible foreground, low upward camera angle.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory looks up at floating islands; Captain Featherbottom introduced as blue bird with white chest/yellow beak."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_enter",
+  "style": "L1",
+  "sourceHash": "321e1b44863a52c9a0900e9ee89137603cc8093815d82b5a08637cb4b7ee29e8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b60a267f-7799-4658-beab-bdb22d3b005b.png",
+  "originalSha256": "42043b2d3ee3a8476ed52d2d2e13ab111608002559e8499a9e50916d0f5b69cc",
+  "file": "library-pr_enter.webp",
+  "sha256": "bad13dec684f933487f0d863e7a970b09c6a4af0f6ec73f7839aee8a5ba6c3cb",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. Jeannie lands on swaying deck of a magnificent paper pirate ship with folded cream sails, teal paper waves beyond, rope rigging made of twisted paper. She faces a ROUND friendly pirate captain, thick brown paper beard visibly full of tiny cookie crumbs, navy tricorn with gold trim, redcoat creamshirt darkpants brownboots, smiling arms-wide welcome. Inkwell peeks drenched and furious from Jeannie's dress pocket, bent damp feather and blue ink droplet. Bright playful nautical setting, no weapons. Exactly Jeannie, captain and quill.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Crumb-bearded redcoat pirate greets Jeannie on paper ship; drenched grumpy Inkwell visible in pocket."
+}

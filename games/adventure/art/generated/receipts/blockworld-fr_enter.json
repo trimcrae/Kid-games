@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_enter",
+  "style": "M1",
+  "sourceHash": "0b0bd567d0edc2de4c8417dd3850efa7c60665d5b20c6759e35d18afbfd128e1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ee0b66bf-5399-4d5f-b133-cbeb687f9de2.png",
+  "originalSha256": "f8b2232b0433497d4a9dcb35d8fd6b9da6db18863439f8cb7d85d66eac3258a8",
+  "file": "blockworld-fr_enter.webp",
+  "sha256": "180355709e160538c35344b0154eec9fb70226e5fd6fce21536604d3a3a05fdf",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit narrowly: REMOVE Cory's axe entirely. This scene occurs BEFORE he crafts any tools. His hands are both EMPTY and relaxed in an open listening gesture toward the sheep. Preserve his face, outfit, white four-legged sheep, proud sheep expression, tree and dawn forest, cinematic voxel geometry and 4:3 composition. No tool or held object.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-2c961425-0b0d-4f81-a199-d1c0da32d758.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected premature axe: Cory now has empty hands; Bartholomew and cinematic forest preserved."
+}

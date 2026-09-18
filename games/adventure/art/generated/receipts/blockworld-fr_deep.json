@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_deep",
+  "style": "M1",
+  "sourceHash": "7da05ef2699712ef6aedc6337b4ffaa1ac4abf6b4a09fb9bb07b4749f94dd24f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9c4a7afe-b0f8-4fa3-8549-0e1e6673760c.png",
+  "originalSha256": "c5cfd8000435742c91e9f817991459baf464deb63c3db212febb4c5485a2aa31",
+  "file": "blockworld-fr_deep.webp",
+  "sha256": "5417c05715436c8aabb5efc8a51c51b0af4fe1c9f4f678b81c2afe38d73a7580",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Deeper forest, tall pine trunks and a few red/brown mushrooms. Cory foreground left smiles gently at Zib peeking shyly from behind a tree right. Zib is a SMALL friendly green Fizzer, a blocky lime-green square head with darker green mottled pixel patches, two square dark eyes with friendly highlights and shy tiny smile, short narrow green cuboid torso, exactly FOUR stubby block feet, NO arms, NO horns, NO wings, NO tail. Like a cute squat green creeper with soft curious expression. Head reaches Cory's waist. Show all four feet and green body partially emerging around trunk so design is clear. Gentle daylight shafts, welcoming woodland scene. Cory's hands EMPTY; no tools yet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Friendly small green blocky Zib peeks from tree, no arms or horns; Cory and pine forest match M1."
+}

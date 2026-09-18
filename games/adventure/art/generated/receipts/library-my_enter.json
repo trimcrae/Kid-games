@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_enter",
+  "style": "L1",
+  "sourceHash": "401ccba4e657a92ecad6025d5aeee90bde973fb54c71e86e37132eb9d50c1bc4",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-19643607-d3ac-4663-ab2d-2243f162805f.png",
+  "originalSha256": "a7b4ba02c7d27212d35a457b36371e92e7ec78a37d409c9b4820a2c307ef7c91",
+  "file": "library-my_enter.webp",
+  "sha256": "6bcf3e7ea595f3a6d2632272ae8c865acffaf7b9217dcd887597cbf738cf89f6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. Jeannie and quill in pocket arrive in cold marble hall of Hush-a-Bye Manor: create marble using veined cream/grey cardstock, elaborate paper staircase and purple draped curtains, moonlit teal window. She studies a velvet-textured paper sign prominently reading 'THE MIDNIGHT CAKE: GONE.' and beneath in smaller clear text 'REWARD: glory, and possibly leftover frosting.' A tall grandfather clock looms in background, hands near midnight. Inkwell pokes out of dress pocket with comically proud detective expression. Mysterious and playful, not frightening, no ghosts or other cast yet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Paper marble manor, grandfather clock and correct missing-cake/reward notice; Jeannie studies clue with Inkwell."
+}

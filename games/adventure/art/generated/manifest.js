@@ -47,6 +47,27 @@
     "singEnd": "art/generated/mermaid-singEnd.webp",
     "concertEnd": "art/generated/mermaid-concertEnd.webp",
     "bandEnd": "art/generated/mermaid-bandEnd.webp"
+  },
+  "blockworld": {
+    "fr_enter": "art/generated/blockworld-fr_enter.webp",
+    "fr_deep": "art/generated/blockworld-fr_deep.webp",
+    "cv_enter": "art/generated/blockworld-cv_enter.webp",
+    "vil_enter": "art/generated/blockworld-vil_enter.webp",
+    "sk_enter": "art/generated/blockworld-sk_enter.webp",
+    "rs_enter": "art/generated/blockworld-rs_enter.webp",
+    "vd_enter": "art/generated/blockworld-vd_enter.webp",
+    "bw_intro": "art/generated/blockworld-bw_intro.webp",
+    "bw_hub": "art/generated/blockworld-bw_hub.webp"
+  },
+  "library": {
+    "ft_enter": "art/generated/library-ft_enter.webp",
+    "pr_enter": "art/generated/library-pr_enter.webp",
+    "sp_enter": "art/generated/library-sp_enter.webp",
+    "dn_enter": "art/generated/library-dn_enter.webp",
+    "my_enter": "art/generated/library-my_enter.webp",
+    "mt_enter": "art/generated/library-mt_enter.webp",
+    "wl_intro": "art/generated/library-wl_intro.webp",
+    "wl_hub": "art/generated/library-wl_hub.webp"
   }
 };
   for (const story of window.STORIES || []) {

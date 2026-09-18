@@ -1,0 +1,28 @@
+# Production character references
+
+Use the accepted page images below as visual references, together with the exact current node text and incoming branch context. New settings retain the family's medium. Only include the current scene's cast; naming absent characters in a prompt can cause unwanted cameos.
+
+## Block World — M1
+
+- [Cory / world opening](../generated/blockworld-bw_intro.webp): six-year-old boy, short cubical brown hair, black rectangular glasses, blue short-sleeve shirt, dark blue trousers, brown boots and backpack. Everything uses dimensional voxel construction. Tools appear only after the relevant story event.
+- [Bartholomew](../generated/blockworld-fr_enter.webp): white cuboid wool, tan square face, pink muzzle, brown hooves, four legs, expressive proud eyebrows. Leaf cape and wooden sword belong only to scenes that request them.
+- [Zib](../generated/blockworld-fr_deep.webp): small lime-green Fizzer, mottled green cubic head, dark square eyes and gentle smile, narrow torso, four stubby feet, no arms, horns, wings or tail. Express hugs through Cory's embrace and Zib leaning in; waving can use a front foot.
+- [Village host](../generated/blockworld-vil_enter.webp): stout bald villager with rectangular nose, brown robe and tan apron. Keep role-specific hats or clothes consistent when introduced.
+- [Captain Featherbottom](../generated/blockworld-sk_enter.webp): plump blue voxel bird, white chest, yellow beak, raised blue crest, comically confident expression.
+- [Voider](../generated/blockworld-vd_enter.webp): enormous purple dragon with lavender belly, two lilac horns, two wings, four limbs and long tail. Huge sympathetic eyes; awkward and lonely rather than threatening.
+
+## Whispering Library — L1
+
+- [Jeannie / Inkwell / library](../generated/library-wl_intro.webp): Jeannie has shoulder-length layered brown paper hair, purple dress with cream collar, cuffs and hem, cream socks and brown shoes. Inkwell is a tiny expressive cream feather quill with gold nib, frequently in her dress pocket or on her shoulder. Follow the node's position and action.
+- [Seven world books](../generated/library-wl_hub.webp): green fairy tree, navy pirate ship, midnight-blue rocket, ochre dinosaur, plum magnifying glass, cream Greek temple, gold star/open book. Exactly seven glowing choices.
+- [Pirate captain](../generated/library-pr_enter.webp): round, brown paper beard with crumbs, navy and gold tricorn, red coat, cream shirt, dark trousers and brown boots.
+- [Space entrance](../generated/library-sp_enter.webp), [dinosaur swamp](../generated/library-dn_enter.webp), [mystery manor](../generated/library-my_enter.webp) and [Mount Mythos](../generated/library-mt_enter.webp) establish the same folded-cardstock construction in each setting. Never switch these branches to the other families' styles.
+
+## Completed short-story references
+
+- [Rainbow Dragon](../generated/rainbow-meet.webp): wax crayon; Ellie with brown bob, tiara and pink dress. Track the dragon's changing colors per branch, including exact food counts.
+- [Family Campout](../generated/campout-camp.webp): ink and colored pencil. Maintain all six family members' established camping clothes and the tan-and-white puppy's blue collar.
+- [Pizza Planet](../generated/pizza-launch.webp): clay rocket with pizza emblem. Red aliens have three eyes; blue jelly aliens have the established tentacle count. The purple planet has three nested rings.
+- [Mermaid](../generated/mermaid-shore.webp): sea-glass mosaic. Ellie wears lavender and tiara; the mermaid has teal hair, shell ornament, coral top and turquoise tail. Maintain the red crab and striped fish designs.
+
+Every accepted image has its full prompt and review in the generated-art receipts. Original source text takes precedence over incidental background details in these references.

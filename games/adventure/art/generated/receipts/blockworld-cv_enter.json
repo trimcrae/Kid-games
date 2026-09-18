@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_enter",
+  "style": "M1",
+  "sourceHash": "4a91b7d714414c5d5808f1277fe51e1731d19fb86351b8edfce2bd9e5f825e8b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d48ba64f-3bf6-41e3-8669-991967d60544.png",
+  "originalSha256": "1c93555ad0eb0c7c74ca84b4bf44ef9b654598c0e1bd93d8d5e05c3fad811404",
+  "file": "blockworld-cv_enter.webp",
+  "sha256": "b8bac7e9001e807722d68a977d967093ebf4b97f53af3a294318d1509f613fe1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 illustration. Match referenced Block World opening EXACTLY: cinematic 3D voxel forms, subtle pixel textures, cubical character anatomy, warm detailed dimensional lighting and atmospheric depth. Same young Cory: brown square-cut hair, black rectangular glasses, blue short-sleeve shirt, darkblue pants, brown boots/backpack. Every object and creature is built of blocky forms. No UI, border or caption. Child-friendly, expressive, readable staging. Cory carefully climbs down stepped stone blocks into the Deep Caves, grinning with his trusty pickaxe (brown wood handle, grey iron pick head) in his right hand. One warm torch fixed to nearby cave wall illuminates his glasses and face. Deep cool dark tunnel descends behind, distant faint cyan diamond-ore sparkle far below. Sense of vast depth but Cory readable and secure on broad ledge. ONLY Cory.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory descends cave holding pickaxe; warm torch, deep blue cavern and diamond ore clear."
+}

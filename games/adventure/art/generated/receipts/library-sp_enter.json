@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_enter",
+  "style": "L1",
+  "sourceHash": "fca9042dcf2913b53e113708e9bc5d2467e8106c64432cff6769874d882ec243",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ecd70f90-1375-4f2a-b143-9f87883e355c.png",
+  "originalSha256": "ad1c36bd7f3c831c8ef5ab81ab010a2378e215583236e196efa4e8da5be298fa",
+  "file": "library-sp_enter.webp",
+  "sha256": "99ae14dce7c0cd12a0cfdb9930d5d9c5a6699ed59b45e86ee157a1260e9d92d2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. In library Jeannie opens a dusty midnight-blue book; its cover legibly reads 'Definitely Do Not Open In Zero Gravity'. Golden and pale-blue paper stars pour out of its spine. Jeannie begins floating, knees bent, purple dress settles modestly around legs, laughing surprised. Inkwell tumbles separately past her ear, grumpy. Cream-paper library shelves twist and tilt around an unfolding circular star tunnel. No spacesuit yet. Space represented by dimensional paper stars and navy cardstock folds, complete paper-theatre medium, not digital sci-fi art.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Jeannie and Inkwell float among dimensional paper stars; book title correctly rendered."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "ft_enter",
+  "style": "L1",
+  "sourceHash": "665815946fc836610c90268ad4221e2ad10bc623ac2180f6b74387a4f94a4415",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2975b684-a4bb-42d5-845f-3bee66d1f6a1.png",
+  "originalSha256": "fd930e8e79b3130f50c6d7905d0ce7753827f33ff76d68e99e572ccf939dcbb0",
+  "file": "library-ft_enter.webp",
+  "sha256": "3a6916be8ac52db3873c52e5f579621a1ef639753f998d7db83f426b5b3898c0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. Jeannie has opened the fat dusty green fairy-tree book all the way. Inkwell peeks grumpily FROM HER DRESS POCKET. Book pages whoosh wide, golden glow like trapped sunshine. The floor transforms into a swirling PAPER tunnel of words and letter-shaped cutouts spiraling downward. Jeannie grins in wonder, holding book in two hands, securely staged at tunnel rim. Library arches curl into paper spiral, no fairytale characters yet. No literal readable prose required, just individual flowing paper letter shapes.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Paper words spiral into floor as Jeannie opens green book; Inkwell in pocket; faithful layered-paper style."
+}

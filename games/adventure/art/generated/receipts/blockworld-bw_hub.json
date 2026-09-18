@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "bw_hub",
+  "style": "M1",
+  "sourceHash": "4f59e090c82bb27f7073d23bc304c3fbb342cc5d3215ee949a6ccdfe963b0074",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8c58d2ee-6adf-4012-9c73-01beca883e46.png",
+  "originalSha256": "a619e1db171941efe05c86c7c01befb8e79245ad1091ab9e36fa5e6596181054",
+  "file": "blockworld-bw_hub.webp",
+  "sha256": "cc17d557d0426d79c643dd4a637f4a61939823e6c65470672b82b9b0bd5b1427",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 illustration. Match referenced Block World opening EXACTLY: cinematic 3D voxel forms, subtle pixel textures, cubical character anatomy, warm detailed dimensional lighting and atmospheric depth. Same young Cory: brown square-cut hair, black rectangular glasses, blue short-sleeve shirt, darkblue pants, brown boots/backpack. Every object and creature is built of blocky forms. No UI, border or caption. Child-friendly, expressive, readable staging. Cory at the Crossroads of Blockville on sunny grass. One wooden signpost foreground left bears exactly SEVEN arrow boards with picture symbols (tree, pickaxe, house, wave, cloud, redstone, purple star) instead of words. A closed wood chest at right. Seven winding trails spread into miniature distant forest, cave mountains, village, sea, floating islands, workshop and distant purple mountains. Main focus Cory and signpost; no other characters. Welcoming choice point.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Seven sign arrows and seven destination symbols match available branches; consistent Cory and voxel world."
+}

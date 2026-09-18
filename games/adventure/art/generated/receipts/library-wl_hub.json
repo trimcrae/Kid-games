@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "wl_hub",
+  "style": "L1",
+  "sourceHash": "e40286463e67b71cf0b9bed6c33956f1d450098be85bcd30c9e27bf1a4f3f019",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d263859e-f08a-49ac-9ad3-e0cd18b06e71.png",
+  "originalSha256": "1214e9c1d518c252256df4cc089d3cce5a2b19792856e383d67e02bfc6abae43",
+  "file": "library-wl_hub.webp",
+  "sha256": "82bff8b817bcb3b0db7ec1f23d1a9798472d1f2c6f39556e6d9e3c91d1cbff11",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 story illustration matching this reference's exquisite layered cut-paper theatre, folded textured cardstock, cream architecture, teal shadows and gold light. Same Jeannie shoulder-length brown paper hair, purple cream-collar dress, socks/brown shoes and tiny grumpy cream quill Inkwell with gold nib on her shoulder. Show Jeannie looking at EXACTLY SEVEN special glowing closed books, all fully separate on ONE eye-level shelf, covers facing viewer. Their covers feature simple cut-paper picture emblems, left to right: green fairy-tree, navy pirate ship, midnight-blue rocket, ochre dinosaur, plum magnifying glass, cream Greek temple, gold star/openbook. Seven warm halos, no eighth glowing book. Surrounding ordinary books on other shelves can remain dim. Inkwell points nib impatiently toward choices. Medium-wide three-quarter view of Jeannie foreground left and long seven-book shelf across upper-right, beautiful paper arches and tiny folded staircases. No writing, UI, border or caption. A wondrous coherent paper-built world, not painted digital scenery.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-ac7641d4-59cd-4ab4-af62-96a35c274579.png"
+  ],
+  "reviewed": true,
+  "review": "Exactly seven separate glowing books show the seven world emblems. Same paper Jeannie/Inkwell and crafted library."
+}
