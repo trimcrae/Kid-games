@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_crew",
+  "style": "L1",
+  "sourceHash": "c09a01cc49735bde7d17764b37fd3decf4727876fe04457a61d3fadecd52c21d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a29d4340-0f18-4197-8c38-866179b2eb71.png",
+  "originalSha256": "626c25bf6b05c5e18acd38fe0a1fc84d19f575f23aaf3f327486b23ce7bcb684",
+  "file": "library-sp_crew.webp",
+  "sha256": "f183de4e8e5c2cd69165a147d42e864b4f106d4d127f112bf707c7fbd9f529bd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Inside same rocket, Reginald grey tealpurple pigeon bucket helmet and three medals is comically TANGLED IN ONE SEATBELT on extra purple passenger seat. Jeannie stands beside him gently frees belt with BOTH hands, smiling. Beepo beside seat laughs with two cyan eyes squeezed joyfully, active arms relaxed. Inkwell floats nearby proud and grumpy. Only girl/quill/robot/pigeon, no other passengers. Show belt as two loose loops around pigeon body/wing, not neck; no danger. Cozy cockpit warm lighting.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_cockpit.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_reginald.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Jeannie freeing Reginald's seatbelt loops, bucket helmet and medals, laughing Beepo and one floating Inkwell."
+}

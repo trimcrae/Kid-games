@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_talk",
+  "style": "L1",
+  "sourceHash": "be7e5e120b99b67a08f4a4733d8abeccfae6388143ad1bad8974a5fd7deecce1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f39767f7-d141-49fc-af6b-7003ba3d539b.png",
+  "originalSha256": "9c6a6685c7c5a184fbd421c0415ebfe4dbb12313afdb6da6096f1c948ec33c4f",
+  "file": "library-sp_talk.webp",
+  "sha256": "d1d697516555221ffbcda7e2716a0308593c6c86086f40870d46239ac3629726",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Same lavender alien colony, Jeannie points to herself with one hand, laughing as she tries their language. THREE aliens (green Plib, blue and lavender), EACH exactly THREE eyes in a row and two antennae, point to themselves and cheer. Small paper speech bubbles above them read 'Bloop', 'Bleep', 'Bworp'; Jeannie's little bubble reads 'Jeannie'. Beepo stands proudly translating with one raised arm. Tiny Inkwell in girl's pocket. No jelly or other props; friendly conversation and warm connection. Keep precise eye counts and two arms per alien.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_colony.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Jeannie/Bloop/Bleep/Bworp speech, three eyes on each alien, two eyes on Beepo, friendly gestures and pocket quill."
+}

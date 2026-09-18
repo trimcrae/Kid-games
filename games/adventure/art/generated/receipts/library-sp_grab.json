@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_grab",
+  "style": "L1",
+  "sourceHash": "88b96252c53e409e86a99a20b3147f5e2a18f525ec7481f523164bea0faee200",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-35b7c448-6fcd-49c5-93d1-6bce4e2b7d06.png",
+  "originalSha256": "f2a8565e29612fa2bc1d8c6d2a3a69c7b97f5ad172fbe7c724524697fd90dc2c",
+  "file": "library-sp_grab.webp",
+  "sha256": "c37c53708f74d5a164c0970cdccc7961bc0640295881d27f1abc73a87fcd4626",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Correct Jeannie's anatomy only. She currently has THREE legs/shoes. REMOVE the lowermost leftward-pointing extra leg and shoe near the far left edge at mid-upper height. Keep the TWO legs pointing toward the top edge (one near x300 and one near x500), each with cream sock and brown shoe. Reconstruct the purple skirt and library background naturally where removed leg was. Exactly TWO legs, TWO shoes, TWO arms. Preserve her face, pose, held Inkwell, reaching hand, magical book, stars, paper style and composition.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-71542d45-b67f-4e8b-b734-9cfd744f4187.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected two legs/two shoes and two arms, one held Inkwell, headfirst motion toward glowing navy book, consistent paper library."
+}

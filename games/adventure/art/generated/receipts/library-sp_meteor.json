@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_meteor",
+  "style": "L1",
+  "sourceHash": "df771d7defbbbe26df174267038278b0dc5c85f1d2470105c496d2095b14ec6c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-84eeac75-89cc-4007-9463-e2c0bde47de5.png",
+  "originalSha256": "a6a10ae6626561ecd71b06accc5bb54a974b48c5d2b0d6a60e75032519ef1f1f",
+  "file": "library-sp_meteor.webp",
+  "sha256": "abd918f288c51eba7f9453f7076fbb741ea0442d4cae0e8c31a578822367098e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Wide playful space action: candyred bent-nose rocket threads a swarm of soft rounded marshmallow-like cream/grey PAPER METEORS. One gently compresses harmlessly on hull with paper motion arc, ship undamaged. Through large porthole see Jeannie steering and Beepo covering BOTH cyan eyes with its TWO upper accordion hands, spare arms retracted. Inkwell in girl pocket. On LAST foreground meteor Reginald grey tealpurple pigeon in bucket helmet and three medals surfs proudly holding ONE tiny gold-star flag in wing. No flames near pigeon, no explosions, friendly springy action.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_reginald.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed harmless soft meteor contact, intact red rocket, Jeannie steering, Beepo covering two eyes, Reginald on meteor with flag and three decorations."
+}

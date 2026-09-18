@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_end_explorer",
+  "style": "L1",
+  "sourceHash": "edbd181069fc91ecea3adf0ff6a7495a755bedd58bcfc0517fcacbda82a83389",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1a4f84b4-525e-493c-9022-c81dae64ee32.png",
+  "originalSha256": "b90f259b078077e141b3515ebf5c990fb04044b9773cadd8dce77572213d39b4",
+  "file": "library-sp_end_explorer.webp",
+  "sha256": "0b0b6c76652632ef49185dbb817be47fb189c774e37cac7e32cb8a5fe71f7615",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Correct ONLY the writing on rolled chart in Jeannie's hand. Replace garbled writing with clear exact text on three lines: 'Jeannie,' then 'Star' then 'Explorer'. Spell Jeannie J-e-a-n-n-i-e. Preserve paper texture, small star decorations, rolled shape, hand, high-five, robot, girl, quill, rocket, book, planets and whole landscape composition exactly.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-3c31e529-b1c3-4e22-8053-675c5f7839aa.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected Jeannie, Star Explorer signature, high-five with Beepo, two girl arms/two legs, rolled chart, rocket and book doorway home."
+}

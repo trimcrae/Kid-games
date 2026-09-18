@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_portal",
+  "style": "L1",
+  "sourceHash": "387268da74695ba9e066fd3a6ed75b2add51cec84befea7cdf8448f6a9ad336f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5bbdf409-8ad6-4ee7-829b-0908d1c82bd9.png",
+  "originalSha256": "3281135b0ca121337491839b42f4d16372f040ea3cfa1463204c326dd40d7613",
+  "file": "library-sp_portal.webp",
+  "sha256": "f6103236804914726cad00d1a713a500f47a217857b34300656f6855961b3f0c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Jeannie and Beepo float weightlessly at edge of one enormous swirling PURPLE PORTAL made of layered spiralling violet paper ribbons and starlight. Beepo cautiously pokes edge with ONE extended accordion arm ending in a single pointing claw-finger; tiny squirt of GOLD STAR confetti bops his triangular nose. His other arm lowered and two spare arms retracted. Jeannie tumbles toward swirl amused, both arms visible; Inkwell beside her with outraged frown. Candyred rocket tiny behind them. No mouths licking portal, no duplicate arms or quills. A grape-coloured magical vortex, no library.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed purple folded spiral portal, Beepo poking with one arm and stardust at nose, two-arm two-leg Jeannie, one floating quill."
+}

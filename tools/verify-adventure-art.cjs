@@ -25,7 +25,8 @@ const server = http.createServer((req, res) => {
     allowed();
     await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
     const origin = `http://127.0.0.1:${server.address().port}`;
-    browser = await chromium.launch({ channel: 'chrome', headless: true });
+    browser = await chromium.launch({ channel: 'chrome', headless: true,
+      args: ['--disk-cache-size=1048576', '--media-cache-size=1048576'] });
     const page = await browser.newPage({ viewport: { width: 1100, height: 1000 }, reducedMotion: 'reduce' });
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));

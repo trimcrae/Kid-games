@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_penpal",
+  "style": "L1",
+  "sourceHash": "97a5da7489c4f806af1445174f817fd47dc56f154edb3e73adbc37066db1bb23",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8a1ccfed-be25-4aca-b421-0ee9ba17f74c.png",
+  "originalSha256": "c6f66e255ce379af8fbde90521636e39c928bafc659756a1e509db90d0292eb9",
+  "file": "library-sp_penpal.webp",
+  "sha256": "ec99ec780ec305358f2bf2a7cfd41ca22cfb03203dc39c95d622070c55d0fe17",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested.  SAME SMALL GREEN PLIB: lime-green round folded-paper head/body, EXACTLY THREE big eyes in one horizontal row, rosy cheeks, two glowing green antenna tips, two little arms and two short legs, no clothes. Intimate friendship scene under starry lavender colony sky. SMALL GREEN Plib shyly presses ONE softly glowing MINT/TURQUOISE LETTER-STONE into Jeannie's open right palm with both little hands. Letter-stone is palm-size faceted rounded crystal tablet with FLAT BLANK FRONT suited for drawings, softly rounded hexagonal outline, mint glow, no eye/mouth; distinguish from golden Egg-Friend. Jeannie smiles tenderly and supports her right wrist with left hand. Inkwell floats near her shoulder with tiny inky tear, cream feather curves slightly toward face. ONLY girl, Plib and quill; no robot/other aliens. Quiet heartfelt moment, no speech text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_colony.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed one mint faceted blank letter-stone in girl's palm, Plib's three eyes, two-arm girl and tearful floating quill; no Egg-Friend mixup."
+}

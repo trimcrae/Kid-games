@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_colony",
+  "style": "L1",
+  "sourceHash": "b76c1a7fb845b8468f12879ec7af0b860dfc368a216ba6e6ad04f05280eadbd4",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7dec2614-87e5-4d48-8c5e-7678e2097a01.png",
+  "originalSha256": "25376427bba8672a42b97215d7358243ebaabd10e6e410fe9a0760ccfd13066a",
+  "file": "library-sp_colony.webp",
+  "sha256": "e7fb5f75f0839d99a15a9ead439f660c634d85dad7acd31a75cdea461d6dbb58",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. NEW friendly alien colony on lavender paper moon with rounded pastel foldedpaper houses under stars. Three ROUND THREE-EYED aliens surround Jeannie delighted. Every alien has EXACTLY THREE eyes in ONE horizontal row on its round dome head, two little glowing-tip antennae, two arms, two short legs, no clothes. SMALL GREEN Plib at front gently tugs Jeannie's sleeve with one hand and offers a small GLOWING PINK SPACE-JELLY snack in other hand on tiny dish. Taller BLUE and LAVENDER aliens behind gently bonk foreheads as greeting. Jeannie smiles down, Inkwell floats proudly beside her as if magic wand. Beepo stands by smiling (TWO eyes, not alien). Snack is small jelly pudding with NO EYES or tentacles, edible treat, distinct from later living jelly mount. Exactly three aliens.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly three eyes on each of green Plib, blue and lavender aliens, two eyes on Beepo, small pink edible jelly, colony and floating quill."
+}

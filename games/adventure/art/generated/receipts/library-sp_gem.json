@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_gem",
+  "style": "L1",
+  "sourceHash": "31826026ce5c6f3ec40c0c99efb06a636e52d96d3ce16e95352488c717a8ce06",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0d7d6253-d526-4b53-918e-2a61fabca78b.png",
+  "originalSha256": "17f63fd3c468d3b4b1305699e70687e606d9954662af615490167959702f1c3c",
+  "file": "library-sp_gem.webp",
+  "sha256": "ae505264180eb9936e393c03524240a99940b479826e1d804962bc5800fc39ff",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Same glowing crystal cave, intimate scene: Beepo lovingly CUDDLES ONE GOLDEN EGG-FRIEND in its two active accordion arms. Egg-Friend palm-size faceted golden egg creature has EXACTLY ONE GOLDEN EYE open in its front and tiny delighted mouth below, no limbs, gold warm glow. Jeannie beside robot tenderly touches egg with one fingertip. Tiny Inkwell hovers astonished near her shoulder. No second unhatched egg in background and no duplicate golden creature. Mint/purple/pink paper crystal clusters frame close view.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_caves.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed one golden egg creature with a single eye and tiny mouth, Beepo cuddling with two arms, Jeannie touching, no duplicate egg."
+}

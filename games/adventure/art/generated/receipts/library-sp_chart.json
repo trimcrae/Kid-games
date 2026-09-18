@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_chart",
+  "style": "L1",
+  "sourceHash": "c2cdbfe3670c14ac3fa2e56941c4b9134dda0acc2080d843299aee7041171de8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-85c470b6-fdec-4472-9be2-fa79a1db43ef.png",
+  "originalSha256": "f3d1165ffad24ff91493d81038bb9b253f7295ef1f7f524e5539e051472afdfc",
+  "file": "library-sp_chart.webp",
+  "sha256": "25a6d499412f6cc9bc696b42e08e7a8ca68766734485ae012aeaa758376a59fe",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Wide view from open rocket hatch at bouquet of EXACTLY THREE nearby featured worlds: GREEN round planet with ONE ring on left, ORANGE planet with darker orange polka-dots at right, BROWN MEATBALL-shaped planet below with saucy texture. Smaller distant stars only. Jeannie inside hatch unrolls ONE BLANK cream star-chart, delighted, Beepo points upper arm toward meatball world, tiny Inkwell hovers deadpan. Candyred creamtrim rocket frames left edge. No pigeon/aliens, no planet labels yet. Layered paper orrery appearance and enormous space depth.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three featured worlds: green ringed, orange polka-dot, meatball, plus blank chart, Beepo pointing, Jeannie and quill."
+}

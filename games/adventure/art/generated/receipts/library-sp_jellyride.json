@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_jellyride",
+  "style": "L1",
+  "sourceHash": "57bed8bea6c1acf289e7b5e9a07ee74629a97e2a991afe2335d596df4e2b640d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0a38f763-846f-4143-9ca3-9ff64f6a4838.png",
+  "originalSha256": "b4ef8ff8b823bfa385e3c35f5f02355b3cc609a7a05cc67095637321bbb7043e",
+  "file": "library-sp_jellyride.webp",
+  "sha256": "3e0bc4dfb6494918110feeba86f56712fd1dcfa60f9e9fe88faebe5bcf55f293",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. NEW wide magical scene: a living SPACE-JELLY as big as school bus, made of translucent layered LAVENDER PAPER, soft domed bell with two gentle dark eyes and little smile, warm lanternlight inside, EXACTLY FOUR long soft ribbon tentacles trailing beneath. Jeannie and SMALL GREEN PLIB (EXACTLY THREE eyes horizontal row, two antennae, two arms/two legs) sit securely on top of broad squishy bell. Beepo beside them grips bell with ALL FOUR accordion arms EXTENDED, exactly two on each side of torso, two dark wheels tucked against jelly back. Four robot arms visible and distinct; no fifth arm. Inkwell floats beside girl secretly enjoying ride. They drift through soft pale-blue paper starlight clouds and gold stars, no rocket or other aliens. Jeannie exactly two arms/two legs.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_colony.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed giant lavender paper jelly carrying Jeannie, three-eyed green Plib and Beepo; four extended robot grippers, one floating quill and starlight clouds."
+}

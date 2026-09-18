@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_introcrew",
+  "style": "L1",
+  "sourceHash": "fd8d3381487fd02ba00d3006d44d38c72f7cde73d0165dbd917d0fdd95631ed3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a0bf1aad-00e7-45cb-a461-e4c4c4e2d7d9.png",
+  "originalSha256": "7705bdb7241ece91133b49b9c80c1189c8dd03b1c10f42cb818c5a73b6d13406",
+  "file": "library-sp_introcrew.webp",
+  "sha256": "b74cb1be0ef5e756808687f09bdb4abe07b825c3875a68f42cf3f2e9e914d6b6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested.  SAME SMALL GREEN PLIB: lime-green round folded-paper head/body, EXACTLY THREE big eyes in one horizontal row, rosy cheeks, two glowing green antenna tips, two little arms and two short legs, no clothes. Jeannie introduces WHOLE CREW to green Plib in lavender colony. Girl holds open palm toward Beepo who gives shy wave; Inkwell hovers proudly upright like magic wand; Reginald grey/cream tealpurple pigeon bucket helmet and THREE medals salutes with wing. Plib laughs so hard his THREE pupils converge comically toward middle, rosy cheeks and little arms hugging belly. All FIVE characters only, no other aliens. Warm group portrait with active gestures, stars above rounded colony houses. No balloons/cake or letters yet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_colony.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_reginald.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed five-character crew introduction, Plib's three crossed eyes, robot wave, pigeon salute, girl and one floating quill."
+}

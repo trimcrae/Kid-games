@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_reginald",
+  "style": "L1",
+  "sourceHash": "e3bf02de4523e1f95dd40a0fb60a465ba407e4b099e0b249dea9ea7001689492",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ed7041ce-d648-46f4-9328-0271e1d3ec10.png",
+  "originalSha256": "e2342ce1da7702bde1e9b337239a1d9801751567923810030ee56e7ac292ee96",
+  "file": "library-sp_reginald.webp",
+  "sha256": "ae7cbd3755ba41b0994b5d41e0983dd39ca1322dfa6820024f811d3cc57f5838",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit environment only: remove all castles, buildings, ocean, plants, foliage, daytime sky and clouds. Replace with BLUE PAPER PLANET terrain of soft rounded crater hills under DEEP NAVY STAR-FILLED SPACE, matching second reference's paper cosmos. Preserve foreground Jeannie, Inkwell, Reginald with bucket helmet and exactly three decorations (gold star, gold round medal, silver bottlecap), Beepo's salute, red rocket and all poses exactly. Continue blue crater ground beneath their feet. No new characters or architecture. Full landscape paper-theatre composition unchanged.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-37483b6a-4ecd-4144-bad3-ce7655af4630.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected blue crater terrain and star space instead of castle landscape; pigeon bucket helmet, exactly two gold medals and one silver bottlecap, Beepo salute."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_chartmore",
+  "style": "L1",
+  "sourceHash": "e498cf016c2caefb4052961ba9d4a456b467d1fca0ee0f02cffc21407ec397c8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-24b48b75-c1e4-447a-a5cd-2c32dd32fb3e.png",
+  "originalSha256": "269ea95a73280ee9ba83655cf407392cb9d5bc1f04524e6f47ca9d8f95aa0830",
+  "file": "library-sp_chartmore.webp",
+  "sha256": "d535f08ef5bfc2ca130849506b19b4935b590f28b02794a448b73e4e62d3ffee",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Inside red/cream rocket by wide window, Jeannie proudly unrolls LARGE FINISHED STAR-CHART across teal console. It contains drawings of green ringed garden world, orange mushroom world, meatball world, blue ringed world, and doodles of flowers, noodle-worms and rocket; handwritten snack names 'Planet Meatball', 'Garden Pea', 'Orange Pop', 'Blueberry Bounce'. Beepo glows proudly with two cyan eyes, two upper arms spread, spare arms retracted; no flower hat unless tinyflowernearconsole optional omit. Tiny Inkwell floats approvingly above chart. Out window far right ONE particularly bright distant unnamed GOLD STAR winks beckoning. Only girl/robot/quill, no pigeon needed.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_chart.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_greenworld.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed completed chart with four world drawings/snack names, flower/noodle doodles, proud Beepo and distant final star."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_firstletter",
+  "style": "L1",
+  "sourceHash": "fa4a912c82865289e7820e6f1a8215f5b55f2430f9eca060f74b8007d8af297f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b733f5af-454d-48ab-806f-1536af4f3bec.png",
+  "originalSha256": "3b534989c4749e239d065b7b01a5a4b18fb7c8394b54d120145d9f349ef78869",
+  "file": "library-sp_firstletter.webp",
+  "sha256": "022043956c1eab34e57fb714afc4e295e79cafa2acc07af965548a38b035b86b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Change only the glowing drawings on BOTH mint letter-stones: remove the extra floating human head above the group. Each stone should show EXACTLY FIVE little figures, once each: girl, three-eyed alien, wheeled robot, feather quill and pigeon, with ONE pink heart above. No extra face or head. Preserve all actual characters, stones, poses, location vignette, stars, paper medium and composition.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-4b3ed967-5f0e-4855-abfe-a0c28df20acc.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected five-figure drawing and heart on both letter-stones, no extra head, distant Plib vignette linked through stars, two-arm Jeannie and moved Inkwell."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_zoom",
+  "style": "L1",
+  "sourceHash": "b480e703368736098f12160211fa7ff69f2bff0d9c5fa87b204cd9a758d3c4a2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2544821e-42ec-41c8-bce4-634f3949d433.png",
+  "originalSha256": "4d988af9cc65a1b3289b7b30a1ad40db3d7aa46ef152fd60bf511d5fefb25d91",
+  "file": "library-sp_zoom.webp",
+  "sha256": "fffa66238708351d3de0cdd6c502da923c0fc384183be14628c6976a49b5d508",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Dramatic view inside same cockpit after BOOST. Jeannie BUCKLED at controls, cheeks comically pushed back and paper hair streaming, wide thrilled eyes. Beepo BUCKLED beside her gripping wheel, TWO cyan eye lenses display spiral patterns. Inkwell securely in pocket with feathers swept back. Outside large forward window SILVER STAR STREAKS race past, large BLUE PLANET with one sparkling ring ahead and smaller PURPLE PORTAL beyond it. Foreground red BOOST button glowing. No duplicate planets/robots, no extra hands.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_cockpit.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_portal.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed buckled crew, Beepo spiral eyes, glowing boost control and streaking stars with blue ringed planet/purple portal ahead."
+}

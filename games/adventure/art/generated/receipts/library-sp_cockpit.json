@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_cockpit",
+  "style": "L1",
+  "sourceHash": "7cc3f2f71e94296252335107312eec65c6480c34860e74960c0774af8de02895",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9cab7660-b11b-4e69-8ad2-a386ae1c211a.png",
+  "originalSha256": "2d345c9a99a72bc86dd5051309f1d47a57c9804e43e6df74fd99c34d595c5ee0",
+  "file": "library-sp_cockpit.webp",
+  "sha256": "b786886ceb2cd282febd347036a58c324e76597ad64bf368041cb960dbc45561",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Inside candy-red rocket, cream curved paper panels with teal console, one large forward window showing stars. Jeannie buckled into purple seat gripping her own small controls; Beepo clutches steering wheel nervously beside her. Three clearly labelled BIG buttons on console: 'BOOST', 'WOBBLE', 'DO NOT PRESS (PLEASE)'. Tiny Inkwell sits in Jeannie's dress pocket unimpressed. No extra people/birds. Rich handmade buttons and gauges, readable labels not UI overlay.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_launch.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed cockpit continuity, Jeannie buckled at controls, nervous Beepo wheel, pocket quill and all three correct button labels."
+}

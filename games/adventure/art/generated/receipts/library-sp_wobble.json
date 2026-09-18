@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_wobble",
+  "style": "L1",
+  "sourceHash": "e4972c5a2a7c5bf577d78dcf269105f9567dd486a51e278502779c7cf2733737",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f7e1a039-3566-4da9-9def-c3fcf92eeea1.png",
+  "originalSha256": "85703a855b8f646b9815c6d299a774a3c8b40243a59cf3669a870b1086a6f072",
+  "file": "library-sp_wobble.webp",
+  "sha256": "0aab35161e6c80e27a71b51eb3dba1ac61f87a4a2d11d113b02ca59b090c07d7",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Same red/cream rocket cockpit now JIGGLES gently in zero gravity. Jeannie stays BUCKLED in her purple seat, laughing, one hand on yellow button labelled WOBBLE. Beepo has unbuckled and performs ONE upside-down flip, two active arms spread, two wheels pointing up, spare arms retracted. Inkwell spins UPSIDE DOWN by window, one expressive cream feather gold nib, NO second quill in pocket. A notebook and a pencil float separately; no other loose clutter. Paper motion loops emphasize slow tumbling, no duplicates of characters or anatomy.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_cockpit.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed buckled Jeannie, upside-down flipping Beepo, spinning quill, floating notebook/pencil and playful cockpit wobble, no duplicate characters."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_launch",
+  "style": "L1",
+  "sourceHash": "dc88e1575a012b0746026913af55bfda2a78f6b95b47ed94e908dee0c4dbdc20",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-52c5f3e3-b15f-4dbe-9ee8-e57c2ddb49ec.png",
+  "originalSha256": "449419102d5a3bf21780669c131a38bb3076bf2496bf189fb6f11d8ad40ef2ea",
+  "file": "library-sp_launch.webp",
+  "sha256": "00a027e2e9403d6b341f3564c0fe61af5091c994940fe90c20795057fef3c16a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  NEW SPACE SCENE: Jeannie floats weightlessly beside ONE CANDY-RED RETRO ROCKET, whose pointed nose has a small cute sideways BEND at its tip. Cream porthole trim, three red fins, open side hatch, no engine flame. Design new BEEPO robot emerging from hatch: small round pear-shaped CREAM and TEAL folded-paper body, domed head, TWO round cyan lens eyes, tiny square nose, nervous smiling speaker mouth, gold antenna with blue bead, little chest panel with three lights and name tag BEEPO, TWO dark little wheels at base. FOUR small telescoping accordion PAPER ARMS total: upper pair lifted nervously, lower pair neatly retracted flush at waist as small folded panels. No legs or extra eyes. Robot child waist-high. Inkwell floats by Jeannie's shoulder, ONE grumpy cream quill with gold nib, no limbs. All rocket and robot surfaces visibly folded paper, no real metal. Velvety midnight paper cosmos, layered golden stars, distant blue planet with one sparkly ring, no library shelves. Only Jeannie/quill/robot/rocket; no pigeon yet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed candy-red bent-nose paper rocket, cream trim and open hatch; cream/teal Beepo with two cyan eyes, blue-tipped gold antenna, chest lights/name, two wheels and retracted spare arm panels; floating Jeannie and quill."
+}

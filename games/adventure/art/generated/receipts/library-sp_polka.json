@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_polka",
+  "style": "L1",
+  "sourceHash": "0d89171bda59cbf9a98063920956a7c4a7fba5c22ea493a3c892b374b84d4b15",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2332190a-5717-44fb-88ab-ac1a624a8d82.png",
+  "originalSha256": "b24396270ada49ba91a132724e68d1efaabcb36b57b1f0e84748f1769e6cb6f5",
+  "file": "library-sp_polka.webp",
+  "sha256": "2f85132ef380d4ffef2a8316380713ac23f2d1b37ce3ec81da9b2fb8decee48a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. On orange polka-dot world, orange spots are giant springy MUSHROOM TRAMPOLINES. Jeannie bounces joyfully between three large orange round caps, exactly two arms/two legs, paper motion arcs and airborne skirt. Beepo small on ground cheering. Reginald same grey/cream tealpurple pigeon in bucket helmet and medal bounces UPSIDE DOWN over right mushroom, delighted despite pompous expression. Tiny Inkwell in Jeannie's dress pocket. Layered warm ochre plain under starry cosmos, no other characters or extra limbs. Mushrooms orange caps with pale stalks, dots visible across distant rolling surface.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_chart.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_planet_blue.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three prominent orange mushroom trampolines, two-leg Jeannie jumping, upside-down helmeted pigeon, Beepo cheering and pocket quill."
+}

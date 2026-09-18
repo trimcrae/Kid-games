@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "sp_song",
+  "style": "L1",
+  "sourceHash": "e3f5a55ba81955a89e2bcabfa7619c5b532ee5fee49e85913daeb3a2e60926b0",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ed5dd2e7-f7a0-4d49-a06e-e46fcf0531da.png",
+  "originalSha256": "0e0192d3bc640569ae0aeb4fa7db2dcd04eb483fc9a8487f874a6de6d3cb7e38",
+  "file": "library-sp_song.webp",
+  "sha256": "a9cfb093a42833c188eccdaf89d3dc7057d1bec156211661821cf5dd44a39399",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Beepo as rocket reference: small cream/teal round wheeled paper robot, domed cream head with teal cap, TWO cyan lens eyes, small dark triangular nose, smiling grille mouth, gold antenna blue bead, gold BEEPO badge and red/yellow/green chest lights, two dark wheels. Two accordion arms active; spare lower pair retracted into waist panels unless requested. Same crystal cave, Jeannie continues tapping mint crystals in wobbly tune, bright gold music notes flow along glowing pink/mint/lavender crystals into newly revealed passage. Secret tunnel clearly SPLITS INTO TWO: left dark navy tunnel twinkling with GOLD STARS; right warm lavender tunnel with tiny abstract speech bubbles suggesting FRIENDLY ALIEN CHATTER, no alien visible yet. Beepo watches in wonder, Inkwell tapping nib lightly on rock. Omit golden egg because it was not picked up on this route. Only girl/robot/quill, no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-sp_caves.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed musical crystals revealing two tunnels, stars on left and friendly speech symbols on right, only Jeannie/Beepo/Inkwell."
+}
