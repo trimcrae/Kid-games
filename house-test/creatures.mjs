@@ -318,7 +318,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   for(const name of ['sleepEyes','happyEyes','mouthOpen'])B[name].scale.setScalar(1e-4);
 
   // ----- animation state -------------------------------------------------
-  const st={t:Math.random()*10,phase:0,walk:0,run:0,bob:0,bobVel:0,lastBob:0,lift:0,hopT:-1,hopK:1,lean:0,roll:0,lastYaw:null,lastTime:null,
+  const st={t:Math.random()*10,phase:Math.random()*Math.PI*2,walk:0,run:0,bob:0,bobVel:0,lastBob:0,lift:0,hopT:-1,hopK:1,lean:0,roll:0,lastYaw:null,lastTime:null,
     sit:0,lie:0,stretch:0,sniff:0,shake:0,scratch:0,fold:0,lookYaw:0,lookPitch:0,
     expr:{sleep:0,happy:0,tired:0,yawn:0,sad:0},blinkIn:1+Math.random()*3,blink:0,wobbleIn:3+Math.random()*4,wobble:0,
     want:{expression:'idle',pose:{},look:[0,0],fold:0,grime:0}};
@@ -345,7 +345,9 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     // pads and a run scurries instead of both skating at one tempo.
     st.walk=approach(st.walk,moving?1:0,reduced?1:1-Math.exp(-dt*12));
     const v=moving?speed:0;st.run=approach(st.run,clamp((v-1.9)/1.2,0,1),k);
-    if(moving){const stride=.45+.08*v;st.phase+=v*dt/stride*Math.PI*2;}
+    // (rig.cadence: a petpet's short legs take quicker, shorter steps than
+    // the Craepet it trots beside, so the two never march in lockstep.)
+    if(moving){const stride=(.45+.08*v)/(rig.cadence||1);st.phase+=v*dt/stride*Math.PI*2;}
     const walkW=st.walk,P=st.phase;
     // Hop impulse (hello, joy, a stair tread).
     let hopLift=0,hopSquash=0;
@@ -448,6 +450,9 @@ export function petpet(id){
   // A duckling's beak and a snail's shell ride on the same few draw calls.
   const extras=id==='duckling'?[{bone:'head',pos:[0,.6,.29],size:[.10,.045,.10],color:palette[1]}]:id==='snail'?[{bone:'body',pos:[0,.45,-.18],size:[.29,.29,.23],color:palette[1]}]:[];
   const root=creature({species},{body:palette[0],accent:palette[1]},extras);root.scale.setScalar(.35);
+  // A third the size, so its feet go round about 1.7x as often (stride
+  // scales with the square root of leg length) to cover the same ground.
+  root.userData.rig.cadence=1.7;
   return root;
 }
 // A small cream name pill (the HUD's own look), sized to its text.

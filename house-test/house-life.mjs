@@ -1,6 +1,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import {activities,destinationFor} from './activities.mjs';
-import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20260916-use2';
+import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20260918-petpet';
+import {createPetpetFollow} from './petpet-follow.mjs';
 import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
@@ -202,7 +203,10 @@ export async function createHouseLife(tour){
     if(avatar)disposeCreature(avatar);avatar=null;
     if(!snapshot.pet)return;
     avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
-    if(snapshot.pet.petpet){const friend=petpet(snapshot.pet.petpet.id);friend.position.set(.4,0,-.3);avatar.add(friend);avatar.userData.petpet=friend;}
+    // The petpet trots at the pet's heel; its height is its own, a beat
+    // behind (petpet-follow.mjs), so a jump is two jumps, not one lump.
+    if(snapshot.pet.petpet){const id=snapshot.pet.petpet.id,friend=petpet(id);friend.position.set(.4,0,-.3);avatar.add(friend);avatar.userData.petpet=friend;
+      avatar.userData.follow=createPetpetFollow({flies:/^(moth|wisp|starling)$/.test(id)});}
     petLife=createPetBehaviour({egg:!!snapshot.pet.egg});visY=null;stepHop=null;
     // A family switch: the new pet pops in happy to see you.
     if(arrivePop){arrivePop=false;petLife.react('hello');}
@@ -487,8 +491,10 @@ export async function createHouseLife(tour){
       if(time>syncAt){syncAt=time+.8;sync();if(active)savePosition();updateNearby();}
       ground.frame();
       if(avatar){
-        const reduced=tour.reducedMotion,rig=avatar.userData.rig;let walking=active&&moving&&!inAir&&!ride,gait=speed;
-        if(hopNow){rig.hop(hopNow);hopNow=0;}
+        const reduced=tour.reducedMotion,rig=avatar.userData.rig,follow=avatar.userData.follow;let walking=active&&moving&&!inAir&&!ride,gait=speed;
+        // Every squash of the pet's body is echoed by its petpet a beat later.
+        const hopRig=s=>{rig.hop(s);follow?.hop(time,s);};
+        if(hopNow){hopRig(hopNow);hopNow=0;}
         // What the pet feels like doing: look back at you, sniff, sit, yawn,
         // doze off when tired… (pet-behaviour.mjs), from its real needs.
         let friend=null,best=3;
@@ -521,13 +527,22 @@ export async function createHouseLife(tour){
         avatar.position.set(player.x,visY,player.z);avatar.rotation.y=heading;avatar.rotation.x=0;
         if(ride){avatar.position.set(player.x+(ride.dx||0),player.y+(ride.dy||0),player.z+(ride.dz||0));avatar.rotation.x=ride.tilt||0;visY=avatar.position.y;stepHop=null;
           if(ride.pose)petOut={...petOut,pose:ride.pose,expression:ride.expression||petOut.expression,emote:ride.emote===undefined?petOut.emote:ride.emote};}
-        rig.setExpression(petOut.expression);rig.setPose(petOut.pose);rig.look(...petOut.look);if(petOut.hop)rig.hop(petOut.hop);
+        rig.setExpression(petOut.expression);rig.setPose(petOut.pose);rig.look(...petOut.look);if(petOut.hop)hopRig(petOut.hop);
         rig.setGrime(petNeeds&&petNeeds.clean<35?.35+.65*(35-petNeeds.clean)/35:0);
         // Wings and tails tuck in beside a wall instead of poking through it.
         if(rig.wings||rig.tail){foldIn-=dt;if(foldIn<=0){foldIn=.2;const s=Math.sin(heading),c=Math.cos(heading);
           foldAmount=[[c,-s],[-c,s],[-s,-c]].some(([x,z])=>world.blocked(player.x+x*.22,player.z+z*.22,player.y))?1:0;}rig.fold(foldAmount);}
         avatar.userData.animate(time,walking,reduced,gait);
-        avatar.userData.petpet?.userData.animate(time,walking,reduced,gait);
+        const pal=avatar.userData.petpet;
+        if(pal){
+          // Its height follows the pet's a beat late (in the avatar's own
+          // units, since it rides inside the scaled avatar); its rig gets
+          // the pet's take-off and landing squashes on the same delay.
+          const f=follow.update(time,dt,avatar.position.y,{reduced});
+          pal.position.y=(f.y-avatar.position.y)/PET_SCALE;
+          if(f.hop)pal.userData.rig.hop(f.hop);
+          pal.userData.animate(time,walking,reduced,gait);
+        }
         // Only if the camera is actually inside the pet (backed right up to a
         // wall) does the pet step aside from view; nearer than that it fades
         // (walkthrough.js).
@@ -659,7 +674,7 @@ export async function createHouseLife(tour){
       return list;
     },
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
+    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),petpet:avatar?.userData.petpet?{lift:+(avatar.userData.petpet.position.y*PET_SCALE).toFixed(3)}:null,appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
         // What a steadiness check samples each frame: where it wants to face, its gait, drawn height, name pill and bubble.
         face:r.c.face,walking:r.c.walking,speed:r.c.speed,y:r.mesh.position.y,label:r.label.visible,emote:r.emote?.showing??null,egg:r.c.egg})),
       // The life clock of the last tick, and every creature body in the scene (yours plus companions: no leftovers after a switch).
