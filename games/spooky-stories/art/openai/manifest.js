@@ -687,7 +687,7 @@ window.SPOOKY_PAINTED_ART = {
     },
     {
       "src": "art/openai/ellie-glass-slipper-4.webp?v=fcfd3bb90e25",
-      "alt": "Story illustration: At the palace, Cinderellie stopped beneath a thousand shining lights. The young prince bowed. “Will you marry me?” he asked. “No Dude!” said Cinderellie. “But I'll dance with you!” Round went the children, their ribbons flying. Cinderellie laughed so hard she forgot to watch the clock."
+      "alt": "Story illustration: At the palace, Cinderellie stopped beneath a thousand shining lights. Nobody asked her to tidy anything. The young prince bowed and held out his hand. “Will you join our dance?” Round went the children, their ribbons flying. Cinderellie laughed so hard she forgot to watch the clock."
     },
     {
       "src": "art/openai/ellie-glass-slipper-5.webp?v=27f884454a0a",
@@ -703,7 +703,7 @@ window.SPOOKY_PAINTED_ART = {
     },
     {
       "src": "art/openai/ellie-glass-slipper-8.webp?v=4b62d8a001a0",
-      "alt": "Story illustration: Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Cinderellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”"
+      "alt": "Story illustration: Her cousins giggled. “You weren't even there!” The messenger offered the slipper. Cinderellie's foot slid in. It fitted exactly. She held up its shining twin. The prince stepped through the doorway. “Will you marry me?” he asked. “No Dude!” said Cinderellie. “But I'll dance with you!”"
     },
     {
       "src": "art/openai/ellie-glass-slipper-9.webp?v=3b0cd26d1d82",

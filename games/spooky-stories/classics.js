@@ -157,8 +157,8 @@ window.ELLIE_CLASSICS = [
         vocab: { shimmered: "shone with a soft, gently changing light" }
       },
       {
-        text: "At the palace, Cinderellie stopped beneath a thousand shining lights. The young prince bowed. “Will you marry me?” he asked. “No Dude!” said Cinderellie. “But I'll dance with you!” Round went the children, their ribbons flying. Cinderellie laughed so hard she forgot to watch the clock.",
-        scene: "Fairy-tale palace children's ball. Cinderellie age three in consistent pearl-lavender silver-leaf gown joins a circle dance with several other children. A friendly preschool boy prince in blue bows and offers his hand. He has just asked her to marry him; she cheerfully replied No Dude and offered to dance instead. Golden chandeliers and colorful ribbons, midnight clock high in background without readable digits. No wedding or lettering.",
+        text: "At the palace, Cinderellie stopped beneath a thousand shining lights. Nobody asked her to tidy anything. The young prince bowed and held out his hand. “Will you join our dance?” Round went the children, their ribbons flying. Cinderellie laughed so hard she forgot to watch the clock.",
+        scene: "Fairy-tale palace children's ball. Cinderellie age three in consistent pearl-lavender silver-leaf gown joins a circle dance with several other children. A friendly preschool boy prince in blue bows and offers his hand, inviting her to dance. Golden chandeliers and colorful ribbons, midnight clock high in background without readable digits. No proposal, wedding or lettering.",
         vocab: { palace: "a very grand home where a royal family lives" }
       },
       {
@@ -177,9 +177,9 @@ window.ELLIE_CLASSICS = [
         vocab: { messenger: "someone who carries news or a message to another person" }
       },
       {
-        text: "Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Cinderellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”",
-        scene: "Recognition scene: messenger kneels offering tiny glass slipper, which fits Cinderellie's foot perfectly. Cinderellie in simple dusty-rose dress proudly holds its matching slipper. Two older cousins look surprised behind. Exactly two glass slippers total, one worn and one held. Cinderellie remains preschool age, no adult glamour.",
-        vocab: { merry: "cheerful and full of fun" }
+        text: "Her cousins giggled. “You weren't even there!” The messenger offered the slipper. Cinderellie's foot slid in. It fitted exactly. She held up its shining twin. The prince stepped through the doorway. “Will you marry me?” he asked. “No Dude!” said Cinderellie. “But I'll dance with you!”",
+        scene: "Illustrate the recognition moment just before the prince enters: messenger kneels offering tiny glass slipper, which fits Cinderellie's foot perfectly. Cinderellie in simple dusty-rose dress proudly holds its matching slipper. Two older cousins look surprised behind. Exactly two glass slippers total, one worn and one held. Cinderellie remains preschool age, no adult glamour. The proposal happens only after this successful fitting.",
+        vocab: { twin: "another one just like it; here, the matching glass slipper" }
       },
       {
         text: "Her cousins looked at the polished floor, then at Cinderellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Cinderellie dress. She took their hands and led them into the dance. No one was left behind.",
