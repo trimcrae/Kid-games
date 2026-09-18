@@ -24,27 +24,27 @@ window.SPOOKY_PAINTED_ART = {
   ],
   "costume-party": [
     {
-      "src": "art/openai/costume-party-0.webp",
+      "src": "art/openai/costume-party-0.webp?v=4f7ecd59c302",
       "alt": "Story illustration: On a spooky-fun night, the whole castle had a costume party!"
     },
     {
-      "src": "art/openai/costume-party-1.webp",
+      "src": "art/openai/costume-party-1.webp?v=06f32ff9ea0f",
       "alt": "Story illustration: Big sister Jeannie was a friendly witch with a tall, pointy hat."
     },
     {
-      "src": "art/openai/costume-party-2.webp",
+      "src": "art/openai/costume-party-2.webp?v=c4eec9c28825",
       "alt": "Story illustration: Cory dressed up as a brave green knight. So strong!"
     },
     {
-      "src": "art/openai/costume-party-3.webp",
+      "src": "art/openai/costume-party-3.webp?v=4ddbf080a182",
       "alt": "Story illustration: Princess Ellie twirled in purple, and baby Kieran was a tiny pumpkin!"
     },
     {
-      "src": "art/openai/costume-party-4.webp",
+      "src": "art/openai/costume-party-4.webp?v=1e7263baf464",
       "alt": "Story illustration: They bobbed for apples and danced with the friendly bats. Squeak!"
     },
     {
-      "src": "art/openai/costume-party-5.webp",
+      "src": "art/openai/costume-party-5.webp?v=3ff29d09df1d",
       "alt": "Story illustration: What a happy, spooky night for everyone. Time for sleepy dreams."
     }
   ],
@@ -94,23 +94,23 @@ window.SPOOKY_PAINTED_ART = {
   ],
   "castle-sleepover": [
     {
-      "src": "art/openai/castle-sleepover-0.webp",
+      "src": "art/openai/castle-sleepover-0.webp?v=7e9bc4d13da6",
       "alt": "Story illustration: Tonight the whole family had a cozy sleepover high up in the castle."
     },
     {
-      "src": "art/openai/castle-sleepover-1.webp",
+      "src": "art/openai/castle-sleepover-1.webp?v=93c16b7fcadf",
       "alt": "Story illustration: Jeannie read a story and Cory built the tallest pillow fort ever."
     },
     {
-      "src": "art/openai/castle-sleepover-2.webp",
+      "src": "art/openai/castle-sleepover-2.webp?v=fc54581e96bd",
       "alt": "Story illustration: Knock, knock! Boo the giggly ghost floated in with marshmallows to share."
     },
     {
-      "src": "art/openai/castle-sleepover-3.webp",
+      "src": "art/openai/castle-sleepover-3.webp?v=4ec2b03fddc3",
       "alt": "Story illustration: Midnight the cat curled up warm, and baby Kieran giggled at the swooping bats."
     },
     {
-      "src": "art/openai/castle-sleepover-4.webp",
+      "src": "art/openai/castle-sleepover-4.webp?v=1fd4816e224b",
       "alt": "Story illustration: Snuggled together under the twinkly stars, everyone drifted off to sweet dreams."
     }
   ],
@@ -142,27 +142,27 @@ window.SPOOKY_PAINTED_ART = {
   ],
   "dancing-dragon": [
     {
-      "src": "art/openai/dancing-dragon-0.webp",
+      "src": "art/openai/dancing-dragon-0.webp?v=210d2384ffa1",
       "alt": "Story illustration: High on a green hill stood a happy castle, where a princess loved to dance."
     },
     {
-      "src": "art/openai/dancing-dragon-1.webp",
+      "src": "art/openai/dancing-dragon-1.webp?v=19133f812066",
       "alt": "Story illustration: One morning a friendly green dragon peeked over the garden wall. Hello!"
     },
     {
-      "src": "art/openai/dancing-dragon-2.webp",
+      "src": "art/openai/dancing-dragon-2.webp?v=4b6d112f0a8e",
       "alt": "Story illustration: “I want to dance too,” said the dragon, “but my feet are much too BIG!”"
     },
     {
-      "src": "art/openai/dancing-dragon-3.webp",
+      "src": "art/openai/dancing-dragon-3.webp?v=37ef79d96982",
       "alt": "Story illustration: Princess Jeannie showed him how. Stomp, stomp, TWIRL! “You can do it!”"
     },
     {
-      "src": "art/openai/dancing-dragon-4.webp",
+      "src": "art/openai/dancing-dragon-4.webp?v=8d177c3b33d3",
       "alt": "Story illustration: Soon everyone danced — Ellie, Cory, and the dragon spun round and round."
     },
     {
-      "src": "art/openai/dancing-dragon-5.webp",
+      "src": "art/openai/dancing-dragon-5.webp?v=d26f64c88c62",
       "alt": "Story illustration: The dragon danced so happily that bright little flowers grew where he stepped!"
     }
   ],
@@ -244,13 +244,13 @@ window.SPOOKY_PAINTED_ART = {
       "alt": "Story illustration: Then Sparkle the unicorn trotted up, carrying a dress with EVERY colour on it!"
     },
     {
-      "src": "art/openai/rainbow-dress-6.webp",
+      "src": "art/openai/rainbow-dress-6.webp?v=cde303dcd9a5",
       "alt": "Story illustration: Ellie twirled to the picnic in her rainbow dress. Pink, yellow, blue, green — hooray!"
     }
   ],
   "hide-and-seek": [
     {
-      "src": "art/openai/hide-and-seek-0.webp",
+      "src": "art/openai/hide-and-seek-0.webp?v=0e668bd1db6d",
       "alt": "Story illustration: One quiet night, Midnight the cat meowed: “Let's all play hide-and-seek!”"
     },
     {
@@ -266,7 +266,7 @@ window.SPOOKY_PAINTED_ART = {
       "alt": "Story illustration: She looked up at the twinkly sky — and spotted the little bat by the moon! Two friends found."
     },
     {
-      "src": "art/openai/hide-and-seek-4.webp",
+      "src": "art/openai/hide-and-seek-4.webp?v=54b8bff659ff",
       "alt": "Story illustration: She tip-toed to the pumpkin patch — and there was baby Kieran, giggling! Three friends found."
     },
     {
@@ -278,33 +278,33 @@ window.SPOOKY_PAINTED_ART = {
       "alt": "Story illustration: A-ha! A swishy tail peeked out by the castle door. “Found you, Midnight!” Four friends found!"
     },
     {
-      "src": "art/openai/hide-and-seek-7.webp",
+      "src": "art/openai/hide-and-seek-7.webp?v=8e06ad2bcbf8",
       "alt": "Story illustration: One, two, three, four! Everyone found, everyone giggling. Midnight purred: “Best game ever.”"
     }
   ],
   "candy-monster": [
     {
-      "src": "art/openai/candy-monster-0.webp",
+      "src": "art/openai/candy-monster-0.webp?v=583412362d1f",
       "alt": "Story illustration: One Halloween day, Princess Ellie went for a walk with her mum and her dad. The leaves went crunch, crunch, crunch."
     },
     {
-      "src": "art/openai/candy-monster-1.webp",
+      "src": "art/openai/candy-monster-1.webp?v=81eb58e4f758",
       "alt": "Story illustration: On the way, Ellie met a wizard with a tall pointy hat. “Happy Halloween!” said the wizard. “Something spooky is coming tonight…”"
     },
     {
-      "src": "art/openai/candy-monster-2.webp",
+      "src": "art/openai/candy-monster-2.webp?v=27d137408158",
       "alt": "Story illustration: STOMP! STOMP! STOMP! A big fuzzy monster came into town. He took ALL the candy in town — every basket and every bowl!"
     },
     {
-      "src": "art/openai/candy-monster-3.webp",
+      "src": "art/openai/candy-monster-3.webp?v=0f5000251570",
       "alt": "Story illustration: But superheroes saved the day! Super Jeannie and Super Cory zoomed in with their capes. Whoosh!"
     },
     {
-      "src": "art/openai/candy-monster-4.webp",
+      "src": "art/openai/candy-monster-4.webp?v=867ed6b68222",
       "alt": "Story illustration: They found the candy and gave it all back. Every basket was full again. Hooray!"
     },
     {
-      "src": "art/openai/candy-monster-5.webp",
+      "src": "art/openai/candy-monster-5.webp?v=8bf364b453c0",
       "alt": "Story illustration: The monster came back every Halloween. And every Halloween, the superheroes saved the day!"
     },
     {
@@ -320,11 +320,11 @@ window.SPOOKY_PAINTED_ART = {
       "alt": "Story illustration: But he did not take just one candy. He took the WHOLE basket, for his monster friend!"
     },
     {
-      "src": "art/openai/candy-monster-9.webp",
+      "src": "art/openai/candy-monster-9.webp?v=c671eec7516e",
       "alt": "Story illustration: “Wait!” said Ellie. “I know that tail!” She waved to the superheroes, and the wizard waved his wand. Swish!"
     },
     {
-      "src": "art/openai/candy-monster-10.webp",
+      "src": "art/openai/candy-monster-10.webp?v=99e3ff79e27f",
       "alt": "Story illustration: The candy floated home to every basket. The monster and his friend said sorry, and the whole town shared: one for you, one for me. Happy Halloween!"
     }
   ],
@@ -408,7 +408,7 @@ window.SPOOKY_PAINTED_ART = {
   ],
   "pumpkin-parade": [
     {
-      "src": "art/openai/pumpkin-parade-0.webp",
+      "src": "art/openai/pumpkin-parade-0.webp?v=0c4ab15bc0de",
       "alt": "Story illustration: Every Halloween, the town holds a pumpkin parade. This year, Princess Ellie got to lead it!"
     },
     {
@@ -420,15 +420,15 @@ window.SPOOKY_PAINTED_ART = {
       "alt": "Story illustration: Then three little pumpkins in a wobbly row. How many pumpkins is that altogether? Six!"
     },
     {
-      "src": "art/openai/pumpkin-parade-3.webp",
+      "src": "art/openai/pumpkin-parade-3.webp?v=b7d00bd70029",
       "alt": "Story illustration: Baby Kieran was a pumpkin too, riding in his wagon. Now there were seven!"
     },
     {
-      "src": "art/openai/pumpkin-parade-4.webp",
+      "src": "art/openai/pumpkin-parade-4.webp?v=7d9815015c74",
       "alt": "Story illustration: Boo floated in front, waving a lantern. Midnight the cat marched behind, tail high."
     },
     {
-      "src": "art/openai/pumpkin-parade-5.webp",
+      "src": "art/openai/pumpkin-parade-5.webp?v=b9152ebaccf2",
       "alt": "Story illustration: Around the castle and down the hill went the parade. Everybody clapped. “Hip-hip-hooray for pumpkins!”"
     }
   ],
@@ -506,33 +506,33 @@ window.SPOOKY_PAINTED_ART = {
       "alt": "Story illustration: Ellie twirled and twirled. The dress floated and shimmered. “It's the most beautiful dress in the whole world!”"
     },
     {
-      "src": "art/openai/spider-dress-5.webp",
+      "src": "art/openai/spider-dress-5.webp?v=5dc415d9f905",
       "alt": "Story illustration: At the ball, everyone asked, “Who made your dress?” Ellie smiled. “My friend Silky.” And Silky waved all eight legs."
     }
   ],
   "first-trick-or-treat": [
     {
-      "src": "art/openai/first-trick-or-treat-0.webp",
+      "src": "art/openai/first-trick-or-treat-0.webp?v=82ecd253ab64",
       "alt": "Story illustration: It was baby Kieran's very first Halloween. Princess Ellie held his hand tight. “I will show you how,” she said."
     },
     {
-      "src": "art/openai/first-trick-or-treat-1.webp",
+      "src": "art/openai/first-trick-or-treat-1.webp?v=5c0089689cdd",
       "alt": "Story illustration: At the first house, Ellie knocked. Knock, knock! “Trick or treat!” One candy for Kieran, one candy for Ellie."
     },
     {
-      "src": "art/openai/first-trick-or-treat-2.webp",
+      "src": "art/openai/first-trick-or-treat-2.webp?v=f1b76de3f16d",
       "alt": "Story illustration: At the second house, a jack-o-lantern grinned on the step. Kieran giggled and patted its nose."
     },
     {
-      "src": "art/openai/first-trick-or-treat-3.webp",
+      "src": "art/openai/first-trick-or-treat-3.webp?v=fb677f0c2d52",
       "alt": "Story illustration: At the third house, Kieran said his very first Halloween word. “Twick!” Everyone cheered."
     },
     {
-      "src": "art/openai/first-trick-or-treat-4.webp",
+      "src": "art/openai/first-trick-or-treat-4.webp?v=98125a399c48",
       "alt": "Story illustration: Three houses, three candies each. “Say thank you,” whispered Ellie. “Tank oo!” said Kieran."
     },
     {
-      "src": "art/openai/first-trick-or-treat-5.webp",
+      "src": "art/openai/first-trick-or-treat-5.webp?v=b871f54e8305",
       "alt": "Story illustration: Back at the castle, Kieran fell asleep with a candy in each hand. “Happy first Halloween, baby brother,” said Ellie."
     }
   ],
