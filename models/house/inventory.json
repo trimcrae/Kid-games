@@ -1,11 +1,12 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "beeeb80060124fca7854d7e8ed6d3129c6f9ecc5c89a8e4d58479df7967d7f90",
+  "generator_sha256": "7b160f6ae6d3122412245d171b84311dbdb652d2243fe1b48422244bb12fe4c5",
   "source_files": [
     "build.py",
     "upstairs.py",
     "extensions.py",
     "basement_garage.py",
+    "vehicles.py",
     "yard.py",
     "exterior.py",
     "dressing.py",
@@ -13,8 +14,8 @@
   ],
   "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 8010,
-  "mesh_objects": 6912,
+  "objects": 8118,
+  "mesh_objects": 7020,
   "cameras": [
     "overview",
     "sunroom",
@@ -2720,7 +2721,7 @@
       "name": "Garage black SUV",
       "collection": "36 | Garage vehicles and storage",
       "photos": "W1,W2",
-      "confidence": "simplified parked SUV; no badges or license details",
+      "confidence": "simplified parked minivan; no badges or license details",
       "location_m": [
         -2.0999999046325684,
         4.269999980926514,
@@ -2731,7 +2732,7 @@
       "name": "Garage burgundy SUV",
       "collection": "36 | Garage vehicles and storage",
       "photos": "W1,W2",
-      "confidence": "simplified parked SUV; no badges or license details",
+      "confidence": "simplified parked crossover SUV; no badges or license details",
       "location_m": [
         -4.619999885559082,
         4.050000190734863,
