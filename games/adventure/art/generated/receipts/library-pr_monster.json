@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_monster",
+  "style": "L1",
+  "sourceHash": "2a4b7c9e9cb3cb8e221ec8331f1ffa98cb3bdd1ae8531ff7a1106a19182b2aec",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cffa7e3c-ce62-4d80-95de-4c21e93c14a3.png",
+  "originalSha256": "6fb89376109d7c4ed1f1d02fa995e2b19468ed8a69993de3afbac5affb7b436d",
+  "file": "library-pr_monster.webp",
+  "sha256": "c390dc99ada14e687c8ae0a411f92d250919b9a3a13ca84453fa3c9d9848c203",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reveal a NEW ENORMOUS SHY SEA CREATURE in layered teal paper sea alongside ship. Design: gentle broad rounded TEAL head and long curved neck, enormous watery amber-brown eyes with worried brows, rounded snout, pale mint throat/belly, two tiny fanlike fin-fronds at back of head, two broad front FLIPPERS, long looping aquatic body submerged with two smooth back humps. No horns, wings, legs, claws or tentacles. It shyly hides partly behind hanging SEAWEED strands. SAME copper-red-haired mermaid with mint shelltop and green scaled tail in water gently pats creature's giant nose with ONE hand. Jeannie watching kindly from low ship rail at left, Inkwell in pocket. Monster much bigger than everyone yet timid and sweet. Only those four characters; omit parrot. It is TEAL now; no purple until later friendship scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_mermaid_cove.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_map.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed shy enormous teal long-necked sea creature with amber eyes, mint belly and head fins, seaweed curtain, mermaid patting nose, Jeannie at rail and pocket quill."
+}

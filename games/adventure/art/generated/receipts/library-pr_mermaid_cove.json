@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_mermaid_cove",
+  "style": "L1",
+  "sourceHash": "2e763170a333fe63f230fc51a4f6d683faf5118f1886f33eac946f04e7b578ab",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f58f96ae-4b71-4811-b06d-c834a642c1d4.png",
+  "originalSha256": "9107529e4e20799024bd371b6b5c1e031964ec4e40f5a89ce9493c83685381f7",
+  "file": "library-pr_mermaid_cove.webp",
+  "sha256": "08998a3ca21b437b23f02add520e95e6f8bc8d1067517badddae4372e55dee8f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie kneels on a LOW ROCK beside a sunlit sheltered turquoise cove. A friendly mermaid with long COPPER-RED folded-paper hair, mint shell top and bright GREEN scaled paper fishtail smiles and braids ONE strand of green seaweed into Jeannie's brown hair like a tiny green crown. Mermaid has two arms, both working gently at braid; tail curls into shallow water. Tiny Inkwell in Jeannie's purple dress pocket looks skeptical. A soggy GREEN PARROT sits nearby on rock, dripping and indignant: emeraldfeathers yellowgreenbreast bluewingtips charcoalbeak orangeeyes longgreentail, no clothes. Pink papercoral and shells around pool, warm paper sunlight. Exactly girl/quill/mermaid/parrot, no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed copper-haired mermaid braiding seaweed into Jeannie's hair, green scaled tail and mint shell top, soggy green parrot and pocket quill."
+}

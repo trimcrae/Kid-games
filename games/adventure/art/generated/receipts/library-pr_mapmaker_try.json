@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_mapmaker_try",
+  "style": "L1",
+  "sourceHash": "964b1ded2f8abf1baed49d6bfab4601438bdd8645e5bb7e1ac035949157b2020",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e72d2e4a-eb9b-4cb9-9efd-0a812cfdd737.png",
+  "originalSha256": "e0ecaf48df37b8430e488edda555e3d1afbdb0ff3eb5e2cef564e677d04832c6",
+  "file": "library-pr_mapmaker_try.webp",
+  "sha256": "9492d214dd9f4a7814fa1be8ad25997418a47473c4aeea7cb7329ae7a34c3ea5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Jeannie revises SAME torn barrel map with duck-shaped brown coffee stain, islands and one red X. She writes clearly 'Quack Island' beside duck stain with one small plain feather pen in her hand. ONE expressive tiny Inkwell floats by inkpot looking delighted and proud, distinguish him from ordinary faceless writing feather. SAME three pirates cheer behind her: crumbbeard redcoat, curlyhair tealvest twohats, redhair stripedshirt woman. Map prominent foreground, neater bays and routes. Exactly two Jeannie arms.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_map.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_crew.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Quack Island label beside duck coffee stain, one red X, ordinary writing feather distinct from proud Inkwell, three cheering pirates."
+}

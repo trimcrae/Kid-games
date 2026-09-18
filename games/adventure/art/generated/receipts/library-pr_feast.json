@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_feast",
+  "style": "L1",
+  "sourceHash": "003e851399734a0095ff366d41e9ffc3cd5b5ab8396b8f71b072bc5e0cbf22c7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-355b1c4e-3140-448b-bfb5-36cc17704296.png",
+  "originalSha256": "48fccf4df936f5f683fe2b6fc027f2a26d251866f7f0852ec7dc28d09bc6861e",
+  "file": "library-pr_feast.webp",
+  "sha256": "3d2da0a817fc2eaab131bbf84a3898d79d6bf885d2ae8b1d8bbdee39abf876c9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same three adult pirates: round crumbbearded redcoat man; lanky curlyblackhair tealvest man; freckled redhaired blue/cream stripedshirt woman. NEW captain's feast on deck under sunset lanterns. Jeannie wearing SAME navy/gold tricorn with cream decorative feather sits at feast table of PICKLES, sea-biscuits and EXACTLY ONE suspicious wobbling green JELLY. Reginald the grey teal purple pigeon now on a small barrel beside table making pompous speech. EXACTLY TWO pirates asleep STANDING upright at rear: redcoat man and tealvest two-hatted man, eyes closed heads drooping. Redhaired woman does wobbly jig beside them. Tiny Inkwell sits nib-first in ONE SILVER THIMBLE full of fresh water ON THE TABLE, feather/face sticking out giving toast; no quill in pocket. Exactly four people, one pigeon, one quill. No extra jelly.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_captain_try2.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed feast of pickles, biscuits and one jelly; two male pirates asleep standing and red-haired pirate dancing; hat-wearing Jeannie, pigeon speech, Inkwell in water thimble."
+}

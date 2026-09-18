@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_follow_x",
+  "style": "L1",
+  "sourceHash": "26319ef622e81f5bc47797a0bccf10aa1c1769b956c32cc9cfc65bc5b44e17bd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-95a7de10-e294-41f0-b4e8-d2804eb4fbef.png",
+  "originalSha256": "c0a90a33cdc3186823eb4013020b2d25936572d46b27fd5d10f7ec3ef923a2b8",
+  "file": "library-pr_follow_x.webp",
+  "sha256": "1fdc7338602ea57a85b05e815c1b86d060050bc40a42b0a1ff720214cdcbf5a2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Targeted edit: REMOVE the human redcoat crumbbearded pirate captain standing between Jeannie and green parrot. In his place put ONE plump grey paper PIGEON Sir Reginald sitting on the ship rail at normal bird scale, cream-grey breast, teal and purple layered neck feathers, orange beak, red feet, smug puffed chest, NO hat/clothes. Use second reference for this pigeon's exact design only. Preserve Jeannie holding map with red X, her pocket Inkwell, green parrot, exactly two blue dolphins, ship, sea, lighting and landscape composition. Do not add any other people, animals, props or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-b593adc0-a23c-44ce-8d06-89c506aa2673.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_captain_try.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected pigeon replacing human captain; Jeannie and map red X, green parrot, exactly two leaping blue dolphins."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_grumble",
+  "style": "L1",
+  "sourceHash": "4ff9118bc280b0d6b49ade936760457fae4cb869a84a713ad1fe91a6ef6f433a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d58b2878-cbee-4b5b-8667-f4f53ae6306d.png",
+  "originalSha256": "037609425b97ed189479f26c378559db0b6155ead8d1f1be585fbe4a79d1c2bd",
+  "file": "library-pr_grumble.webp",
+  "sha256": "604501cd5ab51eaf356a6286b50b5d02f27a7b315ebf99c50f69fb2eeaf7b411",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same three adult pirates: round crumbbearded redcoat captain navygold hat; lanky curlyblackhair tealvest pirate with TWO stacked hats navytricorn plus burgundy top hat; freckled redhaired stripedshirt woman. NEW uneasy but child-friendly deck scene: Jeannie at rail with tiny brave trembling Inkwell in pocket; three adult pirates clutch each other behind her. Reginald plump grey/teal/purple pigeon comically crouches directly behind ONE THIN VERTICAL ROPE stretched from rail to rigging, far too narrow to hide him. Ocean outside ship bulges in one broad smooth swell with a huge VAGUE shadow beneath opaque dark teal paper water. Creature NOT YET visible, no face, eyes, horns, tentacles or animal silhouette. Late afternoon blue-grey cloud light, warm lantern, anticipation.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_captain_try.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed fearful crew huddled, Reginald behind single thin rope, brave quill and giant smooth water swell with indistinct submerged shadow, no creature reveal."
+}

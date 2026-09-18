@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_chest",
+  "style": "L1",
+  "sourceHash": "3810050470b3071cb05b143c07b03e80bb4c62c3d54eb925eff2b3439dc89eb3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-193b28b9-967a-4fa5-9704-5ed0117205fc.png",
+  "originalSha256": "e85fe9cd56fe2bee886340389c5175dfa9ce18f2009027255c24cac7be9e6caa",
+  "file": "library-pr_chest.webp",
+  "sha256": "a910f9d3aec261518212f8f0deff2b790d1c9bed12c0d048412a05754c76a84e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  NEW chest OPENING scene, same barnacled dark oak/brass roundedlid chest now OPEN on deck. Inside clearly visible ONLY heap of softly GLOWING PEARLS, ONE brass SPYGLASS and ONE rolled BLANK MAP partly unfurled showing pristine empty paper. Jeannie kneels beside chest, right hand turns ONE RUSTY KEY in front lock, left hand holds lid up. Same green parrot on chest rim huffs about borrowed key; same grey teal purple Reginald on deck beside chest looks disappointed by lack of snacks. Tiny Inkwell pocket. NO gold coins, food, extra keys, extra arms or monster; warm sunset magical pearl light.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_monster_treasure.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_parrot.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed same barnacled chest opened by one rusty key, glowing pearl heap, one spyglass and one blank map, parrot and disappointed pigeon; two girl arms."
+}

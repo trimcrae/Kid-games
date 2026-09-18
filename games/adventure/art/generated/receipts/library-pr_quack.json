@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_quack",
+  "style": "L1",
+  "sourceHash": "14727c9286af286708a86b1430fafd2871a9d6b6f526d1c81c4f203fe73c014f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ca6461d5-0192-4337-86c4-73c1d9dd0a5e.png",
+  "originalSha256": "3b98b42b401c4bc77083fb74065bfd8b2857d2c76a051c0cf4edae2d72c0d344",
+  "file": "library-pr_quack.webp",
+  "sha256": "9e62302d74c0bc69a98e956d08dc94064751209b0e413e11f19bff837d40ef86",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie has landed on a warm GOLDEN BEACH on Quack Island, kneels and shows an open hand-drawn MAP to a grumpy-but-now-touched RED CRAB. Crab has two broad red pincers, SIX short walking legs, tall eyes on stalks, round paper shell, holding a tiny rectangular wooden CLIPBOARD with one pincer. Map clearly shows duck-shaped island outline and a small rock labelled 'Snack Rock'; top label 'Quack Island'. Crab has happy tears admiring his home. Tiny Inkwell in Jeannie's dress pocket. Behind: one smooth snack rock, pink papercoral, tidepool, sandcastle missingclipboard, turquoise layered waves. Only girl/quill/crab, no people in distance.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Quack Island and Snack Rock labels, happy crying red crab with clipboard, six short legs and two pincers, beach landmarks and pocket quill."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_end_captain",
+  "style": "L1",
+  "sourceHash": "4daf8837416e6163ce51c2ef17f3e1b52cbf875e3f7aee5c42c4f969c7bfcdf7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ccc421cc-9c18-4a66-bab5-01dc477773f9.png",
+  "originalSha256": "146abec3804d935bdda4cab2f8dd4bf924aa1090c82e230d9b08fd2158ef650d",
+  "file": "library-pr_end_captain.webp",
+  "sha256": "237f3453eb0649f41ca56b0a3a292bf97a1c3d7abcca4b1c8459a6e584da6239",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Correct ONLY the green parrot beside Reginald on the helm rail, matching the second reference's established parrot design: dark CHARCOAL hooked beak (not yellow), emerald green feather head/back, yellow-green breast, distinct BLUE wing tips, charcoal grey claws and long green/blue tail. Keep the parrot happy cheering with one wing raised, normal bird size. Preserve all other characters, Jeannie hat and two hands at wheel, pocket Inkwell, pigeon, purple sea creature, three crew, sunset, paper medium and landscape composition. Do not change anything else.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-5a618d5d-7dfd-4f18-a2fe-8a3b45a0eb9f.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_parrot.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected parrot charcoal beak and blue wing tips, Jeannie captain hat and steering hands, cheering crew, proud Reginald, pocket Inkwell, purple guide and golden sunset."
+}

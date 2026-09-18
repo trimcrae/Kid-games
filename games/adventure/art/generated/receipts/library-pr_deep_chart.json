@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_deep_chart",
+  "style": "L1",
+  "sourceHash": "5327781f07efcc593e246611de5697a0ef77b8b39babf3f7eec91152a12125ca",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-bed3dce2-e997-4ec1-abfb-6599668457d1.png",
+  "originalSha256": "badf6652d2745701efd30d72eee61f8ea64949418f74058826a0377cfead2ed2",
+  "file": "library-pr_deep_chart.webp",
+  "sha256": "e843badc8ef91889028aac975c8190b81967b8333d9b20fb22ca11041ceb3ac9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. Jeannie studies clear blue water from a broad low ship rail and draws a sea chart on parchment resting on a nearby barrel. A school of small SILVER-BLUE paper FISH swims in a curved path AROUND dark hidden submerged rocks, revealing obstacles below. Her map mirrors the fish's curved route around the rocks. Tiny Inkwell hovers beside chart with amazed grumpy face, a small plain spare feather pen in Jeannie's hand for sketching. Distinguish single living Inkwell from simple faceless writing feather. Only Jeannie/quill and fish; no other adults. Warm sunlight on wooden deck, layered transparent paper water and rocks.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed fish route around submerged rocks mirrored on map, plain writing feather distinct from one expressive floating Inkwell, two-arm Jeannie."
+}

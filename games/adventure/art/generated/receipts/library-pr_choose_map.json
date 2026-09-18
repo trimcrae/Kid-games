@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_choose_map",
+  "style": "L1",
+  "sourceHash": "c6555fef10d0e351725d422542bdc8a17a357efb693a541b09028eca9a2de388",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-48b78af7-4508-40bf-ab61-b73fe9ab38c8.png",
+  "originalSha256": "0cfa9f6a0315574b71bf375010581a2046d4d4d8123e7f8e41135eb2d65f09c4",
+  "file": "library-pr_choose_map.webp",
+  "sha256": "4a211c5829b298a610e9672f503a1ffac8ed052d33dc249428c899c7744069f8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same three adult pirates: round crumbbearded redcoat man; lanky curlyblackhair tealvest man; freckled redhaired blue/cream stripedshirt woman. SUNSET alternate decision scene: Jeannie spreads ONE entirely BLANK MAP across barrel with TWO hands, its cream surface empty and ready for invention. Three same pirates lean in fascinated, curlyhair man wears TWO stacked hats, redcoat captain his navy hat. One tiny expressive Inkwell hovers above map smiling proudly. Over low rail same gentle PURPLE sea creature leans close whispering secrets, only head/neck outside ship, same amber eyes/head fins. Pink paper CORAL visible in water below rail with few gold music notes. No mermaid or other birds, no ordinary feather pen yet, no labels or drawings on this still-blank map.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_mapmaker_try.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_monster_friend.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed fully blank map spread on barrel, two visible crew lean in, same purple creature whispering, coral/music notes and one delighted floating Inkwell."
+}

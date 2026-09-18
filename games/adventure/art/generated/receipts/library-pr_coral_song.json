@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_coral_song",
+  "style": "L1",
+  "sourceHash": "bb99c1b40716c9e0507a305337bb1f26e09c9a979c1f4efa1d739d36b062b3ac",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0cd0c9c4-2b5c-4b07-b92d-08a4dc2f0bd7.png",
+  "originalSha256": "d0982c81e8b2799d101f65cdb691105868282553769cbbfae77974ed53205895",
+  "file": "library-pr_coral_song.webp",
+  "sha256": "bcabd8909df09c5b7251daa0113d8a4aa52a83029372a20552d2e43ab8ca4908",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only the distant cave at upper right: remove the entire octopus/monster silhouette and its glowing eyes. Replace it with a quiet empty shadowed paper-rock cave with dark blue water. No creature or creature-shaped shadow is visible anywhere. Preserve everything else exactly: Jeannie, Inkwell, singing coral, music notes, map, paper style, composition and full landscape dimensions.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-3a91f4aa-15a6-41eb-baf4-7f1320f46682.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected empty cave without premature creature reveal; singing coral, music notes tracing shallow-to-deep water, map and one floating quill."
+}

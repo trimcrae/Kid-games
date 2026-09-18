@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_island_market",
+  "style": "L1",
+  "sourceHash": "e0aebfa428ca5d7a25806b30d647046935a771ba8517c1c6a88c6c19080cbb21",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-80cb2d3e-3b5e-424f-9fc6-9312b1cbfdd1.png",
+  "originalSha256": "0cb37cce0262df275fe8d8abb93d0004860b4a637e304902e6cea3ffbffc328b",
+  "file": "library-pr_island_market.webp",
+  "sha256": "18fea4ac936431835c5084e68b5b17ca6aa065620f3370fb1fb3c36fb9cd5481",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Quack Island golden beach now has a TINY SEASHELL MARKET run entirely by cheerful crabs at three shell-roof stalls. Jeannie exchanges ONE smooth grey pebble from her right hand for a paper 'map' in her left: comical drawing of handsome crab posing, no geographical map. Vendor same round red crab morphology but wears little purple apron; clipboard crab from reference not needed. Other two crab vendors trade pebbles beside seashell baskets; all crabs have two pincers six short legs two eye stalks. Inkwell in dress pocket. Only girl, quill and THREE crabs. No other people. Warm whimsical island bazaar.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_quack.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three crab vendors, smooth pebble exchange for handsome crab doodle, purple apron, shell market and pocket quill."
+}

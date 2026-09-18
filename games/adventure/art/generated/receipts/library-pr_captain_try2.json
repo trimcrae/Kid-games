@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_captain_try2",
+  "style": "L1",
+  "sourceHash": "237dc4073a90d8fb25c24a8f49492e492bd73d3cac51f9feacc260e85eeffdd7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a61a3f66-d8a9-414c-a7ac-6617521abb69.png",
+  "originalSha256": "201dab559338b08ca3115e5c29adc40853562a75f7f82aa7d81bd0c12fcd8381",
+  "file": "library-pr_captain_try2.webp",
+  "sha256": "de2ab3a96b81781270a869fe8db4d30bef1085159e646c27acbec11a5b0d29d5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same three adult pirates: round crumbbearded redcoat captain navygold hat; lanky curlyblackhair tealvest pirate with TWO stacked hats navytricorn plus burgundy top hat; freckled redhaired stripedshirt woman. Sunset, the crew carries Jeannie joyfully HIGH ON THEIR SHOULDERS, supporting her seated securely across the shoulders of the two men, woman cheering beside them. Girl has EXACTLY TWO arms and two legs, wears a fine new NAVY TRICORN HAT with GOLD trim and ONE CREAM decorative feather. SAME plump grey/teal/purple Reginald pigeon perches on hat BRIM, not a second hat. A little cold sea spray spatters tiny Inkwell who shrieks from her dress pocket. Broad happy composition, no other people or birds.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_captain_try.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Jeannie carried on crew shoulders wearing navy/gold cream-feather captain hat, Reginald on brim, cold spray and shrieking pocket Inkwell, two arms/two legs."
+}

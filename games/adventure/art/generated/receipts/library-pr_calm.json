@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_calm",
+  "style": "L1",
+  "sourceHash": "4fb8c34096ff6307d66f07b5c296b223458196dbc565fd2d73bd7fde788e9134",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-053c713f-6932-45c1-8bb5-21b89d5645d7.png",
+  "originalSha256": "ba061c95f06d604e0507faeeb4e6fd6d772e2c29a98bb48294c3054d9497e534",
+  "file": "library-pr_calm.webp",
+  "sha256": "10666f19e9def35ef78301daf9c61396edba1f3c5f2d2edd1b793b78ce57e0fa",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same three adult pirates: round crumbbearded redcoat man; lanky curlyblackhair tealvest man; freckled redhaired blue/cream stripedshirt woman. MORNING AFTER storm, calm shining mirror-smooth paper sea, warm clear sunrise. Jeannie at same wooden steering wheel, damp brown hair now settling, pleased. Same three pirates CLAPPING her safe steering; soggy green parrot on rail pompously claiming credit. EXACTLY ONE friendly blue dolphin surfaces just outside rail and smiles up at Jeannie. Tiny Inkwell now in her dress pocket, dry, no teacup needed. No Reginald in this scene, no rain, no huge waves. Boat steady, gentle reflection of sun.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_storm.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_follow_x.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed morning mirror-calm sea, three applauding crew, Jeannie steering, one surfaced blue dolphin and green parrot, pocket quill."
+}

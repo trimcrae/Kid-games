@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_dolphins",
+  "style": "L1",
+  "sourceHash": "982ff49c10418e143b35366586d5705e04347fbd70e3389d321e03c1d4dd75c9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6eb06e1c-f978-4891-ab8c-5d00432b0025.png",
+  "originalSha256": "2ae93d9cb6118747109f88a2feab5e7d859ac08e0dbd82e7e798d5258bdc230f",
+  "file": "library-pr_dolphins.webp",
+  "sha256": "7c91845f20324bc7812554ccb9bf856f83ee23ab3af8bdda17c02661eedf16d0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  NEW close bow-side scene from slightly above. EXACTLY TWO same friendly blue paper dolphins with pale bellies gently NUDGE the wooden bow, both pointing their snouts toward a darker SHADOWY PATCH of gently shivering water at right. Jeannie leans inside rail translating their whistles with compassionate expression, one hand gestures toward shadow. Tiny Inkwell in pocket. Same soggy green parrot sits beside her trying an exaggerated awkward grin like dolphins. ONLY girl/quill/parrot/two dolphins; omit Reginald. Creature still invisible, shadow abstract patch underwater without eyes or outlines, bright ocean with paper ripples.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_follow_x.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly two dolphins nudging bow toward abstract shadow patch, Jeannie translating and parrot's exaggerated grin; no premature creature reveal."
+}

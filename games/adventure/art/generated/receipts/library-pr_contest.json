@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_contest",
+  "style": "L1",
+  "sourceHash": "50d38f154247315d7fd9d5d45d5b835b728352d4e792b1eca1c0fbc63501201c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5893c771-8401-4baf-bfa5-65996677a4d9.png",
+  "originalSha256": "105048c71c54ba4b93f337f0adc0a3d464f0d94c0ffe0fe90174bd2684c94ef7",
+  "file": "library-pr_contest.webp",
+  "sha256": "77be0ed404b7ce7729e617e234f7f8a914cc1abbfd194decf28c3a4434ddbad4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  SAME Sir Reginald pigeon from second reference: plump blue-grey layered feather body, cream grey breast, teal and purple neck, orange beak, red feet. Only a pigeon, no clothes or actual monocle. Do not bring forest animals into this ship scene. Under melting ORANGE SUNSET on ship deck Jeannie kneels finishing ONE big neat bow knot in thick rope. Both hands on the bow. Reginald sits smugly ON a loose length of same rope at right, no bow covering him. Three established pirates cheer in background, tiny Inkwell peeks from dress pocket deadpan. Show knot clear foreground, no duplicate girl or pigeon.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_crew.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_pigeon_recruit.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed orange sunset knot contest, neat bow with Jeannie's two hands, Reginald claiming the rope, three cheering crew."
+}

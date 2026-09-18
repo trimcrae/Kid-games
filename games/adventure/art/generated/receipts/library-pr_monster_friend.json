@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_monster_friend",
+  "style": "L1",
+  "sourceHash": "2090b1ee4af1f2f10b7f26b1bcf61a0b255dd7d832517231d9dd49c0340c51c2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a6fa36bc-306f-47fc-8d78-eb8f15549842.png",
+  "originalSha256": "1f890925b950d3f76e14bf46db7eb1a674926f91908bc7509c35de77b876437c",
+  "file": "library-pr_monster_friend.webp",
+  "sha256": "27f608238fb85dabb47140a0cc1c4083db99ace158f67cf346b30eb3814ade1b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same huge shy sea creature now has whole body glowing HAPPY PURPLE, including head, long neck and rounded back humps; pale lavender belly and same amber eyes, two fanlike head fins. In sunset light it smiles and gives a TINY CAREFUL CLAP with its TWO broad purple front flippers together at chest level. Jeannie at low ship rail offers a wooden plate with PICKLES and CRACKERS, delighted. Same copperhaired green-tail mermaid smiles in water beside it. Tiny Inkwell floats beside Jeannie and bends tip of OWN cream feather down to dab a tear at his little face; no arms, no handkerchief, no feet. Calm barely rippling paper water, tender friendship, no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_monster.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed same creature now glowing purple and carefully clapping two flippers, pickle/cracker plate, mermaid and tearful Inkwell."
+}

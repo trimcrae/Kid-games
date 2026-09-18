@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_captain_try",
+  "style": "L1",
+  "sourceHash": "47a1e114abdc9ccb97d67c9ff898e7faa8959a6ee1ca21d141d5f9528cb68459",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-da89edf2-7308-4175-afa8-5b2645a00381.png",
+  "originalSha256": "24cec5c7d3a5d44a31a5de3f91c719f9d7628408059ebb97225f026b1db346cb",
+  "file": "library-pr_captain_try.webp",
+  "sha256": "3ccef30d8a6c784a413f3cf0c095dbf0fd30c65c46d55aa80785ef1ce1c32d97",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  On the ship's sunny deck Jeannie is about to climb an old barrel, but SAME Sir Reginald pigeon from second reference: plump blue-grey layered feather body, cream grey breast, teal and purple neck, orange beak, red feet. Only a pigeon, no clothes or actual monocle. Do not bring forest animals into this ship scene. Reginald has landed proudly ON TOP of barrel, puffing chest and holding one wing near his eye as if adjusting an INVISIBLE monocle. Jeannie pauses with amused surprise on deck beside barrel, one hand at rim. SAME three established pirates watch, thrilled and bemused: round crumb-bearded redcoat captain, lanky tealvest curlyhair pirate with exactly two stacked hats, red-haired stripedshirt woman. Inkwell in dress pocket. No parrot necessary.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_crew.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_pigeon_recruit.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Reginald on barrel miming invisible monocle, Jeannie paused beside it, same three pirates and pocket quill."
+}

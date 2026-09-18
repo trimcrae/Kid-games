@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_monster_treasure",
+  "style": "L1",
+  "sourceHash": "7245abb1ce81a4f9a3deb3ca320e7b454140e37b7aed20b01a65bc11186e0f2b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-391a58d8-edef-4515-af6c-9f42c1fa7c77.png",
+  "originalSha256": "518e5c0a5713e2b6180e63a3bc4251e1a9370d10568524c8e3acaecbe0e183a6",
+  "file": "library-pr_monster_treasure.webp",
+  "sha256": "00134a86a9c69a97737d80097ca487532dabb0e8353785a1a84427ac32e5036f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same enormous TEAL sea creature gently places ONE CLOSED barnacle-covered wooden treasure chest onto ship deck with its two broad front flippers, one supporting underside one steadying side. Chest medium dark oak rounded lid, brass metal straps, rusty central keyhole latch, white barnacle clusters and trailing seaweed, water dripping. Same plump grey/cream/teal/purple pigeon Reginald lands on top of chest ready to sit and claim nest. Jeannie watches with hands clasped delighted, tiny Inkwell in pocket. Only girl, quill, pigeon and teal monster; no mermaid/crew. Composition chest foreground, gentle giant head above rail, warm sea daylight. Chest stays CLOSED.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_monster.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_captain_try.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed closed oak/brass barnacled chest lowered by two teal flippers, Reginald claiming lid, delighted Jeannie and one pocket quill."
+}

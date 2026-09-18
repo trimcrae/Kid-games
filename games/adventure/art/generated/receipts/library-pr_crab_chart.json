@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_crab_chart",
+  "style": "L1",
+  "sourceHash": "047ddde35e073e4a5d09adac7baf10f9cf4ecf94fed7b79046db80a1ac28f8d9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-544a5a00-2df5-40de-9ef6-c956c4c476d1.png",
+  "originalSha256": "6d709aa9154a6946e51a5f5122d42fbe0ca8261606da4761891d0e51dcd2c74b",
+  "file": "library-pr_crab_chart.webp",
+  "sha256": "804112131e48927ed6cd7605fe65dce7ed63addc23b981f7cd2aab721fbd8f15",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Same sunny Quack Island beach, clipboard crab now pins ONE tiny SEASHELL medal on Jeannie's purple dress with one pincer, other pincer holds clipboard. Jeannie kneels appreciatively holding unfolded completed little map in two hands at lap. On map clearly label 'Snack Rock', 'Good Tide-Pool', 'That One Stick He Likes' with simple drawings respectively of rock, tidepool, single stick. Actual small snack rock, clear tidepool and ONE ordinary favorite stick nearby. Tiny Inkwell peeks from pocket. Same red crab with two pincers and six short legs, two eye stalks; only three characters. No new creatures or mermaid.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_quack.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three correct map labels and drawings, one favorite stick nearby, crab pinning shell medal with one pincer and holding clipboard with the other."
+}

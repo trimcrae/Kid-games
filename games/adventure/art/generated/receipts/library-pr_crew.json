@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "pr_crew",
+  "style": "L1",
+  "sourceHash": "a6161ba6f0ce6979b3b0089a71d65a2c6d46b73962719118b1e67003bbea12c4",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5dc9b2a5-86a7-4ca8-a179-7b2153c9b8b8.png",
+  "originalSha256": "d545fd67e638cac4c7fccf72df84d485d834da7648177d2af1cf15c888a3a96f",
+  "file": "library-pr_crew.webp",
+  "sha256": "c1a3e3233e596617da76a28a4e9a66c68da10adda4c4dd9de51ba0b6b18fcf6a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions. NEW scene on same wooden pirate ship deck with cream folded-paper sails, rope rigging and layered teal sea. Jeannie meets silly crew: SAME round crumb-bearded pirate captain redcoat/navy-gold tricorn from ref; ONE lanky brown-skinned pirate with curly black paper hair and teal vest over cream shirt wearing EXACTLY TWO hats stacked, a navy tricorn with a small burgundy top hat on it; ONE freckled red-haired woman pirate with short bob, blue-and-cream striped shirt, brown trousers, tugging hopelessly at a stubborn knot of rope. A SOGGY GREEN PARROT flaps down dripping on them: emerald layered feathers, yellow-green breast, blue wingtips, charcoal hooked beak, orange eyes, long green tail, no clothes. Tiny Inkwell peeks angrily from Jeannie's dress pocket. Establish these three recurring adult pirates and parrot, exactly four people including Jeannie. Lively warm sunny paper scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-pr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed four people, captain's crumb beard and red coat, lanky pirate's two stacked hats, red-haired pirate tugging knot, dripping green parrot, pocket quill; cohesive paper materials."
+}
