@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {createSky} from './sky.mjs';
+import {createSky} from './sky.mjs?v=20260918-sky';
 // (The same URL as walkthrough.js, so both share one copy and its uniforms.)
 import {FOLIAGE,EXTERIOR} from './materials.mjs?v=20260916-light';
 
@@ -34,18 +34,22 @@ export function choosePracticalLights(lights,position,occluders,limit=4){
 // day, dusk, night). Every phase uses the same lights, so switching never
 // recompiles a shader; only colours, intensities and the sun move.
 // sun: [azimuth offset from the exported sun (rad), elevation (rad)].
+// clouds: [lit side, shaded side]; stars: how bright the star field shows;
+// moon: after dark the "sun" is the moon and the sky draws it as one.
 export function phaseForHour(h){return h<6||h>=20?'night':h<8?'dawn':h>=18?'dusk':'day';}
 export const PHASES={
   dawn:{sun:[-1.1,.28],sunColor:'#ffcf9e',sunI:2.4,hemiSky:'#f1e4dc',hemiGround:'#7c6857',hemi:.5,
-    practical:2,emissive:1.2,shadeGlow:.3,leafFill:.02,windows:.15,pet:.9,sky:['#86a3d6','#f6d2b2','#6f7a62'],glow:1,exposure:1.08},
+    practical:2,emissive:1.2,shadeGlow:.3,leafFill:.02,windows:.15,pet:.9,sky:['#86a3d6','#f6d2b2','#6f7a62'],glow:1,exposure:1.08,clouds:['#ffd9bf','#9d8ca8'],stars:.2},
   day:{sun:[0,.72],sunColor:'#ffe6c4',sunI:4,hemiSky:'#eef2fb',hemiGround:'#8a7560',hemi:.78,
-    practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#6fa8dc','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1},
+    practical:2.1,emissive:.7,windows:0,pet:.55,sky:['#5c9bd8','#d6e8ef','#8d9a78'],glow:.6,exposure:1.1,clouds:['#ffffff','#a9b9c9'],stars:0},
   dusk:{sun:[1.25,.2],sunColor:'#ffa866',sunI:2,hemiSky:'#c7b2c4',hemiGround:'#5c4636',hemi:.34,
-    practical:1.15,key:.95,keyCone:.9,petReach:[.5,3.6],warmth:.2,exteriorDim:.6,indoorFloor:.45,indoorSky:'#9296bc',indoorGround:'#5a4632',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04},
+    practical:1.15,key:.95,keyCone:.9,petReach:[.5,3.6],warmth:.2,exteriorDim:.6,indoorFloor:.45,indoorSky:'#9296bc',indoorGround:'#5a4632',emissive:1.7,shadeGlow:.8,leafFill:.05,windows:.35,pet:.9,sky:['#6c83c4','#f6c08a','#5a5a4a'],glow:1.4,exposure:1.04,clouds:['#ffc39c','#7b6b8f'],stars:.3},
   night:{sun:[2.6,.9],sunColor:'#a9bbff',sunI:.3,hemiSky:'#4a5a88',hemiGround:'#2a241c',hemi:.34,
-    practical:1.05,key:1.05,keyCone:.75,petReach:[.6,3.8],warmth:.4,exteriorDim:.3,indoorFloor:.4,indoorSky:'#5e70b4',indoorGround:'#3a3024',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.25,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1},
+    practical:1.05,key:1.05,keyCone:.75,petReach:[.6,3.8],warmth:.4,exteriorDim:.3,indoorFloor:.4,indoorSky:'#5e70b4',indoorGround:'#3a3024',emissive:2.3,shadeGlow:1.3,leafFill:.09,windows:1,pet:1.25,sky:['#1c2547','#3a4a78','#161a22'],glow:0,exposure:1.1,clouds:['#3b4568','#141a2c'],stars:1,moon:1},
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
+// Cloud cover (0 clear .. 1 blanket) and drift speed for the game's weather.
+const CLOUDS={sunny:[.38,1],cloudy:[.84,1],rainy:[.97,1.6],snowy:[.93,.8],windy:[.52,3]};
 // Day-bake weight per phase (the rest is the night bake).
 const BAKED_DAY={day:1,dawn:.6,dusk:.4,night:0};
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
@@ -74,7 +78,7 @@ function skyEnvironment(pmrem,size){
   const target=pmrem.fromEquirectangular(texture);texture.dispose();return target;
 }
 
-export function createHouseLighting(scene,renderer,{mobile=false,camera=null,petLight:withPetLight=true}={}){
+export function createHouseLighting(scene,renderer,{mobile=false,camera=null,petLight:withPetLight=true,reducedMotion=false}={}){
   renderer.shadowMap.enabled=true;
   // Measured: PCF and PCFSoft cost the same here; keep the softer sun edge.
   renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -116,7 +120,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   const petLight=new THREE.PointLight(0xffe2c2,0,2.8,2);if(withPetLight)scene.add(petLight);
   for(const light of [hemisphere,sun,key,...fills,petLight])light.layers.enable(1);
   const slots=[key,...fills].map(light=>({light,source:null,target:0}));
-  const sky=createSky(scene);
+  const sky=createSky(scene,{reducedMotion});
 
   // 64-px probes: only small glossy things reflect now, and a capture on
   // entering a room costs ~10 ms less than at 128 px.
@@ -182,7 +186,13 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     const [top,horizon,ground]=phase.sky;
     warm.set(top);cool.set(horizon);
     if(overcast){warm.lerp(new THREE.Color('#9aa6b4'),.6);cool.lerp(new THREE.Color('#d3d7da'),.5);}
-    sky.set({top:'#'+warm.getHexString(),horizon:'#'+cool.getHexString(),ground,sun:dir.clone().negate(),sunColor:phase.sunColor,glow:overcast?0:phase.glow});
+    // Clouds: the phase colours them, the weather decides how much sky they
+    // cover; a grey day also greys the lit side so they read as one blanket.
+    const [cover,drift]=CLOUDS[weather]||CLOUDS.sunny,[lit,shade]=phase.clouds;
+    const cloudLit=new THREE.Color(lit),cloudShade=new THREE.Color(shade);
+    if(overcast){cloudLit.lerp(new THREE.Color('#c9ced4'),.55);cloudShade.lerp(new THREE.Color('#7f868f'),.4);}
+    sky.set({top:'#'+warm.getHexString(),horizon:'#'+cool.getHexString(),ground,sun:dir.clone().negate(),sunColor:phase.sunColor,glow:overcast?0:phase.glow,
+      cloudLit:'#'+cloudLit.getHexString(),cloudShade:'#'+cloudShade.getHexString(),cloudCover:cover,cloudDrift:drift,stars:(phase.stars??0)*(1-cover*.8),moon:phase.moon??0});
     if(scene.background?.isColor)scene.background.copy(cool);
     if(scene.fog)scene.fog.color.copy(cool);
     renderer.toneMappingExposure=baseExposure*phase.exposure;

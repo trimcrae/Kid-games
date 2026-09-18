@@ -3,7 +3,8 @@ import {WalkingWorld,Body} from './physics.mjs?v=20260916-use2';
 import {createHouseLife} from './house-life.mjs?v=20260918-petpet';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
-import {createHouseLighting} from './lighting.mjs?v=20260916-light';
+import {createHouseLighting} from './lighting.mjs?v=20260918-sky';
+import {createJungle} from './jungle.mjs?v=20260918-sky';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs?v=20260916-use3';
@@ -103,7 +104,7 @@ try {
   boot.fail(error,$('loading').textContent);
   throw error;
 }
-const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0'});
+const lighting=createHouseLighting(scene,renderer,{mobile:matchMedia('(pointer:coarse)').matches,camera,petLight:query.get('petlight')!=='0',reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches});
 if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 // Baked bounce light: ?bakegain= scales it and ?bakemix= sets how much of the
 // ambient it replaces (QA). ?phase=day|dawn|dusk|night and ?weather= pin the
@@ -152,6 +153,9 @@ function standingOn(){
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 // The follow camera: on the player's own sightline, walls only shorten the boom; see camera-guard.mjs.
 const followRig=createFollowRig({reducedMotion});let arrivalYaw=null;
+// The rainforest beyond the fences, the ground under it and the hills on the
+// horizon (jungle.mjs). Built now so its two shaders compile with the house's.
+const jungle=createJungle(scene,{reducedMotion});
 
 // Every way of putting the pet somewhere new — a jump, a family switch, a
 // reload or an imported save — comes through here, so the camera, room name
@@ -642,7 +646,7 @@ async function load(){
       get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
       airborne:!!body?.airborne,verticalSpeed:body?.vy??0,jumps:body?.jumps??0,standingOn:standingOn(),
       map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),interactions:interactions?.state??null,
-      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,framesDrawn,bakedLight:baked?{vertices:baked.bakedVertices,blend:bakedLight.houseLightBlend.value.toArray()}:null,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
+      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,framesDrawn,bakedLight:baked?{vertices:baked.bakedVertices,blend:bakedLight.houseLightBlend.value.toArray()}:null,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,jungleTriangles:jungle.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     boot.fail(error,$('loading').textContent);}
 }
