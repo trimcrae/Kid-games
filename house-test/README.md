@@ -23,6 +23,9 @@ steers in the air so a kid can aim at the cushions. Walking off the edge of the
 table it climbed drops it back to the floor; it will only walk off a drop of up
 to 1.2 m of its own accord, and a jump won't carry it over a storey-high drop,
 past the edge of the lawn or through a seam in the exported floor.
+A petpet trots at the pet's heel but jumps and lands a beat after it, with
+its own take-off and landing squash and quicker steps (`petpet-follow.mjs`,
+`tests/house-petpet-follow.mjs`); a moth, wisp or starling drifts up after it.
 `models/house/test_walkthrough.mjs` replays those hops against the real
 colliders at the same 30 fps the browser runs.
 

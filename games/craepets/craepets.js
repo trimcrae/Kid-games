@@ -1553,7 +1553,10 @@
   /* =========================================================
      LITTLE REACTIONS — the pet hops, hearts float up.
      ========================================================= */
-  function hop(frames) { if (!calm) anim.hop = frames || 22; anim.happy = 70; }
+  function hop(frames) {
+    if (!calm) { anim.hop = frames || 22; anim.phopIn = 7; }   // the petpet copies it seven frames later
+    anim.happy = 70;
+  }
   function hearts() {
     ["💗", "💕", "💖"].forEach(function (h, i) {
       setTimeout(function () { floaty(h, "#ff8fd0"); }, i * 160);
@@ -1689,7 +1692,7 @@
      tx is where it has decided to wander to next; face is which way it
      is looking. They live outside the render so a redraw never makes
      the pet jump back to the middle. */
-  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0, wobble: 0, happy: 0,
+  var anim = { t: 0, napping: false, cv: null, measure: true, hop: 0, phop: 0, phopIn: 0, wobble: 0, happy: 0,
                x: 0.5, tx: null, face: 1, wanderAt: 0, shadow: null };
 
   function levelOf(pet) { return levelFor(pet && pet.xp); }
@@ -1846,6 +1849,13 @@
         : moving  ? Math.round(Math.abs(Math.sin(anim.t / 4)) * pscale * -0.25)
                   : 0;
       var pbreathe = (calm || pfloats || moving) ? 0 : Math.sin(anim.t / (sleeping ? 40 : 14) + 1) * 0.02;
+      // ...and copies the pet's jump for joy a beat later: a quicker, smaller
+      // hop of its own rather than the two rising and landing as one.
+      if (anim.phopIn > 0 && --anim.phopIn === 0) anim.phop = 18;
+      if (anim.phop > 0) {
+        pbob -= Math.round(Math.sin(anim.phop / 18 * Math.PI) * pscale * 2);
+        anim.phop--;
+      }
       P.drawPetpet(cv, pet.petpet.id, { cx: Math.round(anim.px * w), scale: pscale, bob: pbob, breathe: pbreathe, flip: anim.face < 0 });
     }
   }
