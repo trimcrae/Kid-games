@@ -62,7 +62,7 @@ pink-curtain downstairs bedroom.
 
 | Fourth-set area | References | Included |
 | --- | --- | --- |
-| Garage | W1–W3; House Tour 30–33s | Two simplified SUVs retained from the photographs (one present in the walkthrough), concrete slab, exposed joists, raised front sectional door and tracks, rear sectional door, rear glazed pedestrian door, house-access opening, shelving, tool board, wall-hung bicycle and coat hooks |
+| Garage | W1–W3; House Tour 30–33s | A black minivan and a burgundy crossover (`vehicles.py`: lofted bodies with cut wheel arches, glass and a seated cabin; no badges or plates) standing in for the two vehicles in the photographs (one present in the walkthrough), concrete slab, exposed joists, raised front sectional door and tracks, rear sectional door, rear glazed pedestrian door, house-access opening, shelving, tool board, wall-hung bicycle and coat hooks |
 | Basement stairs | W8–W9 | Return flight beside the steps up to the main living room, carpeted treads, white side walls, handrail and doorway |
 | Basement play area | W4–W5 | Foosball table with rods and players, metal bunk bed with made bedding, toddler slide, dollhouse, floor rocker, saucer chair, open bookcase and hanging fabric screens |
 | Basement office and storage | W6, W8; House Tour 227s | Wood drawer desk with laptop, landscape display and two portrait displays on a raised stand, black swivel chair, perpendicular second workstation, storage shelves/cabinet and simplified potted plants |
@@ -554,7 +554,7 @@ top view. `--preview-scale 50 --samples 4` makes quick layout previews.
 Rebuilding **replaces** `house.blend` and `inventory.json`, so
 save manual edits under a different filename before regenerating. The script
 uses a fixed random seed. The generator hash covers `build.py`, `upstairs.py`,
-`extensions.py`, `basement_garage.py`, `yard.py`, `exterior.py`, `dressing.py` and `photoreal.py`.
+`extensions.py`, `basement_garage.py`, `vehicles.py`, `yard.py`, `exterior.py`, `dressing.py` and `photoreal.py`.
 `inventory.json` records it, Blender
 version, object counts, cameras and furniture provenance.
 
