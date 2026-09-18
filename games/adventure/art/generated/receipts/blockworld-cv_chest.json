@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_chest",
+  "style": "M1",
+  "sourceHash": "734974f105616d01ad3afbdf2b78e2cd3b6856f99735f333a9f5e3bb4daefec7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8c79293a-3c6e-4ae7-927a-6c1d281f3db5.png",
+  "originalSha256": "3231a8cfac92f9e9b934fb14009820bc07907e50cc2f0880b33dbe35ac9f9b55",
+  "file": "blockworld-cv_chest.webp",
+  "sha256": "c977f168c43973ee261ee25e9993483c2e40c8913bd24fc0cb8d95245ee21b88",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Remove ONLY the skull in the bottom-right corner, replacing it with ordinary grey voxel stone dungeon floor/wall continuing the surroundings. Preserve everything else exactly, especially all text on the note, Cory, treasure chest, gems, lighting, composition. No skulls or bones.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46/exec-86eff081-6bbd-46ae-b7b2-e1737ab52124.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exact note text, Cory opens gem-filled chest, corrected away added skull; only Cory present."
+}

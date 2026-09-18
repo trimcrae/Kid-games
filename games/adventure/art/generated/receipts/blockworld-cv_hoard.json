@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_hoard",
+  "style": "M1",
+  "sourceHash": "60613f74a3722aafed1abd1d3ec1e69d5f976f819058261be3e77394500767d9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8460fa07-1493-41fe-81cf-a7ceb4ab3c7f.png",
+  "originalSha256": "ae687eea5ccb49e6a99ec214ed22642a93850aa685c501970dc150c3decc1c18",
+  "file": "blockworld-cv_hoard.webp",
+  "sha256": "219cf379f88d20e0a783964bc3651f2d6d685cb7c0510f9b8db3a9bdd388489c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory struggles happily to lower the lid of a wooden iron-bound chest overflowing with a huge mound of blue diamonds. The lid cannot quite close over the treasure. His grey pick rests on the rock beside the chest. Blue gemstone light illuminates his delighted face and the deep blocky cavern, golden torch on wall. No other characters, no text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed chest overflowing blue diamond hoard with Cory trying to lower lid, matching cave cast and style."
+}

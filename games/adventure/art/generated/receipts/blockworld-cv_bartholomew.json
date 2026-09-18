@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_bartholomew",
+  "style": "M1",
+  "sourceHash": "8d8f8092cfd7df9b5b46480e8d535c23e858cc7078f1b4284f32abb472933bf1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ad863768-8199-473e-b877-659d0ce61147.png",
+  "originalSha256": "7a9c0859fe562a6142cf5d61eea43c30393e8e04af063535c1f12e7a30785282",
+  "file": "blockworld-cv_bartholomew.webp",
+  "sha256": "44c7e079d632380a71443fc00a8e7b68b3917da431747853629e14142232110a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Bartholomew the white voxel sheep stands on a low square dungeon stone in a comically heroic pose, wearing a LARGE GREEN LEAF tied over his back as a cape, and proudly holding a little WOODEN SWORD upright with one raised front hoof. Same white cuboid wool, tan squareface, pink muzzle, thick proud eyebrows, brown hooves as second reference. Still a four-legged sheep: three legs grounded, one frontleg raised. Cory watches and laughs affectionately at left. Exactly Cory and sheep, no other characters. Warm torchlit old stone dungeon, no text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed leaf cape and wooden sword held in one raised front hoof, three grounded sheep legs, matching wool/face/eyebrows, Cory watching."
+}

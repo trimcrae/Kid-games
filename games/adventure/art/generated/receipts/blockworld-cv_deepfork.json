@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_deepfork",
+  "style": "M1",
+  "sourceHash": "067616cb9a10a27a7c8e5fd1b9850eea90b3863ae53388787b34cff6665a0de1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-895b850e-3669-4b62-9b68-8d7ca136a79b.png",
+  "originalSha256": "3f2b528ede97d322da22cd50c3d6e8bb7c5ad83218356a382b5300612027b969",
+  "file": "blockworld-cv_deepfork.webp",
+  "sha256": "b28668111ecb7aaf7f2f0792d4dca2b46856692ba39e1e4d635c15a9720e8528",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Deep beneath the world Cory has reached old dark stone and pauses at a fork: one tunnel glitters with blue ore in the far distance, the other slopes still farther DOWN into mysterious near-black depths. Cory holds his iron pick thoughtfully between the two paths. Layered blocky cavern walls, one warm wall torch near him. Atmospheric inviting adventure, only Cory.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed two cave routes, glittering left and descending dark right, Cory thinking with pick."
+}

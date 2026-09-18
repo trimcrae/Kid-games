@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_end_diamond",
+  "style": "M1",
+  "sourceHash": "3ed1b4ddb5729badd721a6466cb41783f28df7e0bffa5216373ef2dff718f56f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9beeca2e-1043-4015-92c4-7a3689504cac.png",
+  "originalSha256": "f96afc4504613c5944d7762afa50b4ca3c687daad589922bb08676479c8dba19",
+  "file": "blockworld-cv_end_diamond.webp",
+  "sha256": "33f5d38ee8dbf22e4c71049f4ad420e900b2138026e802e6f57251687dfdba93",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Happy Diamond Champion ending! Cory stands proudly wearing a small geometric BLUE DIAMOND CROWN, beside his huge wooden chest overflowing with blue diamonds. Small lime-green Fizzer Zib cheers at one side, same narrowtorso cubehead fourstubbyfeet, no arms needed, joy conveyed through open smile. White voxel sheep Bartholomew at other side raises head and baas heroically, proud thick eyebrows tanface pinkmuzzle brownhooves, normal four-legged sheep. Whole cave sparkles BLUE, celebratory radiating gemstone light. EXACTLY three characters; no text, no extra crowns. Use references for same cast and cave, NEW celebratory composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_hoard.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three-character celebration, Cory diamond crown, huge blue hoard, cheering Zib and four-legged Bartholomew."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_crystal_carry",
+  "style": "M1",
+  "sourceHash": "f2dabdcdb22c7eeb3946713fdd78686526b42ea1bf15f53baa068fe07acc5de1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c852f95f-6fae-44bf-8d15-443de4594753.png",
+  "originalSha256": "9030623c98267caec908ce9f095674c23ce55e9316141bdd1240bfd85904d7d5",
+  "file": "blockworld-cv_crystal_carry.webp",
+  "sha256": "51a2c0c04c04406da23d0e55f0bb23b6389a26d7c78ce5112f5c9d61922cdad6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory gently carries ONE glowing iridescent crystal cupped in both hands while walking UP the stepped tunnel toward home. Jewel glows blue at its core with purple edges, lighting the whole dark stone tunnel like a lantern. Proud quiet smile. Behind him tunnel slopes down, ahead higher path hints warm daylight very far away. Same blue shirt, glasses backpack, no pick in hands, no companions. Single crystal only, not a cluster, no other loose gems.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed one blue-core purple-edged glowing crystal held carefully in both hands, Cory ascending toward home."
+}

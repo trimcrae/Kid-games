@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_crack",
+  "style": "M1",
+  "sourceHash": "bb982c658a05b50f53e1856e617c44678d869978c6b6445f92571eb682cfb0f8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-53d3a20c-024b-44e4-bd63-2ac41f262e4f.png",
+  "originalSha256": "068583ae3fb4cad440f2598ffc27c4b4dae27b5ac6ad8c690fe9bf622895635b",
+  "file": "blockworld-cv_crack.webp",
+  "sha256": "d7424096dab56ada5b8c7f0b3ef5ca3add6181904cf2989c1fe5058c520af2c3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory turns sideways and squeezes through a NARROW vertical crack between enormous dark stone voxel walls, his small backpack just fits. His face is full of wonder, lit PURPLE by magical light spilling from the tunnel ahead. View from behind-side into the crack, purple glowing haze deeper beyond, source of glow still concealed. Not yet the geode reveal. Both arms and both legs naturally posed; Cory only.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Cory squeezing sideways through narrow purple-lit rock crack, source of glow still concealed."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_lit_tunnel",
+  "style": "M1",
+  "sourceHash": "76ff80c5cd979495dd99538cbe160732b59d6c71fbe155b535b65e05ffe22db5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-39fb31af-b48d-447e-9f60-5932fcbae6fd.png",
+  "originalSha256": "13056b8aae1fbd172cbf9fc8227f175a4fc65a364fddead986f6068b539f6835",
+  "file": "blockworld-cv_lit_tunnel.webp",
+  "sha256": "4cf22660b058ac32256cd37e749822f98745de575277d02cadee82964e39c5c5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory has lit EXACTLY THREE torches, spaced clearly on cave walls, revealing a fork into TWO tunnels. One passage subtly sparkles blue in the distance, the other has dark old rocky walls. Wide composition, three warm yellow flame torch fixtures clearly visible and countable, two divergent routes. Cory stands at fork with iron pick. No extra flames or torch in his hands; Cory only.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly three wall torches and two divergent tunnels, coherent Cory."
+}

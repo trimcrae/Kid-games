@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_shaft",
+  "style": "M1",
+  "sourceHash": "a177eeaaee5e76b09511ea0d86ddaa1eadb9e1a26e50c6f7b5c2af234af8e0db",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ca4ad03b-f746-4dc1-a480-c5142994ebac.png",
+  "originalSha256": "060ae4670a1928b26944ec9a56ed0d645fbee325690dccf8e875b7da76849dcf",
+  "file": "blockworld-cv_shaft.webp",
+  "sha256": "457fff0f1ff33825716955e7e9c2781ebe483b6de07b1f6733d70fa351629821",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory carefully mines a deep descending STAIRCASE diagonally through blue-grey stone, feet firmly planted on a broad stair landing as his grey iron pick chips the stone wall one step ahead. Show angular stair shaft receding upward behind him with warm torchlight. He is digging safely at an angle, never beneath his feet. Cory is the only character.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed diagonal descending stair shaft, boots on solid landing, pick strikes wall ahead; coherent Cory and voxel style."
+}

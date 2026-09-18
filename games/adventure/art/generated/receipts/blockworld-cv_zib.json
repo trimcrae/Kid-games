@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_zib",
+  "style": "M1",
+  "sourceHash": "c7145ecc3532d3b20334f43c7060c84cd14c57a29bde55c7573dec84997c6eee",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e484f8b9-54c8-483d-a63c-d1a0564397f8.png",
+  "originalSha256": "24815280fb7ab5356ed531c5bc12fe2ad7b06b7304882fa524677ee7b44b9f32",
+  "file": "blockworld-cv_zib.webp",
+  "sha256": "3718ed9db354da5ad950e4634f5e1e21692519e98a1af3c374a93bd415f7c8cf",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory gives his new shy green Fizzer friend Zib a GREAT BIG HUG in a blue-grey cavern. Use second reference for Zib design: lime-green mottled cubic head, little black square eyes and friendly smile, narrow torso, four short green feet dark soles. Small waist-high Zib glows warm lime with happiness. Cory crouches to cuddle around Zib gently. The hug is focus, warm torches and blue rock behind. Exactly these two characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed two-character cave hug, happy glowing Zib with compact torso and stubby feet, matching Cory and cavern."
+}

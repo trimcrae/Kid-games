@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_geode",
+  "style": "M1",
+  "sourceHash": "43d87ebbc5f0228ddffebcdc1514e712b1b9a11c7edcc48b47d021ea9c8e1923",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4795cbd8-f971-40af-8ad1-2b98af3592bc.png",
+  "originalSha256": "77e4952c0f175d5c2d9e8f51d6c7e54d5fd6a0655d5f36c1cf24327c3164d4a5",
+  "file": "blockworld-cv_geode.webp",
+  "sha256": "4641c6e56d5279680fa0078a2d2bfb3215d141d0609d892c1a1a50c6cfd96df3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. A breathtaking SECRET RAINBOW GEODE chamber deep underground. Cory stands small but clearly recognizable in foreground, face glowing with reflected rainbow light, gazing in wonder at enormous geometric stepped voxel crystal clusters arching around him: saturated ruby red, orange, gold, green, cyan, blue and purple. A huge enclosed hollow stone geode, no sky opening, no ordinary waterfall or lava. Giant luminous crystals faceted but built from tiny square blocks, magical colored light and small drifting star sparkles suggest a gentle hum. Wide grand reveal, only Cory. Establish memorable cathedral-like rainbow geode for later scenes.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed monumental enclosed rainbow crystal geode, matching voxel Cory and materials; establishes red/orange/gold left, green/blue/purple right."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_tunnel",
+  "style": "M1",
+  "sourceHash": "100ffe254f0db7ca7c9422ec6498f8ed971b949e69c8ce13298cbe27c3e4a127",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5404aa0c-b0c4-446a-9d2d-79f5a0ca9ebf.png",
+  "originalSha256": "1e915500740c533d6299a230d105e2298a270493e794ce6351e7ac21e2be5b39",
+  "file": "blockworld-cv_tunnel.webp",
+  "sha256": "598644c1040e4383a285968fcf6ee2ef3d95e250ed890a6aacd91bb5ac4a9caf",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory pauses at the entrance of a VERY DARK cave tunnel, barely able to see. Three distinct shadowy alcoves lie ahead, needing light. A single small red-capped mushroom provides faint reddish glow near the entrance. Cory holds his iron pick low, peers curiously into darkness. No installed torches yet; no text or numbers. Only Cory.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three shadowy alcoves, one red mushroom, no installed torches, coherent Cory peering into darkness."
+}

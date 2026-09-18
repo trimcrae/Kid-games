@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_echo",
+  "style": "M1",
+  "sourceHash": "1559c9daadfb28ac1f52b2ab1abcfec8ff65c40964d2eb9f70259548b4a6b033",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-52cfa564-e029-426d-8e0a-707c1e189ebf.png",
+  "originalSha256": "1a512850ba9e4bfe9fadffec283929c7df79e6a4e5e12a404e7a048620f6c479",
+  "file": "blockworld-cv_echo.webp",
+  "sha256": "915fd96e588f2de8ebb36a7c2422fbe706a610ddc9f6cdd227c2d9b58d36b5b2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory cups BOTH hands around his mouth and joyfully calls out into a HUGE cavern with many distant arched passages. Convey echo through broad receding architecture and faint translucent curved sound waves drifting away, no lettering needed. A tiny glimpse of Zib's familiar lime cubehead peeks mischievously from behind a nearby rock, only head visible, as if secretly giggling. Same voxel child and tiny green friend, no additional characters. Blue-grey stone, warm torchlight and tremendous depth.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Cory calling into cavern, sound-wave echo and Zib head peeking behind rock."
+}

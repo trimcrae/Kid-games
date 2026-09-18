@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_bridge",
+  "style": "M1",
+  "sourceHash": "6aea8fafbd2ebf024ff4a0f78d746eb789bba554aea813db1b95424673a0a275",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f4808068-68f3-48ab-8c21-879a718b3ae7.png",
+  "originalSha256": "d44a0d47edcf1cff8ad1c41bf7958b97fddfbf9b49cfbadf0ced9d3484cd571e",
+  "file": "blockworld-cv_bridge.webp",
+  "sha256": "4a3c0e6b78624b27e3ce82ae26223e0cb73cfcaa816625d8ad608d2c6ae5bf81",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory tiptoes across a bridge made of EXACTLY THREE large square stone blocks spanning a narrow orange lava river. Three contiguous cubes in a single straight row, precisely two seams dividing the three square top faces, clear broad view from slightly above. His boots on middle block. Both ends meet solid safe rock banks. Warm lava illuminates blue-grey cavern. No extra bridge blocks, no supports mistaken for blocks, only Cory.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly three adjacent stone bridge cubes with two seams spanning lava; Cory on middle block."
+}

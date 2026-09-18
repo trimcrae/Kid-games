@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_ore_room",
+  "style": "M1",
+  "sourceHash": "15a3c28ed74b1f79288a37ced99de7a546070b53916ef2063ee23bf93885126a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f02ba785-8167-4025-a08f-567193c7103e.png",
+  "originalSha256": "231ed260ba9c5696ac6326905dd868aaa8451724f0308bf9989d142fa9f220f8",
+  "file": "blockworld-cv_ore_room.webp",
+  "sha256": "86d8e9476895039fb53b22d00e360bd200533053659cda6f3a128f1bb549a9f2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory counts EXACTLY THREE treasures laid in a clear row on a flat rock shelf: ONE cyan-blue blocky crystal, ONE golden-yellow blocky crystal, and ONE brilliant pale icy-blue diamond-shaped gemstone. Three separated objects total, all visible unobscured. Beside them a small open wooden treasure chest with EMPTY visible interior, ready to receive the three treasures. Cory kneels and points happily. Dim blue-grey cavern with warm torch; no extra loose gems or glittering ore patches that could confuse counting. Only Cory.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed three distinct collected treasures: one cyan crystal cluster, one gold cluster, one pale diamond; empty chest ready to receive them."
+}

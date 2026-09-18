@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_curious",
+  "style": "M1",
+  "sourceHash": "e7237c24fa2a1b34ee45d186d36e73a5dccf5ff37cbd23e8fd3dabea6b0f3ba5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a66fd09d-6d82-4a9d-9383-40a6fd61347f.png",
+  "originalSha256": "4fa4b4d25a77c599c17a54ca0ef62dcf28e0d3c61419960ff2cbfcb021a41b93",
+  "file": "blockworld-cv_curious.webp",
+  "sha256": "f18c31fa0415b39fa64682f467f6f3c37c79beba7ee75c270a4c733c62dad77e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory has tapped ONE strange bright BLUE voxel cube sitting on grey cave floor, and its lid has just POPPED OPEN revealing an empty dark interior. ONE tiny blue gemstone has rolled out beside it. Cory crouches laughing and reaches to pick up that single tiny gem. His pick rests safely behind him. Magical small star-shaped sparks around the opened blue block suggest a happy ding. Only one gem, one open blue cube, no other treasure or characters, warm torchlit dark cave.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed one open blue block and one tiny blue gem rolling out, Cory reaching to collect, pick resting nearby."
+}

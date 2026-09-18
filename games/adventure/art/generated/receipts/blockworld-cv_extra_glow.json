@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_extra_glow",
+  "style": "M1",
+  "sourceHash": "f78500d9e378ccd16ec841dada49f386c55711616ed0ac18dd6d39b20ec5aa7e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-50e39665-19aa-4b24-9189-c65e65a3355e.png",
+  "originalSha256": "125af99f027fe546ef84c8b33bd64d9cb90b7923c6391c30d296a159dd65c088",
+  "file": "blockworld-cv_extra_glow.webp",
+  "sha256": "71da6a12f7c641349c9d37e472ad9bdabf4eb2ceec9f0f637e2dafd904cd08fa",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory carefully counts EXACTLY FOUR separate small bright GREEN gemstones in a neat widely spaced row on a dark stone ledge. Each gem is a single faceted jewel, not a many-pointed cluster. Four total, no other crystals/gems in walls or background. Cory points at the fourth as he counts, delighted. One warm wall torch illuminates cave corner, grey iron pick leaning against rock. Composition prioritizes four countable green gems. Cory only; no numbers or text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly four separate green gemstones on shelf, counting pose, no extra green gems."
+}

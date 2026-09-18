@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_bedrock",
+  "style": "M1",
+  "sourceHash": "7f03f8981bce3da88ff13c5363ac2df023225020c3a2cd31411d082242271906",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0da0b7cb-7882-4fa1-9e89-322d7d08117e.png",
+  "originalSha256": "550ae249d7a4d1af86001ca419c4ce1cd09a29f220885cc79feeda48945ae390",
+  "file": "blockworld-cv_bedrock.webp",
+  "sha256": "bde90ae8c0a32016a33d66adea3fcb0f62424589d489cda80d8afd95c0e47a04",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. At the BOTTOM of the world Cory taps an unbreakable hard dark mottled BEDROCK wall with his grey iron pick. Dense black-charcoal and grey block pattern forms an intact solid floor and wall. No broken block, no hole, no shards. He looks thoughtful and curious about a secret way down. One warm wall torch highlights pick contact, atmospheric dark deep cavern. Cory only.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed intact hard dark bedrock wall and floor, pick tapping without breaking, Cory thoughtful."
+}

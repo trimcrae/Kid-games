@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_lava_ledge",
+  "style": "M1",
+  "sourceHash": "0d333648ddab22798a72fae2fda3d4a136d4d952730650669306ec0767492460",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2f0b164a-665c-46aa-b921-0c21ce148cd6.png",
+  "originalSha256": "d7a5f3d0df041e6f8a50661ced40d74103687473416249664a1b2f5dfee44e1a",
+  "file": "blockworld-cv_lava_ledge.webp",
+  "sha256": "a0ee69217c3b5202e8d3a18a3d6b51dbb1021f992774f8c9e358dd3e387484c2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. A glowing orange lava river winds through a vast blue-grey underground cavern. Cory stands WELL BACK from the ledge edge on broad solid rock, marveling at the warm glow. Both boots a full body length from the lava drop, grey iron pick by his side. Wide establishing composition makes lava river and safe setback obvious. Cory only.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed wide lava river cavern and Cory standing well back from edge; matching voxel cast, no extra characters."
+}

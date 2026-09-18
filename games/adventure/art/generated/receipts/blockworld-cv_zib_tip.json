@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_zib_tip",
+  "style": "M1",
+  "sourceHash": "33b315f2d7e97bed2b8cd1c66cecb70d7791c81f033538692b914a994f2e82d5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cc16d48f-9e1f-4633-8b59-a35d9a3b71c9.png",
+  "originalSha256": "c60004f1f9fd278310bfbc8deb1b94e166d5eec47fd94acea469a830c8a790ec",
+  "file": "blockworld-cv_zib_tip.webp",
+  "sha256": "f14a0fc6cb298e1a59600ba51544621d0c430acd3c158637487cb8e5a6c65bc3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory crouches and leans his ear near little green Fizzer Zib, who whispers a secret with a friendly conspiratorial expression. Cory giggles. Distant orange lava glow at the end of blue-grey tunnel, a subtle patch of blue diamond ore nearby illustrates what they discuss. EXACTLY TWO characters, Cory and Zib. Zib matches reference compact cubehead narrowtorso four shortfeet; no extra arms needed for whispering. No text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed Cory giggling at Zib whisper, two characters, same compact Fizzer design and lava/diamond hint."
+}

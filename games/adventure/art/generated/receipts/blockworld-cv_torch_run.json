@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_torch_run",
+  "style": "M1",
+  "sourceHash": "1f526e7095ef6aa2cff0c6e206669ce060bf551b3cec870827ae829b141e647f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-84a30dda-63fd-46d8-8bed-b7e7b2aaa143.png",
+  "originalSha256": "92e22eeac6506af2c0362830a7de23a0fde1d8d7e74689dc575930b809c26398",
+  "file": "blockworld-cv_torch_run.webp",
+  "sha256": "fb943e4dfb351f7e154596ca618cc8c3cf35ea16f398d75941f84114f35eac6b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Counting scene: Cory has added one torch to two. In a LONG dark stone corridor show EXACTLY TWO mounted lit torches receding along the left wall, and Cory in foreground holding the newly crafted THIRD lit torch in his right hand, safely upright away from body. A few plain wooden sticks and ONE black coal lump sit on a small rock work surface beside him. EXACTLY THREE flames total throughout entire image, no extra distant torches/lava/fire. The new third torch lights the formerly dark far end. Cory only, no text or numbers.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly two wall torches plus one held torch, three flames total, sticks and coal craft materials."
+}

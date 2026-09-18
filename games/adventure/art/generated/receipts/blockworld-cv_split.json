@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_split",
+  "style": "M1",
+  "sourceHash": "1a52d111b681a55097f484e5c3b1cfcb8a00b0c9236470cf3a0f5a59e8570f3f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d3036cf9-653b-4e78-a94b-89f58ea630b3.png",
+  "originalSha256": "14edef5cabf7ba717e6203d6ea476070af73973b6b12d70f8501b3898bcdcf66",
+  "file": "blockworld-cv_split.webp",
+  "sha256": "084305b9e4f3023f723489ced0e7799892faa8742ad5c9544cb608a9729808ed",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory pauses at TWO diverging cave tunnels, BOTH lit by glowing mushrooms. The LEFT path has cyan glowing mushrooms and a distant sparkling blue ore patch; the RIGHT has purple-and-red glowing mushrooms and slopes down through dark old stone. Cory humorously raises his nose and sniffs with delighted curious expression, hands relaxed at sides. No extra characters. Cave smaller and intimate compared with entrance, diagonal view of two distinct passages. No torches or text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed two clearly distinct mushroom-lit tunnels, sparkling left and deeper right, Cory sniffing curiously."
+}

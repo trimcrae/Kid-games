@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_glow_pool",
+  "style": "M1",
+  "sourceHash": "12a90c6f3d9df352ad2cf7d40b47017fb89eee3b31f22d0c88d6b5781adaab18",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5ce90103-736d-4668-8c4a-4a2924c610c1.png",
+  "originalSha256": "b0f4ec606910b719dca72c7f056794198867bfe351a924e007c9c45c437f354c",
+  "file": "blockworld-cv_glow_pool.webp",
+  "sha256": "938ba1dae06982d2f4d47f30065beaa0754af8b567ac07a7377c2381c6ea95e5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory kneels on a broad solid rocky bank and leans slightly to peek into a CALM glowing turquoise pool. EXACTLY ONE blue crystal floats slowly spinning in the CENTER of the pool, surrounded by gentle square-block ripple rings. Separate orange lava glow visible farther behind the pool beyond a thick rock ridge, clearly two distinct bodies of liquid. Crystal and Cory's curious reflection light up water, blue-grey cavern. Only Cory, one floating blue crystal, no additional gems.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed one floating blue crystal and its reflection in calm turquoise pool, separated lava behind rock ridge, Cory leaning from bank."
+}

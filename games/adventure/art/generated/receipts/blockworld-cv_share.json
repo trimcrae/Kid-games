@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_share",
+  "style": "M1",
+  "sourceHash": "0f57d65ed5f817cc2bb6b52a8bbf4918375149bbd9aaf2405ce62439573f9555",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-73c348aa-11fa-4bf4-ae63-c6dbf07eece5.png",
+  "originalSha256": "110f58e5d0e37be76366e225ae907d2db2d247c306fddc8a8528077a228eee0e",
+  "file": "blockworld-cv_share.webp",
+  "sha256": "9d6e0bacca73996f8113f723dbe5dff080aaeadaf222853cd7cfaed057ad1e65",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory kneels and offers ONE sparkling pale-blue diamond in his open hand to little green Fizzer Zib, who looks astonished and thrilled. Zib glows bright lime-green, illuminating the whole blue-grey cave around both friends. Matching compact cubehead, narrow torso, four stubby feet; no arms necessary, Cory holds the gift near Zib. Tender medium-wide scene, two characters only, one diamond, no text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed single offered diamond, Zib delighted and glowing lime, coherent two-character cave scene."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_mushroom",
+  "style": "M1",
+  "sourceHash": "5177af22385f775b1f742980ccc5165c5e70ac75d0c0348ab3b00a69008b9484",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1154edc8-cfa3-4e0a-a9b1-d0aa32aaa0de.png",
+  "originalSha256": "f0fe35d6bf82686a51935e37e43f65dd78cd88982d3e3740e4e328281dd6d487",
+  "file": "blockworld-cv_mushroom.webp",
+  "sha256": "b7bbf40714599ec7a8bc85f3c0c0d5de657136bbda7d45c719e8307ec06d7ff6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory gently pokes the springy cap of ONE luminous blue mushroom with a finger. TWO MORE mushrooms have just lit up beside it: EXACTLY THREE blue glowing mushrooms total, three clearly separate caps and stems, their soft cyan light reveals the grey stone tunnel. Delight on Cory's face. His pick rests beside his boots. No other mushrooms or characters or glowing gems.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly three separate blue mushrooms, Cory poking largest, no extra countable mushrooms."
+}

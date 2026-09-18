@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_diamond_cave",
+  "style": "M1",
+  "sourceHash": "cb9b969202ce3e460c120278aa4b382e73eb91b849adfb51327db393b36158cd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a7807868-e927-40f2-a967-506795225270.png",
+  "originalSha256": "733e658874d980e9ec0ad6bf6c44761fab12b033288523c8158aa1c9bd5d4853",
+  "file": "blockworld-cv_diamond_cave.webp",
+  "sha256": "3f8e216acd53eb44084f2a6bc446fa2b094541216902fb40b68967964ff5ce45",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory discovers EXACTLY THREE enormous separate blue diamonds twinkling on a broad dark rock ledge, arranged clearly left to right with space between each. Each diamond is a big faceted voxel jewel with flattened top and pointed bottom. Cory holds his iron pick excitedly at side, his closed wooden treasure chest sits behind him. Only these three gemstones, no other shining mineral patches or gems. Cool blue light from three diamonds bathes broad blocky cave. Cory only.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed exactly three large separate blue diamonds, Cory with pick, chest closed."
+}

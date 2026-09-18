@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_old_mine",
+  "style": "M1",
+  "sourceHash": "65c72f4b17040490a89bfae0b812eb0693eb2ce8cf05e0925d8fbb5679575f74",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7f988212-9b07-46d8-bb97-ec43ca358b1a.png",
+  "originalSha256": "f097610caee9e4ececeeb4481979973180597ff571e14659d64a3a79d38e10a0",
+  "file": "blockworld-cv_old_mine.webp",
+  "sha256": "5e07018e5da8ed6338559ec4740a014f978320e64b8a471f0c164bbac2bb4df9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for style and Cory design only; depict NEW scene below. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. No UI, border, captions. All scenery and characters built of voxel blocks. Cory discovers an OLD DUSTY abandoned mine: heavy square timber supports, cobwebs, disused rail track ending near a CLOSED creaky wooden iron-bound chest in the corner. ONE forgotten dull grey pickaxe with weathered brown handle leans against the chest. Cory's hands empty as he peers curiously at discovery; no held second pick. Warm small torch light, dim grey blockrock, evocative dust motes. No skulls, bones, monsters or other people. Chest is still closed.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed dusty timber-supported mine, cobwebs, closed chest and one forgotten pickaxe; Cory empty-handed."
+}

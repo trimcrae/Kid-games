@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "cv_fizzer_lava",
+  "style": "M1",
+  "sourceHash": "53dc5b3123d9e2abd3a3d97d633e29e3b452ae6c7e8fc4b499bb745d61d33f73",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-929ad417-fcf6-4ca4-be94-c5c884e402f7.png",
+  "originalSha256": "1da3b66007095935bcb498108b006fe5fb411e8e6ea354e7dd612cc3e44bdae1",
+  "file": "blockworld-cv_fizzer_lava.webp",
+  "sha256": "bb94ed23d8d509b4cff07b1fabd64897c4028f5efd9ca51f8d7e6039dceefde4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only the long tool resting diagonally at right. Replace the metal fork/pick-shaped head with a plain blunt WOODEN end, so this is simply a long wooden stick from end to end, used to retrieve gems. Keep the same position and angle. Preserve absolutely everything else: the two characters, one purple gem, their pose and faces, all lighting and composition. No other changes.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46/exec-da10db94-680d-48cc-81e8-a16d1e4a06b5.png"
+  ],
+  "reviewed": true,
+  "review": "Reviewed corrected plain wooden stick, one purple gem offered to Cory, same four-appendage compact Zib using small front appendage as story requires."
+}
