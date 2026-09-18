@@ -671,43 +671,43 @@ window.SPOOKY_PAINTED_ART = {
   "ellie-glass-slipper": [
     {
       "src": "art/openai/ellie-glass-slipper-0.webp?v=fc8bdccb71d1",
-      "alt": "Story illustration: Once upon a time, Ellie stayed in a tall old house with two grand cousins. One morning, an invitation arrived: every child was welcome at the palace ball. Ellie imagined the music, the lanterns, the swishing dresses. “May I come too?” she asked. Her cousins barely looked up."
+      "alt": "Story illustration: Once upon a time, Cinderellie stayed in a tall old house with two grand cousins. One morning, an invitation arrived: every child was welcome at the palace ball. Cinderellie imagined the music, the lanterns, the swishing dresses. “May I come too?” she asked. Her cousins barely looked up."
     },
     {
       "src": "art/openai/ellie-glass-slipper-1.webp?v=872bd2047dda",
-      "alt": "Story illustration: “After you tidy all this,” they said, leaving ribbons and shoes everywhere. Ellie worked until the floor shone. But the carriage was already rattling away. Her cousins had gone without her. She sat by the hearth in her dusty-rose dress. One tear made a dark little spot on her apron."
+      "alt": "Story illustration: “After you tidy all this,” they said, leaving ribbons and shoes everywhere. Cinderellie worked until the floor shone. But the carriage was already rattling away. Her cousins had gone without her. She sat by the hearth in her dusty-rose dress. One tear made a dark little spot on her apron."
     },
     {
       "src": "art/openai/ellie-glass-slipper-2.webp?v=f32a8025b1f8",
-      "alt": "Story illustration: “A clean floor is lovely,” said a warm voice. “But you were invited too.” Her fairy godmother stood in the doorway. “Fetch me a pumpkin.” Ellie blinked. A pumpkin? Outside, the fairy tapped it with her wand. Its orange sides swelled into a magnificent golden carriage."
+      "alt": "Story illustration: “A clean floor is lovely,” said a warm voice. “But you were invited too.” Her fairy godmother stood in the doorway. “Fetch me a pumpkin.” Cinderellie blinked. A pumpkin? Outside, the fairy tapped it with her wand. Its orange sides swelled into a magnificent golden carriage."
     },
     {
       "src": "art/openai/ellie-glass-slipper-3.webp?v=7c1b87514038",
-      "alt": "Story illustration: Mice became little white horses. A lizard became a coachman. Then the wand brushed Ellie's dress. Pearl-lavender silk shimmered around her; silver leaves climbed the hem. On her feet glittered two glass slippers. “Be home before midnight,” said the fairy. “Then everything but the slippers becomes ordinary again.”"
+      "alt": "Story illustration: Mice became little white horses. A lizard became a coachman. Then the wand brushed Cinderellie's dress. Pearl-lavender silk shimmered around her; silver leaves climbed the hem. On her feet glittered two glass slippers. “Be home before midnight,” said the fairy. “Then everything but the slippers becomes ordinary again.”"
     },
     {
       "src": "art/openai/ellie-glass-slipper-4.webp?v=fcfd3bb90e25",
-      "alt": "Story illustration: At the palace, Ellie stopped beneath a thousand shining lights. Nobody asked her to tidy anything. The young prince bowed and held out his hand. “Will you join our dance?” Round went the children, their ribbons flying. Ellie laughed so hard she forgot to watch the clock."
+      "alt": "Story illustration: At the palace, Cinderellie stopped beneath a thousand shining lights. The young prince bowed. “Will you marry me?” he asked. “No Dude!” said Cinderellie. “But I'll dance with you!” Round went the children, their ribbons flying. Cinderellie laughed so hard she forgot to watch the clock."
     },
     {
       "src": "art/openai/ellie-glass-slipper-5.webp?v=27f884454a0a",
-      "alt": "Story illustration: DONG. Ellie froze. DONG. The clock was striking midnight! She hurried through the ballroom, down the stairs, past the astonished guards. One glass slipper slipped from her heel. She reached back, then heard another DONG. There wasn't time. She ran on with one bare foot."
+      "alt": "Story illustration: DONG. Cinderellie froze. DONG. The clock was striking midnight! She hurried through the ballroom, down the stairs, past the astonished guards. One glass slipper slipped from her heel. She reached back, then heard another DONG. There wasn't time. She ran on with one bare foot."
     },
     {
       "src": "art/openai/ellie-glass-slipper-6.webp?v=3b15316307d9",
-      "alt": "Story illustration: Just outside her garden, the last chime sounded. The carriage shrank into a pumpkin. The horses scurried away as mice. Ellie stood in her dusty-rose dress again. But in her hand was the other glass slipper, still shining. “It really happened,” she whispered. Then she tucked it safely away."
+      "alt": "Story illustration: Just outside her garden, the last chime sounded. The carriage shrank into a pumpkin. The horses scurried away as mice. Cinderellie stood in her dusty-rose dress again. But in her hand was the other glass slipper, still shining. “It really happened,” she whispered. Then she tucked it safely away."
     },
     {
       "src": "art/openai/ellie-glass-slipper-7.webp?v=8bb867e81ca6",
-      "alt": "Story illustration: The next morning, the palace messenger knocked at every door. He carried the lost slipper on a cushion. “Who danced with us last night?” At Ellie's house, both cousins tried it. One foot was too wide; the other was too long. Ellie stepped forward. “May I try?”"
+      "alt": "Story illustration: The next morning, the palace messenger knocked at every door. He carried the lost slipper on a cushion. “Who danced with us last night?” At Cinderellie's house, both cousins tried it. One foot was too wide; the other was too long. Cinderellie stepped forward. “May I try?”"
     },
     {
       "src": "art/openai/ellie-glass-slipper-8.webp?v=4b62d8a001a0",
-      "alt": "Story illustration: Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Ellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”"
+      "alt": "Story illustration: Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Cinderellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”"
     },
     {
       "src": "art/openai/ellie-glass-slipper-9.webp?v=3b0cd26d1d82",
-      "alt": "Story illustration: Her cousins looked at the polished floor, then at Ellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Ellie dress. She took their hands and led them into the dance. No one was left behind."
+      "alt": "Story illustration: Her cousins looked at the polished floor, then at Cinderellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Cinderellie dress. She took their hands and led them into the dance. No one was left behind."
     }
   ]
 };

@@ -2567,7 +2567,8 @@
     karaokeOn = !!karaoke;
     if (currentClip !== name) {
       try { narrator.pause(); } catch (e) {}
-      narrator.src = "audio/" + name + ".mp3";
+      const revision = CLIPS && CLIPS[name] && CLIPS[name].text;
+      narrator.src = "audio/" + name + ".mp3" + (revision ? "?v=" + revision : "");
       currentClip = name;
     }
     try { narrator.currentTime = fromTime || 0; } catch (e) { /* metadata not in yet */ }

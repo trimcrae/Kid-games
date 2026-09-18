@@ -130,68 +130,68 @@ window.ELLIE_CLASSICS = [
   },
   {
     id: "ellie-glass-slipper",
-    title: "Ellie's Midnight Slipper",
+    title: "Cinderellie",
     classic: "Cinderella",
     sticker: "🥿",
     color: "#7160aa",
-    outfit: "Before and after magic: a pretty dusty-rose dress with small embroidered flowers and a cream apron, brown flats, no crown. At the ball: a magnificent pearl-lavender gown with silver vine embroidery, sheer puff sleeves and layered luminous silk, a small silver hair comb, delicate transparent magical glass slippers. Always Ellie age three, never an adult bride.",
+    outfit: "Before and after magic: a pretty dusty-rose dress with small embroidered flowers and a cream apron, brown flats, no crown. At the ball: a magnificent pearl-lavender gown with silver vine embroidery, sheer puff sleeves and layered luminous silk, a small silver hair comb, delicate transparent magical glass slippers. Always Cinderellie age three, never an adult bride.",
     pages: [
       {
-        text: "Once upon a time, Ellie stayed in a tall old house with two grand cousins. One morning, an invitation arrived: every child was welcome at the palace ball. Ellie imagined the music, the lanterns, the swishing dresses. “May I come too?” she asked. Her cousins barely looked up.",
-        scene: "Elegant old house morning. Ellie, preschooler in dusty-rose embroidered dress and cream apron, looks hopefully at a decorative invitation with no readable words. Two older girl cousins, about ten and twelve, one auburn-haired in coral, one dark-haired in teal, fuss with finery. No known family members, no tiara.",
+        text: "Once upon a time, Cinderellie stayed in a tall old house with two grand cousins. One morning, an invitation arrived: every child was welcome at the palace ball. Cinderellie imagined the music, the lanterns, the swishing dresses. “May I come too?” she asked. Her cousins barely looked up.",
+        scene: "Elegant old house morning. Cinderellie, preschooler in dusty-rose embroidered dress and cream apron, looks hopefully at a decorative invitation with no readable words. Two older girl cousins, about ten and twelve, one auburn-haired in coral, one dark-haired in teal, fuss with finery. No known family members, no tiara.",
         vocab: { invitation: "a message asking you to come to a party or another event" }
       },
       {
-        text: "“After you tidy all this,” they said, leaving ribbons and shoes everywhere. Ellie worked until the floor shone. But the carriage was already rattling away. Her cousins had gone without her. She sat by the hearth in her dusty-rose dress. One tear made a dark little spot on her apron.",
-        scene: "Ellie sits disappointed by a quiet hearth in cleaned old house, wearing same dusty-rose dress and cream apron. No fire close to her. Through window a carriage departs into early evening. One small tear, tender expression, no frightening neglect imagery.",
+        text: "“After you tidy all this,” they said, leaving ribbons and shoes everywhere. Cinderellie worked until the floor shone. But the carriage was already rattling away. Her cousins had gone without her. She sat by the hearth in her dusty-rose dress. One tear made a dark little spot on her apron.",
+        scene: "Cinderellie sits disappointed by a quiet hearth in cleaned old house, wearing same dusty-rose dress and cream apron. No fire close to her. Through window a carriage departs into early evening. One small tear, tender expression, no frightening neglect imagery.",
         vocab: { hearth: "the space in front of a fireplace" }
       },
       {
-        text: "“A clean floor is lovely,” said a warm voice. “But you were invited too.” Her fairy godmother stood in the doorway. “Fetch me a pumpkin.” Ellie blinked. A pumpkin? Outside, the fairy tapped it with her wand. Its orange sides swelled into a magnificent golden carriage.",
-        scene: "Twilight garden. Ellie in dusty-rose dress watches a plump pumpkin transforming into an ornate golden pumpkin carriage under a fairy godmother's wand. Kindly elderly fairy with silver curly hair, plum velvet cape and moonstone brooch, adult painted face matching Ellie. No glass slippers yet.",
+        text: "“A clean floor is lovely,” said a warm voice. “But you were invited too.” Her fairy godmother stood in the doorway. “Fetch me a pumpkin.” Cinderellie blinked. A pumpkin? Outside, the fairy tapped it with her wand. Its orange sides swelled into a magnificent golden carriage.",
+        scene: "Twilight garden. Cinderellie in dusty-rose dress watches a plump pumpkin transforming into an ornate golden pumpkin carriage under a fairy godmother's wand. Kindly elderly fairy with silver curly hair, plum velvet cape and moonstone brooch, adult painted face matching Cinderellie. No glass slippers yet.",
         vocab: { magnificent: "wonderfully beautiful or impressive" }
       },
       {
-        text: "Mice became little white horses. A lizard became a coachman. Then the wand brushed Ellie's dress. Pearl-lavender silk shimmered around her; silver leaves climbed the hem. On her feet glittered two glass slippers. “Be home before midnight,” said the fairy. “Then everything but the slippers becomes ordinary again.”",
-        scene: "Fairy garden reveal. Ellie now wears exquisite pearl-lavender silk gown, silver vine embroidery, sheer puff sleeves, silver hair comb, two transparent glass slippers. Fairy godmother smiles beside her. Golden pumpkin coach, two small white horses and whimsical green-coated coachman behind. No pumpkin on ground or mice now.",
+        text: "Mice became little white horses. A lizard became a coachman. Then the wand brushed Cinderellie's dress. Pearl-lavender silk shimmered around her; silver leaves climbed the hem. On her feet glittered two glass slippers. “Be home before midnight,” said the fairy. “Then everything but the slippers becomes ordinary again.”",
+        scene: "Fairy garden reveal. Cinderellie now wears exquisite pearl-lavender silk gown, silver vine embroidery, sheer puff sleeves, silver hair comb, two transparent glass slippers. Fairy godmother smiles beside her. Golden pumpkin coach, two small white horses and whimsical green-coated coachman behind. No pumpkin on ground or mice now.",
         vocab: { shimmered: "shone with a soft, gently changing light" }
       },
       {
-        text: "At the palace, Ellie stopped beneath a thousand shining lights. Nobody asked her to tidy anything. The young prince bowed and held out his hand. “Will you join our dance?” Round went the children, their ribbons flying. Ellie laughed so hard she forgot to watch the clock.",
-        scene: "Fairy-tale palace children's ball, not a wedding. Ellie age three in consistent pearl-lavender silver-leaf gown dances in a circle with several other children. A friendly preschool boy prince in blue bows and offers hand, no romance. Golden chandeliers and colorful ribbons, midnight clock high in background without readable digits.",
+        text: "At the palace, Cinderellie stopped beneath a thousand shining lights. The young prince bowed. “Will you marry me?” he asked. “No Dude!” said Cinderellie. “But I'll dance with you!” Round went the children, their ribbons flying. Cinderellie laughed so hard she forgot to watch the clock.",
+        scene: "Fairy-tale palace children's ball. Cinderellie age three in consistent pearl-lavender silver-leaf gown joins a circle dance with several other children. A friendly preschool boy prince in blue bows and offers his hand. He has just asked her to marry him; she cheerfully replied No Dude and offered to dance instead. Golden chandeliers and colorful ribbons, midnight clock high in background without readable digits. No wedding or lettering.",
         vocab: { palace: "a very grand home where a royal family lives" }
       },
       {
-        text: "DONG. Ellie froze. DONG. The clock was striking midnight! She hurried through the ballroom, down the stairs, past the astonished guards. One glass slipper slipped from her heel. She reached back, then heard another DONG. There wasn't time. She ran on with one bare foot.",
-        scene: "Ellie hurries down wide palace steps under moonlight, still in lavender gown, one foot barefoot and the other wearing a glass slipper. Exactly one abandoned glass slipper on a step behind her. Kind surprised guards at distant doorway. Urgent but safe, no fall. Golden coach waits below.",
+        text: "DONG. Cinderellie froze. DONG. The clock was striking midnight! She hurried through the ballroom, down the stairs, past the astonished guards. One glass slipper slipped from her heel. She reached back, then heard another DONG. There wasn't time. She ran on with one bare foot.",
+        scene: "Cinderellie hurries down wide palace steps under moonlight, still in lavender gown, one foot barefoot and the other wearing a glass slipper. Exactly one abandoned glass slipper on a step behind her. Kind surprised guards at distant doorway. Urgent but safe, no fall. Golden coach waits below.",
         vocab: { astonished: "very surprised by something you did not expect" }
       },
       {
-        text: "Just outside her garden, the last chime sounded. The carriage shrank into a pumpkin. The horses scurried away as mice. Ellie stood in her dusty-rose dress again. But in her hand was the other glass slipper, still shining. “It really happened,” she whispered. Then she tucked it safely away.",
-        scene: "After transformation in garden beside cottage, Ellie in original dusty-rose dress holds exactly one glass slipper glowing in her hands, both feet bare. Plain orange pumpkin and two small white mice on path. No coach, horses, fairy or lavender gown. Wonder, not sadness.",
+        text: "Just outside her garden, the last chime sounded. The carriage shrank into a pumpkin. The horses scurried away as mice. Cinderellie stood in her dusty-rose dress again. But in her hand was the other glass slipper, still shining. “It really happened,” she whispered. Then she tucked it safely away.",
+        scene: "After transformation in garden beside cottage, Cinderellie in original dusty-rose dress holds exactly one glass slipper glowing in her hands, both feet bare. Plain orange pumpkin and two small white mice on path. No coach, horses, fairy or lavender gown. Wonder, not sadness.",
         vocab: { scurried: "ran quickly with lots of little steps" }
       },
       {
-        text: "The next morning, the palace messenger knocked at every door. He carried the lost slipper on a cushion. “Who danced with us last night?” At Ellie's house, both cousins tried it. One foot was too wide; the other was too long. Ellie stepped forward. “May I try?”",
-        scene: "House sitting room daylight. Kindly palace messenger in navy velvet holds cushion with exactly one tiny glass slipper. Older auburn cousin and dark-haired cousin look frustrated beside a chair, their bare feet clearly too large. Neither cousin wears a glass slipper; the only glass shoe visible is on the cushion. Little Ellie in dusty-rose dress politely steps forward. No fairy or prince present.",
+        text: "The next morning, the palace messenger knocked at every door. He carried the lost slipper on a cushion. “Who danced with us last night?” At Cinderellie's house, both cousins tried it. One foot was too wide; the other was too long. Cinderellie stepped forward. “May I try?”",
+        scene: "House sitting room daylight. Kindly palace messenger in navy velvet holds cushion with exactly one tiny glass slipper. Older auburn cousin and dark-haired cousin look frustrated beside a chair, their bare feet clearly too large. Neither cousin wears a glass slipper; the only glass shoe visible is on the cushion. Little Cinderellie in dusty-rose dress politely steps forward. No fairy or prince present.",
         vocab: { messenger: "someone who carries news or a message to another person" }
       },
       {
-        text: "Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Ellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”",
-        scene: "Recognition scene: messenger kneels offering tiny glass slipper, which fits Ellie's foot perfectly. Ellie in simple dusty-rose dress proudly holds its matching slipper. Two older cousins look surprised behind. Exactly two glass slippers total, one worn and one held. Ellie remains preschool age, no adult glamour.",
+        text: "Her cousins giggled. “You weren't even there!” But the messenger knelt and offered the slipper. Cinderellie's foot slid in. It fitted exactly. Then she brought out its shining twin. Her cousins fell silent. The messenger smiled. “The prince hoped you would come back. The dancing isn't nearly as merry without you.”",
+        scene: "Recognition scene: messenger kneels offering tiny glass slipper, which fits Cinderellie's foot perfectly. Cinderellie in simple dusty-rose dress proudly holds its matching slipper. Two older cousins look surprised behind. Exactly two glass slippers total, one worn and one held. Cinderellie remains preschool age, no adult glamour.",
         vocab: { merry: "cheerful and full of fun" }
       },
       {
-        text: "Her cousins looked at the polished floor, then at Ellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Ellie dress. She took their hands and led them into the dance. No one was left behind.",
-        scene: "Happy ending at second palace children's ball. Ellie in exquisite pearl-lavender silver-leaf gown and both glass slippers leads her two older cousins, auburn coral dress and dark-haired teal dress, by their hands into a dance. Silver-haired fairy godmother in plum cape smiles from doorway. Warm inclusive scene, no wedding, no romantic couple.",
+        text: "Her cousins looked at the polished floor, then at Cinderellie. “We should have waited,” they said. For the next ball, the fairy brought back the lavender gown. This time, her cousins helped Cinderellie dress. She took their hands and led them into the dance. No one was left behind.",
+        scene: "Happy ending at second palace children's ball. Cinderellie in exquisite pearl-lavender silver-leaf gown and both glass slippers leads her two older cousins, auburn coral dress and dark-haired teal dress, by their hands into a dance. Silver-haired fairy godmother in plum cape smiles from doorway. Warm inclusive scene, no wedding, no romantic couple.",
         vocab: { polished: "rubbed until smooth and shiny" }
       }
     ],
     ending: "The End. 🥿",
     questions: [
       { ask: "What did the fairy godmother turn into a carriage?", choices: [["🎃", "A pumpkin"], ["🪑", "A chair"], ["🥣", "A porridge bowl"]] },
-      { ask: "Why did Ellie leave the ball in such a hurry?", choices: [["🕛", "The clock was striking midnight"], ["🎶", "She did not like the music"], ["🌧️", "It had started to rain inside"]] },
-      { ask: "How did Ellie show she was the child from the ball?", choices: [["🥿", "The slipper fitted, and she had its matching twin"], ["👑", "She borrowed the prince's crown"], ["🎃", "She brought a basket of pumpkins"]] }
+      { ask: "Why did Cinderellie leave the ball in such a hurry?", choices: [["🕛", "The clock was striking midnight"], ["🎶", "She did not like the music"], ["🌧️", "It had started to rain inside"]] },
+      { ask: "How did Cinderellie show she was the child from the ball?", choices: [["🥿", "The slipper fitted, and she had its matching twin"], ["👑", "She borrowed the prince's crown"], ["🎃", "She brought a basket of pumpkins"]] }
     ]
   }
 ];
