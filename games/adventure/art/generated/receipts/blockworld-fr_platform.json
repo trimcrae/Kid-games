@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_platform",
+  "style": "M1",
+  "sourceHash": "b461cd2944927980d36acdcec7edc387af3e27df9ddbf9f0223fbc78fdf19169",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9e0f9220-38c2-4620-bffd-de981cae11da.png",
+  "originalSha256": "146b23a8b01ed9cc5ea7b11ab32f3dcb4b7ec620e266753d12d8515282f61d4f",
+  "file": "blockworld-fr_platform.webp",
+  "sha256": "042f491ea22ff2b01f6f81cb7bd706bef19fa3b0af466630c81118240b4a145a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory places last plank on a broad sturdy OCTAGONAL oak platform high around a giant dark-brown pine trunk. Two small ordinary voxel songbirds land by him (one blue and one warmbrown, no hat or captaincrest). Wideview of greenforest quilt far below; platform still empty, no bedroom or tower yet. Short partial guardrails along far edge, frontedge visible to show craft. Friendly panoramic treehouse building moment.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Wide timber platform around pine, Cory placing plank, two ordinary birds; no rooms or tower yet."
+}

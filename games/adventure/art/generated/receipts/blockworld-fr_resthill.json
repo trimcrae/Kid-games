@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_resthill",
+  "style": "M1",
+  "sourceHash": "f7d3bf15592f58051a5cab95490f325b596334c05511c81b4ca8e127d2b480d7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c6a2c905-8a93-4b34-b826-f93a8bc97afb.png",
+  "originalSha256": "31c98768ada851959ba0303b286bf1867b0d6252ac5419b8228c5be92ba2c49d",
+  "file": "blockworld-fr_resthill.webp",
+  "sha256": "c8c56559ff0d847f19eeb2c49bf16d322540e017e632f2aeae7c3d4285ae1135",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory sits on a breezy grassy hill chewing a simple square sandwich. Bartholomew lies relaxed beside him narrating proudly with halfclosed eyes. Both look toward a few fluffy sheep-shaped clouds, broad sky and forestvalley below. White sheep, no extra liveanimals. Middaygentle rest moment. No tools, no buildings distracting from pair.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory snacks beside reclining Bartholomew; whimsical sheep-shaped clouds overhead, consistent voxel scene."
+}

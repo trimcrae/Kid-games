@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_treecraft",
+  "style": "M1",
+  "sourceHash": "4c13ab490c1e6a9b55faf5191f7302d2bba51af127a89ff0cc4ff3dad8e8e18e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ed55ca02-3b4e-4cd8-8d24-235e840839d7.png",
+  "originalSha256": "2411ba51a966e50f7ce5b9f2cf1e6153409ced067e2ba1e2207150af6f27a35c",
+  "file": "blockworld-fr_treecraft.webp",
+  "sha256": "01449018d41d6c429c8adf3156352b98c2e00e966b65ad24da01b31a93090b9d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory makes a small square crafting spot at the BASE of an enormous dark-brown pine trunk: sturdy oak craftingtable, neat plank supply chest and sticks. White cuboid sheep Bartholomew lies in deepgreen shade supervising lazily, same tanface/pinkmuzzle. Cory arranges supplies smiling. Clearly at groundlevel, no platform high in canopy yet. Only boy and sheep.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory organizes crafting station at pine base; Bartholomew rests in shade; only intended pair."
+}

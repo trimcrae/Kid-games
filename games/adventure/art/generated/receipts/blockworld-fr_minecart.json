@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_minecart",
+  "style": "M1",
+  "sourceHash": "7f2d96b938fedb12e1f3efd70289ab10f9cbe34a54676f5a2300bb278d87566a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9608b5fb-420a-4473-982f-3c453199c9e7.png",
+  "originalSha256": "8ddab6f573659508665b149caf26bf8e1fa59e5b9a911e38eabeebde1e0a3097",
+  "file": "blockworld-fr_minecart.webp",
+  "sha256": "846fa5ff85f9b9714f0f37119a72103d088c392448f6d58913bd7826a6209098",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory in deep cave holds pickaxe lowered beside him and counts EXACTLY FOUR loose sparkling gems on broad stone ledge: THREE cyan-blue diamonds and ONE red ruby. Space them in one clear row, all4fullyvisible. Tiny distant orange lava glow and one warmwalltorch; no other gems or diamondore spots anywhere, only these four counting objects. Cory delighted. Cinematic closemedium composition of boy and gem row.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-cv_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly three cyan diamonds and one red ruby on ledge; no extra counting gems."
+}

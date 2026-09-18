@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_ballad",
+  "style": "M1",
+  "sourceHash": "ce41668cd6720b0c9c7ee5b6d13dc7623686a7d4c156bd58613254d7899a7a24",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-dcc69636-3452-4eda-b38f-2ac7dadc00e1.png",
+  "originalSha256": "6db060e1763234b9f0dcd1062f7ef99eade3044d005994ee4d449ea8ac81a7db",
+  "file": "blockworld-fr_ballad.webp",
+  "sha256": "885d15b77c9ddcfe2593e9126a37734eed21891eb5cdb2f1559f1e0c0e48ad2a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove ONLY the small green creature at the lower right. Preserve Cory and the large white sheep with grass in its mouth; these are the ONLY TWO characters. Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-3ff1dd63-20a4-41dc-809b-72f5ba2fa2fa.png"
+  ],
+  "reviewed": true,
+  "review": "Only Cory and Bartholomew; sheep's proud expression, grass snack and empty-handed listening pose retained."
+}

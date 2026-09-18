@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_morewood",
+  "style": "M1",
+  "sourceHash": "3ea224d0bb66cb0ca176d6b556e5c0f3ef68401d2f635aa8fd0baff92da960a7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b22265db-6c24-4382-b374-e3d560a157fa.png",
+  "originalSha256": "ffdb47d9234315a39e134a3ea9cd2b7b042a8fb405b1050ba6aa34889d61f9cb",
+  "file": "blockworld-fr_morewood.webp",
+  "sha256": "76e329bd91aed564574c3bd0ee829c8298f5f116e2f9ddf0887d6f4d20c838c5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove BOTH the white sheep and small green creature. Cory is the ONLY character. Preserve exactly TEN log cubes in two rows of five and the thought bubble showing ONE log becoming FOUR plank blocks; do not alter these counts. Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-35be12cf-8a42-4242-a15f-4ecb6457a298.png"
+  ],
+  "reviewed": true,
+  "review": "Only Cory; exactly ten logs in two rows of five. Diagram shows one log to four planks."
+}

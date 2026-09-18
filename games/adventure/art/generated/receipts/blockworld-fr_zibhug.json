@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_zibhug",
+  "style": "M1",
+  "sourceHash": "18a28407983253eb876266d846c4735377308a5647060dc36d24d98831727451",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a03f433f-661e-4c65-bf75-5407b276eb01.png",
+  "originalSha256": "bddf7ae0fbb8bfac52928039f48ef284f9729f731e18c9b4f7b4db183baecc11",
+  "file": "blockworld-fr_zibhug.webp",
+  "sha256": "820d10622042df0fb507bdbaec4b589be2646cb3ec92f134c80975e25b906247",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory kneels and warmly hugs small Zib by wrapping his two arms around Zib's narrow torso, cheek near green cuboid head. Zib has NO arms, four short feet planted on grass; beams happily with tiny golden fizz sparkles (NOT explosion). Tall pine trunks and oak grove behind. Exactly Cory and Zib. Tender readable embrace, no extra human limbs. Bartholomew is the same white cuboid sheep/tanface/pinkmuzzle/brownhooves/fourlegs in reference, no horns/clothes unless stated. Zib is the same tiny friendly limegreen cuboid Fizzer, four stubby feet, NO arms/wings/horns/tail, shy square eyes/small smile. Include only characters specified in this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_deep.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory kneels and hugs armless four-foot green Zib with full torso; soft gold fizz, no explosion, matching M1 characters."
+}

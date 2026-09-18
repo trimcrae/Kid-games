@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_tallpine",
+  "style": "M1",
+  "sourceHash": "7c5c0060bb799581f69bc3af7865a276f3a4964750fe2f9b0be80c4466da9423",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3ff2320d-ffea-4a64-862c-16468133c045.png",
+  "originalSha256": "c65e3bcb20154d48dc8849d19aef4a73e2a15dd6e2b798878939897d8c8045fa",
+  "file": "blockworld-fr_tallpine.webp",
+  "sha256": "5ddfa478464d80ac62de2e4b749c4243fb901e01e8677d7771924d3285dcc08b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory at base of the single TALLEST PINE in forest, looking up with delighted awe. Enormous straight dark-brown cubical trunk, tiers of deep pine-green stepped branches disappearing into high sky. Small pile of woodblocks nearby ready to start climbing. No ladder or treehouse built yet, no companions. Dramatic upward wideangle emphasizes giant tree, Cory entirebodyforeground.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Tallest pine dominates upward perspective; Cory at base with spare logs, no premature treehouse."
+}

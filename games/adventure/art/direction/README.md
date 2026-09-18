@@ -22,6 +22,8 @@ The user selected **M1, R3, C2, P2, S1, L1** on September 17, 2026, after review
 
 ## Continuity and generation
 
+Use the [production character references](continuity.md) for accepted designs and recurring settings.
+
 1. Use only the selected panel of the relevant sheet as the style reference. Explicitly identify its position in every generation prompt. The other two panels are unselected alternatives and must not influence the image.
 2. Use the sheet for medium, finish and visual language, not as an exact cast, identity, costume or scene specification. The samples contain invented staging and simplified casts.
 3. Read the exact story node, its original artwork, and relevant earlier branch nodes before generating each scene. Respect actions, expressions, named colors, counts, acquired items and who is actually present.

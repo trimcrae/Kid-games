@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_craft",
+  "style": "M1",
+  "sourceHash": "d43a35008f14054953c0970a3e8ff7dc7e22cc217a65f7f8b1cf2c4a733eb349",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-442fbca4-454b-4a7b-9872-9d2a904efdb9.png",
+  "originalSha256": "7cb582113fb3daecfd972e5ee3b65f46d03ec8573750087f31af7b5cc0048845",
+  "file": "blockworld-fr_craft.webp",
+  "sha256": "e7971c67d4176c5747683dc7b92b241bdc7ae49919ad47ca39197f1e94a5be83",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove BOTH the white sheep and small green creature. Cory is the ONLY character. Preserve crafting table, woodplanks, sticks, and two tool DIAGRAMS on sign. No actual finished tools. Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-39310a34-66a7-45af-971a-5a06ae07dd25.png"
+  ],
+  "reviewed": true,
+  "review": "Only Cory at crafting table with raw planks/sticks and tool diagrams; no prematurely crafted tools."
+}

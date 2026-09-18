@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_baseplan",
+  "style": "M1",
+  "sourceHash": "db87713027b9622ef6763d25c4f2bc120fa4ed0044846b16c7fccb2b04365b4a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-42d450d2-f708-4ef6-b23f-a211575ae355.png",
+  "originalSha256": "8775381f4ff66809fe0f3c666ec869d490411c413654c5ac62368fb351d14047",
+  "file": "blockworld-fr_baseplan.webp",
+  "sha256": "b979584f0b75f023a2e9350393cead761c9db61b94ab27c0e7146578bb7d59b0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove BOTH the small green creature and white sheep. Cory is the ONLY character. Preserve sign CORY’S MEGA BASE and all three dirt drawings (cottage, fortress, bunker). Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-f8cdeb50-653f-41a5-aac4-7e90fe6461f5.png"
+  ],
+  "reviewed": true,
+  "review": "Cory alone sketches three distinct building options; correct CORY'S MEGA BASE sign."
+}

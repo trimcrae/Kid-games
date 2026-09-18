@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_recipe",
+  "style": "M1",
+  "sourceHash": "b07716d5b78849e6133c44f4a33ee85e4320697f1c79e20ff1e97395b197565e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7048a336-13e0-4847-ac9b-8ebd3f9a679c.png",
+  "originalSha256": "3a7045167f49cb60dfbc200f9443651e35a54835863e4ac84b4795706c4d3636",
+  "file": "blockworld-fr_recipe.webp",
+  "sha256": "5b89b4cb72908d82ccad4686e55d12736eb56cb6baf51d80f3b4947bf21faad5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove ONLY the white sheep at left. Preserve Cory and the taller green Fizzer Zib with torso and feet. Preserve recipe sign EXACTLY: 3x3 grid with three planks across top row, one stick in center-middle, one stick in center-bottom; othercells empty; text 3 + 2 = 5. Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-2b8e6f6a-13c2-493d-9a66-a7861159f13d.png"
+  ],
+  "reviewed": true,
+  "review": "Cory and Zib only, exact five-piece recipe: three planks across top, two sticks vertically centered; 3+2=5 correct."
+}

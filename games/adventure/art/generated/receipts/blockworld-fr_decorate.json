@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_decorate",
+  "style": "M1",
+  "sourceHash": "921b87302a70866105f5cc7a066d9560085f624bd2ae2a0b17576448b156182b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d76cf3bb-f8d0-4a08-83cc-a1a9fd9923c0.png",
+  "originalSha256": "0c18b2050e1b47fa0dc83edee19c580588f05d96faab989d67bab0f921fed9f2",
+  "file": "blockworld-fr_decorate.webp",
+  "sha256": "4b830a689b702abf4315404db492bf8e8a08b80f5521969a3dda6ac71c33b73a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Narrow edit only to TWO framed wall decorations in upper-right. Replace cyan sword inside LEFT frame with a simple golden WOODEN HOUSE emblem. Replace green creature-head trophy inside RIGHT frame with a simple cyan DIAMOND GEM emblem. These are flat decorative picture icons inside existing frames, not body parts or weapons. Preserve everything else: Cory reclining happily, white rug, warm torches, chest, sunsetwindow, framing and cinematic voxel style. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-6c92f96e-68c0-4702-88cc-9ea3d82b88e0.png"
+  ],
+  "reviewed": true,
+  "review": "Cory reclines on white wool rug; chest, torches and sunset. Frames corrected to house and gem emblems."
+}

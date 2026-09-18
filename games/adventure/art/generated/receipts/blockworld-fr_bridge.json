@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_bridge",
+  "style": "M1",
+  "sourceHash": "101cbc88eb9fe22d8d9574bdc937521befab14919334f04119c1287d477f2522",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f7615569-5730-4433-979f-3fb78559d933.png",
+  "originalSha256": "b4069d75d8cd66e1dfb38cec5698a590020360a0b0d3efbd3ec98de531b72a91",
+  "file": "blockworld-fr_bridge.webp",
+  "sha256": "0f1ddbbad16c4c305f5dddf1a3fe2e415dc3731cfd9b8c590cba9406cd4b7c70",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory tiptoes carefully across EXACTLY THREE large rectangular wood-plank blocks bridging a gap between TWO giant pine trunks. Frame from above at threequarter angle so three adjacent top faces and TWO seams are clearlyvisible; each plank is one uniform block wide. No fourth plank or additional steppingblocks across gap. Pinebranches on either side supportends, forest distantbelow. Boy centeredonmiddleplank, armsout balance, no othercharacters. Clear educational three-block bridge.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly three large plank blocks bridge two pines; two seams visible, Cory on middle block."
+}

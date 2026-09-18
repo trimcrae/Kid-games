@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_chop",
+  "style": "M1",
+  "sourceHash": "349d651be3bdc85fa65f8cc8b45dd8a88bf8e6daac22a3ab1167f476d5e00209",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d8ca7e85-d37a-4a00-8d63-dd6be8257b91.png",
+  "originalSha256": "5c89ee660b9601d8c935d713d538975962cf15c7562d56219f5a24fd5bde052b",
+  "file": "blockworld-fr_chop.webp",
+  "sha256": "a1ff16475cbcc3d0c80b75093b072c04a0a0c18557631560514ecf2df4f1fffb",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Remove the tiny GREEN CREATURE standing on the grass in the LOWER LEFT of this picture, to the LEFT of the boy's left boot (approximately 15% from left edge, 69% from top). Replace that entire little green head, eyes, mouth, body and feet with plain grass and natural forest background. There must be NO green creature, NO face hiding in grass, NO animal. The blue-shirted boy is the ONLY living character. Preserve all other pixels as closely as possible, especially exactly FOUR floating cubic logs, tree, boy, lighting and cinematic voxel style. One narrow removal edit only. Full 4:3 image.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46/exec-cd4ccfe5-b719-463d-aea1-af6813f10875.png"
+  ],
+  "reviewed": true,
+  "review": "Final correction removes both extra companions; exactly four floating logs, Cory punches tree empty-handed."
+}

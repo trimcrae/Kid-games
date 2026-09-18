@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_mushroom",
+  "style": "M1",
+  "sourceHash": "4074288d69a40d41c37ef9b554498256b4a5e5ef0c395133aa5106327ed44b10",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3c3ea8f8-4fc7-483a-b74f-c1a3dcdd5f17.png",
+  "originalSha256": "0238dbe7e851b6f4e7ea2761eb0356f3fab0f1d8e7ccda4caa78550c58002a13",
+  "file": "blockworld-fr_mushroom.webp",
+  "sha256": "b91a1abc9ffa04b052f40e1485e33ac8b08ebb56976db0a18c40fcfef6cca836",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove ONLY the small green creature at lower right. Preserve Cory holding exactly TWO giant mushrooms (one red and one brown) and the excited white sheep. Only those two characters. Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-f80c6237-0c86-4fe6-9a02-7a764ac5cf5e.png"
+  ],
+  "reviewed": true,
+  "review": "Only Cory and Bartholomew; exactly two giant mushrooms, red and brown, held clearly."
+}

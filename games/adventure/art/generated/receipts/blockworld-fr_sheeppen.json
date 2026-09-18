@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_sheeppen",
+  "style": "M1",
+  "sourceHash": "2129dfad4e22e3e7457935663bda11165798bedfc04edad30cd1dad8a9549e48",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-dfa5f673-d9b2-4e93-ae4a-828fd34ea1e5.png",
+  "originalSha256": "c0e3d7cc6eded08e61235cf16330a64a7a094788f3bba4ac1c070c589f5010bf",
+  "file": "blockworld-fr_sheeppen.webp",
+  "sha256": "930b4980b3fb7ae43992ab208265d8c3bbd0b78d5f6588ff42a85fed25381116",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cory finishes friendly wooden fenced sheep pen in sunny meadow. EXACTLY TWO white voxel sheep inside: Bartholomew with proud eyebrows/tanface/pinkmuzzle and a slightly smaller sheep friend with same basic anatomy. Both baa enthusiastically at each other. Exactly4legs each. A trough of clearwater and little patch of fresh grassbuffet inside. Cory outside pen smiling holding one fencepiece, no other animals anywhere. Counttwo clear.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly two white sheep with four legs apiece inside pen; water trough and grass, Cory outside."
+}

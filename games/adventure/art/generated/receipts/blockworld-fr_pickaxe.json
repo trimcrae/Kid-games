@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_pickaxe",
+  "style": "M1",
+  "sourceHash": "a55342f84bd4f5401c08459395202eddc52a520015258b4231bedb79914e61ef",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a224710b-8427-4115-8db7-4815f84c0b56.png",
+  "originalSha256": "4ada6710af511820aae7e512c1a0393a1e48ce32b97899beab55aa7e015efcad",
+  "file": "blockworld-fr_pickaxe.webp",
+  "sha256": "1391d8863db45ded10c9cb6871070dd1f9873f22af8829dc9b7b47b199585bde",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "NARROW EDIT to this finished illustration. Remove ONLY the white sheep from left background. Preserve Cory mining with wood pickaxe and the green Fizzer Zib. These are the only two characters. Preserve Zib's full torso and feet. Fill removed subjects naturally with the existing grass/ground or forest. Everything else stays unchanged: character identity, cubic anatomy, lighting, composition, style, all counting objects and story details. Maintain full-bleed 4:3 cinematic voxel illustration. Do not add any new character, prop, label or text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-d96216a7-29f9-49aa-8016-adc5c1b2cf42.png"
+  ],
+  "reviewed": true,
+  "review": "Cory mines with wooden pickaxe, Zib watches; extra sheep removed. Matching full-bodied green Fizzer."
+}

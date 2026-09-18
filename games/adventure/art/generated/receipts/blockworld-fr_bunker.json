@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_bunker",
+  "style": "M1",
+  "sourceHash": "6e0987647d48e0e3a1defd9758a16e78a508293424483b39a17ae3300f9858cd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-bdf65327-18b7-4992-b8cb-e895d4b946be.png",
+  "originalSha256": "06a417c018e3d767f93c357b59fc8ff908d9dfdc74ac372979fea740bab6155b",
+  "file": "blockworld-fr_bunker.webp",
+  "sha256": "ea0577f62bc34457df5e9a179bbaa87a5545ed140dea80c822bf64cba1025175",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Cutaway-like view into underground stone-and-dirt cozy secret bunker, lit by two friendly walltorches, entrance ladder at back. Cory whispers finger-to-lips while trying to hide a small wooden chest of cookies. Zib has already discovered it and peeks into OPEN chest filled with voxel chocolatechipcookies. Zib tiny green armless fourfoot creature as reference, face mischievous happy. No other characters. Warm funny cozy secret room.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_deep.webp"
+  ],
+  "reviewed": true,
+  "review": "Warm underground bunker, ladder and cookie chest; Zib finds cookies while Cory whispers."
+}

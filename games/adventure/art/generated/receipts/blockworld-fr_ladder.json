@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_ladder",
+  "style": "M1",
+  "sourceHash": "b6bf37795921a998b9e4c0260645d5761d7507f465706c0fee95d1723d5154c7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b1f70135-5848-467d-8803-b89dab1d08ea.png",
+  "originalSha256": "31d043e9c7ed713f5735f9ebbbdedcf1a078f89a27e00f8d5b9351646dc54f96",
+  "file": "blockworld-fr_ladder.webp",
+  "sha256": "4d22902ce36cd4ec7401483af5100ca48b5d0aba8f546b84ba229233d321dd46",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Narrow correction to small green creature at ladder base. It is an ARMLESS Fizzer: REMOVE the green ARM/HAND protruding from its upper torso and touching the ladder. Keep its green square head, face and narrow straight torso; it leans its CHEST gently against ladder to steady it, with FOUR stubby block feet all planted on ground beneath body. No arm, no fingers, no raised frontpaw. Preserve Cory climbing, the complete ladder, pine trunk, forest, layout and lighting. Exact same cinematic voxel 4:3 image except this anatomical fix.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46/exec-7f945ce7-09b5-4306-8fc2-131d1b970abb.png"
+  ],
+  "reviewed": true,
+  "review": "Cory climbs continuous ladder; Zib corrected to armless body bracing base, consistent green design."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_fortress",
+  "style": "M1",
+  "sourceHash": "d68e90ddc68187749d034deb7f7dca7ce35e842f1403793a2e3d4b1a33472ee2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fb494bcf-fa28-43b9-b6c2-cd2257365799.png",
+  "originalSha256": "8d91f0a119805cfef753deec5e016dd1666f43edfcebae47e80703426ccafb8b",
+  "file": "blockworld-fr_fortress.webp",
+  "sha256": "8329170768b8f25d1b593c92fc999ff8f1fec2a806789274c62b40e95bddcfe3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. High three-quarter view of Cory's magnificent square stonefortress with EXACTLY FOUR corner towers, all four separately visible: frontleft, frontright, backleft, backright, connected by four low perimeter walls around an EMPTY open courtyard. Each tower has one redflag. No central keep, no extra turret, no backgroundcastles. Cory stands centerforecourt pointing proudly counting four corners. Bright greenforest surrounds, skywide. Educational count four towers must unmistakable.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-bw_intro.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly four corner towers and four flags around open courtyard; all four clearly visible and countable."
+}
