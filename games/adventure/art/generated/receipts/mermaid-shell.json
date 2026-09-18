@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "shell",
+  "style": "S1",
+  "sourceHash": "c8cdfd4490033116524c29779313b530fc159b38d60df65a9df531aae8548d43",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-aab6f19a-ca53-4304-8682-b911f1663344.png",
+  "originalSha256": "1a120f65d5e8626685ad4e45c664d4af4362463f677e0632d29b52d34274f5c5",
+  "file": "mermaid-shell.webp",
+  "sha256": "b35f2a724e338a2b2b2113bed50f2e1946237c75a80abd15685afad328aed20e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nEllie holds the big pink shell to her ear. Ssshhh… listen… a teeny tiny \"la-la-laaa\" is echoing far away! A crab scuttles up and clicks: \"That echo came from the coral garden!\"\nONLY Ellie and one small red crab on the seaside sand. Ellie gently presses the big PINK spiral shell to one ear and listens with thoughtful expression. Crab raises one claw toward the sea as if guiding her. Use a closer composition than opening, full body and shell visible. No mermaid, dolphin, fish, writing or musical notes; the distant sound is heard, not written.",
+  "references": [
+    "art/generated/mermaid-shore.webp"
+  ],
+  "reviewed": true,
+  "review": "Ellie listening with pink spiral shell held to ear, one guiding red crab, no mermaid or premature notes; matching mosaic medium."
+}

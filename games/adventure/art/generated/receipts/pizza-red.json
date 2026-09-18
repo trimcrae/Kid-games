@@ -1,0 +1,22 @@
+{
+  "storyId": "pizza",
+  "nodeId": "red",
+  "style": "P2",
+  "sourceHash": "07a37764eb318dd365ed624f181331a1a83cc22c89f12d37112cd1ea73bb356c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-eca688af-eeb6-4149-b7f4-1a5c34b73dff.png",
+  "originalSha256": "64d945b0d897d12879ad56a535633894d7935c4ce1fcb11818826a4c151ee5f5",
+  "file": "pizza-red.webp",
+  "sha256": "b0841beb91ea3cb4b9b60e585d8b8a840854ba6198aa9c3d71bc3bd4725ec56d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished single landscape 4:3 illustration for Pizza Planet Rescue. Match ONLY the MIDDLE P2 Clay cosmic comedy panel in the reference sheet: handcrafted stop-motion clay miniature world, visible thumbprints and sculpting marks, tactile clay food and sets, soft colorful studio light, expressive squishy creatures. No printed comic, flat retro poster, painted storybook, plastic shine, text, labels, panels, borders or watermarks.\nROCKET LOCK: same friendly red clay rocket, pointed rounded nose, circular dark-blue porthole with cream rim, three red landing fins, small yellow pizza-slice emblem (no writing), grey ramp when landed. No human pilot visible; captain is the player. Frame important subjects fully and clearly.\nILLUSTRATE ONLY THIS PAGE:\nPAGE: Touchdown on the Red Planet — it's dusty and red, a bit like Mars! The aliens here have THREE eyes and they're starving. They each want pizza. How shall we top it?\nRocket landed on dusty red rocky planet behind EXACTLY TWO little coral-red aliens, both with exactly THREE white eyes in a horizontal row, two short antennae, two arms, two feet, tiny ear nubs and rounded lumpy bodies. One larger and one slightly smaller. Hungry but friendly expressions, hands near rumbling tummies. A closed cardboard pizza box on a low rock in front, no toppings chosen or food eaten yet. No text. No other aliens, planets or humans. Entire scene crafted in clay like P2; repeatable alien designs.",
+  "references": [
+    "art/direction/pizza-options.png (middle/P2)"
+  ],
+  "reviewed": true,
+  "review": "Two coral-red aliens, each with exactly three eyes; closed pizza box, hungry hands on stomachs, consistent red clay rocket and terrain."
+}

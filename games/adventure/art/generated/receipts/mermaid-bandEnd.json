@@ -1,0 +1,23 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "bandEnd",
+  "style": "S1",
+  "sourceHash": "9453e230f61be676efd7b5076311e36cc21b8fc0057d3b965c8e6a065ff54d44",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-681ef53e-0105-445b-b590-c8ddd5f0e766.png",
+  "originalSha256": "d6a59609173bb2af299f66689a2dff5d880e89f74707bba5584a575c76c1c6d2",
+  "file": "mermaid-bandEnd.webp",
+  "sha256": "9d4219d9f308959c008f78c761054f6293355b2ae445acb7a0fea593d92264c9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nBOOM, boom, BOOM! The bubble-drum band marches around the reef all afternoon, and the little mermaid laughs so hard she finds a brand-new song — a giggly one! Music can be found anywhere.\nEntirely UNDERWATER scene in bright afternoon light through water. THREE canonical stripy fish (orange/cream, blue/yellow, green/cream) parade left-to-right around reef blowing large pearly bubble drums with little rhythmic arcs, while red crab marches along sandy seabed below. Mermaid floats nearby at right, laughing joyfully with eyes happily closed and hand near mouth; turquoise tail and teal hair matching reference. A few silver music-note shapes rise from her. No Ellie or dolphin. Five creatures/characters total: three fish, crab, mermaid. Clear joyful distinct composition, same sea-glass mosaic material, no written sounds or words.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/mermaid-shore.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/mermaid-coral.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly three striped fish play bubble drums, crab clicks claws, mermaid laughs. Mosaic medium and recurring designs match."
+}

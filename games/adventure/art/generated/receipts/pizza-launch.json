@@ -1,0 +1,23 @@
+{
+  "storyId": "pizza",
+  "nodeId": "launch",
+  "style": "P2",
+  "sourceHash": "291a360d5c796cb1fcffc1669a95d440c0541abf0b3456574ddfdb02572975d9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8887a30f-5acd-4230-adb7-582fb1e9e633.png",
+  "originalSha256": "a98cead2a826ada5f611e9478e5572d8a2eab86178a15d6947548efb2961a0d8",
+  "file": "pizza-launch.webp",
+  "sha256": "3133972f40f9d6222f421a7e327367c42314940b9ce5c6a5bccd2acd5a407d60",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished single landscape 4:3 illustration for Pizza Planet Rescue. Match ONLY the MIDDLE P2 Clay cosmic comedy panel in the reference sheet: handcrafted stop-motion clay miniature world, visible thumbprints and sculpting marks, tactile clay food and sets, soft colorful studio light, expressive squishy creatures. No printed comic, flat retro poster, painted storybook, plastic shine, text, labels, panels, borders or watermarks.\nROCKET LOCK: same friendly red clay rocket, pointed rounded nose, circular dark-blue porthole with cream rim, three red landing fins, small yellow pizza-slice emblem (no writing), grey ramp when landed. No human pilot visible; captain is the player. Frame important subjects fully and clearly.\nILLUSTRATE ONLY THIS PAGE:\nPAGE: Captain, this is Pizza Control! Three planets full of HUNGRY aliens need lunch. Your pizza rocket is fuelled and ready. Which planet shall we zoom to first?\nShow the red pizza rocket flying diagonally through a handmade starry space set with warm sculpted-clay flame. EXACTLY THREE distinct planets clearly separated: one dusty RED, one entirely BLUE water world, one PURPLE world with three spaced thin rings. No additional moons or planets, no characters, no humans, no pizza boxes. Composition clear enough for a preschooler to choose a destination; same P2 clay look throughout the space scene.\n\nCORRECTION PASS:\nEdit this exact image, preserving all composition, rocket, planet positions, star background, colors, clay medium and lighting. Correct ONLY TWO story-accuracy details. (1) The BLUE planet is an ALL-WATER world: remove every green/brown land patch, replace with blue sculpted ocean and white wave/cloud details; no land whatsoever. (2) Replace the purple planet's current two offset loops with EXACTLY THREE distinct concentric coplanar Saturn-like rings with open gaps: innermost PEARLY CREAM, middle LILAC, outer GOLD. All three are separately visible across the front and sweep behind the planet. Do not add a fourth. Keep exactly three planets total, no creatures or writing. Landscape 4:3 unchanged.",
+  "references": [
+    "art/direction/pizza-options.png (middle/P2)",
+    "exec-1e4eab59-b051-4c54-9b00-d74b935c3c05.png (edit target)"
+  ],
+  "reviewed": true,
+  "review": "Corrected launch now has exactly three planets: dusty red, entirely blue ocean with clouds, and purple with three distinct cream/lilac/gold rings; clay rocket and composition retained."
+}

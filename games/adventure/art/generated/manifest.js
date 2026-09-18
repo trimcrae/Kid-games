@@ -22,6 +22,31 @@
     "wish": "art/generated/campout-wish.webp",
     "foxEnd": "art/generated/campout-foxEnd.webp",
     "reuniteEnd": "art/generated/campout-reuniteEnd.webp"
+  },
+  "pizza": {
+    "launch": "art/generated/pizza-launch.webp",
+    "red": "art/generated/pizza-red.webp",
+    "blue": "art/generated/pizza-blue.webp",
+    "spicy": "art/generated/pizza-spicy.webp",
+    "cheese": "art/generated/pizza-cheese.webp",
+    "frisbee": "art/generated/pizza-frisbee.webp",
+    "boat": "art/generated/pizza-boat.webp",
+    "ring": "art/generated/pizza-ring.webp",
+    "partyEnd": "art/generated/pizza-partyEnd.webp",
+    "moreEnd": "art/generated/pizza-moreEnd.webp"
+  },
+  "mermaid": {
+    "shore": "art/generated/mermaid-shore.webp",
+    "shell": "art/generated/mermaid-shell.webp",
+    "dolphin": "art/generated/mermaid-dolphin.webp",
+    "coral": "art/generated/mermaid-coral.webp",
+    "crabpath": "art/generated/mermaid-crabpath.webp",
+    "bubble": "art/generated/mermaid-bubble.webp",
+    "fishhelp": "art/generated/mermaid-fishhelp.webp",
+    "found": "art/generated/mermaid-found.webp",
+    "singEnd": "art/generated/mermaid-singEnd.webp",
+    "concertEnd": "art/generated/mermaid-concertEnd.webp",
+    "bandEnd": "art/generated/mermaid-bandEnd.webp"
   }
 };
   for (const story of window.STORIES || []) {

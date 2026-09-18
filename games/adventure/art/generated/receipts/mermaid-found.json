@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "found",
+  "style": "S1",
+  "sourceHash": "6de028a96c01f607e5d181e69b8b89ddc43d55e86825f78a20050c8289654b53",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-bc251579-9bc3-4077-bab5-e79417c317ce.png",
+  "originalSha256": "84fd58942f730794029bf70e430222f92198f324c0ba274762a533b102505658",
+  "file": "mermaid-found.webp",
+  "sha256": "cae862a69a709c70baaf46ab11a8f06b3d14c3ee596db07777cfa2a4bedbf64b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nTHERE it is! Tangled in the seaweed sits the mermaid's song, shimmering like a ribbon of stars. Ellie gently sets it free, and it swirls straight back into the mermaid's heart. She beams!\nUNDERWATER fairy-tale scene: Ellie, in same lavender dress and silver tiara, kneels on pale seabed and gently untangles a luminous silver-and-pearl ribbon threaded with tiny star-shaped glass pieces from green seaweed with both hands. Ribbon flows in one graceful clear curve from the seaweed toward mermaid's upper chest at right; a warm little glint over coral tunic suggests song returning to her heart, no anatomical heart imagery. Mermaid beams with relief, turquoise tail curled, same teal hair. Only these TWO characters, no fish, dolphin or crab. Glass mosaic throughout; no words, no air tanks, no helmets, no bubbles hiding faces.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/mermaid-shore.webp"
+  ],
+  "reviewed": true,
+  "review": "Ellie frees a shimmering song ribbon from seaweed beside the consistent teal-haired mermaid."
+}

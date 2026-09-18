@@ -1,0 +1,23 @@
+{
+  "storyId": "pizza",
+  "nodeId": "ring",
+  "style": "P2",
+  "sourceHash": "d4e0db5ff33526ac69744908bf8305864824c95d916fbb1fc36b2287b64eb195",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ad17c6e6-de9b-403c-a014-d54cac613545.png",
+  "originalSha256": "0f3226ab3cf7c5b08c6d2e4318793186434ac7dd64c53e498b22ccf513bf6e3c",
+  "file": "pizza-ring.webp",
+  "sha256": "166d0df9e0f0b75413ed02ef6b650b8364c1f1f8ec3ef6f2bac15fd42d0fb2d7",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished single landscape 4:3 illustration for Pizza Planet Rescue. Match ONLY the MIDDLE P2 Clay cosmic comedy panel in the reference sheet: handcrafted stop-motion clay miniature world, visible thumbprints and sculpting marks, tactile clay food and sets, soft colorful studio light, expressive squishy creatures. No printed comic, flat retro poster, painted storybook, plastic shine, text, labels, panels, borders or watermarks.\nROCKET LOCK: same friendly red clay rocket, pointed rounded nose, circular dark-blue porthole with cream rim, three red landing fins, small yellow pizza-slice emblem (no writing), grey ramp when landed. No human pilot visible; captain is the player. Frame important subjects fully and clearly.\nILLUSTRATE ONLY THIS PAGE:\nPAGE: Last stop: a purple planet wrapped in shiny RINGS, just like Saturn! Count the rings with me: one, two, three glittering rings. The ring-aliens are throwing a party. Should we join?\nLarge fully visible PURPLE clay planet centered in space. Exactly THREE distinct concentric thin rings around it, evenly separated with dark space gaps so each can be counted: innermost pearly cream, middle lilac, outer gold. Show ring backs occluded correctly by planet, no extra arcs or rings. TWO tiny friendly ring aliens standing at top of miniature planet: one lilac, one yellow, both round clay bodies with two eyes, little arms and feet and a single small ring around their waist. Small clay confetti overhead. Red pizza rocket approaches lower left with clay flame. No text, no pizza party aboard yet, no humans.\n\nCORRECTION PASS:\nEdit this exact image, preserving every detail of the purple planet, its EXACT THREE rings (cream, lilac, gold), two celebrating ring aliens, rocket, asteroids, confetti, lighting, clay texture and composition. Correct only the small BLUE background planet at upper left: remove every green or brown land patch and replace with BLUE OCEAN texture plus existing white cloud wisps. This is the story's all-water planet, so NO land. Do not change any other object or add any text.",
+  "references": [
+    "art/direction/pizza-options.png (middle/P2)",
+    "exec-eb9c328e-a4a3-4dd2-917f-8b279c7e2ed8.png (edit target)"
+  ],
+  "reviewed": true,
+  "review": "Three distinct countable planet rings, two ring aliens, matching rocket; corrected blue background world has no land; chosen clay medium."
+}

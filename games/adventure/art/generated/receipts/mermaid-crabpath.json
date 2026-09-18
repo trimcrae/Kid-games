@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "crabpath",
+  "style": "S1",
+  "sourceHash": "d631edc80507510d8bee48282598657293812589ac219451e6bc4cee2f993400",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7fe904f5-3de2-4a77-aff2-8c4d8410f829.png",
+  "originalSha256": "5260aca217316df8cc0c280521b1a6c2170ad60e1bd271891d410aeb60fac2c6",
+  "file": "mermaid-crabpath.webp",
+  "sha256": "e7b785680752e35f452c2354a8ddef2f428c2a93af60fc8154fe17d588aa0d10",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nThe crab's shortcut goes right through a tiny sandcastle town! Tip-toe, tip-toe — careful not to squish the towers. On the far side, music sparkles on the waves like sunshine.\nEllie tiptoes carefully behind one red crab along a narrow clear sand path between FOUR tiny elaborate sandcastles, towers intact and not touched by shoes. Glass-mosaic beach, glistening sea beyond with a few silver musical-note shapes in sparkle patches above waves. Cast ONLY Ellie and crab; no mermaid, dolphin or fish. Full girl's feet visible carefully avoiding castles, warm playful scene with same glass medium and costume.",
+  "references": [
+    "art/generated/mermaid-shore.webp"
+  ],
+  "reviewed": true,
+  "review": "Ellie carefully crossing clear path between four intact sandcastles, red crab leading, silver musical shapes over sea; same costume and mosaic."
+}

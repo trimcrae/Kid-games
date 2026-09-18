@@ -1,0 +1,25 @@
+{
+  "storyId": "pizza",
+  "nodeId": "partyEnd",
+  "style": "P2",
+  "sourceHash": "e1d2807e583f48ad1de5aacb68989420e1d99c3eae220d9540016ed805848455",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-756c418f-7506-4ee1-b8db-53bc350cf97e.png",
+  "originalSha256": "4be4f875b0416e01d7ac6fc9f38a0c4f8085950b3e264b87ba0c21de13c22127",
+  "file": "pizza-partyEnd.webp",
+  "sha256": "720eff07474b6aa305b00d4eeccc067f6f14604c4ec4e52f823dcfaa614e8894",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 single illustration for Pizza Planet Rescue, in the EXACT tactile stop-motion CLAY medium of the attached accepted story page(s). Reference images specify canonical models and colors, not scenes to copy. Hand-sculpted imperfections, thumbprints, rich saturated miniature set, appealing cinematic light, no plastic gloss, no cartoon painting, no lettering, labels, watermark or panels. Same red clay rocket with cream-rimmed round porthole and yellow pizza-slice emblem when present. No visible human captain; the captain is the player. Only scene's requested cast.\nILLUSTRATE ONLY THIS PAGE:\nCaptain beams every alien aboard for the BIGGEST space pizza party ever — red ones, blue ones, ringed ones, all sharing slices among the stars. The whole galaxy is full and happy. Mission complete, Captain!\nShow INSIDE the red pizza rocket's spacious cheerful galley, clay walls with cream-rimmed round windows showing stars. SIX aliens sharing pizza around a big low circular table: two coral-red three-eyed aliens from reference1, two floating blue jellyfish (aqua and pale blue, two eyes and four tentacles) from reference2, and two round ring aliens (one lilac one yellow, two eyes, single waist ring) from reference3. Each species keeps exact reference design. Clay pizza with cheese and pepperoni on table, slices in hands or tentacles, joyful confetti. All six faces visible, no humans, no writing. Preserve distinctive anatomy; do not give jellyfish legs or make red aliens two-eyed.\n\nCORRECTION PASS:\nEdit this exact image only: replace the three PLANETS visible through the three porthole windows with matching starfield and soft nebula. Windows should look out onto stars ONLY, without planets or asteroids. Keep all six aliens, their faces and anatomy, all pizzas, hands and tentacles, table, walls, windows, lighting and clay medium exactly unchanged. Do not alter the ring aliens' waist rings. No other changes.",
+  "references": [
+    "art/generated/pizza-red.webp",
+    "art/generated/pizza-blue.webp",
+    "art/generated/pizza-ring.webp",
+    "exec-95e16f98-0f15-457a-bc5a-61b52d586a16.png (edit target)"
+  ],
+  "reviewed": true,
+  "review": "Six canonical aliens aboard galley, two of each species; correct red eyes, jelly anatomy and waist rings; star-only windows remove conflicting planet details."
+}

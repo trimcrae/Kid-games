@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "coral",
+  "style": "S1",
+  "sourceHash": "88bb16012b69c80a5a2644ac533f0e6bbcf539f94d5bdbc29f3d21131de4f334",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-543fccc4-bc29-4fdb-a2ff-7fc6162a759a.png",
+  "originalSha256": "0db5d30cd860c1f75b88665f8e9c2621cd31f54a3c97ad9b5184f2cecc934e4a",
+  "file": "mermaid-coral.webp",
+  "sha256": "b0e3385fa1c189d2c8742f58600552462ff22d70370d3430c23c71e3263c281f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nDown in the coral garden, stripy fish are humming along to… something! Count the corals with me: one, two, THREE. The humming is loudest by the pink one.\nEntirely UNDERWATER mosaic scene, no beach or sky. EXACTLY THREE separate clearly countable coral colonies rooted on pale sand, with visible gaps: PINK left, YELLOW center, PURPLE right. Each is one branched coral cluster, no extra coral in background. Exactly TWO stripy fish: one orange/cream and one blue/pale-yellow, swimming near the pink coral, little open humming mouths and subtle silver ripples around them. No actual text or notes, no Ellie, mermaid, crab or dolphin. All fish and coral constructed of glass tesserae. Clear learning-count composition.",
+  "references": [
+    "art/generated/mermaid-shore.webp"
+  ],
+  "reviewed": true,
+  "review": "Exactly three separate coral colonies pink/yellow/purple, two stripy fish near pink; completely underwater mosaic, clear count."
+}

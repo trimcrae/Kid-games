@@ -1,0 +1,23 @@
+{
+  "storyId": "pizza",
+  "nodeId": "frisbee",
+  "style": "P2",
+  "sourceHash": "41e58647b4838cc676a302f82840d5b5ef011e428e90c69f86f1fbc9b5351d06",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1d1c1408-b8ea-46bb-9ccd-840fd23e20c0.png",
+  "originalSha256": "6a3f03a10a82cb2d03a02c35665210fe9f60c167c58c919b6353730fa51f581d",
+  "file": "pizza-frisbee.webp",
+  "sha256": "37f673d0765c1d9acfe13b552a00119f492eaeb45e6b28c00273cd6336dddbba",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 single illustration for Pizza Planet Rescue, in the EXACT tactile stop-motion CLAY medium of the attached accepted story page(s). Reference images specify canonical models and colors, not scenes to copy. Hand-sculpted imperfections, thumbprints, rich saturated miniature set, appealing cinematic light, no plastic gloss, no cartoon painting, no lettering, labels, watermark or panels. Same red clay rocket with cream-rimmed round porthole and yellow pizza-slice emblem when present. No visible human captain; the captain is the player. Only scene's requested cast.\nILLUSTRATE ONLY THIS PAGE:\nWHEE! Captain spins the pizza like a flying disc and the jelly-fish aliens leap and catch slices mid-float. Best pizza game in the galaxy! They wobble with joy.\nSame all-water BLUE planet and TWO blue jellyfish aliens as reference, aqua and pale blue, each with two eyes, rosy cheeks, rounded bell and four soft clay tentacles. One whole pepperoni pizza spins like a disc through the air above the water, clearly round golden crust and red pepperoni. Each jelly alien leaps above the clay waves and curls one tentacle around a triangular pizza slice; both delighted. Small swooshing clay arcs indicate playful spinning. Rocket small behind if visible; no people, hands, red aliens, land or boat.\n\nCORRECTION PASS:\nEdit this exact image only to keep the jellyfish anatomy consistent. Each jellyfish must have FOUR total tentacles: ONE curled upward holding the pizza slice and THREE dangling below its bell. Remove any extra dangling tentacle so there are precisely three downward and one upward on EACH jellyfish. Preserve pizza, faces, eyes, colors, bell silhouettes, rocket, waves, sky, composition and clay material. Do not add arms or hands; holding appendage is a tentacle. No other changes.\n\nSECOND CORRECTION:\nEdit this exact image. Change ONLY the turquoise jellyfish on the LEFT: it currently has two dangling tentacles and one raised tentacle holding a pizza slice, which totals three. ADD exactly ONE extra dangling turquoise tentacle from the underside of its bell, visible between or beside the two existing dangling ones. It must end with THREE visible dangling tentacles plus the ONE raised pizza-holding tentacle, FOUR total. Preserve the two existing dangling tentacles and raised one. Do NOT change the pale-blue jellyfish on the RIGHT, which already has the correct four tentacles. Preserve all other details exactly: both faces, pizzas, rocket, sky, water, colors, clay material and framing.",
+  "references": [
+    "art/generated/pizza-blue.webp",
+    "exec-a96560a9-553a-433f-b7c3-457f6ab514e4.png (second edit target)"
+  ],
+  "reviewed": true,
+  "review": "Final corrected image: both jellyfish now have three dangling tentacles and one raised slice-holding tentacle; four total each. Pizza spins overhead, no land, same clay setting."
+}

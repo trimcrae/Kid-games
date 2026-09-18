@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "dolphin",
+  "style": "S1",
+  "sourceHash": "3328a3ae65a83140cad0a7ea8dda39bf63c471d2717503197ef1e44688b4d0fd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8390e80b-7774-4a9a-8c6f-c3bf1fc9dcc9.png",
+  "originalSha256": "5231aedde749faa2df0e3e21a4139efcbc3437a58465ad0514a777fac8579f0b",
+  "file": "mermaid-dolphin.webp",
+  "sha256": "cc20008633ed85c389dce7efc88c10583d3f8ef49061115d1e02212b803fd03a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\n\"Click-click-wheee!\" sings the dolphin. Dolphins really do talk in clicks and whistles! \"I heard a song-bubble float by. It bobbed away toward the deep blue water.\"\nONLY the mermaid and ONE silver-blue dolphin at the sea surface. Mermaid smiles and listens on right, dolphin lifts head above water at left, mouth slightly open as though chirping, one small splash. Rich glass-mosaic waves and deeper cobalt sea beyond; no Ellie, crab, fish, bubble or song ribbon yet. Mermaid's tail visible below surface in mosaic transparency, anatomically clear. No lettering or written sounds.",
+  "references": [
+    "art/generated/mermaid-shore.webp"
+  ],
+  "reviewed": true,
+  "review": "One silver-blue dolphin talking with canonical mermaid at water surface; complete turquoise tail visible below waves; no extra cast."
+}

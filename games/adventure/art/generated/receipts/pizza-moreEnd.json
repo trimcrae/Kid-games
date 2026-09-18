@@ -1,0 +1,23 @@
+{
+  "storyId": "pizza",
+  "nodeId": "moreEnd",
+  "style": "P2",
+  "sourceHash": "72e7bfa963dded0b43846a602849fd400da2e1083d89f88496b2197418bfcdf0",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9c6ad226-30df-45b3-8efb-a958af911938.png",
+  "originalSha256": "a07e806bbec6c247c13978f761b51823e3b99e05da8942abe4637ed0c38e0f49",
+  "file": "pizza-moreEnd.webp",
+  "sha256": "2be61f21c1eca5b2d2f4bfde5fbf66f22a0ec75ba3030a7ebe72c9eac606ca44",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 single illustration for Pizza Planet Rescue, in the EXACT tactile stop-motion CLAY medium of the attached accepted story page(s). Reference images specify canonical models and colors, not scenes to copy. Hand-sculpted imperfections, thumbprints, rich saturated miniature set, appealing cinematic light, no plastic gloss, no cartoon painting, no lettering, labels, watermark or panels. Same red clay rocket with cream-rimmed round porthole and yellow pizza-slice emblem when present. No visible human captain; the captain is the player. Only scene's requested cast.\nILLUSTRATE ONLY THIS PAGE:\n\"There are MORE hungry planets out there!\" Captain zooms home, ovens already glowing, ready to bake a thousand more pizzas. The galaxy will never go hungry on YOUR watch. To infinity… and pepperoni!\nThe same red clay pizza rocket flies dynamically through a star-filled handcrafted space set toward its cozy orbital pizza-bakery home: a small rounded cream-and-red space station with broad open hangar showing two warmly glowing pizza ovens and neatly stacked blank pizza boxes. The rocket is the main subject, in a different composition than launch, rear clay flame trailing. Space bakery can be smaller in background, ovens visibly warm orange. No human or alien characters, no faces on machines, no written signs. Craft all objects from clay with visible sculpting marks. Warm satisfying ending suggesting more adventures.\n\nCORRECTION PASS:\nEdit this exact image only: remove the small red planet near top and the small PURPLE ringed planet at left, replacing them with matching starfield/nebula. Preserve the large foreground EARTH (this is Captain's home), the rocket, warm pizza-bakery space station and two glowing ovens, all lighting, clay texture and composition. No other changes. Do not introduce other planets or rings.",
+  "references": [
+    "art/generated/pizza-launch.webp",
+    "exec-1d133687-a402-49aa-b9a7-741de2712810.png (edit target)"
+  ],
+  "reviewed": true,
+  "review": "Rocket returning to home-Earth orbital bakery with two glowing ovens; conflicting small ringed planet removed; consistent clay material and no characters."
+}

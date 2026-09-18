@@ -1,0 +1,22 @@
+{
+  "storyId": "pizza",
+  "nodeId": "spicy",
+  "style": "P2",
+  "sourceHash": "2ecd3365bcb6edb6a744ca9a9437b4ea1e5c8200609d86a9d7f03e405746f0c6",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ca711b32-769a-4d1c-afa5-f1b61e566dbd.png",
+  "originalSha256": "5b5f801c67e4b4b4fd422f551d65040ac78eae53f920a7e59d77cd664b428974",
+  "file": "pizza-spicy.webp",
+  "sha256": "6802bd753e5379abac2a33f98ad3153885050569b27f11dd3b55bfaa2dbe4b80",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 single illustration for Pizza Planet Rescue, in the EXACT tactile stop-motion CLAY medium of the attached accepted story page(s). Reference images specify canonical models and colors, not scenes to copy. Hand-sculpted imperfections, thumbprints, rich saturated miniature set, appealing cinematic light, no plastic gloss, no cartoon painting, no lettering, labels, watermark or panels. Same red clay rocket with cream-rimmed round porthole and yellow pizza-slice emblem when present. No visible human captain; the captain is the player. Only scene's requested cast.\nILLUSTRATE ONLY THIS PAGE:\nSpicy star pizza! The three-eyed aliens take a bite and blast happy steam out of their ears like little whistles — TOOT TOOT! \"DELICIOUS!\" they cheer. On to the next stop!\nSame TWO red clay aliens on dusty red planet as reference, EACH with exactly THREE eyes across face, two antennae, two little ear nubs, arms and feet. They happily eat slices of pizza topped with clearly star-shaped red hot-sauce blobs. Funny small white curling puffs of steam emerge from each alien's EARS at sides of head; smiles, delight, no pain or fire. Pizza with star-shaped toppings in open box on foreground rock and a slice held by each alien. Same red rocket behind. No speech bubbles or written sound effects.",
+  "references": [
+    "art/generated/pizza-red.webp"
+  ],
+  "reviewed": true,
+  "review": "Two canonical red three-eyed aliens eating star-topped pizza; steam curls from ears, happy expressions, consistent clay rocket and planet."
+}

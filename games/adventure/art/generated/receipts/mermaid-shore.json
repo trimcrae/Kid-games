@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "shore",
+  "style": "S1",
+  "sourceHash": "0d4eb0ba65e0d920879684d4979c0513ed5d8f5795f5d807627c55b3988572fe",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6e3e80f2-70e0-451c-94d3-50f389122212.png",
+  "originalSha256": "782ce02852411839dc2880d1ac55a7128d0182623544e29146263f7d5ca324dd",
+  "file": "mermaid-shore.webp",
+  "sha256": "29744386846d03271fa92f41d14db6377d688fbeffd62da0bb42181db9ce4c39",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 page illustration for The Mermaid's Lost Song.\nSTYLE AND DESIGN reference: match ONLY the LEFTMOST S1 Sea-glass mosaic panel of provided comparison sheet. Entire illustration is a luxurious handmade sea-glass mosaic: rounded translucent tesserae, visible seams, aquamarine and cobalt water, pearly cream sand, coral pink accents, tiny reflected glints. Figures, hair, clothing, rocks, sky and water all use this same mosaic vocabulary. Faces readable and gentle, finer mosaic pieces for delicate features. Do not use Art Nouveau ink, risograph, conventional painting, clay, photoreal people or crayon. No headings, text, labels, border, panels or watermark.\nCANONICAL CAST: Ellie is a preschool girl with dark-brown straight chin-length bob, side fringe, silver tiara, lavender short-sleeved princess dress and brown shoes. Mermaid has long flowing dark-teal hair, coral short-sleeved tunic, turquoise fish tail with a broad graceful fluke, expressive kind eyes; youthful and friendly. Crab is a tiny cheerful red crab with two claws and eight small walking legs.\nILLUSTRATE ONLY PAGE: \"At the seaside, Princess Ellie hears a tiny sniffle. A little mermaid has lost her SONG, and the whole sea is too quiet without it! Where should they listen first?\"\nEllie kneels on pale shoreline at left, looking kindly toward sad mermaid seated on tidepool rock at right, head lowered a little and hand near cheek, sniffly not dramatically crying. One big pink spiral shell rests on sand between them, NOT yet held to ear. One red crab beside rock. Quiet curling waves in background, no musical notes or song yet, no dolphin, fish or extra people. Whole mermaid tail visible and separate from waves. Same approved mosaic beauty in a new finished single scene.",
+  "references": [
+    "art/direction/mermaid-options.png (left/S1)"
+  ],
+  "reviewed": true,
+  "review": "Same approved sea-glass mosaic material, lavender-dress Ellie and sad teal-haired mermaid with complete turquoise tail, one large pink shell on sand, crab at rock; no song or notes prematurely."
+}

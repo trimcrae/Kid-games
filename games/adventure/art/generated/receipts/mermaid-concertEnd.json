@@ -1,0 +1,24 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "concertEnd",
+  "style": "S1",
+  "sourceHash": "fafa3fb79b953124f038195d57dbb70042eb90b72ee31a1ccd0ad2e224efbe03",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1100a71f-7b76-4582-a6c7-9019aec86fe1.png",
+  "originalSha256": "c0c1b36ef89c59e2d8ea5f75428672aa37700b0cf178adbfb3c5107b9c288403",
+  "file": "mermaid-concertEnd.webp",
+  "sha256": "72848a23c87c4dbf16da905c47c39754d158842d1a2af255b8c27b5c09825114",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nThe mermaid strums her golden harp and EVERYONE gets a part: dolphins whistle, fish blub, and the crab keeps time with his claws. It's the first-ever Under-the-Sea Concert — and Ellie conducts!\nEntirely UNDERWATER concert, no beach or sky. Ellie in lavender stands at left on seabed, conducting with one raised hand and slender silver baton, facing the performers. Mermaid sits at center-right strumming a GOLDEN HARP with visible separate strings, turquoise tail folded beside her. One silver-blue dolphin above, one orange/cream striped fish at left, one red crab clicking claws on foreground rock; all participate happily. Exactly those five figures: Ellie, mermaid, dolphin, fish, crab. Silver musical-note shapes swirl gently above harp. Strong clear staging, nothing covering faces, full harp visible. Rich sea-glass tesserae on every object, no lettering.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/mermaid-shore.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/mermaid-dolphin.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/mermaid-coral.webp"
+  ],
+  "reviewed": true,
+  "review": "Ellie conducts with silver baton, mermaid plays golden harp, dolphin, striped fish and crab accompany; all characters separate and readable."
+}

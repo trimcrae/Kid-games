@@ -1,0 +1,22 @@
+{
+  "storyId": "mermaid",
+  "nodeId": "bubble",
+  "style": "S1",
+  "sourceHash": "bd7369629d1b4ac062da25d06db0408050b807501af8296ec06cc09fec7008b9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0fdf0f3f-ca9e-4519-a019-30c306a5e3f7.png",
+  "originalSha256": "cc82dfbf08afd57d7020300e49a0e9591a9595e5fbd973f9a5ba14b25a7117c9",
+  "file": "mermaid-bubble.webp",
+  "sha256": "fb1efde16a198e6551d63c8f1211ca0b3cc71040c0f326739406da3a1e115a12",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 image for The Mermaid's Lost Song. Reference is the approved opening page: exact handmade SEA-GLASS MOSAIC style and recurring character designs. Rich translucent aquamarine/cobalt/pearl/coral glass tesserae, visible fine seams and reflected glints; all scene elements in the same mosaic medium. Faces clear with finer glass pieces. No conventional painting, clay, printed illustration, lettering, captions, labels, panels, frames or watermarks. Musical-note SHAPES allowed only when the scene requests them.\nCAST WHEN PRESENT: Ellie preschool, dark-brown chin-length straight bob and side fringe, silver tiara, lavender short-sleeved dress and brown shoes; mermaid flowing dark-teal hair, coral tunic, turquoise fish tail, shell hair ornament; same small red crab. Dolphin is a friendly silver-blue bottlenose dolphin, recognizable dorsal fin, flippers, horizontal tail flukes, no limbs or clothes. Fish designs are rounded friendly stripy reef fish: orange with cream stripes, blue with pale yellow stripes, green with cream stripes. Include ONLY explicitly requested cast; do not copy all opening-page characters into every image.\nILLUSTRATE ONLY THIS PAGE:\nThere it is — the shiny song-bubble, bobbing over the waves! POP! Out spill silvery notes: \"la-laaa!\" They line up in the water like little fish and swim off, singing all the way.\nA large shimmering pearly SONG BUBBLE above cobalt/teal waves is just bursting, its incomplete thin glass arc and a few droplets surrounding a flowing line of silver musical-note shapes spilling out and moving toward water. ONE friendly silver-blue dolphin below looking upward, no people, mermaid, crab or fish. Notes resemble musical eighth notes, not actual written letters, arranged like a swimming school. Glass mosaic throughout, no text or word POP, no extra bubbles competing with main one.",
+  "references": [
+    "art/generated/mermaid-shore.webp"
+  ],
+  "reviewed": true,
+  "review": "Single bursting pearly song bubble, silvery notes spilling in a line toward waves and one dolphin; no people or extra characters, same mosaic."
+}

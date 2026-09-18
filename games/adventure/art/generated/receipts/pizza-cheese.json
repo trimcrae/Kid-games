@@ -1,0 +1,23 @@
+{
+  "storyId": "pizza",
+  "nodeId": "cheese",
+  "style": "P2",
+  "sourceHash": "4d8bb6436caaa61e6f72075f2a9ef358f85647138c6a1a5cfefa52df3bfd25de",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-34f48623-5108-4ffd-abfa-66b5ce8f7e6e.png",
+  "originalSha256": "2a97e5e18094d330807433cf8c331c941c4a99dbba302e78c693cfe0e3a8cfea",
+  "file": "pizza-cheese.webp",
+  "sha256": "f4182023c14999bee74259a26b8152bb4ac9922d0cc225a503bec6a832d1790d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Use case: illustration-story. ONE finished landscape 4:3 single illustration for Pizza Planet Rescue, in the EXACT tactile stop-motion CLAY medium of the attached accepted story page(s). Reference images specify canonical models and colors, not scenes to copy. Hand-sculpted imperfections, thumbprints, rich saturated miniature set, appealing cinematic light, no plastic gloss, no cartoon painting, no lettering, labels, watermark or panels. Same red clay rocket with cream-rimmed round porthole and yellow pizza-slice emblem when present. No visible human captain; the captain is the player. Only scene's requested cast.\nILLUSTRATE ONLY THIS PAGE:\nSo much gooey cheese it stretches loooong strings! The aliens count their slices: 1, 2, 3, 4, 5 — five each! They do a happy three-eyed wink. Yummy success!\nCounting illustration on same red planet, slightly elevated camera so TWO separate plates in foreground are clearly visible. Behind each plate sits ONE canonical red alien with exactly THREE eye positions (one alien may close its middle eye in a wink). Each plate has exactly FIVE distinct triangular cheese-pizza slices arranged with gaps, tips toward center, countable individually: total TEN slices across two plates. Each alien lifts ONE of its own five slices slightly, still directly over its own plate, with long gooey cheese strings connecting to plate. That lifted slice is included in five: FOUR down plus ONE lifted per alien. No extra pizza or slices anywhere, no toppings other than cheese. Place all ten slices unobscured enough to count; friendly clay comedy, hands anatomically separate from food.\n\nCORRECTION PASS:\nEdit this exact image only. Correct the counting error: each alien currently has FIVE slices on its plate PLUS ONE held slice, making SIX. REMOVE the rightmost resting pizza slice from EACH plate (the slice at about the 3 o'clock edge of each plate), replacing just that slice with empty plate surface. Keep FOUR slices resting on each plate and ONE slice held by each alien = FIVE per alien, TEN total. Preserve other four resting slices on each plate, held slices, cheese strings, positions, hands, three eyes including wink, rocket, scenery, clay style and all lighting. Do not add any slices. Make removed areas clearly empty and separated. No text.",
+  "references": [
+    "art/generated/pizza-red.webp",
+    "exec-f06cb805-ee99-4f6e-a7c3-f0f134b9e4a3.png (edit target)"
+  ],
+  "reviewed": true,
+  "review": "Corrected: four resting slices plus one held slice per alien, exactly five each; two three-eyed aliens and gooey strings, clay medium retained."
+}
