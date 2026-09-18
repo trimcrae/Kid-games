@@ -95,6 +95,26 @@ study:
 - **Lighting** (`lighting.mjs`, `sky.mjs`, `materials.mjs`, `post-aa.mjs`):
   a game shading tier, warm room light with soft shadows, contact shadows,
   time of day and weather matching the HUD clock, and FXAA.
+- **The sky** (`sky.mjs`): one shader, no textures. Over the time-of-day
+  gradient it draws drifting cumulus (noise clouds lit on the sun side and
+  shaded where thick; the game's weather sets the cover, so a cloudy or
+  rainy day is a grey blanket and a windy one races), a bright sun with its
+  glow, and after dark a cratered moon, a halo and twinkling stars. Colours
+  per phase and cover per weather live in `lighting.mjs` (`PHASES.clouds`,
+  `CLOUDS`). Still under `prefers-reduced-motion`.
+- **The jungle** (`jungle.mjs`): the exported yard ends at the property
+  line, so beyond the back fence and the side plantings there is now an
+  imaginary rainforest, code-drawn like Craepet Street: palms, broad canopy
+  trees, giant emergents with buttress roots, banana plants, ferns,
+  flowering bushes, hanging lianas and five parrots on the crowns nearest
+  the garden; a thinner scatter beside the front lawn and behind the
+  cottages, misty hills on the horizon all round, and a ground plane so no
+  direction ends in the void. Everything is merged into four
+  vertex-coloured draw calls (about 128k triangles), casts and takes the
+  sun's shadow, follows the exterior dim and leaf fill after dark, and the
+  leaves sway in the vertex shader. Nothing in it collides or is walkable;
+  routes, the Marauder's Map and the camera guard are untouched. It is not
+  the real neighbourhood.
 - **Frame cost** (`depth-prepass.mjs`, `gpu-timer.mjs`): a depth-only draw of
   the house's big surfaces before each frame, so hidden rooms and floors are
   never shaded; the GPU-timed resolution controller spends the saving on a
