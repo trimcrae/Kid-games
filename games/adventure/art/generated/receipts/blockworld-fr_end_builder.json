@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_end_builder",
+  "style": "M1",
+  "sourceHash": "c2732489d9dabc1f5ce8397c3519fbd43ad0c2beb1071b901a7738168138cd14",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-92abf34c-3bdd-4d26-896e-4b40df93c7c8.png",
+  "originalSha256": "81584e41507d4bb7169324aef61709e9c529928c1c18ccf1ca913c567e72fe3d",
+  "file": "blockworld-fr_end_builder.webp",
+  "sha256": "de8694c0a4769e1cb859ec7ff7d22944a65a5d87f0b2b883212797b95219011b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Narrow edit to this finished cinematic voxel story image. Correct ONLY the small green block protruding UP from the TOP of sleeping Zib's head on right. Remove this stray block/nub/antenna and restore a clean straight top plane of his square green head. Zib has no horn or antenna. Preserve sleeping face, curled body, cushion, Cory, sheep, decorations, room and night lighting. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-e556d2fb-cc3f-441f-870e-c9826fbb19b5.png"
+  ],
+  "reviewed": true,
+  "review": "Same cozy room at night, Cory yawns, Bartholomew baas, Zib sleeps; removed stray nub on Zib head."
+}

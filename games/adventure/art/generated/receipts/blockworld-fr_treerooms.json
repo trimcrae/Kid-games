@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_treerooms",
+  "style": "M1",
+  "sourceHash": "05a511fcbe53d9ce1e1b7db900942489918ce8815c6b857c66b1edb902efd0eb",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-92d379eb-ed25-42da-a58c-bbc7c0c8dcd5.png",
+  "originalSha256": "f0cd341544b2de3ce48f68cc2c22c4f8cc002dc308a04bcc97da58e465685e4d",
+  "file": "blockworld-fr_treerooms.webp",
+  "sha256": "6b9941ca30f9924d045cb98021ad7f07ab17a733fa0eeccefd2c14df65db9648",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Narrow edit to this finished cinematic voxel story image. Correct ONLY green Zib on slide. REMOVE BOTH raised ARM shapes beside his head. Zib has a cubic green head, a narrow straight uninterrupted green torso and exactly FOUR tiny stubby feet at the lower end, with NO ARMS or HANDS anywhere. He slides feet-first happily; express joy with his face. Keep slide, whole treehouse, blue bed, chest, Cory and background unchanged. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-e5dfdd02-112d-40c4-bb1b-5939d4bb6264.png"
+  ],
+  "reviewed": true,
+  "review": "Red-roof bedroom with blue bed and snack chest, continuous cyan spiral slide to ground; corrected Zib to armless form."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_lookout",
+  "style": "M1",
+  "sourceHash": "dc1a2b70379ddefdfc03034fed8776d8e86aed0935b97a850c15a36d61e9b222",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1abe3787-5a58-4ab8-aee2-2724105fdb83.png",
+  "originalSha256": "62d254b9efe874ca6dd766b5196ceab8e79f4bdfa42b5255be64e01ae088389e",
+  "file": "blockworld-fr_lookout.webp",
+  "sha256": "b9888b853628a9af7a57a3c734e22bb60e491819b300365c4729e7703d8cb7d3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Keep the exact red-roof wooden room, broad deck around giant pine and continuous cyan spiral slide of reference. Add a square OAK LOOKOUT TOWER anchored against pine trunk, rising one storey ABOVE the red roof, with four cornerposts and a small railed flat observationdeck. A wooden ladder connects its lowerlevel to treehouse deck. Cory stands high on the lookoutdeck placing last woodblock on cornerrailing, gazing with pride over distant OCEAN to right and MOUNTAINS to left, with a small redroof cottage visible farbelow among green forest. Warm orange SUNSET. No flag yet. ONLY Cory in picture; remove any green creature from reference, no sheep or birds. Wideviewshows impressive height and connectedstructure, expressive boy readable.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_treerooms.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory finishes lookout above matching red-roof treehouse, with ocean, mountains and small base below; no flag yet."
+}

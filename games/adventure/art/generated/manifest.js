@@ -74,8 +74,14 @@
     "fr_ladder": "art/generated/blockworld-fr_ladder.webp",
     "fr_bridge": "art/generated/blockworld-fr_bridge.webp",
     "fr_platform": "art/generated/blockworld-fr_platform.webp",
+    "fr_treerooms": "art/generated/blockworld-fr_treerooms.webp",
+    "fr_lookout": "art/generated/blockworld-fr_lookout.webp",
+    "fr_sheepvisit": "art/generated/blockworld-fr_sheepvisit.webp",
+    "fr_end_builder": "art/generated/blockworld-fr_end_builder.webp",
+    "fr_end_tree": "art/generated/blockworld-fr_end_tree.webp",
     "cv_enter": "art/generated/blockworld-cv_enter.webp",
     "vil_enter": "art/generated/blockworld-vil_enter.webp",
+    "oc_enter": "art/generated/blockworld-oc_enter.webp",
     "sk_enter": "art/generated/blockworld-sk_enter.webp",
     "rs_enter": "art/generated/blockworld-rs_enter.webp",
     "vd_enter": "art/generated/blockworld-vd_enter.webp",
@@ -89,6 +95,7 @@
     "dn_enter": "art/generated/library-dn_enter.webp",
     "my_enter": "art/generated/library-my_enter.webp",
     "mt_enter": "art/generated/library-mt_enter.webp",
+    "fin_enter": "art/generated/library-fin_enter.webp",
     "wl_intro": "art/generated/library-wl_intro.webp",
     "wl_hub": "art/generated/library-wl_hub.webp"
   }

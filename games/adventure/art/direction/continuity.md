@@ -10,6 +10,9 @@ Use the accepted page images below as visual references, together with the exact
 - [Village host](../generated/blockworld-vil_enter.webp): stout bald villager with rectangular nose, brown robe and tan apron. Keep role-specific hats or clothes consistent when introduced.
 - [Captain Featherbottom](../generated/blockworld-sk_enter.webp): plump blue voxel bird, white chest, yellow beak, raised blue crest, comically confident expression.
 - [Voider](../generated/blockworld-vd_enter.webp): enormous purple dragon with lavender belly, two lilac horns, two wings, four limbs and long tail. Huge sympathetic eyes; awkward and lonely rather than threatening.
+- [Treehouse](../generated/blockworld-fr_treerooms.webp) and [lookout](../generated/blockworld-fr_lookout.webp): broad oak platform around giant pine, red-roof bedroom with blue bed, snack chest, cyan spiral slide to ground; the later lookout rises one storey above the roof. The finale adds a pink flag.
+- [Home interior](../generated/blockworld-fr_decorate.webp): oak and cobblestone, white wool rug, chest, warm torches, framed house and gem emblems. Keep decorations about building and discovery.
+- [Mr. Snips / beach](../generated/blockworld-oc_enter.webp): small red voxel crab, expressive tall eyestalks, two pincers and short walking legs. Cory's silver belt buckle draws his attention.
 
 ## Whispering Library — L1
 

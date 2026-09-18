@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "fr_end_tree",
+  "style": "M1",
+  "sourceHash": "3ed23fac427b6cb976f06bc810ce4511bd239237f7c5df05c31b1259f696a9ca",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-25e56adb-0778-4117-8269-69a859e5edaf.png",
+  "originalSha256": "699780482a2b6dd32b53f757dcc7170a0743ee62074ce675b0076c5a3adc6c8e",
+  "file": "blockworld-fr_end_tree.webp",
+  "sha256": "7e9fb1ce74a4b706b1437cd818891c29f590157ce0bfc9ad50cb7520caa7addb",
+  "dimensions": [
+    1447,
+    1087
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching references. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmospheric perspective. SAME Cory age6, short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Consistent face/proportions. No UI, border, captions. All characters and scenery built of voxel blocks, no smooth cartoons. Make the exact story moment clear, including all specified counting quantities. Keep the exact red-roof wooden room, broad deck around giant pine and continuous cyan spiral slide of reference. Add a square OAK LOOKOUT TOWER anchored against pine trunk, rising one storey ABOVE the red roof, with four cornerposts and a small railed flat observationdeck. A wooden ladder connects its lowerlevel to treehouse deck. Grand finale at golden sunset. Cory plants ONE bright PINK FLAG at very top of lookoutdeck, proud happy face. Bartholomew white sheep on mainlower treehouse deck baas triumphantly, fourlegs. Green armless Zib at BOTTOM EXIT of cyan slide gives a little greeting by lifting one of its FOUR short FEET, with otherthree planted. Keep green squarehead and long uninterrupted narrow torso, NO arms/hands orhorns. Exactly three friends. Wide heroic panorama shows entire completed treehouse from flag to slideexit and luminous block forest below. Fully finished railings. No captions, no extra liveanimals.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_treerooms.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory plants pink flag atop matching lookout; Bartholomew cheers from lowerdeck and Zib greets from slide exit; complete cyan slide and railings."
+}

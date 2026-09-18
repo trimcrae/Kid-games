@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_enter",
+  "style": "M1",
+  "sourceHash": "7160e4118431d720cfaab89476f5cc10964fc21fdcda887fc116729d7c476e36",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d3dc7d90-14af-4bda-a12d-fab788efa3c6.png",
+  "originalSha256": "bc31deeea4d203f1b165ed00df5fe8e44ee402a1b6e50fc37ec9627d49287dcf",
+  "file": "blockworld-oc_enter.webp",
+  "sha256": "80663bb2a108b210bdcb3149e0428798a253a64d7d9afab3c43a21a9477b5c6d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Narrow edit to this finished cinematic voxel story image. Repair ONLY the corrupted-looking noisy color bands at TOP and BOTTOM image edges. Replace top noise with clean blue sky continuous with adjacent sky. Replace bottom black/green/rainbow speckles with clean golden sand and the existing natural foreground depth blur, continuous across the full image width. NO crop: retain full 4:3 frame and all existing central picture content, Cory, sheep, crab, planks, ocean and lighting. Remove every glitch/colored-noise patch while preserving the illustration. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-c3fa9e10-b447-4a2c-ad27-ec5877329713.png"
+  ],
+  "reviewed": true,
+  "review": "Cory, queasy white sheep and red Mr. Snips eyeing buckle beside planks. Corrected noisy edge artifacts without cropping."
+}
