@@ -1,0 +1,25 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_dragon_goof",
+  "style": "L1",
+  "sourceHash": "3fe8a2e1651ecd9de0fe73e81ad4d8d736f336a80ac64e8e709a6d2429ed6c6c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-484ac706-c282-45e2-8b17-5fa0a0427f0b.png",
+  "originalSha256": "b36f3e737e5f5aa5cd84a8e07af9760acd2cdd68d3b089940be0af6349fcdd71",
+  "file": "library-dn_dragon_goof.webp",
+  "sha256": "a54b04f3002898fb9256f7199be242a4bedba2dcebf3d5d1accca0643c5755f1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit this illustration with one precise anatomy correction: dragon currently appears to have an extra triangular wing just behind Jeannie near the upper-left side of its torso. Remove that rear triangular wing beside Jeannie and fill with natural dragon blue flank/background as appropriate. Keep exactly TWO wings total: the broad wing lying in foreground to viewer-left of dragon's head and the broad wing on viewer-right beside its head. Preserve all FOUR raised legs, long tail, two horns, head, girl, quill, butterfly, paper craft medium, composition and everything else. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b1d5-ec27-7c71-a73a-a16d9cc0ec46\\exec-3b9992f3-3141-4d9e-8c6b-4480ff788be0.png"
+  ],
+  "reviewed": true,
+  "review": {
+    "approved": true,
+    "notes": "Visually reviewed: matches exact scene and L1 folded-paper continuity. Green sauropod, unbroken speckled egg, crowned pigeon, terracotta spa dinosaur and translator crystal established. Dragon corrected to two wings with four raised limbs."
+  }
+}

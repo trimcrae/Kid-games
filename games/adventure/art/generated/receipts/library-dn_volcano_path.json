@@ -1,0 +1,25 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_volcano_path",
+  "style": "L1",
+  "sourceHash": "b716f76bc985a88bd9f9914be7ebda5eda5da253d983dc5e69d5ac6fedbeed22",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cf4a0df4-02ae-40a5-92cb-5b29ab305680.png",
+  "originalSha256": "cb2d25c03b394364c5b30e0cbd0d4400448affaf3a376b598909696ddd46f4e7",
+  "file": "library-dn_volcano_path.webp",
+  "sha256": "d9bc34c5740827d60744f64a284c7615c9efce18fc1ea7d33d481e571a1edd24",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Scene: Steep but friendly prehistoric mountain path, giant ferns, volcano with curled paper steam rings far beyond. At a crooked wooden sign stands Sir Reginald: plump blue-grey pigeon, cream breast, layered teal-purple neck feathers, orange beak/eyes and red feet; he wears ONLY a small obviously homemade tan paper crown, no other clothes or medals. Puffs chest grandly, one wing raised commanding halt. Jeannie smiling amused, Inkwell leaning from pocket snorting. Sign can be blank weathered wood. Medium shot showing characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_enter.webp"
+  ],
+  "reviewed": true,
+  "review": {
+    "approved": true,
+    "notes": "Visually reviewed: matches exact scene and L1 folded-paper continuity. Green sauropod, unbroken speckled egg, crowned pigeon, terracotta spa dinosaur and translator crystal established. Dragon corrected to two wings with four raised limbs."
+  }
+}

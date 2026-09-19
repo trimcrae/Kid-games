@@ -1,0 +1,25 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_egg_find",
+  "style": "L1",
+  "sourceHash": "bc37ed27f59662be5174f3ede6ab30950ca3ce66a845f25c9633fc2b2838f5d6",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e21f8f2f-b4b0-41ef-8048-5d925059a8bf.png",
+  "originalSha256": "0f5158d3da96732ba1d8e1770cc2e500add9aa02780d026a39e47ae354a51cec",
+  "file": "library-dn_egg_find.webp",
+  "sha256": "2dabb86870318e98b8b74ae18277ceafa87f1645aa3b98e674f03537fa2131d0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Scene: Deep fern forest, moss nest and glossy red and yellow folded-paper mushrooms. Jeannie kneels tenderly beside ONE enormous UNBROKEN cream egg with irregular sage-green speckles, roughly her torso height, rocking gently. No dinosaur or baby visible yet, no drawn face on egg. Inkwell peeks from dress pocket. Intimate hopeful warm forest light, layered deep foliage.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_enter.webp"
+  ],
+  "reviewed": true,
+  "review": {
+    "approved": true,
+    "notes": "Visually reviewed: matches exact scene and L1 folded-paper continuity. Green sauropod, unbroken speckled egg, crowned pigeon, terracotta spa dinosaur and translator crystal established. Dragon corrected to two wings with four raised limbs."
+  }
+}

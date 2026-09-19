@@ -1,0 +1,25 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_crystal_find",
+  "style": "L1",
+  "sourceHash": "1b72244ad748786dd37b2e2bd35c198b0faa28d8666d32cf94ccb667b1c79924",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-71999f29-2202-4d7c-804f-79fff8ab0155.png",
+  "originalSha256": "a03f962471670d24b071194290357a0965cbf96812dd60f1f1870010d33d1cf3",
+  "file": "library-dn_crystal_find.webp",
+  "sha256": "9486deaf02d7a521d67066b0d46d771d6b7f955593cfed5a8cb45ba50035c053",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Scene: Inside glittering folded-paper cave behind warm volcano vents, ONE great tall faceted BLUE translator crystal glows soft cyan on a natural rock pedestal. Jeannie stands touching crystal with one hand, awed and moved; Inkwell watches quietly from her pocket. Layers of cut blue crystals and tan rock, doorway overlooks distant fern forest. A subtle curving trail of golden paper ripples links crystal toward distant forest to suggest translated peeping, no letters or speech bubbles. No dinosaur or hat or baby physically inside cave.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_enter.webp"
+  ],
+  "reviewed": true,
+  "review": {
+    "approved": true,
+    "notes": "Visually reviewed: matches exact scene and L1 folded-paper continuity. Green sauropod, unbroken speckled egg, crowned pigeon, terracotta spa dinosaur and translator crystal established. Dragon corrected to two wings with four raised limbs."
+  }
+}

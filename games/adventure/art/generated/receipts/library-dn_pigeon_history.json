@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_pigeon_history",
+  "style": "L1",
+  "sourceHash": "05d7eb3f44ff9f4a3d75e98c3f71548e611bd6d6af34d92aa4aefb24999dff9d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b2467c50-6cfe-4480-9fdb-29912edd031a.png",
+  "originalSha256": "147dbe118ef92ce049e16158fa94c4a87ef4c8ec7075e0ec767744eaf6b27a7b",
+  "file": "library-dn_pigeon_history.webp",
+  "sha256": "16775775804202a6b052d7c718f5d6a041603264d5d031e2dfa57c3320eb81c4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY, compose NEW scene: Same crowned Reginald in fern forest by muddy clearing, grandly saluting one tiny beetle with wing. EXACTLY THREE simple diagrams scratched into mud below: pigeon, branching family tree, volcano, no words. Jeannie sits nearby listening amused. Inkwell in pocket raises skeptical feather eyebrow. The pigeon is knee high to Jeannie and wears only same handmade paper crown. Broad enough view to show three diagrams and beetle.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: crowned Reginald salutes beetle; three distinct mud diagrams depict pigeon, family tree and volcano."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_offer_ferns",
+  "style": "L1",
+  "sourceHash": "10fcec5d1ddecbd63ce5af3aaffced604ca0355664438383a74a2ac38b4b82bf",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-51930926-4b2f-4626-aed2-07e1ba366f28.png",
+  "originalSha256": "c6c306be5ddfb66ae2cf0b19b692072ebbe7afb5f1c59b0e70c97cdf9f306378",
+  "file": "library-dn_offer_ferns.webp",
+  "sha256": "c7ad9d61352c8e6b9a87c7132ffc21d514f8a42b4810323162a3369c5335b4f1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY, compose NEW scene: Sunny plains. Jeannie STANDS holding an enormous wobbly armful stack of ferns like leafy birthday cake. Green mother sauropod dances happily with ONE front foot raised and THREE pillar feet on ground. Another blue longneck leans down and gently sets ONE pink flower on Jeannie's hair with its lips. Tiny Inkwell grumpy in pocket. Warm joyous wide shot, playful paper leaves scattering.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_meet_herd.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: Jeannie holds the fern stack; green longneck raises one forefoot and blue longneck places pink flower on her hair."
+}
