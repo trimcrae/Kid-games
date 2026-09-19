@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_end_ghost",
+  "style": "L1",
+  "sourceHash": "0ee232ce38871470a8b3f39ca9d8cfb0cdae23a32723bc6a757bf17861b769e8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9277761e-2f9e-4a28-a01a-5551fd4bdeb4.png",
+  "originalSha256": "e7fc6570cba9300ce9b1878a72ca4ae85046c297d34f3877738472bb1186b785",
+  "file": "library-my_end_ghost.webp",
+  "sha256": "89ebbfe570adb5d19de4ac486c57bc2130325a3c46d6e8a73808bbd85cf12bf1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only the birthday cake candles in this image. The current image has twelve candles: seven in the back row and five in front. Add ONE matching short purple striped extinguished candle in the empty space between the third and fourth FRONT-row candles (between the front candle under Jeannie's right hand and the next front candle to its right). Preserve all twelve existing candles. Finished count must be exactly THIRTEEN candles total, seven back plus six front. Preserve Jeannie, ghost Boo, pigeon, Inkwell, cake layers, scenery and all other pixels/designs as closely as possible. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-9d61cc51-f5b7-4e8e-b974-e1ceb7d14f31.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: thirteen extinguished candles counted (seven back plus six front), happy Boo, Jeannie, pigeon and correct two-layer cake."
+}

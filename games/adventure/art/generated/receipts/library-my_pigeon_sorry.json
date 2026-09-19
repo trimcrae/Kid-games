@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "my_pigeon_sorry",
+  "style": "L1",
+  "sourceHash": "3919c9a83b064a80be1d8049acaca23cf118242853956f272f739055d83a1a71",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e18c05d2-63b1-4efa-8bea-9f51fa5d792c.png",
+  "originalSha256": "ee50bb1477689d931de5e9e2c4d587b84c3c21592b1b696f4bc2f5baec1c9b36",
+  "file": "library-my_pigeon_sorry.webp",
+  "sha256": "124d455892834b5c9dae3348ce8bdfe885fe7a4e5945cad01147806f35dd2f0e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY first image. Remove all pigeon clothing: purple shoulder cape, gold medallion, ruffled white cravat and every gold fastening. Replace those areas with his natural cream breast feathers and bluegrey neck with teal/purple shine, matching pigeon in second reference. Make his beak orange and feet red; keep his exact bowed apologetic posture and wing reaching to Boo. No crown/clothes/medals/frosting. Preserve Jeannie, pocketquill, Boo, window, frame and warm paper theatre composition. Second image solely for normal pigeon design.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-cb58a630-4a2e-4041-9e45-72a8aabb1812.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: apologetic natural-feather pigeon shakes Boo's hand, no costume, paper cast and manor consistent."
+}
