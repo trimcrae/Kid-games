@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_summit",
+  "style": "L1",
+  "sourceHash": "624d618295b378aafd99c84e571ab7f3ca214685cd2a122947b46adaff73758a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-20f69d6b-32cc-4098-abac-8fdb3fcee075.png",
+  "originalSha256": "77a5ed8921bb61011f490feed316d153e6f748a3bfddcd7f9cb236695dfbedf1",
+  "file": "library-mt_summit.webp",
+  "sha256": "f38297fc96d52145072cd999df5131f701dbd93be4e573ec99f958fbb42735c3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only tiny cream feather quill Inkwell standing on stone between girl and pigeon. Remove BOTH little legs/feet and the arms. Keep his cream feather with expressive grumpy face and single gold pen nib; make him hover a few inches above same stone, nib pointed down. No human body or legs. Preserve all other scene content and positions including girl, pigeon, both paths, temple, bakery and dragon.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b96f-343e-7421-83f5-326f9df9c431/exec-0dc72cdd-167f-48a3-a44a-bed02af58df4.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: corrected Inkwell to a single expressive cream feather and gold nib with no feet/body; current story scene retained."
+}

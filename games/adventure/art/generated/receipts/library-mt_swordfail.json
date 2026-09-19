@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_swordfail",
+  "style": "L1",
+  "sourceHash": "cc4f182c092a3f7937f53d3162ba5666f23dbeb8f884b73c5c00ca71b54f9498",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-41558af0-49e9-41ca-a5ad-f6aa7eb3965a.png",
+  "originalSha256": "81bf9427339c5a336d1f2904769591f1616dd3fc9879be1c99a9523abbecc9f7",
+  "file": "library-mt_swordfail.webp",
+  "sha256": "d6365054346d2e6d6ec9cc987a5bfd4fb4e2caa430e63a00cb0d3788aa76d604",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the tiny Inkwell character beside SERENADE scroll in first image. Remove the face-bearing inkpot and hovering disconnected feather. Replace with ONE upright cream feather QUILL with grumpy eyes and brows drawn on its lower feather shaft, one small gold nib pointing down, no arms/legs/inkpot/body. Match footless quill design in reference2. Quill hovers beside existing SERENADE scroll. Preserve Jeannie, bent sword, BOINK, sleeping dragon, golden lyre and all composition/colors.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b96f-343e-7421-83f5-326f9df9c431/exec-31da5eae-ff11-4807-9c7c-949b2f34c36c.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: corrected Inkwell to a single expressive cream feather and gold nib with no feet/body; current story scene retained."
+}
