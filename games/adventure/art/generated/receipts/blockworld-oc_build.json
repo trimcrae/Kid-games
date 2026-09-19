@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_build",
+  "style": "M1",
+  "sourceHash": "f64a0696fe0a7fb693fce6dfe2cd6d5b2c3f1228dc67cab3377d53472cc4bf4f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f4e2fcf9-307f-4b48-864b-04d4bd1cadae.png",
+  "originalSha256": "9ebc476eecd9014390fdf851a7b5a88959cb4622b07e2819d8fdddcc449b5e97",
+  "file": "blockworld-oc_build.webp",
+  "sha256": "66b48a74b49b343750b1eb774afe48aacbc0780da19aa3450f991a9964422ccd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Cory at shoreline counts exactly FOUR large oak plank blocks laid separately on sand beside his newly assembled tidy little golden-oak rowboat with squared pointed bow, two crossbenches and one short plain mast. Bartholomew points one hoof toward mast for flagpole. Calm turquoise shallows, no extra loose planks.\nExact story context (do not print): Cory counts his planks: 1, 2, 3, 4 wood blocks. Just enough for a tidy little boat! Bartholomew helpfully suggests \"add a flagpole for HEROIC reasons.\" The boat wobbles but floats.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

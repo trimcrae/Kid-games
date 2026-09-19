@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_setsail",
+  "style": "M1",
+  "sourceHash": "af15a323908fa7fd21fb9ec321a177229b858bf5798305c75d536c2512291ef9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9211b6d7-140c-48a3-a3fa-db8047b2b098.png",
+  "originalSha256": "81290c0b8a2bd180e31c110ea340f0e25a40b0c9c3c64f59c96f8a18bd9c184d",
+  "file": "blockworld-oc_setsail.webp",
+  "sha256": "7735a759b57e239d1008a5b63dc4dcf9847a4b2b9508639fd6b2c753f5ec3e59",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Cory and mast-clutching Bartholomew in familiar oak rowboat at sea. EXACTLY THREE prominent parallel blue wave ridges beside boat and a single small blue-grey dolphin dorsal fin ahead. No full dolphin reveal.\nExact story context (do not print): The blocky sea sparkles in every direction. Cory counts the waves rolling by — 1, 2, 3 — just like the map said. A fin pops up ahead! Friend or fish?",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

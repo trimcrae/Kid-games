@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_whistle",
+  "style": "M1",
+  "sourceHash": "78e8cc3de5a8feab4a3d83939ed08c893360629634042be48f256f4d40a8c22a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ef2e3836-18c5-46df-8b68-020ea7d5938a.png",
+  "originalSha256": "2a7f3551526b40846f771cb51cc324a98da44f09555e5e451d2a4449464f629e",
+  "file": "blockworld-oc_whistle.webp",
+  "sha256": "752dc364c7197bfdd0856e6b43f4ca40fde5cb82ef7ad5b1402d00a368c5c057",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Cory whistles in familiar oak rowboat, Bartholomew gets a splash. EXACTLY TWO friendly blue-grey voxel dolphins with pale cream bellies and short squared snouts leap beside boat: one flipping, one splashing. Whole bodies clearly distinct. No extra fins.\nExact story context (do not print): Cory whistles, and TWO dolphins leap up, squeaking happily! One does a flip, the other splashes Bartholomew, who declares it \"a worthy duel.\" The dolphins want to play a game.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

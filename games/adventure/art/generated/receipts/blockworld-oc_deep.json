@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_deep",
+  "style": "M1",
+  "sourceHash": "9051a21a3c883a43e411b86ae4f2490aae27261d188f92fc4446de103d835701",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2d9af205-d8ac-4522-9d86-250917f8a657.png",
+  "originalSha256": "938f204427614982eaee306c64ba7ad1bf9b6fb388d460340a6d63fdddf4992b",
+  "file": "blockworld-oc_deep.webp",
+  "sha256": "945402eba31003378d12dc1c792eff929073bb517f8a8a2544f2e3bc0fce34f7",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Dramatic high three-quarter view, familiar oak boat with Cory peering down and Bartholomew clutching mast, slightly green face. Through very clear deep blue water enormous dark silhouette of tilted oak shipwreck on seabed, no treasure revealed.\nExact story context (do not print): The water turns deep and quiet. Far below, Cory spies the dark shape of a sunken ship. \"Down there,\" he whispers. Bartholomew clutches the mast. \"A hero NEVER gets seasick,\" he says, getting very seasick.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

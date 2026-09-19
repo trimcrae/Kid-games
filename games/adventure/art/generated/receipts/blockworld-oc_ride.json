@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_ride",
+  "style": "M1",
+  "sourceHash": "c9c269ce37604ac3b5d8a1a6e958a10db3ea510f5a57ca3326bf2986185bd7ad",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0efe7d7f-2185-46d7-bd34-05960f1cfd81.png",
+  "originalSha256": "2eaf4aa1fc6afa9ed5f1472f0e8b8382f5a1ac73aa7c3ad86132ab6c85ccc46e",
+  "file": "blockworld-oc_ride.webp",
+  "sha256": "30a11f9b57ad7a0d11194a4d9642efec90934a725eb3bca3ff23e70eb83d3494",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: One large friendly bluegrey cream-bellied voxel dolphin carries Cory over sparkling wave. Nearby Bartholomew slips harmlessly off a sheep-shaped clump of cubical white seafoam into water, comic splash. Only one sheep, one dolphin.\nExact story context (do not print): A big friendly dolphin lets Cory hop on its back! They zoom over the waves, spray flying everywhere. Bartholomew tries to surf on a sheep-shaped chunk of seafoam and immediately falls off. Twice.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

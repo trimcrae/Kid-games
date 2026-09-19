@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_flag",
+  "style": "M1",
+  "sourceHash": "26899933cbd2f8abd4ef3eeb67efc96e89187ecd1da72d0ca753538bbe31768c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-673c5928-4452-4d22-b1a9-3ce245caa7f7.png",
+  "originalSha256": "4f0c9e6050695a7d3852ce3b488e0b6db7aa1b9a6255ef9b8b0672935bce4104",
+  "file": "blockworld-oc_flag.webp",
+  "sha256": "97b6b27c6ba6b7e52568c7ecef9134a60af8f920989503054cc092558583c3fd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Tiny golden-oak block rowboat with square pointed bow two benches one short mast. Cory rows. Bartholomew balances stiffly on tiny platform atop short mast as living wooly flag, four legs supported and face faintly seasick green. Blue glittering ocean.\nExact story context (do not print): They raise a wooly flag — it's just Bartholomew standing very still on the mast. \"I am the figurehead of DESTINY!\" he announces, then turns slightly green. Off they bob into the blue.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

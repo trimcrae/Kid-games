@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_chase",
+  "style": "M1",
+  "sourceHash": "a11cfc42bec640bb2ab040dfdefce572ca59c17d4018d608fa8692e17171e0f6",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-31123e0b-c091-4492-aea2-2cd37dc2e16b.png",
+  "originalSha256": "b577fd30e9b390ae7accc4107f26b0a7c9e239779b99771b42b3d3613c1a9d68",
+  "file": "blockworld-oc_chase.webp",
+  "sha256": "eb8466720266ea04bbc271be05efb143befa02d92da43266a4a8a3e00aa7a050",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Silly chase around ONE blocky sandcastle: exactly FOUR concentric circular footprint tracks, Cory laughing hands on knees, Mr Snips drops tan map with red X onto sand. No repeated Cory clones.\nExact story context (do not print): Mr. Snips leads Cory in 4 silly circles around a sandcastle. Cory gives up, laughing. The crab, feeling generous, drops a tiny map in the sand. X marks a spot in the sea!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

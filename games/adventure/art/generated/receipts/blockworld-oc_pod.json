@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_pod",
+  "style": "M1",
+  "sourceHash": "07cfd6138ae70f255221048d0869cfb061b6f870cc1a045d5f3797f95a3b72f7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-527c3e5f-8703-48c5-9953-9b759543b79b.png",
+  "originalSha256": "5e760e8189262ed13eb3a691e3089aab3741f0ba2c8a6aecb387112dbb6d0dcd",
+  "file": "blockworld-oc_pod.webp",
+  "sha256": "c6cdb97cec9292f2cbc7f6ca8c73730ac50815ea20236002cf76d9022cb865a0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Familiar oak rowboat encircled by EXACTLY FOUR blue-grey voxel dolphins cream bellies short squared snouts. Cory copies a playful arm spin while standing inside boat, Bartholomew watches. Every dolphin body clear and separate, no extra fins.\nExact story context (do not print): Now there are THREE dolphins, then they call a fourth! Cory copies every leap and spin. The pod chitters with joy — he's a natural. They nudge his boat toward two adventures.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}

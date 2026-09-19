@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_eggs",
+  "style": "M1",
+  "sourceHash": "f874e66c7ba8d91496ae4c5ffab4de7cdf73cf3a9a75047e3fe8113c0336622e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7c5d77a4-1101-4b65-bbce-3c0ef83a4524.png",
+  "originalSha256": "60acfc4ed8a5352ba3195684ca27f3f85f38f88d7a95cac54d860349632a2e34",
+  "file": "blockworld-vil_eggs.webp",
+  "sha256": "1ff07a5533dc118da33f32ddbcc94b8532e847dda99c2430c744b09a65924495",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the extra egg held in Cory's hands above the first basket. REMOVE that held egg entirely and change his hand pose to gently pointing into the basket. Preserve the SIX eggs already in the three baskets, exactly two eggs per basket. Finalimage SIX eggs total, none held or elsewhere. Preserve everything else including three houses, villager, baskets, camera, voxelstyle.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b96f-343e-7421-83f5-326f9df9c431/exec-28855c2f-c08c-4db3-8164-154ee213c62c.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel scene matches page, consistent main cast and exact required counts. Egg correction leaves six total, two per basket."
+}
