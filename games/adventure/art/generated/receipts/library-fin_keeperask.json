@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_keeperask",
+  "style": "L1",
+  "sourceHash": "d4dd23ec7157aa633054c3927b1880c7f80705f0b6c245de69cccb9d2005ebfa",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8bad8227-ff5b-406f-a7e5-a34f66e09f9b.png",
+  "originalSha256": "a9c89545dc61b3c7bd06ebf30a6b1721b96832cc752b08f5647c1de16bc3728b",
+  "file": "library-fin_keeperask.webp",
+  "sha256": "bd9ad2a2fd92a3487c26654f19f616f7713f70e090f9d28437cfcad632f57def",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Serious gentle conversation at nook desk. Keeper has REMOVED all THREE spectacle pairs from head and face; they rest clearly separated on desk: one gold, one copper, one silver. He meets Jeannie's eyes kindly, hands open offering choice, girl attentive with pocket Inkwell. Medal-wearing pigeon quiet at far side, cream/teal books seem to lean in. No new props yet.\nExact story context: The Story Keeper took off all three pairs of glasses, which meant he was being Very Serious. \"Jeannie,\" he said softly, \"I am old, and forgetful, and the stories need a new friend. So I'll give you a choice — the kind only the bravest readers ever get.\" The whole library leaned in to listen. Even Sir Reginald, for once, was quiet.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pigeon.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

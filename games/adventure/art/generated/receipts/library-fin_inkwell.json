@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_inkwell",
+  "style": "L1",
+  "sourceHash": "52bc46ed48529706776a4e1c61b4928a7709c9cb81717c65176ef0a764de2837",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cbcf5ca0-d266-47ea-b4b0-978c00d32d63.png",
+  "originalSha256": "4e6568940c76a7d5870493b95943f20b28c2f4c65761f8a770e986e001c3b76f",
+  "file": "library-fin_inkwell.webp",
+  "sha256": "a505e41f4e948326ba21cbeb39cb4e3996c0e40ed43280c84f77003f6d28183d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie holds her open palm at chest height; ONE expressive FOOTLESS cream feather Inkwell balances his gold writing NIB on her palm, tiny ink drop below nib. Face is on lower feather not separate round head; no human torso or limbs, dress pocket empty. Background large floating open storybook shows THREE little pink pigs in space helmets inside starry space scene, another distant open book shows Cinderella at pirate picnic. Main focus humorous quill explanation in towering paper library.\nExact story context: Inkwell hopped onto her palm, ink dribbling dramatically. \"The stories are JUMBLED, that's what,\" he grumbled. \"Cinderella's at a pirate party, the Three Little Pigs are in outer space, and frankly the spelling has gone DOWNHILL.\" He sniffed. \"We need the Story Keeper. Old softie. Loses his glasses on top of his own head, every single day.\" Jeannie grinned — she'd waited so long to meet the Keeper.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

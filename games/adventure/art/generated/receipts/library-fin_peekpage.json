@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_peekpage",
+  "style": "L1",
+  "sourceHash": "ef59dbe010d8ce471bace72d571bec2e4dd912889d18303357a7d50980c8dfcb",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2b9efd48-4336-4e45-aee6-d296442ab37e.png",
+  "originalSha256": "a9d9271aa149db18e59fe970961c2a77bf5d57a2eed9731e5d28eb2533f80c6e",
+  "file": "library-fin_peekpage.webp",
+  "sha256": "6514594dc8a741faa82d6c09e6fffb03d352a3d03453bfb2a71f090e111a3be4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Close over-shoulder storybook reading. Jeannie and pocket quill look down at SAME golden open-book-and-star volume, held on cream desk. Unfinished page has EXACT short line 'And then a brave girl arrived to help, and her name was —' with rest blank. Girl moved and curious, one goldnib feather quill leans out of pocket. No extra people or written captions elsewhere.\nExact story context: The unfinished page had only one line, written in shaky old handwriting: \"And then a brave girl arrived to help, and her name was —\" It stopped right there, waiting. Jeannie's heart did a happy somersault. \"He's been writing about YOU,\" Inkwell breathed. \"Or he WOULD have, if his hands didn't get so tired. The old fellow needs help, Jeannie. Real help.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_brightbook.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

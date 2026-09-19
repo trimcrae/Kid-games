@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_pirateback",
+  "style": "L1",
+  "sourceHash": "7c1e6e8640b6680e259295c69fbef43b696c9bda058aab89236d73f28b9ad0a3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c45d6ad3-4305-49fb-97ca-796335d782b1.png",
+  "originalSha256": "c6ad5349b4de885df4fc0a016393faf56027d14e9eae9d861491023a4cd2117f",
+  "file": "library-fin_pirateback.webp",
+  "sha256": "6fce5c9e4776a09605a9b86ae9801e575e59bb3cb4dd25d59048b735e7a857b4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie waves goodbye as same round red-coated captain salutes while stepping through large SWIRLY GREEN BOOK PORTAL between shelves. Within portal visible dark oak pirate ship with cream sails on teal sea. His body halfway in portal, coat flowing but intact. Inkwell in girl's pocket, empty cupcake plate on small table aside. Warm library outside, cool sea inside; no duplicate captain.\nExact story context: Jeannie spotted a swirly green portal humming the smell of salt and adventure — that had to be his book. \"Right then,\" the pirate beamed, \"back to the high seas and absolutely no cupcakes, sob.\" He saluted, leapt through, and a faint \"ARRR THANK YE\" echoed back. One story fixed. About nine hundred to go.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

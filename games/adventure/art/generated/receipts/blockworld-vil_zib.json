@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_zib",
+  "style": "M1",
+  "sourceHash": "ec4949402993d6fad4f5876c9d91f05149679d14cdae86de02e52cef1b86d822",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-70910376-0eaa-41ee-896a-f72554810943.png",
+  "originalSha256": "df9348274da18a4342f0116b9445494b0b9c13a3087110b35f70eeb9a6a97e54",
+  "file": "blockworld-vil_zib.webp",
+  "sha256": "78900bb932d31f7023ee7e7640a16fe85a12c87f71ad003c318cf5919f89760f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Zib small limegreen cuboid creature, smiling square head narrow torso four stubby feet no extra limbs. NEW scene: Shy small lime-green voxel Zib steps around a village garden gate to greet Cory, tentative gentle smile. Compact green cubic head and narrow torso, four stubby feet, no extra arms, horns or tail. Friendly morning light.\nExact page context, do not print narrative: A friendly green fellow shuffles over. \"Hissss... hi!\" he says shyly. \"I'm Zib! I don't go boom. I just want hugs. And maybe to help you farm?\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

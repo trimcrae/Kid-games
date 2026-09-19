@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_pathkeeper",
+  "style": "L1",
+  "sourceHash": "88dd03f4ed74c637eaa1efc3cd8d5f49d2c0f493ed73994115634a067132d99f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3a3a6107-aedf-4406-bc30-944aefc8c175.png",
+  "originalSha256": "dc01fdc24f173d151b5d5d2761382ce80fc3424331a6a0cfffd2010153d6090d",
+  "file": "library-fin_pathkeeper.webp",
+  "sha256": "640a5920d34232c3109e7c9b4ffa805e0315a6fa37020d0baa121489fa286f0d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Keeper offers ONE glowing clear AQUAMARINE CRYSTAL KEY, long faceted shaft and open star-shaped bow, to Jeannie on upturned palm. He is still without glasses; THREE distinct pairs rest on desk. Jeannie amazed, pocket featherquill touched. Towering glowing cream bookshelves, intimate invitation to become Story Keeper. Establish crystal key shape consistently, no library card or blankbook.\nExact story context: \"You could become the new Story Keeper,\" he said, eyes twinkling. \"Guardian of every tale ever told — the funny ones, the brave ones, the bedtime ones. You'd never be lonely, for you'd have a billion best friends between the covers.\" He held out a glowing crystal key that smelled faintly of every story at once. \"It is a big job for a small girl. But you, I think, are a very big-hearted reader.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

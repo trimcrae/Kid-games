@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_rest",
+  "style": "L1",
+  "sourceHash": "b6df6c9ae988ea046ce745df081080480d94105c9b2117b0bcbded050a8b57f9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-032b8c27-fa92-4ade-9cd7-cb1e55c5ac6a.png",
+  "originalSha256": "be61766381a99846c4350e264170df46b02bd6a871a290833c70e2fc93cd295d",
+  "file": "library-fin_rest.webp",
+  "sha256": "f59e87fb7468537be58fc37599a0128c1adcb7b51c4c0401787442eded950cab",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Cozy library nook: Jeannie curled in large plush teal paper armchair under cream star blanket; sleepy browncream owl offers a mug with gentle star-shaped steam. SAME elderly Keeper smiles from beside chair, teal word robe, three spectacles on head. ONE small footless Inkwell nestled sideways on chair cushion, empty girl's pocket. Golden safe peaceful mood, no extra cast.\nExact story context: Jeannie flopped into the comfiest armchair in the universe, the kind that hugs you back. The sleepy owl brought her a mug of warm star-tea, and for one perfect minute the whole library was quiet and golden and safe. \"Take all the time you need, dear,\" said the Keeper. \"The best decisions are made with a cozy blanket and a clear head.\" Inkwell snuggled into the chair cushion and pretended he wasn't purring.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

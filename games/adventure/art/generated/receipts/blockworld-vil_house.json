@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_house",
+  "style": "M1",
+  "sourceHash": "eb23f06223f68f80512e69964921149b542c050c541610337aa8a1ef23671073",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-20d275f5-fed1-489d-90ed-1ce17b114069.png",
+  "originalSha256": "092838cc5aacb776fbc5b2ca9ba7489c2ea29efd590051a2a5c1b91afa983971",
+  "file": "blockworld-vil_house.webp",
+  "sha256": "7cb8feb7a8d43cd628ba5a1af5050bb1c0d1e3e625a0c8b3798d5dd05b24972b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: At golden sunset Cory proudly stands at open door of newly purchased cozy oak-and-cobblestone cottage, small red roof, blue window shutters. Neighbors waving along cobbled street. No mayor hat yet.\nExact page context, do not print narrative: Cory buys a cozy blocky house at sunset. Villagers wave. \"Hrmm! A neighbor!\" they cheer. Now everyone knows Cory's name. Maybe... mayor name?",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

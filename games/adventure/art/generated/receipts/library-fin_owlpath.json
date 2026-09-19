@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_owlpath",
+  "style": "L1",
+  "sourceHash": "5ce6483d109f9f6862b1f8897dc22bc3de68b28998d354e1c90961c7bbe1db4b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-eb240d98-3d55-4237-85eb-c18be22500a1.png",
+  "originalSha256": "1d337e9e4248ac072aea553b52f349e54f24814d890d04fa988df8f63f17d7eb",
+  "file": "library-fin_owlpath.webp",
+  "sha256": "5a1b3cea2d8fd8b1e6abb2f59e01892daecabe458b286d093463c4afb37054e8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie holds hand beneath round browncream owl perched on cream shelf. Owl drops ONE brass key into palm and points wing toward whimsical SPIRAL STAIRCASE built from neatly stacked storybooks, leading up to cozy nook behind small squeaky brass gate. Inkwell tucked in dress pocket, expression approves. Stairs clearly safe wide treads, scene distinctive from library ladder.\nExact story context: The owl swiveled its head all the way around (show-off) and pointed a wing at a spiral staircase made of stacked storybooks. At the very top, it hooted, was the Keeper's reading nook. It dropped a small brass key into Jeannie's hand for the squeaky gate. \"Splendid bird,\" said Inkwell. \"For an owl.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

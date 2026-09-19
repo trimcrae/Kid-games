@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_pirate",
+  "style": "L1",
+  "sourceHash": "7c753d4974ee3c8cc7398625c9190a42346a67417dac1a57074e0c51b9605e0a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-11e873e5-a899-443b-9fa0-f0553c8939a2.png",
+  "originalSha256": "21cfe9b5d49739c1cda4a1369aa899fbd5dd7a53d1b26a9974bca99b2dd5cd43",
+  "file": "library-fin_pirate.webp",
+  "sha256": "d7dd2be68515e0e937b2e71ea0d329314b076e3335987f83c948d6328c9c82e4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: New library aisle with green fairy-tale forest spilling as paper stage from open book. Same round brown-bearded pirate in navy/gold tricorn and red coat freezes mid-tiptoe beside plate of dainty fairy cupcakes, white frosting on his NOSE. Jeannie catches him amused, pocket Inkwell skeptical. One pirate only, exact captain design, no princess or dragon in foreground.\nExact story context: Jeannie tiptoed after the pirate, who was tiptoeing after a plate of fairy-tale cupcakes. \"Arr, this be the FANCIEST treasure I ever robbed,\" he whispered, frosting on his nose. He turned, saw Jeannie, and froze mid-tiptoe like a guilty cat. \"...These aren't me books, are they,\" he admitted. \"I fell out of Chapter Seven and I can't find me way home.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_wool",
+  "style": "M1",
+  "sourceHash": "c02feb5288b4ae1edcf0186167e0f84fa50d1b388d4f17de9a7804a4cda2f52a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2513c0c7-54ff-41e0-88f4-9b604778d9ad.png",
+  "originalSha256": "7f17bf0963fae9ad4d601dd7bb5c253d51028a2c387f47dc3bd07eaf606344c9",
+  "file": "blockworld-vil_wool.webp",
+  "sha256": "0f6af60b0a1f340aa62f27d6f08d2ae6d8258d9bb67156e4955015e6be92a576",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. NEW scene: Bartholomew fluffs his wool proudly while Cory kneels to hug him, two emeralds clearly visible on nearby little stool. Village greenery. Four sheep legs; no shears, cape or sword.\nExact page context, do not print narrative: \"You want my WOOL?\" gasps Bartholomew. \"A hero's wool is priceless! ...Okay, 2 emeralds and a hug.\" He fluffs up proudly. \"Heroes need hugs too.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

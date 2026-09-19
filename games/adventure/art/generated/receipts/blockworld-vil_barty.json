@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_barty",
+  "style": "M1",
+  "sourceHash": "7aebe95849590fdb1e063d513c2ad4c5549b98b584b10008e106688a24976438",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-90f1a09c-5abb-422d-8387-5979d237933c.png",
+  "originalSha256": "34420bd1fdb55e543485fdb7567f1266df11127934af558f96e57b694e0796ea",
+  "file": "blockworld-vil_barty.webp",
+  "sha256": "1a64d8ffad31a3dd53a51e8b6c5e4168eef454dee3c2a4f78f9b967083f5ac43",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. NEW scene: Village square low angle. Bartholomew stands proudly on a single stone podium, one hoof against chest, boasting to smiling Cory. Sheep four legs total, three grounded and one raised. No cape or sword.\nExact page context, do not print narrative: A fluffy sheep stands on a block, hoof to chest. \"Behold! I am BARTHOLOMEW, legendary hero AND your next mayor!\" he baas. \"Vote sheep! Free wheat for all!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

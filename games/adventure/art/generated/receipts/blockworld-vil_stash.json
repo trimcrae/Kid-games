@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_stash",
+  "style": "M1",
+  "sourceHash": "843cea439715fb1c1bda8ae41761fef33d3e81869ac4f47980118e676e7b7461",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-aa6423cb-f180-43b2-9c98-0730f2096cbb.png",
+  "originalSha256": "18d8a3df6f24ca8365662a633dd6bc4c03183083e4f141d24e2a89087997a737",
+  "file": "blockworld-vil_stash.webp",
+  "sha256": "506568955b392126ded731691b3a4551ae45bdc7f421ed3d894a0f96b0d4e120",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Close open treasure chest interior containing EXACTLY FIVE large green emeralds, fully visible and spaced apart in a shallow otherwise empty chest. Cory counts on fingers, villager congratulates. No gems outside chest.\nExact page context, do not print narrative: A chest brims with shiny emeralds! Cory counts: 1, 2, 3, 4, 5! \"Hrmm, you're our richest trader,\" beams the villager. \"With this, you could buy a HOUSE or fund a farm.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

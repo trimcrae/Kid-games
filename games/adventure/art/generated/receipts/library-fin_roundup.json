@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_roundup",
+  "style": "L1",
+  "sourceHash": "b41e41c440445b324509487269a2b7efa578146f5a9c14b23d9121335258014d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6d22a559-d2f5-4f65-8c17-6edb95cd5a70.png",
+  "originalSha256": "ae52f715791640e0b04051db002128d56d4c82a368e7970960780d7b07170b1c",
+  "file": "library-fin_roundup.webp",
+  "sha256": "6428e419bc17c1bda1d9f13caab0870e1c2e9cbab9d92856e6af4d7e9420145d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Wide playful library repair scene. Jeannie sleeves rolled leads THREE little pink pigs wearing space helmets out of a navy starry book into a green meadow book. Elderly Keeper in teal wordrobe waves small gold wand toward returning tales; three spectacle pairs atop head. Inkwell hovers near Jeannie as ONE feather/goldnib, no limbs, emptypocket. At right green three-goldhorned friendly cookbook dragon now reads a green GARDENING book with plant emblem. Small distant blonde Goldilocks steps out of yellow submarine book. Paper theatre panels distinguish story characters from Jeannie.\nExact story context: Jeannie rolled up her sleeves. With Inkwell pointing and the Keeper waving his wand, she shooed Goldilocks out of the submarine, walked the Three Little Pigs back from outer space, and convinced the cookbook dragon to read the gardening section instead (much fewer recipes for dragon). Each story slid home with a happy CLICK. The whole library began to hum with relief. \"You're a natural,\" the Keeper marveled.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct paper-theatre finale scene, correct current cast/actions, consistent Jeannie, footless feather quill and Keeper; exact props/signage where present."
+}

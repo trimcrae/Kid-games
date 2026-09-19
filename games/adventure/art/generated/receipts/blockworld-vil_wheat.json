@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_wheat",
+  "style": "M1",
+  "sourceHash": "77a75295bc0a93a2fcf3105cc0d24d800b874de4a5e21cd1436c4663e47f3b0c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ea8c3635-7819-446f-baca-8123f408a3a0.png",
+  "originalSha256": "79c6527a87229c861456e1edcc4657a25c0ec82a7e85a109eda04e8f51b54d43",
+  "file": "blockworld-vil_wheat.webp",
+  "sha256": "ee74f20a2a38f2c8916b1f196651defb120b7b78f5ff97de3a90086785fe71a9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Educational harvest exchange: Cory and clapping villager beside counter with exactly SIX harvested wheat stalks, laid as two clearly separated groups of three. Exactly TWO emerald gems alongside. No additional wheat or gems anywhere; distant fields green grass.\nExact page context, do not print narrative: Cory harvests 6 golden wheat. \"Hrmm! 3 wheat is 1 emerald,\" says the villager. \"So 6 wheat is... TWO emeralds!\" He claps his blocky hands. \"Smart boy!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

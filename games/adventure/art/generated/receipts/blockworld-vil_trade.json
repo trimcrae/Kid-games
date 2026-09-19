@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_trade",
+  "style": "M1",
+  "sourceHash": "daaf10eba2258560a9b9cd2f82e10e9c1ed51ab5b8f74dad5fcca945de5a8dd9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-bc58f6cc-27af-4f30-9432-6203f16d91d3.png",
+  "originalSha256": "0c02b939e9ed697fe2e53951085a71dea68066172aeb6d0955a7a1e7b28649f0",
+  "file": "blockworld-vil_trade.webp",
+  "sha256": "e1906a55b8f5c734b0739de1a6ce3d59b165c7b0d4cbcbf1e121c65d51989963",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Close trading stall: welcoming bald villager opens wooden chest and holds up exactly ONE green emerald. On counter exactly THREE individual wheat stalks side by side. Wooden rate sign '3 wheat = 1 emerald'. Cory considers offer.\nExact page context, do not print narrative: The villager opens a chest. \"Hrmm! 3 wheat for 1 emerald,\" he offers, holding up a glowing green gem. \"Bring me crops, get rich!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}

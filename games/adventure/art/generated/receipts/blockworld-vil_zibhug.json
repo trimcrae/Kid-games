@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_zibhug",
+  "style": "M1",
+  "sourceHash": "b9b7ecee51b7badb81a48b65872edb2c073c2742c90a20209d2384c551f81f8f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-20562cdd-91a8-42b0-8a18-e4bee1ba264f.png",
+  "originalSha256": "c2699c61158d138cabc1c3d92c83333381cbf2d980fa9e4268bd81313fb2f281",
+  "file": "blockworld-vil_zibhug.webp",
+  "sha256": "a0e923d9aac4bcd05f0e4ff30d132d4101e1c572cbdcdc603369e32ccac26735",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Zib small limegreen cuboid creature, smiling square head narrow torso four stubby feet no extra limbs. NEW scene: Cory crouches and hugs delighted Zib beside a village orchard path. Zib leans into hug, tiny sparkles, secret winding path visible beyond gate. New angle/composition distinct from forest reference.\nExact page context, do not print narrative: Cory hugs Zib. \"Hisss... best day EVER!\" Zib glows happy. \"To say thanks, I'll show you the secret pumpkin patch. The BIGGEST pumpkins grow there!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct voxel village scene and consistent Cory/cast. Counting verified: trade three wheat/one gem, harvest six bundles/two gems, wool two gems, stash five gems."
+}
