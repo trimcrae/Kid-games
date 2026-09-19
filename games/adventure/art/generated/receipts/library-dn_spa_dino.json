@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_spa_dino",
+  "style": "L1",
+  "sourceHash": "fb6186dc1b421d589f9a7f5f4da780b95d4a2d82075417d89e450d9eecebae28",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c2740311-d39b-4c17-90c8-ccf580dfd1e4.png",
+  "originalSha256": "c54de95c33f56ac31b85dae571c456008cf44ccff01dc3527b4d75850c60402c",
+  "file": "library-dn_spa_dino.webp",
+  "sha256": "f806f959b2f81f06ac39a8c29d3ea5d146b57855e1f9a480bb75ef5e0e62010e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY, compose NEW scene: Same terracotta dinosaur sits relaxing in folded-stone warm steam spa. Jeannie NOW stands beside pool wearing both brown shoes and cream socks, accepts ONE smooth warm tan pebble from dinosaur's extended front paw. Inkwell floats beside her dipping just gold nib into a soft curl of steam as if sampling its warmth. Serene little smile on pen. Same cream belly, rounded nose and short dorsal bumps on dinosaur. No other quills, no shoes left on bank.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_rumble.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: warm pebble passed from terracotta dinosaur to Jeannie with both shoes on; one quill floats in steam."
+}

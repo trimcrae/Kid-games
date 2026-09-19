@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_baby_chaos",
+  "style": "L1",
+  "sourceHash": "f8b68b697fe2904b8a2c800afdaf0935b1fdb359372aa08e1d880b03b66365ae",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-df7541b4-7482-4c9f-a33f-a597db100e4d.png",
+  "originalSha256": "bb4cdacf4b5906087657ebfcda7b2599bd1a0ad6cff9b1c99c7c2374c8860544",
+  "file": "library-dn_baby_chaos.webp",
+  "sha256": "cc8f9ee2665009ad84b2705ee7d7f51b5de74e4945119b5af6f4aafa9bfc34f2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Fern forest clearing: same light green baby sauropod wears a big yellow mushroom cap as a silly hat and marches in pompous little circles, copying crowned Reginald who looks horrified beside it. Jeannie stands laughing at their matching high-stepping poses. Inkwell dryly amused from purple pocket. Baby has four short legs, cream belly, large brown eyes, tail, small darker dorsal bumps, no wings or horns. Only one baby. No adult dinosaurs.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_cuddle.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: baby in yellow mushroom hat imitates crowned pigeon, high-stepping poses and laughing Jeannie; one baby."
+}

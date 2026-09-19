@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_pigeon_guide",
+  "style": "L1",
+  "sourceHash": "7443bf1237d262f9bf4bf9124a32cf88247f2906b37efc4c4dbbc1cd607fb154",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-208c3a49-ddb3-4b13-b21a-602b5a59232c.png",
+  "originalSha256": "43cee96f6298bd3ff191860775d2de953b4d6533400e60516c4de833812dfe8b",
+  "file": "library-dn_pigeon_guide.webp",
+  "sha256": "8d084e59a07b6457250e86bc75d08a146deb13e9d9848284d72dbbd1a3857fc1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Wide view from inside shadowy fern forest through curtain of parted paper vines into breathtaking sunset meadow full of pink and golden flowers, layered mountains, orange sun. Jeannie has just stepped through vines in amazement. Same small crowned Reginald struts proudly ahead looking back with one wing gesturing as though he planned it. Inkwell gazes appreciatively from her pocket. No signs, no other characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: parted vines reveal flowered sunset meadow, crowned pigeon gestures ahead and Jeannie looks amazed."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_egg_promise",
+  "style": "L1",
+  "sourceHash": "19d79a59646ee4720073b416df0ae87df5fb6d53b0200cdf70a1d55ba85b72ef",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fffbed88-cec7-4d51-bb8f-845d7d1fb8f6.png",
+  "originalSha256": "0c9d7018e878886075a371deb22662c392a2ec42803b08e358c3194100a8817e",
+  "file": "library-dn_egg_promise.webp",
+  "sha256": "7ad672508e21dcf99146b5c5de21598202f05105b79ee1df37f3adc52b7f8f42",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Intimate forest clearing scene, Jeannie kneels looking lovingly into same baby sauropod's huge brown eyes, one hand over her own heart promising protection. Baby has just flopped onto its side with delight, all FOUR short legs visible; a tiny pale green curl of paper swamp-gas puff beside its nose suggests sneeze. Broken green-speckled cream shell halves lie beside moss nest. Inkwell rolls eyes in pocket. No mother or pigeon needed.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_cuddle.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: Jeannie promises with hand on heart; baby on side with four limbs, small sneeze curl and broken speckled shell."
+}

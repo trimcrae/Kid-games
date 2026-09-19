@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_inkwell_calm",
+  "style": "L1",
+  "sourceHash": "6a517c68dd6c9b02aad472b63319084ebab160bb3e3ac776a55487ed99c6ea33",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6bb805c3-dbf8-45e7-bad1-e00b824a1871.png",
+  "originalSha256": "aae387755e596f3a26920716eed1a17e25cf05488db20c5ac1e60033dd8f74b2",
+  "file": "library-dn_inkwell_calm.webp",
+  "sha256": "9fa119af950ffc682a51ad201934d80d751a12d947ff32b5b50698776fe35b14",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY, compose NEW scene: A new intimate gentle composition: standing Jeannie cups Inkwell sideways in BOTH hands at chest height. Same big green mother lowers head and gives the TIP of his cream FEATHER a tiny respectful nose boop (NO tongue). Inkwell blushes trying to look grumpy. Tiny feather quill with gold nib and NO feet. Green mother head and curving neck fill right half, sunny ferns behind. Hands correctly cup one pen, girl smiling reassuringly.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_meet_herd.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: gentle mother longneck nose-boops the blushing quill held in Jeannie's two hands, consistent paper characters."
+}

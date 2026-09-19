@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_find_parents",
+  "style": "L1",
+  "sourceHash": "26827d6f3d7a4d2d2bbf138f157758c15de65ab1fe1a8bb9445f1a50d98165ad",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e7df2e14-a76a-4506-a42f-0274b1d30955.png",
+  "originalSha256": "342e2495661dff27baa7fc58ac77c9fa55e13981a6d5b9c8d012a0faa6efcb41",
+  "file": "library-dn_find_parents.webp",
+  "sha256": "1b61c74f3de92ae4412647102ec9eda767aa108e985699ae3fda9fb1fe593645",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Jeannie and SAME green baby sauropod walking close together along fern forest trail with enormous dinosaur footprints clearly leading toward distant sunny plains, treetops nibbled. Crowned Reginald has just blundered headfirst into a leafy bush at trail edge and pulls a leaf off his paper crown, embarrassed. Inkwell skeptical in dress pocket. Show tender loyal baby keeping within a foot of girl, four legs and long tail, no extra characters.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_cuddle.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: baby walks close to Jeannie beside huge footprints; crowned pigeon extricates itself from bush."
+}
