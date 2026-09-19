@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_pearls",
+  "style": "M1",
+  "sourceHash": "a142515ee5fd09f52aefd4226836f3941adfe1a3592b1a248312892a805b6d68",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2b78b69a-763b-49cc-86fe-eec1cacd979e.png",
+  "originalSha256": "14fc969626c7299fccf970176e5b03141d06c944d7fe625c0f330595d7a07289",
+  "file": "blockworld-oc_pearls.webp",
+  "sha256": "ce4e83c747e5035e929442fdcf8a4aee80580f741ec23d204e3b8092a68e9401",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Underwater wreck counting moment: exactly TEN large pearls laid on dark oak floor in two clearly separated rows of FIVE: upper row white, lower row gold. Cory counts, Mr Snips sheepishly shrugs empty pincers, Bartholomew floats alongside narrating. All ten visible, no other pearls.\nExact story context (do not print): Cory counts the spilled pearls: 5 white, 5 golden — that's 10 shiny pearls! Mr. Snips tries to pocket one, gets caught, and gives a tiny crab shrug. Bartholomew narrates: \"And lo, the hero counted... mathematically.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

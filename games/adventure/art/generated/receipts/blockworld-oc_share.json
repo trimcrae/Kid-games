@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_share",
+  "style": "M1",
+  "sourceHash": "ccd9cfb6ab4884464693fb9828e1911439e4c57d03b26743e241b7c20b7b04ef",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fd29227c-e125-4dff-b619-15c8c61c7b14.png",
+  "originalSha256": "476c08c06ffdc764cdaf717af4f9b34d564094a3624e35b1ae0b74a01cbfeb55",
+  "file": "blockworld-oc_share.webp",
+  "sha256": "45f8baaff466a0e1dfad060b01a5a6bdc5364d65534d91599ed5bb05ba127220",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Underwater fair sharing: Cory and Mr Snips each beside a separate group of EXACTLY FIVE pearls, total TEN. White pearls on Cory side, golden on crab side; all individual clear. Crab points toward shadowy passage where chest remains out of view. No extra pearls.\nExact story context (do not print): Cory gives 5 pearls to Mr. Snips and keeps 5. Fair and square! The crab is so touched he leads Cory straight to the legendary chest's hiding spot. Friendship: the real treasure (also there's gold).",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

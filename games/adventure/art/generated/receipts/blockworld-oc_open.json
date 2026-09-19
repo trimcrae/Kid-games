@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_open",
+  "style": "M1",
+  "sourceHash": "50eba5813f443d24fb30e93e4ea38e5e5887b739161ba9fb580bba172895e3c0",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-48bf2c84-5aa1-47e7-8a44-0040bf7b2ec3.png",
+  "originalSha256": "316ba008a82070b3393d6b67e79d808acbfd7ccf31b37a35675790dd962e0b54",
+  "file": "blockworld-oc_open.webp",
+  "sha256": "6970b861a037fdef7f0780c27aca30ce456afd14108b7d6604f414d1a7b838ec",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Inside wreck, Cory turns ONE golden key in open dark-oak brass-banded chest. Warm light reveals coins, jewels and ONE oversized glowing white pearl. Mr Snips reclines comically overwhelmed on floor, Bartholomew poses grandly. No other large pearls.\nExact story context (do not print): CLICK! The golden key turns and the chest bursts open with light! Gold coins, sparkling gems, and one giant glowing pearl. Mr. Snips faints from joy. Bartholomew demands to be in the official painting.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

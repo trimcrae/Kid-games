@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_garden",
+  "style": "M1",
+  "sourceHash": "98f05194cb19b71cf68c00c96670a7f2842c9f1584cc1e0fa1191c3c62347bc7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b6b67a80-73bb-42cc-8f47-9a0f716f55a0.png",
+  "originalSha256": "bfdc06550f84287454ee91de92fef5f484865dde171e326b4e06ba5000c5559b",
+  "file": "blockworld-oc_garden.webp",
+  "sha256": "c4efb0caa441f6471defd460cdfd7bb6b81707f5135a4039e481f867804e319f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Underwater coral garden: kind voxel mermaid with long copper-red block hair, lilac modest seashell top and turquoise segmented fish tail waves to Cory. EXACTLY THREE distinct coral clusters in row: pink, purple, orange last. Mermaid points behind orange one, key still hidden. No extra coral.\nExact story context (do not print): In the coral garden, a kind mermaid waves hello. \"Looking for treasure? You'll need the golden KEY,\" she sings. \"Mr. Snips hid it — count 3 coral and look behind the orange one.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_fishhelp",
+  "style": "M1",
+  "sourceHash": "eb258d111f497ef8985065b14c7e45ca7b20125212630d6a42773af85f2bffd8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-24f7e598-4a80-4a39-a4fd-86df842b8b42.png",
+  "originalSha256": "6e02d3856f7e3b06e9f3a80b402d53ed81aca5c2a508eaf4cfa115a244ee6d11",
+  "file": "blockworld-oc_fishhelp.webp",
+  "sha256": "d483cb9174ac5a6ed646fece715c214bcbcb1c6ca8001eee2f1a013fb0a70cb4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Underwater Cory bows with bubbles to EXACTLY THREE friendly fish (orange, turquoise, yellow). Fish direct him past EXACTLY TWO coral clusters (pink and purple) toward ONE round dark hatch hole in oak wreck hull. No extra fish/coral.\nExact story context (do not print): Three friendly fish blub-blub the directions: \"Past 2 coral, down 1 hole, mind the crab!\" Cory thanks them with a bubbly little bow. The fish glow with pride.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

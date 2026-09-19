@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_jumps",
+  "style": "M1",
+  "sourceHash": "b328ca49e374fded236684df1130065c9109529d4d447d9a4795508f884b0c90",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-581786a9-fe4b-472d-841e-63564a5506e6.png",
+  "originalSha256": "a9494847553ae577c35f34144b47e99eb3d5e3c6ea02bba6ff3090695f2f4ce4",
+  "file": "blockworld-oc_jumps.webp",
+  "sha256": "8983720b1853c5dbff95c2bff09e7ab8fd8482ea33e2d702ebb73237c38122b7",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Golden low sun. Cory astride ONE bluegrey cream-bellied dolphin at apex of huge leap. Behind them exactly THREE progressively larger white splash rings mark completed jumps, other dolphins cheer from water below without duplicate Corys. Thrilling sweeping diagonal.\nExact story context (do not print): One jump! Two jumps! Three HUGE splashy jumps! Each one is bigger than the last, and the whole pod cheers in dolphin-squeak. The sun sinks low and golden. Cory has never felt so free.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

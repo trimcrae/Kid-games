@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_wreck",
+  "style": "M1",
+  "sourceHash": "d1041046c956349afb54f938f1dace563a7b1ce82c386fd8bc962d701bf2005a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-54e5f8a9-660d-4350-92f3-0c4641c5d3f1.png",
+  "originalSha256": "f9dd57d92c4f4b664d9b99bcdeb038fd7f6cea1bc4aa4ab1d2650017be0a4163",
+  "file": "blockworld-oc_wreck.webp",
+  "sha256": "052ac59cc03f95c6a8d042c77a9432714de7fc988d8cb48403d82b187f0b8d7a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Underwater reveal: Cory swims toward dark oak shipwreck with broken mast, torn teal sail, brass door hinges and warm mysterious glimmers. Coral clusters and tiny fish around hull. Mr Snips perched on ONE shiny gold coin by creaking cabin door. Magical clear underwater air bubbles, no diving gear replacing glasses.\nExact story context (do not print): Down, down, down to the sunken ship! It's covered in coral and curious fish. A door creaks. Inside, Cory sees glimmers — but also Mr. Snips, already perched on something shiny. Of course.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

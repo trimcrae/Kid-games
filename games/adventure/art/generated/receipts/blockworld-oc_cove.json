@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_cove",
+  "style": "M1",
+  "sourceHash": "da9054c9f78ffb273e9564a90064640324df28ac62a50ac72c37f39c8a916b1e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4937f5c1-c771-4023-9db8-8f320dc584f9.png",
+  "originalSha256": "17154b8fa5e84276f4168467eba71776dfc902d56dafa833f6252de98502b5a0",
+  "file": "blockworld-oc_cove.webp",
+  "sha256": "62260084f5a102d33417855ae2104fdef540c098e2f71858b2b122af4e2a415d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Secret turquoise cove enclosed by block cliffs. Cory waist deep surrounded by EXACTLY FIVE friendly bluegrey cream-bellied dolphins, noses gently bonking him. High view showing all five whole bodies separately, no extra distant fins.\nExact story context (do not print): The pod wins the race by a whisker (do dolphins have whiskers?). In the secret cove, the dolphins gather close, bonking Cory gently with their noses. He counts the pod: 1, 2, 3, 4, 5 happy friends.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

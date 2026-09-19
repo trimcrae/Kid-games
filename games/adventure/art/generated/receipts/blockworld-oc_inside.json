@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_inside",
+  "style": "M1",
+  "sourceHash": "699d36df052209c8877e44f38ca799e25d4b0c9c9d7304f9872d1d126d548ebd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5f136624-e27a-4e73-a7ad-dcd7fa09c7a4.png",
+  "originalSha256": "4c32eab51d627f07ffcce78f0a83267b06ecd768747144ce50fe25172ea08f07",
+  "file": "blockworld-oc_inside.webp",
+  "sha256": "458bd9cc7a54dc4f1dbf72ac2c29a58efdf59669d49c641bcbe0456bc877d1c4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Inside tilted oak shipwreck cabin. One large CLOSED dark oak chest rounded stepped lid brass bands rusty lock. Mr Snips on chest guards EXACTLY TWO loose emerald-green gems beside him. Cory approaches grinning, golden underwater light, no loose treasure yet.\nExact story context (do not print): Inside the wreck glows a big wooden chest! Mr. Snips sits on top, guarding 2 loose gems. \"Three rules,\" the crab seems to clack: \"be kind, count careful, and share the shiny.\" Cory grins.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}

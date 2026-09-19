@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_key",
+  "style": "M1",
+  "sourceHash": "37a92b4bfc7068679059f7269cb1220603ed1eb3d0f46fb74ae0f80a80d1255e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8e9dcb99-fa83-4a9b-b67e-dccfb064851d.png",
+  "originalSha256": "217e2a37ddcb61088d04e8d8eea7991d208e1ed714e2ba5e4c481725bfd5ae2b",
+  "file": "blockworld-oc_key.webp",
+  "sha256": "42645b43288cf08425421f03c081aa6be15914e47c62b000fed1325637c32765",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Underwater close view of exactly THREE coral clusters pink then purple then ORANGE. Cory discovers ONE gold key behind third orange coral and offers ONE shiny silver button to Mr Snips; crab gestures agreement. No extra keys/coral.\nExact story context (do not print): Behind the third coral — the orange one! — sits a gleaming golden key. Mr. Snips clacks grumpily; he was saving it for his collection. Cory promises him a shiny button instead, and the crab agrees.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct ocean scene, established voxel characters; five dolphins, ten pearls and equal five/five shares are exact where requested."
+}
