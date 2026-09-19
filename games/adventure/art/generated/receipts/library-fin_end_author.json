@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_end_author",
+  "style": "L1",
+  "sourceHash": "ae0d4e4816ef6fa7434f80e2431ff6894fa120799c262fa1f960447d768c4089",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-66a30f8c-2f6b-4493-bed3-732349add67b.png",
+  "originalSha256": "6b20db5a7ec0f424f9b3905f6888733c6fa1e4549aaa1064b87fb8537060d031",
+  "file": "library-fin_end_author.webp",
+  "sha256": "aca3d8cf36c7f3084fa457242dc91a3539c9ee4cd01eddc1ed399a9c3b764c07",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Grand warm author finale. Jeannie proudly places her NEW cream/gold glowing book on special cream library shelf. Open pages unfold miniature world: friendly green dragon, brave small girl storycharacter distinct from Jeannie, pompous bluegrey pigeon storycharacter, and a tiny drawn quill emblem. REAL Inkwell remains one footless cream feather in Jeannie's pocket. At distant library table two different child readers open copies of her book with small glowing portals inviting play. Real medal-pigeon looks delighted nearby. Focus Jeannie's proud authorship, avoid duplicating adult storykeepers. All paper-engineered, no text captions.\nExact story context: And so Jeannie became The Author — the youngest writer ever to earn a glowing shelf in the magical library. Her world filled up with friendly dragons, brave girls, a pompous pigeon (Sir Reginald was delighted), and one wonderfully grumpy quill who narrated everything. Children everywhere began to find her book, tap it open, and step inside to play. Because the truest magic, Jeannie learned, isn't visiting other people's stories — it's daring to write your very own. THE END... and the first page of everything.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_author_final.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pigeon.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Jeannie presents her new book, miniature story world and proud crowned story-pigeon distinguish fiction from uncrowned Reginald beside her."
+}

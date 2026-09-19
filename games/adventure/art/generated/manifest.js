@@ -355,10 +355,12 @@
     "fin_end_keeper": "art/generated/library-fin_end_keeper.webp",
     "fin_pathhome": "art/generated/library-fin_pathhome.webp",
     "fin_home_visit": "art/generated/library-fin_home_visit.webp",
+    "fin_home_final": "art/generated/library-fin_home_final.webp",
     "fin_end_home": "art/generated/library-fin_end_home.webp",
     "fin_pathauthor": "art/generated/library-fin_pathauthor.webp",
     "fin_author_inkwell": "art/generated/library-fin_author_inkwell.webp",
     "fin_author_final": "art/generated/library-fin_author_final.webp",
+    "fin_end_author": "art/generated/library-fin_end_author.webp",
     "wl_intro": "art/generated/library-wl_intro.webp",
     "wl_hub": "art/generated/library-wl_hub.webp"
   }

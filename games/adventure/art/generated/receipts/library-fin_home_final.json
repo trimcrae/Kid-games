@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_home_final",
+  "style": "L1",
+  "sourceHash": "d7173e36b2cce99a9dd0c65b940be82234b868ad66eb6f8161d344ab07ba61fc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-99b931ae-37d3-49fe-a8dd-035b77d9023d.png",
+  "originalSha256": "d51c89fee5d345bb9d287fa4955c02f9e36ba680a1db34c1f900e83e8d4bb9ad",
+  "file": "library-fin_home_final.webp",
+  "sha256": "aaed858c2d20a06cb91f891dc8c97714b6be67c10ee552fb7643e8713c8934e9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Bright library doorway portal shows cozy sunlit home beyond. Jeannie touches SAME silver JEANNIE card to portal rim with one hand and gently holds ONE footless Inkwell quill in other, empty dresspocket. Same bluegrey pigeon with ONLY handmade goldstar medal on purple ribbon performs grand bow beside doorway. No crown or helmet. Warm farewell, no wizard foreground.\nExact story context: As Jeannie stepped toward the shining doorway home, a trumpet blared and Sir Reginald Pigeon swooped in for one final grand bow. \"It was, of course, MY idea to send you home a hero,\" he declared, medal jingling. \"Do mention me in your memoirs. Chapters one through forty.\" Jeannie laughed, scooped up Inkwell, tapped her glowing card on the portal, and felt the warm pull of her very own front door.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pathhome.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pigeon.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Jeannie returns through home portal with silver library card and Inkwell, Reginald bows with star medal."
+}
