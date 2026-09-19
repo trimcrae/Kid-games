@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_end_egg",
+  "style": "L1",
+  "sourceHash": "69f2c6aa8df63d2ba0cd9b9144e54d1f3fc8b5cd80aa421b0e781613af1d323b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-eaf9ae8b-fa14-49da-ac16-593b44c14bf7.png",
+  "originalSha256": "c569b7186f8f9b65fc13ce4b4bf1df68dc71e3781e0ff3768a16732859338cbc",
+  "file": "library-dn_end_egg.webp",
+  "sha256": "9d20fbb5bde19aeedef584c398ba2824b15669115ed8abcfe7c60372edee3d04",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Tender final nightfall scene in warm volcanic nursery. Jeannie sits among safely nested green-speckled eggs and several drowsy tiny green/blue/gold baby sauropods; one green baby cuddles into her lap. Volcano and safe warm paper steam glow like a nightlight beyond. Crowned Reginald wipes one proud tear with wing nearby. Inkwell softly smiles in dress pocket beside small tied bundle of green baby name-leaves kept safely. Deep blue twilight, golden nursery light, peaceful cared-for feeling, no text.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_guard_final.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_cuddle.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: peaceful twilight nursery, sleeping green blue gold baby sauropods and speckled shells, Jeannie cuddles baby, crowned pigeon tear, pocket quill and saved leaves; consistent paper construction."
+}

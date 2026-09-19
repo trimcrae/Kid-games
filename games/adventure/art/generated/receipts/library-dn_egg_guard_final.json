@@ -1,0 +1,24 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_egg_guard_final",
+  "style": "L1",
+  "sourceHash": "6a3bff06b7dba62f25b26e2244653123e8e56e638abf08121c2cfbc79f6b39ef",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-75c2448b-43ba-46af-b13b-8e9f66ab6c06.png",
+  "originalSha256": "0150719f3c8ee33f87fd70216b7c3457046a376c1874ccaac510855ce01f9651",
+  "file": "library-dn_egg_guard_final.webp",
+  "sha256": "f6c774e2126bbe01aa133eb711326f1474eddc9ca26cfa5c8db128870e8f696a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: At warm glowing volcano nursery Jeannie stands proudly as guardian while several tiny sauropod hatchlings tumble from green-speckled cream shells. Crowned Reginald earnestly teaches babies to coo with one wing raised. Inkwell floats independently over a flat green leaf, using his OWN gold nib to write baby name 'Pip'; other leaves can be face-down or show only tiny marks. One pen only, no human pen body/feet, girl's pocket empty. Steam curls, glowing tan rocks, safe moss nests.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_warm_eggs.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_cuddle.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: four hatchlings, crowned pigeon teaching, Jeannie guards nursery, one independent footless Inkwell writes Pip on leaf. Paper cast and nursery continuous."
+}
