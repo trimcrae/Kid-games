@@ -1,0 +1,25 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_whisper_gather",
+  "style": "L1",
+  "sourceHash": "ec570dfd5687c2622351ec33ac89c32e7058df88205fb60da76690c2a9143c0e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ee3c2ead-f57a-49a5-95a9-3f2307ac3abd.png",
+  "originalSha256": "0b8a6a4d68a1d5f9c6b1e8ab4cde4f54ef89dc5bde401f9ad7cc5de7a00a3bfe",
+  "file": "library-dn_whisper_gather.webp",
+  "sha256": "7c0b48f25772a369f1de419320aecd5d909341e7a50b0d8c50e52e6a47fd8c8a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Golden sunset valley celebration. Jeannie stands central, surrounded by welcoming green/blue longnecks, relaxed terracotta spa dinosaur, dozing smaller dinosaurs and SAME happy green baby. SAME enormous periwinkle blue dragon is NOW upright sitting like goofy dog, four limbs total, TWO folded wings, two ivory horns, lavender belly and long tail; extends one front paw to offer her ONE tiny yellow flower. Inkwell emotionally dabs his nib with edge of feather from pocket. New wide composition, all characters paper sculpture, no captions.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_dragon_goof.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_meet_herd.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_rumble.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_cuddle.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: four-limbed blue dragon offers one yellow flower, two wings, mother herd, terracotta dino and baby surround Jeannie."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_warm_eggs",
+  "style": "L1",
+  "sourceHash": "2314ce3e7e8e0d5a7c8fdd715421f2acbe77fca0de8ff8eb90366c48dbcf5564",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ca3eb761-6c5f-4df6-a663-3401aff8b829.png",
+  "originalSha256": "740ba9da4d7286617dacd020701ce787026296ed2e04aa62920efdf53cac4a36",
+  "file": "library-dn_warm_eggs.webp",
+  "sha256": "8382a30a393fcba0164b156e4e9934a269c63ab7cccac52be19dda0827ff07f2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the FIRST image (volcanic egg nursery). Preserve Jeannie, her face, dress, hands, quill in pocket, all eggs, baby hatching, moss nests, steam, rock terraces, lighting and framing exactly. Correct the cast: REMOVE the large crowned terracotta dinosaur on the RIGHT entirely, including its crown and both arms. In its place beside the eggs put ONE SMALL Sir Reginald PIGEON, matching the SECOND image reference: round blue-grey paper pigeon, cream breast, teal/purple neck, orange beak/eyes, red feet, wearing the same simple tan paper crown. Pigeon is knee high to Jeannie, snug in steam, offended but cozy, not a dinosaur. Keep ONLY the existing smaller terracotta dinosaur in the distant upper-left background pool, UNCROWNED. Only the pigeon wears a crown. Maintain exquisite folded-paper theatre medium and landscape 4:3. No other changes, no text.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-7ecb8d04-4537-47fc-80d5-6f2c7d3154bd.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: same paper Jeannie/quill and hatchling, speckled moss nests, crowned pigeon correctly replaces extra dinosaur; single uncrowned spa dinosaur in background."
+}

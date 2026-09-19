@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "my_portraits",
+  "style": "L1",
+  "sourceHash": "e8544225bdbb8de6cb642993687fc6322b5559248048f302bb9dcbb4cbf13e13",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-72a5bbc1-94c3-4a2d-ad75-03a6d9725a32.png",
+  "originalSha256": "f154ec84f372cb54336f3d4a0e94f45867d0f00a0fd85b42a05384e30afa192e",
+  "file": "library-my_portraits.webp",
+  "sha256": "5cb9ec77cdbf72cbd63ae4b17520e686ea244312d60c97ca4fbeac6230d4e581",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: New midnight manor corridor scene. Jeannie questions pompous blue-grey paper pigeon fluttering out from BEHIND a gilt frame on wall lined with grumpy aristocrat portraits. Pigeon matches second reference, NO CROWN or costume, cream breast, teal/purple neck, orange beak/eyes, red feet. Dab of WHITE frosting on his beak. He puffs chest and gestures as if he owns hallway. Pocket-quill skeptical. Marble floor, cream carved walls, purple hangings, teal moonlight, gold candles consistent with manor reference. No writing.\nStory context: Jeannie stared down a row of painted nobles. 'Did any of you take the Midnight Cake?' she demanded. A pompous pigeon flapped out from behind a frame, puffing his chest. 'Madam, I am Sir Reginald Pigeon, RIGHTFUL OWNER of this manor — I was here FIRST.' He had frosting on his beak. He claimed it was 'fancy beak lotion.'",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-ft_thorns.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: frosting-beaked uncrowned pigeon, Jeannie and pocket quill, grumpy portrait hallway and paper manor continuity."
+}

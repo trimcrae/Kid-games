@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_egg_promise2",
+  "style": "L1",
+  "sourceHash": "f65403db61e68aaa5b45ac60bfbda4b33292e04f51671f3c35898885450be17a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-bcfc1bf6-1c63-4f2d-98d7-44010baa1581.png",
+  "originalSha256": "55efcaaa85fb2c304011409d4abe96031d2e340a5d9a7330652df8e098823704",
+  "file": "library-dn_egg_promise2.webp",
+  "sha256": "2ee8df65e8d3455c7d8b92429e2c646b4adb1f5b1045d582f531ddb224c618e0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Golden sunset in soft fern and moss nest. Jeannie curls up beside same green baby, its one tiny front claw gently holding her purple sleeve. Same enormous green mother bends her long neck around nest protectively and adds a fern. Crowned Reginald is already asleep beside nest, head tucked toward wing. Inkwell peeks from pocket whispering goodnight affectionately. Exactly one baby, no additional limbs, intimate gentle bedtime composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_egg_tell_herd.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: baby holds Jeannie's sleeve in nest, mother shelters them, crowned pigeon sleeps beside them, quill affectionate."
+}
