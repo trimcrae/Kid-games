@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_well",
+  "style": "M1",
+  "sourceHash": "0b31de32736e3c05c458cddc169e57f3da5b5c8c79c7b35e5ac53bc843ed1c70",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a3ba5202-d6f0-497f-803b-0f67d9554111.png",
+  "originalSha256": "071026d6c3e7b611ec764194f1dd246994456d92b734dc03c94ae43c7d26ebe3",
+  "file": "blockworld-vil_well.webp",
+  "sha256": "d77ca2db94a46a9d6623da148d5fffbc8fcaf4e3ef6aee2fe5670b3b492efbf0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY Cory's held bucket and hands. Remove the fourth tilted bucket he is holding, and remove its pouring stream. Keep the THREE upright filled buckets on ground exactly as is. Cory's now-empty hands point happily toward those three buckets. Exactly THREE buckets total in final image. Preserve characters, magic well, Zib, lighting, background and framing.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b96f-343e-7421-83f5-326f9df9c431/exec-6c5b5b10-6628-44ca-a633-1a881d312da4.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

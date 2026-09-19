@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_end_farmer",
+  "style": "M1",
+  "sourceHash": "f21f5cf8fafacee620c4459814c0c1d148ae00e2e507d273aff010cfd2f4344f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-94e671c8-1faa-4f0d-99e4-1ea160dca1de.png",
+  "originalSha256": "783854689a22adc36a3137c9be2ccb9036eed943958328d0b9ecb5b36f628b2d",
+  "file": "blockworld-vil_end_farmer.webp",
+  "sha256": "836494089a1a5076b60175e0ab8d6f378e1803d9a9fb60322112c7e6e0bd6fc1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Zib small limegreen cuboid creature, smiling square head narrow torso four stubby feet no extra limbs. NEW scene: Epic happy harvest ending: Cory wearing golden straw farmer crown, beside joyful Zib, dwarfed by ONE world-record orange pumpkin. Village feast tables and lanterns in distance, radiant sunset.\nExact page context, do not print narrative: Cory is crowned MASTER FARMER beside the biggest pumpkin in the world! It's so huge it has its own zip code. \"Hisss... we did it!\" cheers Zib. The whole village feasts forever. THE END.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

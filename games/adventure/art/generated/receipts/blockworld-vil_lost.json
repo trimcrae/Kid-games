@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_lost",
+  "style": "M1",
+  "sourceHash": "5dc6728e198541975d1ec6834ea9d63743e1ff9526deff56542bc5119689d3e2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8e87db73-033b-4aff-a4db-5a9f75b20b1d.png",
+  "originalSha256": "ffa663eaabab5afbf66944c3937cce2c1e327cfca68fd73a83c9854b23187e43",
+  "file": "blockworld-vil_lost.webp",
+  "sha256": "8f347c1e76ed157bec1f7284f027b55ace6c29266358da446a3fa02977482183",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Cory gently leads tiny lost villager child home beside a path with EXACTLY THREE separate large voxel trees in clear row. One butterfly floats overhead, cottage visible beyond third tree. Avoid other trees in distant view.\nExact page context, do not print narrative: A tiny villager is lost in the woods! \"Hrmm! I followed a butterfly and now I'm here!\" Cory counts the trees back to the path: 1, 2, 3 trees and home! \"Hrmm, hero!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

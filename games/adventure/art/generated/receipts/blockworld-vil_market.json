@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_market",
+  "style": "M1",
+  "sourceHash": "f6a44a6331c658fc084147ceb4edbc2e6dda4845c97336367958011e54680bb4",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f45cfd2f-40f1-4878-8aa3-863dc98a72e1.png",
+  "originalSha256": "26a58317167fb9acfe56ad6a9205c68ba4d3dfd2d3174151e2820d6f201f01b7",
+  "file": "blockworld-vil_market.webp",
+  "sha256": "ce46e06b6695226cd6563b3ca3a46b456e5fd7c3ef3af13394b7bb8d3610d477",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Clear market arithmetic: counter with exactly EIGHT red apples arranged in FOUR pairs and exactly FOUR emeralds in line beneath pairs. Cory proudly counts, two villagers cheer. Rate board '2 apples = 1 emerald'; another distant '5 carrots = 1 emerald', no additional apples/gems.\nExact page context, do not print narrative: The market is busy! \"Hrmm, apples 2 for 1 emerald!\" \"Carrots 5 for 1!\" Cory has 4 emeralds. \"If apples are 2 each, 4 emeralds buys 8 apples!\" The crowd cheers his quick math.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

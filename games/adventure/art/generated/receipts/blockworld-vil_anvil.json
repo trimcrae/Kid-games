@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_anvil",
+  "style": "M1",
+  "sourceHash": "5e5a0ee969d9094f88d966a218a76703956c9bfeaa9142bd307b2d9472e19425",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a0603efe-c127-4779-8b41-cbf5022b9ce7.png",
+  "originalSha256": "136179a15befb1520236593ae6253d25eeb6bf2f814b76d2ffe3119234021a78",
+  "file": "blockworld-vil_anvil.webp",
+  "sha256": "b892850ca958605d31f437a787eda2fb08f43709206f0a6807d4abce76f130e0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only the lower wooden pricing sign at upper right. Keep text '4 wheat' unchanged, but change the three wheat icons to exactly FOUR separate golden wheat stalk icons in a row to the left of text. Preserve every other detail, all characters, anvil, pickaxe, lighting, upper '1 emerald' sign and framing.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b96f-343e-7421-83f5-326f9df9c431/exec-c5567ff3-0a5f-453b-9883-bd578af398ec.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

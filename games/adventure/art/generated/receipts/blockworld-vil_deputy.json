@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_deputy",
+  "style": "M1",
+  "sourceHash": "29ed5378f21c2b81516530823d5e233b48b284db668f398e82fcf5c6235ea5cd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3bbd7b96-a3cd-45fc-8fb5-d6f3c92d1929.png",
+  "originalSha256": "941c51ff1898a32bbe459dc146808ae412c8c4ce175c0aa527b9188de199e33b",
+  "file": "blockworld-vil_deputy.webp",
+  "sha256": "4ded8f2437377ef4687c931def9ea386006bc3b1fb1314fdccc46aa25034c959",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. NEW scene: Cory and delighted Bartholomew shake hand and one front hoof in village square; other three sheep hooves grounded. Cheerful villagers applaud, little wooden badge 'DEPUTY' beside podium.\nExact page context, do not print narrative: \"Deputy Mayor?! ME?\" Bartholomew faints with joy, then springs up saluting. \"A hero serves! I accept!\" The two shake hoof and hand. The village cheers.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

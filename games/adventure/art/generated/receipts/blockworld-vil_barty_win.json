@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_barty_win",
+  "style": "M1",
+  "sourceHash": "281c0d407f39a3edf5deac76c2f4824fe30966adf838cad19ef803ba3510b57a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9983ee20-a300-4300-b8f4-d00aa42c3c1d.png",
+  "originalSha256": "e09e7756a6998ae29be0f655ec257af29b919f2bb82bc6430a0f7f6118395519",
+  "file": "blockworld-vil_barty_win.webp",
+  "sha256": "558fcbea44fdf36bff4192f92ac59319064c5f028ae1ae549c2b526c1ec952b0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. NEW scene: Comedic gracious sheep mayor scene: Bartholomew on podium dramatically overwhelmed, leaning against Cory who gently supports him; smiling villagers. Board 'MAYOR BARTHOLOMEW'. One sheep only.\nExact page context, do not print narrative: \"I WON?!\" Bartholomew faints, wakes, faints again. \"As mayor, I name Cory the REAL village helper!\" The villagers laugh. \"Hrmm, you're too kind, Cory. But you should lead too!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}

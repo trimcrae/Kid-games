@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_end_mayor",
+  "style": "M1",
+  "sourceHash": "cdd6a836e74adbc2c29a36a821c6d798e6d05d9668a89e46b52ecd9556e12fff",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c66a555a-bbe3-4973-9903-3ab7d07c2c6a.png",
+  "originalSha256": "2c348146dc7da1f98bac4535567599c6a0856024140b6221b24ddb8d8a1aba80",
+  "file": "blockworld-vil_end_mayor.webp",
+  "sha256": "fa288e2b649b542d9e1e76f9b7ba9595b52d8252f3480b9432154e8edfb20b21",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. NEW scene: Golden sunset finale portrait: smiling Cory wearing navy voxel mayor top hat with gold band and wheat emblem; bald villager cheers; Bartholomew makes speech from tiny podium. Cozy full barns and fair-trade market behind.\nExact page context, do not print narrative: Cory wears the mayor's hat at golden sunset! \"Hrmm! Three cheers for Mayor Cory!\" Trades are fair, barns are full, and Bartholomew gives a speech every single day. THE END.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct page-specific voxel composition, consistent characters and required numeric details. Corrected signs show four wheat; well three buckets; tower fifteen labeled blocks."
+}
