@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_cookie",
+  "style": "L1",
+  "sourceHash": "bf8923630dfcb44382a67a7b7def6649cf32ccd7b1296f7e3996092bd02f7212",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-46e76c07-bb3f-4206-9ef7-85c165835bcd.png",
+  "originalSha256": "1e7f1ba583949739038859584912b10b80b78c951c77f046913afd77ce6344b4",
+  "file": "library-mt_cookie.webp",
+  "sha256": "d6e427112ffc34efdadaf8ec4160f6d9b6e58a73a1e35af6a15883fedb02f5ae",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY first image. Remove the tiny round human child/person and its separate feather, hand, little fork, gold object and falling crumb from Jeannie's purple pocket entirely. In that pocket put ONE SINGLE cream FEATHER QUILL matching second reference: face with eyes and brows on lower FEATHER, tapering directly to one gold writing NIB, no human head/body/arms/legs/feet. Feather is tall slim, not round. Nib mostly concealed by pocket. This is Inkwell, a talking feather pen. Preserve girl, cookie, one-eyed Cyclops, golden cookie charm, bucket, bakery and exact lighting/composition. Second image solely establishes correct feather-quill design.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-e6570fa4-a76e-4234-b528-5f2890879956.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed full image; distinct page scene, established paper theatre, Jeannie and relevant Mythos characters/props."
+}

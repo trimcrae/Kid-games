@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_riddle1",
+  "style": "L1",
+  "sourceHash": "811d4b83eb89c54302a09af93693cbd2355596cbd28437f4284d8d96f51ac710",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3422e338-9b49-482a-a447-83e14baf9a91.png",
+  "originalSha256": "ccb8b3a027f30ef1edfc41aa9264e8e3f200331feda93b473cb29058066e7b0b",
+  "file": "library-mt_riddle1.webp",
+  "sha256": "c9afc70e1a7fc1745fb101394a10300b089c7d2876486f8cdfac74999ba11d68",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Tiny Oracle on lavender crystal raises one finger asking her first riddle, tired exasperated brow. Jeannie thoughtful with hand to chin; Inkwell floats by her ear, gesturing with feather toward a tiny funny imagined starfish in a little thought curl. No actual clock shown yet (answer undisclosed). Pocket empty. Greek temple, same female Oracle grey bun spectacles cream teal robe.\nStory context: The Oracle cleared her throat dramatically. 'Riddle the first: I have a face and two hands, but no arms or legs. What am I?' Inkwell whispered an answer that was just 'a very confused starfish.' The Oracle glared. 'It is NOT a confused starfish, you ink-stained noodle.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed full image; distinct page scene, established paper theatre, Jeannie and relevant Mythos characters/props."
+}

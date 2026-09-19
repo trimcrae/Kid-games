@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_pigeon",
+  "style": "L1",
+  "sourceHash": "2ec70a3fb62301e97a77bf038feb89a7c9e9b54ab301970e235c5965b9f43e35",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8094d9d8-5ec5-4917-9992-d9dbe598404b.png",
+  "originalSha256": "d3e7736a646728462155a908383bfacc26de31dc7615cf71415a749c14654e6f",
+  "file": "library-fin_pigeon.webp",
+  "sha256": "a62dfc4f3a4a90cca4d762e2311c78b49a9abe83fce6b14d569c79e06690d4d3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: New funny library floor scene. Reginald same bluegrey pompous pigeon cream breast tealpurple neck orangeeyes/beak redfeet, wears ONLY ONE handmade round GOLD CARDBOARD MEDAL on short purple ribbon, medal stamped a rough star, NO crown or helmet, NO frosting. He struts grandly raising both wings as if expecting applause while ONE bookmark trails in wrong direction behind. Jeannie stands amused, pocket Inkwell groans. Soaring cream library tealstar banners and books, dramatic low angle. No mystery manor.\nStory context: A trumpet sounded from absolutely nowhere and in waddled Sir Reginald Pigeon, chest puffed like a feathery beach ball, wearing a tiny medal he had clearly made himself. \"AHEM. I, Sir Reginald, have SINGLE-WINGEDLY saved every story in this library,\" he announced. \"You're welcome. No, no, hold your applause — actually do hold it, a bit louder.\" Inkwell groaned. \"He carried ONE bookmark. Once. In the wrong direction.\"\nOnly include cast requested for this moment. Inkwell is strictly one feather with gold writing nib, no torso/arms/legs/feet. DISTINCT new scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: uncrowned Reginald wears only handmade gold star medal on purple ribbon, bookmark trails, proud pose and annoyed pocket quill."
+}

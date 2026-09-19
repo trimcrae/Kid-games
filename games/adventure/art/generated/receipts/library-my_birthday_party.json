@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_birthday_party",
+  "style": "L1",
+  "sourceHash": "7c4e108e92a38e0d4cbeceb8ae1dc6a69e60b36544e399498ae21cd880f83334",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3745969b-bd9d-4794-a69d-65c8fb603e24.png",
+  "originalSha256": "7c5a76a5568be8f47e02807d4e9bf47403632d1df9c92307f0173413842581cc",
+  "file": "library-my_birthday_party.webp",
+  "sha256": "c0ef7b3f8836dfdb1960b4663de2d06a9823c89492eb8eed25edddee4b790a13",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only FIRST image with these precise corrections. Correct ONLY Inkwell above the streamer: remove any little torso, arms, legs and feet beneath feather. Keep his same cream FEATHER with expressive face and ONE gold pen nib angled down to sign streamer. No human body. Preserve joyful scene, Boo, Jeannie, owl, pigeon, cake, portraits, decorations. Preserve exquisite folded-paper medium and landscape composition. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-9d9f6d02-1422-41e1-b122-67260d2c6493.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: paper birthday celebration with friendly ghost, Jeannie, cake and signing feather; corrected Inkwell body."
+}

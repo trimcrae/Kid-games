@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_kitchen",
+  "style": "L1",
+  "sourceHash": "d77652db749b5a455dbae7c321aa6bb5de9da4ea26870978be64e628ebe06518",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d39e7d9a-05bc-4952-a1d4-5d6fdae78f46.png",
+  "originalSha256": "4a0fd0270f048e4c7c9881c0a1819f30b63fd04a3387a5d35c34a1b1f78dc3ec",
+  "file": "library-my_kitchen.webp",
+  "sha256": "dc842c975d9ba3341b56faf4939634d51efb51b2b72f4250f09531161dcd440d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Enormous gleaming manor kitchen of cream paper tiles and copper pots. Jeannie puzzled by a clear ROUND CAKE-shaped hollow in flour on worktable. ONE floating folded white tea towel dabs at barely suggested invisible eyes as a faint ghost-shaped translucent paper smudge drifts toward doorway; ghost not fully revealed. Pocket Inkwell. Warm kitchen light meets cool doorway.\nExact story context (illustrate the current moment, no full paragraph text on image): The kitchen was enormous, gleaming, and EMPTY — except for a cake-shaped dent in a pile of flour and a single floating tea towel that kept dabbing at invisible eyes. 'Rule 2 says nobody's allowed to be sad in here,' Jeannie read aloud. The tea towel sniffled, said 'I'm not sad, YOU'RE sad,' and dropped to the floor revealing a faint white smudge floating away. The 'wind' had a runny nose. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: floating tea towel dabs invisible eyes, faint ghost smudge retreats, round flour hollow and surprised Jeannie/pocketquill."
+}

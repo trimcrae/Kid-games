@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_streamers",
+  "style": "L1",
+  "sourceHash": "6f01b71b39bd1dbf06807d265d15017b273c02bbce84146529189d7973dca98b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-420e6045-d030-451f-929a-e0e7bba8c6ef.png",
+  "originalSha256": "3a28f8536d54921df818d2ab025edffc9ccbce73aa441c6e89bcbb934b91f324",
+  "file": "library-my_streamers.webp",
+  "sha256": "8091dde601c0834fa33d38351bfdec2ebc5222a59c79ec54c262405e928af01d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie stands safely on a low broad step fixing a looping streamer made of old paper scroll ribbons and small dropped grey pigeon feathers across manor window. Boo watches teary joy with hands clasped, uncrowned pigeon declares ownership below with wing raised. Inkwell in pocket. Several prepared decorations and warm candlelight, intimate setup before actual party; no ladder peril.\nExact story context (illustrate the current moment, no full paragraph text on image): While Boo nervously hovered, Jeannie strung up streamers made from old scrolls and Sir Reginald's dropped feathers. 'These decorations are MINE,' announced the pigeon, 'as I own the air they hang in.' Nobody listened. Boo watched it all with enormous wet eyes. 'It's really happening,' he whispered. 'Somebody's setting up... for ME.' Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Jeannie hangs old-scroll and pigeon-feather streamers from safe step, Boo moved, uncrowned pigeon watches, pocketquill."
+}

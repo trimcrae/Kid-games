@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_courtroom",
+  "style": "L1",
+  "sourceHash": "69663da68999d2f102a2646f9c3047a9c1fbf920fdde5177657748e612e03732",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-db043d33-0b75-48ce-99db-dcfcace1a940.png",
+  "originalSha256": "4811b108137b8d36c99d22449a687ddef310efe703cb4b825e4a5543d66f1799",
+  "file": "library-my_courtroom.webp",
+  "sha256": "9c9e1353d7d58f564975082407320a4f24ef4c60751baca36ce6d71cbc220b63",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Comic pretend witness stand in manor hall. Uncrowned frosting-beaked pigeon perched atop broad brass candlestick, wings pompously raised, then expression deflating as Jeannie raises skeptical eyebrow and points at frosting. Inkwell smug in pocket. Tall closed cupboard visible far behind, no one confined. No crown, no judge wig.\nExact story context (illustrate the current moment, no full paragraph text on image): 'I OBJECT!' boomed Sir Reginald Pigeon, fluttering to the witness candlestick. 'As rightful owner, I demand the thief be banished to the spooky cupboard!' Jeannie raised an eyebrow. 'You have frosting on your beak and you don't own the cupboard, the manor, OR that candlestick.' The pigeon deflated. 'I was here first,' he mumbled. 'Of being wrong, perhaps,' said Inkwell. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: frosting-beaked uncrowned pigeon on brass witness candlestick, skeptical Jeannie/pocketquill, closed cupboard beyond."
+}

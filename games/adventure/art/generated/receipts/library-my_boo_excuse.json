@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_boo_excuse",
+  "style": "L1",
+  "sourceHash": "a375cc51263b51ae5187c371992e45f06f1ced40cf01b427ea72ad299ea50c49",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e5e814c6-a497-4636-a065-c9c3bb892ab6.png",
+  "originalSha256": "537eeb73230153bd709054060984fda1e7adb1091cfc073a8944405b4c7e0137",
+  "file": "library-my_boo_excuse.webp",
+  "sha256": "1d7fdf193033acfae9c3713acd9b8efd3c3fa7386c6c6e4da86b4b6a63330659",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Embarrassed Boo glows pink while trying to invent an alibi, one hand raised importantly, other sheepishly behind head. Jeannie kindly smiles at him, pocket Inkwell skeptical. Small obviously imaginary paper thought-cloud above Boo shows whimsical walrus playing chess on moon (not part of real cellar); main scene remains blue cellar. One ghost and one girl only.\nExact story context (illustrate the current moment, no full paragraph text on image): 'You want my alibi?' Boo straightened up importantly. 'Last night I was on the MOON. Playing chess. With a walrus. The walrus can confirm it, he just isn't here. Or real.' He immediately turned pink. 'I'm doing the lying badly again, aren't I?' Jeannie nodded kindly. 'The worst I've ever seen.' Boo sagged. 'It's a gift.' Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: embarrassed pink Boo tells silly alibi with clearly imaginary walrus/moon chess thought bubble, consistent girl and pocketquill."
+}

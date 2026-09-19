@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_dent",
+  "style": "L1",
+  "sourceHash": "24e7392131c90f49aa3849ebac66f12e9bd784114204c1d50d9f699b28b1b0fc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-437a4a38-8c9d-485b-8484-13843a3237bb.png",
+  "originalSha256": "80b66c9ba6173fca88c1a6af0a8aac3b20d6b7416e694f4d3803f1b446bea426",
+  "file": "library-my_dent.webp",
+  "sha256": "21ecf69c1c117e48b367927a4796c5496c2a14743697636f4e74e30779a9430a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Close three-quarter kitchen worktable detective view. Jeannie brushes flour to reveal TWO wobbly mitten-like ghost handprints beside round cake hollow. ONE shopping list clearly reads 'one cake', 'thirteen candles', 'one friend (HOW??)'. Inkwell hovers with own gold nib pointing gently at last line, empty dress pocket. Flour and paper detail, no ghost yet.\nExact story context (illustrate the current moment, no full paragraph text on image): Jeannie brushed the flour and — aha! — a perfect set of WOBBLY handprints, the kind only a ghost who's bad at carrying things leaves behind. Beside them, a shopping list in shaky writing: 'one cake (just to borrow), thirteen candles, one friend (HOW??).' Inkwell tapped the list. 'The friend part,' he said, surprisingly gentle, 'is the real mystery.' Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: two flour handprints and accurate three-item shopping list; single footless quill and girl investigate paper kitchen."
+}

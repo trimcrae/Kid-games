@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_owl_riddle",
+  "style": "L1",
+  "sourceHash": "5c373c7f28fb32f672904666f607147dadbe14ba6c8754852778232479dcc33c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b5e6bd12-6696-465e-90f1-f883668bdb7a.png",
+  "originalSha256": "e025926315f7a60ff8f7463e6a31d4b6bbcb318e3b403e4836df083adbbda8a6",
+  "file": "library-my_owl_riddle.webp",
+  "sha256": "5c96e7bfb590a4b72140f694732bb5b584f0437509463c815fc7905be8257533",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: New low-angle library conversation. Owl on ladder ruffles feathers impressed as Jeannie grins having solved riddle, thoughtful hand on chin. Inkwell floats beside a small upholstered footstool, suddenly embarrassed after accusing it, gold nib pointed down; her pocket empty. Warm books, open book on desk, no ghost/pigeon.\nExact story context (illustrate the current moment, no full paragraph text on image): 'Before I help,' yawned the owl, 'a riddle: I am taken at night, never to harm, by one who is lonely and means no alarm. What am I?' Jeannie grinned. 'The cake! And the answer means the thief is sad, not bad.' The owl ruffled, impressed. 'Hoo knew. Most detectives just shout at the furniture.' Inkwell, who'd been shouting at a footstool, went quiet. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: impressed browncream owl, Jeannie solves riddle, embarrassed footless quill by accused footstool."
+}

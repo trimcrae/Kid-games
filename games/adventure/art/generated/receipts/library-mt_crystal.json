@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_crystal",
+  "style": "L1",
+  "sourceHash": "4e30fb8f3a306a4452fe57171d7cd553df3d3fcda7a3b42ae71e8523ab67698a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fc71ad75-c14f-4bac-a774-3c9af3fa988a.png",
+  "originalSha256": "4235d14a6634d84a41e9fab617257017762a2c396e3e6b6b9790a9835f19ef25",
+  "file": "library-mt_crystal.webp",
+  "sha256": "e815a8f97fcdbc337a090563623f16e0520631b2589d14492b46c4abdb347590",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Temple closer on tiny teapot-size elderly Oracle perched at large violet knowing crystal. Crystal face shows two distinct glowing symbolic visions: left scrolls and question-like swirls, right little sword emblem and snoring rose-coral dragon silhouette. Jeannie gazes at choice, pocket quill. Oracle tired holds one finger to lips requesting quiet. Keep visions inside crystal, not actual extra dragons.\nStory context: 'The Crystal of Knowing,' yawned the Oracle. 'It shows you what you need, never what you want. Mostly it shows me I need a nap.' The crystal flickered and revealed two paths: one shimmering with riddles and scrolls, one blazing with swords and a snoring dragon. 'Choose your destiny, child, but choose QUIETLY, my head.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed full image; distinct page scene, established paper theatre, Jeannie and relevant Mythos characters/props."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_riddle3",
+  "style": "L1",
+  "sourceHash": "fb5e6a045a2ef521aabdc1a5aae30f93d8b233fbc31891ee1523fd724432e954",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1fa7df41-570b-477d-a3b2-55ccf9f5f4da.png",
+  "originalSha256": "b80708903623cfdeca260b84eb821db5d7b2862d9a1427cdda6dd0080b1ae52c",
+  "file": "library-mt_riddle3.webp",
+  "sha256": "463cd0ef5f36867777def432c8f786770f5470d1fa9ef56f554da313c1795e44",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Intimate eye-level composition: tiny Oracle leans from glowing purple crystal to look DIRECTLY at Jeannie's eyes, both Oracle eyes open. Girl alert and curious, hands lightly at chest; Inkwell in pocket points feather tip to self surprised then realizes he is a pen. Warm questioning moment, no text or symbolic answer.\nStory context: The crystal glowed purple as the Oracle leaned close. 'Last riddle, and the big one. What gets WISER the more questions it asks, never stops wanting to know, and is reading this very story right now?' Inkwell gasped. 'Is it... is it ME? No, I'm a pen.' The Oracle finally opened both eyes and looked straight at Jeannie.\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed full image; distinct page scene, established paper theatre, Jeannie and relevant Mythos characters/props."
+}

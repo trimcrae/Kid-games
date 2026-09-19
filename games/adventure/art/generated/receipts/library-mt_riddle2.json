@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_riddle2",
+  "style": "L1",
+  "sourceHash": "77b4e4808ccd003f52f1b4bc5810f91ce982956e64276897b60e9923b5da86c3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-004fa935-ee28-44bf-92ba-21d141710e45.png",
+  "originalSha256": "be71d9254a8482a0769aae3fd4d76319c429623bdfd905796f8e196c0c00c766",
+  "file": "library-mt_riddle2.webp",
+  "sha256": "aff599f99ed20db30472b72c8ff647e1809cab8d73f450e81196aaa53c3951b5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: New wide temple riddle scene. Uncrowned no-frosting pigeon interrupts, one wing thrust up with crumb in other wing, pompous expression. Tiny Oracle keeps eyes closed and points down telling him sit. Jeannie amused, Inkwell in pocket rolling eyes. No actual footprint answer yet; keep medium paper.\nStory context: 'Riddle the second,' the Oracle said, perking up slightly. 'The more you take, the more you leave behind. What am I?' Sir Reginald Pigeon, who had snuck in, shouted 'BREADCRUMBS! It's obviously breadcrumbs, I am a GOD of these matters!' The Oracle did not even open her eyes. 'It is not breadcrumbs, pigeon. Sit.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed full image; distinct page scene, established paper theatre, Jeannie and relevant Mythos characters/props."
+}

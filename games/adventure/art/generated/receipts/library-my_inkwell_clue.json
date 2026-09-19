@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_inkwell_clue",
+  "style": "L1",
+  "sourceHash": "8f5100abb0b76dc4e9d4bacd94f765ffa6639d04b59d2b6cf76d7ee8e6e26a40",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8c5adea1-2c48-4730-93cc-858a0b2ddc8b.png",
+  "originalSha256": "a5e9f6dc16f4a02b5a9ecfebff042de782dc26179647e1316856c709b2c0c895",
+  "file": "library-my_inkwell_clue.webp",
+  "sha256": "d6e91dc71e0af53b421642a9ad66be2749fab574d567e9c2f99ca15457ebe1f8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Close desk scene: Jeannie has turned over a spare note to reveal Inkwell's secretly kind message, readable 'Be kind to him too.' A second curled edge shows funny suspect doodles chest, footstool, doily. Inkwell hovers beside note bashfully coughing into edge of own feather, ONE quill, girl's pocket empty. Owl softly smiles on ladder behind, warm paper library.\nExact story context (illustrate the current moment, no full paragraph text on image): Inkwell scribbled furiously on a spare page, listing suspects: 'THE CHEST. THE FOOTSTOOL. A SUSPICIOUS DOILY.' Jeannie gently turned the page. Underneath, in his neatest hand, Inkwell had secretly written the truth: 'It is the sad ghost. But solving it isn't enough — be kind to him too.' He coughed. 'You saw nothing. I accuse the doily.' Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: accurate kind secret message and three furniture-suspect doodles, bashful quill and owl in paper library."
+}

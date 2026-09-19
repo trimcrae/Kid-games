@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_detect_path",
+  "style": "L1",
+  "sourceHash": "d641fccd30c1d8a8a84836006cee809b5a6cb85d27c563e9874b495b42383738",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d4037a28-7c05-494a-8fad-b8c7a9a37e53.png",
+  "originalSha256": "8050824f8c103cbf17fafb27a51d2fba540b015134e4ef24412fd043c9f233d1",
+  "file": "library-my_detect_path.webp",
+  "sha256": "cde10a72b7a13a1981a17ff4f0d2287a1b0bb116f7f67cedab324a0cc33a531c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only FIRST image with these precise corrections. Correct ONLY the note on floor beside fork: replace its text with EXACT 'Saving this for later. — B.' Keep the small cake doodle if desired, all other clues and characters identical. Remove tiny human arm/hand sticking from pocket quill, keep cream feather/face/goldnib. Preserve exquisite folded-paper medium and landscape composition. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-651b38af-16ca-45dd-9a92-c3227ba26776.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: evidence scene with exact Saving this for later note, fork, map and familiar cast."
+}

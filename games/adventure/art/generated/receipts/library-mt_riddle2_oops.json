@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_riddle2_oops",
+  "style": "L1",
+  "sourceHash": "441975690935b318edb03a3834eafcd53ce1c2a9d7a171640eed43775a0f3de8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e83303e4-dfb4-4df2-8ca0-3264a06f3fbf.png",
+  "originalSha256": "587a493685d729dc13ec4ba49ac00a1b51464bbc02cac555ab9a95bf3705b730",
+  "file": "library-mt_riddle2_oops.webp",
+  "sha256": "ef7f7d0b36824617395b4f8757fa33ec3339b7542f24aa33fe79fad2122f36c3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Oracle almost smiling points to a clear short trail of Jeannie's FOOTPRINTS in fine temple dust. Jeannie turns to see evidence. Pigeon remains smug at side. Inkwell lies sideways safely on pedestal having rolled eyes and toppled, single cream feather gold nib, girl's pocket EMPTY. Playful explanation of footsteps, no cake/frosting.\nStory context: 'NOPE,' said the Oracle, almost smiling. 'It was FOOTSTEPS. The more you take walking, the more you leave behind you.' Sir Reginald looked smug anyway. 'I was CLOSE. Footsteps, breadcrumbs, basically the same divine wisdom.' Inkwell rolled his eyes so hard he fell over. 'On we go, brave guesser,' said the Oracle.\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed full image; distinct page scene, established paper theatre, Jeannie and relevant Mythos characters/props."
+}

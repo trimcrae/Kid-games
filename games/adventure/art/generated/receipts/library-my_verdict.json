@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_verdict",
+  "style": "L1",
+  "sourceHash": "51b2efa00628c66b00886a2c66ee9b5ad5880cf9a1070ecc98904f675b74e85e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d4f69532-df99-40f3-a6ae-ab61207e2135.png",
+  "originalSha256": "b3b566b8c2b8935e7f0dc9595a7014b3411aa7f3a517dca76d4c6646d782e3aa",
+  "file": "library-my_verdict.webp",
+  "sha256": "8b62ad81d296b3be4aca038a1444383bf8e9972bef9071a39c7f7972cbfbf276",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only FIRST image with these precise corrections. Remove the entire purple sash/scarf and badge worn by pigeon; restore his normal cream breast and bluegrey feather neck with subtle tealpurple shine. Make beak orange. Pigeon has NO clothing or medal in this story. Preserve Jeannie, candlestick, Boo, cake and courtroom. Preserve exquisite folded-paper medium and landscape composition. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-d621bd3d-5b39-4cf5-9bc1-41ab1eab5e0f.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: courtroom cake verdict, ghost and Jeannie with candlestick gavel; pigeon natural feather design."
+}

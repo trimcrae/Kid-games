@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_keepermeet",
+  "style": "L1",
+  "sourceHash": "1c36922741f928332417450f30486502e52d5ef6972cdb20d8a30eab0736febd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a8dfe0d8-8078-4e46-8e4a-80a70a419aec.png",
+  "originalSha256": "a2b66a00a3ea271f1afd933e85a76c4dd8d03c12bdb202ff9e9f658a19760b7f",
+  "file": "library-fin_keepermeet.webp",
+  "sha256": "8877a6e6e7d51b8f0d8cde30cd3451fce492e7ef1b0a4bf716a67a37be56dc82",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: NEW high reading nook at top of spiral staircase MADE FROM STACKED BOOKS within soaring cream paper library, teal and gold decor. Jeannie meets Story Keeper, kindly elderly man with long soft ivory beard, bushy white eyebrows, warm brown eyes, rosy lined face, curly white hair, teal robe printed with tiny gold/cream words and cream cuffs, gold slippers. EXACTLY THREE separate pairs of round spectacles are perched visibly atop his head, none over eyes: one gold, one copper, one silver. He smiles searching pockets, girl gently points to his head. Tiny footless cream feather/goldnib Inkwell in girl's purple pocket. Large cozy teal reading chair, carved cream desk, books, warm light. Establish wizard's recurring appearance, NO pointed hat concealing glasses.\nStory context: At the top of the spiral stair sat the Story Keeper — a kindly old wizard in a robe covered in tiny printed words, with not one but THREE pairs of glasses perched on his head. \"Ah! A reader!\" he beamed. \"Have you seen my glasses? I've been looking everywhere.\" Jeannie pointed gently at his forehead. \"...Marvelous. You're already better at this than I am.\"\nOnly include cast requested for this moment. Inkwell is strictly one feather with gold writing nib, no torso/arms/legs/feet. DISTINCT new scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-wl_intro.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: kind white-bearded Keeper, teal word-print robe, three distinct spectacle frames on head, girl points, book-built spiral stairs and cozy nook."
+}
