@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_license",
+  "style": "L1",
+  "sourceHash": "751567c42f1e7f4515fba9f1dd8440b63114b2f4591d2103c3086c59924495aa",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cedf93a8-5259-4a59-911d-fb6f4ed51516.png",
+  "originalSha256": "c0aaccb887602ee99a109b3e6cd383cb0e45dd75694193f2a92b2db0962a621b",
+  "file": "library-mt_license.webp",
+  "sha256": "118df439085dc76837eb9b4cb7f7408f5c259feb0005c2ad2c6b14e26034750f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Mountain path comic closeup. Embarrassed uncrowned pigeon offers soggy scroll reading 'COUPON: 1 FREE COO'. Jeannie holds her hands out questioning, tiny Inkwell hovering beside scroll laughing with feather bent but intact; pocket EMPTY. Pigeon flushes pink in cheeks, no frosting.\nStory context: Sir Reginald turned bright pink under his feathers. 'My... my LICENSE? It's, ah, being laminated. By OTHER gods. Very busy gods.' He produced a soggy scroll that said 'COUPON: 1 FREE COO.' Inkwell laughed so hard he nearly snapped his own nib. 'Fine, FINE,' huffed the pigeon, 'follow me to the top, but ONLY because I was going there anyway and definitely not because you caught me.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: soggy COUPON 1 FREE COO, embarrassed pigeon and laughing feather quill, Jeannie questioning gesture, paper mountain."
+}

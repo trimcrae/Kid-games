@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_last_clue",
+  "style": "L1",
+  "sourceHash": "be9a28b9bb3da8fd8a0545022dca007ade83a6a060d6c2eaa9405adfe3f2da68",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a3866b86-b7f6-4e65-b0de-7b75f3778f81.png",
+  "originalSha256": "2c41050d0d895efc9ed4dca278c66360c4165ff03d0cd083732fcb98ecad6fa9",
+  "file": "library-my_last_clue.webp",
+  "sha256": "c80b310bc3b3c4bd0d84bef762b8864a738b8d17e1854fa8fdfc9551553681fc",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Quiet close scene under cellar stairs: small drawer open with brass key in its lock. Jeannie kneels holding a faded sepia PHOTO showing one lonely little ghost beside birthday cake. On photo margin short clear handwriting 'I hope someday a friend solves my mystery.' Her eyes wet with empathy, pocket Inkwell gentle. Boo not physically present, only visible in the old photo.\nExact story context (illustrate the current moment, no full paragraph text on image): The brass key fit a tiny drawer under the cellar stairs. Inside: a faded photo of a birthday party from two hundred years ago — one lonely little ghost, one cake, and a hand-written wish, 'I hope someday a friend solves my mystery.' Jeannie's eyes went wet. 'Oh, Boo.' The final clue wasn't about WHO took the cake. It was about WHY. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: tiny drawer under stairs opened by brass key, Jeannie holds lonely Boo birthday photo with accurate wish inscription, concerned pocket quill, paper cellar."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_pegasus",
+  "style": "L1",
+  "sourceHash": "74afb744354e518d1c0e2fbce82247a8ffaa4e10c5093e9541704edbae3a545a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5eb4492e-28db-4987-aad0-e8705ba41d6c.png",
+  "originalSha256": "64c45e5f5f2e956d21d7752178660727e1eb1878faeedcca2ed848590e1e92a2",
+  "file": "library-mt_pegasus.webp",
+  "sha256": "fcd441d85d969fe200c3997d63c863ae5320b24086583ccdd2646f1c24a094ae",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Pegasus newly freed, white winged horse does delighted airborne loop above broad mountain ledge, EXACTLY four legs tucked and two wings extended. Loose vine fallen safely on ground by Jeannie's boots; she waves up with joy. Inkwell hovers by an unrolled short prophecy resting on rock, pocket empty. Horse pale gold mane/tail and soft grey muzzle, no horn.\nStory context: Jeannie tugged the vine loose and Pegasus burst free, doing a triumphant loop that was about forty percent graceful. 'A life debt!' he neighed. 'I shall carry you anywhere on Mount Mythos — except past the bakery, the cookies make me sneeze glitter.' Inkwell consulted his prophecy. 'It says a hero shall ride a noble beast. Or possibly RIDE A NOSE BEAST. My handwriting is dreadful.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_feather.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: freed Pegasus flies with four tucked legs and two white wings; girl waves, one floating quill by prophecy, fallen vine."
+}

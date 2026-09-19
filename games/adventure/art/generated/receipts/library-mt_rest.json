@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_rest",
+  "style": "L1",
+  "sourceHash": "5db4c0db1bde5cc165b9dee123c73c187e671917c97a6cf266811c93ec3b494e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3c70ead9-d760-4afb-ba14-107b66d266b2.png",
+  "originalSha256": "25731a09ec1ab0994adc8f36b21711fbab0d620014d0f2122a5abd223e452af9",
+  "file": "library-mt_rest.webp",
+  "sha256": "91c27fce69d6e2cd160c9a0deee832f6ff4a03d5a3472a6adebb454fbc669f1a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Peachgold mountain sunset, Jeannie rests on warm rock beside sleepy round browncream owl with tiny gold spectacles. Small safe campfire in stone circle. Inkwell reclines alongside unrolled upside-down prophecy near fire but at safe distance, pocket empty. Warm cozy break, folded-paper flame, no library architecture.\nStory context: Jeannie sat on a warm rock as the sky melted into peach and gold, and a sleepy owl blinked beside her. Inkwell stretched out by the campfire and unrolled the prophecy upside down. 'It says here the hero shall TAKE A NAP. No wait — TAKE THE MAP. Definitely the map. Probably.' The mountain felt friendly now, full of cookies and questionable gods.\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: sunset rest with spectacled sleepy owl, small paper campfire and upside-down TAKE THE MAP prophecy beside quill."
+}

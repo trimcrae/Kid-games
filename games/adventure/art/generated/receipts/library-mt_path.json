@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_path",
+  "style": "L1",
+  "sourceHash": "454d24e4c8f88a982f553fd4a3d9fe34874a92b0a5c2ce1f64cdf133620d1035",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-803f7fe9-307d-4d68-a043-23a7669830fe.png",
+  "originalSha256": "b0c0453e200e821c0e9b1edbc3e75229b02d526c8e41f2cb0c2b11410ce5c463",
+  "file": "library-mt_path.webp",
+  "sha256": "06d962d337757bb76d8103c9b69157662d9a8a418e9137b35a95d39bf7719675",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Winding Mythos mountain path. Uncrowned bluegrey paper pigeon blocks Jeannie's way, chest puffed, one wing raised demanding a breadcrumb; one shiny smooth rock by his red feet is his supposed divine treasure. Girl amused, quill in pocket skeptical. No frosting on bird in this chapter. No cake, manor or owl.\nStory context: Halfway up the path, a plump grey pigeon puffed out his chest and blocked the way. 'HALT! I am Sir Reginald Pigeon, MINOR GOD OF PIGEONS, and I was here FIRST,' he declared, looking very pleased with himself. 'No mortal may pass without paying the toll of ONE (1) breadcrumb.' Inkwell sighed. 'He's not a god. He's a pigeon who found a shiny rock.' Sir Reginald gasped as if deeply wounded.\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Reginald demands toll beside shiny rock, Jeannie amused and pocket quill, consistent paper mountain."
+}

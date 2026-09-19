@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_toll",
+  "style": "L1",
+  "sourceHash": "fdd785aff63d50c1cc17a4eb300d7b61b9706e22810f0771762b882b1154262a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d6b611f8-564c-4d5d-8147-0460c954febe.png",
+  "originalSha256": "79d6b9d12c989541b3030dc0932a3a61e4129162f5d762bc74c5dec947597ef5",
+  "file": "library-mt_toll.webp",
+  "sha256": "7bfc9333ee1ad5e18da8297e810a8cd754768879e7eacd1404aa14c99378f205",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie bows with hand pinching EMPTY AIR, pretending to drop breadcrumb. Pigeon pecks at empty rock ledge with huge dignity; absolutely no visible breadcrumb or food in scene. Tiny pocket quill skeptical. Sunshine on cream rock and teal cypress.\nStory context: Jeannie pinched the air, pretended to drop a breadcrumb, and bowed. Sir Reginald pecked at the invisible snack with tremendous dignity. 'DELICIOUS. The finest crumb I have ever eaten,' he lied, beak full of nothing. 'You may pass, worthy mortal. I shall escort you, as is proper for a god of my standing.' Inkwell muttered, 'a god of crumbs that don't exist.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Jeannie mimes dropping imaginary crumb while pigeon pecks bare ledge, comic reaction and mountain continuity."
+}
