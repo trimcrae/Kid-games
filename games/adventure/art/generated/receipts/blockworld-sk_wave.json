@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_wave",
+  "style": "M1",
+  "sourceHash": "9748b6330ba2e67ad48a392f0eb814d166f56ceb70390fb93af408dbe450802a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d2f81a8b-dd88-4e49-8f27-cb6ca20f320d.png",
+  "originalSha256": "0d1d8da4e5c7bccd1b3c122198870b74714a65d3167ac9dda9131c01af90b1ff",
+  "file": "blockworld-sk_wave.webp",
+  "sha256": "b20f81204f79123215ec9ee80522be3d163e15885f028626085e46e6a86d2c75",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory waves from middle of six-cube grey bridge with low oak rails. Featherbottom gently bonks into ONE puffy cloud at side, cloud tuft on yellow beak. Cory holds one spare cube at waist. Friendly comedy.\nExact current story (do not print): Cory waves from the middle of his block bridge. \"Watch THIS,\" yells Featherbottom, attempting a loop-the-loop and instead bonking gently into a cloud. \"Intentional,\" he mumbles, fluff on his beak. Cory laughs so hard he nearly drops a block.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

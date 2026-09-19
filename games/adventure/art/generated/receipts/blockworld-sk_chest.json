@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_chest",
+  "style": "M1",
+  "sourceHash": "08675ea4450af787f5bbbc662aa0278967ef7ed4f7e8e61a062031d1897585f5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-82ac8787-daed-4387-9724-b7162ffcd846.png",
+  "originalSha256": "ae143ced0180dbb8c2c586c0f1692568f4c49175d2b830791d984c1b14f66250",
+  "file": "blockworld-sk_chest.webp",
+  "sha256": "75bd13eb4cdec0e9a22708227f8b38e590509010214ef7d7fa3f4e5b6d687cba",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Close open oak chest near unfinished castle gate: EXACTLY FOUR sky-blue jewels spaced in row atop pale building blocks. Note exact 'For the builder brave enough to climb the sky.' Cory counts with finger, no other gems.\nExact current story (do not print): The chest creaks open: glittering blocks, four shiny gems, and a note. \"For the builder brave enough to climb the sky.\" Cory counts the gems: one, two, three, four sky-blue jewels for the castle towers!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

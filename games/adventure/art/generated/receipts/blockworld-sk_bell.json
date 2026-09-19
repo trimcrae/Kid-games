@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_bell",
+  "style": "M1",
+  "sourceHash": "2714874536f6464884329c719a4eb90f9e833160a2eddc16a0417aab543a3afd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-13514556-59ce-49e6-8c64-166b265e1ab5.png",
+  "originalSha256": "23e0cf3dc57ac5df602b906fc8a10cbf9082c35b0193a3ea31ada8aef9d7c4e0",
+  "file": "blockworld-sk_bell.webp",
+  "sha256": "3e0f3da8b652aa0d251407f9968acf7aca730cf145e05cf05f9ab4b24619f109",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. Bartholomew same white cuboid sheep tan face pink muzzle brown hooves four legs, no cape/sword. NEW scene: Large brass sky bell ringing on castle balcony, Cory holding small golden crown-shaped stone near gate. Bartholomew and Featherbottom with friendly birds cheer, four blue-roofed tower castle behind, sunset.\nExact current story (do not print): DING DONG! The sky bell rings across the clouds. Birds, sheep, and one very dizzy Captain all gather. \"SPEECH!\" tweets Featherbottom. \"Tip: a good king flaps while talking.\" Cory grins and reaches for the crown-stone.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

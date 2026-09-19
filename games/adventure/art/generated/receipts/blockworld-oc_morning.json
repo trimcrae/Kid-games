@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_morning",
+  "style": "M1",
+  "sourceHash": "05098a3574c722e755a8609b85ceb8cd6d46e04576595706665e0099696e5737",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2e97d62c-b7c7-4c6a-8932-145958872042.png",
+  "originalSha256": "369a4acc0e449ee9fa012a73f025d108ae641e557e109aacce18f7706fa792fc",
+  "file": "blockworld-oc_morning.webp",
+  "sha256": "a757a5197b7da404f60385e9476176e8a906e1c2ce6efafc7b67c0d5651ee2f9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Bright morning on sparkling water. Cory stretches both arms aboard golden-oak boat; Bartholomew sits happily at mast. ONE white voxel seagull circles overhead with THREE faint circular motion trails, no duplicated birds. Joyful dawn horizon.\nExact story context (do not print): A bright morning on the water! A seagull squawks a hello and circles 3 times — sailors say that means good luck ahead. Cory stretches, ready for anything the sea brings. \"Adventure, ahoy!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

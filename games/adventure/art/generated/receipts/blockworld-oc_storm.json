@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_storm",
+  "style": "M1",
+  "sourceHash": "49ae52f949c86d13fe2beef4ac22209ebbb7e27c2d0d02f015078ab5c587195c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2f6f21e7-b599-49d6-aa5f-d94c70096ab4.png",
+  "originalSha256": "4e68ef2c70d9c9f33a7a79fe972a30e971c8fb35b283c64e72258ffbdc5231b3",
+  "file": "blockworld-oc_storm.webp",
+  "sha256": "70efe3fe56636fd15935006756aa73618036706a25cbedabdf58e9413e381aa1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Small grumbly grey storm over ocean, mild rain and distant lightning. Cory confidently steers familiar golden oak rowboat, Bartholomew sings loudly mouth open at mast. Three tiny spaced bright glints on wave crests suggest counting calm beats. Courageous not scary.\nExact story context (do not print): A grumbly little storm rolls in! Cory counts the safe seconds between thunder rumbles: 1... 2... 3. Plenty of time to steer smart. Bartholomew sings his ballad LOUDER, which somehow helps.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

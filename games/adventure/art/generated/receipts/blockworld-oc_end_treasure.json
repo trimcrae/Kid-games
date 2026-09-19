@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_end_treasure",
+  "style": "M1",
+  "sourceHash": "9657b5a262c127440658479fa2f5c427bfbf9a98f9b1f0edff43f9916c1d23e9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3f963156-76e8-4833-a34f-a319d8db58d4.png",
+  "originalSha256": "1570e362948b319ed1d9242eb0d04e490c01011a5c1ff9f9e1ce55e673d08adb",
+  "file": "blockworld-oc_end_treasure.webp",
+  "sha256": "bd35d5237fde651fc2e39be304d47a34135761a93f550bbf87ce8d65ec073b5f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Sunset beach ending. Cory and Bartholomew proud beside open recovered oak chest. On clean sand in front exactly TEN gold coins arranged two rows of five, SIX gems in two rows of three, and ONE huge glowing pearl. Mr Snips holds ONE silver button. Chest empty/dark so no extra countable treasure. High view counts all.\nExact story context (do not print): Cory hauls the treasure up to the golden sunset. He counts his haul: 10 coins, 6 gems, 1 enormous pearl. He's the Treasure Diver of the blocky seas! Mr. Snips gets his very own shiny button, and Bartholomew gets a starring role in the ballad. The end... for now!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

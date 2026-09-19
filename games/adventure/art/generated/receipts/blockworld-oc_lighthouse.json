@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_lighthouse",
+  "style": "M1",
+  "sourceHash": "4e21fc1ddbdd8f0cc9231a1522c9bc43d43bba5837be9df6fcbeca6e7933fbab",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-47ec34d0-575a-4ae0-8650-d476bb6879c9.png",
+  "originalSha256": "0c3c3dca8b0bacaf27a4b2b8060c3abe2205c2bcc7ebf070199107ac739ddf33",
+  "file": "blockworld-oc_lighthouse.webp",
+  "sha256": "4d575bc72a2aeee6b9b320191a8bea26364ce12644bf70786056561b7f1005fe",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Oak boat Cory/Bartholomew sailing toward friendly square white-and-red lighthouse on rocky islet. Warm golden beacon points safe channel. Small near-view signal card shows two yellow dots, space, two yellow dots as blinking code. Twilight ocean.\nExact story context (do not print): On a rock stands a blocky lighthouse with a warm torch glow. It blinks 2 times, pauses, blinks 2 more — a friendly code! \"It's saying which way to sail,\" Cory figures out. Clever boy.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

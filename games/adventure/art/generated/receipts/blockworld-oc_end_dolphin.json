@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_end_dolphin",
+  "style": "M1",
+  "sourceHash": "3864ad4957973a4a479bf5236e7a77d636835b48319fc97264465dd853865bac",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1451e70c-0703-4801-b82c-d7462abc4ea8.png",
+  "originalSha256": "91b9272185c8b79bf04c95791ee0cbafb9b72def70a2ebd491cb73e284b6d71d",
+  "file": "blockworld-oc_end_dolphin.webp",
+  "sha256": "32b8be86cfb039af96e0e1fc4e006e79be44a8b009853e854137037d85253977",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Sunset sea finale: Cory rides one of EXACTLY FIVE bluegrey voxel dolphins, cream bellies short squared snouts. Other four arc around him, all five clearly visible. Bartholomew harmless comic splash from fallen foam near edge. Only one Cory/sheep. Wide epic golden ocean.\nExact story context (do not print): Cory leaps and twirls with the whole pod as the sun melts into the sea. Five dolphins, one happy boy, endless waves to ride! He's the Dolphin Rider now, friend of the blue forever. Bartholomew falls off one last time, declaring it \"a heroic landing.\" The end... for now!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

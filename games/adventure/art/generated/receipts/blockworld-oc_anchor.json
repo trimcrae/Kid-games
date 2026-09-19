@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_anchor",
+  "style": "M1",
+  "sourceHash": "409ca113df2b84fb6527e52007ffb388a4d2a879052fa1267769f907c1e6c693",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-40f30c62-f5ec-403b-9cfb-9139484d15b7.png",
+  "originalSha256": "9371f332906db65e94b7f1c447aa2f130af703cac3632fc5eb62b5457281b8da",
+  "file": "blockworld-oc_anchor.webp",
+  "sha256": "b6c867760e97e85774462c3c1bb28a5d67716ab97296ec767acb5e74c431874d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Cory lowers ONE iron anchor on rope from oak rowboat over deep cobalt water. Three large air bubbles surface below, mysterious faint wreck shape deep underneath, Bartholomew waits. Cory chest raised taking calm preparatory breath.\nExact story context (do not print): Cory drops anchor right over a deep blue spot. Bubbles rise from below — something big is down there. He takes 3 big breaths to get ready: one for courage, one for fun, one for luck.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

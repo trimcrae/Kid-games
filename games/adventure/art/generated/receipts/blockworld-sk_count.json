@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_count",
+  "style": "M1",
+  "sourceHash": "bbe32a291ec3cb3973e6adb213008cb3b85cc62af5e36c9079337fd1d6cef5ee",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7b00c30f-f9bc-46c8-ad39-a074ae754b7d.png",
+  "originalSha256": "1f3df1b2ae9d752694355b999518c16a24bc123fa522e5c5afbb28c18f5c6549",
+  "file": "blockworld-sk_count.webp",
+  "sha256": "a169744099213071b3560616d628d7787723f34b1d32f5b114de7b81c524c191",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory proudly placing last of EXACTLY SIX large grey cubes spanning island gap in one straight row. All six blocks visibly divided; no additional support blocks. Safe low oak rails run alongside. Castle isle across.\nExact current story (do not print): One, two, three, four, five, SIX! Cory lays each block snug against the last. The bridge stretches perfectly across the gap. Not one block too few, not one too many. \"Math is basically a superpower,\" he grins.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

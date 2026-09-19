@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_island",
+  "style": "M1",
+  "sourceHash": "de6f76ad79c1beccdbc5e98f842681cb80b0fdb644e99e46c14bc4b813acbdb5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c863c844-6ab6-4989-bd19-fb5b7c3b8948.png",
+  "originalSha256": "052718cfc22c4ddada4ca4655416872981fc57621711900b47abdb955f8e24cc",
+  "file": "blockworld-oc_island.webp",
+  "sha256": "d14cb2bada20a5d688607326bba7e0441d1de7e2cb115e2d70eaf7b072b8d900",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Tiny palm island, Cory reading weathered sign '2 routes ahead' with arrows 'SEA OF DOLPHINS' and 'DEEP OF GOLD'. Mr Snips sunbathing on sand points pincers opposite directions. Familiar oak boat moored, small stormcloud horizon.\nExact story context (do not print): A tiny palm island! Cory finds an old sign: \"2 routes ahead — sea of dolphins, or deep of gold.\" Mr. Snips is sunbathing and points one claw each way, unhelpfully. A storm cloud peeks over the horizon.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_seasick",
+  "style": "M1",
+  "sourceHash": "4826834b3952367ceb64a2c4157e342c4624b32b3e02827bc5bce1c7cc77b651",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b4ca7c7c-e280-4388-a965-dead046d7ea4.png",
+  "originalSha256": "ae53ec07403ffeb29b496ae96b61521a630e341ef3319cf8292f82abd46ad350",
+  "file": "blockworld-oc_seasick.webp",
+  "sha256": "0869fd069dabf2dac78a03b6fb71249641a7eb707072696f17e7d819fa20531b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Close boat rail scene: Bartholomew slumps over golden-oak rail pale green face, then smiles toward ONE friendly bluegrey dolphin squeaking beside hull. Cory pats sheep gently. Friendly paperlike music symbols avoided; action clear with faces/splash.\nExact story context (do not print): Poor Bartholomew flops over the rail, greener than seaweed. \"My ballad... has a SAD verse now,\" he moans. A dolphin pops up and squeaks a silly tune, and the sheep cheers right up. The cure was friends all along.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_gems",
+  "style": "M1",
+  "sourceHash": "32529f92e04bda20bb51dd8d51917c65e02d75ffe332fc08023342d593cd95b1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-844a803d-0226-4a03-ba50-b4f07ac0db11.png",
+  "originalSha256": "cebe800e1de92deaf81e1140b63b01d553cb232490d4abb9cd4fe2cd53347474",
+  "file": "blockworld-sk_gems.webp",
+  "sha256": "0eac2764df05a1858e927e133264ed307c3ab28374456656117277894d2ab7aa",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Wide clear FOUR-tower castle view. Cory places last of EXACTLY FOUR cyan jewels, ONE on each of FOUR corner towers. Blue pointed roofs, grey walls, gold banners. No gate gem yet. Warm sunset.\nExact current story (do not print): Cory sets one gem on each of the four towers. They sparkle in the sunset like tiny stars caught in stone. \"FOUR towers, FOUR gems, perfect!\" he cheers. The castle hums with happy magic. Just a few more blocks now.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

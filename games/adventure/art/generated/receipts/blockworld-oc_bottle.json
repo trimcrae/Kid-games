@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_bottle",
+  "style": "M1",
+  "sourceHash": "80a85577de379e97503524deddb37bc4606f82d6f58cc0c4883aafa09b50cb7a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f009d65b-0a84-417e-8c57-448a90b0902a.png",
+  "originalSha256": "44c950473cc59183556c7b497a2c2ecc672e9f33ec13ba91eea9b547d67e888c",
+  "file": "blockworld-oc_bottle.webp",
+  "sha256": "9ad2f76fe6a8bee0dafa881b431a9910458c11cbca4d56eacb80f3975f18f2fb",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 cinematic M1 3D voxel adventure illustration. Match reference Cory age6, cubical brown hair, black rectangular glasses, blue shirt, darkblue trousers brown boots/backpack and silver belt buckle. Subtly pixel-textured square blocks, dimensional sunshine and layered atmosphere. Everything voxel, not smooth cartoon. Only named NEW scene cast; references for designs only, distinct composition. No UI/border/caption; only requested signs. Bartholomew when present is white cuboid sheep tan face pink muzzle brown hooves four legs, no clothes. Mr Snips when present small red cuboid crab, two tall eyestalks two pincers and short walking legs. Exact counting quantities, all separate and unobscured. NEW scene: Cory in oak rowboat holds open glassy voxel bottle and tan riddle scroll prominently. Simple illustration on scroll EXACTLY FOUR fish around ONE sleeping red crab, plus gold sparkle. Bartholomew grandly claims credit beside him. Ocean calm.\nExact story context (do not print): A message in a bottle bobs by! Inside: a riddle. \"Where 4 fish swim and 1 crab naps, the shiny waits.\" Cory loves a good puzzle. Bartholomew claims HE wrote it, in a past heroic life.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-oc_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}

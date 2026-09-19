@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_castleisle",
+  "style": "M1",
+  "sourceHash": "8093ba7842280718cf4433f98b66f65976b5efe775c67a831e4f3202ed2ccef3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f185b057-483c-4387-8e8d-d5f982d2b8da.png",
+  "originalSha256": "70c5c1b665c54689a6375bffa0486da3703b18967e04f77cdf15650a8afc2a04",
+  "file": "blockworld-sk_castleisle.webp",
+  "sha256": "a1da44f6a2ca679482f65ff7903f4766bf84371d170cf1b7a51cc5abf3fbba95",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory enters incomplete pale-grey voxel castle on floating grassy isle: FOUR corner towers, blue pointed roofs partially unfinished, gold banners. Dusty brass-banded oak chest by arched gate. Friendly birds announce challenge.\nExact current story (do not print): The Castle Isle is grand but unfinished. Half-built towers reach for the clouds. A dusty chest sits by the gate. \"Whoever finishes this castle becomes the Sky Castle King!\" the birds announce. Cory cracks his knuckles. Time to build.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed for distinctive page action, character continuity, child-friendly setting and legibility. Counting pages checked: ocean treasure ten coins/six gems/one pearl; dolphin ending five dolphins; lighthouse four lights; anchor four bubbles; sky counting six bridge blocks; chest four gems."
+}
