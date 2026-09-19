@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_end_glider",
+  "style": "M1",
+  "sourceHash": "e30145f5fa44f1dd7991216c091d98f1a8acd398ff5d752ba6785f557b38d638",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-db5622d8-8338-4b05-8b5c-4a0b05c2321a.png",
+  "originalSha256": "7e604d5e786f6b19f43f2e09c94e7882db2e8120b9aea4c13007e3c16f0abeea",
+  "file": "blockworld-sk_end_glider.webp",
+  "sha256": "699537bd6054360b16f2f8927367fa3376e5d4a4f41d2e46d39ff819a3f42459",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Epic wide soaring ending Cory in cream two-wing glider with blue edges oak spars and leather harness between immense luminous cubical clouds. Small birds dip wings respectfully, Featherbottom boasts beside him, green floating islands below.\nExact current story (do not print): Cory soars between the clouds, wings wide, heart soaring even wider. He has become the Cloud Glider, swiftest flier in all the sky! The birds dip their wings in respect. \"I taught him everything,\" sniffs Featherbottom, who taught him nothing. What a beautiful day to fly.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}

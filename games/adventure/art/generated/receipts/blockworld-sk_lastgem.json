@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_lastgem",
+  "style": "M1",
+  "sourceHash": "7f2258f2957cd4bc8c4b6d3dec608bdef5c9d5ec671fec8cd104c138403febbc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0b7d7a72-a354-47cd-bed3-66472bd0e2cf.png",
+  "originalSha256": "89f47cbeb5390326d4cac21bcc0910a3688139f56273cfeab769b9b1aa474b72",
+  "file": "blockworld-sk_lastgem.webp",
+  "sha256": "575b16b681d0bea59078a9dbe592dafd483ee2ef39a0e764d4edfc6e2e487021",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Close Cory presses ONE glowing cyan gem into arch above castle gate; other hand steadies crown-shaped gold stone lifted overhead, socket still empty. Four-tower castle, gold sunlight. Don't add crown to his head.\nExact current story (do not print): Cory presses a glowing gem above the gate. It blazes like a little sun. \"Now THAT is a castle,\" he breathes. Everyone goes quiet, waiting. Only the crown-stone remains. He lifts it high above his head.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}

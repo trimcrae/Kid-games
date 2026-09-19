@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_barthcrown",
+  "style": "M1",
+  "sourceHash": "5361beb2684db3b00a9f5d281374c6626391aed744d374a605b80ee879eb947a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-959d70c0-31a0-4d2b-8fad-fc37b7ed191d.png",
+  "originalSha256": "6b3f7a819e15bed3035e4c5850a380e950b1eae6213d80757d211c41f8ed6d9d",
+  "file": "blockworld-sk_barthcrown.webp",
+  "sha256": "4ae20cf4f0be00cd0868f5b4a31df7750c451f3636b5dbbf192449238addb538",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. Bartholomew same white cuboid sheep tan face pink muzzle brown hooves four legs, no cape/sword. NEW scene: Cory and sheep together hoist ONE heavy golden crown-shaped stone toward castle gate socket. Bartholomew uses both front hooves and balances hind hooves on broad safe platform. Proud effort, no extra sheep limbs.\nExact current story (do not print): \"Let a hero help!\" cries Bartholomew, and together they hoist the crown-stone. His hooves shake, but he does NOT let go. \"We did it!\" he bleats. Cory beams. Friends make the heaviest stones feel light.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}

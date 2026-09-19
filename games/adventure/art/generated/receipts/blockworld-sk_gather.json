@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_gather",
+  "style": "M1",
+  "sourceHash": "032327aff8bfa73acb727f6bbfa12091137a4842f381e7c5506bd3575ac25d4c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1da067d0-15ac-474c-9c1e-8086af6828b7.png",
+  "originalSha256": "2b24be842c9a2d49e39265ad347e90e2f9d6e71c1c3ddc7d682f33448a922322",
+  "file": "blockworld-sk_gather.webp",
+  "sha256": "ccb6d7208015659acaf84b97a7d06f5635eae19c571018b4938ca75c2c32b488",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Workshop worktable: EXACTLY TWO triangular oak wing frames and EXACTLY THREE cloth rolls, plus handful white feathers. Cory counts. Small birds and proud Featherbottom watch. No spare frames/rolls.\nExact current story (do not print): Cory collects what he needs: two wing frames, three rolls of cloth, and a handful of soft feathers. \"Two wings,\" he counts, \"because one wing only goes in circles!\" The birds nod wisely. Even Featherbottom nods, having learned this the hard way.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_birdsglide",
+  "style": "M1",
+  "sourceHash": "3632fe952b0ef125897589f4373f7d5d377b2b0628a5a81f780eadcb7d6cf5c5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3dd694c0-56b8-4cbb-b020-74c1c235beb4.png",
+  "originalSha256": "39770f1bf7e6bce5495707814db253577a14b4c45c84c47b7a8892089fedbb62",
+  "file": "blockworld-sk_birdsglide.webp",
+  "sha256": "57ed7990688dd993d94122a8922c001e56d278abed820b52bc153e229fa46bbf",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory wears completed two-wing glider cream triangular cloth, blue edge, oak spars, leather back harness; small red/yellow birds demonstrate spreading wings into rising breeze. Featherbottom eyes closed boasts near wooden workshop.\nExact current story (do not print): The real birds explain: \"Spread your wings wide, find the warm wind, and LEAN into it!\" Simple and true. Featherbottom huffs, \"In MY day we flew with our eyes closed.\" \"That explains the windows,\" a bird chirps. Cory giggles.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}

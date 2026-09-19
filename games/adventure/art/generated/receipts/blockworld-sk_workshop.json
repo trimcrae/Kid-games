@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_workshop",
+  "style": "M1",
+  "sourceHash": "1965ae8356f166898408126b178c2a50de12c1964594c217904e93c57ccfcc73",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4ef62e56-3efe-421c-8bd5-bf8af66ec9e4.png",
+  "originalSha256": "b19e7d1c7827e3cdc9ce49f798c8a84a6711aef445c5b667b382d52ea7ed8af7",
+  "file": "blockworld-sk_workshop.webp",
+  "sha256": "6a120c83a46bb97ac21bd6dbd43d51c327c3ca12da2b40976ac9ef08e19b6bf3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Open-sided oak workshop on sky island, fabric and wood, sign 'BUILD WINGS, CATCH WIND, SOAR'. Cory testing wing frame on his BACK, Featherbottom points foolishly to boots. Glider design two pale cream triangular cloth wings with blue borders on oak spars and leather harness.\nExact current story (do not print): The glider workshop is full of feathers, cloth, and clever wooden frames. A sign reads: \"BUILD WINGS, CATCH WIND, SOAR.\" Featherbottom appears instantly. \"Glider lessons! First rule: wings go on your FEET.\" Cory politely puts them on his back instead.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}

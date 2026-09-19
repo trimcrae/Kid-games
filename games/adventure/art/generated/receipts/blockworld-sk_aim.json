@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_aim",
+  "style": "M1",
+  "sourceHash": "b8c4e838c26fc8b69da857d52854efe4f315178b0e54a781720802f4c2ce1518",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b4ddd820-d3a2-4175-a509-64096e9eb4b4.png",
+  "originalSha256": "55d25d4cbab8feb73ed79a6326478045836a13bbfe26c63d1a6c239f4287aeae",
+  "file": "blockworld-sk_aim.webp",
+  "sha256": "0d2616cebed84086ffb3d7b6ae9598e70e19cc41459ba0c1acd0b5902fa014fa",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory in cream/blue two-wing oak glider at launch edge eyes TWO destination clouds: one enormous solid fluffy cloud and one thin wisp. Featherbottom points at thin cloud, Cory gestures at comfy big cloud.\nExact current story (do not print): Cory spots two clouds to glide toward: a fat fluffy one and a thin wispy one. \"The big one looks like a comfy landing pillow,\" he decides. \"Aim for the THIN one, more sporty,\" says Featherbottom. Cory picks the comfy pillow. Smart kid.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each page composition, story action and child-friendly voxel character continuity. Gather scene correctly has two wing frames and three cloth rolls. Castle and glider endings have distinct celebratory scenes."
+}
