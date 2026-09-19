@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_signread",
+  "style": "M1",
+  "sourceHash": "683be6427ed0f6371f37ac663fd7989cf159f388b282304ee87ebac4637e8da3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d968262c-9d71-4d92-99e8-71292409e787.png",
+  "originalSha256": "8c129bcc931014a5a44118ece76a52d31b5ef3ebcb437095b48368986df4f6d2",
+  "file": "blockworld-sk_signread.webp",
+  "sha256": "d81bf93ed1b834734aa260f50fb6ce97b8172f3daa22a0a2521047219fa5c031",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Close wooden sign reading 'LEFT: CASTLE ISLE' and 'RIGHT: GLIDER WORKSHOP'. Tiny lower line 'Choose with your heart. Or a coin.' Cory grins showing empty pockets. Left distant incomplete castle, right wooden workshop.\nExact current story (do not print): The sign lists: \"LEFT: a broken bridge to the Castle Isle. RIGHT: a workshop where you craft a glider.\" Below, tiny letters say: \"Choose with your heart. Or a coin. Coins are easier.\" Cory laughs and pats his empty pockets.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

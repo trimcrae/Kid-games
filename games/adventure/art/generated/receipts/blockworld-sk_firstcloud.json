@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_firstcloud",
+  "style": "M1",
+  "sourceHash": "da2e6adf8ad2757087ac4befeae11b81123b858a5ef5a1f4390cb5f62dc45baa",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f3cf1349-922f-4358-a2b0-edb751e5a7a7.png",
+  "originalSha256": "355aeec20fe5f7ff8ac2f4da49dcd285ba7f102c79f2b605bcc80a9638391db6",
+  "file": "blockworld-sk_firstcloud.webp",
+  "sha256": "f3ac8978d1439dbdfb38deceb0f1ec6874a14eeebb1de0120b7ec863601d5316",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory bouncing on one large fluffy cubical cloud, three small bounce-motion arcs show joyful repeated bounce without duplicated Cory. Grass-topped sky island one jump away, tower tip below. Warm playful.\nExact current story (do not print): Cory reaches the very first cloud. It is soft and bouncy, like a marshmallow trampoline. He bounces once, twice, three times! \"This is the best ladder ever,\" he giggles. A sky island floats just one big jump away.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

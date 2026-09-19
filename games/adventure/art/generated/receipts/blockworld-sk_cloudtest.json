@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_cloudtest",
+  "style": "M1",
+  "sourceHash": "1762b245956ad205c40510e2f3e6bc8dee8d6a99e8ac89b248353c4a8d73835f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9c081171-08b6-4ac2-b163-99eb4bccda43.png",
+  "originalSha256": "a107b8f7e619d72a14e0c0622f748560113bd5496ec3a76c8537f7dbfedee477",
+  "file": "blockworld-sk_cloudtest.webp",
+  "sha256": "e3e8d4a3bd3a9f79cab2313d67dfc38d478b0ddcde576c0fc5fe90c54ce975b2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory at platform edge studies EXACTLY TWO clouds ahead: very small wisp and enormous solid puffy cloud. Featherbottom points insistently toward tiny one while Cory looks at big one. Clear size contrast.\nExact current story (do not print): Two clouds float ahead: a teeny one and a HUGE one. \"Which holds my weight?\" Cory wonders. \"The small one, obviously,\" advises Featherbottom. \"Small clouds try harder.\" That is nonsense. The big puffy cloud is clearly the safe bet.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

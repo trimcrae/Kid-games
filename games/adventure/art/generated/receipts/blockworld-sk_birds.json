@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_birds",
+  "style": "M1",
+  "sourceHash": "435345a4e04ca1f8c719afb49fc0d410be5e2282a6803cdad01512cc58ca8cf2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-721be57f-e8a5-4055-a4d1-d107d6ecfeaf.png",
+  "originalSha256": "76bbf2a94ff30750c37fd835e28083f18b0a179c12050d2b32856968d3f30877",
+  "file": "blockworld-sk_birds.webp",
+  "sha256": "5c399241c79a3ebcebd3657b8943dfa825fc535621d757832c427078fa497589",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: On flowery sky island Cory listens to small friendly yellow/red birds. Featherbottom puffs chest absurdly proud. Two routes in background: grey stone castle island and wooden glider workshop.\nExact current story (do not print): The birds twitter happily and share a secret: \"There are TWO ways to be a sky hero. Build something grand, or learn to fly!\" Featherbottom puffs up. \"I taught them everything, including how to fly into windows.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

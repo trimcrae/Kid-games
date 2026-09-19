@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_advice",
+  "style": "M1",
+  "sourceHash": "e7a5e0617733799ec4fb5b6f0501e341cd6e9aca1f40a4289eed3fb5a629c3be",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7d77a604-78d6-4bbf-98ad-db1a21551514.png",
+  "originalSha256": "b18143b3618a6d640099a31df7704197f919ebd65c720698a5f60c2a48108cfb",
+  "file": "blockworld-sk_advice.webp",
+  "sha256": "617a52cafb462abc24fc4e09a95873fb270cf41704b706f45adf32dbdaf7e10f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: On grassy ground Cory holds a stone cube and looks skeptically at Featherbottom demonstrating absurd arm flapping midair. Floating islands far above. No tower yet.\nExact current story (do not print): \"Real advice?\" gasps the Captain. \"Easy. Jump up, then simply forget to come down!\" Cory blinks. \"I think I will just use blocks.\" \"Suit yourself,\" sniffs the bird, \"but blocks have never won a single flying trophy.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

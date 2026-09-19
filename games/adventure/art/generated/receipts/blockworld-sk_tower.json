@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_tower",
+  "style": "M1",
+  "sourceHash": "583589f3b7cdcb55cc90b8d5ae9b0f53eb6013d8ebaf27defabbe0105013fe7f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-23f9c21d-b332-4a10-a4de-b28e2a752af3.png",
+  "originalSha256": "7c521ab0fe3b4ff70be3ddfafc3751cd0880623db21b697dced3efae24202b91",
+  "file": "blockworld-sk_tower.webp",
+  "sha256": "1d7492915c58b0c312a2775563747e61e2ad77c9a6eb12d88688105021ee8d76",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. Bartholomew same white cuboid sheep tan face pink muzzle brown hooves four legs, no cape/sword. NEW scene: Wide vertical sense within landscape scene: EXACTLY TEN clearly separated cubical grey stone blocks stacked in ONE column, fully visible base to top, numbered small 1 through10 if useful. Cory on top near lowest cloud, Bartholomew eyes closed on ground. No other loose blocks or extra tower layers.\nExact current story (do not print): Cory stacks blocks: one, two, three, four! Each block lifts him higher. He counts to TEN and the clouds are close enough to tickle. \"How high is ten blocks?\" he wonders. \"Very high,\" squeaks a tiny voice from below. Bartholomew has his eyes shut.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

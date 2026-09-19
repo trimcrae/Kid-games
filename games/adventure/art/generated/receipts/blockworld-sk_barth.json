@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_barth",
+  "style": "M1",
+  "sourceHash": "8976d4e079fc48d2bbf7fff34935a79d41fd0457a7ec9e5b199a8f17909e152a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4cea196a-b33d-49dc-b3b0-56fca0f1f5ba.png",
+  "originalSha256": "ec2364ae43940992b3a27ca0314f43bdee862744cff2436c08b7ae16d1192103",
+  "file": "blockworld-sk_barth.webp",
+  "sha256": "d65ea06c2c32bbf2590f76bd3160c6d06c1f4e61e89f7fe22fe4e0a00f403765",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. Bartholomew same white cuboid sheep tan face pink muzzle brown hooves four legs, no cape/sword. NEW scene: On ground, Bartholomew hiding behind ONE tiny stone cube much smaller than his body, wobbling knees, eyes nervously looking up. Cory gently amused, majestic sky islands above. Four sheep legs.\nExact current story (do not print): Bartholomew the legendary hero sheep is hiding behind one tiny block. \"I am NOT scared of heights,\" he announces, knees wobbling. \"I am simply admiring this lovely... ground.\" He is very brave and also very much on the ground.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

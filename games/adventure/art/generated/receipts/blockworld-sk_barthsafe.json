@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_barthsafe",
+  "style": "M1",
+  "sourceHash": "9a051cf2edcdffde6dd245f6b3dd1bc7b6a7ce04f59b9ea71f16886b8156b3ee",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6e995d79-48d3-4e37-82d4-719f71b2e271.png",
+  "originalSha256": "b8ff668ed2d7e221edeaefc6c742d83694d27f500b67ae0efaf260984aa2dd8b",
+  "file": "blockworld-sk_barthsafe.webp",
+  "sha256": "6cffd93065d883c45cc25fa5e77ede19bbf454bc8635b052bf11adc382bebf54",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. Bartholomew same white cuboid sheep tan face pink muzzle brown hooves four legs, no cape/sword. NEW scene: Cory kneels beside nervous sheep and kindly promises support, pointing at stout stone cube with sample oak railings. A small wheat snack beside them, floating islands distant. Warm friendship.\nExact current story (do not print): \"I will build sturdy blocks so you never fall,\" Cory promises. Bartholomew sniffles bravely. \"A true hero accepts a brave friend's help,\" he says, then whispers, \"also can the blocks have railings? And maybe a snack?\" Deal.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}

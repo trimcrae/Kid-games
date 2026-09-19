@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_island",
+  "style": "M1",
+  "sourceHash": "fdbc12d80d229a53e845e2becde70afcfbf9fc2642a28357939f784d96089924",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a2fd4448-65d4-4bd3-93c9-b2097d16f2a8.png",
+  "originalSha256": "b96ab568e8b29f80c2f499a3ef69cace697fa2de654b91bbf8319ecc87f940ad",
+  "file": "blockworld-sk_island.webp",
+  "sha256": "a7f31f144c25f5781efe08bd76e6584ecab7b05f3721dcc285abf4bc52c9dce0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Cory lands on grass-topped floating stone island covered flowers. Friendly small yellow/red voxel birds greet. Wooden sign exact 'WELCOME, SKY BUILDER!' and 'Two roads ahead'. Two paths split behind.\nExact current story (do not print): Cory lands on a sky island bursting with grass and flowers. Friendly birds chirp hello. A wooden sign reads: \"WELCOME, SKY BUILDER! Two roads ahead.\" The birds bob their heads like they are nodding along to a song only they can hear.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct voxel sky scene, Cory and blue Captain consistent; ten tower blocks numbered1–10 and two contrasted clouds where requested."
+}
