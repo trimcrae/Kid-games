@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_hall",
+  "style": "L1",
+  "sourceHash": "a1224e839b2e83254b543e4a423b8d11391cc51bf95875fcd07384316725c75c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-19d9af26-00ef-4d6c-8405-8f9179e4d332.png",
+  "originalSha256": "ff54a8248d0ab015e0485c6126e00cac4a8cb65c829152018cd3cd0fb8b2a7ff",
+  "file": "library-my_hall.webp",
+  "sha256": "113cb6add4915c7d7636e62762fe805dbe71e677eb1827b884dccee5147b37c8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Low wide perspective down portrait hallway. Jeannie crouches to inspect ONE large brass key on marble floor and two distinct trails of dark cake crumbs branching: one toward warmly glowing library door, the other toward blue-lit cellar stairs. Pocket Inkwell. Pigeon absent; portraits watch suspiciously.\nExact story context (illustrate the current moment, no full paragraph text on image): The hallway stretched long and creaky, lined with grumpy-looking portraits whose eyes definitely followed her (rude). On the floor lay a fat brass KEY, dropped in a hurry. There were also crumbs. Lots of crumbs. Suspiciously cake-shaped crumbs leading two directions: toward a glowing library and down toward a cold cellar.\nRecurring cast when present: uncrowned bluegrey pigeon cream breast tealpurple neck orangebeak redfeet; browncream owl gold eyes/beak; Boo ivory tissue ghost scalloped floating hem two mitten hands no legs; cake two-layer dark chocolate lavender frosting white piped scallops. Preserve reference character appearances. Each scene a DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: brass key, two crumb trails lead to labeled warm library and cold cellar, watching portraits, Jeannie/pocketquill."
+}

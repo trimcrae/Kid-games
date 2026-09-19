@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_pigeon",
+  "style": "L1",
+  "sourceHash": "8c8661012afd2e96bd975389481596ee9214e0c86d31993aad05b73e4c084db5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-781d1a80-84bf-46ff-bace-4b885970cf62.png",
+  "originalSha256": "115df999a3512de42bdb4c7a8498b93a059dedc239fbf7ccef9f9ddedbc3ff7e",
+  "file": "library-my_pigeon.webp",
+  "sha256": "d3ce5f038eb54d5dc6f01daa5088f195806a20518f9a456b413b3fe6e5559a4c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: NEW close expressive angle at foot of manor staircase. Uncrowned pigeon peers comically cross-eyed at WHITE frosting on his own orange beak, one wing points proprietorially toward stairs. Jeannie watches with amused skeptical eyebrow, pocket Inkwell. No ghost yet. Clear layered paper feather craft.\nExact story context (illustrate the current moment, no full paragraph text on image): 'FROSTING?' squawked Sir Reginald, going cross-eyed at his own beak. 'I'll have you know I merely SUPERVISED the cake. From very close. With my mouth.' He confessed he'd seen a wobbly white shape carry the cake away, sniffling the whole time. 'A burglar of the saddest sort,' he sniffed. 'Now if you'll excuse me, I OWN that staircase.' He owns nothing.\nRecurring cast when present: uncrowned bluegrey pigeon cream breast tealpurple neck orangebeak redfeet; browncream owl gold eyes/beak; Boo ivory tissue ghost scalloped floating hem two mitten hands no legs; cake two-layer dark chocolate lavender frosting white piped scallops. Preserve reference character appearances. Each scene a DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: cross-eyed uncrowned frosting-beaked pigeon claims staircase, Jeannie skeptical, consistent paper cast."
+}

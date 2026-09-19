@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_feather",
+  "style": "L1",
+  "sourceHash": "5f781129bb37147b143c8ffe6cbef0e2f00b2e82ee588c4697cbb8a17f3d5370",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-57123723-aae7-4faf-8983-b6807fd83f18.png",
+  "originalSha256": "83b3e2f2f74366c42f8cfe0999ff597f17ba36d8cee5895137e9a606627c8fa7",
+  "file": "library-mt_feather.webp",
+  "sha256": "e59663779adc8215819bc649b0784df3ef86959ef3dfcc6802bdcc32fca92d27",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the first image with these precise corrections. REMOVE the tiny humanoid pen character standing outside girl completely. Replace with ONE SMALL FOOTLESS expressive cream feather quill with a single GOLD WRITING NIB, tucked in girl's purple dress pocket (add a modest matching purple pocket if needed). Quill is a feather and nib, NO torso, arms, hands, legs, feet or clothes. Match quill in second reference. Preserve all other characters, composition, props, setting and exquisite folded-paper medium exactly. The second image is only a reference for FOOTLESS INKWELL quill design, do not import its setting or cast.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-02778956-a2ad-45ca-bae5-599a6b8c33c1.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: white four-legged two-winged Pegasus tangled gently in vine, gold mane/tail, girl and corrected footless pocket quill, cloud mountain paper style."
+}

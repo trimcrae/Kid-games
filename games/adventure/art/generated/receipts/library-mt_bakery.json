@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_bakery",
+  "style": "L1",
+  "sourceHash": "6f333de64b15a216a9ff7935b55c74ca56395120b5cfced5b031846a7aba489e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-48199eb3-999f-4672-acfd-cc0067c354fe.png",
+  "originalSha256": "2e4cfc8c123d3010cbbc2ae537bec66d33142dac5b859fa9fc404f83bfafa8cc",
+  "file": "library-mt_bakery.webp",
+  "sha256": "ed317acb0f64c37f31e8b87b607e3d261c22e5fa44fabe3b3f9f15d51aebfc5b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the first image with these precise corrections. REMOVE the tiny humanoid pen character standing outside girl completely. Replace with ONE SMALL FOOTLESS expressive cream feather quill with a single GOLD WRITING NIB, tucked in girl's purple dress pocket (add a modest matching purple pocket if needed). Quill is a feather and nib, NO torso, arms, hands, legs, feet or clothes. Match quill in second reference. Also correct Cyclops face: lower his raised hand to counter, show ENTIRE face with exactly ONE LARGE BROWN EYE positioned centrally directly above his nose; no second eye or empty socket on either side. One eyebrow above central eye. Preserve brown curls, stubble, kind sad expression and tear. All other scene details stay the same. Preserve all other characters, composition, props, setting and exquisite folded-paper medium exactly. The second image is only a reference for FOOTLESS INKWELL quill design, do not import its setting or cast.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-1c96edae-db51-4ac8-9ae0-af801247e5cb.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Cyclops corrected to single centered brown eye, gentle flour-dusted baker, cookie trays and extinguished oven; quill now safely in dress pocket."
+}

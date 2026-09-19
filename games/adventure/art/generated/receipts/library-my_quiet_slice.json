@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_quiet_slice",
+  "style": "L1",
+  "sourceHash": "77b488ec3ecf556ae5065f6d7f5faf8a1ab1ce3e5918215b074d3120827b744d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2859cb04-f9bf-4a95-8f13-5a97c4bb3ecc.png",
+  "originalSha256": "6380d1dc1b8489a192ec7e844c9a3354f2972d436830891c42e6fb18341b48ac",
+  "file": "library-my_quiet_slice.webp",
+  "sha256": "211f95f13583475a586047461c1476d66f6e8f28c9b747c6d58d0566b6c64e8a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Intimate night window seat scene. Jeannie and Boo smiling softly, each holding ONE fork, gently clinking fork tips. Between them plate with shared slice of chocolate lavender cake; remainder of cake on side table with wedge missing. Boo radiant, moon beyond. Tiny Inkwell rests contented in pocket. No crowd or candles.\nExact story context (illustrate the current moment, no full paragraph text on image): They sat by the big window and split the very first slice. Boo took a wobbly bite, then beamed so bright the moon looked dim. 'Two hundred years,' he whispered, 'and this is the best birthday ever — because somebody stayed.' Jeannie clinked her fork against his. 'Same time next year?' Boo nodded so hard a little frosting flew off. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: two forks clink above shared slice, cake remainder has missing wedge, smiling Boo and Jeannie in moonlit window."
+}

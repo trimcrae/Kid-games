@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_evidence",
+  "style": "L1",
+  "sourceHash": "c8f1853a056551d8382e9ca044d4dca6b20e6f5759ca888f9760e9e2db96797c",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b7b00a57-0a15-4a4f-9f38-62a7c89155a8.png",
+  "originalSha256": "263f331cb10f415a245c70e9d414bca9ff0e82917c2877ebe93897124c62b81b",
+  "file": "library-my_evidence.webp",
+  "sha256": "c07675ecde2d3e13cac043a318c98a7342549a70393142742ecea5cf718f569b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie crouches on cellar floor among clear separated clues: cake crumbs, ONE slightly chewed purple cone party hat, open chest holding EXACTLY THIRTEEN short unlit candles arranged visibly as seven in back row and six front, and pink faceted gem atop closed diary. Inkwell from pocket glares at chest. No ghost or cake needed.\nExact story context (illustrate the current moment, no full paragraph text on image): Jeannie crouched and found the works: a trail of crumbs, one party hat, a chest stuffed with thirteen unlit candles, and a sparkly pink GEM Boo had been using as a paperweight on his diary. 'Case basically cracked,' whispered Inkwell, who then loudly accused the chest again. The clues all pointed one sweet, sniffly way. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: counted thirteen unlit candles as seven rear and six front, chewed cone hat, crumbs, pink gem on diary, Jeannie and expressive quill."
+}

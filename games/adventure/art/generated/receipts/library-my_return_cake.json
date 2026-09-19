@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_return_cake",
+  "style": "L1",
+  "sourceHash": "242cc732dcdbf566ec43e2da523e8d4a8efc9433e437aeb11e44f451be557332",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7805e833-3b1a-40a7-aeeb-1d6b4455644d.png",
+  "originalSha256": "ca9bc8bfe515a7ca63925a9e6ef5ea643a97c5df525d972d303547326fd3e525",
+  "file": "library-my_return_cake.webp",
+  "sha256": "0ff9c147c576040d11b01323af8256980857b8df691c2359f6e0389829c30ab4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Side view on creaky manor staircase: Jeannie and Boo together carry SAME lavender frosted two-layer chocolate cake level on a tray, each supporting one side. Girl below ghost on stairs, both smiling as sharing idea dawns. Inkwell in purple pocket. Grumpy portrait figures lean forward within gilt frames intrigued. No candles on cake.\nExact story context (illustrate the current moment, no full paragraph text on image): Together they carried the Midnight Cake back up the creaky stairs. But Jeannie had a better idea than just returning it. 'A whole cake for one party,' she said, 'is too much cake for one ghost — and not enough party.' Boo blinked. 'You mean... I could SHARE it?' 'That,' said Jeannie, 'is how you make friends.' The portraits leaned in, intrigued. Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: girl and ghost jointly support cake tray climbing stairs, curious portraits, matching paper cast."
+}

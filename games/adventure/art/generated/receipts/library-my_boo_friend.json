@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_boo_friend",
+  "style": "L1",
+  "sourceHash": "77a579cf5f0e296b001e8707cbba3c20ee0c2a14e2e01bf28c2e47151f7bd7fe",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-23d7b918-231b-4ce6-8ad8-8c3425892d3c.png",
+  "originalSha256": "1549b00edfcb27480a8171d442c9f5de06a2bb33e87689469480dbc3c17fd12f",
+  "file": "library-my_boo_friend.webp",
+  "sha256": "d9c24bf31c00c308f29d68ee4c7184e4f955cd6ff456f5f6d980f885f2e5d320",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Boo floats beside a tall moonlit manor window, sadly telling Jeannie his lonely birthday story. Jeannie reaches open hand toward him warmly with understanding eyes; Inkwell pocket. A small lavender cake on side table, cool night blue and warm candle accents; new window setting, same soft white tissue ghost.\nExact story context (illustrate the current moment, no full paragraph text on image): Boo floated up to a moonlit window and the whole sad story spilled out. 'It's my birthday. I've haunted this manor for two hundred years and nobody EVER comes to my party. So I borrowed the cake to celebrate alone. Pathetic, huh?' Jeannie's heart squished. 'That's not pathetic,' she said. 'That's an invitation.' Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: sad floating Boo at moonlit window, Jeannie offers friendship, same lavender cake and paper designs."
+}

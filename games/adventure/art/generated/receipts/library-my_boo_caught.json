@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_boo_caught",
+  "style": "L1",
+  "sourceHash": "cd8ae2f6b87b2c30386b32d106c0e172ae963a86cb4d107213a3bdad69d6241a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-94a6fac5-70ad-4bec-b560-41f7bfc76ae9.png",
+  "originalSha256": "fa5249e3985f769ef6909f3a48e45510a23fddf4ea971eea5c043c6d34c944e1",
+  "file": "library-my_boo_caught.webp",
+  "sha256": "2a287ae9b9de3d4295dbb6557ed1411a20b53a706897bb8e8dc7507a73e74171",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Boo has turned three-quarters to look over his shoulder, balancing same whole lavender-frosted chocolate cake behind him on broad floating cloth-like bottom. Two mitten hands raised in embarrassed confession, large paper tears drop. Jeannie kindly leans forward listening, Inkwell in pocket. No human legs or feet on ghost. Silly vulnerable cellar moment, not frightening.\nExact story context (illustrate the current moment, no full paragraph text on image): 'Frosting? Behind my back?' Boo glanced behind his back, where a whole cake sat balanced on his wobbly bottom. 'That is... a HAT. A cake hat. Everyone's wearing them.' He sniffled. 'Okay, fine, IT WAS ME. I'm the worst liar in the manor, the owl told me so.' Big ghostly tears plopped onto the floor. 'Are you going to lock me in the spooky cupboard?' Only include the characters explicitly present in the NEW scene description; don't add other recurring cast as cameos. Use reference characters and setting, but a DISTINCT new illustration for this scene.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: embarrassed crying Boo balances matching cake behind him, friendly Jeannie and pocketquill, no ghost legs."
+}

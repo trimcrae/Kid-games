@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_dragon",
+  "style": "L1",
+  "sourceHash": "25cc4e2222041a46bdcd8c1db44b02b85c09735b3df014d2154a60c9ad6b72b3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d1422df4-6a93-48ab-9765-2089005b2d71.png",
+  "originalSha256": "3e2a4b253d9b320ef997fc95b73768d5a2dbd481ceef4d1884139144a768d20a",
+  "file": "library-mt_dragon.webp",
+  "sha256": "f1d87238bc78e9ce83e9fce2ee892a05d5691736228542f12ea6c9b8b8f50d18",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the first image with these precise corrections. REMOVE the tiny humanoid pen character standing outside girl completely. Replace with ONE SMALL FOOTLESS expressive cream feather quill with a single GOLD WRITING NIB, tucked in girl's purple dress pocket (add a modest matching purple pocket if needed). Quill is a feather and nib, NO torso, arms, hands, legs, feet or clothes. Match quill in second reference. Preserve all other characters, composition, props, setting and exquisite folded-paper medium exactly. The second image is only a reference for FOOTLESS INKWELL quill design, do not import its setting or cast.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-ac29efa3-36ef-4fea-a55c-76eeadf36551.png",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_portraits.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: huge rosecoral Gladys with two gold horns/two wings cuddles golden sun-emblem lyre; girl and corrected pocket quill, warm orange paper crater."
+}

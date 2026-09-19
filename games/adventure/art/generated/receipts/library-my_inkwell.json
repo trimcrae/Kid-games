@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_inkwell",
+  "style": "L1",
+  "sourceHash": "5261fc7136ffdbc371106ca1172041dea8baf45dc93d423143b573d1eccf872e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-46f5bb59-5f0d-4207-8083-e6c74eec23d9.png",
+  "originalSha256": "72ba981ef327992794f7f2942e07ed23f2843ac127b800d5819481713400e2af",
+  "file": "library-my_inkwell.webp",
+  "sha256": "7609eea25d38d81a6744f5e07dac4ba5a89729e1680cbbbb1a6f68509af0b69a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie lifts the lid of one dusty wooden chest revealing just ONE silver fork and a paper note reading 'Saving this for later. — B.' Inkwell balances independently on chest edge glaring at its brass hinges. Her dress pocket EMPTY. Comic detective discovery, manor corridor; no other characters.\nExact story context (illustrate the current moment, no full paragraph text on image): Inkwell hopped onto a dusty chest and squinted dramatically. 'The culprit,' he announced, 'is this CHEST. Look at its guilty little hinges!' The chest did not confess, mostly because chests can't. But when Jeannie lifted the lid, inside was a single fork and a note: 'Saving this for later. — B.' A clue! Inkwell sniffed. 'I was about to say that.'\nRecurring cast when present: uncrowned bluegrey pigeon cream breast tealpurple neck orangebeak redfeet; browncream owl gold eyes/beak; Boo ivory tissue ghost scalloped floating hem two mitten hands no legs; cake two-layer dark chocolate lavender frosting white piped scallops. Preserve reference character appearances. Each scene a DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: one fork and readable B note inside chest, standalone single quill accuses hinges, empty pocket, paper manor."
+}
