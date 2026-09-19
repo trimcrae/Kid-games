@@ -1,6 +1,6 @@
 # Picture-book art trial
 
-Created 2026-09-17 with the built-in OpenAI image generation tool in Codex (no API key or CLI generation). Revised the same day after the user confirmed that Ellie is the child wearing the tiara in their private reference photograph. Current web images are art/ellie-1.webp through art/ellie-3.webp, each 1448 × 1086, totaling approximately 1.0 MiB. Original generated PNGs remain in the account's generated_images directory; earlier illustrations are also recoverable from git history. The source photograph is private and is not included in this repository.
+Created 2026-09-17 with the built-in OpenAI image generation tool in Codex (no API key or CLI generation). Revised the same day after the user confirmed that Ellie is the child wearing the tiara in their private reference photograph. Current web images are art/ellie-1.webp through art/ellie-3.webp, each 1448 × 1086, totaling approximately 1.0 MiB. Earlier published illustrations are recoverable from git history. Local generated PNG originals may be removed after their final WebPs are verified as published, while keeping generation receipts. The source photograph is private and is not included in this repository.
 
 The user explicitly requested this OpenAI illustration trial for Spooky Princess Stories, superseding the older repo restriction on generated child/creature art for this trial. Craepets is outside its scope.
 
