@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_field",
+  "style": "M1",
+  "sourceHash": "6a74af89addbcf2a2e4f4adec131756652f9caa66145a6296563c159dffc194d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7cbd8882-98f0-4196-872c-95893c312137.png",
+  "originalSha256": "b4e6450daabe29ac8074cc67070657b5a4d25399bc97cb76110a748847441fc9",
+  "file": "blockworld-vil_field.webp",
+  "sha256": "7b22b23dca1ae9716d43e97ea7029b0e9f8d58e6dd20c533ee375b92c16d23ca",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit this exact image ONLY by adding ONE orange cubical pumpkin with green stem in empty foreground center soil space, just above bottom image edge between front two pumpkins. There are currently eight pumpkins. Preserve all eight exactly where they are. Add the ninth pumpkin in the missing nearest corner of this three-by-three grid. Do not remove or move any existing pumpkin, preserve characters, lighting, framing. Final image has NINE distinct fully visible pumpkins.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-795bf698-d13b-4fbe-bd3c-1611f7a3d366.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed story-specific scene and established character/prop continuity. Counting corrections show exactly nine pumpkins and three map wave lines."
+}

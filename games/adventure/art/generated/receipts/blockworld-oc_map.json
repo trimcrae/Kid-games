@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "oc_map",
+  "style": "M1",
+  "sourceHash": "a08076c23ab5d36bbb8429db52806690b534271193c12e9e5305201cc7affbb2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-237447ec-9658-4734-9f1d-c19055a4930b.png",
+  "originalSha256": "b3863844cace47e215e94adc0c34a17b94ad58b4c20130cb13baf398f62cfaae",
+  "file": "blockworld-oc_map.webp",
+  "sha256": "df0f36ea5b5edb0ae0f9b3666ffef3817ab5a98730a4449dfc8ba8e728ebe721",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit ONLY the blue wavy-line symbols on left of parchment map. Replace four small wave marks arranged two-by-two with EXACTLY THREE horizontal blue wavy lines stacked vertically, one above another. Preserve palm icon, ship icon, red X and arrows, characters and all rest of image perfectly.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-d81b9326-dd84-4418-ba6e-c082f4708b31.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed story-specific scene and established character/prop continuity. Counting corrections show exactly nine pumpkins and three map wave lines."
+}

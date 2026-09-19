@@ -127,6 +127,7 @@
     "vil_eggs": "art/generated/blockworld-vil_eggs.webp",
     "vil_route": "art/generated/blockworld-vil_route.webp",
     "vil_pumpkin": "art/generated/blockworld-vil_pumpkin.webp",
+    "vil_field": "art/generated/blockworld-vil_field.webp",
     "vil_grow": "art/generated/blockworld-vil_grow.webp",
     "vil_feast": "art/generated/blockworld-vil_feast.webp",
     "vil_election": "art/generated/blockworld-vil_election.webp",
@@ -135,6 +136,7 @@
     "oc_build": "art/generated/blockworld-oc_build.webp",
     "oc_shells": "art/generated/blockworld-oc_shells.webp",
     "oc_chase": "art/generated/blockworld-oc_chase.webp",
+    "oc_map": "art/generated/blockworld-oc_map.webp",
     "oc_flag": "art/generated/blockworld-oc_flag.webp",
     "oc_setsail": "art/generated/blockworld-oc_setsail.webp",
     "oc_whistle": "art/generated/blockworld-oc_whistle.webp",
@@ -352,7 +354,11 @@
     "fin_keeper_goodbye": "art/generated/library-fin_keeper_goodbye.webp",
     "fin_end_keeper": "art/generated/library-fin_end_keeper.webp",
     "fin_pathhome": "art/generated/library-fin_pathhome.webp",
+    "fin_home_visit": "art/generated/library-fin_home_visit.webp",
+    "fin_end_home": "art/generated/library-fin_end_home.webp",
     "fin_pathauthor": "art/generated/library-fin_pathauthor.webp",
+    "fin_author_inkwell": "art/generated/library-fin_author_inkwell.webp",
+    "fin_author_final": "art/generated/library-fin_author_final.webp",
     "wl_intro": "art/generated/library-wl_intro.webp",
     "wl_hub": "art/generated/library-wl_hub.webp"
   }

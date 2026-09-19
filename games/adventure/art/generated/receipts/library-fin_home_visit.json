@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_home_visit",
+  "style": "L1",
+  "sourceHash": "5812ca26c0d514856cb17fe34a55accb6814cb25aefed2f4258a7fbf5bb1f56f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-71b643e7-00dd-40f9-8141-87c06f25ac13.png",
+  "originalSha256": "245bbe3e29e31d4f01a1ad5883216e825e297916146d96bd62aac6d14a77ce64",
+  "file": "library-fin_home_visit.webp",
+  "sha256": "0be156603ad3b83f62aeeb7cb45af5a84a624049452f8b5369c3ab5e1c65ecc9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie hugs SAME moonlight-silver JEANNIE library card against chest. Elderly Keeper laughs welcomingly, one goldspectacle pair over eyes, other two on desk. Browncream owl peeks eagerly toward small bowl of purple grapes on desk. Inkwell leans proudly from dress pocket ready to go home. Cozy golden library, new conversational angle, no portal departure yet.\nExact story context: \"Visit? My dear, you must!\" the Keeper laughed. \"The card opens THIS library too. Pop in any time. Bring snacks — the owl is partial to grapes.\" Inkwell cleared his throat importantly. \"And ME, obviously. I'm coming home with you. Somebody has to make sure you dot your i's and don't forget the good adjectives.\" Jeannie hugged the card to her chest.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pathhome.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed story-specific scene and established character/prop continuity. Counting corrections show exactly nine pumpkins and three map wave lines."
+}
