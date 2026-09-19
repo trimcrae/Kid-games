@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_armory",
+  "style": "L1",
+  "sourceHash": "310b8825c8d9d377b1295505870a7ca703d63a5e6bde5c87700997db518b2bb7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3fdad32f-417a-4e8c-89d9-344ecc27886c.png",
+  "originalSha256": "c0ea170ca2531253993a89b330570ec3c2f344c3119226506e624297253978d6",
+  "file": "library-mt_armory.webp",
+  "sha256": "33cce79b577c88e8d2d685d312411cf88f48e02fbe647c20cde7159a570285b3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Dusty temple armory corner. Jeannie finds a shiny sword safely resting on stand, sturdy round shield, and a SEPARATE small triangular golden HARP with note 'IN CASE OF DRAGON, PLAY MUSIC'. Rusty empty medieval knight statue leans conversationally from corner, friendly eyes in visor. Inkwell independently writes notes on spare scroll, pocket empty. This small triangular harp differs from dragon's larger U-shaped Lyre of Apollo.\nStory context: In a dusty corner Jeannie found a hero's kit: a shiny sword, a sturdy shield, and — oddly — a tiny golden harp with a sticky note reading 'IN CASE OF DRAGON, PLAY MUSIC.' A rusty knight statue in the corner suddenly spoke. 'I tried to FIGHT Gladys for two hundred years. Got nowhere. Should've brought the harp. Learn from my mistakes, kid.' Inkwell wrote that down as 'official prophecy.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

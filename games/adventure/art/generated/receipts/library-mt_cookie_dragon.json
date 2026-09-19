@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_cookie_dragon",
+  "style": "L1",
+  "sourceHash": "3c961debd2c8264e303ae7c24c398f1b361ed3c870422f2f6629a0313e4a4385",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cdb29a85-3918-49ce-94ee-6779980beb87.png",
+  "originalSha256": "9907388a92a4dfa8bb57afabeba233905c9d42032bbd248475a07fc4fae79e3c",
+  "file": "library-mt_cookie_dragon.webp",
+  "sha256": "79c33da1506669b5560bad011a540cdc3ab751f6f49e18aa3df2087308db80e1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie offers ONE golden honey cookie toward enormous Gladys's nose. Dragon's two eyes sparkle with delighted gratitude and tiny HEART-shaped paper smoke puff curls above nose from happy hiccup. Golden U-shaped sixstring lyre rests safely between forelegs. Girl no sword/shield. Inkwell smiles from pocket, warm orange crater same rosecoral dragon.\nStory context: Jeannie offered Gladys one of Crumb the Cyclops's golden cookies. The dragon's eyes went sparkly. She ate it in one gentle gulp and gave a happy little hiccup that puffed out heart-shaped smoke. 'That,' she sniffed, 'is the nicest thing a hero has ever done. Want to hear a song? I'll trade you the lyre if you sing the LAST verse.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_dragon.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_bakery.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_quest",
+  "style": "L1",
+  "sourceHash": "8e61499d817b8404704619ab05fbf76e28e11840a64205ba26fdcbfc1d0899ae",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c40fdac2-cd64-403c-a743-48a6d34fc329.png",
+  "originalSha256": "aa68afe5995a57eb8ef11b6221bc21c7918cc76388c6cd008ebeb4216b2d1090",
+  "file": "library-mt_quest.webp",
+  "sha256": "e3153c40cb00be745f87aea43c43c9ac8c090c67187a76173e652b1ceabbc3ce",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Oracle points across temple balcony toward distant warm orange crater. Within crystal a small vision shows SAME rosecoral Gladys hugging golden U-shaped sixstring lyre. Jeannie listens to task. Inkwell floats over parchment on ledge where short legible word 'SERENADE' replaces smudged word; pocket EMPTY. Dragon only distant/vision, no danger.\nStory context: 'A QUEST, eh? Hero stuff. Loud, sweaty, never naps,' grumbled the Oracle, but she pointed her crystal at a far crater. 'A grumpy dragon named Gladys sits on the Golden Lyre of Apollo, refusing to give it back. Reclaim it and you'll be a Legendary Hero.' Inkwell read the prophecy: 'A hero shall SLAY the dragon — wait, smudge — SERENADE the dragon. Yes. Singing. Definitely singing.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_dragon.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

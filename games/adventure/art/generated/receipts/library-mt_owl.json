@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_owl",
+  "style": "L1",
+  "sourceHash": "4f8f6cd12076711dd11652956c68e5fff95bff24cfdc73fcdf3de2817eec8518",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f007a6e0-3e22-45e1-b254-78286b75205b.png",
+  "originalSha256": "1c8a097eb1d0093d4608524dc12e6c07d1ec6734f6f79bedf440a618e8b268b6",
+  "file": "library-mt_owl.webp",
+  "sha256": "74cad453845ee47a4ea2af847301633d181692f60f48960fc6e54ffdba5e702c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Moonlit safe mountain ledge. Same round browncream owl now wearing tiny gold spectacles, gold eyes/beak, perched on olive branch laughing at own joke. Jeannie listens amused with head tilted; Inkwell dryly skeptical in pocket. Deep indigo paper sky and moon, Greek temple silhouette upmountain. No manor.\nStory context: On a moonlit ledge perched a wise old owl wearing tiny spectacles. 'Hoo goes there?' it asked, then chuckled at its own joke for an uncomfortably long time. 'I am the Owl of Athena, keeper of GOOD ADVICE and TERRIBLE PUNS. Wisdom or glory, little one — which feather will you follow?' Inkwell muttered, 'finally, someone with worse jokes than the prophecy.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_library.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

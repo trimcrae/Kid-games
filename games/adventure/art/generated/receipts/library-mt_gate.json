@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_gate",
+  "style": "L1",
+  "sourceHash": "ba0bbcda9439106b5d064e6ffafcf678a4256f8ce3663e2ab6eb6695ec2f9c6f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b27e1994-983f-4d7a-bdea-836671b07b96.png",
+  "originalSha256": "93b97bc744c96f5b2233410a5d48dcd922b5d7bdf2dd90b24e57e12f68383522",
+  "file": "library-mt_gate.webp",
+  "sha256": "2a631758f216495d88b6e6e52c5bb0ffecbb59a2ac6c116c7fc5d1e18be44b2f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Heavy stone gate blocks mountain trail, carved gentle SNOOZING FACE with closed eyes. Keyhole is a round COOKIE shape, not regular key. Sign short 'GATE OF DESTINY'. Jeannie examines it holding tiny golden cookie charm in palm, Inkwell peers at smudged prophecy on rock. Empty pocket while quill hovers. Cream stone, teal cypress, warm sunlight, no extra characters.\nStory context: A heavy stone gate blocked the trail, carved with a snoozing face and a keyhole shaped like a cookie. 'THE GATE OF DESTINY,' read a sign, then in smaller letters, 'please knock gently, it's a light sleeper.' Inkwell squinted at the prophecy. 'It says a hero needs the GOLDEN KEY. Or a GOLDEN KEE. Or possibly a cookie. The smudges are out of control today.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_bakery.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_riddle3_oops",
+  "style": "L1",
+  "sourceHash": "c1256471f186989c9b6c324a1382af60704e13a91719098bd1116972f3de97ac",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-41a9c84d-3e66-4771-9484-7fa0da570470.png",
+  "originalSha256": "0903b6d018d98709a3ce960ca0ffc6c97c8303cf8f79563385e8a6286bf330d2",
+  "file": "library-mt_riddle3_oops.webp",
+  "sha256": "660e4bf365051adb12ac0e8dec06db6e8070effcd2164927dd05f793f2c98225",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Same temple new angle, Oracle warmly smiles and points kindly at JEANNIE as the answer. Jeannie laughs proudly standing tall, pocket Inkwell has one tiny dark ink teardrop by nib. Gold light just beginning around violet crystal; no scroll handover yet.\nStory context: 'Close, but the answer was YOU,' the Oracle said warmly, which for her was practically a parade. 'The curious reader who keeps asking what happens next. THAT is the truest oracle of all.' Inkwell sniffled. 'That's beautiful. I'm not crying, I'm leaking ink.' Jeannie laughed and stood a little taller.\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

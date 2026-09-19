@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_oracle_win",
+  "style": "L1",
+  "sourceHash": "6cfb8c160b77c21f0f9e1519073b5a9b0daa76619870a327516d17d1bd01bd45",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-04da4c7f-d7c4-4b8f-9ce7-78632cc81d05.png",
+  "originalSha256": "0be54fe6ddf4183049f5fec0229c7eb30abaf41f619ce4ee1e2962338f0d7221",
+  "file": "library-mt_oracle_win.webp",
+  "sha256": "8693ae186de368a7ebf10f819d6134a6e078e6b2c426d62c1f15e4ebe2a27527",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Whole Greek temple glows gold. Tiny Oracle stands on crystal pedestal at Jeannie's chest level and solemnly hands girl ONE luminous long rolled scroll of riddles, gold ribbon ends. Jeannie accepts both hands carefully. Pocket quill delighted, temple gold carved rays, old Oracle relieved and wide awake. Scroll abstract script, no huge caption.\nStory context: The whole temple lit up gold. 'You see TRUE,' the Oracle declared, and for once she sounded wide awake. 'I have answered riddles for a thousand years and my feet are TIRED. I name you the next Oracle of Mount Mythos.' She handed Jeannie a glowing scroll of all the riddles ever. 'Use this wisely. And maybe schedule yourself a nap. Trust me.'\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_temple.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}

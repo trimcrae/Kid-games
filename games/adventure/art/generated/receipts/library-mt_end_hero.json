@@ -1,0 +1,24 @@
+{
+  "storyId": "library",
+  "nodeId": "mt_end_hero",
+  "style": "L1",
+  "sourceHash": "a46bf8d3560b019418be5776931038fe9d0f794165782f9b3c3f9a394767b9c1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0d1896cf-a26b-47a8-9d91-cdcf0a94b0e3.png",
+  "originalSha256": "f0f45d9d8fc76625483cd174dfe76e1e543934ac0d1436152b665daf2a3e95d0",
+  "file": "library-mt_end_hero.webp",
+  "sha256": "d00bf5b092f5badceb894c2232057400a63b6b664ebbfbcba91de1d49236facd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, Mediterranean cream stone, teal cypress trees, golden light and scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Grand summit celebration. Golden U-shaped sixstring Lyre restored on sun-carved pedestal at central cream Greek temple. Jeannie laughing beside pedestal; white Pegasus bows affectionately, rosecoral Gladys smiles behind, enormous one-eyed Crumb presents one very large cookie shaped like Jeannie's smiling face. Uncrowned pigeon cheers with wings raised, pocket Inkwell wipes tiny ink tear. One of each character, all expertly folded paper. New wide finale composition, no text.\nStory context: With the Golden Lyre returned to its place atop Mount Mythos, every god, monster, and minor-pigeon-deity cheered Jeannie's name. Pegasus declared her his forever-rider, Gladys promised glittery flights anytime, and Crumb baked a cookie shaped like her face (it was very large). 'LEGENDARY HERO!' boomed across the peak. Inkwell wiped a proud tear of ink and whispered, 'The prophecy was right all along. Well — the BUY MILK part still confuses me.' Jeannie laughed all the way back into the book.\nOnly show cast explicitly needed in the NEW scene, references establish appearance not composition. No extra feet/body for Inkwell; no duplicate girl or quill. DISTINCT new illustration.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_feather.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_dragon.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-mt_bakery.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually inspected distinct Mythos paper-theatre scene, relevant cast and story props, consistent Jeannie and named Mythos characters."
+}
