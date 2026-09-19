@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_loop",
+  "style": "M1",
+  "sourceHash": "9b4d921536fe594e3ec8e00013ffe263f9e0a3702ff62bd3a51650c9923df909",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-93429c32-0f6a-4581-8598-091834296811.png",
+  "originalSha256": "8f1e733b8015ba8e2952ac6b3606b29f499d92c4a6554ea7e04b4cea9cbe3f42",
+  "file": "blockworld-sk_loop.webp",
+  "sha256": "1749a99b744fe0158bffa400da0c6256adf6fb0f915a6715497aa51de67c5be8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE full-bleed landscape 4:3 M1 cinematic 3D VOXEL image. Same Cory cubical brown hair black glasses blue shirt darkblue trousers brown boots backpack, age6. Everything constructed of subtly pixel-textured blocks, warm dimensional light and atmospheric distance. Captain Featherbottom when requested: blue cuboid bird white chest yellow beak/feet raised blue crest proud face. New scene cast only, no unrequested cameos. References establish designs only. Different composition per page. No UI/captions/borders. Exact quantities fully visible separated and countable. NEW scene: Golden sunset broad banking flight: Cory under two cream triangular wings with blue borders, oak spars. Curved breeze trail illustrates wide loop. Friendly red/yellow birds and Featherbottom fly alongside.\nExact current story (do not print): Cory banks into a wide, golden loop as the sun sinks low. The birds fly in formation beside him, and even Featherbottom keeps up (mostly). \"Best. Flight. EVER!\" he shouts into the warm wind. One more glorious glide and the sky is truly his.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-sk_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

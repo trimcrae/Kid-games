@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_hello",
+  "style": "M1",
+  "sourceHash": "843f81e10aefc77987f55a3b41bd4e96762ab174624b6eec6d56f24ee0cca0eb",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-abd81d72-30c0-496b-a45c-3779b3298908.png",
+  "originalSha256": "7d7aef27d149388ea815ae786d48cf3a25df86e22c404581504aa6d6423e8880",
+  "file": "blockworld-vd_hello.webp",
+  "sha256": "08a05815382dee0cf616fdebfda0cb320d7b399d6244e5b57290b8276d375707",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Cory waves both arms at frozen mid-chew Voider; ONE huge purple jelly tear bouncing between them. Sympathetic joy, no attack.\nExact page story, do not print narrative: Cory waves both arms. \"HI! I'm Cory!\" The Voider freezes mid-chew. Nobody has ever said hello before — everyone always runs away. A giant purple tear plops down and bounces like jelly. \"You... you're not scared of me?\" it rumbles softly.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

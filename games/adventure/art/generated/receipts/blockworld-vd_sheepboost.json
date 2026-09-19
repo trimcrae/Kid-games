@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_sheepboost",
+  "style": "M1",
+  "sourceHash": "9d0e90f9552f3acfc55a08c434fa0969bdcb73e35912deedef2d57de8b52651a",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a08a7b1a-d980-4926-be0d-41030473b9c9.png",
+  "originalSha256": "b7482323ab62d413f6fffb58ba6d5f3bf74913b0bb35ac600ce03763c1686352",
+  "file": "blockworld-vd_sheepboost.webp",
+  "sha256": "ecedc4644295fb63ce21ce301b90e325761812837ec77eaa8b2981bfe2ad0966",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: One dynamic instant Cory reaching upward to grasp ONE blue crystal from high ledge, one springy white Bartholomew underneath as soft cushion. No duplicate Cory/sheep, clear playful upward trajectory.\nExact page story, do not print narrative: \"This is MY hero moment!\" cries Bartholomew, and he launches Cory upward with a mighty woolly BOING. Cory soars, snatches the crystal, and lands in a fluffy sheep cushion. \"BAA-rilliant!\" says Bartholomew, taking a bow. Crystal: acquired.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

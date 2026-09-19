@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_voiderlift",
+  "style": "M1",
+  "sourceHash": "d1480470cd846259321f14454cc10a50cf5554d5330712c53a965a35f710a728",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e7327392-ca11-4fa4-9384-f894c0a02536.png",
+  "originalSha256": "97b2782a2d55115138a0e8e2f5028714d01aa6b77ee2c0db11d0f2306db0320d",
+  "file": "blockworld-vd_voiderlift.webp",
+  "sha256": "d7426f52dfcbabc1699d19a33abdb00e1c46e055b742d5bd0c8dcdef0f4eda9e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Gentle huge purple claw entering wide cave opening supports Cory standing securely on broad fingertip to retrieve ONE blue crystal on high ledge. Voider face visible beyond opening, careful trembling expression.\nExact page story, do not print narrative: The Voider very, VERY carefully scoops Cory up on the tip of one claw and lifts him to the ledge. Its claw is trembling — it's so worried about being too rough. Cory grabs the crystal. \"You did it gently! Good job, big guy!\" The Voider beams with pride.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

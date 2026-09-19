@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_friendpath",
+  "style": "M1",
+  "sourceHash": "3064f2362144227c4a2acbe908167ad4ad7a984c57f3a28b375be1d4c458550d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b32ec0c1-064b-415c-a615-91d554a1ed59.png",
+  "originalSha256": "8bd03e960662d8c3999423b4c4cd190c652055dd0b2faf971ef80030b368e54c",
+  "file": "blockworld-vd_friendpath.webp",
+  "sha256": "d0ae76352a2581a119856d79acb11bb2ec2df2870f2003baef924cff5c24f8ee",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Snowy mountaintop, Voider gentle sneeze scatters a newly built snowman into playful snow cubes, Cory laughs holding carrot, warm purple glow.\nExact page story, do not print narrative: Cory decides the Voider doesn't need fixing — it needs a FRIEND. They build a snowman together (the Voider sneezes and it explodes into a blizzard — oops, giggles all around). For the first time in forever, the lonely creature laughs. A warm purple glow ripples across the snow.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

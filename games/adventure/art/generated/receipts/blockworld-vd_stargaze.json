@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_stargaze",
+  "style": "M1",
+  "sourceHash": "65ae4f996c61ec358d8069bbafd6e55c5d88af69e917dd947cebf485338634fc",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4154a720-4042-4394-9984-abc8642606f6.png",
+  "originalSha256": "1c22f12a9feb0e427c91fab1f425bbbe2d6d215be9cde9b3706e971fc81dc9f7",
+  "file": "blockworld-vd_stargaze.webp",
+  "sha256": "58d956099b03243bf79b0c1b946dc88aac8b3c252334eb21817e596634d0755f",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Cory and immense Voider recline safely together on grassy mountaintop looking at star constellation shaped like dragon. Peaceful night, comfortable perspective.\nExact page story, do not print narrative: They lie back and count the stars together. \"One... two... a hundred... a BAJILLION,\" says Cory. The Voider points at a twinkly cluster shaped like itself. \"That's my family,\" it whispers. It isn't homesick right now, though. Right now, it's just... happy.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

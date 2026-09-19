@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_herobaa",
+  "style": "M1",
+  "sourceHash": "f7eff4709b8f056af1fc497901e4929f29f02e29c041a725576671527344be4b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4224e62a-faf7-49c1-b292-bcfdfc2facd7.png",
+  "originalSha256": "58fcbc02e657198768490ed39d60ffbcef552537d525156240691c383e5b6b12",
+  "file": "blockworld-vd_herobaa.webp",
+  "sha256": "6780ab669d21e960d6199494b2b6204ca8147190f37d261deefadd430a2f6480",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Close giant smiling Voider head with ONE tiny Bartholomew perched safely between two lilac horns, happy proud tear; Cory below smiling.\nExact page story, do not print narrative: The Voider gently lifts Bartholomew onto its head like a tiny woolly crown. \"You're the bravest sheep I've ever met,\" it rumbles. Bartholomew has never been happier. \"Baa,\" he whispers, a single proud tear in his eye. Legend. Status. ACHIEVED.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

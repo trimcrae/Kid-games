@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_gift",
+  "style": "M1",
+  "sourceHash": "30f9863fe6b69edf75d88348163a09a7f24b11846071189966a7ffbe54b62856",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0cd0846a-ef0f-46ce-b2c4-d634387ecb14.png",
+  "originalSha256": "53c7c9366979338f96a341ad43a30baef07ff563025c46194c9ed7d57680ae3b",
+  "file": "blockworld-vd_gift.webp",
+  "sha256": "7cb56385c55cca4501a8ed7bd2a7c51f1447b153d9d37d8d83ec12fc14dff04e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Cory offers ONE shiny pink faceted gem, house-sized Voider palm cradles tiny gem gently against lavender chest. Heartwarming close composition.\nExact page story, do not print narrative: Cory polishes a shiny pink gem and holds it up. \"A friendship gem — so you'll always remember you're not alone.\" The Voider cradles it as gently as it can (which is not very gently — it's the size of a house). The gem glows warm against its chest. It will treasure this forever.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}

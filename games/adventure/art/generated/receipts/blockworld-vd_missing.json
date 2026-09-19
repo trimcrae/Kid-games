@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_missing",
+  "style": "M1",
+  "sourceHash": "a9af4b113ac4e3ad8e345d7bcc5732e13f191fdb033ce2b5317ed8d88ee3b414",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b3df5381-de7e-4acc-aa99-01afe04840c1.png",
+  "originalSha256": "e8c9c327a647237f3bb75966e4b7a4520712a8e283f8723b80ac326f9f48826e",
+  "file": "blockworld-vd_missing.webp",
+  "sha256": "da576d2d2fe13922e8f8009e3742057e702f5aaef07ed206a91794e6724379fc",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Wide scene missing geometrical chunks from landscape, suspended broken islands. Voider gently clasps lavender belly; subtle small glowing block silhouettes visible as soft magical glow through belly, no anatomical cutaway/gore. Cory notices.\nExact page story, do not print narrative: Whole chunks of the world are gone — floating holes where mountains used to be! If the Voider keeps nibbling, soon there'll be nothing left. But Cory notices the blocks it ate aren't destroyed... they're tucked in its tummy like a cozy blanket. It's not greedy. It's homesick.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct page action and child-friendly character design. Voider remains a gentle purple dragon. Gather contains exactly five glowing blocks; crystal hunt and lifting scene clearly identify the blue crystal. Sky loop has a separate flight composition."
+}
