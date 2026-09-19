@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_lamp_on",
+  "style": "M1",
+  "sourceHash": "1678a8a31527d915d126210a6762dd02068d9787a7443dc3c0f9aba53f4139e0",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c1950094-96f7-4a81-b891-59e6b6da039d.png",
+  "originalSha256": "be65038a32fbff22f8551cfff8c729694862584069f295011b66cbdb33955488",
+  "file": "blockworld-rs_lamp_on.webp",
+  "sha256": "b1c1bbad0ef65aa69ec5750a3ccc17c854b8fc77501f2edda496f05cf5e444da",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Red wall lever pulled, blue untouched, gold square lamp brightly ON with red dust circuit tracing toward rumbling stone door.\nExact page story, do not print narrative: CLICK. The red lever powers up and the lamp glows bright. IF the lamp is ON... THEN something should happen! Cory hears a stone door rumble somewhere.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_count_power",
+  "style": "M1",
+  "sourceHash": "cd276f4fd7d353e918c12b9c1244455e320a06a4f0c9e06832140c4baf9073f1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b9e644a9-88a4-4a76-9ff1-65e6c06229f7.png",
+  "originalSha256": "6c785e9b90da5eff0db5259bab40a2f498cd4df4280090c1f30bc754179958a9",
+  "file": "blockworld-rs_count_power.webp",
+  "sha256": "e72c380243f334d84379bec3a07176da219bc11e1a32ce982dfac32814bb1b7b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Exactly THREE red cubical power blocks on workbench before three empty sockets in grey machine with brass gears. No extra red blocks/dust piles that look like blocks.\nExact page story, do not print narrative: A machine needs exactly 3 redstone blocks to run. Cory counts the glowing dust: one, two, three! \"How many blocks do I place?\" a sign asks. Cory grins, he likes counting.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

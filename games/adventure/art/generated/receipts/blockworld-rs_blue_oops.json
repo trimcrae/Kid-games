@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_blue_oops",
+  "style": "M1",
+  "sourceHash": "c6ef454055c2d283ff6e14930a447f8fcd57dd9c882d19a0b3b15b26e2cb3754",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-41ce6c7e-d087-443c-b489-c75fc6687145.png",
+  "originalSha256": "4a724b6bf0cd5bbf601ecbb1983f601b5a30540dfa711d1a8d8b841213ae7bac",
+  "file": "blockworld-rs_blue_oops.webp",
+  "sha256": "d0f841cb663354a46f385e91d81c7a28784e081f50bdbbbdf8a471e3647e23d2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Exactly two wall levers red/blue, Cory pulls BLUE; tipped overhead metal bucket drenches Zib. Lamp unlit.\nExact page story, do not print narrative: Cory yanks the blue lever. SPROING! A bucket of water tips on a green fellow's head. \"Hissss... hi! I'm Zib!\" he giggles, dripping. \"Wrong lever! Try the RED one for the lamp.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

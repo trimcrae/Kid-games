@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_both_levers",
+  "style": "M1",
+  "sourceHash": "2588226b6d2c077bb1710174e4174a6bd2a59a1bd462d566f69f8fc8adae5d03",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ee7ea0bc-9b84-4aa4-935e-98deca65c008.png",
+  "originalSha256": "7b7685c3494f0ede4a1a0b022a5a15d51fec6855fa787223a08575f5123b77c3",
+  "file": "blockworld-rs_both_levers.webp",
+  "sha256": "f72b434742a1cf446b1672a9e143bb334b6c29b945ea3738cd439a53cfb90211",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Cory pulls both red/blue levers; Zib flies harmlessly from broad padded chute, one white chicken squawks, lamps flash.\nExact page story, do not print narrative: Cory grabs both levers and yanks! Lamps flash, a chicken clucks, and Zib the Fizzer rockets out of a chute. \"Hisss-WHEEE!\" Too much power! \"Just the RED one,\" Zib laughs.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

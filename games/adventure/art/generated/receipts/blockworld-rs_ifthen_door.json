@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_ifthen_door",
+  "style": "M1",
+  "sourceHash": "0b54220c0caac3bcd4cc13943c0c9fb84505596819bb2bb196fd986008668940",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-94eb5cc3-834f-4c91-95b7-75e868471b66.png",
+  "originalSha256": "50d75b5ac6be42bc054e7b1678a336d5f4437339166f42a2b7340366771e005b",
+  "file": "blockworld-rs_ifthen_door.webp",
+  "sha256": "0bea7caa354bf389e3e348b48b74d0329e5e1ca8c0ae1e0eddcabd594733bc96",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Open stone door reveals exactly THREE round buttons along wall, each beneath torch bracket, only MIDDLE torch lit. Sign 'PICK THE BUTTON UNDER THE LIT TORCH'. No additional buttons or lit torches.\nExact page story, do not print narrative: A hidden door slides open because the lamp is on. Inside the cave, three buttons wait: ONE opens the path, TWO are silly traps. A sign hints: PICK THE BUTTON UNDER THE LIT TORCH.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

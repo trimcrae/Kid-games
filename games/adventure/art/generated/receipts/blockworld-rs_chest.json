@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_chest",
+  "style": "M1",
+  "sourceHash": "3c61ae8d07b28f4b52ec78649d472e3ff2f8427408db5ea72a2fc2e96af68531",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cbe4fd41-1edb-4595-b8f8-9a453b8e23a1.png",
+  "originalSha256": "4652dbd40b3a0694e846b1fafe7f9c8b5b7dec53175ce335e16508f316152d8b",
+  "file": "blockworld-rs_chest.webp",
+  "sha256": "665ee4477efea3c369c0b60978af4ac982e867621ddc65dab6e31114cc88537d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. NEW scene: Show exactly one live sheep emerging from open oak chest beside redstone dust and tiny scroll.\nExact page story, do not print narrative: The chest pops open with a creeeak. Inside: a stack of redstone, a tiny instruction scroll, and a sheep. A SHEEP! \"Baaa. I am Bartholomew. I invented redstone, you know,\" he says proudly.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

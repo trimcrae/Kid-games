@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_bart_tip",
+  "style": "M1",
+  "sourceHash": "e8812e6de133027d939129915c879b1d63b46f3916d74012aa30610fac49e2e7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3438a952-aaa9-4cfd-8eae-9ebe1cb5e03f.png",
+  "originalSha256": "d67221b855209c93f0ca6e3204206992dc77daaf8a82f7bb8f5a36224fb1ff04",
+  "file": "blockworld-rs_bart_tip.webp",
+  "sha256": "e109142ef930c337989cb4f3eec1333478e1c6244cf8e5d0e4cb96ddc3e39cb3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. NEW scene: Single glowing gold square lamp wired with red dust to an open stone door. Sheep nibbles scroll edge.\nExact page story, do not print narrative: \"The secret of redstone is IF-THEN,\" Bartholomew baas. \"IF the lamp is ON, THEN the door opens. Simple!\" He nibbles the scroll. \"Oops. Snack.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}

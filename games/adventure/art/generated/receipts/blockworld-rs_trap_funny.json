@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_trap_funny",
+  "style": "M1",
+  "sourceHash": "56ca5ac5e318dcaa285243b455752855d9ad4cf3dcd8f9d6d7abec022ab9e950",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d46933e3-1685-4722-8ce1-4725c915d024.png",
+  "originalSha256": "65ef96d1aea7acbedd8a27480e70dea5f7d3aabe844994b1048a338631e5f681",
+  "file": "blockworld-rs_trap_funny.webp",
+  "sha256": "b7ff78941216f7d41b58d2bb6d2f9bc6cdf592f7b4a89398a0e2ce4e00f4ea13",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. NEW scene: Comical giant yellow rubber chicken on spring touches Cory nose, sheep tumbles onto soft wool cushion from chute. Three buttons on wall, middle under lit torch.\nExact page story, do not print narrative: BOING! A giant rubber chicken bonks Cory on the nose. Bartholomew the Sheep tumbles out of a chute. \"I MEANT to do that,\" he says, fluffing his wool. \"Now press the LIT one, obviously.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed generated illustration for page action, blockworld character continuity, clear child-friendly composition and story counting where applicable; rs_count_power contains exactly three red power cubes."
+}
