@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_pumpkin",
+  "style": "M1",
+  "sourceHash": "7389dc679b5ac37f669b887daa9542f9a810d9c9dd853ee949d22e155c323436",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fb062782-39b4-4956-87ee-18989ee40db0.png",
+  "originalSha256": "20dd02e5b2317d803d933050a257369cdb911a88c4daa718c24b557cd56e1f7b",
+  "file": "blockworld-vil_pumpkin.webp",
+  "sha256": "432fef67783e92e361e378419126f323900a35ffdd9dbf14978c52289480a208",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Secret pumpkin patch reveal: ONE enormous orange voxel pumpkin the size of cottage towers over Cory and awestruck farmer, leafy stem overhead. Watering can beside Cory. No other pumpkin fruit.\nExact page context, do not print narrative: In the secret patch, one pumpkin is already the size of a house! \"Hrmm, water it and it grows,\" says a farmer. \"Grow the BIGGEST pumpkin in the world and you'll be Master Farmer!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct scene, character continuity and required counting details; matches page context."
+}

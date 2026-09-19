@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_keeper_goodbye",
+  "style": "L1",
+  "sourceHash": "e4ede82eab5405d3f37b6b636261f96f233addfe292b01d8dbea81fb60bf5047",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-dd93a341-f53d-4a23-a1d1-2ba929758c0c.png",
+  "originalSha256": "5303069a69c4551a1de3b3bcbeec267dfc405fcd0c0fdaa624ed0845a980050f",
+  "file": "library-fin_keeper_goodbye.webp",
+  "sha256": "ea105293fc5ee1efe15d6bf5f9f3bf9b83d016d102fe37482428fe494f1826a2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Soft farewell. Elderly Keeper with teal wordrobe steps halfway through tall DOOR OF GOLDEN STARS into a peaceful reading garden, one hand gently ruffles Jeannie's layered brown hair. Girl holds aquamarine star-bow crystal key; pocket Inkwell fondly grumpy. Keeper wears ONE gold spectacle pair over eyes now and carries other two copper/silver in breast pocket, all accounted for. No vanishing explosion, door looks like closing book.\nExact story context: The old Keeper didn't vanish in a puff — he simply stepped through a door of stars to go finally read all the books HE never had time for. \"I leave them in the best hands,\" he said, ruffling Jeannie's hair. \"And Inkwell — behave.\" \"Never,\" said Inkwell, fondly. The door closed gently, like the last page of a wonderful chapter.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pathkeeper.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct paper-craft composition matches the page, consistent Jeannie, Inkwell and Keeper; key/card/book prop retained."
+}

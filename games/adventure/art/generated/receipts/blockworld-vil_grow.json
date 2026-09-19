@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_grow",
+  "style": "M1",
+  "sourceHash": "2aabec38e633d2c7d6320d0c3832d2d37d275c0548d15ae88ca451f70faa7db8",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cfad26eb-2ff4-4fb2-9894-c3e79b23fe71.png",
+  "originalSha256": "1314db50bf55c5f722174371f2b9c85a44d09ad090bad0211798e6cbbc811cb8",
+  "file": "blockworld-vil_grow.webp",
+  "sha256": "c43c8047fb272a0cd0ff7d14d4f16c1760d16dfb19f12a51655dda2dc108f248",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: ONE colossal orange voxel pumpkin blocks sunset, Cory watering its foot. Villagers measure with EXACTLY EIGHT separate wooden fence sections laid in one straight foreground line, number tiny plaques 1 to 8 on posts if useful. Each section distinguishable, no other fence.\nExact page context, do not print narrative: Cory waters the pumpkin. It swells... BIGGER... and BIGGER, blocking the sunset! \"Hrmm! It's the biggest pumpkin in the WORLD!\" gasps the farmer. Villagers measure it with 8 fence blocks!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct scene, character continuity and required counting details; matches page context."
+}

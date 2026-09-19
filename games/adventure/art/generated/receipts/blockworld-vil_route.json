@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_route",
+  "style": "M1",
+  "sourceHash": "3a75b5072aee0ab7573a7a8f9db676d0b1b8581e07382996a20052124e232f31",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f28322b7-c941-43aa-9c5d-5236254b586c.png",
+  "originalSha256": "8c46795c452557ccc01c9d8ae5f71705b4fa7eefd93ee40315a190f81e15cf46",
+  "file": "blockworld-vil_route.webp",
+  "sha256": "e2712922ee27f853f2e7110517e83e4cef12359e2722e8423682f2a4375008a8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Cory arriving at third cottage with empty delivery basket, three grateful villagers waving at doorways of exactly THREE cottages along curved path. Each doorway small tray has TWO intact eggs, total SIX. Sunny village.\nExact page context, do not print narrative: Cory zips house to house. \"Hrmm, thank you!\" x3. Not one egg cracked! The villagers say, \"You're so helpful — you'd make a fine mayor OR a fine farmer.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct scene, character continuity and required counting details; matches page context."
+}

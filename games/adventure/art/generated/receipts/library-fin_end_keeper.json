@@ -1,0 +1,24 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_end_keeper",
+  "style": "L1",
+  "sourceHash": "4b78a5f69069b1be076be5b0906b0bba07a26be35801df22e07ed7991ce7fc80",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2d6edbe6-8d90-42cc-afa2-17097c1ae297.png",
+  "originalSha256": "a995bb11a3fb81ad9700c8b615dcf9745211eaae3abf09c980ddd90ec585c29f",
+  "file": "library-fin_end_keeper.webp",
+  "sha256": "c554948614be90c6b7cf3a5f9c25c014d48527f160a8160b4551dd2b27419308",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Warm majestic finale in soaring cream magical library. Jeannie seated in Keeper's reading chair reads glowing book aloud to friendly paper ghost Boo and small attentive storybook creatures. Aquamarine star-bow crystal key hangs on fine gold cord at girl's waist. Inkwell ONE footless feather independently writes notes with gold nib at side desk, dresspocket empty. Medal-only Reginald proudly guards doorway facing wrong way. Nearby open books safely contain separate pirate sea and princess castle worlds. Old Keeper absent, new caring guardian, no excessive crowded cameos.\nExact story context: And so Jeannie became the Story Keeper — youngest in all of history, and the kindest by far. She kept the pirates in their seas and the princesses in their castles, gave every wandering ghost a hug and a home, and read a brand-new tale aloud each night to a library full of glowing friends. Inkwell scratched her notes (grumpily, lovingly), Sir Reginald guarded the door (badly, proudly), and not one single story ever felt forgotten again. THE END... which, in a library, is really just the beginning.\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pathkeeper.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pigeon.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-my_cellar.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct paper-craft composition matches the page, consistent Jeannie, Inkwell and Keeper; key/card/book prop retained."
+}

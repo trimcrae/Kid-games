@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_pathauthor",
+  "style": "L1",
+  "sourceHash": "dc8ac337809e471de1944471149a1eba3c6a4493093ca2739cb5d804ae88f0c3",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6c3ded78-7d54-4373-bc57-fd0fe67d0898.png",
+  "originalSha256": "21234c48355e37948c1aed4d6b8ae9eb45787924fea81c4d3ff03a31bdaa57af",
+  "file": "library-fin_pathauthor.webp",
+  "sha256": "091317924d34be6391d52140e45d1a4a5b40bb010b8616e7818f7c2cd2b0f45d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Keeper without glasses on head offers beautiful BLANK cream leather book with embossed GOLD OPEN BOOK emblem and a loose fresh sheet of golden paper. Pages entirely blank, waiting. Jeannie receives it thoughtfully, pocket Inkwell. THREE spectacle pairs clearly on desk, calm warm nook, no crystalkey/librarycard. Establish new author'sbook as cream/gold separate from Keeper'sgoldbook.\nExact story context: \"Or — and this is my favorite,\" the Keeper whispered, eyes sparkling like ink in sunlight, \"you could write your OWN story. A brand-new world that no one has ever read. It would take its place on these shelves and glow beside all the great ones.\" He held out a blank, beautiful book and a fresh sheet of golden paper. \"Every world you've ever visited began exactly like this — empty, and waiting for a brave first sentence.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct paper-craft composition matches the page, consistent Jeannie, Inkwell and Keeper; key/card/book prop retained."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_count",
+  "style": "M1",
+  "sourceHash": "d88a63847f267a01c28bb90213eb71e1e7e9745534bac48224f780a60f3b29cd",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a9db011a-1803-4f0f-8385-90438cda276b.png",
+  "originalSha256": "7f9fe583c3f87ef57260d1c3b0dad91c5bbc71d7f6c68f8b586f9bce850dd0ff",
+  "file": "blockworld-vil_count.webp",
+  "sha256": "1f0b6e9d81203e9e976b5a7f9bb7a6728f403eba889158501c8408acadea7c85",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. NEW scene: Cory points as Bartholomew among sheep raises one front hoof in salute. EXACTLY FOUR sheep total, three ordinary grazing plus ONE Bartholomew. Farmer joyful. Show all sheep bodies separately and clearly, no extra heads/legs.\nExact page context, do not print narrative: Cory counts: one, two, three sheep. \"That's only 3! We need 4!\" Then one stands up and salutes — Bartholomew! \"A hero blends in! That makes FOUR!\" The farmer cheers, \"Hrmm, all here!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct scene, character continuity and required counting details; matches page context."
+}

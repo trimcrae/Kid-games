@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_keeper_final",
+  "style": "L1",
+  "sourceHash": "49a57f640dc79bb7140b08e6fb2a880504ade7a18151971bb0376cc986b3db06",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-2799728a-827a-489e-bf53-7f67f22f59f0.png",
+  "originalSha256": "549454beee96b472c04746695374e828d5974de67cbce986756dee715dcb6503",
+  "file": "library-fin_keeper_final.webp",
+  "sha256": "feb4ecb570f71291a4922b340933250967150dabc7e9a83ec585301cd299bc67",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Jeannie closes one hand around SAME aquamarine star-bow crystal key, holds it near heart and nods firmly. Elderly Keeper without glasses stands smiling happiest sigh; three spectacles stay on desk. ALL library books glow with golden light like friendly stars. Inkwell in purple pocket. New wide transformative composition, no crown or costume change.\nExact story context: Jeannie reached out and closed her hand around the crystal key. The whole library erupted in golden light, every book glowing at once like a sky full of friendly stars. The old Keeper sighed the happiest sigh in the world. \"Are you SURE?\" he asked one last time, already smiling. Jeannie nodded. \"I want to take care of all the stories. Forever.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_pathkeeper.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct paper-craft composition matches the page, consistent Jeannie, Inkwell and Keeper; key/card/book prop retained."
+}

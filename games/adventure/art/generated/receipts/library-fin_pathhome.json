@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "fin_pathhome",
+  "style": "L1",
+  "sourceHash": "5cae3962a6819c30158cc0cfa6904156629c898149322e26276fea3f8f4c2618",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-73c52512-50ab-4953-99df-7d88b95195d2.png",
+  "originalSha256": "81a09b79925a7d441d98d6230dd143bd6890d9c3881dae030132054fc7eae271",
+  "file": "library-fin_pathhome.webp",
+  "sha256": "da4c510be7627b9ad84e8fa54efbaaea7e4f540df662ccc414640ff2719fac42",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration matching reference L1. Exquisite handmade paper-engineered theatre, folded textured cardstock, cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, cream/teal/gold with scene-specific accents, warm dimensional light. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress cream collar/cuffs/hem, cream socks brown shoes; SAME tiny grumpy cream quill Inkwell with expressive face at shaft/goldnib. Every material and character made of paper, including water/fire/stars. Not smooth plastic or painted illustration. No UI, border, captions; only expressly requested story signage. References establish style and recurring designs ONLY. NEW scene: Keeper without spectacles on head conjures ONE small shimmering moonlight-silver rectangular library card, subtle gold border and open-book/star emblem, clear glowing name 'JEANNIE'. Girl accepts with wide delighted eyes, pocketquill. Three spectacle pairs rest separately on desk. Warm library nook, no key or blankbook. Establish magical card for future scenes.\nExact story context: \"Or,\" the Keeper said, conjuring a small shimmering card the color of moonlight, \"you could go home. But not empty-handed.\" It was a magical library card with Jeannie's name in glowing letters. \"Tap it on ANY book — at home, at school, under the covers with a flashlight — and you can step into that world whenever you wish. And step back out in time for dinner.\"\nOnly depict requested cast and this moment. Inkwell is a feather pen with gold nib and face on lower feather, never a separate humanoid. Preserve recurring props/designs. DISTINCT NEW composition.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-fin_keepermeet.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: distinct paper-craft composition matches the page, consistent Jeannie, Inkwell and Keeper; key/card/book prop retained."
+}

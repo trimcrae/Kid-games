@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_promise",
+  "style": "M1",
+  "sourceHash": "621d8c5ff3d27707c3ea8953bb0cbb3c159c2daaec6895d89888bbaa7a37a1a0",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5042e570-5d64-46da-a0d6-fdd6641b1dab.png",
+  "originalSha256": "c84ece4036338c94da62747859e4251f029dda0e999123e3cbd4f34893c3e0e3",
+  "file": "blockworld-vil_promise.webp",
+  "sha256": "cbe7b1191f918c31c54dedb3c71df3cb1cb23ecd90258596a4ada7736587b44e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. NEW scene: Cory earnestly pledges fairness to cheering villagers. Trading board shows '3 wheat = 1 emerald'. Vote tally board has seven clear marks beneath CORY. Warm optimistic town-square composition, no hat yet.\nExact page context, do not print narrative: Cory promises fairness: \"Everyone gets a fair trade — 3 wheat for 1 emerald, always!\" The villagers count their votes: 5, 6, 7... a landslide! \"Hrmm! Mayor Cory!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct scene, character continuity and required counting details; matches page context."
+}

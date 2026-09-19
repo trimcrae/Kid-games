@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vil_feast",
+  "style": "M1",
+  "sourceHash": "3668a0d97e74bc58af55d47c4ab00765c49efeb9de2cbc9744e3f774a6748165",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-47665c9a-7a1a-49d4-b34c-019077060afe.png",
+  "originalSha256": "739fb68ec996b5331765b54fe52eb236edc5aab01a268e7cf4923d9a13b312c1",
+  "file": "blockworld-vil_feast.webp",
+  "sha256": "3b21a9ff1ffd4ba6bd55f81b8598736f85abe252061769a2cf9fea2bba1041e0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story illustration. Cinematic M1 3D voxel: cuboid characters, subtly pixel-textured square-block construction, detailed warm dimensional lighting, layered atmosphere. SAME Cory age6 short square-cut brown hair, black rectangular glasses, blue shirt, darkblue pants, brown boots and backpack. Only cast named in NEW scene. Reference images establish design/style only, create a DISTINCT new composition and pose. No UI, border, captions or speech balloons. All scenery and characters voxel blocks. Counting quantities must be exact, separated and unobscured. Village host stout bald villager rectangular nose brown robe tan apron. Bartholomew white cuboid sheep tan face pink muzzle brown hooves, four legs, proud eyebrows, no cape/sword. Zib small limegreen cuboid creature, smiling square head narrow torso four stubby feet no extra limbs. NEW scene: Long village sunset banquet with warm pumpkin pie slices. Bartholomew theatrically speaks with cheeks full, Cory embraces happy Zib, cheerful villagers. No armor/capes on animals.\nExact page context, do not print narrative: The whole village shares warm pumpkin pie! Bartholomew gives a speech with his mouth full. Zib gets hugs from everyone. \"Hisss... happy!\" \"Hrmm, best feast ever, Cory!\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vil_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: visually reviewed distinct scene, character continuity and required counting details; matches page context."
+}
