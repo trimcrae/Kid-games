@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "sk_bridge",
+  "style": "M1",
+  "sourceHash": "2a26d93bbd3bad7b7883f16b50b8d75f288f1e9a18d20cc4567d41921eb93153",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-65041883-2fee-448d-b519-83dbeeb8613f.png",
+  "originalSha256": "1e6cfb432e270f2126d916659dd991abef57d2876ad441718e98311467489137",
+  "file": "blockworld-sk_bridge.webp",
+  "sha256": "de386d5343ad398314ff963bb05381d7b2201ae22dded5832dbdc00b187d5aa3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit only the freestanding stack of grey building cubes at far left beside Cory. It has five cubes now. Make that stack EXACTLY SIX cubes, all fully visible. Add one cube atop existing stack and place small clear numerals1,2,3,4,5,6 on their fronts from bottom to top. Preserve Cory, blue bird, six-segment measuring rope and all scenery completely unchanged.",
+  "references": [
+    "C:/Users/mcrae/.codex/generated_images/01a0b96f-343e-7421-83f5-326f9df9c431/exec-864eee27-2716-4ed1-a5f8-fc7154b6b543.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}

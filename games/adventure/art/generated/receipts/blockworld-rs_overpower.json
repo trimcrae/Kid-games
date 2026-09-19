@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_overpower",
+  "style": "M1",
+  "sourceHash": "1b82b22b93e02771478db92aa982c87dfc2f26178c60675f3d4b30cd7b90e95b",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ac0330c0-c683-430b-aba5-215ad360d2c6.png",
+  "originalSha256": "020ad2ded7619299b330ac146979633fdf2bfb771c4e89bc681d92e1af6932ff",
+  "file": "blockworld-rs_overpower.webp",
+  "sha256": "7c252ed2252f5b9d878ff0a0295826a3b0e7e2138e05aa59620d03d30e191d1d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Exactly FIVE red power cubes in row feeding shaking grey/brass machine, happy Zib safe comic backflip beside it, gold sparks. No extra power cubes.\nExact page story, do not print narrative: FIVE blocks?! TOO much power! The machine shakes, sparks fly, and Zib pops out doing a backflip. \"Hisss... hi! Whoa, that was a LOT. The machine wants exactly THREE.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}

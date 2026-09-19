@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_underpower",
+  "style": "M1",
+  "sourceHash": "0e6c766af62a737333b0917d01e65060ec1f7fd60f648e4003ee544b3e86eb41",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cb19567b-6667-4fa2-9a11-24515bc10c29.png",
+  "originalSha256": "3e7bfc3c8600ba9841873caa3897aadf7185c7d64946deb46890ff4a0b2c4527",
+  "file": "blockworld-rs_underpower.webp",
+  "sha256": "f76b66b35aaab8ea46da12c064612d7288e12be4bb1c1384ac17f35662a4a7ba",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Exactly ONE red power cube feeding dormant grey/brass machine, tiny smoke puff, two empty sockets. Cory laughing. No extra power cubes.\nExact page story, do not print narrative: One block? The machine coughs, burps a tiny puff of smoke, and falls asleep. Snnzzz. \"Not enough juice,\" Cory laughs. \"It needs THREE.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}

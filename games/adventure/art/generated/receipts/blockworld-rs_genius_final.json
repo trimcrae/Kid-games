@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_genius_final",
+  "style": "M1",
+  "sourceHash": "ad36fc37456e89a4efa083033fd5c6de756d862f2f8bd652abc287273be8a645",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-09379bf9-f343-4cc7-8e64-213e9aa9e7e7.png",
+  "originalSha256": "2008dd7ecf2d35aefd4567c1a7e0dc7fe35d85e067377803a97482fd438f5375",
+  "file": "blockworld-rs_genius_final.webp",
+  "sha256": "0f12879f7cef2b4eca5f90819740bfb80839cc7059dc2562f76942348acffac2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Cory, Zib and sheep stand together on wide pressure plate; counter reads '3', lamp lit, stone door open, gold celebratory fireworks outside window.\nExact page story, do not print narrative: Cory adds a counter: IF three people step on the plate, THEN fireworks pop. He tests it with Zib, Bartholomew, and himself. One, two, three — BOOM, sparkles! The whole machine works perfectly.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}

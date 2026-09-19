@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_machine_hums",
+  "style": "M1",
+  "sourceHash": "ba67b3c1564bc069771649c703cddfb4c135593fddafc3e0ef68ce4a7b0eb265",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c2b69401-525e-45a2-a731-a06581b5a030.png",
+  "originalSha256": "6388cb2bc1354ec6cc99609bad3277dd3f60c0f71976fd29e5bb95f38ea009e4",
+  "file": "blockworld-rs_machine_hums.webp",
+  "sha256": "0ad1d909741378494261596111f9f1826b39940d6c234993c7ab29a9d6f220ee",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Exactly THREE red power cubes in separate sockets of gently humming grey machine with spinning brass gears. Cory proud.\nExact page story, do not print narrative: THREE blocks — perfect! The machine hums to life, gears spinning. Cory feels like a real inventor. Now, what should this clever machine actually DO?",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}

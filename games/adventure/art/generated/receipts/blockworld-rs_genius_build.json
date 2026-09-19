@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_genius_build",
+  "style": "M1",
+  "sourceHash": "f860e7fdd771d7f42c35016d0bf0a593ccf34829bcdfacbdf8168be0429a256f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f96d9395-9484-446d-9271-cf0409a08d9a.png",
+  "originalSha256": "3c6e8b9b6c4db5972c41b792a2e97f2bfe5815c906c2086c6c7577886d00d91e",
+  "file": "blockworld-rs_genius_build.webp",
+  "sha256": "d6a7d2789e8ed52424e1f6e6d3689b324471e7ead957d103ee08073f87978526",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Cory steps on ONE stone pressure plate, connected red dust lights ONE gold cube lamp, ONE stone door opens wide. All three components clearly connected and sequential.\nExact page story, do not print narrative: Cory connects plate to lamp to door. He steps on the plate — the lamp glows — the door swings WIDE open all by itself! \"IT'S AUTOMATIC!\" he cheers. Pure genius.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_backwards_oops",
+  "style": "M1",
+  "sourceHash": "10891cb6ed8ca371c0e0414d5c4a7c6b2936cc6715c905e86fb08a2786ee15fa",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8709a927-284a-46c0-98b7-fdea189671cb.png",
+  "originalSha256": "617b3d8903ba2918f3e4204740764ef04bc9bc718757b1e91a4127e102f8d276",
+  "file": "blockworld-rs_backwards_oops.webp",
+  "sha256": "89355091f26da9d9cd2cf1a4fd1bfccdb0919a62fc9e8f0cba3ee48bfd56f3e2",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. NEW scene: Comedic puzzled white chicken safely pokes head beside wrongly closing door, no injury. Red wires confusing crossing sequence, sheep points corrective blueprint pressureplate-lamp-door.\nExact page story, do not print narrative: Backwards! The door opens BEFORE anyone steps on the plate, then slams shut on a confused chicken. Bartholomew shakes his head. \"Plate FIRST, then lamp, then door. I invented this, you know.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed each distinct scene for story action, character continuity and composition. Sky bridge correction has six numbered building blocks; redstone overpower has five cubes, underpower one cube, working machine three cubes. Logic plan shows plate then lamp then door, final scene counts three friends."
+}
