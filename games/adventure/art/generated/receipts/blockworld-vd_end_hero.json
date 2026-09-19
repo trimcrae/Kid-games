@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_end_hero",
+  "style": "M1",
+  "sourceHash": "d9a98450666ab46d7efad6192af17509b463c962b4907c23b338465a13181389",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-82ee02cb-21ac-4d51-bbc5-1a72625c0fbc.png",
+  "originalSha256": "3836d3f24db4dd1804dfe5085e8f656fec8c73c9738f7289f25a3a1cb72c1b57",
+  "file": "blockworld-vd_end_hero.webp",
+  "sha256": "186f49393b339f7437cb20ddcb2bb30a4b2a3b5c1fc297eaedb8b6325d175c20",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Voider ascends puregold beam from EXACT FIVE golden cubes and ONE blue crystal. Gentle sparkling stream of stone/grass/tree blocks flows from mouth back into rebuilding mountains, no vomiting/disgust. Cory waves below, stars above.\nExact page story, do not print narrative: The Voider floats up the beam of light, gently coughing every single block back into the world as it goes — mountains, trees, and all! \"Thank you, Cory. I'll never forget you!\" it calls, sailing home to the stars. The world is whole again, and a new star twinkles a little brighter. Cory saved everything. THE END. 🌟",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

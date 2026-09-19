@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_proud",
+  "style": "M1",
+  "sourceHash": "04445a6068b89e608ab3a4d178a7b63e3c35659d042ccd33a169fa31f583ceba",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f4dce9bf-8ab4-4eae-aef7-c238994c1b16.png",
+  "originalSha256": "21f8ed051187497a8db549978d35b94fc3978283fa795fc169eb963ea267e3c0",
+  "file": "blockworld-vd_proud.webp",
+  "sha256": "d8751f0fe5921bc47f99ac48c4be81b268886f2e24d7ef67242a6314270beab8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Cory praises Voider, giant purple glow lights mountainside, Voider smiles proud. ONE blue crystal held by Cory, no beacon yet.\nExact page story, do not print narrative: \"You're not clumsy,\" Cory says. \"You're gentle and kind, and you tried your best.\" The Voider has never been told a nice thing in its whole long life. It glows so bright it lights up the entire mountainside. Now — the beacon awaits.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

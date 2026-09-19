@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_lightbeacon",
+  "style": "M1",
+  "sourceHash": "aaf328230582e81bcbd8f24008c44a924aca7338fada442b31d7a72044865dd7",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-161af575-aa3a-41d7-9cd2-b6a9ec3194a2.png",
+  "originalSha256": "3ef3948cf761be7c27431b68edea5fe20dde2a97f8e4faa0cf5daeb2b398ead4",
+  "file": "blockworld-vd_lightbeacon.webp",
+  "sha256": "a233956c4577490dca8aec99a10066b9e479fa7f8640153b50680b0c1c02da6a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: FIVE gold cubes topped ONE blue crystal on mountaintop release tall pure whitegold beam into night; distant answering purple family glow in stars. Cory and astonished Voider watch.\nExact page story, do not print narrative: FWOOOSH! A pillar of pure light blasts up into the night, splitting the sky open. The Voider gasps. Way, way up high, an answering glow appears — its family, calling it home at last. \"That's... that's for ME?\" it whispers. \"Nobody ever did anything for me before.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

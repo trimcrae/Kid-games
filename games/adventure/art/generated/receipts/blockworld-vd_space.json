@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_space",
+  "style": "M1",
+  "sourceHash": "51dfea9cf25a178dcab952066725de0f6829683c34597b463582005aecf6f6e1",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f6126d9b-c7ce-48b3-896d-ae1a37bab766.png",
+  "originalSha256": "5b6dec157ed7d895ea204554c3c0d734f2da05a6ef43269df44baa7504496d5d",
+  "file": "blockworld-vd_space.webp",
+  "sha256": "891bfe628040725e7d81eab41c7347d139e49d72aa881a92595b2a1c313f4f92",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Cory/Zib riding Voider into velvet space with cubical stars and distant swirling purple dragon family. Tender awe, no spaceship.\nExact page story, do not print narrative: They burst into the velvet dark of SPACE, stars whizzing past like glowing snow. Up ahead, a glittering cloud of purple shapes swirls — the Voider's family, dancing in the cosmos. \"They're really here,\" it breathes. \"And you brought me home, Cory.\"",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

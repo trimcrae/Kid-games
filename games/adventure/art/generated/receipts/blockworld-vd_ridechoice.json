@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_ridechoice",
+  "style": "M1",
+  "sourceHash": "d6bfd9c8115f5be1e18f63a624c539d2d60e87f39ec72d1bd1186e80d261380d",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-da547633-3d1b-4e58-b75b-79a85488a41d.png",
+  "originalSha256": "7f81cb848c3471411fa4f78832b3ac4888ad7a922750deb61de2607bfa59d443",
+  "file": "blockworld-vd_ridechoice.webp",
+  "sha256": "401fc98a7fc8f1b7e191206609eaca00b677efcaa403409a39cb00baf737a94d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Lit fivecube beacon behind. Voider lowers ONE of two enormous purple wings as broad ramp to back, Cory considers invitation at foot. Fourlimbs still present.\nExact page story, do not print narrative: The beam is lit and the way is open. The Voider lowers a wing like a ramp. \"Climb on, Cory! Let's go to the stars TOGETHER!\" Cory's heart pounds. He could send it off as a hero... or he could go along for the greatest ride ever.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

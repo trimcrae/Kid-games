@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_family",
+  "style": "M1",
+  "sourceHash": "7f79d32b46ff026236be919d0cecbcf18d65714c6756953a990f229020133884",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-28048478-7ba9-4a0e-8263-075ab8c1cd60.png",
+  "originalSha256": "cfb9c5b9900f09b902ea8520c6305cce6e0f60b0a95e5012e37c8b1279fb083e",
+  "file": "blockworld-vd_family.webp",
+  "sha256": "d026861cd980497e92653d80e0f6abff146d29a585ec89640129bfc6b1d589c8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Friendly purple dragon relatives circle Voider in cosmos, giant heads bow gently toward tiny Cory rider with Zib. Family same twohorn/twowings/fourlimbs body plan, assorted lavender/violet shades. Keep mainVoider largestforeground recognizable.\nExact page story, do not print narrative: A whole swirl of purple dragon-cousins twirls around them, nuzzling the Voider with happy rumbles. \"This is my friend Cory — he found me!\" the Voider announces. The whole family bows their giant heads in thanks. Cory has never felt so tiny and so important all at once.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

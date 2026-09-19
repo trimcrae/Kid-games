@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_sheepwave",
+  "style": "M1",
+  "sourceHash": "589dd44b9ef9a367c4d78e6a5e9e93a9c292d9aafbb367ae9a951e89bc4da5ec",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-68ccb30b-e478-4e62-a0bf-50dac0b6a728.png",
+  "originalSha256": "23a4f532b52c739d0f23b73f7550641a8f8e9f37407bd06f44df5b9f7b9fdbb2",
+  "file": "blockworld-vd_sheepwave.webp",
+  "sha256": "5d8b1ba8ed9d94403a5ac35de6645f1043fa08ff265b364edfd6cfa4a46477dd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Foreground Bartholomew on mountaintop salutes with one hoof, three hooves grounded, proud tear. Cory aboard purple Voider in background preparing flight, sunset.\nExact page story, do not print narrative: Bartholomew salutes from the mountaintop. \"Go forth, brave Cory! I shall guard the realm while you're gone!\" Then, quietly: \"...and maybe one day, I too shall ride a dragon. BAA.\" He sniffles proudly and waves his little hoof. A true hero's farewell.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

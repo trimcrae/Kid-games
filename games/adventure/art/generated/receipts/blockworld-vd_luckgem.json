@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_luckgem",
+  "style": "M1",
+  "sourceHash": "1b0a14ee8fd365c6435a1738beea8a6049845758856a963bdb3875ad231ab543",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-07b4c34a-e169-4189-8176-bf2d43383f2c.png",
+  "originalSha256": "6354fa808747bde3673863b6cc1acc1251b7866e4e7d2be3262153c2682d33d1",
+  "file": "blockworld-vd_luckgem.webp",
+  "sha256": "52eca669ec82b59ab7d2d8709b260bca60825d32950821f53207e7851be81292",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Cory on Voider back tucks ONE glowing green gem into blue shirt pocket. Tiny limegreen Zib perched securely on shoulder with fourstubbyfeet. Voider head smiling close by.\nExact page story, do not print narrative: Cory tucks a glowing green gem into his pocket. \"For luck — and to light our way!\" Zib the Fizzer fizzes up. \"Take me too! That's my cousin you're riding!\" The little Fizzer perches on Cory's shoulder. The whole family's coming along now.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}

@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "vd_end_friend",
+  "style": "M1",
+  "sourceHash": "e8c9af565e388230d529b9dd7f281a6e02f9785da5e811d0fc45cb7e25ceea7f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b039ab1c-606e-4e5b-a662-7ed5493fbda0.png",
+  "originalSha256": "042360af4a6c0b125239aa5efc902d447fe953477954302edf161bd148df11f8",
+  "file": "blockworld-vd_end_friend.webp",
+  "sha256": "acf06703c879ed753b524ea9258df0dd2cdabe7126aba105f958b84ca9ad8f58",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. Voider ENORMOUS purple voxel dragon, lavender belly, exactly TWO lilac horns TWO purple wings FOUR limbs and longtail, huge sympathetic eyes, kind clumsy and lonely, not threatening. NEW scene: Voider carefully restores blocks into mountainside with giant claws while Cory, Bartholomew and limegreen Zib visit smiling. Green repaired valley, golden sunrise, happyfriendship. Blocks no longer eaten.\nExact page story, do not print narrative: The Voider decides it doesn't want to leave — not when it finally has friends! It promises to stop nibbling the world and instead help REBUILD it, block by careful block. Cory, Bartholomew, and Zib visit every single day. The loneliest creature in the world is lonely no more. THE END. 💜",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-vd_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct actions, gentle purple dragon continuity and child-friendly friendship/hero/flight endings. Beacon building shows five glow blocks plus one blue crystal; hero ending retains five gold blocks and blue crystal. Flight scenes keep Cory and Zib recognizable."
+}
