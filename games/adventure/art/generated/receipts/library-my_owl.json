@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_owl",
+  "style": "L1",
+  "sourceHash": "42107a5a6d52aef1fa69ea3e157eeba3b26edeee47c8427792503609cba988f9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7b68a8e1-17a9-473a-89af-eca4022a1223.png",
+  "originalSha256": "19d5e560aef9d646956b79f3c0113a4ba02c75a28cb02682fe0f51eb7f5e5f94",
+  "file": "library-my_owl.webp",
+  "sha256": "d131d020fe698c880eb06305083790c226fa18882735cb4fa8c04bf5f4aabdfc",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit this illustration with precise minimal correction. Change ONLY incorrect map title 'Willowmere Manor' to EXACT 'Hush-a-Bye Manor'. Same ink script, two or three lines, preserve map, cellar circle, hiding spot note, cake doodle, owl, girl and quill exactly. Same exquisite folded-paper theatre, lighting, colors, composition and 4:3 landscape, no other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-1f6c1a44-fd91-4c65-ad98-77425dbae300.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: map title corrected to Hush-a-Bye Manor, circled cellar, hiding-place note and cake doodle; owl and girl match references."
+}

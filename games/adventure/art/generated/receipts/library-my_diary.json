@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_diary",
+  "style": "L1",
+  "sourceHash": "bf64bf3c50c6724924d62129511d4934190c0925d0748126e1fcd0f2370ff780",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-896dd4f6-74a9-45f2-9d27-98694c919285.png",
+  "originalSha256": "bd2046894c0e33a7697a1f44198e900c3416c093d8d3bd1a7d51145c31c4e5bc",
+  "file": "library-my_diary.webp",
+  "sha256": "4e1a9354884622b46f97bea814b6a0b9ba2c805c0c1d0738b9dae36616cda606",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit this illustration with precise minimal correction. Remove ENTIRE cake display at right including glass dome, cake, golden stand and dangling note. Restore ordinary bookshelves and stacked books there. The missing cake is still hidden in cellar, never visible in this library scene. Preserve girl, diary text, owl and floating quill. Same exquisite folded-paper theatre, lighting, colors, composition and 4:3 landscape, no other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-a6e6a1a0-4701-4f91-9203-c543d278bd56.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: hopeful B diary text, concerned Jeannie, footless floating quill and owl; premature cake display removed."
+}

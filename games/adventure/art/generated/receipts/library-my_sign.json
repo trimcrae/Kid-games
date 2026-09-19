@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_sign",
+  "style": "L1",
+  "sourceHash": "3186554f004811291d7edfa9aa812e23656d719abff7342ef9d37e0230ba92d4",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a991794f-06c3-4713-9676-2763525285bd.png",
+  "originalSha256": "9291844b81bed5be2a3fbfe2a9942204c1ed471b08a424c4a201ca771e4bd3f1",
+  "file": "library-my_sign.webp",
+  "sha256": "092cd0fbfec3c6c9b6e82d968ce092cb89011152fcc5396ddf0af50f666189aa",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit this illustration with precise minimal correction. Remove pigeon at lower left and owl on left pedestal entirely, restoring floor and pedestal. Only Jeannie and pocket Inkwell present. Preserve numbered rule sign, magnifying glass, girl, quill, architecture. Same exquisite folded-paper theatre, lighting, colors, composition and 4:3 landscape, no other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-aa46efe0-b97d-48f7-be60-4052f4293e77.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: only Jeannie and pocket quill read three rule pictograms; unwanted bird cameos removed."
+}

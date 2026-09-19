@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "my_party_plan",
+  "style": "L1",
+  "sourceHash": "ff2a7c67110f100759f0fc46280797ed1e183df6c549e72aac0be43ab1483de2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6eb0cebe-ed44-45f6-8cf3-56377f402047.png",
+  "originalSha256": "374b00b47153dbf0dccd8123ed61c37b0a63dd0f19fec345bc15dc9559dae39f",
+  "file": "library-my_party_plan.webp",
+  "sha256": "2a92653e40f0832dedaa06e6fbde5a4b3338d1a8c1ba5a974d84968b5b3aee9b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "Edit this illustration with precise minimal correction. Correct candle count on central table to EXACTLY THIRTEEN total. Remove all current table candles and replace with TWO clearly separated straight rows: BACK ROW exactly SEVEN unlit candles, FRONT ROW exactly SIX unlit candles. Space evenly, each whole candle and single wick visible, no overlap, no additional candles anywhere else. Preserve all characters, party hat, cake, streamers and scene. Same exquisite folded-paper theatre, lighting, colors, composition and 4:3 landscape, no other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0b96f-343e-7421-83f5-326f9df9c431\\exec-7e47ae12-6063-4ae0-adbb-f586fce93408.png"
+  ],
+  "reviewed": true,
+  "review": "PASS: counted exactly thirteen unlit candles, seven back and six front; Boo glows pink, hat, quill streamers, owl and uncrowned pigeon."
+}
