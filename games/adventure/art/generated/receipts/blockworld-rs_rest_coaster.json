@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_rest_coaster",
+  "style": "M1",
+  "sourceHash": "d2b2205bbc8bd980ffe119eb5c63bf3e3436bec70033aa9cd43b33dd5ff84331",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1c401791-7b67-4380-8764-563e1631dca0.png",
+  "originalSha256": "e3a35d80e240945694f151af4a5e0e141560287fb988e92804bf730b08bac8dd",
+  "file": "blockworld-rs_rest_coaster.webp",
+  "sha256": "be250bb375cff9f791a5e4bbcdbb75721d316fa76af5c227aee4f0542f331051",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Cory and Zib sit safely on low unfinished track segment at sunset; tall hill completed behind, partial loop under construction.\nExact page story, do not print narrative: Cory and Zib sit on the half-built track watching the sunset. \"Hisss... this coaster is going to be the BEST,\" Zib sighs happily. Cory could keep building, or visit the crossroads.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

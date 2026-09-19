@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_coaster_power",
+  "style": "M1",
+  "sourceHash": "fb9d372010c4124fad0ef8809067f7bfa794e8e9c746461460d5506c7ebf21a9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a01c0d4f-f275-41ac-a763-789cb2dc8abc.png",
+  "originalSha256": "7d0218f2b87e23dffce3d1c52051ef7dff9a40aaa45e9bc111526d1200da8a0b",
+  "file": "blockworld-rs_coaster_power.webp",
+  "sha256": "04d41cf09c82e0ad10c83738d376d516ca21ace51281befa2ce726dfb1957a72",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Exactly FOUR glowing red cubes in row by track base power ONE grey minecart carrying Cory up tall hill. Hair wind swept.\nExact page story, do not print narrative: FOUR blocks — WHOOSH! The cart blasts up the giant hill with a roar. Cory's hair flaps in the wind. Now he needs to design the rest of the wild ride. What comes next?",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

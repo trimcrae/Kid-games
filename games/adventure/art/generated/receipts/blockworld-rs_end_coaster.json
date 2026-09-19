@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_end_coaster",
+  "style": "M1",
+  "sourceHash": "0e1c8a82e8fd9456e46c794fd1e5456ec705c6815543cf360b524af7fec70346",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-8c9345c6-1c5b-41e8-b4dd-6fd005beae01.png",
+  "originalSha256": "eed100d01a96db7d4f1436f8b2b5218f9bf66e657abcf748c570180420223de7",
+  "file": "blockworld-rs_end_coaster.webp",
+  "sha256": "d1ec52ccd58928e138ef7f21a961909103b7bfc4cac139929692d7932ffb1683",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Ribbon opening at wooden station with FOUR red power cubes. Cory celebrates next to lever; ONE cart carries happy Zib and backward-facing boastful sheep across splash dip after hill and loop.\nExact page story, do not print narrative: The ribbon snaps and the world's wildest coaster ROARS to life — up the hill, through the loop, SPLASH through the dip! Zib screams with joy, Bartholomew rides backward bragging. Cory powered it all with smart counting and clever switches. He's the COASTER TYCOON!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

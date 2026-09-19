@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_loop_works",
+  "style": "M1",
+  "sourceHash": "04ba759af26cac266b4ca47543b5b79196595d3b30eec54eb2781ecfa153b545",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-fcf0e553-7bc6-4118-9316-5c3392a3d8af.png",
+  "originalSha256": "892f5479180e95c4926a88bb64a517afb80034e5aa06309439b5e64e2c413680",
+  "file": "blockworld-rs_loop_works.webp",
+  "sha256": "f0d4b8754be1d2e60bfb61dec747ceb73d6c5fa9bdd1d443e04b1b8bbcb4ad9a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Grey minecart carrying Cory and Zib speeding through full vertical loop, oak supports, speed trails, joyful faces.\nExact page story, do not print narrative: ZOOM! The cart rockets through the loop and everyone whoops. \"It works because it's FAST!\" Cory cheers. The coaster is getting legendary. One more big feature?",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

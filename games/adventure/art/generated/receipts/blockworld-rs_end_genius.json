@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_end_genius",
+  "style": "M1",
+  "sourceHash": "2dd7c9e2fcb9b55a536d97b070d071a627f9b2322712aa8a9c510b1c7cb0adce",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c024c41d-4984-4191-8c2d-fe319743bd40.png",
+  "originalSha256": "8d0771d25cb18242fcd7201a44cc37bd7ac2263371d39ac2475a4f3ff4f35894",
+  "file": "blockworld-rs_end_genius.webp",
+  "sha256": "9b2234280c465e4b7abe1168e4ca6d09141fd0699ee34673baabc1ac4681a5c5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Triumphant workshop finale Cory, Zib and sheep celebrate functioning pressureplate-lamp-open door with fireworks through windows. Clear red connections, warm magic machinery.\nExact page story, do not print narrative: Cory's automatic machine purrs perfectly: step, light, OPEN, fireworks! Zib and Bartholomew clap their hooves and paws. Cory used logic, counting, and clever if-then thinking to build something amazing. He's a true REDSTONE GENIUS!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

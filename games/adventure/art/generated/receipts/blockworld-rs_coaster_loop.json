@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_coaster_loop",
+  "style": "M1",
+  "sourceHash": "830f592ccbd549f79b868804419e5e02f2dc85c79eb91ce75028e1159f6e7551",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-46ae9c02-b1be-4d4d-a325-b8470ecafebe.png",
+  "originalSha256": "55ec95033fa97a066db2cf50eab0c08ac08b36d15498699d0550ed06c2a401e9",
+  "file": "blockworld-rs_coaster_loop.webp",
+  "sha256": "4a8f092c4215c6ef16abd5558ab17a7ed0e51a8f98d6686328198cb9bed5b21c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Cory builds enormous complete vertical silver-track loop supported by oak beams beside existing tall hill. Grey cart poised high on hill, no rider duplicated.\nExact page story, do not print narrative: Cory builds a HUGE loop-the-loop. The puzzle: IF the cart goes fast enough, THEN it makes it around. Does it have enough speed from that big hill?",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

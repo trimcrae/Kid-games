@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_turtle_oops",
+  "style": "M1",
+  "sourceHash": "e406d8767df7fd66c85a5232e328fac29e0e90cf591039c1005ab861c23f1d31",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cfda2152-91d0-43a6-ae64-261a1a726c78.png",
+  "originalSha256": "531269d61b2a6b9cb2cdf9b7fe00b4b47db6451b16ad7ee412091259fe958850",
+  "file": "blockworld-rs_turtle_oops.webp",
+  "sha256": "3b44c5ddc5cb0a737c778c7695294db693967834f6a1f9bde94243c8aed3ca78",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Grey cart safely hangs upside down at loop top, tiny green turtle with cuboid shell and happy Zib secured inside. Cory ground below laughs, harmless silly scene.\nExact page story, do not print narrative: A turtle on a coaster?! The cart slows, flops at the top of the loop, and dangles upside down. Zib waves from inside. \"Hisss... hi from up here!\" \"Speed is GOOD for loops,\" Cory laughs.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_weak_coaster",
+  "style": "M1",
+  "sourceHash": "5c661d0bff08585126c9fa65e711d1e395e81a57e602aa3b3bac399bf6d715c5",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-d8f0b153-b8b6-43de-ac4d-ab77728c35ad.png",
+  "originalSha256": "00458f616209c7def9a852e678e2c6f844c1d9c9ece480ad786d1c04d27684ca",
+  "file": "blockworld-rs_weak_coaster.webp",
+  "sha256": "99555a2032efcf9367ea5eb73e1a0b591437a82dfc17a052b7099f42de962495",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Exactly TWO glowing red cubes at track base with two empty sockets. ONE grey minecart with Zib rolls backward halfway up hill. Cory observes.\nExact page story, do not print narrative: Two blocks isn't enough! The cart chugs halfway up the hill, sighs, and rolls backward. Zib is riding it. \"Hisss... wheee... aww.\" \"Need FOUR for a big hill,\" Cory notes.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

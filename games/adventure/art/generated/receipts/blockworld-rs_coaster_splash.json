@@ -1,0 +1,23 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_coaster_splash",
+  "style": "M1",
+  "sourceHash": "1f9f434685893cadf459b2450626330a29a5cd96ab8432dc463fa45b2ccbe686",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a912e90b-d832-468c-8495-6eb7178f8461.png",
+  "originalSha256": "d2400333aa3ba8159e5aadeece4840bee3c85f62345ba27cbd1418d2b87f4f59",
+  "file": "blockworld-rs_coaster_splash.webp",
+  "sha256": "bd683ee616399ae2cbaaa66183455890e9547bd60a54424c6a235a1fc8af14a0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Cory at side watches grey cart with Zib rush through shallow water dip, enormous joyful blue splash. Tall hill and loop behind.\nExact page story, do not print narrative: Cory adds a giant splash dip. IF the cart hits the water, THEN everyone gets soaked! Zib volunteers to test it. SPLOOSH! \"Hisss... hi... glug glug!\" Soaked but thrilled.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

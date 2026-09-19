@@ -1,0 +1,24 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_coaster_grand",
+  "style": "M1",
+  "sourceHash": "733f629cd93d7c2e8ecd2fb0a9b2f8e55616ffd0188e2538a43adf4752fd690f",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cb94ba37-3594-406a-832f-3715b49fb3ec.png",
+  "originalSha256": "0dd3b8641a3eb02182cbb1f77c76687434cfa2c31b954541fd3adcb4dbdd82bd",
+  "file": "blockworld-rs_coaster_grand.webp",
+  "sha256": "028328c3e25c7728fa98e60118c900066f1a89dafb7a3c5d2f5aa03e4a9eaa0b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. Bartholomew white cubic wool tan face pink muzzle brown hooves fourlegs no cape/sword. Zib small limegreen cubic head narrow torso four stubbyfeet, friendly face no extra limbs wings/tail. NEW scene: Wide completed coaster overview with tall hill, ONE full loop, water splash dip; EXACTLY FOUR red power cubes at station. Cory proud, sheep boasts, Zib first in line.\nExact page story, do not print narrative: The world's wildest roller coaster is DONE — hill, loop, splash, and four power blocks humming. Bartholomew baas, \"I invented coasters too, you know.\" Zib lines up to ride it ninety times.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_enter.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

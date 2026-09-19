@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_coaster_start",
+  "style": "M1",
+  "sourceHash": "85a4dee057155e5dcfbf2d203e23b70379499958670ac3172f65edf50b7cd712",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ff5cf1ea-4993-40d6-9e87-db43050d9be5.png",
+  "originalSha256": "f8cd561e8575ef59becfb6658454424aa13efcf305926dbe4495940afd573340",
+  "file": "blockworld-rs_coaster_start.webp",
+  "sha256": "b2b99e367ce59dd1231aae588588329a291d993a4d34316d5c19db396f9342bc",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Tall wooden coaster scaffold and silver track huge hill; sign 'BIG HILL = 4 POWER BLOCKS'. Cory at base studies four empty sockets.\nExact page story, do not print narrative: Outside, an enormous empty coaster track curves into the sky. To launch a cart, Cory needs POWER. A sign says: A BIG HILL NEEDS 4 POWER BLOCKS. Time to think like an engineer!",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}

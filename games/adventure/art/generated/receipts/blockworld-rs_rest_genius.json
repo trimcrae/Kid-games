@@ -1,0 +1,22 @@
+{
+  "storyId": "blockworld",
+  "nodeId": "rs_rest_genius",
+  "style": "M1",
+  "sourceHash": "2a2ca6a653b9b134320d971e6814ca4e2ae5f28fda7d45467392b1d1830af6e9",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5147cb86-a8fd-401c-b939-0133c3b19c5a.png",
+  "originalSha256": "e67764d1b1afb8f1174e8171e0fa3e459f27f94ef99b7c9529ceae19016a24a8",
+  "file": "blockworld-rs_rest_genius.webp",
+  "sha256": "cc67b6e8311ebe8e9dde11b58ef79d6110163cdb4a6cb1a556c8ddf2a7fa2524",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape4:3 M1 cinematic 3D voxel story image. All characters and scenery made of pixeltextured dimensional cuboid blocks, rich warm light and atmospheric depth. Same Cory6 short cubical brown hair, black rectangular glasses, blue shirt darkblue pants brown boots backpack. References for recurring designs only; create distinct scene composition. No UI border caption speechballoons. Only characters explicitly needed in current scene. NEW scene: Cory resting and stretching in sunshine outside workshop, finished plate-lamp-door machine visible through open wall.\nExact page story, do not print narrative: Cory wipes redstone dust off his hands and stretches in the sunshine. His automatic machine hums happily behind him. He could finish the masterpiece, or wander back to the crossroads.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/blockworld-rs_enter.webp"
+  ],
+  "reviewed": true,
+  "review": "PASS: Visually reviewed distinct story scenes, recurring character designs and clear coaster/logic actions. Coaster start has four empty power slots, weak coaster exactly two power cubes, powered coaster exactly four cubes, and both endings match their story rewards."
+}
