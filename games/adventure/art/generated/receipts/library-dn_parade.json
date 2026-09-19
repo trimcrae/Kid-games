@@ -1,0 +1,23 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_parade",
+  "style": "L1",
+  "sourceHash": "2994cb2ac68942de568de59a176bc3141d81f76c78cccd0165b51b2e418f6023",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c09b0ccb-bfac-4ce5-b769-66c9ac24afeb.png",
+  "originalSha256": "8fb7541a543305a62cd427305e6fab9e4bd367125d1f5b36505023173be8b96b",
+  "file": "library-dn_parade.webp",
+  "sha256": "96e6c3ed18451d3849a8f5d831886ae115ab5807faebc37f67c0bc00eb4cdaf9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Wide sweeping lively parade along prehistoric valley path. Jeannie marches at front, green mother and blue/sage longneck dinosaurs sway and honk behind her in a curving line. Crowned Reginald flies proudly ahead, wings spread. Pink and golden paper flower petals shower from treetops the longnecks gently shake. Inkwell taps his gold nib happily against edge of purple dress pocket, trying to look serious. All cut and folded paper, strong visual rhythm.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_meet_herd.webp",
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_volcano_path.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: Jeannie leads a longneck parade under falling petals; crowned pigeon flies ahead, consistent paper medium."
+}

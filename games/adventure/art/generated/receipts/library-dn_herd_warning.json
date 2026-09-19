@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_herd_warning",
+  "style": "L1",
+  "sourceHash": "d58f3585d8c7af9dd7c2e4bd6bcc5070de2648e729a8c8bed1774ab1e929ac6e",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7028f7d7-5171-4a27-a452-ab5facd5d41c.png",
+  "originalSha256": "a5f7c3c173716c1d28e435e562c4d307cc6381abbee6be42f2568d66e5334a62",
+  "file": "library-dn_herd_warning.webp",
+  "sha256": "1253e089c535c089127f2f36483bf0baee29e319d8e518108f631b0eb38e8529",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Sunny plains, distant volcano puffing harmless paper steam rings. Jeannie points toward volcano inquisitively. SAME green longneck mother reclines comfortably, eyes blissfully closed as if miming a hot bath, holds a fern delicately in her lips toward girl as reassurance. Inkwell dubious in pocket. Blue longneck looks unconcerned beyond. Mother has exactly FOUR legs folded or resting, no human arms. Warm comedy and reassuring safety.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_meet_herd.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: relaxed four-legged mother offers fern while Jeannie points to harmless steam-ring volcano; blue herd beyond."
+}

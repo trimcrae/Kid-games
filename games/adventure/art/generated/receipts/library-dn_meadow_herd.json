@@ -1,0 +1,22 @@
+{
+  "storyId": "library",
+  "nodeId": "dn_meadow_herd",
+  "style": "L1",
+  "sourceHash": "539c79db4c7facbd7b4ab37070f42ab810a9e70fd908c6800574cc975bf51ae2",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-55361789-0c3a-4935-8713-3beacf3ecc78.png",
+  "originalSha256": "c04f735d13f2f72a4361289ece71804c7dfa616c03fdb9ea6c2666c3b086dc01",
+  "file": "library-dn_meadow_herd.webp",
+  "sha256": "1e5d21c7380d63e6de771fca9a7f4184b4c5fa1776fd11f1c5077355635a6301",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "prompt": "ONE finished full-bleed landscape 4:3 story-page illustration. Use reference for L1 medium and established character designs, depict NEW scene below. Exquisite handmade paper-engineered theatre, folded textured cardstock, visible cut edges, layered scenery, sculpted paper characters and hair, miniature architecture, warm dimensional lighting. SAME Jeannie age7, shoulderlength layered brown paper hair, purple dress with cream collar/cuffs/hem, cream socks and brown shoes. SAME tiny Inkwell: expressive grumpy cream feather quill with gold nib, about Jeannie's hand length, no feet; a writing quill not a person. All materials/characters made of folded paper, including water, foliage, light effects. No UI, border or captions.  Reference images establish medium and characters ONLY; compose this NEW scene: Sunset meadow full of flowers and dozing green/blue/sage longneck dinosaurs. Foreground one friendly blue sauropod lies on its BACK, cream belly upward, FOUR legs raised with one hind leg thumping joyfully. Jeannie kneels rubbing its belly laughing. Its long neck curls comfortably beside her, tail extends into flowers. Inkwell grumpily folded in pocket. Other longnecks doze in distant flowers. No dragon wings or horns anywhere.",
+  "references": [
+    "C:/Projects/kid-games/games/adventure/art/generated/library-dn_meet_herd.webp"
+  ],
+  "reviewed": true,
+  "review": "Reviewed: blue longneck lies belly-up with exactly four legs while Jeannie rubs its belly, sunset flowers and resting herd."
+}
