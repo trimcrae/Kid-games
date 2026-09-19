@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "follow",
   "style": "C2",
-  "sourceHash": "685c9b15d710b7c80ec24cb91fc8ce6525d3b9a34bf4058bd6732433c8758ba5",
+  "sourceHash": "d1891aa0e401c1b14e231c7f3176a33ef343f91763bdee409ae96c6a0c9c37f4",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-33ac6c5b-9a36-4a61-adcb-ec8f0df27ada.png",
   "originalSha256": "85b67c8b379fb6715bc35e36aa38348530f9c396a4d45874d3e965f990949ff3",
@@ -19,5 +19,6 @@
     "art/generated/campout-explore.webp"
   ],
   "reviewed": true,
-  "review": "Exactly Jeannie, Cory, Biscuit, adult fox and one kit at root den; friendly interaction, same puppy/cast and selected pencil medium."
+  "review": "Exactly Jeannie, Cory, Biscuit, adult fox and one kit at root den; friendly interaction, same puppy/cast and selected pencil medium.",
+  "legacySourceHash": "685c9b15d710b7c80ec24cb91fc8ce6525d3b9a34bf4058bd6732433c8758ba5"
 }

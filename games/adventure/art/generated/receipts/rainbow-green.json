@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "green",
   "style": "R3",
-  "sourceHash": "e0e42b0da72ddc0a4b5941309d0b6944fe9e62f500a0eb156b1e4af97e4d267a",
+  "sourceHash": "580a5b6e5ca9399f9096e34ed5fa895dd47c13a1db6f878743d5f6ecaf21f546",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-ba040cb7-5eb2-485e-8438-8eb9ecede72e.png",
   "originalSha256": "129a84f1f3a8b91bbe9381055e0798ac1ce1cc084f469a8722fd58c8640470a6",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Dragon chewing leaves with green tail, red wing and yellow tummy; Ellie clapping; matched crayon style."
+  "review": "Dragon chewing leaves with green tail, red wing and yellow tummy; Ellie clapping; matched crayon style.",
+  "legacySourceHash": "e0e42b0da72ddc0a4b5941309d0b6944fe9e62f500a0eb156b1e4af97e4d267a"
 }

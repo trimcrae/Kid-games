@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "hello",
   "style": "R3",
-  "sourceHash": "331bbcfdb65a5b6bbd796ce7a891d452601b576b88959653ac806dfd8d42ed3e",
+  "sourceHash": "1e46e7b5f81c3e4b1e8406ee383a42949865afde1e2e12da5996c9a872fc1767",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-2971e888-2911-4ccd-ada3-18ee9ccc6d50.png",
   "originalSha256": "6b29de79880eafe9ecda408203689f00ea704c79ec95e478cf91822e9cec254e",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Same crayon characters; sympathetic Ellie listens while sad wholly grey dragon examines its paw; no fruit yet."
+  "review": "Same crayon characters; sympathetic Ellie listens while sad wholly grey dragon examines its paw; no fruit yet.",
+  "legacySourceHash": "331bbcfdb65a5b6bbd796ce7a891d452601b576b88959653ac806dfd8d42ed3e"
 }

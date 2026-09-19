@@ -2,7 +2,7 @@
   "storyId": "blockworld",
   "nodeId": "fr_end_tree",
   "style": "M1",
-  "sourceHash": "3ed23fac427b6cb976f06bc810ce4511bd239237f7c5df05c31b1259f696a9ca",
+  "sourceHash": "45e0f500b9860a5173f09ca5e6d95aa4de68e9a1ccaf1c1178524240ee77498a",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-25e56adb-0778-4117-8269-69a859e5edaf.png",
   "originalSha256": "699780482a2b6dd32b53f757dcc7170a0743ee62074ce675b0076c5a3adc6c8e",
@@ -20,5 +20,6 @@
     "C:/Projects/kid-games/games/adventure/art/generated/blockworld-fr_zibhug.webp"
   ],
   "reviewed": true,
-  "review": "Cory plants pink flag atop matching lookout; Bartholomew cheers from lowerdeck and Zib greets from slide exit; complete cyan slide and railings."
+  "review": "Cory plants pink flag atop matching lookout; Bartholomew cheers from lowerdeck and Zib greets from slide exit; complete cyan slide and railings.",
+  "legacySourceHash": "3ed23fac427b6cb976f06bc810ce4511bd239237f7c5df05c31b1259f696a9ca"
 }

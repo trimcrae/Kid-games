@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "concertEnd",
   "style": "S1",
-  "sourceHash": "fafa3fb79b953124f038195d57dbb70042eb90b72ee31a1ccd0ad2e224efbe03",
+  "sourceHash": "10e3a1fb514a2c6b2de96c5939e783e75996829e5e6df723cc45d28cd91aaea1",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-1100a71f-7b76-4582-a6c7-9019aec86fe1.png",
   "originalSha256": "c0c1b36ef89c59e2d8ea5f75428672aa37700b0cf178adbfb3c5107b9c288403",
@@ -20,5 +20,6 @@
     "C:/Projects/kid-games/games/adventure/art/generated/mermaid-coral.webp"
   ],
   "reviewed": true,
-  "review": "Ellie conducts with silver baton, mermaid plays golden harp, dolphin, striped fish and crab accompany; all characters separate and readable."
+  "review": "Ellie conducts with silver baton, mermaid plays golden harp, dolphin, striped fish and crab accompany; all characters separate and readable.",
+  "legacySourceHash": "fafa3fb79b953124f038195d57dbb70042eb90b72ee31a1ccd0ad2e224efbe03"
 }

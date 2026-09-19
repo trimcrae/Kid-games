@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "flyEarly",
   "style": "R3",
-  "sourceHash": "86f943f33703a65e7361105c6d6f526881f8c40f082072fa3a5cfb145ed73264",
+  "sourceHash": "1dea195d8037fe86945230e11d2c0be45d72bb66f1cf2b666bf3613aaeff496f",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-27f0247b-a1c7-411d-b059-ec91fe701339.png",
   "originalSha256": "d7250a425a56419c0f1ee9af44ab6488130013c1c01909a99b8d7b669c296a5f",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Ellie rides the red dragon above clouds; full dragon and rider visible, no rainbow colors; matching designs and medium."
+  "review": "Ellie rides the red dragon above clouds; full dragon and rider visible, no rainbow colors; matching designs and medium.",
+  "legacySourceHash": "86f943f33703a65e7361105c6d6f526881f8c40f082072fa3a5cfb145ed73264"
 }

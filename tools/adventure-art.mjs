@@ -8,14 +8,16 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const base = path.join(root, 'games/adventure');
 const output = path.join(base, 'art/generated');
-const context = vm.createContext({ window: { ART: {} } });
+const context = vm.createContext({ window: {} });
 for (const file of ['story-data.js', 'stories-long.js']) {
   vm.runInContext(fs.readFileSync(path.join(base, file), 'utf8'), context);
 }
 const stories = context.window.STORIES;
 const selections = JSON.parse(fs.readFileSync(path.join(base, 'art/direction/selections.json')));
 const jobs = stories.flatMap(story => Object.entries(story.nodes).map(([id, node]) => {
-  const source = { text: node.text, art: node.art?.toString() || node.scene, choices: node.choices, end: node.end };
+  // Illustration descriptions guide generation; they contain no executable art.
+  // Retain the hash key "art" so existing data-based receipts stay compatible.
+  const source = { text: node.text, art: node.illustration, choices: node.choices, end: node.end };
   return {
     storyId: story.id, title: story.title, nodeId: id,
     style: selections.selections.find(s => s.storyId === story.id).id,

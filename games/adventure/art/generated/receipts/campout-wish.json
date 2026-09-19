@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "wish",
   "style": "C2",
-  "sourceHash": "83000d175c982fdb453eb876a94ca0bc1b8ee8b99373389a3630fd1cb58bfdbb",
+  "sourceHash": "a550315e0967b1341863940eeba5e3f057185765a68f5c0e224ede613c77d777",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-d3a812bd-b90f-4234-9f95-618ebcb1a0fb.png",
   "originalSha256": "a1babd986d771726f188d8b514c072c084c272a4c4d237a34d2495386c8c9b7e",
@@ -18,5 +18,6 @@
     "art/generated/campout-camp.webp"
   ],
   "reviewed": true,
-  "review": "Six family members, all eyes closed, Kieran held by Mom, one shooting star with thin trail; consistent night campsite and clothing."
+  "review": "Six family members, all eyes closed, Kieran held by Mom, one shooting star with thin trail; consistent night campsite and clothing.",
+  "legacySourceHash": "83000d175c982fdb453eb876a94ca0bc1b8ee8b99373389a3630fd1cb58bfdbb"
 }

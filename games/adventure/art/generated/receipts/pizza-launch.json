@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "launch",
   "style": "P2",
-  "sourceHash": "291a360d5c796cb1fcffc1669a95d440c0541abf0b3456574ddfdb02572975d9",
+  "sourceHash": "56614c6d2523dc02a80a6efc3fde6b8ddea6e0ece0f7e7880550c18baf868897",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-8887a30f-5acd-4230-adb7-582fb1e9e633.png",
   "originalSha256": "a98cead2a826ada5f611e9478e5572d8a2eab86178a15d6947548efb2961a0d8",
@@ -19,5 +19,6 @@
     "exec-1e4eab59-b051-4c54-9b00-d74b935c3c05.png (edit target)"
   ],
   "reviewed": true,
-  "review": "Corrected launch now has exactly three planets: dusty red, entirely blue ocean with clouds, and purple with three distinct cream/lilac/gold rings; clay rocket and composition retained."
+  "review": "Corrected launch now has exactly three planets: dusty red, entirely blue ocean with clouds, and purple with three distinct cream/lilac/gold rings; clay rocket and composition retained.",
+  "legacySourceHash": "291a360d5c796cb1fcffc1669a95d440c0541abf0b3456574ddfdb02572975d9"
 }

@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "flower",
   "style": "R3",
-  "sourceHash": "0c7c3516db554cfcb56f65d0ad31d2a052720191dd33168b244450254723295e",
+  "sourceHash": "474bb35b5060bddf76912cc9e5070603b9a7dc710dd9b1689b4dae352f4078a8",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-97884c9f-8a48-4546-8e97-56eaf6db5372.png",
   "originalSha256": "237b4aa1c51b54c6be7123c124706d495f0fedac6140f9af6eefa185248d748a",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Same crayon characters; Ellie offers one pink flower; wholly grey dragon sniffs and smiles; no premature fruit or colors."
+  "review": "Same crayon characters; Ellie offers one pink flower; wholly grey dragon sniffs and smiles; no premature fruit or colors.",
+  "legacySourceHash": "0c7c3516db554cfcb56f65d0ad31d2a052720191dd33168b244450254723295e"
 }

@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "tag",
   "style": "C2",
-  "sourceHash": "6554c9626a13c6cb538c85c89007f08c17333239b02d70a615d8368273694116",
+  "sourceHash": "4791187e5e97083fe6f8881c596f933edfe0f6a664a7a9c596cbb83cde706747",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-3ad66578-4141-4ac5-b452-704f71a611a4.png",
   "originalSha256": "964eff7242885716d0f5af21a9afff5719aa80f12aec7c20891a091bf195fa7b",
@@ -19,5 +19,6 @@
     "art/generated/campout-explore.webp"
   ],
   "reviewed": true,
-  "review": "Three children: Cory, Jeannie, distinct yellow-clothed owner hugging Biscuit; sunrise, tag reads BISCUIT and campsite sign 8; same medium."
+  "review": "Three children: Cory, Jeannie, distinct yellow-clothed owner hugging Biscuit; sunrise, tag reads BISCUIT and campsite sign 8; same medium.",
+  "legacySourceHash": "6554c9626a13c6cb538c85c89007f08c17333239b02d70a615d8368273694116"
 }

@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "singEnd",
   "style": "S1",
-  "sourceHash": "12edfb5d12245818fc0cd2277e76e6f011e203b06a6fbbf53f1e66bb18b2037c",
+  "sourceHash": "cc8020c6c4d5bfe64c6376d3acb1360a21df9610b5fc1e0563d853d46fd856ee",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-03c8e2d2-cc34-46e0-8295-7d2485b9aaf5.png",
   "originalSha256": "ff21d80cfd9a29226f071f5c4ba1294007d3bacc46b7b8e26e9134a3bf5f52a9",
@@ -19,5 +19,6 @@
     "C:/Projects/kid-games/games/adventure/art/generated/mermaid-dolphin.webp"
   ],
   "reviewed": true,
-  "review": "Sunset singing ending has Ellie, mermaid, dolphin, whale and crab in the selected mosaic style."
+  "review": "Sunset singing ending has Ellie, mermaid, dolphin, whale and crab in the selected mosaic style.",
+  "legacySourceHash": "12edfb5d12245818fc0cd2277e76e6f011e203b06a6fbbf53f1e66bb18b2037c"
 }

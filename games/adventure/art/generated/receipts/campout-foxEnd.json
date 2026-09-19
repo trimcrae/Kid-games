@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "foxEnd",
   "style": "C2",
-  "sourceHash": "b2ecc51141ce47882465b08cae2e8beb285a9510b5164eafbee4c9a21320998b",
+  "sourceHash": "1f5fb79e6bd9420f1e03857b8aa4b62b3bacf87dad48622f7e11190050b7a31c",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-25ad6500-f0df-4039-85ed-a8ffc5222b53.png",
   "originalSha256": "dc382c2ab79ec22d43dc50da52a6d0e3b71e131e00c13cd1d9f17a212939cd03",
@@ -19,5 +19,6 @@
     "art/generated/campout-explore.webp"
   ],
   "reviewed": true,
-  "review": "Cory and Jeannie sharing breakfast at sunny original campsite, one fox at woodland edge away from food; no puppy or extra cast."
+  "review": "Cory and Jeannie sharing breakfast at sunny original campsite, one fox at woodland edge away from food; no puppy or extra cast.",
+  "legacySourceHash": "b2ecc51141ce47882465b08cae2e8beb285a9510b5164eafbee4c9a21320998b"
 }

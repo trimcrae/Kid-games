@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "partyEnd",
   "style": "P2",
-  "sourceHash": "e1d2807e583f48ad1de5aacb68989420e1d99c3eae220d9540016ed805848455",
+  "sourceHash": "d1afbd247dfc4030861f7e4e7d02d13c3cd831417596d9efc45dea532205138e",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-756c418f-7506-4ee1-b8db-53bc350cf97e.png",
   "originalSha256": "4be4f875b0416e01d7ac6fc9f38a0c4f8085950b3e264b87ba0c21de13c22127",
@@ -21,5 +21,6 @@
     "exec-95e16f98-0f15-457a-bc5a-61b52d586a16.png (edit target)"
   ],
   "reviewed": true,
-  "review": "Six canonical aliens aboard galley, two of each species; correct red eyes, jelly anatomy and waist rings; star-only windows remove conflicting planet details."
+  "review": "Six canonical aliens aboard galley, two of each species; correct red eyes, jelly anatomy and waist rings; star-only windows remove conflicting planet details.",
+  "legacySourceHash": "e1d2807e583f48ad1de5aacb68989420e1d99c3eae220d9540016ed805848455"
 }

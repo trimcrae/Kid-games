@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "cheese",
   "style": "P2",
-  "sourceHash": "4d8bb6436caaa61e6f72075f2a9ef358f85647138c6a1a5cfefa52df3bfd25de",
+  "sourceHash": "593f65e54b25afb6a447c9e1884293feabc5e8118e14e4eedce3c65f557be119",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-34f48623-5108-4ffd-abfa-66b5ce8f7e6e.png",
   "originalSha256": "2a97e5e18094d330807433cf8c331c941c4a99dbba302e78c693cfe0e3a8cfea",
@@ -19,5 +19,6 @@
     "exec-f06cb805-ee99-4f6e-a7c3-f0f134b9e4a3.png (edit target)"
   ],
   "reviewed": true,
-  "review": "Corrected: four resting slices plus one held slice per alien, exactly five each; two three-eyed aliens and gooey strings, clay medium retained."
+  "review": "Corrected: four resting slices plus one held slice per alien, exactly five each; two three-eyed aliens and gooey strings, clay medium retained.",
+  "legacySourceHash": "4d8bb6436caaa61e6f72075f2a9ef358f85647138c6a1a5cfefa52df3bfd25de"
 }

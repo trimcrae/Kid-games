@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🗺️ Choose Your Own Adventure</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗺️</text></svg>" />
+  <link rel="icon" href="art/generated/rainbow-meet.webp" type="image/webp" />
   <meta name="theme-color" content="#8a5cff" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="../../assets/css/style.css" />
@@ -26,9 +26,7 @@
       box-shadow: 0 18px 38px rgba(43,36,64,.4); outline: none;
     }
     .story-card .cover { display:block; width: 100%; height: 150px; }
-    .story-card .cover svg { display:block; }
     .story-card .cover .cover-img { display:block; width:100%; height:150px; object-fit:cover; }
-    .story-card .cover canvas { display:block; width:100%; height:150px; object-fit:cover; image-rendering:pixelated; }
     .story-card h2 { margin: .6rem .6rem .1rem; font-size: 1.15rem; line-height: 1.15; }
     .story-card .who  { margin: 0 .6rem; font-size: .82rem; opacity: .9; font-weight: bold; }
     .story-card .teach{ margin: .35rem .7rem 0; font-size: .85rem; opacity: .92; }
@@ -74,7 +72,10 @@
       background: #120a2a; display: block; line-height: 0;
     }
     .scene-art .scene-img { display:block; width:100%; height:100%; object-fit:contain; }
-    .scene-art canvas { display:block; width:100%; height:100%; image-rendering:pixelated; }
+    .illustration { display:flex; width:100%; height:100%; align-items:center; justify-content:center; }
+    .image-status { color:#fff; font:600 1rem/1.4 system-ui,sans-serif; padding:1rem; text-align:center; }
+    .image-status[role="button"] { cursor:pointer; text-decoration:underline; }
+    .image-status:focus-visible { outline:3px solid var(--yellow); outline-offset:-3px; }
     .scene-art.turning { animation: pageTurn .5s ease; }
     @keyframes pageTurn {
       0%   { transform: perspective(900px) rotateY(0); opacity: 1; }
@@ -267,11 +268,11 @@
 
   <script src="../../assets/js/voice.js"></script>
   <script src="../../assets/js/confetti.js"></script>
-  <script src="art.js"></script>
   <script src="glossary.js"></script>
   <script src="story-data.js"></script>
   <script src="stories-long.js"></script>
   <script src="art/generated/manifest.js"></script>
+  <script src="images.js"></script>
   <script src="adventure.js"></script>
 </body>
 </html>

@@ -1,646 +1,437 @@
-/* ===========================================================
-   Choose Your Own Adventure — SHORT STORIES
-   -----------------------------------------------------------
-   The quick, gentle tales for the littlest readers. The two big
-   epics (Block World & The Whispering Library) live in
-   stories-long.js, which appends itself to window.STORIES.
-
-   Node format (this file uses inline art() functions):
-     { art: ()=>svg, text, choices:[{label,to}] }   // a page
-     { art: ()=>svg, text, end:"Ending name" }       // an ending
-   =========================================================== */
-(function () {
-  "use strict";
-  const A = window.ART;
-
-  /* A burst of party confetti, drawn as vector shapes. The pizza story used
-     to drop a literal 🎉 emoji glyph into the artwork, which broke the smooth
-     vector style (and rendered as whatever the device's emoji font happened
-     to be). */
-  function confetti(cx, cy, sc) {
-    const bits = [
-      [-30, 6, "#ff5d8f", 0], [-18, -6, "#ffd166", 32], [-6, 10, "#5aa9ff", -20],
-      [7, -4, "#7ed957", 54], [20, 8, "#b06ad9", 12], [31, -2, "#ff8f43", -40]
-    ];
-    let s = "";
-    bits.forEach(([bx, by, c, rot], i) => {
-      s += `<rect x="${bx - 2.6}" y="${by - 1.4}" width="5.2" height="2.8" rx="1.2" fill="${c}" transform="rotate(${rot} ${bx} ${by})">` +
-        `<animate attributeName="opacity" values="1;.4;1" dur="${1.6 + i * 0.24}s" repeatCount="indefinite"/></rect>`;
-    });
-    // a few curling streamers above the bits
-    s += `<g fill="none" stroke-width="2" stroke-linecap="round">` +
-      `<path d="M-24 -14 q6 -8 13 -3" stroke="#ffd166"/>` +
-      `<path d="M-2 -18 q7 -7 14 0" stroke="#ff5d8f"/>` +
-      `<path d="M16 -14 q7 -8 14 -2" stroke="#5aa9ff"/></g>`;
-    return `<g transform="translate(${cx} ${cy}) scale(${sc || 1})">${s}</g>`;
+// Short adventures. Generated illustrations are assigned by art/generated/manifest.js.
+window.STORIES = [
+  {
+    "id": "rainbow",
+    "coverImg": "art/generated/rainbow-meet.webp",
+    "title": "Ellie & the Rainbow Dragon",
+    "emoji": "🐉",
+    "color": "#ff7eb6",
+    "ages": "3+",
+    "who": "Ellie",
+    "teaches": "colours, counting & kindness",
+    "blurb": "Help a little grey dragon find all its colours!",
+    "start": "meet",
+    "nodes": {
+      "meet": {
+        "text": "Princess Ellie skips through the meadow. A little dragon sits all alone — and it is grey all over! It looks sad.",
+        "choices": [
+          {
+            "label": "👋 Wave and say hello",
+            "to": "hello"
+          },
+          {
+            "label": "🌸 Pick it a flower",
+            "to": "flower"
+          }
+        ]
+      },
+      "flower": {
+        "text": "Ellie picks a pink flower and holds it out. The dragon sniffs it and smiles a tiny smile. \"Thank you,\" it whispers.",
+        "choices": [
+          {
+            "label": "💬 Ask what's wrong",
+            "to": "hello"
+          }
+        ]
+      },
+      "hello": {
+        "text": "\"I lost all my colours,\" sniffs the dragon. \"To get them back, I must eat the rainbow fruit. Which one should we find first?\"",
+        "choices": [
+          {
+            "label": "🍎 Red apples",
+            "to": "red"
+          },
+          {
+            "label": "🫐 Blue berries",
+            "to": "blue"
+          }
+        ]
+      },
+      "red": {
+        "text": "They find shiny red apples. Count with Ellie: one… two… three! The dragon gobbles them up and its WINGS turn bright RED! What next?",
+        "choices": [
+          {
+            "label": "🍌 Yellow bananas",
+            "to": "yellow"
+          },
+          {
+            "label": "🦋 Fly up now!",
+            "to": "flyEarly"
+          }
+        ]
+      },
+      "blue": {
+        "text": "They find a bush of blueberries. Count them: one… two… three! Munch munch — the dragon's tail turns deep BLUE! What colour next?",
+        "choices": [
+          {
+            "label": "🍌 Yellow bananas",
+            "to": "yellow"
+          },
+          {
+            "label": "🍎 Red apples",
+            "to": "red"
+          }
+        ]
+      },
+      "yellow": {
+        "text": "Sweet yellow bananas! One, two! The dragon's tummy glows sunny YELLOW. Just one more colour to go — let's get green!",
+        "choices": [
+          {
+            "label": "🌿 Green leaves!",
+            "to": "green"
+          }
+        ]
+      },
+      "green": {
+        "text": "Crunchy green leaves make the dragon's tail GREEN. Red, yellow, green… Ellie claps. \"You're almost a rainbow! Ready to FLY?\"",
+        "choices": [
+          {
+            "label": "🌈 Yes — fly to the rainbow!",
+            "to": "rainbowEnd"
+          }
+        ]
+      },
+      "flyEarly": {
+        "text": "Ellie hops on and the red dragon soars over the clouds! It isn't a whole rainbow yet — but flying with a friend is the best feeling in the world. ❤️",
+        "end": "A Red Sky Ride"
+      },
+      "rainbowEnd": {
+        "text": "WHOOSH! Every colour swirls together and the dragon shines like a RAINBOW! Ellie rides it over the castle while everyone cheers. What a sparkly day! 🌈",
+        "end": "Rainbow Flight"
+      }
+    }
+  },
+  {
+    "id": "campout",
+    "coverImg": "art/generated/campout-camp.webp",
+    "title": "The Great Family Campout",
+    "emoji": "🏕️",
+    "color": "#f4791f",
+    "ages": "All ages",
+    "who": "the whole family",
+    "teaches": "nature, teamwork & wonder",
+    "blurb": "A starry night, s'mores, and a little lost puppy!",
+    "start": "camp",
+    "nodes": {
+      "camp": {
+        "text": "Under a million stars, the whole family sits by the campfire. Suddenly — a tiny WHIMPER comes from the dark woods. Baby Kieran points. What should they do?",
+        "choices": [
+          {
+            "label": "🔦 Explore the woods together",
+            "to": "explore"
+          },
+          {
+            "label": "🍫 Stay and make s'mores",
+            "to": "smores"
+          }
+        ]
+      },
+      "explore": {
+        "text": "Flashlights on! Jeannie and Cory tip-toe between the trees. In a beam of light they find a shivering little PUPPY, all alone. Its big eyes look up at them.",
+        "choices": [
+          {
+            "label": "🐶 Scoop it up to keep it warm",
+            "to": "warm"
+          },
+          {
+            "label": "🐾 Follow where it wants to go",
+            "to": "follow"
+          }
+        ]
+      },
+      "smores": {
+        "text": "Marshmallows toast to golden brown — squish them with chocolate! Cory counts the stars: 1, 2, 3… too many! An owl hoots (owls are awake at night). Then the puppy trots right into camp.",
+        "choices": [
+          {
+            "label": "🌟 Make a wish on a shooting star",
+            "to": "wish"
+          },
+          {
+            "label": "🐶 Help the lost puppy",
+            "to": "warm"
+          }
+        ]
+      },
+      "follow": {
+        "text": "The puppy leads them to a cosy den where a gentle FOX family lives! The fox isn't scary at all — it had been keeping the lost puppy safe and warm all night. What kind neighbours!",
+        "choices": [
+          {
+            "label": "🦊 Thank the fox and head back",
+            "to": "foxEnd"
+          }
+        ]
+      },
+      "warm": {
+        "text": "They wrap the puppy in a soft blanket by the fire. It stops shivering and licks Jeannie's nose! There's a little collar with a name tag. Should they check it?",
+        "choices": [
+          {
+            "label": "🔖 Read the name tag",
+            "to": "tag"
+          },
+          {
+            "label": "🏡 Search for its family at dawn",
+            "to": "tag"
+          }
+        ]
+      },
+      "tag": {
+        "text": "The tag says \"BISCUIT\" with a campsite number nearby! At sunrise the family walks Biscuit home, where a worried little kid bursts into a huge happy hug. Hooray!",
+        "choices": [
+          {
+            "label": "🎉 Celebrate the happy reunion",
+            "to": "reuniteEnd"
+          }
+        ]
+      },
+      "wish": {
+        "text": "A shooting star streaks across the sky! Everyone squeezes their eyes shut and wishes together. Cory wishes the puppy finds its home — and in the morning, it does. Some wishes really do come true. 🌠",
+        "choices": [
+          {
+            "label": "🐶 See the puppy go home",
+            "to": "reuniteEnd"
+          }
+        ]
+      },
+      "foxEnd": {
+        "text": "Back at camp, the family tells the tale of the kind woodland fox over breakfast. They learned that wild animals can be gentle and that helping each other is what families — and forests — do best. 🦊",
+        "end": "Friends of the Forest"
+      },
+      "reuniteEnd": {
+        "text": "Biscuit is safely home, and the family heads back to camp for pancakes. Cory, Jeannie, Ellie and baby Kieran all agree: the best part of any adventure is doing it TOGETHER. The End — for now! ❤️",
+        "end": "Heroes of the Campout"
+      }
+    }
+  },
+  {
+    "id": "pizza",
+    "coverImg": "art/generated/pizza-launch.webp",
+    "title": "Pizza Planet Rescue",
+    "emoji": "🍕",
+    "color": "#ffb142",
+    "ages": "All ages",
+    "who": "everyone",
+    "teaches": "counting, colours & space facts",
+    "blurb": "Blast off to feed hungry aliens across the galaxy!",
+    "start": "launch",
+    "nodes": {
+      "launch": {
+        "text": "Captain, this is Pizza Control! Three planets full of HUNGRY aliens need lunch. Your pizza rocket is fuelled and ready. Which planet shall we zoom to first?",
+        "choices": [
+          {
+            "label": "🔴 The Red Planet",
+            "to": "red"
+          },
+          {
+            "label": "🔵 The Blue Water Planet",
+            "to": "blue"
+          }
+        ]
+      },
+      "red": {
+        "text": "Touchdown on the Red Planet — it's dusty and red, a bit like Mars! The aliens here have THREE eyes and they're starving. They each want pizza. How shall we top it?",
+        "choices": [
+          {
+            "label": "🌶️ Spicy hot-sauce stars",
+            "to": "spicy"
+          },
+          {
+            "label": "🧀 Extra gooey cheese",
+            "to": "cheese"
+          }
+        ]
+      },
+      "blue": {
+        "text": "Splash! The Blue Planet is ALL water and the aliens are giggly jelly-fish folk who float everywhere. A normal pizza would sink! How do we serve it?",
+        "choices": [
+          {
+            "label": "🥏 Toss it like a flying disc",
+            "to": "frisbee"
+          },
+          {
+            "label": "🚤 Float it on a pizza-boat",
+            "to": "boat"
+          }
+        ]
+      },
+      "spicy": {
+        "text": "Spicy star pizza! The three-eyed aliens take a bite and blast happy steam out of their ears like little whistles — TOOT TOOT! \"DELICIOUS!\" they cheer. On to the next stop!",
+        "choices": [
+          {
+            "label": "🚀 Blast to the last planet",
+            "to": "ring"
+          }
+        ]
+      },
+      "cheese": {
+        "text": "So much gooey cheese it stretches loooong strings! The aliens count their slices: 1, 2, 3, 4, 5 — five each! They do a happy three-eyed wink. Yummy success!",
+        "choices": [
+          {
+            "label": "🚀 Blast to the last planet",
+            "to": "ring"
+          }
+        ]
+      },
+      "frisbee": {
+        "text": "WHEE! Captain spins the pizza like a flying disc and the jelly-fish aliens leap and catch slices mid-float. Best pizza game in the galaxy! They wobble with joy.",
+        "choices": [
+          {
+            "label": "🚀 Blast to the last planet",
+            "to": "ring"
+          }
+        ]
+      },
+      "boat": {
+        "text": "A little pizza-boat sails across the water world, dropping warm slices to every floating alien. Not one slice gets soggy — clever Captain! They blow bubbly thank-yous.",
+        "choices": [
+          {
+            "label": "🚀 Blast to the last planet",
+            "to": "ring"
+          }
+        ]
+      },
+      "ring": {
+        "text": "Last stop: a purple planet wrapped in shiny RINGS, just like Saturn! Count the rings with me: one, two, three glittering rings. The ring-aliens are throwing a party. Should we join?",
+        "choices": [
+          {
+            "label": "🎉 Invite EVERYONE to a pizza party",
+            "to": "partyEnd"
+          },
+          {
+            "label": "🏁 Race home to bake even more",
+            "to": "moreEnd"
+          }
+        ]
+      },
+      "partyEnd": {
+        "text": "Captain beams every alien aboard for the BIGGEST space pizza party ever — red ones, blue ones, ringed ones, all sharing slices among the stars. The whole galaxy is full and happy. Mission complete, Captain! 🍕🚀",
+        "end": "Galactic Pizza Hero"
+      },
+      "moreEnd": {
+        "text": "\"There are MORE hungry planets out there!\" Captain zooms home, ovens already glowing, ready to bake a thousand more pizzas. The galaxy will never go hungry on YOUR watch. To infinity… and pepperoni! 🍕",
+        "end": "Pizza Captain Forever"
+      }
+    }
+  },
+  {
+    "id": "mermaid",
+    "title": "The Mermaid's Lost Song",
+    "emoji": "🧜‍♀️",
+    "color": "#38b6ff",
+    "ages": "3+",
+    "who": "Ellie & Jeannie",
+    "teaches": "listening, music & counting",
+    "blurb": "A little mermaid lost her song — follow the sounds of the sea to find it!",
+    "start": "shore",
+    "nodes": {
+      "shore": {
+        "text": "At the seaside, Princess Ellie hears a tiny sniffle. A little mermaid has lost her SONG, and the whole sea is too quiet without it! Where should they listen first?",
+        "choices": [
+          {
+            "label": "🐚 Listen inside the big shell",
+            "to": "shell"
+          },
+          {
+            "label": "🐬 Ask the friendly dolphin",
+            "to": "dolphin"
+          }
+        ]
+      },
+      "shell": {
+        "text": "Ellie holds the big pink shell to her ear. Ssshhh… listen… a teeny tiny \"la-la-laaa\" is echoing far away! A crab scuttles up and clicks: \"That echo came from the coral garden!\"",
+        "choices": [
+          {
+            "label": "🪸 Swim to the coral garden",
+            "to": "coral"
+          },
+          {
+            "label": "🦀 Follow the crab's secret shortcut",
+            "to": "crabpath"
+          }
+        ]
+      },
+      "dolphin": {
+        "text": "\"Click-click-wheee!\" sings the dolphin. Dolphins really do talk in clicks and whistles! \"I heard a song-bubble float by. It bobbed away toward the deep blue water.\"",
+        "choices": [
+          {
+            "label": "🫧 Chase the song-bubble",
+            "to": "bubble"
+          },
+          {
+            "label": "🪸 Search the coral garden instead",
+            "to": "coral"
+          }
+        ]
+      },
+      "coral": {
+        "text": "Down in the coral garden, stripy fish are humming along to… something! Count the corals with me: one, two, THREE. The humming is loudest by the pink one.",
+        "choices": [
+          {
+            "label": "👂 Listen at the pink coral",
+            "to": "found"
+          },
+          {
+            "label": "🐟 Ask the stripy fish for help",
+            "to": "fishhelp"
+          }
+        ]
+      },
+      "crabpath": {
+        "text": "The crab's shortcut goes right through a tiny sandcastle town! Tip-toe, tip-toe — careful not to squish the towers. On the far side, music sparkles on the waves like sunshine.",
+        "choices": [
+          {
+            "label": "🎶 Follow the sparkling music",
+            "to": "found"
+          }
+        ]
+      },
+      "bubble": {
+        "text": "There it is — the shiny song-bubble, bobbing over the waves! POP! Out spill silvery notes: \"la-laaa!\" They line up in the water like little fish and swim off, singing all the way.",
+        "choices": [
+          {
+            "label": "🎵 Follow the singing notes",
+            "to": "found"
+          }
+        ]
+      },
+      "fishhelp": {
+        "text": "\"Blub-blub!\" The stripy fish puff up their cheeks and blow bubble-drums — BOOM, boom, BOOM! The whole reef starts to wiggle and dance along to the beat.",
+        "choices": [
+          {
+            "label": "🥁 March with the bubble-drum band",
+            "to": "bandEnd"
+          },
+          {
+            "label": "👂 Keep listening for the lost song",
+            "to": "found"
+          }
+        ]
+      },
+      "found": {
+        "text": "THERE it is! Tangled in the seaweed sits the mermaid's song, shimmering like a ribbon of stars. Ellie gently sets it free, and it swirls straight back into the mermaid's heart. She beams!",
+        "choices": [
+          {
+            "label": "🎤 Sing it together, nice and loud",
+            "to": "singEnd"
+          },
+          {
+            "label": "🎪 Throw a big under-sea concert",
+            "to": "concertEnd"
+          }
+        ]
+      },
+      "singEnd": {
+        "text": "The mermaid and Ellie sing to the setting sun, and the whole sea hums along — whales down low, dolphins up high, crabs clicking the beat. A song you SHARE is the sweetest song of all. 🎶",
+        "end": "The Sunset Duet"
+      },
+      "concertEnd": {
+        "text": "The mermaid strums her golden harp and EVERYONE gets a part: dolphins whistle, fish blub, and the crab keeps time with his claws. It's the first-ever Under-the-Sea Concert — and Ellie conducts!",
+        "end": "Star of the Sea Concert"
+      },
+      "bandEnd": {
+        "text": "BOOM, boom, BOOM! The bubble-drum band marches around the reef all afternoon, and the little mermaid laughs so hard she finds a brand-new song — a giggly one! Music can be found anywhere. 🥁",
+        "end": "The Bubble-Drum Band"
+      }
+    },
+    "coverImg": "art/generated/mermaid-shore.webp"
   }
-
-  /* =======================================================
-     1) ELLIE & THE RAINBOW DRAGON  (3+, colours & counting)
-     ======================================================= */
-  const rainbow = {
-    id: "rainbow",
-    coverImg: "art/rainbow-cover.png",
-    title: "Ellie & the Rainbow Dragon",
-    emoji: "🐉",
-    color: "#ff7eb6",
-    ages: "3+",
-    who: "Ellie",
-    teaches: "colours, counting & kindness",
-    blurb: "Help a little grey dragon find all its colours!",
-    cover: () => A.skyDay({ hills: true }) + A.castle(320, 208, .55) +
-      A.dragon({ x: 140, y: 150, scale: 1.3, color: "#b06ad9" }) +
-      A.princess({ x: 70, y: 230, scale: 1, dress: "#ff5d8f" }),
-    start: "meet",
-    nodes: {
-      meet: {
-        art: () => A.meadow() + A.castle(330, 216, .5) +
-          A.dragon({ x: 250, y: 200, scale: 1, color: "#b9b9c4", mood: "sad" }) +
-          A.princess({ x: 90, y: 235, scale: 1.05, dress: "#ff5d8f" }),
-        text: "Princess Ellie skips through the meadow. A little dragon sits all alone — and it is grey all over! It looks sad.",
-        choices: [
-          { label: "👋 Wave and say hello", to: "hello" },
-          { label: "🌸 Pick it a flower", to: "flower" }
-        ]
-      },
-      flower: {
-        art: () => A.meadow() +
-          A.dragon({ x: 250, y: 200, scale: 1, color: "#b9b9c4" }) +
-          A.princess({ x: 110, y: 235, scale: 1.05, dress: "#ff5d8f" }) +
-          A.flower(180, 210, "#ff5d8f"),
-        text: "Ellie picks a pink flower and holds it out. The dragon sniffs it and smiles a tiny smile. \"Thank you,\" it whispers.",
-        choices: [{ label: "💬 Ask what's wrong", to: "hello" }]
-      },
-      hello: {
-        art: () => A.meadow() +
-          A.dragon({ x: 250, y: 200, scale: 1.05, color: "#b9b9c4" }) +
-          A.princess({ x: 110, y: 235, scale: 1.05, dress: "#ff5d8f" }),
-        text: "\"I lost all my colours,\" sniffs the dragon. \"To get them back, I must eat the rainbow fruit. Which one should we find first?\"",
-        choices: [
-          { label: "🍎 Red apples", to: "red" },
-          { label: "🫐 Blue berries", to: "blue" }
-        ]
-      },
-      red: {
-        art: () => A.meadow() + A.tree(320, 220, 1.1, "#3bb36a") +
-      `<circle cx="302" cy="180" r="7" fill="#e8584f"/><circle cx="304.5" cy="177.5" r="2" fill="#fff" opacity=".85"/>` +
-      `<circle cx="322" cy="163" r="7" fill="#e8584f"/><circle cx="324.5" cy="160.5" r="2" fill="#fff" opacity=".85"/>` +
-      `<circle cx="341" cy="185" r="7" fill="#e8584f"/><circle cx="343.5" cy="182.5" r="2" fill="#fff" opacity=".85"/>` +
-      A.dragon({ x: 220, y: 200, scale: 1.05, color: "#ff6b6b" }) +
-      A.princess({ x: 90, y: 235, scale: 1, dress: "#ff5d8f" }),
-        text: "They find shiny red apples. Count with Ellie: one… two… three! The dragon gobbles them up and its WINGS turn bright RED! What next?",
-        choices: [
-          { label: "🍌 Yellow bananas", to: "yellow" },
-          { label: "🦋 Fly up now!", to: "flyEarly" }
-        ]
-      },
-      blue: {
-        art: () => A.meadow() +
-      `<ellipse cx="150" cy="250" rx="34" ry="18" fill="#3d8f5f"/><ellipse cx="132" cy="242" rx="18" ry="12" fill="#4aa870"/><ellipse cx="164" cy="240" rx="20" ry="13" fill="#4aa870"/>` +
-      `<circle cx="136" cy="246" r="6" fill="#4a6fd8"/><circle cx="138" cy="244" r="1.8" fill="#fff" opacity=".8"/>` +
-      `<circle cx="153" cy="238" r="6" fill="#4a6fd8"/><circle cx="155" cy="236" r="1.8" fill="#fff" opacity=".8"/>` +
-      `<circle cx="168" cy="248" r="6" fill="#4a6fd8"/><circle cx="170" cy="246" r="1.8" fill="#fff" opacity=".8"/>` +
-      A.dragon({ x: 240, y: 200, scale: 1.05, color: "#5aa9ff" }) +
-      A.princess({ x: 90, y: 235, scale: 1, dress: "#ff5d8f" }),
-        text: "They find a bush of blueberries. Count them: one… two… three! Munch munch — the dragon's tail turns deep BLUE! What colour next?",
-        choices: [
-          { label: "🍌 Yellow bananas", to: "yellow" },
-          { label: "🍎 Red apples", to: "red" }
-        ]
-      },
-      yellow: {
-        art: () => A.meadow() +
-      A.dragon({ x: 235, y: 200, scale: 1.1, color: "#ffd23e" }) +
-      A.princess({ x: 90, y: 235, scale: 1, dress: "#ff5d8f" }) +
-      `<g transform="translate(150 246) rotate(-10)"><path d="M-14 -4 C-14 8 -4 14 8 12 C13 11 16 5 15 1 C13 6 5 8 -2 5 C-8 3 -10 -2 -9 -7 C-9 -10 -13 -9 -14 -4Z" fill="#ffd23e" stroke="#e0a92e" stroke-width="1"/><circle cx="-12" cy="-6" r="1.6" fill="#8a5a33"/><circle cx="14" cy="2" r="1.4" fill="#8a5a33"/></g>` +
-      `<g transform="translate(186 256) rotate(14)"><path d="M-14 -4 C-14 8 -4 14 8 12 C13 11 16 5 15 1 C13 6 5 8 -2 5 C-8 3 -10 -2 -9 -7 C-9 -10 -13 -9 -14 -4Z" fill="#ffd23e" stroke="#e0a92e" stroke-width="1"/><circle cx="-12" cy="-6" r="1.6" fill="#8a5a33"/><circle cx="14" cy="2" r="1.4" fill="#8a5a33"/></g>`,
-        text: "Sweet yellow bananas! One, two! The dragon's tummy glows sunny YELLOW. Just one more colour to go — let's get green!",
-        choices: [{ label: "🌿 Green leaves!", to: "green" }]
-      },
-      green: {
-        art: () => A.forest() +
-      // a leafy branch for the dragon to crunch, since the words promise
-      // "crunchy green leaves"
-      `<g transform="translate(196 236)"><path d="M-20 6 Q0 0 22 -4" stroke="#5d7c3a" stroke-width="2.6" fill="none" stroke-linecap="round"/>` +
-      `<path d="M-14 4 Q-11 -6 -2 -6 Q-7 3 -14 4Z" fill="#4fae3f"/>` +
-      `<path d="M-2 0 Q2 -11 11 -10 Q6 0 -2 0Z" fill="#61c44b"/>` +
-      `<path d="M8 -3 Q13 -13 22 -11 Q16 -2 8 -3Z" fill="#4fae3f"/>` +
-      `<path d="M-9 8 Q-5 16 4 15 Q-1 7 -9 8Z" fill="#61c44b"/></g>` +
-      A.dragon({ x: 250, y: 214, scale: 1.15, color: "#7ed957" }) +
-      A.princess({ x: 96, y: 248, scale: 1, dress: "#ff5d8f" }),
-        text: "Crunchy green leaves make the dragon's tail GREEN. Red, yellow, green… Ellie claps. \"You're almost a rainbow! Ready to FLY?\"",
-        choices: [{ label: "🌈 Yes — fly to the rainbow!", to: "rainbowEnd" }]
-      },
-      flyEarly: {
-        art: () => A.skyDay({}) + A.cloud(120, 120, 1) + A.cloud(300, 90, .8) +
-          A.dragon({ x: 200, y: 160, scale: 1.3, color: "#ff6b6b" }) +
-          A.princess({ x: 200, y: 150, scale: .7, dress: "#ff5d8f", crown: true }),
-        text: "Ellie hops on and the red dragon soars over the clouds! It isn't a whole rainbow yet — but flying with a friend is the best feeling in the world. ❤️",
-        end: "A Red Sky Ride"
-      },
-      rainbowEnd: {
-        // Layer order matters here: the rainbow is painted FIRST so it arcs
-        // behind the castle and the crowd instead of striping across them.
-        art: () => A.skyDay({ sun: true }) + A.cloud(90, 90, .9) + A.cloud(320, 70, .8) +
-      `<g opacity=".92">
-       <path d="M40 262 A 190 190 0 0 1 360 262" fill="none" stroke="#e8584f" stroke-width="8"/>
-       <path d="M40 271 A 180 180 0 0 1 360 271" fill="none" stroke="#ffb142" stroke-width="8"/>
-       <path d="M40 280 A 170 170 0 0 1 360 280" fill="none" stroke="#ffd166" stroke-width="8"/>
-       <path d="M40 289 A 160 160 0 0 1 360 289" fill="none" stroke="#7ed957" stroke-width="8"/>
-       <path d="M40 298 A 150 150 0 0 1 360 298" fill="none" stroke="#5aa9ff" stroke-width="8"/></g>` +
-      A.castle(330, 250, .5) +
-      // the cheering crowd, raised clear of the bottom edge so nobody is
-      // sliced off, and given bright party colours
-      A.boy({ x: 58, y: 258, scale: .72, shirt: "#3ddc84" }) +
-      A.princess({ x: 112, y: 258, scale: .68, dress: "#ffb142" }) +
-      A.dragon({ x: 200, y: 150, scale: 1.4, rainbow: true, color: "#b06ad9" }) +
-      A.princess({ x: 200, y: 140, scale: .7, dress: "#ff5d8f", crown: true }) +
-      // swirling colour sparks, drawn as twinkling four-point sparkles rather
-      // than the flat dots that used to look like stray specks
-      [[150, 118, 8, "#e8584f"], [252, 128, 7, "#ffb142"], [198, 94, 6, "#ffd166"],
-       [122, 172, 6, "#7ed957"], [276, 176, 7, "#5aa9ff"], [168, 190, 5, "#b06ad9"]]
-        .map(([sx, sy, r, c], i) =>
-          `<path transform="translate(${sx} ${sy})" fill="${c}" d="M0 ${-r} Q${r * .22} ${-r * .22} ${r} 0 Q${r * .22} ${r * .22} 0 ${r} Q${-r * .22} ${r * .22} ${-r} 0 Q${-r * .22} ${-r * .22} 0 ${-r}Z">` +
-          `<animate attributeName="opacity" values="1;.3;1" dur="${2 + i * 0.3}s" repeatCount="indefinite"/></path>`).join(""),
-        text: "WHOOSH! Every colour swirls together and the dragon shines like a RAINBOW! Ellie rides it over the castle while everyone cheers. What a sparkly day! 🌈",
-        end: "Rainbow Flight"
-      }
-    }
-  };
-
-  /* =======================================================
-     2) THE GREAT FAMILY CAMPOUT (all ages, togetherness)
-     ======================================================= */
-  const campout = {
-    id: "campout",
-    coverImg: "art/campout-cover.png",
-    title: "The Great Family Campout",
-    emoji: "🏕️",
-    color: "#f4791f",
-    ages: "All ages",
-    who: "the whole family",
-    teaches: "nature, teamwork & wonder",
-    blurb: "A starry night, s'mores, and a little lost puppy!",
-    cover: () => A.night({}) + A.tent(90, 240, 1, "#e8584f") + A.campfire(220, 240, 1.2) +
-      A.puppy({ x: 320, y: 245, scale: .9 }),
-    start: "camp",
-    nodes: {
-      camp: {
-        // The words point at "the dark woods" that Kieran is pointing to, so
-        // the woods have to actually be in the picture.
-        art: () => A.night({}) +
-      A.pine(378, 256, .95, "#173d2c") +
-      A.pine(348, 246, .72, "#12321f") +
-      A.tree(312, 252, .85, "#154a30") +
-      A.tent(56, 250, .9, "#e8584f") + A.tent(124, 252, .8, "#4a8fe0") +
-      A.campfire(182, 250, 1) +
-      A.princess({ x: 246, y: 256, scale: .8, dress: "#ff5d8f" }) +
-      A.boy({ x: 278, y: 256, scale: .8, shirt: "#3ddc84" }) +
-      A.baby({ x: 216, y: 262, scale: .75 }),
-        text: "Under a million stars, the whole family sits by the campfire. Suddenly — a tiny WHIMPER comes from the dark woods. Baby Kieran points. What should they do?",
-        choices: [
-          { label: "🔦 Explore the woods together", to: "explore" },
-          { label: "🍫 Stay and make s'mores", to: "smores" }
-        ]
-      },
-      explore: {
-        art: () => A.night({ moonX: 340, moonY: 50 }) +
-      A.tree(45, 262, 1.1, "#1f5c3c") + A.tree(350, 258, 1.2, "#1a5236") + A.tree(210, 250, .75, "#246647") +
-      // a soft, warm, rounded torch beam — the old flat triangle had a hard
-      // vertical far edge that showed up as a grey rectangular block of haze
-      A.flashlight({ x: 162, y: 251, len: 128, spread: 22 }) +
-      A.princess({ x: 95, y: 258, scale: .85, dress: "#ff5d8f" }) +
-      A.boy({ x: 150, y: 260, scale: .85, shirt: "#3ddc84" }) +
-      A.puppy({ x: 292, y: 252, scale: .9 }),
-        text: "Flashlights on! Jeannie and Cory tip-toe between the trees. In a beam of light they find a shivering little PUPPY, all alone. Its big eyes look up at them.",
-        choices: [
-          { label: "🐶 Scoop it up to keep it warm", to: "warm" },
-          { label: "🐾 Follow where it wants to go", to: "follow" }
-        ]
-      },
-      smores: {
-        art: () => A.night({}) + A.tree(42, 262, 1, "#1f5c3c") +
-      A.owl({ x: 42, y: 194, scale: .6 }) +
-      // the s'more now rests on a log by the fire instead of hovering in mid-air
-      A.campfire(200, 250, 1.3) +
-      `<rect x="104" y="248" width="34" height="9" rx="4.5" fill="#6b4423"/>` +
-      `<rect x="104" y="248" width="34" height="4" rx="2" fill="#8a5a33"/>` +
-      A.smore(121, 240, .9) +
-      A.princess({ x: 268, y: 256, scale: .85, dress: "#ff5d8f" }) +
-      A.boy({ x: 90, y: 256, scale: .85, shirt: "#3ddc84" }) +
-      A.puppy({ x: 335, y: 252, scale: .85 }),
-        text: "Marshmallows toast to golden brown — squish them with chocolate! Cory counts the stars: 1, 2, 3… too many! An owl hoots (owls are awake at night). Then the puppy trots right into camp.",
-        choices: [
-          { label: "🌟 Make a wish on a shooting star", to: "wish" },
-          { label: "🐶 Help the lost puppy", to: "warm" }
-        ]
-      },
-      follow: {
-        art: () => A.night({ moonX: 60, moonY: 48 }) +
-      A.tree(38, 258, 1.05, "#1f5c3c") + A.tree(362, 255, 1.15, "#1a5236") +
-      `<path d="M252 264 Q252 216 305 216 Q358 216 358 264 Z" fill="#5a4a33"/>` +
-      `<path d="M284 264 Q284 234 305 234 Q326 234 326 264 Z" fill="#241a10"/>` +
-      A.fox({ x: 268, y: 246, scale: 1 }) + A.fox({ x: 330, y: 252, scale: .6 }) +
-      A.puppy({ x: 200, y: 252, scale: .85 }) +
-      A.princess({ x: 88, y: 255, scale: .8, dress: "#ff5d8f" }) +
-      A.boy({ x: 140, y: 257, scale: .8, shirt: "#3ddc84" }),
-        text: "The puppy leads them to a cosy den where a gentle FOX family lives! The fox isn't scary at all — it had been keeping the lost puppy safe and warm all night. What kind neighbours!",
-        choices: [{ label: "🦊 Thank the fox and head back", to: "foxEnd" }]
-      },
-      warm: {
-        art: () => A.night({}) + A.campfire(220, 250, 1.1) +
-      A.puppy({ x: 130, y: 248, scale: 1 }) +
-      `<path d="M108 268 Q105 250 121 247 Q131 251 143 247 Q159 250 156 268 Q131 275 108 268Z" fill="#a368d8"/>` +
-      `<path d="M115 263 Q131 268 149 263" stroke="#8a4fc0" stroke-width="2" fill="none" opacity=".7"/>` +
-      A.princess({ x: 300, y: 256, scale: .8, dress: "#ff5d8f" }),
-        text: "They wrap the puppy in a soft blanket by the fire. It stops shivering and licks Jeannie's nose! There's a little collar with a name tag. Should they check it?",
-        choices: [
-          { label: "🔖 Read the name tag", to: "tag" },
-          { label: "🏡 Search for its family at dawn", to: "tag" }
-        ]
-      },
-      tag: {
-        art: () => A.skySunset() + A.tent(64, 252, .85, "#e8584f") +
-      A.boy({ x: 118, y: 262, scale: .8, shirt: "#3ddc84" }) +
-      A.princess({ x: 320, y: 262, scale: .8, dress: "#ff5d8f" }) +
-      A.puppy({ x: 205, y: 258, scale: .95 }) +
-      A.boy({ x: 240, y: 262, scale: .78, shirt: "#ffd166" }),
-        text: "The tag says \"BISCUIT\" with a campsite number nearby! At sunrise the family walks Biscuit home, where a worried little kid bursts into a huge happy hug. Hooray!",
-        choices: [{ label: "🎉 Celebrate the happy reunion", to: "reuniteEnd" }]
-      },
-      wish: {
-        art: () => A.night({}) +
-      // a real shooting star: glowing head with a tapered, fading tail
-      // (this used to be a fat beige stick with a ball on the end)
-      A.shootingStar({ x: 148, y: 96, len: 110, angle: 27 }) +
-      A.campfire(200, 250, 1.1) +
-      A.princess({ x: 300, y: 256, scale: .8, dress: "#ff5d8f" }) +
-      A.boy({ x: 90, y: 256, scale: .8, shirt: "#3ddc84" }) +
-      A.baby({ x: 145, y: 262, scale: .7 }),
-        text: "A shooting star streaks across the sky! Everyone squeezes their eyes shut and wishes together. Cory wishes the puppy finds its home — and in the morning, it does. Some wishes really do come true. 🌠",
-        choices: [{ label: "🐶 See the puppy go home", to: "reuniteEnd" }]
-      },
-      foxEnd: {
-        art: () => A.skyDay({}) + A.tent(90, 250, .9, "#e8584f") +
-          A.fox({ x: 320, y: 250, scale: .85 }) +
-          A.princess({ x: 130, y: 256, scale: .85, dress: "#ff5d8f" }) +
-          A.boy({ x: 200, y: 256, scale: .85, shirt: "#3ddc84" }),
-        text: "Back at camp, the family tells the tale of the kind woodland fox over breakfast. They learned that wild animals can be gentle and that helping each other is what families — and forests — do best. 🦊",
-        end: "Friends of the Forest"
-      },
-      reuniteEnd: {
-        art: () => A.skyDay({}) + A.tent(70, 250, .9, "#e8584f") + A.campfire(145, 252, .8) +
-      A.boy({ x: 195, y: 258, scale: .85, shirt: "#3ddc84" }) +
-      A.princess({ x: 300, y: 258, scale: .85, dress: "#ff5d8f" }) +
-      A.princess({ x: 255, y: 260, scale: .7, dress: "#b06ad9" }) +
-      A.baby({ x: 345, y: 264, scale: .7 }),
-        text: "Biscuit is safely home, and the family heads back to camp for pancakes. Cory, Jeannie, Ellie and baby Kieran all agree: the best part of any adventure is doing it TOGETHER. The End — for now! ❤️",
-        end: "Heroes of the Campout"
-      }
-    }
-  };
-
-  /* =======================================================
-     3) PIZZA PLANET RESCUE (all ages, silly counting & space)
-     ======================================================= */
-  const pizza = {
-    id: "pizza",
-    coverImg: "art/pizza-cover.png",
-    title: "Pizza Planet Rescue",
-    emoji: "🍕",
-    color: "#ffb142",
-    ages: "All ages",
-    who: "everyone",
-    teaches: "counting, colours & space facts",
-    blurb: "Blast off to feed hungry aliens across the galaxy!",
-    cover: () => A.space({}) + A.planet(310, 90, 36, "#e8584f") + A.planet(70, 220, 28, "#4a8fe0", true) +
-      A.rocket({ x: 200, y: 170, scale: 1.3, color: "#e8584f", flame: true }),
-    start: "launch",
-    nodes: {
-      launch: {
-        art: () => A.space({}) + A.planet(320, 80, 30, "#e8584f") + A.planet(70, 90, 26, "#4a8fe0") +
-          A.planet(200, 250, 34, "#ffd166", true) +
-          A.rocket({ x: 200, y: 150, scale: 1.2, color: "#e8584f", flame: true }),
-        text: "Captain, this is Pizza Control! Three planets full of HUNGRY aliens need lunch. Your pizza rocket is fuelled and ready. Which planet shall we zoom to first?",
-        choices: [
-          { label: "🔴 The Red Planet", to: "red" },
-          { label: "🔵 The Blue Water Planet", to: "blue" }
-        ]
-      },
-      red: {
-        art: () => A.space({}) + A.planet(200, 250, 70, "#e8584f") +
-      A.rocket({ x: 90, y: 110, scale: .8, color: "#ffd166" }) +
-      A.alien({ x: 200, y: 200, scale: 1, color: "#ff9a8f" }) +
-      `<ellipse cx="200" cy="190" rx="2.6" ry="3.4" fill="#fff"/><circle cx="200" cy="190.6" r="1.6" fill="#2b2440"/>` +
-      A.alien({ x: 280, y: 215, scale: .8, color: "#ff7a6f" }) +
-      `<ellipse cx="280" cy="207" rx="2.1" ry="2.7" fill="#fff"/><circle cx="280" cy="207.5" r="1.3" fill="#2b2440"/>`,
-        text: "Touchdown on the Red Planet — it's dusty and red, a bit like Mars! The aliens here have THREE eyes and they're starving. They each want pizza. How shall we top it?",
-        choices: [
-          { label: "🌶️ Spicy hot-sauce stars", to: "spicy" },
-          { label: "🧀 Extra gooey cheese", to: "cheese" }
-        ]
-      },
-      blue: {
-        art: () => {
-      const jelly = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-14 2 Q-14 -16 0 -16 Q14 -16 14 2 Q7 5 0 4 Q-7 5 -14 2Z" fill="${c}" opacity=".92"/><path d="M-10 4 q-2 8 1 14 M-4 5 q-1.5 9 1 15 M3 5 q2 9 -1 15 M9 4 q3 8 0 14" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/><circle cx="-4.5" cy="-6" r="1.8" fill="#2b2440"/><circle cx="4.5" cy="-6" r="1.8" fill="#2b2440"/><path d="M-3 -1.5 Q0 1 3 -1.5" stroke="#2b2440" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="-8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/><circle cx="8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/></g>`;
-      return A.space({}) + A.planet(200, 250, 72, "#4a8fe0") +
-        A.rocket({ x: 90, y: 100, scale: .8, color: "#e8584f" }) +
-        jelly(210, 192, 1.1, "#9be15d") + jelly(288, 212, .85, "#ffd166");
-    },
-        text: "Splash! The Blue Planet is ALL water and the aliens are giggly jelly-fish folk who float everywhere. A normal pizza would sink! How do we serve it?",
-        choices: [
-          { label: "🥏 Toss it like a flying disc", to: "frisbee" },
-          { label: "🚤 Float it on a pizza-boat", to: "boat" }
-        ]
-      },
-      spicy: {
-        art: () => A.space({}) + A.planet(200, 260, 70, "#e8584f") +
-      `<circle cx="200" cy="224" r="24" fill="#e8a04a"/><circle cx="200" cy="224" r="19" fill="#ffd166"/>` +
-      `<path d="M190 211 l2 4.2 4.6 .6 -3.4 3.2 .9 4.6 -4.1 -2.2 -4.1 2.2 .9 -4.6 -3.4 -3.2 4.6 -.6Z" fill="#e8584f"/>` +
-      `<path d="M208 218 l2 4.2 4.6 .6 -3.4 3.2 .9 4.6 -4.1 -2.2 -4.1 2.2 .9 -4.6 -3.4 -3.2 4.6 -.6Z" fill="#e8584f"/>` +
-      `<path d="M197 227 l2 4.2 4.6 .6 -3.4 3.2 .9 4.6 -4.1 -2.2 -4.1 2.2 .9 -4.6 -3.4 -3.2 4.6 -.6Z" fill="#e8584f"/>` +
-      A.alien({ x: 140, y: 200, scale: 1, color: "#ff9a8f" }) +
-      `<ellipse cx="140" cy="190" rx="2.6" ry="3.4" fill="#fff"/><circle cx="140" cy="190.6" r="1.6" fill="#2b2440"/>` +
-      `<circle cx="122" cy="176" r="4" fill="#fff" opacity=".8"/><circle cx="117" cy="167" r="3" fill="#fff" opacity=".55"/><circle cx="158" cy="176" r="4" fill="#fff" opacity=".8"/><circle cx="163" cy="167" r="3" fill="#fff" opacity=".55"/>` +
-      A.alien({ x: 260, y: 205, scale: 1, color: "#ff7a6f" }) +
-      `<ellipse cx="260" cy="195" rx="2.6" ry="3.4" fill="#fff"/><circle cx="260" cy="195.6" r="1.6" fill="#2b2440"/>` +
-      `<circle cx="242" cy="181" r="4" fill="#fff" opacity=".8"/><circle cx="237" cy="172" r="3" fill="#fff" opacity=".55"/><circle cx="278" cy="181" r="4" fill="#fff" opacity=".8"/><circle cx="283" cy="172" r="3" fill="#fff" opacity=".55"/>`,
-        text: "Spicy star pizza! The three-eyed aliens take a bite and blast happy steam out of their ears like little whistles — TOOT TOOT! \"DELICIOUS!\" they cheer. On to the next stop!",
-        choices: [{ label: "🚀 Blast to the last planet", to: "ring" }]
-      },
-      cheese: {
-        art: () => A.space({}) + A.planet(200, 260, 70, "#e8584f") +
-      `<circle cx="200" cy="228" r="26" fill="#e8a04a"/><circle cx="200" cy="228" r="21" fill="#ffd166"/>` +
-      `<path d="M200 228 L200 207 M200 228 L220 221.5 M200 228 L212.3 245 M200 228 L187.7 245 M200 228 L180 221.5" stroke="#c9862e" stroke-width="2"/>` +
-      `<path d="M234 194 L248 216 L226 216 Z" fill="#ffd166" stroke="#e8a04a" stroke-width="2"/>` +
-      `<path d="M230 214 q0 8 -2 13 M240 215 q1 8 0 13" stroke="#ffe9a8" stroke-width="1.6" fill="none"/>` +
-      A.alien({ x: 142, y: 202, scale: 1, color: "#ff9a8f" }) +
-      `<ellipse cx="142" cy="192" rx="2.6" ry="3.4" fill="#fff"/><circle cx="142" cy="192.6" r="1.6" fill="#2b2440"/>` +
-      A.alien({ x: 264, y: 206, scale: .9, color: "#ff7a6f" }) +
-      `<ellipse cx="264" cy="197" rx="2.3" ry="3" fill="#fff"/><circle cx="264" cy="197.5" r="1.4" fill="#2b2440"/>`,
-        text: "So much gooey cheese it stretches loooong strings! The aliens count their slices: 1, 2, 3, 4, 5 — five each! They do a happy three-eyed wink. Yummy success!",
-        choices: [{ label: "🚀 Blast to the last planet", to: "ring" }]
-      },
-      frisbee: {
-        art: () => {
-      const jelly = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-14 2 Q-14 -16 0 -16 Q14 -16 14 2 Q7 5 0 4 Q-7 5 -14 2Z" fill="${c}" opacity=".92"/><path d="M-10 4 q-2 8 1 14 M-4 5 q-1.5 9 1 15 M3 5 q2 9 -1 15 M9 4 q3 8 0 14" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/><circle cx="-4.5" cy="-6" r="1.8" fill="#2b2440"/><circle cx="4.5" cy="-6" r="1.8" fill="#2b2440"/><path d="M-3 -1.5 Q0 1 3 -1.5" stroke="#2b2440" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="-8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/><circle cx="8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/></g>`;
-      return A.space({}) + A.planet(200, 270, 80, "#4a8fe0") +
-        `<circle cx="200" cy="110" r="22" fill="#ffd166" stroke="#e8a04a" stroke-width="5"/>` +
-        `<circle cx="193" cy="104" r="3.5" fill="#e8584f"/><circle cx="207" cy="113" r="3.5" fill="#e8584f"/><circle cx="199" cy="121" r="3" fill="#e8584f"/><circle cx="208" cy="100" r="3" fill="#e8584f"/>` +
-        `<path d="M166 96 q-14 4 -22 12 M170 124 q-12 6 -16 14" stroke="#fff" stroke-width="2" opacity=".5" fill="none"/>` +
-        // a caught slice with a real crust edge and pepperoni, rather than the
-        // bare yellow triangle that looked like a stray arrow
-        `<g transform="translate(266 162) rotate(24)">` +
-        `<path d="M0 -14 L12 10 L-12 10Z" fill="#ffd166"/>` +
-        `<path d="M12 10 Q0 14 -12 10 Q0 6 12 10Z" fill="#e0a24a"/>` +
-        `<circle cx="-3" cy="2" r="2.5" fill="#e8584f"/><circle cx="4" cy="5" r="2.1" fill="#e8584f"/><circle cx="0" cy="-6" r="1.8" fill="#e8584f"/></g>` +
-        jelly(130, 195, 1, "#9be15d") + jelly(272, 205, 1, "#ffd166");
-    },
-        text: "WHEE! Captain spins the pizza like a flying disc and the jelly-fish aliens leap and catch slices mid-float. Best pizza game in the galaxy! They wobble with joy.",
-        choices: [{ label: "🚀 Blast to the last planet", to: "ring" }]
-      },
-      boat: {
-        art: () => {
-      const jelly = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-14 2 Q-14 -16 0 -16 Q14 -16 14 2 Q7 5 0 4 Q-7 5 -14 2Z" fill="${c}" opacity=".92"/><path d="M-10 4 q-2 8 1 14 M-4 5 q-1.5 9 1 15 M3 5 q2 9 -1 15 M9 4 q3 8 0 14" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/><circle cx="-4.5" cy="-6" r="1.8" fill="#2b2440"/><circle cx="4.5" cy="-6" r="1.8" fill="#2b2440"/><path d="M-3 -1.5 Q0 1 3 -1.5" stroke="#2b2440" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="-8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/><circle cx="8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/></g>`;
-      // A recognisable little boat: curved hull with a rim and a stripe, a
-      // proper crusted pizza as cargo, wavelets on the water world, and the
-      // slices it's handing out drawn with crust + pepperoni. (This used to
-      // be a plain brown trapezoid holding a yellow disc, which read as an
-      // ice-cream cone, plus two bare triangles floating in space.)
-      const slice = (x, y, rot) =>
-        `<g transform="translate(${x} ${y}) rotate(${rot})">` +
-        `<path d="M0 -13 L11 9 L-11 9Z" fill="#ffd166"/>` +
-        `<path d="M11 9 Q0 13 -11 9 Q0 5 11 9Z" fill="#e0a24a"/>` +
-        `<circle cx="-3" cy="1" r="2.4" fill="#e8584f"/><circle cx="4" cy="4" r="2" fill="#e8584f"/><circle cx="0" cy="-6" r="1.7" fill="#e8584f"/></g>`;
-      return A.space({}) + A.planet(200, 270, 80, "#4a8fe0") +
-        // wavelets across the water world's surface
-        `<g stroke="#a9dcff" stroke-width="2.2" fill="none" opacity=".65" stroke-linecap="round">` +
-        `<path d="M132 214 q9 -6 18 0 q9 6 18 0"/><path d="M232 214 q9 -6 18 0 q9 6 18 0"/>` +
-        `<path d="M150 232 q9 -6 18 0 q9 6 18 0"/><path d="M214 232 q9 -6 18 0 q9 6 18 0"/></g>` +
-        // hull
-        `<path d="M164 190 Q200 186 236 190 L226 206 Q200 212 174 206Z" fill="#c98a4a"/>` +
-        `<path d="M164 190 Q200 186 236 190 L234 194 Q200 190 166 194Z" fill="#e0a866"/>` +
-        `<path d="M176 199 h48" stroke="#8a5a33" stroke-width="1.8" opacity=".6"/>` +
-        // little mast + pennant so it reads as a boat at a glance
-        `<rect x="199" y="164" width="2.6" height="24" rx="1.3" fill="#8a5a33"/>` +
-        `<path d="M202 165 q12 3 20 -1 v8 q-9 4 -20 1Z" fill="#e8584f"/>` +
-        // the pizza cargo, with crust
-        `<circle cx="188" cy="180" r="12" fill="#e8a04a"/><circle cx="188" cy="180" r="9" fill="#ffd166"/>` +
-        `<circle cx="185" cy="177" r="2.2" fill="#e8584f"/><circle cx="191" cy="183" r="2" fill="#e8584f"/>` +
-        slice(128, 200, -18) + slice(268, 204, 16) +
-        jelly(112, 220, 1, "#9be15d") + jelly(288, 224, .9, "#ffd166");
-    },
-        text: "A little pizza-boat sails across the water world, dropping warm slices to every floating alien. Not one slice gets soggy — clever Captain! They blow bubbly thank-yous.",
-        choices: [{ label: "🚀 Blast to the last planet", to: "ring" }]
-      },
-      ring: {
-        art: () => A.space({}) +
-      `<path d="M88 150 A 112 38 0 0 1 312 150" fill="none" stroke="#ffd166" stroke-width="5" opacity=".9"/>` +
-      `<path d="M104 150 A 96 32 0 0 1 296 150" fill="none" stroke="#c9a0f0" stroke-width="6" opacity=".9"/>` +
-      `<path d="M120 150 A 80 26 0 0 1 280 150" fill="none" stroke="#e8d5ff" stroke-width="6" opacity=".9"/>` +
-      A.planet(200, 150, 55, "#a368d8") +
-      `<path d="M120 150 A 80 26 0 0 0 280 150" fill="none" stroke="#e8d5ff" stroke-width="6"/>` +
-      `<path d="M104 150 A 96 32 0 0 0 296 150" fill="none" stroke="#c9a0f0" stroke-width="6"/>` +
-      `<path d="M88 150 A 112 38 0 0 0 312 150" fill="none" stroke="#ffd166" stroke-width="5"/>` +
-      `<circle cx="128" cy="168" r="2" fill="#fff"/><circle cx="255" cy="176" r="2" fill="#fff"/><circle cx="305" cy="158" r="2" fill="#fff"/>` +
-      A.alien({ x: 185, y: 84, scale: .8, color: "#c77dff" }) +
-      A.alien({ x: 224, y: 88, scale: .7, color: "#ffd166" }) +
-      confetti(200, 42) +
-      A.rocket({ x: 62, y: 240, scale: .75, color: "#e8584f", flame: true }),
-        text: "Last stop: a purple planet wrapped in shiny RINGS, just like Saturn! Count the rings with me: one, two, three glittering rings. The ring-aliens are throwing a party. Should we join?",
-        choices: [
-          { label: "🎉 Invite EVERYONE to a pizza party", to: "partyEnd" },
-          { label: "🏁 Race home to bake even more", to: "moreEnd" }
-        ]
-      },
-      partyEnd: {
-        art: () => {
-      const jelly = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M-14 2 Q-14 -16 0 -16 Q14 -16 14 2 Q7 5 0 4 Q-7 5 -14 2Z" fill="${c}" opacity=".92"/><path d="M-10 4 q-2 8 1 14 M-4 5 q-1.5 9 1 15 M3 5 q2 9 -1 15 M9 4 q3 8 0 14" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/><circle cx="-4.5" cy="-6" r="1.8" fill="#2b2440"/><circle cx="4.5" cy="-6" r="1.8" fill="#2b2440"/><path d="M-3 -1.5 Q0 1 3 -1.5" stroke="#2b2440" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="-8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/><circle cx="8" cy="-2.5" r="1.6" fill="#ff9ec2" opacity=".6"/></g>`;
-      return A.space({}) + A.planet(330, 70, 24, "#e8584f") + A.planet(60, 80, 22, "#4a8fe0") +
-        A.planet(200, 250, 50, "#a368d8", true) +
-        A.alien({ x: 110, y: 200, scale: .9, color: "#ff9a8f" }) +
-        `<ellipse cx="110" cy="191.5" rx="2.3" ry="3" fill="#fff"/><circle cx="110" cy="192" r="1.4" fill="#2b2440"/>` +
-        jelly(290, 195, 1, "#9be15d") +
-        A.alien({ x: 200, y: 170, scale: 1, color: "#c77dff" }) +
-        `<circle cx="200" cy="212" r="15" fill="#ffd166" stroke="#e8a04a" stroke-width="4"/>` +
-        `<path d="M200 212 L200 198 M200 212 L213 208 M200 212 L208 224 M200 212 L192 224 M200 212 L187 208" stroke="#c9862e" stroke-width="1.6"/>` +
-        confetti(200, 40, 1.15);
-    },
-        text: "Captain beams every alien aboard for the BIGGEST space pizza party ever — red ones, blue ones, ringed ones, all sharing slices among the stars. The whole galaxy is full and happy. Mission complete, Captain! 🍕🚀",
-        end: "Galactic Pizza Hero"
-      },
-      moreEnd: {
-        art: () => A.space({}) +
-          A.planet(70, 220, 30, "#4a8fe0", true) +
-          A.rocket({ x: 230, y: 150, scale: 1.3, color: "#e8584f", flame: true }),
-        text: "\"There are MORE hungry planets out there!\" Captain zooms home, ovens already glowing, ready to bake a thousand more pizzas. The galaxy will never go hungry on YOUR watch. To infinity… and pepperoni! 🍕",
-        end: "Pizza Captain Forever"
-      }
-    }
-  };
-
-  /* =======================================================
-     4) THE MERMAID'S LOST SONG (3+, listening, music & counting)
-     ======================================================= */
-  const mermaid = {
-    id: "mermaid",
-    title: "The Mermaid's Lost Song",
-    emoji: "🧜‍♀️",
-    color: "#38b6ff",
-    ages: "3+",
-    who: "Ellie & Jeannie",
-    teaches: "listening, music & counting",
-    blurb: "A little mermaid lost her song — follow the sounds of the sea to find it!",
-    cover: () => A.beachBg({}) + A.mermaid({ x: 265, y: 205, scale: 2.2 }) +
-      A.princess({ x: 100, y: 215, scale: .95, dress: "#b06ad9" }) +
-      A.shell({ x: 175, y: 222, scale: 1.4 }),
-    start: "shore",
-    nodes: {
-      shore: {
-        art: () => A.beachBg({}) +
-          A.princess({ x: 95, y: 218, scale: 1, dress: "#b06ad9" }) +
-          A.mermaid({ x: 270, y: 200, scale: 2 }) +
-          A.shell({ x: 180, y: 226, scale: 1.2 }) + A.crab({ x: 330, y: 262, scale: .8 }),
-        text: "At the seaside, Princess Ellie hears a tiny sniffle. A little mermaid has lost her SONG, and the whole sea is too quiet without it! Where should they listen first?",
-        choices: [
-          { label: "🐚 Listen inside the big shell", to: "shell" },
-          { label: "🐬 Ask the friendly dolphin", to: "dolphin" }
-        ]
-      },
-      shell: {
-        art: () => A.beachBg({}) +
-          A.princess({ x: 130, y: 218, scale: 1, dress: "#b06ad9" }) +
-          A.shell({ x: 205, y: 220, scale: 2.4 }) + A.crab({ x: 300, y: 248, scale: 1.1 }),
-        text: "Ellie holds the big pink shell to her ear. Ssshhh… listen… a teeny tiny \"la-la-laaa\" is echoing far away! A crab scuttles up and clicks: \"That echo came from the coral garden!\"",
-        choices: [
-          { label: "🪸 Swim to the coral garden", to: "coral" },
-          { label: "🦀 Follow the crab's secret shortcut", to: "crabpath" }
-        ]
-      },
-      dolphin: {
-        art: () => A.oceanBg({}) +
-          A.dolphin({ x: 150, y: 195, scale: 1.8 }) +
-          A.mermaid({ x: 290, y: 195, scale: 1.7 }),
-        text: "\"Click-click-wheee!\" sings the dolphin. Dolphins really do talk in clicks and whistles! \"I heard a song-bubble float by. It bobbed away toward the deep blue water.\"",
-        choices: [
-          { label: "🫧 Chase the song-bubble", to: "bubble" },
-          { label: "🪸 Search the coral garden instead", to: "coral" }
-        ]
-      },
-      coral: {
-        art: () => A.sea({}) +
-          A.coral({ x: 90, y: 290, scale: 1.6, color: "#ff7eb6" }) +
-          A.coral({ x: 200, y: 292, scale: 1.4, color: "#ffd166" }) +
-          A.coral({ x: 310, y: 290, scale: 1.5, color: "#b06ad9" }) +
-          A.fish({ x: 150, y: 210, scale: 1 }) + A.fish({ x: 260, y: 175, scale: .8, color: "#5aa9ff" }),
-        text: "Down in the coral garden, stripy fish are humming along to… something! Count the corals with me: one, two, THREE. The humming is loudest by the pink one.",
-        choices: [
-          { label: "👂 Listen at the pink coral", to: "found" },
-          { label: "🐟 Ask the stripy fish for help", to: "fishhelp" }
-        ]
-      },
-      crabpath: {
-        // "a tiny sandcastle TOWN" — so more than one castle — plus the
-        // sparkling music the words promise on the far side
-        art: () => A.beachBg({}) +
-          A.sandcastle({ x: 186, y: 252, scale: 1.25 }) +
-          A.sandcastle({ x: 246, y: 246, scale: .85 }) +
-          A.sandcastle({ x: 292, y: 256, scale: 1.05 }) +
-          A.sandcastle({ x: 338, y: 244, scale: .7 }) +
-          A.note({ x: 300, y: 172, scale: .7, color: "#fff6d8", beam: true }) +
-          A.note({ x: 246, y: 190, scale: .55, color: "#fff6d8" }) +
-          A.crab({ x: 130, y: 262, scale: 1.1 }) +
-          A.princess({ x: 70, y: 222, scale: .95, dress: "#b06ad9" }),
-        text: "The crab's shortcut goes right through a tiny sandcastle town! Tip-toe, tip-toe — careful not to squish the towers. On the far side, music sparkles on the waves like sunshine.",
-        choices: [{ label: "🎶 Follow the sparkling music", to: "found" }]
-      },
-      bubble: {
-        art: () => A.oceanBg({}) +
-          `<circle cx="210" cy="120" r="26" fill="#dff6ff" opacity=".45" stroke="#fff" stroke-width="2"/>` +
-          `<circle cx="201" cy="110" r="7" fill="#fff" opacity=".55"/>` +
-          A.note({ x: 208, y: 116, scale: .95, color: "#2f6f96" }) +
-          A.note({ x: 148, y: 92, scale: .7, color: "#3d7ea6", beam: true }) +
-          A.note({ x: 268, y: 84, scale: .62, color: "#3d7ea6" }) +
-          A.dolphin({ x: 110, y: 190, scale: 1.4 }),
-        text: "There it is — the shiny song-bubble, bobbing over the waves! POP! Out spill silvery notes: \"la-laaa!\" They line up in the water like little fish and swim off, singing all the way.",
-        choices: [{ label: "🎵 Follow the singing notes", to: "found" }]
-      },
-      fishhelp: {
-        art: () => A.sea({}) +
-          A.fish({ x: 130, y: 180, scale: 1.2 }) + A.fish({ x: 230, y: 150, scale: 1, color: "#5aa9ff" }) +
-          A.fish({ x: 300, y: 205, scale: .9, color: "#9be15d" }) +
-          `<circle cx="180" cy="120" r="5" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".8"/>` +
-          `<circle cx="205" cy="100" r="7" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".7"/>`,
-        text: "\"Blub-blub!\" The stripy fish puff up their cheeks and blow bubble-drums — BOOM, boom, BOOM! The whole reef starts to wiggle and dance along to the beat.",
-        choices: [
-          { label: "🥁 March with the bubble-drum band", to: "bandEnd" },
-          { label: "👂 Keep listening for the lost song", to: "found" }
-        ]
-      },
-      found: {
-        // The song is snagged low in the weeds (the words say "tangled in the
-        // seaweed"), drawn as a glittering star-strung ribbon rather than the
-        // bare white squiggle that used to float alone in open water — and
-        // Ellie, who frees it, is in frame.
-        art: () => A.sea({}) + (() => {
-          const rib = `M118 250 Q150 214 186 236 Q222 258 258 218 Q282 192 306 206`;
-          return A.seaweed(126, 268, "#2f9e57") + A.seaweed(196, 274, "#37a85e") + A.seaweed(300, 268, "#2b8f4e") +
-            `<path d="${rib}" stroke="#bff0ff" stroke-width="8" fill="none" opacity=".28" stroke-linecap="round"/>` +
-            `<path d="${rib}" stroke="#fff8d0" stroke-width="3" fill="none" stroke-linecap="round">` +
-            `<animate attributeName="opacity" values=".75;1;.75" dur="2.6s" repeatCount="indefinite"/></path>` +
-            [[130, 244, 5], [168, 230, 6], [206, 244, 5], [244, 232, 6], [280, 204, 5], [306, 206, 4]]
-              .map(([sx, sy, r], i) =>
-                `<path transform="translate(${sx} ${sy})" fill="#fff8d0" d="M0 ${-r} Q${r * .22} ${-r * .22} ${r} 0 Q${r * .22} ${r * .22} 0 ${r} Q${-r * .22} ${r * .22} ${-r} 0 Q${-r * .22} ${-r * .22} 0 ${-r}Z">` +
-                `<animate attributeName="opacity" values="1;.35;1" dur="${1.8 + i * 0.3}s" repeatCount="indefinite"/></path>`).join("") +
-            A.note({ x: 156, y: 150, scale: .8, color: "#eaf7ff", beam: true }) +
-            A.note({ x: 236, y: 136, scale: .7, color: "#eaf7ff" });
-        })() +
-          A.princess({ x: 74, y: 250, scale: 1, dress: "#b06ad9" }) +
-          A.mermaid({ x: 268, y: 176, scale: 1.9 }),
-        text: "THERE it is! Tangled in the seaweed sits the mermaid's song, shimmering like a ribbon of stars. Ellie gently sets it free, and it swirls straight back into the mermaid's heart. She beams!",
-        choices: [
-          { label: "🎤 Sing it together, nice and loud", to: "singEnd" },
-          { label: "🎪 Throw a big under-sea concert", to: "concertEnd" }
-        ]
-      },
-      singEnd: {
-        // "the whole sea hums along — whales down low, dolphins up high, crabs
-        // clicking the beat": a sunset SEA (not dry hills), and the chorus of
-        // animals the sentence names.
-        art: () => A.sunsetSeaBg({}) +
-          A.dolphin({ x: 300, y: 148, scale: 1.15 }) +
-          A.seaMonster({ x: 118, y: 250, scale: 1.05, color: "#4a6f9e" }) +
-          A.mermaid({ x: 246, y: 214, scale: 1.85 }) +
-          `<path d="M62 214 Q70 190 96 188 Q124 190 132 214 Q98 222 62 214Z" fill="#4a3a5e"/>` +
-          `<path d="M62 214 Q70 190 96 188 Q112 189 118 200 Q92 206 62 214Z" fill="#6b5480"/>` +
-          A.princess({ x: 96, y: 192, scale: 1, dress: "#b06ad9" }) +
-          A.crab({ x: 336, y: 268, scale: .95 }) +
-          A.note({ x: 176, y: 128, scale: .95, color: "#fff3c8", beam: true }) +
-          A.note({ x: 232, y: 104, scale: .75, color: "#fff3c8" }) +
-          A.note({ x: 288, y: 118, scale: .6, color: "#fff3c8" }),
-        text: "The mermaid and Ellie sing to the setting sun, and the whole sea hums along — whales down low, dolphins up high, crabs clicking the beat. A song you SHARE is the sweetest song of all. 🎶",
-        end: "The Sunset Duet"
-      },
-      concertEnd: {
-        art: () => A.sea({}) +
-          A.mermaid({ x: 200, y: 170, scale: 1.8 }) + A.harp({ x: 120, y: 220, scale: 1.1 }) +
-          A.dolphin({ x: 310, y: 170, scale: 1.1 }) + A.crab({ x: 290, y: 265, scale: .9 }) +
-          A.fish({ x: 80, y: 150, scale: .9 }),
-        text: "The mermaid strums her golden harp and EVERYONE gets a part: dolphins whistle, fish blub, and the crab keeps time with his claws. It's the first-ever Under-the-Sea Concert — and Ellie conducts!",
-        end: "Star of the Sea Concert"
-      },
-      bandEnd: {
-        art: () => A.sea({}) +
-          A.fish({ x: 120, y: 170, scale: 1.1 }) + A.fish({ x: 200, y: 190, scale: .95, color: "#5aa9ff" }) +
-          A.fish({ x: 275, y: 165, scale: .9, color: "#9be15d" }) + A.crab({ x: 200, y: 268, scale: 1 }) +
-          `<circle cx="160" cy="120" r="6" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".8"/>` +
-          `<circle cx="240" cy="105" r="8" fill="none" stroke="#dff6ff" stroke-width="1.6" opacity=".7"/>`,
-        text: "BOOM, boom, BOOM! The bubble-drum band marches around the reef all afternoon, and the little mermaid laughs so hard she finds a brand-new song — a giggly one! Music can be found anywhere. 🥁",
-        end: "The Bubble-Drum Band"
-      }
-    }
-  };
-
-  /* ---- register the short stories (long ones append later) ---- */
-  window.STORIES = [rainbow, campout, pizza, mermaid];
-})();
+];

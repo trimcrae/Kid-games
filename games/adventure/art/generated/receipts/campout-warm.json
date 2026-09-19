@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "warm",
   "style": "C2",
-  "sourceHash": "5685fe2a03f9d75e76408a13e3d0fcff7457e65840eac6605542945116f54639",
+  "sourceHash": "524da001e6ad1391f7555e48fe0ace7d469d0029363fbb10dfda5f286e970205",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-e6565aa0-c30b-4eb9-bbf1-a5344eba5037.png",
   "originalSha256": "64c4b639a86a861916e6da7531de260fe2ffca2a129eb28ccbcbb5e6a7fe6593",
@@ -19,5 +19,6 @@
     "art/generated/campout-explore.webp"
   ],
   "reviewed": true,
-  "review": "Jeannie holding puppy in purple blanket; tongue visibly licking nose; blue collar and brass tag, night campfire, correct cast."
+  "review": "Jeannie holding puppy in purple blanket; tongue visibly licking nose; blue collar and brass tag, night campfire, correct cast.",
+  "legacySourceHash": "5685fe2a03f9d75e76408a13e3d0fcff7457e65840eac6605542945116f54639"
 }

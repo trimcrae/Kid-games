@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "found",
   "style": "S1",
-  "sourceHash": "6de028a96c01f607e5d181e69b8b89ddc43d55e86825f78a20050c8289654b53",
+  "sourceHash": "7213c86c1e79e21a47ac618fee3ed1608d581d024befa1f1dfea4cfa6ad61cc7",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-bc251579-9bc3-4077-bab5-e79417c317ce.png",
   "originalSha256": "84fd58942f730794029bf70e430222f92198f324c0ba274762a533b102505658",
@@ -18,5 +18,6 @@
     "C:/Projects/kid-games/games/adventure/art/generated/mermaid-shore.webp"
   ],
   "reviewed": true,
-  "review": "Ellie frees a shimmering song ribbon from seaweed beside the consistent teal-haired mermaid."
+  "review": "Ellie frees a shimmering song ribbon from seaweed beside the consistent teal-haired mermaid.",
+  "legacySourceHash": "6de028a96c01f607e5d181e69b8b89ddc43d55e86825f78a20050c8289654b53"
 }

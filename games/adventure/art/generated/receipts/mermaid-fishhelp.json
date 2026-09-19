@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "fishhelp",
   "style": "S1",
-  "sourceHash": "acef1d45859cfc82984a76f5763a35e609b4d3172d50861640dc8b5e7171f355",
+  "sourceHash": "1e48a8713ccf69ff07c9f1507679d83653d605c83ae70722089c073083b00d4f",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-5efe5f91-da6a-4a28-84c7-c589b99b0cd2.png",
   "originalSha256": "4c97611acb0d6d707378cb300f28033ee614afa97ff896a28347d43eef91f0a2",
@@ -19,5 +19,6 @@
     "C:/Projects/kid-games/games/adventure/art/generated/mermaid-coral.webp"
   ],
   "reviewed": true,
-  "review": "Three striped fish blow bubble drums, with the three coral colors and consistent sea-glass tesserae."
+  "review": "Three striped fish blow bubble drums, with the three coral colors and consistent sea-glass tesserae.",
+  "legacySourceHash": "acef1d45859cfc82984a76f5763a35e609b4d3172d50861640dc8b5e7171f355"
 }

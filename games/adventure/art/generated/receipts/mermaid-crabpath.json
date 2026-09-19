@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "crabpath",
   "style": "S1",
-  "sourceHash": "d631edc80507510d8bee48282598657293812589ac219451e6bc4cee2f993400",
+  "sourceHash": "8132e6b11bbf2d757395dc3f39543925ad2437cc4e3ade2056771feec0824cde",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-7fe904f5-3de2-4a77-aff2-8c4d8410f829.png",
   "originalSha256": "5260aca217316df8cc0c280521b1a6c2170ad60e1bd271891d410aeb60fac2c6",
@@ -18,5 +18,6 @@
     "art/generated/mermaid-shore.webp"
   ],
   "reviewed": true,
-  "review": "Ellie carefully crossing clear path between four intact sandcastles, red crab leading, silver musical shapes over sea; same costume and mosaic."
+  "review": "Ellie carefully crossing clear path between four intact sandcastles, red crab leading, silver musical shapes over sea; same costume and mosaic.",
+  "legacySourceHash": "d631edc80507510d8bee48282598657293812589ac219451e6bc4cee2f993400"
 }

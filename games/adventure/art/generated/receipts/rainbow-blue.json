@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "blue",
   "style": "R3",
-  "sourceHash": "3e8a2412e25ba91d876820bc5da0f8cf0fef0aa796b9f127c26ce2223447f40a",
+  "sourceHash": "168f93fba872315490f7a21eb155f4c536761bb9ae666119100d65e447456457",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-4398a72b-7bfc-4560-aa20-a6b198897132.png",
   "originalSha256": "c998022907be095552899bd63a5804615cef0512a2b3480c02429ac733575c38",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Exactly three blueberries on leaf, deep-blue curled tail and otherwise grey dragon; same Ellie and crayon medium."
+  "review": "Exactly three blueberries on leaf, deep-blue curled tail and otherwise grey dragon; same Ellie and crayon medium.",
+  "legacySourceHash": "3e8a2412e25ba91d876820bc5da0f8cf0fef0aa796b9f127c26ce2223447f40a"
 }

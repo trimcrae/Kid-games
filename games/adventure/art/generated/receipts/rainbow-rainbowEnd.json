@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "rainbowEnd",
   "style": "R3",
-  "sourceHash": "22c1a0259d911406ced2df46f72a3980aa597f0c7575c4c718e7aa565a78ea97",
+  "sourceHash": "cd14f0bb73137761f3bea15f7c979be930d9abe1dec13fd90314444ce6ecacce",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-ef6b320b-b267-49bf-a588-c5a298a79ac6.png",
   "originalSha256": "f21f086b0b514c7e9d3e8b8a31729e04100fe1d6e9597003658a2a51ffc841fe",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Rainbow-colored dragon carrying Ellie above castle; exactly Cory and Jeannie cheering below; rainbow behind cast; bodies visible and matched crayon medium."
+  "review": "Rainbow-colored dragon carrying Ellie above castle; exactly Cory and Jeannie cheering below; rainbow behind cast; bodies visible and matched crayon medium.",
+  "legacySourceHash": "22c1a0259d911406ced2df46f72a3980aa597f0c7575c4c718e7aa565a78ea97"
 }

@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "boat",
   "style": "P2",
-  "sourceHash": "bf373f8dfd38a31ac910c3d6bc334963beafa5ddb9e943c5959536ff3df3b8e7",
+  "sourceHash": "8524b0f864a76403a4bfd49869d948c58fd0b6c76c5ab37c298085992e7dd72f",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-901e1c17-a4d6-4edd-b758-0ef3bf0ca416.png",
   "originalSha256": "c6a380e52874bc4e7f29bd01b54e559f611ccf246f832eaed61ca55dd333dbef",
@@ -19,5 +19,6 @@
     "exec-26cb0c02-99e2-460b-8de3-b60eda890f69.png (edit target)"
   ],
   "reviewed": true,
-  "review": "Corrected four tentacles per jellyfish: three hanging, one holding slice; dry pizza on recognizable boat, slices above water and joyful bubbles."
+  "review": "Corrected four tentacles per jellyfish: three hanging, one holding slice; dry pizza on recognizable boat, slices above water and joyful bubbles.",
+  "legacySourceHash": "bf373f8dfd38a31ac910c3d6bc334963beafa5ddb9e943c5959536ff3df3b8e7"
 }

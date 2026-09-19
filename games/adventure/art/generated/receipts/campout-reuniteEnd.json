@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "reuniteEnd",
   "style": "C2",
-  "sourceHash": "b175b5b65c8fc9cf097a84bfe0c4ec6108038824fe6acf3da11790a81268ef44",
+  "sourceHash": "f19c323af9909e026252a3b5056aa8b2a3fb988574e5d7e395485f23df493131",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-1fd7e2ed-b710-47cf-beca-a00da2a869c8.png",
   "originalSha256": "cc35b9c8cfb8301bfb55554753c3fd9032ca9fa6661a180c16d5762632f6b463",
@@ -18,5 +18,6 @@
     "art/generated/campout-camp.webp"
   ],
   "reviewed": true,
-  "review": "Six family members and pancake breakfast at familiar sunny campsite; no puppy, consistent identities and pencil rendering."
+  "review": "Six family members and pancake breakfast at familiar sunny campsite; no puppy, consistent identities and pencil rendering.",
+  "legacySourceHash": "b175b5b65c8fc9cf097a84bfe0c4ec6108038824fe6acf3da11790a81268ef44"
 }

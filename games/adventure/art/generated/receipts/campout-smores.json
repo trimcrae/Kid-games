@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "smores",
   "style": "C2",
-  "sourceHash": "258afb3b3087b986894c8e4099092defb6a0609c57fb0c845c72e6df7293c992",
+  "sourceHash": "2c4318a4f125fca765104df94e15ea5921e0b308d0d370881fb15cbe5c84d755",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-508ce211-9990-40e1-9907-b65ee33170ac.png",
   "originalSha256": "ef0f4e6f97102f8d32847813ae8f55f11f3fc4dce5925daebf87bca32cdd758c",
@@ -18,5 +18,6 @@
     "art/generated/campout-camp.webp"
   ],
   "reviewed": true,
-  "review": "Jeannie roasting marshmallow, Cory pointing to stars, one owl and one arriving puppy; s'more visible on log; same campsite and style."
+  "review": "Jeannie roasting marshmallow, Cory pointing to stars, one owl and one arriving puppy; s'more visible on log; same campsite and style.",
+  "legacySourceHash": "258afb3b3087b986894c8e4099092defb6a0609c57fb0c845c72e6df7293c992"
 }

@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "coral",
   "style": "S1",
-  "sourceHash": "88bb16012b69c80a5a2644ac533f0e6bbcf539f94d5bdbc29f3d21131de4f334",
+  "sourceHash": "3ce8803e1138ccaca89d2abce12d710248a2114659c98703f5397ccbcc15a9d1",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-543fccc4-bc29-4fdb-a2ff-7fc6162a759a.png",
   "originalSha256": "0db5d30cd860c1f75b88665f8e9c2621cd31f54a3c97ad9b5184f2cecc934e4a",
@@ -18,5 +18,6 @@
     "art/generated/mermaid-shore.webp"
   ],
   "reviewed": true,
-  "review": "Exactly three separate coral colonies pink/yellow/purple, two stripy fish near pink; completely underwater mosaic, clear count."
+  "review": "Exactly three separate coral colonies pink/yellow/purple, two stripy fish near pink; completely underwater mosaic, clear count.",
+  "legacySourceHash": "88bb16012b69c80a5a2644ac533f0e6bbcf539f94d5bdbc29f3d21131de4f334"
 }

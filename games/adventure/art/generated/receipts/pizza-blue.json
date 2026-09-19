@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "blue",
   "style": "P2",
-  "sourceHash": "6cdebc211e63da86f251521b375bbcdf9dfaedd93193869bbb99fbf28a6c9065",
+  "sourceHash": "fa48e8b9a2289faa16602d5208f0cb357805b365aa44abe16f9790c2f2230249",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-6e02dfc6-fea0-4d33-815e-e638dadbcf5f.png",
   "originalSha256": "9ae959c35cc35f41b4b3a3c75f5a0019854c5dc7afe59ab4ad906ea8bacfea01",
@@ -18,5 +18,6 @@
     "art/direction/pizza-options.png (middle/P2)"
   ],
   "reviewed": true,
-  "review": "Two blue jellyfish with two eyes and four tentacles each, floating over all-water planet; clay waves and same hovering rocket; no land or humans."
+  "review": "Two blue jellyfish with two eyes and four tentacles each, floating over all-water planet; clay waves and same hovering rocket; no land or humans.",
+  "legacySourceHash": "6cdebc211e63da86f251521b375bbcdf9dfaedd93193869bbb99fbf28a6c9065"
 }

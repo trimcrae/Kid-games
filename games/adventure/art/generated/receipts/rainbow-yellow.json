@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "yellow",
   "style": "R3",
-  "sourceHash": "b877bcbd832b79353cfb8baccbd892b97cdfb5f8152fd1d7c9d4b5ca992f5b1e",
+  "sourceHash": "b859158ae8e0335dd96ba892cba770e9edfb82ab9112dafecad56d1c7734f3b6",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-2e0e19e3-7c2b-48ea-85be-53e41134e8c1.png",
   "originalSha256": "c7ec34e1b61d6360b4b03631ac9a819a5401d361d4825ddaa7c50e5ceec2444f",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Exactly two bananas and a bright yellow tummy, grey head and feet; wings/tail hidden for branch compatibility; matching crayon Ellie."
+  "review": "Exactly two bananas and a bright yellow tummy, grey head and feet; wings/tail hidden for branch compatibility; matching crayon Ellie.",
+  "legacySourceHash": "b877bcbd832b79353cfb8baccbd892b97cdfb5f8152fd1d7c9d4b5ca992f5b1e"
 }

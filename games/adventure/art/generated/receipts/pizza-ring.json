@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "ring",
   "style": "P2",
-  "sourceHash": "d4e0db5ff33526ac69744908bf8305864824c95d916fbb1fc36b2287b64eb195",
+  "sourceHash": "0addebb23c2383a87b32348ae2310a36ed697b11b217161606bc6d1b2302ba8c",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-ad17c6e6-de9b-403c-a014-d54cac613545.png",
   "originalSha256": "0f3226ab3cf7c5b08c6d2e4318793186434ac7dd64c53e498b22ccf513bf6e3c",
@@ -19,5 +19,6 @@
     "exec-eb9c328e-a4a3-4dd2-917f-8b279c7e2ed8.png (edit target)"
   ],
   "reviewed": true,
-  "review": "Three distinct countable planet rings, two ring aliens, matching rocket; corrected blue background world has no land; chosen clay medium."
+  "review": "Three distinct countable planet rings, two ring aliens, matching rocket; corrected blue background world has no land; chosen clay medium.",
+  "legacySourceHash": "d4e0db5ff33526ac69744908bf8305864824c95d916fbb1fc36b2287b64eb195"
 }

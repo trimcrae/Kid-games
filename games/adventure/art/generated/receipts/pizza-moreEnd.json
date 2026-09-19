@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "moreEnd",
   "style": "P2",
-  "sourceHash": "72e7bfa963dded0b43846a602849fd400da2e1083d89f88496b2197418bfcdf0",
+  "sourceHash": "bbac4dd4ade8fc33553966e0c14d572172167b65b42a872574bffc9db92d91cd",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-9c6ad226-30df-45b3-8efb-a958af911938.png",
   "originalSha256": "a07e806bbec6c247c13978f761b51823e3b99e05da8942abe4637ed0c38e0f49",
@@ -19,5 +19,6 @@
     "exec-1d133687-a402-49aa-b9a7-741de2712810.png (edit target)"
   ],
   "reviewed": true,
-  "review": "Rocket returning to home-Earth orbital bakery with two glowing ovens; conflicting small ringed planet removed; consistent clay material and no characters."
+  "review": "Rocket returning to home-Earth orbital bakery with two glowing ovens; conflicting small ringed planet removed; consistent clay material and no characters.",
+  "legacySourceHash": "72e7bfa963dded0b43846a602849fd400da2e1083d89f88496b2197418bfcdf0"
 }

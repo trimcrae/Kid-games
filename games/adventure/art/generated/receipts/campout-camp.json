@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "camp",
   "style": "C2",
-  "sourceHash": "2ae4e2301070a207604c0ebee43746331c6ccf19e9aa883dba448bd776cf0ed9",
+  "sourceHash": "52dce940d8c765ba9a54fd743e5c14e98eed934901e1251b44cb92d12ec046f0",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-cbd9b0b9-7b2a-4cef-ab44-a4aaf9ccbe82.png",
   "originalSha256": "3bb1ee069b3aa130382235cb5ae009f5b731d0da7bfc5b4bcd3fe98c67c3ab36",
@@ -18,5 +18,6 @@
     "art/direction/campout-options.png (middle/C2)"
   ],
   "reviewed": true,
-  "review": "Full image checked: six distinct family members, Kieran held by Mom and pointing toward woods, two tents and night campfire; no premature puppy. Chosen detailed ink and colored-pencil medium with consistent family age differences."
+  "review": "Full image checked: six distinct family members, Kieran held by Mom and pointing toward woods, two tents and night campfire; no premature puppy. Chosen detailed ink and colored-pencil medium with consistent family age differences.",
+  "legacySourceHash": "2ae4e2301070a207604c0ebee43746331c6ccf19e9aa883dba448bd776cf0ed9"
 }

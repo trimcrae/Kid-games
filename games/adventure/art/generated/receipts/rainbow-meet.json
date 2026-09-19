@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "meet",
   "style": "R3",
-  "sourceHash": "7c8c6c2a654a3aadc0bc1e72ec2a921dbae3195479f6299a4dd8fc247fcd2399",
+  "sourceHash": "61ab8f2d90461e864d3f29acca9523f405b2326533e1f7f5832ed8598c2840c2",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-669b08e9-14e7-462b-a3ba-ab7208ae57e6.png",
   "originalSha256": "ca67d2dcc7b4c78d9196530a81d1a2a2c3b233bb7fed4d7170aca5f93fa753ef",
@@ -18,5 +18,6 @@
     "art/direction/rainbow-options.png (right/R3)"
   ],
   "reviewed": true,
-  "review": "Checked full image: chosen crayon medium, pink-dress Ellie arriving, sad wholly grey dragon, meadow and distant castle; no premature fruit, flower-giving or rainbow."
+  "review": "Checked full image: chosen crayon medium, pink-dress Ellie arriving, sad wholly grey dragon, meadow and distant castle; no premature fruit, flower-giving or rainbow.",
+  "legacySourceHash": "7c8c6c2a654a3aadc0bc1e72ec2a921dbae3195479f6299a4dd8fc247fcd2399"
 }

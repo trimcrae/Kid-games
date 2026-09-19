@@ -2,7 +2,7 @@
   "storyId": "pizza",
   "nodeId": "frisbee",
   "style": "P2",
-  "sourceHash": "41e58647b4838cc676a302f82840d5b5ef011e428e90c69f86f1fbc9b5351d06",
+  "sourceHash": "e7d06680ff670d40823c3f5406d5e6f16f7db38ef187ffb30df5def16c325a7c",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-1d1c1408-b8ea-46bb-9ccd-840fd23e20c0.png",
   "originalSha256": "6a3f03a10a82cb2d03a02c35665210fe9f60c167c58c919b6353730fa51f581d",
@@ -19,5 +19,6 @@
     "exec-a96560a9-553a-433f-b7c3-457f6ab514e4.png (second edit target)"
   ],
   "reviewed": true,
-  "review": "Final corrected image: both jellyfish now have three dangling tentacles and one raised slice-holding tentacle; four total each. Pizza spins overhead, no land, same clay setting."
+  "review": "Final corrected image: both jellyfish now have three dangling tentacles and one raised slice-holding tentacle; four total each. Pizza spins overhead, no land, same clay setting.",
+  "legacySourceHash": "41e58647b4838cc676a302f82840d5b5ef011e428e90c69f86f1fbc9b5351d06"
 }

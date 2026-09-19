@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "bandEnd",
   "style": "S1",
-  "sourceHash": "9453e230f61be676efd7b5076311e36cc21b8fc0057d3b965c8e6a065ff54d44",
+  "sourceHash": "4ce6139ef885af07860ee0854a1df4cb38d7737e18857dfbe2a9e99017515638",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-681ef53e-0105-445b-b590-c8ddd5f0e766.png",
   "originalSha256": "d6a59609173bb2af299f66689a2dff5d880e89f74707bba5584a575c76c1c6d2",
@@ -19,5 +19,6 @@
     "C:/Projects/kid-games/games/adventure/art/generated/mermaid-coral.webp"
   ],
   "reviewed": true,
-  "review": "Exactly three striped fish play bubble drums, crab clicks claws, mermaid laughs. Mosaic medium and recurring designs match."
+  "review": "Exactly three striped fish play bubble drums, crab clicks claws, mermaid laughs. Mosaic medium and recurring designs match.",
+  "legacySourceHash": "9453e230f61be676efd7b5076311e36cc21b8fc0057d3b965c8e6a065ff54d44"
 }

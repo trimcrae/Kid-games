@@ -2,7 +2,7 @@
   "storyId": "campout",
   "nodeId": "explore",
   "style": "C2",
-  "sourceHash": "b0b8bcc4db9d84f3aded745cdc93bbba6a7ed3db2d0f85ee9f7285ceae20c0bc",
+  "sourceHash": "d01a32abbe2d76f8182ef04264cd0bf934b0294962f74636ba999aca2949b78a",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-d82ec182-cb88-4a40-af5d-b15e293838ad.png",
   "originalSha256": "bc0295e84faed881dc9a0dc57e0e6382a4d8ca90e620e25e1de115805ab3c89d",
@@ -18,5 +18,6 @@
     "art/generated/campout-camp.webp"
   ],
   "reviewed": true,
-  "review": "Jeannie and Cory only, appropriate flashlight action, one tan-and-white puppy with blue collar; ink and colored-pencil medium."
+  "review": "Jeannie and Cory only, appropriate flashlight action, one tan-and-white puppy with blue collar; ink and colored-pencil medium.",
+  "legacySourceHash": "b0b8bcc4db9d84f3aded745cdc93bbba6a7ed3db2d0f85ee9f7285ceae20c0bc"
 }

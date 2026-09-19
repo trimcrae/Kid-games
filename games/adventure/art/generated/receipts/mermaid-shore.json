@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "shore",
   "style": "S1",
-  "sourceHash": "0d4eb0ba65e0d920879684d4979c0513ed5d8f5795f5d807627c55b3988572fe",
+  "sourceHash": "9d5e6b9f7c44730a8f146190444b35fa599cc5a578401cb8811b24d29c304abb",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-6e3e80f2-70e0-451c-94d3-50f389122212.png",
   "originalSha256": "782ce02852411839dc2880d1ac55a7128d0182623544e29146263f7d5ca324dd",
@@ -18,5 +18,6 @@
     "art/direction/mermaid-options.png (left/S1)"
   ],
   "reviewed": true,
-  "review": "Same approved sea-glass mosaic material, lavender-dress Ellie and sad teal-haired mermaid with complete turquoise tail, one large pink shell on sand, crab at rock; no song or notes prematurely."
+  "review": "Same approved sea-glass mosaic material, lavender-dress Ellie and sad teal-haired mermaid with complete turquoise tail, one large pink shell on sand, crab at rock; no song or notes prematurely.",
+  "legacySourceHash": "0d4eb0ba65e0d920879684d4979c0513ed5d8f5795f5d807627c55b3988572fe"
 }

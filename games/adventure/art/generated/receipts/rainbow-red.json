@@ -2,7 +2,7 @@
   "storyId": "rainbow",
   "nodeId": "red",
   "style": "R3",
-  "sourceHash": "deeab51d26a2506db0ce1b1d7e64c3f40fe92c70b3a4de6561a0f5f6c656d5dc",
+  "sourceHash": "42897f55c74bb375cba6528e4bfea31fd9288d6cb7dd5081210443652c222e94",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-7aff2389-7f13-45c5-97e7-27b395a8841e.png",
   "originalSha256": "6bec4297554b61130b3ab5b8b581082b092c01a22ae83cf95a5c651a365260cc",
@@ -18,5 +18,6 @@
     "art/generated/rainbow-meet.webp"
   ],
   "reviewed": true,
-  "review": "Three individually visible red apples, two red wings and grey head/body; tail not shown, preserving compatibility with incoming paths; chosen crayon style."
+  "review": "Three individually visible red apples, two red wings and grey head/body; tail not shown, preserving compatibility with incoming paths; chosen crayon style.",
+  "legacySourceHash": "deeab51d26a2506db0ce1b1d7e64c3f40fe92c70b3a4de6561a0f5f6c656d5dc"
 }

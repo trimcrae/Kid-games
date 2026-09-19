@@ -2,7 +2,7 @@
   "storyId": "mermaid",
   "nodeId": "bubble",
   "style": "S1",
-  "sourceHash": "bd7369629d1b4ac062da25d06db0408050b807501af8296ec06cc09fec7008b9",
+  "sourceHash": "3fdf6ea5a38970df41bd88c4ff8c229b3626fade2cb37a3c571eec6c627e7c74",
   "generator": "Codex built-in OpenAI image tool",
   "originalFile": "exec-0fdf0f3f-ca9e-4519-a019-30c306a5e3f7.png",
   "originalSha256": "cc82dfbf08afd57d7020300e49a0e9591a9595e5fbd973f9a5ba14b25a7117c9",
@@ -18,5 +18,6 @@
     "art/generated/mermaid-shore.webp"
   ],
   "reviewed": true,
-  "review": "Single bursting pearly song bubble, silvery notes spilling in a line toward waves and one dolphin; no people or extra characters, same mosaic."
+  "review": "Single bursting pearly song bubble, silvery notes spilling in a line toward waves and one dolphin; no people or extra characters, same mosaic.",
+  "legacySourceHash": "bd7369629d1b4ac062da25d06db0408050b807501af8296ec06cc09fec7008b9"
 }

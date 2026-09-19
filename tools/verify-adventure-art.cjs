@@ -1,4 +1,4 @@
-// Browser verification for every currently illustrated adventure node.
+// Browser verification for EVERY adventure node, including loading and failures.
 // Use installed Playwright via NODE_PATH and Chrome; never downloads a runtime.
 const { chromium } = require('playwright');
 const fs = require('node:fs');
@@ -34,6 +34,8 @@ const server = http.createServer((req, res) => {
     allowed();
     await page.goto(origin + '/games/adventure/');
     assert.equal(await page.locator('.story-card').count(), 6);
+    await page.waitForFunction(() => [...document.querySelectorAll('.cover img')].length === 6 && [...document.querySelectorAll('.cover img')].every(img => img.complete && img.naturalWidth > 0));
+    assert.equal(await page.locator('svg, canvas').count(), 0);
     const stories = await page.evaluate(() => window.STORIES.map(s => ({ id: s.id, start: s.start, nodes: Object.fromEntries(Object.entries(s.nodes).map(([id, n]) => [id, { img: n.img, choices: n.choices }])) })));
     let visited = 0;
     for (const story of stories) {
@@ -45,13 +47,15 @@ const server = http.createServer((req, res) => {
           if (!routes.has(ch.to)) { routes.set(ch.to, [...routes.get(id), index]); queue.push(ch.to); }
         }
       }
-      for (const [id, node] of Object.entries(story.nodes).filter(([, n]) => n.img)) {
+      for (const [id, node] of Object.entries(story.nodes)) {
         allowed();
+        assert(node.img, `Missing generated image: ${story.id}/${id}`);
         assert(routes.has(id), `Unreachable illustrated page ${story.id}/${id}`);
         await page.goto(origin + '/games/adventure/');
         await page.locator('.story-card').nth(stories.indexOf(story)).click();
         for (const index of routes.get(id)) { allowed(); await page.locator('#choices > button').nth(index).click(); }
         await page.waitForFunction(src => { const img = document.querySelector('#scene-art img'); return img?.getAttribute('src') === src && img.complete && img.naturalWidth > 0; }, node.img);
+        assert.equal(await page.locator('svg, canvas').count(), 0);
         assert.equal(await page.locator('#choices > button').count() > 0, true);
         visited++;
       }
@@ -65,13 +69,16 @@ const server = http.createServer((req, res) => {
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     const evidence = process.env.ADVENTURE_ART_EVIDENCE;
     if (evidence) { allowed(); await page.screenshot({ path: evidence, fullPage: true }); }
-    // Network failure retains the original SVG illustration.
+    // Network failure offers retry and never displays a vector illustration.
     allowed();
     await page.route('**/rainbow-flower.webp', route => route.abort());
     await page.locator('#choices > button').nth(1).click();
-    await page.locator('#scene-art svg').waitFor();
+    await page.locator('#scene-art [role="button"]').waitFor();
     assert.equal(await page.locator('#scene-art img').count(), 0);
+    assert.equal(await page.locator('svg, canvas').count(), 0);
     await page.unroute('**/rainbow-flower.webp');
+    await page.locator('#scene-art [role="button"]').click();
+    await page.waitForFunction(() => document.querySelector('#scene-art img')?.naturalWidth > 0);
     // Delayed previous page cannot overwrite the illustration after Back.
     allowed();
     await page.locator('#back-btn').click();
@@ -82,6 +89,7 @@ const server = http.createServer((req, res) => {
     await page.route('**/rainbow-flower.webp', async route => { requested(); await gate; await route.continue(); });
     await page.locator('#choices > button').nth(1).click();
     await seen;
+    assert.equal(await page.locator('#scene-art svg, #scene-art canvas, #scene-art img').count(), 0);
     await page.locator('#back-btn').click();
     const completed = page.waitForResponse('**/rainbow-flower.webp');
     release();
@@ -93,7 +101,7 @@ const server = http.createServer((req, res) => {
     await page.goto(origin + '/');
     assert(await page.locator('a[href="games/adventure/"]').count() > 0);
     assert.deepEqual(errors, []);
-    console.log(JSON.stringify({ illustratedPagesVisited: visited, cards: 6, mobileOverflow: false, failureFallback: 'passed', staleImageGuard: 'passed', consoleErrors: errors }));
+    console.log(JSON.stringify({ illustratedPagesVisited: visited, cards: 6, mobileOverflow: false, failureRetry: 'passed', staleImageGuard: 'passed', consoleErrors: errors }));
   } finally {
     if (browser) await browser.close();
     server.close();
