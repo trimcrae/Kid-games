@@ -10,15 +10,5 @@ window.PANORAMA_MANIFEST = {
   "page": "https://commons.wikimedia.org/wiki/File:Heron_Bommie_SVII.jpg",
   "width": 4096,
   "height": 2048
- },
- "antarctica": {
-  "file": "antarctica.jpg",
-  "title": "Mapillary (eneerhut) 2019-12-11 13H51M50S011 (1348746352167419 at jp2gu7mrobec0bce12el0h with LG Electronics LG-R105).jpg",
-  "artist": "eneerhut",
-  "license": "CC BY-SA 4.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Mapillary_(eneerhut)_2019-12-11_13H51M50S011_(1348746352167419_at_jp2gu7mrobec0bce12el0h_with_LG_Electronics_LG-R105).jpg",
-  "width": 4096,
-  "height": 2048
  }
 };

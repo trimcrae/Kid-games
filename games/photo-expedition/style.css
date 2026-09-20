@@ -37,7 +37,9 @@
 
 /* ---------- top bar ---------- */
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.6rem 0.8rem; flex-wrap: wrap; }
-.rank { background: rgba(255,255,255,0.85); border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.95rem; }
+.rank { background: rgba(255,255,255,0.85); border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.95rem; text-align: center; }
+.rank .km { display: block; font-size: 0.8rem; color: #6a6580; }
+.rank .km:empty { display: none; }
 
 /* ---------- world map ---------- */
 .map-wrap { padding: 0 0.6rem; }
@@ -205,3 +207,12 @@
 .flyin-actions { position: absolute; left: 0; right: 0; bottom: max(24px, env(safe-area-inset-bottom)); opacity: 0; transition: opacity .4s; align-items: center; }
 .flyin-actions.show { opacity: 1; }
 .flyin-actions .btn-big { margin: 0; }
+
+/* ---------- the real 360° viewpoint ---------- */
+.hud-btn.small { padding: 0.45rem 0.6rem; }
+.hud-btn.look { display: none; background: #2a6fa8; border-color: #fff; animation: pulse 1.2s infinite; } .hud-btn.look.show { display: inline-block; }
+#pano-bar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(max(12px, env(safe-area-inset-bottom)) + 8px); display: none; align-items: center; gap: 0.6rem; background: rgba(0,0,0,0.55); color: #fff; padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.85rem; pointer-events: auto; max-width: 96vw; }
+.pano #pano-bar { display: flex; }
+.pano .hud-right, .pano #joy, .pano #hud-hint, .pano .hud-actions { display: none !important; }
+.pano.cam .vf-controls { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 64px); }
+.album-item.real { outline: 3px solid #2a6fa8; }

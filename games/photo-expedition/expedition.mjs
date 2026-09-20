@@ -19,6 +19,7 @@
    =========================================================== */
 import { buildWorld, SIZE, GRID, CELL } from "./world.mjs";
 import { createCreatureManager } from "./creatures.mjs";
+import { createAmbience } from "./ambience.mjs";
 
 const DAY_SECONDS = 360;          // one sunrise-to-sunset in real seconds
 const NIGHT_SECONDS = 80;
@@ -34,7 +35,9 @@ export async function startExpedition(opts) {
   const canvas = $("ex-canvas");
   const isTouch = window.matchMedia("(pointer: coarse)").matches;
   const dpr = Math.min(window.devicePixelRatio || 1, isTouch ? 1.5 : 2);
-  const quality = (isTouch || window.innerWidth < 900) ? 0.6 : 1;
+  let lowDetail = false;
+  try { lowDetail = localStorage.getItem("photo-expedition.detail") === "low"; } catch (e) {}
+  const quality = ((isTouch || window.innerWidth < 900) ? 0.6 : 1) * (lowDetail ? 0.7 : 1);
 
   // every listener is registered through on() so exit() can drop them all at once —
   // the HUD buttons are shared by every expedition, and must not toggle twice
@@ -42,8 +45,8 @@ export async function startExpedition(opts) {
   const on = (el, ev, fn, o) => el.addEventListener(ev, fn, Object.assign({ signal: ac.signal }, o || {}));
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(dpr);
-  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.setPixelRatio(lowDetail ? Math.min(dpr, 1) : dpr);
+  renderer.shadowMap.enabled = !lowDetail; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -51,7 +54,53 @@ export async function startExpedition(opts) {
   const subjectIds = site.subjects.filter((s) => ["animal", "bird", "swimmer", "flutter"].includes(SUBJECTS[s].kind));
   const zoo = createCreatureManager(THREE, world, site, tier, subjectIds);
 
+  const ambience = createAmbience(site.biome);
+  let ambMuted = false; try { ambMuted = localStorage.getItem("photo-expedition.sound") === "off"; } catch (e) {}
+  ambience.setMuted(ambMuted);
+  const startSound = () => { ambience.start(); };
   const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 2600);
+
+  /* ---------- the real 360° viewpoint ---------- */
+  const panoInfo = window.PANORAMA_MANIFEST && PANORAMA_MANIFEST[site.id];
+  let panoMode = false, panoScene = null, panoCam = null, panoPos = null;
+  if (panoInfo) {
+    // a signpost 35 m from the start, towards the middle of the map, on dry land
+    const sp = world.spawn.player; const dir = Math.atan2(-sp[0], -sp[1]);
+    for (let d = 35; d < 120 && !panoPos; d += 8) {
+      const x = sp[0] + Math.sin(dir) * d, z = sp[1] + Math.cos(dir) * d;
+      if (world.underwater || (world.heightAt(x, z) > world.waterLevel + 0.8 && world.slopeAt(x, z) < 0.5)) panoPos = new THREE.Vector3(x, world.heightAt(x, z), z);
+    }
+    if (panoPos) {
+      const g = new THREE.Group();
+      const std = (o) => new THREE.MeshStandardMaterial(o);
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 1.6, 8), std({ color: 0x6b4a2a })); post.position.y = 0.8; g.add(post);
+      const legs = new THREE.Group();
+      for (let i = 0; i < 3; i++) { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.5, 6), std({ color: 0x333333 })); l.position.set(Math.cos(i * 2.09) * 0.35, 0.7, Math.sin(i * 2.09) * 0.35); l.rotation.z = Math.cos(i * 2.09) * 0.45; l.rotation.x = -Math.sin(i * 2.09) * 0.45; legs.add(l); }
+      g.add(legs);
+      const cam = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.22, 0.2), std({ color: 0x222222 })); cam.position.y = 1.55; g.add(cam);
+      const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.09, 0.16, 12), std({ color: 0x111111, metalness: 0.6, roughness: 0.3 })); lens.rotation.x = Math.PI / 2; lens.position.set(0, 1.55, 0.17); g.add(lens);
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), std({ color: 0x9fd8ff, emissive: 0x2a6fa8, emissiveIntensity: 0.6, roughness: 0.3 })); ball.position.y = 2.15; g.add(ball);
+      g.position.copy(panoPos); g.traverse((o) => { o.castShadow = true; }); world.scene.add(g);
+      world.landmarks.push({ subject: "viewpoint", pos: panoPos.clone(), radius: 2, height: 2.5, mesh: g });
+      world.colliders.push({ x: panoPos.x, z: panoPos.z, r: 0.7 });
+    }
+  }
+  function enterPano() {
+    if (!panoInfo || panoMode) return;
+    if (!panoScene) {
+      panoScene = new THREE.Scene();
+      const tex = new THREE.TextureLoader().load("panoramas/" + panoInfo.file); tex.colorSpace = THREE.SRGBColorSpace;
+      const sphere = new THREE.Mesh(new THREE.SphereGeometry(60, 64, 40), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide }));
+      sphere.scale.x = -1;     // the photo is seen from inside: un-mirror it
+      panoScene.add(sphere);
+      panoCam = new THREE.PerspectiveCamera(70, camera.aspect, 0.1, 200);
+    }
+    panoMode = true; root.classList.add("pano");
+    $("pano-credit").innerHTML = `📍 Real 360° photograph · ${escapeHtml(panoInfo.artist || "Wikimedia Commons")} · ${escapeHtml(panoInfo.license)}`;
+    if (window.SFX) SFX.good && SFX.good();
+  }
+  function leavePano() { panoMode = false; root.classList.remove("pano"); }
+  function escapeHtml(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
   const player = {
     pos: new THREE.Vector3(world.spawn.player[0], 0, world.spawn.player[1]),
     yaw: Math.PI, pitch: 0, sneak: false, run: false, swimY: 0,
@@ -68,7 +117,7 @@ export async function startExpedition(opts) {
   if (world.underwater) player.swimY = world.waterLevel - 6;
   const EYE = 1.6, EYE_SNEAK = 0.9;
   let focal = 35, camMode = false, clock = 0.08, t = 0, running = true, last = performance.now();
-  let treasureFound = false, waypoint = null, shots = 0, lastShotAt = -10, mapOpen = false;
+  let treasureFound = false, waypoint = null, shots = 0, realShots = 0, lastShotAt = -10, mapOpen = false;
   const best = {};           // subject id -> stars
   const treasurePos = new THREE.Vector3(TREASURE_AT[site.id][0], 0, TREASURE_AT[site.id][1]);
   treasurePos.y = world.heightAt(treasurePos.x, treasurePos.z);
@@ -88,6 +137,7 @@ export async function startExpedition(opts) {
     const w = root.clientWidth, h = root.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h; camera.updateProjectionMatrix();
+    if (panoCam) { panoCam.aspect = w / h; panoCam.updateProjectionMatrix(); }
   }
   on(window, "resize", resize); resize();
 
@@ -110,14 +160,21 @@ export async function startExpedition(opts) {
   on(window, "keydown", onKey); on(window, "keyup", onKey);
 
   // look: drag anywhere on the canvas (mouse or the right-hand side on touch)
-  let dragging = null;
+  let dragging = null, pinch = null;
   const lookArea = $("look-area");
   const onDown = (e) => {
     if (e.target.closest && e.target.closest("button, input, .no-look")) return;
+    startSound();
+    if (e.touches && e.touches.length >= 2) { const a = e.touches[0], b = e.touches[1]; pinch = { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), focal }; dragging = null; if (!camMode) toggleCamera(); e.preventDefault(); return; }
     const p = e.touches ? e.touches[0] : e;
     dragging = { x: p.clientX, y: p.clientY, id: e.touches ? e.touches[0].identifier : -1 };
   };
   const onMove = (e) => {
+    if (pinch && e.touches && e.touches.length >= 2) {
+      const a = e.touches[0], b = e.touches[1]; const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      focal = Math.max(24, Math.min(300, Math.round(pinch.focal * d / pinch.d))); $("zoom").value = focal; updateZoomLabel();
+      if (e.cancelable) e.preventDefault(); return;
+    }
     if (!dragging) return;
     let p = e.touches ? Array.from(e.touches).find((t) => t.identifier === dragging.id) : e;
     if (!p) return;
@@ -128,7 +185,7 @@ export async function startExpedition(opts) {
     dragging.x = p.clientX; dragging.y = p.clientY;
     if (e.cancelable) e.preventDefault();
   };
-  const onUp = () => { dragging = null; };
+  const onUp = (e) => { dragging = null; if (!e || !e.touches || e.touches.length < 2) pinch = null; };
   on(lookArea, "mousedown", onDown); on(window, "mousemove", onMove); on(window, "mouseup", onUp);
   on(lookArea, "touchstart", onDown, { passive: false }); on(lookArea, "touchmove", onMove, { passive: false }); on(lookArea, "touchend", onUp);
   on(lookArea, "wheel", (e) => { if (camMode) { zoomBy(e.deltaY < 0 ? 1.12 : 0.9); e.preventDefault(); } }, { passive: false });
@@ -155,6 +212,14 @@ export async function startExpedition(opts) {
   on($("btn-dig"), "click", dig);
   on($("shutter"), "click", shoot);
   on($("btn-exit"), "click", () => exit());
+  on($("btn-look"), "click", () => { startSound(); enterPano(); });
+  on($("btn-trail"), "click", leavePano);
+  on($("btn-sound"), "click", () => { startSound(); ambMuted = !ambMuted; ambience.setMuted(ambMuted); $("btn-sound").textContent = ambMuted ? "🔇" : "🔊"; try { localStorage.setItem("photo-expedition.sound", ambMuted ? "off" : "on"); } catch (e) {} });
+  $("btn-sound").textContent = ambMuted ? "🔇" : "🔊";
+  on($("btn-detail"), "click", () => { try { localStorage.setItem("photo-expedition.detail", lowDetail ? "high" : "low"); } catch (e) {} $("btn-detail").textContent = lowDetail ? "✨ Detail: high (restart)" : "✨ Detail: low (restart)"; });
+  $("btn-detail").textContent = lowDetail ? "✨ Detail: low" : "✨ Detail: high";
+  on(window, "keydown", (e) => { if (e.code === "KeyL" && !e.repeat) { if (panoMode) leavePano(); else if (panoPos && player.pos.distanceTo(panoPos) < 9) enterPano(); } });
+  on(window, "keydown", startSound, { once: true });
   on($("zoom"), "input", (e) => { focal = +e.target.value; updateZoomLabel(); });
   on($("btn-zoom-in"), "click", () => zoomBy(1.3)); on($("btn-zoom-out"), "click", () => zoomBy(0.77));
   on($("bigmap-close"), "click", toggleMap);
@@ -212,8 +277,8 @@ export async function startExpedition(opts) {
     ctx.font = (full ? 22 : 12) + "px system-ui, sans-serif";
     for (const L of world.landmarks) {
       if (L.subject === "everest") continue;
-      const sub = SUBJECTS[L.subject]; const emoji = sub ? sub.emoji : (L.subject === "wreck" ? "⚓" : L.subject === "temple" ? "🛕" : L.subject === "hut" ? "🛖" : L.subject === "oasis" ? "🌴" : L.subject === "hotspring" ? "♨️" : L.subject === "pirate" ? "🪨" : L.subject === "sledge" ? "🛷" : L.subject === "pyramid2" ? "🔺" : L.subject === "iceberg2" ? "🧊" : "📍");
-      if (!full && !sub) continue;
+      const sub = SUBJECTS[L.subject]; const emoji = sub ? sub.emoji : (L.subject === "wreck" ? "⚓" : L.subject === "temple" ? "🛕" : L.subject === "hut" ? "🛖" : L.subject === "oasis" ? "🌴" : L.subject === "hotspring" ? "♨️" : L.subject === "pirate" ? "🪨" : L.subject === "sledge" ? "🛷" : L.subject === "pyramid2" ? "🔺" : L.subject === "iceberg2" ? "🧊" : L.subject === "viewpoint" ? "👁️" : "📍");
+      if (!full && !sub && L.subject !== "viewpoint") continue;
       const [x, y] = toXY(L.pos.x, L.pos.z); ctx.fillText(emoji, x, y);
     }
     // animals you've spotted
@@ -306,8 +371,20 @@ export async function startExpedition(opts) {
   }
 
   function scoreShot() {
-    const subs = visibleSubjects().filter((s) => s.info);
     const env = world.env;
+    if (panoMode) {
+      // a real photograph of the real place: it's all about holding the camera well
+      const blur = Math.min(1, player.turnNow * 8) * (focal / 60);
+      const level = 1 - Math.min(1, Math.abs(player.pitch) / 0.6);
+      const notes = [], good = ["A real 360° photograph — you are standing in the real " + site.name.replace(/^The /, "") + "."];
+      let sc = 55 + level * 25 + (blur < 0.2 ? 15 : blur < 0.5 ? 6 : 0) + (focal >= 35 && focal <= 120 ? 5 : 0);
+      if (level < 0.5) notes.push("The horizon is tilted — level the camera for a landscape."); else good.push("Level horizon.");
+      if (blur >= 0.2) notes.push("A little shaky — stop turning before you shoot."); else good.push("Sharp — you held still.");
+      if (focal > 150) notes.push("Very zoomed in: a wide lens shows more of a real place.");
+      sc = Math.round(Math.min(100, sc));
+      return { subject: null, real: true, score: sc, stars: sc >= 88 ? 5 : sc >= 72 ? 4 : 3, notes, good, label: "Real view · " + site.name.replace(/^The /, ""), when: env.label };
+    }
+    const subs = visibleSubjects().filter((s) => s.info);
     const sunDot = fwd.dot(env.sunDir);
     const blur = Math.min(1, player.speedNow * 0.6 + player.turnNow * 8) * (focal / 60);
     const notes = [], good = [];
@@ -367,6 +444,8 @@ export async function startExpedition(opts) {
     if (subject.action) { score *= 1.1; good.push(subject.kindOf === "landmark" ? "You caught the eruption!" : "Action shot!"); }
     if (subject.info.rare >= 3) { score *= 1.12; good.push("A " + name + " — hardly anyone ever gets this picture."); }
     if (subject.creature && subject.creature.breaching) good.push("A breaching whale! Front page.");
+    const herd = subs.filter((x) => x.id === subject.id && x.sizeFrac > 0.06).length;
+    if (herd >= 3) { score *= 1.08; good.push("The whole herd — " + herd + " " + name + "s in one frame!"); }
     score = Math.max(8, Math.min(100, Math.round(score)));
     let stars = score >= 86 ? 5 : score >= 70 ? 4 : score >= 52 ? 3 : score >= 32 ? 2 : 1;
     if (tier.name === "Little Explorer") stars = Math.max(stars, 3);
@@ -377,18 +456,18 @@ export async function startExpedition(opts) {
   function shoot() {
     if (!camMode || t - lastShotAt < 0.6) return;
     lastShotAt = t;
-    renderer.render(world.scene, camera);
+    renderer.render(panoMode ? panoScene : world.scene, panoMode ? panoCam : camera);
     const W = 720, H = Math.round(720 / camera.aspect);
     shotCanvas.width = W; shotCanvas.height = H;
     const g = shotCanvas.getContext("2d");
     g.drawImage(renderer.domElement, 0, 0, W, H);
     const dataUrl = shotCanvas.toDataURL("image/jpeg", 0.8);
     const result = scoreShot();
-    shots++;
+    shots++; if (result.real) realShots++;
     const photo = {
       id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       site: site.id, subject: result.subject, label: result.label, stars: result.stars, score: result.score,
-      notes: result.notes, good: result.good, when: result.when, grid: gridRef(player.pos.x, player.pos.z), focal, taken: Date.now(), img: dataUrl
+      notes: result.notes, good: result.good, when: result.when, grid: gridRef(player.pos.x, player.pos.z), focal, taken: Date.now(), img: dataUrl, real: !!result.real
     };
     if (result.subject && SUBJECTS[result.subject]) { best[result.subject] = Math.max(best[result.subject] || 0, result.stars); renderTasks(); }
     flash(); clickSound();
@@ -408,7 +487,7 @@ export async function startExpedition(opts) {
   function showShot(photo) {
     const card = $("shot-card");
     $("shot-img").src = photo.img;
-    $("shot-title").textContent = (photo.subject && SUBJECTS[photo.subject] ? SUBJECTS[photo.subject].emoji + " " : "🏞️ ") + photo.label;
+    $("shot-title").textContent = (photo.subject && SUBJECTS[photo.subject] ? SUBJECTS[photo.subject].emoji + " " : photo.real ? "📍 " : "🏞️ ") + photo.label;
     $("shot-stars").textContent = "★".repeat(photo.stars) + "☆".repeat(5 - photo.stars);
     $("shot-score").textContent = photo.score + " / 100";
     $("shot-good").innerHTML = photo.good.map((n) => `<li>✅ ${n}</li>`).join("");
@@ -453,6 +532,7 @@ export async function startExpedition(opts) {
     const sy = Math.sin(player.yaw), cy = Math.cos(player.yaw);
     move.set((-sy * fz + cy * fx) * speed, 0, (-cy * fz - sy * fx) * speed);
     // note: forward is -z rotated by yaw; yaw=0 looks down -z
+    if (panoMode) { move.set(0, 0, 0); }
     let nx = player.pos.x + move.x * dt, nz = player.pos.z + move.z * dt;
     nx = Math.max(-SIZE / 2 + 6, Math.min(SIZE / 2 - 6, nx)); nz = Math.max(-SIZE / 2 + 6, Math.min(SIZE / 2 - 6, nz));
     // walls: rocks, trunks, landmarks
@@ -482,8 +562,9 @@ export async function startExpedition(opts) {
     }
     camera.position.copy(player.pos);
     camera.rotation.set(0, 0, 0, "YXZ"); camera.rotation.y = player.yaw; camera.rotation.x = player.pitch;
+    if (panoCam) { panoCam.rotation.set(0, 0, 0, "YXZ"); panoCam.rotation.y = player.yaw; panoCam.rotation.x = player.pitch; }
     const wantFov = camMode ? THREE.MathUtils.radToDeg(2 * Math.atan(12 / focal)) : 68;
-    if (Math.abs(camera.fov - wantFov) > 0.01) { camera.fov += (wantFov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); }
+    if (Math.abs(camera.fov - wantFov) > 0.01) { camera.fov += (wantFov - camera.fov) * Math.min(1, dt * 10); camera.updateProjectionMatrix(); if (panoCam) { panoCam.fov = camera.fov; panoCam.updateProjectionMatrix(); } }
   }
 
   /* ---------- HUD ---------- */
@@ -514,6 +595,7 @@ export async function startExpedition(opts) {
     compassEl.innerHTML = html;
     const dT = player.pos.distanceTo(treasurePos);
     $("btn-dig").classList.toggle("show", !treasureFound && dT < 7);
+    $("btn-look").classList.toggle("show", !!panoPos && !panoMode && player.pos.distanceTo(panoPos) < 9);
     if (!treasureFound && dT < 30) hintEl.textContent = dT < 7 ? "✨ Something is buried right here! Press DIG." : "✨ Something glints nearby…";
     else hintEl.textContent = "";
     if (camMode) {
@@ -533,12 +615,13 @@ export async function startExpedition(opts) {
       zoo.update(dt, t, player.pos, world.env, player.sneak, player.run && player.speedNow > 1);
     }
     world.update(dt, t, clock, player.pos);
-    renderer.toneMappingExposure = 1.05 - world.env.night * 0.35 + (world.underwater ? 0.1 : 0);
+    ambience.update(world.env);
+    renderer.toneMappingExposure = panoMode ? 1 : 1.05 - world.env.night * 0.35 + (world.underwater ? 0.1 : 0);
     glint.scale.setScalar(1 + Math.sin(t * 5) * 0.4);
     updateHUD(dt);
     player.turnNow *= Math.pow(0.02, dt);
-    renderer.render(world.scene, camera);
-    if (!mapOpen) drawMap(miniCtx, mini.width, false);
+    renderer.render(panoMode ? panoScene : world.scene, panoMode ? panoCam : camera);
+    if (!mapOpen && !panoMode) drawMap(miniCtx, mini.width, false);
     requestAnimationFrame(frame);
   }
   mini.width = mini.height = 150;
@@ -546,11 +629,13 @@ export async function startExpedition(opts) {
 
   function exit() {
     running = false;
-    ac.abort();
+    ac.abort(); ambience.stop();
+    if (panoScene) panoScene.traverse((o) => { if (o.material && o.material.map) o.material.map.dispose(); if (o.geometry) o.geometry.dispose(); });
+    root.classList.remove("pano");
     root.classList.remove("cam", "map-open");
     $("shot-card").classList.remove("show"); $("treasure-card").classList.remove("show");
     world.dispose(); renderer.dispose();
-    opts.onExit && opts.onExit({ shots, best, treasureFound });
+    opts.onExit && opts.onExit({ shots, best, treasureFound, realShots });
   }
   return { exit, get best() { return best; }, world, zoo, player, shoot, toggleCamera, get clock() { return clock; }, set clock(v) { clock = v; } };
 }

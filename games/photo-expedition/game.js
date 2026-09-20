@@ -43,6 +43,7 @@
   function siteStars(siteId) { const s = prof.stars[siteId] || {}; return Object.values(s).reduce((a, b) => a + b, 0) + (prof.treasures.includes(siteId) ? 3 : 0); }
   function totalStars() { return SITES.reduce((a, s) => a + siteStars(s.id), 0); }
   function siteDone(site) { return site.subjects.every((id) => ((prof.stars[site.id] || {})[id] || 0) >= tier.passStars) && prof.treasures.includes(site.id); }
+  function kmFlown() { let km = 0; for (let i = 1; i < prof.route.length; i++) { const a = WorldMap.siteById(prof.route[i - 1]), b = WorldMap.siteById(prof.route[i]); if (a && b) km += WorldMap.distanceKm(a, b); } return km; }
   function rankFor(stars) { let r = RANKS[0]; for (const x of RANKS) if (stars >= x[0]) r = x; return r; }
   function isUnlocked(site) { return !tier.gates || prof.unlocked.includes(site.id); }
 
@@ -81,6 +82,8 @@
     WorldMap.setState({ unlocked: new Set(tier.gates ? prof.unlocked : SITES.map((s) => s.id)), stars, done, current: currentSite ? currentSite.id : null, route: prof.route, question });
     const total = totalStars(); const r = rankFor(total);
     $("rank-emoji").textContent = r[2]; $("rank-name").textContent = r[1]; $("total-stars").textContent = total;
+    const km = kmFlown();
+    $("km-flown").textContent = km ? "✈️ " + Math.round(km).toLocaleString("en-US") + " km flown" + (km >= 40075 ? " — that's all the way round the Earth!" : " · round the Earth is 40,075 km") : "";
     $("album-count").textContent = prof.photos.length ? "(" + prof.photos.length + ")" : "";
   }
   function fmtKm(km) { return Math.round(km).toLocaleString("en-US") + " km (" + Math.round(km * 0.621).toLocaleString("en-US") + " miles)"; }
@@ -239,6 +242,7 @@
     root.classList.add("loading");
     try {
       const [THREE, mod] = await Promise.all([import("../../assets/vendor/three/three.module.min.js"), import("./expedition.mjs")]);
+      const starsBefore = totalStars(), rankBefore = rankFor(starsBefore)[1], bestBefore = Object.assign({ __treasure: prof.treasures.includes(site.id) }, prof.stars[site.id] || {});
       if (!prof.route.length || prof.route[prof.route.length - 1] !== site.id) prof.route.push(site.id);
       prof.visits[site.id] = (prof.visits[site.id] || 0) + 1; persist();
       expedition = await mod.startExpedition({
@@ -250,7 +254,23 @@
           persist();
         },
         onTreasure() { if (!prof.treasures.includes(site.id)) prof.treasures.push(site.id); persist(); },
-        onExit(summary) { expedition = null; root.classList.remove("loading"); openBrief(site); show("s-map"); openSite(site); }
+        onExit(summary) {
+          expedition = null; root.classList.remove("loading"); show("s-map"); openSite(site);
+          // what came home
+          const lines = [];
+          lines.push(`📷 ${summary.shots} photo${summary.shots === 1 ? "" : "s"} taken` + (summary.realShots ? ` (${summary.realShots} inside the real 360° view)` : ""));
+          for (const id of site.subjects) { const b = (prof.stars[site.id] || {})[id] || 0, was = bestBefore[id] || 0; if (b > was) lines.push(`${SUBJECTS[id].emoji} ${SUBJECTS[id].name}: new best ${"★".repeat(b)}${b >= tier.passStars && was < tier.passStars ? " — assignment complete!" : ""}`); }
+          if (summary.treasureFound && !(bestBefore.__treasure)) lines.push(`${site.treasure.emoji} Found ${site.treasure.name}!`);
+          const gained = totalStars() - starsBefore; if (gained > 0) lines.push(`⭐ ${gained} new star${gained === 1 ? "" : "s"} — ${totalStars()} in all`);
+          if (siteDone(site)) lines.push(`🏆 ${site.name} is complete!`);
+          const next = SITES.find((x) => !isUnlocked(x)); if (next && tier.gates) lines.push(`🔒 Next: ${next.name} unlocks at ${next.gate.stars} ★ (${Math.max(0, next.gate.stars - totalStars())} to go)`);
+          const rankNow = rankFor(totalStars())[1];
+          $("sum-title").textContent = "🏕️ Back at camp — " + site.name;
+          $("sum-lines").innerHTML = lines.map((l) => `<li>${l}</li>`).join("") || "<li>Nothing in the bag this time. Try sneaking closer!</li>";
+          $("sum-rank").textContent = rankNow !== rankBefore ? `🎉 Promoted: you are now a ${rankNow}!` : "";
+          if (rankNow !== rankBefore) { window.Confetti && Confetti.burst(); window.SFX && SFX.win(); }
+          $("summary").classList.add("show");
+        }
       });
       // the expedition module is loaded: give the 3D scene the whole screen
       root.classList.remove("loading");
@@ -272,9 +292,9 @@
     const grid = $("album-grid"); grid.innerHTML = "";
     $("album-empty").classList.toggle("hidden", prof.photos.length > 0);
     for (const p of prof.photos) {
-      const b = document.createElement("button"); b.className = "album-item";
+      const b = document.createElement("button"); b.className = "album-item" + (p.real ? " real" : "");
       const site = WorldMap.siteById(p.site);
-      b.innerHTML = `<img src="${p.img}" alt="${p.label}" loading="lazy" /><div class="cap"><span>${(p.subject && SUBJECTS[p.subject] ? SUBJECTS[p.subject].emoji : "🏞️")} ${p.label}</span><span class="st">${"★".repeat(p.stars)}</span></div>`;
+      b.innerHTML = `<img src="${p.img}" alt="${p.label}" loading="lazy" /><div class="cap"><span>${(p.subject && SUBJECTS[p.subject] ? SUBJECTS[p.subject].emoji : p.real ? "📍" : "🏞️")} ${p.label}</span><span class="st">${"★".repeat(p.stars)}</span></div>`;
       b.addEventListener("click", () => openViewer(p));
       grid.appendChild(b);
     }
@@ -286,11 +306,12 @@
     const site = WorldMap.siteById(p.site); const sub = p.subject && SUBJECTS[p.subject];
     $("v-img").src = p.img;
     $("v-meta").textContent = `${site ? site.name : ""} · square ${p.grid} · ${p.focal} mm · ${p.when}`;
-    $("v-title").textContent = (sub ? sub.emoji + " " : "🏞️ ") + p.label + (site ? " — " + site.name : "");
+    $("v-title").textContent = (sub ? sub.emoji + " " : p.real ? "📍 " : "🏞️ ") + p.label + (site ? " — " + site.name : "");
     $("v-stars").textContent = "★".repeat(p.stars) + "☆".repeat(5 - p.stars); $("v-score").textContent = p.score + " / 100";
     $("v-good").innerHTML = (p.good || []).map((n) => `<li>✅ ${n}</li>`).join("");
     $("v-notes").innerHTML = (p.notes || []).map((n) => `<li>💡 ${n}</li>`).join("");
-    $("v-fact").textContent = sub ? "📓 " + sub.fact : (site ? "📓 " + site.intro : "");
+    const pano = p.real && window.PANORAMA_MANIFEST && PANORAMA_MANIFEST[p.site];
+    $("v-fact").textContent = sub ? "📓 " + sub.fact : (p.real && pano ? "📍 Taken inside a real 360° photograph of " + (site ? site.name : "the place") + " by " + (pano.artist || "a Wikimedia Commons photographer") + " (" + pano.license + ")." : (site ? "📓 " + site.intro : ""));
     const fig = $("v-pro-fig");
     if (sub) { fig.classList.remove("hidden"); $("v-pro").innerHTML = photoBlock(p.subject, sub.emoji); $("v-pro-cap").textContent = "How a pro shot it"; }
     else fig.classList.add("hidden");
@@ -356,6 +377,7 @@
   $("cover-close").addEventListener("click", () => $("cover").classList.remove("show"));
 
   /* ---------------- wiring ---------------- */
+  $("sum-close").addEventListener("click", () => $("summary").classList.remove("show"));
   $("btn-change").addEventListener("click", () => { renderPicker(); show("s-start"); });
   $("btn-album").addEventListener("click", openAlbum);
   $("brief-album").addEventListener("click", openAlbum);

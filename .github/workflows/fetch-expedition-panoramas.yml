@@ -3,7 +3,6 @@ name: Fetch Photo Expedition panoramas
 # Finds one free-licensed 360° photograph per expedition on Wikimedia Commons
 # (the "Look around for real" viewpoints) and commits it back to the branch.
 # Runs when the panorama manifest or the fetch script changes, or by hand.
-# the Actions tab. Photos that already exist are skipped unless "force".
 
 on:
   workflow_dispatch:
