@@ -1,0 +1,15 @@
+{
+ "_about": "Real 360° photographs (equirectangular panoramas) from Wikimedia Commons, one per expedition, for the 'Look around for real' viewpoint. tools/fetch-expedition-panoramas.mjs searches Commons with each entry's terms, keeps only 2:1 equirectangular JPEGs at least 3000 px wide that are filed as panoramas and whose title or categories match a `must` pattern, saves them into games/photo-expedition/panoramas/ and writes panoramas/manifest.js with the credit. Entries are tried in order; a site with no suitable panorama simply has no viewpoint.",
+ "width": 4096,
+ "entries": [
+  { "site": "serengeti", "terms": ["Serengeti equirectangular", "Serengeti 360 panorama", "Serengeti spherical panorama", "Tanzania savanna equirectangular", "Ngorongoro equirectangular"], "must": ["Serengeti", "Tanzania", "Ngorongoro", "savanna"] },
+  { "site": "amazon", "terms": ["Amazon rainforest equirectangular", "Amazonas 360 panorama", "rainforest equirectangular panorama", "Brazil jungle spherical panorama"], "must": ["Amazon", "rainforest", "jungle", "selva"] },
+  { "site": "reef", "terms": ["underwater equirectangular coral", "coral reef 360 panorama", "underwater spherical panorama", "Great Barrier Reef equirectangular"], "must": ["reef", "underwater", "coral", "diving"] },
+  { "site": "arctic", "terms": ["Svalbard equirectangular", "Svalbard 360 panorama", "Longyearbyen equirectangular", "Spitsbergen spherical panorama", "glacier equirectangular panorama Norway"], "must": ["Svalbard", "Spitsbergen", "Longyearbyen", "glacier", "Arctic"] },
+  { "site": "galapagos", "terms": ["Galápagos equirectangular", "Galapagos 360 panorama", "Galápagos spherical panorama", "volcanic island equirectangular"], "must": ["Gal[aá]pagos", "volcan"] },
+  { "site": "himalaya", "terms": ["Everest base camp equirectangular", "Everest 360 panorama", "Himalaya equirectangular", "Annapurna equirectangular", "Nepal mountains spherical panorama"], "must": ["Everest", "Himalaya", "Annapurna", "Nepal", "Khumbu"] },
+  { "site": "sahara", "terms": ["Giza equirectangular", "Pyramids of Giza 360 panorama", "Giza spherical panorama", "Sahara equirectangular", "desert dunes equirectangular"], "must": ["Giza", "Pyramid", "Sahara", "desert", "dune"] },
+  { "site": "yellowstone", "terms": ["Yellowstone equirectangular", "Grand Prismatic 360 panorama", "Old Faithful equirectangular", "Yellowstone spherical panorama"], "must": ["Yellowstone", "Prismatic", "Old Faithful", "geyser"] },
+  { "site": "antarctica", "terms": ["Antarctica equirectangular", "Antarctica 360 panorama", "Antarctic spherical panorama", "iceberg equirectangular", "penguin colony equirectangular"], "must": ["Antarctic", "iceberg", "penguin"] }
+ ]
+}
