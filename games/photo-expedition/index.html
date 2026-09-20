@@ -195,6 +195,19 @@
     </div>
   </div>
 
+  <!-- fly in from space: real NASA satellite views, zooming down to the expedition -->
+  <div id="flyin" class="overlay flyin">
+    <div class="flyin-box">
+      <canvas id="flyin-canvas" width="1024" height="1024"></canvas>
+      <div class="flyin-caption"><b id="flyin-title"></b><span id="flyin-scale"></span></div>
+      <div class="flyin-credit">🛰️ NASA Blue Marble · public domain</div>
+      <div class="row flyin-actions">
+        <button class="btn-big" id="flyin-go">🚙 Land here</button>
+        <button class="btn-small" id="flyin-close">✕ Back</button>
+      </div>
+    </div>
+  </div>
+
   <!-- the magazine cover maker -->
   <div id="cover" class="overlay">
     <div class="card cover-card">
@@ -215,6 +228,7 @@
   <script src="data.js"></script>
   <script src="land.js"></script>
   <script src="photos/manifest.js"></script>
+  <script src="satellite/manifest.js"></script>
   <script src="worldmap.js"></script>
   <script src="game.js"></script>
 </body>

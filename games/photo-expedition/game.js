@@ -106,9 +106,11 @@
       <div class="site-facts"><span>★ ${stars} earned here</span><span>${site.subjects.length} photo assignments</span><span>${site.treasure.emoji} 1 treasure</span></div>
       <div class="subject-chips">${chips}</div>
       ${gate}
-      ${unlocked ? `<button class="btn-big" id="btn-brief">📓 Open the field guide</button>` : (totalStars() >= site.gate.stars ? `<button class="btn-big" id="btn-unlock">🔑 Unlock it</button>` : "")}`;
+      ${unlocked ? `<button class="btn-big" id="btn-brief">📓 Open the field guide</button>` : (totalStars() >= site.gate.stars ? `<button class="btn-big" id="btn-unlock">🔑 Unlock it</button>` : "")}
+      ${hasFlyIn(site) ? `<div class="row"><button class="btn-small" id="btn-flyin">🛰️ See it from space</button></div>` : ""}`;
     const bb = $("btn-brief"); if (bb) bb.addEventListener("click", () => openBrief(site));
     const bu = $("btn-unlock"); if (bu) bu.addEventListener("click", () => askQuestion(site));
+    const bf = $("btn-flyin"); if (bf) bf.addEventListener("click", () => flyIn(site, () => openBrief(site)));
     refreshMapState();
     panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
@@ -179,6 +181,54 @@
     }).join("");
     $("brief-treasure").innerHTML = `<h3>${site.treasure.emoji} Treasure: ${site.treasure.name} ${prof.treasures.includes(site.id) ? "✅ found" : ""}</h3><p>${tier.name === "Pro" ? site.treasure.pro : site.treasure.clue}</p><p class="muted">Open the map with <b>M</b> in the expedition to read the clue again and plant a waypoint.</p>`;
     show("s-brief");
+  }
+
+  /* ---------------- fly in from space ---------------- */
+  /* Real NASA views of the site at five zoom levels (satellite/manifest.js, fetched by
+     a workflow). We zoom continuously: each level is scaled up until the next one,
+     which is k times closer, fades in at 1/k and grows to fill the square. */
+  let flyAnim = null;
+  function hasFlyIn(site) { return !!(window.SATELLITE_MANIFEST && SATELLITE_MANIFEST[site.id] && SATELLITE_MANIFEST[site.id].length >= 2); }
+  function flyIn(site, then) {
+    const levels = SATELLITE_MANIFEST[site.id];
+    const ov = $("flyin"), c = $("flyin-canvas"), g = c.getContext("2d"), acts = ov.querySelector(".flyin-actions");
+    ov.classList.add("show"); acts.classList.remove("show");
+    $("flyin-title").textContent = site.emoji + " " + site.name + " from space";
+    $("flyin-scale").textContent = "";
+    const imgs = levels.map((l) => { const im = new Image(); im.src = "satellite/" + l.file; return im; });
+    const W = c.width;
+    let stop = false;
+    const finish = () => { stop = true; ov.classList.remove("show"); };
+    $("flyin-close").onclick = finish;
+    $("flyin-go").onclick = () => { finish(); then && then(); };
+    const ready = Promise.all(imgs.map((im) => new Promise((r) => { if (im.complete) r(); else { im.onload = r; im.onerror = r; } })));
+    ready.then(() => {
+      const t0 = performance.now(), per = 1500, hold = 700;
+      const drawAt = (im, scale, alpha) => { if (!im.naturalWidth) return; g.globalAlpha = alpha; const s = W * scale; g.drawImage(im, (W - s) / 2, (W - s) / 2, s, s); g.globalAlpha = 1; };
+      const pin = () => { g.strokeStyle = "rgba(255,209,102,0.9)"; g.lineWidth = 3; g.beginPath(); g.arc(W / 2, W / 2, 22, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.moveTo(W / 2 - 34, W / 2); g.lineTo(W / 2 - 26, W / 2); g.moveTo(W / 2 + 26, W / 2); g.lineTo(W / 2 + 34, W / 2); g.moveTo(W / 2, W / 2 - 34); g.lineTo(W / 2, W / 2 - 26); g.moveTo(W / 2, W / 2 + 26); g.lineTo(W / 2, W / 2 + 34); g.stroke(); };
+      const frame = (now) => {
+        if (stop) return;
+        const e = now - t0 - hold;
+        let i = Math.max(0, Math.floor(e / per)), u = e < 0 ? 0 : (e / per) - i;
+        g.fillStyle = "#000"; g.fillRect(0, 0, W, W);
+        if (i >= levels.length - 1) {
+          drawAt(imgs[levels.length - 1], 1, 1); pin();
+          $("flyin-scale").textContent = "about " + levels[levels.length - 1].km.toLocaleString("en-US") + " km across · " + WorldMap.fmtCoord(site.lat, site.lon);
+          acts.classList.add("show");
+          flyAnim = null; return;
+        }
+        const k = levels[i].deg / levels[i + 1].deg;
+        // ease the zoom so it feels like a camera, not a slideshow
+        const ue = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+        drawAt(imgs[i], Math.pow(k, ue), 1);
+        drawAt(imgs[i + 1], Math.pow(k, ue - 1), Math.max(0, Math.min(1, (ue - 0.25) / 0.5)));
+        pin();
+        const km = levels[i].km + (levels[i + 1].km - levels[i].km) * ue;
+        $("flyin-scale").textContent = "about " + Math.round(km / 10) * 10 + " km across";
+        flyAnim = requestAnimationFrame(frame);
+      };
+      flyAnim = requestAnimationFrame(frame);
+    });
   }
 
   /* ---------------- the expedition ---------------- */
@@ -310,8 +360,9 @@
   $("brief-album").addEventListener("click", openAlbum);
   $("album-back").addEventListener("click", () => show(currentSite ? "s-brief" : "s-map"));
   $("brief-back").addEventListener("click", () => { show("s-map"); if (currentSite) openSite(currentSite); });
-  $("brief-go").addEventListener("click", () => startExpedition(currentSite));
-  $("brief-go2").addEventListener("click", () => startExpedition(currentSite));
+  const go = () => { if (hasFlyIn(currentSite)) flyIn(currentSite, () => startExpedition(currentSite)); else startExpedition(currentSite); };
+  $("brief-go").addEventListener("click", go);
+  $("brief-go2").addEventListener("click", go);
 
   renderPicker();
   // straight back in for whoever played last

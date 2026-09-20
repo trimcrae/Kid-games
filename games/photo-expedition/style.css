@@ -194,3 +194,14 @@
   .hud-btn { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
   .brief-card { margin-left: 0.3rem; margin-right: 0.3rem; }
 }
+
+/* ---------- fly in from space ---------- */
+.flyin { background: #000; padding: 0; }
+.flyin-box { position: relative; width: min(100vw, 100vh, 900px); height: min(100vw, 100vh, 900px); }
+#flyin-canvas { width: 100%; height: 100%; display: block; }
+.flyin-caption { position: absolute; left: 0; right: 0; top: max(10px, env(safe-area-inset-top)); text-align: center; color: #fff; text-shadow: 0 2px 6px #000; font-size: clamp(1rem, 2.6vw, 1.5rem); pointer-events: none; }
+.flyin-caption b { display: block; font-size: 1.3em; }
+.flyin-credit { position: absolute; right: 8px; bottom: 8px; color: rgba(255,255,255,0.7); font-size: 0.75rem; }
+.flyin-actions { position: absolute; left: 0; right: 0; bottom: max(24px, env(safe-area-inset-bottom)); opacity: 0; transition: opacity .4s; align-items: center; }
+.flyin-actions.show { opacity: 1; }
+.flyin-actions .btn-big { margin: 0; }
