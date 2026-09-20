@@ -62,12 +62,13 @@ function reject(info, entry) {
   const strong = [info.title, strip((meta.ObjectName || {}).value), info.cats.join(" | ")].join(" \n ");
   if (!/equirectangular|360°|360 degree|spherical panorama|photo sphere|photosphere|panoram|LG-R105|Theta|Insta360|Gear 360|GoPro Max|Mapillary/i.test(strong)) return "not filed as a panorama";
   if (/interior|indoor|museum|church|cathedral|mosque|station|shop|office|hotel|room|hall|inside/i.test(strong)) return "indoors";
+  if (/Mapillary|LG-R105/i.test(strong)) return "handheld sphere (photographer in frame)";
   if (!entry.must.some((m) => new RegExp(m, "i").test(strong))) return "no must match";
   return "";
 }
 async function find(entry, width, used) {
   for (const term of entry.terms) {
-    const titles = (await search(term + " -interior -indoor filemime:image/jpeg")).filter((t) => !used.has(t));
+    const titles = (await search(term + " -interior -indoor")).filter((t) => !used.has(t));
     await sleep(250);
     for (let i = 0; i < titles.length; i += 10) {
       const batch = await infos(titles.slice(i, i + 10), width);

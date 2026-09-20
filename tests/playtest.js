@@ -2208,6 +2208,10 @@ const GAMES = {
     await page.locator("#treasure-close").click();
     await page.locator("#btn-exit").click();
     await page.waitForSelector("#s-map.show");
+    // back at camp: the summary of the trip, then on to the map
+    await page.waitForSelector("#summary.show");
+    if (!/photo/.test(await page.locator("#sum-lines").textContent())) throw new Error("the camp summary does not count the photos");
+    await page.locator("#sum-close").click();
     const saved = await page.evaluate(() => { const p = PhotoExpedition.profile; return { photos: p.photos.length, treasure: p.treasures.includes("serengeti"), img: p.photos[0] && p.photos[0].img.slice(0, 22) }; });
     if (saved.photos !== 1 || !/^data:image\/jpeg/.test(saved.img)) throw new Error("the photo was not saved to the album");
     if (!saved.treasure) throw new Error("the treasure was not saved");

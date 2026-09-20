@@ -28,6 +28,7 @@ export function createAmbience(biome) {
     return g;
   }
   function chirp(c, f0, f1, dur, vol) {
+    if (!running || !master) return;
     const o = c.createOscillator(), g = c.createGain(); const t = c.currentTime;
     o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.2); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
