@@ -204,15 +204,16 @@
     const ready = Promise.all(imgs.map((im) => new Promise((r) => { if (im.complete) r(); else { im.onload = r; im.onerror = r; } })));
     ready.then(() => {
       const t0 = performance.now(), per = 1500, hold = 700;
-      const drawAt = (im, scale, alpha) => { if (!im.naturalWidth) return; g.globalAlpha = alpha; const s = W * scale; g.drawImage(im, (W - s) / 2, (W - s) / 2, s, s); g.globalAlpha = 1; };
+      // every image is drawn so that the site (cx, cy inside the picture) sits at the centre of the canvas
+      const drawAt = (im, lvl, scale, alpha) => { if (!im.naturalWidth) return; g.globalAlpha = alpha; const s = W * scale; g.drawImage(im, W / 2 - (lvl.cx == null ? 0.5 : lvl.cx) * s, W / 2 - (lvl.cy == null ? 0.5 : lvl.cy) * s, s, s); g.globalAlpha = 1; };
       const pin = () => { g.strokeStyle = "rgba(255,209,102,0.9)"; g.lineWidth = 3; g.beginPath(); g.arc(W / 2, W / 2, 22, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.moveTo(W / 2 - 34, W / 2); g.lineTo(W / 2 - 26, W / 2); g.moveTo(W / 2 + 26, W / 2); g.lineTo(W / 2 + 34, W / 2); g.moveTo(W / 2, W / 2 - 34); g.lineTo(W / 2, W / 2 - 26); g.moveTo(W / 2, W / 2 + 26); g.lineTo(W / 2, W / 2 + 34); g.stroke(); };
       const frame = (now) => {
         if (stop) return;
         const e = now - t0 - hold;
         let i = Math.max(0, Math.floor(e / per)), u = e < 0 ? 0 : (e / per) - i;
-        g.fillStyle = "#000"; g.fillRect(0, 0, W, W);
+        g.fillStyle = "#03101f"; g.fillRect(0, 0, W, W);
         if (i >= levels.length - 1) {
-          drawAt(imgs[levels.length - 1], 1, 1); pin();
+          drawAt(imgs[levels.length - 1], levels[levels.length - 1], 1, 1); pin();
           $("flyin-scale").textContent = "about " + levels[levels.length - 1].km.toLocaleString("en-US") + " km across · " + WorldMap.fmtCoord(site.lat, site.lon);
           acts.classList.add("show");
           flyAnim = null; return;
@@ -220,8 +221,8 @@
         const k = levels[i].deg / levels[i + 1].deg;
         // ease the zoom so it feels like a camera, not a slideshow
         const ue = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
-        drawAt(imgs[i], Math.pow(k, ue), 1);
-        drawAt(imgs[i + 1], Math.pow(k, ue - 1), Math.max(0, Math.min(1, (ue - 0.25) / 0.5)));
+        drawAt(imgs[i], levels[i], Math.pow(k, ue), 1);
+        drawAt(imgs[i + 1], levels[i + 1], Math.pow(k, ue - 1), Math.max(0, Math.min(1, (ue - 0.25) / 0.5)));
         pin();
         const km = levels[i].km + (levels[i + 1].km - levels[i].km) * ue;
         $("flyin-scale").textContent = "about " + Math.round(km / 10) * 10 + " km across";

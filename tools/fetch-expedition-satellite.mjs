@@ -42,11 +42,19 @@ async function loadSites() {
   return ctx.SITES;
 }
 
-async function fetchView(lat, lon, widthDeg, attempt = 1) {
-  // keep the view square in degrees; at high latitudes the map is stretched, which is what a flat map does
-  const half = widthDeg / 2, halfLat = Math.min(half, 89.9 - Math.abs(lat)) ;
+/* A view centred on the site — except near the date line or the poles, where the
+   box is slid to stay on the map, so the manifest also records where the site sits
+   inside each picture (cx, cy as fractions) and the game keeps the pin on it. */
+function viewBox(lat, lon, widthDeg) {
+  const half = widthDeg / 2;
+  const lonC = Math.max(-180 + half, Math.min(180 - half, lon));
   const latC = Math.max(-90 + half, Math.min(90 - half, lat));
-  const bbox = [latC - half, lon - half, latC + half, lon + half];          // EPSG:4326 in WMS 1.3.0 is lat,lon order
+  const bbox = [latC - half, lonC - half, latC + half, lonC + half];          // EPSG:4326 in WMS 1.3.0 is lat,lon order
+  return { bbox, cx: (lon - (lonC - half)) / widthDeg, cy: ((latC + half) - lat) / widthDeg };
+}
+
+async function fetchView(lat, lon, widthDeg, attempt = 1) {
+  const { bbox } = viewBox(lat, lon, widthDeg);
   const url = WMS + "?" + new URLSearchParams({ SERVICE: "WMS", REQUEST: "GetMap", VERSION: "1.3.0", LAYERS: LAYER, CRS: "EPSG:4326", BBOX: bbox.join(","), WIDTH: String(SIZE), HEIGHT: String(SIZE), FORMAT: "image/jpeg" });
   try {
     const res = await fetch(url, { headers: { "User-Agent": UA } });
@@ -72,12 +80,14 @@ async function main() {
       const file = `${s.id}-${i}.jpg`, path = resolve(OUT, file);
       const w = LEVELS[i];
       const km = Math.round(w * 111 * Math.cos(s.lat * Math.PI / 180));
-      if (!FORCE && (await exists(path))) { manifest[s.id].push({ file, deg: w, km }); continue; }
+      const { cx, cy } = viewBox(s.lat, s.lon, w);
+      const entry = { file, deg: w, km, cx: +cx.toFixed(4), cy: +cy.toFixed(4) };
+      if (!FORCE && (await exists(path))) { manifest[s.id].push(entry); continue; }
       process.stdout.write(`• ${s.id} ${w}° … `);
       try {
         const { buf } = await fetchView(s.lat, s.lon, w);
         await writeFile(path, buf);
-        manifest[s.id].push({ file, deg: w, km });
+        manifest[s.id].push(entry);
         fetched++;
         console.log(Math.round(buf.length / 1024) + " KB");
         await sleep(300);
