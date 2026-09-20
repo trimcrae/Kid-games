@@ -1,0 +1,46 @@
+name: Fetch Photo Expedition satellite views
+
+# Downloads NASA Blue Marble views of every expedition site (public domain,
+# no API key) so the game can fly in from space before the 3D walk, and
+# commits them back to the branch. Runs when the script changes, or by hand.
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-fetch views that already exist"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "tools/fetch-expedition-satellite.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: expedition-satellite-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  satellite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Fetch satellite views
+        run: node tools/fetch-expedition-satellite.mjs ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
+      - name: Commit satellite views
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A "games/photo-expedition/satellite"
+          if git diff --cached --quiet; then
+            echo "No new satellite views to commit."
+          else
+            git commit -m "Add Photo Expedition satellite views [skip ci]"
+            git pull --rebase origin "${{ github.ref_name }}"
+            git push
+          fi

@@ -471,18 +471,6 @@ window.PHOTO_MANIFEST = {
   "width": 1100,
   "height": 825
  },
- "site-serengeti": {
-  "file": "site-serengeti.jpg",
-  "title": "Chestnut sparrow (Passer eminibey).jpg",
-  "artist": "Hobbyfotowiki",
-  "license": "CC0",
-  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
-  "page": "https://commons.wikimedia.org/wiki/File:Chestnut_sparrow_(Passer_eminibey).jpg",
-  "pool": "quality",
-  "term": "incategory:\"Quality images\" deepcat:\"Serengeti National Park\" -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram",
-  "width": 1100,
-  "height": 733
- },
  "site-amazon": {
   "file": "site-amazon.jpg",
   "title": "Igarapé do Rego.jpg",
@@ -494,30 +482,6 @@ window.PHOTO_MANIFEST = {
   "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Amazon River\" -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram",
   "width": 1100,
   "height": 734
- },
- "site-arctic": {
-  "file": "site-arctic.jpg",
-  "title": "Northern fulmars chasing Kittywakes away from their fishing ground, Svalbard.jpg",
-  "artist": "AWeith",
-  "license": "CC BY-SA 4.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Northern_fulmars_chasing_Kittywakes_away_from_their_fishing_ground,_Svalbard.jpg",
-  "pool": "quality",
-  "term": "incategory:\"Quality images\" deepcat:\"Svalbard\" -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram",
-  "width": 1100,
-  "height": 619
- },
- "site-galapagos": {
-  "file": "site-galapagos.jpg",
-  "title": "Zayapa (Grapsus grapsus), Cerro Brujo, isla de San Cristóbal, islas Galápagos, Ecuador, 2015-07-24, DD 151.JPG",
-  "artist": "Diego Delso",
-  "license": "CC BY-SA 4.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Zayapa_(Grapsus_grapsus),_Cerro_Brujo,_isla_de_San_Crist%C3%B3bal,_islas_Gal%C3%A1pagos,_Ecuador,_2015-07-24,_DD_151.JPG",
-  "pool": "featured",
-  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Galápagos Islands\" -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram",
-  "width": 1100,
-  "height": 733
  },
  "site-himalaya": {
   "file": "site-himalaya.jpg",

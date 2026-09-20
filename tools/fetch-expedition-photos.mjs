@@ -49,7 +49,8 @@ const POOLS = [
   'incategory:"Quality images"'
 ];
 /* keep the field guide to living animals in the wild, photographed (not mapped, painted or shot from orbit) */
-const EXCLUDE = " -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram";
+const EXCLUDE = " -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving";
+const VERBOSE = process.argv.includes("--verbose") || !!process.env.GITHUB_ACTIONS;
 
 async function api(params, attempt = 1) {
   const url = API + "?" + new URLSearchParams({ format: "json", formatversion: "2", origin: "*", ...params });
@@ -94,25 +95,30 @@ function describe(info) {
   return { strong, weak: strong + " \n " + stripHtml((meta.ImageDescription || {}).value) };
 }
 
-function acceptable(info, entry) {
-  if (info.mime !== "image/jpeg") return false;
-  if (!info.width || !info.height) return false;
+/* Why a candidate is turned down (or "" if it is fine) — the log shows the reasons
+   so a subject that finds nothing can be fixed from the workflow output alone. */
+function reject(info, entry) {
+  if (info.mime !== "image/jpeg") return "not jpeg";
+  if (!info.width || !info.height) return "no size";
   const ratio = info.width / info.height;
-  if (ratio < 1.1 || ratio > 2.3) return false;      // landscape, not panoramic strips
-  if (info.width < 1200) return false;
+  if (ratio < 1.1 || ratio > 2.3) return "ratio " + ratio.toFixed(2);
+  if (info.width < 1200) return "small";
   const meta = info.extmetadata || {};
   const lic = String((meta.LicenseShortName || {}).value || "").toLowerCase();
-  if (/nc|nd/.test(lic) || lic === "") return false;   // only free licences
-  if (String((meta.Restrictions || {}).value || "")) return false;
+  if (/nc|nd/.test(lic) || lic === "") return "licence " + (lic || "none");
+  if (String((meta.Restrictions || {}).value || "")) return "restricted";
   const { strong, weak } = describe(info);
   // a modern colour photograph of the real thing, not an old print, a painting or a satellite pass
-  if (/\b1[0-8]\d\d\b|\b19[0-8]\d\b|engraving|painting|drawing|illustration|lithograph|monochrome|black and white|black-and-white|sepia|postcard/i.test(strong)) return false;
-  if (/satellite|landsat|sentinel-2|from space|\bmap of\b|\bmaps\b/i.test(weak) && entry.kind !== "landscape") return false;
-  if (/satellite|landsat|sentinel-2|from space|\bmaps\b/i.test(strong)) return false;
-  if (!(entry.must || []).some((m) => new RegExp(m, "i").test(strong))) return false;
-  if ((entry.not || []).some((m) => new RegExp(m, "i").test(strong))) return false;
-  return (entry.also || []).every((m) => new RegExp(m, "i").test(weak));
+  if (/\b1[0-8]\d\d\b|\b19[0-6]\d\b/.test(info.title)) return "old (year in title)";
+  if (/engraving|painting|drawing|illustration|lithograph|black and white photographs|black-and-white photographs|sepia|postcard/i.test(strong)) return "not a colour photo";
+  if (/satellite|landsat|sentinel-2|from space|\bmap of\b/i.test(weak) && entry.kind !== "landscape") return "satellite/map";
+  if (/satellite|landsat|sentinel-2|from space/i.test(strong)) return "satellite";
+  if (!(entry.must || []).some((m) => new RegExp(m, "i").test(strong))) return "no must match";
+  if ((entry.not || []).some((m) => new RegExp(m, "i").test(strong))) return "not-pattern";
+  if (!(entry.also || []).every((m) => new RegExp(m, "i").test(weak))) return "also-pattern";
+  return "";
 }
+function acceptable(info, entry) { return reject(info, entry) === ""; }
 
 async function findPhoto(entry, width, used) {
   const queries = [];
@@ -127,6 +133,7 @@ async function findPhoto(entry, width, used) {
     if (!titles.length) continue;
     for (let i = 0; i < titles.length; i += 10) {
       const infos = await imageInfo(titles.slice(i, i + 10), width);
+      if (VERBOSE) { const why = {}; for (const x of infos) { const r = reject(x, entry) || "ok"; why[r] = (why[r] || 0) + 1; } console.log(`\n    ${q.slice(0, 70)}… → ${infos.length} candidates: ${Object.entries(why).map(([k, v]) => k + "×" + v).join(", ")}`); }
       // prefer wild over captive when both are offered
       const ok = infos.filter((x) => acceptable(x, entry));
       const pick = ok.find((x) => !/\bzoo\b|captive|aquarium|safari park/i.test(describe(x).weak)) || ok[0];

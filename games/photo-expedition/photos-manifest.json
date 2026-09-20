@@ -689,15 +689,17 @@
     "Serengeti landscape",
     "Serengeti plains",
     "Serengeti sunset",
-    "Serengeti acacia"
+    "Serengeti kopje",
+    "Serengeti"
    ],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -719,29 +721,39 @@
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
    "id": "site-reef",
    "cats": [
     "Great Barrier Reef",
-    "Aerial photographs of the Great Barrier Reef"
+    "Aerial photographs of the Great Barrier Reef",
+    "Coral reefs of Australia"
    ],
    "must": [
-    "Great Barrier Reef"
+    "Great Barrier Reef",
+    "Queensland",
+    "Whitsunday",
+    "Heron Island"
    ],
    "terms": [
-    "Great Barrier Reef"
+    "Great Barrier Reef aerial",
+    "Great Barrier Reef",
+    "Heron Island reef",
+    "Whitsunday reef",
+    "coral reef Queensland"
    ],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -756,16 +768,19 @@
    ],
    "terms": [
     "Svalbard glacier",
-    "Svalbard",
-    "Spitsbergen"
+    "Svalbard fjord",
+    "Svalbard landscape",
+    "Spitsbergen mountains",
+    "Svalbard"
    ],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -780,16 +795,18 @@
    "terms": [
     "Galápagos landscape",
     "Bartolomé Island",
-    "Galápagos Islands aerial",
-    "Galápagos coast"
+    "Pinnacle Rock Galápagos",
+    "Galápagos Islands coast",
+    "Galápagos"
    ],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -813,8 +830,9 @@
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -839,8 +857,9 @@
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -862,8 +881,9 @@
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   },
   {
@@ -886,8 +906,9 @@
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "(Featured|Quality|Valued) (pictures|images) of (animals|birds|mammals|fish|reptiles|insects|amphibians|arthropods|molluscs)",
-    "\\bAves\\b|\\bMammalia\\b|\\bActinopterygii\\b|\\bReptilia\\b"
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
    ]
   }
  ]
