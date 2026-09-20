@@ -680,27 +680,18 @@
    "id": "site-serengeti",
    "cats": [
     "Landscapes of Serengeti National Park",
-    "Landscapes of Tanzania",
-    "Serengeti National Park"
+    "Landscapes of Tanzania"
    ],
    "must": [
     "Serengeti"
    ],
-   "terms": [
-    "Serengeti landscape",
-    "Serengeti plains",
-    "Serengeti sunset",
-    "Serengeti kopje",
-    "Serengeti"
-   ],
+   "terms": [],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
-    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
-    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+    "\\b(agamas?|lizards?|lagartija|albatross|iguanas?|birds?|crabs?|seals?|lions?|penguins?|reptiles?|Squamata|Aves|Mammalia|Reptilia|animals?|fauna|wildlife|Lacertilia|Microlophus|Agama)\\b"
    ],
    "alsoStrong": [
     "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
@@ -802,27 +793,19 @@
    "id": "site-galapagos",
    "cats": [
     "Landscapes of the Galápagos Islands",
-    "Landscapes of Ecuador",
-    "Galápagos Islands"
+    "Landscapes of Galápagos",
+    "Landscapes of Ecuador"
    ],
    "must": [
     "Gal[aá]pagos"
    ],
-   "terms": [
-    "Galápagos landscape",
-    "Bartolomé Island",
-    "Pinnacle Rock Galápagos",
-    "Galápagos Islands coast",
-    "Galápagos"
-   ],
+   "terms": [],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
    ],
    "not": [
-    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
-    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
-    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+    "\\b(agamas?|lizards?|lagartija|albatross|iguanas?|birds?|crabs?|seals?|lions?|penguins?|reptiles?|Squamata|Aves|Mammalia|Reptilia|animals?|fauna|wildlife|Lacertilia|Microlophus|Agama)\\b"
    ],
    "alsoStrong": [
     "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
