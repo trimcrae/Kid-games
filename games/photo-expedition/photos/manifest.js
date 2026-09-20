@@ -614,5 +614,17 @@ window.PHOTO_MANIFEST = {
   "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Svalbard\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
   "width": 1100,
   "height": 619
+ },
+ "site-galapagos": {
+  "file": "site-galapagos.jpg",
+  "title": "Amanecer en isla de San Cristóbal, islas Galápagos, Ecuador, 2015-07-25, DD 01.JPG",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Amanecer_en_isla_de_San_Crist%C3%B3bal,_islas_Gal%C3%A1pagos,_Ecuador,_2015-07-25,_DD_01.JPG",
+  "pool": "quality",
+  "term": "incategory:\"Quality images\" deepcat:\"Landscapes of Ecuador\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 644
  }
 };
