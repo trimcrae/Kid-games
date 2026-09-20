@@ -101,7 +101,7 @@ const BIOMES = {
     spawn: { player: [-120, 150] }
   },
   reef: {
-    seed: 37, water: 30, amp: 6, fog: 0.02, underwater: true,
+    seed: 37, water: 30, amp: 6, fog: 0.011, underwater: true,
     colours: { grass: [0.75, 0.72, 0.55], dry: [0.7, 0.66, 0.5], dirt: [0.55, 0.5, 0.4], rock: [0.4, 0.38, 0.32] },
     height(N, x, z) {
       let h = N.fbm(x / 90, z / 90, 4) * 6 + N.fbm(x / 25, z / 25, 3) * 1.5 + 12;
@@ -113,7 +113,7 @@ const BIOMES = {
       return h;
     },
     colour(b, h, slope, x, z, n) { return mix(b.grass, b.dirt, Math.min(1, Math.max(0, (14 - h) / 12))); },
-    trees: [{ type: "coral", count: 260 }, { type: "seaweed", count: 300 }, { type: "rock", count: 40 }],
+    trees: [{ type: "coral", count: 420 }, { type: "brain", count: 160 }, { type: "seaweed", count: 500 }, { type: "anemone", count: 120 }, { type: "rock", count: 40 }],
     grass: 0, sky: "sea",
     landmarks: [{ subject: "coral", x: 0, z: 0 }, { subject: "wreck", x: -150, z: 60 }],
     spawn: { player: [60, 120] }
@@ -806,19 +806,29 @@ function makeScatterLibrary(THREE, B, site) {
     const a1 = new THREE.CylinderGeometry(0.2, 0.25, 1.4, 6); a1.translate(0.75, 2, 0); a1.rotateZ(0.15);
     lib.cactus = { parts: [{ geo: mergeGeos(THREE, [g, a1]), mat: std({ color: 0x5f8a44 }) }], scale: [0.5, 1.4], spacing: 3, collide: 0.4, where: (x, z, h) => h > 4 && h < 34 };
   }
-  // coral heads and sea fans
+  // coral: branching staghorn clusters, round brain corals, waving kelp and anemones
   {
-    const heads = [];
-    const h1 = bumpy(THREE, new THREE.SphereGeometry(1.4, 8, 6), 0.35, 31); h1.scale(1, 0.7, 1); h1.translate(0, 0.6, 0);
-    heads.push(h1);
-    const b = new THREE.CylinderGeometry(0.12, 0.18, 2.2, 5); b.translate(0.9, 1.1, 0.6);
-    const b2 = b.clone(); b2.translate(-1.6, 0, -0.8);
-    heads.push(b, b2);
-    const geo = mergeGeos(THREE, heads);
-    paintVertexColours(THREE, geo, (x, y, z, i) => { const pal = [[0.95, 0.4, 0.5], [0.95, 0.65, 0.25], [0.55, 0.3, 0.7], [0.3, 0.75, 0.6]]; const c = pal[Math.floor(Math.abs(Math.sin(x * 13 + z * 7)) * 4) % 4]; return c; });
-    lib.coral = { parts: [{ geo, mat: std({ vertexColors: true, flatShading: true, roughness: 0.8 }) }], scale: [0.6, 2.4], spacing: 4, collide: 0.8, where: (x, z, h) => h > 8 };
-    const w = new THREE.PlaneGeometry(0.4, 2.5); w.translate(0, 1.2, 0);
-    lib.seaweed = { parts: [{ geo: w, mat: std({ color: 0x2f7f4a, side: THREE.DoubleSide }), shadow: false }], scale: [0.6, 1.6], spacing: 1.2 };
+    const branches = [];
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * Math.PI * 2, len = 1.4 + (i % 3) * 0.5;
+      const b = new THREE.CylinderGeometry(0.05, 0.14, len, 5); b.translate(0, len / 2, 0); b.rotateZ(0.5 + (i % 2) * 0.35); b.rotateY(a); branches.push(b);
+      const tip = new THREE.SphereGeometry(0.12, 5, 4); tip.translate(0, len, 0); tip.rotateZ(0.5 + (i % 2) * 0.35); tip.rotateY(a); branches.push(tip);
+    }
+    const base = bumpy(THREE, new THREE.SphereGeometry(0.7, 8, 6), 0.3, 31); base.scale(1, 0.5, 1); branches.push(base);
+    const geo = mergeGeos(THREE, branches);
+    paintVertexColours(THREE, geo, (x, y, z) => { const pal = [[1, 0.45, 0.55], [1, 0.7, 0.3], [0.65, 0.35, 0.85], [0.35, 0.85, 0.7], [0.95, 0.9, 0.5]]; return pal[Math.floor(Math.abs(Math.sin(x * 3 + z * 5)) * 5) % 5]; });
+    lib.coral = { parts: [{ geo, mat: std({ vertexColors: true, roughness: 0.7, emissive: 0x442233, emissiveIntensity: 0.35 }) }], scale: [0.7, 2.6], spacing: 2.5, collide: 0.6, where: (x, z, h) => h > 8 };
+    const brain = bumpy(THREE, new THREE.SphereGeometry(1.2, 12, 9, 0, Math.PI * 2, 0, Math.PI / 2), 0.12, 33);
+    paintVertexColours(THREE, brain, (x, y, z) => { const t = Math.sin(x * 9) * Math.cos(z * 9) > 0 ? 0.85 : 0.55; return [0.95 * t, 0.75 * t, 0.35 * t]; });
+    lib.brain = { parts: [{ geo: brain, mat: std({ vertexColors: true, roughness: 0.8, emissive: 0x332211, emissiveIntensity: 0.4 }) }], scale: [0.5, 2], spacing: 3, collide: 0.8, where: (x, z, h) => h > 8 };
+    const kelpTex = grassBladeTexture(THREE);
+    const w = new THREE.PlaneGeometry(1.2, 3.6); w.translate(0, 1.7, 0);
+    const w2 = w.clone(); w2.rotateY(Math.PI / 2);
+    lib.seaweed = { parts: [{ geo: mergeGeos(THREE, [w, w2]), mat: std({ map: kelpTex, color: 0x2f8f4a, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide }), shadow: false }], scale: [0.6, 1.8], spacing: 1.2 };
+    const tent = [];
+    for (let i = 0; i < 14; i++) { const t = new THREE.CylinderGeometry(0.04, 0.07, 0.9, 4); t.translate(0, 0.45, 0); t.rotateX(0.5 + (i % 3) * 0.3); t.rotateY((i / 14) * Math.PI * 2); tent.push(t); }
+    const disc = new THREE.CylinderGeometry(0.4, 0.3, 0.2, 10); disc.translate(0, 0.1, 0); tent.push(disc);
+    lib.anemone = { parts: [{ geo: mergeGeos(THREE, tent), mat: std({ color: 0xe0a0ff, roughness: 0.6 }) }], scale: [0.6, 1.6], spacing: 1.5, where: (x, z, h) => h > 8 };
   }
   return lib;
 }

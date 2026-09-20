@@ -76,6 +76,17 @@ commits it back:
 - **Story narration** → `.github/workflows/build-audio.yml` runs Piper
   (`en_US-lessac-medium`) over the `text:` strings and commits the `.mp3`s.
 - **Story art** → `.github/workflows/generate-art.yml` fetches painterly PNGs.
+- **Photo Expedition's real photographs** → `.github/workflows/fetch-expedition-photos.yml`
+  runs `tools/fetch-expedition-photos.mjs`, which searches Wikimedia Commons
+  for **Featured pictures** (then Quality images) matching each entry in
+  `games/photo-expedition/photos-manifest.json` — by Commons category
+  (`deepcat:`) and search terms, accepted only when a `must` pattern matches
+  the picture's title/categories — and commits the JPEGs plus
+  `photos/manifest.js` (photographer, licence, source page: the game shows the
+  credit under every picture). To add or fix a subject, edit the manifest
+  entry (delete the old `.jpg` to re-fetch it) and push. Never use
+  image-generation models for this game's field guide: it exists to show
+  the kids real photographs by real photographers.
 
 **Never use image-generation models for Craepets** (or for anything depicting
 creatures or children). Craepets art is code-drawn only: the creatures, egg,

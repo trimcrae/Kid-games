@@ -548,5 +548,5 @@ export async function startExpedition(opts) {
     world.dispose(); renderer.dispose();
     opts.onExit && opts.onExit({ shots, best, treasureFound });
   }
-  return { exit, get best() { return best; }, world, zoo, player, shoot, toggleCamera };
+  return { exit, get best() { return best; }, world, zoo, player, shoot, toggleCamera, get clock() { return clock; }, set clock(v) { clock = v; } };
 }

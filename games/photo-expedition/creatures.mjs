@@ -377,7 +377,7 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
   for (const id of subjectIds) {
     const S = SPECIES[id]; if (!S) continue;
     const info = SUBJECTS[id];
-    const groups = S.herd >= 4 ? 2 : (S.rare ? 1 : 2);
+    const groups = S.tiny ? 5 : (S.herd >= 4 ? 2 : (S.rare ? 1 : 2));
     for (let gi = 0; gi < groups; gi++) {
       const home = pickSpot(S.habitat); if (!home) continue;
       const n = S.herd;
