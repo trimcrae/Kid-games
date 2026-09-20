@@ -2138,11 +2138,10 @@ const GAMES = {
     await page.waitForSelector("#s-map.show");
     // tap a spot on the map: scroll the (phone-width) map so it's on screen, then click fresh coordinates
     const spot = async (lon, lat) => {
-      const p = await page.evaluate(([lon, lat]) => {
-        const [x, y] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const sc = c.parentElement;
-        sc.scrollLeft = Math.max(0, x - sc.clientWidth / 2); c.scrollIntoView({ block: "center" });
-        const r = c.getBoundingClientRect(); return { x: r.left + x, y: r.top + y };
-      }, [lon, lat]);
+      // the page scrolls smoothly, so bring the map into view first and measure once it has settled
+      await page.evaluate(([lon, lat]) => { const [x] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const sc = c.parentElement; sc.scrollLeft = Math.max(0, x - sc.clientWidth / 2); c.scrollIntoView({ block: "center", behavior: "instant" }); }, [lon, lat]);
+      await page.waitForTimeout(350);
+      const p = await page.evaluate(([lon, lat]) => { const [x, y] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const r = c.getBoundingClientRect(); return { x: r.left + x, y: r.top + y }; }, [lon, lat]);
       await page.mouse.click(p.x, p.y); await page.waitForTimeout(200);
     };
     const tapSite = async (id) => { const st = await page.evaluate((id) => SITES.find((s) => s.id === id), id); await spot(st.lon, st.lat); };
