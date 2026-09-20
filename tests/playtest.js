@@ -52,7 +52,7 @@ const DEVICES = {
 
 /* ---------- a tiny static file server (no dependencies) ---------- */
 const MIME = {
-  ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
+  ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
   ".png": "image/png", ".jpg": "image/jpeg", ".svg": "image/svg+xml",
   ".mp3": "audio/mpeg", ".m4a": "audio/mp4", ".json": "application/json",
   ".ico": "image/x-icon", ".gitignore": "text/plain", ".md": "text/markdown",
@@ -2120,6 +2120,107 @@ const GAMES = {
     await page.waitForTimeout(200);
     if (!/solved/i.test(await page.locator("#feedback").textContent())) throw new Error("filled grid was not detected as solved");
     return `${puzzles} puzzles all open cleanly; filled ${n} cells; puzzle solved`;
+  },
+
+  async "Photo Expedition"(page, g, d) {
+    await page.goto(`${BASE}/games/photo-expedition/#pick`, { waitUntil: "networkidle" });
+    await page.evaluate(() => localStorage.removeItem("photo-expedition.v1"));
+    await page.reload({ waitUntil: "networkidle" });
+    // every site has real coordinates, a biome, subjects with facts, and a treasure with two clues
+    const bad = await page.evaluate(() => SITES.filter((s) => !(typeof s.lat === "number" && typeof s.lon === "number" && s.biome && s.subjects.length >= 4 &&
+      s.subjects.every((id) => SUBJECTS[id] && SUBJECTS[id].fact && SUBJECTS[id].tip) && s.treasure && s.treasure.clue && s.treasure.pro && s.treasure.fact)).map((s) => s.id));
+    if (bad.length) throw new Error("sites missing data: " + bad.join(", "));
+    const continents = await page.evaluate(() => new Set(SITES.map((s) => s.continent)).size);
+    if (continents !== 7) throw new Error("expected an expedition on all 7 continents, got " + continents);
+
+    // pick Cory, land on the world map, tap the Serengeti pin
+    await page.locator(".explorer-btn", { hasText: "Cory" }).click();
+    await page.waitForSelector("#s-map.show");
+    // tap a spot on the map: scroll the (phone-width) map so it's on screen, then click fresh coordinates
+    const spot = async (lon, lat) => {
+      const p = await page.evaluate(([lon, lat]) => {
+        const [x, y] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const sc = c.parentElement;
+        sc.scrollLeft = Math.max(0, x - sc.clientWidth / 2); c.scrollIntoView({ block: "center" });
+        const r = c.getBoundingClientRect(); return { x: r.left + x, y: r.top + y };
+      }, [lon, lat]);
+      await page.mouse.click(p.x, p.y); await page.waitForTimeout(200);
+    };
+    const tapSite = async (id) => { const st = await page.evaluate((id) => SITES.find((s) => s.id === id), id); await spot(st.lon, st.lat); };
+    await tapSite("serengeti");
+    await page.waitForSelector("#btn-brief");
+    if (!/2°S 35°E/.test(await page.locator("#site-panel").textContent())) throw new Error("the Serengeti card does not show its coordinates");
+
+    // a locked site asks a map question; tapping the wrong continent is refused, the right one unlocks it
+    await page.evaluate(() => { PhotoExpedition.profile.stars.serengeti = { lion: 5, zebra: 5 }; });
+    await tapSite("amazon");
+    await page.waitForSelector("#btn-unlock");
+    await page.locator("#btn-unlock").click();
+    await page.waitForSelector("#map-question:not(.hidden)");
+    await spot(20, 5);     // Africa: wrong
+    if (!/❌/.test(await page.locator("#mq-feedback").textContent())) throw new Error("tapping the wrong continent was not refused");
+    await spot(-60, -10);  // South America: right
+    if (!/✅/.test(await page.locator("#mq-feedback").textContent())) throw new Error("tapping South America did not unlock the Amazon");
+    await page.waitForTimeout(1200);
+    if (!(await page.evaluate(() => PhotoExpedition.profile.unlocked.includes("amazon")))) throw new Error("the Amazon was not saved as unlocked");
+
+    // the field guide lists every assignment with a fact
+    await tapSite("serengeti");
+    await page.waitForSelector("#btn-brief");
+    if (!/Serengeti/.test(await page.locator("#site-panel h2").textContent())) throw new Error("tapping the Serengeti pin did not open its card");
+    await page.locator("#btn-brief").click();
+    await page.waitForSelector("#s-brief.show");
+    if ((await page.locator(".guide-card").count()) !== 5) throw new Error("the Serengeti field guide should have 5 subjects");
+
+    // the 3D expedition: the world builds, the animals are there, the camera scores a picture and it lands in the album
+    await page.locator("#brief-go").click();
+    // with NASA views fetched, starting an expedition first flies in from space: let it land
+    if (await page.locator("#flyin.show").count()) {
+      await page.waitForSelector(".flyin-actions.show", { timeout: 30000 });
+      if (!/km across/.test(await page.locator("#flyin-scale").textContent())) throw new Error("the fly-in never reached the ground");
+      await page.locator("#flyin-go").click();
+    }
+    await page.waitForFunction(() => window.PhotoExpedition.expedition && PhotoExpedition.expedition.world && PhotoExpedition.expedition.zoo.list.length > 10, null, { timeout: 60000 });
+    await page.waitForTimeout(800);
+    const aimed = await page.evaluate(() => {
+      const ex = PhotoExpedition.expedition, p = ex.player; let best = null, bd = 1e9;
+      for (const c of ex.zoo.list) { const dd = Math.hypot(c.pos.x - p.pos.x, c.pos.z - p.pos.z); if (c.present && dd < bd) { bd = dd; best = c; } }
+      // stand 12 m from the nearest animal and face it, then raise the camera
+      p.pos.x = best.pos.x + 12; p.pos.z = best.pos.z; p.yaw = Math.atan2(-(best.pos.x - p.pos.x), -(best.pos.z - p.pos.z)); p.pitch = -0.02;
+      ex.toggleCamera(); return best.id;
+    });
+    await page.waitForTimeout(700);
+    await page.evaluate(() => PhotoExpedition.expedition.shoot());
+    await page.waitForSelector("#shot-card.show");
+    const stars = (await page.locator("#shot-stars").textContent()).split("★").length - 1;
+    const title = await page.locator("#shot-title").textContent();
+    if (stars < 1) throw new Error("the photo was not scored");
+    await page.locator("#shot-close").click();
+    // the grid map opens with the treasure clue
+    await page.locator("#btn-map").click();
+    await page.waitForSelector("#bigmap-wrap.overlay", { state: "attached" });
+    if (!/Treasure clue/.test(await page.locator("#bigmap-wrap").textContent())) throw new Error("the expedition map has no treasure clue");
+    await page.locator("#bigmap-close").click();
+    // dig up the treasure
+    await page.evaluate(() => { const ex = PhotoExpedition.expedition; const tp = ex.world.landmarks; ex.player.pos.x = 101; ex.player.pos.z = -12; });
+    await page.waitForTimeout(400);
+    await page.evaluate(() => document.getElementById("btn-dig").click());
+    await page.waitForSelector("#treasure-card.show");
+    await page.locator("#treasure-close").click();
+    await page.locator("#btn-exit").click();
+    await page.waitForSelector("#s-map.show");
+    const saved = await page.evaluate(() => { const p = PhotoExpedition.profile; return { photos: p.photos.length, treasure: p.treasures.includes("serengeti"), img: p.photos[0] && p.photos[0].img.slice(0, 22) }; });
+    if (saved.photos !== 1 || !/^data:image\/jpeg/.test(saved.img)) throw new Error("the photo was not saved to the album");
+    if (!saved.treasure) throw new Error("the treasure was not saved");
+    await page.locator("#btn-album").click();
+    await page.waitForSelector("#s-album.show");
+    if ((await page.locator(".album-item").count()) !== 1) throw new Error("the album does not show the photo");
+    await page.locator(".album-item").first().click();
+    await page.waitForSelector("#viewer.show");
+    await page.locator("#v-cover").click();
+    await page.waitForTimeout(600);
+    const cover = await page.evaluate(() => document.getElementById("cover-save").href.length);
+    if (cover < 5000) throw new Error("the magazine cover was not drawn");
+    return `7 continents; unlock question works; shot a ${aimed} (${title.trim()}, ${stars}★); treasure dug; album + cover work`;
   },
 
   async "The Post Office"(page, g, d) {

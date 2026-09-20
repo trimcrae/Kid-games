@@ -1,0 +1,936 @@
+{
+ "_about": "Real photographs for Photo Expedition's field guide. tools/fetch-expedition-photos.mjs searches Wikimedia Commons for FEATURED pictures (the community's best photographs, all free to use) — first inside the subject's own categories (cats, searched with deepcat:), then by search terms — and only accepts a picture whose title, description or categories match one of the `must` patterns, so a search for 'monal' can never come back with a fencing trophy. It saves the photos into games/photo-expedition/photos/ and writes photos/manifest.js with the photographer credit and licence for every one. Run by .github/workflows/fetch-expedition-photos.yml. Patterns in `must` are matched against the picture's title, object name and categories only (never the free-text description, which mentions all sorts); `also` patterns must match the whole text too. Entries are fetched in order and no picture is used twice, so the site landscapes come last. `not` patterns reject a picture (used to keep animals out of the landscape heroes, and flowers out of the baobab). `alsoStrong` patterns must match the title/categories (the landscape heroes need a landscape word there, so an albatross over an island is not a landscape).",
+ "width": 1100,
+ "entries": [
+  {
+   "id": "lion",
+   "cats": [
+    "Panthera leo"
+   ],
+   "must": [
+    "Panthera leo",
+    "\\blions?\\b"
+   ],
+   "terms": [
+    "Panthera leo"
+   ]
+  },
+  {
+   "id": "elephant",
+   "cats": [
+    "Loxodonta africana"
+   ],
+   "must": [
+    "Loxodonta",
+    "elephant"
+   ],
+   "terms": [
+    "Loxodonta africana"
+   ]
+  },
+  {
+   "id": "giraffe",
+   "cats": [
+    "Giraffa camelopardalis",
+    "Giraffa"
+   ],
+   "must": [
+    "Giraffa",
+    "giraffe"
+   ],
+   "terms": [
+    "Giraffa"
+   ]
+  },
+  {
+   "id": "zebra",
+   "cats": [
+    "Equus quagga"
+   ],
+   "must": [
+    "Equus quagga",
+    "zebra"
+   ],
+   "terms": [
+    "Equus quagga"
+   ]
+  },
+  {
+   "id": "baobab",
+   "cats": [
+    "Adansonia digitata",
+    "Adansonia"
+   ],
+   "must": [
+    "Adansonia",
+    "baobab"
+   ],
+   "terms": [
+    "Adansonia digitata tree",
+    "baobab tree",
+    "Adansonia digitata"
+   ],
+   "not": [
+    "flower",
+    "blossom",
+    "fruit",
+    "seed",
+    "leaf",
+    "bark close"
+   ]
+  },
+  {
+   "id": "jaguar",
+   "cats": [
+    "Panthera onca"
+   ],
+   "must": [
+    "Panthera onca",
+    "jaguar"
+   ],
+   "terms": [
+    "Panthera onca"
+   ]
+  },
+  {
+   "id": "toucan",
+   "cats": [
+    "Ramphastos toco"
+   ],
+   "must": [
+    "Ramphastos toco",
+    "toco toucan"
+   ],
+   "terms": [
+    "Ramphastos toco"
+   ]
+  },
+  {
+   "id": "macaw",
+   "cats": [
+    "Ara macao"
+   ],
+   "must": [
+    "Ara macao",
+    "scarlet macaw"
+   ],
+   "terms": [
+    "Ara macao"
+   ]
+  },
+  {
+   "id": "capybara",
+   "cats": [
+    "Hydrochoerus hydrochaeris"
+   ],
+   "must": [
+    "Hydrochoer",
+    "capybara"
+   ],
+   "terms": [
+    "Hydrochoerus hydrochaeris"
+   ]
+  },
+  {
+   "id": "morpho",
+   "cats": [
+    "Morpho peleides",
+    "Morpho (genus)",
+    "Morpho"
+   ],
+   "must": [
+    "\\bMorpho\\b"
+   ],
+   "terms": [
+    "Morpho peleides",
+    "Morpho menelaus",
+    "Morpho butterfly"
+   ]
+  },
+  {
+   "id": "turtle",
+   "cats": [
+    "Chelonia mydas"
+   ],
+   "must": [
+    "Chelonia mydas",
+    "green sea turtle",
+    "green turtle"
+   ],
+   "terms": [
+    "Chelonia mydas"
+   ]
+  },
+  {
+   "id": "clownfish",
+   "cats": [
+    "Amphiprion ocellaris",
+    "Amphiprion"
+   ],
+   "must": [
+    "Amphiprion",
+    "clownfish",
+    "anemonefish"
+   ],
+   "terms": [
+    "Amphiprion ocellaris"
+   ]
+  },
+  {
+   "id": "reefshark",
+   "cats": [
+    "Carcharhinus melanopterus",
+    "Carcharhinus amblyrhynchos",
+    "Triaenodon obesus",
+    "Carcharhinus"
+   ],
+   "must": [
+    "Carcharhinus",
+    "Triaenodon",
+    "reef shark"
+   ],
+   "terms": [
+    "Carcharhinus melanopterus",
+    "blacktip reef shark",
+    "grey reef shark",
+    "whitetip reef shark",
+    "Triaenodon obesus",
+    "Carcharhinus shark"
+   ]
+  },
+  {
+   "id": "manta",
+   "cats": [
+    "Mobula alfredi",
+    "Mobula birostris",
+    "Manta"
+   ],
+   "must": [
+    "Mobula",
+    "Manta"
+   ],
+   "terms": [
+    "Mobula alfredi",
+    "manta ray"
+   ]
+  },
+  {
+   "id": "coral",
+   "cats": [
+    "Coral reefs",
+    "Acropora",
+    "Corals"
+   ],
+   "must": [
+    "coral reef",
+    "Coral reefs",
+    "Acropora",
+    "coral garden",
+    "reef scene",
+    "corals"
+   ],
+   "terms": [
+    "coral reef",
+    "corals reef fish"
+   ],
+   "not": [
+    "(Featured|Quality) (pictures|images) of fish"
+   ]
+  },
+  {
+   "id": "polarbear",
+   "cats": [
+    "Ursus maritimus"
+   ],
+   "must": [
+    "Ursus maritimus",
+    "polar bear"
+   ],
+   "terms": [
+    "Ursus maritimus"
+   ]
+  },
+  {
+   "id": "walrus",
+   "cats": [
+    "Odobenus rosmarus"
+   ],
+   "must": [
+    "Odobenus",
+    "walrus"
+   ],
+   "terms": [
+    "Odobenus rosmarus",
+    "walrus"
+   ]
+  },
+  {
+   "id": "arcticfox",
+   "cats": [
+    "Vulpes lagopus"
+   ],
+   "must": [
+    "Vulpes lagopus",
+    "Alopex",
+    "arctic fox"
+   ],
+   "terms": [
+    "Vulpes lagopus"
+   ]
+  },
+  {
+   "id": "reindeer",
+   "cats": [
+    "Rangifer tarandus platyrhynchus",
+    "Rangifer tarandus"
+   ],
+   "must": [
+    "Rangifer",
+    "reindeer",
+    "caribou"
+   ],
+   "terms": [
+    "Rangifer tarandus platyrhynchus",
+    "Rangifer tarandus"
+   ]
+  },
+  {
+   "id": "aurora",
+   "cats": [
+    "Aurora borealis",
+    "Aurorae"
+   ],
+   "must": [
+    "aurora",
+    "northern lights"
+   ],
+   "terms": [
+    "aurora borealis",
+    "aurora"
+   ]
+  },
+  {
+   "id": "tortoise",
+   "cats": [
+    "Chelonoidis niger",
+    "Chelonoidis"
+   ],
+   "must": [
+    "Chelonoidis",
+    "Geochelone",
+    "giant tortoise"
+   ],
+   "terms": [
+    "Chelonoidis niger",
+    "Galápagos giant tortoise"
+   ]
+  },
+  {
+   "id": "iguana",
+   "cats": [
+    "Amblyrhynchus cristatus"
+   ],
+   "must": [
+    "Amblyrhynchus",
+    "marine iguana"
+   ],
+   "terms": [
+    "Amblyrhynchus cristatus"
+   ]
+  },
+  {
+   "id": "booby",
+   "cats": [
+    "Sula nebouxii"
+   ],
+   "must": [
+    "Sula nebouxii",
+    "blue-footed booby"
+   ],
+   "terms": [
+    "Sula nebouxii"
+   ]
+  },
+  {
+   "id": "sealion",
+   "cats": [
+    "Zalophus wollebaeki"
+   ],
+   "must": [
+    "Zalophus",
+    "sea lion"
+   ],
+   "terms": [
+    "Zalophus wollebaeki",
+    "Galápagos sea lion"
+   ]
+  },
+  {
+   "id": "volcano",
+   "cats": [
+    "Volcanoes of the Galápagos Islands",
+    "Sierra Negra (volcano)",
+    "Volcanoes of Ecuador"
+   ],
+   "must": [
+    "volcano",
+    "Sierra Negra",
+    "crater",
+    "caldera"
+   ],
+   "terms": [
+    "Galápagos volcano",
+    "Sierra Negra Galápagos",
+    "volcano crater"
+   ]
+  },
+  {
+   "id": "snowleopard",
+   "cats": [
+    "Panthera uncia"
+   ],
+   "must": [
+    "Panthera uncia",
+    "Uncia uncia",
+    "snow leopard"
+   ],
+   "terms": [
+    "Panthera uncia",
+    "snow leopard"
+   ]
+  },
+  {
+   "id": "yak",
+   "cats": [
+    "Bos grunniens",
+    "Bos mutus"
+   ],
+   "must": [
+    "Bos grunniens",
+    "Bos mutus",
+    "\\byaks?\\b"
+   ],
+   "terms": [
+    "Bos grunniens",
+    "yak Nepal"
+   ]
+  },
+  {
+   "id": "monal",
+   "cats": [
+    "Lophophorus impejanus"
+   ],
+   "must": [
+    "Lophophorus",
+    "monal"
+   ],
+   "terms": [
+    "Lophophorus impejanus",
+    "Himalayan monal"
+   ]
+  },
+  {
+   "id": "redpanda",
+   "cats": [
+    "Ailurus fulgens"
+   ],
+   "must": [
+    "Ailurus",
+    "red panda"
+   ],
+   "terms": [
+    "Ailurus fulgens"
+   ]
+  },
+  {
+   "id": "everest",
+   "cats": [
+    "Mount Everest"
+   ],
+   "must": [
+    "Everest",
+    "Sagarmatha",
+    "Chomolungma"
+   ],
+   "terms": [
+    "Mount Everest"
+   ]
+  },
+  {
+   "id": "camel",
+   "cats": [
+    "Camelus dromedarius"
+   ],
+   "must": [
+    "Camelus",
+    "dromedar",
+    "camel"
+   ],
+   "terms": [
+    "Camelus dromedarius"
+   ]
+  },
+  {
+   "id": "fennec",
+   "cats": [
+    "Vulpes zerda"
+   ],
+   "must": [
+    "Vulpes zerda",
+    "fennec"
+   ],
+   "terms": [
+    "Vulpes zerda",
+    "fennec fox"
+   ]
+  },
+  {
+   "id": "vulture",
+   "cats": [
+    "Neophron percnopterus"
+   ],
+   "must": [
+    "Neophron",
+    "Egyptian vulture"
+   ],
+   "terms": [
+    "Neophron percnopterus",
+    "Egyptian vulture"
+   ]
+  },
+  {
+   "id": "pyramids",
+   "cats": [
+    "Great Pyramid of Giza",
+    "Giza pyramid complex",
+    "Pyramids of Giza"
+   ],
+   "must": [
+    "Giza",
+    "Great Pyramid",
+    "Pyramid of Khufu",
+    "Pyramid of Khafre",
+    "Pyramids"
+   ],
+   "terms": [
+    "Great Pyramid of Giza",
+    "Giza pyramids"
+   ]
+  },
+  {
+   "id": "sphinx",
+   "cats": [
+    "Great Sphinx of Giza"
+   ],
+   "must": [
+    "Great Sphinx",
+    "Sphinx of Giza"
+   ],
+   "terms": [
+    "Great Sphinx of Giza"
+   ]
+  },
+  {
+   "id": "bison",
+   "cats": [
+    "Bison bison"
+   ],
+   "must": [
+    "Bison bison",
+    "American bison",
+    "\\bbison\\b"
+   ],
+   "terms": [
+    "Bison bison Yellowstone",
+    "Bison bison"
+   ]
+  },
+  {
+   "id": "elk",
+   "cats": [
+    "Cervus canadensis",
+    "Cervus elaphus canadensis"
+   ],
+   "must": [
+    "Cervus canadensis",
+    "\\belk\\b",
+    "wapiti"
+   ],
+   "terms": [
+    "Cervus canadensis",
+    "wapiti",
+    "Rocky Mountain elk",
+    "bull elk"
+   ]
+  },
+  {
+   "id": "grizzly",
+   "cats": [
+    "Ursus arctos horribilis",
+    "Ursus arctos"
+   ],
+   "must": [
+    "Ursus arctos",
+    "grizzly",
+    "brown bear"
+   ],
+   "terms": [
+    "Ursus arctos horribilis",
+    "Ursus arctos"
+   ]
+  },
+  {
+   "id": "eagle",
+   "cats": [
+    "Haliaeetus leucocephalus"
+   ],
+   "must": [
+    "Haliaeetus leucocephalus",
+    "bald eagle"
+   ],
+   "terms": [
+    "Haliaeetus leucocephalus"
+   ]
+  },
+  {
+   "id": "geyser",
+   "cats": [
+    "Old Faithful",
+    "Geysers of Yellowstone National Park"
+   ],
+   "must": [
+    "Old Faithful",
+    "geyser"
+   ],
+   "terms": [
+    "Old Faithful",
+    "Yellowstone geyser eruption"
+   ]
+  },
+  {
+   "id": "emperor",
+   "cats": [
+    "Aptenodytes forsteri"
+   ],
+   "must": [
+    "Aptenodytes forsteri",
+    "emperor penguin"
+   ],
+   "terms": [
+    "Aptenodytes forsteri",
+    "emperor penguin",
+    "emperor penguins",
+    "Aptenodytes forsteri chick"
+   ]
+  },
+  {
+   "id": "seal",
+   "cats": [
+    "Leptonychotes weddellii",
+    "Seals of Antarctica",
+    "Mirounga leonina",
+    "Lobodon carcinophaga"
+   ],
+   "must": [
+    "Leptonychotes",
+    "Weddell seal",
+    "Antarctic fur seal",
+    "elephant seal",
+    "crabeater seal",
+    "leopard seal",
+    "Mirounga",
+    "Lobodon",
+    "Hydrurga"
+   ],
+   "terms": [
+    "Leptonychotes weddellii",
+    "Weddell seal",
+    "seal Antarctica ice"
+   ]
+  },
+  {
+   "id": "humpback",
+   "cats": [
+    "Megaptera novaeangliae"
+   ],
+   "must": [
+    "Megaptera",
+    "humpback"
+   ],
+   "terms": [
+    "Megaptera novaeangliae breaching",
+    "Megaptera novaeangliae"
+   ]
+  },
+  {
+   "id": "iceberg",
+   "cats": [
+    "Icebergs of Antarctica",
+    "Icebergs"
+   ],
+   "must": [
+    "iceberg"
+   ],
+   "terms": [
+    "iceberg Antarctica",
+    "iceberg"
+   ]
+  },
+  {
+   "id": "site-serengeti",
+   "cats": [
+    "Landscapes of Serengeti National Park",
+    "Landscapes of Tanzania"
+   ],
+   "must": [
+    "Serengeti"
+   ],
+   "terms": [
+    "Serengeti sunset",
+    "Serengeti plains",
+    "Serengeti landscape",
+    "Serengeti acacia",
+    "Serengeti kopje",
+    "Serengeti"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(agamas?|lizards?|lagartija|albatross|iguanas?|birds?|crabs?|seals?|lions?|penguins?|reptiles?|Squamata|Aves|Mammalia|Reptilia|animals?|fauna|wildlife|Lacertilia|Microlophus|Agama)\\b"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-amazon",
+   "cats": [
+    "Landscapes of the Amazon rainforest",
+    "Amazon rainforest",
+    "Amazon River"
+   ],
+   "must": [
+    "Amazon"
+   ],
+   "terms": [
+    "Amazon rainforest",
+    "Amazon river aerial",
+    "rainforest Brazil"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-reef",
+   "cats": [
+    "Great Barrier Reef",
+    "Aerial photographs of the Great Barrier Reef",
+    "Coral reefs of Australia"
+   ],
+   "must": [
+    "Great Barrier Reef",
+    "Queensland",
+    "Whitsunday",
+    "Heron Island"
+   ],
+   "terms": [
+    "Great Barrier Reef aerial",
+    "Great Barrier Reef",
+    "Heron Island reef",
+    "Whitsunday reef",
+    "coral reef Queensland"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-arctic",
+   "cats": [
+    "Landscapes of Svalbard",
+    "Svalbard",
+    "Spitsbergen"
+   ],
+   "must": [
+    "Svalbard",
+    "Spitsbergen"
+   ],
+   "terms": [
+    "Svalbard glacier",
+    "Svalbard fjord",
+    "Svalbard landscape",
+    "Spitsbergen mountains",
+    "Svalbard"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-galapagos",
+   "cats": [
+    "Landscapes of the Galápagos Islands",
+    "Landscapes of Galápagos",
+    "Landscapes of Ecuador"
+   ],
+   "must": [
+    "Gal[aá]pagos"
+   ],
+   "terms": [],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(agamas?|lizards?|lagartija|albatross|iguanas?|birds?|crabs?|seals?|lions?|penguins?|reptiles?|Squamata|Aves|Mammalia|Reptilia|animals?|fauna|wildlife|Lacertilia|Microlophus|Agama)\\b"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-himalaya",
+   "cats": [
+    "Himalayas",
+    "Mount Everest"
+   ],
+   "must": [
+    "Himalaya",
+    "Everest",
+    "Nepal"
+   ],
+   "terms": [
+    "Himalaya Nepal",
+    "Himalayas",
+    "Everest"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-sahara",
+   "cats": [
+    "Sahara",
+    "Erg Chebbi",
+    "Deserts of Egypt"
+   ],
+   "must": [
+    "Sahara",
+    "Erg Chebbi",
+    "desert"
+   ],
+   "terms": [
+    "Sahara dunes",
+    "Erg Chebbi",
+    "Sahara"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-yellowstone",
+   "cats": [
+    "Grand Prismatic Spring",
+    "Yellowstone National Park"
+   ],
+   "must": [
+    "Yellowstone",
+    "Prismatic"
+   ],
+   "terms": [
+    "Grand Prismatic Spring",
+    "Yellowstone National Park"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  },
+  {
+   "id": "site-antarctica",
+   "cats": [
+    "Landscapes of Antarctica",
+    "Antarctica",
+    "Antarctic Peninsula"
+   ],
+   "must": [
+    "Antarctic"
+   ],
+   "terms": [
+    "Antarctica landscape",
+    "Antarctic Peninsula",
+    "Antarctica"
+   ],
+   "kind": "landscape",
+   "also": [
+    "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
+   ],
+   "not": [
+    "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
+    "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
+    "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
+   ]
+  }
+ ]
+}

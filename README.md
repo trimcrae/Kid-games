@@ -27,6 +27,7 @@ no logins.
 │   ├── _template/          ← copy this folder to start a new game
 │   ├── craepets/           ← adopt & raise a learning pet 🥚
 │   ├── bubble-pop/         ← our first game 🫧
+│   ├── photo-expedition/   ← explore 3D worlds & photograph the wild 📸
 │   ├── crossword/          ← themed mini crosswords ✏️
 │   ├── strands/            ← trace hidden theme words 🧶
 │   ├── spelling-bee/       ← make words from a honeycomb 🐝
@@ -35,6 +36,26 @@ no logins.
 └── tools/                  ← offline puzzle generators (Node) for
                               crossword & strands — run, then paste output
 ```
+
+> **📸 Photo Expedition** is Cory's dream job: explorer and wildlife
+> photographer. A real world map (Natural Earth coastlines, a latitude and
+> longitude grid you can actually read) with nine expeditions, one on every
+> continent; each is a walk-around 3D world built entirely from code with
+> three.js (vendored in `assets/vendor/three/`) — terrain, trees, water, sky,
+> a day that turns golden and then dark, and animals put together from
+> spheres and cylinders that graze, flock, fly, swim and run away if you're
+> clumsy. You raise the camera, zoom 24–300 mm and every shot is scored the
+> way a photo editor would (size in the frame, rule of thirds, eye contact,
+> light direction, holding still). A grid minimap, a compass in degrees and a
+> buried treasure per expedition teach map reading; the field guide shows
+> **real, free-licensed Featured photographs from Wikimedia Commons** with a
+> true fact for every animal — those are fetched by
+> `.github/workflows/fetch-expedition-photos.yml` (see `tools/fetch-expedition-photos.mjs`
+> and `games/photo-expedition/photos-manifest.json`) and committed back with
+> their photographer credits. A second tiny pipeline
+> (`.github/workflows/fetch-expedition-satellite.yml`) fetches public-domain
+> NASA Blue Marble views of every site so an expedition starts by flying in
+> from space — no API key, nothing loaded live.
 
 > **🥚 Craepets** is the big one: a virtual-pet world where the whole
 > economy runs on learning. You adopt a pixel creature, then every coin

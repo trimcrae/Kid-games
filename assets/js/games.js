@@ -25,6 +25,18 @@
 
 const GAMES = [
   {
+    title: "Photo Expedition",
+    emoji:  "📸",
+    flag:   "NEW · Explore the world, shoot like a pro",
+    blurb:  "Cory's dream job: explorer and wildlife photographer. A REAL world map with latitude and longitude — 2°S 35°E is the Serengeti — and nine expeditions, one on every continent, unlocked by tapping the right continent (Explorer) or the right 10° grid square (Pro). Each one is a walk-around 3D world built from code: the savanna at golden hour, the Amazon river, snorkelling the Great Barrier Reef, Svalbard's sea ice under the northern lights, a Galápagos volcano, the Himalayas, the pyramids in the Sahara, Yellowstone's geyser and the Antarctic ice. You walk (or swim), sneak up on animals that RUN if you're clumsy, raise the camera and zoom from 24 mm to a 300 mm telephoto, and every shot is scored the way a photo editor would — how big the animal is, whether it's on a rule-of-thirds line, whether you caught its eyes, whether the sun was behind you, whether you held still — with a tip for next time. A grid minimap (A–H × 1–8), a compass in degrees, a waypoint flag and one buried treasure per expedition with a map clue (Pro clues are compass bearings and distances). The field guide shows real, free-licensed FEATURED photographs from Wikimedia Commons of every animal and place, with a true fact and the photographer's credit, and your best shot goes on the cover of The Explorer's Journal. Geography, map-reading & coordinates, compass bearings, animal facts, photography.",
+    url:    "games/photo-expedition/",
+    ages:   "3+",
+    kids:   ["cory","jeannie","ellie","shannon","tristan"],
+    color:  "#1f6f5f",
+    ready:  true
+  },
+
+  {
     title: "The Post Office",
     emoji:  "📮",
     blurb:  "Send real mail to the rest of the family! Pick who you are, write a proper letter — greeting, message, closing and signature — choose your paper, stick on a stamp, address the envelope and post it. It lands in their mailbox on this device the moment they pick their name: they open the envelope, read it and write back. Letter-writing, reading, spelling and dates: every letter gets a postmark with the day it was posted. Tap-a-sentence quick words for the little ones, and a stamp album to fill up.",
