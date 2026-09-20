@@ -1,0 +1,230 @@
+{
+ "_about": "Real 360° photographs (equirectangular panoramas) from Wikimedia Commons, one per expedition, for the 'Look around for real' viewpoint. tools/fetch-expedition-panoramas.mjs searches Commons with each entry's terms, keeps only 2:1 equirectangular JPEGs at least 3000 px wide that are filed as panoramas and whose title or categories match a `must` pattern, saves them into games/photo-expedition/panoramas/ and writes panoramas/manifest.js with the credit. Entries are tried in order; a site with no suitable panorama simply has no viewpoint. Most 360° photographs on Commons come from Mapillary imports and phone photo-spheres, so the search terms pair a place with the cameras that shoot them (LG-R105, Ricoh Theta, Insta360, Gear 360, GoPro Max) or the words photosphere / 360° panorama.",
+ "width": 4096,
+ "entries": [
+  {
+   "site": "serengeti",
+   "terms": [
+    "savanna 360°",
+    "savanna photosphere",
+    "savanna spherical panorama",
+    "savanna equirectangular panorama photo",
+    "safari Tanzania 360°",
+    "safari Tanzania photosphere",
+    "safari Tanzania spherical panorama",
+    "safari Tanzania equirectangular panorama photo",
+    "Kenya savannah 360°",
+    "Kenya savannah photosphere",
+    "Kenya savannah spherical panorama",
+    "Kenya savannah equirectangular panorama photo",
+    "acacia savanna 360°",
+    "acacia savanna photosphere",
+    "acacia savanna spherical panorama",
+    "acacia savanna equirectangular panorama photo"
+   ],
+   "must": [
+    "Serengeti",
+    "Tanzania",
+    "Ngorongoro",
+    "Mara",
+    "savanna"
+   ]
+  },
+  {
+   "site": "amazon",
+   "terms": [
+    "rainforest 360°",
+    "rainforest photosphere",
+    "rainforest spherical panorama",
+    "rainforest equirectangular panorama photo",
+    "jungle river 360°",
+    "jungle river photosphere",
+    "jungle river spherical panorama",
+    "jungle river equirectangular panorama photo",
+    "Amazon 360°",
+    "Amazon photosphere",
+    "Amazon spherical panorama",
+    "Amazon equirectangular panorama photo"
+   ],
+   "must": [
+    "Amazon",
+    "rainforest",
+    "jungle",
+    "selva",
+    "Manaus"
+   ]
+  },
+  {
+   "site": "reef",
+   "terms": [
+    "coral reef underwater 360°",
+    "coral reef underwater photosphere",
+    "coral reef underwater spherical panorama",
+    "coral reef underwater equirectangular panorama photo"
+   ],
+   "must": [
+    "reef",
+    "underwater",
+    "coral",
+    "diving"
+   ]
+  },
+  {
+   "site": "arctic",
+   "terms": [
+    "glacier 360°",
+    "glacier photosphere",
+    "glacier spherical panorama",
+    "glacier equirectangular panorama photo",
+    "Svalbard 360°",
+    "Svalbard photosphere",
+    "Svalbard spherical panorama",
+    "Svalbard equirectangular panorama photo",
+    "Arctic fjord 360°",
+    "Arctic fjord photosphere",
+    "Arctic fjord spherical panorama",
+    "Arctic fjord equirectangular panorama photo",
+    "Greenland ice 360°",
+    "Greenland ice photosphere",
+    "Greenland ice spherical panorama",
+    "Greenland ice equirectangular panorama photo"
+   ],
+   "must": [
+    "Svalbard",
+    "Spitsbergen",
+    "Longyearbyen",
+    "glacier",
+    "Arctic",
+    "Greenland"
+   ],
+   "not": [
+    "Athabasca",
+    "Jasper",
+    "Columbia Icefield"
+   ]
+  },
+  {
+   "site": "galapagos",
+   "terms": [
+    "Galápagos 360°",
+    "Galápagos photosphere",
+    "Galápagos spherical panorama",
+    "Galápagos equirectangular panorama photo",
+    "volcanic island 360°",
+    "volcanic island photosphere",
+    "volcanic island spherical panorama",
+    "volcanic island equirectangular panorama photo",
+    "lava field coast 360°",
+    "lava field coast photosphere",
+    "lava field coast spherical panorama",
+    "lava field coast equirectangular panorama photo"
+   ],
+   "must": [
+    "Gal[aá]pagos",
+    "volcan",
+    "lava"
+   ]
+  },
+  {
+   "site": "himalaya",
+   "terms": [
+    "Himalaya 360°",
+    "Himalaya photosphere",
+    "Himalaya spherical panorama",
+    "Himalaya equirectangular panorama photo",
+    "Everest 360°",
+    "Everest photosphere",
+    "Everest spherical panorama",
+    "Everest equirectangular panorama photo",
+    "Nepal mountains 360°",
+    "Nepal mountains photosphere",
+    "Nepal mountains spherical panorama",
+    "Nepal mountains equirectangular panorama photo",
+    "Ladakh mountains 360°",
+    "Ladakh mountains photosphere",
+    "Ladakh mountains spherical panorama",
+    "Ladakh mountains equirectangular panorama photo"
+   ],
+   "must": [
+    "Everest",
+    "Himalaya",
+    "Annapurna",
+    "Nepal",
+    "Khumbu",
+    "Ladakh"
+   ]
+  },
+  {
+   "site": "sahara",
+   "terms": [
+    "Giza 360°",
+    "Giza photosphere",
+    "Giza spherical panorama",
+    "Giza equirectangular panorama photo",
+    "Sahara 360°",
+    "Sahara photosphere",
+    "Sahara spherical panorama",
+    "Sahara equirectangular panorama photo",
+    "desert dunes 360°",
+    "desert dunes photosphere",
+    "desert dunes spherical panorama",
+    "desert dunes equirectangular panorama photo",
+    "Wadi Rum 360°",
+    "Wadi Rum photosphere",
+    "Wadi Rum spherical panorama",
+    "Wadi Rum equirectangular panorama photo"
+   ],
+   "must": [
+    "Giza",
+    "Pyramid",
+    "Sahara",
+    "desert",
+    "dune",
+    "Wadi"
+   ]
+  },
+  {
+   "site": "yellowstone",
+   "terms": [
+    "Yellowstone 360°",
+    "Yellowstone photosphere",
+    "Yellowstone spherical panorama",
+    "Yellowstone equirectangular panorama photo",
+    "geyser 360°",
+    "geyser photosphere",
+    "geyser spherical panorama",
+    "geyser equirectangular panorama photo",
+    "hot spring Wyoming 360°",
+    "hot spring Wyoming photosphere",
+    "hot spring Wyoming spherical panorama",
+    "hot spring Wyoming equirectangular panorama photo"
+   ],
+   "must": [
+    "Yellowstone",
+    "Prismatic",
+    "Old Faithful",
+    "geyser"
+   ]
+  },
+  {
+   "site": "antarctica",
+   "terms": [
+    "Antarctica 360°",
+    "Antarctica photosphere",
+    "Antarctica spherical panorama",
+    "Antarctica equirectangular panorama photo",
+    "iceberg 360°",
+    "iceberg photosphere",
+    "iceberg spherical panorama",
+    "iceberg equirectangular panorama photo"
+   ],
+   "must": [
+    "Antarctic",
+    "iceberg",
+    "South Pole",
+    "Ross Sea",
+    "McMurdo"
+   ]
+  }
+ ]
+}

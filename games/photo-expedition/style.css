@@ -37,7 +37,9 @@
 
 /* ---------- top bar ---------- */
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.6rem 0.8rem; flex-wrap: wrap; }
-.rank { background: rgba(255,255,255,0.85); border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.95rem; }
+.rank { background: rgba(255,255,255,0.85); border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.95rem; text-align: center; }
+.rank .km { display: block; font-size: 0.8rem; color: #6a6580; }
+.rank .km:empty { display: none; }
 
 /* ---------- world map ---------- */
 .map-wrap { padding: 0 0.6rem; }
@@ -55,6 +57,8 @@
 .chip.done { background: #d8f5e0; }
 .chip .st { color: #d4a017; }
 .locked { background: #fff3cd; border-radius: 12px; padding: 0.6rem 0.9rem; margin: 0.6rem 0; }
+.daily { margin: 0.7rem 0.6rem 0; background: #fff8e1; border-left: 6px solid var(--gold); border-radius: 12px; padding: 0.55rem 0.9rem; font-size: 0.98rem; }
+.daily .okay { color: #2f9e44; font-weight: 800; }
 .question { margin: 0.8rem 0.6rem 0; background: #fff8e1; border: 3px solid var(--gold); }
 .question p { margin: 0.3rem 0; font-size: 1.1rem; }
 .feedback { font-weight: 800; min-height: 1.4em; }
@@ -97,7 +101,7 @@
 .hud { position: absolute; inset: 0; pointer-events: none; font-family: var(--font); color: #fff; }
 .hud > * { pointer-events: none; }
 .hud button, .hud #joy, .hud-right, .hud-actions { pointer-events: auto; }
-.hud-top { position: absolute; top: max(8px, env(safe-area-inset-top)); left: 10px; right: 10px; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.hud-top { position: absolute; top: max(8px, env(safe-area-inset-top)); left: 10px; right: 10px; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; z-index: 3; }
 .hud-pill { background: rgba(0,0,0,0.45); backdrop-filter: blur(6px); border-radius: 999px; padding: 0.35rem 0.8rem; font-weight: 700; font-size: 0.9rem; text-shadow: 0 1px 2px #000; }
 .hud-pill:empty { display: none; }
 .hud-btn { font: inherit; font-weight: 800; font-size: 0.95rem; color: #fff; background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.5); border-radius: 999px; padding: 0.55rem 0.95rem; cursor: pointer; backdrop-filter: blur(6px); }
@@ -125,7 +129,7 @@
 .hud-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
 .hud-btn.swim { display: none; } .underwater .hud-btn.swim { display: inline-block; }
 .hud-btn.dig { display: none; background: #e0a458; color: #2b2440; border-color: #fff; animation: pulse 1s infinite; } .hud-btn.dig.show { display: inline-block; }
-@keyframes pulse { 50% { transform: scale(1.08); } }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(255,209,102,0.45); } }
 
 /* viewfinder */
 #viewfinder { position: absolute; inset: 0; display: none; pointer-events: none; }
@@ -188,7 +192,12 @@
 
 @media (max-width: 700px) {
   .viewer-row, .cover-card { grid-template-columns: 1fr; }
-  #minimap { width: 110px; height: 110px; }
+  #minimap { width: 96px; height: 96px; }
+  .hud-top { gap: 0.3rem; }
+  .hud-pill { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
+  #btn-detail { display: none; }
+  .hud-right { top: calc(max(8px, env(safe-area-inset-top)) + 100px); }
+  #compass { top: calc(max(8px, env(safe-area-inset-top)) + 70px); width: 50vw; }
   #hud-tasks { display: none; }
   .cam .vf-info { top: 18%; font-size: 0.8rem; }
   .hud-btn { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
@@ -205,3 +214,12 @@
 .flyin-actions { position: absolute; left: 0; right: 0; bottom: max(24px, env(safe-area-inset-bottom)); opacity: 0; transition: opacity .4s; align-items: center; }
 .flyin-actions.show { opacity: 1; }
 .flyin-actions .btn-big { margin: 0; }
+
+/* ---------- the real 360° viewpoint ---------- */
+.hud-btn.small { padding: 0.45rem 0.6rem; }
+.hud-btn.look { display: none; background: #2a6fa8; border-color: #fff; animation: pulse 1.2s infinite; } .hud-btn.look.show { display: inline-block; }
+#pano-bar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(max(12px, env(safe-area-inset-bottom)) + 8px); display: none; align-items: center; gap: 0.6rem; background: rgba(0,0,0,0.55); color: #fff; padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.85rem; pointer-events: auto; max-width: 96vw; }
+.pano #pano-bar { display: flex; }
+.pano .hud-right, .pano #joy, .pano #hud-hint, .pano .hud-actions { display: none !important; }
+.pano.cam .vf-controls { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 64px); }
+.album-item.real { outline: 3px solid #2a6fa8; }

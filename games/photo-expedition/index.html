@@ -34,6 +34,7 @@
           <li>📓 <b>The field guide</b> — real photographs by the world's best wildlife photographers, and a true fact about every animal.</li>
           <li>🚶 <b>Walk the wild</b> — arrow keys or WASD to walk (a joystick on a tablet), drag to look, <b>E</b> to raise the camera, <b>space</b> to shoot, <b>M</b> for the map, <b>X</b> to sneak.</li>
           <li>📷 <b>Your camera</b> — zoom from 24 mm to 300 mm. Big in the frame, on a grid line, eyes to you, sun behind you, hold still: that's a five-star shot.</li>
+          <li>👁️ <b>Real viewpoints</b> — find the tripod in each world and press <b>L</b> to stand inside a real 360° photograph of the place, turn around, and shoot.</li>
           <li>🧭 <b>The treasure</b> — every expedition hides one. The clue is on your map, in grid squares. Get close and DIG.</li>
         </ul>
       </div>
@@ -44,10 +45,11 @@
   <section id="s-map" class="screen">
     <div class="topbar">
       <button class="btn-small" id="btn-change">👤 <span id="who-name">Cory</span></button>
-      <div class="rank"><span id="rank-emoji">🎒</span> <b id="rank-name">Camp Helper</b> · <span id="total-stars">0</span> ★</div>
+      <div class="rank"><span id="rank-emoji">🎒</span> <b id="rank-name">Camp Helper</b> · <span id="total-stars">0</span> ★ <span id="km-flown" class="km"></span></div>
       <button class="btn-small" id="btn-album">🖼️ Album <span id="album-count"></span></button>
     </div>
     <div class="map-wrap"><div class="map-scroll"><canvas id="worldmap"></canvas></div></div>
+    <div id="daily" class="daily hidden"></div>
     <div id="map-question" class="card question hidden">
       <p id="mq-text"></p>
       <p id="mq-feedback" class="feedback"></p>
@@ -91,8 +93,11 @@
         <div class="hud-pill" id="hud-clock">6:30 am</div>
         <div class="hud-pill" id="hud-grid">Square A1</div>
         <div class="hud-pill" id="hud-waypoint"></div>
+        <button class="hud-btn no-look small" id="btn-sound" title="Sound">🔊</button>
+        <button class="hud-btn no-look small" id="btn-detail" title="Detail">✨ Detail</button>
         <button class="hud-btn no-look" id="btn-exit">🏕️ Back to camp</button>
       </div>
+      <div id="pano-bar" class="no-look"><span id="pano-credit"></span><button class="hud-btn" id="btn-trail">🥾 Back to the trail</button></div>
       <div id="compass"><div id="compass-strip"></div><div class="needle"></div></div>
       <div class="hud-right no-look">
         <canvas id="minimap" width="150" height="150"></canvas>
@@ -107,6 +112,7 @@
           <button class="hud-btn swim" id="btn-up">⬆️ Up</button>
           <button class="hud-btn swim" id="btn-down">⬇️ Dive</button>
           <button class="hud-btn dig" id="btn-dig">⛏️ DIG</button>
+          <button class="hud-btn look" id="btn-look">👁️ Look around for real</button>
           <button class="hud-btn camera" id="btn-camera">📷 Camera</button>
         </div>
       </div>
@@ -195,6 +201,16 @@
     </div>
   </div>
 
+  <!-- back at camp: what the expedition brought home -->
+  <div id="summary" class="overlay">
+    <div class="card shot">
+      <h3 id="sum-title">🏕️ Back at camp</h3>
+      <ul id="sum-lines" class="good"></ul>
+      <p id="sum-rank" class="done-line"></p>
+      <button class="btn-big" id="sum-close">🗺️ To the world map</button>
+    </div>
+  </div>
+
   <!-- fly in from space: real NASA satellite views, zooming down to the expedition -->
   <div id="flyin" class="overlay flyin">
     <div class="flyin-box">
@@ -229,6 +245,7 @@
   <script src="land.js"></script>
   <script src="photos/manifest.js"></script>
   <script src="satellite/manifest.js"></script>
+  <script src="panoramas/manifest.js"></script>
   <script src="worldmap.js"></script>
   <script src="game.js"></script>
 </body>

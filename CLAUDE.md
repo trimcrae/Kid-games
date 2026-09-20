@@ -92,6 +92,11 @@ commits it back:
   site (public domain, GIBS WMS, no key) into `games/photo-expedition/satellite/`
   for the fly-in from space. Google Earth / Street View need API keys and
   billing, so they are deliberately not used.
+- **Photo Expedition's 360° viewpoints** → `.github/workflows/fetch-expedition-panoramas.yml`
+  runs `tools/fetch-expedition-panoramas.mjs`: one free equirectangular
+  photograph per site from Commons (`games/photo-expedition/panoramas-manifest.json`),
+  2:1 and filed as a panorama, tripod shots only. Few remote places have one;
+  a site without a panorama simply has no tripod in its world.
 
 **Never use image-generation models for Craepets** (or for anything depicting
 creatures or children). Craepets art is code-drawn only: the creatures, egg,

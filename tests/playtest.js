@@ -2138,11 +2138,10 @@ const GAMES = {
     await page.waitForSelector("#s-map.show");
     // tap a spot on the map: scroll the (phone-width) map so it's on screen, then click fresh coordinates
     const spot = async (lon, lat) => {
-      const p = await page.evaluate(([lon, lat]) => {
-        const [x, y] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const sc = c.parentElement;
-        sc.scrollLeft = Math.max(0, x - sc.clientWidth / 2); c.scrollIntoView({ block: "center" });
-        const r = c.getBoundingClientRect(); return { x: r.left + x, y: r.top + y };
-      }, [lon, lat]);
+      // the page scrolls smoothly, so bring the map into view first and measure once it has settled
+      await page.evaluate(([lon, lat]) => { const [x] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const sc = c.parentElement; sc.scrollLeft = Math.max(0, x - sc.clientWidth / 2); c.scrollIntoView({ block: "center", behavior: "instant" }); }, [lon, lat]);
+      await page.waitForTimeout(350);
+      const p = await page.evaluate(([lon, lat]) => { const [x, y] = WorldMap.lonLatToXY(lon, lat); const c = document.getElementById("worldmap"); const r = c.getBoundingClientRect(); return { x: r.left + x, y: r.top + y }; }, [lon, lat]);
       await page.mouse.click(p.x, p.y); await page.waitForTimeout(200);
     };
     const tapSite = async (id) => { const st = await page.evaluate((id) => SITES.find((s) => s.id === id), id); await spot(st.lon, st.lat); };
@@ -2208,6 +2207,10 @@ const GAMES = {
     await page.locator("#treasure-close").click();
     await page.locator("#btn-exit").click();
     await page.waitForSelector("#s-map.show");
+    // back at camp: the summary of the trip, then on to the map
+    await page.waitForSelector("#summary.show");
+    if (!/photo/.test(await page.locator("#sum-lines").textContent())) throw new Error("the camp summary does not count the photos");
+    await page.locator("#sum-close").click();
     const saved = await page.evaluate(() => { const p = PhotoExpedition.profile; return { photos: p.photos.length, treasure: p.treasures.includes("serengeti"), img: p.photos[0] && p.photos[0].img.slice(0, 22) }; });
     if (saved.photos !== 1 || !/^data:image\/jpeg/.test(saved.img)) throw new Error("the photo was not saved to the album");
     if (!saved.treasure) throw new Error("the treasure was not saved");
