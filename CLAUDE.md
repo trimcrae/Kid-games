@@ -87,6 +87,11 @@ commits it back:
   entry (delete the old `.jpg` to re-fetch it) and push. Never use
   image-generation models for this game's field guide: it exists to show
   the kids real photographs by real photographers.
+- **Photo Expedition's satellite views** → `.github/workflows/fetch-expedition-satellite.yml`
+  runs `tools/fetch-expedition-satellite.mjs`: five NASA Blue Marble views per
+  site (public domain, GIBS WMS, no key) into `games/photo-expedition/satellite/`
+  for the fly-in from space. Google Earth / Street View need API keys and
+  billing, so they are deliberately not used.
 
 **Never use image-generation models for Craepets** (or for anything depicting
 creatures or children). Craepets art is code-drawn only: the creatures, egg,

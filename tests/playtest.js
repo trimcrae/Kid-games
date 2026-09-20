@@ -2173,6 +2173,12 @@ const GAMES = {
 
     // the 3D expedition: the world builds, the animals are there, the camera scores a picture and it lands in the album
     await page.locator("#brief-go").click();
+    // with NASA views fetched, starting an expedition first flies in from space: let it land
+    if (await page.locator("#flyin.show").count()) {
+      await page.waitForSelector(".flyin-actions.show", { timeout: 30000 });
+      if (!/km across/.test(await page.locator("#flyin-scale").textContent())) throw new Error("the fly-in never reached the ground");
+      await page.locator("#flyin-go").click();
+    }
     await page.waitForFunction(() => window.PhotoExpedition.expedition && PhotoExpedition.expedition.world && PhotoExpedition.expedition.zoo.list.length > 10, null, { timeout: 60000 });
     await page.waitForTimeout(800);
     const aimed = await page.evaluate(() => {

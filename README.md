@@ -52,7 +52,10 @@ no logins.
 > true fact for every animal — those are fetched by
 > `.github/workflows/fetch-expedition-photos.yml` (see `tools/fetch-expedition-photos.mjs`
 > and `games/photo-expedition/photos-manifest.json`) and committed back with
-> their photographer credits.
+> their photographer credits. A second tiny pipeline
+> (`.github/workflows/fetch-expedition-satellite.yml`) fetches public-domain
+> NASA Blue Marble views of every site so an expedition starts by flying in
+> from space — no API key, nothing loaded live.
 
 > **🥚 Craepets** is the big one: a virtual-pet world where the whole
 > economy runs on learning. You adopt a pixel creature, then every coin
