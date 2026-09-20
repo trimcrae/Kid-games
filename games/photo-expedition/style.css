@@ -223,3 +223,13 @@
 .pano .hud-right, .pano #joy, .pano #hud-hint, .pano .hud-actions { display: none !important; }
 .pano.cam .vf-controls { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 64px); }
 .album-item.real { outline: 3px solid #2a6fa8; }
+
+/* the shot beside the pro's picture */
+.shot-pair { display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
+.shot-pair:has(#shot-pro.show) { grid-template-columns: 3fr 2fr; align-items: start; }
+#shot-pro { margin: 0; display: none; }
+#shot-pro.show { display: block; }
+#shot-pro img { width: 100%; aspect-ratio: 3/2; object-fit: cover; border-radius: 10px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.25); }
+#shot-pro figcaption { font-size: 0.72rem; color: #6a6580; margin-top: 0.2rem; }
+#hud-toast { position: absolute; left: 50%; top: 24%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: #fff; font-weight: 700; padding: 0.5rem 1rem; border-radius: 999px; font-size: 1rem; opacity: 0; transition: opacity .4s; pointer-events: none; max-width: 90vw; text-align: center; }
+#hud-toast.show { opacity: 1; }

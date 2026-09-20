@@ -493,6 +493,11 @@ export async function startExpedition(opts) {
     $("shot-score").textContent = photo.score + " / 100";
     $("shot-good").innerHTML = photo.good.map((n) => `<li>✅ ${n}</li>`).join("");
     $("shot-notes").innerHTML = photo.notes.map((n) => `<li>💡 ${n}</li>`).join("");
+    // the pro's picture of the same animal, right next to the kid's
+    const pro = photo.subject && window.PHOTO_MANIFEST && PHOTO_MANIFEST[photo.subject];
+    const proBox = $("shot-pro");
+    if (pro) { proBox.innerHTML = `<img src="photos/${pro.file}" alt="${pro.title}" /><figcaption>How a pro shot it · ${pro.artist || "Wikimedia Commons"}</figcaption>`; proBox.classList.add("show"); }
+    else { proBox.innerHTML = ""; proBox.classList.remove("show"); }
     const done = photo.subject && photo.stars >= tier.passStars && SUBJECTS[photo.subject];
     $("shot-done").textContent = done ? "Assignment complete: " + SUBJECTS[photo.subject].name + "!" : "";
     card.classList.add("show");
@@ -570,7 +575,7 @@ export async function startExpedition(opts) {
 
   /* ---------- HUD ---------- */
   const compassEl = $("compass-strip"), clockEl = $("hud-clock"), gridEl = $("hud-grid"), hintEl = $("hud-hint"), subjEl = $("vf-subject"), wpEl = $("hud-waypoint");
-  let hudTimer = 0;
+  let hudTimer = 0, lastLabel = null;
   function clockLabel() {
     const d = clock % 1.25; let hrs;
     if (d <= 1) hrs = 6 + d * 12; else hrs = 18 + (d - 1) / 0.25 * 12;
@@ -583,6 +588,10 @@ export async function startExpedition(opts) {
     const hd = headingDeg();
     const env = world.env;
     clockEl.textContent = clockLabel() + " · " + (env.label === "dawn" ? "🌅 golden hour" : env.label === "dusk" ? "🌇 golden hour" : env.label === "night" ? "🌙 night" : "☀️ day");
+    if (env.label !== lastLabel) {
+      if (lastLabel !== null) toast(env.label === "dusk" ? "🌇 Golden hour! The best light of the day — shoot now." : env.label === "night" ? "🌙 Night. " + (world.biome.aurora ? "Look north for the northern lights!" : "Animals are hard to see until the sun comes up.") : env.label === "dawn" ? "🌅 Sunrise — golden hour again." : "☀️ Full daylight. Harsh light: try shooting with the sun behind you.");
+      lastLabel = env.label;
+    }
     gridEl.textContent = "Square " + gridRef(player.pos.x, player.pos.z) + " · " + Math.round(hd) + "° " + compassName(hd);
     // compass strip
     let html = "";
@@ -605,6 +614,9 @@ export async function startExpedition(opts) {
       subjEl.textContent = subs.length ? subs[0].info.emoji + " " + subs[0].info.name + " · " + Math.round(subs[0].dist) + " m" : "";
     }
   }
+
+  let toastTimer = 0;
+  function toast(msg) { const el = $("hud-toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 4500); }
 
   /* ---------- main loop ---------- */
   function frame(now) {
