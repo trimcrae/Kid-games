@@ -107,7 +107,13 @@ export function makeCreature(THREE, id) {
   const g = new THREE.Group();
   const parts = { legs: [], wings: [], head: null, neck: null, tail: null, jaw: null, fins: [] };
   const M = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; m.receiveShadow = false; return m; };
-  let skin = S.pattern ? std({ map: patternTexture(THREE, S.colour, S.pattern[0], S.pattern[1], id.length * 31) }) : std({ color: S.colour });
+  let skin;
+  if (S.pattern) {
+    const tex = patternTexture(THREE, S.colour, S.pattern[0], S.pattern[1], id.length * 31);
+    // spots and rosettes are small on a big cat: tile the pattern over long bodies
+    if (S.pattern[0] !== "stripes" && S.pattern[0] !== "belly") { const r = Math.max(1, Math.round(S.len * 1.6)); tex.repeat.set(r, Math.max(1, Math.round(r * 0.6))); }
+    skin = std({ map: tex });
+  } else skin = std({ color: S.colour });
   const plain = std({ color: S.colour });
   const dark = std({ color: 0x1a1612 });
   const eyeGeo = new THREE.SphereGeometry(1, 6, 5);

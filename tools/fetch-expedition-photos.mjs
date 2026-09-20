@@ -85,10 +85,13 @@ async function imageInfo(titles, width) {
   return titles.map((t) => byTitle.get(t)).filter(Boolean);
 }
 
-/* Everything we know about a picture, as one lump of text the `must` patterns are checked against. */
+/* What we know about a picture. `strong` is the title, object name and categories —
+   the `must` patterns are checked against that, because a description can mention a
+   polar bear in a picture of an iceberg. `weak` adds the description for `also`. */
 function describe(info) {
   const meta = info.extmetadata || {};
-  return [info.title, stripHtml((meta.ObjectName || {}).value), stripHtml((meta.ImageDescription || {}).value), (info.cats || []).join(" | "), stripHtml((meta.Categories || {}).value)].join(" \n ");
+  const strong = [info.title, stripHtml((meta.ObjectName || {}).value), (info.cats || []).join(" | "), stripHtml((meta.Categories || {}).value)].join(" \n ");
+  return { strong, weak: strong + " \n " + stripHtml((meta.ImageDescription || {}).value) };
 }
 
 function acceptable(info, entry) {
@@ -101,9 +104,14 @@ function acceptable(info, entry) {
   const lic = String((meta.LicenseShortName || {}).value || "").toLowerCase();
   if (/nc|nd/.test(lic) || lic === "") return false;   // only free licences
   if (String((meta.Restrictions || {}).value || "")) return false;
-  const text = describe(info);
-  if (/satellite|landsat|sentinel-2|from space|aerial photograph by nasa|\bmap of\b/i.test(text) && entry.kind !== "landscape") return false;
-  return (entry.must || []).some((m) => new RegExp(m, "i").test(text));
+  const { strong, weak } = describe(info);
+  // a modern colour photograph of the real thing, not an old print, a painting or a satellite pass
+  if (/\b1[0-8]\d\d\b|\b19[0-8]\d\b|engraving|painting|drawing|illustration|lithograph|monochrome|black and white|black-and-white|sepia|postcard/i.test(strong)) return false;
+  if (/satellite|landsat|sentinel-2|from space|\bmap of\b|\bmaps\b/i.test(weak) && entry.kind !== "landscape") return false;
+  if (/satellite|landsat|sentinel-2|from space|\bmaps\b/i.test(strong)) return false;
+  if (!(entry.must || []).some((m) => new RegExp(m, "i").test(strong))) return false;
+  if ((entry.not || []).some((m) => new RegExp(m, "i").test(strong))) return false;
+  return (entry.also || []).every((m) => new RegExp(m, "i").test(weak));
 }
 
 async function findPhoto(entry, width, used) {
@@ -121,7 +129,7 @@ async function findPhoto(entry, width, used) {
       const infos = await imageInfo(titles.slice(i, i + 10), width);
       // prefer wild over captive when both are offered
       const ok = infos.filter((x) => acceptable(x, entry));
-      const pick = ok.find((x) => !/\bzoo\b|captive|aquarium|safari park/i.test(describe(x))) || ok[0];
+      const pick = ok.find((x) => !/\bzoo\b|captive|aquarium|safari park/i.test(describe(x).weak)) || ok[0];
       if (pick) return { pick, pool: pool.includes("Featured") ? "featured" : "quality", term: q };
       await sleep(250);
     }
