@@ -96,6 +96,11 @@
     "glacier",
     "Arctic",
     "Greenland"
+   ],
+   "not": [
+    "Athabasca",
+    "Jasper",
+    "Columbia Icefield"
    ]
   },
   {
@@ -211,16 +216,14 @@
     "iceberg 360°",
     "iceberg photosphere",
     "iceberg spherical panorama",
-    "iceberg equirectangular panorama photo",
-    "penguin colony 360°",
-    "penguin colony photosphere",
-    "penguin colony spherical panorama",
-    "penguin colony equirectangular panorama photo"
+    "iceberg equirectangular panorama photo"
    ],
    "must": [
     "Antarctic",
     "iceberg",
-    "penguin"
+    "South Pole",
+    "Ross Sea",
+    "McMurdo"
    ]
   }
  ]

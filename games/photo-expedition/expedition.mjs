@@ -96,7 +96,8 @@ export async function startExpedition(opts) {
       panoCam = new THREE.PerspectiveCamera(70, camera.aspect, 0.1, 200);
     }
     panoMode = true; root.classList.add("pano");
-    $("pano-credit").innerHTML = `📍 Real 360° photograph · ${escapeHtml(panoInfo.artist || "Wikimedia Commons")} · ${escapeHtml(panoInfo.license)}`;
+    const where = (panoInfo.title || "").replace(/\.[a-z0-9]+$/i, "").replace(/[_-]+/g, " ").slice(0, 60);
+    $("pano-credit").innerHTML = `📍 Real 360° photograph: <b>${escapeHtml(where)}</b> · ${escapeHtml(panoInfo.artist || "Wikimedia Commons")} · ${escapeHtml(panoInfo.license)}`;
     if (window.SFX) SFX.good && SFX.good();
   }
   function leavePano() { panoMode = false; root.classList.remove("pano"); }

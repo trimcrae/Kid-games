@@ -64,6 +64,7 @@ function reject(info, entry) {
   if (/interior|indoor|museum|church|cathedral|mosque|station|shop|office|hotel|room|hall|inside/i.test(strong)) return "indoors";
   if (/Mapillary|LG-R105/i.test(strong)) return "handheld sphere (photographer in frame)";
   if (!entry.must.some((m) => new RegExp(m, "i").test(strong))) return "no must match";
+  if ((entry.not || []).some((m) => new RegExp(m, "i").test(strong))) return "not-pattern";
   return "";
 }
 async function find(entry, width, used) {
