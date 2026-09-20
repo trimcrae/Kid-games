@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <title>📸 Photo Expedition</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📸</text></svg>" />
+  <meta name="theme-color" content="#1f6f5f" />
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob blob-1"></span>
+    <span class="blob blob-2"></span>
+    <span class="blob blob-3"></span>
+  </div>
+
+  <!-- ============ 1. who's exploring ============ -->
+  <section id="s-start" class="screen show">
+    <a class="back-link" href="../../">← Back to the Arcade</a>
+    <header class="hero" style="padding-top:0.5rem;">
+      <h1 class="title"><span class="emo">📸</span> Photo Expedition</h1>
+      <p class="tagline">Explore the world. Photograph the wild. Find the treasure.</p>
+    </header>
+    <main class="game-stage start-stage">
+      <h2>Who's the photographer today?</h2>
+      <div id="explorer-picker" class="explorer-grid"></div>
+      <div class="howto card">
+        <h3>Your kit</h3>
+        <ul>
+          <li>🗺️ <b>The world map</b> — nine expeditions, one on every continent. Read the grid: 2°S 35°E is the Serengeti.</li>
+          <li>📓 <b>The field guide</b> — real photographs by the world's best wildlife photographers, and a true fact about every animal.</li>
+          <li>🚶 <b>Walk the wild</b> — arrow keys or WASD to walk (a joystick on a tablet), drag to look, <b>E</b> to raise the camera, <b>space</b> to shoot, <b>M</b> for the map, <b>X</b> to sneak.</li>
+          <li>📷 <b>Your camera</b> — zoom from 24 mm to 300 mm. Big in the frame, on a grid line, eyes to you, sun behind you, hold still: that's a five-star shot.</li>
+          <li>🧭 <b>The treasure</b> — every expedition hides one. The clue is on your map, in grid squares. Get close and DIG.</li>
+        </ul>
+      </div>
+    </main>
+  </section>
+
+  <!-- ============ 2. the world map ============ -->
+  <section id="s-map" class="screen">
+    <div class="topbar">
+      <button class="btn-small" id="btn-change">👤 <span id="who-name">Cory</span></button>
+      <div class="rank"><span id="rank-emoji">🎒</span> <b id="rank-name">Camp Helper</b> · <span id="total-stars">0</span> ★</div>
+      <button class="btn-small" id="btn-album">🖼️ Album <span id="album-count"></span></button>
+    </div>
+    <div class="map-wrap"><div class="map-scroll"><canvas id="worldmap"></canvas></div></div>
+    <div id="map-question" class="card question hidden">
+      <p id="mq-text"></p>
+      <p id="mq-feedback" class="feedback"></p>
+    </div>
+    <div id="site-panel" class="card site-panel">
+      <p class="muted">Tap a pin on the map to read about an expedition.</p>
+    </div>
+  </section>
+
+  <!-- ============ 3. the field guide / briefing ============ -->
+  <section id="s-brief" class="screen">
+    <div class="topbar">
+      <button class="btn-small" id="brief-back">← World map</button>
+      <div class="rank" id="brief-place"></div>
+      <button class="btn-small" id="brief-album">🖼️ Album</button>
+    </div>
+    <div class="brief">
+      <div class="hero-photo" id="brief-hero"></div>
+      <div class="card brief-card">
+        <h2 id="brief-title"></h2>
+        <p id="brief-intro"></p>
+        <p class="tip" id="brief-tip"></p>
+        <div class="brief-meta" id="brief-meta"></div>
+        <button class="btn-big" id="brief-go">🚙 Start the expedition</button>
+      </div>
+      <h3 class="guide-h">📓 Field guide — your assignments</h3>
+      <div id="guide" class="guide"></div>
+      <div class="card treasure-card-brief" id="brief-treasure"></div>
+      <button class="btn-big" id="brief-go2">🚙 Start the expedition</button>
+    </div>
+  </section>
+
+  <!-- ============ 4. the expedition ============ -->
+  <section id="s-world" class="screen world">
+    <canvas id="ex-canvas"></canvas>
+    <div id="look-area"></div>
+    <div id="flash"></div>
+
+    <div class="hud">
+      <div class="hud-top">
+        <div class="hud-pill" id="hud-clock">6:30 am</div>
+        <div class="hud-pill" id="hud-grid">Square A1</div>
+        <div class="hud-pill" id="hud-waypoint"></div>
+        <button class="hud-btn no-look" id="btn-exit">🏕️ Back to camp</button>
+      </div>
+      <div id="compass"><div id="compass-strip"></div><div class="needle"></div></div>
+      <div class="hud-right no-look">
+        <canvas id="minimap" width="150" height="150"></canvas>
+        <ul id="hud-tasks"></ul>
+      </div>
+      <div id="hud-hint"></div>
+      <div class="hud-bottom no-look">
+        <div id="joy"><div id="joy-knob"></div></div>
+        <div class="hud-actions">
+          <button class="hud-btn" id="btn-map">🗺️ Map</button>
+          <button class="hud-btn" id="btn-sneak">🤫 Sneak</button>
+          <button class="hud-btn swim" id="btn-up">⬆️ Up</button>
+          <button class="hud-btn swim" id="btn-down">⬇️ Dive</button>
+          <button class="hud-btn dig" id="btn-dig">⛏️ DIG</button>
+          <button class="hud-btn camera" id="btn-camera">📷 Camera</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- the viewfinder -->
+    <div id="viewfinder">
+      <div class="vf-grid"><i></i><i></i><i></i><i></i></div>
+      <div class="vf-corner tl"></div><div class="vf-corner tr"></div><div class="vf-corner bl"></div><div class="vf-corner br"></div>
+      <div class="vf-info">
+        <span id="focal">35 mm</span> <span id="focal-kind">normal</span>
+        <span id="vf-subject"></span>
+      </div>
+      <div class="vf-controls no-look">
+        <button class="hud-btn" id="btn-zoom-out">➖</button>
+        <input type="range" id="zoom" min="24" max="300" value="35" step="1" />
+        <button class="hud-btn" id="btn-zoom-in">➕</button>
+        <button class="shutter" id="shutter" aria-label="Take the picture"></button>
+      </div>
+    </div>
+
+    <!-- result of a shot -->
+    <div id="shot-card" class="overlay">
+      <div class="card shot">
+        <img id="shot-img" alt="Your photograph" />
+        <h3 id="shot-title"></h3>
+        <div class="stars"><span id="shot-stars"></span> <small id="shot-score"></small></div>
+        <ul id="shot-good" class="good"></ul>
+        <ul id="shot-notes" class="notes"></ul>
+        <p id="shot-done" class="done-line"></p>
+        <button class="btn-big" id="shot-close">Keep shooting 📷</button>
+      </div>
+    </div>
+
+    <!-- treasure found -->
+    <div id="treasure-card" class="overlay">
+      <div class="card shot">
+        <h3 id="treasure-title"></h3>
+        <p id="treasure-fact"></p>
+        <button class="btn-big" id="treasure-close">Brilliant! 🎉</button>
+      </div>
+    </div>
+
+    <!-- the big map -->
+    <div id="bigmap-wrap" class="overlay">
+      <div class="card bigmap-card">
+        <div class="bigmap-head"><h3>🗺️ Expedition map</h3><button class="btn-small" id="bigmap-close">✕ Close</button></div>
+        <canvas id="bigmap"></canvas>
+        <p class="muted" id="bigmap-scale"></p>
+        <p id="bigmap-you"></p>
+        <p class="clue"><b>Treasure clue:</b> <span id="bigmap-clue"></span></p>
+        <p class="muted">Tap the map to plant a 🚩 waypoint — your compass will point to it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. the album ============ -->
+  <section id="s-album" class="screen">
+    <div class="topbar">
+      <button class="btn-small" id="album-back">← Back</button>
+      <div class="rank">🖼️ <b id="album-title">Album</b></div>
+      <button class="btn-small" id="btn-cover">📰 Make a cover</button>
+    </div>
+    <div id="album-grid" class="album-grid"></div>
+    <p id="album-empty" class="muted center">No photos yet. Go on an expedition and press the shutter!</p>
+  </section>
+
+  <!-- photo viewer -->
+  <div id="viewer" class="overlay">
+    <div class="card viewer-card">
+      <div class="viewer-row">
+        <figure><img id="v-img" alt="Your photograph" /><figcaption>Your shot · <span id="v-meta"></span></figcaption></figure>
+        <figure id="v-pro-fig"><div id="v-pro"></div><figcaption id="v-pro-cap"></figcaption></figure>
+      </div>
+      <h3 id="v-title"></h3>
+      <div class="stars"><span id="v-stars"></span> <small id="v-score"></small></div>
+      <ul id="v-good" class="good"></ul>
+      <ul id="v-notes" class="notes"></ul>
+      <p id="v-fact" class="fact"></p>
+      <div class="row">
+        <a class="btn-small" id="v-save" download="photo.jpg">💾 Save</a>
+        <button class="btn-small" id="v-cover">📰 Put on a cover</button>
+        <button class="btn-small danger" id="v-delete">🗑️ Delete</button>
+        <button class="btn-small" id="v-close">✕ Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- the magazine cover maker -->
+  <div id="cover" class="overlay">
+    <div class="card cover-card">
+      <canvas id="cover-canvas" width="900" height="1200"></canvas>
+      <div class="cover-controls">
+        <label>Headline <input id="cover-headline" maxlength="40" /></label>
+        <label>Photographer <input id="cover-by" maxlength="24" /></label>
+        <div class="row">
+          <a class="btn-small" id="cover-save" download="explorers-journal.jpg">💾 Save the cover</a>
+          <button class="btn-small" id="cover-close">✕ Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/sfx.js"></script>
+  <script src="../../assets/js/confetti.js"></script>
+  <script src="data.js"></script>
+  <script src="land.js"></script>
+  <script src="photos/manifest.js"></script>
+  <script src="worldmap.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

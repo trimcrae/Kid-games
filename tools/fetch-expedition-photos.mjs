@@ -48,8 +48,8 @@ const POOLS = [
   'incategory:"Featured pictures on Wikimedia Commons"',
   'incategory:"Quality images"'
 ];
-/* keep the field guide to living animals in the wild */
-const EXCLUDE = " -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin";
+/* keep the field guide to living animals in the wild, photographed (not mapped, painted or shot from orbit) */
+const EXCLUDE = " -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram";
 
 async function api(params, attempt = 1) {
   const url = API + "?" + new URLSearchParams({ format: "json", formatversion: "2", origin: "*", ...params });
@@ -65,47 +65,64 @@ async function api(params, attempt = 1) {
 }
 
 function stripHtml(s) {
-  return String(s || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return String(s || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
 async function search(query) {
-  const data = await api({ action: "query", list: "search", srsearch: query, srnamespace: "6", srlimit: "25", srqiprofile: "classic" });
+  const data = await api({ action: "query", list: "search", srsearch: query, srnamespace: "6", srlimit: "30" });
+  if (data.error) return [];                       // e.g. a deepcat tree that is too big
   return (data.query && data.query.search ? data.query.search : []).map((r) => r.title);
 }
 
 async function imageInfo(titles, width) {
   const data = await api({
-    action: "query", titles: titles.join("|"), prop: "imageinfo",
+    action: "query", titles: titles.join("|"), prop: "imageinfo|categories", cllimit: "100",
     iiprop: "url|size|mime|extmetadata", iiurlwidth: String(width)
   });
   const pages = (data.query && data.query.pages) || [];
   const byTitle = new Map();
-  for (const p of pages) if (p.imageinfo && p.imageinfo[0]) byTitle.set(p.title, { title: p.title, ...p.imageinfo[0] });
+  for (const p of pages) if (p.imageinfo && p.imageinfo[0]) byTitle.set(p.title, { title: p.title, cats: (p.categories || []).map((c) => c.title), ...p.imageinfo[0] });
   return titles.map((t) => byTitle.get(t)).filter(Boolean);
 }
 
-function acceptable(info) {
+/* Everything we know about a picture, as one lump of text the `must` patterns are checked against. */
+function describe(info) {
+  const meta = info.extmetadata || {};
+  return [info.title, stripHtml((meta.ObjectName || {}).value), stripHtml((meta.ImageDescription || {}).value), (info.cats || []).join(" | "), stripHtml((meta.Categories || {}).value)].join(" \n ");
+}
+
+function acceptable(info, entry) {
   if (info.mime !== "image/jpeg") return false;
   if (!info.width || !info.height) return false;
   const ratio = info.width / info.height;
-  if (ratio < 1.15 || ratio > 2.2) return false;      // landscape, not panoramic strips
-  if (info.width < 1400) return false;
+  if (ratio < 1.1 || ratio > 2.3) return false;      // landscape, not panoramic strips
+  if (info.width < 1200) return false;
   const meta = info.extmetadata || {};
   const lic = String((meta.LicenseShortName || {}).value || "").toLowerCase();
   if (/nc|nd/.test(lic) || lic === "") return false;   // only free licences
   if (String((meta.Restrictions || {}).value || "")) return false;
-  return true;
+  const text = describe(info);
+  if (/satellite|landsat|sentinel-2|from space|aerial photograph by nasa|\bmap of\b/i.test(text) && entry.kind !== "landscape") return false;
+  return (entry.must || []).some((m) => new RegExp(m, "i").test(text));
 }
 
-async function findPhoto(entry, width) {
+async function findPhoto(entry, width, used) {
+  const queries = [];
   for (const pool of POOLS) {
-    for (const term of entry.terms) {
-      const titles = await search(pool + " " + term + EXCLUDE);
-      await sleep(250);
-      if (!titles.length) continue;
-      const infos = await imageInfo(titles.slice(0, 10), width);
-      const pick = infos.find(acceptable);
-      if (pick) return { pick, pool: pool.includes("Featured") ? "featured" : "quality", term };
+    for (const cat of entry.cats || []) queries.push({ q: `${pool} deepcat:"${cat}"${EXCLUDE}`, pool });
+    for (const term of entry.terms || []) queries.push({ q: `${pool} "${term}"${EXCLUDE}`, pool });
+    for (const term of entry.terms || []) queries.push({ q: `${pool} ${term}${EXCLUDE}`, pool });
+  }
+  for (const { q, pool } of queries) {
+    const titles = (await search(q)).filter((t) => !used.has(t));
+    await sleep(250);
+    if (!titles.length) continue;
+    for (let i = 0; i < titles.length; i += 10) {
+      const infos = await imageInfo(titles.slice(i, i + 10), width);
+      // prefer wild over captive when both are offered
+      const ok = infos.filter((x) => acceptable(x, entry));
+      const pick = ok.find((x) => !/\bzoo\b|captive|aquarium|safari park/i.test(describe(x))) || ok[0];
+      if (pick) return { pick, pool: pool.includes("Featured") ? "featured" : "quality", term: q };
       await sleep(250);
     }
   }
@@ -139,6 +156,7 @@ async function main() {
   const width = manifest.width || 1400;
   await mkdir(OUT_DIR, { recursive: true });
   const credits = await loadExisting();
+  const used = new Set(Object.values(credits).map((c) => "File:" + c.title));   // no two subjects share a picture
   let fetched = 0, skipped = 0, failed = 0;
 
   for (const entry of manifest.entries) {
@@ -147,7 +165,7 @@ async function main() {
     if (!FORCE && credits[entry.id] && (await exists(file))) { skipped++; continue; }
     process.stdout.write(`• ${entry.id} … `);
     try {
-      const found = await findPhoto(entry, width);
+      const found = await findPhoto(entry, width, used);
       if (!found) { console.log("nothing suitable found"); failed++; continue; }
       const { pick, pool, term } = found;
       const buf = await download(pick.thumburl || pick.url);
@@ -163,6 +181,7 @@ async function main() {
         pool, term,
         width: pick.thumbwidth || pick.width, height: pick.thumbheight || pick.height
       };
+      used.add(pick.title);
       fetched++;
       console.log(`${pool}: ${credits[entry.id].title} (${Math.round(buf.length / 1024)} KB, ${credits[entry.id].license})`);
       await sleep(400);

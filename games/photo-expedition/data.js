@@ -60,7 +60,7 @@ const SITES = [
     treasure: {
       id: "compass", name: "The Explorer's Lost Compass", emoji: "🧭",
       clue: "An old explorer dropped her brass compass under the biggest baobab tree. Find the baobab on your map and search the ground around its trunk.",
-      pro: "From the water hole, walk 140 m on a bearing of 060° (east-north-east). The compass is buried where the shade of a baobab falls at noon.",
+      pro: "From the water hole, walk 165 m on a bearing of 070° (east-north-east). The compass is buried where the shade of the giant baobab falls at noon.",
       fact: "A compass needle always points north because it is a tiny magnet — and the whole Earth is a giant one."
     },
     gate: null
@@ -81,8 +81,8 @@ const SITES = [
     subjects: ["jaguar", "toucan", "macaw", "capybara", "morpho"],
     treasure: {
       id: "idol", name: "The Golden Jaguar Idol", emoji: "🗿",
-      clue: "A stone temple is lost in the trees. Its golden idol lies where the river makes a big bend — find the bend on your map, then look for old stone steps.",
-      pro: "From where the river meets the north edge of the map, follow the water 200 m downstream. The steps are 40 m east of the bank.",
+      clue: "A stone temple is lost in the trees. Its golden idol lies where the river makes its big bend towards the east, in the bottom corner of your map — find the bend, then look for old stone steps just east of the bank.",
+      pro: "Follow the river south to the point where it bends furthest east. The temple steps are 35 m east of that bank.",
       fact: "The Amazon river carries more water than the next seven biggest rivers put together."
     },
     gate: { stars: 4 }
@@ -104,7 +104,7 @@ const SITES = [
     treasure: {
       id: "chest", name: "The Shipwreck's Chest", emoji: "⚓",
       clue: "A sailing ship sank here long ago. Wrecks settle in the deepest, darkest water — find the deep blue part of your map and swim down to the mast.",
-      pro: "The wreck lies in the deep channel on the west side. Swim 150 m on a bearing of 240° from the big coral head at the centre of the map.",
+      pro: "The wreck lies in the deep channel on the west side. Swim 165 m on a bearing of 240° from the big coral head at the centre of the map.",
       fact: "More than 1,600 ships have been wrecked on the Great Barrier Reef — the old sailors could not see the coral under the waves."
     },
     gate: { stars: 9 }
@@ -127,7 +127,7 @@ const SITES = [
     treasure: {
       id: "sledge", name: "The Polar Explorer's Sledge", emoji: "🛷",
       clue: "A hundred years ago an explorer left a wooden sledge on the ice. Sledges are pulled across the FLAT snow, never up the mountains — search the flat white part of your map, near the sea.",
-      pro: "The sledge sits on the sea-ice shelf. From the highest peak, head 260 m due south, then 60 m west.",
+      pro: "The sledge sits on the sea-ice shelf, 20 m from the open water. It is in grid square F7 — 40 m east and 110 m south of the centre of the map.",
       fact: "In Svalbard the sun does not set at all from April to August, and does not rise at all from November to January."
     },
     gate: { stars: 14 }
@@ -149,7 +149,7 @@ const SITES = [
     treasure: {
       id: "pirate", name: "The Pirate's Chest", emoji: "🏴‍☠️",
       clue: "Real pirates hid on these islands 300 years ago! They buried their chest in the black sand of a beach on the EAST side, behind a rock shaped like a whale.",
-      pro: "The chest is on the eastern beach. Take a bearing of 095° from the volcano's crater rim and walk 210 m.",
+      pro: "The chest is on the eastern beach. Take a bearing of 095° from the volcano's crater and walk 185 m.",
       fact: "Charles Darwin visited the Galápagos in 1835. Seeing the different finches on each island helped him work out how animals evolve."
     },
     gate: { stars: 19 }
@@ -172,7 +172,7 @@ const SITES = [
     treasure: {
       id: "fossil", name: "The Spiral Sea-Shell Fossil", emoji: "🐚",
       clue: "Millions of years ago these mountains were the bottom of the sea! Sea-shell fossils are found in the rocky river valley — look at the LOWEST part of your map, where the stream runs.",
-      pro: "Ammonite fossils weather out of the black shale in the stream bed. Follow the stream 180 m upstream from the south edge of the map.",
+      pro: "Ammonite fossils weather out of the black shale in the stream bed. Follow the stream 180 m upstream (north) from the south edge of the map, and look on its west bank.",
       fact: "The Himalayas are still growing about 4 millimetres a year, because India is pushing into Asia."
     },
     gate: { stars: 24 }
@@ -216,7 +216,7 @@ const SITES = [
     treasure: {
       id: "journal", name: "The Lost Explorer's Journal", emoji: "📓",
       clue: "In 1870 an explorer got lost here for 37 days. His notebook lies in the pine forest on the NORTH edge of your map, at the foot of the tallest tree.",
-      pro: "The journal is in the northern pines. From the geyser, walk 220 m on a bearing of 350°.",
+      pro: "The journal is in the northern pines. From the geyser, walk 130 m on a bearing of 350°.",
       fact: "Yellowstone has more geysers than the rest of the world put together — over 500 of them."
     },
     gate: { stars: 34 }
@@ -239,7 +239,7 @@ const SITES = [
     treasure: {
       id: "tin", name: "The Hundred-Year-Old Biscuit Tin", emoji: "🍪",
       clue: "Explorers who came here 100 years ago left a wooden hut, and inside it, tins of biscuits that are STILL there because it's too cold for them to rot. The hut is on the rocky shore, away from the ice — find the brown part of your map.",
-      pro: "Scott's hut stands on the bare rock of the point. From the centre of the penguin colony, walk 250 m on a bearing of 120°.",
+      pro: "Scott's hut stands on the bare rock of the point. It is in grid square H8, the bottom-right corner of the map, on the brown rock.",
       fact: "Antarctica is a desert! It gets less rain and snow than the Sahara — the ice is just very, very old."
     },
     gate: { stars: 38 }
