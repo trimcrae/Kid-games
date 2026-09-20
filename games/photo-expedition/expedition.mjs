@@ -36,6 +36,11 @@ export async function startExpedition(opts) {
   const dpr = Math.min(window.devicePixelRatio || 1, isTouch ? 1.5 : 2);
   const quality = (isTouch || window.innerWidth < 900) ? 0.6 : 1;
 
+  // every listener is registered through on() so exit() can drop them all at once —
+  // the HUD buttons are shared by every expedition, and must not toggle twice
+  const ac = new AbortController();
+  const on = (el, ev, fn, o) => el.addEventListener(ev, fn, Object.assign({ signal: ac.signal }, o || {}));
+
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
   renderer.setPixelRatio(dpr);
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -84,7 +89,7 @@ export async function startExpedition(opts) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h; camera.updateProjectionMatrix();
   }
-  window.addEventListener("resize", resize); resize();
+  on(window, "resize", resize); resize();
 
   /* ---------- input ---------- */
   const keys = {};
@@ -102,7 +107,7 @@ export async function startExpedition(opts) {
     keys[e.code] = e.type === "keydown";
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
   };
-  window.addEventListener("keydown", onKey); window.addEventListener("keyup", onKey);
+  on(window, "keydown", onKey); on(window, "keyup", onKey);
 
   // look: drag anywhere on the canvas (mouse or the right-hand side on touch)
   let dragging = null;
@@ -124,9 +129,9 @@ export async function startExpedition(opts) {
     if (e.cancelable) e.preventDefault();
   };
   const onUp = () => { dragging = null; };
-  lookArea.addEventListener("mousedown", onDown); window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", onUp);
-  lookArea.addEventListener("touchstart", onDown, { passive: false }); lookArea.addEventListener("touchmove", onMove, { passive: false }); lookArea.addEventListener("touchend", onUp);
-  lookArea.addEventListener("wheel", (e) => { if (camMode) { zoomBy(e.deltaY < 0 ? 1.12 : 0.9); e.preventDefault(); } }, { passive: false });
+  on(lookArea, "mousedown", onDown); on(window, "mousemove", onMove); on(window, "mouseup", onUp);
+  on(lookArea, "touchstart", onDown, { passive: false }); on(lookArea, "touchmove", onMove, { passive: false }); on(lookArea, "touchend", onUp);
+  on(lookArea, "wheel", (e) => { if (camMode) { zoomBy(e.deltaY < 0 ? 1.12 : 0.9); e.preventDefault(); } }, { passive: false });
 
   // joystick
   const joy = $("joy"), knob = $("joy-knob"); let joyVec = { x: 0, y: 0 }, joyId = null;
@@ -141,22 +146,22 @@ export async function startExpedition(opts) {
     if (e.cancelable) e.preventDefault();
   };
   const joyEnd = () => { joyId = null; joyVec = { x: 0, y: 0 }; knob.style.transform = ""; };
-  joy.addEventListener("touchstart", joyStart, { passive: false }); joy.addEventListener("touchmove", joyMove, { passive: false }); joy.addEventListener("touchend", joyEnd);
-  joy.addEventListener("mousedown", joyStart); window.addEventListener("mousemove", joyMove); window.addEventListener("mouseup", joyEnd);
+  on(joy, "touchstart", joyStart, { passive: false }); on(joy, "touchmove", joyMove, { passive: false }); on(joy, "touchend", joyEnd);
+  on(joy, "mousedown", joyStart); on(window, "mousemove", joyMove); on(window, "mouseup", joyEnd);
 
-  $("btn-camera").addEventListener("click", toggleCamera);
-  $("btn-map").addEventListener("click", toggleMap);
-  $("btn-sneak").addEventListener("click", () => { player.sneak = !player.sneak; $("btn-sneak").classList.toggle("on", player.sneak); });
-  $("btn-dig").addEventListener("click", dig);
-  $("shutter").addEventListener("click", shoot);
-  $("btn-exit").addEventListener("click", () => exit());
-  $("zoom").addEventListener("input", (e) => { focal = +e.target.value; updateZoomLabel(); });
-  $("btn-zoom-in").addEventListener("click", () => zoomBy(1.3)); $("btn-zoom-out").addEventListener("click", () => zoomBy(0.77));
-  $("bigmap-close").addEventListener("click", toggleMap);
-  $("btn-up").addEventListener("touchstart", (e) => { keys.SwimUp = true; e.preventDefault(); }, { passive: false }); $("btn-up").addEventListener("touchend", () => { keys.SwimUp = false; });
-  $("btn-down").addEventListener("touchstart", (e) => { keys.SwimDown = true; e.preventDefault(); }, { passive: false }); $("btn-down").addEventListener("touchend", () => { keys.SwimDown = false; });
-  $("btn-up").addEventListener("mousedown", () => { keys.SwimUp = true; }); $("btn-down").addEventListener("mousedown", () => { keys.SwimDown = true; });
-  window.addEventListener("mouseup", () => { keys.SwimUp = keys.SwimDown = false; });
+  on($("btn-camera"), "click", toggleCamera);
+  on($("btn-map"), "click", toggleMap);
+  on($("btn-sneak"), "click", () => { player.sneak = !player.sneak; $("btn-sneak").classList.toggle("on", player.sneak); });
+  on($("btn-dig"), "click", dig);
+  on($("shutter"), "click", shoot);
+  on($("btn-exit"), "click", () => exit());
+  on($("zoom"), "input", (e) => { focal = +e.target.value; updateZoomLabel(); });
+  on($("btn-zoom-in"), "click", () => zoomBy(1.3)); on($("btn-zoom-out"), "click", () => zoomBy(0.77));
+  on($("bigmap-close"), "click", toggleMap);
+  on($("btn-up"), "touchstart", (e) => { keys.SwimUp = true; e.preventDefault(); }, { passive: false }); on($("btn-up"), "touchend", () => { keys.SwimUp = false; });
+  on($("btn-down"), "touchstart", (e) => { keys.SwimDown = true; e.preventDefault(); }, { passive: false }); on($("btn-down"), "touchend", () => { keys.SwimDown = false; });
+  on($("btn-up"), "mousedown", () => { keys.SwimUp = true; }); on($("btn-down"), "mousedown", () => { keys.SwimDown = true; });
+  on(window, "mouseup", () => { keys.SwimUp = keys.SwimDown = false; });
   root.classList.toggle("underwater", world.underwater);
   root.classList.toggle("touch", isTouch);
 
@@ -234,7 +239,7 @@ export async function startExpedition(opts) {
     $("bigmap-clue").textContent = tier.name === "Pro" ? site.treasure.pro : site.treasure.clue;
     $("bigmap-you").textContent = "You are in square " + gridRef(player.pos.x, player.pos.z) + ", facing " + compassName(headingDeg()) + ".";
   }
-  big.addEventListener("click", (e) => {
+  on(big, "click", (e) => {
     const r = big.getBoundingClientRect(); const u = (e.clientX - r.left) / r.width, v = (e.clientY - r.top) / r.height;
     waypoint = new THREE.Vector3((u - 0.5) * SIZE, 0, (v - 0.5) * SIZE);
     drawBigMap(); $("bigmap-you").textContent = "Waypoint set in square " + gridRef(waypoint.x, waypoint.z) + ". The compass will point to it.";
@@ -416,7 +421,7 @@ export async function startExpedition(opts) {
   }
   let celebrated = false;
   function allDone() { return site.subjects.every((id) => (best[id] || 0) >= tier.passStars) && treasureFound; }
-  $("shot-close").addEventListener("click", () => $("shot-card").classList.remove("show"));
+  on($("shot-close"), "click", () => $("shot-card").classList.remove("show"));
 
   /* ---------- treasure ---------- */
   function dig() {
@@ -433,7 +438,7 @@ export async function startExpedition(opts) {
     opts.onTreasure && opts.onTreasure(site.treasure);
     if (allDone() && !celebrated) { celebrated = true; $("treasure-fact").textContent += " 🏆 And that's the whole expedition done!"; }
   }
-  $("treasure-close").addEventListener("click", () => $("treasure-card").classList.remove("show"));
+  on($("treasure-close"), "click", () => $("treasure-card").classList.remove("show"));
 
   /* ---------- movement ---------- */
   const move = new THREE.Vector3();
@@ -541,8 +546,7 @@ export async function startExpedition(opts) {
 
   function exit() {
     running = false;
-    window.removeEventListener("keydown", onKey); window.removeEventListener("keyup", onKey);
-    window.removeEventListener("resize", resize);
+    ac.abort();
     root.classList.remove("cam", "map-open");
     $("shot-card").classList.remove("show"); $("treasure-card").classList.remove("show");
     world.dispose(); renderer.dispose();
