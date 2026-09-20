@@ -626,5 +626,17 @@ window.PHOTO_MANIFEST = {
   "term": "incategory:\"Quality images\" deepcat:\"Landscapes of Ecuador\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
   "width": 1100,
   "height": 644
+ },
+ "site-serengeti": {
+  "file": "site-serengeti.jpg",
+  "title": "Western white-bearded wildebeest (Connochaetes taurinus mearnsi) Mara River crossing 2a Zebras.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Western_white-bearded_wildebeest_(Connochaetes_taurinus_mearnsi)_Mara_River_crossing_2a_Zebras.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" \"Serengeti\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 733
  }
 };
