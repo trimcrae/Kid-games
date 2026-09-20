@@ -1,0 +1,67 @@
+{
+  "_about": "Real photographs for Photo Expedition's field guide. tools/fetch-expedition-photos.mjs searches Wikimedia Commons for FEATURED pictures (the community's best, professionally-judged photos, all free to use) matching each entry's terms, saves them into games/photo-expedition/photos/ and writes photos/manifest.js with the photographer credit and licence for every one. Terms are tried in order; the first landscape JPEG that passes wins. Run by .github/workflows/fetch-expedition-photos.yml.",
+  "width": 1400,
+  "entries": [
+    { "id": "site-serengeti",  "terms": ["Serengeti acacia landscape", "Serengeti savanna", "Serengeti"] },
+    { "id": "lion",            "terms": ["Panthera leo male Serengeti", "Panthera leo male savanna", "Panthera leo"] },
+    { "id": "elephant",        "terms": ["Loxodonta africana Serengeti", "Loxodonta africana savanna", "Loxodonta africana"] },
+    { "id": "giraffe",         "terms": ["Giraffa Serengeti", "Giraffa savanna", "Giraffa camelopardalis"] },
+    { "id": "zebra",           "terms": ["Equus quagga Serengeti", "Equus quagga herd", "Equus quagga"] },
+    { "id": "baobab",          "terms": ["Adansonia digitata sunset", "Adansonia digitata Tanzania", "Adansonia baobab tree"] },
+
+    { "id": "site-amazon",     "terms": ["Amazon rainforest river aerial", "Amazon rainforest", "rainforest canopy Brazil"] },
+    { "id": "jaguar",          "terms": ["Panthera onca Pantanal", "Panthera onca wild", "Panthera onca"] },
+    { "id": "toucan",          "terms": ["Ramphastos toco", "toco toucan", "Ramphastos"] },
+    { "id": "macaw",           "terms": ["Ara macao flying", "Ara macao", "scarlet macaw"] },
+    { "id": "capybara",        "terms": ["Hydrochoerus hydrochaeris Pantanal", "Hydrochoerus hydrochaeris", "capybara"] },
+    { "id": "morpho",          "terms": ["Morpho peleides", "Morpho butterfly blue", "Morpho"] },
+
+    { "id": "site-reef",       "terms": ["Great Barrier Reef aerial", "Great Barrier Reef coral", "coral reef Australia underwater"] },
+    { "id": "turtle",          "terms": ["Chelonia mydas swimming", "Chelonia mydas", "green sea turtle underwater"] },
+    { "id": "clownfish",       "terms": ["Amphiprion ocellaris anemone", "Amphiprion anemone", "clownfish anemone"] },
+    { "id": "reefshark",       "terms": ["Carcharhinus melanopterus", "blacktip reef shark", "reef shark underwater"] },
+    { "id": "manta",           "terms": ["Mobula alfredi", "Manta ray underwater", "Mobula birostris"] },
+    { "id": "coral",           "terms": ["coral reef fish underwater Red Sea", "coral reef underwater", "Acropora reef"] },
+
+    { "id": "site-arctic",     "terms": ["Svalbard glacier fjord", "Svalbard landscape", "Spitsbergen"] },
+    { "id": "polarbear",       "terms": ["Ursus maritimus Svalbard", "Ursus maritimus sea ice", "Ursus maritimus"] },
+    { "id": "walrus",          "terms": ["Odobenus rosmarus Svalbard", "Odobenus rosmarus", "walrus"] },
+    { "id": "arcticfox",       "terms": ["Vulpes lagopus winter", "Vulpes lagopus", "arctic fox"] },
+    { "id": "reindeer",        "terms": ["Rangifer tarandus platyrhynchus", "Svalbard reindeer", "Rangifer tarandus snow"] },
+    { "id": "aurora",          "terms": ["aurora borealis Norway", "aurora borealis", "northern lights"] },
+
+    { "id": "site-galapagos",  "terms": ["Galápagos Islands landscape", "Galapagos Bartolomé", "Galapagos island"] },
+    { "id": "tortoise",        "terms": ["Chelonoidis niger", "Galápagos giant tortoise", "Chelonoidis"] },
+    { "id": "iguana",          "terms": ["Amblyrhynchus cristatus", "marine iguana", "Amblyrhynchus"] },
+    { "id": "booby",           "terms": ["Sula nebouxii", "blue-footed booby", "Sula nebouxii feet"] },
+    { "id": "sealion",         "terms": ["Zalophus wollebaeki", "Galápagos sea lion", "Zalophus"] },
+    { "id": "volcano",         "terms": ["Galápagos volcano crater", "Sierra Negra Galapagos", "volcanic crater island"] },
+
+    { "id": "site-himalaya",   "terms": ["Mount Everest Himalaya sunrise", "Himalaya Nepal mountains", "Himalaya"] },
+    { "id": "snowleopard",     "terms": ["Panthera uncia", "snow leopard", "Uncia uncia"] },
+    { "id": "yak",             "terms": ["Bos grunniens Himalaya", "yak Nepal", "Bos grunniens"] },
+    { "id": "monal",           "terms": ["Lophophorus impejanus", "Himalayan monal", "Lophophorus"] },
+    { "id": "redpanda",        "terms": ["Ailurus fulgens", "red panda", "Ailurus"] },
+    { "id": "everest",         "terms": ["Mount Everest", "Everest Kala Patthar", "Sagarmatha"] },
+
+    { "id": "site-sahara",     "terms": ["Sahara dunes Egypt", "Sahara desert dunes", "Erg Chebbi dunes"] },
+    { "id": "camel",           "terms": ["Camelus dromedarius desert", "Camelus dromedarius", "dromedary desert"] },
+    { "id": "fennec",          "terms": ["Vulpes zerda", "fennec fox", "Vulpes zerda desert"] },
+    { "id": "vulture",         "terms": ["Neophron percnopterus flying", "Neophron percnopterus", "Egyptian vulture"] },
+    { "id": "pyramids",        "terms": ["Great Pyramid of Giza", "Giza pyramids", "Pyramids of Giza"] },
+    { "id": "sphinx",          "terms": ["Great Sphinx of Giza", "Sphinx Giza", "Sphinx Egypt"] },
+
+    { "id": "site-yellowstone","terms": ["Grand Prismatic Spring", "Yellowstone National Park landscape", "Yellowstone"] },
+    { "id": "bison",           "terms": ["Bison bison Yellowstone", "Bison bison snow", "Bison bison"] },
+    { "id": "elk",             "terms": ["Cervus canadensis Yellowstone", "Cervus canadensis bull", "Cervus canadensis"] },
+    { "id": "grizzly",         "terms": ["Ursus arctos horribilis", "grizzly bear Yellowstone", "Ursus arctos Alaska"] },
+    { "id": "eagle",           "terms": ["Haliaeetus leucocephalus flying", "Haliaeetus leucocephalus", "bald eagle"] },
+    { "id": "geyser",          "terms": ["Old Faithful eruption", "Old Faithful", "Yellowstone geyser eruption"] },
+
+    { "id": "site-antarctica", "terms": ["Antarctica iceberg landscape", "Antarctic Peninsula", "Antarctica"] },
+    { "id": "emperor",         "terms": ["Aptenodytes forsteri", "emperor penguin", "Aptenodytes forsteri chick"] },
+    { "id": "seal",            "terms": ["Leptonychotes weddellii", "Weddell seal", "Antarctic seal ice"] },
+    { "id": "humpback",        "terms": ["Megaptera novaeangliae breaching", "Megaptera novaeangliae", "humpback whale"] },
+    { "id": "iceberg",         "terms": ["iceberg Antarctica", "iceberg blue", "iceberg"] }
+  ]
+}

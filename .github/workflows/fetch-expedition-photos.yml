@@ -1,0 +1,54 @@
+name: Fetch Photo Expedition photographs
+
+# Downloads the real, free-licensed Featured pictures that Photo Expedition's
+# field guide shows (from Wikimedia Commons) and commits them, plus their
+# credits, back to the branch. GitHub's runners have open internet; the
+# sandboxed dev environments can't reach commons.wikimedia.org.
+#
+# Runs when the photo manifest or the fetch script changes, or by hand from
+# the Actions tab. Photos that already exist are skipped unless "force".
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-fetch photos that already exist"
+        type: boolean
+        default: false
+  push:
+    paths:
+      - "games/photo-expedition/photos-manifest.json"
+      - "tools/fetch-expedition-photos.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: expedition-photos-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch photographs
+        run: node tools/fetch-expedition-photos.mjs ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
+
+      - name: Commit photographs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A "games/photo-expedition/photos"
+          if git diff --cached --quiet; then
+            echo "No new photographs to commit."
+          else
+            git commit -m "Add Photo Expedition field-guide photographs [skip ci]"
+            git pull --rebase origin "${{ github.ref_name }}"
+            git push
+          fi
