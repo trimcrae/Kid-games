@@ -530,5 +530,113 @@ window.PHOTO_MANIFEST = {
   "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Antarctica\" -skull -skeleton -taxidermy -carcass -hunting -stuffed -statue -painting -drawing -map -stamp -coin -satellite -Landsat -Sentinel -diagram",
   "width": 1100,
   "height": 825
+ },
+ "reefshark": {
+  "file": "reefshark.jpg",
+  "title": "Blacktip reef shark (Carcharhinus melanopterus) Moorea.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Blacktip_reef_shark_(Carcharhinus_melanopterus)_Moorea.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Carcharhinus melanopterus\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 733
+ },
+ "walrus": {
+  "file": "walrus.jpg",
+  "title": "Моржи на фоне мыса Останцового, остров Хейса.jpg",
+  "artist": "Николай Гернет",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:%D0%9C%D0%BE%D1%80%D0%B6%D0%B8_%D0%BD%D0%B0_%D1%84%D0%BE%D0%BD%D0%B5_%D0%BC%D1%8B%D1%81%D0%B0_%D0%9E%D1%81%D1%82%D0%B0%D0%BD%D1%86%D0%BE%D0%B2%D0%BE%D0%B3%D0%BE,_%D0%BE%D1%81%D1%82%D1%80%D0%BE%D0%B2_%D0%A5%D0%B5%D0%B9%D1%81%D0%B0.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Odobenus rosmarus\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 733
+ },
+ "elk": {
+  "file": "elk.jpg",
+  "title": "Cervus canadensis nannodes at Tomales Point.jpg",
+  "artist": "Frank Schulenburg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Cervus_canadensis_nannodes_at_Tomales_Point.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Cervus canadensis\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 733
+ },
+ "emperor": {
+  "file": "emperor.jpg",
+  "title": "Penguin in Antarctica jumping out of the water.jpg",
+  "artist": "Christopher Michel",
+  "license": "CC BY 2.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Penguin_in_Antarctica_jumping_out_of_the_water.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Aptenodytes forsteri\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 731
+ },
+ "seal": {
+  "file": "seal.jpg",
+  "title": "Mirounga leonina.jpg",
+  "artist": "Butterfly austral - Serge Ouachée",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mirounga_leonina.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Mirounga leonina\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 731
+ },
+ "site-serengeti": {
+  "file": "site-serengeti.jpg",
+  "title": "MC Siedleragame.jpg",
+  "artist": "Christian Mehlführer, User:Chmehl",
+  "license": "CC BY 2.5",
+  "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
+  "page": "https://commons.wikimedia.org/wiki/File:MC_Siedleragame.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Serengeti National Park\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 825
+ },
+ "site-reef": {
+  "file": "site-reef.jpg",
+  "title": "Heron Bommie SVII.jpg",
+  "artist": "© Underwater Earth / XL Catlin Seaview Survey / Christophe Bailhache",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Heron_Bommie_SVII.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Great Barrier Reef\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 550
+ },
+ "site-arctic": {
+  "file": "site-arctic.jpg",
+  "title": "Evening sun in Fair Haven, Svalbard.jpg",
+  "artist": "AWeith",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Evening_sun_in_Fair_Haven,_Svalbard.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Svalbard\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 619
+ },
+ "site-galapagos": {
+  "file": "site-galapagos.jpg",
+  "title": "Waved Albatross in flight, Española Island 2.jpg",
+  "artist": "E bailey",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Waved_Albatross_in_flight,_Espa%C3%B1ola_Island_2.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Galápagos Islands\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 733
  }
 };
