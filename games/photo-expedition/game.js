@@ -41,7 +41,30 @@
     return p;
   }
   function siteStars(siteId) { const s = prof.stars[siteId] || {}; return Object.values(s).reduce((a, b) => a + b, 0) + (prof.treasures.includes(siteId) ? 3 : 0); }
-  function totalStars() { return SITES.reduce((a, s) => a + siteStars(s.id), 0); }
+  function totalStars() { return SITES.reduce((a, s) => a + siteStars(s.id), 0) + (prof.bonus || 0); }
+  /* ---- today's assignment: one subject, one time of day, picked from the date ---- */
+  const WHENS = ["dawn", "day", "dusk"];
+  function todayKey() { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+  function dailyAssignment() {
+    const open = SITES.filter(isUnlocked); if (!open.length) return null;
+    let h = 0; for (const c of todayKey() + explorer.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+    const site = open[h % open.length]; const subs = site.subjects.filter((id) => SUBJECTS[id].kind !== "moment");
+    const id = subs[(h >> 3) % subs.length]; const sub = SUBJECTS[id];
+    const when = sub.when === "any" || sub.when === "day" ? WHENS[(h >> 7) % WHENS.length] : sub.when;
+    return { site, id, sub, when, done: prof.daily && prof.daily.key === todayKey() && prof.daily.done };
+  }
+  function whenWord(w) { return { dawn: "at golden hour (dawn or dusk)", dusk: "at dusk or night", day: "in daylight", night: "at night" }[w] || w; }
+  function renderDaily() {
+    const d = dailyAssignment(); const el = $("daily"); if (!d) { el.classList.add("hidden"); return; }
+    el.classList.remove("hidden");
+    el.innerHTML = `📌 <b>Today's assignment:</b> photograph a ${d.sub.emoji} <b>${d.sub.name}</b> ${whenWord(d.when)} in ${d.site.name} — <b>+3 ★</b>${d.done ? ' <span class="okay">✅ done!</span>' : ""}`;
+  }
+  function checkDaily(photo) {
+    const d = dailyAssignment(); if (!d || d.done || !photo.subject) return false;
+    const whenOk = d.when === "dawn" ? (photo.when === "dawn" || photo.when === "dusk") : d.when === "dusk" ? (photo.when === "dusk" || photo.when === "night") : d.when === "day" ? photo.when === "day" : photo.when === d.when;
+    if (photo.subject === d.id && photo.site === d.site.id && photo.stars >= tier.passStars && whenOk) { prof.daily = { key: todayKey(), done: true }; prof.bonus = (prof.bonus || 0) + 3; return true; }
+    return false;
+  }
   function siteDone(site) { return site.subjects.every((id) => ((prof.stars[site.id] || {})[id] || 0) >= tier.passStars) && prof.treasures.includes(site.id); }
   function kmFlown() { let km = 0; for (let i = 1; i < prof.route.length; i++) { const a = WorldMap.siteById(prof.route[i - 1]), b = WorldMap.siteById(prof.route[i]); if (a && b) km += WorldMap.distanceKm(a, b); } return km; }
   function rankFor(stars) { let r = RANKS[0]; for (const x of RANKS) if (stars >= x[0]) r = x; return r; }
@@ -85,6 +108,7 @@
     const km = kmFlown();
     $("km-flown").textContent = km ? "✈️ " + Math.round(km).toLocaleString("en-US") + " km flown" + (km >= 40075 ? " — that's all the way round the Earth!" : " · round the Earth is 40,075 km") : "";
     $("album-count").textContent = prof.photos.length ? "(" + prof.photos.length + ")" : "";
+    renderDaily();
   }
   function fmtKm(km) { return Math.round(km).toLocaleString("en-US") + " km (" + Math.round(km * 0.621).toLocaleString("en-US") + " miles)"; }
   function openSite(site) {
@@ -251,6 +275,7 @@
           prof.photos.unshift(photo);
           if (prof.photos.length > MAX_PHOTOS) { const idx = prof.photos.slice(12).reduce((w, p, i) => (p.stars < prof.photos[w + 12].stars ? i : w), 0) + 12; prof.photos.splice(idx, 1); }
           if (photo.subject && SUBJECTS[photo.subject]) { prof.stars[site.id] = prof.stars[site.id] || {}; prof.stars[site.id][photo.subject] = Math.max(prof.stars[site.id][photo.subject] || 0, photo.stars); }
+          if (checkDaily(photo)) { const el = document.getElementById("shot-done"); el.textContent = "📌 Today's assignment done — +3 ★!"; window.Confetti && Confetti.burst({ count: 80 }); }
           persist();
         },
         onTreasure() { if (!prof.treasures.includes(site.id)) prof.treasures.push(site.id); persist(); },

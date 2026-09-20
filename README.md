@@ -55,7 +55,9 @@ no logins.
 > their photographer credits. A second tiny pipeline
 > (`.github/workflows/fetch-expedition-satellite.yml`) fetches public-domain
 > NASA Blue Marble views of every site so an expedition starts by flying in
-> from space — no API key, nothing loaded live.
+> from space — no API key, nothing loaded live. Where Commons has a free
+> 360° photograph of the place, a tripod in the 3D world lets him stand
+> inside the real photo and shoot (`fetch-expedition-panoramas.yml`).
 
 > **🥚 Craepets** is the big one: a virtual-pet world where the whole
 > economy runs on learning. You adopt a pixel creature, then every coin
