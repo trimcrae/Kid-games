@@ -1,5 +1,5 @@
 {
- "_about": "Real photographs for Photo Expedition's field guide. tools/fetch-expedition-photos.mjs searches Wikimedia Commons for FEATURED pictures (the community's best photographs, all free to use) — first inside the subject's own categories (cats, searched with deepcat:), then by search terms — and only accepts a picture whose title, description or categories match one of the `must` patterns, so a search for 'monal' can never come back with a fencing trophy. It saves the photos into games/photo-expedition/photos/ and writes photos/manifest.js with the photographer credit and licence for every one. Run by .github/workflows/fetch-expedition-photos.yml. Patterns in `must` are matched against the picture's title, object name and categories only (never the free-text description, which mentions all sorts); `also` patterns must match the whole text too. Entries are fetched in order and no picture is used twice, so the site landscapes come last. `not` patterns reject a picture (used to keep animals out of the landscape heroes, and flowers out of the baobab).",
+ "_about": "Real photographs for Photo Expedition's field guide. tools/fetch-expedition-photos.mjs searches Wikimedia Commons for FEATURED pictures (the community's best photographs, all free to use) — first inside the subject's own categories (cats, searched with deepcat:), then by search terms — and only accepts a picture whose title, description or categories match one of the `must` patterns, so a search for 'monal' can never come back with a fencing trophy. It saves the photos into games/photo-expedition/photos/ and writes photos/manifest.js with the photographer credit and licence for every one. Run by .github/workflows/fetch-expedition-photos.yml. Patterns in `must` are matched against the picture's title, object name and categories only (never the free-text description, which mentions all sorts); `also` patterns must match the whole text too. Entries are fetched in order and no picture is used twice, so the site landscapes come last. `not` patterns reject a picture (used to keep animals out of the landscape heroes, and flowers out of the baobab). `alsoStrong` patterns must match the title/categories (the landscape heroes need a landscape word there, so an albatross over an island is not a landscape).",
  "width": 1100,
  "entries": [
   {
@@ -679,8 +679,9 @@
   {
    "id": "site-serengeti",
    "cats": [
-    "Serengeti National Park",
-    "Serengeti"
+    "Landscapes of Serengeti National Park",
+    "Landscapes of Tanzania",
+    "Serengeti National Park"
    ],
    "must": [
     "Serengeti"
@@ -700,11 +701,15 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
    "id": "site-amazon",
    "cats": [
+    "Landscapes of the Amazon rainforest",
     "Amazon rainforest",
     "Amazon River"
    ],
@@ -724,6 +729,9 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
@@ -754,11 +762,15 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
    "id": "site-arctic",
    "cats": [
+    "Landscapes of Svalbard",
     "Svalbard",
     "Spitsbergen"
    ],
@@ -781,12 +793,16 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
    "id": "site-galapagos",
    "cats": [
     "Landscapes of the Galápagos Islands",
+    "Landscapes of Ecuador",
     "Galápagos Islands"
    ],
    "must": [
@@ -807,6 +823,9 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
@@ -833,6 +852,9 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
@@ -860,6 +882,9 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
@@ -884,14 +909,17 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   },
   {
    "id": "site-antarctica",
    "cats": [
+    "Landscapes of Antarctica",
     "Antarctica",
-    "Antarctic Peninsula",
-    "Icebergs of Antarctica"
+    "Antarctic Peninsula"
    ],
    "must": [
     "Antarctic"
@@ -909,6 +937,9 @@
     "\\b(birds?|sparrow|fulmar|kittiwake|gull|crab|seal|sea lion|bear|fox|monkey|fish|whale|penguin|insect|butterfly|beetle|lizard|iguana|tortoise|turtle|deer|antelope|zebra|elephant|lion|giraffe)\\b",
     "\\b(Aves|Mammalia|Reptilia|Actinopterygii|Insecta|Arthropoda|Decapoda|Passeriformes|Procellariiformes)\\b",
     "Passer|Fulmarus|Rissa|Grapsus|Zalophus|Sula|Amblyrhynchus"
+   ],
+   "alsoStrong": [
+    "Landscape|Panorama|Aerial|Glacier|Fjord|Plains?|Savanna|Dunes?|Reef|Mountain|Sunset|Sunrise|Valley|Volcano|Crater|Lava|Coast|Beach|Bay|Lagoon|Kopje|Ice|Desert|Oasis|Rainforest|Forest|River|Lake|Spring|Geyser"
    ]
   }
  ]

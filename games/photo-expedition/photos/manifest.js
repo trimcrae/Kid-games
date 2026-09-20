@@ -591,18 +591,6 @@ window.PHOTO_MANIFEST = {
   "width": 1100,
   "height": 731
  },
- "site-serengeti": {
-  "file": "site-serengeti.jpg",
-  "title": "MC Siedleragame.jpg",
-  "artist": "Christian Mehlführer, User:Chmehl",
-  "license": "CC BY 2.5",
-  "licenseUrl": "https://creativecommons.org/licenses/by/2.5",
-  "page": "https://commons.wikimedia.org/wiki/File:MC_Siedleragame.jpg",
-  "pool": "featured",
-  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Serengeti National Park\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
-  "width": 1100,
-  "height": 825
- },
  "site-reef": {
   "file": "site-reef.jpg",
   "title": "Heron Bommie SVII.jpg",
@@ -626,17 +614,5 @@ window.PHOTO_MANIFEST = {
   "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Svalbard\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
   "width": 1100,
   "height": 619
- },
- "site-galapagos": {
-  "file": "site-galapagos.jpg",
-  "title": "Waved Albatross in flight, Española Island 2.jpg",
-  "artist": "E bailey",
-  "license": "CC BY-SA 4.0",
-  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-  "page": "https://commons.wikimedia.org/wiki/File:Waved_Albatross_in_flight,_Espa%C3%B1ola_Island_2.jpg",
-  "pool": "featured",
-  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Galápagos Islands\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
-  "width": 1100,
-  "height": 733
  }
 };

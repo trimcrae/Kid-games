@@ -116,6 +116,7 @@ function reject(info, entry) {
   if (!(entry.must || []).some((m) => new RegExp(m, "i").test(strong))) return "no must match";
   if ((entry.not || []).some((m) => new RegExp(m, "i").test(strong))) return "not-pattern";
   if (!(entry.also || []).every((m) => new RegExp(m, "i").test(weak))) return "also-pattern";
+  if (!(entry.alsoStrong || []).every((m) => new RegExp(m, "i").test(strong))) return "no landscape word in title/categories";
   return "";
 }
 function acceptable(info, entry) { return reject(info, entry) === ""; }
