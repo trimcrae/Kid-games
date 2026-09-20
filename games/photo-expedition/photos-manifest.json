@@ -685,7 +685,14 @@
    "must": [
     "Serengeti"
    ],
-   "terms": [],
+   "terms": [
+    "Serengeti sunset",
+    "Serengeti plains",
+    "Serengeti landscape",
+    "Serengeti acacia",
+    "Serengeti kopje",
+    "Serengeti"
+   ],
    "kind": "landscape",
    "also": [
     "landscape|view|panorama|scenery|savanna|savannah|plain|dune|glacier|fjord|mountain|reef|forest|rainforest|river|sunset|sunrise|aerial|island|valley|lake|ice|coast|beach|peak|desert|spring|park"
