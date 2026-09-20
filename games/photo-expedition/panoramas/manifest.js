@@ -10,5 +10,45 @@ window.PANORAMA_MANIFEST = {
   "page": "https://commons.wikimedia.org/wiki/File:Heron_Bommie_SVII.jpg",
   "width": 4096,
   "height": 2048
+ },
+ "amazon": {
+  "file": "amazon.jpg",
+  "title": "Rainforest trail - Panorama (Dimitrios Savva and Jarod Guest via Poly Haven).jpg",
+  "artist": "Dimitrios Savva (Photography), https://polyhaven.com/all?a=Dimitrios%20Savva , https://web.archive.org/web/2023062320191",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "page": "https://commons.wikimedia.org/wiki/File:Rainforest_trail_-_Panorama_(Dimitrios_Savva_and_Jarod_Guest_via_Poly_Haven).jpg",
+  "width": 4096,
+  "height": 2048
+ },
+ "arctic": {
+  "file": "arctic.jpg",
+  "title": "MK04463-72 Athabasca Glacier Icefields Parkway (Jasper NP) spherical.jpg",
+  "artist": "Martin Kraft",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "page": "https://commons.wikimedia.org/wiki/File:MK04463-72_Athabasca_Glacier_Icefields_Parkway_(Jasper_NP)_spherical.jpg",
+  "width": 4096,
+  "height": 2048
+ },
+ "sahara": {
+  "file": "sahara.jpg",
+  "title": "Night Panorama in Wadi Rum.jpg",
+  "artist": "Faraheed",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Night_Panorama_in_Wadi_Rum.jpg",
+  "width": 4096,
+  "height": 2048
+ },
+ "antarctica": {
+  "file": "antarctica.jpg",
+  "title": "African penguin colony, Simons Town, 360 degrees.jpg",
+  "artist": "Discott",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:African_penguin_colony,_Simons_Town,_360_degrees.jpg",
+  "width": 4096,
+  "height": 2048
  }
 };
