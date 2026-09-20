@@ -269,7 +269,7 @@ const WorldMap = (function () {
       ctx.font = "bold 12px " + getComputedStyle(document.body).fontFamily;
       const label = s.name.replace(/^The /, "");
       const tw = ctx.measureText(label).width + 12;
-      const ly = y + PIN_R + 12;
+      const ly = s.lat < -70 ? y - PIN_R - 12 : y + PIN_R + 12;   // Antarctica's label goes above its pin
       ctx.fillStyle = "rgba(20,24,30,0.78)";
       roundRect(ctx, x - tw / 2, ly - 9, tw, 18, 9); ctx.fill();
       ctx.fillStyle = "#fff"; ctx.fillText(label, x, ly);

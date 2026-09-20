@@ -93,6 +93,13 @@ const SPECIES = {
   humpback:  { rig: "fish", shape: "whale", len: 14, colour: "#2a2f38", belly: "#c8ccd0", speed: 3, flee: 3, alert: 10, herd: 1, habitat: "sea", breach: true, rare: true }
 };
 
+/* a little lumpiness for manes and shaggy things */
+function bumpyGeo(THREE, geo, amount) {
+  const p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const n = Math.sin(x * 9.1) * Math.cos(y * 7.3 + z * 5.7); p.setXYZ(i, x * (1 + n * amount), y * (1 + n * amount), z * (1 + n * amount)); }
+  geo.computeVertexNormals(); return geo;
+}
+
 /* ---------------- builders ---------------- */
 export function makeCreature(THREE, id) {
   const S = SPECIES[id];
@@ -109,7 +116,7 @@ export function makeCreature(THREE, id) {
 
   if (S.rig === "quad") {
     const bodyY = S.sh * 0.72;
-    const body = M(new THREE.SphereGeometry(1, 14, 10), skin, 0, bodyY, 0);
+    const body = M(new THREE.SphereGeometry(1, 20, 14), skin, 0, bodyY, 0);
     body.scale.set(S.w, S.sh * 0.34, S.len * 0.5);
     g.add(body);
     if (S.belly) { const b = M(new THREE.SphereGeometry(1, 10, 8), std({ color: S.belly }), 0, bodyY - S.sh * 0.1, 0); b.scale.set(S.w * 0.82, S.sh * 0.3, S.len * 0.42); g.add(b); }
@@ -142,7 +149,7 @@ export function makeCreature(THREE, id) {
       if (S.bigEars) e.scale.set(0.25, 1.3, 1); else e.rotation.z = -sx * 0.35;
       head.add(e);
     }
-    if (S.mane) { const mane = M(new THREE.SphereGeometry(S.head * 1.9, 12, 9), std({ color: "#7a4a1e", flatShading: true }), 0, -S.head * 0.2, -S.head * 0.6); mane.scale.set(1, 1.1, 0.9); head.add(mane); }
+    if (S.mane) { const mane = M(bumpyGeo(THREE, new THREE.SphereGeometry(S.head * 1.35, 14, 10), 0.12), std({ color: "#7a4a1e" }), 0, -S.head * 0.15, -S.head * 0.55); mane.scale.set(1, 1.05, 0.85); head.add(mane); }
     if (S.maneRidge) { const r = M(new THREE.BoxGeometry(0.06, 0.22, nl), dark, 0, nl / 2 + S.head * 0.6, 0); neck.add(r); }
     if (S.beard) { const b = M(new THREE.SphereGeometry(S.head * 0.6, 8, 6), skin, 0, -S.head * 0.8, S.head * 0.3); b.scale.set(0.8, 1.4, 0.9); head.add(b); }
     if (S.trunk) {
@@ -500,7 +507,7 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
       if (cr.target && cr.state !== "graze") {
         const sp = S.speed * (cr.state === "flee" ? S.flee / S.speed : 1);
         moving = steer(cr, cr.target, sp, dt, cr.state === "flee" ? 3 : 1.5, true);
-        if (cr.pos.distanceTo(cr.target) < 1.5) { cr.target = null; if (cr.state !== "flee") cr.timer = Math.min(cr.timer, 0.5); }
+        if (cr.target && cr.pos.distanceTo(cr.target) < 1.5) { cr.target = null; if (cr.state !== "flee") cr.timer = Math.min(cr.timer, 0.5); }
       }
       const gy = world.heightAt(cr.pos.x, cr.pos.z);
       cr.group.position.set(cr.pos.x, Math.max(gy, world.waterLevel - (S.rig === "blob" ? 0.3 : 0)), cr.pos.z);

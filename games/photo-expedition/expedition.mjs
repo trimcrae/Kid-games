@@ -52,8 +52,14 @@ export async function startExpedition(opts) {
     yaw: Math.PI, pitch: 0, sneak: false, run: false, swimY: 0,
     vel: new THREE.Vector3(), speedNow: 0, turnNow: 0
   };
-  // face the middle of the map to start
-  player.yaw = Math.atan2(-player.pos.x, -player.pos.z);
+  // start on dry land (the biome recipe's spawn is a wish, the noise decides), facing the middle of the map
+  if (!world.underwater && world.heightAt(player.pos.x, player.pos.z) < world.waterLevel + 0.6) {
+    outer: for (let r = 6; r < 200; r += 6) for (let a = 0; a < Math.PI * 2; a += 0.4) {
+      const x = player.pos.x + Math.cos(a) * r, z = player.pos.z + Math.sin(a) * r;
+      if (Math.abs(x) < 220 && Math.abs(z) < 220 && world.heightAt(x, z) > world.waterLevel + 0.8 && world.slopeAt(x, z) < 0.5) { player.pos.set(x, 0, z); break outer; }
+    }
+  }
+  player.yaw = Math.atan2(player.pos.x, player.pos.z);
   if (world.underwater) player.swimY = world.waterLevel - 6;
   const EYE = 1.6, EYE_SNEAK = 0.9;
   let focal = 35, camMode = false, clock = 0.08, t = 0, running = true, last = performance.now();
@@ -212,13 +218,13 @@ export async function startExpedition(opts) {
     if (treasureFound) { const [x, y] = toXY(treasurePos.x, treasurePos.z); ctx.fillText(site.treasure.emoji, x, y); }
     // player
     const [px2, py2] = toXY(player.pos.x, player.pos.z);
-    ctx.save(); ctx.translate(px2, py2); ctx.rotate(-player.yaw + Math.PI);
+    ctx.save(); ctx.translate(px2, py2); ctx.rotate(-player.yaw);
     ctx.fillStyle = "#ff4d6d"; ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
     const r = full ? 12 : 7;
     ctx.beginPath(); ctx.moveTo(0, -r * 1.4); ctx.lineTo(r, r); ctx.lineTo(0, r * 0.4); ctx.lineTo(-r, r); ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.restore();
-    // north arrow
-    ctx.fillStyle = "#fff"; ctx.font = "bold " + (full ? 16 : 10) + "px system-ui, sans-serif"; ctx.fillText("N ↑", w - (full ? 24 : 14), full ? 12 : 8);
+    // north arrow, tucked into the bottom-right square
+    ctx.fillStyle = "#fff"; ctx.font = "bold " + (full ? 16 : 10) + "px system-ui, sans-serif"; ctx.fillText("N ↑", w - (full ? 22 : 12), w - (full ? 14 : 8));
   }
   function drawBigMap() {
     const s = Math.min(big.parentElement.clientWidth - 8, 520);
@@ -234,7 +240,7 @@ export async function startExpedition(opts) {
     drawBigMap(); $("bigmap-you").textContent = "Waypoint set in square " + gridRef(waypoint.x, waypoint.z) + ". The compass will point to it.";
   });
   function gridRef(x, z) { const c = Math.max(0, Math.min(GRID - 1, Math.floor((x + SIZE / 2) / CELL))), r = Math.max(0, Math.min(GRID - 1, Math.floor((z + SIZE / 2) / CELL))); return "ABCDEFGH"[c] + (r + 1); }
-  function headingDeg() { let d = (-player.yaw * 180 / Math.PI + 180) % 360; if (d < 0) d += 360; return d; }
+  function headingDeg() { let d = (-player.yaw * 180 / Math.PI) % 360; if (d < 0) d += 360; return d; }
   function compassName(d) { return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(d / 45) % 8]; }
 
   /* ---------- HUD tasks ---------- */
@@ -243,7 +249,7 @@ export async function startExpedition(opts) {
       const s = SUBJECTS[id], b = best[id] || 0; const done = b >= tier.passStars;
       return `<li class="${done ? "done" : ""}"><span>${s.emoji}</span> ${s.name} <b>${b ? "★".repeat(b) : ""}</b></li>`;
     });
-    rows.push(`<li class="${treasureFound ? "done" : ""}"><span>${site.treasure.emoji}</span> ${site.treasure.name}</li>`);
+    rows.push(`<li class="${treasureFound ? "done" : ""}"><span>${site.treasure.emoji}</span> Treasure</li>`);
     hudTasks.innerHTML = rows.join("");
   }
   renderTasks();
@@ -261,6 +267,7 @@ export async function startExpedition(opts) {
       const dot = toS.clone().normalize().dot(fwd); if (dot < 0.2) return;
       ndc.copy(pos).project(camera);
       const sizeFrac = (height / (dist * tanH)) / 2;               // fraction of frame height
+      if (sizeFrac < 0.015 && obj.kindOf !== "sky") return;          // a speck is not a subject
       const rx = (radius / (dist * tanH)) / camera.aspect, ry = sizeFrac / 2;
       if (Math.abs(ndc.x) > 1 + rx || Math.abs(ndc.y) > 1 + ry) return;
       // is a hill in the way?
@@ -396,7 +403,7 @@ export async function startExpedition(opts) {
   function showShot(photo) {
     const card = $("shot-card");
     $("shot-img").src = photo.img;
-    $("shot-title").textContent = (photo.info ? photo.info.emoji + " " : "🏞️ ") + photo.label;
+    $("shot-title").textContent = (photo.subject && SUBJECTS[photo.subject] ? SUBJECTS[photo.subject].emoji + " " : "🏞️ ") + photo.label;
     $("shot-stars").textContent = "★".repeat(photo.stars) + "☆".repeat(5 - photo.stars);
     $("shot-score").textContent = photo.score + " / 100";
     $("shot-good").innerHTML = photo.good.map((n) => `<li>✅ ${n}</li>`).join("");

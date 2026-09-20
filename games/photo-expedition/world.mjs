@@ -255,26 +255,42 @@ function noiseTexture(THREE, size, base, spread, seed) {
   const g = c.getContext("2d"); const img = g.createImageData(size, size);
   const N = makeNoise(seed || 5);
   for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
-    // tileable by sampling on a torus
-    const a = (x / size) * Math.PI * 2, b = (y / size) * Math.PI * 2;
-    const n = N.fbm(Math.cos(a) * 3 + 10, Math.sin(a) * 3 + Math.cos(b) * 3, 3) * 0.5 + N.fbm(Math.sin(b) * 5, Math.cos(a) * 5 + 30, 4) * 0.5;
+    // three octaves of grit: pebbles, clumps and broad patches
+    const n = N.fbm(x / 7 + 3, y / 7 + 9, 3) * 0.45 + N.fbm(x / 23 + 40, y / 23, 3) * 0.35 + N.fbm(x / 61, y / 61 + 70, 2) * 0.2;
     const v = Math.max(0, Math.min(255, base + n * spread));
     const i = (y * size + x) * 4; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255;
   }
   g.putImageData(img, 0, 0);
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace;
+  // mirrored repeat makes any texture seamless, so no torus tricks are needed
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.MirroredRepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+/* leafy canopy texture: blotches of darker and lighter green on a base */
+function leafBlotchTexture(THREE, base, dark, light, seed) {
+  const c = document.createElement("canvas"); c.width = c.height = 256;
+  const g = c.getContext("2d");
+  let s = seed || 9; const rnd = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+  g.fillStyle = base; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 260; i++) {
+    g.fillStyle = rnd() < 0.5 ? dark : light; g.globalAlpha = 0.35 + rnd() * 0.4;
+    const x = rnd() * 256, y = rnd() * 256, r = 6 + rnd() * 16;
+    g.beginPath(); g.ellipse(x, y, r, r * (0.5 + rnd() * 0.5), rnd() * 3, 0, Math.PI * 2); g.fill();
+  }
+  g.globalAlpha = 1;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.MirroredRepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; t.repeat.set(2, 2);
   return t;
 }
 function grassBladeTexture(THREE) {
   const c = document.createElement("canvas"); c.width = 64; c.height = 128;
   const g = c.getContext("2d");
   g.clearRect(0, 0, 64, 128);
-  for (let i = 0; i < 7; i++) {
-    const x = 8 + i * 8, lean = (i - 3) * 6, h = 60 + Math.random() * 60;
-    g.strokeStyle = "rgba(255,255,255,1)"; g.lineWidth = 3 + Math.random() * 2; g.lineCap = "round";
-    g.beginPath(); g.moveTo(x, 128); g.quadraticCurveTo(x + lean * 0.4, 128 - h * 0.6, x + lean, 128 - h); g.stroke();
+  for (let i = 0; i < 11; i++) {
+    const x = 5 + i * 5.4, lean = (i - 5) * 4 + (Math.random() - 0.5) * 6, h = 55 + Math.random() * 70;
+    const grad = g.createLinearGradient(0, 128, 0, 128 - h); grad.addColorStop(0, "rgba(120,120,120,1)"); grad.addColorStop(1, "rgba(255,255,255,1)");
+    g.strokeStyle = grad; g.lineWidth = 1.6 + Math.random() * 1.4; g.lineCap = "round";
+    g.beginPath(); g.moveTo(x, 128); g.quadraticCurveTo(x + lean * 0.3, 128 - h * 0.55, x + lean, 128 - h); g.stroke();
   }
-  const t = new THREE.CanvasTexture(c); return t;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 function leafTexture(THREE, fill) {
   const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -350,8 +366,8 @@ export function buildWorld(THREE, site, quality) {
       return B.colour(B.colours, y, slopeAt(x, z), x, z, n);
     });
   }
-  const detail = noiseTexture(THREE, 256, 205, 60, B.seed);
-  detail.repeat.set(90, 90);
+  const detail = noiseTexture(THREE, 512, 190, 95, B.seed);
+  detail.repeat.set(70, 70);
   const tmat = new THREE.MeshStandardMaterial({ vertexColors: true, map: detail, roughness: 0.95, metalness: 0 });
   const terrain = new THREE.Mesh(tgeo, tmat);
   terrain.receiveShadow = true; terrain.castShadow = false;
@@ -370,10 +386,11 @@ export function buildWorld(THREE, site, quality) {
         const a = (i / n) * Math.PI * 2 + N.rnd() * 0.2;
         if (site.biome === "volcanic") break;
         const h = (B.peaks ? 180 : 60) * (0.5 + N.rnd()), r = 60 + N.rnd() * 90;
-        const g = bumpy(THREE, new THREE.ConeGeometry(r, h, 7, 3), 0.18, i + 9);
+        const g = bumpy(THREE, new THREE.ConeGeometry(r, h, 9, 5), 0.28, i + 9);
         paintVertexColours(THREE, g, (x, y) => (y > h * 0.1 ? [0.95, 0.96, 1] : [0.45, 0.44, 0.44]));
         const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }));
         m.position.set(Math.cos(a) * R * (0.9 + N.rnd() * 0.5), h / 2 - 10, Math.sin(a) * R * (0.9 + N.rnd() * 0.5));
+        m.scale.set(1 + N.rnd() * 1.4, 1, 1 + N.rnd() * 1.4); m.rotation.y = N.rnd() * Math.PI;
         ring.add(m);
       }
       group.add(ring);
@@ -453,11 +470,11 @@ export function buildWorld(THREE, site, quality) {
   }
   // grass tufts: cheap crossed planes, in enormous numbers
   if (B.grass) {
-    const count = Math.round(B.grass * q);
+    const count = Math.round(B.grass * 1.6 * q);
     const tex = grassBladeTexture(THREE);
     const gc = B.grassColour;
-    const gmat = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(gc[0], gc[1], gc[2]), transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 1 });
-    const g1 = new THREE.PlaneGeometry(1.6, 1.1); g1.translate(0, 0.5, 0);
+    const gmat = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(gc[0], gc[1], gc[2]), transparent: true, alphaTest: 0.4, side: THREE.DoubleSide, roughness: 1 });
+    const g1 = new THREE.PlaneGeometry(1.1, 0.85); g1.translate(0, 0.4, 0);
     const g2 = g1.clone(); g2.rotateY(Math.PI / 2);
     const im1 = new THREE.InstancedMesh(g1, gmat, count), im2 = new THREE.InstancedMesh(g2, gmat, count);
     im1.frustumCulled = im2.frustumCulled = false;
@@ -470,8 +487,8 @@ export function buildWorld(THREE, site, quality) {
       if (h < waterLevel + 0.3 || slopeAt(x, z) > 0.6) continue;
       if (site.biome === "mountain" && h > 55) continue;
       if (site.biome === "volcanic" && (h < 4 || h > 30)) continue;
-      const s = 0.7 + N.rnd() * 0.8;
-      rot.set(0, N.rnd() * Math.PI, 0); quat.setFromEuler(rot); pos.set(x, h - 0.05, z); scl.set(s, s * (0.8 + N.rnd() * 0.5), s);
+      const s = 0.55 + N.rnd() * 0.7;
+      rot.set(0, N.rnd() * Math.PI, 0); quat.setFromEuler(rot); pos.set(x, h - 0.05, z); scl.set(s, s * (0.8 + N.rnd() * 0.6), s);
       m.compose(pos, quat, scl); im1.setMatrixAt(n, m); im2.setMatrixAt(n, m); n++;
     }
     im1.count = im2.count = n; group.add(im1); group.add(im2);
@@ -668,6 +685,13 @@ function buildClouds(THREE, N, B) {
   };
 }
 
+function dotTexture(THREE) {
+  const c = document.createElement("canvas"); c.width = c.height = 32; const g = c.getContext("2d");
+  const rg = g.createRadialGradient(16, 16, 0, 16, 16, 16); rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(0.5, "rgba(255,255,255,0.6)"); rg.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = rg; g.fillRect(0, 0, 32, 32);
+  return new THREE.CanvasTexture(c);
+}
+
 function buildParticles(THREE, B, site) {
   let kind = null;
   if (B.underwater) kind = "bubbles"; else if (site.biome === "arctic" || site.biome === "antarctic" || site.biome === "mountain") kind = "snow"; else if (site.biome === "rainforest") kind = "fireflies";
@@ -677,7 +701,7 @@ function buildParticles(THREE, B, site) {
   const pos = new Float32Array(n * 3), vel = new Float32Array(n);
   for (let i = 0; i < n; i++) { pos[i * 3] = (Math.random() - 0.5) * 80; pos[i * 3 + 1] = Math.random() * 30; pos[i * 3 + 2] = (Math.random() - 0.5) * 80; vel[i] = 0.5 + Math.random(); }
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({ size: kind === "fireflies" ? 0.5 : 0.35, color: kind === "fireflies" ? 0xffe066 : 0xffffff, transparent: true, opacity: kind === "bubbles" ? 0.5 : 0.85, sizeAttenuation: true, depthWrite: false });
+  const mat = new THREE.PointsMaterial({ size: kind === "fireflies" ? 0.5 : 0.35, color: kind === "fireflies" ? 0xffe066 : 0xffffff, transparent: true, opacity: kind === "bubbles" ? 0.5 : 0.85, sizeAttenuation: true, depthWrite: false, map: dotTexture(THREE) });
   const points = new THREE.Points(geo, mat);
   points.frustumCulled = false;
   return {
@@ -715,14 +739,17 @@ function makeScatterLibrary(THREE, B, site) {
   // acacia: thin trunk, flat-topped umbrella of leaves
   {
     const trunk = new THREE.CylinderGeometry(0.22, 0.45, 5.5, 6); trunk.translate(0, 2.7, 0);
-    const canopy = new THREE.SphereGeometry(4.2, 9, 6); canopy.scale(1, 0.32, 1); canopy.translate(0, 6.2, 0);
-    bumpy(THREE, canopy, 0.12, 4);
-    lib.acacia = { parts: [{ geo: trunk, mat: bark }, { geo: canopy, mat: std({ color: 0x4f6b2a, flatShading: true }) }], scale: [0.7, 1.5], spacing: 9, collide: 0.6 };
+    const canopy = new THREE.SphereGeometry(4.2, 14, 9); canopy.scale(1, 0.3, 1); canopy.translate(0, 6.2, 0);
+    bumpy(THREE, canopy, 0.14, 4);
+    const c2 = new THREE.SphereGeometry(2.6, 12, 8); c2.scale(1, 0.32, 1); c2.translate(1.8, 5.2, 1.2); bumpy(THREE, c2, 0.14, 5);
+    const b1 = new THREE.CylinderGeometry(0.08, 0.16, 3.2, 5); b1.translate(0, 1.6, 0); b1.rotateZ(0.7); b1.translate(0.3, 4.2, 0);
+    const b2 = b1.clone(); b2.rotateY(2.2);
+    lib.acacia = { parts: [{ geo: mergeGeos(THREE, [trunk, b1, b2]), mat: bark }, { geo: mergeGeos(THREE, [canopy, c2]), mat: std({ map: leafBlotchTexture(THREE, "#5a7a2e", "#3a5a1e", "#8aa040", 4), roughness: 0.9 }) }], scale: [0.7, 1.5], spacing: 9, collide: 0.6 };
   }
   // bush
   {
-    const g = bumpy(THREE, new THREE.SphereGeometry(1.2, 7, 5), 0.2, 8); g.scale(1.3, 0.8, 1.3); g.translate(0, 0.7, 0);
-    lib.bush = { parts: [{ geo: g, mat: std({ color: site.biome === "volcanic" ? 0x5f6b3a : 0x6b7d3a, flatShading: true }) }], scale: [0.6, 1.6], spacing: 3, shadow: true };
+    const g = bumpy(THREE, new THREE.SphereGeometry(1.2, 10, 7), 0.28, 8); g.scale(1.3, 0.8, 1.3); g.translate(0, 0.7, 0);
+    lib.bush = { parts: [{ geo: g, mat: std({ map: leafBlotchTexture(THREE, site.biome === "volcanic" ? "#5f6b3a" : "#6b7d3a", "#3f4a20", "#8a9a4a", 8), roughness: 0.95 }) }], scale: [0.6, 1.6], spacing: 3, shadow: true };
   }
   // rock
   {
@@ -741,15 +768,17 @@ function makeScatterLibrary(THREE, B, site) {
     const c1 = new THREE.ConeGeometry(2.6, 5, 7); c1.translate(0, 5, 0);
     const c2 = new THREE.ConeGeometry(2, 4.5, 7); c2.translate(0, 8, 0);
     const c3 = new THREE.ConeGeometry(1.3, 3.5, 7); c3.translate(0, 10.6, 0);
-    const green = std({ color: site.biome === "mountain" ? 0x2f4a2a : 0x2b5a30, flatShading: true });
+    const green = std({ map: leafBlotchTexture(THREE, site.biome === "mountain" ? "#2f4a2a" : "#2b5a30", "#1a2e18", "#4a7a3a", 31), roughness: 0.95 });
     lib.pine = { parts: [{ geo: trunk, mat: bark }, { geo: c1, mat: green }, { geo: c2, mat: green }, { geo: c3, mat: green }], scale: [0.7, 1.7], spacing: 5, collide: 0.5,
       where: (x, z, h, s) => site.biome === "mountain" ? (h < 50 && s < 0.6) : (site.biome === "yellowstone" ? (z < -40 || h > 12 || (x > 120 && z > 100)) : true) };
   }
   // kapok / rainforest giant: buttress trunk and a big leafy crown of planes
   {
     const trunk = new THREE.CylinderGeometry(0.5, 1.4, 14, 7); trunk.translate(0, 7, 0);
-    const crown = bumpy(THREE, new THREE.SphereGeometry(6, 9, 7), 0.22, 21); crown.scale(1, 0.7, 1); crown.translate(0, 15, 0);
-    lib.kapok = { parts: [{ geo: trunk, mat: std({ color: 0x4c3a2a }) }, { geo: crown, mat: std({ color: 0x2f6b25, flatShading: true }) }], scale: [0.8, 1.6], spacing: 10, collide: 1.2,
+    const crown = bumpy(THREE, new THREE.SphereGeometry(6, 14, 10), 0.24, 21); crown.scale(1, 0.7, 1); crown.translate(0, 15, 0);
+    const crown2 = bumpy(THREE, new THREE.SphereGeometry(4, 12, 8), 0.24, 22); crown2.translate(3.5, 12, 2);
+    const crown3 = bumpy(THREE, new THREE.SphereGeometry(3.5, 12, 8), 0.24, 23); crown3.translate(-3.5, 13, -2.5);
+    lib.kapok = { parts: [{ geo: trunk, mat: std({ color: 0x4c3a2a }) }, { geo: mergeGeos(THREE, [crown, crown2, crown3]), mat: std({ map: leafBlotchTexture(THREE, "#2f6b25", "#1e4a18", "#4f9a35", 21), roughness: 0.9 }) }], scale: [0.8, 1.6], spacing: 10, collide: 1.2,
       where: (x, z, h) => h > 2.5 };
   }
   // palm
@@ -895,7 +924,7 @@ function buildLandmark(THREE, id, site, N) {
     // the eruption: a column of white particles that rises every so often
     const n = 400, geo = new THREE.BufferGeometry(), pos = new Float32Array(n * 3);
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 1.6, transparent: true, opacity: 0.85, depthWrite: false }));
+    const pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xffffff, size: 2.2, transparent: true, opacity: 0.8, depthWrite: false, map: dotTexture(THREE) }));
     pts.frustumCulled = false; g.add(pts);
     const state = { active: false, phase: 0 };
     const period = 150, dur = 24;
