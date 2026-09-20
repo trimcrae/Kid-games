@@ -614,5 +614,29 @@ window.PHOTO_MANIFEST = {
   "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Svalbard\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
   "width": 1100,
   "height": 619
+ },
+ "site-serengeti": {
+  "file": "site-serengeti.jpg",
+  "title": "Mwanza flat-headed rock agamas (Agama mwanzae) Serengeti.jpg",
+  "artist": "Charles J. Sharp",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mwanza_flat-headed_rock_agamas_(Agama_mwanzae)_Serengeti.jpg",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Serengeti National Park\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 733
+ },
+ "site-galapagos": {
+  "file": "site-galapagos.jpg",
+  "title": "Lagartija de lava de Galápagos (Microlophus albemarlensis), isla Santa Cruz, islas Galápagos, Ecuador, 2015-07-26, DD 19.JPG",
+  "artist": "Diego Delso",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Lagartija_de_lava_de_Gal%C3%A1pagos_(Microlophus_albemarlensis),_isla_Santa_Cruz,_islas_Gal%C3%A1pagos,_Ecuador,_2015-07-26,_DD_19.JPG",
+  "pool": "featured",
+  "term": "incategory:\"Featured pictures on Wikimedia Commons\" deepcat:\"Landscapes of Ecuador\" -skull -skeleton -taxidermy -carcass -stuffed -statue -painting -engraving",
+  "width": 1100,
+  "height": 574
  }
 };
