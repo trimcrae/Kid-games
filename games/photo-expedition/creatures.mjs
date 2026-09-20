@@ -366,8 +366,8 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
   }
   function pickSpot(kind, near, r) {
     for (let i = 0; i < 60; i++) {
-      const x = near ? near.x + (N.rnd() - 0.5) * 2 * r : (N.rnd() - 0.5) * 440;
-      const z = near ? near.z + (N.rnd() - 0.5) * 2 * r : (N.rnd() - 0.5) * 440;
+      const x = near && r ? near.x + (N.rnd() - 0.5) * 2 * r : (N.rnd() - 0.5) * 440;
+      const z = near && r ? near.z + (N.rnd() - 0.5) * 2 * r : (N.rnd() - 0.5) * 440;
       if (habitatOK(kind, x, z)) return new THREE.Vector3(x, 0, z);
     }
     return null;
@@ -505,7 +505,10 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
           else {
             cr.state = "wander"; cr.timer = 4 + N.rnd() * 8;
             const near = cr.leader && cr.leader !== cr ? cr.leader.pos : cr.home;
-            cr.target = pickSpot(S.habitat, near, cr.leader && cr.leader !== cr ? 10 : 45);
+            // now and then the herd leader walks the herd down to the water to drink
+            const thirsty = !world.underwater && world.waterLevel > -3 && (!cr.leader || cr.leader === cr) && S.rig === "quad" && r > 1 - 0.18;
+            cr.target = (thirsty && pickSpot("riverbank", null, 0)) || pickSpot(S.habitat, near, cr.leader && cr.leader !== cr ? 10 : 45);
+            if (thirsty && cr.target) cr.timer = 14 + N.rnd() * 10;
           }
         }
       }
