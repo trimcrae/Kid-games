@@ -373,11 +373,11 @@ export async function startExpedition(opts) {
     if (!camMode || t - lastShotAt < 0.6) return;
     lastShotAt = t;
     renderer.render(world.scene, camera);
-    const W = 900, H = Math.round(900 / camera.aspect);
+    const W = 720, H = Math.round(720 / camera.aspect);
     shotCanvas.width = W; shotCanvas.height = H;
     const g = shotCanvas.getContext("2d");
     g.drawImage(renderer.domElement, 0, 0, W, H);
-    const dataUrl = shotCanvas.toDataURL("image/jpeg", 0.82);
+    const dataUrl = shotCanvas.toDataURL("image/jpeg", 0.8);
     const result = scoreShot();
     shots++;
     const photo = {

@@ -15,7 +15,7 @@
 (function () {
   "use strict";
   const SAVE_KEY = "photo-expedition.v1";
-  const MAX_PHOTOS = 48;
+  const MAX_PHOTOS = 40;   // ~60 KB each, well inside localStorage
   const $ = (id) => document.getElementById(id);
 
   let save = load();
