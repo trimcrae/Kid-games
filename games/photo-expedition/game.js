@@ -74,6 +74,7 @@
   function show(id) {
     document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("show", s.id === id));
     window.scrollTo(0, 0);
+    WorldMap.setActive(id === "s-map");
     if (id === "s-map") { WorldMap.refresh(); refreshMapState(); }
   }
 

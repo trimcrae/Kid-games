@@ -25,7 +25,7 @@ const WorldMap = (function () {
   let W = 0, H = 0;            // css pixels
   let state = { unlocked: new Set(), stars: {}, done: new Set(), current: null, route: [], question: null, hover: null };
   let opts = {};
-  let raf = 0, t0 = performance.now();
+  let raf = 0, active = false, t0 = performance.now();
   let rings = null;            // decoded [[lon,lat],...] rings
 
   const PIN_R = 18;
@@ -111,7 +111,7 @@ const WorldMap = (function () {
       r += (tr - r) * w; g += (tg - g) * w; b += (tb - b) * w;
     }
     const shade = 0.82 + n * 0.36;
-    return "rgb(" + (r * shade | 0) + "," + (g * shade | 0) + "," + (b * shade | 0) + ")";
+    return [r * shade | 0, g * shade | 0, b * shade | 0];
   }
 
   /* ---- build the base map once ---- */
@@ -147,17 +147,26 @@ const WorldMap = (function () {
     }
     // continental shelf glow
     c.save(); c.shadowColor = "rgba(190,230,255,0.9)"; c.shadowBlur = 10; c.fillStyle = "#7fb9d6"; c.fill(path); c.restore();
-    // land, painted as tinted tiles clipped to the coastline
-    c.save(); c.clip(path);
+    // Paint climate tiles into a small bitmap first, then clip ONE image to
+    // the coastline. Thousands of separate fills under this complex clip
+    // can exhaust the browser's graphics process on otherwise capable PCs.
     const cell = 4;
-    for (let y = 0; y < H; y += cell) {
-      for (let x = 0; x < W; x += cell) {
+    const climate = document.createElement("canvas");
+    climate.width = Math.ceil(W / cell); climate.height = Math.ceil(H / cell);
+    const climateCtx = climate.getContext("2d");
+    const pixels = climateCtx.createImageData(climate.width, climate.height);
+    for (let row = 0; row < climate.height; row++) {
+      for (let col = 0; col < climate.width; col++) {
+        const x = col * cell, y = row * cell;
         const [lon, lat] = xyToLonLat(x + cell / 2, y + cell / 2);
         const n = noise(x / 9, y / 9) * 0.6 + noise(x / 33, y / 33) * 0.4;
-        c.fillStyle = tintFor(lon, lat, n);
-        c.fillRect(x, y, cell + 0.5, cell + 0.5);
+        const rgb = tintFor(lon, lat, n), i = (row * climate.width + col) * 4;
+        pixels.data[i] = rgb[0]; pixels.data[i + 1] = rgb[1]; pixels.data[i + 2] = rgb[2]; pixels.data[i + 3] = 255;
       }
     }
+    climateCtx.putImageData(pixels, 0, 0);
+    c.save(); c.clip(path); c.imageSmoothingEnabled = false;
+    c.drawImage(climate, 0, 0, climate.width * cell, climate.height * cell);
     c.restore();
     c.strokeStyle = "rgba(40,60,50,0.55)"; c.lineWidth = 0.8; c.stroke(path);
 
@@ -202,7 +211,8 @@ const WorldMap = (function () {
 
   /* ---- overlay drawing ---- */
   function draw() {
-    if (!ctx) return;
+    raf = 0;
+    if (!ctx || !active || document.hidden) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     if (atlas) ctx.drawImage(atlas, 0, 0, W, H);
@@ -349,12 +359,20 @@ const WorldMap = (function () {
     canvas = el; ctx = canvas.getContext("2d"); opts = o || {};
     canvas.addEventListener("click", onClick);
     canvas.addEventListener("mousemove", onMove);
-    window.addEventListener("resize", () => { if (canvas.isConnected && canvas.offsetParent) resize(); });
-    resize();
-    cancelAnimationFrame(raf); draw();
+    window.addEventListener("resize", () => { if (active && !document.hidden) refresh(); });
+    document.addEventListener("visibilitychange", () => setActive(active));
+    // The photographer picker needs no atlas or animation. Build the map
+    // only once it is visible, and stop it when entering a 3D expedition.
+    setActive(false);
   }
   function setState(s) { Object.assign(state, s); }
   function refresh() { if (canvas && canvas.offsetParent) { const w = canvas.parentElement.getBoundingClientRect().width; if (Math.max(720, Math.floor(w)) !== W) resize(); } }
 
-  return { init, setState, refresh, lonLatToXY, xyToLonLat, distanceKm, continentAt, fmtCoord, siteById };
+  function setActive(value) {
+    active = value;
+    cancelAnimationFrame(raf); raf = 0;
+    if (active && !document.hidden) { refresh(); draw(); }
+  }
+
+  return { init, setState, setActive, refresh, lonLatToXY, xyToLonLat, distanceKm, continentAt, fmtCoord, siteById };
 })();
