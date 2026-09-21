@@ -622,12 +622,31 @@ function buildSky(THREE, B) {
         col += sunCol * (disc * 2.5 + glow) * (1.0 - night) * (1.0 - underwater*0.7);
         // ground haze below the horizon
         col = mix(col, horizon, smoothstep(0.0, -0.15, d.y) * 0.7);
-        // stars
+        // stars: an equal-angle grid over the sky dome, one small round
+        // point per cell, each with its own size, tint, twinkle phase and
+        // speed so they shimmer independently instead of pulsing in unison
         if (night > 0.05 && d.y > 0.0) {
-          vec2 sp = d.xz / (d.y + 0.2) * 60.0;
-          float s = hash(floor(sp));
-          float star = step(0.995, s) * (0.5 + 0.5 * sin(time * 2.0 + s * 60.0)) * smoothstep(0.0, 0.3, d.y);
-          col += vec3(star) * night;
+          float el = asin(clamp(d.y, 0.0, 1.0));
+          float az = atan(d.x, d.z);
+          float rowf = el * 40.0;
+          float row = floor(rowf);
+          float cols = max(6.0, floor(250.0 * cos((row + 0.5) / 40.0)));
+          float colf = (az + 3.14159265) / 6.2831853 * cols;
+          vec2 cell = vec2(floor(colf), row);
+          float s = hash(cell);
+          if (s > 0.955) {
+            vec2 f = vec2(fract(colf), fract(rowf));
+            vec2 off = vec2(hash(cell + 7.7), hash(cell + 3.3)) * 0.6 + 0.2;
+            float r = length(f - off);
+            float mag = hash(cell + 17.3);
+            float phase = hash(cell + 41.7) * 6.2832;
+            float rate = 0.6 + hash(cell + 93.1) * 2.4;
+            float twinkle = 0.7 + 0.3 * sin(time * rate + phase);
+            float size = 0.07 + mag * mag * 0.1;
+            vec3 tint = mix(vec3(1.0, 0.92, 0.8), vec3(0.8, 0.9, 1.0), hash(cell + 5.5));
+            float star = smoothstep(size, size * 0.25, r) * (0.3 + 0.7 * mag) * twinkle * smoothstep(0.0, 0.25, d.y);
+            col += tint * star * night;
+          }
         }
         // aurora: ribbons of green light across the northern sky at night
         if (aurora > 0.5 && night > 0.2 && d.y > 0.05 && d.z < 0.2) {
