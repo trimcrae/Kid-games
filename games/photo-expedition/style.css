@@ -1,9 +1,13 @@
 /* ===========================================================
    Photo Expedition — styles.
-   The map, field guide and album use the arcade's bright look;
+   The map, field guide and album use a wildlife field journal;
    the expedition itself is a full-screen camera app.
    =========================================================== */
-:root { --teal: #1f6f5f; --sand: #f2e3c4; --khaki: #6b7d3a; --gold: #ffd166; --ink2: #2b2440; }
+:root { --teal: #1f6f5f; --sand: #f2e3c4; --khaki: #6b7d3a; --gold: #ffd166; --ink2: #203d35; --ink: #203d35; }
+body { background: #f4f1e8; }
+button, a, input { touch-action: manipulation; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #cf7b17; outline-offset: 4px; }
+.world button:focus-visible, .world input:focus-visible { outline-color: var(--gold); }
 
 .screen { display: none; }
 .screen.show { display: block; }
@@ -17,22 +21,23 @@
   background: linear-gradient(90deg, #1f6f5f, #2f9e44); box-shadow: 0 6px 0 rgba(0,0,0,0.15); transition: transform .08s;
 }
 .btn-big { font-size: 1.25rem; padding: 0.9rem 1.6rem; display: block; margin: 1rem auto 0; }
-.btn-small { font-size: 0.95rem; padding: 0.5rem 0.95rem; box-shadow: 0 3px 0 rgba(0,0,0,0.15); text-decoration: none; display: inline-block; }
+.btn-small { font-size: 0.95rem; padding: 0.5rem 0.95rem; min-height: 44px; box-shadow: 0 3px 0 rgba(0,0,0,0.15); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
 .btn-big:active, .btn-small:active { transform: translateY(3px); box-shadow: none; }
 .btn-small.danger { background: linear-gradient(90deg, #e63946, #ff6b6b); }
 .row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-top: 0.8rem; }
 
 /* ---------- start ---------- */
-.start-stage { max-width: 900px; margin: 0 auto; padding: 0 1rem 2rem; }
+.start-stage { max-width: 1160px; margin: 0 auto; padding: 0 1.5rem 3rem; text-align: left; }
 .start-stage h2 { text-align: center; margin: 0.2rem 0 0.8rem; }
-.explorer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem; }
+.explorer-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.8rem; margin-bottom: 1.8rem; }
 .explorer-btn { font: inherit; border: 3px solid transparent; border-radius: 18px; background: #fff; padding: 1rem 0.5rem; cursor: pointer; box-shadow: 0 6px 18px rgba(40,30,80,0.12); text-align: center; transition: transform .1s; }
 .explorer-btn:hover { transform: translateY(-3px); border-color: var(--gold); }
 .explorer-btn .e { font-size: 2.6rem; display: block; }
 .explorer-btn .n { font-weight: 800; font-size: 1.15rem; display: block; }
 .explorer-btn .t { font-size: 0.8rem; color: #6a6580; display: block; }
 .explorer-btn .s { font-size: 0.85rem; color: #b8860b; display: block; margin-top: 0.2rem; }
-.howto ul { padding-left: 1.2rem; line-height: 1.55; }
+.howto ul { padding: 0; line-height: 1.55; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+.howto li { padding-left: 0.85rem; border-left: 2px solid #dbd5bf; }
 .howto h3 { margin: 0 0 0.4rem; }
 
 /* ---------- top bar ---------- */
@@ -73,7 +78,7 @@
 .placeholder small { font-weight: 400; opacity: 0.85; }
 .credit { position: absolute; right: 0; bottom: 0; background: rgba(0,0,0,0.55); color: #fff; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-top-left-radius: 8px; max-width: 100%; }
 .credit a { color: #ffd166; }
-.brief-card { margin-top: -2.5rem; position: relative; margin-left: 0.8rem; margin-right: 0.8rem; }
+.brief-card { margin-top: 0.9rem; position: relative; border-left: 4px solid var(--gold); }
 .brief-card h2 { margin: 0 0 0.3rem; }
 .tip { background: #fff8e1; border-left: 5px solid var(--gold); padding: 0.5rem 0.8rem; border-radius: 8px; }
 .brief-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.95rem; }
@@ -134,7 +139,8 @@
 /* viewfinder */
 #viewfinder { position: absolute; inset: 0; display: none; pointer-events: none; }
 .cam #viewfinder { display: block; }
-.cam .hud-right, .cam #hud-tasks, .cam #compass { opacity: 0.35; }
+.cam .hud-right { visibility: hidden; pointer-events: none; }
+.cam #compass { opacity: 0.65; }
 .vf-grid { position: absolute; inset: 0; }
 .vf-grid i { position: absolute; background: rgba(255,255,255,0.45); }
 .vf-grid i:nth-child(1) { left: 33.33%; top: 0; width: 1px; height: 100%; }
@@ -144,13 +150,13 @@
 .vf-corner { position: absolute; width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.85); }
 .vf-corner.tl { left: 6%; top: 12%; border-right: 0; border-bottom: 0; } .vf-corner.tr { right: 6%; top: 12%; border-left: 0; border-bottom: 0; }
 .vf-corner.bl { left: 6%; bottom: 14%; border-right: 0; border-top: 0; } .vf-corner.br { right: 6%; bottom: 14%; border-left: 0; border-top: 0; }
-.vf-info { position: absolute; left: 50%; top: 13%; transform: translateX(-50%); background: rgba(0,0,0,0.5); color: #fff; padding: 0.3rem 0.9rem; border-radius: 999px; font-weight: 800; white-space: nowrap; }
+.vf-info { position: absolute; left: 50%; top: 13%; transform: translateX(-50%); background: rgba(8,26,23,0.85); color: #fff; padding: 0.5rem 1rem; border: 1px solid #ffffff40; border-radius: 8px; font-weight: 800; max-width: 90%; text-align: center; }
 .vf-info #focal-kind { opacity: 0.7; font-weight: 400; margin-right: 0.6rem; }
 .vf-info #vf-subject { color: var(--gold); }
 .vf-controls { position: absolute; left: 50%; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 70px); transform: translateX(-50%); display: flex; align-items: center; gap: 0.6rem; pointer-events: auto; background: rgba(0,0,0,0.4); padding: 0.5rem 0.8rem; border-radius: 999px; }
 .touch .vf-controls { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 130px); }
 #zoom { width: min(220px, 34vw); accent-color: var(--gold); }
-.shutter { width: 64px; height: 64px; border-radius: 50%; border: 5px solid #fff; background: radial-gradient(circle, #ff4d6d 55%, #c9184a 60%); cursor: pointer; box-shadow: 0 0 0 4px rgba(0,0,0,0.4); }
+.shutter { width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; border: 4px solid #fff; background: radial-gradient(circle, #fff 57%, #a9bab5 60%, #243e36 64%); cursor: pointer; box-shadow: 0 0 0 4px rgba(0,0,0,0.4); }
 .shutter:active { transform: scale(0.92); }
 
 /* overlays inside the world & elsewhere */
@@ -196,10 +202,10 @@
   .hud-top { gap: 0.3rem; }
   .hud-pill { font-size: 0.75rem; padding: 0.3rem 0.6rem; }
   #btn-detail { display: none; }
-  .hud-right { top: calc(max(8px, env(safe-area-inset-top)) + 100px); }
-  #compass { top: calc(max(8px, env(safe-area-inset-top)) + 70px); width: 50vw; }
+  .hud-right { top: calc(max(8px, env(safe-area-inset-top)) + 144px); }
+  #compass { top: calc(max(8px, env(safe-area-inset-top)) + 104px); width: 50vw; }
   #hud-tasks { display: none; }
-  .cam .vf-info { top: 18%; font-size: 0.8rem; }
+  .cam .vf-info { top: calc(max(8px, env(safe-area-inset-top)) + 142px); font-size: 0.8rem; }
   .hud-btn { padding: 0.5rem 0.7rem; font-size: 0.85rem; }
   .brief-card { margin-left: 0.3rem; margin-right: 0.3rem; }
 }
@@ -233,3 +239,83 @@
 #shot-pro figcaption { font-size: 0.72rem; color: #6a6580; margin-top: 0.2rem; }
 #hud-toast { position: absolute; left: 50%; top: 24%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: #fff; font-weight: 700; padding: 0.5rem 1rem; border-radius: 999px; font-size: 1rem; opacity: 0; transition: opacity .4s; pointer-events: none; max-width: 90vw; text-align: center; }
 #hud-toast.show { opacity: 1; }
+
+/* Field journal: warm paper, forest green, and the photographs themselves. */
+#s-start > .back-link { position: relative; top: auto; left: auto; margin: 1rem 1.5rem; color: var(--teal); background: transparent; box-shadow: none; padding: 0.5rem 0; }
+.expedition-hero { position: relative; isolation: isolate; max-width: 1112px; min-height: 360px; margin: 0 auto 2rem; padding: 2.8rem 3rem; overflow: hidden; border-radius: 22px; background: #183a30; text-align: left; box-shadow: 0 16px 36px #203d3520; }
+.start-photo { position: absolute; inset: 0; pointer-events: none; }
+.start-photo > img { position: absolute; inset: 0; z-index: -2; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 48%; }
+.expedition-hero::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, #102c27ee, #102c2785 46%, #102c2700 78%); }
+.start-photo .credit { z-index: 2; padding: 0.35rem 0.65rem; pointer-events: auto; }
+.hero-copy { pointer-events: none; }
+.eyebrow { color: var(--teal); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; margin: 0 0 0.6rem; }
+.hero-copy .eyebrow { color: #ffe0a0; }
+.expedition-hero .title { color: #fff9e9; background: none; font-size: clamp(2.8rem, 5.6vw, 4.7rem); line-height: 0.98; letter-spacing: -0.055em; text-shadow: none; }
+.title-dot { color: var(--gold); }
+.expedition-hero .tagline { color: #fff9e9; font-size: 1.05rem; line-height: 1.5; margin-top: 1.15rem; }
+.hero-stamp { color: #fff0c9; font-size: 0.75rem; font-weight: 700; margin: 1.4rem 0 0; }
+.hero-stamp span { margin: 0 0.45rem; color: var(--gold); }
+.picker-heading { margin-bottom: 1rem; }
+.picker-heading h2 { text-align: left; font-size: clamp(1.15rem, 3vw, 1.5rem); }
+.explorer-btn { border: 1px solid #dcded2; color: var(--ink); border-radius: 14px; box-shadow: 0 4px 0 #203d350b; padding: 0.85rem 0.4rem; }
+.explorer-btn:hover { background: #fffbed; border-color: #b99542; }
+.explorer-btn .e { margin-bottom: 0.3rem; }
+.explorer-btn .s { color: #826019; font-size: 0.75rem; }
+.howto.card { background: #ebeadd; box-shadow: none; border: 1px solid #dddfcf; padding: 1.3rem 1.5rem; }
+.howto h3 { font-size: 1.2rem; }
+.topbar { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+.rank { background: #e6e8da; color: #294b3f; }
+.map-wrap, .site-panel, .daily, .question { max-width: 1168px; margin-left: auto; margin-right: auto; }
+.site-panel, .daily, .question { width: calc(100% - 1.6rem); }
+.card, .guide-card { box-shadow: 0 6px 20px #203d3510; }
+.brief-card h2 { font-size: 1.8rem; letter-spacing: -0.035em; }
+.guide-photo { height: 220px; }
+.guide-body { padding: 1rem; }
+.guide-body .when, .chip { background: #e9eee3; color: #365342; }
+.guide-body .rare { background: #fff0cb; color: #765516; }
+.guide-h { padding-top: 0.7rem; border-top: 1px solid #d9dcca; }
+.album-grid { max-width: 1200px; margin: 0 auto; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.2rem; }
+.album-item { padding: 0.5rem; border: 1px solid #dddcca; border-radius: 5px; }
+.album-item img { border-radius: 2px; }
+.album-item .cap { padding: 0.7rem 0.2rem 0.3rem; }
+.hud-pill, .hud-btn, #hud-tasks { background-color: #102c27b8; border-color: #ffffff55; }
+.hud-btn { min-height: 44px; }
+.hud-btn.camera { background: #f3d182; color: #213b32; border-color: #ffedbc; }
+.hud-btn.camera.on { background: #fff4ce; }
+.vf-controls { border: 1px solid #ffffff45; background: #102c27d9; box-shadow: 0 8px 30px #0005; }
+.vf-grid i { background: #ffffff55; box-shadow: 0 0 2px #0006; }
+.vf-corner { border-color: #fff5d7; }
+.shot { max-width: 760px; }
+.shot-pair { padding-bottom: 0.4rem; }
+.shot-pair:has(#shot-pro.show) { grid-template-columns: 1fr 1fr; }
+.shot-pair > img { aspect-ratio: 3/2; object-fit: contain; background: #102c27; }
+@media (max-width: 900px) {
+  .expedition-hero { margin-left: 1.5rem; margin-right: 1.5rem; }
+  .explorer-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 540px) {
+  #s-start > .back-link { margin: 0.5rem 1rem; }
+  .expedition-hero { min-height: 330px; margin: 0 1rem 1.5rem; padding: 2rem 1.4rem 3rem; }
+  .expedition-hero::after { background: linear-gradient(90deg, #102c27e8, #102c2770); }
+  .start-photo > img { object-position: 62% center; }
+  .start-photo .credit { font-size: 0.6rem; }
+  .hero-stamp { font-size: 0.68rem; }
+  .hero-stamp span { margin: 0 0.2rem; }
+  .start-stage { padding: 0 1rem 2rem; }
+  .explorer-grid { gap: 0.55rem; }
+  .explorer-btn .e { font-size: 2rem; }
+  .explorer-btn .n { font-size: 1rem; }
+  .howto ul { grid-template-columns: 1fr; }
+  .howto.card { padding: 1rem; }
+  .topbar .rank { order: 3; width: 100%; border-radius: 8px; }
+  .guide { grid-template-columns: minmax(0, 1fr); }
+  .brief-card h2 { font-size: 1.5rem; }
+  .shot-pair:has(#shot-pro.show) { grid-template-columns: 1fr; }
+  .vf-controls { gap: 0.4rem; padding: 0.5rem; }
+  #zoom { width: min(150px, 30vw); }
+  .vf-info #vf-subject { display: block; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

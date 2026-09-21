@@ -185,7 +185,7 @@
     const m = window.PHOTO_MANIFEST && PHOTO_MANIFEST[id];
     if (m) {
       const lic = m.licenseUrl ? `<a href="${m.licenseUrl}" target="_blank" rel="noopener">${m.license}</a>` : m.license;
-      return `<img src="photos/${m.file}" alt="${m.title}" loading="lazy" /><div class="credit">📷 ${escapeHtml(m.artist || "Wikimedia Commons")} · ${lic} · <a href="${m.page}" target="_blank" rel="noopener">source</a></div>`;
+      return `<img src="photos/${m.file}" alt="${escapeHtml(m.title)}" loading="${big ? "eager" : "lazy"}" /><div class="credit">📷 ${escapeHtml(m.artist || "Wikimedia Commons")} · ${lic} · <a href="${m.page}" target="_blank" rel="noopener">source</a></div>`;
     }
     return `<div class="placeholder"><span class="pe">${emoji}</span>${big ? "Real photograph on its way" : "Photo coming"}<small>The expedition team is still developing the film.</small></div>`;
   }
@@ -412,6 +412,7 @@
   $("brief-go").addEventListener("click", go);
   $("brief-go2").addEventListener("click", go);
 
+  $("start-photo").innerHTML = photoBlock("elephant", "🐘", true);
   renderPicker();
   // straight back in for whoever played last
   if (save.last && EXPLORERS.find((e) => e.id === save.last) && location.hash !== "#pick") pickExplorer(EXPLORERS.find((e) => e.id === save.last));

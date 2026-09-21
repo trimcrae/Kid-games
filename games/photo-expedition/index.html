@@ -11,21 +11,21 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="bg-blobs" aria-hidden="true">
-    <span class="blob blob-1"></span>
-    <span class="blob blob-2"></span>
-    <span class="blob blob-3"></span>
-  </div>
 
   <!-- ============ 1. who's exploring ============ -->
   <section id="s-start" class="screen show">
     <a class="back-link" href="../../">← Back to the Arcade</a>
-    <header class="hero" style="padding-top:0.5rem;">
-      <h1 class="title"><span class="emo">📸</span> Photo Expedition</h1>
-      <p class="tagline">Explore the world. Photograph the wild. Find the treasure.</p>
+    <header class="hero expedition-hero">
+      <div id="start-photo" class="start-photo"></div>
+      <div class="hero-copy">
+        <p class="eyebrow">A world of wildlife awaits</p>
+        <h1 class="title">Photo<br>Expedition<span class="title-dot">.</span></h1>
+        <p class="tagline">Explore the world. Photograph the wild.<br>Find the treasure.</p>
+        <p class="hero-stamp">9 expeditions <span>·</span> 7 continents <span>·</span> Your camera</p>
+      </div>
     </header>
     <main class="game-stage start-stage">
-      <h2>Who's the photographer today?</h2>
+      <div class="picker-heading"><p class="eyebrow">Choose your explorer</p><h2>Who's the photographer today?</h2></div>
       <div id="explorer-picker" class="explorer-grid"></div>
       <div class="howto card">
         <h3>Your kit</h3>
@@ -128,9 +128,9 @@
         <span id="vf-subject"></span>
       </div>
       <div class="vf-controls no-look">
-        <button class="hud-btn" id="btn-zoom-out">➖</button>
-        <input type="range" id="zoom" min="24" max="300" value="35" step="1" />
-        <button class="hud-btn" id="btn-zoom-in">➕</button>
+        <button class="hud-btn" id="btn-zoom-out" aria-label="Zoom out">➖</button>
+        <input type="range" id="zoom" aria-label="Lens focal length in millimetres" min="24" max="300" value="35" step="1" />
+        <button class="hud-btn" id="btn-zoom-in" aria-label="Zoom in">➕</button>
         <button class="shutter" id="shutter" aria-label="Take the picture"></button>
       </div>
     </div>
