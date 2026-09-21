@@ -58,7 +58,7 @@ function patternTexture(THREE, base, kind, colour2, seed) {
 const SPECIES = {
   lion:      { rig: "quad", len: 1.9, sh: 1.05, w: 0.6, colour: "#c9a15c", belly: "#e0c48e", head: 0.42, snout: 0.5, neck: [0.35, 0.3], legs: 0.22, ears: 0.12, tail: [1.0, 0.06, "tuft"], mane: true, speed: 1.2, flee: 5.5, alert: 26, herd: 3, graze: 0.5, habitat: "dry" },
   elephant:  { rig: "quad", len: 4.2, sh: 3.1, w: 1.8, colour: "#8a8583", head: 0.9, snout: 0, neck: [0.2, 0.1], legs: 0.45, ears: 0.9, bigEars: true, tail: [1.4, 0.05], trunk: true, tusks: true, speed: 1.0, flee: 4.5, alert: 22, herd: 4, graze: 0.5, habitat: "any" },
-  giraffe:   { rig: "quad", len: 2.4, sh: 3.0, w: 0.8, colour: "#e0a95c", pattern: ["patches", "#8a5a2a"], head: 0.4, snout: 0.5, neck: [2.3, 1.05], legs: 0.2, ears: 0.14, ossicones: true, tail: [1.0, 0.04, "tuft"], speed: 1.4, flee: 6, alert: 24, herd: 3, graze: 0.4, browse: true, habitat: "any" },
+  giraffe:   { rig: "quad", len: 2.6, sh: 3.0, w: 0.9, slope: 0.28, colour: "#e0a95c", pattern: ["patches", "#8a5a2a"], head: 0.4, snout: 0.5, neck: [2.3, 1.05], legs: 0.2, ears: 0.14, ossicones: true, tail: [1.0, 0.04, "tuft"], speed: 1.4, flee: 6, alert: 24, herd: 3, graze: 0.4, browse: true, habitat: "any" },
   zebra:     { rig: "quad", len: 2.1, sh: 1.35, w: 0.65, colour: "#f4f4f2", pattern: ["stripes", "#1a1a1a"], head: 0.36, snout: 0.5, neck: [0.7, 0.75], legs: 0.16, ears: 0.14, maneRidge: true, tail: [0.7, 0.04, "tuft"], speed: 1.6, flee: 7, alert: 28, herd: 6, graze: 0.6, habitat: "dry" },
   jaguar:    { rig: "quad", len: 1.6, sh: 0.7, w: 0.5, colour: "#d9a441", pattern: ["rosettes", "#2a1a0a"], belly: "#f0e0c0", head: 0.34, snout: 0.4, neck: [0.3, 0.2], legs: 0.16, ears: 0.1, tail: [1.0, 0.05], speed: 1.3, flee: 7, alert: 34, herd: 1, graze: 0.2, habitat: "riverbank", rare: true },
   capybara:  { rig: "quad", len: 1.2, sh: 0.55, w: 0.5, colour: "#8a6a3a", head: 0.3, snout: 0.45, boxHead: true, neck: [0.15, 0.1], legs: 0.12, ears: 0.08, tail: null, speed: 0.8, flee: 3.5, alert: 12, herd: 4, graze: 0.6, habitat: "riverbank" },
@@ -74,7 +74,7 @@ const SPECIES = {
   yak:       { rig: "quad", len: 2.3, sh: 1.5, w: 1.0, colour: "#2a221c", pattern: ["shaggy", "#000"], head: 0.4, snout: 0.5, neck: [0.4, 0.1], legs: 0.25, ears: 0.1, horns: "curved", hump: 0.35, skirt: true, tail: [0.6, 0.15], speed: 0.9, flee: 4, alert: 16, herd: 4, graze: 0.7, habitat: "any" },
   monal:     { rig: "bird", len: 0.6, span: 1.0, colour: "#1a4a8a", belly: "#0a2a1a", beak: "#4a4a4a", feet: "#6a6a4a", perch: "ground", iridescent: true, speed: 7, alert: 12, herd: 2, habitat: "any" },
   redpanda:  { rig: "quad", len: 0.6, sh: 0.3, w: 0.25, colour: "#b5451b", belly: "#2a1a10", head: 0.17, snout: 0.35, faceWhite: true, neck: [0.1, 0.2], legs: 0.06, ears: 0.08, tail: [0.5, 0.09, "bands"], speed: 0.9, flee: 4, alert: 14, herd: 1, graze: 0.4, habitat: "trees" },
-  camel:     { rig: "quad", len: 2.6, sh: 2.0, w: 0.8, colour: "#c8a06a", head: 0.36, snout: 0.6, neck: [1.3, 0.9], legs: 0.16, ears: 0.1, hump: 0.7, tail: [0.6, 0.04, "tuft"], speed: 1.2, flee: 5, alert: 16, herd: 4, graze: 0.4, habitat: "any" },
+  camel:     { rig: "quad", len: 2.6, sh: 2.0, w: 0.9, slope: 0.1, colour: "#c8a06a", head: 0.36, snout: 0.6, neck: [1.3, 0.9], legs: 0.16, ears: 0.1, hump: 0.7, tail: [0.6, 0.04, "tuft"], speed: 1.2, flee: 5, alert: 16, herd: 4, graze: 0.4, habitat: "any" },
   fennec:    { rig: "quad", len: 0.4, sh: 0.2, w: 0.15, colour: "#e8d4a8", head: 0.12, snout: 0.5, neck: [0.08, 0.3], legs: 0.04, ears: 0.14, bigEars: true, tail: [0.3, 0.05], speed: 2.2, flee: 9, alert: 20, herd: 1, graze: 0.3, habitat: "any", rare: true },
   vulture:   { rig: "bird", len: 0.7, span: 1.7, colour: "#f0ede0", belly: "#f0ede0", wingtips: "#1a1a1a", beak: "#e0b030", feet: "#b0a080", perch: "sky", speed: 10, alert: 20, herd: 2, habitat: "any" },
   bison:     { rig: "quad", len: 3.0, sh: 1.8, w: 1.1, colour: "#4a3220", pattern: ["shaggy", "#000"], head: 0.55, snout: 0.5, neck: [0.5, -0.1], legs: 0.25, ears: 0.1, horns: "short", hump: 0.6, beard: true, tail: [0.6, 0.05, "tuft"], speed: 1.0, flee: 6, alert: 20, herd: 6, graze: 0.7, habitat: "meadow" },
@@ -122,16 +122,20 @@ export function makeCreature(THREE, id) {
 
   if (S.rig === "quad") {
     const bodyY = S.sh * 0.72;
+    // body radii: a real body is deeper than it is wide and never rounder than it is long,
+    // so the depth is capped by the length (a giraffe is tall, not a ball on stilts)
+    const bw = S.w * 0.62, bh = Math.min(S.sh * 0.34, S.len * 0.27), bl = S.len * 0.5;
     const body = M(new THREE.SphereGeometry(1, 20, 14), skin, 0, bodyY, 0);
-    body.scale.set(S.w, S.sh * 0.34, S.len * 0.5);
+    body.scale.set(bw, bh, bl);
+    if (S.slope) body.rotation.x = -S.slope;          // shoulders higher than the rump
     g.add(body);
-    if (S.belly) { const b = M(new THREE.SphereGeometry(1, 10, 8), std({ color: S.belly }), 0, bodyY - S.sh * 0.1, 0); b.scale.set(S.w * 0.82, S.sh * 0.3, S.len * 0.42); g.add(b); }
-    if (S.hump) { const h = M(new THREE.SphereGeometry(1, 10, 8), skin, 0, bodyY + S.sh * 0.2, S.len * (id === "camel" ? 0.05 : 0.22)); h.scale.set(S.w * 0.7, S.hump, S.len * 0.28); g.add(h); }
-    if (S.skirt) { const sk = M(new THREE.CylinderGeometry(S.w * 1.05, S.w * 1.15, S.sh * 0.5, 12), skin, 0, bodyY - S.sh * 0.25, 0); sk.scale.z = S.len * 0.45 / S.w; g.add(sk); }
+    if (S.belly) { const b = M(new THREE.SphereGeometry(1, 10, 8), std({ color: S.belly }), 0, bodyY - bh * 0.28, 0); b.scale.set(bw * 0.85, bh * 0.85, bl * 0.85); if (S.slope) b.rotation.x = -S.slope; g.add(b); }
+    if (S.hump) { const h = M(new THREE.SphereGeometry(1, 10, 8), skin, 0, bodyY + bh * 0.55, S.len * (id === "camel" ? 0.05 : 0.22)); h.scale.set(bw * 0.9, S.hump, S.len * 0.28); g.add(h); }
+    if (S.skirt) { const sk = M(new THREE.CylinderGeometry(bw * 1.05, bw * 1.15, bh * 1.2, 12), skin, 0, bodyY - bh * 0.5, 0); sk.scale.z = bl * 0.9 / bw; g.add(sk); }
     // legs
     const legLen = bodyY;
     for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
-      const pivot = new THREE.Group(); pivot.position.set(sx * S.w * 0.55, bodyY - S.sh * 0.05, sz * S.len * 0.32);
+      const pivot = new THREE.Group(); pivot.position.set(sx * bw * 0.72, bodyY - bh * 0.15, sz * bl * 0.62);
       const leg = M(new THREE.CylinderGeometry(S.legs * 0.8, S.legs, legLen, 7), skin, 0, -legLen / 2, 0);
       pivot.add(leg);
       const foot = M(new THREE.SphereGeometry(S.legs * 1.25, 7, 5), skin, 0, -legLen + S.legs * 0.4, S.legs * 0.3); foot.scale.y = 0.6; pivot.add(foot);
@@ -139,7 +143,7 @@ export function makeCreature(THREE, id) {
     }
     // neck + head
     const [nl, na] = S.neck;
-    const neck = new THREE.Group(); neck.position.set(0, bodyY + S.sh * 0.1, S.len * 0.45);
+    const neck = new THREE.Group(); neck.position.set(0, bodyY + bh * 0.3 + (S.slope ? bl * Math.sin(S.slope) * 0.8 : 0), bl * 0.85);
     neck.rotation.x = -na;
     const neckMesh = M(new THREE.CylinderGeometry(S.head * 0.55, S.head * 0.85, nl, 8), skin, 0, nl / 2, 0);
     neck.add(neckMesh);
@@ -176,12 +180,12 @@ export function makeCreature(THREE, id) {
     // tail
     if (S.tail) {
       const [tl, tr, style] = S.tail;
-      const tail = new THREE.Group(); tail.position.set(0, bodyY + S.sh * 0.12, -S.len * 0.48); tail.rotation.x = 0.9 + (style === "tuft" ? 0.4 : 0);
+      const tail = new THREE.Group(); tail.position.set(0, bodyY + bh * 0.35 - (S.slope ? bl * Math.sin(S.slope) * 0.8 : 0), -bl * 0.92); tail.rotation.x = S.rig === "quad" && (id === "arcticfox" || id === "redpanda" || id === "snowleopard" || id === "fennec") ? 0.7 : 0.3;
       const tm = M(new THREE.CylinderGeometry(tr * 0.6, tr, tl, 6), style === "bands" ? std({ map: patternTexture(THREE, S.colour, "stripes", "#3a2010", 5) }) : skin, 0, -tl / 2, 0); tail.add(tm);
       if (style === "tuft") tail.add(M(new THREE.SphereGeometry(tr * 2.2, 6, 5), dark, 0, -tl, 0));
       g.add(tail); parts.tail = tail;
     }
-    radius = Math.max(S.len * 0.55, S.w); height = S.sh + (S.neck[0] * Math.sin(S.neck[1] + 0.3)) + S.head; eyeY = S.sh * 0.9 + S.neck[0] * Math.sin(S.neck[1]);
+    radius = Math.max(S.len * 0.55, bw); height = S.sh + (S.neck[0] * Math.sin(S.neck[1] + 0.3)) + S.head; eyeY = S.sh * 0.9 + S.neck[0] * Math.sin(S.neck[1]);
     parts.bodyY = bodyY;
   }
   else if (S.rig === "blob") {
