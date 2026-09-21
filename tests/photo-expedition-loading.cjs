@@ -65,8 +65,19 @@ const base = process.env.PHOTO_BASE || 'http://127.0.0.1:8766';
     if (process.env.PHOTO_SCREENSHOT) await page.screenshot({ path: process.env.PHOTO_SCREENSHOT });
     console.log('PASS: fresh load, map pins, briefing, paused hidden map, saved-player reload, phone resize');
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.evaluate(() => { PhotoExpedition.openBrief(SITES[0]); void PhotoExpedition.startExpedition(SITES[0]); });
+    // Follow the real Start button: the old shortcut missed the satellite
+    // introduction, which could wait forever with its Continue button hidden.
+    const pendingSatellite = [];
+    await page.route('**/satellite/*.jpg', route => { pendingSatellite.push(route); });
+    await page.evaluate(() => PhotoExpedition.openBrief(SITES[0]));
+    await page.locator('#brief-go').click();
+    await page.locator('#flyin-go').waitFor({ state: 'visible', timeout: 1000 });
+    await page.locator('#flyin-scale').filter({ hasText: 'Satellite views are unavailable' }).waitFor();
+    await page.locator('#flyin-go').click();
     await page.waitForFunction(() => !!PhotoExpedition.expedition);
+    for (const route of pendingSatellite) await route.abort();
+    await page.waitForTimeout(100);
+    assert.equal(await page.locator('#flyin.show').count(), 0, 'Late image completion reopened the introduction');
     const expeditionPaints = await page.evaluate(() => mapPaints);
     await page.locator('#btn-camera').click();
     await page.locator('#shutter').click();

@@ -220,17 +220,26 @@
   function flyIn(site, then) {
     const levels = SATELLITE_MANIFEST[site.id];
     const ov = $("flyin"), c = $("flyin-canvas"), g = c.getContext("2d"), acts = ov.querySelector(".flyin-actions");
-    ov.classList.add("show"); acts.classList.remove("show");
+    // The introduction is optional: slow satellite downloads must never trap
+    // the player before the expedition, or hide the way to continue.
+    ov.classList.add("show"); acts.classList.add("show");
     $("flyin-title").textContent = site.emoji + " " + site.name + " from space";
-    $("flyin-scale").textContent = "";
+    $("flyin-scale").textContent = "Loading satellite views… You can land now.";
+    g.fillStyle = "#03101f"; g.fillRect(0, 0, c.width, c.height);
     const imgs = levels.map((l) => { const im = new Image(); im.src = "satellite/" + l.file; return im; });
     const W = c.width;
-    let stop = false;
-    const finish = () => { stop = true; ov.classList.remove("show"); };
+    let stop = false, loadTimer;
+    const finish = () => { stop = true; clearTimeout(loadTimer); cancelAnimationFrame(flyAnim); flyAnim = null; ov.classList.remove("show"); };
     $("flyin-close").onclick = finish;
     $("flyin-go").onclick = () => { finish(); then && then(); };
     const ready = Promise.all(imgs.map((im) => new Promise((r) => { if (im.complete) r(); else { im.onload = r; im.onerror = r; } })));
-    ready.then(() => {
+    Promise.race([ready, new Promise(r => { loadTimer = setTimeout(r, 2500); })]).then(() => {
+      clearTimeout(loadTimer);
+      if (stop) return;
+      if (!imgs.some(im => im.naturalWidth)) {
+        $("flyin-scale").textContent = "Satellite views are unavailable. You can still land and explore.";
+        return;
+      }
       const t0 = performance.now(), per = 1500, hold = 700;
       // every image is drawn so that the site (cx, cy inside the picture) sits at the centre of the canvas
       const drawAt = (im, lvl, scale, alpha) => { if (!im.naturalWidth) return; g.globalAlpha = alpha; const s = W * scale; g.drawImage(im, W / 2 - (lvl.cx == null ? 0.5 : lvl.cx) * s, W / 2 - (lvl.cy == null ? 0.5 : lvl.cy) * s, s, s); g.globalAlpha = 1; };
@@ -266,7 +275,7 @@
     show("s-world");
     root.classList.add("loading");
     try {
-      const [THREE, mod] = await Promise.all([import("../../assets/vendor/three/three.module.min.js"), import("./expedition.mjs")]);
+      const [THREE, mod] = await Promise.all([import("../../assets/vendor/three/three.module.min.js"), import("./expedition.mjs?v=20260921-wildlife")]);
       const starsBefore = totalStars(), rankBefore = rankFor(starsBefore)[1], bestBefore = Object.assign({ __treasure: prof.treasures.includes(site.id) }, prof.stars[site.id] || {});
       if (!prof.route.length || prof.route[prof.route.length - 1] !== site.id) prof.route.push(site.id);
       prof.visits[site.id] = (prof.visits[site.id] || 0) + 1; persist();

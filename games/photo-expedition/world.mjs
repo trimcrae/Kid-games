@@ -15,6 +15,8 @@
      world.landmarks  → [{ subject, pos, radius }] for the photo scorer
    =========================================================== */
 
+import { taperedCurve, blade, mergeForms } from './forms.mjs';
+
 export const SIZE = 480;          // metres across
 export const GRID = 8;            // squares per side
 export const CELL = SIZE / GRID;  // 60 m
@@ -292,6 +294,18 @@ function grassBladeTexture(THREE) {
   }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
+function waterNormals(THREE) {
+  const n=128,c=document.createElement('canvas');c.width=c.height=n;
+  const ctx=c.getContext('2d'),img=ctx.createImageData(n,n);
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){
+    const u=x/n*Math.PI*2,v=y/n*Math.PI*2;
+    const dx=Math.cos(u*3+Math.sin(v*2))*.22+Math.cos(u*7-v*5)*.08;
+    const dy=Math.cos(v*4+Math.sin(u*2))*.18-Math.cos(u*7-v*5)*.08;
+    const l=Math.hypot(dx,dy,1),i=(y*n+x)*4;
+    img.data[i]=(dx/l*.5+.5)*255;img.data[i+1]=(dy/l*.5+.5)*255;img.data[i+2]=(1/l*.5+.5)*255;img.data[i+3]=255;
+  }
+  ctx.putImageData(img,0,0);const tex=new THREE.CanvasTexture(c);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;return tex;
+}
 function leafTexture(THREE, fill) {
   const c = document.createElement("canvas"); c.width = c.height = 128;
   const g = c.getContext("2d");
@@ -366,8 +380,8 @@ export function buildWorld(THREE, site, quality) {
       return B.colour(B.colours, y, slopeAt(x, z), x, z, n);
     });
   }
-  const detail = noiseTexture(THREE, 512, 190, 95, B.seed);
-  detail.repeat.set(70, 70);
+  const detail = noiseTexture(THREE, 256, 222, 36, B.seed);
+  detail.repeat.set(48, 48);
   const tmat = new THREE.MeshStandardMaterial({ vertexColors: true, map: detail, roughness: 0.95, metalness: 0 });
   const terrain = new THREE.Mesh(tgeo, tmat);
   terrain.receiveShadow = true; terrain.castShadow = false;
@@ -379,6 +393,19 @@ export function buildWorld(THREE, site, quality) {
     const far = new THREE.Mesh(new THREE.CircleGeometry(SIZE * 6, 48), new THREE.MeshStandardMaterial({ color: new THREE.Color(...mix(B.colours.grass, B.colours.dry, 0.5)), roughness: 1 }));
     far.rotation.x = -Math.PI / 2; far.position.y = (B.underwater ? 0 : Math.min(waterLevel, 1)) - 0.5;
     group.add(far);
+    // Continuous rolling terrain beyond the walkable square adds depth.
+    if (!B.underwater) {
+      const pos=[],uv=[],idx=[],rows=14,cols=128;
+      const amp=B.peaks?65:site.biome==='rainforest'?48:site.biome==='desert'?32:site.biome==='antarctic'?24:18;
+      for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){
+        const a=i/cols*Math.PI*2,r=340+j/rows*1800,x=Math.cos(a)*r,z=Math.sin(a)*r;
+        const fade=Math.min(1,j/3),h=far.position.y+fade*(amp*.7+N.fbm(x/280,z/280,4)*amp);
+        pos.push(x,h,z);uv.push(x/480,z/480);
+      }
+      for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=j*(cols+1)+i,b=a+cols+1;idx.push(a,a+1,b,a+1,b+1,b)}
+      const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(idx);geo.computeVertexNormals();
+      group.add(new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:new THREE.Color(...mix(B.colours.grass,B.colours.dry,.45)),roughness:1})));
+    }
     if (B.peaks || site.biome === "arctic" || site.biome === "volcanic") {
       const ring = new THREE.Group();
       const n = 22, R = SIZE * 1.15;
@@ -400,7 +427,7 @@ export function buildWorld(THREE, site, quality) {
   /* ---- water ---- */
   let water = null;
   if (!B.underwater && waterLevel > -4) {
-    const wn = noiseTexture(THREE, 128, 128, 90, 77); wn.repeat.set(40, 40);
+    const wn = waterNormals(THREE); wn.repeat.set(40, 40);
     const wm = new THREE.MeshPhysicalMaterial({ color: site.biome === "arctic" || site.biome === "antarctic" ? 0x3a6f8f : 0x2b7fb0, transparent: true, opacity: 0.82, roughness: 0.12, metalness: 0.05, normalMap: wn, normalScale: new THREE.Vector2(0.35, 0.35) });
     water = new THREE.Mesh(new THREE.PlaneGeometry(SIZE * 8, SIZE * 8), wm);
     water.rotation.x = -Math.PI / 2; water.position.y = waterLevel;
@@ -473,8 +500,18 @@ export function buildWorld(THREE, site, quality) {
     const count = Math.round(B.grass * 1.6 * q);
     const tex = grassBladeTexture(THREE);
     const gc = B.grassColour;
-    const gmat = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(gc[0], gc[1], gc[2]), transparent: true, alphaTest: 0.4, side: THREE.DoubleSide, roughness: 1 });
-    const g1 = new THREE.PlaneGeometry(1.1, 0.85); g1.translate(0, 0.4, 0);
+    const gmat = new THREE.MeshStandardMaterial({ map: tex, color: new THREE.Color(gc[0], gc[1], gc[2]), alphaTest: 0.4, alphaToCoverage: true, side: THREE.DoubleSide, roughness: 1 });
+    const wind={value:0};
+    gmat.onBeforeCompile=shader=>{
+      shader.uniforms.expeditionWind=wind;
+      shader.vertexShader='uniform float expeditionWind;\n'+shader.vertexShader;
+      shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+        float phase=instanceMatrix[3].x*.17+instanceMatrix[3].z*.11;
+        transformed.x+=sin(expeditionWind*1.6+phase)*uv.y*uv.y*.12;`);
+    };
+    updaters.push((dt,t)=>{wind.value=t});
+    const grassH=site.biome==='savanna'?1.15:.85;
+    const g1 = new THREE.PlaneGeometry(1.1, grassH); g1.translate(0, grassH*.5, 0);
     const g2 = g1.clone(); g2.rotateY(Math.PI / 2);
     const im1 = new THREE.InstancedMesh(g1, gmat, count), im2 = new THREE.InstancedMesh(g2, gmat, count);
     im1.frustumCulled = im2.frustumCulled = false;
@@ -497,7 +534,6 @@ export function buildWorld(THREE, site, quality) {
   /* ---- sky ---- */
   const sky = buildSky(THREE, B);
   scene.add(sky.mesh);
-  if (!B.underwater) { const clouds = buildClouds(THREE, N, B); scene.add(clouds.group); updaters.push(clouds.update); }
 
   /* ---- lights ---- */
   const sun = new THREE.DirectionalLight(0xffffff, 2.2);
@@ -542,8 +578,8 @@ export function buildWorld(THREE, site, quality) {
     sun.position.copy(sd).multiplyScalar(180).add(playerPos || new THREE.Vector3());
     if (playerPos) sun.target.position.copy(playerPos);
     const skyCol = skyColours(B, above, env.night);
-    hemi.color.copy(skyCol.zenith); hemi.groundColor.copy(skyCol.ground);
-    hemi.intensity = (B.underwater ? 1.4 : 0.55 + 0.7 * above) * (1 - env.night * 0.75) + 0.12;
+    hemi.color.copy(skyCol.zenith).lerp(tmpC.setRGB(1,1,1),.45); hemi.groundColor.copy(skyCol.ground).lerp(tmpC.setRGB(.5,.45,.35),.35);
+    hemi.intensity = (B.underwater ? 1.6 : 1.15 + 0.85 * above) * (1 - env.night * 0.86) + 0.12;
     scene.fog.color.copy(B.underwater ? skyCol.horizon : skyCol.horizon);
     sky.set(sd, skyCol, env.night, day);
     if (water) water.material.color.copy(skyCol.horizon).multiplyScalar(0.5).add(tmpC.set(0x123a55).multiplyScalar(0.5));
@@ -588,6 +624,9 @@ function skyColours(B, above, night) {
               horizon: new THREE_Color(o.horizon.r * nd + 0.04, o.horizon.g * nd + 0.05, o.horizon.b * nd + 0.1),
               ground: new THREE_Color(grd.r * nd, grd.g * nd, grd.b * nd) };
   if (B.underwater) { T.horizon.setRGB(0.05 + 0.1 * above, 0.3 + 0.2 * above, 0.5 + 0.2 * above); T.zenith.setRGB(0.1, 0.45, 0.7); }
+  // The palette is in display colours; the sky shader now uses the same
+  // colour management as the terrain and wildlife.
+  T.zenith.convertSRGBToLinear(); T.horizon.convertSRGBToLinear(); T.ground.convertSRGBToLinear();
   return T;
 }
 let THREE_Color = null;
@@ -598,16 +637,18 @@ function buildSky(THREE, B) {
     sunDir: { value: new THREE.Vector3(0, 1, 0) },
     zenith: { value: new THREE.Color(0.3, 0.5, 0.9) },
     horizon: { value: new THREE.Color(0.9, 0.85, 0.7) },
-    night: { value: 0 }, time: { value: 0 }, aurora: { value: B.aurora ? 1 : 0 }, underwater: { value: B.underwater ? 1 : 0 }
+    night: { value: 0 }, time: { value: 0 }, aurora: { value: B.aurora ? 1 : 0 }, underwater: { value: B.underwater ? 1 : 0 },
+    cloudCover: { value: B.sky==='humid'?.57:B.sky==='clear'?.28:.43 }
   };
   const mat = new THREE.ShaderMaterial({
     uniforms, side: THREE.BackSide, depthWrite: false, fog: false,
     vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); gl_Position.z = gl_Position.w; }`,
     fragmentShader: `
-      uniform vec3 sunDir; uniform vec3 zenith; uniform vec3 horizon; uniform float night; uniform float time; uniform float aurora; uniform float underwater;
+      uniform vec3 sunDir; uniform vec3 zenith; uniform vec3 horizon; uniform float night; uniform float time; uniform float aurora; uniform float underwater; uniform float cloudCover;
       varying vec3 vDir;
       float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
       float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f); return mix(mix(hash(i), hash(i+vec2(1,0)), f.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), f.x), f.y); }
+      float cloudNoise(vec2 p){ return noise(p)*.53+noise(p*2.07+13.2)*.27+noise(p*4.13+7.6)*.13+noise(p*8.31)*.07; }
       void main(){
         vec3 d = normalize(vDir);
         float up = max(d.y, 0.0);
@@ -616,16 +657,35 @@ function buildSky(THREE, B) {
         float sd = max(dot(d, sunDir), 0.0);
         float sunUp = max(sunDir.y, -0.1);
         // sun disc and its glow, warmer and bigger when low
-        float disc = smoothstep(0.9985, 0.9995, sd);
-        float glow = pow(sd, 6.0) * (0.35 + (1.0 - min(sunUp*3.0,1.0)) * 0.6);
-        vec3 sunCol = mix(vec3(1.0, 0.55, 0.25), vec3(1.0, 0.98, 0.9), min(sunUp * 2.5, 1.0));
-        col += sunCol * (disc * 2.5 + glow) * (1.0 - night) * (1.0 - underwater*0.7);
+        float disc = smoothstep(0.99982, 0.99996, sd);
+        float glow = pow(sd, 32.0) * .22 + pow(sd, 4.0) * .045;
+        vec3 sunCol = mix(vec3(1.0, 0.48, 0.19), vec3(1.0, 0.96, 0.85), clamp(sunUp * 2.5, 0.0, 1.0));
+        col += sunCol * (disc * 3.0 + glow) * (1.0 - night) * (1.0 - underwater*.7);
+        // Perspective cloud banks with lit rims and shaded interiors, all in
+        // the sky pass: no camera-facing cotton-ball sprites or extra draws.
+        float cloudMask=1.0;
+        if(underwater < .5 && d.y > .015){
+          vec2 p=d.xz/(d.y+.22)*2.3+vec2(time*.004,time*.0015);
+          float n=cloudNoise(p),edge=1.0-cloudCover;
+          float density=smoothstep(edge,edge+.18,n)*smoothstep(.015,.12,d.y);
+          cloudMask=1.0-density;
+          float light=clamp((n-cloudNoise(p+sunDir.xz*.12))*3.0+.65,.25,1.0);
+          vec3 shade=mix(vec3(.29,.37,.49),vec3(.94,.96,1.0),light);
+          shade=mix(shade,shade*vec3(1.12,.76,.48),pow(1.0-max(sunDir.y,0.0),5.0)*.65);
+          shade=mix(shade,vec3(.035,.05,.085),night*.94);
+          col=mix(col,shade,density*.94);
+          col+=sunCol*pow(sd,80.0)*density*(1.0-density)*.5*(1.0-night);
+        }
         // ground haze below the horizon
-        col = mix(col, horizon, smoothstep(0.0, -0.15, d.y) * 0.7);
+        col = mix(col, horizon, (1.0-smoothstep(-0.15, 0.0, d.y)) * 0.7);
         // stars: an equal-angle grid over the sky dome, one small round
         // point per cell, each with its own size, tint, twinkle phase and
         // speed so they shimmer independently instead of pulsing in unison
         if (night > 0.05 && d.y > 0.0) {
+          vec3 moonDir=normalize(vec3(-sunDir.x,max(.22,-sunDir.y),-sunDir.z));
+          float moon=smoothstep(.99972,.99994,dot(d,moonDir));
+          float maria=.75+.25*noise(d.xz*700.0);
+          col+=vec3(.72,.79,.91)*moon*maria*night*cloudMask;
           float el = asin(clamp(d.y, 0.0, 1.0));
           float az = atan(d.x, d.z);
           float rowf = el * 40.0;
@@ -644,20 +704,22 @@ function buildSky(THREE, B) {
             float twinkle = 0.7 + 0.3 * sin(time * rate + phase);
             float size = 0.07 + mag * mag * 0.1;
             vec3 tint = mix(vec3(1.0, 0.92, 0.8), vec3(0.8, 0.9, 1.0), hash(cell + 5.5));
-            float star = smoothstep(size, size * 0.25, r) * (0.3 + 0.7 * mag) * twinkle * smoothstep(0.0, 0.25, d.y);
-            col += tint * star * night;
+            float star = (1.0-smoothstep(size*.25,size,r)) * (0.3 + 0.7 * mag) * twinkle * smoothstep(0.0, 0.25, d.y);
+            col += tint * star * night * cloudMask;
           }
         }
         // aurora: ribbons of green light across the northern sky at night
         if (aurora > 0.5 && night > 0.2 && d.y > 0.05 && d.z < 0.2) {
           float band = d.y;
           float w = noise(vec2(d.x * 3.0 + time * 0.05, band * 6.0 - time * 0.08)) * 0.6 + noise(vec2(d.x * 9.0 - time * 0.1, band * 12.0)) * 0.4;
-          float curtain = smoothstep(0.15, 0.35, band) * smoothstep(0.8, 0.45, band) * pow(w, 2.2) * 2.2;
-          curtain *= smoothstep(0.2, -0.4, d.z);
+          float curtain = smoothstep(0.15, 0.35, band) * (1.0-smoothstep(0.45, 0.8, band)) * pow(w, 2.2) * 2.2;
+          curtain *= 1.0-smoothstep(-0.4, 0.2, d.z);
           vec3 ac = mix(vec3(0.1, 0.9, 0.4), vec3(0.6, 0.2, 0.9), smoothstep(0.35, 0.7, band));
-          col += ac * curtain * night;
+          col += ac * curtain * night * cloudMask;
         }
         gl_FragColor = vec4(col, 1.0);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
       }`
   });
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(1500, 32, 16), mat);
@@ -667,39 +729,6 @@ function buildSky(THREE, B) {
     set(sunDir, cols, night, day) {
       uniforms.sunDir.value.copy(sunDir); uniforms.zenith.value.copy(cols.zenith); uniforms.horizon.value.copy(cols.horizon);
       uniforms.night.value = night; uniforms.time.value = performance.now() / 1000;
-    }
-  };
-}
-
-function buildClouds(THREE, N, B) {
-  const group = new THREE.Group();
-  const c = document.createElement("canvas"); c.width = 256; c.height = 128;
-  const g = c.getContext("2d");
-  for (let i = 0; i < 40; i++) {
-    const x = 128 + (Math.random() - 0.5) * 190, y = 70 + (Math.random() - 0.5) * 50, r = 14 + Math.random() * 26;
-    const rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, "rgba(255,255,255,0.55)"); rg.addColorStop(1, "rgba(255,255,255,0)");
-    g.fillStyle = rg; g.fillRect(x - r, y - r, r * 2, r * 2);
-  }
-  const tex = new THREE.CanvasTexture(c);
-  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, fog: false, opacity: 0.9 });
-  const n = B.sky === "sea" ? 0 : (B.sky === "humid" ? 22 : 14);
-  const sprites = [];
-  for (let i = 0; i < n; i++) {
-    const s = new THREE.Sprite(mat.clone());
-    const a = N.rnd() * Math.PI * 2, r = 500 + N.rnd() * 700;
-    s.position.set(Math.cos(a) * r, 220 + N.rnd() * 160, Math.sin(a) * r);
-    const sc = 220 + N.rnd() * 300; s.scale.set(sc, sc * 0.5, 1);
-    group.add(s); sprites.push({ s, speed: 1.5 + N.rnd() * 2 });
-  }
-  return {
-    group,
-    update(dt, t, env, playerPos) {
-      group.position.set(playerPos ? playerPos.x : 0, 0, playerPos ? playerPos.z : 0);
-      for (const c of sprites) {
-        c.s.position.x += c.speed * dt; if (c.s.position.x > 1200) c.s.position.x = -1200;
-        const glow = 0.55 + 0.45 * Math.max(0, env.elevation);
-        c.s.material.color.setRGB(glow + env.golden * 0.4, glow + env.golden * 0.1, glow).multiplyScalar(1 - env.night * 0.85);
-      }
     }
   };
 }
@@ -758,12 +787,13 @@ function makeScatterLibrary(THREE, B, site) {
   // acacia: thin trunk, flat-topped umbrella of leaves
   {
     const trunk = new THREE.CylinderGeometry(0.22, 0.45, 5.5, 6); trunk.translate(0, 2.7, 0);
-    const canopy = new THREE.SphereGeometry(4.2, 14, 9); canopy.scale(1, 0.3, 1); canopy.translate(0, 6.2, 0);
-    bumpy(THREE, canopy, 0.14, 4);
-    const c2 = new THREE.SphereGeometry(2.6, 12, 8); c2.scale(1, 0.32, 1); c2.translate(1.8, 5.2, 1.2); bumpy(THREE, c2, 0.14, 5);
-    const b1 = new THREE.CylinderGeometry(0.08, 0.16, 3.2, 5); b1.translate(0, 1.6, 0); b1.rotateZ(0.7); b1.translate(0.3, 4.2, 0);
-    const b2 = b1.clone(); b2.rotateY(2.2);
-    lib.acacia = { parts: [{ geo: mergeGeos(THREE, [trunk, b1, b2]), mat: bark }, { geo: mergeGeos(THREE, [canopy, c2]), mat: std({ map: leafBlotchTexture(THREE, "#5a7a2e", "#3a5a1e", "#8aa040", 4), roughness: 0.9 }) }], scale: [0.7, 1.5], spacing: 9, collide: 0.6 };
+    const crowns=[],branches=[trunk];
+    for(let i=0;i<8;i++){
+      const a=i*2.4,r=i?2.2+(i%3)*.4:0,x=Math.cos(a)*r,z=Math.sin(a)*r,y=5.7+(i%3)*.34;
+      const crown=bumpy(THREE,new THREE.SphereGeometry(1.8,10,7),.18,i+4);crown.scale(1,.32,1);crown.translate(x,y,z);crowns.push(crown);
+      branches.push(taperedCurve(THREE,[[0,3.5,0],[x*.4,4.7,z*.4],[x,y-.25,z]],.16,.045,6,6));
+    }
+    lib.acacia = { parts: [{ geo: mergeForms(THREE,branches), mat: bark }, { geo: mergeForms(THREE,crowns), mat: std({ map: leafBlotchTexture(THREE, "#5a7a2e", "#3a5a1e", "#8aa040", 4), roughness: 0.9 }) }], scale: [0.7, 1.5], spacing: 9, collide: 0.6 };
   }
   // bush
   {
@@ -784,39 +814,53 @@ function makeScatterLibrary(THREE, B, site) {
   // pine
   {
     const trunk = new THREE.CylinderGeometry(0.2, 0.4, 4, 6); trunk.translate(0, 2, 0);
-    const c1 = new THREE.ConeGeometry(2.6, 5, 7); c1.translate(0, 5, 0);
-    const c2 = new THREE.ConeGeometry(2, 4.5, 7); c2.translate(0, 8, 0);
-    const c3 = new THREE.ConeGeometry(1.3, 3.5, 7); c3.translate(0, 10.6, 0);
+    const sprays=[];
+    for(let level=0;level<8;level++)for(let branch=0;branch<6;branch++){
+      const length=2.7*(1-level/9),a=branch*Math.PI/3+level*.75;
+      const f=blade(THREE,length,length*.85,-.3,0,5);f.rotateX(-.2);f.rotateY(a);f.translate(0,3.2+level*.95,0);sprays.push(f);
+    }
     const green = std({ map: leafBlotchTexture(THREE, site.biome === "mountain" ? "#2f4a2a" : "#2b5a30", "#1a2e18", "#4a7a3a", 31), roughness: 0.95 });
-    lib.pine = { parts: [{ geo: trunk, mat: bark }, { geo: c1, mat: green }, { geo: c2, mat: green }, { geo: c3, mat: green }], scale: [0.7, 1.7], spacing: 5, collide: 0.5,
+    green.side=THREE.DoubleSide;
+    lib.pine = { parts: [{ geo: trunk, mat: bark }, { geo: mergeForms(THREE,sprays), mat: green }], scale: [0.7, 1.7], spacing: 5, collide: 0.5,
       where: (x, z, h, s) => site.biome === "mountain" ? (h < 50 && s < 0.6) : (site.biome === "yellowstone" ? (z < -40 || h > 12 || (x > 120 && z > 100)) : true) };
   }
   // kapok / rainforest giant: buttress trunk and a big leafy crown of planes
   {
     const trunk = new THREE.CylinderGeometry(0.5, 1.4, 14, 7); trunk.translate(0, 7, 0);
-    const crown = bumpy(THREE, new THREE.SphereGeometry(6, 14, 10), 0.24, 21); crown.scale(1, 0.7, 1); crown.translate(0, 15, 0);
-    const crown2 = bumpy(THREE, new THREE.SphereGeometry(4, 12, 8), 0.24, 22); crown2.translate(3.5, 12, 2);
-    const crown3 = bumpy(THREE, new THREE.SphereGeometry(3.5, 12, 8), 0.24, 23); crown3.translate(-3.5, 13, -2.5);
-    lib.kapok = { parts: [{ geo: trunk, mat: std({ color: 0x4c3a2a }) }, { geo: mergeGeos(THREE, [crown, crown2, crown3]), mat: std({ map: leafBlotchTexture(THREE, "#2f6b25", "#1e4a18", "#4f9a35", 21), roughness: 0.9 }) }], scale: [0.8, 1.6], spacing: 10, collide: 1.2,
+    const trunks=[trunk],crowns=[];
+    for(let i=0;i<8;i++){
+      const a=i*2.4,x=Math.cos(a)*(i?3.8:0),z=Math.sin(a)*(i?3.8:0),y=14+(i%3)*1.2;
+      trunks.push(taperedCurve(THREE,[[0,9,0],[x*.5,12,z*.5],[x,y,z]],.5,.12,7,7));
+      const root=taperedCurve(THREE,[[0,3,0],[Math.cos(a)*1.2,.7,Math.sin(a)*1.2],[Math.cos(a)*3,0,Math.sin(a)*3]],.5,.08,6,7);trunks.push(root);
+      const crown=bumpy(THREE,new THREE.SphereGeometry(3.1,10,8),.2,i+21);crown.scale(1,.65,1);crown.translate(x,y,z);crowns.push(crown);
+    }
+    lib.kapok = { parts: [{ geo: mergeForms(THREE,trunks), mat: std({ color: 0x4c3a2a }) }, { geo: mergeForms(THREE,crowns), mat: std({ map: leafBlotchTexture(THREE, "#2f6b25", "#1e4a18", "#4f9a35", 21), roughness: 0.9 }) }], scale: [0.8, 1.6], spacing: 10, collide: 1.2,
       where: (x, z, h) => h > 2.5 };
   }
   // palm
   {
     const trunk = new THREE.CylinderGeometry(0.18, 0.32, 8, 6); trunk.translate(0, 4, 0); trunk.rotateZ(0.08);
     const parts = [{ geo: trunk, mat: std({ color: 0x8a6a3a }) }];
-    const frond = new THREE.PlaneGeometry(1.2, 5); frond.translate(0, 2.5, 0); frond.rotateX(-0.9);
     const fronds = [];
-    for (let i = 0; i < 7; i++) { const f = frond.clone(); f.rotateY((i / 7) * Math.PI * 2); f.translate(0.6, 7.8, 0); fronds.push(f); }
-    const merged = mergeGeos(THREE, fronds);
+    for (let i=0;i<8;i++){
+      const a=i*Math.PI/4;
+      const stem=taperedCurve(THREE,[[0,0,0],[0,.8,1.8],[0,-1.3,4.5]],.035,.008,10,5);stem.rotateY(a);stem.translate(.6,7.8,0);fronds.push(stem);
+      for(let j=1;j<9;j++)for(const sx of [-1,1]){
+        const t=j/10,len=.9*Math.sin(Math.PI*t)+.2;
+        const f=blade(THREE,len,.22,-.12,0,4);f.rotateY(sx*1.15);f.translate(0,Math.sin(t*Math.PI)*.9-t*t*1.3,4.5*t);f.rotateY(a);f.translate(.6,7.8,0);fronds.push(f);
+      }
+    }
+    const merged = mergeForms(THREE, fronds);
     parts.push({ geo: merged, mat: std({ color: 0x3f8a3a, side: THREE.DoubleSide, flatShading: true }) });
     lib.palm = { parts, scale: [0.7, 1.4], spacing: 5, collide: 0.4, where: (x, z, h) => site.biome === "desert" ? true : h > 1.5 && h < 6 };
   }
   // fern
   {
     const parts = [];
-    const leaf = new THREE.PlaneGeometry(0.5, 1.8); leaf.translate(0, 0.9, 0); leaf.rotateX(-0.7);
-    const leaves = []; for (let i = 0; i < 6; i++) { const l = leaf.clone(); l.rotateY((i / 6) * Math.PI * 2); leaves.push(l); }
-    parts.push({ geo: mergeGeos(THREE, leaves), mat: std({ color: 0x3c7f2c, side: THREE.DoubleSide }), shadow: false });
+    const leaves=[];for(let i=0;i<6;i++)for(let j=1;j<6;j++)for(const sx of [-1,1]){
+      const t=j/6,l=blade(THREE,.36*Math.sin(t*Math.PI)+.05,.12,.025,0,2);l.rotateY(sx*1.05);l.translate(0,Math.sin(t*Math.PI)*.55,t*1.5);l.rotateY(i*Math.PI*2/6);leaves.push(l);
+    }
+    parts.push({ geo: mergeForms(THREE, leaves), mat: std({ color: 0x3c7f2c, side: THREE.DoubleSide }), shadow: false });
     lib.fern = { parts, scale: [0.6, 1.6], spacing: 1.5 };
   }
   // cactus / dry scrub for the volcanic island
@@ -832,6 +876,7 @@ function makeScatterLibrary(THREE, B, site) {
       const a = (i / 9) * Math.PI * 2, len = 1.4 + (i % 3) * 0.5;
       const b = new THREE.CylinderGeometry(0.05, 0.14, len, 5); b.translate(0, len / 2, 0); b.rotateZ(0.5 + (i % 2) * 0.35); b.rotateY(a); branches.push(b);
       const tip = new THREE.SphereGeometry(0.12, 5, 4); tip.translate(0, len, 0); tip.rotateZ(0.5 + (i % 2) * 0.35); tip.rotateY(a); branches.push(tip);
+      for(const sx of [-1,1]){const fork=taperedCurve(THREE,[[0,len*.55,0],[sx*.3,len*.8,0],[sx*.55,len*.98,.15]],.075,.018,5,5);fork.rotateZ(.5+(i%2)*.35);fork.rotateY(a);branches.push(fork)}
     }
     const base = bumpy(THREE, new THREE.SphereGeometry(0.7, 8, 6), 0.3, 31); base.scale(1, 0.5, 1); branches.push(base);
     const geo = mergeGeos(THREE, branches);
@@ -878,15 +923,15 @@ function buildLandmark(THREE, id, site, N) {
 
   if (id === "baobab") {
     const trunk = bumpy(THREE, new THREE.CylinderGeometry(2.2, 4.2, 16, 12, 6), 0.06, 5); trunk.translate(0, 8, 0);
-    add(trunk, std({ color: 0x8a7462 }));
+    const wood=[trunk],crowns=[];
     for (let i = 0; i < 9; i++) {
       const a = (i / 9) * Math.PI * 2, len = 6 + N.rnd() * 5;
-      const br = new THREE.CylinderGeometry(0.25, 0.8, len, 6); br.translate(0, len / 2, 0);
-      const m = add(br, std({ color: 0x8a7462 }), Math.cos(a) * 1.5, 15.5, Math.sin(a) * 1.5);
-      m.rotation.set(Math.sin(a) * 0.9, 0, -Math.cos(a) * 0.9);
-      const leaves = bumpy(THREE, new THREE.SphereGeometry(2.2, 7, 5), 0.2, i + 40);
-      add(leaves, std({ color: 0x5a7a2e, flatShading: true }), Math.cos(a) * (1.5 + len * 0.72), 15.5 + len * 0.62, Math.sin(a) * (1.5 + len * 0.72));
+      const x=Math.cos(a)*(1.5+len*.72),z=Math.sin(a)*(1.5+len*.72),y=15.5+len*.62;
+      wood.push(taperedCurve(THREE,[[Math.cos(a),12,Math.sin(a)],[x*.45,17,z*.45],[x,y,z]],1,.14,12,8));
+      for(let j=0;j<3;j++){const leaves=bumpy(THREE,new THREE.SphereGeometry(2.1,10,7),.18,i*3+j+40);leaves.scale(1,.48,1);leaves.translate(x+Math.cos(j*2.1)*1.2,y+(j%2)*.3,z+Math.sin(j*2.1)*1.2);crowns.push(leaves)}
     }
+    add(mergeForms(THREE,wood),std({color:0x8a7462}));
+    add(mergeForms(THREE,crowns),std({map:leafBlotchTexture(THREE,'#607836','#344720','#95a35d',41)}));
     return { mesh: g, radius: 11, height: 24, centreY: 13, collide: 4.5 };
   }
   if (id === "temple") {

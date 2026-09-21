@@ -22,6 +22,8 @@
    the field guide says.
    =========================================================== */
 
+import { taperedCurve, blade, mergeForms } from './forms.mjs';
+
 /* ---------------- textures ---------------- */
 function patternTexture(THREE, base, kind, colour2, seed) {
   const c = document.createElement("canvas"); c.width = c.height = 128;
@@ -40,7 +42,13 @@ function patternTexture(THREE, base, kind, colour2, seed) {
     g.lineWidth = 2.2; g.strokeStyle = colour2 || "#000";
     for (let i = 0; i < 30; i++) { const x = rnd() * 128, y = rnd() * 128, r = 4 + rnd() * 4; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.stroke(); g.beginPath(); g.arc(x, y, 1.4, 0, Math.PI * 2); g.fill(); }
   } else if (kind === "patches") {
-    for (let i = 0; i < 18; i++) { const x = rnd() * 128, y = rnd() * 128, r = 8 + rnd() * 12; g.beginPath(); g.ellipse(x, y, r, r * 0.7, rnd() * 3, 0, Math.PI * 2); g.fill(); }
+    // Giraffe coat: angular islands separated by pale channels.
+    for (let row = -1; row < 6; row++) for (let col = -1; col < 5; col++) {
+      const x = col * 32 + (row % 2) * 16, y = row * 26;
+      g.beginPath();
+      for (let j = 0; j < 6; j++) { const a = j * Math.PI / 3, r = 12 + rnd() * 3; const px=x+Math.cos(a)*r,py=y+Math.sin(a)*r; if(j)g.lineTo(px,py);else g.moveTo(px,py); }
+      g.closePath(); g.fill();
+    }
   } else if (kind === "belly") {
     // dark back, pale front (penguins, orcas, sharks): top half of the texture is the back
     g.fillRect(0, 0, 128, 64);
@@ -48,7 +56,17 @@ function patternTexture(THREE, base, kind, colour2, seed) {
     for (let i = 0; i < 3; i++) g.fillRect(20 + i * 40, 0, 12, 128);
   } else if (kind === "shaggy") {
     for (let i = 0; i < 400; i++) { g.globalAlpha = 0.25; g.fillRect(rnd() * 128, rnd() * 128, 2, 6 + rnd() * 8); }
+  } else if (kind === 'scutes') {
+    g.strokeStyle='#272d1d';g.lineWidth=2;
+    for(let row=-1;row<6;row++)for(let col=-1;col<6;col++){
+      const x=col*29+(row%2)*14.5,y=row*25;g.beginPath();
+      for(let j=0;j<6;j++){const a=j*Math.PI/3,px=x+Math.cos(a)*16,py=y+Math.sin(a)*16;if(j)g.lineTo(px,py);else g.moveTo(px,py)}g.closePath();g.stroke();
+    }
   }
+  // Fine directional grain gives plain coats a surface as well as a colour.
+  g.globalAlpha = kind === 'hide' ? 0.06 : 0.065;
+  for (let i=0;i<1800;i++) { g.fillStyle = rnd() < .5 ? '#fff' : '#241c14'; g.fillRect(rnd()*128,rnd()*128,kind==='hide'?5:1,kind==='hide'?1:3); }
+  g.globalAlpha = 1;
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping;
   return t;
 }
@@ -105,19 +123,20 @@ export function makeCreature(THREE, id) {
   const S = SPECIES[id];
   const std = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.85, metalness: 0 }, o));
   const g = new THREE.Group();
-  const parts = { legs: [], wings: [], head: null, neck: null, tail: null, jaw: null, fins: [] };
+  const parts = { legs: [], knees: [], legSpecs: [], wings: [], head: null, neck: null, tail: null, jaw: null, fins: [] };
   const M = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; m.receiveShadow = false; return m; };
   let skin;
   if (S.pattern) {
     const tex = patternTexture(THREE, S.colour, S.pattern[0], S.pattern[1], id.length * 31);
     // spots and rosettes are small on a big cat: tile the pattern over long bodies
-    if (S.pattern[0] !== "stripes" && S.pattern[0] !== "belly") { const r = Math.max(1, Math.round(S.len * 1.6)); tex.repeat.set(r, Math.max(1, Math.round(r * 0.6))); }
+    if (S.pattern[0] !== "stripes" && S.pattern[0] !== "belly") { const r = S.pattern[0]==='patches'?1.4:Math.max(1, Math.round(S.len * 1.6)); tex.repeat.set(r, Math.max(1, Math.round(r * 0.6))); }
     skin = std({ map: tex });
-  } else skin = std({ color: S.colour });
+  } else skin = std({ map: patternTexture(THREE, S.colour, S.trunk || S.rig === 'blob' ? 'hide' : 'fur', null, id.length*31) });
   const plain = std({ color: S.colour });
   const dark = std({ color: 0x1a1612 });
-  const eyeGeo = new THREE.SphereGeometry(1, 6, 5);
-  const addEyes = (parent, r, x, y, z) => { for (const sx of [-1, 1]) { const e = M(eyeGeo, dark, sx * x, y, z); e.scale.setScalar(r); parent.add(e); } };
+  const eyeGeo = new THREE.SphereGeometry(1, 10, 8);
+  const eyeMat = std({ color: '#100e0b', roughness: .16 });
+  const addEyes = (parent, r, x, y, z) => { for (const sx of [-1, 1]) { const e = M(eyeGeo, eyeMat, sx * x, y, z); e.scale.set(r*.7,r*.6,r*.5); parent.add(e); } };
   let radius = S.len * 0.6, height = S.sh || S.len, eyeY = S.sh || S.len * 0.5;
 
   if (S.rig === "quad") {
@@ -132,13 +151,22 @@ export function makeCreature(THREE, id) {
     if (S.belly) { const b = M(new THREE.SphereGeometry(1, 10, 8), std({ color: S.belly }), 0, bodyY - bh * 0.28, 0); b.scale.set(bw * 0.85, bh * 0.85, bl * 0.85); if (S.slope) b.rotation.x = -S.slope; g.add(b); }
     if (S.hump) { const h = M(new THREE.SphereGeometry(1, 10, 8), skin, 0, bodyY + bh * 0.55, S.len * (id === "camel" ? 0.05 : 0.22)); h.scale.set(bw * 0.9, S.hump, S.len * 0.28); g.add(h); }
     if (S.skirt) { const sk = M(new THREE.CylinderGeometry(bw * 1.05, bw * 1.15, bh * 1.2, 12), skin, 0, bodyY - bh * 0.5, 0); sk.scale.z = bl * 0.9 / bw; g.add(sk); }
-    // legs
-    const legLen = bodyY;
+    // Muscular upper limbs taper into a bent wrist/hock and a grounded foot.
+    const hoofed = ['giraffe','zebra','reindeer','yak','camel','bison','elk'].includes(id);
+    const footMat = hoofed ? std({color:'#3c3229'}) : skin;
+    const footH = S.legs * .65;
+    const legLen = bodyY - bh*.15 - footH;
     for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
       const pivot = new THREE.Group(); pivot.position.set(sx * bw * 0.72, bodyY - bh * 0.15, sz * bl * 0.62);
-      const leg = M(new THREE.CylinderGeometry(S.legs * 0.8, S.legs, legLen, 7), skin, 0, -legLen / 2, 0);
-      pivot.add(leg);
-      const foot = M(new THREE.SphereGeometry(S.legs * 1.25, 7, 5), skin, 0, -legLen + S.legs * 0.4, S.legs * 0.3); foot.scale.y = 0.6; pivot.add(foot);
+      const bend = (S.trunk ? .015 : sz > 0 ? .04 : -.14) * legLen, upper = legLen*.53;
+      pivot.add(M(taperedCurve(THREE,[[0,0,0],[0,-upper*.5,bend*.55],[0,-upper,bend]],S.legs*(S.trunk?1:.98),S.legs*.64,6,8),skin));
+      const knee = new THREE.Group();knee.position.set(0,-upper,bend);
+      const joint=new THREE.SphereGeometry(S.legs*.7,10,7);
+      const shin=taperedCurve(THREE,[[0,0,0],[0,-(legLen-upper)*.6,-bend*.55],[0,-(legLen-upper),-bend]],S.legs*.58,S.legs*.48,6,8);
+      knee.add(M(mergeForms(THREE,[joint,shin]),skin));
+      const foot=M(new THREE.SphereGeometry(1,12,8),footMat,0,-(legLen-upper),-bend+S.legs*.28);foot.scale.set(S.legs*(hoofed?.72:.9),footH,S.legs*(hoofed?.95:1.1));knee.add(foot);
+      pivot.add(knee);parts.knees.push(knee);
+      parts.legSpecs.push({upper,len:legLen,bend,forward:S.legs*.28,footH,footZ:foot.scale.z,rootY:pivot.position.y});
       g.add(pivot); parts.legs.push(pivot);
     }
     // neck + head
@@ -147,28 +175,32 @@ export function makeCreature(THREE, id) {
     // na is the neck's elevation above horizontal: the neck mesh runs along +y,
     // so tip it forward (towards +z, the way the animal faces) by 90° minus na
     neck.rotation.x = Math.PI / 2 - na;
-    const neckMesh = M(new THREE.CylinderGeometry(S.head * 0.55, S.head * 0.85, nl, 8), skin, 0, nl / 2, 0);
+    const neckMesh = M(taperedCurve(THREE,[[0,0,0],[0,nl*.45,-nl*.06],[0,nl,0]],S.head * .88,S.head * .57,10,10), skin);
     neck.add(neckMesh);
     const head = new THREE.Group(); head.position.set(0, nl, 0); head.rotation.x = -(Math.PI / 2 - na) + 0.15;   // head level, nose a touch down
-    const skull = M(S.boxHead ? new THREE.BoxGeometry(S.head * 1.6, S.head * 1.4, S.head * 2) : new THREE.SphereGeometry(S.head, 12, 9), S.faceWhite ? std({ color: "#f0e6d8" }) : skin, 0, 0, 0);
+    const skull = M(new THREE.SphereGeometry(S.head, 20, 14), S.faceWhite ? std({ color: "#f0e6d8" }) : skin, 0, 0, 0);
+    if(S.boxHead) skull.scale.set(.85,.72,1.25);
+    else if(hoofed) skull.scale.set(.8,.9,1.2);
     head.add(skull);
     if (S.snout) { const sn = M(new THREE.SphereGeometry(S.head * 0.65, 9, 7), S.faceWhite ? std({ color: "#f0e6d8" }) : plain, 0, -S.head * 0.15, S.head * S.snout * 1.5); sn.scale.set(0.9, 0.75, 1.4); head.add(sn); const nose = M(new THREE.SphereGeometry(S.head * 0.22, 6, 5), dark, 0, -S.head * 0.05, S.head * S.snout * 1.5 + S.head * 0.8); head.add(nose); }
     addEyes(head, S.head * 0.16, S.head * 0.55, S.head * 0.2, S.head * 0.7);
     // ears
-    const earGeo = S.bigEars ? new THREE.SphereGeometry(S.ears, 8, 6) : new THREE.ConeGeometry(S.ears * 0.8, S.ears * 2, 6);
+    const rounded = S.trunk || ['lion','jaguar','snowleopard','polarbear','grizzly','capybara'].includes(id);
+    const earGeo = new THREE.SphereGeometry(1,12,9);
     for (const sx of [-1, 1]) {
-      const e = M(earGeo, skin, sx * S.head * (S.bigEars ? 0.95 : 0.6), S.head * (S.bigEars ? 0.1 : 0.85), S.bigEars ? -S.head * 0.2 : 0);
-      if (S.bigEars) e.scale.set(0.25, 1.3, 1); else e.rotation.z = -sx * 0.35;
-      head.add(e);
+      const ear=new THREE.Group();ear.position.set(sx*S.head*(S.trunk?.95:.65),S.head*(S.trunk?.05:.85),-S.head*.16);ear.rotation.y=sx*.32;ear.rotation.z=-sx*(S.trunk?.2:.35);
+      const ew=S.ears*(S.trunk?1:rounded?.85:.7),eh=S.ears*(S.trunk?1.25:rounded?1:1.65);
+      const e=M(earGeo,skin);e.scale.set(ew,eh,S.ears*.16);ear.add(e);
+      const inner=M(earGeo,std({color:S.trunk?'#9f8f86':'#b59a81'}),0,0,S.ears*.12);inner.scale.set(ew*.66,eh*.72,S.ears*.06);ear.add(inner);head.add(ear);
     }
     if (S.mane) { const mane = M(bumpyGeo(THREE, new THREE.SphereGeometry(S.head * 1.35, 14, 10), 0.12), std({ color: "#7a4a1e" }), 0, -S.head * 0.15, -S.head * 0.55); mane.scale.set(1, 1.05, 0.85); head.add(mane); }
     if (S.maneRidge) { const r = M(new THREE.BoxGeometry(0.06, 0.22, nl), dark, 0, nl / 2 + S.head * 0.6, 0); neck.add(r); }
     if (S.beard) { const b = M(new THREE.SphereGeometry(S.head * 0.6, 8, 6), skin, 0, -S.head * 0.8, S.head * 0.3); b.scale.set(0.8, 1.4, 0.9); head.add(b); }
     if (S.trunk) {
       const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, -S.head * 0.2, S.head * 0.8), new THREE.Vector3(0, -S.head * 1.2, S.head * 1.1), new THREE.Vector3(0, -S.head * 2.4, S.head * 1.0), new THREE.Vector3(0, -S.head * 3.2, S.head * 1.3)]);
-      const tr = M(new THREE.TubeGeometry(curve, 12, S.head * 0.28, 8), skin); head.add(tr); parts.trunk = tr;
+      const tr = M(taperedCurve(THREE,curve.points.map(p=>p.toArray()),S.head*.32,S.head*.09,20,10), skin); head.add(tr); parts.trunk = tr;
     }
-    if (S.tusks) for (const sx of [-1, 1]) { const t = M(new THREE.ConeGeometry(S.head * 0.12, S.head * 1.4, 7), std({ color: "#f0e8d0" }), sx * S.head * 0.45, -S.head * 0.7, S.head * 1.1); t.rotation.x = -Math.PI / 2 - 0.4; head.add(t); }
+    if (S.tusks) for (const sx of [-1, 1]) head.add(M(taperedCurve(THREE,[[sx*S.head*.48,-S.head*.4,S.head*.6],[sx*S.head*.58,-S.head*.65,S.head*1.3],[sx*S.head*.62,-S.head*.45,S.head*2]],S.head*.105,.008,14,8),std({color:'#ede2c5',roughness:.5})));
     if (S.ossicones) for (const sx of [-1, 1]) { const o = M(new THREE.CylinderGeometry(0.05, 0.04, 0.3, 6), std({ color: "#5a3a1a" }), sx * 0.12, S.head * 1.1, -0.05); head.add(o); const k = M(new THREE.SphereGeometry(0.07, 6, 5), dark, sx * 0.12, S.head * 1.3, -0.05); head.add(k); }
     if (S.horns) for (const sx of [-1, 1]) { const h = M(new THREE.ConeGeometry(S.head * 0.14, S.head * (S.horns === "curved" ? 1.6 : 0.8), 7), std({ color: "#3a3028" }), sx * S.head * 0.8, S.head * 0.6, 0); h.rotation.z = -sx * (S.horns === "curved" ? 1.3 : 0.8); h.rotation.x = -0.4; head.add(h); }
     if (S.antlers) {
@@ -183,8 +215,8 @@ export function makeCreature(THREE, id) {
     if (S.tail) {
       const [tl, tr, style] = S.tail;
       const tail = new THREE.Group(); tail.position.set(0, bodyY + bh * 0.35 - (S.slope ? bl * Math.sin(S.slope) * 0.8 : 0), -bl * 0.92); tail.rotation.x = S.rig === "quad" && (id === "arcticfox" || id === "redpanda" || id === "snowleopard" || id === "fennec") ? 0.7 : 0.3;
-      const tm = M(new THREE.CylinderGeometry(tr * 0.6, tr, tl, 6), style === "bands" ? std({ map: patternTexture(THREE, S.colour, "stripes", "#3a2010", 5) }) : skin, 0, -tl / 2, 0); tail.add(tm);
-      if (style === "tuft") tail.add(M(new THREE.SphereGeometry(tr * 2.2, 6, 5), dark, 0, -tl, 0));
+      const tm = M(taperedCurve(THREE,[[0,0,0],[0,-tl*.45,-tl*.2],[0,-tl*.88,-tl*.3]],tr,style==='tuft'?tr*.35:tr*.18,12,8), style === "bands" ? std({ map: patternTexture(THREE, S.colour, "bands", "#3a2010", 5) }) : skin); tail.add(tm);
+      if (style === "tuft") tail.add(M(new THREE.SphereGeometry(tr * 2.2, 8, 6), dark, 0, -tl*.88, -tl*.3));
       g.add(tail); parts.tail = tail;
     }
     radius = Math.max(S.len * 0.55, bw); height = S.sh + (S.neck[0] * Math.sin(S.neck[1] + 0.3)) + S.head; eyeY = S.sh * 0.9 + S.neck[0] * Math.sin(S.neck[1]);
@@ -198,13 +230,14 @@ export function makeCreature(THREE, id) {
     head.add(M(new THREE.SphereGeometry(S.head * 0.2, 6, 5), dark, 0, -S.head * 0.05, S.head * 0.95));
     if (S.tusks) for (const sx of [-1, 1]) { const t = M(new THREE.ConeGeometry(S.head * 0.12, S.head * 1.6, 6), std({ color: "#f0e8d0" }), sx * S.head * 0.3, -S.head * 0.9, S.head * 0.6); t.rotation.x = Math.PI; head.add(t); }
     if (S.ears) for (const sx of [-1, 1]) head.add(M(new THREE.SphereGeometry(S.head * 0.15, 5, 4), skin, sx * S.head * 0.8, S.head * 0.3, 0));
+    if(S.whiskers){const whiskers=[];for(const sx of [-1,1])for(let i=0;i<4;i++)whiskers.push(taperedCurve(THREE,[[sx*S.head*.25,-S.head*.2,S.head*.8],[sx*S.head*.7,-S.head*(.2+i*.1),S.head],[sx*S.head*1.15,-S.head*(.3+i*.17),S.head*.8]],S.head*.012,.001,6,4));head.add(M(mergeForms(THREE,whiskers),std({color:'#c8baa0'})))}
     g.add(head); parts.head = head;
     for (const sx of [-1, 1]) { const f = M(new THREE.SphereGeometry(1, 7, 5), skin, sx * S.w * 0.55, S.sh * 0.15, S.len * 0.15); f.scale.set(S.len * 0.08, S.sh * 0.06, S.len * 0.2); g.add(f); parts.fins.push(f); }
     const tf = M(new THREE.SphereGeometry(1, 7, 5), skin, 0, S.sh * 0.15, -S.len * 0.5); tf.scale.set(S.w * 0.35, S.sh * 0.08, S.len * 0.15); g.add(tf);
     radius = S.len * 0.55; height = S.sh; eyeY = S.sh * 0.75;
   }
   else if (S.rig === "shelled") {
-    const shell = M(new THREE.SphereGeometry(1, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2), std({ color: S.shell, flatShading: true }), 0, S.sh * 0.35, 0); shell.scale.set(S.w * 0.55, S.sh * 0.65, S.len * 0.5); g.add(shell);
+    const shell = M(new THREE.SphereGeometry(1, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), std({ map:patternTexture(THREE,S.shell,'scutes',null,9) }), 0, S.sh * 0.35, 0); shell.scale.set(S.w * 0.55, S.sh * 0.65, S.len * 0.5); g.add(shell);
     const under = M(new THREE.CylinderGeometry(S.w * 0.5, S.w * 0.5, S.sh * 0.3, 14), plain, 0, S.sh * 0.3, 0); under.scale.z = S.len / S.w; g.add(under);
     for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const p = new THREE.Group(); p.position.set(sx * S.w * 0.4, S.sh * 0.3, sz * S.len * 0.3); p.add(M(new THREE.CylinderGeometry(S.len * 0.08, S.len * 0.1, S.sh * 0.3, 7), plain, 0, -S.sh * 0.15, 0)); g.add(p); parts.legs.push(p); }
     const neck = new THREE.Group(); neck.position.set(0, S.sh * 0.35, S.len * 0.42); neck.rotation.x = Math.PI / 2 - 0.5;
@@ -216,16 +249,16 @@ export function makeCreature(THREE, id) {
   else if (S.rig === "lizard") {
     const body = M(new THREE.SphereGeometry(1, 10, 8), plain, 0, S.sh * 0.6, 0); body.scale.set(S.w * 0.5, S.sh * 0.5, S.len * 0.32); g.add(body);
     const tail = new THREE.Group(); tail.position.set(0, S.sh * 0.5, -S.len * 0.3);
-    tail.add(M(new THREE.ConeGeometry(S.w * 0.3, S.len * 0.7, 6), plain, 0, 0, -S.len * 0.35)).rotation.x = Math.PI / 2; g.add(tail); parts.tail = tail;
-    const head = new THREE.Group(); head.position.set(0, S.sh * 0.6, S.len * 0.32); head.add(M(new THREE.BoxGeometry(S.w * 0.8, S.sh * 0.7, S.len * 0.2), plain, 0, 0, S.len * 0.08)); addEyes(head, S.sh * 0.15, S.w * 0.4, S.sh * 0.25, S.len * 0.1); g.add(head); parts.head = head;
+    tail.add(M(taperedCurve(THREE,[[0,0,0],[0,-S.sh*.1,-S.len*.35],[S.len*.09,-S.sh*.25,-S.len*.7]],S.w*.3,.004,14,8),skin)); g.add(tail); parts.tail = tail;
+    const head = new THREE.Group(); head.position.set(0, S.sh * 0.6, S.len * 0.32);const skull=M(new THREE.SphereGeometry(1,14,10),skin,0,0,S.len*.08);skull.scale.set(S.w*.44,S.sh*.42,S.len*.15);head.add(skull); addEyes(head, S.sh * 0.15, S.w * 0.4, S.sh * 0.25, S.len * 0.1); g.add(head); parts.head = head;
     for (let i = 0; i < 8; i++) g.add(M(new THREE.ConeGeometry(0.02, 0.09, 4), std({ color: "#5a5a4a" }), 0, S.sh * 1.05, S.len * 0.3 - i * S.len * 0.07));
     for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const p = new THREE.Group(); p.position.set(sx * S.w * 0.5, S.sh * 0.5, sz * S.len * 0.2); const l = M(new THREE.CylinderGeometry(0.03, 0.035, S.sh * 0.6, 5), plain, sx * S.sh * 0.3, -S.sh * 0.2, 0); l.rotation.z = -sx * 1.0; p.add(l); g.add(p); parts.legs.push(p); }
     radius = S.len * 0.5; height = S.sh * 1.2; eyeY = S.sh * 0.7;
   }
   else if (S.rig === "upright") {
     const back = std({ color: S.colour }), front = std({ color: S.belly });
-    const body = M(new THREE.SphereGeometry(1, 14, 12), back, 0, S.sh * 0.5, 0); body.scale.set(S.w * 0.5, S.sh * 0.5, S.w * 0.5); g.add(body);
-    const belly = M(new THREE.SphereGeometry(1, 12, 10), front, 0, S.sh * 0.46, S.w * 0.12); belly.scale.set(S.w * 0.42, S.sh * 0.42, S.w * 0.42); g.add(belly);
+    const body = M(new THREE.SphereGeometry(1, 24, 18), back, 0, S.sh * 0.5, 0); body.scale.set(S.w * 0.5, S.sh * 0.5, S.w * 0.5); g.add(body);
+    const belly = M(new THREE.SphereGeometry(1, 24, 18), front, 0, S.sh * 0.48, S.w * 0.3); belly.scale.set(S.w * 0.39, S.sh * 0.4, S.w * 0.23); g.add(belly);
     const head = new THREE.Group(); head.position.set(0, S.sh * 0.95, 0.02); head.add(M(new THREE.SphereGeometry(S.w * 0.32, 10, 8), back));
     for (const sx of [-1, 1]) head.add(M(new THREE.SphereGeometry(S.w * 0.13, 7, 5), std({ color: S.cheek }), sx * S.w * 0.22, -S.w * 0.05, S.w * 0.18));
     const beak = M(new THREE.ConeGeometry(S.w * 0.08, S.w * 0.4, 6), std({ color: "#2a2a2a" }), 0, -S.w * 0.05, S.w * 0.45); beak.rotation.x = Math.PI / 2; head.add(beak);
@@ -245,33 +278,41 @@ export function makeCreature(THREE, id) {
     const beak = M(new THREE.ConeGeometry(S.bigBeak ? S.len * 0.09 : S.len * 0.05, beakLen, 7), std({ color: S.beak }), 0, S.bigBeak ? -S.len * 0.05 : 0, S.len * 0.16 + beakLen / 2); beak.rotation.x = Math.PI / 2; head.add(beak);
     addEyes(head, S.len * 0.03, S.len * 0.1, S.len * 0.05, S.len * 0.1);
     g.add(head); parts.head = head;
-    // wings: flat boxes hinged at the body
-    const wingMat = S.iridescent ? std({ color: "#20a070", metalness: 0.6, roughness: 0.3 }) : back;
+    // Overlapping primaries make a scalloped flight silhouette, in one mesh
+    // per wing rather than a draw call for every feather.
+    const wingMat = std({vertexColors:true,side:THREE.DoubleSide,metalness:S.iridescent?.25:0,roughness:S.iridescent?.45:.85});
     for (const sx of [-1, 1]) {
       const pivot = new THREE.Group(); pivot.position.set(sx * S.len * 0.15, S.len * 0.08, 0);
-      const wing = M(new THREE.BoxGeometry(S.span * 0.5, S.len * 0.03, S.len * 0.32), wingMat, sx * S.span * 0.25, 0, -S.len * 0.05); pivot.add(wing);
-      if (S.wingtips) { const tip = M(new THREE.BoxGeometry(S.span * 0.18, S.len * 0.032, S.len * 0.3), std({ color: S.wingtips }), sx * S.span * 0.42, 0, -S.len * 0.06); pivot.add(tip); }
-      if (S.wingMid) { const mid = M(new THREE.BoxGeometry(S.span * 0.14, S.len * 0.032, S.len * 0.3), std({ color: S.wingMid }), sx * S.span * 0.26, 0, -S.len * 0.06); pivot.add(mid); }
+      const feathers=[];const leading=blade(THREE,S.span*.51,S.len*.42,S.len*.035);leading.rotateY(sx*Math.PI/2);feathers.push(leading);
+      for(let i=0;i<8;i++){const feather=blade(THREE,S.len*(.36+.15*Math.sin(i/8*Math.PI)),S.len*.14,S.len*.012,sx*S.len*.035);feather.rotateY(Math.PI+sx*(i/7)*.3);feather.translate(sx*S.span*(.09+i*.053),-.006*i,-S.len*.04);feathers.push(feather)}
+      const geo=mergeForms(THREE,feathers),p=geo.attributes.position,cols=[];
+      for(let i=0;i<p.count;i++){const span=Math.abs(p.getX(i))/S.span;const c=new THREE.Color(span>.32&&S.wingtips?S.wingtips:span>.18&&S.wingMid?S.wingMid:S.colour);c.multiplyScalar(.85+.15*Math.cos(p.getZ(i)*38));cols.push(c.r,c.g,c.b)}
+      geo.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));pivot.add(M(geo,wingMat));
       g.add(pivot); parts.wings.push(pivot);
     }
-    const tail = M(new THREE.BoxGeometry(S.len * 0.18, S.len * 0.02, S.longTail ? S.len * 0.6 : S.len * 0.3), S.wingtips ? std({ color: S.wingtips }) : back, 0, 0, -S.len * (S.longTail ? 0.65 : 0.5)); g.add(tail);
+    const tailFeathers=[];for(let i=-2;i<=2;i++){const f=blade(THREE,S.len*(S.longTail?.68:.36)*(1-Math.abs(i)*.08),S.len*.095,S.len*.01);f.rotateY(Math.PI+i*.13);f.translate(i*S.len*.035,0,-S.len*.32);tailFeathers.push(f)}
+    g.add(M(mergeForms(THREE,tailFeathers),std({color:S.wingtips||S.colour,side:THREE.DoubleSide})));
     for (const sx of [-1, 1]) { const f = M(new THREE.BoxGeometry(S.len * 0.06, S.len * 0.12, S.len * 0.12), std({ color: S.feet }), sx * S.len * 0.08, -S.len * 0.24, S.len * 0.05); g.add(f); parts.fins.push(f); }
     radius = S.span * 0.5; height = S.len * 0.5; eyeY = S.len * 0.2;
   }
   else if (S.rig === "fish") {
     const back = std({ color: S.colour }), front = std({ color: S.belly || S.colour });
     if (S.shape === "turtle") {
-      const shell = M(new THREE.SphereGeometry(1, 12, 9), std({ color: S.shell, flatShading: true }), 0, 0, 0); shell.scale.set(S.len * 0.42, S.len * 0.18, S.len * 0.5); g.add(shell);
+      const shell = M(new THREE.SphereGeometry(1, 24, 16), std({ map:patternTexture(THREE,S.shell,'scutes',null,9) }), 0, 0, 0); shell.scale.set(S.len * 0.42, S.len * 0.18, S.len * 0.5); g.add(shell);
       const head = new THREE.Group(); head.position.set(0, 0, S.len * 0.55); head.add(M(new THREE.SphereGeometry(S.len * 0.12, 8, 6), plain)); addEyes(head, S.len * 0.025, S.len * 0.07, S.len * 0.04, S.len * 0.08); g.add(head); parts.head = head;
       for (const [sx, sz] of [[-1, 0.25], [1, 0.25], [-1, -0.3], [1, -0.3]]) { const p = new THREE.Group(); p.position.set(sx * S.len * 0.38, -S.len * 0.02, sz * S.len); const fl = M(new THREE.SphereGeometry(1, 7, 5), plain, sx * S.len * 0.2, 0, 0); fl.scale.set(S.len * (sz > 0 ? 0.28 : 0.16), S.len * 0.03, S.len * 0.1); fl.rotation.y = sx * 0.6; p.add(fl); g.add(p); parts.fins.push(p); }
       radius = S.len * 0.6; height = S.len * 0.3;
     } else if (S.shape === "manta") {
-      const wing = new THREE.Shape(); wing.moveTo(0, 0.5); wing.lineTo(1, 0.15); wing.lineTo(0.6, -0.35); wing.lineTo(0, -0.5); wing.lineTo(-0.6, -0.35); wing.lineTo(-1, 0.15); wing.closePath();
-      const geo = new THREE.ShapeGeometry(wing); geo.rotateX(-Math.PI / 2); geo.scale(S.len * 0.5, 1, S.len * 0.5);
-      const top = M(geo, std({ color: S.colour, side: THREE.DoubleSide }), 0, 0, 0); g.add(top);
+      for(const sx of [-1,1]){
+        const outline=new THREE.Shape();outline.moveTo(0,.25);outline.quadraticCurveTo(.34,.27,.52,-.06);outline.quadraticCurveTo(.34,-.13,0,-.27);outline.closePath();
+        const geo=new THREE.ShapeGeometry(outline,12);geo.scale(sx*S.len,S.len,1);geo.rotateX(Math.PI/2);
+        const p=geo.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,Math.sin(Math.abs(p.getX(i))/S.len*Math.PI)*S.len*.045);geo.computeVertexNormals();
+        const wing=M(geo,std({color:S.colour,side:THREE.DoubleSide}));g.add(wing);parts.wings.push(wing);
+      }
       const body = M(new THREE.SphereGeometry(1, 10, 8), back, 0, 0, 0); body.scale.set(S.len * 0.1, S.len * 0.05, S.len * 0.3); g.add(body);
       const tail = M(new THREE.CylinderGeometry(0.02, 0.05, S.len * 0.5, 5), back, 0, 0, -S.len * 0.5); tail.rotation.x = Math.PI / 2; g.add(tail);
-      parts.mantaWing = top; radius = S.len * 0.5; height = S.len * 0.1;
+      for(const sx of [-1,1])g.add(M(taperedCurve(THREE,[[sx*S.len*.075,0,S.len*.18],[sx*S.len*.09,0,S.len*.3],[sx*S.len*.06,S.len*.02,S.len*.34]],S.len*.026,S.len*.012,8,7),back));
+      radius = S.len * 0.5; height = S.len * 0.1;
     } else {
       const bodyLen = S.len;
       const body = M(new THREE.SphereGeometry(1, 12, 9), back, 0, 0, 0); body.scale.set(bodyLen * 0.12, bodyLen * 0.16, bodyLen * 0.5);
@@ -281,9 +322,15 @@ export function makeCreature(THREE, id) {
       g.add(body);
       const belly = M(new THREE.SphereGeometry(1, 10, 8), front, 0, -bodyLen * 0.04, 0); belly.scale.set(bodyLen * 0.1, bodyLen * 0.12, bodyLen * 0.42); if (S.shape !== "fish") g.add(belly);
       const tail = new THREE.Group(); tail.position.set(0, 0, -bodyLen * 0.45);
-      const fluke = M(new THREE.BoxGeometry(S.shape === "shark" ? bodyLen * 0.05 : bodyLen * 0.4, S.shape === "shark" ? bodyLen * 0.35 : bodyLen * 0.04, bodyLen * 0.2), back, 0, 0, -bodyLen * 0.12); tail.add(fluke); g.add(tail); parts.tail = tail;
-      if (S.shape === "shark") { const dorsal = M(new THREE.ConeGeometry(bodyLen * 0.1, bodyLen * 0.22, 4), back, 0, bodyLen * 0.2, 0); dorsal.rotation.y = Math.PI / 4; g.add(dorsal); const tipMat = std({ color: "#1a1a1a" }); g.add(M(new THREE.ConeGeometry(bodyLen * 0.035, bodyLen * 0.06, 4), tipMat, 0, bodyLen * 0.32, 0)); }
-      for (const sx of [-1, 1]) { const f = M(new THREE.BoxGeometry(bodyLen * (S.shape === "whale" ? 0.32 : 0.16), bodyLen * 0.02, bodyLen * 0.1), back, sx * bodyLen * (S.shape === "whale" ? 0.25 : 0.16), -bodyLen * 0.05, bodyLen * 0.12); f.rotation.z = sx * 0.4; g.add(f); parts.fins.push(f); }
+      const flukes=[];for(const sx of [-1,1]){const f=blade(THREE,bodyLen*(S.shape==='fish'?.19:.25),bodyLen*.2,bodyLen*.012,sx*bodyLen*.05);f.rotateY(sx*2.0);if(S.shape!=='whale')f.rotateZ(Math.PI/2);flukes.push(f)}
+      tail.add(M(mergeForms(THREE,flukes),std({color:S.colour,side:THREE.DoubleSide})));g.add(tail);parts.tail=tail;
+      if (S.shape === "shark") {
+        const outline=new THREE.Shape();outline.moveTo(0,0);outline.quadraticCurveTo(.06,.15,.14,.25);outline.quadraticCurveTo(.13,.1,.26,0);outline.closePath();
+        const geo=new THREE.ExtrudeGeometry(outline,{depth:.018,bevelEnabled:false,curveSegments:8});geo.translate(0,0,-.009);geo.scale(bodyLen,bodyLen,bodyLen);geo.rotateY(Math.PI/2);
+        const p=geo.attributes.position,cols=[];for(let i=0;i<p.count;i++){const c=new THREE.Color(p.getY(i)>bodyLen*.19?'#252b2d':S.colour);cols.push(c.r,c.g,c.b)}geo.setAttribute('color',new THREE.Float32BufferAttribute(cols,3));
+        g.add(M(geo,std({vertexColors:true}),0,bodyLen*.12,bodyLen*.08));
+      }
+      for (const sx of [-1, 1]) { const geo=blade(THREE,bodyLen*(S.shape==='whale'?.38:.23),bodyLen*.13,bodyLen*.015);geo.rotateY(sx*2);const f=M(geo,std({color:S.colour,side:THREE.DoubleSide}),sx*bodyLen*.08,-bodyLen*.05,bodyLen*.12);f.rotation.z=sx*.4;g.add(f);parts.fins.push(f); }
       addEyes(g, bodyLen * 0.02, bodyLen * 0.1, bodyLen * 0.04, bodyLen * 0.38);
       radius = bodyLen * 0.5; height = bodyLen * 0.3;
       if (S.shape === "whale") { const bumps = std({ color: S.colour }); for (let i = 0; i < 6; i++) g.add(M(new THREE.SphereGeometry(bodyLen * 0.02, 5, 4), bumps, (i % 2 ? 1 : -1) * bodyLen * 0.04, bodyLen * 0.1, bodyLen * 0.3 + i * 0.03)); }
@@ -294,7 +341,8 @@ export function makeCreature(THREE, id) {
     const wingMat = std({ color: S.colour, side: THREE.DoubleSide, metalness: 0.3, roughness: 0.4 });
     for (const sx of [-1, 1]) {
       const pivot = new THREE.Group();
-      const w = M(new THREE.PlaneGeometry(S.len, S.len * 0.9), wingMat, sx * S.len * 0.5, 0, 0); w.rotation.x = -Math.PI / 2; w.castShadow = false; pivot.add(w);
+      const lobes=[];for(const sz of [-1,1]){const l=blade(THREE,S.len*(sz>0?1:.7),S.len*.75,S.len*.04);l.rotateY(sx*(sz>0?1:2));lobes.push(l)}
+      const geo=mergeForms(THREE,lobes);const w=M(geo,wingMat);w.castShadow=false;pivot.add(w);
       g.add(pivot); parts.wings.push(pivot);
     }
     g.add(M(new THREE.CylinderGeometry(0.01, 0.01, S.len * 0.7, 5), dark).rotateX(Math.PI / 2));
@@ -309,7 +357,20 @@ function animate(cr, t, moving, dt) {
   const P = cr.parts, S = cr.spec, gait = moving ? 1 : 0;
   const f = S.rig === "quad" ? (2.6 + 6 / (S.len + 1)) * (cr.fleeing ? 1.8 : 1) : 4;
   if (S.rig === "quad" || S.rig === "shelled" || S.rig === "lizard") {
-    P.legs.forEach((leg, i) => { leg.rotation.x = Math.sin(t * f + (i % 2 ? Math.PI : 0) + (i > 1 ? Math.PI * 0.5 : 0)) * 0.5 * gait; });
+    let supportBottom=Infinity;
+    P.legs.forEach((leg, i) => {
+      const phase=t*f+(i===0||i===3?0:Math.PI),a=Math.sin(phase)*.38*gait,k=Math.max(0,Math.cos(phase))*.45*gait;
+      leg.rotation.x=a;if(P.knees[i])P.knees[i].rotation.x=k;
+      const p=P.legSpecs[i];
+      if(p&&(!moving||Math.cos(phase)<=0)){
+        const centre=p.rootY-p.upper*Math.cos(a)-p.bend*Math.sin(a)-(p.len-p.upper)*Math.cos(a+k)-(-p.bend+p.forward)*Math.sin(a+k);
+        const radius=Math.hypot(p.footH*Math.cos(a+k),p.footZ*Math.sin(a+k));
+        supportBottom=Math.min(supportBottom,centre-radius);
+      }
+    });
+    // Keep the planted feet on the terrain during the stride instead of
+    // lifting the whole animal above its shadow as rigid legs swing.
+    if(Number.isFinite(supportBottom))cr.group.position.y-=supportBottom*(cr.scale||1);
     if (P.neck) {
       // neck elevation: grazers drop the nose towards the grass, browsers reach up into the leaves
       const elev = cr.grazing ? (P.browse ? P.neckAngle + 0.3 : -0.5) : P.neckAngle;
@@ -321,7 +382,7 @@ function animate(cr, t, moving, dt) {
     }
     if (P.tail) P.tail.rotation.z = Math.sin(t * 2 + cr.seed) * 0.25;
     if (P.trunk) P.trunk.rotation.x = Math.sin(t * 1.3 + cr.seed) * 0.15;
-    cr.group.position.y += Math.abs(Math.sin(t * f)) * 0.03 * gait * S.len;
+    if(S.rig!=='quad')cr.group.position.y += Math.abs(Math.sin(t * f)) * 0.03 * gait * S.len;
   } else if (S.rig === "blob") {
     cr.group.position.y += Math.abs(Math.sin(t * 3)) * 0.08 * gait;
     P.fins.forEach((f, i) => { f.rotation.y = Math.sin(t * 3 + i) * 0.4 * gait; });
@@ -337,9 +398,9 @@ function animate(cr, t, moving, dt) {
     P.fins.forEach((f) => { f.visible = !flying; });
     if (P.head) P.head.rotation.y = flying ? 0 : Math.sin(t * 1.5 + cr.seed) * 0.5;
   } else if (S.rig === "fish") {
-    if (P.tail) P.tail.rotation.y = Math.sin(t * (S.tiny ? 12 : 3) + cr.seed) * 0.4;
+    if (P.tail) { const angle=Math.sin(t*(S.tiny?12:3)+cr.seed)*.4;if(S.shape==='whale')P.tail.rotation.x=angle;else P.tail.rotation.y=angle; }
     P.fins.forEach((f, i) => { f.rotation.x = Math.sin(t * 2 + i) * 0.3; });
-    if (P.mantaWing) { P.mantaWing.rotation.z = 0; P.mantaWing.scale.y = 1; cr.group.rotation.z = Math.sin(t * 1.2) * 0.25; }
+    if (S.shape==='manta') { P.wings.forEach((wing,i)=>{wing.rotation.z=(i?1:-1)*Math.sin(t*1.8+cr.seed)*.22});cr.group.rotation.z=Math.sin(t*1.2)*.12; }
     cr.group.rotation.x = -(cr.vy || 0) * 0.4;
   } else if (S.rig === "flutter") {
     P.wings.forEach((w, i) => { w.rotation.z = (i ? -1 : 1) * (0.2 + Math.sin(t * 14) * 0.9); });
@@ -396,9 +457,10 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
         const cr = makeCreature(THREE, id);
         cr.id = id; cr.info = info; cr.seed = N.rnd() * 100;
         cr.home = home.clone(); cr.leader = leader;
-        cr.target = null; cr.state = "wander"; cr.timer = N.rnd() * 3; cr.speed = 0; cr.heading = N.rnd() * Math.PI * 2;
+        cr.target = null; cr.state = "wander"; cr.timer = N.rnd() * 3; cr.speed = 0; cr.turn = 0; cr.heading = N.rnd() * Math.PI * 2;
         cr.pos = home.clone().add(new THREE.Vector3((N.rnd() - 0.5) * 12, 0, (N.rnd() - 0.5) * 12));
         cr.flying = S.rig === "bird" && S.perch === "sky"; cr.alt = 0; cr.present = true;
+        if(S.rig==='bird'&&!cr.flying){cr.perchAt=home.clone();cr.y=world.heightAt(home.x,home.z)+(S.perch==='tree'?7:.05)}
         cr.scale = 0.85 + N.rnd() * 0.3; cr.group.scale.setScalar(cr.scale);
         cr.when = info.when; cr.rare = info.rare;
         if (S.rig === "fish" || S.rig === "bird") cr.alt = S.rig === "fish" ? (world.underwater ? 6 + N.rnd() * 10 : -2) : 20 + N.rnd() * 20;
@@ -447,11 +509,15 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
           // land sometimes
           if (S.perch !== "sky" && cr.state !== "flee" && cr.timer <= 0 && N.rnd() < 0.3) { cr.flying = false; cr.timer = 8 + N.rnd() * 14; cr.target = null; cr.perchAt = pickSpot(S.perch === "tree" ? "trees" : "shore", cr.home, 50) || cr.home.clone(); }
           if (S.perch === "sky" && cr.timer <= 0) cr.timer = 4 + N.rnd() * 6;
-          const sp = S.speed * (cr.state === "flee" ? 1.5 : 1);
-          steer(cr, cr.target, sp, dt, 2.5);
-          const groundY = world.heightAt(cr.pos.x, cr.pos.z);
-          const wantY = Math.max(groundY + cr.alt, world.waterLevel + cr.alt);
-          cr.y = cr.y == null ? wantY : cr.y + (wantY - cr.y) * Math.min(1, dt * 1.2);
+          // Landing clears the flight target. Do not steer toward that null
+          // target on the transition frame; the perch branch takes over next.
+          if(cr.flying){
+            const sp = S.speed * (cr.state === "flee" ? 1.5 : 1);
+            steer(cr, cr.target, sp, dt, 2.5);
+            const groundY = world.heightAt(cr.pos.x, cr.pos.z);
+            const wantY = Math.max(groundY + cr.alt, world.waterLevel + cr.alt);
+            cr.y = cr.y == null ? wantY : cr.y + (wantY - cr.y) * Math.min(1, dt * 1.2);
+          }
         } else {
           if (cr.perchAt) {
             const perchY = world.heightAt(cr.perchAt.x, cr.perchAt.z) + (S.perch === "tree" ? 7 : 0.05);
