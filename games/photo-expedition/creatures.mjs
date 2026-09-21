@@ -74,7 +74,7 @@ const SPECIES = {
   yak:       { rig: "quad", len: 2.3, sh: 1.5, w: 1.0, colour: "#2a221c", pattern: ["shaggy", "#000"], head: 0.4, snout: 0.5, neck: [0.4, 0.1], legs: 0.25, ears: 0.1, horns: "curved", hump: 0.35, skirt: true, tail: [0.6, 0.15], speed: 0.9, flee: 4, alert: 16, herd: 4, graze: 0.7, habitat: "any" },
   monal:     { rig: "bird", len: 0.6, span: 1.0, colour: "#1a4a8a", belly: "#0a2a1a", beak: "#4a4a4a", feet: "#6a6a4a", perch: "ground", iridescent: true, speed: 7, alert: 12, herd: 2, habitat: "any" },
   redpanda:  { rig: "quad", len: 0.6, sh: 0.3, w: 0.25, colour: "#b5451b", belly: "#2a1a10", head: 0.17, snout: 0.35, faceWhite: true, neck: [0.1, 0.2], legs: 0.06, ears: 0.08, tail: [0.5, 0.09, "bands"], speed: 0.9, flee: 4, alert: 14, herd: 1, graze: 0.4, habitat: "trees" },
-  camel:     { rig: "quad", len: 2.6, sh: 2.0, w: 0.9, slope: 0.1, colour: "#c8a06a", head: 0.36, snout: 0.6, neck: [1.3, 0.9], legs: 0.16, ears: 0.1, hump: 0.7, tail: [0.6, 0.04, "tuft"], speed: 1.2, flee: 5, alert: 16, herd: 4, graze: 0.4, habitat: "any" },
+  camel:     { rig: "quad", len: 2.6, sh: 2.0, w: 0.9, slope: 0.1, colour: "#c8a06a", head: 0.36, snout: 0.6, neck: [1.2, 0.6], legs: 0.16, ears: 0.1, hump: 0.7, tail: [0.6, 0.04, "tuft"], speed: 1.2, flee: 5, alert: 16, herd: 4, graze: 0.4, habitat: "any" },
   fennec:    { rig: "quad", len: 0.4, sh: 0.2, w: 0.15, colour: "#e8d4a8", head: 0.12, snout: 0.5, neck: [0.08, 0.3], legs: 0.04, ears: 0.14, bigEars: true, tail: [0.3, 0.05], speed: 2.2, flee: 9, alert: 20, herd: 1, graze: 0.3, habitat: "any", rare: true },
   vulture:   { rig: "bird", len: 0.7, span: 1.7, colour: "#f0ede0", belly: "#f0ede0", wingtips: "#1a1a1a", beak: "#e0b030", feet: "#b0a080", perch: "sky", speed: 10, alert: 20, herd: 2, habitat: "any" },
   bison:     { rig: "quad", len: 3.0, sh: 1.8, w: 1.1, colour: "#4a3220", pattern: ["shaggy", "#000"], head: 0.55, snout: 0.5, neck: [0.5, -0.1], legs: 0.25, ears: 0.1, horns: "short", hump: 0.6, beard: true, tail: [0.6, 0.05, "tuft"], speed: 1.0, flee: 6, alert: 20, herd: 6, graze: 0.7, habitat: "meadow" },
@@ -144,10 +144,12 @@ export function makeCreature(THREE, id) {
     // neck + head
     const [nl, na] = S.neck;
     const neck = new THREE.Group(); neck.position.set(0, bodyY + bh * 0.3 + (S.slope ? bl * Math.sin(S.slope) * 0.8 : 0), bl * 0.85);
-    neck.rotation.x = -na;
+    // na is the neck's elevation above horizontal: the neck mesh runs along +y,
+    // so tip it forward (towards +z, the way the animal faces) by 90° minus na
+    neck.rotation.x = Math.PI / 2 - na;
     const neckMesh = M(new THREE.CylinderGeometry(S.head * 0.55, S.head * 0.85, nl, 8), skin, 0, nl / 2, 0);
     neck.add(neckMesh);
-    const head = new THREE.Group(); head.position.set(0, nl, 0); head.rotation.x = na - 0.1;
+    const head = new THREE.Group(); head.position.set(0, nl, 0); head.rotation.x = -(Math.PI / 2 - na) + 0.15;   // head level, nose a touch down
     const skull = M(S.boxHead ? new THREE.BoxGeometry(S.head * 1.6, S.head * 1.4, S.head * 2) : new THREE.SphereGeometry(S.head, 12, 9), S.faceWhite ? std({ color: "#f0e6d8" }) : skin, 0, 0, 0);
     head.add(skull);
     if (S.snout) { const sn = M(new THREE.SphereGeometry(S.head * 0.65, 9, 7), S.faceWhite ? std({ color: "#f0e6d8" }) : plain, 0, -S.head * 0.15, S.head * S.snout * 1.5); sn.scale.set(0.9, 0.75, 1.4); head.add(sn); const nose = M(new THREE.SphereGeometry(S.head * 0.22, 6, 5), dark, 0, -S.head * 0.05, S.head * S.snout * 1.5 + S.head * 0.8); head.add(nose); }
@@ -176,7 +178,7 @@ export function makeCreature(THREE, id) {
         for (let i = 0; i < 3; i++) { const tine = M(new THREE.CylinderGeometry(0.02, 0.035, S.antlers * 0.45, 5), mat, sx * (S.head * 0.45 + S.antlers * (0.15 + i * 0.12)), S.head * 0.7 + S.antlers * (0.35 + i * 0.22), -S.head * 0.2 - i * 0.05); tine.rotation.z = -sx * 1.4 + sx * i * 0.3; head.add(tine); }
       }
     }
-    neck.add(head); g.add(neck); parts.neck = neck; parts.head = head; parts.neckAngle = na;
+    neck.add(head); g.add(neck); parts.neck = neck; parts.head = head; parts.neckAngle = na; parts.browse = !!S.browse;
     // tail
     if (S.tail) {
       const [tl, tr, style] = S.tail;
@@ -205,9 +207,9 @@ export function makeCreature(THREE, id) {
     const shell = M(new THREE.SphereGeometry(1, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2), std({ color: S.shell, flatShading: true }), 0, S.sh * 0.35, 0); shell.scale.set(S.w * 0.55, S.sh * 0.65, S.len * 0.5); g.add(shell);
     const under = M(new THREE.CylinderGeometry(S.w * 0.5, S.w * 0.5, S.sh * 0.3, 14), plain, 0, S.sh * 0.3, 0); under.scale.z = S.len / S.w; g.add(under);
     for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) { const p = new THREE.Group(); p.position.set(sx * S.w * 0.4, S.sh * 0.3, sz * S.len * 0.3); p.add(M(new THREE.CylinderGeometry(S.len * 0.08, S.len * 0.1, S.sh * 0.3, 7), plain, 0, -S.sh * 0.15, 0)); g.add(p); parts.legs.push(p); }
-    const neck = new THREE.Group(); neck.position.set(0, S.sh * 0.35, S.len * 0.42); neck.rotation.x = -0.5;
+    const neck = new THREE.Group(); neck.position.set(0, S.sh * 0.35, S.len * 0.42); neck.rotation.x = Math.PI / 2 - 0.5;
     neck.add(M(new THREE.CylinderGeometry(S.len * 0.07, S.len * 0.1, S.len * 0.4, 7), plain, 0, S.len * 0.2, 0));
-    const head = new THREE.Group(); head.position.set(0, S.len * 0.4, 0); head.add(M(new THREE.SphereGeometry(S.len * 0.11, 8, 6), plain)); addEyes(head, S.len * 0.02, S.len * 0.06, S.len * 0.04, S.len * 0.08);
+    const head = new THREE.Group(); head.position.set(0, S.len * 0.4, 0); head.rotation.x = -(Math.PI / 2 - 0.5); head.add(M(new THREE.SphereGeometry(S.len * 0.11, 8, 6), plain)); addEyes(head, S.len * 0.02, S.len * 0.06, S.len * 0.04, S.len * 0.08);
     neck.add(head); g.add(neck); parts.neck = neck; parts.head = head; parts.neckAngle = 0.5;
     radius = S.len * 0.55; height = S.sh; eyeY = S.sh * 0.6;
   }
@@ -309,9 +311,13 @@ function animate(cr, t, moving, dt) {
   if (S.rig === "quad" || S.rig === "shelled" || S.rig === "lizard") {
     P.legs.forEach((leg, i) => { leg.rotation.x = Math.sin(t * f + (i % 2 ? Math.PI : 0) + (i > 1 ? Math.PI * 0.5 : 0)) * 0.5 * gait; });
     if (P.neck) {
-      const graze = cr.grazing ? (S.browse ? -0.6 : 1.0) : 0;
-      P.neck.rotation.x += ((-P.neckAngle + graze) - P.neck.rotation.x) * Math.min(1, dt * 2);
-      if (P.head) P.head.rotation.y = Math.sin(t * 0.7 + cr.seed) * 0.25 * (1 - gait);
+      // neck elevation: grazers drop the nose towards the grass, browsers reach up into the leaves
+      const elev = cr.grazing ? (P.browse ? P.neckAngle + 0.3 : -0.5) : P.neckAngle;
+      P.neck.rotation.x += ((Math.PI / 2 - elev) - P.neck.rotation.x) * Math.min(1, dt * 2);
+      if (P.head) {
+        P.head.rotation.x = -P.neck.rotation.x + (cr.grazing && !P.browse ? 0.6 : 0.15);   // keep the head level, nose down to graze
+        P.head.rotation.y = Math.sin(t * 0.7 + cr.seed) * 0.25 * (1 - gait);
+      }
     }
     if (P.tail) P.tail.rotation.z = Math.sin(t * 2 + cr.seed) * 0.25;
     if (P.trunk) P.trunk.rotation.x = Math.sin(t * 1.3 + cr.seed) * 0.15;
