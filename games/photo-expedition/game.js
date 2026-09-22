@@ -275,7 +275,7 @@
     show("s-world");
     root.classList.add("loading");
     try {
-      const [THREE, mod] = await Promise.all([import("../../assets/vendor/three/three.module.min.js"), import("./expedition.mjs?v=20260921-wildlife")]);
+      const [THREE, mod] = await Promise.all([import("../../assets/vendor/three/three.module.min.js"), import("./expedition.mjs?v=20260921-fauna2")]);
       const starsBefore = totalStars(), rankBefore = rankFor(starsBefore)[1], bestBefore = Object.assign({ __treasure: prof.treasures.includes(site.id) }, prof.stars[site.id] || {});
       if (!prof.route.length || prof.route[prof.route.length - 1] !== site.id) prof.route.push(site.id);
       prof.visits[site.id] = (prof.visits[site.id] || 0) + 1; persist();

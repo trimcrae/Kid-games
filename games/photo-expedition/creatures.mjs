@@ -23,6 +23,8 @@
    =========================================================== */
 
 import { taperedCurve, blade, mergeForms } from './forms.mjs';
+import { contour, coat } from './wildlife-surfaces.mjs';
+import { createWalkRig, updateWalk } from './locomotion.mjs';
 
 /* ---------------- textures ---------------- */
 function patternTexture(THREE, base, kind, colour2, seed) {
@@ -119,14 +121,22 @@ function bumpyGeo(THREE, geo, amount) {
 }
 
 /* ---------------- builders ---------------- */
-export function makeCreature(THREE, id) {
-  const S = SPECIES[id];
+export function makeCreature(THREE, id, materials = new Map()) {
+  const S = { ...SPECIES[id] };
+  if (S.rig === 'quad') {
+    const feline=['lion','jaguar','snowleopard','arcticfox','fennec','redpanda'].includes(id);
+    S.head *= S.trunk ? .94 : feline ? .72 : .84;
+    S.legs *= feline ? .68 : S.trunk ? .82 : .9;
+  }
   const std = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.85, metalness: 0 }, o));
   const g = new THREE.Group();
   const parts = { legs: [], knees: [], legSpecs: [], wings: [], head: null, neck: null, tail: null, jaw: null, fins: [] };
   const M = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; m.receiveShadow = false; return m; };
   let skin;
-  if (S.pattern) {
+  if (S.rig === 'quad') {
+    if (!materials.has(id)) materials.set(id, coat(THREE,S,id));
+    skin = materials.get(id);
+  } else if (S.pattern) {
     const tex = patternTexture(THREE, S.colour, S.pattern[0], S.pattern[1], id.length * 31);
     // spots and rosettes are small on a big cat: tile the pattern over long bodies
     if (S.pattern[0] !== "stripes" && S.pattern[0] !== "belly") { const r = S.pattern[0]==='patches'?1.4:Math.max(1, Math.round(S.len * 1.6)); tex.repeat.set(r, Math.max(1, Math.round(r * 0.6))); }
@@ -140,60 +150,79 @@ export function makeCreature(THREE, id) {
   let radius = S.len * 0.6, height = S.sh || S.len, eyeY = S.sh || S.len * 0.5;
 
   if (S.rig === "quad") {
-    const bodyY = S.sh * 0.72;
+    g.rotation.order='YXZ';
+    const bodyY = S.sh * 0.78;
     // body radii: a real body is deeper than it is wide and never rounder than it is long,
     // so the depth is capped by the length (a giraffe is tall, not a ball on stilts)
-    const bw = S.w * 0.62, bh = Math.min(S.sh * 0.34, S.len * 0.27), bl = S.len * 0.5;
-    const body = M(new THREE.SphereGeometry(1, 20, 14), skin, 0, bodyY, 0);
-    body.scale.set(bw, bh, bl);
-    if (S.slope) body.rotation.x = -S.slope;          // shoulders higher than the rump
+    const bw = S.w * 0.58, bh = Math.min(S.sh * 0.3, S.len * 0.23), bl = S.len * 0.5;
+    const cat = ['lion','jaguar','snowleopard','arcticfox','fennec','redpanda'].includes(id);
+    const heavy = S.trunk || ['capybara','polarbear','grizzly','yak','bison'].includes(id);
+    const profile = [[-1,0,0,0],[-.85,.66,.68,.68],[-.55,1,.93,heavy?.93:.8],[-.18,heavy?1.04:.84,.91,cat?.65:.9],[.2,1.01,1,1.03],[.55,.98,1.06,.91],[.82,.69,.87,.69],[1,0,0,0]];
+    const bodyGeo = contour(THREE,profile.map(([z,w,top,bottom])=>[z*bl,w*bw,top*bh,bottom*bh,(S.slope||0)*z*bl*.7]));
+    const body = M(bodyGeo, skin, 0, bodyY, 0);
     g.add(body);
-    if (S.belly) { const b = M(new THREE.SphereGeometry(1, 10, 8), std({ color: S.belly }), 0, bodyY - bh * 0.28, 0); b.scale.set(bw * 0.85, bh * 0.85, bl * 0.85); if (S.slope) b.rotation.x = -S.slope; g.add(b); }
     if (S.hump) { const h = M(new THREE.SphereGeometry(1, 10, 8), skin, 0, bodyY + bh * 0.55, S.len * (id === "camel" ? 0.05 : 0.22)); h.scale.set(bw * 0.9, S.hump, S.len * 0.28); g.add(h); }
     if (S.skirt) { const sk = M(new THREE.CylinderGeometry(bw * 1.05, bw * 1.15, bh * 1.2, 12), skin, 0, bodyY - bh * 0.5, 0); sk.scale.z = bl * 0.9 / bw; g.add(sk); }
     // Muscular upper limbs taper into a bent wrist/hock and a grounded foot.
     const hoofed = ['giraffe','zebra','reindeer','yak','camel','bison','elk'].includes(id);
     const footMat = hoofed ? std({color:'#3c3229'}) : skin;
-    const footH = S.legs * .65;
-    const legLen = bodyY - bh*.15 - footH;
+    const footH = S.legs * (S.trunk ? .43 : .42);
+    const legLen = bodyY - bh*.16 - footH;
+    const walkLegs=[];
     for (const [sx, sz] of [[-1, 1], [1, 1], [-1, -1], [1, -1]]) {
-      const pivot = new THREE.Group(); pivot.position.set(sx * bw * 0.72, bodyY - bh * 0.15, sz * bl * 0.62);
-      const bend = (S.trunk ? .015 : sz > 0 ? .04 : -.14) * legLen, upper = legLen*.53;
-      pivot.add(M(taperedCurve(THREE,[[0,0,0],[0,-upper*.5,bend*.55],[0,-upper,bend]],S.legs*(S.trunk?1:.98),S.legs*.64,6,8),skin));
-      const knee = new THREE.Group();knee.position.set(0,-upper,bend);
-      const joint=new THREE.SphereGeometry(S.legs*.7,10,7);
-      const shin=taperedCurve(THREE,[[0,0,0],[0,-(legLen-upper)*.6,-bend*.55],[0,-(legLen-upper),-bend]],S.legs*.58,S.legs*.48,6,8);
-      knee.add(M(mergeForms(THREE,[joint,shin]),skin));
-      const foot=M(new THREE.SphereGeometry(1,12,8),footMat,0,-(legLen-upper),-bend+S.legs*.28);foot.scale.set(S.legs*(hoofed?.72:.9),footH,S.legs*(hoofed?.95:1.1));knee.add(foot);
-      pivot.add(knee);parts.knees.push(knee);
-      parts.legSpecs.push({upper,len:legLen,bend,forward:S.legs*.28,footH,footZ:foot.scale.z,rootY:pivot.position.y});
+      const pivot = new THREE.Group(); pivot.position.set(sx * bw * .76, bodyY - bh * .16, sz * bl * .59);
+      // Rounded muscle groups blend into tapered shins, with a small paw/hoof.
+      const upperLength=legLen*.56,lowerLength=legLen*(S.trunk?.52:.58),thick=S.legs*(S.trunk?.94:sz<0?1:.85);
+      const segment=(r1,r2,len)=>{
+        const geo=contour(THREE,[[-.07,0,0,0,0],[0,r1*.8,r1*.8,r1*.8,0],[.23,r1,r1,r1,0],[.72,r2*1.04,r2*1.04,r2*1.04,0],[1,r2,r2,r2,0],[1.05,0,0,0,0]],16,16);
+        geo.rotateX(Math.PI/2);const mesh=M(geo,skin);mesh.scale.y=len;return mesh;
+      };
+      const upper=segment(thick,S.legs*.48,upperLength),lower=segment(S.legs*(S.trunk?.65:.48),S.legs*(S.trunk?.7:.3),lowerLength);
+      const foot=M(new THREE.SphereGeometry(1,18,12),footMat,0,-legLen,0);
+      foot.scale.set(S.legs*(S.trunk?.77:hoofed?.48:.72),footH,S.legs*(S.trunk?.84:hoofed?.66:.93));
+      lower.position.y=-upperLength;pivot.add(upper,lower,foot);
+      walkLegs.push({hip:pivot.position.clone(),upper,lower,foot,upperLength,lowerLength,footH,front:sz>0});
       g.add(pivot); parts.legs.push(pivot);
     }
+    parts.walk=createWalkRig(THREE,walkLegs);
     // neck + head
     const [nl, na] = S.neck;
     const neck = new THREE.Group(); neck.position.set(0, bodyY + bh * 0.3 + (S.slope ? bl * Math.sin(S.slope) * 0.8 : 0), bl * 0.85);
     // na is the neck's elevation above horizontal: the neck mesh runs along +y,
     // so tip it forward (towards +z, the way the animal faces) by 90° minus na
     neck.rotation.x = Math.PI / 2 - na;
-    const neckMesh = M(taperedCurve(THREE,[[0,0,0],[0,nl*.45,-nl*.06],[0,nl,0]],S.head * .88,S.head * .57,10,10), skin);
+    const neckMesh = M(taperedCurve(THREE,[[0,-nl*.16,0],[0,nl*.45,-nl*.06],[0,nl,0]],S.head * (hoofed?1.02:1.2),S.head * .63,16,16), skin);
     neck.add(neckMesh);
     const head = new THREE.Group(); head.position.set(0, nl, 0); head.rotation.x = -(Math.PI / 2 - na) + 0.15;   // head level, nose a touch down
-    const skull = M(new THREE.SphereGeometry(S.head, 20, 14), S.faceWhite ? std({ color: "#f0e6d8" }) : skin, 0, 0, 0);
-    if(S.boxHead) skull.scale.set(.85,.72,1.25);
-    else if(hoofed) skull.scale.set(.8,.9,1.2);
+    const h=S.head, muzzle=hoofed?1.8:S.boxHead?1.6:['lion','jaguar','snowleopard','redpanda'].includes(id)?1:cat?1.3:1.5;
+    const headProfile=S.trunk?[[-.9,0,0,0,0],[-.55,.7,.85,.7,0],[0,.85,1,.74,0],[.55,.72,.87,.64,-.08],[1,.34,.4,.4,-.2],[1.2,0,0,0,-.2]]:S.boxHead?[[-.9,0,0,0,0],[-.5,.78,.68,.64,0],[.2,.81,.69,.67,0],[1.15,.75,.62,.57,-.06],[1.6,.52,.48,.43,-.08],[1.78,0,0,0,-.08]]:[[-.9,0,0,0,0],[-.55,.72,.86,.65,0],[0,.83,.87,.68,0],[.5,.67,.6,.59,-.06],[muzzle*.75,.45,.35,.34,-.22],[muzzle,.34,.27,.26,-.23],[muzzle+.12,0,0,0,-.23]];
+    const headGeo=contour(THREE,headProfile.map(p=>p.map(v=>v*h)),28,24);
+    const skull = M(headGeo,S.faceWhite?std({color:'#e7dbca'}):skin);
+    if(S.trunk)skull.scale.set(1.1,1.3,.8);
     head.add(skull);
-    if (S.snout) { const sn = M(new THREE.SphereGeometry(S.head * 0.65, 9, 7), S.faceWhite ? std({ color: "#f0e6d8" }) : plain, 0, -S.head * 0.15, S.head * S.snout * 1.5); sn.scale.set(0.9, 0.75, 1.4); head.add(sn); const nose = M(new THREE.SphereGeometry(S.head * 0.22, 6, 5), dark, 0, -S.head * 0.05, S.head * S.snout * 1.5 + S.head * 0.8); head.add(nose); }
-    addEyes(head, S.head * 0.16, S.head * 0.55, S.head * 0.2, S.head * 0.7);
+    if (S.snout) {const nose=M(new THREE.SphereGeometry(1,16,10),dark,0,-h*.12,h*muzzle);nose.scale.set(h*(hoofed?.3:.24),h*.16,h*.13);head.add(nose)}
+    addEyes(head, h*.16,h*.72,h*.23,h*.39);
     // ears
-    const rounded = S.trunk || ['lion','jaguar','snowleopard','polarbear','grizzly','capybara'].includes(id);
-    const earGeo = new THREE.SphereGeometry(1,12,9);
+    const rounded = S.trunk || ['lion','jaguar','snowleopard','polarbear','grizzly','capybara','arcticfox','redpanda'].includes(id);
+    const earGeo = new THREE.SphereGeometry(1,24,18);
+    const earPos=earGeo.attributes.position;
+    for(let i=0;i<earPos.count;i++){
+      const x=earPos.getX(i),y=earPos.getY(i),z=earPos.getZ(i);
+      if(S.trunk)earPos.setXYZ(i,x*(.87+y*.22),y-.12*x*x,z+.09*Math.sin(y*4)*x);
+      else if(!rounded)earPos.setX(i,x*(1-.5*Math.max(0,y)));
+    }
+    earGeo.computeVertexNormals();
     for (const sx of [-1, 1]) {
       const ear=new THREE.Group();ear.position.set(sx*S.head*(S.trunk?.95:.65),S.head*(S.trunk?.05:.85),-S.head*.16);ear.rotation.y=sx*.32;ear.rotation.z=-sx*(S.trunk?.2:.35);
       const ew=S.ears*(S.trunk?1:rounded?.85:.7),eh=S.ears*(S.trunk?1.25:rounded?1:1.65);
       const e=M(earGeo,skin);e.scale.set(ew,eh,S.ears*.16);ear.add(e);
-      const inner=M(earGeo,std({color:S.trunk?'#9f8f86':'#b59a81'}),0,0,S.ears*.12);inner.scale.set(ew*.66,eh*.72,S.ears*.06);ear.add(inner);head.add(ear);
+      if(!S.trunk){const inner=M(earGeo,std({color:'#a8937f'}),0,0,S.ears*.12);inner.scale.set(ew*.66,eh*.72,S.ears*.06);ear.add(inner)}
+      head.add(ear);
     }
-    if (S.mane) { const mane = M(bumpyGeo(THREE, new THREE.SphereGeometry(S.head * 1.35, 14, 10), 0.12), std({ color: "#7a4a1e" }), 0, -S.head * 0.15, -S.head * 0.55); mane.scale.set(1, 1.05, 0.85); head.add(mane); }
+    if(S.mane){
+      const geo=contour(THREE,[[-1.8,0,0,0,0],[-1.4,.9,1,1.25,-.1],[-.8,1.18,1.2,1.5,-.1],[-.3,1.05,1.05,1.4,-.1],[.05,.72,.78,.86,0],[.25,0,0,0,0]].map(p=>p.map(v=>v*h)),32,32);
+      head.add(M(bumpyGeo(THREE,geo,.07),std({color:'#705034',bumpMap:skin.bumpMap,bumpScale:.035})));
+    }
     if (S.maneRidge) { const r = M(new THREE.BoxGeometry(0.06, 0.22, nl), dark, 0, nl / 2 + S.head * 0.6, 0); neck.add(r); }
     if (S.beard) { const b = M(new THREE.SphereGeometry(S.head * 0.6, 8, 6), skin, 0, -S.head * 0.8, S.head * 0.3); b.scale.set(0.8, 1.4, 0.9); head.add(b); }
     if (S.trunk) {
@@ -202,12 +231,13 @@ export function makeCreature(THREE, id) {
     }
     if (S.tusks) for (const sx of [-1, 1]) head.add(M(taperedCurve(THREE,[[sx*S.head*.48,-S.head*.4,S.head*.6],[sx*S.head*.58,-S.head*.65,S.head*1.3],[sx*S.head*.62,-S.head*.45,S.head*2]],S.head*.105,.008,14,8),std({color:'#ede2c5',roughness:.5})));
     if (S.ossicones) for (const sx of [-1, 1]) { const o = M(new THREE.CylinderGeometry(0.05, 0.04, 0.3, 6), std({ color: "#5a3a1a" }), sx * 0.12, S.head * 1.1, -0.05); head.add(o); const k = M(new THREE.SphereGeometry(0.07, 6, 5), dark, sx * 0.12, S.head * 1.3, -0.05); head.add(k); }
-    if (S.horns) for (const sx of [-1, 1]) { const h = M(new THREE.ConeGeometry(S.head * 0.14, S.head * (S.horns === "curved" ? 1.6 : 0.8), 7), std({ color: "#3a3028" }), sx * S.head * 0.8, S.head * 0.6, 0); h.rotation.z = -sx * (S.horns === "curved" ? 1.3 : 0.8); h.rotation.x = -0.4; head.add(h); }
+    if (S.horns) for(const sx of [-1,1]){const reach=S.horns==='curved'?1.6:1.1;head.add(M(taperedCurve(THREE,[[sx*h*.65,h*.5,0],[sx*h*reach,h*.7,-h*.1],[sx*h*(reach+.2),h*1.3,-h*.2],[sx*h*(reach-.1),h*1.7,-h*.13]],h*.18,.004,18,10),std({color:'#b5aa91',roughness:.7})))}
     if (S.antlers) {
       const mat = std({ color: "#6a5238" });
       for (const sx of [-1, 1]) {
-        const main = M(new THREE.CylinderGeometry(0.03, 0.05, S.antlers, 6), mat, sx * S.head * 0.45, S.head * 0.7 + S.antlers * 0.45, -S.head * 0.2); main.rotation.z = -sx * 0.5; main.rotation.x = 0.5; head.add(main);
-        for (let i = 0; i < 3; i++) { const tine = M(new THREE.CylinderGeometry(0.02, 0.035, S.antlers * 0.45, 5), mat, sx * (S.head * 0.45 + S.antlers * (0.15 + i * 0.12)), S.head * 0.7 + S.antlers * (0.35 + i * 0.22), -S.head * 0.2 - i * 0.05); tine.rotation.z = -sx * 1.4 + sx * i * 0.3; head.add(tine); }
+        const a=S.antlers,x=sx*h*.45,y=h*.7,z=-h*.2;
+        head.add(M(taperedCurve(THREE,[[x,y,z],[x+sx*a*.2,y+a*.45,z-a*.18],[x+sx*a*.47,y+a*.78,z-a*.4],[x+sx*a*.5,y+a,z-a*.6]],.047,.006,18,9),mat));
+        for(let i=0;i<4;i++){const t=(i+1)/5,bx=x+sx*a*.5*t,by=y+a*t,bz=z-a*.6*t;head.add(M(taperedCurve(THREE,[[bx,by,bz],[bx+sx*a*.12,by+a*.19,bz+a*.16],[bx+sx*a*.16,by+a*.36,bz+a*.21]],.025,.003,10,7),mat))}
       }
     }
     neck.add(head); g.add(neck); parts.neck = neck; parts.head = head; parts.neckAngle = na; parts.browse = !!S.browse;
@@ -357,20 +387,7 @@ function animate(cr, t, moving, dt) {
   const P = cr.parts, S = cr.spec, gait = moving ? 1 : 0;
   const f = S.rig === "quad" ? (2.6 + 6 / (S.len + 1)) * (cr.fleeing ? 1.8 : 1) : 4;
   if (S.rig === "quad" || S.rig === "shelled" || S.rig === "lizard") {
-    let supportBottom=Infinity;
-    P.legs.forEach((leg, i) => {
-      const phase=t*f+(i===0||i===3?0:Math.PI),a=Math.sin(phase)*.38*gait,k=Math.max(0,Math.cos(phase))*.45*gait;
-      leg.rotation.x=a;if(P.knees[i])P.knees[i].rotation.x=k;
-      const p=P.legSpecs[i];
-      if(p&&(!moving||Math.cos(phase)<=0)){
-        const centre=p.rootY-p.upper*Math.cos(a)-p.bend*Math.sin(a)-(p.len-p.upper)*Math.cos(a+k)-(-p.bend+p.forward)*Math.sin(a+k);
-        const radius=Math.hypot(p.footH*Math.cos(a+k),p.footZ*Math.sin(a+k));
-        supportBottom=Math.min(supportBottom,centre-radius);
-      }
-    });
-    // Keep the planted feet on the terrain during the stride instead of
-    // lifting the whole animal above its shadow as rigid legs swing.
-    if(Number.isFinite(supportBottom))cr.group.position.y-=supportBottom*(cr.scale||1);
+    if(S.rig!=='quad')P.legs.forEach((leg,i)=>{leg.rotation.x=Math.sin(t*f+(i%2?Math.PI:0))*.3*gait});
     if (P.neck) {
       // neck elevation: grazers drop the nose towards the grass, browsers reach up into the leaves
       const elev = cr.grazing ? (P.browse ? P.neckAngle + 0.3 : -0.5) : P.neckAngle;
@@ -413,6 +430,7 @@ function animate(cr, t, moving, dt) {
 export function createCreatureManager(THREE, world, site, tier, subjectIds) {
   const N = world.noise;
   const list = [];
+  const materials = new Map();
   const shy = tier.shy;
   const tmp = new THREE.Vector3();
 
@@ -454,7 +472,7 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
       const n = S.herd;
       let leader = null;
       for (let i = 0; i < n; i++) {
-        const cr = makeCreature(THREE, id);
+        const cr = makeCreature(THREE, id, materials);
         cr.id = id; cr.info = info; cr.seed = N.rnd() * 100;
         cr.home = home.clone(); cr.leader = leader;
         cr.target = null; cr.state = "wander"; cr.timer = N.rnd() * 3; cr.speed = 0; cr.turn = 0; cr.heading = N.rnd() * Math.PI * 2;
@@ -595,23 +613,28 @@ export function createCreatureManager(THREE, world, site, tier, subjectIds) {
         if (cr.target && cr.pos.distanceTo(cr.target) < 1.5) { cr.target = null; if (cr.state !== "flee") cr.timer = Math.min(cr.timer, 0.5); }
       }
       const gy = world.heightAt(cr.pos.x, cr.pos.z);
+      cr.fleeing = cr.state === 'flee'; cr.grazing = cr.state === 'graze';
       cr.group.position.set(cr.pos.x, Math.max(gy, world.waterLevel - (S.rig === "blob" ? 0.3 : 0)), cr.pos.z);
       cr.group.rotation.y = cr.heading;
       // tilt with the ground a little
       const ahead = world.heightAt(cr.pos.x + Math.sin(cr.heading) * 2, cr.pos.z + Math.cos(cr.heading) * 2);
       cr.group.rotation.x = -Math.atan2(ahead - gy, 2) * 0.7;
       animate(cr, t, moving, dt);
+      updateWalk(THREE, cr, dt, world.heightAt);
     }
   }
 
   /* turn towards a target and move; returns true if it moved */
   function steer(cr, target, speed, dt, turnRate, ground) {
+    // Short-legged animals cannot plausibly cover several metres per step.
+    if(ground&&cr.spec.rig==='quad')speed=Math.min(speed,cr.spec.sh*(cr.state==='flee'?4.5:1.8));
     const dx = target.x - cr.pos.x, dz = target.z - cr.pos.z;
     const want = Math.atan2(dx, dz);
     let d = want - cr.heading; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2;
     const turn = Math.max(-turnRate * dt, Math.min(turnRate * dt, d));
     cr.heading += turn; cr.turn = turn / dt / turnRate;
-    const step = speed * dt * 2.2;
+    cr.speed = ground ? cr.speed+(speed-cr.speed)*Math.min(1,dt*3) : speed;
+    const step = cr.speed * dt * (ground ? 1 : 2.2);
     const nx = cr.pos.x + Math.sin(cr.heading) * step, nz = cr.pos.z + Math.cos(cr.heading) * step;
     if (ground) {
       // don't walk into water, off the map, or through rocks

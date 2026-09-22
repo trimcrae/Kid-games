@@ -17,8 +17,8 @@
      const ex = await startExpedition({ THREE, site, tier, explorer,
        root, onPhoto, onTreasure, onExit });
    =========================================================== */
-import { buildWorld, SIZE, GRID, CELL } from "./world.mjs?v=20260921-wildlife";
-import { createCreatureManager } from "./creatures.mjs?v=20260921-wildlife";
+import { buildWorld, SIZE, GRID, CELL } from "./world.mjs?v=20260921-fauna2";
+import { createCreatureManager } from "./creatures.mjs?v=20260921-fauna2";
 import { createAmbience } from "./ambience.mjs";
 
 const DAY_SECONDS = 360;          // one sunrise-to-sunset in real seconds

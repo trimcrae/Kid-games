@@ -16,6 +16,7 @@
    =========================================================== */
 
 import { taperedCurve, blade, mergeForms } from './forms.mjs';
+import { barkMaterial, foliageMaterial, leafCloud, broadleafTree, pineTree } from './vegetation.mjs';
 
 export const SIZE = 480;          // metres across
 export const GRID = 8;            // squares per side
@@ -473,8 +474,11 @@ export function buildWorld(THREE, site, quality) {
   for (const T of B.trees) {
     const lib = scatter[T.type]; if (!lib) continue;
     const count = Math.round(T.count * q);
+    for (const part of lib.parts) if(part.mat.userData.wind) updaters.push((dt,t)=>{part.mat.userData.wind.value=t});
     const m = new THREE.Matrix4(), pos = new THREE.Vector3(), rot = new THREE.Euler(), scl = new THREE.Vector3(), quat = new THREE.Quaternion();
-    const inst = lib.parts.map((part) => { const im = new THREE.InstancedMesh(part.geo, part.mat, count); im.castShadow = part.shadow !== false; im.receiveShadow = true; im.frustumCulled = false; return im; });
+    // Spatial batches let both the camera and shadow camera skip trees behind
+    // them. One world-sized instance batch kept drawing the entire forest.
+    const batches = new Map();
     let n = 0, tries = 0;
     while (n < count && tries < count * 30) {
       tries++;
@@ -488,12 +492,34 @@ export function buildWorld(THREE, site, quality) {
       const y = B.underwater ? h : h - 0.15;
       rot.set(0, N.rnd() * Math.PI * 2, 0); quat.setFromEuler(rot); pos.set(x, y, z); scl.set(s, s, s);
       m.compose(pos, quat, scl);
-      for (const im of inst) im.setMatrixAt(n, m);
+      const cell = Math.floor((x+SIZE/2)/120)+4*Math.floor((z+SIZE/2)/120);
+      if(!batches.has(cell))batches.set(cell,[]);
+      batches.get(cell).push(m.clone());
       placed.push([x, z, lib.spacing * 0.6]);
       if (lib.collide) colliders.push({ x, z, r: lib.collide * s });
       n++;
     }
-    for (const im of inst) { im.count = n; im.instanceMatrix.needsUpdate = true; group.add(im); }
+    for(const matrices of batches.values())for(const part of lib.parts){
+      const meshes=[];
+      for(const far of part.farGeo?[false,true]:[false]){
+        const im=new THREE.InstancedMesh(far?part.farGeo:part.geo,part.mat,matrices.length);
+        im.castShadow=part.shadow!==false&&!far;im.receiveShadow=true;
+        matrices.forEach((matrix,i)=>im.setMatrixAt(i,matrix));
+        im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();
+        im.boundingSphere.radius+=.5;group.add(im);meshes.push(im);
+      }
+      if(meshes.length===2){
+        let last=-Infinity;
+        updaters.push((dt,t,env,p)=>{
+          if(!p||t-last<.35)return;last=t;
+          let nearCount=0,farCount=0;
+          for(const matrix of matrices){const e=matrix.elements,near=Math.hypot(e[12]-p.x,e[14]-p.z)<100;meshes[near?0:1].setMatrixAt(near?nearCount++:farCount++,matrix)}
+          meshes[0].count=nearCount;meshes[1].count=farCount;
+          for(const im of meshes)im.instanceMatrix.needsUpdate=true;
+        });
+        meshes[1].count=0;
+      }
+    }
   }
   // grass tufts: cheap crossed planes, in enormous numbers
   if (B.grass) {
@@ -781,25 +807,17 @@ function buildParticles(THREE, B, site) {
 function makeScatterLibrary(THREE, B, site) {
   const lib = {};
   const std = (o) => new THREE.MeshStandardMaterial(Object.assign({ roughness: 0.9, metalness: 0 }, o));
-  const bark = std({ color: 0x5a3f28 });
-  const leafTex = leafTexture(THREE, "#ffffff");
+  const bark = barkMaterial(THREE);
+  const leaves = foliageMaterial(THREE), needles = foliageMaterial(THREE,true);
+  const treeParts=kind=>{
+    const make=distant=>kind==='pine'?pineTree(THREE,needles,bark,distant):broadleafTree(THREE,kind,leaves,bark,distant);
+    const near=make(false),far=make(true);
+    near.forEach((part,i)=>{part.farGeo=far[i].geo});return near;
+  };
 
-  // acacia: thin trunk, flat-topped umbrella of leaves
-  {
-    const trunk = new THREE.CylinderGeometry(0.22, 0.45, 5.5, 6); trunk.translate(0, 2.7, 0);
-    const crowns=[],branches=[trunk];
-    for(let i=0;i<8;i++){
-      const a=i*2.4,r=i?2.2+(i%3)*.4:0,x=Math.cos(a)*r,z=Math.sin(a)*r,y=5.7+(i%3)*.34;
-      const crown=bumpy(THREE,new THREE.SphereGeometry(1.8,10,7),.18,i+4);crown.scale(1,.32,1);crown.translate(x,y,z);crowns.push(crown);
-      branches.push(taperedCurve(THREE,[[0,3.5,0],[x*.4,4.7,z*.4],[x,y-.25,z]],.16,.045,6,6));
-    }
-    lib.acacia = { parts: [{ geo: mergeForms(THREE,branches), mat: bark }, { geo: mergeForms(THREE,crowns), mat: std({ map: leafBlotchTexture(THREE, "#5a7a2e", "#3a5a1e", "#8aa040", 4), roughness: 0.9 }) }], scale: [0.7, 1.5], spacing: 9, collide: 0.6 };
-  }
-  // bush
-  {
-    const g = bumpy(THREE, new THREE.SphereGeometry(1.2, 10, 7), 0.28, 8); g.scale(1.3, 0.8, 1.3); g.translate(0, 0.7, 0);
-    lib.bush = { parts: [{ geo: g, mat: std({ map: leafBlotchTexture(THREE, site.biome === "volcanic" ? "#5f6b3a" : "#6b7d3a", "#3f4a20", "#8a9a4a", 8), roughness: 0.95 }) }], scale: [0.6, 1.6], spacing: 3, shadow: true };
-  }
+  // Open, branching canopies with individual leafy sprays.
+  lib.acacia = { parts: treeParts('acacia'), scale:[.7,1.5], spacing:9, collide:.6 };
+  lib.bush = { parts:[{geo:leafCloud(THREE,[[0,.85,0,1.1,.65,1.1,75,.7]],8,'#82944f'),mat:leaves}],scale:[.6,1.6],spacing:3,shadow:true };
   // rock
   {
     const g = bumpy(THREE, new THREE.DodecahedronGeometry(1.2, 1), 0.25, 12); g.translate(0, 0.4, 0);
@@ -811,36 +829,13 @@ function makeScatterLibrary(THREE, B, site) {
     const g = bumpy(THREE, new THREE.DodecahedronGeometry(1.4, 1), 0.3, 13); g.scale(1.4, 0.7, 1); g.translate(0, 0.4, 0);
     lib.icechunk = { parts: [{ geo: g, mat: std({ color: 0xd8f0ff, flatShading: true, roughness: 0.4 }) }], scale: [0.5, 3], spacing: 4, collide: 1.2, where: (x, z, h) => h < 12 };
   }
-  // pine
-  {
-    const trunk = new THREE.CylinderGeometry(0.2, 0.4, 4, 6); trunk.translate(0, 2, 0);
-    const sprays=[];
-    for(let level=0;level<8;level++)for(let branch=0;branch<6;branch++){
-      const length=2.7*(1-level/9),a=branch*Math.PI/3+level*.75;
-      const f=blade(THREE,length,length*.85,-.3,0,5);f.rotateX(-.2);f.rotateY(a);f.translate(0,3.2+level*.95,0);sprays.push(f);
-    }
-    const green = std({ map: leafBlotchTexture(THREE, site.biome === "mountain" ? "#2f4a2a" : "#2b5a30", "#1a2e18", "#4a7a3a", 31), roughness: 0.95 });
-    green.side=THREE.DoubleSide;
-    lib.pine = { parts: [{ geo: trunk, mat: bark }, { geo: mergeForms(THREE,sprays), mat: green }], scale: [0.7, 1.7], spacing: 5, collide: 0.5,
-      where: (x, z, h, s) => site.biome === "mountain" ? (h < 50 && s < 0.6) : (site.biome === "yellowstone" ? (z < -40 || h > 12 || (x > 120 && z > 100)) : true) };
-  }
-  // kapok / rainforest giant: buttress trunk and a big leafy crown of planes
-  {
-    const trunk = new THREE.CylinderGeometry(0.5, 1.4, 14, 7); trunk.translate(0, 7, 0);
-    const trunks=[trunk],crowns=[];
-    for(let i=0;i<8;i++){
-      const a=i*2.4,x=Math.cos(a)*(i?3.8:0),z=Math.sin(a)*(i?3.8:0),y=14+(i%3)*1.2;
-      trunks.push(taperedCurve(THREE,[[0,9,0],[x*.5,12,z*.5],[x,y,z]],.5,.12,7,7));
-      const root=taperedCurve(THREE,[[0,3,0],[Math.cos(a)*1.2,.7,Math.sin(a)*1.2],[Math.cos(a)*3,0,Math.sin(a)*3]],.5,.08,6,7);trunks.push(root);
-      const crown=bumpy(THREE,new THREE.SphereGeometry(3.1,10,8),.2,i+21);crown.scale(1,.65,1);crown.translate(x,y,z);crowns.push(crown);
-    }
-    lib.kapok = { parts: [{ geo: mergeForms(THREE,trunks), mat: std({ color: 0x4c3a2a }) }, { geo: mergeForms(THREE,crowns), mat: std({ map: leafBlotchTexture(THREE, "#2f6b25", "#1e4a18", "#4f9a35", 21), roughness: 0.9 }) }], scale: [0.8, 1.6], spacing: 10, collide: 1.2,
-      where: (x, z, h) => h > 2.5 };
-  }
+  lib.pine = { parts:treeParts('pine'),scale:[.7,1.7],spacing:5,collide:.5,
+    where:(x,z,h,s)=>site.biome==='mountain'?(h<50&&s<.6):(site.biome==='yellowstone'?(z< -40||h>12||(x>120&&z>100)):true) };
+  lib.kapok = { parts:treeParts('kapok'),scale:[.8,1.6],spacing:10,collide:1.2,where:(x,z,h)=>h>2.5 };
   // palm
   {
     const trunk = new THREE.CylinderGeometry(0.18, 0.32, 8, 6); trunk.translate(0, 4, 0); trunk.rotateZ(0.08);
-    const parts = [{ geo: trunk, mat: std({ color: 0x8a6a3a }) }];
+    const parts = [{ geo: trunk, mat: barkMaterial(THREE,"#a98b64") }];
     const fronds = [];
     for (let i=0;i<8;i++){
       const a=i*Math.PI/4;
@@ -851,7 +846,7 @@ function makeScatterLibrary(THREE, B, site) {
       }
     }
     const merged = mergeForms(THREE, fronds);
-    parts.push({ geo: merged, mat: std({ color: 0x3f8a3a, side: THREE.DoubleSide, flatShading: true }) });
+    parts.push({ geo: merged, mat: std({ color: 0x3f8a3a, side: THREE.DoubleSide, roughness:.8 }) });
     lib.palm = { parts, scale: [0.7, 1.4], spacing: 5, collide: 0.4, where: (x, z, h) => site.biome === "desert" ? true : h > 1.5 && h < 6 };
   }
   // fern
@@ -928,10 +923,11 @@ function buildLandmark(THREE, id, site, N) {
       const a = (i / 9) * Math.PI * 2, len = 6 + N.rnd() * 5;
       const x=Math.cos(a)*(1.5+len*.72),z=Math.sin(a)*(1.5+len*.72),y=15.5+len*.62;
       wood.push(taperedCurve(THREE,[[Math.cos(a),12,Math.sin(a)],[x*.45,17,z*.45],[x,y,z]],1,.14,12,8));
-      for(let j=0;j<3;j++){const leaves=bumpy(THREE,new THREE.SphereGeometry(2.1,10,7),.18,i*3+j+40);leaves.scale(1,.48,1);leaves.translate(x+Math.cos(j*2.1)*1.2,y+(j%2)*.3,z+Math.sin(j*2.1)*1.2);crowns.push(leaves)}
+      crowns.push([x,y,z,2.9,1.2,2.9,66,1.7]);
     }
-    add(mergeForms(THREE,wood),std({color:0x8a7462}));
-    add(mergeForms(THREE,crowns),std({map:leafBlotchTexture(THREE,'#607836','#344720','#95a35d',41)}));
+    add(mergeForms(THREE,wood),barkMaterial(THREE,'#ad9a85'));
+    const leafMat=foliageMaterial(THREE);
+    add(leafCloud(THREE,crowns,41,'#809952'),leafMat);
     return { mesh: g, radius: 11, height: 24, centreY: 13, collide: 4.5 };
   }
   if (id === "temple") {
