@@ -162,8 +162,9 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
         player.x=from.x+(px-from.x)*k;player.y=from.y+(pivot.y-Math.cos(a)*rope+.03-from.y)*k;player.z=from.z+(pivot.z+Math.sin(a)*rope+.08-from.z)*k;
         life.face(0);life.ride({dx:0,dy:0,dz:0,tilt:-a*.6,pose:{sit:k},expression:amp>.5?'happy':undefined});
         if((Math.abs(a)>.7&&Math.sign(a)!==Math.sign(lastA)))sounds.boing();lastA=a;
-        // Seen from the side, where the swinging shows.
-        return {yaw:key==='swing-a'?-Math.PI/2:Math.PI/2};
+        // Look from the open side of each swing. The former sides put a tree
+        // trunk and a front frame leg over the rider through much of the arc.
+        return {yaw:key==='swing-a'?Math.PI/2:-Math.PI/2};
       },
       stop(){
         riding=false;settle=reducedMotion?0:2;life.ride(null);

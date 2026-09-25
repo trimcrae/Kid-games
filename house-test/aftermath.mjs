@@ -61,7 +61,9 @@ export function createAftermath(){
     if(phase==='throw'){
       const k=Math.min(1,t/.7);prop.x=prop.from.x+(prop.to.x-prop.from.x)*k;prop.z=prop.from.z+(prop.to.z-prop.from.z)*k;
       o.face=Math.atan2(prop.x-pet.x,prop.z-pet.z);o.look=[0,-.1];
-      if(t>(reduced?1.2:.35)){phase=reduced?'happy':'chase';t=0;}
+      // Finish the roll before the chase begins. Switching at .35 s left the
+      // ball frozen halfway along the .7 s interpolation.
+      if(t>=(reduced?1.2:.7)){phase=reduced?'happy':'chase';t=0;}
       return o;
     }
     if(phase==='chase'){
