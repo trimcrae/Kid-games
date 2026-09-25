@@ -98,8 +98,7 @@ commits it back:
   2:1 and filed as a panorama, tripod shots only. Few remote places have one;
   a site without a panorama simply has no tripod in its world.
 
-**Never use image-generation models for Craepets** (or for anything depicting
-creatures or children). Craepets art is code-drawn only: the creatures, egg,
+**Never use image-generation models for Craepets**. Craepets art is code-drawn only: the creatures, egg,
 petpets and wardrobe are **built from spheres, cones and tubes in Blender**
 (`tools/craepets-art/render.py`, run headless via the `bpy` pip package on the
 CPU), grown a coat of real Cycles hair so they look like small animals rather
