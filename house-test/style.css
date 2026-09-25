@@ -248,7 +248,7 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
 #map .parchment::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;
   background:repeating-linear-gradient(0deg,#0000 0 3px,#8a6a3a11 3px 4px),repeating-linear-gradient(90deg,#0000 0 5px,#8a6a3a0d 5px 6px)}
 #map .map-oath{font-family:"Brush Script MT","Segoe Script","Snell Roundhand","Bradley Hand","Apple Chancery",cursive;font-size:20px;font-style:italic;color:#5a3a18;margin:0 0 6px;
-  opacity:0;transition:opacity .5s ease}
+  opacity:0;transition:opacity .5s ease;pointer-events:none}
 #map.sworn .map-oath{opacity:.9}
 #map .map-title{font-family:Georgia,"Palatino Linotype",serif;font-variant:small-caps;letter-spacing:.14em;font-size:30px;font-weight:700;color:#3d2510;text-shadow:0 1px 0 #fff3d6}
 #map .map-sub{font-style:italic;font-size:14px;color:#5a3a18;margin:2px auto 10px;max-width:520px}
@@ -263,7 +263,7 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
 #map-elsewhere{font-style:italic;font-size:14px;min-height:1.4em;margin:10px auto 8px;max-width:560px;color:#5a3a18}
 #map-done{font-family:"Brush Script MT","Segoe Script","Snell Roundhand","Bradley Hand","Apple Chancery",cursive;font-size:22px;background:#3d2510;color:#f6e9c8;border-color:#3d2510;border-radius:999px;padding:8px 26px;box-shadow:0 3px 0 #1c0f05}
 #map-done:hover{background:#5a3a18;border-color:#5a3a18}
-#close-map{position:absolute;top:10px;right:12px;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;background:#f6e9c8cc;border:1.5px solid #8a6231;color:#3d2510;font-size:22px;line-height:1;box-shadow:none}
+#close-map{position:absolute;z-index:1;top:10px;right:12px;width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;background:#f6e9c8cc;border:1.5px solid #8a6231;color:#3d2510;font-size:22px;line-height:1;box-shadow:none}
 @media(prefers-reduced-motion:reduce){#map .map-oath,#map-canvas{transition:none}}
 
 /* --- Use what's here (interactions.mjs): one pill above the action bubble --- */
