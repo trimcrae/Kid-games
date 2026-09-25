@@ -4,6 +4,7 @@ import {hangBarInteractions} from './hang-bar.mjs?v=20260925-motion';
 import {roombaInteractions} from './roomba.mjs?v=20260925-motion';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
 import {bedInteractions} from './beds.mjs?v=20260925-motion2';
+import {driveCar} from './car-driving.mjs?v=20260925-drive1';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
@@ -21,7 +22,6 @@ const $=id=>document.getElementById(id);
 // Plan (Blender) coordinates to the browser's: x, height, -y.
 const at=(x,y,h)=>({x,y:h,z:-y});
 const TAU=Math.PI*2;
-const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 // Match THREE.Matrix4.makeRotationY: local +X turns toward world -Z.
 export const carPoint=(x,z,dx,dz,h)=>({x:x+dx*Math.cos(h)+dz*Math.sin(h),z:z-dx*Math.sin(h)+dz*Math.cos(h)});
 
@@ -67,7 +67,7 @@ function createSounds(){
   };
 }
 
-export function createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,tour,bindButton,reducedMotion=false}){
+export function createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,tour,bindButton,reducedMotion=false,getDriveInput=()=>({throttle:0,steer:0})}){
   const sounds=createSounds();
   const pill=$('interact'),label=$('interact-label');
   const info=data.props||{},propBoxes={};
@@ -287,7 +287,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // It stands on the garage floor (its tyres were modelled a touch below it).
     {const f=world.floor(home.x,home.z,b.min[1]+.3);if(Number.isFinite(f))home.y=f;}
     const halfW=(b.max[0]-b.min[0])/2-.05,halfL=(b.max[2]-b.min[2])/2-.05;
-    const car={x:home.x,y:home.y,z:home.z,heading:0,speed:0,parked:true,lastFit:null};
+    const car={x:home.x,y:home.y,z:home.z,heading:0,speed:0,steering:0,parked:true,lastFit:null};
     debug.cars[key]=car;
     const boxes=propBoxes[key]||[],saved=boxes.map(x=>({min:[...x.min],max:[...x.max]}));
     // Glass you can see the driver through.
@@ -379,48 +379,32 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       const lx=dx*c-dz*s,lz=dx*s+dz*c;return Math.hypot(Math.max(0,Math.abs(lx)-halfW),Math.max(0,Math.abs(lz)-halfL));}
     list.push({id:key,icon:'🚗',name:`Drive the ${colour} car`,kind:'drive',radius:1.0,distance:beside,
       get at(){const d=door();return {x:d.x,y:car.y,z:d.z};},
-      hint:'↑ ↓ drive · ← → steer · Space honks · E to get out',
+      hint:'↑ accelerate · ↓ brake/reverse · ← → steer · Space honks · E to get out',
       start(){
-        car.speed=0;car.parked=false;
+        car.speed=0;car.steering=0;car.parked=false;
         for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
         // The view looks down on the car from over its roof (a boom aimed
         // at the driver would start inside the car's own baked panels).
-        tour.setCameraRig({target:1.75,boom:5.0,height:2.5});
+        tour.setCameraRig({target:1.75,boom:6.6,height:2.5});
         sounds.engine(0);life.say('Vroom!',1500);
       },
       tick(dt){
-        const fwd=(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0),steer=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
-        const top=fwd>=0?4.5:2.2;
-        car.speed+=((fwd*top)-car.speed)*(1-Math.exp(-dt*(fwd?1.6:3)));
-        if(Math.abs(car.speed)<.03&&!fwd)car.speed=0;
-        if(car.speed){
-          const turn=steer*Math.min(1.4,Math.abs(car.speed)*.55)*Math.sign(car.speed)*dt;
-          const h=wrap(car.heading+turn),step=car.speed*dt;
-          const now=trouble(car.x,car.z,car.heading);
-          // Straight on; failing that, glance off to either side, so a wall
-          // met at an angle slides the car along it instead of stopping it
-          // dead; failing that, at least turn on the spot so the steering
-          // can always work the car free.
-          let moved=false;
-          for(const [dir,scale] of [[h,1],[h+.6,.7],[h-.6,.7],[h,0]]){
-            const nx=car.x-Math.sin(dir)*step*scale,nz=car.z-Math.cos(dir)*step*scale,next=trouble(nx,nz,h);
-            if(next.n>now.n+1e-9)continue;
-            car.x=nx;car.z=nz;car.heading=h;if(next.ground!==null)car.y+=(next.ground-car.y)*Math.min(1,dt*6);
-            moved=scale>0;break;
-          }
-          car.lastFit=moved;
-          if(!moved){car.speed*=.3;if(Math.abs(car.speed)<.3)car.speed=0;bump();}
-        }
-         place();
+        const analog=getDriveInput()||{};
+        const throttle=Math.max(-1,Math.min(1,(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0)+(Number(analog.throttle)||0)));
+        const steer=Math.max(-1,Math.min(1,(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0)+(Number(analog.steer)||0)));
+        const outcome=driveCar(car,{throttle,steer},dt,trouble);
+        car.lastFit=outcome.moved;
+        if(outcome.hit)bump();
+        place();
         player.x=car.x;player.y=car.y;player.z=car.z;
         const seat=carPoint(0,0,-.42,.15,car.heading);
-         life.face(car.heading+Math.PI);life.ride({dx:seat.x,dy:.62,dz:seat.z,pose:{sit:.8}});
-        sounds.engine(Math.abs(car.speed)/4.5);
+        life.face(car.heading+Math.PI);life.ride({dx:seat.x,dy:.62,dz:seat.z,pose:{sit:.8}});
+        sounds.engine(Math.abs(car.speed)/5.2);
         return {yaw:car.heading};
       },
       key(code){if(code==='Space'){sounds.horn();return true;}return false;},
       stop(){
-        car.speed=0;car.parked=true;sounds.engine(null);place();parkBoxes();tour.setCameraRig(null);life.ride(null);
+        car.speed=0;car.steering=0;car.parked=true;sounds.engine(null);place();parkBoxes();tour.setCameraRig(null);life.ride(null);
         // Out by the driver's door — the other side if that's against a wall.
         for(const side of [-(halfW+.45),halfW+.45]){const d=corner(side,.3),spot=world.safeSpot(d.x,car.y,d.z);if(spot&&Math.hypot(spot.x-d.x,spot.z-d.z)<1){player.x=spot.x;player.y=spot.y;player.z=spot.z;break;}}
       }});

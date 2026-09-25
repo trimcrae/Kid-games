@@ -386,6 +386,8 @@ export async function createHouseLife(tour){
     el.hidden=false;
   }
   function coach(time,active){
+    // A seated activity owns its controls; driving is not walking practice.
+    if(ride){lastSpot={...player};jumpTipAt=menuTipAt=0;showCoach([]);return;}
     if(!active||!avatar||!engine.state().pet){showCoach([]);return;}
     // Count real steps only: a Rooms jump is not the player learning to walk.
     const step=lastSpot?Math.hypot(player.x-lastSpot.x,player.z-lastSpot.z):0;if(step<.6&&Math.abs(player.y-(lastSpot?.y??player.y))<.5)walked+=step;lastSpot={...player};
