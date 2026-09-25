@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-moon-delivery",
+  "page": 4,
+  "style": "comic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a41bbdc2-2945-4486-ab5c-bcf92d59162c.png",
+  "originalSha256": "9310c998a5730692f256c98a5bba307958561a7e3f9a4fa08a2b083b5769510c",
+  "file": "cory-moon-delivery-4.webp",
+  "sha256": "116dc2459a36940116986ac3085ca0c9b55b8bf309c46fc859e36b40c0f9f661",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "c9233f8e75abd876fd30333e52a6e96f46b097db52a1b73a2e1028984d831647",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory's Moon Delivery, page 5: A bump at the corner.\nART DIRECTION: Rich retro 1950s space-adventure comic illustration with confident ink drawing, Ben-Day dots, painted gouache color, dramatic but playful framing, vintage ochre/coral/indigo palette. A single beautifully staged illustrated panel WITHOUT a panel frame, captions or text. Show the children playing with a shoebox rover and cardboard moon base on a pretend moon blanket at home, not real astronauts in vacuum.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: blue T-shirt under ochre overalls, black rectangular glasses, short brown hair. Jeannie: rose jumper, gray trousers, shoulder-length brown hair. Ellie: lavender jumper and leggings, dark-brown bob. Ordinary play clothes, no actual spacesuits; pretend play is clear.\nILLUSTRATE THIS MOMENT: Cory catches an empty sandwich box sliding out from under a loose paper strip on his shoebox rover during a gentle corner test.\nStory context for this exact page: His first repair was a strip of paper laid across the box. It looked tidy, but the empty box still slipped out from underneath on a turn. Cory caught it. “A roof is not the same as a wall,” he said. He needed something around the sides.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-moon-delivery-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Empty sandwich box slips beneath loose paper strap; Cory catches it."
+}

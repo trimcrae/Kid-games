@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-moon-delivery",
+  "page": 2,
+  "style": "comic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f4b7f901-ca9a-4ef1-84b5-24f3a9dddd96.png",
+  "originalSha256": "e941f4e09e3c1c8041cddf5efb674e9986ba621aac2381fe9edb88e10155a5b2",
+  "file": "cory-moon-delivery-2.webp",
+  "sha256": "f3c7f7196ce3a48c3065c6c378bfe96c7caadc65d2da9c44c3ea6d41684a1a3b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "7987678743cfc84506a140378dd00d3347dd9400b0dea1959c5e4b0f38394b1d",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory's Moon Delivery, page 3: Two possible paths.\nART DIRECTION: Rich retro 1950s space-adventure comic illustration with confident ink drawing, Ben-Day dots, painted gouache color, dramatic but playful framing, vintage ochre/coral/indigo palette. A single beautifully staged illustrated panel WITHOUT a panel frame, captions or text. Show the children playing with a shoebox rover and cardboard moon base on a pretend moon blanket at home, not real astronauts in vacuum.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: blue T-shirt under ochre overalls, black rectangular glasses, short brown hair. Jeannie: rose jumper, gray trousers, shoulder-length brown hair. Ellie: lavender jumper and leggings, dark-brown bob. Ordinary play clothes, no actual spacesuits; pretend play is clear.\nILLUSTRATE THIS MOMENT: Cory kneels beside a square-grid route map, comparing a long route around the pretend moon blanket with a shorter path between paper craters.\nStory context for this exact page: Cory traced two routes with his finger. One went all the way around the edge of the blanket. The other slipped between two small craters. He counted the squares in each route. The shorter path had enough room for the rover. That was the one he would test first.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-moon-delivery-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Long outside route and shorter internal detour are visibly distinct on square-grid map."
+}

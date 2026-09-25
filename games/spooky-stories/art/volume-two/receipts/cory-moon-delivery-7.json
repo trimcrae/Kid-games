@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-moon-delivery",
+  "page": 7,
+  "style": "comic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3fd486f0-371b-47a7-bc19-25585b20294f.png",
+  "originalSha256": "6e3265478fc077d7ccbe0225d7fe598ca778527f44819fa7f5ea50b308f10430",
+  "file": "cory-moon-delivery-7.webp",
+  "sha256": "88ce6cd2b3d758dd34ed95a293f407d123c97178bda383e3a2da7c0b2426ca88",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "a13c61a23fbbe6854677fb5832e3d249200a271ccbdd9c4a9f4e4383da03b694",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory's Moon Delivery, page 8: A successful landing.\nART DIRECTION: Rich retro 1950s space-adventure comic illustration with confident ink drawing, Ben-Day dots, painted gouache color, dramatic but playful framing, vintage ochre/coral/indigo palette. A single beautifully staged illustrated panel WITHOUT a panel frame, captions or text. Show the children playing with a shoebox rover and cardboard moon base on a pretend moon blanket at home, not real astronauts in vacuum.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: blue T-shirt under ochre overalls, black rectangular glasses, short brown hair. Jeannie: rose jumper, gray trousers, shoulder-length brown hair. Ellie: lavender jumper and leggings, dark-brown bob. Ordinary play clothes, no actual spacesuits; pretend play is clear.\nILLUSTRATE THIS MOMENT: The children share a picnic at their cardboard moon base beside the parked rover and completed route map.\nStory context for this exact page: Jeannie opened the parcel at Moon Base. “Delivery complete,” she said. There were two sandwich halves. She handed one to Cory. Ellie arrived with apple slices. Their pretend moon had no air, no trees, and absolutely excellent picnic service. Cory added the safe route to his map.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-moon-delivery-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Successful delivery closes in a sibling picnic beside rover and map."
+}
