@@ -8,7 +8,7 @@ const root = path.resolve(__dirname, '../games/spooky-stories');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const context = { window: {} };
 vm.createContext(context);
-for (const name of ['classics.js', 'family-stories.js', 'volume-two.js', 'family-art.js', 'volume-two-art.js', 'audio/manifest.js']) vm.runInContext(read(name), context);
+for (const name of ['classics.js', 'family-stories.js', 'volume-two.js', 'family-art.js', 'audio/manifest.js']) vm.runInContext(read(name), context);
 const engine = read('storybook.js');
 const boundary = engine.indexOf('  // Painterly cover pictures rendered by the art pipeline');
 vm.runInContext(engine.slice(0, boundary) + '\nwindow.catalog = { STORIES, QUIZZES, VOCAB };\n})();', context);
@@ -55,8 +55,8 @@ for (const story of context.window.FAMILY_STORIES) {
     assert.ok(p.alt.length > 30, story.id + ': meaningful picture description');
     assert.ok(p.text.split(/\s+/).length <= 65, story.id + ': page fits a spread');
     Object.keys(VOCAB[story.id][i]).forEach(w => assert.ok(p.text.toLowerCase().includes(w), story.id + ': vocabulary word ' + w));
-    if (p.img) assert.ok(fs.statSync(path.join(root,p.img)).size > 1000);
-    else assert.match(rendered.pages[i].art(), /<svg/);
+    if (p.img && !process.argv.includes('--pending-art')) assert.ok(fs.statSync(path.join(root,p.img)).size > 1000);
+    else if (!p.img) assert.match(rendered.pages[i].art(), /<svg/);
   });
 }
 assert.equal(STORIES.length, 39);
@@ -64,11 +64,15 @@ assert.equal(new Set(STORIES.map(s=>s.id)).size, 39);
 assert.equal(context.window.STORYBOOK_VOLUME_TWO.length, 10, 'Ten new stories');
 assert.equal(new Set(context.window.STORYBOOK_VOLUME_TWO.map(s=>s.artStyle)).size, 10, 'Ten different art styles');
 for (const story of context.window.STORYBOOK_VOLUME_TWO) {
-  assert.equal(story.pages.length, 5);
-  const pictures = story.pages.map((p,i) => context.window.familyIllustration(story.artStyle,i));
-  pictures.forEach(svg=>assert.ok(svg.includes('data-art-style="'+story.artStyle+'"'), 'Explicit renderer: '+story.artStyle));
-  // Normalize generated filter IDs before comparing: every page needs a different composition.
-  assert.equal(new Set(pictures.map(svg=>svg.replace(/volume-two-(?:leaf-)?\d+/g,'art'))).size, 5, 'Five different illustrations: '+story.id);
+  assert.ok(story.pages.length > 5, 'Expanded story: '+story.id);
+  assert.equal(new Set(story.pages.map(p=>p.img)).size, story.pages.length, 'A unique generated illustration per page');
+  if (!process.argv.includes('--pending-art')) for (const [i,p] of story.pages.entries()) {
+    const file=path.join(root,p.img), receipt=JSON.parse(fs.readFileSync(path.join(root,'art/volume-two/receipts',story.id+'-'+i+'.json'),'utf8'));
+    assert.equal(receipt.generator,'Codex built-in OpenAI image tool');
+    assert.equal(receipt.style,story.artStyle);
+    assert.equal(receipt.reviewed,true,'Art reviewed: '+p.img);
+    assert.equal(receipt.sha256,crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
+  }
 }
 if (!process.argv.includes('--pending-audio')) assert.deepEqual(missing, [], 'Every recording must match the exact displayed text');
 console.log(`PASS: ${STORIES.length} books; ${clips} page/end/question audio contracts; ${missing.length} recordings pending.`);
