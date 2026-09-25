@@ -27,8 +27,11 @@ export function driveCar(car,{throttle=0,steer=0},dt,fit){
       car.speed=next*speed>0?next:0;
     }else{
       const top=throttle>0?5.2:2.8;
+      const target=throttle*top;
       const acceleration=throttle>0?6.2:4.3;
-      car.speed=clamp(speed+throttle*acceleration*t,-top,top);
+      const rate=Math.abs(target)>Math.abs(speed)?acceleration:5.5;
+      const change=clamp(target-speed,-rate*t,rate*t);
+      car.speed=speed+change;
     }
     if(Math.abs(car.speed)<.015)car.speed=0;
     if(!car.speed)continue;
