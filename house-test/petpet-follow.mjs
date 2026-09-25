@@ -11,8 +11,8 @@ export const SNAP=.6;         // a bigger jump in height in one frame is a telep
 export function createPetpetFollow({flies=false}={}){
   const trail=[];             // where the Craepet has been, newest last
   const hops=[];              // {at,strength}: the Craepet's squashes, to echo
-  let y=null,flyX=null,flyZ=null;
-  function reset(){trail.length=0;hops.length=0;y=flyX=flyZ=null;}
+  let y=null,flyX=null,flyZ=null,lastFollower=null;
+  function reset(){trail.length=0;hops.length=0;y=flyX=flyZ=null;lastFollower=null;}
   // The Craepet's rig hopped (take-off, touchdown, hello, a note on the
   // piano): the petpet does the same a beat later, a touch less.
   function hop(time,strength){hops.push({at:time+BEAT,strength:strength*.9});}
@@ -20,12 +20,12 @@ export function createPetpetFollow({flies=false}={}){
   // Also returns any echoed hop that has fallen due.
   function update(time,dt,leaderY,{reduced=false,leader=null}={}){
     let echo=0;
-    if(reduced){reset();return {y:leaderY,hop:0,offsetX:.4,offsetZ:-.3};}
+    if(reduced){reset();return {y:leaderY,hop:0,offsetX:.4,offsetZ:-.3,airborne:false,moving:false,speed:0};}
     while(hops.length&&hops[0].at<=time)echo=Math.max(echo,hops.shift().strength);
     const last=trail[trail.length-1];
     if(last&&(Math.abs(leaderY-last.y)>SNAP||time<last.t||
       (leader&&last.x!==undefined&&Math.hypot(leader.x-last.x,leader.z-last.z)>1.5)))reset();
-    trail.push({t:time,y:leaderY,x:leader?.x,z:leader?.z,heading:leader?.heading,scale:leader?.scale??1});
+    trail.push({t:time,y:leaderY,x:leader?.x,z:leader?.z,heading:leader?.heading,scale:leader?.scale??1,airborne:!!leader?.airborne});
     while(trail.length>2&&trail[1].t<=time-BEAT)trail.shift();
     const at=time-BEAT;
     let sample;
@@ -33,7 +33,7 @@ export function createPetpetFollow({flies=false}={}){
     else{
       let i=0;while(i<trail.length-2&&trail[i+1].t<=at)i++;
       const a=trail[i],b=trail[i+1],k=b.t===a.t?1:Math.min(1,Math.max(0,(at-a.t)/(b.t-a.t)));
-      sample={y:a.y+(b.y-a.y)*k,x:a.x+(b.x-a.x)*k,z:a.z+(b.z-a.z)*k,scale:a.scale+(b.scale-a.scale)*k,
+      sample={y:a.y+(b.y-a.y)*k,x:a.x+(b.x-a.x)*k,z:a.z+(b.z-a.z)*k,scale:a.scale+(b.scale-a.scale)*k,airborne:k<.5?a.airborne:b.airborne,
         heading:a.heading+Math.atan2(Math.sin(b.heading-a.heading),Math.cos(b.heading-a.heading))*k};
     }
     let offsets={};
@@ -47,16 +47,23 @@ export function createPetpetFollow({flies=false}={}){
       // route makes the delayed point fall on the other side of furniture.
       const radius=Math.hypot(localX,localZ),max=.85;
       if(radius>max){localX*=max/radius;localZ*=max/radius;}
-      offsets={offsetX:localX,offsetZ:localZ};
+      const worldX=leader.x+(localX*C+localZ*S)*(leader.scale??1);
+      const worldZ=leader.z+(-localX*S+localZ*C)*(leader.scale??1);
+      const distance=lastFollower&&time>lastFollower.t?Math.hypot(worldX-lastFollower.x,worldZ-lastFollower.z):0;
+      const speed=dt>0?Math.min(4,distance/dt):0;
+      offsets={offsetX:localX,offsetZ:localZ,moving:speed>.08,speed};
+      lastFollower={x:worldX,z:worldZ,t:time};
     }
     if(flies){
       // Drift after the pet: a flier never lands with a bump.
       y=y===null?leaderY:y+(leaderY-y)*(1-Math.exp(-dt*FLY_RATE));
-      return {y,hop:0,...offsets};
+      // A flier can still be descending after the delayed leader sample has
+      // landed. Its shadow returns only when it reaches the support height.
+      return {y,hop:0,airborne:!!sample.airborne||y>leaderY+.04,...offsets};
     }
     // A walker puts all three coordinates where the owner was a beat ago.
     y=sample.y;
-    return {y,hop:echo,...offsets};
+    return {y,hop:echo,airborne:!!sample.airborne,...offsets};
   }
   return {reset,hop,update};
 }

@@ -19,12 +19,18 @@ export function createGround(scene,{maxRaysPerFrame=2}={}){
     frame(){rays=0;},
     offset(p,fallback=0){
       const key=Math.round(p.x*4)+','+Math.round(p.z*4)+','+Math.round(p.y*20);
-      const known=cache.get(key);if(known!==undefined)return known;
+      const known=cache.get(key);
+      // A single 25 cm patch can straddle oak, rug and tile edges. Reuse the
+      // sample only close to where it was taken, and keep its absolute height
+      // so a pet changing collision floors does not inherit a stale offset.
+      if(known&&Math.hypot(p.x-known.x,p.z-known.z)<.045)
+        return THREE.MathUtils.clamp(known.y-p.y,0,.05);
       if(rays>=maxRaysPerFrame)return fallback;rays++;
       origin.set(p.x,p.y+.08,p.z);ray.set(origin,down);ray.far=.14;
       const hit=ray.intersectObjects(candidates(),false)[0];
-      const off=hit?THREE.MathUtils.clamp(hit.point.y-p.y,0,.05):0;
-      if(cache.size>6000)cache.clear();cache.set(key,off);return off;
+      const y=hit?hit.point.y:p.y;
+      const off=THREE.MathUtils.clamp(y-p.y,0,.05);
+      if(cache.size>6000)cache.clear();cache.set(key,{x:p.x,z:p.z,y});return off;
     },
   };
 }

@@ -43,7 +43,7 @@ const ACTIONS={
 };
 export function createPetBehaviour({random=Math.random,egg=false}={}){
   let state=egg?'egg':'rest',t=0,dur=1.2,idle=0,wasMoving=false,turned=false,happyFor=0,hopNow=0,sweep=random()*6,lookSide=1;
-  let pending=null,lastAction='',cueIn=0,cueTurn=0;
+  let pending=null,lastAction='',cueIn=0,cueTurn=0,wasRiding=false;
   function begin(name,time){state=name;t=0;dur=time??ACTIONS[name][0]*(.85+random()*.3);turned=false;lookSide=random()<.5?-1:1;if(name==='hop'||name==='greet')hopNow=1;}
   // Every low need gets its own body-language cue, taking turns, so a pet that
   // is both hungry and grubby shows both within a few seconds of standing.
@@ -72,9 +72,9 @@ export function createPetBehaviour({random=Math.random,egg=false}={}){
     pending='greet';happyFor=2.6;idle=0;
   }
   // input: {moving, needs, camera:{angle,distance}|null (angle relative to the
-  // pet's facing, 0 = in front), friend:{angle}|null, night, reduced}
+  // pet's facing, 0 = in front), friend:{angle}|null, night, reduced, ride}
   function update(dt,input={}){
-    const {moving=false,needs=null,camera=null,friend=null,night=false,reduced=false}=input;
+    const {moving=false,needs=null,camera=null,friend=null,night=false,reduced=false,ride=false}=input;
     t+=dt;happyFor=Math.max(0,happyFor-dt);cueIn-=dt;
     const mood=egg?'good':moodOf(needs);
     let out={state,expression:'idle',pose:{},look:[0,0],emote:null,hop:0,turnTo:null,mood};
@@ -83,6 +83,10 @@ export function createPetBehaviour({random=Math.random,egg=false}={}){
       if(state==='wobble'&&t>dur){state='egg';t=0;dur=5+random()*5;}
       out.state=state;out.hop=reduced?0:hopNow;hopNow=0;return out;
     }
+    // Activities control their own pose. Pausing the idle clock prevents a
+    // queued look-back, sleep or greeting hop from firing on a moving seat.
+    if(ride){wasRiding=true;hopNow=0;return {...out,state:'ride'};}
+    if(wasRiding){wasRiding=false;begin('rest',.8);idle=0;}
     if(pending){begin(pending);pending=null;}
     if(moving){
       if(state!=='greet'||t>dur)state='walk';idle=0;wasMoving=true;

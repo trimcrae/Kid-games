@@ -68,6 +68,78 @@ for(const sp of species){
   assert(reverseStances>10&&reverseSlip<.006,`backward planted paw slid ${reverseSlip.toFixed(3)} m`);
 }
 // Blinks happen on their own; a sleeping pet's eyes stay shut.
+// A stationary turn and a sideways step both move feet through a real gait.
+// During stance their world positions remain planted even as the root turns
+// or slides; swing paws stay on their own side of the body.
+{
+  const c=build({species:'blorb'}),rig=c.userData.rig,leg=rig.bones.legL;
+  let previous=null,slip=0,planted=0,sideReach=0;
+  for(let i=0;i<90;i++){
+    c.position.x+=1/60;rig.update(1/60,{moving:true,speed:1});c.updateMatrixWorld(true);
+    const p=leg.getWorldPosition(new THREE.Vector3());
+    const low=leg.position.y-leg.userData.rest.y<.001;
+    if(i>20&&low&&previous?.low){slip=Math.max(slip,p.distanceTo(previous.p));planted++;}
+    sideReach=Math.max(sideReach,Math.abs(leg.position.x-leg.userData.rest.x));
+    assert(rig.bones.legL.position.x<rig.bones.legR.position.x,'sideways paws crossed');
+    previous={p,low};
+  }
+  assert(planted>10&&slip<.007,`sideways planted paw slid ${slip}`);
+  assert(sideReach>.08,'sideways travel did not swing the foot sideways');
+  previous=null;slip=0;planted=0;
+  for(let i=0;i<100;i++){
+    c.rotation.y+=.025;rig.update(1/60);c.updateMatrixWorld(true);
+    const p=leg.getWorldPosition(new THREE.Vector3());
+    const low=leg.position.y-leg.userData.rest.y<.001;
+    if(i>20&&low&&previous?.low){slip=Math.max(slip,p.distanceTo(previous.p));planted++;}
+    previous={p,low};
+  }
+  assert(planted>10&&slip<.007,`turning planted paw swept ${slip}`);
+  c.position.x+=12;rig.update(1/60,{moving:true,speed:1});
+  assert(Math.abs(leg.position.x-leg.userData.rest.x)<.4,'teleport stretched a planted leg toward the old room');
+  rig.setPose({sit:1});run(c,.8);
+  const angle=c.rotation.y;c.rotation.y+=.5;rig.update(1/60);
+  assert(Math.abs(leg.position.y-leg.userData.rest.y)<.12,'seated turn incorrectly triggered a walking step');
+  c.rotation.y=angle;
+}
+// A cat's upper fore- and hindlegs blend into the trunk. The old rigid
+// capsules translated away from their shoulder/hip on a long planted stride.
+{
+  const c=build({species:'cat'}),rig=c.userData.rig,mesh=rig.meshes[0],g=mesh.geometry;
+  const P=g.getAttribute('position'),I=g.getAttribute('skinIndex'),W=g.getAttribute('skinWeight');
+  const torsoIndex=rig.skeleton.bones.indexOf(rig.bones.torso);
+  const sample={};
+  for(const name of ['legL','armR']){
+    const limbIndex=rig.skeleton.bones.indexOf(rig.bones[name]);
+    let upper=-1,lower=-1;
+    for(let i=0;i<P.count;i++)if(I.getX(i)===limbIndex&&I.getY(i)===torsoIndex){
+      if(P.getY(i)>.30&&W.getY(i)>.8)upper=i;
+      if(P.getY(i)<.12&&W.getY(i)<.2)lower=i;
+    }
+    assert(upper>=0&&lower>=0,`${name} has no attached shoulder and free paw`);
+    sample[name]={upper,lower,baseUpper:null,baseLower:null,maxUpper:0,maxLower:0};
+  }
+  c.updateMatrixWorld(true);
+  const transformed=i=>mesh.applyBoneTransform(i,new THREE.Vector3().fromBufferAttribute(P,i));
+  for(const s of Object.values(sample)){s.baseUpper=transformed(s.upper);s.baseLower=transformed(s.lower);}
+  for(let i=0;i<100;i++){
+    c.position.z+=.015;rig.update(1/60,{moving:true,speed:.9});c.updateMatrixWorld(true);
+    for(const s of Object.values(sample)){
+      s.maxUpper=Math.max(s.maxUpper,Math.abs(transformed(s.upper).z-s.baseUpper.z));
+      s.maxLower=Math.max(s.maxLower,Math.abs(transformed(s.lower).z-s.baseLower.z));
+    }
+  }
+  for(const [name,s] of Object.entries(sample))
+    assert(s.maxLower>.05&&s.maxUpper<s.maxLower*.45,`${name} detached from trunk: upper ${s.maxUpper}, lower ${s.maxLower}`);
+}
+// A snail glides on a broad foot instead of hopping or pumping four limbs.
+{
+  const c=petpet('snail'),rig=c.userData.rig,leg=rig.bones.legL,arm=rig.bones.armL;
+  let highest=0,armSwing=0;
+  for(let i=0;i<90;i++){c.position.z+=.01;rig.update(1/60,{moving:true,speed:.6});
+    highest=Math.max(highest,Math.abs(leg.position.y-leg.userData.rest.y));armSwing=Math.max(armSwing,Math.abs(arm.rotation.x));}
+  assert(highest<.04&&armSwing<.001,`snail still walks: lift ${highest}, arm ${armSwing}`);
+}
+// Blinks happen on their own; a sleeping pet's eyes stay shut.
 {
   const c=build({species:'zibbit'}),rig=c.userData.rig;let blinked=false;
   run(c,8,{},()=>{if(rig.bones.eyes.scale.y<.2)blinked=true;});assert(blinked,'never blinked');

@@ -80,4 +80,25 @@ function ride(f,seconds,leaderY,opts){const out=[];for(let i=0;i*DT<=seconds;i++
   const pet=hz(creature({species:'blorb'})),pal=hz(petpet('duckling'));
   assert(pal>pet*2.3&&pal<pet*3.3,`petpet steps at ${pal} Hz, pet at ${pet} Hz`);
 }
+{ // Companion gait follows its own delayed horizontal motion. A turning
+  // owner gives it steps until it reaches the new heel; a teleport does not.
+  const f=createPetpetFollow();let r;
+  for(let i=0;i<20;i++)r=f.update(i*DT,DT,0,{leader:{x:0,z:0,heading:0,scale:.6}});
+  assert.equal(r.moving,false);
+  let moved=false;
+  for(let i=20;i<40;i++){r=f.update(i*DT,DT,0,{leader:{x:0,z:0,heading:Math.PI/2,scale:.6}});moved ||= r.moving&&r.speed>.08;}
+  assert(moved,'companion did not walk around a stationary turning owner');
+  r=f.update(40*DT,DT,0,{leader:{x:10,z:0,heading:0,scale:.6}});
+  assert(!r.moving,'companion marched during a room teleport');
+}
+{ // Air support belongs to the delayed sample, not to absolute height: a
+  // companion standing on a bed has a shadow, but one mid-jump does not.
+  const f=createPetpetFollow();let r;
+  for(let i=0;i<20;i++)r=f.update(i*DT,DT,1,{leader:{x:0,z:0,heading:0,scale:.6,airborne:false}});
+  assert(!r.airborne,'elevated floor was mistaken for flight');
+  for(let i=20;i<30;i++)r=f.update(i*DT,DT,1+Math.min(.5,(i-20)*.05),{leader:{x:0,z:0,heading:0,scale:.6,airborne:true}});
+  assert(r.airborne,'companion did not become airborne after the owner');
+  for(let i=30;i<55;i++)r=f.update(i*DT,DT,1.5,{leader:{x:0,z:0,heading:0,scale:.6,airborne:false}});
+  assert(!r.airborne,'companion remained airborne after landing');
+}
 console.log('petpet follow OK');
