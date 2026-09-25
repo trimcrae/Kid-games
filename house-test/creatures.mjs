@@ -79,6 +79,14 @@ function mergeParts(parts,{surface=false}={}){
       if(p.pattern&&U){const q=p.pattern,row=q[Math.min(q.length-1,Math.max(0,Math.floor((1-U.getY(i))*q.length)))],c=row[Math.min(row.length-1,Math.max(0,Math.floor(U.getX(i)*row.length)))];col.set([c.r,c.g,c.b],v*3);}
       else{col[v*3]=p.color.r;col[v*3+1]=p.color.g;col[v*3+2]=p.color.b;}
       skinIndex[v*4]=p.bone;skinWeight[v*4]=1;
+      if(p.attachY){
+        // The upper part of a cat's limb belongs to the shoulder/hip, while
+        // its lower half follows the paw. A rigid capsule left a visible gap
+        // at the joint at the far end of each planted step.
+        const f=clamp((_v.y-p.attachY[0])/(p.attachY[1]-p.attachY[0]),0,1);
+        const shoulder=f*f*(3-2*f);
+        skinIndex[v*4+1]=boneIndex.torso;skinWeight[v*4]=1-shoulder;skinWeight[v*4+1]=shoulder;
+      }
       if(surf){surf[v*2]=p.rough;surf[v*2+1]=p.emit;}
     }
   }
@@ -214,9 +222,9 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler();
   function place(pos,size,rot){_e.set(rot?.[0]||0,rot?.[1]||0,rot?.[2]||0);return new THREE.Matrix4().compose(new THREE.Vector3(...pos),_q.setFromEuler(_e).clone(),new THREE.Vector3(...size));}
   // part(kind, bone, position, size, {shape, rot, color, rough, emit})
-  function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0}={}){
+  function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0,attachY=null}={}){
     const fur=kind==='fur';
-    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?1:rough,emit});
+    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?1:rough,emit,attachY});
   }
   const sp=pet.species,rig={species:sp,egg:!!pet.egg,hopper:sp==='snorbit'&&!pet.egg,floater:sp==='glimmr'&&!pet.egg,
     ears:false,tail:false,wings:false};
@@ -247,9 +255,9 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
       part('detail','sleepEyes',[side*.055,.505,.418],[.032,.02,.032],{shape:arc,rot:[0,0,Math.PI],color:DARK,rough:.6});
       part('detail','happyEyes',[side*.055,.50,.418],[.03,.035,.03],{shape:arc,color:DARK,rough:.6});
       // Front legs step (shoulders); hind legs swing (hips).
-      part('fur','leg'+L,[side*.075,.17,.16],[.05,.17,.055]);
+      part('fur','leg'+L,[side*.075,.17,.16],[.05,.17,.055],{attachY:[.20,.31]});
       part('fur','leg'+L,[side*.075,.035,.17],[.055,.035,.06],white);
-      part('fur','arm'+L,[side*.09,.20,-.20],[.065,.18,.085]);
+      part('fur','arm'+L,[side*.09,.20,-.20],[.065,.18,.085],{attachY:[.23,.34]});
       part('fur','arm'+L,[side*.09,.035,-.16],[.058,.035,.065],white);
     }
     part('fur','head',[0,.435,.40],[.075,.055,.06],white);
@@ -342,6 +350,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
 
   // ----- animation state -------------------------------------------------
   const st={t:Math.random()*10,phase:Math.random()*Math.PI*2,walk:0,run:0,bob:0,bobVel:0,lastBob:0,lift:0,hopT:-1,hopK:1,airborne:false,airPose:0,land:0,lean:0,roll:0,lastYaw:null,lastWorld:null,lastTime:null,
+    feet:Object.fromEntries(['legL','legR','armL','armR'].map(n=>[n,{anchor:new THREE.Vector3(),stance:false}])),strideX:0,strideZ:1,lastScale:null,
     sit:0,lie:0,stretch:0,sniff:0,shake:0,scratch:0,fold:0,lookYaw:0,lookPitch:0,
     expr:{sleep:0,happy:0,tired:0,yawn:0,sad:0},blinkIn:1+Math.random()*3,blink:0,wobbleIn:3+Math.random()*4,wobble:0,
     want:{expression:'idle',pose:{},look:[0,0],fold:0,grime:0}};
@@ -360,7 +369,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     st.airPose=approach(st.airPose,st.airborne&&!reduced?1:0,k);
     st.land=reduced?0:st.land*Math.exp(-dt*12);
     // Turning rate from the heading the caller set, for leaning into turns.
-    const yaw=root.rotation.y,turnRate=st.lastYaw===null||dt===0?0:wrap(yaw-st.lastYaw)/dt;st.lastYaw=yaw;
+    const yaw=root.rotation.y,turnDelta=st.lastYaw===null?0:wrap(yaw-st.lastYaw),turnRate=dt===0?0:turnDelta/dt;st.lastYaw=yaw;
     const w=st.want,ex=w.expression,pose=w.pose;
     for(const key of ['sit','lie','stretch','sniff','shake','scratch'])st[key]=approach(st[key],pose[key]||0,k);
     const targets={sleep:ex==='sleep'?1:0,happy:ex==='happy'||ex==='squint'?1:0,tired:ex==='tired'||ex==='yawn'?1:0,yawn:ex==='yawn'?1:0,sad:ex==='sad'?1:0};
@@ -371,14 +380,25 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     // During stance each paw moves backward by the distance its owner really
     // traveled. The old speed-driven phase crossed a full cycle while the
     // avatar moved much farther than a paw could reach, visibly skating.
-    st.walk=approach(st.walk,moving?1:0,reduced?1:1-Math.exp(-dt*12));
+    const pivot=!moving&&Math.abs(turnRate)>.2&&!rig.petpetId&&!rig.floater&&!st.airborne&&st.hopT<0&&st.sit<.05&&st.lie<.05&&st.stretch<.05;
+    st.walk=approach(st.walk,moving||pivot?1:0,reduced?1:1-Math.exp(-dt*12));
     const v=moving?speed:0;st.run=approach(st.run,clamp((v-1.9)/1.2,0,1),k);
     root.updateWorldMatrix(true,false);root.matrixWorld.decompose(worldAt,worldQ,worldScale);
     worldForward.set(0,0,1).applyQuaternion(worldQ);
-    const travel=st.lastWorld?(worldAt.x-st.lastWorld.x)*worldForward.x+(worldAt.z-st.lastWorld.z)*worldForward.z:0;
+    const dx=st.lastWorld?worldAt.x-st.lastWorld.x:0,dz=st.lastWorld?worldAt.z-st.lastWorld.z:0;
+    const travel=dx*worldForward.x+dz*worldForward.z;
+    const sideTravel=dx*worldForward.z-dz*worldForward.x;
     if(!st.lastWorld)st.lastWorld=worldAt.clone();else st.lastWorld.copy(worldAt);
+    if(Math.hypot(dx,dz)>.5||st.lastScale!==null&&Math.abs(worldScale.x-st.lastScale)>.01)
+      for(const foot of Object.values(st.feet))foot.stance=false;
+    st.lastScale=worldScale.x;
     const reach=rig.cat?.13:.15;
-    if(moving&&Math.abs(travel)<.5){st.phase+=travel/(2*reach*Math.max(.01,worldScale.x))*.62*Math.PI*2;}
+    const lateral=moving&&Math.abs(sideTravel)>Math.abs(travel)*1.2;
+    if(moving&&Math.hypot(dx,dz)<.5){
+      const distance=lateral?Math.abs(sideTravel):travel;
+      st.phase+=distance/(2*reach*Math.max(.01,worldScale.x))*.62*Math.PI*2;
+    }else if(pivot)st.phase+=Math.abs(turnDelta)*(rig.cat?.17:.19)/(2*reach)*.62*Math.PI*2;
+    st.strideX=lateral?Math.sign(sideTravel):0;st.strideZ=lateral?0:1;
     const walkW=st.walk,P=st.phase;
     // Hop impulse (hello, joy, a stair tread).
     let hopLift=0,hopSquash=0,hopAir=0;
@@ -400,7 +420,8 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     }
     // Body height: step bob, the snorbit's hop, a glimmr's float, hops.
     let lift;
-    if(rig.hopper)lift=Math.max(0,Math.sin(P))*(.05+.02*v)*walkW;
+    if(rig.petpetId==='snail')lift=0;
+    else if(rig.hopper)lift=Math.max(0,Math.sin(P))*(.05+.02*v)*walkW;
     else lift=Math.abs(Math.sin(P))*(rig.cat?.009:.014)*walkW;
     const float=rig.floater?(.06+(reduced?0:Math.sin(st.t*2)*.035)):0;
     if(reduced)lift=0;
@@ -425,22 +446,35 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     B.head.rotation.set(-st.lookPitch+.4*st.sniff+.3*st.lie+.12*st.expr.tired-.25*st.expr.yawn+nod-.3*st.stretch,st.lookYaw-shake*1.4,(reduced?0:Math.sin(st.t*9))*.05*st.scratch+.1*st.scratch);
     // Feet and arms.
     const A=reach*walkW*(reduced?.5:1),lift2=(rig.cat?.08:.075)*walkW*(reduced?0:1);
+    // A stance paw remembers its point on the floor. Inverting the current
+    // parent transform keeps it there through yaw, strafing and body bob.
+    const plant=(name,stance)=>{
+      const bone=B[name],foot=st.feet[name];
+      if(stance){
+        if(!foot.stance){bone.parent.updateWorldMatrix(true,false);foot.anchor.copy(bone.position);bone.parent.localToWorld(foot.anchor);}
+        else{bone.parent.updateWorldMatrix(true,false);const p=bone.parent.worldToLocal(foot.anchor.clone());bone.position.x=p.x;bone.position.z=p.z;}
+      }
+      foot.stance=stance;
+    };
     const hopFeet=rig.hopper;
     for(const [name,side,off] of [['legL',-1,0],['legR',1,Math.PI]]){
       const ph=P+(hopFeet?0:off),rest=B[name].userData.rest,step=footstep(ph,A,lift2);
       const poseY=rig.cat?-.13*st.sit-.18*st.lie:-.025*st.sit+.02*st.lie;
-      B[name].position.set(rest.x*(rig.floater?.65:1+.2*st.lie),rest.y+step.y+float+poseY+hopLift+(rig.hopper?lift:0)+st.airPose*.085+
-        (rig.floater?.06:0)+(st.scratch&&side>0?.05*st.scratch:0),rest.z+step.z+.05*st.sit+.08*st.lie-.08*st.stretch-(rig.floater?.08:0));
+      B[name].position.set(rest.x*(rig.floater?.65:1+.2*st.lie)+step.z*st.strideX,rest.y+step.y+float+poseY+hopLift+(rig.hopper?lift:0)+st.airPose*.085+
+        (rig.floater?.06:0)+(st.scratch&&side>0?.05*st.scratch:0),rest.z+step.z*st.strideZ+.05*st.sit+.08*st.lie-.08*st.stretch-(rig.floater?.08:0));
+      if(rig.petpetId==='snail')B[name].position.set(rest.x*.65,rest.y-.035,rest.z-.03);
+      else plant(name,walkW>.1&&step.y<1e-5&&!st.airborne&&st.lie<.05&&st.sit<.05);
     }
     for(const [name,side,off] of [['armL',-1,Math.PI],['armR',1,0]]){
       const arm=B[name],rest=arm.userData.rest;
       if(rig.cat){
         const step=footstep(P+off,A,lift2*.85);
-        arm.position.set(rest.x,rest.y+step.y-lift-.07*st.sit-.13*st.lie+hopAir*.04+st.airPose*.07,
-          rest.z+step.z+.08*st.stretch-.04*st.lie);
+        arm.position.set(rest.x+step.z*st.strideX,rest.y+step.y-lift-.07*st.sit-.13*st.lie+hopAir*.04+st.airPose*.07,
+          rest.z+step.z*st.strideZ+.08*st.stretch-.04*st.lie);
         arm.rotation.set(-.2*st.stretch,0,0);
+        plant(name,walkW>.1&&step.y<1e-5&&!st.airborne&&st.lie<.05&&st.sit<.05);
       }else{
-        arm.rotation.set((reduced?0:-Math.sin(P+off)*.55*walkW)-1.1*st.stretch-.3*st.sit-.45*hopAir-.55*st.airPose,0,
+        arm.rotation.set((rig.petpetId==='snail'?0:reduced?0:-Math.sin(P+off)*.55*walkW)-1.1*st.stretch-.3*st.sit-.45*hopAir-.55*st.airPose,0,
           side*(.15*st.lie+(reduced?0:.08*st.shake*Math.sin(st.t*30))));
       }
     }
