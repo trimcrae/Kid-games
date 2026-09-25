@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import {lots,neighborhoodBoxes} from './neighborhood-layout.mjs';
-import {disposeCreature} from './creatures.mjs?v=20260925-motion';
-import {furnishing} from './furnishings.mjs?v=20260925-motion';
+import {disposeCreature} from './creatures.mjs?v=20260925-motion2';
+import {furnishing} from './furnishings.mjs?v=20260925-motion2';
 // Craepet Street: an imaginary lane of little cottages beyond the real front
 // yard, one per family profile. The walking colliders are the plain boxes in
 // neighborhood-layout.mjs (tests use them); everything drawn here is dressing

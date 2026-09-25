@@ -5,7 +5,7 @@
 // and any step you take ends it at once. Reduced motion keeps the moment but
 // not the trotting, rolling or hopping. Pure logic: it returns directions
 // for the pet and where any prop should be; house-life draws them.
-import {needValue} from './pet-behaviour.mjs';
+import {needValue} from './pet-behaviour.mjs?v=20260925-motion2';
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 // Which moment, from the pet's needs before and after the activity.
 export function aftermathFor(before,after){

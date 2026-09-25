@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {labelSprite} from './creatures.mjs?v=20260925-motion';
+import {labelSprite} from './creatures.mjs?v=20260925-motion2';
 // Pet-sized furniture displayed in the living-room collection. The original
 // item IDs, ownership, storage, home capacities and bonuses stay in the engine.
 export function furnishing(item,index,{label:named=true}={}){
