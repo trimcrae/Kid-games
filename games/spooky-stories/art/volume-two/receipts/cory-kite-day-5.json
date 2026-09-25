@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-kite-day",
+  "page": 5,
+  "style": "woodblock",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c2ebf072-749a-498c-b82c-53eca99a000d.png",
+  "originalSha256": "cf72a87f2bd2ec5513b9d8d150daf9cc90f5aa93731e74b1ce2ec16744600afa",
+  "file": "cory-kite-day-5.webp",
+  "sha256": "d4182cdc7b06b3d758865f8b24590c11c55d588d05e001b4675bc8b9c1b2bd15",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "c831603df7c1ae997d57e08ceae29650fc4fc6788153d03a93278a92477c7fa3",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Patient Kite, page 6: The kite comes home.\nART DIRECTION: Sophisticated multicolor hand-printed woodblock landscape illustration: visible wood grain and carved hatch marks, flowing cloud bands, layered rolling hills, beautiful muted sage/ochre/rust/blue inks and cream paper, graceful expressive illustrated children. Richly detailed printmaking craft, a warm breezy open meadow, not flat clipart or isometric blocks.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: six-year-old boy, short brown hair, black rectangular glasses, rust jumper, blue trousers, brown boots. Jeannie: seven, shoulder-length brown hair, rose jumper and trousers. Ellie: three, dark-brown bob, lavender jumper. Dad: clean-shaven adult man with short light-brown hair, sage jacket and tan trousers. Red diamond kite with exactly three small bows on its tail.\nILLUSTRATE THIS MOMENT: The family gathers the red kite and its three-bow tail as the field becomes still again.\nStory context for this exact page: When the breeze faded, Cory and Dad brought the kite down slowly. Ellie caught the last bow as it settled on the grass. “Was it tired?” she asked. “The wind got quieter,” Cory said. He folded the tail carefully. Another windy day would come. The patient kite could wait.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Remove only the tiny fourth red bow at the very end of the white kite tail near the grass below Ellie's hands. Keep the three larger bows, including the one Ellie holds. The kite tail must have exactly three bows in total. Replace the removed tiny bow with meadow grass, preserving the white tail tip, people, kite and woodblock style. Keep landscape 4:3. No words or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-26150d4c-8e13-4ce4-8e50-7c99659f215e.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: exactly three bows remain on kite tail, Ellie holds last bow as family packs up."
+}

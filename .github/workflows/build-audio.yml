@@ -60,7 +60,7 @@ jobs:
         run: python3 build_audio.py
 
       - name: Check every book has matching narration
-        run: node tests/storybook-library.cjs --pending-art
+        run: node tests/storybook-library.cjs
 
       - name: Commit narration audio
         run: |

@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 4,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-4f4c7fd2-002c-485b-90cf-b74f11c4c956.png",
+  "originalSha256": "c7df11303f1d2be95fa1bfa9897d055ddc2f16e944c5261af6e8e8265ce7cf51",
+  "file": "jeannie-fog-bell-4.webp",
+  "sha256": "ee33d6f3630cc841aca71965c9c590c7da306b7444ce98c3c3b3b1ba7495f724",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "0394f7c7a1660be834b8eaebcf6fafd1330ffd9829d2be1aee8c897757a36553",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 5: The fog lifts.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: The clearing fog reveals a garden gate touching a small hanging welcome bell as it swings.\nStory context for this exact page: Slowly the gate became clear. A welcome bell hung beside its latch. The gate swung a little, bumped the bell, and rang. Dad pointed from the porch. Jeannie watched it happen twice. “There is my evidence,” she said. The mystery had been waiting only a few steps away.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-fog-bell-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Clearing fog reveals bell beside moving gate as Dad and Jeannie observe from porch."
+}

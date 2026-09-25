@@ -1,0 +1,22 @@
+{
+  "storyId": "ellie-mosaic-fountain",
+  "page": 3,
+  "style": "mosaic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-46991a85-1c4c-4bf8-976b-8748a297978e.png",
+  "originalSha256": "ffc70868ce4d02d637e2e1d941a820b1baf29283270521961248d061f0b79fe5",
+  "file": "ellie-mosaic-fountain-3.webp",
+  "sha256": "a7281a5751324dd87fbaabf34b5b004a1e4355b4d5169af73ed9ec0369f65e39",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "4ebb76131bfb9f070d6801f4b442da86cbecd505162d1718791f036b4d8984e1",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Ellie and the Broken Rainbow, page 4: Walk the rainbow.\nART DIRECTION: An elaborate handmade ceramic-tile story illustration: thousands of small irregular glazed tesserae, subtle grout, rich turquoise/coral/ochre/ivory colors and reflected light, graceful natural human forms depicted entirely in mosaic. Beautiful Roman/Byzantine-inspired craft but a cozy child-friendly imaginary palace courtyard. The depicted story objects are large cardboard tiles and a blue bowl; the medium of the whole image is mosaic. No vector stand-ins.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Ellie: three-year-old girl with a dark-brown bob and side fringe, lavender princess dress. Cory: six, short brown hair, rectangular glasses, blue tunic and trousers. Jeannie: seven, shoulder-length brown hair, rose dress. Mum: dark bob with gray streaks, round glasses, olive dress, holding baby Kieran securely in pale blue.\nILLUSTRATE THIS MOMENT: Ellie and Cory trace a complete repeating red-yellow-blue ring of large cardboard tiles around the blue bowl fountain.\nStory context for this exact page: Before adding decorations, Ellie checked the path. She pointed to each tile in order: red, yellow, blue. Around the whole circle she went. Cory followed with one finger. At the end, the last blue tile met the first red one. Their pattern could go around and around.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Reframe this scene as a closer view of ONE SIDE of the fountain. Only the FRONT HALF of its circular colored path is visible; the rest of the path is naturally hidden behind the large bowl or outside the image. The visible path is ONE continuous shallow CURVING ARC of exactly SIX broad cardboard tiles laid end to end from LEFT to RIGHT in this exact order: RED, YELLOW, BLUE, RED, YELLOW, BLUE. Make these six broad shapes simple and unmistakable; small tesserae within each tile are all the same tile color. This is six colored tiles, not concentric bands. Preserve the current character actions, expressive faces, blue bowl, sunlit courtyard and ceramic-mosaic artistic medium. Do not show the entire circle. The clear repeating color clue matters most. Keep landscape 4:3. No words or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-050e577a-bd5b-4375-9e3f-670ec8253578.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected close view clearly shows red-yellow-blue repeated twice along front arc; children check the pattern."
+}

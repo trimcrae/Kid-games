@@ -70,6 +70,7 @@ for (const story of context.window.STORYBOOK_VOLUME_TWO) {
     const file=path.join(root,p.img), receipt=JSON.parse(fs.readFileSync(path.join(root,'art/volume-two/receipts',story.id+'-'+i+'.json'),'utf8'));
     assert.equal(receipt.generator,'Codex built-in OpenAI image tool');
     assert.equal(receipt.style,story.artStyle);
+    assert.equal(receipt.sourceHash,crypto.createHash('sha256').update(JSON.stringify({text:p.text,alt:p.alt,style:story.artStyle})).digest('hex'),'Art corresponds to this page: '+p.img);
     assert.equal(receipt.reviewed,true,'Art reviewed: '+p.img);
     assert.equal(receipt.sha256,crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
   }

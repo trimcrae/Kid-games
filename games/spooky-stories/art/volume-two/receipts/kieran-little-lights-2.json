@@ -1,0 +1,22 @@
+{
+  "storyId": "kieran-little-lights",
+  "page": 2,
+  "style": "pointillism",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e528fc5c-d1fb-40f7-b661-5ea732457971.png",
+  "originalSha256": "7a07651c32497b30915534a8022739d4f8e986c8361299fb4aa72c499dec0f5d",
+  "file": "kieran-little-lights-2.webp",
+  "sha256": "20e83f70b466e62f8d78a8ef2150823081af9c50348dcf63e2c1e41603109180",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "33fd613c9b1a04271f775e41766b857f3f166a36833daab704d86e3370bec209",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Kieran and the Three Little Lights, page 3: Where is the star?.\nART DIRECTION: Luminous pointillist oil painting made of thousands of individually painted tiny colored dots and dabs, rich twilight indigo/purple with glowing gold and rose light, tactile canvas and subtle painterly depth. Natural expressive human faces formed from color points, a cozy family sitting room. True hand-painted pointillism, not a regular halftone screen or dots laid over vector shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Mum: adult woman with dark bob and gray streaks, round glasses, sage cardigan; holds infant Kieran securely in a pale-blue sleeper. Jeannie: seven, shoulder-length brown hair and rose jumper. Cory: six, short brown hair, black rectangular glasses, blue jumper. Ellie: three, dark-brown bob and lavender jumper. Only people explicitly required by the current scene.\nILLUSTRATE THIS MOMENT: A cushion partly hides the star lantern while Kieran looks around its edge from Mum's arms.\nStory context for this exact page: Cory held a cushion between Kieran and the star lantern. The star disappeared. Kieran leaned sideways in Mum's arms. There it was again! Cory moved the cushion away. The lantern had stayed in the same place all along. Only their view of it had changed.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\nVisual continuity: EXACTLY THREE paper lanterns total, one circular-window lantern, one star-window lantern, one house-window lantern. Do not add extra decorative lanterns.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/kieran-little-lights-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory shifts cushion and Kieran peeks around it toward the star; all three lanterns remain."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "ellie-mosaic-fountain",
+  "page": 1,
+  "style": "mosaic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-868e9787-b098-4e2b-a4c5-0d48b4902553.png",
+  "originalSha256": "189b42398339bcc22a3217ccba8a8add18ddb11510b998ed8122bde7efb4034b",
+  "file": "ellie-mosaic-fountain-1.webp",
+  "sha256": "05c6831f23433410470d8f5041bdefd3f8a556ffc7a8c89a5e8197dcec50bcf5",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "34c030f199a6a1abe70d713c25c1c107a3a1c0e8f8adb1785de7a31a20c21a07",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Ellie and the Broken Rainbow, page 2: One gap at a time.\nART DIRECTION: An elaborate handmade ceramic-tile story illustration: thousands of small irregular glazed tesserae, subtle grout, rich turquoise/coral/ochre/ivory colors and reflected light, graceful natural human forms depicted entirely in mosaic. Beautiful Roman/Byzantine-inspired craft but a cozy child-friendly imaginary palace courtyard. The depicted story objects are large cardboard tiles and a blue bowl; the medium of the whole image is mosaic. No vector stand-ins.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Ellie: three-year-old girl with a dark-brown bob and side fringe, lavender princess dress. Cory: six, short brown hair, rectangular glasses, blue tunic and trousers. Jeannie: seven, shoulder-length brown hair, rose dress. Mum: dark bob with gray streaks, round glasses, olive dress, holding baby Kieran securely in pale blue.\nILLUSTRATE THIS MOMENT: Ellie replaces the missing yellow tile between a red tile and a blue tile in the curved path.\nStory context for this exact page: Ellie picked up a blue tile and tried the first gap. A red tile sat on one side and a blue tile on the other. Blue, blue? That did not sound right. She said the pattern slowly. Red, yellow, blue. Into the gap went yellow.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/ellie-mosaic-fountain-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Ellie inserts a yellow piece between red and blue, in textured ceramic mosaic style."
+}

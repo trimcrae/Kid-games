@@ -37,7 +37,10 @@ const published = new Map(git('ls-tree', '-r', remoteMain).split('\n').flatMap(l
   return match ? [[match[2], match[1]]] : [];
 }));
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
-const base = path.join(repo, 'games/adventure/art/generated');
+// A task may scope cleanup to another generated-image collection with the same receipts.
+const base = path.resolve(repo, option('--asset-dir') || 'games/adventure/art/generated');
+const relativeBase = path.relative(repo, base);
+if (!relativeBase || relativeBase.startsWith('..') || path.isAbsolute(relativeBase)) throw Error('Asset directory must be inside the repository.');
 const items = [];
 for (const file of fs.readdirSync(path.join(base, 'receipts')).filter(f => f.endsWith('.json'))) {
   const receipt = path.join(base, 'receipts', file);

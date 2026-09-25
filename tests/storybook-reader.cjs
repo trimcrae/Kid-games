@@ -38,6 +38,13 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
         };
       });
       const page = await context.newPage();
+      const checkGeneratedPicture = async () => {
+        await page.waitForFunction(() => {
+          const img = document.querySelector('.scene-img');
+          return img && img.complete && img.naturalWidth > 0;
+        });
+        assert.match(await page.locator('.scene-img').getAttribute('src'), /^art\/volume-two\/.+\.webp$/);
+      };
       page.on('pageerror',e=>errors.push(e.message));
       page.on('response',r=>{if(r.status()>=400) errors.push(`${r.status()} ${r.url()}`);});
       await page.goto(base+'/games/spooky-stories/');
@@ -46,6 +53,7 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
       for (let i=0;i<total;i++) {
         allowed();
         await page.locator('.story-card').nth(i).click();
+        if (i<10) await checkGeneratedPicture();
         if (process.argv.includes('--audio') && width===1280 && i<10) {
           await page.locator('#read-btn').click();
           await page.waitForFunction(() => window.testAudio.some(a => !a.paused && a.currentTime>0 && a.readyState>=2));
@@ -73,6 +81,7 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
             allowed();
             if((await page.locator('#next-btn').textContent()).includes('More stories')) break;
             await page.locator('#next-btn').click();
+            if (i<10) await checkGeneratedPicture();
             const visible = await page.locator('#page-text').textContent();
             assert.ok((await page.locator('#transcript-copy').textContent()).includes(visible));
           }

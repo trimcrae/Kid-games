@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-kite-day",
+  "page": 4,
+  "style": "woodblock",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-5f302fea-ff25-45e1-9f60-a3a73b74b334.png",
+  "originalSha256": "b401c176535c3354ba44442d62abb5b2f1e5a106c503180864dc7f77ad1eedb1",
+  "file": "cory-kite-day-4.webp",
+  "sha256": "2a29b6b19bb70a4c2f4c9dfd50a3e226af20cde3386a8089f82770a575042280",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "6ef7802316fa02be0ccac3363c6f7eeeff05de8f877f3406233378dbb14d8003",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Patient Kite, page 5: A gentle start.\nART DIRECTION: Sophisticated multicolor hand-printed woodblock landscape illustration: visible wood grain and carved hatch marks, flowing cloud bands, layered rolling hills, beautiful muted sage/ochre/rust/blue inks and cream paper, graceful expressive illustrated children. Richly detailed printmaking craft, a warm breezy open meadow, not flat clipart or isometric blocks.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: six-year-old boy, short brown hair, black rectangular glasses, rust jumper, blue trousers, brown boots. Jeannie: seven, shoulder-length brown hair, rose jumper and trousers. Ellie: three, dark-brown bob, lavender jumper. Dad: clean-shaven adult man with short light-brown hair, sage jacket and tan trousers. Red diamond kite with exactly three small bows on its tail.\nILLUSTRATE THIS MOMENT: The red kite climbs over rolling fields on a gently taut line, its three tail bows fluttering.\nStory context for this exact page: This time Cory kept the string gently taut while Dad held the kite up. A steady breeze caught it. Dad let go. The kite climbed above the field, and its three bows fluttered behind. Cory did not need to yank. Small changes in his hands helped it stay in the air.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\nVisual continuity: the kite tail has EXACTLY THREE bows total whenever its full tail is visible.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-kite-day-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Successful steady flight with three bows and taut string, Dad releasing kite."
+}

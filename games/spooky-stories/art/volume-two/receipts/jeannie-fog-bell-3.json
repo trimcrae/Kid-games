@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 3,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7c0dffbc-2b3a-4832-917e-b16591522d77.png",
+  "originalSha256": "5b363d42d8d9432b99e73200f4ea315571b3b20ecd519951937f8e2d10126392",
+  "file": "jeannie-fog-bell-3.webp",
+  "sha256": "c5630b2feb89664b5237da05d636e45db2b281b233b508c6415af3735ec8ab5c",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "b7f78796784fff820e120111d92103675b4908420104a280eb63eca4197142c3",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 4: A clue in the rhythm.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: Wisps of fog sweep past the garden gate, with a small bell-shaped silhouette beside the latch.\nStory context for this exact page: Ding. A pause. Ding, ding. Then a creak. The sounds came just after the wind brushed Jeannie's cheek. She watched the fog curl past the gate. Another little gust. Another creak and ring. “Perhaps something moves when the wind pushes it,” she said.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Edit the supplied story illustration. Keep Jeannie and Dad safely on the cottage PORCH, leaning at its timber railing and listening to wind, not standing beside the gate. Show the gate farther away down the garden path, still mostly obscured by curling fog. Hide the bell in the fog completely: this page has not revealed the source of the sound yet. Preserve the two characters' likenesses, clothes, warm gray charcoal medium and cottage atmosphere. A gust lifts Jeannie's hair and bends foliage; one coherent scene. Keep 4:3 landscape dimensions. No text, signature or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-10ba06ac-86bc-4ad0-a02e-ebae2c9627df.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: both listen from porch, wind moves hair and fog hides distant gate and bell."
+}
