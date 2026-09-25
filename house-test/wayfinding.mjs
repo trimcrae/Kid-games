@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {routeSearch} from './route-search.mjs';
+import {routeSearch} from './route-search.mjs?v=20260925-motion';
 export {routeSearch};
 
 // "Walk there" directions as paw prints on the floor along a real walkable
@@ -11,7 +11,7 @@ export function createRouter(world,warm=null){
   let worker=null,sent=-1,next=1;const pending=new Map();
   function fallback(r){r.local=routeSearch(world,r.from,r.to);}
   try{
-    worker=new Worker(new URL('./route-worker.mjs',import.meta.url),{type:'module'});
+    worker=new Worker(new URL('./route-worker.mjs?v=20260925-motion',import.meta.url),{type:'module'});
     worker.onmessage=e=>{const m=e.data,r=pending.get(m.id);if(!r)return;pending.delete(m.id);r.state=m.state;r.path=m.path;r.expanded=m.expanded;r.ms=m.ms;};
     worker.onerror=e=>{e.preventDefault?.();worker=null;for(const r of pending.values())fallback(r);pending.clear();};
   }catch{worker=null;}

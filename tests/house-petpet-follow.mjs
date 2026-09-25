@@ -50,11 +50,34 @@ function ride(f,seconds,leaderY,opts){const out=[];for(let i=0;i*DT<=seconds;i++
   const f=createPetpetFollow();f.hop(0,1);
   for(let i=0;i<30;i++){const r=f.update(i*DT,DT,jump(i*DT),{reduced:true});assert.equal(r.y,jump(i*DT));assert.equal(r.hop,0);}
 }
+{ // Walking leaves the small follower a beat behind in the horizontal path.
+  const f=createPetpetFollow();let result;
+  for(let i=0;i<80;i++){const t=i*DT;result=f.update(t,DT,0,{leader:{x:0,z:t,heading:0,scale:.6}});}
+  assert(result.offsetZ<-.45&&result.offsetZ>-.65,`follower did not trail the owner's path: ${result.offsetZ}`);
+  assert(Math.abs(result.offsetX-.4)<.01,'follower wandered off the heel side');
+}
+{ // Turning in place keeps the petpet at its old world point until it walks
+  // around the heel; a teleport puts it back beside the owner immediately.
+  const f=createPetpetFollow();for(let i=0;i<20;i++)f.update(i*DT,DT,0,{leader:{x:0,z:0,heading:0,scale:.6}});
+  const turn=f.update(20*DT,DT,0,{leader:{x:0,z:0,heading:Math.PI/2,scale:.6}});
+  assert(turn.offsetZ>.25,`follower snapped around the turn: ${JSON.stringify(turn)}`);
+  let settled;for(let i=21;i<45;i++)settled=f.update(i*DT,DT,0,{leader:{x:0,z:0,heading:Math.PI/2,scale:.6}});
+  assert(Math.abs(settled.offsetX-.4)<.01&&Math.abs(settled.offsetZ+.3)<.01,'follower did not reach new heel');
+  let walking;for(let i=45;i<65;i++)walking=f.update(i*DT,DT,0,{leader:{x:(i-44)*DT,z:0,heading:Math.PI/2,scale:.6}});
+  assert(walking.offsetZ<-.4&&walking.offsetZ>-.85,'follower did not trail after turning');
+  const moved=f.update(65*DT,DT,0,{leader:{x:10,z:0,heading:Math.PI/2,scale:.6}});
+  assert(Math.abs(moved.offsetX-.4)<.01&&Math.abs(moved.offsetZ+.3)<.01,'teleport dragged follower through old room');
+  const rewind=f.update(.1,DT,0,{leader:{x:0,z:0,heading:0,scale:.6}});
+  assert(Math.abs(rewind.offsetX-.4)<.01&&Math.abs(rewind.offsetZ+.3)<.01,'time rewind left a stale trail');
+  const reduced=f.update(.2,DT,1,{reduced:true,leader:{x:1,z:1,heading:0,scale:.6}});
+  assert.deepEqual([reduced.y,reduced.hop,reduced.offsetX,reduced.offsetZ],[1,0,.4,-.3],
+    'reduced motion did not return to the heel');
+}
 { // Feet: at a walk the petpet's legs go round faster than the Craepet's.
   function hz(root){const rig=root.userData.rig,leg=rig.bones.legL,z0=leg.userData.rest.z;let crossings=0,last=null;
-    for(let t=0;t<2;t+=1/30){rig.update(1/30,{moving:true,speed:1.5});const s=Math.sign(leg.position.z-z0);if(last!==null&&s!==last&&s!==0)crossings++;if(s!==0)last=s;}
+    for(let t=0;t<2;t+=1/120){root.position.z+=1.5/120;rig.update(1/120,{moving:true,speed:1.5});const s=Math.sign(leg.position.z-z0);if(last!==null&&s!==last&&s!==0)crossings++;if(s!==0)last=s;}
     return crossings/2/2;}
   const pet=hz(creature({species:'blorb'})),pal=hz(petpet('duckling'));
-  assert(pal>pet*1.4&&pal<pet*2,`petpet steps at ${pal} Hz, pet at ${pet} Hz`);
+  assert(pal>pet*2.3&&pal<pet*3.3,`petpet steps at ${pal} Hz, pet at ${pet} Hz`);
 }
 console.log('petpet follow OK');

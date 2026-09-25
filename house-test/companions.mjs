@@ -7,7 +7,7 @@
 // within 0.9 m of a room's arrival spot or activity station, so they never
 // block the camera or the spot you walk up to. Pure logic (no Three), tested
 // against the real walking world.
-import {routeSearch,walkable} from './route-search.mjs?v=20260915-arrows';
+import {routeSearch,walkable} from './route-search.mjs?v=20260925-motion';
 import {easeRoute} from './route-ease.mjs';
 const TAU=Math.PI*2;
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
@@ -103,7 +103,9 @@ export function createCompanion({id,egg=false,day,night,start,random=Math.random
 // ctx: {world, player, night, seen(point)->bool, random, reduced, camera?:{x,z}}
 export function updateCompanion(c,dt,ctx){
   const {world,player,night=false,reduced=false,random=Math.random}=ctx;
-  const seen=ctx.seen?ctx.seen(c.point):true;
+  const visible=point=>ctx.seen?ctx.seen(point):true;
+  const seen=visible(c.point);
+  const tripVisible=spot=>seen||visible(spot.up?spot.stand:spot);
   c.t+=dt;c.dwell-=dt;c.greetIn-=dt;c.happy=Math.max(0,c.happy-dt);
   const out={expression:'idle',pose:{},look:[0,0],hop:0,emote:null};
   const gap=Math.hypot(c.point.x-player.x,c.point.z-player.z),sameFloor=Math.abs(c.point.y-player.y)<(c.up?1:.6);
@@ -116,7 +118,7 @@ export function updateCompanion(c,dt,ctx){
   if(!visiting&&(!list.includes(c.spot)||(!night&&c.dwell<=0&&list.length>1&&c.mode==='at'))){
     const choices=list.filter(p=>p!==c.spot);const next=choices.length?choices[Math.floor(random()*choices.length)]:list[0];
     c.dwell=25+random()*25;
-    if(next&&next!==c.spot){c.spot=next;goTo(c,next,seen);}
+    if(next&&next!==c.spot){c.spot=next;goTo(c,next,tripVisible(next));}
   }
   const spot=c.spot;
   // Make room for your pet: two smooth steps away rather than a shove —
@@ -130,7 +132,16 @@ export function updateCompanion(c,dt,ctx){
   const home=spot&&(spot.up?spot.stand:spot);
   // Left standing somewhere else (it made room, or gave up a walk a moment
   // ago): back to its place once you're not right beside it.
-  if(home&&c.mode==='at'&&!c.crowded&&(gap>1.5||!sameFloor)&&c.t>(c.restUntil||0)&&(spot.up?!c.up:Math.hypot(home.x-c.point.x,home.z-c.point.z)>.3))goTo(c,spot,seen);
+  if(home&&c.mode==='at'&&!c.crowded&&(gap>1.5||!sameFloor)&&c.t>(c.restUntil||0)&&(spot.up?!c.up:Math.hypot(home.x-c.point.x,home.z-c.point.z)>.3)){
+    // After an unsuccessful route, stay calm until there is a walkable way
+    // again; a door or another mover clearing immediately releases the hold.
+    if(c.unreachable!==spot)goTo(c,spot,tripVisible(spot));
+    else if(c.t>=(c.retryAt||0)){
+      const probe={...c.point};world.move(probe,home.x-probe.x,home.z-probe.z);
+      if(Math.hypot(probe.x-home.x,probe.z-home.z)<.06)goTo(c,spot,tripVisible(spot));
+      else c.retryAt=c.t+1;
+    }
+  }
   if(!c.up&&sameFloor&&gap<(c.spot?.temp?.45:.7)&&c.mode!=='aside'&&c.mode!=='hop'&&(!c.crowded||c.crowded==='made room'&&gap<.45)){
     // (Not back into the camera trailing behind you, where it would vanish.)
     const away=Math.atan2(c.point.x-player.x,c.point.z-player.z),left=Math.max(.25,1-gap),cam=ctx.camera;let angle,backup;
@@ -149,11 +160,11 @@ export function updateCompanion(c,dt,ctx){
     c.aside.left-=step;c.face=toYou;c.walking=moved>1e-4;c.speed=moved/Math.max(dt,1e-4);
     if(c.aside.left<=0||moved<step*.3){c.aside.left=0;c.aside.back-=dt;c.walking=false;c.speed=0;
       // Then back to its place once you've moved off, or it just stays here and watches you.
-      if(c.aside.back<=0){const made=c.aside.moved>.1;c.aside=null;if(gap>1.2&&spot)goTo(c,spot,seen);else{c.mode='at';c.crowded=made?'made room':'boxed in';c.crowdedUntil=c.t+8;}}}
+      if(c.aside.back<=0){const made=c.aside.moved>.1;c.aside=null;if(gap>1.2&&spot&&c.unreachable!==spot)goTo(c,spot,tripVisible(spot));else{c.mode='at';c.crowded=made?'made room':'boxed in';c.crowdedUntil=c.t+8;}}}
   }else if(c.mode==='travel'){
     const tgt=c.target;
-    if(!seen&&(Math.hypot(tgt.x-c.point.x,tgt.z-c.point.z)>.1||Math.abs(tgt.y-c.point.y)>.3)){Object.assign(c.point,tgt);c.path=c.search=null;arrive(c);}
-    else walk(c,dt,world,seen,reduced);
+    if(!seen&&!visible(tgt)&&(Math.hypot(tgt.x-c.point.x,tgt.z-c.point.z)>.1||Math.abs(tgt.y-c.point.y)>.3)){Object.assign(c.point,tgt);c.path=c.search=null;arrive(c);}
+    else walk(c,dt,world,seen||visible(tgt),reduced);
   }else if(c.mode==='hop'){
     // Up onto (or down from) a bed, a seat or a chair in a short arc.
     const h=c.hop;h.t=Math.min(1,h.t+dt/(reduced?.01:.45));
@@ -221,7 +232,7 @@ function walk(c,dt,world,seen,reduced){
   if(c.search){
     c.searchT+=dt;let found=null;
     c.search.forEach((s,i)=>{if(found)return;if(s.state==='searching')s.run(1);if(s.state==='found')found=i?s.path.slice().reverse():s.path;});
-    if(found){c.path=easeRoute(world,straighten(world,found)).slice(1);c.search=null;}
+    if(found){c.path=easeRoute(world,straighten(world,found)).slice(1);c.search=null;if(!c.path.length){arrive(c);return;}}
     else if(c.search.every(s=>s.state==='failed')||c.searchT>2){c.path=[{x:tgt.x,y:tgt.y,z:tgt.z}];c.search=null;}
     else{c.walking=false;c.speed=0;c.vel=0;c.face=Math.atan2(tgt.x-c.point.x,tgt.z-c.point.z);return;}
   }
@@ -244,16 +255,30 @@ function walk(c,dt,world,seen,reduced){
   const want=(last?Math.max(.15,Math.min(pace,d*2.2)):pace)*(turning>1.2?.15:1-turning*.6);
   c.vel+=(want-c.vel)*(reduced?1:1-Math.exp(-dt*6));
   const step=Math.min(d,c.vel*dt),before={...c.point};world.move(c.point,dx/d*step,dz/d*step);
-  const moved=Math.hypot(c.point.x-before.x,c.point.z-before.z);c.distance+=moved;c.walking=true;c.speed=moved/Math.max(dt,1e-4);
+  const moved=Math.hypot(c.point.x-before.x,c.point.z-before.z);c.distance+=moved;c.walking=moved>1e-4;c.speed=moved/Math.max(dt,1e-4);
   c.stuck=moved<step*.3?c.stuck+dt:0;
   if(c.stuck>.8){c.stuck=0;
     if(!seen){Object.assign(c.point,tgt);c.path=null;arrive(c);}
     // Something new in the way: look for the way once more from here, then settle where it is.
     else if(!c.replanned){c.replanned=true;c.path=null;}
-    else{c.path=null;c.mode='at';c.walking=false;c.speed=0;c.vel=0;c.dwell=4;c.restUntil=c.t+4;}
+    else{
+      // Try one short side step with a genuinely clear remaining leg. This
+      // lets a pet round a chair corner when the grid route touched its edge.
+      const angle=Math.atan2(tgt.x-c.point.x,tgt.z-c.point.z);
+      let detour=null;
+      for(const offset of [Math.PI/2,-Math.PI/2,2.2,-2.2]){
+        const q={...c.point};world.move(q,Math.sin(angle+offset)*.45,Math.cos(angle+offset)*.45);
+        if(Math.hypot(q.x-c.point.x,q.z-c.point.z)<.25||Math.abs(q.y-c.point.y)>.26)continue;
+        const probe={...q};world.move(probe,tgt.x-q.x,tgt.z-q.z);
+        if(Math.hypot(probe.x-tgt.x,probe.z-tgt.z)<.06&&Math.abs(probe.y-tgt.y)<.3){detour=q;break;}
+      }
+      if(detour){c.path=[detour,{...tgt}];c.vel=0;c.stuck=0;}
+      else{c.path=null;c.mode='at';c.walking=false;c.speed=0;c.vel=0;c.unreachable=c.spot;c.retryAt=c.t+1;}
+    }
   }
 }
 function goTo(c,spot,seen){
+  if(c.unreachable!==spot)c.unreachable=null;
   c.target=spot.up?spot.stand:{x:spot.x,y:spot.y,z:spot.z};c.stuck=0;c.path=c.search=null;c.replanned=false;c.vel=0;
   if(!seen){ // nobody's looking: just be there
     Object.assign(c.point,spot.up?{x:spot.x,y:spot.y,z:spot.z}:c.target);c.up=!!spot.up;c.standFrom=spot.up?{...spot.stand}:null;

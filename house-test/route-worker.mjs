@@ -1,6 +1,6 @@
 // Worker thread for the paw-print route search (see wayfinding.mjs).
-import {WalkingWorld} from './physics.mjs';
-import {routeSearch} from './route-search.mjs';
+import {WalkingWorld} from './physics.mjs?v=20260925-motion';
+import {routeSearch} from './route-search.mjs?v=20260925-motion';
 let world=null,warm=null;
 // Warm up in the background (a long cross-floor search) so a later request
 // runs on already-compiled code — but in small slices, so a player's real
