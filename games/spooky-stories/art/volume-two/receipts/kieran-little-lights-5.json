@@ -1,0 +1,22 @@
+{
+  "storyId": "kieran-little-lights",
+  "page": 5,
+  "style": "pointillism",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-ef2b00b9-a993-4c2c-9858-1d7b29961cae.png",
+  "originalSha256": "d2f22f3514cad51838dd2ece011f0a96f59a261fa2d71ba4358dfcc57e19c65f",
+  "file": "kieran-little-lights-5.webp",
+  "sha256": "5f60d6731c6807eaf0fa76cfdde1fe6e054b0d7498a70c5225caee33660f09b1",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "eb5406b92a3d334684d7a85fa810b511e2156276641ee4f902d7b9e1a4833661",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Kieran and the Three Little Lights, page 6: Goodnight, little lights.\nART DIRECTION: Luminous pointillist oil painting made of thousands of individually painted tiny colored dots and dabs, rich twilight indigo/purple with glowing gold and rose light, tactile canvas and subtle painterly depth. Natural expressive human faces formed from color points, a cozy family sitting room. True hand-painted pointillism, not a regular halftone screen or dots laid over vector shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Mum: adult woman with dark bob and gray streaks, round glasses, sage cardigan; holds infant Kieran securely in a pale-blue sleeper. Jeannie: seven, shoulder-length brown hair and rose jumper. Cory: six, short brown hair, black rectangular glasses, blue jumper. Ellie: three, dark-brown bob and lavender jumper. Only people explicitly required by the current scene.\nILLUSTRATE THIS MOMENT: The three lanterns rest quietly on the rug as the last house-shaped glow fades at bedtime.\nStory context for this exact page: Mum carried Kieran toward bed. Jeannie switched off the circle light. Cory switched off the star. Ellie said goodnight to the little house and switched that one off too. The room grew quiet. The lights were finished for the evening, but their little path would be ready another night.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\nVisual continuity: EXACTLY THREE paper lanterns total, one circular-window lantern, one star-window lantern, one house-window lantern. Do not add extra decorative lanterns.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/kieran-little-lights-0.webp"
+  ],
+  "reviewed": true,
+  "review": "All three lantern interiors are dark at bedtime; sleepy Kieran and consistent pointillist family."
+}

@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 1,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-b479466c-3636-40e2-b160-af03d61b0c12.png",
+  "originalSha256": "819ba9eed32610650c04abeea1aaf8fcd96f6c9cb707a548c551f63f6f60444a",
+  "file": "jeannie-fog-bell-1.webp",
+  "sha256": "1f1b33122b8ac1656b46172413e3db7f46490768634497b1848f3e8f256090b4",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "467e67a1e1ed145f8a9a4a19bb273f34e29d1b3767433f1fa5a3505a51bd8f6f",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 2: The first guess.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: A notebook with a sketched boat and a question mark lies on the porch rail above a faint meadow.\nStory context for this exact page: Jeannie imagined a boat beyond the hedge. But yesterday they had walked there and found a meadow, not a harbor. A boat was possible in a story. It was less likely in that field. She put a small question mark beside her first guess in her notebook.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-fog-bell-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Jeannie considers a boat sketch and question mark while observing a foggy meadow from the porch."
+}

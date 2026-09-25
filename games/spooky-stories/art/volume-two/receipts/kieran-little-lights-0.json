@@ -1,0 +1,20 @@
+{
+  "storyId": "kieran-little-lights",
+  "page": 0,
+  "style": "pointillism",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-7a0455f2-6233-4bb8-8a55-d0cceb5eaae8.png",
+  "originalSha256": "bac8c10320c881bf1995d15d5e64d8e241f55f797891d6c0bdefc44ea42ccc28",
+  "file": "kieran-little-lights-0.webp",
+  "sha256": "74b15bd0f0ec65b83906bd98a1c3db05c572aa06d62a68b77b976334ff4ef662",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "4019b729d13c9ab2290d03d0a9b5bf2ef776ed1644a004e367b88b6305ffcdae",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Kieran and the Three Little Lights, page 1: A path of lights.\nART DIRECTION: Luminous pointillist oil painting made of thousands of individually painted tiny colored dots and dabs, rich twilight indigo/purple with glowing gold and rose light, tactile canvas and subtle painterly depth. Natural expressive human faces formed from color points, a cozy family sitting room. True hand-painted pointillism, not a regular halftone screen or dots laid over vector shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Mum: adult woman with dark bob and gray streaks, round glasses, sage cardigan; holds infant Kieran securely in a pale-blue sleeper. Jeannie: seven, shoulder-length brown hair and rose jumper. Cory: six, short brown hair, black rectangular glasses, blue jumper. Ellie: three, dark-brown bob and lavender jumper. Only people explicitly required by the current scene.\nILLUSTRATE THIS MOMENT: Mum carries Kieran beside three glowing paper lanterns with circle, star, and house-shaped windows.\nStory context for this exact page: Mum carried Kieran into the sitting room at dusk. Jeannie had made three paper lanterns around battery lights. One had a round window. One had a star. One had a little house. She set them along the rug, with plenty of space between. Kieran pointed at the nearest glow.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [],
+  "reviewed": true,
+  "review": "Pointillist family scene with circle, star and house lanterns."
+}

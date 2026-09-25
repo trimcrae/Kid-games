@@ -1,0 +1,20 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 0,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-bbbc0b34-5256-4fc0-84ca-dd95018ac80d.png",
+  "originalSha256": "5bfe8466d5d33af68f0a36eb3bd7eac297097156d8fc860efa28940009ef52b5",
+  "file": "jeannie-fog-bell-0.webp",
+  "sha256": "401f717b3b9340ead9e488b7b588f7565492d9f7b4230fa1cbb15ad2e3990705",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "6b59eae5d4138b447c3d3528b4545789169e4f879b20e137bae6a55ddb1935cd",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 1: The garden disappears.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: Jeannie and Dad stand together on a cottage porch looking toward a faint garden gate in soft gray fog.\nStory context for this exact page: Morning fog wrapped the holiday cottage in gray. Jeannie stood on the porch with Dad. The gate was only a pale shape. Beyond it, something rang: ding, ding. “A ship?” Jeannie guessed. Dad listened. “What else could ring a bell?” They stayed on the porch and gathered ideas.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [],
+  "reviewed": true,
+  "review": "Charcoal porch and fog, Jeannie and Dad clear and consistent."
+}

@@ -283,7 +283,7 @@ const GAMES = [
   {
     title: "The Family Storybook",
     emoji: "📖",
-    blurb: "29 illustrated books with read-aloud audio, full transcripts, and cozy two-page spreads. Join Jeannie's map mystery, Cory's bridge-building adventure, Kieran's moon song, and Ellie's fairy tales. Learn vocabulary, patterns, problem-solving, and story comprehension together.",
+    blurb: "39 illustrated books with read-aloud audio, full transcripts, and cozy two-page spreads. Ten new adventures in ten art styles: a midnight train, a moon delivery, a rainbow window, a sock parade, and more. Learn vocabulary, patterns, observation, and problem-solving with all four kids.",
     url:   "games/spooky-stories/",
     ages:  "3+",
     kids: ["ellie","jeannie","cory","kieran"],

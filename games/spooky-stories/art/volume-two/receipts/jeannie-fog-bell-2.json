@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 2,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-f9f5af10-a1c0-4ef5-8277-1192293134a4.png",
+  "originalSha256": "d84124da36a7be557fd27ea91357719d590aada3e593e1b69f67d7ec3343c474",
+  "file": "jeannie-fog-bell-2.webp",
+  "sha256": "50aa741ad5b66ecac2bd59c06e8ed794bef36a656ebfea851ec5929d3444ec15",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "8a8b4acfa9056b4fd6738b6edd8535e5a35dcaff40806128017d831e50483d64",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 3: Another possibility.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: Jeannie’s notebook on the cottage porch shows tentative sketches of a boat and a bicycle while Dad listens beside her in the fog.\nStory context for this exact page: “A bicycle has a bell,” Dad said. Jeannie listened for wheels on the gravel. She could not hear any. That did not prove there was no bicycle, but it gave her another thing to check. She drew a bicycle beside the boat and left both guesses open.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-fog-bell-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Boat and bicycle guesses remain notebook sketches on foggy porch."
+}

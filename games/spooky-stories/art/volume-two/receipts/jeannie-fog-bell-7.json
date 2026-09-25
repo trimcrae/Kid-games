@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 7,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-1875b1a7-a696-42dc-900b-ce28bc3e0621.png",
+  "originalSha256": "57be9e8bd48cfd50439e09da0272feba6670f11937e4ba5c3cfaf1264a3f21e3",
+  "file": "jeannie-fog-bell-7.webp",
+  "sha256": "4b5ab89b9a6d6ff5821656416f8203640709211c3c8e4f285ede293c7681a31d",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "de72c3099138fca264dd4d912c3053f1c5d92fe79692817cf1ea65402d956bce",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 8: Two useful stories.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: Jeannie's notebook shows a gate-and-bell sketch beside an imaginary ship sailing across a meadow.\nStory context for this exact page: Dad fastened the gate. The bell grew quiet. Jeannie wrote the real explanation in her notebook. Underneath, she wrote a different title: The Ship That Sailed Through a Meadow. “That one can be make-believe,” she said. Dad smiled. “And now you'll know which story you're telling.”\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-fog-bell-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Notebook separates the real gate-and-bell explanation from imagined boat in a meadow; father and daughter on porch."
+}

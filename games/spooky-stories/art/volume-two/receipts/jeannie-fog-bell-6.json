@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-fog-bell",
+  "page": 6,
+  "style": "charcoal",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-247c322f-6762-4998-b2a4-87c168fcca9f.png",
+  "originalSha256": "2d38b2b43eab6f9802d3533c6e6cde891f19b520b97b7622299740a847956ad2",
+  "file": "jeannie-fog-bell-6.webp",
+  "sha256": "a9b42d38fd382b0dca6b9f3a6c6603e56f0a8f579e1ec2a04d675a982b0005be",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "55de560887607e06de94288f95118547146b7320ed32b567802ef478c86bffce",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Bell in the Fog, page 7: The useful quiet.\nART DIRECTION: Beautiful fine-art charcoal and graphite picture-book drawing on warm ivory paper. Fine expressive pencil contours, soft rubbed charcoal, carefully drawn natural human faces, textured stone cottage and wooden gate, luminous gray mist. Gentle intriguing morning mystery, never frightening. Delicate tonal depth, visible artist marks, no digital vector shapes, no color except warm paper.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old girl with shoulder-length brown hair, knitted cardigan, trousers and wellington boots. Dad: adult man, short light-brown hair, clean-shaven, outdoor sweater and trousers. Grayscale charcoal; keep their appearance consistent.\nILLUSTRATE THIS MOMENT: Jeannie and Dad examine the now-fastened gate latch while a robin sings from the clearing garden hedge.\nStory context for this exact page: Dad showed Jeannie the loose latch. Together they closed it properly. The gate stayed still, and the bell stopped interrupting the morning. A robin sang from the hedge. Jeannie had been listening so hard for the mystery that she had almost missed the other sounds around it.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-fog-bell-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Dad helps Jeannie secure latch while robin sings; charcoal details and cast consistent."
+}

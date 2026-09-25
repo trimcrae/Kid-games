@@ -2433,7 +2433,9 @@
 
   // The former picture-book demo and original sibling stories share this reader.
   STORIES.unshift(...(window.FAMILY_STORIES || []).map(story => {
-    const art = i => () => window.familyIllustration(story.artStyle, i);
+    const art = i => () => story.pages[i].img
+      ? '<p class="image-unavailable">The illustration could not load. You can still read and listen to this page.</p>'
+      : window.familyIllustration(story.artStyle, i);
     const pages = story.pages.map((p, i) => ({ ...p, art: art(i) }));
     VOCAB[story.id] = {};
     pages.forEach((p, i) => { VOCAB[story.id][i] = p.vocab || {}; });

@@ -1,0 +1,22 @@
+{
+  "storyId": "kieran-little-lights",
+  "page": 1,
+  "style": "pointillism",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-250126df-f933-4d21-adfe-bbcda6ff8e4f.png",
+  "originalSha256": "9025d98e3a445c9f5369d015c0d8c17b58c12f5a05fea57b59a3e1e85ee6bdc9",
+  "file": "kieran-little-lights-1.webp",
+  "sha256": "db0c2a2bceb2d5864b223327dec17d554c065b60c38af3c28b6cb924205964bd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "3bba5eb547816a5405108bce42e5dce0e01ba5dfad582af4fe3e6be13e08eb62",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Kieran and the Three Little Lights, page 2: Near and far.\nART DIRECTION: Luminous pointillist oil painting made of thousands of individually painted tiny colored dots and dabs, rich twilight indigo/purple with glowing gold and rose light, tactile canvas and subtle painterly depth. Natural expressive human faces formed from color points, a cozy family sitting room. True hand-painted pointillism, not a regular halftone screen or dots laid over vector shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Mum: adult woman with dark bob and gray streaks, round glasses, sage cardigan; holds infant Kieran securely in a pale-blue sleeper. Jeannie: seven, shoulder-length brown hair and rose jumper. Cory: six, short brown hair, black rectangular glasses, blue jumper. Ellie: three, dark-brown bob and lavender jumper. Only people explicitly required by the current scene.\nILLUSTRATE THIS MOMENT: Three lanterns recede along a dotted twilight rug while Kieran follows their glow from Mum's arms.\nStory context for this exact page: The round lantern was nearest. The star was farther away. The house waited at the far end of the rug. Mum walked slowly beside the lights. Kieran turned his head to follow each one. Ellie walked behind them, whispering their names like a tiny bedtime poem.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\nVisual continuity: EXACTLY THREE paper lanterns total, one circular-window lantern, one star-window lantern, one house-window lantern. Do not add extra decorative lanterns.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/kieran-little-lights-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Three lanterns recede circle-star-house; Mum carries Kieran along the light path."
+}
