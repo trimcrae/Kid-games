@@ -29,7 +29,7 @@ export function walkable(world,p,x,z){
     const nx=p.x+dx*s/steps,nz=p.z+dz*s/steps;let top=-Infinity,edge=-Infinity;
     for(const b of list){
       if(nx>=b.min[0]-.10&&nx<=b.max[0]+.10&&nz>=b.min[2]-.10&&nz<=b.max[2]+.10&&b.max[1]<=y+.255&&b.max[1]>=y-.40){
-        edge=Math.max(edge,b.max[1]);
+        if(b.max[1]<=y+.03)edge=Math.max(edge,b.max[1]);
         if(nx>=b.min[0]-.01&&nx<=b.max[0]+.01&&nz>=b.min[2]-.01&&nz<=b.max[2]+.01)top=Math.max(top,b.max[1]);}
     }
     const fl=Number.isFinite(top)?top:edge;if(!Number.isFinite(fl))return null;
