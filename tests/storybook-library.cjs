@@ -68,7 +68,7 @@ for (const story of context.window.STORYBOOK_VOLUME_TWO) {
   const pictures = story.pages.map((p,i) => context.window.familyIllustration(story.artStyle,i));
   pictures.forEach(svg=>assert.ok(svg.includes('data-art-style="'+story.artStyle+'"'), 'Explicit renderer: '+story.artStyle));
   // Normalize generated filter IDs before comparing: every page needs a different composition.
-  assert.equal(new Set(pictures.map(svg=>svg.replace(/volume-two-\d+/g,'art'))).size, 5, 'Five different illustrations: '+story.id);
+  assert.equal(new Set(pictures.map(svg=>svg.replace(/volume-two-(?:leaf-)?\d+/g,'art'))).size, 5, 'Five different illustrations: '+story.id);
 }
 if (!process.argv.includes('--pending-audio')) assert.deepEqual(missing, [], 'Every recording must match the exact displayed text');
 console.log(`PASS: ${STORIES.length} books; ${clips} page/end/question audio contracts; ${missing.length} recordings pending.`);

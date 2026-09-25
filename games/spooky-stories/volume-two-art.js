@@ -74,7 +74,7 @@
   }
   function stainedglass(i,id) {
     const lead='stroke="#353047" stroke-width="6" stroke-linejoin="round"';
-    const panels=repeat(5,j=>path(`M${86+j*91} 143L${130+j*91} 64 ${177+j*91} 143Z`,j%2?'#9765ad':'#59aaa8',lead));
+    const panels=repeat(5,j=>path(`M${86+j*91} 143L${130+j*91} 64 ${177+j*91} 143Z`,'#efca5c',lead));
     const shapes=repeat(3,r=>repeat(5,c=>{
       const x=131+c*91,y=190+r*77;
       if(r===0) return dot(x,y,27,i<2&&c===2?'#eee3ce':'#488dc5',lead);
@@ -96,7 +96,7 @@
       repeat(4,j=>line(4,10+j*12,32,10+j*12,'#eee4cd',4)))+'</g>';
   }
   function crayon(i,id) {
-    const pile=repeat(6,j=>sock(216+j%3*102,181+Math.floor(j/3)*110,['#c96262','#769fba','#dcb85a'][j%3],j%3===2?'sun':'stripe',.75));
+    const pile=repeat(5,j=>sock(216+j%3*102,181+Math.floor(j/3)*110,['#c96262','#769fba','#dcb85a'][j%3],j%3===2?'sun':'stripe',.75));
     return rect(0,0,640,480,'#fff6df')+`<g filter="url(#${id}-rough)" stroke-linecap="round" stroke-linejoin="round">`+
       repeat(32,j=>path(`M${20+j*20} 388q36-19 25 18t29 23`,'none',`stroke="${['#d5b092','#e2c4a6','#b7b8ae'][j%3]}" stroke-width="3" opacity=".5"`))+
       path('M46 243Q115 204 183 245L164 359H67Z','#d7b58b','stroke="#9d8069" stroke-width="4"')+
@@ -134,7 +134,8 @@
       type==='lobed'?'M0 93L-24 43-87 26-48-5-70-51-18-34 0-103 18-34 70-51 48-5 87 26 24 43Z':
       type==='toothed'?'M0 106L-21 72-12 67-29 47-19 39-32 17-21 9-29-14-17-20-21-48-10-45 0-107 10-45 21-48 17-20 29-14 21 9 32 17 19 39 29 47 12 67 21 72Z':
       'M0 106C-48 25-42-48 0-107C42-48 48 25 0 106Z';
-    return `<g transform="translate(${x} ${y}) scale(${s})">`+path(shape,c)+line(0,119,0,-88,ink,2)+repeat(7,j=>line(0,70-j*23,-(type==='round'?51:20),40-j*23,ink,1.5)+line(0,61-j*22,type==='round'?51:20,31-j*22,ink,1.5))+'</g>';
+    const clip=`volume-two-leaf-${++serial}`;
+    return `<g transform="translate(${x} ${y}) scale(${s})"><defs><clipPath id="${clip}">${path(shape,c)}</clipPath></defs>`+path(shape,c)+line(0,119,0,-88,ink,2)+`<g clip-path="url(#${clip})">`+repeat(7,j=>line(0,70-j*23,-(type==='round'?51:20),40-j*23,ink,1.5)+line(0,61-j*22,type==='round'?51:20,31-j*22,ink,1.5))+'</g></g>';
   }
   function cyanotype(i,id) {
     return rect(0,0,640,480,'#e9edd9')+rect(24,25,592,429,'#205c91')+
@@ -195,7 +196,8 @@
       (i===0||i===1||i===4?`<g transform="rotate(-63 460 317)">${kite(460,317)}</g>`:kite(kx,ky))+
       child(140,352,.98,'#bd8757','short','#4f5548')+
       (i===0||i===2?child(69,299,1.25,'#72928c','short','#4f5548'):'')+
-      (i===1?child(300,278,.9,'#b1a8b0','long','#4f5548'):'')+
+      (i===1?child(300,278,.9,'#b1a8b0','long','#4f5548')+path('M328 289q-2 24 5 49','none','stroke="#a85165" stroke-width="6"'):'')+
+      (i===2?child(554,325,.85,'#b1a8b0','long','#4f5548')+path('M580 335q25-12 45-10','none','stroke="#a85165" stroke-width="6"'):'')+
       (i===3?path('M166 364Q332 335 410 163','none','stroke="#635446" stroke-width="2"'):'')+
       (i===4?child(559,355,.74,'#bb947a','long','#4f5548'):'')+
       repeat(18,j=>path(`M${20+j*35} 467q${wind?32:5}-30 ${wind?43:8}-46`,'none','stroke="#586e51" stroke-width="2"'))+
