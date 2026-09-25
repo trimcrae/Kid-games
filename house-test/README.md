@@ -60,16 +60,23 @@ study:
 - **Things to use** (`interactions.mjs`, `E`): a pill says what E does
   here. Swing on the back-yard swings, bounce on the trampoline (hold ↓ to
   stop), get in either car and drive it out of the garage and down the
-  street (arrows drive and steer, Space honks, E gets out; it parks where
-  you leave it). It is a toy car, so it rides up onto anything flat up to
+  street (↑ accelerates, ↓ brakes then reverses, ←/→ steer, Space honks,
+  E gets out; it parks where you leave it). Steering eases in and centers
+  when released; lifting off the accelerator coasts to a stop. On touch
+  screens the pad drives and steers, with partial pressure controlling speed,
+  and the action button becomes a horn. A wider, smoothly turning driving
+  camera shows more of the car and road; walking tips stay hidden while seated.
+  It is a toy car, so it rides up onto anything flat up to
   80 cm — kerbs, the porch, bushes, the bus-stop bench — and drives
   straight over any *thing* lower than 110 cm (chairs, steps, bins, the
   toy house); only walls, sills, fences and rails, tall things (poles,
   trees, the mailbox, the swing frame, the other car) and the brink of the
-  world stop it. Meeting a wall at an angle slides it along instead of
-  stopping it dead, and it can always back out of whatever it hit. The
+  world stop it. Meeting a wall at an angle projects motion along its surface
+  rather than making the car dart sideways; a direct impact stops it, and
+  reversing backs it away. Small physics steps keep handling consistent at
+  different frame rates. The
   engine is a quiet low hum that is silent while it stands still.
-  open the fridge (both doors swing out on the snacks), play the piano in
+  Open the fridge (both doors swing out on the snacks), play the piano in
   the family room (1–8 or A–K play C to C, with the note named), switch the
   televisions and ceiling fans on, rock in the rocking chairs and flush the
   toilets. The parts that move come out of the export as their own draw

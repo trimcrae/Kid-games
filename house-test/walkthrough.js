@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260925-motion';
-import {createHouseLife} from './house-life.mjs?v=20260925-motion2';
+import {createHouseLife} from './house-life.mjs?v=20260925-car';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
 import {createHouseLighting} from './lighting.mjs?v=20260918-sky';
@@ -16,7 +16,7 @@ import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHead
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
-import {createInteractions} from './interactions.mjs?v=20260925-motion2';
+import {createInteractions} from './interactions.mjs?v=20260925-car';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 

@@ -82,6 +82,9 @@ body:has(.overlay:not([hidden]),#rooms:not([hidden]),#activity-panel:not([hidden
 #coach kbd{margin:0 2px}
 #hint{bottom:112px;display:none}
 #hint[data-show]{display:block;background:#fff1ea;border-color:#f6cdbd}
+@media(pointer:fine) and (min-height:600px){
+  body:has(#jump[aria-label="Honk"]) #hint[data-show]{top:140px;bottom:auto}
+}
 #coach:not([hidden])~#hint[data-show]{bottom:176px}
 
 /* --- The pet's speech bubble, anchored above its head by house-life.mjs --- */
