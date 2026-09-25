@@ -7,9 +7,15 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {WalkingWorld} from '../house-test/physics.mjs';
+import {carPoint} from '../house-test/interactions.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const world=new WalkingWorld(data.colliders,{height:1.05});
 const props=data.props||{};
+// The car collision footprint and passenger offset must use the same Y turn
+// as the rendered mesh: at +90 degrees, its nose (-Z) points left (-X).
+assert.deepEqual(carPoint(0,0,0,-1,Math.PI/2),{x:-1,z:-Math.cos(Math.PI/2)});
+const seat=carPoint(0,0,-.42,.15,Math.PI/2);
+assert(Math.abs(seat.x-.15)<1e-9&&Math.abs(seat.z-.42)<1e-9,'car seat turned opposite its shell');
 for(const key of ['fridge-a','fridge-b','swing-a','swing-b','fan-family','fan-primary','car']){
   assert(props[key],`prop ${key} missing from the export`);
   assert(data.groups.some(g=>g.prop===key),`prop ${key} has no draw group`);

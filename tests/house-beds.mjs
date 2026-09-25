@@ -5,7 +5,7 @@
 // back where it got on. Run against the real house with a stub of the page.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {WalkingWorld} from '../house-test/physics.mjs';
+import {WalkingWorld,Body} from '../house-test/physics.mjs';
 import {findBeds,besideBed,bedReach,bedInteractions,REST_PER_SECOND} from '../house-test/beds.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
@@ -46,9 +46,9 @@ let energy=30,done=0,said=[],rideNow=null,rig=null,hops=0;
 const life={say:t=>said.push(t),ride:v=>{rideNow=v;},face(){},hop(){hops++;},rest(n,fin){energy=Math.min(100,energy+n);if(fin)done++;return energy;}};
 const veil={classes:new Set(),classList:{add(c){veil.classes.add(c);},remove(c){veil.classes.delete(c);}}};
 globalThis.document={getElementById:id=>id==='sleep'?veil:null};globalThis.window={};
-const list=[],player={x:0,y:0,z:0};
+const list=[],ticking=[],player={x:0,y:0,z:0};
 const body={resets:0,reset(){this.resets++;}};
-bedInteractions({world,data,player,life,body,tour:{setCameraRig(r){rig=r;}},reducedMotion:false,list,ticking:[],sounds:{click(){}}});
+bedInteractions({world,data,player,life,body,tour:{setCameraRig(r){rig=r;}},reducedMotion:false,list,ticking,sounds:{click(){}}});
 assert.equal(list.length,beds.length,'not every bed can be used');
 for(const it of list)assert(it.kind==='ride'&&it.icon==='😴'&&/^Sleep in the /.test(it.name)&&it.off==='Wake up',`${it.id} is not a bed you can sleep in`);
 // Standing beside Cory's bed (the end bedroom, upstairs).
@@ -81,10 +81,13 @@ assert.equal(energy,100);assert(out?.done,'rested, but it slept on');
 it.stop();
 assert.equal(done,1,'the sleep did not count as a Rest');
 assert(rideNow===null&&!veil.classes.has('on')&&rig===null,'waking did not put things back');
+assert(Math.abs(player.x-cory.x)<.05,'waking teleported off the bed');
+for(let i=0;i<42;i++)for(const f of ticking)f(1/60);
 assert(Math.hypot(player.x-start.x,player.z-start.z)<.3&&Math.abs(player.y-start.y)<.05,`the pet woke somewhere else: ${JSON.stringify(player)}`);
 assert(body.resets===1&&hops===1&&said.some(t=>/rested/i.test(t)),'no wake-up');
 // Woken early (E, or a step) it keeps what it slept for.
 energy=20;Object.assign(player,start);it.start();it.tick(.7);for(let i=0;i<3.5*60;i++)it.tick(1/60);it.stop();
+for(let i=0;i<42;i++)for(const f of ticking)f(1/60);
 assert.equal(energy,20+REST_PER_SECOND*3);assert(said.some(t=>/nap/.test(t)),'an early wake did not say what it got');
 // On the bottom bunk, the top bunk wins the tie for E.
 const topIt=list.find(i=>i.id===top.id),bottomIt=list.find(i=>i.id===bottom.id);
@@ -101,4 +104,31 @@ for(let i=0;i<42;i++){
   if(player.y>onBottom.y+.12){rose=true;assert(!inside||player.y>=top.top-.01,'the climb rises through the upper bunk');}
 }
 assert(rose&&Math.abs(player.y-top.top)<.01,'the top bunk climb did not arrive on its mattress');topIt.stop();
+// The real walking body and the wake path must agree. In particular, gravity
+// should not strand the pet beside the mattress when the exit finishes.
+const physicalPlayer={...start},physicalBody=new Body(world),physicalList=[],physicalTicks=[];
+bedInteractions({world,data,player:physicalPlayer,life,body:physicalBody,tour:{setCameraRig(){}},reducedMotion:false,
+  list:physicalList,ticking:physicalTicks,sounds:{click(){}}});
+const physicalBed=physicalList.find(i=>i.id===cory.id);
+physicalBed.start();physicalBody.reset(physicalPlayer);
+for(let i=0;i<42;i++)physicalBed.tick(1/60);
+physicalBed.stop();
+let previous={...physicalPlayer};
+for(let i=0;i<42;i++){
+  for(const f of physicalTicks)f(1/60);
+  physicalBody.step(physicalPlayer,0,0,1/60);
+  assert(Math.hypot(physicalPlayer.x-previous.x,physicalPlayer.z-previous.z)<.14,'wake exit jumped sideways');
+  if(besideBed(cory,physicalPlayer)<.1)assert(physicalPlayer.y>=cory.top-.01,'wake exit dropped through mattress');
+  previous={...physicalPlayer};
+}
+assert(Math.hypot(physicalPlayer.x-start.x,physicalPlayer.z-start.z)<.3&&Math.abs(physicalPlayer.y-start.y)<.1,
+  `physical wake did not reach the floor: ${JSON.stringify(physicalPlayer)}`);
+// A Rooms jump directly below the same x/z must end the old bed animation.
+Object.assign(physicalPlayer,start);physicalBed.start();physicalBody.reset(physicalPlayer);
+for(let i=0;i<42;i++)physicalBed.tick(1/60);
+physicalBed.stop();for(const f of physicalTicks)f(1/60);
+physicalPlayer.y-=2;const jumped={...physicalPlayer};
+for(const f of physicalTicks)f(1/60);
+assert.deepEqual(physicalPlayer,jumped,'old wake animation moved pet after Rooms jump');
+assert.equal(rideNow,null,'old wake pose survived Rooms jump');
 console.log(`PASS beds: ${beds.length} beds (${beds.map(b=>b.what).join(', ')}), all standable beside; sleep rests ${REST_PER_SECOND}/s and wakes itself when full`);
