@@ -56,7 +56,7 @@
       <path d="M477 78L512 54 551 78Z" fill="#be6e5b"/>
       ${i===4 ? '<path d="M494 81L289 21V133L494 102Z" fill="#fff1a1" opacity=".5"/>' : ''}
       ${i===0?Array.from({length:6},(_,j)=>cube(330+(j%2)*72,352+Math.floor(j/2)*30,30,16)).join(''):''}
-      ${i===1?Array.from({length:6},(_,j)=>cube(340,302-j*27,32,24)).join('')+track(0,3):''}
+      ${i===1?Array.from({length:3},(_,j)=>cube(380,364-j*27,31,15)).join('')+track(0,3):''}
       ${i>=2?track(0,3)+track(1,3):''}
       </g>
       ${person(i===4?401:103,283,.94,'#c45d4f')}

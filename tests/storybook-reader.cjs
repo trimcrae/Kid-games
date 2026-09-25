@@ -26,18 +26,32 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
   const cutoff = setInterval(() => { try { allowed(); } catch { browser.close(); } }, 1000);
   const errors = [];
   try {
-    for (const [width,height] of [[1280,900],[820,1180],[390,844],[320,740]]) {
+    const sizes = process.argv.includes('--audio') ? [[1280,900],[390,844]] : [[1280,900],[820,1180],[390,844],[320,740]];
+    for (const [width,height] of sizes) {
       allowed();
       const context = await browser.newContext({viewport:{width,height}, reducedMotion:'reduce'});
+      await context.addInitScript(() => {
+        const NativeAudio = window.Audio;
+        window.testAudio = [];
+        window.Audio = class extends NativeAudio {
+          constructor(...args) { super(...args); window.testAudio.push(this); }
+        };
+      });
       const page = await context.newPage();
       page.on('pageerror',e=>errors.push(e.message));
       page.on('response',r=>{if(r.status()>=400) errors.push(`${r.status()} ${r.url()}`);});
       await page.goto(base+'/games/spooky-stories/');
       assert.equal(await page.locator('.story-card').count(),29);
-      const total = width===1280 ? 29 : 4;
+      const total = width===1280 && !process.argv.includes('--audio') ? 29 : 4;
       for (let i=0;i<total;i++) {
         allowed();
         await page.locator('.story-card').nth(i).click();
+        if (process.argv.includes('--audio') && width===1280 && i<4) {
+          await page.locator('#read-btn').click();
+          await page.waitForFunction(() => window.testAudio.some(a => !a.paused && a.currentTime>0 && a.readyState>=2));
+          await page.locator('#stop-btn').click();
+          assert.ok(await page.evaluate(() => window.testAudio.every(a => a.paused)), 'Stop silences the narration');
+        }
         await page.locator('#transcript summary').click();
         const firstText = await page.locator('#page-text').textContent();
         assert.ok((await page.locator('#transcript-copy').textContent()).includes(firstText));

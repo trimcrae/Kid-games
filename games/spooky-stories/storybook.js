@@ -2578,6 +2578,7 @@
   // such clip (the page then just stays quiet and the words stay on screen).
   function narrate(name, fromTime, karaoke) {
     if (!hasClip(name)) { stopNarration(); return false; }
+    document.getElementById("narration-status").textContent = "";
     karaokeOn = !!karaoke;
     if (currentClip !== name) {
       try { narrator.pause(); } catch (e) {}
@@ -2587,7 +2588,11 @@
     }
     try { narrator.currentTime = fromTime || 0; } catch (e) { /* metadata not in yet */ }
     const pr = narrator.play();
-    if (pr && pr.catch) pr.catch(() => { paintWord(-1); });
+    if (pr && pr.catch) pr.catch(error => {
+      paintWord(-1);
+      if (error.name !== "AbortError") document.getElementById("narration-status").textContent =
+        "Tap the speaker to start the recording. You can read along on the page.";
+    });
     tickKaraoke();
     return true;
   }
@@ -2597,7 +2602,11 @@
     paintWord(-1);
   }
   narrator.addEventListener("ended", () => paintWord(-1));
-  narrator.addEventListener("error", () => paintWord(-1));
+  narrator.addEventListener("error", () => {
+    paintWord(-1);
+    document.getElementById("narration-status").textContent =
+      "The recording could not load. Try the speaker again, or read the words on the page.";
+  });
 
   /* ---- word highlighting ------------------------------------
      audio/manifest.js tells us, for every sentence in the clip,
