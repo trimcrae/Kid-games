@@ -22,6 +22,7 @@ on:
     paths:
       - "games/spooky-stories/storybook.js"
       - "games/spooky-stories/classics.js"
+      - "games/spooky-stories/family-stories.js"
       - "games/spooky-stories/audio/build_audio.py"
       - ".github/workflows/build-audio.yml"
 
@@ -56,6 +57,9 @@ jobs:
         env:
           FORCE_RENDER: ${{ inputs.force && '1' || '' }}
         run: python3 build_audio.py
+
+      - name: Check every book has matching narration
+        run: node tests/storybook-library.cjs
 
       - name: Commit narration audio
         run: |

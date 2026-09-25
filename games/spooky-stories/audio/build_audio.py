@@ -37,7 +37,7 @@ import hashlib, json, os, re, struct, subprocess, sys, tempfile, wave
 import imageio_ffmpeg
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCES = [os.path.join(HERE, "..", name) for name in ("storybook.js", "classics.js")]
+SOURCES = [os.path.join(HERE, "..", name) for name in ("storybook.js", "classics.js", "family-stories.js")]
 OUT = HERE
 VOICE = os.path.join(HERE, "voices", "en_US-lessac-medium.onnx")
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
@@ -74,7 +74,7 @@ src = "\n".join(open(source, encoding="utf-8").read() for source in SOURCES)
 # comprehension questions that follow the pages (-> "<id>-q<n>.mp3").
 stories, cur = [], None
 for m in re.finditer(r'\b(id|text|ending|ask):\s*"((?:[^"\\]|\\.)*)"', src):
-    key, val = m.group(1), m.group(2)
+    key, val = m.group(1), json.loads('"' + m.group(2) + '"')
     if key == "id":
         cur = {"id": val, "texts": [], "asks": []}
         stories.append(cur)
