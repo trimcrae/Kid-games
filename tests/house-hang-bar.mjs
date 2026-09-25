@@ -4,7 +4,7 @@
 // and nowhere near the floor — then leave it somewhere it can land.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {WalkingWorld} from '../house-test/physics.mjs';
+import {WalkingWorld,Body} from '../house-test/physics.mjs';
 import {hangBarInteractions} from '../house-test/hang-bar.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 const world=new WalkingWorld(data.colliders,{height:1.05});
@@ -12,7 +12,7 @@ const rods=data.colliders.filter(b=>/^Overhead monkey bar/.test(b.name));
 assert(rods.length>=6,`only ${rods.length} monkey bar rungs in the export`);
 const barY=(rods[0].min[1]+rods[0].max[1])/2;
 
-const list=[],ticking=[],player={x:0,y:0,z:0},body={airborne:false,vy:0};
+const list=[],ticking=[],player={x:0,y:0,z:0},body=new Body(world);
 const rides=[];const life={hop(){},say(){},face(){},ride(v){rides.push(v);}};
 hangBarInteractions({world,data,player,life,body,reducedMotion:false,list,ticking,sounds:{boing(){}}});
 const bars=list.filter(it=>it.id==='monkey-bars');
@@ -44,8 +44,16 @@ assert(zHigh-zLow>.4&&zHigh-zLow<1.0,`the swing is ${(zHigh-zLow).toFixed(2)} m 
 const last=rides[rides.length-1];
 assert(last.pose&&last.pose.stretch===1,'the pet is not reaching up');
 // Letting go: over floor it can land on, and falling rather than teleporting.
+const release={x:player.x,z:player.z};
 it.stop();
 const land=world.floor(player.x,player.z,it.at.y);
 assert(Number.isFinite(land)&&!world.blocked(player.x,player.z,land),'it lets go over something it cannot land on');
 assert(body.airborne&&player.y>land+.5,'it does not drop, it teleports');
+assert(Math.hypot(player.x-release.x,player.z-release.z)<.01,'the pet jumps sideways when it lets go above clear floor');
+for(let i=0;i<40;i++){for(const f of ticking)f(1/60);body.step(player,0,0,1/60);}
+assert(Math.hypot(player.x-release.x,player.z-release.z)>.01,'the pet loses all horizontal momentum on release');
+body.airborne=false;for(const f of ticking)f(1/60);
+const landed={x:player.x,z:player.z};body.airborne=true;
+for(let i=0;i<30;i++)for(const f of ticking)f(1/60);
+assert(Math.hypot(player.x-landed.x,player.z-landed.z)<1e-8,'an old bar release moved the pet on its next jump');
 console.log(`PASS monkey bars: ${rods.length} rungs at y ${barY.toFixed(2)}; hangs ${(barY-low).toFixed(2)} m below, swings ${(zHigh-zLow).toFixed(2)} m, lands on ${land.toFixed(2)}`);
