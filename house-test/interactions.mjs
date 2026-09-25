@@ -385,7 +385,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
         for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
         // The view looks down on the car from over its roof (a boom aimed
         // at the driver would start inside the car's own baked panels).
-        tour.setCameraRig({target:1.05,boom:6.6,height:3.2});
+        tour.setCameraRig({target:1.75,boom:6.6,height:2.5});
         sounds.engine(0);life.say('Vroom!',1500);
       },
       tick(dt){
