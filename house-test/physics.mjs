@@ -33,7 +33,9 @@ export class WalkingWorld {
     for (const b of this.nearby(x,z)) {
       if (x>=b.min[0]-.10 && x<=b.max[0]+.10 && z>=b.min[2]-.10 && z<=b.max[2]+.10
           && b.max[1]<=y+.255 && b.max[1]>=y-.40) {
-        edge=Math.max(edge,b.max[1]);
+        // A seam may borrow support from the adjacent piece, but its padded
+        // edge must not become an invisible step up to a higher landing.
+        if(b.max[1]<=y+.03)edge=Math.max(edge,b.max[1]);
         if(x>=b.min[0]-.01 && x<=b.max[0]+.01 && z>=b.min[2]-.01 && z<=b.max[2]+.01)top=Math.max(top,b.max[1]);
       }
     }
@@ -118,8 +120,9 @@ export class WalkingWorld {
     if (Math.hypot(p.x-from.x,p.z-from.z)>=want-.002) return false;
     // Something stopped the step. A wall stops the body in mid-air too; only a
     // missing floor lets the very same step through.
-    const air={x:from.x,y:from.y,z:from.z};
-    this.moveAir(air,dx,dz);
+    const air={x:p.x,y:from.y,z:p.z};
+    const remainX=from.x+dx-p.x,remainZ=from.z+dz-p.z;
+    this.moveAir(air,remainX,remainZ);
     if (Math.hypot(air.x-p.x,air.z-p.z)<.02) return false;
     // Only step off onto something a little way down — off the table it climbed
     // onto, down the porch. A longer drop than STEP_OFF (the stairwell, the
