@@ -142,7 +142,12 @@ const keys=new Set();let joy={x:0,y:0},velocity={x:0,z:0},last=performance.now()
 // down onto whatever is underneath — the floor, or the bed, couch or table it
 // cleared.
 let body=null;
-function requestJump(){if(active&&ready)body?.jump();}
+function requestJump(){
+  if(!active||!ready)return;
+  // The touch action button follows the same activity control as Space.
+  if(interactions?.key('Space'))return;
+  if(!interactions?.controls())body?.jump();
+}
 // What the pet is standing on right now (for QA: "bed", "couch", "table"…).
 function standingOn(){
   if(!world||body?.airborne)return null;
@@ -332,6 +337,7 @@ joystick.addEventListener('pointerdown',e=>{if(!active)return;joyId=e.pointerId;
 joystick.addEventListener('pointermove',e=>{if(e.pointerId===joyId)updateJoy(e);});
 function endJoy(){joyId=null;joy={x:0,y:0};knob.style.transform='';if(joystick.classList.contains('floating')){joystick.classList.remove('floating');joystick.style.left=joystick.style.top=joystick.style.bottom='';}}
 joystick.addEventListener('pointerup',endJoy);joystick.addEventListener('pointercancel',endJoy);
+joystick.addEventListener('lostpointercapture',endJoy);
 // The jump paw, for fingers. It acts the instant it is touched (a jump that
 // waited for the finger to lift would always be too late), and the browser's
 // own click for that same tap is ignored; a click with no touch behind it —
@@ -485,6 +491,12 @@ function animate(now){
     // On something (a swing, the car, the piano) the interaction moves the
     // pet and may steer the view; the walking below is skipped.
     const riding=interactions?.controls();
+    const driving=interactions?.active?.kind==='drive';
+    const actionLabel=driving?'Honk':'Jump';
+    if(jumpButton.getAttribute('aria-label')!==actionLabel){
+      jumpButton.setAttribute('aria-label',actionLabel);
+      jumpButton.firstElementChild.textContent=driving?'📣':'🐾';
+    }
     const turnKeys=riding?0:(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
     if(turnKeys){turnRate+=(turnKeys*TURN_SPEED-turnRate)*(reducedMotion?1:1-Math.exp(-dt*10));yaw+=turnRate*dt;
       if(yaw>Math.PI||yaw<-Math.PI)yaw-=Math.PI*2*Math.round(yaw/(Math.PI*2));}
@@ -504,7 +516,10 @@ function animate(now){
     const before={x:player.x,z:player.z};
     const steer=interactions?.tick(dt,now/1000);
     if(riding){
-      velocity={x:0,z:0};if(steer&&Number.isFinite(steer.yaw)){yaw=steer.yaw;}
+      velocity={x:0,z:0};if(steer&&Number.isFinite(steer.yaw)){
+        const turn=Math.atan2(Math.sin(steer.yaw-yaw),Math.cos(steer.yaw-yaw));
+        yaw=driving&&!reducedMotion?yaw+turn*(1-Math.exp(-dt*7)):steer.yaw;
+      }
     }else{
       // Walk, jump and fall (physics.mjs). Take-off and touchdown bounce the body.
       const bounce=body.step(player,velocity.x*dt,velocity.z*dt,dt);
@@ -646,7 +661,13 @@ async function load(){
     bindButton($('map-button'),()=>map.toggle());
     // Things to use with E (interactions.mjs): swings, the car, the fridge…
     interactions=createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,bindButton,reducedMotion,
-      tour:{setCameraRig(r){followRig.setRig(r);},hint(text,show){if(text)setHint(text,show);else setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · 🐾 to jump · tap an activity');}}});
+      getDriveInput:()=>({throttle:-joy.y,steer:-joy.x}),
+      tour:{setCameraRig(r){followRig.setRig(r);},hint(text,show){
+        if(text){
+          if(!finePointer()&&interactions?.active?.kind==='drive')text='Pad ↑ drive · ↓ brake / reverse · ← → steer · 📣 honk · Get out to park';
+          setHint(text,show);
+        }else setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · 🐾 to jump · tap an activity');
+      }}});
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>PINNED_SKY||life.sky());lighting.prime(player);}
