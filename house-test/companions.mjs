@@ -139,6 +139,7 @@ export function updateCompanion(c,dt,ctx){
     else if(c.t>=(c.retryAt||0)){
       const probe={...c.point};world.move(probe,home.x-probe.x,home.z-probe.z);
       if(Math.hypot(probe.x-home.x,probe.z-home.z)<.06)goTo(c,spot,tripVisible(spot));
+      else c.retryAt=c.t+1;
     }
   }
   if(!c.up&&sameFloor&&gap<(c.spot?.temp?.45:.7)&&c.mode!=='aside'&&c.mode!=='hop'&&(!c.crowded||c.crowded==='made room'&&gap<.45)){

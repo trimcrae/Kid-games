@@ -30,12 +30,16 @@ assert(companion.point.x<.1,'companion teleported into the visible destination')
 // selects a new place, instead of marching into the same obstacle every 4 s.
 companion.mode='travel';companion.target=destination;companion.path=[destination];companion.search=null;
 companion.replanned=true;companion.stuck=.9;companion.point={x:0,y:0,z:0};
-const blocked=Object.create(floor);blocked.move=()=>{};
+const blocked=Object.create(floor);let probes=0;blocked.move=()=>{probes++;};
 updateCompanion(companion,1/30,{world:blocked,player:{x:4,y:0,z:0},seen:()=>true});
 assert.equal(companion.mode,'at');assert.equal(companion.walking,false);
 assert.equal(companion.unreachable,companion.spot);
 updateCompanion(companion,1/30,{world:blocked,player:{x:4,y:0,z:0},seen:()=>true});
 assert.equal(companion.mode,'at');
+updateCompanion(companion,1.1,{world:blocked,player:{x:4,y:0,z:0},seen:()=>true});
+const beforeRetry=probes;
+for(let i=0;i<20;i++)updateCompanion(companion,1/30,{world:blocked,player:{x:4,y:0,z:0},seen:()=>true});
+assert.equal(probes,beforeRetry,'blocked route was probed on every frame');
 blocked.move=WalkingWorld.prototype.move;
 updateCompanion(companion,1.1,{world:blocked,player:{x:4,y:0,z:0},seen:()=>true});
 assert.equal(companion.mode,'travel','companion did not resume after the way cleared');
