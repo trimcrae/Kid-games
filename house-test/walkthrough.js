@@ -244,16 +244,17 @@ document.addEventListener('keydown',e=>{
   if(map?.isOpen){if(e.code==='Escape'||e.code==='KeyM'){e.preventDefault();map.close();}return;}
   if(e.code==='Escape'&&!interactions?.active){if(!$('rooms').hidden)showRooms(false);else pause();return;}
   if(!active)return;
+  // An active instrument or vehicle gets its keys before house shortcuts.
+  if(interactions?.active){
+    if(e.code==='KeyE'||e.code==='Escape'){e.preventDefault();interactions.stop();return;}
+    if(interactions.key(e.code)){e.preventDefault();return;}
+  }
   if(e.code==='KeyR'){e.preventDefault();showRooms(true);return;}
   if(e.code==='KeyM'){e.preventDefault();map?.open();return;}
   if(e.code==='KeyF'){e.preventDefault();$('family-button').click();return;}
   if(e.code==='KeyC'){e.preventDefault();$('pet-button').click();return;}
   // E uses what's here: gets you off whatever you're on, on to what's in
   // reach (interactions.mjs), or into the room's activity.
-  if(interactions?.active){
-    if(e.code==='KeyE'||e.code==='Escape'){e.preventDefault();interactions.stop();return;}
-    if(interactions.key(e.code)){e.preventDefault();return;}
-  }
   if(e.code==='KeyE'){e.preventDefault();if(!interactions?.start())life?.interact();return;}
   // Space jumps. The browser's own key repeat comes through while it is held,
   // which simply hops again on landing — exactly what a held key should do.
