@@ -133,21 +133,47 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   for(const key of ['swing-a','swing-b']){
     const b=info[key];if(!b)continue;
     const px=(b.min[0]+b.max[0])/2,top=1.16,seatY=-.38,seatZ=-24.92,pivot={x:px,y:top,z:-25.0},rope=top-seatY;
-    let t=0,amp=0;
+    let t=0,amp=0,mount=0,from=null,riding=false,settle=0,dismount=null;
+    const swingPose=a=>pose(key,hinge(pivot,new THREE.Vector3(1,0,0),-a));
+    ticking.push(dt=>{
+      if(dismount){
+        if(!body.airborne||Math.hypot(player.x-dismount.x,player.z-dismount.z)>1.5)dismount=null;
+        else{
+          dismount.t=Math.min(1,dismount.t+dt/(reducedMotion ? .01 : .32));
+          player.x=dismount.x+(dismount.spot.x-dismount.x)*dismount.t;
+          player.z=dismount.z+(dismount.spot.z-dismount.z)*dismount.t;
+          if(dismount.t>=1)dismount=null;
+        }
+      }
+      if(riding||settle<=0)return;
+      t+=dt;settle=Math.max(0,settle-dt);
+      const a=reducedMotion?0:Math.sin(t*Math.sqrt(9.8/rope))*amp*(settle/2);
+      swingPose(a);
+      if(!settle){amp=0;swingPose(0);}
+    });
     list.push({id:key,icon:'🎠',name:'Swing',kind:'ride',at:{x:px,y:-.82,z:-23.95},radius:1.2,
-      start(){t=0;amp=0;},
+      start(){from={...player};t=0;amp=0;mount=0;riding=true;settle=0;dismount=null;},
       tick(dt){
-        t+=dt;amp+=(0.95-amp)*(reducedMotion?1:1-Math.exp(-dt*.5));
+        t+=dt;mount=Math.min(1,mount+dt/.55);amp+=(0.95-amp)*(reducedMotion?1:1-Math.exp(-dt*.5));
         const a=reducedMotion?0:Math.sin(t*Math.sqrt(9.8/rope))*amp;
-        pose(key,hinge(pivot,new THREE.Vector3(1,0,0),-a));
+        swingPose(a);
         // The seat hangs under the pivot, out along the swing's angle.
-        player.x=px;player.y=pivot.y-Math.cos(a)*rope+.03;player.z=pivot.z+Math.sin(a)*rope+.08;
-        life.face(0);life.ride({dx:0,dy:0,dz:0,tilt:-a*.6,pose:{sit:1},expression:amp>.5?'happy':undefined});
+        const k=mount*mount*(3-2*mount);
+        player.x=from.x+(px-from.x)*k;player.y=from.y+(pivot.y-Math.cos(a)*rope+.03-from.y)*k;player.z=from.z+(pivot.z+Math.sin(a)*rope+.08-from.z)*k;
+        life.face(0);life.ride({dx:0,dy:0,dz:0,tilt:-a*.6,pose:{sit:k},expression:amp>.5?'happy':undefined});
         if((Math.abs(a)>.7&&Math.sign(a)!==Math.sign(lastA)))sounds.boing();lastA=a;
-        // Seen from the side, where the swinging shows (and no tree trunk).
+        // Seen from the side, where the swinging shows.
         return {yaw:key==='swing-a'?-Math.PI/2:Math.PI/2};
       },
-      stop(){pose(key,hinge(pivot,new THREE.Vector3(1,0,0),0));life.ride(null);}});
+      stop(){
+        riding=false;settle=reducedMotion?0:2;life.ride(null);
+        // Push clear of the seat while falling, instead of leaving the pet
+        // standing on its moving collider above the lawn.
+        const spot=world.safeSpot(from.x,from.y,from.z)||from;
+        dismount={x:player.x,z:player.z,spot,t:0};player.y+=.2;
+        body.airborne=true;body.vy=0;
+        if(!settle)swingPose(0);
+      }});
   }
   let lastA=0;
   // ----- rocking chairs: sit and rock.
@@ -162,11 +188,19 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   {
     const notes=[['C',261.63],['D',293.66],['E',329.63],['F',349.23],['G',392.0],['A',440.0],['B',493.88],['C',523.25]];
     const codes={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5,Digit7:6,Digit8:7,KeyA:0,KeyS:1,KeyD:2,KeyF:3,KeyG:4,KeyH:5,KeyJ:6,KeyK:7};
+    let from=null,mount=0;
     list.push({id:'piano',icon:'🎹',name:'Play the piano',kind:'play',at:{x:10.8,y:-1.05,z:-1.6},radius:1.2,face:{x:10.3,z:-1.41},
       hint:'Play with 1–8 (or A S D F G H J K): C D E F G A B C · E when you\'re done',
-      start(){life.face(Math.PI/2+Math.PI);life.ride({pose:{sit:.6}});},
+      start(){from={...player};mount=0;life.face(-Math.PI/2);},
+      tick(dt){mount=Math.min(1,mount+dt/.5);const k=mount*mount*(3-2*mount);
+        player.x=from.x+(10.75-from.x)*k;player.z=from.z+(-1.43-from.z)*k;player.y=from.y;
+        // The floor cushion here is 35 cm high; put the body on it, facing
+        // the keybed instead of leaving a seated pose standing by the piano.
+        life.ride({dy:.35*k,pose:{sit:k}});
+        return {yaw:Math.PI};
+      },
       key(code){const i=codes[code];if(i===undefined)return false;const [name,f]=notes[i];sounds.note(f);life.hop(.35);life.say(`♪ ${name}`,700);return true;},
-      stop(){life.ride(null);}});
+      stop(){life.ride(null);if(from){const spot=world.safeSpot(from.x,from.y,from.z)||from;Object.assign(player,spot);body.reset(player);}}});
   }
   // ----- the cars: get in either and drive it out of the garage.
   debug.cars={};
@@ -300,10 +334,10 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
           car.lastFit=moved;
           if(!moved){car.speed*=.3;if(Math.abs(car.speed)<.3)car.speed=0;bump();}
         }
-        place();
+         place();
         player.x=car.x;player.y=car.y;player.z=car.z;
         const s=Math.sin(car.heading),c=Math.cos(car.heading);
-        life.face(car.heading+Math.PI);life.ride({dx:-.42*c-.15*s,dy:.62,dz:-.42*s+.15*c,pose:{sit:.8}});
+         life.face(car.heading+Math.PI);life.ride({dx:-.42*c-.15*s,dy:.62,dz:-.42*s+.15*c,pose:{sit:.8}});
         sounds.engine(Math.abs(car.speed)/4.5);
         return {yaw:car.heading};
       },
@@ -368,7 +402,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       if(!body.airborne&&onMat()&&!keys.has('ArrowDown')){body.vy=7;body.airborne=true;trampoline.bounces++;sounds.boing();life.hop(.9);if(trampoline.bounces===1)life.say('Boing!',1200);}
     },
     // For QA.
-    get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
+     get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
   };
   bindButton(pill,()=>{if(active)api.stop();else api.start();});
   return api;

@@ -49,6 +49,11 @@ for (let i = 0; i < 120 * 60; i++) {
   assert(p.x > 9.8 && p.x < 14.6 && p.z > -4.55 && p.z < -.1, `it left the family room (${p.x.toFixed(2)}, ${p.z.toFixed(2)})`);
   assert(Number.isFinite(f) && Math.abs(f + 1.03) < .06, `it climbed onto something at ${f} (${p.x.toFixed(2)}, ${p.z.toFixed(2)})`);
   assert(!world.blocked(p.x, p.z, f, .02), `it drove into ${world.blocked(p.x, p.z, f, .02)}`);
+  for(let j=0;j<8;j++){
+    const x=p.x+Math.sin(j*Math.PI/4)*.17,z=p.z+Math.cos(j*Math.PI/4)*.17,edge=world.floor(x,z,-1.03);
+    assert(x>9.85&&x<14.58&&z>-4.5&&z<-.15&&Number.isFinite(edge)&&Math.abs(edge+1.03)<.05&&!world.blocked(x,z,edge,.015),
+      `the Roomba bumper clipped furniture or left the carpet at ${x.toFixed(2)}, ${z.toFixed(2)}`);
+  }
 }
 const ran = globalThis.window.houseRoomba();
 assert(ran.on && ran.bumps > 3, `it barely moved (${ran.bumps} bumps)`);
@@ -56,7 +61,8 @@ assert(Math.hypot(ran.x - park.x, ran.z - park.z) > .3 || ran.bumps > 3, 'it nev
 
 // It gets out of the pet's way: with the pet stood in the middle of the room
 // for a minute, it never comes right up against its paws.
-player.x = 12.7; player.z = -2.4;
+const startPet=[{x:12.7,z:-2.4},{x:11.5,z:-2.2},{x:13.2,z:-1.2}].sort((a,b)=>Math.hypot(b.x-it.at.x,b.z-it.at.z)-Math.hypot(a.x-it.at.x,a.z-it.at.z))[0];
+player.x=startPet.x; player.z=startPet.z;
 let closest = 9;
 for (let i = 0; i < 60 * 60; i++) {
   for (const f of ticking) f(dt);

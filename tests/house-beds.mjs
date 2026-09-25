@@ -59,6 +59,14 @@ assert(Math.abs(it.at.y-player.y)<.01,'the bed is reported on another floor');
 player.y=-1.05;assert(it.distance(player)===Infinity,'a bed a floor up is offered');
 Object.assign(player,start);
 it.start();
+assert(Math.hypot(player.x-start.x,player.z-start.z)<.01,'the climb snapped to the bed');
+for(let i=0;i<21;i++){
+  it.tick(1/60);
+  const inside=player.x>cory.box.min[0]&&player.x<cory.box.max[0]&&player.z>cory.box.min[2]&&player.z<cory.box.max[2];
+  if(inside)assert(player.y>=cory.top-.01,'the climb passes through the mattress cover');
+}
+assert(player.x>start.x&&player.x<cory.x&&player.y>start.y,'the pet did not travel over the bed');
+for(let i=0;i<21;i++)it.tick(1/60);
 assert(Math.abs(player.x-cory.x)<.01&&Math.abs(player.y-cory.top)<.01&&Math.abs(player.z-cory.z)<.01,'the pet did not get onto the bed');
 assert(rideNow&&rideNow.sleeping&&rideNow.pose.lie===1&&rideNow.expression==='sleep'&&rideNow.emote==='zz','the pet is not asleep');
 assert(veil.classes.has('on'),'the lights did not go down');
@@ -76,7 +84,7 @@ assert(rideNow===null&&!veil.classes.has('on')&&rig===null,'waking did not put t
 assert(Math.hypot(player.x-start.x,player.z-start.z)<.3&&Math.abs(player.y-start.y)<.05,`the pet woke somewhere else: ${JSON.stringify(player)}`);
 assert(body.resets===1&&hops===1&&said.some(t=>/rested/i.test(t)),'no wake-up');
 // Woken early (E, or a step) it keeps what it slept for.
-energy=20;Object.assign(player,start);it.start();for(let i=0;i<3.5*60;i++)it.tick(1/60);it.stop();
+energy=20;Object.assign(player,start);it.start();it.tick(.7);for(let i=0;i<3.5*60;i++)it.tick(1/60);it.stop();
 assert.equal(energy,20+REST_PER_SECOND*3);assert(said.some(t=>/nap/.test(t)),'an early wake did not say what it got');
 // On the bottom bunk, the top bunk wins the tie for E.
 const topIt=list.find(i=>i.id===top.id),bottomIt=list.find(i=>i.id===bottom.id);
@@ -85,4 +93,12 @@ assert(topIt.distance(player)<bottomIt.distance(player),'on the bottom bunk, E w
 const floorSpot={x:bottom.box.min[0]-.4,y:bottom.top-.6,z:bottom.z};
 Object.assign(player,floorSpot);
 assert(bottomIt.distance(player)<topIt.distance(player),'from the floor, the top bunk comes before the bottom one');
+Object.assign(player,onBottom);topIt.start();
+let rose=false;
+for(let i=0;i<42;i++){
+  topIt.tick(1/60);
+  const inside=player.x>top.box.min[0]&&player.x<top.box.max[0]&&player.z>top.box.min[2]&&player.z<top.box.max[2];
+  if(player.y>onBottom.y+.12){rose=true;assert(!inside||player.y>=top.top-.01,'the climb rises through the upper bunk');}
+}
+assert(rose&&Math.abs(player.y-top.top)<.01,'the top bunk climb did not arrive on its mattress');topIt.stop();
 console.log(`PASS beds: ${beds.length} beds (${beds.map(b=>b.what).join(', ')}), all standable beside; sleep rests ${REST_PER_SECOND}/s and wakes itself when full`);
