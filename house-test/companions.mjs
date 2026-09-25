@@ -105,7 +105,16 @@ export function updateCompanion(c,dt,ctx){
   const {world,player,night=false,reduced=false,random=Math.random}=ctx;
   const visible=point=>ctx.seen?ctx.seen(point):true;
   const seen=visible(c.point);
-  const tripVisible=spot=>seen||visible(spot.up?spot.stand:spot);
+  const routeSeen=point=>{
+    if(visible(c.point)||visible(point))return true;
+    // Both ends can be outside the frustum while their connecting walk
+    // passes right across the player's view. Keep that arrival on foot.
+    const n=Math.ceil(Math.hypot(point.x-c.point.x,point.z-c.point.z)/.3);
+    for(let i=1;i<n;i++)if(visible({x:c.point.x+(point.x-c.point.x)*i/n,
+      y:c.point.y+(point.y-c.point.y)*i/n,z:c.point.z+(point.z-c.point.z)*i/n}))return true;
+    return false;
+  };
+  const tripVisible=spot=>routeSeen(spot.up?spot.stand:spot);
   c.t+=dt;c.dwell-=dt;c.greetIn-=dt;c.happy=Math.max(0,c.happy-dt);
   const out={expression:'idle',pose:{},look:[0,0],hop:0,emote:null};
   const gap=Math.hypot(c.point.x-player.x,c.point.z-player.z),sameFloor=Math.abs(c.point.y-player.y)<(c.up?1:.6);
@@ -163,14 +172,30 @@ export function updateCompanion(c,dt,ctx){
       if(c.aside.back<=0){const made=c.aside.moved>.1;c.aside=null;if(gap>1.2&&spot&&c.unreachable!==spot)goTo(c,spot,tripVisible(spot));else{c.mode='at';c.crowded=made?'made room':'boxed in';c.crowdedUntil=c.t+8;}}}
   }else if(c.mode==='travel'){
     const tgt=c.target;
-    if(!seen&&!visible(tgt)&&(Math.hypot(tgt.x-c.point.x,tgt.z-c.point.z)>.1||Math.abs(tgt.y-c.point.y)>.3)){Object.assign(c.point,tgt);c.path=c.search=null;arrive(c);}
-    else walk(c,dt,world,seen||visible(tgt),reduced);
+    if(!routeSeen(tgt)&&(Math.hypot(tgt.x-c.point.x,tgt.z-c.point.z)>.1||Math.abs(tgt.y-c.point.y)>.3)){Object.assign(c.point,tgt);c.path=c.search=null;arrive(c);}
+    else walk(c,dt,world,routeSeen(tgt),reduced);
   }else if(c.mode==='hop'){
-    // Up onto (or down from) a bed, a seat or a chair in a short arc.
-    const h=c.hop;h.t=Math.min(1,h.t+dt/(reduced?.01:.45));
-    const k=h.t*h.t*(3-2*h.t);c.point.x=h.from.x+(h.to.x-h.from.x)*k;c.point.z=h.from.z+(h.to.z-h.from.z)*k;
-    c.point.y=h.from.y+(h.to.y-h.from.y)*k+(reduced?0:Math.sin(Math.PI*h.t)*.12);c.walking=false;
-    if(h.t>=1){c.up=h.up;c.mode=h.then||'at';if(c.mode==='travel'&&!c.target)c.mode='at';}
+    // Clear the mattress edge before travelling across it. The old diagonal
+    // arc moved sideways immediately, with the paws still below the bed top.
+    const h=c.hop;
+    if(!h.up&&!h.checked){
+      h.checked=true;
+      if(world.blocked(h.to.x,h.to.z,h.to.y)||!Number.isFinite(world.floor(h.to.x,h.to.z,h.to.y))){
+        const safe=world.safeSpot(h.to.x,h.to.y,h.to.z);
+        if(safe)h.to=safe;
+        else{c.mode='at';c.walking=false;c.speed=0;c.hop=null;c.up=true;}
+      }
+    }
+    if(c.hop){
+      h.t=Math.min(1,h.t+dt/(reduced?.01:.6));
+      const smooth=k=>k*k*(3-2*k),cross=smooth(Math.max(0,Math.min(1,(h.t-.28)/.44)));
+      c.point.x=h.from.x+(h.to.x-h.from.x)*cross;c.point.z=h.from.z+(h.to.z-h.from.z)*cross;
+      const high=Math.max(h.from.y,h.to.y)+(reduced?0:.18);
+      c.point.y=h.t<.28?h.from.y+(high-h.from.y)*smooth(h.t/.28):
+        h.t>.72?high+(h.to.y-high)*smooth((h.t-.72)/.28):high;
+      c.walking=false;
+    }
+    if(c.hop&&h.t>=1){c.up=h.up;c.mode=h.then||'at';if(c.mode==='travel'&&!c.target)c.mode='at';c.hop=null;}
   }else{
     c.walking=false;c.speed=0;c.vel=0;
     if(spot&&c.mode!=='at')c.mode='at';
@@ -319,7 +344,10 @@ export function lineOfSight(boxes,a,b,stop=.9){
   for(const box of boxes){
     // A box the camera itself sits in (a coarse furniture or trim box) can't hide anything.
     if(a.x>=box.min[0]&&a.x<=box.max[0]&&a.y>=box.min[1]&&a.y<=box.max[1]&&a.z>=box.min[2]&&a.z<=box.max[2])continue;
-    let near=0,far=stop,hit=true;
+    // The last part of the ray may pass through the companion's own chair or
+    // bed. A wall there still hides its name and heart completely.
+    const hard=/wall|door|window|partition|jamb|glass|ceiling|roof/i.test(box.name||'');
+    let near=0,far=hard?1:stop,hit=true;
     for(let i=0;i<3;i++){
       if(Math.abs(d[i])<1e-9){if(o[i]<box.min[i]||o[i]>box.max[i]){hit=false;break;}continue;}
       let t1=(box.min[i]-o[i])/d[i],t2=(box.max[i]-o[i])/d[i];if(t1>t2)[t1,t2]=[t2,t1];
