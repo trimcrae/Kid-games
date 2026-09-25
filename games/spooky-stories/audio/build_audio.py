@@ -37,7 +37,7 @@ import hashlib, json, os, re, struct, subprocess, sys, tempfile, wave
 import imageio_ffmpeg
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCES = [os.path.join(HERE, "..", name) for name in ("storybook.js", "classics.js", "family-stories.js")]
+SOURCES = [os.path.join(HERE, "..", name) for name in ("storybook.js", "classics.js", "family-stories.js", "volume-two.js")]
 OUT = HERE
 VOICE = os.path.join(HERE, "voices", "en_US-lessac-medium.onnx")
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
