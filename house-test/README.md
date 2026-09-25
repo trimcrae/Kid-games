@@ -6,16 +6,13 @@ This page is intentionally absent from the arcade registry and home page. It
 includes `noindex,nofollow,noarchive`; that is a search-engine request, not
 authentication. GitHub Pages and this repository remain public.
 
-Control your own Craepet in third person with WASD or arrows. Starting the game
-(or clicking the view) captures the pointer, like any first-person game: the
-cursor disappears and moving the mouse turns the view as far as you like.
-Hold Shift to move faster, press Space to jump, E to choose a nearby activity, R for rooms,
-M for the Marauder's Map and F for family. Escape releases the mouse and pauses. If a browser refuses
-capture (some in-app or embedded browsers can), the footer says so, hold-and-drag
-looking takes over, and a normal Chrome or Edge tab gives full mouse look.
-Touch devices have a movement pad, a 🐾 jump button and drag-to-look. Every pet
-is drawn at `PET_SCALE` (`creatures.mjs`), dog-sized against the real-size
-furniture.
+Control your own Craepet in third person with the arrow keys: ↑/↓ walk forward
+and back, and ←/→ turn. Hold Shift to run, press Space to jump, E to use what is
+nearby, R for rooms, M for the Marauder's Map, F for family and C to say hello.
+Escape pauses. The mouse clicks buttons and panels; moving or dragging it does
+not steer the view. Touch devices have a movement pad, a 🐾 jump button and
+swipe to look. Every pet is drawn at `PET_SCALE` (`creatures.mjs`), dog-sized
+against the real-size furniture.
 
 **Jumping** (`Body` in `physics.mjs`) clears about 89 cm, so the pet hops up
 onto every bed, couch and table in the house but not the kitchen worktops, and
@@ -224,9 +221,9 @@ the game's **own** saves: `craepets.who`, `craepets.v1.<who>` and
 `craepets.voice`. The same player, pet, coins and things go there and back; nothing
 is copied, the house edition's `craepets.house.*` saves are not touched, the
 "Who's playing?" picker is skipped (the game already knows) and the save-transfer
-screens are hidden (the game has its own Help → backups). The top bar (touch, or
-with the mouse released), the pause card and any loading or 3D failure offer
-**Back to the Craepets game**, which finishes the current activity and saves first.
+screens are hidden (the game has its own Help → backups). The top bar, the pause
+card and any loading or 3D failure offer **Back to the Craepets game**, which
+finishes the current activity and saves first.
 
 Opened on its own (`house-test/`), it is the separate house edition exactly as
 before, with its own saves; the notes below describe that mode.
