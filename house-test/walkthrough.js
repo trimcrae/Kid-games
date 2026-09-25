@@ -202,7 +202,7 @@ async function resume(){
 function showRooms(show){
   const wasOpen=!$('rooms').hidden;
   $('rooms').hidden=!show;$('rooms-button').setAttribute('aria-expanded',String(show));
-  if(show){suspend();welcome.hidden=true;}
+  if(show){suspend();welcome.hidden=true;$('room-list').querySelector('button')?.focus();}
   // Closing the panel returns to walking; other callers just tidy it away on
   // the way to an activity.
   else if(ready){active=true;$('touch-controls').style.visibility='visible';canvas.focus();}
@@ -237,9 +237,38 @@ bindButton(start,()=>failed||boot.state==='failed'||boot.state==='stalled'?locat
 bindButton($('rooms-button'),()=>showRooms($('rooms').hidden));bindButton($('close-rooms'),()=>showRooms(false));
 bindButton($('welcome-rooms'),()=>{if(ready)showRooms(true);});bindButton($('welcome-family'),()=>{if(ready)$('family-button').click();});
 bindButton($('reset'),()=>jumpTo(rooms[0]));
+// The panels take over the house controls. Keep keyboard focus in the visible
+// panel, including when a player tabs out of the activity iframe.
+const panelOrder=['activity-panel','save-panel','activity-choices','family-panel','map','rooms','welcome'];
+const panelFocusables='button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),iframe,[tabindex]:not([tabindex="-1"])';
+function openPanel(){
+  for(const id of panelOrder){
+    const panel=$(id);
+    if(!panel.hidden&&(id!=='map'||map?.isOpen))return panel;
+  }
+  return null;
+}
+function panelTabStops(panel){
+  return [...panel.querySelectorAll(panelFocusables)].filter(el=>el.getClientRects().length&&getComputedStyle(el).visibility!=='hidden');
+}
+document.addEventListener('keydown',e=>{
+  if(e.code!=='Tab')return;
+  const panel=openPanel();if(!panel)return;
+  const stops=panelTabStops(panel);if(!stops.length)return;
+  const current=document.activeElement,index=stops.indexOf(current);
+  if(index<0||e.shiftKey&&index===0||!e.shiftKey&&index===stops.length-1){
+    e.preventDefault();
+    (e.shiftKey?stops[stops.length-1]:stops[0]).focus();
+  }
+},true);
+document.addEventListener('focusin',e=>{
+  const panel=openPanel();
+  if(panel&&!panel.contains(e.target))panelTabStops(panel)[0]?.focus();
+});
 document.addEventListener('keydown',e=>{
   if(!$('activity-choices').hidden){if(e.code==='Escape')$('close-choices').click();return;}
-  if(!$('activity-panel').hidden||!$('family-panel').hidden||!$('save-panel').hidden)return;
+  if(!$('save-panel').hidden){if(e.code==='Escape'){e.preventDefault();$('close-saves').click();}return;}
+  if(!$('activity-panel').hidden||!$('family-panel').hidden)return;
   // The Marauder's Map: M (or Escape) folds it away again; nothing else while it's open.
   if(map?.isOpen){if(e.code==='Escape'||e.code==='KeyM'){e.preventDefault();map.close();}return;}
   if(e.code==='Escape'&&!interactions?.active){if(!$('rooms').hidden)showRooms(false);else pause();return;}
