@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-midnight-train",
+  "page": 3,
+  "style": "linocut",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-e6fccb22-bcd4-4e77-99df-3445d40d77df.png",
+  "originalSha256": "9f472e2c846d83133c826290dfa33c4869ba791ef1a7d6232a87066b955b98f9",
+  "file": "cory-midnight-train-3.webp",
+  "sha256": "d1aec6d2c3355bdd4eef0ef90734b6714e14e52421ea2acf4187841215b8f3c3",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "4b5c3819a89f88375d855fe4c4d72160c56c893b413a27d377aafc4478eedc83",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Midnight Train, page 4: Check it twice.\nART DIRECTION: Intricate hand-carved two-ink linocut print on warm cream paper: midnight petrol-blue and muted ochre inks, expressive cut marks, fine hatch textures, rich invented vintage-railway detail, elegant strong composition. A real crafted storybook print with natural expressive human figures, not geometric clipart. Wonderful cozy dream atmosphere.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory wears a dark-blue vintage wool coat, cream scarf, brown boots, and his black rectangular glasses. His hair is short brown. The driver is a friendly adult woman in railway uniform. At breakfast Cory wears a blue knit jumper instead of the coat.\nILLUSTRATE THIS MOMENT: Cory compares a card with one long dash and two short marks to three glowing signal lamps at the moonlit station.\nStory context for this exact page: The signal began again. Cory followed the long light with one slow sweep of his pencil, then made two short marks for the quick lights. When the lamps repeated, he checked his card instead of adding more marks. One small card could describe the whole repeating message.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-midnight-train-0.webp"
+  ],
+  "reviewed": true,
+  "review": "One long and two short card marks match three signal lamps; consistent linocut cast."
+}

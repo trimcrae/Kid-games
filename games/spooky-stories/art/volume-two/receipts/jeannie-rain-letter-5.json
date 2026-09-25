@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-rain-letter",
+  "page": 5,
+  "style": "watercolor",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-54ad5e6e-9c36-4027-a5ff-8af324147832.png",
+  "originalSha256": "2ee35c9aff75c91436c8c719f55462ca9f4f8a92ecdd49b64dc80792e20594d1",
+  "file": "jeannie-rain-letter-5.webp",
+  "sha256": "eb0bfe3774c7f70819e8c469aa5363dae49036ae11c0ce8ba63a5ebbe29fe3a6",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "efab4e7648d0a600b85825e1143dfa06f18e19d1a36c93b02f926266a0f969c0",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Rain-Washed Letter, page 6: Knock, knock.\nART DIRECTION: Sumptuous traditional watercolor picture-book painting on subtly textured cold-pressed paper. Translucent wet-on-wet washes, delicate lively pencil underdrawing, richly observed cottage-garden details, gentle rainy light, beautiful expressive faces. Never flat vector or diagram.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie wears a teal raincoat with hood down, dark leggings, red wellington boots. Ellie wears a yellow raincoat with hood down and purple wellington boots. Indoors keep these recognizable colors. Dad wears a soft blue jumper and tan trousers; Mum an olive cardigan.\nILLUSTRATE THIS MOMENT: Dad welcomes Jeannie and Ellie into a greenhouse with a little tea table among yellow flowers.\nStory context for this exact page: Jeannie knocked on the greenhouse door. Dad opened it with a teapot in his hand. Inside, Mum had spread a cloth between the pots. “Our garden tea!” Ellie cried. Dad saw the soggy letter. “I should have put that in an envelope.” Jeannie held it up. “You left us just enough.”\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-rain-letter-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Parents welcome children to greenhouse tea; cast and invitation match."
+}

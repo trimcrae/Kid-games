@@ -1,0 +1,22 @@
+{
+  "storyId": "kieran-sock-parade",
+  "page": 1,
+  "style": "crayon",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-cbc2fe90-f6af-4e99-a4ac-a001706f3de4.png",
+  "originalSha256": "e136ff1d135bc7f96aa4e970d1ddc78694d00c9067b0752bb52aa81b2f4592bd",
+  "file": "kieran-sock-parade-1.webp",
+  "sha256": "7c9c56c064b72c5e466c251e5097426e75e14b61c69369b80db135ad23a251c9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "85e042f739ebdcc0434744a1fb99475c07118fb5f7111a3334e55733fc906f5a",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Kieran and the Sock Parade, page 2: Red with red.\nART DIRECTION: Beautiful professional wax-crayon and soft oil-pastel picture-book art on warm textured paper. Abundant layered scribbly strokes, joyful rounded shapes, charming expressive natural faces, tactile bright fabrics, playful cozy family-room details. Clearly hand-drawn crayon, not vector shapes or a photograph.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Kieran is an infant in a pale-blue romper. Ellie wears a lavender jumper and leggings; Jeannie a dusty-rose jumper and trousers; Cory a blue jumper and black rectangular glasses; Mum an olive cardigan and round glasses; Dad a light-blue shirt and tan trousers.\nILLUSTRATE THIS MOMENT: Rows of red and blue socks lie beside a yellow sun sock and a yellow moon sock.\nStory context for this exact page: Jeannie laid the socks in a row. Red beside red. Blue beside blue. Kieran patted a yellow sock with a smiling sun. Ellie searched the pile and found another yellow sock. But this one had a moon. “Same color,” she said. “Different picture.”\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Edit the supplied already-reviewed story illustration. There must be only ONE yellow sun sock in this scene because its partner is missing. Preserve the sun sock beneath Kieran's hand. Change the second yellow sun sock in the foreground row to a plain red sock with white stripes. Keep the yellow moon socks, all people, all other details and crayon style unchanged. This is a small exact correction, not a new composition. Keep 4:3 landscape dimensions. No text, signature or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-0ab878ab-907c-43f0-b1ae-49248c931ea6.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: only one sun sock, with moon socks visibly different despite yellow color."
+}

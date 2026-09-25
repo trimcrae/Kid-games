@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-midnight-train",
+  "page": 2,
+  "style": "linocut",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-694f6bdc-1618-45f0-9b1b-9bed87b76cf1.png",
+  "originalSha256": "fe445f4de5482f99e02d15e82aeb65c49ff879de2fe9d571370d78badac18c06",
+  "file": "cory-midnight-train-2.webp",
+  "sha256": "3599c6287c3209867c31eb8c6d0e658eb959269d1c5fec918f686e4a41da384a",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "6192529df876d6d59e7aeec3e1b730c48dac58052f67c3fb68732521f98b22e3",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Midnight Train, page 3: An extra blink.\nART DIRECTION: Intricate hand-carved two-ink linocut print on warm cream paper: midnight petrol-blue and muted ochre inks, expressive cut marks, fine hatch textures, rich invented vintage-railway detail, elegant strong composition. A real crafted storybook print with natural expressive human figures, not geometric clipart. Wonderful cozy dream atmosphere.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory wears a dark-blue vintage wool coat, cream scarf, brown boots, and his black rectangular glasses. His hair is short brown. The driver is a friendly adult woman in railway uniform. At breakfast Cory wears a blue knit jumper instead of the coat.\nILLUSTRATE THIS MOMENT: A wandering firefly glows below three fixed signal lamps while Cory checks his drawn pattern.\nStory context for this exact page: Cory drew the pattern on a card. Just then, another tiny light flashed near the track. “Four lights?” he wondered. The little light moved sideways, then up. It was a firefly. The signal lamps stayed in their row. Cory smiled and kept three marks on his card.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-midnight-train-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Three fixed signal lamps contrast with the moving firefly; card has three marks."
+}

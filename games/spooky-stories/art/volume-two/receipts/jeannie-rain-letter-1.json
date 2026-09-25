@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-rain-letter",
+  "page": 1,
+  "style": "watercolor",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-90523551-0d06-432f-9066-183d2cddd993.png",
+  "originalSha256": "e4509325aa5791ab57380ebc4998f06d38e82545b7aaf27bb928016f56f5044f",
+  "file": "jeannie-rain-letter-1.webp",
+  "sha256": "7614385c64a9a0badd68c69c02ad996a9ff04626909200f9d8781e9cb507ac89",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "0b5e30a093744e417d566478c3568d6fbef6bf074c164ae4a2639932bd7b2dab",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie and the Rain-Washed Letter, page 2: Save the clues.\nART DIRECTION: Sumptuous traditional watercolor picture-book painting on subtly textured cold-pressed paper. Translucent wet-on-wet washes, delicate lively pencil underdrawing, richly observed cottage-garden details, gentle rainy light, beautiful expressive faces. Never flat vector or diagram.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie wears a teal raincoat with hood down, dark leggings, red wellington boots. Ellie wears a yellow raincoat with hood down and purple wellington boots. Indoors keep these recognizable colors. Dad wears a soft blue jumper and tan trousers; Mum an olive cardigan.\nILLUSTRATE THIS MOMENT: Jeannie copies the damp invitation into a notebook at a kitchen table while Ellie watches beside a towel.\nStory context for this exact page: Another raindrop landed on the letter. Jeannie tucked it beneath her coat while Ellie held the gate. Indoors, they laid it on a towel. Jeannie copied the three words and the flower into her notebook. Now they could take the clues outside without losing any more of them.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/jeannie-rain-letter-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Drying invitation and copying its three words match the kitchen scene."
+}

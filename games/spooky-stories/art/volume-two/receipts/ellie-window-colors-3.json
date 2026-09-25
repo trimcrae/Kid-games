@@ -1,0 +1,22 @@
+{
+  "storyId": "ellie-window-colors",
+  "page": 3,
+  "style": "stainedglass",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0a6b4b2c-538c-4dd6-81c0-a3cbeb15fb2d.png",
+  "originalSha256": "59f12e5dcb38b25ad741ba73985e3bc7237b80b197f98eefd04d940af13aa458",
+  "file": "ellie-window-colors-3.webp",
+  "sha256": "8b08285eca691374a52c1bd3a1c9abc188a82aad1de0cd6a7fca0bdbe61fdc22",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "dfbb1d37fe36ac3b20dd41c5e4e041b9823d20cef6ffac4c9672d4a8d070bf23",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Ellie and the Rainbow Window, page 4: Ellie's sorting shop.\nART DIRECTION: Magnificent luminous stained-glass narrative art: every shape and human figure made from richly textured translucent colored glass divided by fine dark lead lines. Glowing jewel colors, cathedral-window craftsmanship, painterly natural human faces within the glass mosaic, detailed castle interior. A coherent immersive scene, not a diagram or isolated shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Ellie wears a lavender princess dress with silver trim and simple slippers, her dark-brown chin-length bob and side fringe visible; no elaborate headdress. Jeannie wears a rose dress, Mum an olive dress and round glasses, Cory a blue tunic and trousers with black rectangular glasses.\nILLUSTRATE THIS MOMENT: Ellie sorts colorful window stickers into circles, triangles, and squares on a low castle table while Cory smiles at a yellow triangle.\nStory context for this exact page: There were stickers left in the basket. Ellie made three little groups on the table: circles, triangles, and squares. Cory came to her pretend shop. “Something with three corners, please.” Ellie counted the corners of a triangle and handed it over. “That will be one smile.”\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/ellie-window-colors-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Sorted circles, triangles and squares; Cory receives a triangle."
+}

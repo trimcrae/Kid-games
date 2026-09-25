@@ -1,0 +1,22 @@
+{
+  "storyId": "kieran-sock-parade",
+  "page": 5,
+  "style": "crayon",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0f7929a5-40a9-4fe9-939c-1406a0832fe3.png",
+  "originalSha256": "2444a96e6900cda459cda65eb3f03e5960c9a0be8fde078560a900fc4ca10269",
+  "file": "kieran-sock-parade-5.webp",
+  "sha256": "15463e58cde2ae875696bf43d6c787ed4e011cb987849d0d2f94501d06f6c0c9",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "a794bb7197cfde39d42b2447de5c9c6993c97054e6a246f657ce73f00a875044",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Kieran and the Sock Parade, page 6: The smallest bow.\nART DIRECTION: Beautiful professional wax-crayon and soft oil-pastel picture-book art on warm textured paper. Abundant layered scribbly strokes, joyful rounded shapes, charming expressive natural faces, tactile bright fabrics, playful cozy family-room details. Clearly hand-drawn crayon, not vector shapes or a photograph.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Kieran is an infant in a pale-blue romper. Ellie wears a lavender jumper and leggings; Jeannie a dusty-rose jumper and trousers; Cory a blue jumper and black rectangular glasses; Mum an olive cardigan and round glasses; Dad a light-blue shirt and tan trousers.\nILLUSTRATE THIS MOMENT: Kieran wiggles two matching sun socks while Dad notices he is still wearing only one green sock.\nStory context for this exact page: Mum dressed Kieran's feet in the little sun socks. He kicked once, then twice. The family bowed to the tiniest performers in the parade. Dad looked at his own feet. One green sock. One bare foot. “Ah,” he said. “Perhaps we need an encore.”\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Edit the supplied already-reviewed story illustration. Change only Kieran's two socks so they match the pair found in the story: solid golden-yellow knitted bodies with orange cuffs, orange heels and orange toes, and one large smiling orange sun motif on each sock. No white bodies and no repeated small suns. Keep both socks on his feet, all characters, Dad's one green sock and one bare foot, and crayon style unchanged. This is a small exact correction, not a new composition. Keep 4:3 landscape dimensions. No text, signature or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-bfa92100-44ad-47d8-8d05-9698b8fa28a8.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: Kieran wears the same yellow/orange sun-sock pair; Dad has one green sock and one bare foot."
+}
