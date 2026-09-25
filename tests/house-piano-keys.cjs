@@ -1,10 +1,10 @@
-// Run against a local server with HOUSE_BASE and a seeded profile with HOUSE_SEED.
+// Run against a local server with HOUSE_BASE. HOUSE_SEED can skip adoption.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const {chromium}=require('playwright');
 
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
-const seed=JSON.parse(fs.readFileSync(process.env.HOUSE_SEED,'utf8'));
+const seed=process.env.HOUSE_SEED?JSON.parse(fs.readFileSync(process.env.HOUSE_SEED,'utf8')):null;
 const notes=['C','D','E','F','G','A','B','C'];
 const keys=['Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8',
   'KeyA','KeyS','KeyD','KeyF','KeyG','KeyH','KeyJ','KeyK'];
@@ -14,12 +14,21 @@ const keys=['Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digi
   const errors=[];
   try{
     const context=await browser.newContext({viewport:{width:1280,height:800}});
-    await context.addInitScript(saved=>{for(const [key,value] of Object.entries(saved))localStorage.setItem(key,value);},seed);
+    if(seed)await context.addInitScript(saved=>{for(const [key,value] of Object.entries(saved))localStorage.setItem(key,value);},seed);
     const page=await context.newPage();
     page.on('pageerror',error=>errors.push(error.message));
     await page.goto(base+'/house-test/');
     await page.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:90000});
+    await page.frame({url:/activity.html/}).evaluate(()=>Craepets._events(false));
     await page.locator('#start').click();
+    if(!seed){
+      await page.locator('[data-profile="cory"]').click();
+      const activity=page.frameLocator('#activity-frame');
+      await activity.locator('#pet-name').fill('Piano Tester');
+      await activity.locator('#do-adopt').click();
+      await activity.locator('[data-tapegg]').click({clickCount:8,delay:120});
+      await page.locator('#close-activity').click();
+    }
     assert(await page.evaluate(()=>houseTest.go({x:10.8,y:-1.05,z:-1.6})),'Could not reach piano');
     await page.waitForFunction(()=>houseTest.state.interactions.near==='piano');
     await page.keyboard.press('KeyE');
