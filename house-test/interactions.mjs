@@ -1,9 +1,9 @@
 import * as THREE from './vendor/three.module.min.js';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
-import {hangBarInteractions} from './hang-bar.mjs?v=20260916-use3';
-import {roombaInteractions} from './roomba.mjs?v=20260916-use3';
+import {hangBarInteractions} from './hang-bar.mjs?v=20260925-motion';
+import {roombaInteractions} from './roomba.mjs?v=20260925-motion';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
-import {bedInteractions} from './beds.mjs?v=20260917-bed';
+import {bedInteractions} from './beds.mjs?v=20260925-motion';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
