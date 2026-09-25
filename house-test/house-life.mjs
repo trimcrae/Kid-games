@@ -545,9 +545,10 @@ export async function createHouseLife(tour){
               airborne:!ride&&(inAir||!!stepHop)}});
           pal.position.x=f.offsetX;pal.position.z=f.offsetZ;
           pal.position.y=(f.y-avatar.position.y)/PET_SCALE;
+          pal.userData.followState=f;
           if(f.hop)pal.userData.rig.hop(f.hop);
           pal.userData.rig.setAirborne(f.airborne);
-          pal.userData.animate(time,f.moving,reduced,f.speed);
+          pal.userData.animate(time,f.moving&&!f.airborne,reduced,f.speed);
         }
         // Only if the camera is actually inside the pet (backed right up to a
         // wall) does the pet step aside from view; nearer than that it fades
@@ -681,7 +682,7 @@ export async function createHouseLife(tour){
       return list;
     },
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),petpet:avatar?.userData.petpet?{lift:+(avatar.userData.petpet.position.y*PET_SCALE).toFixed(3)}:null,appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
+    diagnostics:()=>({hereRoom,petHeading:heading,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),petpet:avatar?.userData.petpet?{lift:+(avatar.userData.petpet.position.y*PET_SCALE).toFixed(3),offset:[avatar.userData.petpet.position.x,avatar.userData.petpet.position.z],moving:!!avatar.userData.petpet.userData.followState?.moving,airborne:!!avatar.userData.petpet.userData.followState?.airborne}:null,appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
         // What a steadiness check samples each frame: where it wants to face, its gait, drawn height, name pill and bubble.
         face:r.c.face,walking:r.c.walking,speed:r.c.speed,y:r.mesh.position.y,label:r.label.visible,emote:r.emote?.showing??null,egg:r.c.egg})),
       // The life clock of the last tick, and every creature body in the scene (yours plus companions: no leftovers after a switch).
