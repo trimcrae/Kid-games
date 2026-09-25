@@ -281,12 +281,12 @@ const GAMES = [
   },
 
   {
-    title: "Ellie's Storybook",
+    title: "The Family Storybook",
     emoji: "📖",
-    blurb: "25 illustrated read-aloud books starring Ellie: the Three Bears, a giant beanstalk, Cinderella's glass slipper, and 22 cozy spooky favourites. Follow the words as they're read, tap to learn vocabulary, and answer questions about what happened and why. For Ellie & Jeannie!",
+    blurb: "29 illustrated books with read-aloud audio, full transcripts, and cozy two-page spreads. Join Jeannie's map mystery, Cory's bridge-building adventure, Kieran's moon song, and Ellie's fairy tales. Learn vocabulary, patterns, problem-solving, and story comprehension together.",
     url:   "games/spooky-stories/",
     ages:  "3+",
-    kids: ["ellie","jeannie"],
+    kids: ["ellie","jeannie","cory","kieran"],
     color: "#8a5cff",
     ready: true
   },

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>📖 Ellie's Storybook</title>
+  <title>📖 The Family Storybook</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>" />
   <meta name="theme-color" content="#8a5cff" />
   <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png" />
@@ -248,6 +248,7 @@
       .page-text .w { transition: none; }
     }
   </style>
+  <link rel="stylesheet" href="storybook.css?v=family-20260925" />
 </head>
 <body>
   <div class="bg-blobs" aria-hidden="true">
@@ -259,14 +260,13 @@
   <a class="back-link" href="../../">← Back to the Arcade</a>
 
   <header class="hero" style="padding: .5rem 1rem 0;">
-    <h1 class="title"><span class="emo">📖</span> Ellie's Storybook</h1>
+    <h1 class="title"><span class="emo">📖</span> The Family Storybook</h1>
   </header>
 
   <main class="sb-wrap">
     <!-- LIBRARY -->
     <section id="library">
-      <p class="sb-intro">Classic tales, magical adventures, and cozy spooky favourites. Pick a book to read with Ellie. 💜</p>
-      <p style="text-align:center"><a class="big-btn" href="picture-book-test/" style="display:inline-flex;font-size:1rem">✨ Try a new picture book: Ellie and the Shy Shadow</a></p>
+      <p class="sb-intro">Big adventures for Jeannie, Cory, Ellie, and Kieran. Open a book, listen along, and wonder together.</p>
       <div class="sticker-shelf" id="sticker-shelf" aria-label="Your sticker collection"></div>
       <div id="story-grid" class="story-grid"></div>
     </section>
@@ -280,10 +280,15 @@
       </div>
 
       <div class="book">
+        <div class="book-spread">
         <div class="stage">
           <div class="page-art" id="page-art" role="img" aria-label="story picture"></div>
         </div>
+        <div class="page-copy">
+        <p class="page-count" id="page-count"></p>
+        <h3 id="page-title"></h3>
         <p class="page-text" id="page-text" aria-live="polite"></p>
+        <p id="wonder" class="wonder" hidden></p>
 
         <!-- meaning of a "big word" the reader tapped -->
         <div class="word-card" id="word-card" hidden>
@@ -294,9 +299,12 @@
 
         <p class="tap-hint" id="tap-hint">✨ Tap the picture to play! ✨</p>
         <div class="dots" id="dots" aria-hidden="true"></div>
-        <p class="page-count" id="page-count"></p>
         <div class="mode-row">
           <button class="mode-btn" id="self-btn" aria-pressed="false">🔊 Read it to me</button>
+          <button class="mode-btn" id="stop-btn">Stop reading</button>
+        </div>
+        <p id="narration-status" role="status"></p>
+        </div>
         </div>
 
         <!-- what you can do once you reach "The End" -->
@@ -319,6 +327,11 @@
         <button class="big-btn pink" id="prev-btn">◀ Back</button>
         <button class="big-btn" id="next-btn">Turn the page ▶</button>
       </div>
+      <details id="transcript" class="transcript">
+        <summary>Full story transcript</summary>
+        <p class="transcript-note">The same words you hear in the read-aloud, all in one place.</p>
+        <div id="transcript-copy"></div>
+      </details>
     </section>
   </main>
 
@@ -326,9 +339,11 @@
        as a plain script means the reader never requests an mp3 that the audio
        pipeline hasn't rendered yet — new story text is simply silent instead of
        404-ing, and it works from a file:// copy too. -->
-  <script src="audio/manifest.js?v=cinderellie-fitting-20260917"></script>
+  <script src="audio/manifest.js?v=family-20260925"></script>
   <script src="art/openai/manifest.js?v=cinderellie-fitting-20260917"></script>
   <script src="classics.js?v=cinderellie-fitting-20260917"></script>
-  <script src="storybook.js?v=cinderellie-fitting-20260917"></script>
+  <script src="family-stories.js?v=family-20260925"></script>
+  <script src="family-art.js?v=family-20260925"></script>
+  <script src="storybook.js?v=family-20260925"></script>
 </body>
 </html>

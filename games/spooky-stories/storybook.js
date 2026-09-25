@@ -2431,6 +2431,20 @@
     };
   }));
 
+  // The former picture-book demo and original sibling stories share this reader.
+  STORIES.unshift(...(window.FAMILY_STORIES || []).map(story => {
+    const art = i => () => window.familyIllustration(story.artStyle, i);
+    const pages = story.pages.map((p, i) => ({ ...p, art: art(i) }));
+    VOCAB[story.id] = {};
+    pages.forEach((p, i) => { VOCAB[story.id][i] = p.vocab || {}; });
+    QUIZZES.push({ id: story.id, qs: story.questions });
+    return { ...story, cover: story.pages[0].img
+      ? () => `<img class="cover-img" src="${story.pages[0].img}" alt="" loading="lazy">`
+      : art(0),
+      pages: pages.concat([{ ...pages[pages.length - 1], title: "The End",
+        wonder: "", end: true, text: story.ending }]) };
+  }));
+
   // Painterly cover pictures rendered by the art pipeline
   // (games/spooky-stories/art/<id>-cover.png, from assets/art/art-manifest.json).
   // Stories not listed here keep their hand-drawn SVG cover. A listed cover
@@ -2925,6 +2939,7 @@
          <h2>${story.title}</h2>
          ${story.classic ? `<p class="byline">✨ A retelling of ${story.classic}</p>` : ""}
          ${story.by ? `<p class="byline">✍️ A story made up by ${story.by}!</p>` : ""}
+         ${story.style ? `<p class="art-style">${story.style}</p>` : ""}
          <p>${last} pages • Tap to read</p>
          ${at ? `<span class="bookmark">🔖 Keep reading — page ${at + 1}</span>` : ""}`;
       // painterly cover not rendered yet? swap in the hand-drawn SVG cover
@@ -2942,6 +2957,17 @@
   // ---- Open / render a story ----
   function openStory(story) {
     current = story;
+    history.replaceState(null, "", "#" + story.id);
+    const transcript = document.getElementById("transcript-copy");
+    transcript.replaceChildren();
+    document.getElementById("transcript").open = false;
+    story.pages.forEach((p, i) => {
+      const heading = document.createElement("h3");
+      heading.textContent = p.end ? "The End" : "Page " + (i + 1) + (p.title ? ": " + p.title : "");
+      const paragraph = document.createElement("p");
+      paragraph.textContent = p.text;
+      transcript.append(heading, paragraph);
+    });
     page = 0;
     // pick up where this story was left off (never on the "The End" page)
     const marks = loadMarks();
@@ -2967,6 +2993,7 @@
     closeQuiz();
     hideWordCard();
     current = null;
+    history.replaceState(null, "", location.pathname + location.search);
     reader.classList.remove("active");
     library.style.display = "";
     buildLibrary();
@@ -3015,7 +3042,7 @@
     // End pages reuse the closing illustration; SVG remains a load-error fallback.
     const paintings = (window.SPOOKY_PAINTED_ART || {})[current.id];
     const painting = paintings && paintings[Math.min(page, paintings.length - 1)];
-    artEl.setAttribute("aria-label", painting ? painting.alt : "story picture");
+    artEl.setAttribute("aria-label", painting ? painting.alt : p.alt || "story picture");
     if (painting || p.img) {
       const img = document.createElement("img");
       img.className = "scene-img";
@@ -3039,6 +3066,13 @@
 
     // text, split into tappable words
     layoutText(p.text, vocabFor(current.id, page));
+    const pageTitle = document.getElementById("page-title");
+    pageTitle.textContent = p.title || (p.end ? "The End" : current.title);
+    const wonder = document.getElementById("wonder");
+    wonder.textContent = p.wonder || "";
+    wonder.hidden = !p.wonder;
+    document.getElementById("narration-status").textContent = hasClip(clipName(current.id, page))
+      ? "" : "The recording for this page is not available yet. You can read every word here.";
 
     // dots + a plain "page 3 of 6" for readers and screen readers
     dotsEl.innerHTML = "";
@@ -3052,8 +3086,8 @@
 
     // hint only when there are tappable things
     const hasTaps = artEl.querySelector(".tap");
-    hintEl.style.visibility = (hasTaps || painting || p.end) ? "visible" : "hidden";
-    hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : painting
+    hintEl.style.visibility = "visible";
+    hintEl.textContent = p.end ? "🎉 Hooray! 🎉" : !hasTaps
       ? "✨ Tap a word to hear it! ✨"
       : "✨ Tap the picture to play — or tap a word to hear it! ✨";
 
@@ -3314,6 +3348,7 @@
     if (!current) return;
     narrate(clipName(current.id, page), 0, true);
   });
+  document.getElementById("stop-btn").addEventListener("click", stopNarration);
 
   // "Read it to me" <-> "I'll read it myself" — Jeannie can switch the voice
   // off and read the page herself, then tap 🔊 (or any word) to check.
@@ -3350,4 +3385,6 @@
   document.addEventListener("visibilitychange", () => { if (document.hidden) stopNarration(); });
 
   buildLibrary();
+  const linkedStory = STORIES.find(story => "#" + story.id === location.hash);
+  if (linkedStory) openStory(linkedStory);
 })();
