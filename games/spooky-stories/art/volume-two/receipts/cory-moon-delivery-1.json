@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-moon-delivery",
+  "page": 1,
+  "style": "comic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-3eabf6ec-4158-4332-b665-0b488f1d9aae.png",
+  "originalSha256": "cfbfd45c471a46b386a2471d6804f494f18fb983c91daa8b9394841a0564a17f",
+  "file": "cory-moon-delivery-1.webp",
+  "sha256": "eb9255f25e64253ede394c8b349286135c8bbbaf22e34fe0abee59d640434cce",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "7528071981999c1eb574f8fb6b4d9a70f8e5e8c928cf219535489fbde44ba8dd",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory's Moon Delivery, page 2: Crater ahead.\nART DIRECTION: Rich retro 1950s space-adventure comic illustration with confident ink drawing, Ben-Day dots, painted gouache color, dramatic but playful framing, vintage ochre/coral/indigo palette. A single beautifully staged illustrated panel WITHOUT a panel frame, captions or text. Show the children playing with a shoebox rover and cardboard moon base on a pretend moon blanket at home, not real astronauts in vacuum.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: blue T-shirt under ochre overalls, black rectangular glasses, short brown hair. Jeannie: rose jumper, gray trousers, shoulder-length brown hair. Ellie: lavender jumper and leggings, dark-brown bob. Ordinary play clothes, no actual spacesuits; pretend play is clear.\nILLUSTRATE THIS MOMENT: A large paper crater blocks the rover's planned turn while Cory studies his square-grid map.\nStory context for this exact page: The rover rolled two squares forward. Then Cory saw the biggest crater sitting exactly where he wanted to turn. Ellie had added it while he packed the sandwich. “New information,” Commander Cory announced. He stopped the rover and unfolded his map. The moon needed a new route.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-moon-delivery-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory compares blocked route with a large pretend crater; cardboard play setting and cast consistent."
+}

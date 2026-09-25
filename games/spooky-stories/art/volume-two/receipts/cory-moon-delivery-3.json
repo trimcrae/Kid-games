@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-moon-delivery",
+  "page": 3,
+  "style": "comic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a8c6b9d1-8ad8-4b91-afb6-cd6a6ff79eea.png",
+  "originalSha256": "34aa2a6fe3fc8de105b53eeb02a77cf3dde9e527ac7c8f0750472432957ee272",
+  "file": "cory-moon-delivery-3.webp",
+  "sha256": "3239bcdbbe0f10eaf8d49a7a59b6955d5a3ace8366707323dc4a0a0502fef818",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "28a1ec5846d8b18a8623d5629d298884ca90cded0417a33d5685d6e1afe2276f",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory's Moon Delivery, page 4: Around, not through.\nART DIRECTION: Rich retro 1950s space-adventure comic illustration with confident ink drawing, Ben-Day dots, painted gouache color, dramatic but playful framing, vintage ochre/coral/indigo palette. A single beautifully staged illustrated panel WITHOUT a panel frame, captions or text. Show the children playing with a shoebox rover and cardboard moon base on a pretend moon blanket at home, not real astronauts in vacuum.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: blue T-shirt under ochre overalls, black rectangular glasses, short brown hair. Jeannie: rose jumper, gray trousers, shoulder-length brown hair. Ellie: lavender jumper and leggings, dark-brown bob. Ordinary play clothes, no actual spacesuits; pretend play is clear.\nILLUSTRATE THIS MOMENT: The rover follows a detour around the crater, with its sandwich box tilting on the open cargo deck.\nStory context for this exact page: Cory moved the rover one square left, three squares forward, and one square right. It went around the crater. But the sandwich slid toward the edge of its box. Jeannie called from Moon Base, “Your passenger needs a seat!” Cory brought the rover back for a small repair.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Edit the supplied story illustration. Make the red-and-white sandwich box visibly tilt and slide precariously toward the rover's front edge as it rounds the paper crater. Lower the front cargo wall to a shallow unprotected edge so the sliding problem is visually clear; the protective cardboard rim is added later in the story. Preserve all characters, route, cardboard base, retro comic style and composition. Keep 4:3 landscape dimensions. No text, signature or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-23dbf9fb-2b65-494e-8ba6-012b9a2f424d.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: parcel visibly tilts toward unprotected front of rover, showing the problem solved later."
+}

@@ -1,0 +1,20 @@
+{
+  "storyId": "jeannie-leaf-detective",
+  "page": 0,
+  "style": "cyanotype",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-a969a41c-10d8-4571-a9bf-626f8a1691c2.png",
+  "originalSha256": "3e9eb51d95e3ab35de1a1bb0ad9a94d95420eb3c538d7d638d517ca745c97c82",
+  "file": "jeannie-leaf-detective-0.webp",
+  "sha256": "053e83707ebefe74e6f0ae64f1aa4b971bc5416e65d3cb148ee32ee967bc55c8",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "376927d2e06cc75618f55fdf5808f4670f88ef018f0f12507c2e22fe7178a740",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie, Leaf Detective, page 1: The blue notebook.\nART DIRECTION: Exquisite cyanotype botanical story illustration in deep Prussian-blue and luminous ivory only, textured sensitized paper, intricate leaf photogram silhouettes with very fine veins and softly feathered exposure edges. Rich heirloom botanical-print craftsmanship, tactile papers and notebooks, graceful organic composition. Human figures when specified should be finely drawn blue-and-ivory illustrated people, not faceless icons. Never a simple diagram.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old with shoulder-length brown hair, cardigan and trousers. Cory: six-year-old with short brown hair and rectangular glasses, jumper and trousers. Mum has a dark bob with gray streaks and round glasses. All represented in the cyanotype blue-and-ivory palette.\nILLUSTRATE THIS MOMENT: Jeannie compares a long white leaf outline in a blue notebook with a round garden leaf.\nStory context for this exact page: Jeannie opened a blue notebook full of white leaf outlines. One page had no label. She carried it into the garden. “We need to find the matching leaf,” she told Cory. He found a big round one straight away. Jeannie tilted the notebook. The mystery leaf was long and narrow.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [],
+  "reviewed": true,
+  "review": "Blue-and-ivory cyanotype contrasts narrow and rounded leaf shapes."
+}

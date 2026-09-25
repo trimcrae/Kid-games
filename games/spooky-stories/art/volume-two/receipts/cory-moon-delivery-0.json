@@ -1,0 +1,20 @@
+{
+  "storyId": "cory-moon-delivery",
+  "page": 0,
+  "style": "comic",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-18046ef2-957a-4725-b458-6fccfa6b04ff.png",
+  "originalSha256": "20380d540b9812942e9408b13e689e6c0f2e414da02dbb5cb1c8d7aab8989074",
+  "file": "cory-moon-delivery-0.webp",
+  "sha256": "1ff887719d1df86e7b7187a1ee769f0a1dde1d7780bb3fb647094f84806ee270",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "64d7640a7ef7f74c8d13ea1d72f9550416885eaead2031aeb1255cbca6d91662",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory's Moon Delivery, page 1: Parcel for the moon.\nART DIRECTION: Rich retro 1950s space-adventure comic illustration with confident ink drawing, Ben-Day dots, painted gouache color, dramatic but playful framing, vintage ochre/coral/indigo palette. A single beautifully staged illustrated panel WITHOUT a panel frame, captions or text. Show the children playing with a shoebox rover and cardboard moon base on a pretend moon blanket at home, not real astronauts in vacuum.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory: blue T-shirt under ochre overalls, black rectangular glasses, short brown hair. Jeannie: rose jumper, gray trousers, shoulder-length brown hair. Ellie: lavender jumper and leggings, dark-brown bob. Ordinary play clothes, no actual spacesuits; pretend play is clear.\nILLUSTRATE THIS MOMENT: Cory plans a shoebox rover route across a pretend moon blanket toward Jeannie's cardboard moon base.\nStory context for this exact page: Commander Cory had a very important delivery: a sandwich for Jeannie at Moon Base. Their moon was a blanket covered with paper craters. Their rover was a shoebox on wheels. Cory drew a route on squared paper. Two squares forward, one square right, and straight to lunch.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [],
+  "reviewed": true,
+  "review": "Retro comic moon-play scene; Cory's glasses and space props consistent."
+}

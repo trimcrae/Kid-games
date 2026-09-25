@@ -1,0 +1,22 @@
+{
+  "storyId": "jeannie-leaf-detective",
+  "page": 5,
+  "style": "cyanotype",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-105790c9-309c-4ffe-a184-fdc603621a9b.png",
+  "originalSha256": "1199535c784b2aef7b93ce332623859370b971764766d04063c6618d72cd71ba",
+  "file": "jeannie-leaf-detective-5.webp",
+  "sha256": "3b622beebc3d3b2d61db40d07193a92c6ff2a3a9b5988dbfead60efac1737c7e",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "ab48886ccf43339a1afc269addeaa1073169bd1c2e95b3887486432020b56f04",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Jeannie, Leaf Detective, page 6: A picture to keep.\nART DIRECTION: Exquisite cyanotype botanical story illustration in deep Prussian-blue and luminous ivory only, textured sensitized paper, intricate leaf photogram silhouettes with very fine veins and softly feathered exposure edges. Rich heirloom botanical-print craftsmanship, tactile papers and notebooks, graceful organic composition. Human figures when specified should be finely drawn blue-and-ivory illustrated people, not faceless icons. Never a simple diagram.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Jeannie: seven-year-old with shoulder-length brown hair, cardigan and trousers. Cory: six-year-old with short brown hair and rectangular glasses, jumper and trousers. Mum has a dark bob with gray streaks and round glasses. All represented in the cyanotype blue-and-ivory palette.\nILLUSTRATE THIS MOMENT: Jeannie’s notebook holds a careful botanical outline with branching veins, while Cory steadies the matching fallen leaf on the table.\nStory context for this exact page: Back at the table, Cory held the leaf still while Jeannie drew its outline. She added the middle vein and the smaller branches. Their drawing was not perfect, but it showed the details that mattered. They returned the leaf to the garden and kept the picture in the notebook.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Edit the supplied story illustration. Correct the leaf identification continuity: the mystery leaf is LONG AND NARROW, lance-shaped, about four times as long as it is wide, with tiny sawtooth serrations and a single central midrib with side veins. Replace the prominent broad round leaf being held or steadied, and its matching large drawing in the notebook, with that long narrow serrated leaf. Keep the people, hands, expressions, layout, blue-and-ivory cyanotype medium and unrelated small botanical drawings unchanged. No broad round or lobed shape for the matching mystery leaf. Keep 4:3 landscape dimensions. No text, signature or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-8619fef5-56cb-407c-ac30-03c36a833ded.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: Cory steadies long toothed leaf while Jeannie records matching outline and branching veins."
+}
