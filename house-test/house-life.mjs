@@ -1,7 +1,7 @@
 import * as THREE from './vendor/three.module.min.js';
 import {activities,destinationFor} from './activities.mjs';
 import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20260925-motion';
-import {createPetpetFollow} from './petpet-follow.mjs';
+import {createPetpetFollow} from './petpet-follow.mjs?v=20260925-motion';
 import {furnishing} from './furnishings.mjs';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
@@ -538,10 +538,11 @@ export async function createHouseLife(tour){
         avatar.userData.animate(time,walking,reduced,gait);
         const pal=avatar.userData.petpet;
         if(pal){
-          // Its height follows the pet's a beat late (in the avatar's own
-          // units, since it rides inside the scaled avatar); its rig gets
-          // the pet's take-off and landing squashes on the same delay.
-          const f=follow.update(time,dt,avatar.position.y,{reduced});
+          // Follow the heel through turns as well as jumps, returning local
+          // offsets because the petpet lives inside the scaled avatar.
+          const f=follow.update(time,dt,avatar.position.y,{reduced,
+            leader:{x:avatar.position.x,z:avatar.position.z,heading:avatar.rotation.y,scale:PET_SCALE}});
+          pal.position.x=f.offsetX;pal.position.z=f.offsetZ;
           pal.position.y=(f.y-avatar.position.y)/PET_SCALE;
           if(f.hop)pal.userData.rig.hop(f.hop);
           pal.userData.animate(time,walking,reduced,gait);

@@ -7,7 +7,7 @@
 // within 0.9 m of a room's arrival spot or activity station, so they never
 // block the camera or the spot you walk up to. Pure logic (no Three), tested
 // against the real walking world.
-import {routeSearch,walkable} from './route-search.mjs?v=20260915-arrows';
+import {routeSearch,walkable} from './route-search.mjs?v=20260925-motion';
 import {easeRoute} from './route-ease.mjs';
 const TAU=Math.PI*2;
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
