@@ -34,13 +34,13 @@ p{margin:0}
 
 /* --- Top bar: the pet badge on the left, round buttons on the right --- */
 .topbar{position:fixed;top:0;left:0;right:0;padding:18px 20px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none;z-index:4}
-.player{display:grid;gap:8px;pointer-events:auto;justify-items:start}
-#player-chip{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--panel);box-shadow:var(--shadow);text-align:left}
-#chip-face{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--nav-soft);border:2px solid var(--line)}
-.chip-text{display:grid;line-height:1.15}
-#pet-status{font-size:17px;font-weight:800}
-#chip-coins{font-size:14px;font-weight:700;color:var(--ink-soft)}
-#weather-status{font-size:24px;line-height:1}
+.player{display:grid;gap:8px;pointer-events:auto;justify-items:start;min-width:0}
+#player-chip{display:flex;align-items:center;gap:10px;max-width:100%;min-width:0;padding:6px 14px 6px 6px;border-radius:999px;background:var(--panel);box-shadow:var(--shadow);text-align:left}
+#chip-face{width:42px;height:42px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--nav-soft);border:2px solid var(--line)}
+.chip-text{display:grid;min-width:0;line-height:1.15}
+#pet-status{font-size:17px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#chip-coins{font-size:14px;font-weight:700;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#weather-status{font-size:24px;line-height:1;flex:none}
 #pet-needs{display:flex;gap:6px;padding:7px 10px;border-radius:16px;background:var(--panel);border:2px solid var(--line);box-shadow:var(--shadow);pointer-events:none;font-size:14px;font-weight:700}
 #pet-needs:empty{display:none}
 .meter{display:grid;grid-template-columns:auto 44px;align-items:center;gap:5px}
@@ -215,6 +215,27 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   .location{top:auto;bottom:170px;font-size:16px}
   #nearby-actions button{font-size:15px;padding:6px 14px}
 }
+/* On phones the room announcement must clear the nearby action stack. Each
+   extra action adds a button row; keep the action itself fully readable. */
+@media(pointer:coarse) and (max-width:700px) and (min-height:501px){
+  .location{bottom:242px}
+  body:has(#nearby:not([hidden]) #nearby-actions button:nth-child(2)) .location{bottom:320px}
+  body:has(#nearby:not([hidden]) #nearby-actions button:nth-child(3)) .location{bottom:398px}
+  body:has(#nearby:not([hidden]) #nearby-actions button:nth-child(4)) .location{bottom:476px}
+}
+/* A phone cannot fit the badge and four 48px controls in one row. Give the
+   controls their own row and let long names and coin totals use the badge. */
+@media(max-width:520px) and (min-height:501px){
+  .topbar{display:block}
+  .actions{top:128px}
+  body.from-game .actions{top:180px}
+  #coach,#hint{top:196px}
+  body.from-game #coach,body.from-game #hint{top:242px}
+  #journey{top:190px}
+  body.from-game #journey{top:236px}
+  #journey:not([hidden])~#coach{top:242px}
+  body.from-game #journey:not([hidden])~#coach{top:288px}
+}
 @media(max-height:500px){
   .topbar{padding:10px 14px}
   .welcome-card{grid-template-columns:1fr 1fr;align-items:center;width:min(760px,100%);padding:18px 22px;gap:10px 18px;max-height:96vh}
@@ -271,3 +292,16 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
 #interact kbd{font-size:13px}
 #nearby:not([hidden])~#interact{bottom:96px}
 @media(pointer:coarse){#interact{bottom:auto;top:150px;left:auto;right:12px;transform:none}#interact kbd{display:none!important}}
+@media(pointer:coarse) and (max-width:520px) and (min-height:501px){
+  /* An interaction can appear alongside the activity stack. Put its pill in
+     the other column, below the menu controls, and give the coach a rest. */
+  #interact,#nearby:not([hidden])~#interact{top:190px;bottom:auto;left:12px;right:auto;max-width:calc(100vw - 172px)}
+  body.from-game #interact,body.from-game #nearby:not([hidden])~#interact{top:240px}
+  body:has(#interact:not([hidden])) #coach{visibility:hidden}
+}
+@media(pointer:coarse) and (max-width:420px) and (max-height:650px) and (min-height:501px){
+  /* On a short phone three nearby actions leave no clear space for a toast.
+     Its live text remains available to screen readers. */
+  body:has(#nearby:not([hidden]) #nearby-actions button:nth-child(3)) .location{opacity:0;transition:none}
+  body:has(.location.show) :is(#coach,#hint){visibility:hidden}
+}
