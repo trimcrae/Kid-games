@@ -532,6 +532,9 @@ export async function createHouseLife(tour){
         // Wings and tails tuck in beside a wall instead of poking through it.
         if(rig.wings||rig.tail){foldIn-=dt;if(foldIn<=0){foldIn=.2;const s=Math.sin(heading),c=Math.cos(heading);
           foldAmount=[[c,-s],[-c,s],[-s,-c]].some(([x,z])=>world.blocked(player.x+x*.22,player.z+z*.22,player.y))?1:0;}rig.fold(foldAmount);}
+        // Physics, rather than an expressive hop timer, decides when the paws
+        // should tuck in. A seated ride keeps its own pose.
+        rig.setAirborne?.(!ride&&(inAir||!!stepHop));
         avatar.userData.animate(time,walking,reduced,gait);
         const pal=avatar.userData.petpet;
         if(pal){
@@ -574,7 +577,7 @@ export async function createHouseLife(tour){
         r.logicAt=(r.logicAt||0)+dt;
         if(!inView&&r.logicAt<.5){r.mesh.visible=r.label.visible=r.near=false;r.emote?.update(dt,null,null,false,true);continue;}
         const hold=inView&&!active,step=hold?0:inView?dt:r.logicAt;r.logicAt=0;
-        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:()=>inView,camera:tour.camera.position});
+        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:point=>seenFrom(player,point,r.drawn?.5:0),camera:tour.camera.position});
         // Feet on the visible floor finish (found per 25 cm patch): eased over
         // a rug's edge or a threshold rather than popping a few centimetres
         // (quicker going up, so feet don't sink into the step); a hop onto
@@ -587,6 +590,7 @@ export async function createHouseLife(tour){
         else if(rig&&c.egg&&gap<3&&Math.abs(p.y-player.y)<.6&&!r.wobbled){r.wobbled=true;rig.hop(.6);}else if(gap>4)r.wobbled=false;
         // Every frame it's updated (a family's few pets; the 5 Hz pose for far
         // ones read as a stutter across the open main floor and yard).
+        rig?.setAirborne?.(c.mode==='hop');
         r.mesh.userData.animate(time,c.walking&&!hold,reduced,c.speed);
         // Hide a companion only while its body overlaps the camera's space.
         r.mesh.visible=inView&&!companionBlocksCamera(p,tour.camera.position,r.cameraBounds);
