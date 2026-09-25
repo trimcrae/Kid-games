@@ -66,11 +66,17 @@ export function roombaInteractions(ctx) {
   // spot, a turn away from the pet is driven round as an arc (pivoting on the
   // spot while the pet stands over it would leave it spinning there for ever).
   let on = false, heading = bot.rotation.y, spin = 0, reverse = 0, turn = 0, arc = false, nudge = 0, bumps = 0;
+  const rim=Array.from({length:8},(_,i)=>[Math.sin(i*TAU/8)*R,Math.cos(i*TAU/8)*R]);
   const ok = (x, z) => {
-    if (x < ROOM.x0 || x > ROOM.x1 || z < ROOM.z0 || z > ROOM.z1) return false;
-    const f = world.floor(x, z, FLOOR);
-    // The stairs and the raised hearth read as a different floor: not for it.
-    return Number.isFinite(f) && Math.abs(f - FLOOR) < FLAT && !world.blocked(x, z, f, .02);
+    // The centre can clear a table leg while the circular bumper intersects
+    // it. Check the whole rim against room edges, raised surfaces and boxes.
+    for(const [dx,dz] of [[0,0],...rim]){
+      const px=x+dx,pz=z+dz;
+      if(px<ROOM.x0||px>ROOM.x1||pz<ROOM.z0||pz>ROOM.z1)return false;
+      const f=world.floor(px,pz,FLOOR);
+      if(!Number.isFinite(f)||Math.abs(f-FLOOR)>=FLAT||world.blocked(px,pz,f,.015))return false;
+    }
+    return true;
   };
   const away = () => { turn = (Math.random() < .5 ? -1 : 1) * (Math.PI * .28 + Math.random() * Math.PI * .55); arc = false; };
 
@@ -109,7 +115,12 @@ export function roombaInteractions(ctx) {
     const speed = reverse > 0 ? -BACK : (turn ? (arc ? SPEED * .55 : 0) : SPEED);
     if (speed) {
       const d = speed * dt, nx = bot.position.x + Math.sin(heading) * d, nz = bot.position.z + Math.cos(heading) * d;
-      if (ok(nx, nz)) { bot.position.x = nx; bot.position.z = nz; }
+      // A pet may step into the path during an arc or reverse. The bumper
+      // cannot advance through its paws just because the room floor is clear.
+      if(Math.hypot(nx-player.x,nz-player.z)<R+.14&&Math.hypot(nx-player.x,nz-player.z)<Math.hypot(bot.position.x-player.x,bot.position.z-player.z)){
+        reverse=0;turn=Math.PI*.65*(Math.sin(heading-Math.atan2(player.x-bot.position.x,player.z-bot.position.z))>=0?1:-1);arc=false;
+      }
+      else if (ok(nx, nz)) { bot.position.x = nx; bot.position.z = nz; }
       else if (reverse > 0) { reverse = 0; away(); }          // stuck behind as well: just turn
       else { reverse = .45; bumps++; away(); }                 // bump: back off, then turn away
     }

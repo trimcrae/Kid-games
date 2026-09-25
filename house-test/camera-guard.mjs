@@ -261,14 +261,17 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
     setRig(r){rig=r||CAMERA_RIG;state=null;},
     place(focus,yaw,pitch,dt,world,guard,clearance){
       const view=boomCamera(focus,yaw,pitch,world,guard,clearance,rig);
-      if(!state)state={distance:view.distance,yaw,spin:0,ahead:Infinity,wait:0};
+      if(!state)state={distance:view.distance,yaw,spin:0,ahead:Infinity,wait:0,turnSign:0};
       else{
         // How fast the view is panning, smoothed over a few frames.
         const turn=Math.atan2(Math.sin(yaw-state.yaw),Math.cos(yaw-state.yaw));state.yaw=yaw;
         state.spin+=((dt>0&&Math.abs(turn)<.3?turn/dt:0)-state.spin)*(1-Math.exp(-dt*8));
         // Panning towards a wall: look a moment ahead along the pan (every few
         // frames), so the boom starts gliding in before the wall arrives.
-        if(Math.abs(state.spin)>.3){
+        const turning=dt>0&&Math.abs(turn)>1e-4&&Math.abs(turn)<.3;
+        const sign=turning?Math.sign(turn):0;
+        if(sign!==state.turnSign){state.ahead=Infinity;state.wait=0;state.turnSign=sign;}
+        if(turning&&Math.abs(state.spin)>.3){
           if(!(state.wait-->0)){state.wait=RESCAN-1;
             const ahead=boomCamera(focus,yaw+Math.max(-.6,Math.min(.6,state.spin*LEAD)),pitch,world,guard,clearance,rig).distance;
             state.ahead=ahead<view.distance-.3?ahead:Infinity;}
@@ -290,12 +293,21 @@ export function createFollowRig({reducedMotion=false,rig=CAMERA_RIG}={}){
       // Move along the boom (in or out, whichever is nearer) only as far as
       // it needs, rather than jumping to the full length.
       if(!fits(state.distance)){
-        for(let k=.08;k<view.distance;k+=.08){
-          const out=state.distance+k,inward=state.distance-k;
-          if(out<view.distance&&fits(out)){state.distance=out;return {target:t,position:along(out),distance:out,pitch};}
-          if(inward>=JAM+.1&&fits(inward)){state.distance=inward;return {target:t,position:along(inward),distance:inward,pitch};}
-          if(out>=view.distance&&inward<JAM+.1)break;
+        // Find the first legal point to either side, then bisect the boundary.
+        // Sampling only every 8 cm used to move the eye a visible step at a
+        // chair edge even when the legal point was millimetres away.
+        let best=null;
+        for(let k=.04;k<view.distance;k+=.04){
+          for(const direction of [1,-1]){
+            const candidate=state.distance+direction*k;
+            if(candidate>=view.distance||candidate<JAM+.1||!fits(candidate))continue;
+            let good=candidate,bad=state.distance+direction*(k-.04);
+            for(let i=0;i<7;i++){const mid=(good+bad)/2;if(fits(mid))good=mid;else bad=mid;}
+            if(best===null||Math.abs(good-state.distance)<Math.abs(best-state.distance))best=good;
+          }
+          if(best!==null)break;
         }
+        if(best!==null){state.distance=best;return {target:t,position:along(best),distance:best,pitch};}
         state.distance=view.distance;return view;
       }
       return {target:t,position:along(state.distance),distance:state.distance,pitch};

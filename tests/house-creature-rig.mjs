@@ -46,14 +46,98 @@ for(const sp of species){
 // just the walk tempo at a higher speed.
 {
   const c=build({species:'blorb'}),rig=c.userData.rig,leg=rig.bones.legL;
-  function cadence(speed){let crossings=0,last=null,reach=0;const z0=leg.userData.rest.z;
-    run(c,2,{moving:true,speed},()=>{const s=Math.sign(leg.position.z-z0);if(last!==null&&s!==last&&s!==0)crossings++;if(s!==0)last=s;reach=Math.max(reach,Math.abs(leg.position.z-z0));});
-    return {hz:crossings/2/2,reach};}
+  function cadence(speed){let crossings=0,last=null,reach=0,slip=0,stances=0,prior=null;const z0=leg.userData.rest.z;
+    for(let t=0;t<2;t+=1/60){c.position.z+=speed/60;rig.update(1/60,{moving:true,speed});
+      const s=Math.sign(leg.position.z-z0);if(last!==null&&s!==last&&s!==0)crossings++;if(s!==0)last=s;
+      reach=Math.max(reach,Math.abs(leg.position.z-z0));c.updateMatrixWorld(true);
+      const paw=leg.getWorldPosition(new THREE.Vector3());
+      if(t>.4&&prior&&Math.abs(leg.position.y-leg.userData.rest.y)<.001&&Math.abs(prior.y-leg.userData.rest.y)<.001){slip=Math.max(slip,Math.abs(paw.z-prior.z));stances++;}
+      prior={z:paw.z,y:leg.position.y};}
+    return {hz:crossings/2/2,reach,slip,stances};}
   const walk=cadence(1.9),runFast=cadence(3.1);
-  assert(walk.hz>2.2&&walk.hz<4.5,`walk cadence ${walk.hz} Hz`);
+  assert(walk.hz>4&&walk.hz<8,`walk cadence ${walk.hz} Hz`);
   assert(runFast.hz>walk.hz,'running does not step faster');
-  assert(3.1/runFast.hz>1.9/walk.hz,'running does not take longer strides');
-  assert(walk.reach>.04,'feet barely move');
+  assert(walk.reach>.1,'feet barely move');
+  assert(walk.stances>20&&walk.slip<.006,`planted paw slid ${walk.slip.toFixed(3)} m per frame`);
+  // A backward step must plant in the opposite direction too.
+  let last=null,reverseSlip=0,reverseStances=0;
+  for(let t=0;t<1;t+=1/60){c.position.z-=1.2/60;rig.update(1/60,{moving:true,speed:1.2});c.updateMatrixWorld(true);
+    const z=leg.getWorldPosition(new THREE.Vector3()).z,y=leg.position.y;
+    if(t>.25&&last&&Math.abs(y-leg.userData.rest.y)<.001&&Math.abs(last.y-leg.userData.rest.y)<.001){reverseSlip=Math.max(reverseSlip,Math.abs(z-last.z));reverseStances++;}
+    last={z,y};}
+  assert(reverseStances>10&&reverseSlip<.006,`backward planted paw slid ${reverseSlip.toFixed(3)} m`);
+}
+// Blinks happen on their own; a sleeping pet's eyes stay shut.
+// A stationary turn and a sideways step both move feet through a real gait.
+// During stance their world positions remain planted even as the root turns
+// or slides; swing paws stay on their own side of the body.
+{
+  const c=build({species:'blorb'}),rig=c.userData.rig,leg=rig.bones.legL;
+  let previous=null,slip=0,planted=0,sideReach=0;
+  for(let i=0;i<90;i++){
+    c.position.x+=1/60;rig.update(1/60,{moving:true,speed:1});c.updateMatrixWorld(true);
+    const p=leg.getWorldPosition(new THREE.Vector3());
+    const low=leg.position.y-leg.userData.rest.y<.001;
+    if(i>20&&low&&previous?.low){slip=Math.max(slip,p.distanceTo(previous.p));planted++;}
+    sideReach=Math.max(sideReach,Math.abs(leg.position.x-leg.userData.rest.x));
+    assert(rig.bones.legL.position.x<rig.bones.legR.position.x,'sideways paws crossed');
+    previous={p,low};
+  }
+  assert(planted>10&&slip<.007,`sideways planted paw slid ${slip}`);
+  assert(sideReach>.08,'sideways travel did not swing the foot sideways');
+  previous=null;slip=0;planted=0;
+  for(let i=0;i<100;i++){
+    c.rotation.y+=.025;rig.update(1/60);c.updateMatrixWorld(true);
+    const p=leg.getWorldPosition(new THREE.Vector3());
+    const low=leg.position.y-leg.userData.rest.y<.001;
+    if(i>20&&low&&previous?.low){slip=Math.max(slip,p.distanceTo(previous.p));planted++;}
+    previous={p,low};
+  }
+  assert(planted>10&&slip<.007,`turning planted paw swept ${slip}`);
+  c.position.x+=12;rig.update(1/60,{moving:true,speed:1});
+  assert(Math.abs(leg.position.x-leg.userData.rest.x)<.4,'teleport stretched a planted leg toward the old room');
+  rig.setPose({sit:1});run(c,.8);
+  const angle=c.rotation.y;c.rotation.y+=.5;rig.update(1/60);
+  assert(Math.abs(leg.position.y-leg.userData.rest.y)<.12,'seated turn incorrectly triggered a walking step');
+  c.rotation.y=angle;
+}
+// A cat's upper fore- and hindlegs blend into the trunk. The old rigid
+// capsules translated away from their shoulder/hip on a long planted stride.
+{
+  const c=build({species:'cat'}),rig=c.userData.rig,mesh=rig.meshes[0],g=mesh.geometry;
+  const P=g.getAttribute('position'),I=g.getAttribute('skinIndex'),W=g.getAttribute('skinWeight');
+  const torsoIndex=rig.skeleton.bones.indexOf(rig.bones.torso);
+  const sample={};
+  for(const name of ['legL','armR']){
+    const limbIndex=rig.skeleton.bones.indexOf(rig.bones[name]);
+    let upper=-1,lower=-1;
+    for(let i=0;i<P.count;i++)if(I.getX(i)===limbIndex&&I.getY(i)===torsoIndex){
+      if(P.getY(i)>.30&&W.getY(i)>.8)upper=i;
+      if(P.getY(i)<.12&&W.getY(i)<.2)lower=i;
+    }
+    assert(upper>=0&&lower>=0,`${name} has no attached shoulder and free paw`);
+    sample[name]={upper,lower,baseUpper:null,baseLower:null,maxUpper:0,maxLower:0};
+  }
+  c.updateMatrixWorld(true);
+  const transformed=i=>mesh.applyBoneTransform(i,new THREE.Vector3().fromBufferAttribute(P,i));
+  for(const s of Object.values(sample)){s.baseUpper=transformed(s.upper);s.baseLower=transformed(s.lower);}
+  for(let i=0;i<100;i++){
+    c.position.z+=.015;rig.update(1/60,{moving:true,speed:.9});c.updateMatrixWorld(true);
+    for(const s of Object.values(sample)){
+      s.maxUpper=Math.max(s.maxUpper,Math.abs(transformed(s.upper).z-s.baseUpper.z));
+      s.maxLower=Math.max(s.maxLower,Math.abs(transformed(s.lower).z-s.baseLower.z));
+    }
+  }
+  for(const [name,s] of Object.entries(sample))
+    assert(s.maxLower>.05&&s.maxUpper<s.maxLower*.45,`${name} detached from trunk: upper ${s.maxUpper}, lower ${s.maxLower}`);
+}
+// A snail glides on a broad foot instead of hopping or pumping four limbs.
+{
+  const c=petpet('snail'),rig=c.userData.rig,leg=rig.bones.legL,arm=rig.bones.armL;
+  let highest=0,armSwing=0;
+  for(let i=0;i<90;i++){c.position.z+=.01;rig.update(1/60,{moving:true,speed:.6});
+    highest=Math.max(highest,Math.abs(leg.position.y-leg.userData.rest.y));armSwing=Math.max(armSwing,Math.abs(arm.rotation.x));}
+  assert(highest<.04&&armSwing<.001,`snail still walks: lift ${highest}, arm ${armSwing}`);
 }
 // Blinks happen on their own; a sleeping pet's eyes stay shut.
 {
@@ -67,6 +151,22 @@ for(const sp of species){
   const c=build({species:'snorbit'}),rig=c.userData.rig,body=rig.bones.body;const seen=new Set();
   rig.hop(1);run(c,3,{reduced:true},()=>seen.add([body.position.y,rig.bones.torso.scale.y,rig.bones.head.position.y,body.rotation.x,body.rotation.z].map(v=>v.toFixed(4)).join()));
   assert.equal(seen.size,1,'the body moved under reduced motion');
+}
+// Expressive hops carry the paws with the body. A physical jump hides the
+// root-bound shadow until landing, when the torso briefly compresses.
+{
+  const c=build({species:'blorb'}),rig=c.userData.rig,leg=rig.bones.legL;
+  rig.hop(1);run(c,.25);assert(leg.position.y-leg.userData.rest.y>.09,'hop left paws on the floor');
+  rig.setAirborne(true);run(c,.5);assert(rig.shadow.material.opacity<.04,'contact shadow floated in the air');
+  rig.setAirborne(false);rig.update(1/60);
+  assert(rig.bones.torso.scale.y<.98,'landing had no compression');
+  run(c,.5);assert(rig.shadow.material.opacity>.5,'shadow did not return after landing');
+}
+// Sleep is a curled, floor-level posture, not an upright standing pet with
+// just its head tilted.
+{
+  const c=build({species:'blorb'}),rig=c.userData.rig,rest=bounds(c,true).max.y;
+  rig.setPose({lie:1});run(c,1);assert(bounds(c,true).max.y<rest-.07,'sleep stayed upright');
 }
 // A glimmr floats and its shadow lightens; everyone else stands on the floor.
 {
@@ -84,6 +184,18 @@ for(const sp of species){
     assert(size.y>.3&&size.y<.42&&size.z>size.y,`${name} is not cat-shaped: ${size.toArray().map(v=>v.toFixed(2))}`);
     const rest=b.max.y;
     for(const pose of [{},{sit:1},{lie:1},{stretch:1}]){rig.setPose(pose);run(c,.8,{moving:true,speed:1});run(c,.4);assert(bounds(c,true).max.y<=rest+.03,`${name} ${JSON.stringify(pose)} reared up`);}
+    rig.setPose({});let diagonal=0,opposite=0,frontSlip=0,frontStances=0,prior=null;
+    for(let t=0;t<1;t+=1/60){c.position.z+=.9/60;rig.update(1/60,{moving:true,speed:.9});
+      const front=rig.bones.legL.position.z-rig.bones.legL.userData.rest.z;
+      const farHind=rig.bones.armR.position.z-rig.bones.armR.userData.rest.z;
+      const nearHind=rig.bones.armL.position.z-rig.bones.armL.userData.rest.z;
+      if(t>.3){diagonal+=Math.abs(front-farHind);opposite+=Math.abs(front-nearHind);}
+      c.updateMatrixWorld(true);const paw=rig.bones.armL.getWorldPosition(new THREE.Vector3());
+      const low=rig.bones.armL.position.y-rig.bones.armL.userData.rest.y+rig.bones.body.position.y<.003;
+      if(t>.3&&low&&prior?.low){frontSlip=Math.max(frontSlip,Math.abs(paw.z-prior.z));frontStances++;}
+      prior={z:paw.z,low};}
+    assert(diagonal<opposite*.7,`${name} did not alternate diagonal paws`);
+    assert(frontStances>5&&frontSlip<.009,`${name} front paw slid ${frontSlip.toFixed(3)} m`);
     assert(bounds(c,true).max.y<LEGACY.craepet[4],`${name} stands taller than a Craepet`);
   }
 }

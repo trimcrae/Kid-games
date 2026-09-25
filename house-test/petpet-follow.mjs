@@ -9,37 +9,61 @@ export const BEAT=.14;        // seconds a walker lags behind its Craepet
 export const FLY_RATE=7;      // a flier closes the height gap at this rate
 export const SNAP=.6;         // a bigger jump in height in one frame is a teleport
 export function createPetpetFollow({flies=false}={}){
-  const trail=[];             // {t,y}: where the Craepet has been, newest last
+  const trail=[];             // where the Craepet has been, newest last
   const hops=[];              // {at,strength}: the Craepet's squashes, to echo
-  let y=null;
-  function reset(){trail.length=0;hops.length=0;y=null;}
+  let y=null,flyX=null,flyZ=null,lastFollower=null;
+  function reset(){trail.length=0;hops.length=0;y=flyX=flyZ=null;lastFollower=null;}
   // The Craepet's rig hopped (take-off, touchdown, hello, a note on the
   // piano): the petpet does the same a beat later, a touch less.
   function hop(time,strength){hops.push({at:time+BEAT,strength:strength*.9});}
   // The height the petpet stands at now, given the Craepet's this frame.
   // Also returns any echoed hop that has fallen due.
-  function update(time,dt,leaderY,{reduced=false}={}){
+  function update(time,dt,leaderY,{reduced=false,leader=null}={}){
     let echo=0;
-    if(reduced){reset();return {y:leaderY,hop:0};}
+    if(reduced){reset();return {y:leaderY,hop:0,offsetX:.4,offsetZ:-.3,airborne:false,moving:false,speed:0};}
     while(hops.length&&hops[0].at<=time)echo=Math.max(echo,hops.shift().strength);
     const last=trail[trail.length-1];
-    if(last&&(Math.abs(leaderY-last.y)>SNAP||time<last.t))reset();
-    trail.push({t:time,y:leaderY});
+    if(last&&(Math.abs(leaderY-last.y)>SNAP||time<last.t||
+      (leader&&last.x!==undefined&&Math.hypot(leader.x-last.x,leader.z-last.z)>1.5)))reset();
+    trail.push({t:time,y:leaderY,x:leader?.x,z:leader?.z,heading:leader?.heading,scale:leader?.scale??1,airborne:!!leader?.airborne});
     while(trail.length>2&&trail[1].t<=time-BEAT)trail.shift();
-    if(flies){
-      // Drift after the pet: a flier never lands with a bump.
-      y=y===null?leaderY:y+(leaderY-y)*(1-Math.exp(-dt*FLY_RATE));
-      return {y,hop:0};
-    }
-    // A walker is exactly where the pet was a beat ago.
     const at=time-BEAT;
-    if(trail.length<2||trail[0].t>=at)y=trail[0].y;
+    let sample;
+    if(trail.length<2||trail[0].t>=at)sample=trail[0];
     else{
       let i=0;while(i<trail.length-2&&trail[i+1].t<=at)i++;
       const a=trail[i],b=trail[i+1],k=b.t===a.t?1:Math.min(1,Math.max(0,(at-a.t)/(b.t-a.t)));
-      y=a.y+(b.y-a.y)*k;
+      sample={y:a.y+(b.y-a.y)*k,x:a.x+(b.x-a.x)*k,z:a.z+(b.z-a.z)*k,scale:a.scale+(b.scale-a.scale)*k,airborne:k<.5?a.airborne:b.airborne,
+        heading:a.heading+Math.atan2(Math.sin(b.heading-a.heading),Math.cos(b.heading-a.heading))*k};
     }
-    return {y,hop:echo};
+    let offsets={};
+    if(leader){
+      const h=sample.heading,c=Math.cos(h),s=Math.sin(h);
+      let x=sample.x+(c*.4-s*.3)*sample.scale,z=sample.z+(-s*.4-c*.3)*sample.scale;
+      if(flies){const a=1-Math.exp(-dt*FLY_RATE);flyX=flyX===null?x:flyX+(x-flyX)*a;flyZ=flyZ===null?z:flyZ+(z-flyZ)*a;x=flyX;z=flyZ;}
+      const dx=x-leader.x,dz=z-leader.z,C=Math.cos(leader.heading),S=Math.sin(leader.heading);
+      let localX=(dx*C-dz*S)/(leader.scale??1),localZ=(dx*S+dz*C)/(leader.scale??1);
+      // Stay close enough to the owner's heel when a quick turn or blocked
+      // route makes the delayed point fall on the other side of furniture.
+      const radius=Math.hypot(localX,localZ),max=.85;
+      if(radius>max){localX*=max/radius;localZ*=max/radius;}
+      const worldX=leader.x+(localX*C+localZ*S)*(leader.scale??1);
+      const worldZ=leader.z+(-localX*S+localZ*C)*(leader.scale??1);
+      const distance=lastFollower&&time>lastFollower.t?Math.hypot(worldX-lastFollower.x,worldZ-lastFollower.z):0;
+      const speed=dt>0?Math.min(4,distance/dt):0;
+      offsets={offsetX:localX,offsetZ:localZ,moving:speed>.08,speed};
+      lastFollower={x:worldX,z:worldZ,t:time};
+    }
+    if(flies){
+      // Drift after the pet: a flier never lands with a bump.
+      y=y===null?leaderY:y+(leaderY-y)*(1-Math.exp(-dt*FLY_RATE));
+      // A flier can still be descending after the delayed leader sample has
+      // landed. Its shadow returns only when it reaches the support height.
+      return {y,hop:0,airborne:!!sample.airborne||y>leaderY+.04,...offsets};
+    }
+    // A walker puts all three coordinates where the owner was a beat ago.
+    y=sample.y;
+    return {y,hop:echo,airborne:!!sample.airborne,...offsets};
   }
   return {reset,hop,update};
 }

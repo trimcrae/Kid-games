@@ -5,7 +5,7 @@
 // and any step you take ends it at once. Reduced motion keeps the moment but
 // not the trotting, rolling or hopping. Pure logic: it returns directions
 // for the pet and where any prop should be; house-life draws them.
-import {needValue} from './pet-behaviour.mjs';
+import {needValue} from './pet-behaviour.mjs?v=20260925-motion2';
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 // Which moment, from the pet's needs before and after the activity.
 export function aftermathFor(before,after){
@@ -61,7 +61,9 @@ export function createAftermath(){
     if(phase==='throw'){
       const k=Math.min(1,t/.7);prop.x=prop.from.x+(prop.to.x-prop.from.x)*k;prop.z=prop.from.z+(prop.to.z-prop.from.z)*k;
       o.face=Math.atan2(prop.x-pet.x,prop.z-pet.z);o.look=[0,-.1];
-      if(t>(reduced?1.2:.35)){phase=reduced?'happy':'chase';t=0;}
+      // Finish the roll before the chase begins. Switching at .35 s left the
+      // ball frozen halfway along the .7 s interpolation.
+      if(t>=(reduced?1.2:.7)){phase=reduced?'happy':'chase';t=0;}
       return o;
     }
     if(phase==='chase'){

@@ -34,5 +34,8 @@ function run(kind,{reduced=false,cancelAt=null}={}){
 {const {active,t}=run('feed',{cancelAt:.3});assert(!active&&t<.5,'a step did not end it');}
 {const {seen}=run('bath');assert(seen.some(o=>o.pose.shake&&o.emote==='sparkle'),'no shake');}
 {const {seen}=run('rest');assert(seen.some(o=>o.pose.stretch>.5),'no stretch');assert(seen.some(o=>o.expression==='yawn'),'no yawn');}
-{const {seen,p}=run('play');assert(seen.some(o=>o.prop?.kind==='ball'),'no ball');assert(Math.hypot(p.x-start.x,p.z-start.z)>.4,'did not chase the ball');}
+{const {seen,p}=run('play');assert(seen.some(o=>o.prop?.kind==='ball'),'no ball');assert(Math.hypot(p.x-start.x,p.z-start.z)>.4,'did not chase the ball');
+  const firstChase=seen.findIndex(o=>o.phase==='chase');assert(firstChase>0,'no chase');
+  const ball=seen[firstChase].prop;
+  assert(Math.hypot(ball.x-ball.to.x,ball.z-ball.to.z)<.01,'ball froze before reaching its roll destination');}
 console.log('PASS aftermath: feed trots to the mat and munches, bath shakes, rest stretches, play chases a ball; a step ends it; reduced motion stays put');

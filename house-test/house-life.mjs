@@ -1,18 +1,18 @@
 import * as THREE from './vendor/three.module.min.js';
 import {activities,destinationFor} from './activities.mjs';
-import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20260918-petpet';
-import {createPetpetFollow} from './petpet-follow.mjs';
-import {furnishing} from './furnishings.mjs';
+import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20260925-motion2';
+import {createPetpetFollow} from './petpet-follow.mjs?v=20260925-motion2';
+import {furnishing} from './furnishings.mjs?v=20260925-motion2';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
-import {createNeighborhood} from './neighborhood.mjs';
-import {ROUTINES,HOUSE_CATS,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260916-use2';
-import {createGround} from './pet-ground.mjs';
-import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs';
+import {createNeighborhood} from './neighborhood.mjs?v=20260925-motion2';
+import {ROUTINES,HOUSE_CATS,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260925-motion2';
+import {createGround} from './pet-ground.mjs?v=20260925-motion2';
+import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs?v=20260925-motion2';
 import {createEmotes} from './emotes.mjs';
-import {createRouter,createPawTrail} from './wayfinding.mjs';
+import {createRouter,createPawTrail} from './wayfinding.mjs?v=20260925-motion';
 import {easeRoute} from './route-ease.mjs';
-import {aftermathFor,createAftermath} from './aftermath.mjs';
+import {aftermathFor,createAftermath} from './aftermath.mjs?v=20260925-motion2';
 import {placeDecor} from './decor-slots.mjs';
 import {GAME_MODE} from './play-mode.mjs';
 const $=id=>document.getElementById(id);
@@ -386,6 +386,8 @@ export async function createHouseLife(tour){
     el.hidden=false;
   }
   function coach(time,active){
+    // A seated activity owns its controls; driving is not walking practice.
+    if(ride){lastSpot={...player};jumpTipAt=menuTipAt=0;showCoach([]);return;}
     if(!active||!avatar||!engine.state().pet){showCoach([]);return;}
     // Count real steps only: a Rooms jump is not the player learning to walk.
     const step=lastSpot?Math.hypot(player.x-lastSpot.x,player.z-lastSpot.z):0;if(step<.6&&Math.abs(player.y-(lastSpot?.y??player.y))<.5)walked+=step;lastSpot={...player};
@@ -471,7 +473,7 @@ export async function createHouseLife(tour){
     airborne(flag){if(flag&&!inAir)coachDone('jump');inAir=!!flag;},
     // Riding something (interactions.mjs): the body sits where it's told —
     // offset from the walking position, tilted along — instead of standing.
-    ride(v){ride=v||null;},
+    ride(v){ride=v||null;if(ride)aftermath.stop();},
     say(text,ms){say(text,ms);},
     // Asleep in a bed (beds.mjs): energy back, a little at a time; `done`
     // marks the end of the sleep for the pet's wishes. Returns the energy now.
@@ -499,7 +501,7 @@ export async function createHouseLife(tour){
         // doze off when tired… (pet-behaviour.mjs), from its real needs.
         let friend=null,best=3;
         for(const r of roamers){const p=r.c.point,d=Math.hypot(p.x-player.x,p.z-player.z);if(d<best&&Math.abs(p.y-player.y)<.5){best=d;friend={angle:angleTo(player,heading,p)};}}
-        petOut=petLife.update(dt,{moving:walking,needs:petNeeds,camera:{angle:angleTo(player,heading,tour.camera.position)},friend,night:engine.timeOfDay?.()==='night',reduced});
+        petOut=petLife.update(dt,{moving:walking,ride:!!ride,needs:petNeeds,camera:{angle:angleTo(player,heading,tour.camera.position)},friend,night:engine.timeOfDay?.()==='night',reduced});
         if(petOut.turnTo!==null&&!walking)wantHeading=heading+petOut.turnTo;
         // Straight after Feed / Bath / Rest / Play: a short scene in the house
         // (aftermath.mjs) that any step of yours ends.
@@ -532,16 +534,23 @@ export async function createHouseLife(tour){
         // Wings and tails tuck in beside a wall instead of poking through it.
         if(rig.wings||rig.tail){foldIn-=dt;if(foldIn<=0){foldIn=.2;const s=Math.sin(heading),c=Math.cos(heading);
           foldAmount=[[c,-s],[-c,s],[-s,-c]].some(([x,z])=>world.blocked(player.x+x*.22,player.z+z*.22,player.y))?1:0;}rig.fold(foldAmount);}
+        // Physics, rather than an expressive hop timer, decides when the paws
+        // should tuck in. A seated ride keeps its own pose.
+        rig.setAirborne?.(!ride&&(inAir||!!stepHop));
         avatar.userData.animate(time,walking,reduced,gait);
         const pal=avatar.userData.petpet;
         if(pal){
-          // Its height follows the pet's a beat late (in the avatar's own
-          // units, since it rides inside the scaled avatar); its rig gets
-          // the pet's take-off and landing squashes on the same delay.
-          const f=follow.update(time,dt,avatar.position.y,{reduced});
+          // Follow the heel through turns as well as jumps, returning local
+          // offsets because the petpet lives inside the scaled avatar.
+          const f=follow.update(time,dt,avatar.position.y,{reduced,
+            leader:{x:avatar.position.x,z:avatar.position.z,heading:avatar.rotation.y,scale:PET_SCALE,
+              airborne:!ride&&(inAir||!!stepHop)}});
+          pal.position.x=f.offsetX;pal.position.z=f.offsetZ;
           pal.position.y=(f.y-avatar.position.y)/PET_SCALE;
+          pal.userData.followState=f;
           if(f.hop)pal.userData.rig.hop(f.hop);
-          pal.userData.animate(time,walking,reduced,gait);
+          pal.userData.rig.setAirborne(f.airborne);
+          pal.userData.animate(time,f.moving&&!f.airborne,reduced,f.speed);
         }
         // Only if the camera is actually inside the pet (backed right up to a
         // wall) does the pet step aside from view; nearer than that it fades
@@ -574,7 +583,7 @@ export async function createHouseLife(tour){
         r.logicAt=(r.logicAt||0)+dt;
         if(!inView&&r.logicAt<.5){r.mesh.visible=r.label.visible=r.near=false;r.emote?.update(dt,null,null,false,true);continue;}
         const hold=inView&&!active,step=hold?0:inView?dt:r.logicAt;r.logicAt=0;
-        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:()=>inView,camera:tour.camera.position});
+        const {out,gap}=updateCompanion(c,step,{world,player,night,reduced,seen:point=>seenFrom(player,point,r.drawn?.5:0),camera:tour.camera.position});
         // Feet on the visible floor finish (found per 25 cm patch): eased over
         // a rug's edge or a threshold rather than popping a few centimetres
         // (quicker going up, so feet don't sink into the step); a hop onto
@@ -587,6 +596,7 @@ export async function createHouseLife(tour){
         else if(rig&&c.egg&&gap<3&&Math.abs(p.y-player.y)<.6&&!r.wobbled){r.wobbled=true;rig.hop(.6);}else if(gap>4)r.wobbled=false;
         // Every frame it's updated (a family's few pets; the 5 Hz pose for far
         // ones read as a stutter across the open main floor and yard).
+        rig?.setAirborne?.(c.mode==='hop');
         r.mesh.userData.animate(time,c.walking&&!hold,reduced,c.speed);
         // Hide a companion only while its body overlaps the camera's space.
         r.mesh.visible=inView&&!companionBlocksCamera(p,tour.camera.position,r.cameraBounds);
@@ -674,7 +684,7 @@ export async function createHouseLife(tour){
       return list;
     },
     petHeadWorld(target=new THREE.Vector3()){if(!avatar)return null;avatar.userData.head.getWorldPosition(target);target.y=avatar.position.y+avatarBounds.maxY;return target;},
-    diagnostics:()=>({hereRoom,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),petpet:avatar?.userData.petpet?{lift:+(avatar.userData.petpet.position.y*PET_SCALE).toFixed(3)}:null,appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
+    diagnostics:()=>({hereRoom,petHeading:heading,bubbles:markers.filter(m=>m.bubble.visible).map(m=>m.name),route:route&&{state:route.state,points:route.path?.length??0,expanded:route.expanded,workerMs:route.ms??null,worker:!route.local},pawPrints:trail.count,petBehaviour:petOut&&{state:petOut.state,expression:petOut.expression,emote:emotes.showing,mood:petOut.mood},pet:engine.state().pet?.name,profile:engine.who(),station:selected?.id,nearby:near.map(s=>s.id),destination:destination?.id,avatar:!!avatar,avatarSize:avatar&&avatarSize.toArray(),petpet:avatar?.userData.petpet?{lift:+(avatar.userData.petpet.position.y*PET_SCALE).toFixed(3),offset:[avatar.userData.petpet.position.x,avatar.userData.petpet.position.z],moving:!!avatar.userData.petpet.userData.followState?.moving,airborne:!!avatar.userData.petpet.userData.followState?.airborne}:null,appearance:avatarKey,furniture:decor.children.length,roamers:roamers.map(r=>({id:r.id,name:r.name,position:{...r.c.point},distance:r.c.distance,height:r.cameraBounds.maxY-r.cameraBounds.minY,mode:r.c.mode,act:r.c.spot?.act,up:r.c.up,visible:r.mesh.visible,heading:r.c.heading,
         // What a steadiness check samples each frame: where it wants to face, its gait, drawn height, name pill and bubble.
         face:r.c.face,walking:r.c.walking,speed:r.c.speed,y:r.mesh.position.y,label:r.label.visible,emote:r.emote?.showing??null,egg:r.c.egg})),
       // The life clock of the last tick, and every creature body in the scene (yours plus companions: no leftovers after a switch).

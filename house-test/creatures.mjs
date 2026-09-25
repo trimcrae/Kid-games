@@ -79,6 +79,14 @@ function mergeParts(parts,{surface=false}={}){
       if(p.pattern&&U){const q=p.pattern,row=q[Math.min(q.length-1,Math.max(0,Math.floor((1-U.getY(i))*q.length)))],c=row[Math.min(row.length-1,Math.max(0,Math.floor(U.getX(i)*row.length)))];col.set([c.r,c.g,c.b],v*3);}
       else{col[v*3]=p.color.r;col[v*3+1]=p.color.g;col[v*3+2]=p.color.b;}
       skinIndex[v*4]=p.bone;skinWeight[v*4]=1;
+      if(p.attachY){
+        // The upper part of a cat's limb belongs to the shoulder/hip, while
+        // its lower half follows the paw. A rigid capsule left a visible gap
+        // at the joint at the far end of each planted step.
+        const f=clamp((_v.y-p.attachY[0])/(p.attachY[1]-p.attachY[0]),0,1);
+        const shoulder=f*f*(3-2*f);
+        skinIndex[v*4+1]=boneIndex.torso;skinWeight[v*4]=1-shoulder;skinWeight[v*4+1]=shoulder;
+      }
       if(surf){surf[v*2]=p.rough;surf[v*2+1]=p.emit;}
     }
   }
@@ -191,6 +199,15 @@ function readable(hex,body){
 
 const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+// A foot stays on the floor while its body passes over it, then travels
+// forward in a short lifted arc. Offsetting phases gives either alternating
+// biped steps or the diagonal four-paw walk of a cat.
+function footstep(phase,reach,height){
+  const u=((phase/(Math.PI*2))%1+1)%1,stance=.62;
+  if(u<stance)return {z:reach*(1-2*u/stance),y:0};
+  const swing=(u-stance)/(1-stance),smooth=swing*swing*(3-2*swing);
+  return {z:reach*(-1+2*smooth),y:height*Math.sin(Math.PI*swing)};
+}
 
 export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]) {
   const root=new THREE.Group();
@@ -205,9 +222,9 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler();
   function place(pos,size,rot){_e.set(rot?.[0]||0,rot?.[1]||0,rot?.[2]||0);return new THREE.Matrix4().compose(new THREE.Vector3(...pos),_q.setFromEuler(_e).clone(),new THREE.Vector3(...size));}
   // part(kind, bone, position, size, {shape, rot, color, rough, emit})
-  function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0}={}){
+  function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0,attachY=null}={}){
     const fur=kind==='fur';
-    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?1:rough,emit});
+    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?1:rough,emit,attachY});
   }
   const sp=pet.species,rig={species:sp,egg:!!pet.egg,hopper:sp==='snorbit'&&!pet.egg,floater:sp==='glimmr'&&!pet.egg,
     ears:false,tail:false,wings:false};
@@ -238,13 +255,19 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
       part('detail','sleepEyes',[side*.055,.505,.418],[.032,.02,.032],{shape:arc,rot:[0,0,Math.PI],color:DARK,rough:.6});
       part('detail','happyEyes',[side*.055,.50,.418],[.03,.035,.03],{shape:arc,color:DARK,rough:.6});
       // Front legs step (shoulders); hind legs swing (hips).
-      part('fur','leg'+L,[side*.075,.17,.16],[.05,.17,.055]);
+      part('fur','leg'+L,[side*.075,.17,.16],[.05,.17,.055],{attachY:[.20,.31]});
       part('fur','leg'+L,[side*.075,.035,.17],[.055,.035,.06],white);
-      part('fur','arm'+L,[side*.09,.20,-.20],[.065,.18,.085]);
+      part('fur','arm'+L,[side*.09,.20,-.20],[.065,.18,.085],{attachY:[.23,.34]});
       part('fur','arm'+L,[side*.09,.035,-.16],[.058,.035,.065],white);
     }
     part('fur','head',[0,.435,.40],[.075,.055,.06],white);
     part('detail','head',[0,.45,.445],[.018,.014,.012],{color:'#e8899a',rough:.5});
+    // Whiskers are part of the moving head, with a dark root and pale tips.
+    // They make the cats' faces legible when seen from the side in the house.
+    for(const side of [-1,1])for(let i=0;i<3;i++){
+      part('detail','head',[side*(.117+i*.006),.43+(i-1)*.022,.43],[.075,.004,.005],
+        {rot:[0,side*.14,(i-1)*side*.18],color:'#f4e7d8',rough:1});
+    }
     part('detail','mouth',[0,.42,.45],[.02,.014,.02],{shape:arc,rot:[.2,0,Math.PI],color:DARK,rough:.6});
     part('detail','mouthOpen',[0,.41,.44],[.02,.018,.01],{color:'#5a2a33',rough:.5});
     part('fur','tail',[0,.44,-.42],[.035,.035,.24],{rot:[.9,0,0]});
@@ -277,7 +300,14 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     if(sp==='snorbit'){rig.ears=true;for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');part('fur',E,[side*.14,1.02,0],[.085,.32,.07],{rot:[0,0,-side*.2]});part('detail',E,[side*.15,1.03,.052],[.043,.24,.025],{rot:[0,0,-side*.2]});}}
     if(sp==='puddlepop'||sp==='flarn'){rig.ears=true;for(const side of [-1,1])part(sp==='flarn'?'detail':'fur','ear'+(side<0?'L':'R'),[side*.19,.89,0],[.10,.23,.10],{shape:cone,rot:[0,0,-side*.23]});}
     if(sp==='twiggle'){rig.ears=true;for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');part('detail',E,[side*.15,.94,0],[.025,.31,.025],{shape:cone});part('fur',E,[side*.25,.99,0],[.14,.047,.075],{rot:[0,0,side*.4]});}}
-    if(sp==='flarn'||sp==='glimmr'){rig.wings=true;for(const side of [-1,1])part('detail','wing'+(side<0?'L':'R'),[side*.35,.50,-.13],[.23,.12,.035],{rot:[0,0,side*.45]});}
+    if(sp==='flarn'||sp==='glimmr'){rig.wings=true;for(const side of [-1,1]){
+      const W='wing'+(side<0?'L':'R');
+      part('detail',W,[side*.35,.50,-.13],[.23,.12,.035],{rot:[0,0,side*.45]});
+      // A second tapered lobe and a coloured patch make the wing read as a
+      // wing rather than one small pill when the creature crosses a room.
+      part('detail',W,[side*.46,.45,-.14],[.11,.065,.025],{shape:cone,rot:[0,0,-side*.65]});
+      part('detail',W,[side*.31,.52,-.092],[.085,.055,.008],{color:sp==='glimmr'?'#f3e5ff':'#ffe7a7'});
+    }}
     if(sp==='zibbit'){rig.ears=true;for(const side of [-1,1]){part('fur','ear'+(side<0?'L':'R'),[side*.18,.82,.03],[.12,.13,.12]);part('detail','leg'+(side<0?'L':'R'),[side*.25,.08,.15],[.17,.055,.17]);}}
     if(sp==='blorb'){rig.ears=true;for(const side of [-1,1])part('fur','ear'+(side<0?'L':'R'),[side*.19,.83,-.01],[.10,.12,.085]);}
     if(sp==='flarn'||sp==='puddlepop'||sp==='twiggle'){rig.tail=true;part('fur','tail',[0,.3,-.32],[.07,.08,.25],{rot:[-.4,0,0]});}
@@ -297,7 +327,8 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     if(wear.neck){const color=readable(wear.neck==='bluescarf'?'#57c4ff':wear.neck==='medal'?'#ffd166':wear.neck==='pearls'?'#fff6f0':wear.neck==='bowtie'?'#8a5cff':'#ff5d6c',body).getStyle();
       part('detail','torso',[0,.49,.05],[.265,.035,.20],{color,rough:.8});if(wear.neck==='medal')part('detail','torso',[0,.4,.23],[.07,.07,.015],{color,rough:.3});else if(wear.neck==='bowtie')for(const side of [-1,1])part('detail','torso',[side*.055,.49,.23],[.065,.04,.025],{color,rough:.8});}
   }
-  for(const x of extras)part('detail',x.bone||'head',x.pos,x.size,{color:x.color,rough:x.rough??.9});
+  for(const x of extras)part(x.kind||'detail',x.bone||'head',x.pos,x.size,
+    {shape:x.shape||sphere,rot:x.rot,color:x.color,rough:x.rough??.9});
   // Build the creature: one skinned mesh on its skeleton (plus the shadow).
   root.updateMatrixWorld(true);
   const skeleton=new THREE.Skeleton(bones);
@@ -318,7 +349,8 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   for(const name of ['sleepEyes','happyEyes','mouthOpen'])B[name].scale.setScalar(1e-4);
 
   // ----- animation state -------------------------------------------------
-  const st={t:Math.random()*10,phase:Math.random()*Math.PI*2,walk:0,run:0,bob:0,bobVel:0,lastBob:0,lift:0,hopT:-1,hopK:1,lean:0,roll:0,lastYaw:null,lastTime:null,
+  const st={t:Math.random()*10,phase:Math.random()*Math.PI*2,walk:0,run:0,bob:0,bobVel:0,lastBob:0,lift:0,hopT:-1,hopK:1,airborne:false,airPose:0,land:0,lean:0,roll:0,lastYaw:null,lastWorld:null,lastTime:null,
+    feet:Object.fromEntries(['legL','legR','armL','armR'].map(n=>[n,{anchor:new THREE.Vector3(),local:new THREE.Vector3(),lastWorld:null,stance:false}])),strideX:0,strideZ:1,lastScale:null,
     sit:0,lie:0,stretch:0,sniff:0,shake:0,scratch:0,fold:0,lookYaw:0,lookPitch:0,
     expr:{sleep:0,happy:0,tired:0,yawn:0,sad:0},blinkIn:1+Math.random()*3,blink:0,wobbleIn:3+Math.random()*4,wobble:0,
     want:{expression:'idle',pose:{},look:[0,0],fold:0,grime:0}};
@@ -326,14 +358,18 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   function setPose(pose){st.want.pose=pose||{};}
   function look(yaw=0,pitch=0){st.want.look=[clamp(yaw,-1.1,1.1),clamp(pitch,-.5,.6)];}
   function hop(strength=1){if(st.hopT<0||st.hopT>.6){st.hopT=0;st.hopK=strength;}}
+  function setAirborne(value){if(st.airborne&&!value)st.land=1;st.airborne=!!value;}
   function fold(v){st.want.fold=v;}
   function setGrime(v){st.want.grime=clamp(v,0,1);}
   const approach=(cur,target,k)=>cur+(target-cur)*k;
+  const worldAt=new THREE.Vector3(),worldScale=new THREE.Vector3(),worldForward=new THREE.Vector3(),worldQ=new THREE.Quaternion();
   function update(dt,{moving=false,speed=0,reduced=false}={}){
     dt=clamp(dt,0,.1);st.t+=dt;
     const k=reduced?1:1-Math.exp(-dt*8),kSlow=reduced?1:1-Math.exp(-dt*3);
+    st.airPose=approach(st.airPose,st.airborne&&!reduced?1:0,k);
+    st.land=reduced?0:st.land*Math.exp(-dt*12);
     // Turning rate from the heading the caller set, for leaning into turns.
-    const yaw=root.rotation.y,turnRate=st.lastYaw===null||dt===0?0:wrap(yaw-st.lastYaw)/dt;st.lastYaw=yaw;
+    const yaw=root.rotation.y,turnDelta=st.lastYaw===null?0:wrap(yaw-st.lastYaw),turnRate=dt===0?0:turnDelta/dt;st.lastYaw=yaw;
     const w=st.want,ex=w.expression,pose=w.pose;
     for(const key of ['sit','lie','stretch','sniff','shake','scratch'])st[key]=approach(st[key],pose[key]||0,k);
     const targets={sleep:ex==='sleep'?1:0,happy:ex==='happy'||ex==='squint'?1:0,tired:ex==='tired'||ex==='yawn'?1:0,yawn:ex==='yawn'?1:0,sad:ex==='sad'?1:0};
@@ -341,19 +377,36 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     st.lookYaw=approach(st.lookYaw,w.look[0],reduced?1:1-Math.exp(-dt*5));st.lookPitch=approach(st.lookPitch,w.look[1],reduced?1:1-Math.exp(-dt*5));
     st.fold=approach(st.fold,w.fold,1-Math.exp(-dt*10));
     for(const m of meshes)m.material.userData.uniforms.uGrime.value=w.grime;
-    // Gait: the feet advance with the distance actually covered, so a stroll
-    // pads and a run scurries instead of both skating at one tempo.
-    st.walk=approach(st.walk,moving?1:0,reduced?1:1-Math.exp(-dt*12));
+    // During stance each paw moves backward by the distance its owner really
+    // traveled. The old speed-driven phase crossed a full cycle while the
+    // avatar moved much farther than a paw could reach, visibly skating.
+    const pivot=!moving&&Math.abs(turnRate)>.2&&!rig.petpetId&&!rig.floater&&!st.airborne&&st.hopT<0&&st.sit<.05&&st.lie<.05&&st.stretch<.05;
+    st.walk=approach(st.walk,moving||pivot?1:0,reduced?1:1-Math.exp(-dt*12));
     const v=moving?speed:0;st.run=approach(st.run,clamp((v-1.9)/1.2,0,1),k);
-    // (rig.cadence: a petpet's short legs take quicker, shorter steps than
-    // the Craepet it trots beside, so the two never march in lockstep.)
-    if(moving){const stride=(.45+.08*v)/(rig.cadence||1);st.phase+=v*dt/stride*Math.PI*2;}
+    root.updateWorldMatrix(true,false);root.matrixWorld.decompose(worldAt,worldQ,worldScale);
+    worldForward.set(0,0,1).applyQuaternion(worldQ);
+    const dx=st.lastWorld?worldAt.x-st.lastWorld.x:0,dz=st.lastWorld?worldAt.z-st.lastWorld.z:0;
+    const travel=dx*worldForward.x+dz*worldForward.z;
+    const sideTravel=dx*worldForward.z-dz*worldForward.x;
+    if(!st.lastWorld)st.lastWorld=worldAt.clone();else st.lastWorld.copy(worldAt);
+    if(Math.hypot(dx,dz)>.5||st.lastScale!==null&&Math.abs(worldScale.x-st.lastScale)>.01)
+      for(const foot of Object.values(st.feet)){foot.stance=false;foot.lastWorld=null;}
+    st.lastScale=worldScale.x;
+    const reach=rig.cat?.13:.15;
+    const lateral=moving&&Math.abs(sideTravel)>Math.abs(travel)*1.2;
+    if(moving&&Math.hypot(dx,dz)<.5){
+      const distance=lateral?Math.abs(sideTravel):travel;
+      st.phase+=distance/(2*(lateral?reach*.55:reach)*Math.max(.01,worldScale.x))*.62*Math.PI*2;
+    }else if(pivot)st.phase+=Math.abs(turnDelta)*(rig.cat?.17:.19)/(2*reach)*.62*Math.PI*2;
+    st.strideX=lateral?Math.sign(sideTravel):0;st.strideZ=lateral?0:1;
     const walkW=st.walk,P=st.phase;
     // Hop impulse (hello, joy, a stair tread).
-    let hopLift=0,hopSquash=0;
+    let hopLift=0,hopSquash=0,hopAir=0;
     if(st.hopT>=0){st.hopT+=dt/(.42+.1*st.hopK);const h=st.hopT;
       if(h>=1)st.hopT=-1;
-      else if(!reduced){hopLift=Math.sin(Math.PI*h)*.16*st.hopK;hopSquash=(h<.15?-(.15-h)/.15:h>.85?-(h-.85)/.15:0)*.12*st.hopK;}}
+      else if(!reduced){hopLift=Math.sin(Math.PI*h)*.16*st.hopK;hopAir=Math.sin(Math.PI*h);
+        // Compress before launch and on touchdown; extend through the apex.
+        hopSquash=(h<.16?-(1-h/.16):h>.84?-(h-.84)/.16:hopAir*.34)*.12*st.hopK;}}
     if(rig.egg){
       // An egg only wobbles: now and then on its own, harder when tapped or
       // greeted, and rocks along when you carry it about.
@@ -367,43 +420,74 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     }
     // Body height: step bob, the snorbit's hop, a glimmr's float, hops.
     let lift;
-    if(rig.hopper)lift=Math.max(0,Math.sin(P))*(.05+.02*v)*walkW;
-    else lift=Math.abs(Math.sin(P))*(.018+.009*v)*walkW;
+    if(rig.petpetId==='snail')lift=0;
+    else if(rig.hopper)lift=Math.max(0,Math.sin(P))*(.05+.02*v)*walkW;
+    else lift=Math.abs(Math.sin(P))*(rig.cat?.009:.014)*walkW;
     const float=rig.floater?(.06+(reduced?0:Math.sin(st.t*2)*.035)):0;
     if(reduced)lift=0;
     const breathe=reduced?0:(1-walkW)*Math.sin(st.t*(st.expr.sleep>.5?2.8:5.6))*(st.expr.sleep>.5?.03:.018);
     st.bobVel=dt>0?(lift-st.lastBob)/dt:0;st.lastBob=lift;
-    const squash=reduced?0:clamp(st.bobVel*.5,-.07,.07)+hopSquash;
+    const squash=reduced?0:clamp(st.bobVel*.5,-.07,.07)+hopSquash-st.land*.11;
     const sy=(1+squash+breathe)*(1-.08*st.sit-.2*st.lie)*(1-.06*st.stretch),sxz=1/Math.sqrt(Math.max(.5,1+squash))*(1+.1*st.lie);
     // Breathing and squash only change the torso; the head, arms, wings and
     // tail ride on its top so nothing grows taller than the pet at rest.
     B.torso.scale.set(sxz,sy,sxz*(1+.08*st.stretch));
     for(const name of ['head','armL','armR','tail','wingL','wingR']){const r=B[name].userData.rest;B[name].position.set(r.x,r.y*Math.min(sy,1+breathe*.3),r.z);}
-    B.body.position.set(0,lift+hopLift+float-.05*st.sit-.1*st.lie,0);
+    if(rig.petpetId==='snail'){B.head.position.y-=.16;B.head.position.z+=.09;}
+    B.body.position.set(0,lift+hopLift+float-.05*st.sit-(rig.cat?.1:0)*st.lie,0);
     st.lean=approach(st.lean,reduced?0:v*.035*walkW,k);
     st.roll=approach(st.roll,reduced?0:clamp(-turnRate*.06,-.2,.2)*walkW,k);
     const shake=reduced?0:Math.sin(st.t*30)*.32*st.shake;
     // (A cat stretches long and low, not up on its hind legs.)
-    B.body.rotation.set(st.lean+.22*st.sniff+.3*st.stretch*(rig.cat?.15:1),shake,st.roll);
+    B.body.rotation.set(st.lean+.22*st.sniff+.3*st.stretch*(rig.cat?.15:1)+(rig.cat?.08:.85)*st.lie,
+      shake,st.roll+(rig.floater&&!reduced?Math.sin(st.t*8)*.025:0));
     // Head: look, sniff the floor, droop when tired or asleep, tilt to scratch.
     const nod=reduced?0:Math.sin(st.t*14)*.05*st.sniff;
     B.head.rotation.set(-st.lookPitch+.4*st.sniff+.3*st.lie+.12*st.expr.tired-.25*st.expr.yawn+nod-.3*st.stretch,st.lookYaw-shake*1.4,(reduced?0:Math.sin(st.t*9))*.05*st.scratch+.1*st.scratch);
     // Feet and arms.
-    const A=(.06+.015*v)*walkW*(reduced?.5:1),lift2=.05*walkW*(reduced?0:1);
+    const A=reach*(lateral?.55:1)*walkW*(reduced?.5:1),lift2=(rig.cat?.08:.075)*walkW*(reduced?0:1);
+    // A stance paw remembers its point on the floor. Inverting the current
+    // parent transform keeps it there through yaw, strafing and body bob.
+    const plant=(name,stance)=>{
+      const bone=B[name],foot=st.feet[name];
+      if(stance){
+        if(!foot.stance){
+          if(foot.lastWorld)foot.anchor.copy(foot.lastWorld);
+          else{bone.parent.updateWorldMatrix(true,false);foot.anchor.copy(bone.position);bone.parent.localToWorld(foot.anchor);}
+          bone.parent.updateWorldMatrix(true,false);bone.parent.worldToLocal(foot.local.copy(foot.anchor));bone.position.x=foot.local.x;bone.position.z=foot.local.z;
+        }
+        else{bone.parent.updateWorldMatrix(true,false);bone.parent.worldToLocal(foot.local.copy(foot.anchor));bone.position.x=foot.local.x;bone.position.z=foot.local.z;}
+      }
+      foot.stance=stance;
+    };
     const hopFeet=rig.hopper;
     for(const [name,side,off] of [['legL',-1,0],['legR',1,Math.PI]]){
-      const ph=P+(hopFeet?0:off),rest=B[name].userData.rest;
-      B[name].position.set(rest.x*(1+.2*st.lie),rest.y+Math.max(0,Math.cos(ph))*lift2+float+(st.scratch&&side>0?.05*st.scratch:0),rest.z+Math.sin(ph)*A+.05*st.sit+.06*st.lie);
+      const ph=P+(hopFeet?0:off),rest=B[name].userData.rest,step=footstep(ph,A,lift2);
+      const poseY=rig.cat?-.13*st.sit-.18*st.lie:-.025*st.sit+.02*st.lie;
+      B[name].position.set(rest.x*(rig.floater?.65:1+.2*st.lie)+step.z*st.strideX,rest.y+step.y+float+poseY+hopLift+(rig.hopper?lift:0)+st.airPose*.085+
+        (rig.floater?.06:0)+(st.scratch&&side>0?.05*st.scratch:0),rest.z+step.z*st.strideZ+.05*st.sit+.08*st.lie-.08*st.stretch-(rig.floater?.08:0));
+      if(rig.petpetId==='snail')B[name].position.set(rest.x*.65,rest.y-.035,rest.z-.03);
+      else plant(name,walkW>.1&&step.y<.004&&!st.airborne&&st.lie<.05&&st.sit<.05);
     }
     for(const [name,side,off] of [['armL',-1,Math.PI],['armR',1,0]]){
-      B[name].rotation.set((reduced?0:-Math.sin(P+off)*.55*walkW)-1.1*st.stretch-.3*st.sit,0,side*(.15*st.lie+(reduced?0:.08*st.shake*Math.sin(st.t*30))));
+      const arm=B[name],rest=arm.userData.rest;
+      if(rig.cat){
+        const step=footstep(P+off,A,lift2*.85);
+        arm.position.set(rest.x+step.z*st.strideX,rest.y+step.y-lift-.07*st.sit-.13*st.lie+hopAir*.04+st.airPose*.07,
+          rest.z+step.z*st.strideZ+.08*st.stretch-.04*st.lie);
+        arm.rotation.set(-.2*st.stretch,0,0);
+        plant(name,walkW>.1&&step.y<.004&&!st.airborne&&st.lie<.05&&st.sit<.05);
+      }else{
+        arm.rotation.set((rig.petpetId==='snail'?0:reduced?0:-Math.sin(P+off)*.55*walkW)-1.1*st.stretch-.3*st.sit-.45*hopAir-.55*st.airPose,0,
+          side*(.15*st.lie+(reduced?0:.08*st.shake*Math.sin(st.t*30))));
+      }
     }
     // Ears: bounce a beat behind the body, droop when tired, sad or asleep.
     if(rig.ears){const droop=.35*st.expr.tired+.45*st.expr.sad+.3*st.lie,flick=reduced?0:clamp(-st.bobVel*.8,-.25,.25)+(st.scratch?Math.sin(st.t*22)*.2*st.scratch:0);
       B.earL.rotation.set(flick+.2*droop,0,droop);B.earR.rotation.set(flick+.2*droop,0,-droop);}
     if(rig.tail){const wagAmp=.15+.35*st.expr.happy+.1*walkW,wagRate=3+9*st.expr.happy+4*walkW;
       B.tail.rotation.set(-.25*st.run+.6*st.fold,(reduced?0:Math.sin(st.t*wagRate))*wagAmp*(1-st.lie*.8),0);}
-    if(rig.wings){const flap=reduced?0:Math.sin(st.t*(rig.floater?9:12))*(.12+.25*walkW+.3*st.expr.happy)*(1-st.fold);
+    if(rig.wings){const flap=reduced?0:Math.sin(st.t*(rig.floater?16:12))*(rig.floater?.3:.12+.25*walkW+.3*st.expr.happy)*(1-st.fold);
       B.wingL.rotation.set(0,.9*st.fold,-flap);B.wingR.rotation.set(0,-.9*st.fold,flap);}
     // Face: blink every few seconds; closed eyes when asleep; ^ ^ when happy.
     st.blinkIn-=dt;if(st.blinkIn<=0){st.blink=.14;st.blinkIn=2.5+Math.random()*3.5;}
@@ -418,9 +502,16 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     B.mouth.scale.set(1,Math.max(1e-4,(1-st.expr.sad*1.6)*(1-st.expr.yawn)),1);
     // The contact shadow shrinks and fades while the body is off the floor.
     const air=hopLift+float+lift*.5;
-    shadow.scale.setScalar(1-clamp(air*1.4,0,.45));shadow.material.opacity=SHADOW_OPACITY*(1-clamp(air*2.2,0,.55));
+    shadow.scale.setScalar(1-clamp(air*1.4,0,.45));
+    // The plane belongs to the creature root. While a physical jump lifts
+    // that root off the surface, fade the plane so it never hangs in midair.
+    shadow.material.opacity=SHADOW_OPACITY*(1-clamp(air*2.2,0,.55))*(st.airborne?0:1-st.airPose);
+    for(const [name,foot] of Object.entries(st.feet)){
+      if(!foot.lastWorld)foot.lastWorld=new THREE.Vector3();
+      B[name].getWorldPosition(foot.lastWorld);
+    }
   }
-  Object.assign(rig,{bones:B,skeleton,meshes,shadow,head:B.head,setExpression,setPose,look,hop,fold,setGrime,update,
+  Object.assign(rig,{bones:B,skeleton,meshes,shadow,head:B.head,setExpression,setPose,look,hop,setAirborne,fold,setGrime,update,
     get state(){return {expression:st.want.expression,pose:{...st.want.pose},sleep:+st.expr.sleep.toFixed(2),happy:+st.expr.happy.toFixed(2)};}});
   root.userData.rig=rig;root.userData.head=B.head;
   // Older callers (and companions) still just say "time, walking?".
@@ -446,13 +537,58 @@ export function disposeCreature(root){
 }
 export function petpet(id){
   const palette={duckling:['#ffd863','#ff9f45'],snail:['#c99a6b','#ffe2bd'],blobbin:['#6fdc8c','#e0ffe9'],moth:['#c9a7f5','#fff0c9'],kit:['#ffb28a','#fff0e6'],hedge:['#8f684e','#e3cdae'],wisp:['#c6edff','#ffffff'],starling:['#ffd863','#fff8de']}[id]||['#ffe6a2','#fff8de'];
-  const species={moth:'glimmr',kit:'puddlepop',wisp:'glimmr',hedge:'twiggle',starling:'zibbit'}[id]||'blorb';
-  // A duckling's beak and a snail's shell ride on the same few draw calls.
-  const extras=id==='duckling'?[{bone:'head',pos:[0,.6,.29],size:[.10,.045,.10],color:palette[1]}]:id==='snail'?[{bone:'body',pos:[0,.45,-.18],size:[.29,.29,.23],color:palette[1]}]:[];
+  // A small neutral body is a canvas for each companion's own silhouette;
+  // the adult Blorb's round bear ears made a snail or bird look like a bear.
+  const species={moth:'craepet',kit:'cat',wisp:'glimmr',hedge:'craepet',starling:'craepet',snail:'craepet',duckling:'craepet',blobbin:'craepet'}[id]||'craepet';
+  const extras=[];
+  const add=(bone,pos,size,color,shape=sphere,rot=null,kind='detail')=>extras.push({bone,pos,size,color,shape,rot,kind});
+  if(id==='duckling'){
+    add('head',[0,.59,.30],[.13,.055,.11],'#ef8b3f',roundSphere);
+    for(const s of [-1,1]){add('wing'+(s<0?'L':'R'),[s*.27,.41,-.01],[.14,.065,.12],palette[0],roundSphere,[0,0,s*.3],'fur');
+      add('leg'+(s<0?'L':'R'),[s*.16,.015,.16],[.11,.03,.15],'#ec8a37',roundSphere);}
+    add('tail',[0,.40,-.27],[.11,.09,.13],palette[0],cone,[-.7,0,0],'fur');
+  }else if(id==='snail'){
+    // A continuous low sole is the contact surface; the borrowed Craepet
+    // limbs below are hidden so the shell reads as a gliding snail.
+    add('body',[0,.105,.01],[.29,.095,.35],palette[0],roundSphere,null,'fur');
+    add('body',[.13,.45,-.15],[.32,.30,.28],'#e6ba7b',roundSphere);
+    // The spiral sits on the visible front quarter of the shell, and the
+    // shell projects well beyond the little head when seen from the side.
+    add('body',[.13,.46,.09],[.17,.17,.012],'#98664f',new THREE.TorusGeometry(1,.15,6,22));
+    add('body',[.13,.46,.105],[.08,.08,.012],'#fff0cb',new THREE.TorusGeometry(1,.18,6,18));
+    for(const s of [-1,1]){add('head',[s*.11,.93,.09],[.018,.20,.018],palette[0],sphere,null,'fur');
+      add('head',[s*.11,.98,.09],[.045,.045,.045],'#fff7e6');}
+  }else if(id==='hedge'){
+    for(let i=0;i<22;i++){const a=i*2.399,y=.42+(i%4)*.075;
+      add('body',[Math.cos(a)*.23,y,Math.sin(a)*.12-.12],[.055,.18,.055],'#70513e',cone,[Math.sin(a)*.7,0,-Math.cos(a)*.7]);}
+    add('head',[0,.57,.26],[.075,.045,.10],'#3b2d29',roundSphere);
+  }else if(id==='moth'){
+    for(const s of [-1,1]){add('wing'+(s<0?'L':'R'),[s*.40,.55,-.09],[.23,.21,.025],'#eee0ff',roundSphere,[0,0,s*.25]);
+      add('wing'+(s<0?'L':'R'),[s*.35,.37,-.10],[.15,.12,.025],'#aa83d6',roundSphere,[0,0,-s*.25]);
+      add('head',[s*.12,.96,0],[.014,.18,.014],'#785c91',sphere,null,'fur');}
+  }else if(id==='starling'){
+    add('head',[0,.59,.29],[.075,.045,.10],'#d88935',cone,[Math.PI/2,0,0]);
+    for(const s of [-1,1])add('wing'+(s<0?'L':'R'),[s*.38,.52,-.11],[.20,.10,.04],'#edb83f',roundSphere,[0,0,s*.3]);
+    add('tail',[0,.34,-.31],[.11,.035,.20],'#d88935',roundSphere);
+  }else if(id==='wisp'){
+    for(let i=0;i<5;i++){const a=i*Math.PI*2/5;add('head',[Math.cos(a)*.17,.88,Math.sin(a)*.13],[.04,.08,.04],'#f9ffff',roundSphere,null,'fur');}
+  }else if(id==='blobbin'){
+    for(const s of [-1,1]){add('head',[s*.15,.92,0],[.035,.15,.035],palette[0],sphere,null,'fur');
+      add('head',[s*.15,.99,0],[.075,.075,.06],palette[1],roundSphere);
+      add('leg'+(s<0?'L':'R'),[s*.23,.015,.13],[.14,.025,.12],palette[0],roundSphere);}
+  }
   const root=creature({species},{body:palette[0],accent:palette[1]},extras);root.scale.setScalar(.35);
-  // A third the size, so its feet go round about 1.7x as often (stride
-  // scales with the square root of leg length) to cover the same ground.
-  root.userData.rig.cadence=1.7;
+  const rig=root.userData.rig;rig.petpetId=id;
+  if(id==='duckling'||id==='moth'||id==='starling')rig.wings=true;
+  if(id==='duckling')rig.bones.head.scale.set(.85,.85,.85);
+  if(id==='snail'){
+    rig.bones.head.scale.set(.68,.60,.75);
+    for(const name of ['armL','armR','legL','legR'])rig.bones[name].scale.setScalar(1e-4);
+  }
+  if(id==='hedge')rig.bones.head.scale.set(.8,.8,.8);
+  if(id==='blobbin')rig.bones.head.scale.set(1.2,.75,1);
+  // Its small world scale makes each planted stride shorter, so its paws
+  // naturally cycle faster while keeping up with the owner.
   return root;
 }
 // A small cream name pill (the HUD's own look), sized to its text.

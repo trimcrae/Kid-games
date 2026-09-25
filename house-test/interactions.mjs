@@ -1,9 +1,10 @@
 import * as THREE from './vendor/three.module.min.js';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
-import {hangBarInteractions} from './hang-bar.mjs?v=20260916-use3';
-import {roombaInteractions} from './roomba.mjs?v=20260916-use3';
+import {hangBarInteractions} from './hang-bar.mjs?v=20260925-motion';
+import {roombaInteractions} from './roomba.mjs?v=20260925-motion';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
-import {bedInteractions} from './beds.mjs?v=20260917-bed';
+import {bedInteractions} from './beds.mjs?v=20260925-motion2';
+import {driveCar} from './car-driving.mjs?v=20260925-drive1';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
@@ -21,7 +22,8 @@ const $=id=>document.getElementById(id);
 // Plan (Blender) coordinates to the browser's: x, height, -y.
 const at=(x,y,h)=>({x,y:h,z:-y});
 const TAU=Math.PI*2;
-const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
+// Match THREE.Matrix4.makeRotationY: local +X turns toward world -Z.
+export const carPoint=(x,z,dx,dz,h)=>({x:x+dx*Math.cos(h)+dz*Math.sin(h),z:z-dx*Math.sin(h)+dz*Math.cos(h)});
 
 // A tiny synth: piano notes, a car engine and horn, a fridge click, a flush.
 // (No audio files; nothing to download.) Silent until the first press, as
@@ -65,7 +67,7 @@ function createSounds(){
   };
 }
 
-export function createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,tour,bindButton,reducedMotion=false}){
+export function createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,tour,bindButton,reducedMotion=false,getDriveInput=()=>({throttle:0,steer:0})}){
   const sounds=createSounds();
   const pill=$('interact'),label=$('interact-label');
   const info=data.props||{},propBoxes={};
@@ -101,13 +103,41 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     const inside=new THREE.Mesh(new THREE.PlaneGeometry(.88,1.28),new THREE.MeshStandardMaterial({map:tex,roughness:.7,emissive:'#ffffff',emissiveMap:tex,emissiveIntensity:.25}));
     inside.position.set(cx,1.235,front+.075);inside.rotation.y=Math.PI;inside.visible=false;scene.add(inside);
     let open=false,angle=0;
+    // The export's static door boxes remain indexed at their closed position.
+    // Register a second set over the whole swing, then move those boxes with
+    // the drawn doors; the walking world's grid has no removal operation.
+    const movingDoors=doors.map(([key,hx,dir])=>{
+      const originals=propBoxes[key]||[];
+      const rotated=(b,a)=>{
+        const s=Math.sin(dir*a*1.75),c=Math.cos(dir*a*1.75),zs=front+.04;
+        const points=[];
+        for(const x of [b.min[0],b.max[0]])for(const z of [b.min[2],b.max[2]])points.push([hx+(x-hx)*c+(z-zs)*s,zs-(x-hx)*s+(z-zs)*c]);
+        return {min:[Math.min(...points.map(p=>p[0])),b.min[1],Math.min(...points.map(p=>p[1]))],max:[Math.max(...points.map(p=>p[0])),b.max[1],Math.max(...points.map(p=>p[1]))]};
+      };
+      const boxes=originals.map(b=>{
+        const closed={min:[...b.min],max:[...b.max]},end=rotated(closed,1);
+        const sweep={name:b.name,min:[Math.min(closed.min[0],end.min[0])-1,closed.min[1],Math.min(closed.min[2],end.min[2])-1],max:[Math.max(closed.max[0],end.max[0])+1,closed.max[1],Math.max(closed.max[2],end.max[2])+1]};
+        world.addBoxes([sweep]);
+        b.min=[1e6,1e6,1e6];b.max=[1e6+1,1e6+1,1e6+1];
+        return {source:closed,box:sweep};
+      });
+      return {key,hx,dir,boxes,rotated};
+    });
+    const doorBounds=a=>movingDoors.flatMap(d=>d.boxes.map(v=>d.rotated(v.source,a)));
+    const touchesPet=a=>doorBounds(a).some(b=>player.y<b.max[1]&&player.y+world.height>b.min[1]&&
+      Math.hypot(player.x-Math.max(b.min[0],Math.min(player.x,b.max[0])),player.z-Math.max(b.min[2],Math.min(player.z,b.max[2])))<world.radius+.03);
     list.push({id:'fridge',icon:'🧊',name:'Open the fridge',kind:'toggle',at:{x:cx,y:0,z:front-.85},radius:1.2,face:{x:cx,z:front},
       label:()=>open?'Close the fridge':'Open the fridge',
       start(){open=!open;sounds.click();if(open)life.say(['Mmm, snacks!','Cheese!','Who ate the cake?','Cat food for Bubba and Beebs.'][Math.floor(Math.random()*4)],2600);}});
     ticking.push(dt=>{
-      const want=open?1:0;angle+=(want-angle)*(reducedMotion?1:1-Math.exp(-dt*7));
+      const want=open?1:0,next=angle+(want-angle)*(reducedMotion?1:1-Math.exp(-dt*7));
+      // Closing pauses when the pet stands in either door's path.
+      if(open||!touchesPet(next))angle=next;
       inside.visible=angle>.02;
-      for(const [key,hx,dir] of doors)pose(key,hinge({x:hx,y:0,z:front+.04},new THREE.Vector3(0,1,0),dir*angle*1.75));
+      for(const d of movingDoors){
+        pose(d.key,hinge({x:d.hx,y:0,z:front+.04},new THREE.Vector3(0,1,0),d.dir*angle*1.75));
+        for(const v of d.boxes){const b=d.rotated(v.source,angle);v.box.min=b.min;v.box.max=b.max;}
+      }
     });
   }
   // ----- ceiling fans spin up (and down) when you switch them.
@@ -133,40 +163,121 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   for(const key of ['swing-a','swing-b']){
     const b=info[key];if(!b)continue;
     const px=(b.min[0]+b.max[0])/2,top=1.16,seatY=-.38,seatZ=-24.92,pivot={x:px,y:top,z:-25.0},rope=top-seatY;
-    let t=0,amp=0;
+    let t=0,amp=0,mount=0,from=null,riding=false,settle=0,dismount=null;
+    const swingPose=a=>pose(key,hinge(pivot,new THREE.Vector3(1,0,0),-a));
+    ticking.push(dt=>{
+      if(dismount){
+        if(!body.airborne||Math.hypot(player.x-dismount.x,player.z-dismount.z)>1.5)dismount=null;
+        else{
+          dismount.t=Math.min(1,dismount.t+dt/(reducedMotion ? .01 : .32));
+          player.x=dismount.x+(dismount.spot.x-dismount.x)*dismount.t;
+          player.z=dismount.z+(dismount.spot.z-dismount.z)*dismount.t;
+          if(dismount.t>=1)dismount=null;
+        }
+      }
+      if(riding||settle<=0)return;
+      t+=dt;settle=Math.max(0,settle-dt);
+      const a=reducedMotion?0:Math.sin(t*Math.sqrt(9.8/rope))*amp*(settle/2);
+      swingPose(a);
+      if(!settle){amp=0;swingPose(0);}
+    });
     list.push({id:key,icon:'🎠',name:'Swing',kind:'ride',at:{x:px,y:-.82,z:-23.95},radius:1.2,
-      start(){t=0;amp=0;},
+      start(){from={...player};t=0;amp=0;mount=0;riding=true;settle=0;dismount=null;},
       tick(dt){
-        t+=dt;amp+=(0.95-amp)*(reducedMotion?1:1-Math.exp(-dt*.5));
+        t+=dt;mount=Math.min(1,mount+dt/.55);amp+=(0.95-amp)*(reducedMotion?1:1-Math.exp(-dt*.5));
         const a=reducedMotion?0:Math.sin(t*Math.sqrt(9.8/rope))*amp;
-        pose(key,hinge(pivot,new THREE.Vector3(1,0,0),-a));
+        swingPose(a);
         // The seat hangs under the pivot, out along the swing's angle.
-        player.x=px;player.y=pivot.y-Math.cos(a)*rope+.03;player.z=pivot.z+Math.sin(a)*rope+.08;
-        life.face(0);life.ride({dx:0,dy:0,dz:0,tilt:-a*.6,pose:{sit:1},expression:amp>.5?'happy':undefined});
+        const k=mount*mount*(3-2*mount);
+        player.x=from.x+(px-from.x)*k;player.y=from.y+(pivot.y-Math.cos(a)*rope+.03-from.y)*k;player.z=from.z+(pivot.z+Math.sin(a)*rope+.08-from.z)*k;
+        life.face(0);life.ride({dx:0,dy:0,dz:0,tilt:-a*.6,pose:{sit:k},expression:amp>.5?'happy':undefined});
         if((Math.abs(a)>.7&&Math.sign(a)!==Math.sign(lastA)))sounds.boing();lastA=a;
-        // Seen from the side, where the swinging shows (and no tree trunk).
-        return {yaw:key==='swing-a'?-Math.PI/2:Math.PI/2};
+        // Look from the open side of each swing. The former sides put a tree
+        // trunk and a front frame leg over the rider through much of the arc.
+        return {yaw:key==='swing-a'?Math.PI/2:-Math.PI/2};
       },
-      stop(){pose(key,hinge(pivot,new THREE.Vector3(1,0,0),0));life.ride(null);}});
+      stop(){
+        riding=false;settle=reducedMotion?0:2;life.ride(null);
+        // Push clear of the seat while falling, instead of leaving the pet
+        // standing on its moving collider above the lawn.
+        const spot=world.safeSpot(from.x,from.y,from.z)||from;
+        dismount={x:player.x,z:player.z,spot,t:0};player.y+=.2;
+        body.airborne=true;body.vy=0;
+        if(!settle)swingPose(0);
+      }});
   }
   let lastA=0;
   // ----- rocking chairs: sit and rock.
   for(const [id,seat,heading,spot] of [['rocker-nursery',{x:13.1,y:1.84,z:-1.33},-Math.PI/2,{x:12.5,y:1.26,z:-1.33}],['rocker-porch-a',{x:.55,y:.53,z:1.3},-Math.PI/2,{x:1.05,y:-.06,z:1.4}],['rocker-porch-b',{x:.55,y:.53,z:.42},-Math.PI/2,{x:1.0,y:-.06,z:.6}]]){
-    let t=0;
+    let t=0,from=null,mount=0,dismount=null;
+    ticking.push(dt=>{
+      if(!dismount)return;
+      if(active||['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].some(k=>keys.has(k))||
+         Math.hypot(player.x-dismount.lastX,player.z-dismount.lastZ)>.45||
+         Math.abs(player.y-dismount.lastY)>1){dismount=null;return;}
+      dismount.t=Math.min(1,dismount.t+dt/(reducedMotion?.01:.36));
+      const k=dismount.t*dismount.t*(3-2*dismount.t);
+      player.x=dismount.x+(dismount.spot.x-dismount.x)*k;
+      player.z=dismount.z+(dismount.spot.z-dismount.z)*k;
+      // The old seat may catch the paws during the horizontal departure.
+      // Keep the body in its fall until it is clear of the rocker.
+      body.airborne=true;
+      dismount.lastX=player.x;dismount.lastY=player.y;dismount.lastZ=player.z;
+      if(dismount.t===1)dismount=null;
+    });
     list.push({id,icon:'🪑',name:'Rock in the chair',kind:'ride',at:spot,radius:1.0,
-      start(){t=0;player.x=seat.x;player.y=seat.y;player.z=seat.z;},
-      tick(dt){t+=dt;const rock=reducedMotion?0:Math.sin(t*2.2)*.12;life.face(heading+Math.PI);life.ride({dy:Math.abs(rock)*.05,tilt:rock,pose:{sit:1}});},
-      stop(){life.ride(null);}});
+      start(){t=0;mount=0;from={...player};dismount=null;life.face(heading+Math.PI);},
+      tick(dt){t+=dt;mount=Math.min(1,mount+dt/(reducedMotion?.01:.5));const k=mount*mount*(3-2*mount);
+        // Rise beside the arm first, then pass over the seat, then settle.
+        const across=Math.max(0,Math.min(1,(k-.28)/.62));
+        player.x=from.x+(seat.x-from.x)*across;player.z=from.z+(seat.z-from.z)*across;
+        player.y=k<.28?from.y+(seat.y+.08-from.y)*(k/.28):k<.9?seat.y+.08:seat.y+.08*(1-(k-.9)/.1);
+        const rock=reducedMotion?0:Math.sin(t*2.2)*.12;
+        life.ride({dy:Math.abs(rock)*.05,tilt:rock*k,pose:{sit:k}});
+      },
+      stop(){life.ride(null);const landing=world.safeSpot(from.x,from.y,from.z)||spot;
+        dismount={x:player.x,z:player.z,lastX:player.x,lastY:player.y,lastZ:player.z,spot:landing,t:0};
+        body.airborne=true;body.vy=0;
+      }});
   }
   // ----- the piano: E to sit down, then the keys play a scale.
   {
     const notes=[['C',261.63],['D',293.66],['E',329.63],['F',349.23],['G',392.0],['A',440.0],['B',493.88],['C',523.25]];
     const codes={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4,Digit6:5,Digit7:6,Digit8:7,KeyA:0,KeyS:1,KeyD:2,KeyF:3,KeyG:4,KeyH:5,KeyJ:6,KeyK:7};
+    let from=null,mount=0,dismount=null;
+    const cushion=data.colliders.find(b=>b.name==='Clean folded green floor cushion');
+    ticking.push(dt=>{
+      if(!dismount)return;
+      if(active||['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].some(k=>keys.has(k))||
+         Math.hypot(player.x-dismount.lastX,player.z-dismount.lastZ)>.45||
+         Math.abs(player.y-dismount.lastY)>1){dismount=null;return;}
+      dismount.t=Math.min(1,dismount.t+dt/(reducedMotion?.01:.42));
+      const k=dismount.t*dismount.t*(3-2*dismount.t);
+      player.x=dismount.x+(dismount.spot.x-dismount.x)*k;
+      player.z=dismount.z+(dismount.spot.z-dismount.z)*k;
+      const inside=cushion&&player.x>=cushion.min[0]-.1&&player.x<=cushion.max[0]+.1&&player.z>=cushion.min[2]-.1&&player.z<=cushion.max[2]+.1;
+      if(inside)player.y=Math.max(player.y,cushion.max[1]+.03);
+      else{dismount.cleared??=k;player.y=dismount.seatY+(dismount.spot.y-dismount.seatY)*Math.min(1,(k-dismount.cleared)/Math.max(.01,1-dismount.cleared));}
+      dismount.lastX=player.x;dismount.lastY=player.y;dismount.lastZ=player.z;
+      if(dismount.t===1){player.y=dismount.spot.y;body.reset(player);dismount=null;}
+    });
     list.push({id:'piano',icon:'🎹',name:'Play the piano',kind:'play',at:{x:10.8,y:-1.05,z:-1.6},radius:1.2,face:{x:10.3,z:-1.41},
       hint:'Play with 1–8 (or A S D F G H J K): C D E F G A B C · E when you\'re done',
-      start(){life.face(Math.PI/2+Math.PI);life.ride({pose:{sit:.6}});},
+      start(){from={...player};mount=0;dismount=null;life.face(-Math.PI/2);},
+      tick(dt){mount=Math.min(1,mount+dt/.5);const k=mount*mount*(3-2*mount);
+        player.x=from.x+(10.75-from.x)*k;player.z=from.z+(-1.43-from.z)*k;player.y=from.y;
+        // The floor cushion here is 35 cm high; put the body on it, facing
+        // the keybed instead of leaving a seated pose standing by the piano.
+        life.ride({dy:.35*k,pose:{sit:k}});
+        return {yaw:Math.PI};
+      },
       key(code){const i=codes[code];if(i===undefined)return false;const [name,f]=notes[i];sounds.note(f);life.hop(.35);life.say(`♪ ${name}`,700);return true;},
-      stop(){life.ride(null);}});
+      stop(){if(from){const spot=world.safeSpot(from.x,from.y,from.z)||from;
+        const seated=mount*mount*(3-2*mount);
+        player.y+=.35*seated;life.ride(null);
+        dismount={x:player.x,z:player.z,seatY:player.y,lastX:player.x,lastY:player.y,lastZ:player.z,spot,t:0,cleared:null};
+        body.airborne=true;body.vy=0;
+      }else life.ride(null);}});
   }
   // ----- the cars: get in either and drive it out of the garage.
   debug.cars={};
@@ -176,14 +287,14 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // It stands on the garage floor (its tyres were modelled a touch below it).
     {const f=world.floor(home.x,home.z,b.min[1]+.3);if(Number.isFinite(f))home.y=f;}
     const halfW=(b.max[0]-b.min[0])/2-.05,halfL=(b.max[2]-b.min[2])/2-.05;
-    const car={x:home.x,y:home.y,z:home.z,heading:0,speed:0,parked:true,lastFit:null};
+    const car={x:home.x,y:home.y,z:home.z,heading:0,speed:0,steering:0,parked:true,lastFit:null};
     debug.cars[key]=car;
     const boxes=propBoxes[key]||[],saved=boxes.map(x=>({min:[...x.min],max:[...x.max]}));
     // Glass you can see the driver through.
     for(const m of meshesOf(key))if(/glass/i.test(m.name))m.material=new THREE.MeshPhysicalMaterial({color:glass,roughness:.12,metalness:.1,transparent:true,opacity:.45});
     // Turned about where it was modelled, then moved by how far it has gone.
     function place(){pose(key,_m.makeTranslation(car.x-home.x,car.y-home.y,car.z-home.z).multiply(_a.makeTranslation(home.x,home.y,home.z)).multiply(_b.makeRotationY(car.heading)).multiply(new THREE.Matrix4().makeTranslation(-home.x,-home.y,-home.z)));}
-    function corner(dx,dz,h=car.heading){const s=Math.sin(h),c=Math.cos(h);return {x:car.x+dx*c-dz*s,z:car.z+dx*s+dz*c};}
+    function corner(dx,dz,h=car.heading){return carPoint(car.x,car.z,dx,dz,h);}
     // Where the car is tested against the world: the corners, the middle of
     // each end, the centre and halfway along each side (so a wall's end cannot
     // slip between two samples when the car swings round).
@@ -241,9 +352,9 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // (the old blocked-corner count let it grind on through instead, or
     // pinned it where no move changed the count).
     function trouble(x,z,h){
-      const s=Math.sin(h),c=Math.cos(h);let n=0,off=0,sum=0,k=0;
+      let n=0,off=0,sum=0,k=0;
       for(const [dx,dz] of SAMPLES){
-        const px=x+dx*c-dz*s,pz=z+dx*s+dz*c,g=groundAt(px,pz);
+        const {x:px,z:pz}=carPoint(x,z,dx,dz,h),g=groundAt(px,pz);
         if(g===null){off++;continue;}
         sum+=g;k++;n+=squeeze(px,pz,g);
       }
@@ -265,51 +376,35 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     const door=()=>corner(-(halfW+.45),.3);
     // In reach from any side of the car, not just the driver's door.
     function beside(p){const s=Math.sin(car.heading),c=Math.cos(car.heading),dx=p.x-car.x,dz=p.z-car.z;
-      const lx=dx*c+dz*s,lz=-dx*s+dz*c;return Math.hypot(Math.max(0,Math.abs(lx)-halfW),Math.max(0,Math.abs(lz)-halfL));}
+      const lx=dx*c-dz*s,lz=dx*s+dz*c;return Math.hypot(Math.max(0,Math.abs(lx)-halfW),Math.max(0,Math.abs(lz)-halfL));}
     list.push({id:key,icon:'🚗',name:`Drive the ${colour} car`,kind:'drive',radius:1.0,distance:beside,
       get at(){const d=door();return {x:d.x,y:car.y,z:d.z};},
-      hint:'↑ ↓ drive · ← → steer · Space honks · E to get out',
+      hint:'↑ accelerate · ↓ brake/reverse · ← → steer · Space honks · E to get out',
       start(){
-        car.speed=0;car.parked=false;
+        car.speed=0;car.steering=0;car.parked=false;
         for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
         // The view looks down on the car from over its roof (a boom aimed
         // at the driver would start inside the car's own baked panels).
-        tour.setCameraRig({target:1.75,boom:5.0,height:2.5});
+        tour.setCameraRig({target:1.75,boom:6.6,height:2.5});
         sounds.engine(0);life.say('Vroom!',1500);
       },
       tick(dt){
-        const fwd=(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0),steer=(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0);
-        const top=fwd>=0?4.5:2.2;
-        car.speed+=((fwd*top)-car.speed)*(1-Math.exp(-dt*(fwd?1.6:3)));
-        if(Math.abs(car.speed)<.03&&!fwd)car.speed=0;
-        if(car.speed){
-          const turn=steer*Math.min(1.4,Math.abs(car.speed)*.55)*Math.sign(car.speed)*dt;
-          const h=wrap(car.heading+turn),step=car.speed*dt;
-          const now=trouble(car.x,car.z,car.heading);
-          // Straight on; failing that, glance off to either side, so a wall
-          // met at an angle slides the car along it instead of stopping it
-          // dead; failing that, at least turn on the spot so the steering
-          // can always work the car free.
-          let moved=false;
-          for(const [dir,scale] of [[h,1],[h+.6,.7],[h-.6,.7],[h,0]]){
-            const nx=car.x-Math.sin(dir)*step*scale,nz=car.z-Math.cos(dir)*step*scale,next=trouble(nx,nz,h);
-            if(next.n>now.n+1e-9)continue;
-            car.x=nx;car.z=nz;car.heading=h;if(next.ground!==null)car.y+=(next.ground-car.y)*Math.min(1,dt*6);
-            moved=scale>0;break;
-          }
-          car.lastFit=moved;
-          if(!moved){car.speed*=.3;if(Math.abs(car.speed)<.3)car.speed=0;bump();}
-        }
+        const analog=getDriveInput()||{};
+        const throttle=Math.max(-1,Math.min(1,(keys.has('ArrowUp')?1:0)-(keys.has('ArrowDown')?1:0)+(Number(analog.throttle)||0)));
+        const steer=Math.max(-1,Math.min(1,(keys.has('ArrowLeft')?1:0)-(keys.has('ArrowRight')?1:0)+(Number(analog.steer)||0)));
+        const outcome=driveCar(car,{throttle,steer},dt,trouble);
+        car.lastFit=outcome.moved;
+        if(outcome.hit)bump();
         place();
         player.x=car.x;player.y=car.y;player.z=car.z;
-        const s=Math.sin(car.heading),c=Math.cos(car.heading);
-        life.face(car.heading+Math.PI);life.ride({dx:-.42*c-.15*s,dy:.62,dz:-.42*s+.15*c,pose:{sit:.8}});
-        sounds.engine(Math.abs(car.speed)/4.5);
+        const seat=carPoint(0,0,-.42,.15,car.heading);
+        life.face(car.heading+Math.PI);life.ride({dx:seat.x,dy:.62,dz:seat.z,pose:{sit:.8}});
+        sounds.engine(Math.abs(car.speed)/5.2);
         return {yaw:car.heading};
       },
       key(code){if(code==='Space'){sounds.horn();return true;}return false;},
       stop(){
-        car.speed=0;car.parked=true;sounds.engine(null);place();parkBoxes();tour.setCameraRig(null);life.ride(null);
+        car.speed=0;car.steering=0;car.parked=true;sounds.engine(null);place();parkBoxes();tour.setCameraRig(null);life.ride(null);
         // Out by the driver's door — the other side if that's against a wall.
         for(const side of [-(halfW+.45),halfW+.45]){const d=corner(side,.3),spot=world.safeSpot(d.x,car.y,d.z);if(spot&&Math.hypot(spot.x-d.x,spot.z-d.z)<1){player.x=spot.x;player.y=spot.y;player.z=spot.z;break;}}
       }});
@@ -325,7 +420,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   // tick?(dt) → null | {yaw?, done?}, key?(code), stop()}) and per-frame work
   // onto `ticking` (dt=>{}). `off` is what the pill says while you're on it;
   // a tick returning {done:true} gets off by itself.
-  const ctx={THREE,scene,world,renderer,data,player,keys,life,body,tour,reducedMotion,list,ticking,sounds,propMeshes,meshesOf,pose,hinge};
+  const ctx={THREE,scene,world,renderer,data,player,keys,life,body,tour,reducedMotion,list,ticking,sounds,propMeshes,meshesOf,pose,hinge,isBusy:()=>!!active};
   for(const extend of [hangBarInteractions,roombaInteractions,yotoInteractions,bedInteractions]){try{extend(ctx);}catch(error){console.warn('An interaction module failed to load:',error);}}
   // Which one is in reach: the nearest on this floor within its radius.
   function findNear(){
@@ -368,7 +463,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       if(!body.airborne&&onMat()&&!keys.has('ArrowDown')){body.vy=7;body.airborne=true;trampoline.bounces++;sounds.boing();life.hop(.9);if(trampoline.bounces===1)life.say('Boing!',1200);}
     },
     // For QA.
-    get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
+     get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
   };
   bindButton(pill,()=>{if(active)api.stop();else api.start();});
   return api;

@@ -70,6 +70,18 @@ for(const [n,action,emote] of [[{hunger:20},'hungry','food'],[{clean:18},'shake'
   for(const st of ['lookaround','sniff']){const looks=new Set(seen.filter(o=>o.state===st).map(o=>o.look.join()));assert(looks.size<=2,st+' sweeps under reduced motion');}
 }
 // An egg never walks, wanders or sleeps; it wobbles now and then and when greeted.
+// An activity owns the pose while the pet rides. Its old idle timer must not
+// initiate a look-back, greeting hop, sleep, or emote on a moving seat.
+{
+  const b=createPetBehaviour({random:seeded(11)});play(b,1,{moving:true,needs:needs()});
+  b.react('hello');
+  const riding=play(b,12,{ride:true,needs:needs({energy:8}),camera:behind});
+  assert(riding.every(o=>o.state==='ride'&&o.turnTo===null&&o.hop===0&&o.emote===null&&Object.keys(o.pose).length===0),
+    'idle pose or turn leaked into the activity');
+  const after=b.update(1/30,{needs:needs(),camera:behind});
+  assert.equal(after.state,'rest','activity exit did not resume from rest');
+}
+// An egg never walks, wanders or sleeps; it wobbles now and then and when greeted.
 {
   const b=createPetBehaviour({random:seeded(7),egg:true});
   const seen=play(b,30,{moving:false});

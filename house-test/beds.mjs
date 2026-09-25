@@ -40,12 +40,37 @@ export function besideBed(bed,p){const b=bed.box;return Math.hypot(Math.max(0,b.
 // climb onto (a bed from the floor, the top bunk from the bottom one).
 export function bedReach(bed,p){const dy=bed.top-p.y;return dy>-.35&&dy<1.5;}
 
-export function bedInteractions({world,data,player,life,body,tour,reducedMotion,list,sounds}){
+export function bedInteractions({world,data,player,life,body,tour,reducedMotion,list,ticking=[],sounds,keys=new Set(),isBusy=()=>false}){
   const beds=findBeds(data.colliders,world);
   if(!beds.length)return;
   const veil=document.getElementById('sleep');
   for(const bed of beds){
-    let from=null,slept=0,nextTick=1,gained=0,rested=false;
+    let from=null,slept=0,nextTick=1,gained=0,rested=false,climb=0,via=null,dismount=null;
+    ticking.push(dt=>{
+      if(!dismount)return;
+      // A Rooms jump or a new activity owns the pet immediately.
+      if(isBusy()||['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].some(k=>keys.has(k))||
+         Math.hypot(player.x-dismount.lastX,player.z-dismount.lastZ)>.45||
+         Math.abs(player.y-dismount.lastY)>1){life.ride(null);dismount=null;return;}
+      dismount.t=Math.min(1,dismount.t+dt/(reducedMotion?.01:.65));
+      const k=dismount.t*dismount.t*(3-2*dismount.t);
+      if(dismount.via){
+        const v=dismount.via,p=dismount.spot;
+        if(k<.4){const u=k/.4;player.x=bed.x+(v.x-bed.x)*u;player.z=bed.z+(v.z-bed.z)*u;player.y=bed.top+.06;}
+        else if(k<.7){const u=(k-.4)/.3;player.x=v.x;player.z=v.z;player.y=bed.top+.06+(p.y-bed.top-.06)*u;}
+        else{const u=(k-.7)/.3;player.x=v.x+(p.x-v.x)*u;player.z=v.z+(p.z-v.z)*u;player.y=p.y;}
+      }else{
+        const p=dismount.spot;
+        player.x=bed.x+(p.x-bed.x)*k;player.z=bed.z+(p.z-bed.z)*k;
+        player.y=bed.top+(p.y-bed.top)*Math.max(0,(k-.35)/.65)+Math.sin(Math.PI*k)*.06;
+      }
+      // Physics may pull down after this tick; the next tick resumes the
+      // controlled climb. Never put the pet through the mattress footprint.
+      if(besideBed(bed,player)<.1)player.y=Math.max(player.y,bed.top+.02);
+      dismount.lastX=player.x;dismount.lastZ=player.z;dismount.lastY=player.y;
+      life.ride({pose:{lie:1-k,sit:Math.sin(Math.PI*k)*.6},sleeping:false});
+      if(k===1){life.ride(null);body?.reset?.(player);dismount=null;}
+    });
     // Watched from across the bed, from whichever long side has the room's
     // floor beside it (a bed in a corner has a wall down one side and, past
     // the other, nothing at all).
@@ -84,17 +109,35 @@ export function bedInteractions({world,data,player,life,body,tour,reducedMotion,
       },
       off:'Wake up',
       start(){
-        from={x:player.x,y:player.y,z:player.z};slept=0;nextTick=1;gained=0;rested=false;
-        // Onto the middle of the mattress, lying along it.
-        player.x=bed.x;player.y=bed.top;player.z=bed.z;
+        from={x:player.x,y:player.y,z:player.z};slept=0;nextTick=1;gained=0;rested=false;climb=0;dismount=null;
+        // From the lower bunk, first move beyond the open side of the upper
+        // mattress so the ascent goes around it rather than through it.
+        via=bed.below&&besideBed(bed,from)<.02&&from.y<bed.top-.2
+          ?{x:bed.x+open[0]*(halfW+.35),z:bed.z+open[1]*(halfL+.35)}:null;
+        // Move onto the mattress over a few frames; stay above its cover as
+        // the body climbs so it never cuts through the bed frame.
         life.face(bed.along?Math.PI/2:0);
-        life.ride({dx:0,dy:0,dz:0,pose:{lie:1},expression:'sleep',emote:'zz',sleeping:true});
+        life.ride({pose:{lie:0},sleeping:false});
         tour?.setCameraRig?.(rig);
         if(veil)veil.classList.add('on');
         sounds?.click?.();
         life.say('Zzz… 💤',2200);
       },
       tick(dt){
+        if(climb<1){climb=Math.min(1,climb+dt/(reducedMotion ? .01 : .7));const k=climb*climb*(3-2*climb);
+          if(via){
+            if(k<.28){const u=k/.28;player.x=from.x+(via.x-from.x)*u;player.z=from.z+(via.z-from.z)*u;player.y=from.y;}
+            else if(k<.6){const u=(k-.28)/.32;player.x=via.x;player.z=via.z;player.y=from.y+(bed.top+.06-from.y)*u;}
+            else{const u=(k-.6)/.4;player.x=via.x+(bed.x-via.x)*u;player.z=via.z+(bed.z-via.z)*u;player.y=bed.top+.06*(1-u);}
+          }else{
+            const outside=besideBed(bed,from),length=Math.hypot(bed.x-from.x,bed.z-from.z);
+            const enter=length>0?Math.max(.08,Math.min(.7,outside/length)):.08;
+            player.x=from.x+(bed.x-from.x)*k;player.z=from.z+(bed.z-from.z)*k;
+            player.y=from.y+(bed.top-from.y)*Math.min(1,k/enter)+Math.sin(Math.PI*k)*.08;
+          }
+          life.ride({pose:{lie:k},expression:k>.85?'sleep':undefined,emote:k>.85?'zz':undefined,sleeping:k>.85});
+          return {yaw:viewYaw};
+        }
         slept+=dt;
         // Rest comes a little at a time, so the energy bar can be watched filling.
         while(slept>=nextTick){
@@ -111,12 +154,20 @@ export function bedInteractions({world,data,player,life,body,tour,reducedMotion,
         tour?.setCameraRig?.(null);
         life.ride(null);
         life.rest?.(0,true);
-        // Back where you got on (beside the bed, or on it if you had jumped
-        // up) — unless something else already moved the pet (a Rooms jump).
+        // Return along the mattress and down its open side. A new activity,
+        // movement input or Rooms jump cancels this transition.
         const stillHere=Math.hypot(player.x-bed.x,player.z-bed.z)<.05&&Math.abs(player.y-bed.top)<.05;
         const spot=stillHere?(from&&world.safeSpot(from.x,from.y,from.z))||from:null;
-        if(spot){player.x=spot.x;player.y=spot.y;player.z=spot.z;}
-        body?.reset?.(player);
+        if(spot){
+          let exitVia=via;
+          if(!exitVia&&besideBed(bed,spot)>.1){
+            const dx=spot.x-bed.x,dz=spot.z-bed.z;
+            const u=Math.min(dx?((halfW+.22)/Math.abs(dx)):Infinity,dz?((halfL+.22)/Math.abs(dz)):Infinity,1);
+            exitVia={x:bed.x+dx*u,z:bed.z+dz*u};
+          }
+          dismount={spot,via:exitVia,t:0,lastX:player.x,lastZ:player.z,lastY:player.y};body.airborne=true;body.vy=0;
+        }
+        else body?.reset?.(player);
         life.hop(.5);
         life.say(rested?'All rested! ⚡':gained>0?`That was a lovely nap. +${Math.round(gained)} ⚡`:'Mmm, cosy.',2600);
       }});
