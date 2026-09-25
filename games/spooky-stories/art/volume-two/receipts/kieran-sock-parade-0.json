@@ -1,0 +1,22 @@
+{
+  "storyId": "kieran-sock-parade",
+  "page": 0,
+  "style": "crayon",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-41176ac8-c3b5-4ab6-8369-9eeac21d1317.png",
+  "originalSha256": "685c58078572e718073edf3f077697e30cb428e5c3f71b9e5ffcd53897a2c909",
+  "file": "kieran-sock-parade-0.webp",
+  "sha256": "3cc56407b21c1a4c8c42bb621d38958cc85eaffa3b6bcee9a8d24244be2f6c86",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "db0ad12f82a9922e18b88d01f2683b5cacb50f48766e6a2142780de7276c15d7",
+  "prompt": "Use case: precise-object-edit. In this crayon story illustration, change ONLY the small sock held up in Ellie's hand (the preschool girl in lavender at center). It currently has pink/red hearts. Make her sock blue-and-white horizontally striped, the SAME striped pattern and colors as the tiny sock Kieran holds at lower left. This is the pair that the story says matches. Preserve every face, pose, all other objects, the exact wax-crayon/oil-pastel style, framing, lighting and colors. No other changes.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-f4c7b6fa-95f8-4ec2-9196-4a3590cd636f.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected crayon image has matching blue-and-white striped socks."
+}

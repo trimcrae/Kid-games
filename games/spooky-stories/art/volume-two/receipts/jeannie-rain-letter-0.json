@@ -1,0 +1,20 @@
+{
+  "storyId": "jeannie-rain-letter",
+  "page": 0,
+  "style": "watercolor",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-9e0928aa-b58a-45fd-9b6c-6c2ea4276d44.png",
+  "originalSha256": "1ce6b32b9a4d0293da0dc5f2b042b87aa1e8389a77e677afe1b9b229b86eea6d",
+  "file": "jeannie-rain-letter-0.webp",
+  "sha256": "256e744ef2914abbab3d3008bb598c73fd4c30e0291a6026acf25d2c71c9f691",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "5267478b1ffff23b01b7b98d4d8a683d89bd5b81ee16295bb8eacd19d6eb0ba9",
+  "prompt": "Use case: illustration-story. Create ONE finished landscape 4:3 full-bleed children's picture-book illustration for 'Jeannie and the Rain-Washed Letter', opening page. Art direction: sumptuous traditional watercolor on subtly textured cold-pressed paper, translucent wet-on-wet washes, delicate lively pencil underdrawing, richly observed garden details, gentle rainy light, beautiful expressive faces, sophisticated illustrated book, NOT flat vector or diagram. Scene: a rainy English cottage garden gate, droplets on leaves, climbing roses and wet stepping stones. Seven-year-old Jeannie, shoulder-length brown hair, teal raincoat with hood down, dark leggings and red wellington boots, has discovered a rain-spotted cream invitation tucked in the gate. Her little three-year-old sister Ellie has a straight dark-brown chin-length bob and side fringe, yellow raincoat with hood down and purple wellington boots. Jeannie holds the damp letter so both sisters can inspect it with intrigued, warm expressions. The letter has washed-out ink with just the words 'Come', 'Yellow', 'Afternoon' and a small painted yellow flower still visible. The letter must be natural size, not a floating label. ONLY these two children. Make the younger child visibly smaller. Ground the figures and show natural hands and readable silhouettes, a charming immersive setting with depth. Wide composition, main figures large enough to read, no crop of heads or feet. No panel borders, captions, title, watermarks, UI, or decorative lettering outside the tiny invitation.",
+  "references": [],
+  "reviewed": true,
+  "review": "Watercolor cast, invitation words and yellow flower match."
+}

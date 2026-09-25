@@ -1,0 +1,20 @@
+{
+  "storyId": "ellie-window-colors",
+  "page": 0,
+  "style": "stainedglass",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-0a2f347d-fdd0-439e-af7e-a26df771a79b.png",
+  "originalSha256": "07d60a2b19729960ff471714e9cf7bd5dfdbbcc13feba3a2f939130cb65bb0e1",
+  "file": "ellie-window-colors-0.webp",
+  "sha256": "03136a68879a09232068698d4356aabdd449401b0b2fe00e22d66e10a9904bcd",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "4858454692e44181c57d5593e4f2e8087a503d157a35cb9b7af9a65015f9b34a",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Ellie and the Rainbow Window, page 1: A patch of blue.\nART DIRECTION: Magnificent luminous stained-glass narrative art: every shape and human figure made from richly textured translucent colored glass divided by fine dark lead lines. Glowing jewel colors, cathedral-window craftsmanship, painterly natural human faces within the glass mosaic, detailed castle interior. A coherent immersive scene, not a diagram or isolated shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Ellie wears a lavender princess dress with silver trim and simple slippers, her dark-brown chin-length bob and side fringe visible; no elaborate headdress. Jeannie wears a rose dress, Mum an olive dress and round glasses, Cory a blue tunic and trousers with black rectangular glasses.\nILLUSTRATE THIS MOMENT: Ellie stands in blue and yellow pools of window light below a tall jewel-colored castle window.\nStory context for this exact page: Ellie found a blue patch on the castle floor. She stepped into it. Her white socks looked blue! A yellow patch glowed beside her. Above the stairs, sunlight shone through a window made of colored shapes. “The window is painting,” Ellie whispered.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [],
+  "reviewed": true,
+  "review": "Stained glass fantasy scene and blue patch establish the story."
+}

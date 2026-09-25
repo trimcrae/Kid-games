@@ -1,0 +1,22 @@
+{
+  "storyId": "ellie-window-colors",
+  "page": 4,
+  "style": "stainedglass",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-6ade5e6c-aa1d-483a-b56e-0c5351d5cc22.png",
+  "originalSha256": "e6323cb1ee8fde60c9fcbb25c103f76ba68a398c450dc7d855e3db29f4c6e875",
+  "file": "ellie-window-colors-4.webp",
+  "sha256": "8a67bde3e3a91f8c41b5def4cf9382dbb2268c642adf20a588fa2959867c883b",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "1cdc8cdf58c557996962cf3c14fcd9fbfaceeb9d9ebe503a5312e823b9d32582",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Ellie and the Rainbow Window, page 5: The moving rainbow.\nART DIRECTION: Magnificent luminous stained-glass narrative art: every shape and human figure made from richly textured translucent colored glass divided by fine dark lead lines. Glowing jewel colors, cathedral-window craftsmanship, painterly natural human faces within the glass mosaic, detailed castle interior. A coherent immersive scene, not a diagram or isolated shapes.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Ellie wears a lavender princess dress with silver trim and simple slippers, her dark-brown chin-length bob and side fringe visible; no elaborate headdress. Jeannie wears a rose dress, Mum an olive dress and round glasses, Cory a blue tunic and trousers with black rectangular glasses.\nILLUSTRATE THIS MOMENT: The colored pools of light now stretch across the castle floor toward a low wooden bench.\nStory context for this exact page: After lunch, Ellie came back to her blue patch. It was gone! She looked under the bench. There it was, farther across the floor. Mum explained that the sun appeared in a different place as the day went on. The window's colors had moved with the sunlight.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/ellie-window-colors-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Blue light has moved under the bench; Ellie searches there."
+}

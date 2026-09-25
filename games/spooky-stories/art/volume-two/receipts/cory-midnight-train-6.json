@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-midnight-train",
+  "page": 6,
+  "style": "linocut",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-82e32316-b714-4638-8d86-fcc2099f4bd4.png",
+  "originalSha256": "efa568d11ad80d8a1a925cc4865448f5c919b32d73ccd49413d67e8a71e61bb8",
+  "file": "cory-midnight-train-6.webp",
+  "sha256": "563e8c9dbfb17be83a0399a7500b7167f77f510cf4f41c61f084e89665ca9de0",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "b68e48de0cdc8a07766ae9f2fbba55737af4d83680443457c526c40d1955c012",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Midnight Train, page 7: The morning ticket.\nART DIRECTION: Intricate hand-carved two-ink linocut print on warm cream paper: midnight petrol-blue and muted ochre inks, expressive cut marks, fine hatch textures, rich invented vintage-railway detail, elegant strong composition. A real crafted storybook print with natural expressive human figures, not geometric clipart. Wonderful cozy dream atmosphere.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory wears a dark-blue vintage wool coat, cream scarf, brown boots, and his black rectangular glasses. His hair is short brown. The driver is a friendly adult woman in railway uniform. At breakfast Cory wears a blue knit jumper instead of the coat.\nILLUSTRATE THIS MOMENT: Cory and Jeannie tap a spoon rhythm at breakfast, with a little train doodle beside the toast.\nStory context for this exact page: At breakfast, Cory told Jeannie about his journey. He tapped a spoon on the table: long, short, short. Jeannie copied him, then changed the pattern. Cory copied hers. Their train never left the kitchen, but by the time the toast arrived, they had travelled through a dozen rhythms.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-midnight-train-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Cory and Jeannie tap spoons over breakfast with a train doodle; consistent linocut."
+}

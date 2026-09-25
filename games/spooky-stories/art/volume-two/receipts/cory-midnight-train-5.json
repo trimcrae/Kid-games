@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-midnight-train",
+  "page": 5,
+  "style": "linocut",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-220317a9-822a-44dc-a119-55bb96bc18c6.png",
+  "originalSha256": "f7d5ce663e6364c0c32686675f1b0eb79c2fae3ec7fe4fe314320e08113a310e",
+  "file": "cory-midnight-train-5.webp",
+  "sha256": "0f9979dc5d4cb619055d4f4d013cc567ec77370baf65c4a408b000582adb7aae",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "56fd7840898cb8b040c467a93ecd2a9e670569d13abffaecf9755483ef917896",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Midnight Train, page 6: A quiet carriage.\nART DIRECTION: Intricate hand-carved two-ink linocut print on warm cream paper: midnight petrol-blue and muted ochre inks, expressive cut marks, fine hatch textures, rich invented vintage-railway detail, elegant strong composition. A real crafted storybook print with natural expressive human figures, not geometric clipart. Wonderful cozy dream atmosphere.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory wears a dark-blue vintage wool coat, cream scarf, brown boots, and his black rectangular glasses. His hair is short brown. The driver is a friendly adult woman in railway uniform. At breakfast Cory wears a blue knit jumper instead of the coat.\nILLUSTRATE THIS MOMENT: Inside a softly lit vintage train carriage, Cory quietly follows a rhythm on his knee while a child passenger sleeps and a silver river passes outside.\nStory context for this exact page: A little passenger in the next seat was trying to sleep. Cory stopped tapping the window and followed the wheel rhythm silently with his fingers on his knee. Beyond the glass, a bridge carried them over a silver river. Even a quiet journey could feel enormous.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.",
+  "references": [
+    "C:/Projects/.worktrees/storybooks-ten-20260925/games/spooky-stories/art/volume-two/cory-midnight-train-0.webp"
+  ],
+  "reviewed": true,
+  "review": "Quiet Cory taps his knee beside sleeping child; silver river and warm carriage match."
+}

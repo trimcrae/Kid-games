@@ -1,0 +1,22 @@
+{
+  "storyId": "cory-midnight-train",
+  "page": 4,
+  "style": "linocut",
+  "generator": "Codex built-in OpenAI image tool",
+  "originalFile": "exec-c0fc97dd-8a8e-4385-9b2f-548a2f76ff97.png",
+  "originalSha256": "10c350da46ac292bd90dbae272c67f7ed0c078e6ecef65893f3a4385dc72cc89",
+  "file": "cory-midnight-train-4.webp",
+  "sha256": "c3f04812cf824102a7edc84f42c1d01320639fc33fb2cd0dd839599d315cc265",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "encoding": "WebP quality 90; no crop or resize",
+  "sourceHash": "bd28ddaa820f61d8d68e5fa3215f583f68481d97081da46c862b3f48dba4a39a",
+  "prompt": "Use case: illustration-story. Create ONE finished full-bleed landscape 4:3 picture-book illustration, Cory and the Midnight Train, page 5: Ready to go.\nART DIRECTION: Intricate hand-carved two-ink linocut print on warm cream paper: midnight petrol-blue and muted ochre inks, expressive cut marks, fine hatch textures, rich invented vintage-railway detail, elegant strong composition. A real crafted storybook print with natural expressive human figures, not geometric clipart. Wonderful cozy dream atmosphere.\nFamily identities: Jeannie is seven with shoulder-length brown hair; Cory is six with short brown hair and black rectangular glasses; Ellie is three with a straight dark-brown chin-length bob and side fringe; Kieran is an infant. Preserve age differences. Mum has a dark bob with gray streaks and round glasses. Dad has short light-brown hair and is clean-shaven. Include ONLY people needed for this scene, never the entire family by default.\nCONTINUITY: Cory wears a dark-blue vintage wool coat, cream scarf, brown boots, and his black rectangular glasses. His hair is short brown. The driver is a friendly adult woman in railway uniform. At breakfast Cory wears a blue knit jumper instead of the coat.\nILLUSTRATE THIS MOMENT: The little train leaves the station under repeating signal lights while Cory rides inside a lit carriage.\nStory context for this exact page: The driver checked Cory's card against the lamps. Long, short, short. She nodded, rang the bell, and eased the train away. Cory settled into a velvet seat. Outside, the station grew smaller. Inside, the wheels made a new pattern: clickety-clack, clickety-clack, clickety-clack.\nCOMPOSITION: immersive finished children's-book art, clear main action, beautiful environmental detail, expressive poses, thoughtful lighting and visual storytelling, important hands/faces/props fully visible. Keep the visual clues accurate. Do not reveal later story events. One coherent scene, no collage, panels, page frames, captions, book mockup, UI, watermark, or decorative writing. No text except the invitation's three surviving words when that invitation is the focus; elsewhere avoid legible writing. Reference image when supplied establishes the same characters and artistic medium; change the composition to the current scene rather than copying the previous scene.\n\nFinal targeted correction: Use case: precise-object-edit. Edit the supplied already-reviewed story illustration. The female driver must remain driving the train, not standing on the platform. Replace the waving woman on the left platform with a clearly different adult male station porter in a flat cap. Retain Cory in the lit carriage, landscape, three signal lamps and linocut style; no other changes. This is a small exact correction, not a new composition. Keep 4:3 landscape dimensions. No text, signature or watermark.",
+  "references": [
+    "C:\\Users\\mcrae\\.codex\\generated_images\\01a0d964-f14d-7711-863b-9ca653745ea6\\exec-65c6760b-0c8d-4b9d-adc1-953aad7d9dfb.png"
+  ],
+  "reviewed": true,
+  "review": "Corrected: male station porter waves while driver remains with departing train; Cory in lit carriage."
+}
