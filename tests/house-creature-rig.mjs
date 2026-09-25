@@ -106,14 +106,30 @@ for(const sp of species){
 {
   const c=build({species:'cat'}),rig=c.userData.rig,mesh=rig.meshes[0],g=mesh.geometry;
   const P=g.getAttribute('position'),I=g.getAttribute('skinIndex'),W=g.getAttribute('skinWeight');
-  const limbIndex=rig.bones.legL.userData===undefined?-1:rig.skeleton.bones.indexOf(rig.bones.legL);
   const torsoIndex=rig.skeleton.bones.indexOf(rig.bones.torso);
-  let upper=0,lower=0;
-  for(let i=0;i<P.count;i++)if(I.getX(i)===limbIndex&&I.getY(i)===torsoIndex){
-    if(P.getY(i)>.30&&W.getY(i)>.7)upper++;
-    if(P.getY(i)<.12&&W.getY(i)<.3)lower++;
+  const sample={};
+  for(const name of ['legL','armR']){
+    const limbIndex=rig.skeleton.bones.indexOf(rig.bones[name]);
+    let upper=-1,lower=-1;
+    for(let i=0;i<P.count;i++)if(I.getX(i)===limbIndex&&I.getY(i)===torsoIndex){
+      if(P.getY(i)>.30&&W.getY(i)>.8)upper=i;
+      if(P.getY(i)<.12&&W.getY(i)<.2)lower=i;
+    }
+    assert(upper>=0&&lower>=0,`${name} has no attached shoulder and free paw`);
+    sample[name]={upper,lower,baseUpper:null,baseLower:null,maxUpper:0,maxLower:0};
   }
-  assert(upper>0&&lower>0,'cat leg is still rigidly attached to its moving paw');
+  c.updateMatrixWorld(true);
+  const transformed=i=>mesh.applyBoneTransform(i,new THREE.Vector3().fromBufferAttribute(P,i));
+  for(const s of Object.values(sample)){s.baseUpper=transformed(s.upper);s.baseLower=transformed(s.lower);}
+  for(let i=0;i<100;i++){
+    c.position.z+=.015;rig.update(1/60,{moving:true,speed:.9});c.updateMatrixWorld(true);
+    for(const s of Object.values(sample)){
+      s.maxUpper=Math.max(s.maxUpper,Math.abs(transformed(s.upper).z-s.baseUpper.z));
+      s.maxLower=Math.max(s.maxLower,Math.abs(transformed(s.lower).z-s.baseLower.z));
+    }
+  }
+  for(const [name,s] of Object.entries(sample))
+    assert(s.maxLower>.05&&s.maxUpper<s.maxLower*.45,`${name} detached from trunk: upper ${s.maxUpper}, lower ${s.maxLower}`);
 }
 // A snail glides on a broad foot instead of hopping or pumping four limbs.
 {

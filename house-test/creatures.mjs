@@ -350,7 +350,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
 
   // ----- animation state -------------------------------------------------
   const st={t:Math.random()*10,phase:Math.random()*Math.PI*2,walk:0,run:0,bob:0,bobVel:0,lastBob:0,lift:0,hopT:-1,hopK:1,airborne:false,airPose:0,land:0,lean:0,roll:0,lastYaw:null,lastWorld:null,lastTime:null,
-    feet:Object.fromEntries(['legL','legR','armL','armR'].map(n=>[n,{anchor:new THREE.Vector3(),stance:false}])),strideX:0,strideZ:1,lastScale:null,
+    feet:Object.fromEntries(['legL','legR','armL','armR'].map(n=>[n,{anchor:new THREE.Vector3(),local:new THREE.Vector3(),lastWorld:null,stance:false}])),strideX:0,strideZ:1,lastScale:null,
     sit:0,lie:0,stretch:0,sniff:0,shake:0,scratch:0,fold:0,lookYaw:0,lookPitch:0,
     expr:{sleep:0,happy:0,tired:0,yawn:0,sad:0},blinkIn:1+Math.random()*3,blink:0,wobbleIn:3+Math.random()*4,wobble:0,
     want:{expression:'idle',pose:{},look:[0,0],fold:0,grime:0}};
@@ -390,13 +390,13 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     const sideTravel=dx*worldForward.z-dz*worldForward.x;
     if(!st.lastWorld)st.lastWorld=worldAt.clone();else st.lastWorld.copy(worldAt);
     if(Math.hypot(dx,dz)>.5||st.lastScale!==null&&Math.abs(worldScale.x-st.lastScale)>.01)
-      for(const foot of Object.values(st.feet))foot.stance=false;
+      for(const foot of Object.values(st.feet)){foot.stance=false;foot.lastWorld=null;}
     st.lastScale=worldScale.x;
     const reach=rig.cat?.13:.15;
     const lateral=moving&&Math.abs(sideTravel)>Math.abs(travel)*1.2;
     if(moving&&Math.hypot(dx,dz)<.5){
       const distance=lateral?Math.abs(sideTravel):travel;
-      st.phase+=distance/(2*reach*Math.max(.01,worldScale.x))*.62*Math.PI*2;
+      st.phase+=distance/(2*(lateral?reach*.55:reach)*Math.max(.01,worldScale.x))*.62*Math.PI*2;
     }else if(pivot)st.phase+=Math.abs(turnDelta)*(rig.cat?.17:.19)/(2*reach)*.62*Math.PI*2;
     st.strideX=lateral?Math.sign(sideTravel):0;st.strideZ=lateral?0:1;
     const walkW=st.walk,P=st.phase;
@@ -445,14 +445,18 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     const nod=reduced?0:Math.sin(st.t*14)*.05*st.sniff;
     B.head.rotation.set(-st.lookPitch+.4*st.sniff+.3*st.lie+.12*st.expr.tired-.25*st.expr.yawn+nod-.3*st.stretch,st.lookYaw-shake*1.4,(reduced?0:Math.sin(st.t*9))*.05*st.scratch+.1*st.scratch);
     // Feet and arms.
-    const A=reach*walkW*(reduced?.5:1),lift2=(rig.cat?.08:.075)*walkW*(reduced?0:1);
+    const A=reach*(lateral?.55:1)*walkW*(reduced?.5:1),lift2=(rig.cat?.08:.075)*walkW*(reduced?0:1);
     // A stance paw remembers its point on the floor. Inverting the current
     // parent transform keeps it there through yaw, strafing and body bob.
     const plant=(name,stance)=>{
       const bone=B[name],foot=st.feet[name];
       if(stance){
-        if(!foot.stance){bone.parent.updateWorldMatrix(true,false);foot.anchor.copy(bone.position);bone.parent.localToWorld(foot.anchor);}
-        else{bone.parent.updateWorldMatrix(true,false);const p=bone.parent.worldToLocal(foot.anchor.clone());bone.position.x=p.x;bone.position.z=p.z;}
+        if(!foot.stance){
+          if(foot.lastWorld)foot.anchor.copy(foot.lastWorld);
+          else{bone.parent.updateWorldMatrix(true,false);foot.anchor.copy(bone.position);bone.parent.localToWorld(foot.anchor);}
+          bone.parent.updateWorldMatrix(true,false);bone.parent.worldToLocal(foot.local.copy(foot.anchor));bone.position.x=foot.local.x;bone.position.z=foot.local.z;
+        }
+        else{bone.parent.updateWorldMatrix(true,false);bone.parent.worldToLocal(foot.local.copy(foot.anchor));bone.position.x=foot.local.x;bone.position.z=foot.local.z;}
       }
       foot.stance=stance;
     };
@@ -463,7 +467,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
       B[name].position.set(rest.x*(rig.floater?.65:1+.2*st.lie)+step.z*st.strideX,rest.y+step.y+float+poseY+hopLift+(rig.hopper?lift:0)+st.airPose*.085+
         (rig.floater?.06:0)+(st.scratch&&side>0?.05*st.scratch:0),rest.z+step.z*st.strideZ+.05*st.sit+.08*st.lie-.08*st.stretch-(rig.floater?.08:0));
       if(rig.petpetId==='snail')B[name].position.set(rest.x*.65,rest.y-.035,rest.z-.03);
-      else plant(name,walkW>.1&&step.y<1e-5&&!st.airborne&&st.lie<.05&&st.sit<.05);
+      else plant(name,walkW>.1&&step.y<.004&&!st.airborne&&st.lie<.05&&st.sit<.05);
     }
     for(const [name,side,off] of [['armL',-1,Math.PI],['armR',1,0]]){
       const arm=B[name],rest=arm.userData.rest;
@@ -472,7 +476,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
         arm.position.set(rest.x+step.z*st.strideX,rest.y+step.y-lift-.07*st.sit-.13*st.lie+hopAir*.04+st.airPose*.07,
           rest.z+step.z*st.strideZ+.08*st.stretch-.04*st.lie);
         arm.rotation.set(-.2*st.stretch,0,0);
-        plant(name,walkW>.1&&step.y<1e-5&&!st.airborne&&st.lie<.05&&st.sit<.05);
+        plant(name,walkW>.1&&step.y<.004&&!st.airborne&&st.lie<.05&&st.sit<.05);
       }else{
         arm.rotation.set((rig.petpetId==='snail'?0:reduced?0:-Math.sin(P+off)*.55*walkW)-1.1*st.stretch-.3*st.sit-.45*hopAir-.55*st.airPose,0,
           side*(.15*st.lie+(reduced?0:.08*st.shake*Math.sin(st.t*30))));
@@ -502,6 +506,10 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     // The plane belongs to the creature root. While a physical jump lifts
     // that root off the surface, fade the plane so it never hangs in midair.
     shadow.material.opacity=SHADOW_OPACITY*(1-clamp(air*2.2,0,.55))*(st.airborne?0:1-st.airPose);
+    for(const [name,foot] of Object.entries(st.feet)){
+      if(!foot.lastWorld)foot.lastWorld=new THREE.Vector3();
+      B[name].getWorldPosition(foot.lastWorld);
+    }
   }
   Object.assign(rig,{bones:B,skeleton,meshes,shadow,head:B.head,setExpression,setPose,look,hop,setAirborne,fold,setGrime,update,
     get state(){return {expression:st.want.expression,pose:{...st.want.pose},sleep:+st.expr.sleep.toFixed(2),happy:+st.expr.happy.toFixed(2)};}});
@@ -540,6 +548,9 @@ export function petpet(id){
       add('leg'+(s<0?'L':'R'),[s*.16,.015,.16],[.11,.03,.15],'#ec8a37',roundSphere);}
     add('tail',[0,.40,-.27],[.11,.09,.13],palette[0],cone,[-.7,0,0],'fur');
   }else if(id==='snail'){
+    // A continuous low sole is the contact surface; the borrowed Craepet
+    // limbs below are hidden so the shell reads as a gliding snail.
+    add('body',[0,.105,.01],[.29,.095,.35],palette[0],roundSphere,null,'fur');
     add('body',[.13,.45,-.15],[.32,.30,.28],'#e6ba7b',roundSphere);
     // The spiral sits on the visible front quarter of the shell, and the
     // shell projects well beyond the little head when seen from the side.
@@ -571,8 +582,8 @@ export function petpet(id){
   if(id==='duckling'||id==='moth'||id==='starling')rig.wings=true;
   if(id==='duckling')rig.bones.head.scale.set(.85,.85,.85);
   if(id==='snail'){
-    rig.bones.head.scale.set(.75,.65,.8);
-    for(const name of ['armL','armR','legL','legR'])rig.bones[name].scale.set(.55,.65,.7);
+    rig.bones.head.scale.set(.68,.60,.75);
+    for(const name of ['armL','armR','legL','legR'])rig.bones[name].scale.setScalar(1e-4);
   }
   if(id==='hedge')rig.bones.head.scale.set(.8,.8,.8);
   if(id==='blobbin')rig.bones.head.scale.set(1.2,.75,1);
