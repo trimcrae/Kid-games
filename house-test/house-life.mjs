@@ -471,7 +471,7 @@ export async function createHouseLife(tour){
     airborne(flag){if(flag&&!inAir)coachDone('jump');inAir=!!flag;},
     // Riding something (interactions.mjs): the body sits where it's told —
     // offset from the walking position, tilted along — instead of standing.
-    ride(v){ride=v||null;},
+    ride(v){ride=v||null;if(ride)aftermath.stop();},
     say(text,ms){say(text,ms);},
     // Asleep in a bed (beds.mjs): energy back, a little at a time; `done`
     // marks the end of the sleep for the pet's wishes. Returns the energy now.
@@ -499,7 +499,7 @@ export async function createHouseLife(tour){
         // doze off when tired… (pet-behaviour.mjs), from its real needs.
         let friend=null,best=3;
         for(const r of roamers){const p=r.c.point,d=Math.hypot(p.x-player.x,p.z-player.z);if(d<best&&Math.abs(p.y-player.y)<.5){best=d;friend={angle:angleTo(player,heading,p)};}}
-        petOut=petLife.update(dt,{moving:walking,needs:petNeeds,camera:{angle:angleTo(player,heading,tour.camera.position)},friend,night:engine.timeOfDay?.()==='night',reduced});
+        petOut=petLife.update(dt,{moving:walking,ride:!!ride,needs:petNeeds,camera:{angle:angleTo(player,heading,tour.camera.position)},friend,night:engine.timeOfDay?.()==='night',reduced});
         if(petOut.turnTo!==null&&!walking)wantHeading=heading+petOut.turnTo;
         // Straight after Feed / Bath / Rest / Play: a short scene in the house
         // (aftermath.mjs) that any step of yours ends.
@@ -541,11 +541,13 @@ export async function createHouseLife(tour){
           // Follow the heel through turns as well as jumps, returning local
           // offsets because the petpet lives inside the scaled avatar.
           const f=follow.update(time,dt,avatar.position.y,{reduced,
-            leader:{x:avatar.position.x,z:avatar.position.z,heading:avatar.rotation.y,scale:PET_SCALE}});
+            leader:{x:avatar.position.x,z:avatar.position.z,heading:avatar.rotation.y,scale:PET_SCALE,
+              airborne:!ride&&(inAir||!!stepHop)}});
           pal.position.x=f.offsetX;pal.position.z=f.offsetZ;
           pal.position.y=(f.y-avatar.position.y)/PET_SCALE;
           if(f.hop)pal.userData.rig.hop(f.hop);
-          pal.userData.animate(time,walking,reduced,gait);
+          pal.userData.rig.setAirborne(f.airborne);
+          pal.userData.animate(time,f.moving,reduced,f.speed);
         }
         // Only if the camera is actually inside the pet (backed right up to a
         // wall) does the pet step aside from view; nearer than that it fades
