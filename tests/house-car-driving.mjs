@@ -31,12 +31,12 @@ function withHouseCar(key,extraBoxes,check,{spawn}={}){
     const world=new WalkingWorld(data.colliders,{height:1.05});
     if(extraBoxes.length)world.addBoxes(structuredClone(extraBoxes));
     const b=data.props[key],player={x:(b.min[0]+b.max[0])/2,y:b.min[1]+.08,z:(b.min[2]+b.max[2])/2};
-    let throttle=0;
-    const api=createInteractions({scene:{add(){}},world,renderer:{render:{},getDrawingBufferSize(v){v.set(1280,720);}},data,propMeshes:{},player,keys:new Set(),life:{face(){},ride(){},say(){},airborne(){},hop(){}},body:{reset(){},vy:0,airborne:false},tour:{setCameraRig(){},hint(){}},bindButton(){},getDriveInput:()=>({throttle,steer:0})});
+    let throttle=0,steer=0;
+    const api=createInteractions({scene:{add(){}},world,renderer:{render:{},getDrawingBufferSize(v){v.set(1280,720);}},data,propMeshes:{},player,keys:new Set(),life:{face(){},ride(){},say(){},airborne(){},hop(){}},body:{reset(){},vy:0,airborne:false},tour:{setCameraRig(){},hint(){}},bindButton(){},getDriveInput:()=>({throttle,steer})});
     api.tick(.016,1);
     assert.equal(api.near?.id,key);
     api.start();
-    check({api,world,player,home:{...player},setThrottle:value=>{throttle=value;},step:(seconds,frame=1/60)=>{for(let t=0;t<seconds-1e-9;){const dt=Math.min(frame,seconds-t);api.tick(dt,1+t);t+=dt;}}});
+    check({api,world,player,home:{...player},setThrottle:value=>{throttle=value;},setSteer:value=>{steer=value;},step:(seconds,frame=1/60)=>{for(let t=0;t<seconds-1e-9;){const dt=Math.min(frame,seconds-t);api.tick(dt,1+t);t+=dt;}}});
   }finally{globalThis.document=priorDocument;globalThis.window=priorWindow;globalThis.Audio=priorAudio;}
 }
 
@@ -209,6 +209,17 @@ test('all exported side and rear lawns support travel across their edge',()=>{
       assert.ok(Math.abs(c.y+.82)<.02,`${name} supports the tyres: ${JSON.stringify(c)}`);
     },{spawn:{x:40,y:-.82,z:6}});
   }
+});
+
+test('approaching the apron from the lower west lawn does not lift the car sideways',()=>{
+  withHouseCar('car',[],({api,setThrottle,setSteer,step})=>{
+    setThrottle(-1);setSteer(-1);
+    let highest=-Infinity;
+    for(let i=0;i<240;i++){step(1/60);highest=Math.max(highest,api.state.cars.car.y);}
+    const c=api.state.cars.car;
+    assert.ok(c.x>-7,`car reaches the apron edge from the lawn: ${JSON.stringify(c)}`);
+    assert.ok(highest<-.5,`edge approach cannot pop onto the raised apron: ${JSON.stringify({highest,...c})}`);
+  },{spawn:{x:-8,y:-.82,z:2}});
 });
 
 test('parking twice moves original collider indices without ghosts',()=>{
