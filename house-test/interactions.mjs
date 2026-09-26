@@ -4,7 +4,7 @@ import {hangBarInteractions} from './hang-bar.mjs?v=20260925-motion';
 import {roombaInteractions} from './roomba.mjs?v=20260925-motion';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
 import {bedInteractions} from './beds.mjs?v=20260925-motion2';
-import {driveCar} from './car-driving.mjs?v=20260925-drive1';
+import {driveCar} from './car-driving.mjs?v=20260926-ground1';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
@@ -83,9 +83,21 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
 
   // ----- the fridge: both French doors swing open, and there are the snacks.
   {
-    const cx=(info['fridge-a']&&info['fridge-b'])?(info['fridge-a'].max[0]+info['fridge-b'].min[0])/2:2.68;
-    const doors=[['fridge-a',info['fridge-a']?.min[0]??2.23,1],['fridge-b',info['fridge-b']?.max[0]??3.13,-1]];
-    const front=Math.min(info['fridge-a']?.min[2]??-5.38,info['fridge-b']?.min[2]??-5.38);
+    // The prop extents also include handles, drawings and the dispenser. Use
+    // the two door panels for the hinges and centre, so attachments do not
+    // move the pivot when their bounds change.
+    const panel=key=>(propBoxes[key]||[]).find(b=>/^French door(?:\.\d+)?$/.test(b.name));
+    const panelA=panel('fridge-a'),panelB=panel('fridge-b');
+    const cx=(panelA&&panelB)?(panelA.max[0]+panelB.min[0])/2:
+      (info['fridge-a']&&info['fridge-b'])?(info['fridge-a'].max[0]+info['fridge-b'].min[0])/2:2.68;
+    const doors=[['fridge-a',panelA?.min[0]??info['fridge-a']?.min[0]??2.23,1],
+                 ['fridge-b',panelB?.max[0]??info['fridge-b']?.max[0]??3.13,-1]];
+    const front=Math.min(panelA?.min[2]??info['fridge-a']?.min[2]??-5.38,
+                         panelB?.min[2]??info['fridge-b']?.min[2]??-5.38);
+    const cabinet=data.colliders.find(b=>b.name==='Refrigerator cabinet');
+    // The snack image sits just in front of the opaque cabinet and behind the
+    // closed panels. Panel-front + .075 would bury it inside the cabinet.
+    const insideZ=cabinet&&cabinet.min[2]>front+.01?cabinet.min[2]-.005:front+.02;
     // What's inside, painted on the cabinet front where the doors were.
     const c=document.createElement('canvas');c.width=256;c.height=384;const g=c.getContext('2d');
     g.fillStyle='#eef3f5';g.fillRect(0,0,256,384);
@@ -101,7 +113,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     g.fillStyle='#3b2e25';g.font='bold 15px ui-rounded,system-ui,sans-serif';g.fillText('Cat food · Bubba & Beebs',22,368);
     const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
     const inside=new THREE.Mesh(new THREE.PlaneGeometry(.88,1.28),new THREE.MeshStandardMaterial({map:tex,roughness:.7,emissive:'#ffffff',emissiveMap:tex,emissiveIntensity:.25}));
-    inside.position.set(cx,1.235,front+.075);inside.rotation.y=Math.PI;inside.visible=false;scene.add(inside);
+    inside.position.set(cx,1.235,insideZ);inside.rotation.y=Math.PI;inside.visible=false;scene.add(inside);
     let open=false,angle=0;
     // The export's static door boxes remain indexed at their closed position.
     // Register a second set over the whole swing, then move those boxes with
@@ -299,30 +311,28 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // each end, the centre and halfway along each side (so a wall's end cannot
     // slip between two samples when the car swings round).
     const SAMPLES=[[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL],[halfW,halfL/2],[-halfW,halfL/2],[halfW,-halfL/2],[-halfW,-halfL/2]];
-    // What the car drives over. It is a toy car in a kids' game, so it is
-    // generous: anything flat up to CLIMB above its wheels it simply rides up
-    // onto (kerbs, the graded apron, the porch, a garden bed, a bush, the
-    // bus-stop bench), and any *thing* lower than CLEAR it barrels straight
-    // over (garden chairs, the front steps, the toy house, tree stakes,
-    // bins). Walls are still walls, though: a thin, long box that stands
-    // tall or floats above the ground — a wall, a sill, a fence or porch rail
-    // — is solid from kerb height (KERB) up, so the car can never mount a
-    // window sill and drive into the living room. Tall things (the mailbox,
-    // the swing frame, poles, trees, the other car) stop it too.
-    const CLIMB=.8,CLEAR=1.1,KERB=.3;
-    const shape=b=>b.carShape??=(()=>{const w=b.max[0]-b.min[0],d=b.max[2]-b.min[2],h=b.max[1]-b.min[1];return {thin:Math.min(w,d)<=.35&&Math.max(w,d)>=1.2,tall:h>=.3,broad:Math.min(w,d)>=.5,slab:h<=.12};})();
-    // Ground is anything broad, or a thin slab lying about the car's level
-    // (the strips of a graded ramp): never a rail floating above it.
-    const ground=b=>{const s=shape(b);return s.broad||(s.slab&&b.min[1]<=car.y+KERB);};
-    const wall=(b,y)=>{const s=shape(b);return s.thin&&(s.tall||b.min[1]>y+KERB);};
+    // Only the known driving surfaces support the tyres. A broad bench,
+    // bush or garden bed is still an obstacle, regardless of its flat top.
+    // The apron is made of narrow strips; the footprint samples bridge their
+    // seams while backing out of the garage.
+    const STEP=.24,RAMP_REACH=.55,TYRE=.12;
+    const drivable=b=>b.carDriveable??=/^(?:Garage concrete slab|Asphalt driveway|Asphalt apron graded to garage threshold walk strip \d+|Front (?:lawn|foundation lawn|side lawn)|Rear (?:lawn|east lawn|west lawn)|(?:West|East) side lawn|Street at edge of study|Sidewalk concrete panel(?:\.\d+)?|Neighborhood ground)$/.test(b.name);
     // The ground under one point of the car: the highest such top not far
     // above the body, however far below (the driveway falls away under the
     // back of a car nosing out of the garage; the old walking-step test saw
     // "no floor" there and the car stuck at the threshold).
-    const groundAt=(px,pz)=>{
+    const groundAt=(px,pz,x,h)=>{
       let top=-Infinity;
+      const xRadius=Math.abs(Math.cos(h))*halfW+Math.abs(Math.sin(h))*halfL;
       for(const b of world.nearby(px,pz,.1)){
-        if(b.max[1]>car.y+CLIMB||b.max[1]<car.y-1.5||!ground(b))continue;
+        // Averaging support over a car-length footprint makes its centre
+        // lag behind the leading wheels uphill. The known garage grade needs
+        // extra reach only while the whole car follows that grade lengthwise.
+        // A side approach from the lower lawn must not lift it onto the edge.
+        const onGrade=b.name==='Garage concrete slab'||b.name.startsWith('Asphalt apron graded to garage threshold walk strip ');
+        const aligned=Math.abs(Math.sin(h))<.35&&x-xRadius>=b.min[0]-.1&&x+xRadius<=b.max[0]+.1;
+        const reach=onGrade&&aligned?RAMP_REACH:STEP;
+        if(!drivable(b)||b.max[1]>car.y+reach||b.max[1]<car.y-1.5)continue;
         if(px>=b.min[0]-.10&&px<=b.max[0]+.10&&pz>=b.min[2]-.10&&pz<=b.max[2]+.10)top=Math.max(top,b.max[1]);
       }
       return Number.isFinite(top)?top:null;
@@ -335,7 +345,11 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     function squeeze(px,pz,y){
       let d=0;
       for(const b of world.nearby(px,pz,R)){
-        if(b.max[1]<=y+(wall(b,y)?KERB:CLEAR)||b.min[1]>=y+world.height)continue;
+        // A driving surface that is too high for this sample is a ledge,
+        // especially at the side of the graded apron. Ordinary terrain under
+        // the tyres remains transparent to the body collision check.
+        if(drivable(b)&&b.max[1]<=y+STEP)continue;
+        if(b.max[1]<=y+TYRE||b.min[1]>=y+world.height)continue;
         const ix=Math.min(px-b.min[0],b.max[0]-px),iz=Math.min(pz-b.min[2],b.max[2]-pz);
         const sd=ix>=0&&iz>=0?-Math.min(ix,iz):Math.hypot(Math.max(0,-ix),Math.max(0,-iz));
         if(sd<R)d+=R-sd;
@@ -354,7 +368,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     function trouble(x,z,h){
       let n=0,off=0,sum=0,k=0;
       for(const [dx,dz] of SAMPLES){
-        const {x:px,z:pz}=carPoint(x,z,dx,dz,h),g=groundAt(px,pz);
+        const {x:px,z:pz}=carPoint(x,z,dx,dz,h),g=groundAt(px,pz,x,h);
         if(g===null){off++;continue;}
         sum+=g;k++;n+=squeeze(px,pz,g);
       }
@@ -365,13 +379,27 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // rather than every frame the car leans on a wall.
     let lastBump=-1;
     function bump(){const t=performance.now();if(t-lastBump<600)return;lastBump=t;sounds.click();}
+    // The original collider objects already belong to WalkingWorld. Keep
+    // their grid entries in sync instead of adding a new copy at every park.
+    const boxIds=boxes.map(bx=>world.boxes.indexOf(bx));
+    function gridCells(bx,visit){
+      for(let x=Math.floor(bx.min[0]/2);x<=Math.floor(bx.max[0]/2);x++)
+        for(let z=Math.floor(bx.min[2]/2);z<=Math.floor(bx.max[2]/2);z++)visit(`${x},${z}`);
+    }
+    function unindexBoxes(){boxes.forEach((bx,i)=>gridCells(bx,k=>{
+      const cell=world.grid.get(k);if(!cell)return;
+      const at=cell.indexOf(boxIds[i]);if(at>=0)cell.splice(at,1);
+      if(!cell.length)world.grid.delete(k);
+    }));}
     function parkBoxes(){
-      // The car's boxes move with it: one box round the parked car.
+      // One rotated bounding rectangle around the parked car.
       const cs=[corner(halfW,halfL),corner(-halfW,halfL),corner(halfW,-halfL),corner(-halfW,-halfL)];
       const minX=Math.min(...cs.map(c=>c.x)),maxX=Math.max(...cs.map(c=>c.x)),minZ=Math.min(...cs.map(c=>c.z)),maxZ=Math.max(...cs.map(c=>c.z));
       boxes.forEach((bx,i)=>{const dy0=saved[i].min[1]-home.y,dy1=saved[i].max[1]-home.y;bx.min=[minX,car.y+dy0,minZ];bx.max=[maxX,car.y+dy1,maxZ];});
-      world.addBoxes(boxes.map(bx=>({name:bx.name,min:bx.min,max:bx.max,prop:key})));
-      // (The old entries stay in the grid but their boxes now sit here.)
+      boxes.forEach((bx,i)=>gridCells(bx,k=>{
+        if(!world.grid.has(k))world.grid.set(k,[]);
+        world.grid.get(k).push(boxIds[i]);
+      }));
     }
     const door=()=>corner(-(halfW+.45),.3);
     // In reach from any side of the car, not just the driver's door.
@@ -382,6 +410,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       hint:'↑ accelerate · ↓ brake/reverse · ← → steer · Space honks · E to get out',
       start(){
         car.speed=0;car.steering=0;car.parked=false;
+        unindexBoxes();
         for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
         // The view looks down on the car from over its roof (a boom aimed
         // at the driver would start inside the car's own baked panels).

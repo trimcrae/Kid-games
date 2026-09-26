@@ -351,19 +351,60 @@ def text_mesh(body, size):
 
 
 # ------------------------------------------------------------------ code-drawn kid art
+def clip_art_polygon(points, left, right, bottom, top):
+    """Keep a drawing polygon inside its paper, retaining edge intersections."""
+    for axis, edge, keep_less in ((0, left, False), (0, right, True),
+                                  (1, bottom, False), (1, top, True)):
+        clipped = []
+        if not points:
+            break
+        previous = points[-1]
+        previous_inside = previous[axis] <= edge if keep_less else previous[axis] >= edge
+        for current in points:
+            inside = current[axis] <= edge if keep_less else current[axis] >= edge
+            if inside != previous_inside:
+                fraction = (edge - previous[axis]) / (current[axis] - previous[axis])
+                cross = [previous[i] + fraction * (current[i] - previous[i]) for i in (0, 1)]
+                cross[axis] = edge
+                clipped.append(tuple(cross))
+            if inside:
+                clipped.append(current)
+            previous, previous_inside = current, inside
+        points = clipped
+    # An intersection can coincide with a vertex already on the paper edge.
+    # Such repeats make zero-length Blender edges even though the face has area.
+    tolerance = 1e-10 * max(right - left, top - bottom)
+    unique = []
+    for point in points:
+        if not unique or math.dist(point, unique[-1]) > tolerance:
+            unique.append(point)
+    if len(unique) > 1 and math.dist(unique[0], unique[-1]) <= tolerance:
+        unique.pop()
+    if len(unique) < 3:
+        return []
+    area_twice = sum((x - left) * (unique[(i + 1) % len(unique)][1] - bottom) -
+                     (unique[(i + 1) % len(unique)][0] - left) * (z - bottom)
+                     for i, (x, z) in enumerate(unique))
+    return unique if abs(area_twice) > 1e-12 * (right - left) * (top - bottom) else []
+
+
 def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None):
     """A paper drawing in the local x/z plane (front -Y) from simple shapes,
     merged into ``target`` after an optional placement (at, rot)."""
     g = Geo(target.root, target.name)
     g.box((cx, y0 - .003, cz), (w, .006, h), D['paper'])
     layer = [y0 - .0065]
+    drawing = []
 
     def P(u, v):
         return (cx + u * w, cz + v * h)
 
-    def put(pts2, mat):
-        g.vflat(pts2, layer[0], mat)
-        layer[0] -= .0012
+    def put(pts2, mat, advance=True):
+        clipped = clip_art_polygon(pts2, cx - w / 2, cx + w / 2, cz - h / 2, cz + h / 2)
+        if len(clipped) >= 3:
+            drawing.append((clipped, layer[0], mat))
+        if advance:
+            layer[0] -= .0012
 
     def disc(u, v, r, mat, n=16, sx=1.0, sy=1.0):
         rr = r * min(w, h)
@@ -386,10 +427,10 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
             for k in range(n):
                 a, b = k * math.pi / n, (k + 1) * math.pi / n
                 ox, oz = cx + u * w, cz + v * h
-                g.vflat([(ox + r0 * m * math.cos(a), oz + r0 * m * math.sin(a)),
-                         (ox + r1 * m * math.cos(a), oz + r1 * m * math.sin(a)),
-                         (ox + r1 * m * math.cos(b), oz + r1 * m * math.sin(b)),
-                         (ox + r0 * m * math.cos(b), oz + r0 * m * math.sin(b))], layer[0], mat)
+                put([(ox + r0 * m * math.cos(a), oz + r0 * m * math.sin(a)),
+                     (ox + r1 * m * math.cos(a), oz + r1 * m * math.sin(a)),
+                     (ox + r1 * m * math.cos(b), oz + r1 * m * math.sin(b)),
+                     (ox + r0 * m * math.cos(b), oz + r0 * m * math.sin(b))], mat, False)
             layer[0] -= .0012
 
     if motif == 'sun_house':
@@ -487,6 +528,13 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
                 if ch in cmap:
                     u0, v0 = -.44 + i * .11, .44 - (j + 1) * .11
                     rect(u0, v0, u0 + .105, v0 + .105, cmap[ch])
+    # Keep every drawing between 0.5 and 4 mm above the paper. Dense pixel
+    # and grid drawings still preserve their order without floating centimetres
+    # in front of an unframed poster.
+    depths = dict.fromkeys(depth for _, depth, _ in drawing)
+    depth_index = {depth: i for i, depth in enumerate(depths)}
+    for points, depth, mat in drawing:
+        g.vflat(points, y0 - .0065 - .0035 * depth_index[depth] / max(1, len(depths) - 1), mat)
     if frame:
         fw = .022
         for dx in (-1, 1):
@@ -676,7 +724,7 @@ g.done()
 g, _ = rug_on('Entry doormat', 5.55, -.90, .30, .60, .90, D['kraft'], D['coral'], .06)
 g.done()
 zc = down(4.45, .32, 1.6)
-g = prop('Entry chest top bowl plant and pet picture', 4.45, .32, zc)
+g = prop('Entry chest top bowl plant and pet picture', 4.45, .32, zc, 180)
 g.cyl((-.25, -.02, .022), .06, .044, D['teal'], 14, top=.085)
 for dx in (-.02, .02):
     g.box((-.25 + dx, -.02, .045), (.03, .012, .004), D['mustard'])
@@ -726,7 +774,7 @@ for k in range(4):
     g.box((.015 * math.cos(k * 1.6), .015 * math.sin(k * 1.6), .17), (.014, .03, .16), D['wood'],
           (_rng.uniform(-.15, .15), _rng.uniform(-.15, .15), 0))
 g.done()
-for x, z, motif in [(2.93, 1.45, 'sun_house'), (2.42, 1.62, 'pet'), (2.95, 1.05, 'rainbow')]:
+for x, z, motif in [(2.93, 1.58, 'sun_house'), (2.42, 1.62, 'pet'), (2.95, .88, 'rainbow')]:
     g = wall_prop('Kitchen fridge drawing ' + motif, x, 5.95, z, (0, -1, 0))
     art(g, 0, 0, .21, .28, motif, 0, False, rot=(0, _rng.uniform(-.09, .09), 0))
     g.cyl((0, -.012, .12), .016, .012, D['mustard'], 10, rot=(math.pi / 2, 0, 0))
@@ -1731,4 +1779,3 @@ clock('Office clock', 4.20, 7.40, -1.10, (0, 1, 0), .12)
 
 print('DRESSING:', len(_made), 'dressing meshes;',
       sum(len(bpy.data.objects[n].data.polygons) for n in _made), 'faces', flush=True)
-

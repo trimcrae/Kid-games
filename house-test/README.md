@@ -66,12 +66,11 @@ study:
   screens the pad drives and steers, with partial pressure controlling speed,
   and the action button becomes a horn. A wider, smoothly turning driving
   camera shows more of the car and road; walking tips stay hidden while seated.
-  It is a toy car, so it rides up onto anything flat up to
-  80 cm — kerbs, the porch, bushes, the bus-stop bench — and drives
-  straight over any *thing* lower than 110 cm (chairs, steps, bins, the
-  toy house); only walls, sills, fences and rails, tall things (poles,
-  trees, the mailbox, the swing frame, the other car) and the brink of the
-  world stop it. Meeting a wall at an angle projects motion along its surface
+  The garage slab, graded apron, driveway, lawn, sidewalk, street and Craepet
+  Street ground support the tyres. The cars climb small changes in those
+  surfaces; bushes, benches, furniture, walls, the other car and the brink of
+  the world stop them. Meeting an obstacle at an angle projects motion along
+  its surface
   rather than making the car dart sideways; a direct impact stops it, and
   reversing backs it away. Small physics steps keep handling consistent at
   different frame rates. The
@@ -291,10 +290,15 @@ Run with a Python that has Blender's `bpy` module:
 
 ```sh
 python models/house/build.py
-python models/house/export_walkthrough.py -- --ao
+python models/house/verify.py
+python models/house/export_walkthrough.py -- --ao --lightmap --lightmap-samples 128
 node models/house/test_walkthrough.mjs
 python -m http.server 8765
 ```
+
+Keep the model, manifest, mesh, AO, lightmap UVs and day/night lightmap pages
+together when publishing a rebuild. Changed geometry needs fresh lighting
+sidecars; exporting with only `--ao` removes the baked-light manifest block.
 
 Visit `http://localhost:8765/house-test/`. The exporter produces a gzip-compressed
 interleaved position/normal buffer, material groups and spatial collision boxes.
