@@ -83,9 +83,17 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
 
   // ----- the fridge: both French doors swing open, and there are the snacks.
   {
-    const cx=(info['fridge-a']&&info['fridge-b'])?(info['fridge-a'].max[0]+info['fridge-b'].min[0])/2:2.68;
-    const doors=[['fridge-a',info['fridge-a']?.min[0]??2.23,1],['fridge-b',info['fridge-b']?.max[0]??3.13,-1]];
-    const front=Math.min(info['fridge-a']?.min[2]??-5.38,info['fridge-b']?.min[2]??-5.38);
+    // The prop extents also include handles, drawings and the dispenser. Use
+    // the two door panels for the hinges and inside plane, so attachments do
+    // not move the pivot when their bounds change.
+    const panel=key=>(propBoxes[key]||[]).find(b=>/^French door(?:\.\d+)?$/.test(b.name));
+    const panelA=panel('fridge-a'),panelB=panel('fridge-b');
+    const cx=(panelA&&panelB)?(panelA.max[0]+panelB.min[0])/2:
+      (info['fridge-a']&&info['fridge-b'])?(info['fridge-a'].max[0]+info['fridge-b'].min[0])/2:2.68;
+    const doors=[['fridge-a',panelA?.min[0]??info['fridge-a']?.min[0]??2.23,1],
+                 ['fridge-b',panelB?.max[0]??info['fridge-b']?.max[0]??3.13,-1]];
+    const front=Math.min(panelA?.min[2]??info['fridge-a']?.min[2]??-5.38,
+                         panelB?.min[2]??info['fridge-b']?.min[2]??-5.38);
     // What's inside, painted on the cabinet front where the doors were.
     const c=document.createElement('canvas');c.width=256;c.height=384;const g=c.getContext('2d');
     g.fillStyle='#eef3f5';g.fillRect(0,0,256,384);
