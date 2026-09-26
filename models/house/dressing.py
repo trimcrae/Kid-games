@@ -724,7 +724,7 @@ g.done()
 g, _ = rug_on('Entry doormat', 5.55, -.90, .30, .60, .90, D['kraft'], D['coral'], .06)
 g.done()
 zc = down(4.45, .32, 1.6)
-g = prop('Entry chest top bowl plant and pet picture', 4.45, .32, zc)
+g = prop('Entry chest top bowl plant and pet picture', 4.45, .32, zc, 180)
 g.cyl((-.25, -.02, .022), .06, .044, D['teal'], 14, top=.085)
 for dx in (-.02, .02):
     g.box((-.25 + dx, -.02, .045), (.03, .012, .004), D['mustard'])
@@ -774,7 +774,7 @@ for k in range(4):
     g.box((.015 * math.cos(k * 1.6), .015 * math.sin(k * 1.6), .17), (.014, .03, .16), D['wood'],
           (_rng.uniform(-.15, .15), _rng.uniform(-.15, .15), 0))
 g.done()
-for x, z, motif in [(2.93, 1.45, 'sun_house'), (2.42, 1.62, 'pet'), (2.95, 1.05, 'rainbow')]:
+for x, z, motif in [(2.93, 1.58, 'sun_house'), (2.42, 1.62, 'pet'), (2.95, .88, 'rainbow')]:
     g = wall_prop('Kitchen fridge drawing ' + motif, x, 5.95, z, (0, -1, 0))
     art(g, 0, 0, .21, .28, motif, 0, False, rot=(0, _rng.uniform(-.09, .09), 0))
     g.cyl((0, -.012, .12), .016, .012, D['mustard'], 10, rot=(math.pi / 2, 0, 0))

@@ -1,5 +1,6 @@
 """Fast source-level geometry and moving-prop checks; Blender is not required."""
 import ast
+import json
 import math
 from pathlib import Path
 import types
@@ -99,8 +100,89 @@ class ArtTests(unittest.TestCase):
         self.assertEqual(len(bands), 60)
         self.assertEqual(len({y for _, y, _ in bands}), 5)
 
+    def test_entry_chest_picture_faces_with_its_host_chest(self):
+        dressing = ast.parse((HERE / 'dressing.py').read_text(encoding='utf-8'))
+        build = ast.parse((HERE / 'build.py').read_text(encoding='utf-8'))
+        def named_call(tree, function, name):
+            return next(node for node in ast.walk(tree) if isinstance(node, ast.Call)
+                        and isinstance(node.func, ast.Name) and node.func.id == function
+                        and node.args and isinstance(node.args[0], ast.Constant)
+                        and node.args[0].value == name)
+        host = named_call(build, 'chest', 'Entry tall chest of drawers')
+        picture = named_call(dressing, 'prop', 'Entry chest top bowl plant and pet picture')
+        host_angle = ast.literal_eval(host.args[4])
+        picture_angle = ast.literal_eval(picture.args[4]) if len(picture.args) > 4 else 0
+        self.assertEqual(picture_angle, host_angle)
+        self.assertEqual(picture_angle, 180)  # local -Y paper front faces the entry room
+
 
 class FridgeTests(unittest.TestCase):
+    def test_fridge_papers_and_magnets_clear_dispenser_and_stay_on_doors(self):
+        dressing = ast.parse((HERE / 'dressing.py').read_text(encoding='utf-8'))
+        layout = next(node for node in ast.walk(dressing) if isinstance(node, ast.For)
+                      and isinstance(node.target, ast.Tuple)
+                      and [item.id for item in node.target.elts] == ['x', 'z', 'motif']
+                      and any(isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+                              and call.func.id == 'wall_prop' and call.args
+                              and isinstance(call.args[0], ast.BinOp)
+                              and isinstance(call.args[0].left, ast.Constant)
+                              and call.args[0].left.value == 'Kitchen fridge drawing '
+                              for child in node.body for call in ast.walk(child)))
+        drawings = ast.literal_eval(layout.iter)
+        art_call = next(call for child in layout.body for call in ast.walk(child)
+                        if isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+                        and call.func.id == 'art')
+        width, height = (ast.literal_eval(art_call.args[i]) for i in (3, 4))
+        tilt_call = next(call for call in ast.walk(art_call) if isinstance(call, ast.Call)
+                         and isinstance(call.func, ast.Attribute) and call.func.attr == 'uniform')
+        tilt = max(abs(ast.literal_eval(arg)) for arg in tilt_call.args)
+        horizontal_reach = width / 2 * math.cos(tilt) + height / 2 * math.sin(tilt)
+        vertical_reach = height / 2 * math.cos(tilt) + width / 2 * math.sin(tilt)
+        magnet = next(call for child in layout.body for call in ast.walk(child)
+                      if isinstance(call, ast.Call) and isinstance(call.func, ast.Attribute)
+                      and call.func.attr == 'cyl')
+        magnet_z = ast.literal_eval(magnet.args[0])[2]
+        magnet_radius = ast.literal_eval(magnet.args[1])
+        self.assertLessEqual(magnet_z + magnet_radius, vertical_reach)
+
+        build = ast.parse((HERE / 'build.py').read_text(encoding='utf-8'))
+        calls = [node for node in ast.walk(build) if isinstance(node, ast.Call)
+                 and isinstance(node.func, ast.Name) and node.func.id in {'asset', 'box'}
+                 and node.args and isinstance(node.args[0], ast.Constant)]
+        fridge = next(node for node in calls if node.args[0].value == 'French-door refrigerator')
+        fridge_z = ast.literal_eval(fridge.args[1])[2]
+        dispenser = []
+        for name in ('Water dispenser recess', 'Water dispenser shelf'):
+            node = next(node for node in calls if node.args[0].value == name)
+            local, size = (ast.literal_eval(node.args[i]) for i in (1, 2))
+            dispenser.append((name, local[0], size[0],
+                              fridge_z + local[2] - size[2] / 2,
+                              fridge_z + local[2] + size[2] / 2))
+
+        exported = json.loads((HERE.parent.parent / 'house-test/house.json').read_text(encoding='utf-8'))
+        doors = {b['prop']: b for b in exported['colliders']
+                 if b.get('prop') in {'fridge-a', 'fridge-b'} and b['name'].startswith('French door')}
+        self.assertEqual(set(doors), {'fridge-a', 'fridge-b'})
+        fridge_x = (doors['fridge-a']['max'][0] + doors['fridge-b']['min'][0]) / 2
+        for x, z, motif in drawings:
+            with self.subTest(motif=motif):
+                side = 'fridge-a' if x < fridge_x else 'fridge-b'
+                panel = doors[side]
+                left, right = x - horizontal_reach, x + horizontal_reach
+                bottom, top = z - vertical_reach, z + vertical_reach
+                self.assertGreater(left, panel['min'][0] + .02)
+                self.assertLess(right, panel['max'][0] - .02)
+                self.assertGreater(bottom, panel['min'][1] + .03)
+                self.assertLess(top, panel['max'][1] - .03)
+                for name, local_x, dispenser_width, low, high in dispenser:
+                    # Kitchen quarter-turn plus the refrigerator's own 90°
+                    # turn maps local X to minus browser X.
+                    dispenser_x = fridge_x - local_x
+                    if right <= dispenser_x - dispenser_width / 2 or left >= dispenser_x + dispenser_width / 2:
+                        continue
+                    self.assertTrue(bottom >= high + .04 or top <= low - .04,
+                                    f'{motif} paper or magnet overlaps {name}')
+
     def test_dispenser_parts_follow_panel_selected_by_world_geometry(self):
         namespace = source_functions('export_walkthrough.py', 'prop_key')
         fridge = types.SimpleNamespace(name='French-door refrigerator',
