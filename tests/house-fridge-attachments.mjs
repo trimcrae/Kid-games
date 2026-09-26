@@ -30,6 +30,7 @@ function fridgePose(withShelf){
   api.tick(1/60,1);
   assert.equal(api.near?.id,'fridge');
   api.start();api.tick(1/60,2);
+  assert(inside.visible,'snack plane did not appear when the fridge opened');
   return {plane:[inside.position.x,inside.position.z],
     doorA:[...meshA.matrix.elements],doorB:[...meshB.matrix.elements]};
 }
@@ -38,8 +39,13 @@ const bare=fridgePose(false),attached=fridgePose(true);
 assert.deepEqual(attached,bare,'dispenser attachment shifted the fridge hinge or inside plane');
 const panelA=source.colliders.find(b=>b.prop==='fridge-a'&&/^French door(?:\.\d+)?$/.test(b.name));
 const panelB=source.colliders.find(b=>b.prop==='fridge-b'&&/^French door(?:\.\d+)?$/.test(b.name));
-const expectedFront=Math.min(panelA.min[2],panelB.min[2]);
-assert(Math.abs(bare.plane[1]-(expectedFront+.075))<1e-6,'inside plane did not use door-panel front');
+const panelFront=Math.min(panelA.min[2],panelB.min[2]);
+const cabinet=source.colliders.find(b=>b.name==='Refrigerator cabinet');
+assert(cabinet,'refrigerator cabinet collider missing');
+assert(bare.plane[1]>panelFront+.001,'snack plane is in front of a closed door');
+assert(bare.plane[1]<cabinet.min[2]-.001,'snack plane is hidden inside the opaque cabinet');
+assert(Math.abs(bare.plane[1]-(cabinet.min[2]-.005))<1e-6,
+  'snack plane did not follow the cabinet front');
 assert(Math.abs(bare.plane[0]-(panelA.max[0]+panelB.min[0])/2)<1e-6,
   'inside plane did not use door-panel centre');
 console.log('PASS fridge attachments do not shift door hinges or inside plane');

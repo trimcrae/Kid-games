@@ -84,8 +84,8 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   // ----- the fridge: both French doors swing open, and there are the snacks.
   {
     // The prop extents also include handles, drawings and the dispenser. Use
-    // the two door panels for the hinges and inside plane, so attachments do
-    // not move the pivot when their bounds change.
+    // the two door panels for the hinges and centre, so attachments do not
+    // move the pivot when their bounds change.
     const panel=key=>(propBoxes[key]||[]).find(b=>/^French door(?:\.\d+)?$/.test(b.name));
     const panelA=panel('fridge-a'),panelB=panel('fridge-b');
     const cx=(panelA&&panelB)?(panelA.max[0]+panelB.min[0])/2:
@@ -94,6 +94,10 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
                  ['fridge-b',panelB?.max[0]??info['fridge-b']?.max[0]??3.13,-1]];
     const front=Math.min(panelA?.min[2]??info['fridge-a']?.min[2]??-5.38,
                          panelB?.min[2]??info['fridge-b']?.min[2]??-5.38);
+    const cabinet=data.colliders.find(b=>b.name==='Refrigerator cabinet');
+    // The snack image sits just in front of the opaque cabinet and behind the
+    // closed panels. Panel-front + .075 would bury it inside the cabinet.
+    const insideZ=cabinet&&cabinet.min[2]>front+.01?cabinet.min[2]-.005:front+.02;
     // What's inside, painted on the cabinet front where the doors were.
     const c=document.createElement('canvas');c.width=256;c.height=384;const g=c.getContext('2d');
     g.fillStyle='#eef3f5';g.fillRect(0,0,256,384);
@@ -109,7 +113,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     g.fillStyle='#3b2e25';g.font='bold 15px ui-rounded,system-ui,sans-serif';g.fillText('Cat food · Bubba & Beebs',22,368);
     const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;
     const inside=new THREE.Mesh(new THREE.PlaneGeometry(.88,1.28),new THREE.MeshStandardMaterial({map:tex,roughness:.7,emissive:'#ffffff',emissiveMap:tex,emissiveIntensity:.25}));
-    inside.position.set(cx,1.235,front+.075);inside.rotation.y=Math.PI;inside.visible=false;scene.add(inside);
+    inside.position.set(cx,1.235,insideZ);inside.rotation.y=Math.PI;inside.visible=false;scene.add(inside);
     let open=false,angle=0;
     // The export's static door boxes remain indexed at their closed position.
     // Register a second set over the whole swing, then move those boxes with
