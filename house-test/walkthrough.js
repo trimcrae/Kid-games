@@ -16,7 +16,7 @@ import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHead
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
-import {createInteractions} from './interactions.mjs?v=20260925-car';
+import {createInteractions} from './interactions.mjs?v=20260926-house-fixes';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 
@@ -112,7 +112,7 @@ if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 // The export's data files are cached by content: the manifest by release, and
 // the mesh, AO and lightmaps by their own hashes from that manifest, so a new
 // manifest never meets an old mesh from a browser or offline cache.
-const DATA_VERSION='20260916-use3';
+const DATA_VERSION='20260926-house-fixes';
 // How long a ready house waits for a bake still downloading (?bakegrace= ms).
 const BAKE_GRACE=THREE.MathUtils.clamp(Number(query.get('bakegrace'))||3000,0,15000);
 // Calibrated against the matched captures (September 16): the day bake at 0.75,
