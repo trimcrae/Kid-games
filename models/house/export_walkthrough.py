@@ -129,7 +129,9 @@ def prop_key(o, verts):
     if parent == 'Garage black SUV':
         return 'car2'
     centre_x = sum(v.x for v in verts) / max(1, len(verts))
-    if parent == 'French-door refrigerator' and n.startswith(('French door', 'Curved vertical fridge handle')):
+    if parent == 'French-door refrigerator' and n.startswith((
+            'French door', 'Curved vertical fridge handle',
+            'Water dispenser recess', 'Water dispenser shelf')):
         # Turned with the kitchen, the two doors end up side by side along X.
         return 'fridge-' + ('a' if centre_x < o.parent.matrix_world.translation.x else 'b')
     if n.startswith('Kitchen fridge drawing'):

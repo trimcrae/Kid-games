@@ -351,6 +351,29 @@ def text_mesh(body, size):
 
 
 # ------------------------------------------------------------------ code-drawn kid art
+def clip_art_polygon(points, left, right, bottom, top):
+    """Keep a drawing polygon inside its paper, retaining edge intersections."""
+    for axis, edge, keep_less in ((0, left, False), (0, right, True),
+                                  (1, bottom, False), (1, top, True)):
+        clipped = []
+        if not points:
+            break
+        previous = points[-1]
+        previous_inside = previous[axis] <= edge if keep_less else previous[axis] >= edge
+        for current in points:
+            inside = current[axis] <= edge if keep_less else current[axis] >= edge
+            if inside != previous_inside:
+                fraction = (edge - previous[axis]) / (current[axis] - previous[axis])
+                cross = [previous[i] + fraction * (current[i] - previous[i]) for i in (0, 1)]
+                cross[axis] = edge
+                clipped.append(tuple(cross))
+            if inside:
+                clipped.append(current)
+            previous, previous_inside = current, inside
+        points = clipped
+    return points
+
+
 def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None):
     """A paper drawing in the local x/z plane (front -Y) from simple shapes,
     merged into ``target`` after an optional placement (at, rot)."""
@@ -361,9 +384,12 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
     def P(u, v):
         return (cx + u * w, cz + v * h)
 
-    def put(pts2, mat):
-        g.vflat(pts2, layer[0], mat)
-        layer[0] -= .0012
+    def put(pts2, mat, advance=True):
+        clipped = clip_art_polygon(pts2, cx - w / 2, cx + w / 2, cz - h / 2, cz + h / 2)
+        if len(clipped) >= 3:
+            g.vflat(clipped, layer[0], mat)
+        if advance:
+            layer[0] -= .0012
 
     def disc(u, v, r, mat, n=16, sx=1.0, sy=1.0):
         rr = r * min(w, h)
@@ -386,10 +412,10 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
             for k in range(n):
                 a, b = k * math.pi / n, (k + 1) * math.pi / n
                 ox, oz = cx + u * w, cz + v * h
-                g.vflat([(ox + r0 * m * math.cos(a), oz + r0 * m * math.sin(a)),
-                         (ox + r1 * m * math.cos(a), oz + r1 * m * math.sin(a)),
-                         (ox + r1 * m * math.cos(b), oz + r1 * m * math.sin(b)),
-                         (ox + r0 * m * math.cos(b), oz + r0 * m * math.sin(b))], layer[0], mat)
+                put([(ox + r0 * m * math.cos(a), oz + r0 * m * math.sin(a)),
+                     (ox + r1 * m * math.cos(a), oz + r1 * m * math.sin(a)),
+                     (ox + r1 * m * math.cos(b), oz + r1 * m * math.sin(b)),
+                     (ox + r0 * m * math.cos(b), oz + r0 * m * math.sin(b))], mat, False)
             layer[0] -= .0012
 
     if motif == 'sun_house':
@@ -1731,4 +1757,3 @@ clock('Office clock', 4.20, 7.40, -1.10, (0, 1, 0), .12)
 
 print('DRESSING:', len(_made), 'dressing meshes;',
       sum(len(bpy.data.objects[n].data.polygons) for n in _made), 'faces', flush=True)
-
