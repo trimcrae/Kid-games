@@ -304,7 +304,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // The apron is made of narrow strips; the footprint samples bridge their
     // seams while backing out of the garage.
     const STEP=.24,RAMP_REACH=.7,TYRE=.12;
-    const drivable=b=>b.carDriveable??=/^(?:Garage concrete slab|Asphalt driveway|Asphalt apron graded to garage threshold walk strip \d+|Front (?:foundation )?lawn|Street at edge of study|Sidewalk concrete panel(?:\.\d+)?|Neighborhood ground)$/.test(b.name);
+    const drivable=b=>b.carDriveable??=/^(?:Garage concrete slab|Asphalt driveway|Asphalt apron graded to garage threshold walk strip \d+|Front (?:lawn|foundation lawn|side lawn)|Rear (?:lawn|east lawn|west lawn)|(?:West|East) side lawn|Street at edge of study|Sidewalk concrete panel(?:\.\d+)?|Neighborhood ground)$/.test(b.name);
     // The ground under one point of the car: the highest such top not far
     // above the body, however far below (the driveway falls away under the
     // back of a car nosing out of the garage; the old walking-step test saw
