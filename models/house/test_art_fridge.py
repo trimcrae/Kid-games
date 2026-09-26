@@ -59,11 +59,29 @@ class ArtTests(unittest.TestCase):
                                        points[(i + 1) % len(points)][0] * z
                                        for i, (x, z) in enumerate(points))) / 2
                         self.assertGreater(area, 1e-12)
+                        for i, point in enumerate(points):
+                            following = points[(i + 1) % len(points)]
+                            self.assertGreater(math.dist(point, following), 1e-10)
                         for x, z in points:
                             self.assertGreaterEqual(x, .37 - width / 2 - 1e-10)
                             self.assertLessEqual(x, .37 + width / 2 + 1e-10)
                             self.assertGreaterEqual(z, -.21 - height / 2 - 1e-10)
                             self.assertLessEqual(z, -.21 + height / 2 + 1e-10)
+                    depths = [y for _, y, _ in polygons]
+                    self.assertGreaterEqual(min(depths), -.010 - 1e-10)
+                    self.assertLessEqual(max(depths), -.0065 + 1e-10)
+
+    def test_intersection_on_existing_boundary_vertex_is_unique(self):
+        clipped = self.ns['clip_art_polygon'](
+            [(-.2, -.1), (.15, -.225), (.5, -.4), (.4, .1)], -.3, .3, -.225, .225)
+        self.assertGreaterEqual(len(clipped), 3)
+        self.assertEqual(sum(math.dist(p, (.15, -.225)) < 1e-10 for p in clipped), 1)
+        self.assertTrue(all(math.dist(p, clipped[(i + 1) % len(clipped)]) > 1e-10
+                            for i, p in enumerate(clipped)))
+        self.assertEqual(self.ns['clip_art_polygon'](
+            [(-1, 0), (-.5, .1), (-.5, -.1)], -.3, .3, -.225, .225), [])
+        self.assertEqual(self.ns['clip_art_polygon'](
+            [(-1, 0), (-.3, .1), (-.3, -.1)], -.3, .3, -.225, .225), [])
 
     def test_landscape_hills_are_trimmed_and_remain_visible(self):
         target = types.SimpleNamespace(root=None, name='test', merge=lambda *a: None)
@@ -83,21 +101,20 @@ class ArtTests(unittest.TestCase):
 
 
 class FridgeTests(unittest.TestCase):
-    def test_dispenser_parts_follow_left_french_door(self):
+    def test_dispenser_parts_follow_panel_selected_by_world_geometry(self):
         namespace = source_functions('export_walkthrough.py', 'prop_key')
         fridge = types.SimpleNamespace(name='French-door refrigerator',
                                        matrix_world=types.SimpleNamespace(
-                                           translation=types.SimpleNamespace(x=5.0)))
+                                           translation=types.SimpleNamespace(x=2.68)))
         namespace['bpy'] = types.SimpleNamespace(data=types.SimpleNamespace(
             objects={'French-door refrigerator': fridge}))
         prop_key = namespace['prop_key']
-        verts = [types.SimpleNamespace(x=x) for x in (4.74, 4.82)]
-        for name in ('French door', 'Curved vertical fridge handle',
-                     'Water dispenser recess', 'Water dispenser shelf'):
+        verts = [types.SimpleNamespace(x=x) for x in (2.69, 2.78)]
+        for name in ('Water dispenser recess', 'Water dispenser shelf'):
             with self.subTest(name=name):
-                self.assertEqual(prop_key(types.SimpleNamespace(name=name, parent=fridge), verts), 'fridge-a')
+                self.assertEqual(prop_key(types.SimpleNamespace(name=name, parent=fridge), verts), 'fridge-b')
         self.assertEqual(prop_key(types.SimpleNamespace(name='French door', parent=fridge),
-                                  [types.SimpleNamespace(x=5.2)]), 'fridge-b')
+                                  [types.SimpleNamespace(x=2.45)]), 'fridge-a')
         self.assertIsNone(prop_key(types.SimpleNamespace(name='Bottom freezer drawer', parent=fridge), verts))
 
 

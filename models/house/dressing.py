@@ -371,7 +371,21 @@ def clip_art_polygon(points, left, right, bottom, top):
                 clipped.append(current)
             previous, previous_inside = current, inside
         points = clipped
-    return points
+    # An intersection can coincide with a vertex already on the paper edge.
+    # Such repeats make zero-length Blender edges even though the face has area.
+    tolerance = 1e-10 * max(right - left, top - bottom)
+    unique = []
+    for point in points:
+        if not unique or math.dist(point, unique[-1]) > tolerance:
+            unique.append(point)
+    if len(unique) > 1 and math.dist(unique[0], unique[-1]) <= tolerance:
+        unique.pop()
+    if len(unique) < 3:
+        return []
+    area_twice = sum((x - left) * (unique[(i + 1) % len(unique)][1] - bottom) -
+                     (unique[(i + 1) % len(unique)][0] - left) * (z - bottom)
+                     for i, (x, z) in enumerate(unique))
+    return unique if abs(area_twice) > 1e-12 * (right - left) * (top - bottom) else []
 
 
 def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None):
@@ -380,6 +394,7 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
     g = Geo(target.root, target.name)
     g.box((cx, y0 - .003, cz), (w, .006, h), D['paper'])
     layer = [y0 - .0065]
+    drawing = []
 
     def P(u, v):
         return (cx + u * w, cz + v * h)
@@ -387,7 +402,7 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
     def put(pts2, mat, advance=True):
         clipped = clip_art_polygon(pts2, cx - w / 2, cx + w / 2, cz - h / 2, cz + h / 2)
         if len(clipped) >= 3:
-            g.vflat(clipped, layer[0], mat)
+            drawing.append((clipped, layer[0], mat))
         if advance:
             layer[0] -= .0012
 
@@ -513,6 +528,13 @@ def art(target, cx, cz, w, h, motif, y0=0.0, frame=True, at=(0, 0, 0), rot=None)
                 if ch in cmap:
                     u0, v0 = -.44 + i * .11, .44 - (j + 1) * .11
                     rect(u0, v0, u0 + .105, v0 + .105, cmap[ch])
+    # Keep every drawing between 0.5 and 4 mm above the paper. Dense pixel
+    # and grid drawings still preserve their order without floating centimetres
+    # in front of an unframed poster.
+    depths = dict.fromkeys(depth for _, depth, _ in drawing)
+    depth_index = {depth: i for i, depth in enumerate(depths)}
+    for points, depth, mat in drawing:
+        g.vflat(points, y0 - .0065 - .0035 * depth_index[depth] / max(1, len(depths) - 1), mat)
     if frame:
         fw = .022
         for dx in (-1, 1):
