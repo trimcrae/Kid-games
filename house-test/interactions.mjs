@@ -307,20 +307,28 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // each end, the centre and halfway along each side (so a wall's end cannot
     // slip between two samples when the car swings round).
     const SAMPLES=[[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL],[halfW,halfL/2],[-halfW,halfL/2],[halfW,-halfL/2],[-halfW,-halfL/2]];
-    // Only the exported driving surfaces support the tyres. A broad bench,
+    // Only the known driving surfaces support the tyres. A broad bench,
     // bush or garden bed is still an obstacle, regardless of its flat top.
     // The apron is made of narrow strips; the footprint samples bridge their
     // seams while backing out of the garage.
-    const STEP=.24,TYRE=.12;
-    const drivable=b=>b.carDriveable??=/^(?:Garage concrete slab|Asphalt driveway|Asphalt apron graded to garage threshold walk strip \d+|Front (?:foundation )?lawn|Street at edge of study|Sidewalk concrete panel(?:\.\d+)?|Neighborhood ground)$/.test(b.name);
+    const STEP=.24,RAMP_REACH=.55,TYRE=.12;
+    const drivable=b=>b.carDriveable??=/^(?:Garage concrete slab|Asphalt driveway|Asphalt apron graded to garage threshold walk strip \d+|Front (?:lawn|foundation lawn|side lawn)|Rear (?:lawn|east lawn|west lawn)|(?:West|East) side lawn|Street at edge of study|Sidewalk concrete panel(?:\.\d+)?|Neighborhood ground)$/.test(b.name);
     // The ground under one point of the car: the highest such top not far
     // above the body, however far below (the driveway falls away under the
     // back of a car nosing out of the garage; the old walking-step test saw
     // "no floor" there and the car stuck at the threshold).
-    const groundAt=(px,pz)=>{
+    const groundAt=(px,pz,x,h)=>{
       let top=-Infinity;
+      const xRadius=Math.abs(Math.cos(h))*halfW+Math.abs(Math.sin(h))*halfL;
       for(const b of world.nearby(px,pz,.1)){
-        if(!drivable(b)||b.max[1]>car.y+STEP||b.max[1]<car.y-1.5)continue;
+        // Averaging support over a car-length footprint makes its centre
+        // lag behind the leading wheels uphill. The known garage grade needs
+        // extra reach only while the whole car follows that grade lengthwise.
+        // A side approach from the lower lawn must not lift it onto the edge.
+        const onGrade=b.name==='Garage concrete slab'||b.name.startsWith('Asphalt apron graded to garage threshold walk strip ');
+        const aligned=Math.abs(Math.sin(h))<.35&&x-xRadius>=b.min[0]-.1&&x+xRadius<=b.max[0]+.1;
+        const reach=onGrade&&aligned?RAMP_REACH:STEP;
+        if(!drivable(b)||b.max[1]>car.y+reach||b.max[1]<car.y-1.5)continue;
         if(px>=b.min[0]-.10&&px<=b.max[0]+.10&&pz>=b.min[2]-.10&&pz<=b.max[2]+.10)top=Math.max(top,b.max[1]);
       }
       return Number.isFinite(top)?top:null;
@@ -333,7 +341,11 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     function squeeze(px,pz,y){
       let d=0;
       for(const b of world.nearby(px,pz,R)){
-        if(drivable(b)||b.max[1]<=y+TYRE||b.min[1]>=y+world.height)continue;
+        // A driving surface that is too high for this sample is a ledge,
+        // especially at the side of the graded apron. Ordinary terrain under
+        // the tyres remains transparent to the body collision check.
+        if(drivable(b)&&b.max[1]<=y+STEP)continue;
+        if(b.max[1]<=y+TYRE||b.min[1]>=y+world.height)continue;
         const ix=Math.min(px-b.min[0],b.max[0]-px),iz=Math.min(pz-b.min[2],b.max[2]-pz);
         const sd=ix>=0&&iz>=0?-Math.min(ix,iz):Math.hypot(Math.max(0,-ix),Math.max(0,-iz));
         if(sd<R)d+=R-sd;
@@ -352,7 +364,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     function trouble(x,z,h){
       let n=0,off=0,sum=0,k=0;
       for(const [dx,dz] of SAMPLES){
-        const {x:px,z:pz}=carPoint(x,z,dx,dz,h),g=groundAt(px,pz);
+        const {x:px,z:pz}=carPoint(x,z,dx,dz,h),g=groundAt(px,pz,x,h);
         if(g===null){off++;continue;}
         sum+=g;k++;n+=squeeze(px,pz,g);
       }

@@ -15,21 +15,28 @@ function run(c,input,seconds,frame=1/60,fit=clear){
 }
 
 const house=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
-function withHouseCar(key,extraBoxes,check){
+function withHouseCar(key,extraBoxes,check,{spawn}={}){
   const priorDocument=globalThis.document,priorWindow=globalThis.window,priorAudio=globalThis.Audio;
   const canvasContext=new Proxy({}, {get:(target,name)=>name==='measureText'?()=>({width:50}):()=>{}});
   globalThis.document={getElementById:()=>({hidden:false,textContent:''}),createElement:()=>({width:0,height:0,getContext:()=>canvasContext})};
   globalThis.window={};globalThis.Audio=class {addEventListener(){} pause(){}};
   try{
-    const data=structuredClone(house),world=new WalkingWorld(data.colliders,{height:1.05});
+    const data=structuredClone(house);
+    if(spawn){
+      const bounds=data.props[key],x=(bounds.min[0]+bounds.max[0])/2,z=(bounds.min[2]+bounds.max[2])/2;
+      const shift=[spawn.x-x,spawn.y-bounds.min[1],spawn.z-z];
+      for(const box of [bounds,...data.colliders.filter(b=>b.prop===key)])
+        for(const edge of [box.min,box.max])for(let axis=0;axis<3;axis++)edge[axis]+=shift[axis];
+    }
+    const world=new WalkingWorld(data.colliders,{height:1.05});
     if(extraBoxes.length)world.addBoxes(structuredClone(extraBoxes));
     const b=data.props[key],player={x:(b.min[0]+b.max[0])/2,y:b.min[1]+.08,z:(b.min[2]+b.max[2])/2};
-    let throttle=0;
-    const api=createInteractions({scene:{add(){}},world,renderer:{render:{},getDrawingBufferSize(v){v.set(1280,720);}},data,propMeshes:{},player,keys:new Set(),life:{face(){},ride(){},say(){},airborne(){},hop(){}},body:{reset(){},vy:0,airborne:false},tour:{setCameraRig(){},hint(){}},bindButton(){},getDriveInput:()=>({throttle,steer:0})});
+    let throttle=0,steer=0;
+    const api=createInteractions({scene:{add(){}},world,renderer:{render:{},getDrawingBufferSize(v){v.set(1280,720);}},data,propMeshes:{},player,keys:new Set(),life:{face(){},ride(){},say(){},airborne(){},hop(){}},body:{reset(){},vy:0,airborne:false},tour:{setCameraRig(){},hint(){}},bindButton(){},getDriveInput:()=>({throttle,steer})});
     api.tick(.016,1);
     assert.equal(api.near?.id,key);
     api.start();
-    check({api,world,player,home:{...player},setThrottle:value=>{throttle=value;},step:(seconds,frame=1/60)=>{for(let t=0;t<seconds-1e-9;){const dt=Math.min(frame,seconds-t);api.tick(dt,1+t);t+=dt;}}});
+    check({api,world,player,home:{...player},setThrottle:value=>{throttle=value;},setSteer:value=>{steer=value;},step:(seconds,frame=1/60)=>{for(let t=0;t<seconds-1e-9;){const dt=Math.min(frame,seconds-t);api.tick(dt,1+t);t+=dt;}}});
   }finally{globalThis.document=priorDocument;globalThis.window=priorWindow;globalThis.Audio=priorAudio;}
 }
 
@@ -161,6 +168,10 @@ test('both exported cars descend the garage apron at common frame sizes',()=>{
       const c=api.state.cars[key];
       assert.ok(c.z>7,`${key} reaches driveway at ${frame}: ${JSON.stringify(c)}`);
       assert.ok(c.y<-.55&&c.y>-.9,`${key} follows the apron at ${frame}: ${JSON.stringify(c)}`);
+      setThrottle(1);step(6,frame);
+      const back=api.state.cars[key];
+      assert.ok(back.z<-2,`${key} drives back up the apron at ${frame}: ${JSON.stringify(back)}`);
+      assert.ok(Math.abs(back.y+.16)<.08,`${key} returns to the garage slab at ${frame}: ${JSON.stringify(back)}`);
     });
 });
 
@@ -182,6 +193,33 @@ test('the driveway connects to the generated neighborhood ground',()=>{
     assert.ok(c.z>20,`car reaches Craepet Street: ${JSON.stringify(c)}`);
     assert.ok(c.y<-.7&&c.y>-.9,`car stays grounded on the neighborhood: ${JSON.stringify(c)}`);
   });
+});
+
+test('all exported side and rear lawns support travel across their edge',()=>{
+  const lawns=['Front side lawn','Rear lawn','West side lawn','East side lawn','Rear east lawn','Rear west lawn'];
+  for(const name of lawns){
+    const terrain=[
+      {name:'Front lawn',min:[35,-1.02,4],max:[45,-.82,12]},
+      {name,min:[35,-1.02,-4],max:[45,-.82,4]},
+    ];
+    withHouseCar('car',terrain,({api,setThrottle,step})=>{
+      setThrottle(1);step(2.5);
+      const c=api.state.cars.car;
+      assert.ok(c.z<1.5,`${name} lets the car cross its boundary: ${JSON.stringify(c)}`);
+      assert.ok(Math.abs(c.y+.82)<.02,`${name} supports the tyres: ${JSON.stringify(c)}`);
+    },{spawn:{x:40,y:-.82,z:6}});
+  }
+});
+
+test('approaching the apron from the lower west lawn does not lift the car sideways',()=>{
+  withHouseCar('car',[],({api,setThrottle,setSteer,step})=>{
+    setThrottle(-1);setSteer(-1);
+    let highest=-Infinity;
+    for(let i=0;i<240;i++){step(1/60);highest=Math.max(highest,api.state.cars.car.y);}
+    const c=api.state.cars.car;
+    assert.ok(c.x>-7,`car reaches the apron edge from the lawn: ${JSON.stringify(c)}`);
+    assert.ok(highest<-.5,`edge approach cannot pop onto the raised apron: ${JSON.stringify({highest,...c})}`);
+  },{spawn:{x:-8,y:-.82,z:2}});
 });
 
 test('parking twice moves original collider indices without ghosts',()=>{
