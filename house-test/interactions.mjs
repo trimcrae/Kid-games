@@ -4,7 +4,7 @@ import {hangBarInteractions} from './hang-bar.mjs?v=20260925-motion';
 import {roombaInteractions} from './roomba.mjs?v=20260925-motion';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
 import {bedInteractions} from './beds.mjs?v=20260925-motion2';
-import {driveCar} from './car-driving.mjs?v=20260925-drive1';
+import {driveCar} from './car-driving.mjs?v=20260926-ground1';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
 // trampoline, drive the burgundy car out of the garage, open the fridge, play
@@ -299,22 +299,12 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // each end, the centre and halfway along each side (so a wall's end cannot
     // slip between two samples when the car swings round).
     const SAMPLES=[[0,0],[halfW,halfL],[-halfW,halfL],[halfW,-halfL],[-halfW,-halfL],[0,halfL],[0,-halfL],[halfW,halfL/2],[-halfW,halfL/2],[halfW,-halfL/2],[-halfW,-halfL/2]];
-    // What the car drives over. It is a toy car in a kids' game, so it is
-    // generous: anything flat up to CLIMB above its wheels it simply rides up
-    // onto (kerbs, the graded apron, the porch, a garden bed, a bush, the
-    // bus-stop bench), and any *thing* lower than CLEAR it barrels straight
-    // over (garden chairs, the front steps, the toy house, tree stakes,
-    // bins). Walls are still walls, though: a thin, long box that stands
-    // tall or floats above the ground — a wall, a sill, a fence or porch rail
-    // — is solid from kerb height (KERB) up, so the car can never mount a
-    // window sill and drive into the living room. Tall things (the mailbox,
-    // the swing frame, poles, trees, the other car) stop it too.
-    const CLIMB=.8,CLEAR=1.1,KERB=.3;
-    const shape=b=>b.carShape??=(()=>{const w=b.max[0]-b.min[0],d=b.max[2]-b.min[2],h=b.max[1]-b.min[1];return {thin:Math.min(w,d)<=.35&&Math.max(w,d)>=1.2,tall:h>=.3,broad:Math.min(w,d)>=.5,slab:h<=.12};})();
-    // Ground is anything broad, or a thin slab lying about the car's level
-    // (the strips of a graded ramp): never a rail floating above it.
-    const ground=b=>{const s=shape(b);return s.broad||(s.slab&&b.min[1]<=car.y+KERB);};
-    const wall=(b,y)=>{const s=shape(b);return s.thin&&(s.tall||b.min[1]>y+KERB);};
+    // Only the exported driving surfaces support the tyres. A broad bench,
+    // bush or garden bed is still an obstacle, regardless of its flat top.
+    // The apron is made of narrow strips; the footprint samples bridge their
+    // seams while backing out of the garage.
+    const STEP=.24,TYRE=.12;
+    const drivable=b=>b.carDriveable??=/^(?:Garage concrete slab|Asphalt driveway|Asphalt apron graded to garage threshold walk strip \d+|Front (?:foundation )?lawn|Street at edge of study|Sidewalk concrete panel(?:\.\d+)?|Neighborhood ground)$/.test(b.name);
     // The ground under one point of the car: the highest such top not far
     // above the body, however far below (the driveway falls away under the
     // back of a car nosing out of the garage; the old walking-step test saw
@@ -322,7 +312,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     const groundAt=(px,pz)=>{
       let top=-Infinity;
       for(const b of world.nearby(px,pz,.1)){
-        if(b.max[1]>car.y+CLIMB||b.max[1]<car.y-1.5||!ground(b))continue;
+        if(!drivable(b)||b.max[1]>car.y+STEP||b.max[1]<car.y-1.5)continue;
         if(px>=b.min[0]-.10&&px<=b.max[0]+.10&&pz>=b.min[2]-.10&&pz<=b.max[2]+.10)top=Math.max(top,b.max[1]);
       }
       return Number.isFinite(top)?top:null;
@@ -335,7 +325,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     function squeeze(px,pz,y){
       let d=0;
       for(const b of world.nearby(px,pz,R)){
-        if(b.max[1]<=y+(wall(b,y)?KERB:CLEAR)||b.min[1]>=y+world.height)continue;
+        if(drivable(b)||b.max[1]<=y+TYRE||b.min[1]>=y+world.height)continue;
         const ix=Math.min(px-b.min[0],b.max[0]-px),iz=Math.min(pz-b.min[2],b.max[2]-pz);
         const sd=ix>=0&&iz>=0?-Math.min(ix,iz):Math.hypot(Math.max(0,-ix),Math.max(0,-iz));
         if(sd<R)d+=R-sd;
@@ -365,13 +355,27 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
     // rather than every frame the car leans on a wall.
     let lastBump=-1;
     function bump(){const t=performance.now();if(t-lastBump<600)return;lastBump=t;sounds.click();}
+    // The original collider objects already belong to WalkingWorld. Keep
+    // their grid entries in sync instead of adding a new copy at every park.
+    const boxIds=boxes.map(bx=>world.boxes.indexOf(bx));
+    function gridCells(bx,visit){
+      for(let x=Math.floor(bx.min[0]/2);x<=Math.floor(bx.max[0]/2);x++)
+        for(let z=Math.floor(bx.min[2]/2);z<=Math.floor(bx.max[2]/2);z++)visit(`${x},${z}`);
+    }
+    function unindexBoxes(){boxes.forEach((bx,i)=>gridCells(bx,k=>{
+      const cell=world.grid.get(k);if(!cell)return;
+      const at=cell.indexOf(boxIds[i]);if(at>=0)cell.splice(at,1);
+      if(!cell.length)world.grid.delete(k);
+    }));}
     function parkBoxes(){
-      // The car's boxes move with it: one box round the parked car.
+      // One rotated bounding rectangle around the parked car.
       const cs=[corner(halfW,halfL),corner(-halfW,halfL),corner(halfW,-halfL),corner(-halfW,-halfL)];
       const minX=Math.min(...cs.map(c=>c.x)),maxX=Math.max(...cs.map(c=>c.x)),minZ=Math.min(...cs.map(c=>c.z)),maxZ=Math.max(...cs.map(c=>c.z));
       boxes.forEach((bx,i)=>{const dy0=saved[i].min[1]-home.y,dy1=saved[i].max[1]-home.y;bx.min=[minX,car.y+dy0,minZ];bx.max=[maxX,car.y+dy1,maxZ];});
-      world.addBoxes(boxes.map(bx=>({name:bx.name,min:bx.min,max:bx.max,prop:key})));
-      // (The old entries stay in the grid but their boxes now sit here.)
+      boxes.forEach((bx,i)=>gridCells(bx,k=>{
+        if(!world.grid.has(k))world.grid.set(k,[]);
+        world.grid.get(k).push(boxIds[i]);
+      }));
     }
     const door=()=>corner(-(halfW+.45),.3);
     // In reach from any side of the car, not just the driver's door.
@@ -382,6 +386,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       hint:'↑ accelerate · ↓ brake/reverse · ← → steer · Space honks · E to get out',
       start(){
         car.speed=0;car.steering=0;car.parked=false;
+        unindexBoxes();
         for(const bx of boxes){bx.min=[1e6,1e6,1e6];bx.max=[1e6+1,1e6+1,1e6+1];}   // out of the way while it moves
         // The view looks down on the car from over its roof (a boom aimed
         // at the driver would start inside the car's own baked panels).
