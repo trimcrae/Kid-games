@@ -290,10 +290,15 @@ Run with a Python that has Blender's `bpy` module:
 
 ```sh
 python models/house/build.py
-python models/house/export_walkthrough.py -- --ao
+python models/house/verify.py
+python models/house/export_walkthrough.py -- --ao --lightmap --lightmap-samples 128
 node models/house/test_walkthrough.mjs
 python -m http.server 8765
 ```
+
+Keep the model, manifest, mesh, AO, lightmap UVs and day/night lightmap pages
+together when publishing a rebuild. Changed geometry needs fresh lighting
+sidecars; exporting with only `--ao` removes the baked-light manifest block.
 
 Visit `http://localhost:8765/house-test/`. The exporter produces a gzip-compressed
 interleaved position/normal buffer, material groups and spatial collision boxes.
