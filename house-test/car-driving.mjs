@@ -34,7 +34,13 @@ export function driveCar(car,{throttle=0,steer=0},dt,fit){
       car.speed=speed+change;
     }
     if(Math.abs(car.speed)<.015)car.speed=0;
-    if(!car.speed)continue;
+    if(!car.speed){
+      // Finish settling after the pedal is released or a collision stops the
+      // car on a grade. Otherwise the last bit of smoothing leaves it hovering.
+      const ground=fit(car.x,car.z,car.heading).ground;
+      if(ground!==null&&ground!==undefined)car.y+=(ground-car.y)*(1-Math.exp(-t*7));
+      continue;
+    }
 
     // Forward follows local -Z. Steering reverses naturally when backing up.
     const turn=car.steering*Math.sign(car.speed)*Math.min(1.7,.32+Math.abs(car.speed)*.42)*t;
