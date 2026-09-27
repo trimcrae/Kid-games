@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import http from 'node:http';
+import {startServer, allowedPath} from '../tools/parent-demos/serve.mjs';
+
+const root = new URL('../', import.meta.url);
+const read = relative => readFile(new URL(relative,root),'utf8');
+for (const file of ['assets/js/games.js','assets/js/app.js','index.html','sw.js']) {
+  assert.doesNotMatch(await read(file), /parent-demos|block-lab|spellbound/i, `${file} exposes a preview`);
+}
+const guard = (await read('tools/parent-demos/preview-guard.js')).replace('export const','const');
+for (const hostname of ['trimcrae.github.io','example.com','127.0.0.1.evil.test','localhost.evil.test','127.0.0.1','localhost','[::1]']) {
+  const elements = {demo:{hidden:true,removed:false,remove(){this.removed=true;},removeAttribute(key){if(key==='hidden')this.hidden=false;}},'preview-lock':{textContent:'',removed:false,remove(){this.removed=true;}}};
+  vm.runInNewContext(guard,{location:{hostname,protocol:'http:'},document:{getElementById:key=>elements[key]}});
+  const local = ['127.0.0.1','localhost','[::1]'].includes(hostname);
+  assert.equal(elements.demo.hidden,!local);
+  assert.equal(elements.demo.removed,!local);
+  assert.equal(elements['preview-lock'].removed,local);
+}
+assert.equal(allowedPath('/tools/parent-demos/../serve.mjs'),null);
+assert.equal(allowedPath('/tools/parent-demos/%2e%2e/serve.mjs'),null);
+assert.equal(allowedPath('/tools/parent-demos/%5c..%5cserve.mjs'),null);
+assert.equal(allowedPath('/tools/parent-demos/%ZZ'),null);
+const server = await startServer(0);
+const port = server.address().port;
+const request = (urlPath, headers={}) => new Promise((resolve,reject)=>{
+  http.get({hostname:'127.0.0.1',port,path:urlPath,headers},res=>{
+    const chunks=[]; res.on('data',c=>chunks.push(c)); res.on('end',()=>resolve({status:res.statusCode,headers:res.headers,body:Buffer.concat(chunks).toString()}));
+  }).on('error',reject);
+});
+try {
+  for (const url of ['/','/tools/parent-demos','/tools/parent-demos/block-lab','/tools/parent-demos/spellbound']) assert.equal((await request(url)).status,302,url);
+  for (const url of ['/tools/parent-demos/','/tools/parent-demos/preview-guard.js','/assets/vendor/three/three.module.min.js','/assets/vendor/three/three.core.min.js','/assets/css/style.css']) assert.equal((await request(url)).status,200,url);
+  for (const url of ['/CLAUDE.md','/.git/config','/tools/parent-demos/serve.mjs','/tools/parent-demos/../../cleanup-report.json','/games/craepets/','/tools/parent-demos/%2e%2e/serve.mjs']) assert.equal((await request(url)).status,404,url);
+  assert.equal((await request('/tools/parent-demos/',{Host:'evil.test'})).status,403);
+  assert.equal((await request('/tools/parent-demos/',{'Sec-Fetch-Site':'cross-site'})).status,403);
+  assert.equal((await request('/tools/parent-demos/')).headers['cache-control'],'no-store');
+  console.log('PASS: previews absent from arcade discovery; public hosts blocked; local routes work; unrelated files unavailable.');
+} finally { await new Promise(resolve=>server.close(resolve)); }
