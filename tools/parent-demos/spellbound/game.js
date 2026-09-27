@@ -67,14 +67,16 @@ function choices(items, onChoose) {
   $('lesson-content').append(holder);
 }
 function nextButton(text, action) {
-  if ($('lesson-content').querySelector('.next-button')) return;
+  const existing = $('lesson-content').querySelector('.next-button');
+  if (existing) return existing;
   const button = document.createElement('button'); button.type = 'button'; button.className = 'gold-button next-button'; button.textContent = text;
   button.addEventListener('click', action); $('lesson-content').append(button);
+  return button;
 }
 function rightAnswer(button, holder, text, action, nextText) {
   button.classList.add('good');
   holder.querySelectorAll('button').forEach(b => b.disabled = true);
-  feedback(text, true); nextButton(nextText, action);
+  feedback(text, true); nextButton(nextText, action).focus();
 }
 function wrong(button, text) { button.classList.add('bad'); feedback(text); }
 function sparkle(place) {
@@ -380,7 +382,15 @@ function createWorld() {
     const hits=raycaster.intersectObject(walkPlane); if(hits.length) { moveTarget=hits[0].point.clone(); moveTarget.x=THREE.MathUtils.clamp(moveTarget.x,-16,16); moveTarget.z=THREE.MathUtils.clamp(moveTarget.z,-7.5,14); targetRing.position.copy(moveTarget); targetRing.position.y=.16; targetRing.visible=true; }
     host.focus({preventScroll:true});
   });
-  function resize() { const w=host.clientWidth,h=host.clientHeight; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+  function resize() {
+    const w=host.clientWidth,h=host.clientHeight;
+    renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+    // Preserve a useful horizontal view of all three stations on narrow screens.
+    const scale=Math.max(1,1.3/camera.aspect);
+    camera.position.set(player.position.x*.18,24*scale,32*scale+player.position.z*.08);
+    camera.lookAt(player.position.x*.08,1,-1+player.position.z*.05);
+    scene.fog.density=.014/scale;
+  }
   const observer = new ResizeObserver(resize); observer.observe(host); resize();
   function nearest() { let result=null,distance=5.0; for(const [id,p] of Object.entries(places)) { const d=player.position.distanceTo(p.approach); if(d<distance) {distance=d;result=id;} } return result; }
   function refresh() {
@@ -425,9 +435,8 @@ function createWorld() {
         player.rotation.y=Math.atan2(direction.x,direction.z); player.position.y=reduceMotion?0:Math.sin(elapsed*12)*.035;
       } else player.position.y=0;
     }
-    const aspect=camera.aspect;
-    const distance=aspect<1?42:32;
-    viewTarget.set(player.position.x*.18,24+(aspect<1?5:0),distance+player.position.z*.08);
+    const viewScale=Math.max(1,1.3/camera.aspect);
+    viewTarget.set(player.position.x*.18,24*viewScale,32*viewScale+player.position.z*.08);
     camera.position.lerp(viewTarget,Math.min(1,dt*2.5)); camera.lookAt(player.position.x*.08,1, -1+player.position.z*.05);
     if(!reduceMotion) { lantern.rotation.y=elapsed*.35; lantern.position.y=3.3+Math.sin(elapsed*1.5)*.1; towerCrystal.rotation.y=elapsed*.4; rings.forEach((r,i)=>r.rotation.y+=dt*.1*(i+1)); wandTip.scale.setScalar(.9+Math.sin(elapsed*4)*.2); }
     moths.forEach((m,i)=>{
@@ -438,7 +447,25 @@ function createWorld() {
       if(!reduceMotion) {m.left.rotation.z=Math.sin(elapsed*12+i)*.6;m.right.rotation.z=-m.left.rotation.z;}
     });
     if(burst) { const age=(now-burst.time)/1000; beams.forEach((b,i)=>{b.visible=age<1.4;b.position.copy(burst.point).add(new THREE.Vector3(Math.sin(i*2.4)*age*4,1.5+age*3+Math.cos(i)*age,Math.cos(i*2.4)*age*4)); b.scale.setScalar(Math.max(.05,1.3-age));});if(age>1.4)burst=null; }
-    markers.forEach(label=>{const p=places[label.dataset.marker].position;markerPoint.set(p.x,label.dataset.marker==='roots'?13.4:label.dataset.marker==='well'?4.7:8,p.z).project(camera);label.style.left=`${(markerPoint.x*.5+.5)*host.clientWidth}px`;label.style.top=`${(-markerPoint.y*.5+.5)*host.clientHeight}px`;label.hidden=markerPoint.z>1;});
+    const heading=document.querySelector('.world-heading');
+    const safeTop=heading.offsetTop+heading.offsetHeight+10;
+    const placedLabels=[];
+    markers.forEach(label=>{
+      const p=places[label.dataset.marker].position;
+      markerPoint.set(p.x,label.dataset.marker==='roots'?13.4:label.dataset.marker==='well'?4.7:8,p.z).project(camera);
+      label.hidden=markerPoint.z>1;
+      if(label.hidden) return;
+      const width=label.offsetWidth,height=label.offsetHeight;
+      const left=THREE.MathUtils.clamp((markerPoint.x*.5+.5)*host.clientWidth,width/2+8,host.clientWidth-width/2-8);
+      let bottom=THREE.MathUtils.clamp((-markerPoint.y*.5+.5)*host.clientHeight,safeTop+height,host.clientHeight-100);
+      // On phones the labels can share a row; stagger overlaps instead of hiding names.
+      for(const previous of placedLabels) {
+        if(left-width/2<previous.right+5 && left+width/2>previous.left-5 && bottom-height<previous.bottom+5 && bottom>previous.top-5) bottom=previous.bottom+height+6;
+      }
+      bottom=Math.min(bottom,host.clientHeight-90);
+      label.style.left=`${left}px`;label.style.top=`${bottom}px`;
+      placedLabels.push({left:left-width/2,right:left+width/2,top:bottom-height,bottom});
+    });
     const near=nearest();
     const buttonText=!state.started?'Begin the mystery ✦':state.complete?'Read your ending ✦':near?`Explore ${places[near].name} ✦`:'Follow your next clue ✦';
     if(buttonText!==lastNearest) {$('interact').textContent=buttonText;lastNearest=buttonText;}
