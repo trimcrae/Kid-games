@@ -10,6 +10,13 @@ for (const file of ['assets/js/games.js','assets/js/app.js','index.html','sw.js'
   assert.doesNotMatch(await read(file), /parent-demos|block-lab|spellbound/i, `${file} exposes a preview`);
 }
 const guard = (await read('tools/parent-demos/preview-guard.js')).replace('export const','const');
+for (const demo of ['block-lab','spellbound']) {
+  const html = await read(`tools/parent-demos/${demo}/index.html`);
+  assert.match(html, /<main id="demo" hidden>/, 'Game must be hidden before scripts load');
+  assert.match(html, /if \(previewAllowed\) import\('\.\/game\.js'\)/, 'Game import must be conditional');
+  assert.doesNotMatch(html, /<script[^>]+src=["'][^"']*game\.js/, 'No unguarded game script');
+  assert.match(await read(`tools/parent-demos/${demo}/style.css`), /\[hidden\]\s*\{\s*display:\s*none\s*!important/, 'Author CSS must preserve hidden');
+}
 for (const hostname of ['trimcrae.github.io','example.com','127.0.0.1.evil.test','localhost.evil.test','127.0.0.1','localhost','[::1]']) {
   const elements = {demo:{hidden:true,removed:false,remove(){this.removed=true;},removeAttribute(key){if(key==='hidden')this.hidden=false;}},'preview-lock':{textContent:'',removed:false,remove(){this.removed=true;}}};
   vm.runInNewContext(guard,{location:{hostname,protocol:'http:'},document:{getElementById:key=>elements[key]}});
@@ -32,6 +39,7 @@ const request = (urlPath, headers={}) => new Promise((resolve,reject)=>{
 try {
   for (const url of ['/','/tools/parent-demos','/tools/parent-demos/block-lab','/tools/parent-demos/spellbound']) assert.equal((await request(url)).status,302,url);
   for (const url of ['/tools/parent-demos/','/tools/parent-demos/preview-guard.js','/assets/vendor/three/three.module.min.js','/assets/vendor/three/three.core.min.js','/assets/css/style.css']) assert.equal((await request(url)).status,200,url);
+  for (const demo of ['block-lab','spellbound']) for (const file of ['index.html','game.js','logic.mjs','style.css']) assert.equal((await request(`/tools/parent-demos/${demo}/${file}`)).status,200,`${demo}/${file}`);
   for (const url of ['/CLAUDE.md','/.git/config','/tools/parent-demos/serve.mjs','/tools/parent-demos/../../cleanup-report.json','/games/craepets/','/tools/parent-demos/%2e%2e/serve.mjs']) assert.equal((await request(url)).status,404,url);
   assert.equal((await request('/tools/parent-demos/',{Host:'evil.test'})).status,403);
   assert.equal((await request('/tools/parent-demos/',{'Sec-Fetch-Site':'cross-site'})).status,403);
