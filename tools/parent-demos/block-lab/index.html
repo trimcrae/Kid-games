@@ -4,16 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#153b37">
+  <meta name="robots" content="noindex, nofollow">
   <title>Block & Bloom · Parent preview</title>
   <link rel="stylesheet" href="../../../assets/css/style.css">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <section id="preview-lock"><h1>Local parent preview</h1><p>This demo is available only in the local parent preview.</p></section>
+  <section id="preview-lock"><h1>Parent preview</h1><p>Loading the demo… JavaScript is needed to play.</p></section>
   <main id="demo" hidden>
     <header class="topbar">
       <a class="back-link" href="../" aria-label="Back to parent demos">← <span>Parent workshop</span></a>
-      <span class="private-label"><i></i> PRIVATE DEMO</span>
+      <span class="private-label"><i></i> UNLISTED DEMO</span>
       <button class="quiet-button" id="restart" type="button">Start over</button>
     </header>
     <section class="title-row">
@@ -51,6 +52,6 @@
     <footer class="demo-footer"><span>Original island & voxel art · built with Three.js</span><span id="save-status">Saved on this device only</span></footer>
     <dialog id="restart-dialog"><h2>A fresh island?</h2><p>This clears this demo's saved buildings and starts the three missions again.</p><div><button id="cancel-restart" type="button">Keep my island</button><button id="confirm-restart" class="primary-button" type="button">Start fresh</button></div></dialog>
   </main>
-  <script type="module">import { previewAllowed } from '../preview-guard.js'; if (previewAllowed) import('./game.js');</script>
+  <script type="module">import { previewAllowed } from '../preview-guard.js?v=20260927-online'; if (previewAllowed) import('./game.js');</script>
 </body>
 </html>

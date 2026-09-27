@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <section id="preview-lock"><p class="eyebrow">Local parent preview</p><h1>A little magic is being prepared.</h1><p>This demo is available only in the local parent preview.</p><a href="../">Return to parent previews</a></section>
+  <section id="preview-lock"><p class="eyebrow">Parent preview</p><h1>A little magic is being prepared.</h1><p>Loading the demo… JavaScript is needed to play.</p><a href="../">Return to parent previews</a></section>
   <main id="demo" hidden>
     <header class="academy-header"><a class="back-link" href="../" aria-label="Back to parent previews">← Parent previews</a><div class="brand"><span class="brand-star" aria-hidden="true">✧</span><div><p class="eyebrow">An original learning adventure</p><h1>Spellbound <span>Academy</span></h1></div></div><button id="journal-toggle" class="quiet-button" type="button" aria-expanded="true" aria-controls="journal">Your journal <span aria-hidden="true">✎</span></button></header>
     <div class="adventure-layout">
@@ -37,10 +37,10 @@
       <button type="button" data-visit="roots"><span class="place-number">02</span><span class="place-icon" aria-hidden="true">✧</span><span><strong>Star Tower</strong><small>Build a spell from word roots.</small></span><span class="place-state" id="state-roots">Explore →</span></button>
       <button type="button" data-visit="potion"><span class="place-number">03</span><span class="place-icon" aria-hidden="true">⚗</span><span><strong>Moonmint Glasshouse</strong><small>Measure a little moonlight.</small></span><span class="place-state" id="state-potion">Explore →</span></button>
     </nav>
-    <footer class="page-footer"><span>Made for curious minds · Reading, word roots & ratios</span><span>Parent-only prototype · About 5–10 minutes</span></footer>
+    <footer class="page-footer"><span>Made for curious minds · Reading, word roots & ratios</span><span>Parent preview · About 5–10 minutes</span></footer>
     <dialog id="lesson" aria-labelledby="lesson-title"><div class="dialog-inner"><button class="close-dialog" id="close-lesson" type="button" aria-label="Return to courtyard">×</button><p class="eyebrow" id="lesson-kicker"></p><h2 id="lesson-title"></h2><div id="lesson-content"></div><p id="feedback" role="status" aria-live="polite"></p><div class="dialog-actions"><button type="button" id="hint-button" class="text-button">A small hint ✧</button><button type="button" id="leave-button" class="quiet-button">Back to courtyard</button></div></div></dialog>
     <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
   </main>
-  <script type="module">import { previewAllowed } from '../preview-guard.js'; if (previewAllowed) import('./game.js');</script>
+  <script type="module">import { previewAllowed } from '../preview-guard.js?v=20260927-online'; if (previewAllowed) import('./game.js');</script>
 </body>
 </html>

@@ -1,8 +1,13 @@
 # Parent world demos
 
 Two original, bounded educational prototypes requested for Cory and Jeannie.
-These are **awaiting parent approval**, and must not be added to `GAMES`, the
+These are **awaiting approval for the kids' arcade**, and must not be added to `GAMES`, the
 arcade landing page, Surprise Me, resume suggestions, or service-worker warmup.
+
+The parent approved online access by direct link on 2026-09-27:
+https://trimcrae.github.io/Kid-games/tools/parent-demos/
+Both demos and the hub request `noindex,nofollow`. They are unlisted, not
+password-protected: anyone with the link can open them.
 
 Start from the repository root, using the installed Node runtime:
 
@@ -14,11 +19,10 @@ Open http://127.0.0.1:4175/tools/parent-demos/ . The server binds to loopback,
 serves only the two demos and their small existing dependencies, and does not
 list or expose unrelated repository files. Stop it with Ctrl+C.
 
-The preview guard hides the page and does not load either game outside
-localhost/loopback. Therefore merging the source to `main` does not make the
-games playable on GitHub Pages. This is a visibility restriction, **not an
-authentication system**: source files in the public repository remain public.
-Release to the kids requires a later explicit parent instruction.
+The preview guard supports the HTTPS GitHub Pages host and localhost/loopback.
+Adding the demos to the kids' arcade still requires a later explicit parent
+instruction. The arcade will not automatically download these demos for offline
+use; its service worker may cache them after someone opens a direct link.
 
 - **Block & Bloom:** a voxel island for coordinate-based building, garden area,
   and a tower combining volume and material ratios. Mining, placement,
@@ -55,6 +59,7 @@ Reviewed in the local browser on 2026-09-26, including desktop and 390px layouts
 - No browser errors or warnings observed in either game.
 
 The tests check that neither demo is referenced by arcade discovery or offline
-warmup, nonlocal hosts fail the preview guard, pages start hidden, and the local
-server only exposes its allowlisted files. The preview hub intentionally remains
-the local-only entry point; this review does not approve release to the kids.
+warmup, the approved online host and local preview work, unrelated hosts fail the
+preview guard, all three pages request no indexing, and the local server only
+exposes its allowlisted files. Online preview access does not approve adding the
+demos to the kids' arcade.

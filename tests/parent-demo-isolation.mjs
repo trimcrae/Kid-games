@@ -10,6 +10,9 @@ for (const file of ['assets/js/games.js','assets/js/app.js','index.html','sw.js'
   assert.doesNotMatch(await read(file), /parent-demos|block-lab|spellbound/i, `${file} exposes a preview`);
 }
 const guard = (await read('tools/parent-demos/preview-guard.js')).replace('export const','const');
+for (const page of ['index.html','block-lab/index.html','spellbound/index.html']) {
+  assert.match(await read(`tools/parent-demos/${page}`), /<meta name="robots" content="noindex,\s*nofollow">/, `${page} must request no indexing`);
+}
 for (const demo of ['block-lab','spellbound']) {
   const html = await read(`tools/parent-demos/${demo}/index.html`);
   assert.match(html, /<main id="demo" hidden>/, 'Game must be hidden before scripts load');
@@ -17,13 +20,18 @@ for (const demo of ['block-lab','spellbound']) {
   assert.doesNotMatch(html, /<script[^>]+src=["'][^"']*game\.js/, 'No unguarded game script');
   assert.match(await read(`tools/parent-demos/${demo}/style.css`), /\[hidden\]\s*\{\s*display:\s*none\s*!important/, 'Author CSS must preserve hidden');
 }
-for (const hostname of ['trimcrae.github.io','example.com','127.0.0.1.evil.test','localhost.evil.test','127.0.0.1','localhost','[::1]']) {
+for (const [hostname,protocol,allowed] of [
+  ['trimcrae.github.io','https:',true], ['trimcrae.github.io','http:',false],
+  ['trimcrae.github.io.evil.test','https:',false], ['example.com','https:',false],
+  ['127.0.0.1.evil.test','http:',false], ['localhost.evil.test','http:',false],
+  ['127.0.0.1','http:',true], ['localhost','http:',true], ['[::1]','http:',true],
+  ['localhost','https:',true], ['','file:',false],
+]) {
   const elements = {demo:{hidden:true,removed:false,remove(){this.removed=true;},removeAttribute(key){if(key==='hidden')this.hidden=false;}},'preview-lock':{textContent:'',removed:false,remove(){this.removed=true;}}};
-  vm.runInNewContext(guard,{location:{hostname,protocol:'http:'},document:{getElementById:key=>elements[key]}});
-  const local = ['127.0.0.1','localhost','[::1]'].includes(hostname);
-  assert.equal(elements.demo.hidden,!local);
-  assert.equal(elements.demo.removed,!local);
-  assert.equal(elements['preview-lock'].removed,local);
+  vm.runInNewContext(guard,{location:{hostname,protocol},document:{getElementById:key=>elements[key]}});
+  assert.equal(elements.demo.hidden,!allowed);
+  assert.equal(elements.demo.removed,!allowed);
+  assert.equal(elements['preview-lock'].removed,allowed);
 }
 assert.equal(allowedPath('/tools/parent-demos/../serve.mjs'),null);
 assert.equal(allowedPath('/tools/parent-demos/%2e%2e/serve.mjs'),null);
@@ -44,5 +52,5 @@ try {
   assert.equal((await request('/tools/parent-demos/',{Host:'evil.test'})).status,403);
   assert.equal((await request('/tools/parent-demos/',{'Sec-Fetch-Site':'cross-site'})).status,403);
   assert.equal((await request('/tools/parent-demos/')).headers['cache-control'],'no-store');
-  console.log('PASS: previews absent from arcade discovery; public hosts blocked; local routes work; unrelated files unavailable.');
+  console.log('PASS: direct-link online previews enabled; no arcade discovery or search indexing requested; local server stays scoped.');
 } finally { await new Promise(resolve=>server.close(resolve)); }
