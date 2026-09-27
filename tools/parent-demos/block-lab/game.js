@@ -54,6 +54,15 @@ function updateSelection(x = selected.x, y = selected.y, z = selected.z) {
   requestRender();
 }
 
+function readCoordinateFields(normalize = false) {
+  const fields = ['x', 'y', 'z'].map(axis => $(`coord-${axis}`).value.trim());
+  const values = fields.map(value => value === '' ? NaN : Number(value));
+  // Leave empty or unfinished input untouched while the player is typing.
+  // Explicit coordinate actions normalize every displayed field before acting.
+  if (!normalize && !values.every((value, index) => Number.isInteger(value) && value >= 1 && value <= (index === 1 ? MAX_HEIGHT : GRID_SIZE))) return;
+  updateSelection(...values);
+}
+
 function chooseMaterial(material) {
   selectedMaterial = material;
   document.querySelectorAll('[data-material]').forEach(button => {
@@ -535,10 +544,14 @@ function pick(event, forceMine = false) {
 function wireEvents() {
   document.querySelectorAll('[data-material]').forEach(button => button.addEventListener('click', () => chooseMaterial(button.dataset.material)));
   document.querySelectorAll('[data-gather]').forEach(button => button.addEventListener('click', () => gather(button.dataset.gather)));
-  $('place').addEventListener('click', build); $('mine').addEventListener('click', mine);
+  $('place').addEventListener('click', () => { readCoordinateFields(true); build(); });
+  $('mine').addEventListener('click', () => { readCoordinateFields(true); mine(); });
   $('tool-build').addEventListener('click', () => setTool('build')); $('tool-mine').addEventListener('click', () => setTool('mine'));
   $('blueprint').addEventListener('click', toggleBlueprint); $('check-build').addEventListener('click', checkBuild); $('hint').addEventListener('click', showHint);
-  for (const axis of ['x', 'y', 'z']) $(`coord-${axis}`).addEventListener('change', () => updateSelection(Number($('coord-x').value), Number($('coord-y').value), Number($('coord-z').value)));
+  for (const axis of ['x', 'y', 'z']) {
+    $(`coord-${axis}`).addEventListener('input', () => readCoordinateFields());
+    $(`coord-${axis}`).addEventListener('change', () => readCoordinateFields(true));
+  }
   $('orbit-left').addEventListener('click', () => { orbit.angle -= Math.PI / 6; updateCamera(); });
   $('orbit-right').addEventListener('click', () => { orbit.angle += Math.PI / 6; updateCamera(); });
   $('reset-view').addEventListener('click', resetView);
