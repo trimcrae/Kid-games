@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153b37">
+  <title>Block & Bloom · Parent preview</title>
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <section id="preview-lock"><h1>Local parent preview</h1><p>This demo is available only in the local parent preview.</p></section>
+  <main id="demo" hidden>
+    <header class="topbar">
+      <a class="back-link" href="../" aria-label="Back to parent demos">← <span>Parent workshop</span></a>
+      <span class="private-label"><i></i> PRIVATE DEMO</span>
+      <button class="quiet-button" id="restart" type="button">Start over</button>
+    </header>
+    <section class="title-row">
+      <div><p class="eyebrow">CORY'S ISLAND EXPEDITION</p><h1>Block <span>&</span> Bloom<span class="title-square"></span></h1><p class="subtitle">A little island. Big ideas. Build something that adds up.</p></div>
+      <div class="session-note"><span>3 BUILDING MISSIONS</span><strong>Coordinates · Area · Volume</strong><small>About 5–10 minutes · progress saves here</small></div>
+    </section>
+    <div class="workshop">
+      <section class="world-panel" aria-label="Interactive block island">
+        <div class="world-top"><span class="island-pill"><i></i> SUNSEED ISLAND</span><div class="view-actions"><button id="orbit-left" type="button" aria-label="Turn view left">↶</button><button id="reset-view" type="button">Reset view</button><button id="orbit-right" type="button" aria-label="Turn view right">↷</button></div></div>
+        <div id="viewport" tabindex="0" role="application" aria-label="3D block island. Arrow keys move the selected map square, Page Up and Page Down change layer, Space builds, M mines. Drag to turn the camera. Accessible coordinate controls are below."></div>
+        <div class="world-help" id="world-help">Drag to orbit · click to build · right-click to mine · scroll to zoom</div>
+        <div class="world-bottom"><div class="tool-switch" role="group" aria-label="Click tool"><button id="tool-build" type="button" class="active" aria-pressed="true">▣ Build</button><button id="tool-mine" type="button" aria-pressed="false">⌑ Mine</button></div><button class="blueprint-button" id="blueprint" type="button" aria-pressed="false">◇ Show blueprint</button></div>
+        <div id="renderer-notice" hidden>The 3D view is unavailable on this device. You can still complete every mission with the map and coordinate controls below.</div>
+        <div class="coordinate-tag" id="coordinate-tag">ACROSS 2 · ALONG 2 · LAYER 1</div>
+      </section>
+      <aside class="mission-panel" aria-label="Learning mission">
+        <div class="mission-topline"><span class="eyebrow">YOUR FIELD JOURNAL</span><span id="mission-number">01 / 03</span></div>
+        <ol class="mission-steps" aria-label="Mission progress"><li class="current" aria-current="step"><span>1</span>Map</li><li><span>2</span>Garden</li><li><span>3</span>Tower</li></ol>
+        <div class="mission-heading"><span id="mission-icon">⌖</span><div><p id="mission-subject">Coordinates</p><h2 id="mission-title">Mark the trail</h2></div></div>
+        <p class="mission-brief" id="mission-brief"></p>
+        <div id="mission-detail" class="mission-detail"></div>
+        <p class="mission-instruction" id="mission-instruction"></p>
+        <div class="progress-row"><span id="progress-label">0 of 3 placed</span><span id="progress-fraction">0 / 3</span></div><div class="progress-track"><div id="progress-fill"></div></div>
+        <div class="guide-card"><span class="guide-avatar" aria-hidden="true">✦</span><div><strong>FERN · ISLAND GUIDE</strong><p id="guide-text" role="status" aria-live="polite">Pick amber, then build the three trail markers. You have four of every material to begin!</p></div></div>
+        <button class="primary-button" id="check-build" type="button">Check my build <span>→</span></button>
+        <button class="hint-button" id="hint" type="button">I could use a hint</button>
+        <div id="completion" hidden><div class="completion-seal">✷</div><h3>Island architect!</h3><p>Three ideas, brought to life. Your trail, living garden, and sun tower belong together.</p><div class="earned-tags"><span>⌖ Map reader</span><span>▦ Area thinker</span><span>▥ Volume builder</span></div><button class="primary-button" id="free-build" type="button">Keep building on my island</button></div>
+      </aside>
+    </div>
+    <section class="builder-deck" aria-label="Block building controls">
+      <div class="materials-panel"><div class="deck-label"><h2>YOUR BLOCK POUCH</h2><span>Choose a material · keys 1–3</span></div><div class="hotbar" role="group" aria-label="Selected material"><button class="material" data-material="moss" type="button" aria-pressed="false"><span class="block-swatch moss"></span><span><strong>Moss</strong><small>Living green</small></span><b id="count-moss">4</b><kbd>1</kbd></button><button class="material" data-material="stone" type="button" aria-pressed="false"><span class="block-swatch stone"></span><span><strong>Stone</strong><small>Strong & steady</small></span><b id="count-stone">4</b><kbd>2</kbd></button><button class="material selected" data-material="amber" type="button" aria-pressed="true"><span class="block-swatch amber"></span><span><strong>Amber</strong><small>A little sunlight</small></span><b id="count-amber">4</b><kbd>3</kbd></button></div><div class="supply-row"><span>ISLAND SUPPLY <small>Tap to mine more</small></span><button data-gather="moss" type="button">+4 moss</button><button data-gather="stone" type="button">+4 stone</button><button data-gather="amber" type="button">+4 amber</button></div></div>
+      <div class="coordinate-controls"><div class="deck-label"><h2>BUILD AT A COORDINATE</h2><span id="selected-description">Amber · empty square</span></div><div class="coordinate-inputs"><label>Across (X)<input id="coord-x" type="number" min="1" max="8" value="2" inputmode="numeric"></label><label>Along (Z)<input id="coord-z" type="number" min="1" max="8" value="2" inputmode="numeric"></label><label>Layer<input id="coord-y" type="number" min="1" max="4" value="1" inputmode="numeric"></label><button class="place-button" id="place" type="button">▣ Place</button><button class="mine-button" id="mine" type="button">⌑ Mine</button></div></div>
+    </section>
+    <details class="map-details"><summary><span>▦ Open the island map & keyboard guide</span><small>Build every mission without the 3D view</small></summary><div class="map-layout"><div><p class="map-axis">← ACROSS (X) →</p><div class="map-with-axis"><span class="vertical-axis">ALONG (Z) →</span><div id="map-grid" class="map-grid" role="group" aria-label="Island coordinate map for selected layer"></div></div><p class="map-caption" id="map-caption">Map shows layer 1. Select a square, then Place or Mine.</p></div><div class="keyboard-guide"><h3>Your island, your controls</h3><p><strong>Mouse / touch:</strong> drag the world to turn it. Tap a square to build; switch to Mine to remove a block. Tap the supply rocks to gather.</p><p><strong>Keyboard:</strong> focus the island. Arrow keys move the square; Page Up / Page Down change layer. Space builds, M mines, and 1–3 select a block. Q / E turn the camera; + / − zoom.</p><p><strong>Map:</strong> tap any coordinate button to select it, then use Place. You can also type Across, Along, and Layer directly. Blocks need support, and towers are mined from the top.</p><p class="learning-note">Every mission asks you to make the math with blocks. There are no timers, scores, or lost lives.</p></div></div></details>
+    <footer class="demo-footer"><span>Original island & voxel art · built with Three.js</span><span id="save-status">Saved on this device only</span></footer>
+    <dialog id="restart-dialog"><h2>A fresh island?</h2><p>This clears this demo's saved buildings and starts the three missions again.</p><div><button id="cancel-restart" type="button">Keep my island</button><button id="confirm-restart" class="primary-button" type="button">Start fresh</button></div></dialog>
+  </main>
+  <script type="module">import { previewAllowed } from '../preview-guard.js'; if (previewAllowed) import('./game.js');</script>
+</body>
+</html>
