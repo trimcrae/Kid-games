@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171632">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Spellbound Academy · Parent preview</title>
+  <link rel="stylesheet" href="../../../assets/css/style.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <section id="preview-lock"><p class="eyebrow">Local parent preview</p><h1>A little magic is being prepared.</h1><p>This demo is available only in the local parent preview.</p><a href="../">Return to parent previews</a></section>
+  <main id="demo" hidden>
+    <header class="academy-header"><a class="back-link" href="../" aria-label="Back to parent previews">← Parent previews</a><div class="brand"><span class="brand-star" aria-hidden="true">✧</span><div><p class="eyebrow">An original learning adventure</p><h1>Spellbound <span>Academy</span></h1></div></div><button id="journal-toggle" class="quiet-button" type="button" aria-expanded="true" aria-controls="journal">Your journal <span aria-hidden="true">✎</span></button></header>
+    <div class="adventure-layout">
+      <section class="world-shell" aria-label="Explore Spellbound Academy">
+        <div id="world" tabindex="0" role="application" aria-label="Magical courtyard. Use W A S D or arrow keys to walk, E to visit a nearby station. You can also use the station buttons below."></div>
+        <div class="world-heading"><span class="location-pill">☾ THE MOONLIT COURTYARD</span><p id="world-status">The stars have forgotten their way home.</p></div>
+        <div class="world-markers" aria-hidden="true"><span class="map-label" data-marker="archive">01 · Whisper Library</span><span class="map-label" data-marker="roots">02 · Star Tower</span><span class="map-label" data-marker="potion">03 · Moonmint Glasshouse</span><span class="map-label" data-marker="well">Moonwell</span></div>
+        <div id="spell-flash" aria-hidden="true"></div>
+        <div class="world-footer"><p id="walk-help">Click a path to wander · WASD / arrows to walk · E to explore</p><button type="button" id="interact" class="gold-button">Begin the mystery ✦</button></div>
+        <div class="touch-walk" aria-label="Walking controls"><button type="button" data-walk="up" aria-label="Walk north">↑</button><div><button type="button" data-walk="left" aria-label="Walk west">←</button><button type="button" data-walk="down" aria-label="Walk south">↓</button><button type="button" data-walk="right" aria-label="Walk east">→</button></div></div>
+        <p id="render-fallback" hidden>The courtyard could not open on this device. You can still play the full story using the places below.</p>
+      </section>
+      <aside id="journal" class="journal">
+        <div class="journal-top"><p class="eyebrow">FIELD JOURNAL · APPRENTICE 01</p><h2>The missing<br>moon moths</h2><p>A storm has broken the Moon Lantern. Find its lost moths and bring the academy’s stars back.</p></div>
+        <div class="progress-track" aria-label="Adventure progress"><span id="progress-fill"></span></div><p id="progress-text" class="progress-text">0 of 3 discoveries</p>
+        <h3>Your next discovery</h3><p id="next-task" class="next-task"></p>
+        <ol id="journal-notes" class="journal-notes"></ol>
+        <button id="story-button" type="button" class="text-button">Read Professor Wren’s letter →</button>
+        <div class="journal-bottom"><span class="save-note" id="save-note">Progress stays on this device</span><button id="reset" type="button" class="text-button">Start over</button></div>
+      </aside>
+    </div>
+    <nav class="place-cards" aria-label="Visit an academy location">
+      <button type="button" data-visit="archive"><span class="place-number">01</span><span class="place-icon" aria-hidden="true">▤</span><span><strong>Whisper Library</strong><small>Read clues. Follow the evidence.</small></span><span class="place-state" id="state-archive">Explore →</span></button>
+      <button type="button" data-visit="roots"><span class="place-number">02</span><span class="place-icon" aria-hidden="true">✧</span><span><strong>Star Tower</strong><small>Build a spell from word roots.</small></span><span class="place-state" id="state-roots">Explore →</span></button>
+      <button type="button" data-visit="potion"><span class="place-number">03</span><span class="place-icon" aria-hidden="true">⚗</span><span><strong>Moonmint Glasshouse</strong><small>Measure a little moonlight.</small></span><span class="place-state" id="state-potion">Explore →</span></button>
+    </nav>
+    <footer class="page-footer"><span>Made for curious minds · Reading, word roots & ratios</span><span>Parent-only prototype · About 5–10 minutes</span></footer>
+    <dialog id="lesson" aria-labelledby="lesson-title"><div class="dialog-inner"><button class="close-dialog" id="close-lesson" type="button" aria-label="Return to courtyard">×</button><p class="eyebrow" id="lesson-kicker"></p><h2 id="lesson-title"></h2><div id="lesson-content"></div><p id="feedback" role="status" aria-live="polite"></p><div class="dialog-actions"><button type="button" id="hint-button" class="text-button">A small hint ✧</button><button type="button" id="leave-button" class="quiet-button">Back to courtyard</button></div></div></dialog>
+    <div class="sr-only" id="announcement" role="status" aria-live="polite"></div>
+  </main>
+  <script type="module">import { previewAllowed } from '../preview-guard.js'; if (previewAllowed) import('./game.js');</script>
+</body>
+</html>
