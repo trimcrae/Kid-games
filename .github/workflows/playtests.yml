@@ -1,0 +1,38 @@
+name: Focused playtests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playtests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install test dependency
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Install Chromium
+        # The next step selects full Chromium explicitly, so a separate
+        # headless-shell download is unnecessary.
+        run: node node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
+      - name: Select installed Chromium
+        run: |
+          node -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'
+      - name: Run focused regressions
+        run: npm run test:regressions

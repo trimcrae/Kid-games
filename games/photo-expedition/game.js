@@ -49,8 +49,9 @@
     const open = SITES.filter(isUnlocked); if (!open.length) return null;
     let h = 0; for (const c of todayKey() + explorer.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
     const site = open[h % open.length]; const subs = site.subjects.filter((id) => SUBJECTS[id].kind !== "moment");
-    const id = subs[(h >> 3) % subs.length]; const sub = SUBJECTS[id];
-    const when = sub.when === "any" || sub.when === "day" ? WHENS[(h >> 7) % WHENS.length] : sub.when;
+    // Keep the unsigned date hash unsigned, so array indices cannot go negative.
+    const id = subs[(h >>> 3) % subs.length]; const sub = SUBJECTS[id];
+    const when = sub.when === "any" || sub.when === "day" ? WHENS[(h >>> 7) % WHENS.length] : sub.when;
     return { site, id, sub, when, done: prof.daily && prof.daily.key === todayKey() && prof.daily.done };
   }
   function whenWord(w) { return { dawn: "at golden hour (dawn or dusk)", dusk: "at dusk or night", day: "in daylight", night: "at night" }[w] || w; }

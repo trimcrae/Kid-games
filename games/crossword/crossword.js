@@ -208,6 +208,9 @@
   }
 
   function startPuzzle(i) {
+    // Save the clock against its old puzzle before changing the active slot.
+    stopClock();
+    clearTimeout(badTimer);
     pi = i;
     puzzle = PUZZLES[i];
     solvedNow = false;
@@ -253,8 +256,12 @@
       puzzle.entries.find((e) => e.dir === "across") || puzzle.entries[0];
     if (first) selectEntry(first, true);
     touchStreak();
+    solvedNow = isComplete();
+    st.solved = solvedNow;
+    save();
     startClock(st.secs);
     updateTimerUI();
+    if (solvedNow) showSolved(false);
   }
 
   /* the grid has to fit the phone, whatever the puzzle's width — so the
@@ -325,8 +332,9 @@
         inp.setAttribute("autocapitalize", "characters");
         inp.setAttribute("aria-label", cellLabel(r, c));
         inp.addEventListener("focus", () => onFocus(r, c));
-        inp.addEventListener("mousedown", () => onClickCell(r, c));
-        inp.addEventListener("touchstart", () => onClickCell(r, c), { passive: true });
+        // A touch also synthesizes a mouse event; one pointer event means
+        // tapping a crossing changes direction exactly once on every device.
+        inp.addEventListener("pointerdown", () => onClickCell(r, c));
         inp.addEventListener("input", () => onInput(r, c));
         inp.addEventListener("keydown", (e) => onKeyDown(e, r, c));
         wrap.appendChild(inp);
@@ -376,14 +384,14 @@
     const target = cells.find((cell) => !user[cell.r][cell.c]) || cells[0];
     curCell = { r: target.r, c: target.c };
     const inp = inputs[target.r][target.c];
-    if (inp) { suppressFocusSelect = true; inp.focus({ preventScroll: !!quiet }); }
+    if (inp && document.activeElement !== inp) { suppressFocusSelect = true; inp.focus({ preventScroll: !!quiet }); }
     highlight();
   }
 
   let suppressFocusSelect = false;
   function onClickCell(r, c) {
     // toggle direction if re-clicking the focused cell
-    suppressFocusSelect = true;
+    suppressFocusSelect = document.activeElement !== inputs[r][c];
     selectCell(r, c, true);
   }
   function onFocus(r, c) {
@@ -472,7 +480,7 @@
     if (!cell) return;
     curCell = { r: cell.r, c: cell.c };
     const inp = inputs[cell.r][cell.c];
-    if (inp) { suppressFocusSelect = true; inp.focus({ preventScroll: true }); }
+    if (inp && document.activeElement !== inp) { suppressFocusSelect = true; inp.focus({ preventScroll: true }); }
     highlight();
   }
 
@@ -709,6 +717,8 @@
     const st = slot(pi);
     st.solved = false; st.revealed = false; st.letterHints = 0; st.secs = 0;
     secs = 0; updateTimerUI();
+    el.next.classList.add("hidden");
+    startClock(0);
     persist();
     markDoneClues(true);
     el.feedback.textContent = "";
@@ -720,8 +730,10 @@
 
   /* ---------- the optional play clock ---------- */
   function startClock(from) {
-    stopClock();
+    if (tickId) clearInterval(tickId);
+    tickId = 0;
     secs = from || 0;
+    if (solvedNow) return;
     tickId = setInterval(() => {
       if (solvedNow) return;
       secs++;
@@ -757,6 +769,7 @@
   }
 
   function winGame() {
+    if (solvedNow) return;
     solvedNow = true;
     const st = slot(pi);
     const clean = !st.revealed && !st.letterHints;
@@ -765,15 +778,23 @@
     if (clean && secs > 0 && (!st.best || secs < st.best)) st.best = secs;
     persist();
     stopClock();
+    showSolved(true);
+  }
+
+  function showSolved(celebrate) {
+    const st = slot(pi);
+    const clean = !st.revealed && !st.letterHints;
     markDoneClues();
     clearTimeout(badTimer);
     el.grid.querySelectorAll(".xcell").forEach((w) => { w.classList.remove("bad"); w.classList.add("good"); });
     const timeBit = meta().timer && secs ? " (" + fmtTime(secs) + ")" : "";
     flash((clean ? "🏆 You solved the " + puzzle.name + " crossword all by yourself!"
                  : "🏆 You solved the " + puzzle.name + " crossword! Awesome!") + timeBit, "var(--green)");
-    sparkleBurst();
-    window.Confetti && Confetti.burst({ count: 100 });
-    if (window.SFX) SFX.win();
+    if (celebrate) {
+      sparkleBurst();
+      window.Confetti && Confetti.burst({ count: 100 });
+      if (window.SFX) SFX.win();
+    }
     const j = nextUnsolved();
     el.next.textContent = j === -1 ? "✏️ All puzzles" : "Next puzzle ▶";
     el.next.classList.remove("hidden");

@@ -17,24 +17,46 @@
 window.Confetti = (function () {
   "use strict";
 
-  const reduce =
-    window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let motionQuery = null;
+  try { motionQuery = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)"); }
+  catch (e) { /* preferences may be unavailable */ }
 
   const COLORS = ["#ff5d8f", "#8a5cff", "#38b6ff", "#3ddc84", "#ffd166"];
+  const layers = new Map();
   let styleInjected = false;
+
+  function removeLayer(layer) {
+    clearTimeout(layers.get(layer));
+    layers.delete(layer);
+    try { layer.remove(); } catch (e) { /* ignore */ }
+  }
+
+  function clear() {
+    layers.forEach(function (timer, layer) { removeLayer(layer); });
+  }
+
+  document.addEventListener("visibilitychange", function () { if (document.hidden) clear(); });
+  window.addEventListener("pagehide", clear);
+  if (motionQuery) {
+    const changed = function () { if (motionQuery.matches) clear(); };
+    try {
+      if (motionQuery.addEventListener) motionQuery.addEventListener("change", changed);
+      else if (motionQuery.addListener) motionQuery.addListener(changed);
+    } catch (e) { /* the preference is also checked before every burst */ }
+  }
 
   function injectStyle() {
     if (styleInjected) return;
-    styleInjected = true;
     try {
       const s = document.createElement("style");
       s.textContent =
         ".confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}" +
         ".confetti-bit{position:absolute;top:-12px;width:10px;height:14px;border-radius:2px;" +
         "will-change:transform,opacity;animation:confetti-fall linear forwards}" +
-        "@keyframes confetti-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}";
+        "@keyframes confetti-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}" +
+        "@media(prefers-reduced-motion:reduce){.confetti-layer{display:none}}";
       document.head.appendChild(s);
+      styleInjected = true;
     } catch (e) { /* ignore */ }
   }
 
@@ -42,26 +64,30 @@ window.Confetti = (function () {
   function rand(min, max) { return min + Math.random() * (max - min); }
 
   function burst(opts) {
-    if (reduce) return; // be calm for reduced-motion kids
+    if (document.hidden || !document.body || (motionQuery && motionQuery.matches)) return;
+    let layer = null;
     try {
       injectStyle();
       const o = opts || {};
-      const count = o.count || 90;
+      const count = typeof o.count === "number" && Number.isFinite(o.count)
+        ? Math.max(0, Math.min(200, Math.floor(o.count))) : 90;
+      if (!count) return;
       // origin as a fraction of the viewport (default: top, spread wide)
-      const ox = typeof o.x === "number" ? o.x : null;
-      const oy = typeof o.y === "number" ? o.y : null;
+      const ox = typeof o.x === "number" && Number.isFinite(o.x) ? Math.max(0, Math.min(1, o.x)) : null;
+      const oy = typeof o.y === "number" && Number.isFinite(o.y) ? Math.max(0, Math.min(1, o.y)) : null;
 
-      const layer = document.createElement("div");
+      // Rapid successes should not fill the page with thousands of elements.
+      if (layers.size >= 3) removeLayer(layers.keys().next().value);
+      layer = document.createElement("div");
       layer.className = "confetti-layer";
       layer.setAttribute("aria-hidden", "true");
-      document.body.appendChild(layer);
 
       const vw = window.innerWidth;
       for (let i = 0; i < count; i++) {
         const bit = document.createElement("span");
         bit.className = "confetti-bit";
         const startX = ox !== null ? ox * vw + rand(-60, 60) : rand(0, vw);
-        bit.style.left = Math.max(0, startX) + "px";
+        bit.style.left = Math.max(0, Math.min(vw, startX)) + "px";
         bit.style.top = (oy !== null ? oy * 100 : -3) + (oy !== null ? "vh" : "%");
         bit.style.background = COLORS[i % COLORS.length];
         bit.style.opacity = "1";
@@ -74,12 +100,11 @@ window.Confetti = (function () {
         layer.appendChild(bit);
       }
 
+      document.body.appendChild(layer);
       // tidy up after the longest possible piece has fallen
-      setTimeout(function () {
-        try { layer.remove(); } catch (e) { /* ignore */ }
-      }, 3600);
-    } catch (e) { /* ignore */ }
+      layers.set(layer, setTimeout(function () { removeLayer(layer); }, 3600));
+    } catch (e) { if (layer) removeLayer(layer); }
   }
 
-  return { burst };
+  return { burst, clear };
 })();

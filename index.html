@@ -9,9 +9,10 @@
   <meta name="theme-color" content="#8a5cff" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260915-mystery" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261001-improvements" />
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to games</a>
   <div class="bg-blobs" aria-hidden="true">
     <span class="blob blob-1"></span>
     <span class="blob blob-2"></span>
@@ -27,20 +28,33 @@
   </header>
 
   <nav class="kid-chips" id="kid-chips" aria-label="Who's playing?">
-    <button class="kid-chip" data-kid="all"     aria-pressed="true">🌈 Everybody</button>
-    <button class="kid-chip" data-kid="jeannie" aria-pressed="false">📖 Jeannie</button>
-    <button class="kid-chip" data-kid="cory"    aria-pressed="false">⛏️ Cory</button>
-    <button class="kid-chip" data-kid="ellie"   aria-pressed="false">👑 Ellie</button>
-    <button class="kid-chip" data-kid="kieran"  aria-pressed="false">👶 Kieran</button>
-    <button class="kid-chip" data-kid="shannon" aria-pressed="false">👩 Shannon</button>
-    <button class="kid-chip" data-kid="tristan" aria-pressed="false">👨 Tristan</button>
+    <button type="button" class="kid-chip" data-kid="all"     aria-pressed="true" aria-controls="game-grid">🌈 Everybody</button>
+    <button type="button" class="kid-chip" data-kid="jeannie" aria-pressed="false" aria-controls="game-grid">📖 Jeannie</button>
+    <button type="button" class="kid-chip" data-kid="cory"    aria-pressed="false" aria-controls="game-grid">⛏️ Cory</button>
+    <button type="button" class="kid-chip" data-kid="ellie"   aria-pressed="false" aria-controls="game-grid">👑 Ellie</button>
+    <button type="button" class="kid-chip" data-kid="kieran"  aria-pressed="false" aria-controls="game-grid">👶 Kieran</button>
+    <button type="button" class="kid-chip" data-kid="shannon" aria-pressed="false" aria-controls="game-grid">👩 Shannon</button>
+    <button type="button" class="kid-chip" data-kid="tristan" aria-pressed="false" aria-controls="game-grid">👨 Tristan</button>
   </nav>
 
-  <p class="lucky-row">
-    <button class="lucky-btn" id="lucky">🎲 Surprise me!</button>
-  </p>
+  <div class="arcade-tools">
+    <label for="game-search" class="search-label">Find a game</label>
+    <div class="search-row">
+      <input id="game-search" type="search" placeholder="Search games or learning topics" maxlength="120" aria-describedby="search-hint" aria-controls="game-grid" autocomplete="off" spellcheck="false" />
+      <button type="button" class="clear-search" id="clear-search" hidden>Clear</button>
+    </div>
+    <p id="search-hint" class="search-hint">Try a name or a topic, like spelling or animals.</p>
+    <p class="lucky-row">
+      <button type="button" class="lucky-btn" id="lucky">🎲 Surprise me!</button>
+    </p>
+    <p id="game-results" class="game-results" role="status" aria-live="polite" aria-atomic="true"></p>
+  </div>
 
-  <main>
+  <main id="main-content" tabindex="-1">
+    <div class="empty-state" id="empty-state" hidden>
+      <p>No games found. Try another word or pick Everybody.</p>
+      <button type="button" class="kid-chip" id="reset-filters">🌈 Show all games</button>
+    </div>
     <section class="game-grid" id="game-grid" aria-label="Games">
       <!-- Game cards are added here by assets/js/games.js -->
     </section>
@@ -52,6 +66,6 @@
   </footer>
 
   <script src="assets/js/games.js?v=20260915-mystery"></script>
-  <script src="assets/js/app.js?v=20260915-mystery"></script>
+  <script src="assets/js/app.js?v=20261001-improvements"></script>
 </body>
 </html>

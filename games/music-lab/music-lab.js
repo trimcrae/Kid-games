@@ -90,8 +90,16 @@
     if (raw && typeof raw === "object") save = Object.assign(save, raw);
   } catch (e) { /* first visit */ }
   if (!TEMPOS[save.tempo]) save.tempo = "steady";
-  if (!save.echoBestBy || typeof save.echoBestBy !== "object") save.echoBestBy = {};
+  if (!save.echoBestBy || typeof save.echoBestBy !== "object" || Array.isArray(save.echoBestBy)) save.echoBestBy = {};
+  if (!save.songs || typeof save.songs !== "object" || Array.isArray(save.songs)) save.songs = {};
   if (!Array.isArray(save.tune)) save.tune = [];
+  const playableNotes = WHITE.concat(BLACK.map(function (key) { return key.note; }));
+  save.tune = save.tune.filter(function (n) {
+    return n && playableNotes.indexOf(n.note) !== -1 && typeof n.t === "number" && Number.isFinite(n.t) && n.t >= 0 && n.t <= 300000;
+  }).slice(0, 80).sort(function (a, b) { return a.t - b.t; });
+  ["echoBest", "nameStars", "staffStars", "nameStreakBest", "staffSpeedBest", "chordCount", "chordStreakBest"].forEach(function (key) {
+    if (!Number.isSafeInteger(save[key]) || save[key] < 0) save[key] = 0;
+  });
 
   function persist() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {}
@@ -114,7 +122,10 @@
         master.gain.value = 0.3;
         master.connect(ctx.destination);
       }
-      if (ctx.state === "suspended" && ctx.resume) ctx.resume();
+      if (ctx.state === "suspended" && ctx.resume) {
+        const resumed = ctx.resume();
+        if (resumed && resumed.catch) resumed.catch(function () {});
+      }
       return ctx;
     } catch (e) { return null; }
   }
@@ -216,7 +227,7 @@
 
   function startMetro() {
     stopMetro();
-    if (!save.metro) return;
+    if (!save.metro || document.hidden) return;
     metroCount = 0;
     click(true);
     metroTimer = setInterval(function () {
@@ -315,17 +326,18 @@
     return k || "";
   }
 
-  let lastPointer = 0;
   function wireKey(btn, note) {
+    let lastPointer = 0;
     btn.addEventListener("pointerdown", function (e) {
+      if (e.button !== 0) return;
       lastPointer = Date.now();
       if (e.pointerType !== "mouse") e.preventDefault();
       press(note);
     });
     // Fires for real clicks that produced no pointerdown (keyboard
     // Enter/Space, assistive tech) without double-playing a tap.
-    btn.addEventListener("click", function () {
-      if (Date.now() - lastPointer < 700) return;
+    btn.addEventListener("click", function (e) {
+      if (e.detail !== 0 && Date.now() - lastPointer < 700) return;
       press(note);
     });
     // A finger that slides off a key must never leave it stuck down.
@@ -429,14 +441,34 @@
      MODES
      ========================================================= */
   let mode = "free";
-  let timers = [];
-  function later(fn, ms) { const t = setTimeout(fn, ms); timers.push(t); return t; }
-  function stopTimers() { timers.forEach(clearTimeout); timers = []; }
+  const timers = new Set();
+  let backgrounded = document.hidden;
+  let resumeMetro = false;
+  function armTimer(timer) {
+    timer.started = performance.now();
+    timer.id = setTimeout(function () {
+      timers.delete(timer);
+      timer.fn();
+    }, timer.remaining);
+  }
+  function later(fn, ms) {
+    const timer = { fn: fn, remaining: ms, started: 0, id: null };
+    timers.add(timer);
+    if (!backgrounded) armTimer(timer);
+    return timer;
+  }
+  function cancelLater(timer) {
+    if (!timer) return;
+    clearTimeout(timer.id);
+    timers.delete(timer);
+  }
+  function stopTimers() { timers.forEach(function (timer) { clearTimeout(timer.id); }); timers.clear(); }
 
   // every mode fills this in: what to do when a key is pressed
   let onPress = function () {};
 
   function press(note) {
+    if (backgrounded) return;
     audio();
     tone(note, 0.6, 0);
     flash(note);
@@ -906,7 +938,7 @@
     el.title.textContent = "Find the note 🔤";
     show(el.bigNote, true);
 
-    let want = null, right = 0, streak = 0, asked = 0, ival = null, root = null;
+    let want = null, right = 0, streak = 0, asked = 0, ival = null, root = null, answered = false;
     let level = Math.min(Math.max(save.nameLevel | 0, 1), 3);
 
     function scores() {
@@ -927,6 +959,8 @@
     }
 
     function ask() {
+      stopTimers();
+      answered = false;
       clearHints();
       clearFlashes();
       ival = null; root = null;
@@ -969,8 +1003,9 @@
     }
 
     onPress = function (note) {
-      if (!want) return;
+      if (!want || answered) return;
       if (correct(note)) {
+        answered = true;
         flash(note, "good", 300);
         clearHints();
         right++; streak++;
@@ -1066,7 +1101,7 @@
 
     let want = null, right = 0, asked = 0;
     let level = Math.min(Math.max(save.staffLevel | 0, 1), 3);
-    let racing = false, secondsLeft = 0, raceScore = 0;
+    let racing = false, secondsLeft = 0, raceScore = 0, answered = false, advanceTimer = null;
 
     function scores() {
       setScore("Right: <span>" + right + " / " + asked + "</span> &nbsp; Stars: <span>" + save.staffStars + "</span>" +
@@ -1093,6 +1128,9 @@
     }
 
     function ask() {
+      cancelLater(advanceTimer);
+      advanceTimer = null;
+      answered = false;
       clearHints();
       clearFlashes();
       const p = pool();
@@ -1123,6 +1161,9 @@
     }
     function endRace() {
       racing = false;
+      answered = true;
+      cancelLater(advanceTimer);
+      advanceTimer = null;
       clearHints();
       const b = save.staffSpeedBest || 0;
       if (raceScore > b) { save.staffSpeedBest = raceScore; persist(); }
@@ -1141,8 +1182,9 @@
     drawChips();
 
     onPress = function (note) {
-      if (!want) return;
+      if (!want || answered || (level === 3 && !racing)) return;
       if (note === want) {
+        answered = true;
         flash(note, "good", 300);
         clearHints();
         right++;
@@ -1154,7 +1196,7 @@
         if (window.SFX) SFX.good();
         if (right % 5 === 0 && window.Confetti) Confetti.burst({ count: 45 });
         scores();
-        later(ask, racing ? 450 : 1000);
+        advanceTimer = later(ask, racing ? 450 : 1000);
       } else {
         flash(note, "bad", 260);
         buzz();
@@ -1334,7 +1376,7 @@
   // laptop keyboard
   document.addEventListener("keydown", function (e) {
     if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
-    if (/^(INPUT|TEXTAREA)$/.test((e.target && e.target.tagName) || "")) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || "") || (e.target && e.target.isContentEditable)) return;
     const k = e.key.toLowerCase();
     const w = TYPE_WHITE.indexOf(k);
     const note = w >= 0 ? WHITE[w] : TYPE_BLACK[k];
@@ -1349,9 +1391,28 @@
   }
   el.hint.innerHTML = DEFAULT_HINT;
 
-  // a tab-away or a locked phone should not leave notes ringing
+  // Pause both the lesson clock and Web Audio's scheduled notes. Keeping
+  // each callback's remaining delay lets Echo and speed rounds carry on
+  // from the same place after a locked phone or a trip to another tab.
   document.addEventListener("visibilitychange", function () {
-    if (document.hidden) { stopTimers(); stopMetro(); stopAllTones(); }
+    if (document.hidden && !backgrounded) {
+      backgrounded = true;
+      timers.forEach(function (timer) {
+        clearTimeout(timer.id);
+        timer.remaining = Math.max(0, timer.remaining - (performance.now() - timer.started));
+      });
+      resumeMetro = metroTimer !== null;
+      stopMetro();
+      clearFlashes();
+      if (ctx && ctx.state === "running") ctx.suspend().catch(function () {});
+      persist();
+    } else if (!document.hidden && backgrounded) {
+      backgrounded = false;
+      if (ctx && ctx.state === "suspended") ctx.resume().catch(function () {});
+      timers.forEach(armTimer);
+      if (resumeMetro) startMetro();
+      resumeMetro = false;
+    }
   });
 
   setMode("free");

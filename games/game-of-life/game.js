@@ -999,6 +999,7 @@
   rotateChip.addEventListener("click", () => {
     state.rot = (state.rot + 1) % 4;
     window.SFX && SFX.pop && SFX.pop();
+    scheduleSave();
   });
 
   /* One sentence of real science for whatever brush is selected. */
@@ -1561,6 +1562,12 @@
 
   window.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") saveNow();
+  });
+  // A quick reload or leaving immediately after drawing can happen before
+  // the debounced save. Flush that last edit while the page still exists.
+  window.addEventListener("pagehide", () => {
+    clearTimeout(saveTimer);
+    saveNow();
   });
 
   /* ---------- boot ---------- */

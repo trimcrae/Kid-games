@@ -4,9 +4,10 @@
   "private": true,
   "description": "Automated play-testing for the McRae Family Arcade (Desktop / iPad / iPhone).",
   "scripts": {
-    "test": "node playtest.js"
+    "test": "node playtest.js",
+    "test:regressions": "node regressions.cjs"
   },
   "dependencies": {
-    "playwright-core": "^1.40.0"
+    "playwright-core": "1.63.0"
   }
 }

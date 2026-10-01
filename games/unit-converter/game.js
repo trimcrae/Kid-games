@@ -488,6 +488,16 @@
     return String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
   }
 
+  // Read the whole number, never just its first few characters. Keep the
+  // minus signs used by tablet keyboards and correctly grouped commas.
+  function parseNumber(raw) {
+    const text = String(raw == null ? "" : raw).trim()
+      .replace(/[\u2212\u2012-\u2015]/g, "-");
+    if (!/^[+-]?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text)) return NaN;
+    const value = Number(text.replace(/,/g, ""));
+    return Number.isFinite(value) ? value : NaN;
+  }
+
   // =====================================================================
   //  🔎 EXPLORE
   // =====================================================================
@@ -587,9 +597,10 @@
 
   function render() {
     const from = cat.units[fromIdx];
-    const raw = parseFloat($("value").value);
-    const val = isNaN(raw) ? 0 : raw;
+    const val = parseNumber($("value").value);
     const baseVal = toBase(from, val);
+    const valid = Number.isFinite(val) && Number.isFinite(baseVal);
+    $("value").setAttribute("aria-invalid", valid ? "false" : "true");
 
     $("inputTitle").textContent = "CONVERT " + cat.label.replace(/^\S+\s/, "").toUpperCase();
     $("resHead").innerHTML = fmtHTML(val) + " " + esc(from.sym) + " &nbsp;=";
@@ -606,6 +617,7 @@
       row.type = "button";
       row.className = "row" + (i === fromIdx ? " active" : "");
       const out = fromBase(u, baseVal);
+      row.disabled = !Number.isFinite(out);
       // The maths relationship: how do you turn a "from" number into this row?
       let rel = "";
       if (i !== fromIdx && from.factor && u.factor) {
@@ -637,7 +649,11 @@
     db.setAttribute("aria-pressed", showAll ? "true" : "false");
     db.hidden = hidden <= 0 && !showAll;
 
-    const cmp = compareLine(cat.key, baseVal);
+    const cmp = !Number.isFinite(val)
+      ? "✏️ Enter a number to see how the units compare."
+      : !Number.isFinite(baseVal)
+        ? "🔎 Try a smaller number — this conversion is too large to calculate."
+        : compareLine(cat.key, baseVal);
     $("compare").innerHTML = cmp;
     $("compare").style.display = cmp ? "" : "none";
 
@@ -1204,6 +1220,18 @@
     row.appendChild(inp); row.appendChild(unit); row.appendChild(go);
     body.appendChild(row);
 
+    const error = document.createElement("div");
+    error.id = "ansError";
+    error.className = "quiz-feedback";
+    error.hidden = true;
+    error.setAttribute("role", "status");
+    inp.setAttribute("aria-describedby", error.id);
+    inp.addEventListener("input", () => {
+      inp.removeAttribute("aria-invalid");
+      error.hidden = true;
+    });
+    body.appendChild(error);
+
     const acts = document.createElement("div");
     acts.className = "quiz-actions";
     const hint = document.createElement("button");
@@ -1238,16 +1266,21 @@
   function submitAnswer(raw) {
     const q = current;
     if (!q) return;
-    // Tablet keyboards happily produce − (U+2212) and – (en dash); a child
-    // typing a below-zero temperature should not be punished for that.
-    const txt = String(raw == null ? "" : raw).trim()
-      .replace(/,/g, "").replace(/[\u2212\u2012-\u2015]/g, "-").replace(/^\+/, "");
-    if (txt === "") {
+    const user = parseNumber(raw);
+    if (!Number.isFinite(user)) {
       const inp = $("ansInput");
-      if (inp) { inp.placeholder = "type a number!"; try { inp.focus(); } catch (e) {} }
+      const error = $("ansError");
+      if (error) {
+        error.textContent = "✏️ Type a number, such as 12 or 2.5. Use commas only to group thousands, like 1,000.";
+        error.hidden = false;
+      }
+      if (inp) {
+        inp.setAttribute("aria-invalid", "true");
+        inp.placeholder = "type a number!";
+        try { inp.focus(); } catch (e) {}
+      }
       return;
     }
-    const user = parseFloat(txt);
     const verdict = grade(q, user);
     current = null;
 
