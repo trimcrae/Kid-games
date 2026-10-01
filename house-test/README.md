@@ -257,7 +257,11 @@ Browser storage cannot be read across browsers. Family gifts and shop transactio
 stay inside the house edition. Backups/import/reset also remain in activity Help.
 
 Seven code-built 3D species use each pet's palette (including patterned
-palettes), equipment and petpet. The live models are simplified geometry, not
+palettes), equipment and petpet. Sculpted wings, leaf ears, webbed feet and
+curved tails distinguish the species while keeping the same house scale and
+two draw calls per pet. Furniture has separate shapes for beds, sofas, chairs,
+lamps, plants and bookcases, batched by finish to keep rendering costs bounded.
+The live models are simplified geometry, not
 the offline Blender fur renders. Equipped furniture stands as pet-sized
 pieces in fixed spots around the living room and foyer (`decor-slots.mjs`); changing wall/floor styles also colours
 the main room. All original ownership, home capacity and furniture bonuses

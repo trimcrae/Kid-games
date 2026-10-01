@@ -1,11 +1,11 @@
 import * as THREE from './vendor/three.module.min.js';
 import {activities,destinationFor} from './activities.mjs';
-import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20260925-motion2';
+import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20261001-visuals';
 import {createPetpetFollow} from './petpet-follow.mjs?v=20260925-motion2';
-import {furnishing} from './furnishings.mjs?v=20260925-motion2';
+import {furnishing} from './furnishings.mjs?v=20261001-visuals';
 import {familyRooms} from './rooms.mjs';
 import {setupSaves} from './save-panel.mjs';
-import {createNeighborhood} from './neighborhood.mjs?v=20260925-motion2';
+import {createNeighborhood} from './neighborhood.mjs?v=20261001-visuals';
 import {ROUTINES,HOUSE_CATS,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260925-motion2';
 import {createGround} from './pet-ground.mjs?v=20260925-motion2';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs?v=20260925-motion2';

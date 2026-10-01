@@ -23,7 +23,7 @@
    =========================================================== */
 
 import { taperedCurve, blade, mergeForms } from './forms.mjs';
-import { contour, coat } from './wildlife-surfaces.mjs';
+import { contour, coat, hide } from './wildlife-surfaces.mjs?v=20261001-visuals';
 import { createWalkRig, updateWalk } from './locomotion.mjs';
 
 /* ---------------- textures ---------------- */
@@ -120,6 +120,19 @@ function bumpyGeo(THREE, geo, amount) {
   geo.computeVertexNormals(); return geo;
 }
 
+// Keep small details in a single draw: their colour follows the geometry,
+// rather than making a separate material and mesh for every pupil or patch.
+function colouredForms(THREE, forms) {
+  const colours = [];
+  for (const [geo, colour] of forms) {
+    const c = new THREE.Color(colour), count = geo.index?.count || geo.attributes.position.count;
+    for (let i = 0; i < count; i++) colours.push(c.r, c.g, c.b);
+  }
+  const geo = mergeForms(THREE, forms.map(([geo]) => geo));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colours, 3));
+  return geo;
+}
+
 /* ---------------- builders ---------------- */
 export function makeCreature(THREE, id, materials = new Map()) {
   const S = { ...SPECIES[id] };
@@ -136,6 +149,9 @@ export function makeCreature(THREE, id, materials = new Map()) {
   if (S.rig === 'quad') {
     if (!materials.has(id)) materials.set(id, coat(THREE,S,id));
     skin = materials.get(id);
+  } else if (S.rig === 'blob') {
+    if (!materials.has(id)) materials.set(id, hide(THREE,S,id));
+    skin = materials.get(id);
   } else if (S.pattern) {
     const tex = patternTexture(THREE, S.colour, S.pattern[0], S.pattern[1], id.length * 31);
     // spots and rosettes are small on a big cat: tile the pattern over long bodies
@@ -144,9 +160,14 @@ export function makeCreature(THREE, id, materials = new Map()) {
   } else skin = std({ map: patternTexture(THREE, S.colour, S.trunk || S.rig === 'blob' ? 'hide' : 'fur', null, id.length*31) });
   const plain = std({ color: S.colour });
   const dark = std({ color: 0x1a1612 });
-  const eyeGeo = new THREE.SphereGeometry(1, 10, 8);
-  const eyeMat = std({ color: '#100e0b', roughness: .16 });
-  const addEyes = (parent, r, x, y, z) => { for (const sx of [-1, 1]) { const e = M(eyeGeo, eyeMat, sx * x, y, z); e.scale.set(r*.7,r*.6,r*.5); parent.add(e); } };
+  const iris = ['lion','jaguar','snowleopard','eagle'].includes(id) ? '#9c702a' : '#403025';
+  const eyeGeo = colouredForms(THREE, [
+    [new THREE.SphereGeometry(1, 10, 8).scale(.7,.6,.5), iris],
+    [new THREE.SphereGeometry(1, 8, 6).scale(.35,.43,.13).translate(0,0,.44), '#090a09'],
+    [new THREE.SphereGeometry(1, 5, 4).scale(.07,.07,.035).translate(.16,.2,.55), '#dce5df']
+  ]);
+  const eyeMat = std({vertexColors:true,roughness:.13});
+  const addEyes = (parent, r, x, y, z) => { for (const sx of [-1, 1]) { const e = M(eyeGeo, eyeMat, sx * x, y, z); e.scale.setScalar(r); e.rotation.y=sx*.2; parent.add(e); } };
   let radius = S.len * 0.6, height = S.sh || S.len, eyeY = S.sh || S.len * 0.5;
 
   if (S.rig === "quad") {
@@ -180,7 +201,15 @@ export function makeCreature(THREE, id, materials = new Map()) {
       const upper=segment(thick,S.legs*.48,upperLength),lower=segment(S.legs*(S.trunk?.65:.48),S.legs*(S.trunk?.7:.3),lowerLength);
       const foot=M(new THREE.SphereGeometry(1,18,12),footMat,0,-legLen,0);
       foot.scale.set(S.legs*(S.trunk?.77:hoofed?.48:.72),footH,S.legs*(S.trunk?.84:hoofed?.66:.93));
-      lower.position.y=-upperLength;pivot.add(upper,lower,foot);
+      // Start in the same grounded two-bone stance used by the walking IK.
+      // Straight rest segments used to overlap the ankle and stick through
+      // the paw in field-guide/model previews before the first animation.
+      const jointY=(upperLength*upperLength-lowerLength*lowerLength+legLen*legLen)/(2*legLen);
+      const jointZ=Math.sqrt(Math.max(0,upperLength*upperLength-jointY*jointY))*(sz>0?-1:1);
+      upper.quaternion.setFromUnitVectors(new THREE.Vector3(0,-1,0),new THREE.Vector3(0,-jointY,jointZ).normalize());
+      lower.position.set(0,-jointY,jointZ);
+      lower.quaternion.setFromUnitVectors(new THREE.Vector3(0,-1,0),new THREE.Vector3(0,-legLen+jointY,-jointZ).normalize());
+      pivot.add(upper,lower,foot);
       walkLegs.push({hip:pivot.position.clone(),upper,lower,foot,upperLength,lowerLength,footH,front:sz>0});
       g.add(pivot); parts.legs.push(pivot);
     }
@@ -194,14 +223,38 @@ export function makeCreature(THREE, id, materials = new Map()) {
     const neckMesh = M(taperedCurve(THREE,[[0,-nl*.16,0],[0,nl*.45,-nl*.06],[0,nl,0]],S.head * (hoofed?1.02:1.2),S.head * .63,16,16), skin);
     neck.add(neckMesh);
     const head = new THREE.Group(); head.position.set(0, nl, 0); head.rotation.x = -(Math.PI / 2 - na) + 0.15;   // head level, nose a touch down
-    const h=S.head, muzzle=hoofed?1.8:S.boxHead?1.6:['lion','jaguar','snowleopard','redpanda'].includes(id)?1:cat?1.3:1.5;
-    const headProfile=S.trunk?[[-.9,0,0,0,0],[-.55,.7,.85,.7,0],[0,.85,1,.74,0],[.55,.72,.87,.64,-.08],[1,.34,.4,.4,-.2],[1.2,0,0,0,-.2]]:S.boxHead?[[-.9,0,0,0,0],[-.5,.78,.68,.64,0],[.2,.81,.69,.67,0],[1.15,.75,.62,.57,-.06],[1.6,.52,.48,.43,-.08],[1.78,0,0,0,-.08]]:[[-.9,0,0,0,0],[-.55,.72,.86,.65,0],[0,.83,.87,.68,0],[.5,.67,.6,.59,-.06],[muzzle*.75,.45,.35,.34,-.22],[muzzle,.34,.27,.26,-.23],[muzzle+.12,0,0,0,-.23]];
+    const h=S.head, bigCat=['lion','jaguar','snowleopard'].includes(id), fox=['fennec','arcticfox'].includes(id);
+    const muzzle=hoofed?1.8:S.boxHead?1.6:['lion','jaguar','snowleopard','redpanda'].includes(id)?1:cat?1.3:1.5;
+    const headProfile=S.trunk?[[-.9,0,0,0,0],[-.55,.7,.85,.7,0],[0,.85,1,.74,0],[.55,.72,.87,.64,-.08],[1,.34,.4,.4,-.2],[1.2,0,0,0,-.2]]:S.boxHead?[[-.9,0,0,0,0],[-.5,.78,.68,.64,0],[.2,.81,.69,.67,0],[1.15,.75,.62,.57,-.06],[1.6,.52,.48,.43,-.08],[1.78,0,0,0,-.08]]:bigCat?[[-.9,0,0,0,0],[-.58,.68,.77,.64,0],[-.15,.93,.9,.76,0],[.28,.85,.74,.67,0],[.6,.64,.4,.4,-.07],[.95,.45,.23,.24,-.16],[1.12,0,0,0,-.16]]:[[-.9,0,0,0,0],[-.55,.72,.86,.65,0],[0,.83,.87,.68,0],[.5,.67,.6,.59,-.06],[muzzle*.75,.45,.35,.34,-.22],[muzzle,.34,.27,.26,-.23],[muzzle+.12,0,0,0,-.23]];
     const headGeo=contour(THREE,headProfile.map(p=>p.map(v=>v*h)),28,24);
-    const skull = M(headGeo,S.faceWhite?std({color:'#e7dbca'}):skin);
+    let face = skin;
+    if (S.faceWhite) {
+      // Red pandas have a rusty crown, white cheeks and brows, and dark
+      // tear tracks. These are markings on the skull, not a white head ball.
+      const p=headGeo.attributes.position, colours=[];
+      const rust=new THREE.Color('#b55c35'), cream=new THREE.Color('#eee5d6'), tear=new THREE.Color('#594037');
+      for(let i=0;i<p.count;i++) {
+        const x=Math.abs(p.getX(i)/h),y=p.getY(i)/h,z=p.getZ(i)/h;
+        const cheek=Math.exp(-Math.pow((x-.55)/.35,2)-Math.pow((y+.02)/.52,2)-Math.pow((z-.65)/.65,2));
+        const brow=Math.exp(-Math.pow((x-.5)/.3,2)-Math.pow((y-.58)/.2,2)-Math.pow((z-.3)/.5,2));
+        const muzzleWhite=Math.max(0,Math.min(1,(z-.58)*3))*Math.max(0,Math.min(1,(.25-y)*3));
+        const track=Math.exp(-Math.pow((x-.61)/.16,2)-Math.pow((y-.06)/.23,2)-Math.pow((z-.5)/.25,2));
+        const c=rust.clone().lerp(cream,Math.min(1,Math.max(cheek*1.4,brow*1.5,muzzleWhite))).lerp(tear,Math.min(1,track*1.5));
+        colours.push(c.r,c.g,c.b);
+      }
+      headGeo.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));
+      face=std({vertexColors:true,bumpMap:skin.bumpMap,bumpScale:.012});
+    }
+    const skull = M(headGeo,face);
     if(S.trunk)skull.scale.set(1.1,1.3,.8);
     head.add(skull);
+    if(bigCat) {
+      const pads=[];
+      for(const sx of [-1,1])pads.push(new THREE.SphereGeometry(1,12,8).scale(h*.26,h*.19,h*.26).translate(sx*h*.23,-h*.16,h*.79));
+      head.add(M(mergeForms(THREE,pads),std({color:S.belly||'#dcc49b',bumpMap:skin.bumpMap,bumpScale:.008})));
+    }
     if (S.snout) {const nose=M(new THREE.SphereGeometry(1,16,10),dark,0,-h*.12,h*muzzle);nose.scale.set(h*(hoofed?.3:.24),h*.16,h*.13);head.add(nose)}
-    addEyes(head, h*.16,h*.72,h*.23,h*.39);
+    addEyes(head, h*(bigCat?.14:.16),h*(bigCat?.77:.72),h*.23,h*(bigCat?.45:.39));
     // ears
     const rounded = S.trunk || ['lion','jaguar','snowleopard','polarbear','grizzly','capybara','arcticfox','redpanda'].includes(id);
     const earGeo = new THREE.SphereGeometry(1,24,18);
@@ -210,18 +263,30 @@ export function makeCreature(THREE, id, materials = new Map()) {
       const x=earPos.getX(i),y=earPos.getY(i),z=earPos.getZ(i);
       if(S.trunk)earPos.setXYZ(i,x*(.87+y*.22),y-.12*x*x,z+.09*Math.sin(y*4)*x);
       else if(!rounded)earPos.setX(i,x*(1-.5*Math.max(0,y)));
+      if(fox)earPos.setXYZ(i,x*(1-.7*Math.max(0,y)),y,z);
     }
     earGeo.computeVertexNormals();
     for (const sx of [-1, 1]) {
-      const ear=new THREE.Group();ear.position.set(sx*S.head*(S.trunk?.95:.65),S.head*(S.trunk?.05:.85),-S.head*.16);ear.rotation.y=sx*.32;ear.rotation.z=-sx*(S.trunk?.2:.35);
-      const ew=S.ears*(S.trunk?1:rounded?.85:.7),eh=S.ears*(S.trunk?1.25:rounded?1:1.65);
+      const ear=new THREE.Group();ear.position.set(sx*S.head*(S.trunk?.95:.65),S.head*(S.trunk?.05:.85),-S.head*.16);ear.rotation.y=sx*.32;ear.rotation.z=-sx*(S.trunk?.2:fox?.12:.35);
+      // The fennec's large ears start above the skull. The old centred oval
+      // extended below its jaw and obscured the head from the side.
+      const ew=S.ears*(S.trunk?1:fox?.52:rounded?.85:.7),eh=S.ears*(S.trunk?1.25:fox?1.05:rounded?1:1.65);
+      if(fox)ear.position.y+=eh*.7;
       const e=M(earGeo,skin);e.scale.set(ew,eh,S.ears*.16);ear.add(e);
       if(!S.trunk){const inner=M(earGeo,std({color:'#a8937f'}),0,0,S.ears*.12);inner.scale.set(ew*.66,eh*.72,S.ears*.06);ear.add(inner)}
       head.add(ear);
     }
     if(S.mane){
-      const geo=contour(THREE,[[-1.8,0,0,0,0],[-1.4,.9,1,1.25,-.1],[-.8,1.18,1.2,1.5,-.1],[-.3,1.05,1.05,1.4,-.1],[.05,.72,.78,.86,0],[.25,0,0,0,0]].map(p=>p.map(v=>v*h)),32,32);
-      head.add(M(bumpyGeo(THREE,geo,.07),std({color:'#705034',bumpMap:skin.bumpMap,bumpScale:.035})));
+      const geo=bumpyGeo(THREE,contour(THREE,[[-1.8,0,0,0,0],[-1.4,.78,.86,1.24,-.1],[-.8,1.06,1.05,1.43,-.1],[-.3,.96,.94,1.27,-.1],[.05,.63,.7,.8,0],[.25,0,0,0,0]].map(p=>p.map(v=>v*h)),28,24),.045);
+      const p=geo.attributes.position,colours=[];
+      for(let i=0;i<p.count;i++) {
+        const light=new THREE.Color('#a17b46'),shade=new THREE.Color('#4c3524');
+        const lower=Math.max(0,Math.min(1,.45-p.getY(i)/h*.45));
+        const c=light.lerp(shade,lower).multiplyScalar(.94+.06*Math.sin(p.getZ(i)*90+p.getX(i)*50));
+        colours.push(c.r,c.g,c.b);
+      }
+      geo.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));
+      head.add(M(geo,std({vertexColors:true,bumpMap:skin.bumpMap,bumpScale:.028})));
     }
     if (S.maneRidge) { const r = M(new THREE.BoxGeometry(0.06, 0.22, nl), dark, 0, nl / 2 + S.head * 0.6, 0); neck.add(r); }
     if (S.beard) { const b = M(new THREE.SphereGeometry(S.head * 0.6, 8, 6), skin, 0, -S.head * 0.8, S.head * 0.3); b.scale.set(0.8, 1.4, 0.9); head.add(b); }
@@ -253,17 +318,28 @@ export function makeCreature(THREE, id, materials = new Map()) {
     parts.bodyY = bodyY;
   }
   else if (S.rig === "blob") {
-    const body = M(new THREE.SphereGeometry(1, 14, 10), skin, 0, S.sh * 0.5, 0); body.scale.set(S.w * 0.5, S.sh * 0.5, S.len * 0.5); g.add(body);
-    const head = new THREE.Group(); head.position.set(0, S.sh * 0.75, S.len * 0.45);
-    head.add(M(new THREE.SphereGeometry(S.head, 10, 8), skin, 0, 0, 0));
-    addEyes(head, S.head * 0.15, S.head * 0.5, S.head * 0.25, S.head * 0.7);
-    head.add(M(new THREE.SphereGeometry(S.head * 0.2, 6, 5), dark, 0, -S.head * 0.05, S.head * 0.95));
-    if (S.tusks) for (const sx of [-1, 1]) { const t = M(new THREE.ConeGeometry(S.head * 0.12, S.head * 1.6, 6), std({ color: "#f0e8d0" }), sx * S.head * 0.3, -S.head * 0.9, S.head * 0.6); t.rotation.x = Math.PI; head.add(t); }
+    const seaLion=id==='sealion',h=S.head;
+    // A tapering rump and a raised shoulder distinguish a sea lion from
+    // the lower, broad-necked true seal and the walrus's heavy chest.
+    const profile=[[-.5,0,0,0,.18],[-.43,.2,.18,.13,.23],[-.22,.46,.43,.27,.36],[.08,.5,.48,.38,.43],[.28,seaLion?.32:.43,seaLion?.54:.41,.31,seaLion?.56:.47],[.42,.2,.27,.19,seaLion?.72:.55],[.46,0,0,0,seaLion?.72:.55]];
+    const body=M(contour(THREE,profile.map(([z,w,top,bottom,y])=>[z*S.len,w*S.w,top*S.sh,bottom*S.sh,y*S.sh]),24,20),skin);g.add(body);
+    const head = new THREE.Group(); head.position.set(0,S.sh*(seaLion?.91:.76),S.len*.4);
+    const hp=[[-.8,0,0,0,0],[-.5,.66,.71,.64,0],[0,.8,.74,.66,0],[.5,.63,.43,.44,-.08],[1,.5,.28,.3,-.12],[1.15,0,0,0,-.12]];
+    head.add(M(contour(THREE,hp.map(p=>p.map(v=>v*h)),20,16),skin));
+    addEyes(head,h*.13,h*.68,h*.25,h*.44);
+    const muzzle=[];
+    for(const sx of [-1,1]) {
+      muzzle.push([new THREE.SphereGeometry(1,12,8).scale(h*.3,h*.23,h*.29).translate(sx*h*.24,-h*.17,h*.77),S.tusks?'#b39a7d':S.colour]);
+      muzzle.push([new THREE.SphereGeometry(1,8,6).scale(h*.085,h*.08,h*.04).translate(sx*h*.11,-h*.02,h*1.035),'#201b17']);
+    }
+    head.add(M(colouredForms(THREE,muzzle),std({vertexColors:true,roughness:.7})));
+    if (S.tusks) for (const sx of [-1, 1]) head.add(M(taperedCurve(THREE,[[sx*h*.33,-h*.26,h*.84],[sx*h*.37,-h*.93,h*.88],[sx*h*.35,-h*1.55,h*.96]],h*.1,.005,12,7),std({color:'#eee3c9',roughness:.48})));
     if (S.ears) for (const sx of [-1, 1]) head.add(M(new THREE.SphereGeometry(S.head * 0.15, 5, 4), skin, sx * S.head * 0.8, S.head * 0.3, 0));
-    if(S.whiskers){const whiskers=[];for(const sx of [-1,1])for(let i=0;i<4;i++)whiskers.push(taperedCurve(THREE,[[sx*S.head*.25,-S.head*.2,S.head*.8],[sx*S.head*.7,-S.head*(.2+i*.1),S.head],[sx*S.head*1.15,-S.head*(.3+i*.17),S.head*.8]],S.head*.012,.001,6,4));head.add(M(mergeForms(THREE,whiskers),std({color:'#c8baa0'})))}
+    {const whiskers=[];for(const sx of [-1,1])for(let i=0;i<4;i++)whiskers.push(taperedCurve(THREE,[[sx*h*.25,-h*.2,h*.93],[sx*h*.7,-h*(.2+i*.06),h*1.08],[sx*h*1.1,-h*(.25+i*.11),h*.94]],h*(S.whiskers?.012:.006),.001,6,4));head.add(M(mergeForms(THREE,whiskers),std({color:'#c8baa0'})))}
     g.add(head); parts.head = head;
-    for (const sx of [-1, 1]) { const f = M(new THREE.SphereGeometry(1, 7, 5), skin, sx * S.w * 0.55, S.sh * 0.15, S.len * 0.15); f.scale.set(S.len * 0.08, S.sh * 0.06, S.len * 0.2); g.add(f); parts.fins.push(f); }
-    const tf = M(new THREE.SphereGeometry(1, 7, 5), skin, 0, S.sh * 0.15, -S.len * 0.5); tf.scale.set(S.w * 0.35, S.sh * 0.08, S.len * 0.15); g.add(tf);
+    for (const sx of [-1, 1]) { const geo=blade(THREE,S.len*(seaLion?.27:.2),S.len*.14,S.sh*.035,sx*S.len*.03);geo.rotateY(sx*1.1);const f=M(geo,std({color:S.colour,side:THREE.DoubleSide}),sx*S.w*.39,S.sh*.14,S.len*.12);g.add(f);parts.fins.push(f); }
+    const hind=[];for(const sx of [-1,1]){const f=blade(THREE,S.len*.18,S.w*.34,S.sh*.03);f.rotateY(Math.PI+sx*.46);f.translate(sx*S.w*.06,S.sh*.15,-S.len*.42);hind.push(f)}
+    g.add(M(mergeForms(THREE,hind),std({color:S.colour,side:THREE.DoubleSide})));
     radius = S.len * 0.55; height = S.sh; eyeY = S.sh * 0.75;
   }
   else if (S.rig === "shelled") {
@@ -299,13 +375,45 @@ export function makeCreature(THREE, id, materials = new Map()) {
     radius = S.w * 0.6; height = S.sh; eyeY = S.sh * 0.95;
   }
   else if (S.rig === "bird") {
-    const back = std({ color: S.colour }), front = std({ color: S.belly || S.colour });
-    const body = M(new THREE.SphereGeometry(1, 12, 9), back, 0, 0, 0); body.scale.set(S.len * 0.22, S.len * 0.22, S.len * 0.45); g.add(body);
-    const bl = M(new THREE.SphereGeometry(1, 10, 8), front, 0, -S.len * 0.05, S.len * 0.05); bl.scale.set(S.len * 0.19, S.len * 0.18, S.len * 0.38); g.add(bl);
+    const back = std({ color: S.colour });
+    const breadth=id==='booby'?.18:id==='eagle'?.25:.22;
+    const bodyGeo=contour(THREE,[[-.45,0,0,0,0],[-.28,breadth*.7,.13,.12,0],[-.07,breadth,.22,.2,0],[.18,breadth*.92,.25,.21,.015],[.35,breadth*.57,.2,.13,.045],[.48,0,0,0,.08]].map(p=>p.map(v=>v*S.len)),22,16);
+    const bp=bodyGeo.attributes.position,bodyColours=[];
+    for(let i=0;i<bp.count;i++) {
+      const c=new THREE.Color(S.colour),pale=new THREE.Color(S.belly||S.colour);
+      const belly=Math.max(0,Math.min(1,(-bp.getY(i)/S.len+.06)*7));c.lerp(pale,belly);
+      bodyColours.push(c.r,c.g,c.b);
+    }
+    bodyGeo.setAttribute('color',new THREE.Float32BufferAttribute(bodyColours,3));
+    g.add(M(bodyGeo,std({vertexColors:true})));
     const head = new THREE.Group(); head.position.set(0, S.len * 0.2, S.len * 0.42);
-    head.add(M(new THREE.SphereGeometry(S.len * 0.16, 10, 8), S.headWhite ? std({ color: "#ffffff" }) : back));
+    const birdHead=new THREE.SphereGeometry(S.len*.16,14,10);
+    let headMat=S.headWhite?std({color:'#eeeade'}):back;
+    if(id==='macaw') {
+      const p=birdHead.attributes.position,colours=[];
+      for(let i=0;i<p.count;i++) {
+        const x=Math.abs(p.getX(i)/S.len),y=p.getY(i)/S.len,z=p.getZ(i)/S.len;
+        const cheek=Math.exp(-Math.pow((x-.14)/.09,2)-Math.pow((y-.025)/.075,2)-Math.pow((z-.065)/.085,2));
+        const c=new THREE.Color(S.colour).lerp(new THREE.Color('#e9dfcc'),Math.min(1,cheek*1.8));colours.push(c.r,c.g,c.b);
+      }
+      birdHead.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));headMat=std({vertexColors:true});
+    }
+    head.add(M(birdHead,headMat));
     const beakLen = S.bigBeak ? S.len * 0.7 : S.len * 0.18;
-    const beak = M(new THREE.ConeGeometry(S.bigBeak ? S.len * 0.09 : S.len * 0.05, beakLen, 7), std({ color: S.beak }), 0, S.bigBeak ? -S.len * 0.05 : 0, S.len * 0.16 + beakLen / 2); beak.rotation.x = Math.PI / 2; head.add(beak);
+    if(S.bigBeak||['eagle','macaw'].includes(id)) {
+      const profile=S.bigBeak?[[.1,.06,.09,.04,-.035],[.24,.085,.12,.045,-.04],[.49,.074,.11,.04,-.05],[.72,.041,.065,.023,-.05],[.86,0,0,0,-.07]]:[[.1,.055,.045,.032,0],[.19,.05,.055,.032,-.005],[.27,.027,.04,.022,-.025],[.32,.014,.014,.017,-.053],[.34,0,0,0,-.07]];
+      const geo=contour(THREE,profile.map(p=>p.map(v=>v*S.len)),18,12),p=geo.attributes.position,colours=[];
+      for(let i=0;i<p.count;i++) {
+        const z=p.getZ(i)/S.len,y=p.getY(i)/S.len;
+        const c=new THREE.Color(S.beak);
+        if(S.bigBeak){c.lerp(new THREE.Color('#dedf48'),Math.max(0,Math.min(1,(.48-z)*2)));c.lerp(new THREE.Color('#3a3426'),Math.max(0,Math.min(1,(z-.73)*10)));if(y<-.07)c.multiplyScalar(.68)}
+        else c.lerp(new THREE.Color(id==='macaw'?'#3c3730':'#b97a0e'),Math.max(0,Math.min(1,(.2-z)*5)));
+        colours.push(c.r,c.g,c.b);
+      }
+      geo.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));head.add(M(geo,std({vertexColors:true,roughness:.5})));
+    } else {
+      const beak=M(new THREE.ConeGeometry(S.len*.05,beakLen,7),std({color:S.beak}),0,0,S.len*.16+beakLen/2);beak.rotation.x=Math.PI/2;head.add(beak);
+    }
     addEyes(head, S.len * 0.03, S.len * 0.1, S.len * 0.05, S.len * 0.1);
     g.add(head); parts.head = head;
     // Overlapping primaries make a scalloped flight silhouette, in one mesh

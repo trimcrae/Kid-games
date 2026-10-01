@@ -11,18 +11,47 @@ import * as THREE from './vendor/three.module.min.js';
 export const PET_SCALE=.6;
 const sphere=new THREE.SphereGeometry(1,16,12);
 const roundSphere=new THREE.SphereGeometry(1,24,16);
+const smallSphere=new THREE.SphereGeometry(1,8,6);
 const cone=new THREE.ConeGeometry(1,1,12);
 // Half a ring: a smile, a sleeping eye (turned over) or a happy ^ eye.
 const arc=new THREE.TorusGeometry(1,.22,6,14,Math.PI);
-const shared=new Set([sphere,roundSphere,cone,arc]);
+// Bevelled profiles give thin wings, leaves and webbed toes an actual edge.
+// They remain part of the same skinned mesh; there are no extra draw calls.
+function profile(points,depth=.024,bevel=.008){
+  const shape=new THREE.Shape();shape.moveTo(...points[0]);
+  for(const p of points.slice(1))p.length===6?shape.bezierCurveTo(...p):shape.lineTo(...p);
+  shape.closePath();
+  const g=new THREE.ExtrudeGeometry(shape,{depth,bevelEnabled:true,bevelThickness:bevel,bevelSize:bevel,bevelSegments:2,curveSegments:8,steps:1});
+  g.translate(0,0,-depth/2);return g;
+}
+const dragonWing=profile([[0,0],[.10,.17,.29,.20,.40,.16],[.36,.11,.36,.04,.41,.015],
+  [.32,.02,.28,-.005,.28,-.07],[.22,-.025,.17,-.06,.14,-.13],[.13,-.04,.08,-.01,0,-.03]]);
+const spriteWing=profile([[0,0],[.12,.21,.30,.20,.40,.10],[.41,.04,.30,-.02,.18,-.015],
+  [.35,-.07,.35,-.13,.26,-.14],[.13,-.15,.045,-.09,0,-.015]],.018,.006);
+const leaf=profile([[0,0],[.30,.36,.77,.36,1,0],[.76,-.34,.30,-.34,0,0]],.20,.04);
+const webFoot=profile([[-.72,-.70],[-1,-.18],[-.92,.72],[-.50,.44],[-.30,1],[0,.57],[.35,1],[.50,.44],[.95,.65],[.90,-.22],[.65,-.75]],.35,.06);
+webFoot.rotateX(Math.PI/2);
+const starPoints=[];for(let i=0;i<10;i++){const a=Math.PI/2+i*Math.PI/5,r=i%2?.45:1;starPoints.push([Math.cos(a)*r,Math.sin(a)*r]);}
+const star=profile(starPoints,.22,.04);
+const wispBody=roundSphere.clone();
+{const p=wispBody.attributes.position;for(let i=0;i<p.count;i++){const y=p.getY(i),t=(y+1)/2;
+  const taper=.18+.82*Math.sin(Math.min(1,t*1.28)*Math.PI/2);p.setXYZ(i,p.getX(i)*taper+.16*(1-t)*(1-t),y,p.getZ(i)*taper);}wispBody.computeVertexNormals();}
+const shared=new Set([sphere,roundSphere,smallSphere,cone,arc,dragonWing,spriteWing,leaf,webFoot,wispBody,star]);
+function taperedTube(points,radius=.035,tip=.55){
+  const curve=new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),g=new THREE.TubeGeometry(curve,16,radius,8,false);
+  const p=g.attributes.position,u=g.attributes.uv;
+  for(let i=0;i<p.count;i++){const t=u.getX(i),c=curve.getPointAt(t),k=1-(1-tip)*t;
+    p.setXYZ(i,c.x+(p.getX(i)-c.x)*k,c.y+(p.getY(i)-c.y)*k,c.z+(p.getZ(i)-c.z)*k);}
+  g.computeVertexNormals();return g;
+}
 
 // ---------------------------------------------------------------------------
 // Rig. Each creature is one skinned mesh on a small skeleton, plus its
 // contact shadow: two draw calls instead of the ~20 separate spheres it used
 // to be, and every part can still move on its own —
 // a head that looks round, eyes that blink or close, ears that droop, feet
-// that step. At rest every vertex sits exactly where the old spheres did, so
-// the measured sizes of every species are unchanged.
+// that step. Sculpted profiles stay within each species' established size
+// envelope, so the pets still fit the same furniture and doorways.
 // ---------------------------------------------------------------------------
 const BONES=[
   // name, parent, rest position (creature units, feet at 0)
@@ -64,14 +93,15 @@ function makeSkeleton(layout=BONES){
 const _v=new THREE.Vector3(),_n=new THREE.Vector3(),_nm=new THREE.Matrix3();
 function mergeParts(parts,{surface=false}={}){
   let verts=0,indices=0;
-  for(const p of parts){verts+=p.geo.attributes.position.count;indices+=p.geo.index.count;}
+  for(const p of parts){verts+=p.geo.attributes.position.count;indices+=p.geo.index?.count??p.geo.attributes.position.count;}
   const pos=new Float32Array(verts*3),nor=new Float32Array(verts*3),uv=new Float32Array(verts*2),col=new Float32Array(verts*3);
-  const skinIndex=new Uint16Array(verts*4),skinWeight=new Float32Array(verts*4),surf=surface?new Float32Array(verts*2):null;
+  const skinIndex=new Uint16Array(verts*4),skinWeight=new Float32Array(verts*4),surf=surface?new Float32Array(verts*3):null;
   const index=new Uint32Array(indices);
   let v=0,ix=0;
   for(const p of parts){
     const g=p.geo,P=g.attributes.position,N=g.attributes.normal,U=g.attributes.uv;_nm.getNormalMatrix(p.matrix);
-    for(let i=0;i<g.index.count;i++)index[ix++]=g.index.array[i]+v;
+    const count=g.index?.count??P.count;
+    for(let i=0;i<count;i++)index[ix++]=(g.index?g.index.array[i]:i)+v;
     for(let i=0;i<P.count;i++,v++){
       _v.fromBufferAttribute(P,i).applyMatrix4(p.matrix);pos[v*3]=_v.x;pos[v*3+1]=_v.y;pos[v*3+2]=_v.z;
       _n.fromBufferAttribute(N,i).applyMatrix3(_nm).normalize();nor[v*3]=_n.x;nor[v*3+1]=_n.y;nor[v*3+2]=_n.z;
@@ -87,14 +117,14 @@ function mergeParts(parts,{surface=false}={}){
         const shoulder=f*f*(3-2*f);
         skinIndex[v*4+1]=boneIndex.torso;skinWeight[v*4]=1-shoulder;skinWeight[v*4+1]=shoulder;
       }
-      if(surf){surf[v*2]=p.rough;surf[v*2+1]=p.emit;}
+      if(surf){surf[v*3]=p.rough;surf[v*3+1]=p.emit;surf[v*3+2]=p.fuzz;}
     }
   }
   const geo=new THREE.BufferGeometry();
   geo.setAttribute('position',new THREE.BufferAttribute(pos,3));geo.setAttribute('normal',new THREE.BufferAttribute(nor,3));
   geo.setAttribute('uv',new THREE.BufferAttribute(uv,2));geo.setAttribute('color',new THREE.BufferAttribute(col,3));
   geo.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(skinIndex,4));geo.setAttribute('skinWeight',new THREE.BufferAttribute(skinWeight,4));
-  if(surf)geo.setAttribute('aSurf',new THREE.BufferAttribute(surf,2));
+  if(surf)geo.setAttribute('aSurf',new THREE.BufferAttribute(surf,3));
   geo.setIndex(new THREE.BufferAttribute(index,1));
   geo.computeBoundingBox();geo.computeBoundingSphere();
   return geo;
@@ -118,31 +148,32 @@ const FUR_FRAGMENT=`
   float strand=cpN(vFur*vec3(58.0,21.0,58.0));
   float fiber=mix(clump,strand,0.45);
   float baseLum=dot(diffuseColor.rgb,vec3(0.2126,0.7152,0.0722));
-  vec3 furCol=diffuseColor.rgb*mix(mix(0.52,0.8,smoothstep(0.3,0.85,baseLum)),1.04,fiber);
+  vec3 furCol=diffuseColor.rgb*mix(mix(0.72,0.88,smoothstep(0.3,0.85,baseLum)),1.04,fiber);
   float furLum=dot(furCol,vec3(0.2126,0.7152,0.0722));
-  furCol=max(mix(vec3(furLum),furCol,1.28),0.0);
+  furCol=max(mix(vec3(furLum),furCol,1.12),0.0);
   diffuseColor.rgb=mix(diffuseColor.rgb,furCol,furLike);
   float speck=step(0.84,cpH(floor(vFur*34.0)))*step(0.35,clump);
-  diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.86,0.8,0.72),uGrime*0.6*furLike);
-  diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.26,0.19,0.13),uGrime*speck*0.85*furLike);`;
+  float mudSurface=max(furLike,step(0.4,vSurf.x)*(1.0-step(0.75,vSurf.x)));
+  diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.86,0.8,0.72),uGrime*0.6*mudSurface);
+  diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.26,0.19,0.13),uGrime*speck*0.85*mudSurface);`;
 const FUR_NORMAL=`
   {float d=0.35;vec3 g=vec3(cpN(clumpP+vec3(d,0.0,0.0)),cpN(clumpP+vec3(0.0,d,0.0)),cpN(clumpP+vec3(0.0,0.0,d)))-clump;
-   normal=normalize(normal-(mat3(viewMatrix)*g)*0.9*furLike);}`;
+   normal=normalize(normal-(mat3(viewMatrix)*g)*0.45*furLike);}`;
 // One coat material for every creature: a MeshStandard shader with the fur
 // added in onBeforeCompile, identical source and defines for all of them, so
 // the whole cast shares a single GPU program (quick to compile at load; the
 // old MeshPhysical sheen took three heavier programs). Per-part surface
 // (roughness, glow, how furry) rides in a vertex attribute; the velvet sheen
 // is an explicit grazing-angle term that follows the light the coat receives.
-const COAT_KEY='craepet-coat-1';
+const COAT_KEY='craepet-coat-2';
 function coatCompile(shader){
   Object.assign(shader.uniforms,this.userData.uniforms);
   shader.vertexShader=shader.vertexShader
-    .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nattribute vec2 aSurf;\nvarying vec2 vSurf;')
+    .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nattribute vec3 aSurf;\nvarying vec3 vSurf;')
     .replace('#include <begin_vertex>','#include <begin_vertex>\nvFur=position;\nvSurf=aSurf;');
   shader.fragmentShader=shader.fragmentShader
-    .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nvarying vec2 vSurf;\nuniform float uRim;\nuniform float uGrime;\nuniform vec3 uSheen;'+FUR_NOISE)
-    .replace('#include <color_fragment>','#include <color_fragment>'+FUR_FRAGMENT.replace('FURLIKE','smoothstep(0.75,0.92,vSurf.x)'))
+    .replace('#include <common>','#include <common>\nvarying vec3 vFur;\nvarying vec3 vSurf;\nuniform float uRim;\nuniform float uGrime;\nuniform vec3 uSheen;'+FUR_NOISE)
+    .replace('#include <color_fragment>','#include <color_fragment>'+FUR_FRAGMENT.replace('FURLIKE','vSurf.z'))
     .replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=vSurf.x;')
     .replace('#include <normal_fragment_maps>','#include <normal_fragment_maps>'+FUR_NORMAL)
     .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*vSurf.y;')
@@ -217,16 +248,17 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
   // vertex colours from the same 16x22 pattern the 2D art uses, so every
   // creature keeps one shared shader with no texture.
   const pattern=palette.pattern?palette.pattern.map(row=>row.map(c=>new THREE.Color(c))):null;
-  const FUR=palette.body,ACCENT=palette.accent;
+  const FUR=palette.body,ACCENT=palette.accent,sp=pet.species;
+  const skin=sp==='flarn'||sp==='zibbit',skinRough=sp==='zibbit'?.42:.66;
   const parts=[];
   const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler();
   function place(pos,size,rot){_e.set(rot?.[0]||0,rot?.[1]||0,rot?.[2]||0);return new THREE.Matrix4().compose(new THREE.Vector3(...pos),_q.setFromEuler(_e).clone(),new THREE.Vector3(...size));}
   // part(kind, bone, position, size, {shape, rot, color, rough, emit})
-  function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0,attachY=null}={}){
+  function part(kind,bone,pos,size,{shape=sphere,rot=null,color=null,rough=.95,emit=0,attachY=null,fuzz=null}={}){
     const fur=kind==='fur';
-    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?1:rough,emit,attachY});
+    parts.push({geo:shape,matrix:place(pos,size,rot),bone:boneIndex[bone],color:new THREE.Color(fur?(color||FUR):(color||ACCENT)),pattern:fur&&!color?pattern:null,rough:fur?(skin?skinRough:1):rough,emit,attachY,fuzz:fuzz??(fur&&!skin?1:0)});
   }
-  const sp=pet.species,rig={species:sp,egg:!!pet.egg,hopper:sp==='snorbit'&&!pet.egg,floater:sp==='glimmr'&&!pet.egg,
+  const rig={species:sp,egg:!!pet.egg,hopper:sp==='snorbit'&&!pet.egg,floater:sp==='glimmr'&&!pet.egg,
     ears:false,tail:false,wings:false};
   const DARK='#33242b',WHITE='#fffdf3';
   if(pet.egg){
@@ -270,48 +302,114 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
     }
     part('detail','mouth',[0,.42,.45],[.02,.014,.02],{shape:arc,rot:[.2,0,Math.PI],color:DARK,rough:.6});
     part('detail','mouthOpen',[0,.41,.44],[.02,.018,.01],{color:'#5a2a33',rough:.5});
-    part('fur','tail',[0,.44,-.42],[.035,.035,.24],{rot:[.9,0,0]});
-    part('fur','tail',[0,.55,-.53],[.03,.03,.05],white);
+    part('fur','tail',[0,0,0],[1,1,1],{shape:taperedTube([[0,.36,-.28],[0,.44,-.45],[.015,.57,-.55],[.025,.622,-.50]],.036,.68)});
+    part('fur','tail',[.025,.622,-.50],[.026,.029,.028],{shape:roundSphere,...white});
   }else{
-    part('fur','torso',[0,.36,0],[.26,.30,.22],{shape:roundSphere});
-    part('detail','torso',[0,.35,.182],[.17,.21,.055]);
-    part('fur','head',[0,.66,.025],[.255,.225,.22],{shape:roundSphere});
+    // Preserve the house-sized envelopes while giving each species its own
+    // anatomy: a rabbit, kitten, pocket dragon, leafy fawn, sprite and frog.
+    const frog=sp==='zibbit',sprite=sp==='glimmr',rabbit=sp==='snorbit';
+    const eyeY=frog?.83:.70,eyeX=frog?.145:.105,eyeZ=frog?.192:.218;
+    if(frog)for(const name of ['eyes','sleepEyes','happyEyes']){
+      B[name].position.y+=eyeY-.70;B[name].userData.rest.copy(B[name].position);
+    }
+    part('fur','torso',sprite?[.025,.305,0]:[0,.36,0],sprite?[.25,.315,.22]:rabbit?[.235,.30,.215]:frog?[.26,.28,.22]:[.26,.30,.22],{shape:sprite?wispBody:roundSphere});
+    part('detail','torso',[0,.35,.181],sprite?[.13,.18,.036]:[.155,.195,.04],{shape:roundSphere,rough:skin?skinRough:.98,fuzz:skin?0:.72});
+    // A neck overlaps both volumes, rather than leaving a seam under the chin.
+    part('fur','head',[0,.53,.012],[.18,.105,.16],{shape:roundSphere});
+    part('fur','head',[0,frog?.646:.66,.025],frog?[.27,.192,.225]:rabbit?[.245,.225,.22]:[.255,.225,.22],{shape:roundSphere});
+    const iris=frog?'#b48229':sp==='flarn'?'#8cad4d':sp==='puddlepop'?'#63aa72':sprite?'#777ec7':'#6b4833';
     for(const side of [-1,1]){
       const L=side<0?'L':'R';
-      part('fur','leg'+L,[side*.16,.09,.07],[.105,.10,.15]);
-      part('fur','arm'+L,[side*.255,.35,.015],[.075,.16,.085]);
-      // Eyes after the 2D Craepets: white, a warm brown iris, a dark pupil
-      // and a bright spark, looking gently forward rather than apart.
-      part('detail','eyes',[side*.105,.70,.218],[.072,.08,.034],{color:WHITE,rough:.45});
-      part('detail','eyes',[side*.099,.694,.245],[.052,.062,.018],{color:'#5b3a26',rough:.3});
-      part('detail','eyes',[side*.098,.691,.258],[.030,.037,.010],{color:'#1a120e',rough:.25});
-      part('detail','eyes',[side*.105+.02,.72,.266],[.016,.02,.008],{color:WHITE,rough:.2,emit:.55});
-      // Closed eyes: a soft curve for sleeping, ^ for happy.
-      part('detail','sleepEyes',[side*.105,.70,.254],[.05,.03,.05],{shape:arc,rot:[0,0,Math.PI],color:DARK,rough:.6});
-      part('detail','happyEyes',[side*.105,.685,.254],[.048,.05,.05],{shape:arc,color:DARK,rough:.6});
-      // Rosy cheeks.
-      part('detail','head',[side*.168,.598,.176],[.046,.028,.012],{rot:[0,side*.72,0],color:'#f39cae',rough:.9});
+      if(!sprite){
+        part('fur','leg'+L,[side*.16,.09,.07],[rabbit?.112:.105,.10,rabbit?.17:.15],{shape:roundSphere});
+        // Blend the shoulder into the trunk as the hand swings, keeping the
+        // upper fur attached instead of a separate floating oval.
+        part('fur','arm'+L,[side*.255,.35,.015],[.075,.16,.085],{attachY:[.40,.505]});
+        if(!frog)for(let toe=0;toe<2;toe++)part('detail','leg'+L,[side*.16+(toe-.5)*.046,.072,.197],[.004,.018,.023],{shape:smallSphere,color:ACCENT,rough:.97,fuzz:skin?0:.5});
+      }else part('fur','arm'+L,[side*.255,.39,.01],[.075,.11,.065]);
+      // Eye whites, irises and wet corneal highlights keep their own smooth
+      // finish, even when the surrounding coat has a rough velvet surface.
+      part('detail','eyes',[side*eyeX,eyeY,eyeZ],[.072,.08,.034],{color:WHITE,rough:.29});
+      part('detail','eyes',[side*(eyeX-.006),eyeY-.006,eyeZ+.027],[.052,.062,.018],{color:iris,rough:.25});
+      part('detail','eyes',[side*(eyeX-.007),eyeY-.009,eyeZ+.040],[.030,.037,.010],{color:'#1a120e',rough:.19});
+      part('detail','eyes',[side*eyeX+.02,eyeY+.020,eyeZ+.048],[.014,.017,.006],{color:WHITE,rough:.16,emit:.25});
+      part('detail','sleepEyes',[side*eyeX,eyeY,eyeZ+.036],[.05,.03,.05],{shape:arc,rot:[0,0,Math.PI],color:DARK,rough:.6});
+      part('detail','happyEyes',[side*eyeX,eyeY-.015,eyeZ+.036],[.048,.05,.05],{shape:arc,color:DARK,rough:.6});
+      part('detail','head',[side*.168,.598,.176],[.034,.020,.010],{rot:[0,side*.72,0],color:'#efabb4',rough:.94});
+      if(!frog)part('fur','head',[side*.039,.565,.209],[.051,.039,.045],{shape:roundSphere,color:sp==='puddlepop'?ACCENT:undefined});
     }
-    part('detail','head',[0,.573,.232],[.036,.022,.016],{color:DARK,rough:.35});
-    // A small smile, and an open mouth for yawns and giggles.
-    part('detail','mouth',[0,.556,.224],[.036,.03,.036],{shape:arc,rot:[.2,0,Math.PI],color:DARK,rough:.6});
-    part('detail','mouthOpen',[0,.542,.214],[.032,.028,.014],{color:'#5a2a33',rough:.5});
-    part('detail','mouthOpen',[0,.532,.222],[.019,.011,.008],{color:'#f07a8c',rough:.5});
-    if(sp==='snorbit'){rig.ears=true;for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');part('fur',E,[side*.14,1.02,0],[.085,.32,.07],{rot:[0,0,-side*.2]});part('detail',E,[side*.15,1.03,.052],[.043,.24,.025],{rot:[0,0,-side*.2]});}}
-    if(sp==='puddlepop'||sp==='flarn'){rig.ears=true;for(const side of [-1,1])part(sp==='flarn'?'detail':'fur','ear'+(side<0?'L':'R'),[side*.19,.89,0],[.10,.23,.10],{shape:cone,rot:[0,0,-side*.23]});}
-    if(sp==='twiggle'){rig.ears=true;for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');part('detail',E,[side*.15,.94,0],[.025,.31,.025],{shape:cone});part('fur',E,[side*.25,.99,0],[.14,.047,.075],{rot:[0,0,side*.4]});}}
-    if(sp==='flarn'||sp==='glimmr'){rig.wings=true;for(const side of [-1,1]){
-      const W='wing'+(side<0?'L':'R');
-      part('detail',W,[side*.35,.50,-.13],[.23,.12,.035],{rot:[0,0,side*.45]});
-      // A second tapered lobe and a coloured patch make the wing read as a
-      // wing rather than one small pill when the creature crosses a room.
-      part('detail',W,[side*.46,.45,-.14],[.11,.065,.025],{shape:cone,rot:[0,0,-side*.65]});
-      part('detail',W,[side*.31,.52,-.092],[.085,.055,.008],{color:sp==='glimmr'?'#f3e5ff':'#ffe7a7'});
+    if(frog){
+      for(const side of [-1,1])part('detail','head',[side*.033,.638,.240],[.009,.005,.004],{color:'#506d3b',rough:.7});
+    }else part('detail','head',[0,.573,.244],[.030,.018,.014],{color:DARK,rough:.28});
+    part('detail','mouth',[0,.556,.240],[frog?.078:.036,.03,.036],{shape:arc,rot:[.2,0,Math.PI],color:DARK,rough:.6});
+    part('detail','mouthOpen',[0,.542,.232],[frog?.062:.032,.028,.014],{color:'#5a2a33',rough:.5});
+    part('detail','mouthOpen',[0,.532,.240],[frog?.035:.019,.011,.008],{color:'#f07a8c',rough:.5});
+    if(rabbit){rig.ears=true;for(const side of [-1,1]){
+      const E='ear'+(side<0?'L':'R');
+      part('fur',E,[side*.14,1.02,0],[.085,.32,.07],{shape:roundSphere,rot:[0,0,-side*.2]});
+      part('detail',E,[side*.15,1.03,.052],[.043,.24,.021],{shape:roundSphere,rot:[0,0,-side*.2],rough:.98,fuzz:.65});
     }}
-    if(sp==='zibbit'){rig.ears=true;for(const side of [-1,1]){part('fur','ear'+(side<0?'L':'R'),[side*.18,.82,.03],[.12,.13,.12]);part('detail','leg'+(side<0?'L':'R'),[side*.25,.08,.15],[.17,.055,.17]);}}
-    if(sp==='blorb'){rig.ears=true;for(const side of [-1,1])part('fur','ear'+(side<0?'L':'R'),[side*.19,.83,-.01],[.10,.12,.085]);}
-    if(sp==='flarn'||sp==='puddlepop'||sp==='twiggle'){rig.tail=true;part('fur','tail',[0,.3,-.32],[.07,.08,.25],{rot:[-.4,0,0]});}
-    if(sp==='glimmr')part('detail','head',[0,.97,0],[.07,.25,.07],{shape:cone});
+    if(sp==='puddlepop'){
+      rig.ears=true;
+      for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');
+        part('fur',E,[side*.19,.89,0],[.10,.23,.075],{shape:cone,rot:[0,0,-side*.23]});
+        part('detail',E,[side*.19,.89,.045],[.055,.14,.018],{shape:cone,rot:[0,0,-side*.23],rough:.98,fuzz:.55});
+        for(let i=0;i<2;i++)part('detail','head',[side*.147,.567+(i-.5)*.018,.228],[.050,.003,.003],{rot:[0,-side*.1,side*(i-.5)*.15],color:ACCENT,rough:1});
+      }
+    }
+    if(sp==='flarn'){
+      rig.ears=true;
+      for(const side of [-1,1])part('detail','ear'+(side<0?'L':'R'),[0,0,0],[1,1,1],
+        {shape:taperedTube([[side*.16,.795,-.012],[side*.18,.89,-.025],[side*.215,1.014,-.025]],.055,.08),rough:.48});
+      // Small overlapping scales along the crown and back identify a dragon
+      // without covering its skin in the fur shader used by the mammals.
+      for(let i=0;i<3;i++)part('detail','head',[0,.78+i*.018,-.12-i*.024],[.04,.037,.012],{shape:roundSphere,rough:.7});
+    }
+    if(sp==='twiggle'){
+      rig.ears=true;
+      for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');
+        part('fur',E,[0,0,0],[1,1,1],{shape:taperedTube([[side*.14,.80,0],[side*.15,.93,0],[side*.23,1.015,0],[side*.17,1.091,0]],.019,.70)});
+        part('detail',E,[side*.15,.945,.008],[side*.253,.15,.06],{shape:leaf,rot:[0,0,side*.45],color:new THREE.Color(FUR).lerp(new THREE.Color(ACCENT),.25).getStyle(),rough:.82});
+        part('detail',E,[0,0,0],[1,1,1],{shape:taperedTube([[side*.16,.95,.016],[side*.27,1.010,.016],[side*.375,1.060,.016]],.004,.50),color:ACCENT,rough:.95});
+      }
+      for(const side of [-1,1])for(let i=0;i<3;i++)part('detail','torso',[side*(.11+(i%2)*.035),.28+i*.064,-.17],[.025,.017,.012],{color:ACCENT,rough:1,fuzz:.5});
+    }
+    if(sp==='flarn'||sprite){
+      rig.wings=true;
+      for(const side of [-1,1]){const W='wing'+(side<0?'L':'R');
+        part('detail',W,[side*.2,.50,-.13],[side,1,1],{shape:sprite?spriteWing:dragonWing,rough:sprite?.74:.64,emit:sprite?.06:0});
+        const ribColor=new THREE.Color(ACCENT).multiplyScalar(.72).getStyle();
+        for(const end of (sprite?[[.55,.59],[.46,.36]]:[[.59,.66],[.49,.435],[.34,.38]]))
+          part('detail',W,[0,0,0],[1,1,1],{shape:taperedTube([[side*.21,.50,-.112],[side*((.21+end[0])/2),(.50+end[1])/2+.016,-.11],[side*end[0],end[1],-.112]],.007,.6),color:ribColor,rough:.8});
+      }
+    }
+    if(frog){
+      rig.ears=true;
+      for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');
+        part('fur',E,[side*.145,.861,.04],[.105,.089,.095],{shape:roundSphere});
+        part('detail','leg'+(side<0?'L':'R'),[side*.25,.063,.15],[.17,.10,.17],{shape:webFoot,color:FUR,rough:.45});
+      }
+      part('detail','head',[0,.865,.041],[.060,.060,.027],{shape:star,color:ACCENT,rough:.8});
+    }
+    if(sp==='blorb'){
+      rig.ears=true;
+      for(const side of [-1,1]){const E='ear'+(side<0?'L':'R');
+        part('fur',E,[side*.19,.83,-.01],[.10,.12,.085],{shape:roundSphere});
+        part('detail',E,[side*.19,.85,.052],[.056,.071,.014],{rough:.98,fuzz:.75});
+      }
+    }
+    if(sp==='flarn'||sp==='puddlepop'||sp==='twiggle'){
+      rig.tail=true;
+      const points=sp==='puddlepop'?[[0,.30,-.12],[0,.28,-.34],[.035,.33,-.525],[.06,.43,-.535],[.07,.44,-.46]]:
+        sp==='flarn'?[[0,.30,-.12],[0,.265,-.31],[.035,.30,-.48],[.045,.38,-.57]]:
+        [[0,.30,-.12],[0,.27,-.30],[0,.33,-.52],[0,.38,-.55]];
+      part('fur','tail',[0,0,0],[1,1,1],{shape:taperedTube(points,.062,sp==='flarn'?.18:.64)});
+      const tip=points.at(-1);part('detail','tail',tip,sp==='flarn'?[.042,.072,.025]:[.044,.049,.043],{shape:sp==='flarn'?cone:roundSphere,color:ACCENT,rough:skin?.6:.99,fuzz:skin?0:.8});
+    }
+    if(sprite){
+      for(const points of [[[0,.85,0],[.02,.99,0],[.065,1.079,0]],[[.02,.86,.012],[.13,.95,.005],[.15,.995,0]]])
+        part('detail','head',[0,0,0],[1,1,1],{shape:taperedTube(points,.027,.28),rough:.98,fuzz:.6,emit:.06});
+    }
     const wear=pet.wear||{},body=palette.body;
     if(wear.head){
       const h=wear.head,hat=readable(/crown|princess|halo|helmet/.test(h)?'#ffd863':/chef/.test(h)?'#fffdf3':/santa|bow/.test(h)?'#ef627b':'#996bdd',body).getStyle();
@@ -323,7 +421,7 @@ export function creature(pet,palette={body:'#57c4ff',accent:'#dcf3ff'},extras=[]
       else {part('detail','head',[0,.87,0],[.27,.045,.23],o);part('detail','head',[0,1,0],[.18,.23,.16],{shape:/party|wizard|santa/.test(h)?cone:sphere,...o});}
     }
     if(wear.face){const color=readable(wear.face==='heartglasses'?'#ff5d8f':wear.face==='starglasses'?'#ffd166':'#242035',body).getStyle();
-      for(const side of [-1,1]){part('detail','head',[side*.105,.7,.258],[.088,.088,.088],{shape:new THREE.TorusGeometry(1,.136,8,20),color,rough:.4});if(wear.face==='sunglasses')part('detail','head',[side*.105,.7,.263],[.075,.073,.012],{color,rough:.2});}}
+      for(const side of [-1,1]){part('detail','head',[side*eyeX,eyeY,eyeZ+.040],[.088,.088,.088],{shape:new THREE.TorusGeometry(1,.136,8,20),color,rough:.4});if(wear.face==='sunglasses')part('detail','head',[side*eyeX,eyeY,eyeZ+.045],[.075,.073,.012],{color,rough:.2});}}
     if(wear.neck){const color=readable(wear.neck==='bluescarf'?'#57c4ff':wear.neck==='medal'?'#ffd166':wear.neck==='pearls'?'#fff6f0':wear.neck==='bowtie'?'#8a5cff':'#ff5d6c',body).getStyle();
       part('detail','torso',[0,.49,.05],[.265,.035,.20],{color,rough:.8});if(wear.neck==='medal')part('detail','torso',[0,.4,.23],[.07,.07,.015],{color,rough:.3});else if(wear.neck==='bowtie')for(const side of [-1,1])part('detail','torso',[side*.055,.49,.23],[.065,.04,.025],{color,rough:.8});}
   }

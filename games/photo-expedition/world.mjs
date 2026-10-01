@@ -16,7 +16,7 @@
    =========================================================== */
 
 import { taperedCurve, blade, mergeForms } from './forms.mjs';
-import { barkMaterial, foliageMaterial, leafCloud, broadleafTree, pineTree } from './vegetation.mjs';
+import { barkMaterial, foliageMaterial, leafCloud, broadleafTree, pineTree } from './vegetation.mjs?v=20261001-visuals';
 
 export const SIZE = 480;          // metres across
 export const GRID = 8;            // squares per side
@@ -336,6 +336,37 @@ function bumpy(THREE, geo, amount, seed) {
   geo.computeVertexNormals(); return geo;
 }
 
+// Shared, small procedural surfaces keep the instanced scenery readable up
+// close without adding a draw call or downloading any texture.
+function mineralMaterial(THREE, colour, seed, ice = false) {
+  const map = noiseTexture(THREE, 128, ice ? 235 : 208, ice ? 42 : 100, seed);
+  const bump = map.clone(); bump.colorSpace = THREE.NoColorSpace;
+  return new THREE.MeshStandardMaterial({ color: colour, map, bumpMap: bump,
+    bumpScale: ice ? .035 : .14, roughness: ice ? .32 : .98,
+    flatShading: true, vertexColors: true });
+}
+
+function sandstoneMaterial(THREE, colour, courses = 1) {
+  const canvas = document.createElement('canvas'); canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d'), N = makeNoise(107);
+  ctx.fillStyle = '#e6dfce'; ctx.fillRect(0, 0, 256, 256);
+  for (let row = 0; row < 8; row++) for (let column = -1; column < 5; column++) {
+    const x = column * 64 + (row % 2) * 32, y = row * 32;
+    const grey = Math.round(208 + N.rnd() * 31);
+    ctx.fillStyle = `rgb(${grey},${grey},${grey})`; ctx.fillRect(x + 1, y + 1, 62, 30);
+    ctx.strokeStyle = 'rgba(89,74,54,.22)'; ctx.lineWidth = 1;
+    ctx.strokeRect(x + .5, y + .5, 64, 32);
+  }
+  for (let i = 0; i < 2300; i++) {
+    ctx.fillStyle = N.rnd() < .5 ? 'rgba(73,58,42,.12)' : 'rgba(255,255,255,.3)';
+    ctx.fillRect(N.rnd() * 256, N.rnd() * 256, 1 + N.rnd() * 2, 1);
+  }
+  const map = new THREE.CanvasTexture(canvas); map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(courses, courses); map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 4;
+  const bump = map.clone(); bump.colorSpace = THREE.NoColorSpace;
+  return new THREE.MeshStandardMaterial({ color: colour, map, bumpMap: bump, bumpScale: .12, roughness: .97 });
+}
+
 /* ============================================================
    buildWorld
    ============================================================ */
@@ -383,7 +414,8 @@ export function buildWorld(THREE, site, quality) {
   }
   const detail = noiseTexture(THREE, 256, 222, 36, B.seed);
   detail.repeat.set(48, 48);
-  const tmat = new THREE.MeshStandardMaterial({ vertexColors: true, map: detail, roughness: 0.95, metalness: 0 });
+  const groundBump = detail.clone(); groundBump.colorSpace = THREE.NoColorSpace;
+  const tmat = new THREE.MeshStandardMaterial({ vertexColors: true, map: detail, bumpMap: groundBump, bumpScale: .16, roughness: 0.95, metalness: 0 });
   const terrain = new THREE.Mesh(tgeo, tmat);
   terrain.receiveShadow = true; terrain.castShadow = false;
   group.add(terrain);
@@ -605,7 +637,7 @@ export function buildWorld(THREE, site, quality) {
     if (playerPos) sun.target.position.copy(playerPos);
     const skyCol = skyColours(B, above, env.night);
     hemi.color.copy(skyCol.zenith).lerp(tmpC.setRGB(1,1,1),.45); hemi.groundColor.copy(skyCol.ground).lerp(tmpC.setRGB(.5,.45,.35),.35);
-    hemi.intensity = (B.underwater ? 1.6 : 1.15 + 0.85 * above) * (1 - env.night * 0.86) + 0.12;
+    hemi.intensity = (B.underwater ? 1.6 : .95 + .72 * above) * (1 - env.night * 0.86) + 0.12;
     scene.fog.color.copy(B.underwater ? skyCol.horizon : skyCol.horizon);
     sky.set(sd, skyCol, env.night, day);
     if (water) water.material.color.copy(skyCol.horizon).multiplyScalar(0.5).add(tmpC.set(0x123a55).multiplyScalar(0.5));
@@ -620,6 +652,7 @@ export function buildWorld(THREE, site, quality) {
 
   function dispose() {
     scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); if (o.material) { const ms = Array.isArray(o.material) ? o.material : [o.material]; ms.forEach((m) => { for (const k in m) if (m[k] && m[k].isTexture) m[k].dispose(); m.dispose(); }); } });
+    sun.dispose();
   }
 
   return { scene, group, heightAt, slopeAt, waterLevel, underwater: !!B.underwater, landmarks, colliders, update, env, sun, dispose, spawn: B.spawn, biome: B, noise: N };
@@ -820,49 +853,70 @@ function makeScatterLibrary(THREE, B, site) {
   lib.bush = { parts:[{geo:leafCloud(THREE,[[0,.85,0,1.1,.65,1.1,75,.7]],8,'#82944f'),mat:leaves}],scale:[.6,1.6],spacing:3,shadow:true };
   // rock
   {
-    const g = bumpy(THREE, new THREE.DodecahedronGeometry(1.2, 1), 0.25, 12); g.translate(0, 0.4, 0);
+    const g = bumpy(THREE, new THREE.DodecahedronGeometry(1.2, 1), 0.32, 12);
+    g.scale(1.15, .72, .92); g.translate(0, 0.4, 0);
+    paintVertexColours(THREE, g, (x, y, z) => {
+      const strata = .8 + .16 * Math.sin(y * 11 + x * 2.2) + .08 * Math.sin(z * 9);
+      const lichen = Math.max(0, y - .5) * .09;
+      return [strata + lichen, strata + lichen, strata];
+    });
     const col = B.colours.rock;
-    lib.rock = { parts: [{ geo: g, mat: std({ color: new THREE.Color(col[0], col[1], col[2]), flatShading: true }) }], scale: [0.4, 2.6], spacing: 3, collide: 0.9 };
+    lib.rock = { parts: [{ geo: g, mat: mineralMaterial(THREE, new THREE.Color(col[0], col[1], col[2]), 112) }], scale: [0.4, 2.6], spacing: 3, collide: 0.9 };
   }
   // ice chunk
   {
     const g = bumpy(THREE, new THREE.DodecahedronGeometry(1.4, 1), 0.3, 13); g.scale(1.4, 0.7, 1); g.translate(0, 0.4, 0);
-    lib.icechunk = { parts: [{ geo: g, mat: std({ color: 0xd8f0ff, flatShading: true, roughness: 0.4 }) }], scale: [0.5, 3], spacing: 4, collide: 1.2, where: (x, z, h) => h < 12 };
+    paintVertexColours(THREE, g, (x, y) => {
+      const top = Math.max(0, Math.min(1, (y + .6) / 1.7));
+      return [.58 + top * .42, .8 + top * .2, .94 + top * .06];
+    });
+    lib.icechunk = { parts: [{ geo: g, mat: mineralMaterial(THREE, 0xe7f7ff, 113, true) }], scale: [0.5, 3], spacing: 4, collide: 1.2, where: (x, z, h) => h < 12 };
   }
   lib.pine = { parts:treeParts('pine'),scale:[.7,1.7],spacing:5,collide:.5,
     where:(x,z,h,s)=>site.biome==='mountain'?(h<50&&s<.6):(site.biome==='yellowstone'?(z< -40||h>12||(x>120&&z>100)):true) };
   lib.kapok = { parts:treeParts('kapok'),scale:[.8,1.6],spacing:10,collide:1.2,where:(x,z,h)=>h>2.5 };
   // palm
   {
-    const trunk = new THREE.CylinderGeometry(0.18, 0.32, 8, 6); trunk.translate(0, 4, 0); trunk.rotateZ(0.08);
+    const trunk = taperedCurve(THREE, [[0,0,0],[.2,3,.1],[.45,6,0],[.6,7.8,0]], .32, .15, 14, 7);
     const parts = [{ geo: trunk, mat: barkMaterial(THREE,"#a98b64") }];
     const fronds = [];
     for (let i=0;i<8;i++){
       const a=i*Math.PI/4;
       const stem=taperedCurve(THREE,[[0,0,0],[0,.8,1.8],[0,-1.3,4.5]],.035,.008,10,5);stem.rotateY(a);stem.translate(.6,7.8,0);fronds.push(stem);
       for(let j=1;j<9;j++)for(const sx of [-1,1]){
-        const t=j/10,len=.9*Math.sin(Math.PI*t)+.2;
-        const f=blade(THREE,len,.22,-.12,0,4);f.rotateY(sx*1.15);f.translate(0,Math.sin(t*Math.PI)*.9-t*t*1.3,4.5*t);f.rotateY(a);f.translate(.6,7.8,0);fronds.push(f);
+        const t=j/10,len=1.35*Math.sin(Math.PI*t)+.24;
+        const f=blade(THREE,len,.34,-.28,sx*.08,4);f.rotateY(sx*1.35);f.translate(0,Math.sin(t*Math.PI)*.9-t*t*1.3,4.5*t);f.rotateY(a);f.translate(.6,7.8,0);fronds.push(f);
       }
     }
     const merged = mergeForms(THREE, fronds);
-    parts.push({ geo: merged, mat: std({ color: 0x3f8a3a, side: THREE.DoubleSide, roughness:.8 }) });
+    paintVertexColours(THREE, merged, (x,y,z)=>{const v=.72+.3*Math.max(0,Math.min(1,(y-6.4)/2.3));return [v*.8,v,v*.72]});
+    parts.push({ geo: merged, mat: std({ color: 0x5e9e48, vertexColors:true, side: THREE.DoubleSide, roughness:.8 }) });
     lib.palm = { parts, scale: [0.7, 1.4], spacing: 5, collide: 0.4, where: (x, z, h) => site.biome === "desert" ? true : h > 1.5 && h < 6 };
   }
   // fern
   {
     const parts = [];
-    const leaves=[];for(let i=0;i<6;i++)for(let j=1;j<6;j++)for(const sx of [-1,1]){
-      const t=j/6,l=blade(THREE,.36*Math.sin(t*Math.PI)+.05,.12,.025,0,2);l.rotateY(sx*1.05);l.translate(0,Math.sin(t*Math.PI)*.55,t*1.5);l.rotateY(i*Math.PI*2/6);leaves.push(l);
+    const leaves=[];for(let i=0;i<6;i++){
+      const a=i*Math.PI*2/6,stem=taperedCurve(THREE,[[0,.05,0],[0,.65,.65],[0,.18,1.65]],.018,.004,4,3);stem.rotateY(a);leaves.push(stem);
+      for(let j=1;j<6;j++)for(const sx of [-1,1]){
+        const t=j/6,l=blade(THREE,.5*Math.sin(t*Math.PI)+.06,.18,.065,0,2);l.rotateY(sx*1.2);l.translate(0,Math.sin(t*Math.PI)*.62,t*1.65);l.rotateY(a);leaves.push(l);
+      }
     }
-    parts.push({ geo: mergeForms(THREE, leaves), mat: std({ color: 0x3c7f2c, side: THREE.DoubleSide }), shadow: false });
+    const geo=mergeForms(THREE,leaves);paintVertexColours(THREE,geo,(x,y,z)=>{const t=.65+.3*Math.max(0,Math.min(1,y/.6));return[t*.72,t,t*.6]});
+    parts.push({ geo, mat: std({ color: 0x65a246, vertexColors:true, side: THREE.DoubleSide }), shadow: false });
     lib.fern = { parts, scale: [0.6, 1.6], spacing: 1.5 };
   }
-  // cactus / dry scrub for the volcanic island
+  // Galápagos prickly pear: joined, flattened pads instead of two open tubes.
   {
-    const g = new THREE.CylinderGeometry(0.35, 0.45, 2.6, 7); g.translate(0, 1.3, 0);
-    const a1 = new THREE.CylinderGeometry(0.2, 0.25, 1.4, 6); a1.translate(0.75, 2, 0); a1.rotateZ(0.15);
-    lib.cactus = { parts: [{ geo: mergeGeos(THREE, [g, a1]), mat: std({ color: 0x5f8a44 }) }], scale: [0.5, 1.4], spacing: 3, collide: 0.4, where: (x, z, h) => h > 4 && h < 34 };
+    const pads=[];
+    for(const [x,y,z,rx,ry,rz,lean] of [[0,.75,0,.43,.8,.2,-.08],[.1,1.95,0,.44,.62,.18,.08],[-.49,1.25,.06,.38,.55,.16,.48],[.61,1.6,-.04,.38,.62,.17,-.5],[.93,2.38,0,.3,.43,.14,-.22]]){
+      const pad=new THREE.SphereGeometry(1,8,6);pad.scale(rx,ry,rz);pad.rotateZ(lean);pad.translate(x,y,z);pads.push(pad);
+    }
+    const geo=mergeForms(THREE,pads);paintVertexColours(THREE,geo,(x,y,z)=>{const t=.68+.25*Math.max(0,Math.min(1,y/2.8));return[t*.82,t,t*.72]});
+    const c=document.createElement('canvas');c.width=c.height=64;const ctx=c.getContext('2d');ctx.fillStyle='#e3ead4';ctx.fillRect(0,0,64,64);
+    for(let y=7;y<64;y+=12)for(let x=5;x<64;x+=12){const px=x+(Math.floor(y/12)%2)*5;ctx.fillStyle='#6c7f59';ctx.beginPath();ctx.arc(px,y,1.1,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#f8f2dc';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(px-1.8,y+2);ctx.lineTo(px+.6,y-2);ctx.stroke()}
+    const map=new THREE.CanvasTexture(c);map.colorSpace=THREE.SRGBColorSpace;
+    lib.cactus = { parts: [{ geo, mat: std({ color: 0x80a759, map, vertexColors:true }) }], scale: [0.5, 1.4], spacing: 3, collide: 0.4, where: (x, z, h) => h > 4 && h < 34 };
   }
   // coral: branching staghorn clusters, round brain corals, waving kelp and anemones
   {
@@ -875,19 +929,38 @@ function makeScatterLibrary(THREE, B, site) {
     }
     const base = bumpy(THREE, new THREE.SphereGeometry(0.7, 8, 6), 0.3, 31); base.scale(1, 0.5, 1); branches.push(base);
     const geo = mergeGeos(THREE, branches);
-    paintVertexColours(THREE, geo, (x, y, z) => { const pal = [[1, 0.45, 0.55], [1, 0.7, 0.3], [0.65, 0.35, 0.85], [0.35, 0.85, 0.7], [0.95, 0.9, 0.5]]; return pal[Math.floor(Math.abs(Math.sin(x * 3 + z * 5)) * 5) % 5]; });
-    lib.coral = { parts: [{ geo, mat: std({ vertexColors: true, roughness: 0.7, emissive: 0x442233, emissiveIntensity: 0.35 }) }], scale: [0.7, 2.6], spacing: 2.5, collide: 0.6, where: (x, z, h) => h > 8 };
-    const brain = bumpy(THREE, new THREE.SphereGeometry(1.2, 12, 9, 0, Math.PI * 2, 0, Math.PI / 2), 0.12, 33);
-    paintVertexColours(THREE, brain, (x, y, z) => { const t = Math.sin(x * 9) * Math.cos(z * 9) > 0 ? 0.85 : 0.55; return [0.95 * t, 0.75 * t, 0.35 * t]; });
-    lib.brain = { parts: [{ geo: brain, mat: std({ vertexColors: true, roughness: 0.8, emissive: 0x332211, emissiveIntensity: 0.4 }) }], scale: [0.5, 2], spacing: 3, collide: 0.8, where: (x, z, h) => h > 8 };
-    const kelpTex = grassBladeTexture(THREE);
-    const w = new THREE.PlaneGeometry(1.2, 3.6); w.translate(0, 1.7, 0);
-    const w2 = w.clone(); w2.rotateY(Math.PI / 2);
-    lib.seaweed = { parts: [{ geo: mergeGeos(THREE, [w, w2]), mat: std({ map: kelpTex, color: 0x2f8f4a, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide }), shadow: false }], scale: [0.6, 1.8], spacing: 1.2 };
+    paintVertexColours(THREE, geo, (x, y, z) => {
+      const tip=Math.max(0,Math.min(1,(y-1.1)/1.4));
+      return [.75+tip*.25,.4+tip*.48,.34+tip*.44];
+    });
+    lib.coral = { parts: [{ geo, mat: std({ vertexColors: true, roughness: .88 }) }], scale: [0.7, 2.6], spacing: 2.5, collide: 0.6, where: (x, z, h) => h > 8 };
+    const brain = bumpy(THREE, new THREE.SphereGeometry(1.2, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), 0.08, 33);
+    const c=document.createElement('canvas');c.width=c.height=128;const ctx=c.getContext('2d'),pixels=ctx.createImageData(128,128);
+    for(let y=0;y<128;y++)for(let x=0;x<128;x++){
+      const ridge=Math.abs(Math.sin(x*.29+Math.sin(y*.19)*1.9+Math.sin(y*.067)*2.2));
+      const v=Math.round(76+Math.pow(ridge,.45)*166),k=(y*128+x)*4;
+      pixels.data[k]=pixels.data[k+1]=pixels.data[k+2]=v;pixels.data[k+3]=255;
+    }
+    ctx.putImageData(pixels,0,0);const folds=new THREE.CanvasTexture(c);folds.colorSpace=THREE.SRGBColorSpace;folds.anisotropy=4;
+    lib.brain = { parts: [{ geo: brain, mat: std({ color:0xc7ab66,map:folds,roughness:.9 }) }], scale: [0.5, 2], spacing: 3, collide: 0.8, where: (x, z, h) => h > 8 };
+    const straps=[];for(let i=0;i<4;i++){
+      const w=blade(THREE,2.3+(i%3)*.6,.28+(i%2)*.1,.22,(i-1.5)*.19,5);
+      w.rotateX(-Math.PI/2);w.rotateY(i*2.4);w.translate(Math.cos(i*2.4)*.13,0,Math.sin(i*2.4)*.13);straps.push(w);
+    }
+    const kelpGeo=mergeForms(THREE,straps);paintVertexColours(THREE,kelpGeo,(x,y,z)=>{const t=.58+Math.min(1,y/3.5)*.35;return[t*.66,t,t*.74]});
+    const kelpMat=std({color:0x69a65a,vertexColors:true,side:THREE.DoubleSide});const sway={value:0};kelpMat.userData.wind=sway;
+    kelpMat.onBeforeCompile=shader=>{shader.uniforms.kelpTime=sway;shader.vertexShader='uniform float kelpTime;\n'+shader.vertexShader;shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+      float phase=0.;
+      #ifdef USE_INSTANCING
+        phase=instanceMatrix[3].x*.1+instanceMatrix[3].z*.14;
+      #endif
+      transformed.x+=sin(kelpTime*.7+position.y*.8+phase)*position.y*position.y*.035;`)};
+    lib.seaweed = { parts: [{ geo: kelpGeo, mat: kelpMat, shadow: false }], scale: [0.6, 1.8], spacing: 1.2 };
     const tent = [];
-    for (let i = 0; i < 14; i++) { const t = new THREE.CylinderGeometry(0.04, 0.07, 0.9, 4); t.translate(0, 0.45, 0); t.rotateX(0.5 + (i % 3) * 0.3); t.rotateY((i / 14) * Math.PI * 2); tent.push(t); }
+    for (let i = 0; i < 10; i++) { const a=i*Math.PI/5,r=.28+(i%3)*.06;tent.push(taperedCurve(THREE,[[Math.cos(a)*r,.12,Math.sin(a)*r],[Math.cos(a)*r*1.7,.65,Math.sin(a)*r*1.7],[Math.cos(a)*r*1.45,1.1+(i%3)*.09,Math.sin(a)*r*1.45]],.06,.014,6,4)); }
     const disc = new THREE.CylinderGeometry(0.4, 0.3, 0.2, 10); disc.translate(0, 0.1, 0); tent.push(disc);
-    lib.anemone = { parts: [{ geo: mergeGeos(THREE, tent), mat: std({ color: 0xe0a0ff, roughness: 0.6 }) }], scale: [0.6, 1.6], spacing: 1.5, where: (x, z, h) => h > 8 };
+    const anemone=mergeForms(THREE,tent);paintVertexColours(THREE,anemone,(x,y,z)=>{const t=Math.min(1,Math.max(0,y/1.25));return[.65+t*.3,.3+t*.52,.68+t*.23]});
+    lib.anemone = { parts: [{ geo: anemone, mat: std({ vertexColors:true, roughness: 0.65 }) }], scale: [0.6, 1.6], spacing: 1.5, where: (x, z, h) => h > 8 };
   }
   return lib;
 }
@@ -977,16 +1050,26 @@ function buildLandmark(THREE, id, site, N) {
   if (id === "pyramids" || id === "pyramid2") {
     const big = id === "pyramids";
     const geo = new THREE.ConeGeometry(big ? 115 : 80, big ? 73 : 52, 4, 1);
-    const m = add(geo, std({ color: 0xd3b787, flatShading: true }), 0, (big ? 73 : 52) / 2 - 1, 0); m.rotation.y = Math.PI / 4;
+    const m = add(geo, sandstoneMaterial(THREE, 0xd3b787, big ? 6 : 4), 0, (big ? 73 : 52) / 2 - 1, 0); m.rotation.y = Math.PI / 4;
     return { mesh: g, radius: big ? 90 : 62, height: big ? 73 : 52, centreY: big ? 30 : 22, collide: big ? 82 : 58 };
   }
   if (id === "sphinx") {
-    const stone = std({ color: 0xc9a97a });
-    const body = add(new THREE.BoxGeometry(14, 8, 36), stone, 0, 4, 0);
-    add(new THREE.BoxGeometry(6, 8, 14), stone, -5, 3, 13); add(new THREE.BoxGeometry(6, 8, 14), stone, 5, 3, 13);   // paws
-    add(new THREE.BoxGeometry(10, 12, 9), stone, 0, 12, 6);   // head
-    add(new THREE.BoxGeometry(14, 6, 3), stone, 0, 16, 5);    // headdress
-    add(new THREE.BoxGeometry(4, 3, 2), stone, 0, 11, 10.5);  // nose
+    const stoneMap=noiseTexture(THREE,128,224,60,119),stoneBump=stoneMap.clone();stoneBump.colorSpace=THREE.NoColorSpace;
+    const stone = std({color:0xc9a97a,map:stoneMap,bumpMap:stoneBump,bumpScale:.1,roughness:.98}),forms=[];
+    const oval=(x,y,z,rx,ry,rz)=>{const geo=new THREE.SphereGeometry(1,12,8);geo.scale(rx,ry,rz);geo.translate(x,y,z);forms.push(geo)};
+    oval(0,4,-1,6.8,4.5,16.5);oval(0,7.4,7,5.2,5.4,5.7);
+    for(const side of [-1,1]){oval(side*4.5,2.5,12.5,2.35,2.6,8.4);oval(side*4.5,1.8,19,2.5,1.8,2.2)}
+    oval(0,14.2,7.7,3.9,4.6,3.2);oval(0,12.8,10.25,2.8,2.3,1.35);oval(0,14.1,11.5,.85,1.2,.8);
+    for(const side of [-1,1])forms.push(taperedCurve(THREE,[[side*2.8,17.3,7.5],[side*4.5,15.4,6.8],[side*5.4,10.9,6.2]],1.35,.7,9,7));
+    // Carved eyebrows, eyes and mouth read at camera height rather than only
+    // as stacked boxes; merge each surface into one draw.
+    const carvings=[];for(const side of [-1,1]){
+      const eye=new THREE.SphereGeometry(1,8,5);eye.scale(.68,.22,.14);eye.translate(side*1.3,14.8,10.95);carvings.push(eye);
+      forms.push(taperedCurve(THREE,[[side*.65,15.35,10.9],[side*1.3,15.6,10.8],[side*2,15.25,10.7]],.14,.08,5,5));
+    }
+    carvings.push(taperedCurve(THREE,[[-1.2,11.9,11.15],[0,11.65,11.48],[1.2,11.9,11.15]],.09,.07,8,4));
+    add(mergeForms(THREE,forms),stone);
+    add(mergeForms(THREE,carvings),std({color:0x75604a,roughness:1}));
     return { mesh: g, radius: 22, height: 20, centreY: 8, collide: 18 };
   }
   if (id === "geyser") {
@@ -1013,7 +1096,9 @@ function buildLandmark(THREE, id, site, N) {
     return { mesh: g, radius: 12, height: 50, centreY: 20, collide: 6, update, active: () => state.active };
   }
   if (id === "hotspring") {
-    const geo = new THREE.CircleGeometry(24, 40);
+    // Several radial rows retain the blue/green/yellow bacterial bands. A
+    // circle fan had only a blue centre and red edge, losing every middle band.
+    const geo = new THREE.RingGeometry(0, 24, 64, 16);
     paintVertexColours(THREE, geo, (x, y) => { const d = Math.hypot(x, y) / 24; return d < 0.45 ? [0.1, 0.5, 0.85] : d < 0.65 ? [0.2, 0.75, 0.6] : d < 0.82 ? [0.9, 0.75, 0.1] : [0.85, 0.35, 0.1]; });
     const m = add(geo, std({ vertexColors: true, roughness: 0.2 }), 0, 0.3, 0); m.rotation.x = -Math.PI / 2;
     return { mesh: g, radius: 24, height: 2, centreY: 0.5, collide: 22 };
@@ -1026,7 +1111,8 @@ function buildLandmark(THREE, id, site, N) {
   if (id === "iceberg" || id === "iceberg2") {
     const geo = bumpy(THREE, new THREE.DodecahedronGeometry(id === "iceberg" ? 34 : 22, 1), 0.3, id === "iceberg" ? 51 : 52);
     geo.scale(1.5, 0.75, 1);
-    const m = add(geo, std({ color: 0xe6f5ff, flatShading: true, roughness: 0.35 }), 0, id === "iceberg" ? 8 : 4, 0);
+    paintVertexColours(THREE,geo,(x,y,z)=>{const top=Math.max(0,Math.min(1,(y+12)/28));return[.55+top*.45,.8+top*.2,.94+top*.06]});
+    const m = add(geo, mineralMaterial(THREE, 0xe6f5ff, 115, true), 0, id === "iceberg" ? 8 : 4, 0);
     return { mesh: g, radius: id === "iceberg" ? 50 : 34, height: 34, centreY: 12, collide: false, lift: 0 };
   }
   return null;

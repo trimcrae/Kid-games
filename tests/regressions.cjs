@@ -15,6 +15,7 @@ const suites = [
   { file: "service-worker.cjs", timeout: 90000, browser: true },
   { file: "young-games-regressions.js", timeout: 90000, browser: true },
   { file: "word-puzzles-lifecycle.cjs", timeout: 90000, browser: true },
+  { file: "three-model-visuals.cjs", timeout: 300000, browser: true },
 ];
 
 let active;

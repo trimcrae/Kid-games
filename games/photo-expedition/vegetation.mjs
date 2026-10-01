@@ -89,7 +89,17 @@ export function broadleafTree(THREE, kind, leafMat, bark, distant=false) {
     }
     lobes.push([x,y+.3,z,tall?2.5:1.7,tall?1.4:.6,tall?2.5:1.7,distant?28:(tall?95:100),(tall?2:1.05)*(distant?1.65:1)]);
   }
-  for(let i=0;i<(tall?7:4);i++) {const a=i*2.4;branches.push(taperedCurve(THREE,[[0,tall?2.5:.7,0],[Math.cos(a)*.6,.25,Math.sin(a)*.6],[Math.cos(a)*(tall?2.2:.9),-.08,Math.sin(a)*(tall?2.2:.9)]],tall?.45:.13,.025,distant?3:6,distant?5:8))}
+  for(let i=0;i<(tall?7:4);i++) {
+    const a=i*2.4;
+    if(tall){
+      // Kapok roots are thin, tall buttresses, not round tentacles. These
+      // closed wedges also cost fewer triangles than the previous tubes.
+      const shape=new THREE.Shape();shape.moveTo(0,0);shape.lineTo(0,2.7);
+      shape.quadraticCurveTo(.45,.6,2.2,-.08);shape.lineTo(0,0);
+      const root=new THREE.ExtrudeGeometry(shape,{depth:.22,bevelEnabled:false,curveSegments:distant?2:4});
+      root.translate(0,0,-.11);root.rotateY(a);branches.push(root);
+    }else branches.push(taperedCurve(THREE,[[0,.7,0],[Math.cos(a)*.6,.25,Math.sin(a)*.6],[Math.cos(a)*.9,-.08,Math.sin(a)*.9]],.13,.025,distant?3:6,distant?5:8));
+  }
   return [{geo:mergeForms(THREE,branches),mat:bark},{geo:leafCloud(THREE,lobes,tall?83:19,tall?'#66884b':'#7c8d49'),mat:leafMat}];
 }
 
