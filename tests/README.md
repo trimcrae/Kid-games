@@ -142,7 +142,13 @@ npm run test:regressions -- craepets-import-browser.cjs
 The import checks cover malformed backups, full storage, older backups,
 reloads and preserving each family member's saved pet. The browser suite also
 continues an active lesson after a rejected import and plays an imported pet
-on desktop and phone sizes.
+on desktop and phone sizes. Both suites exercise the actual original engine
+and the explicit house activity fork, using standalone `craepets.house.*`
+and shared `craepets.*` save modes. They preserve siblings, the other edition,
+preferences and reset flags, and transfer bought houses, equipped furniture
+and paid room styles. The browser suite loads the real activity iframe inside
+a minimal same-origin host and verifies a shared-profile round trip through
+both engines; it does not start the unchanged full 3D walkthrough.
 
 [`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
 for pull requests and pushes to `main`, with a fifteen-minute job limit. It
