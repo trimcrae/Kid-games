@@ -97,10 +97,10 @@ async function check(browser, base, options) {
     assert.equal(await page.evaluate(() => ["hunger","happy","energy","clean","xp","born"].every((key)=>Number.isFinite(Craepets.state().pet[key]))), true);
     await page.evaluate(() => {
       const candidate=JSON.parse(JSON.stringify(Craepets.state()));
-      candidate.harvest.farm=['<b id="import-markup-harvest">crop</b>'];
+      candidate.harvest.farm=['<b id=z>crop</b>'];
       candidate.review=[{key:"fixture",tier:"mid",subject:"math",misses:1,q:{
-        q:"Choose two",subject:"math",tier:"mid",big:{emoji:'<b id="import-markup">2</b>'},
-        choices:[{t:"2",emoji:'<i id="import-markup-choice">two</i>',colour:'red" data-import-markup="yes'}, {t:"3"}],answer:0
+        q:"Choose two",subject:"math",tier:"mid",big:{emoji:'<b id=x>2</b>'},
+        choices:[{t:"2",emoji:'<i id=y>2</i>',colour:'red" data-x="yes'}, {t:"3"}],answer:0
       }}];
       Craepets.importJson(JSON.stringify(candidate));
       window.importTestRandom=Math.random;Math.random=()=>0;
@@ -112,10 +112,18 @@ async function check(browser, base, options) {
       await page.evaluate(() => {Math.random=window.importTestRandom;delete window.importTestRandom;});
     }
     assert.equal(await page.evaluate(() => Craepets.session().q.fromReview), "fixture", "imported review question must actually be offered");
-    assert.equal(await page.locator("#import-markup, #import-markup-choice, #import-markup-harvest, [data-import-markup]").count(), 0, "imported display strings must stay text");
-    assert.match(await page.locator(".qbig").textContent(), /<b id="import-markup">/);
+    assert.equal(await page.locator("#x, #y, #z, [data-x]").count(), 0, "imported display strings must stay text");
+    assert.match(await page.locator(".qbig").textContent(), /<b id=x>/);
     const answer = await page.evaluate(() => Craepets.session().q.answer);
-    await page.locator(".choice").nth(answer).click();
+    try {await page.locator(".choice").nth(answer).click();}
+    catch (error) {
+      console.error("Imported choice hit target", await page.evaluate((index) => {
+        const target=document.querySelectorAll(".choice")[index], rect=target.getBoundingClientRect();
+        const hit=document.elementFromPoint(rect.x+rect.width/2,Math.min(innerHeight-1,rect.y+rect.height/2));
+        return {viewport:[innerWidth,innerHeight],rect:{x:rect.x,y:rect.y,w:rect.width,h:rect.height},hit:hit&&hit.outerHTML.slice(0,240)};
+      },answer));
+      throw error;
+    }
     assert.equal(await page.evaluate(() => Craepets.state().stats.correct), 1, "a transferred pet must still earn a correct answer");
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
     assert.deepEqual(errors, [], "imports and subsequent play must produce no browser errors");
