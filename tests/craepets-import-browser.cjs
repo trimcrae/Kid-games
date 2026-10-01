@@ -87,6 +87,7 @@ async function check(browser, base, options) {
     assert.equal(await page.evaluate(() => Craepets.session()), null);
     await page.reload({waitUntil:"load"});
     await page.waitForFunction(() => window.Craepets && Craepets.state());
+    await page.evaluate(() => Craepets._events(false));
     assert.equal(await page.evaluate(() => Craepets.state().pet.name), "Transferred");
     assert.equal(await page.evaluate(() => localStorage.getItem("craepets.v1.ellie")), '{"v":1,"pet":null,"coins":99}');
 
