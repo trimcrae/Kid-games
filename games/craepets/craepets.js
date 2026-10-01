@@ -3106,7 +3106,7 @@
     var cells = [];
     for (var i = 0; i < SLOTS; i++) {
       cells.push('<div class="plot ' + place + (i < sess.plots.length ? " full" : "") + '">' +
-                 (i < sess.plots.length ? sess.plots[i] : info.empty) + "</div>");
+                 (i < sess.plots.length ? esc(sess.plots[i]) : info.empty) + "</div>");
     }
     var basket = '<div class="plots" aria-label="' + sess.plots.length + " of " + SLOTS +
                  ' filled" role="img">' + cells.join("") + "</div>";
@@ -3154,8 +3154,8 @@
     if (!Q) return "";
     var big = "";
     if (Q.big) {
-      if (Q.big.colour) big = '<div class="qbig swatch" style="background:' + Q.big.colour + '"></div>';
-      else if (Q.big.emoji) big = '<div class="qbig">' + Q.big.emoji + "</div>";
+      if (Q.big.colour) big = '<div class="qbig swatch" style="background:' + esc(Q.big.colour) + '"></div>';
+      else if (Q.big.emoji) big = '<div class="qbig">' + esc(Q.big.emoji) + "</div>";
       else if (Q.big.text) big = '<div class="qbig">' + esc(Q.big.text) + "</div>";
     }
     var longest = 0;
@@ -3164,8 +3164,8 @@
 
     var buttons = Q.choices.map(function (c, i) {
       var inner = "";
-      if (c.colour) inner = '<span class="paint" style="background:' + c.colour + '"></span>';
-      if (c.emoji) inner += '<span class="pic">' + c.emoji + "</span>";
+      if (c.colour) inner = '<span class="paint" style="background:' + esc(c.colour) + '"></span>';
+      if (c.emoji) inner += '<span class="pic">' + esc(c.emoji) + "</span>";
       if (c.t) inner += "<span" + (c.huge ? ' class="huge"' : "") + ">" + esc(c.t) + "</span>";
       var mark = "";
       if (q.state === "done") {
@@ -5901,6 +5901,17 @@
           (!Number.isFinite(entry) || entry < 0 || entry > Number.MAX_SAFE_INTEGER))) invalidValley();
     });
   }
+  function validateReviewQuestion(q) {
+    validateSaveFields(q, { q: "", subject: "", tier: "", homeTier: "", kind: "", key: "", teach: "", rung: 0, step: 0, seen: 0, seenRight: 0 });
+    if (typeof q.q !== "string" || !Array.isArray(q.choices) || !q.choices.length ||
+        !Number.isSafeInteger(q.answer) || q.answer < 0 || q.answer >= q.choices.length) invalidValley();
+    if (q.big != null) validateSaveFields(q.big, { text: "", emoji: "", colour: "" });
+    ["say", "sayTeach"].forEach(function (key) {
+      if (q[key] != null && (!Array.isArray(q[key]) || !q[key].every(function (s) { return typeof s === "string"; }))) invalidValley();
+    });
+    if (q.sayA != null && typeof q.sayA !== "string") invalidValley();
+    q.choices.forEach(function (choice) { validateSaveFields(choice, { t: "", emoji: "", colour: "", huge: false }); });
+  }
   function importCandidate(s, id) {
     if (!saveRecord(s) || s.v !== 1 || !saveRecord(s.pet) ||
         typeof s.pet.name !== "string" || !s.pet.name.trim() ||
@@ -5925,18 +5936,26 @@
         validateSaveFields(s.house.rooms[key], { wall: "", floor: "", view: "", name: "" });
       });
     }
+    if (s.wish != null) {
+      validateSaveFields(s.wish, { kind: "", id: "", at: 0, day: 0, done: false, doneAt: 0, need: 0, got: 0 });
+      if (typeof s.wish.kind !== "string" || typeof s.wish.id !== "string") invalidValley();
+    }
+    if (s.harvest) {
+      ["farm", "well", "pool"].forEach(function (key) {
+        if (s.harvest[key] && !s.harvest[key].every(function (crop) { return typeof crop === "string"; })) invalidValley();
+      });
+    }
     if (s.stall) {
       ["goods", "sales"].forEach(function (key) {
         (s.stall[key] || []).forEach(function (row) {
           validateSaveFields(row, key === "goods" ? { id: "", n: 0, price: 0 } : { id: "", from: "", price: 0, day: 0 });
+          if (typeof row.id !== "string") invalidValley();
         });
       });
     }
     (s.review || []).forEach(function (row) {
       validateSaveFields(row, { key: "", tier: "", subject: "", misses: 0, q: {} });
-      if (!saveRecord(row.q) || !Array.isArray(row.q.choices) || !row.q.choices.length ||
-          !Number.isSafeInteger(row.q.answer) || row.q.answer < 0 || row.q.answer >= row.q.choices.length ||
-          !row.q.choices.every(saveRecord)) invalidValley();
+      validateReviewQuestion(row.q);
     });
     Object.keys(s.seen || {}).forEach(function (key) {
       var row = s.seen[key];

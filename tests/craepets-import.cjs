@@ -50,6 +50,7 @@ function boot() {
       blank: function(){return blankSave(D.profile(who));},
       load: function(){return load(who);},
       prepare: function(s){return importCandidate(s,who);},
+      ask: function(subject,tier,rung){return D.ask(subject,tier,null,rung);},
       import: importValley,
       setState: function(s){S=s;},
       state: function(){return S;},
@@ -66,6 +67,7 @@ function boot() {
   return { api, values, messages, effects, initial, fail: () => { failWrite = true; } };
 }
 const clone = (value) => JSON.parse(JSON.stringify(value));
+const reviewQuestion = () => ({key:"review",tier:"mid",subject:"math",misses:1,q:{q:"One plus one?",subject:"math",tier:"mid",choices:[{t:"2"},{t:"3"}],answer:0}});
 const invalid = [
   ["invalid JSON", () => "{"],
   ["root array", () => "[]"],
@@ -103,6 +105,19 @@ const invalid = [
   ["zero hatch target", (s) => { s.pet.egg = {need:0,got:0,taps:0}; }],
   ["steps string", (s) => { s.steps = "broken"; }],
   ["petpet names array", (s) => { s.petpetNames = []; }],
+  ["sale missing item", (s) => { s.stall.sales = [{}]; }],
+  ["wish missing item", (s) => { s.wish = {kind:"food",at:Date.now(),day:s.day}; }],
+  ["wish timing string", (s) => { s.wish = {kind:"food",id:"apple",at:"broken",day:s.day}; }],
+  ["harvest record", (s) => { s.harvest.farm = [{}]; }],
+  ["review numeric big text", (s) => { const r=reviewQuestion();r.q.big={text:17};s.review=[r]; }],
+  ["review big array", (s) => { const r=reviewQuestion();r.q.big=[];s.review=[r]; }],
+  ["review narration string", (s) => { const r=reviewQuestion();r.q.say="broken";s.review=[r]; }],
+  ["review lesson narration string", (s) => { const r=reviewQuestion();r.q.sayTeach="broken";s.review=[r]; }],
+  ["review answer narration record", (s) => { const r=reviewQuestion();r.q.sayA={};s.review=[r]; }],
+  ["review choice text number", (s) => { const r=reviewQuestion();r.q.choices[0].t=17;s.review=[r]; }],
+  ["review choice emoji record", (s) => { const r=reviewQuestion();r.q.choices[0].emoji={};s.review=[r]; }],
+  ["review question record", (s) => { const r=reviewQuestion();r.q.q={};s.review=[r]; }],
+  ["review subject array", (s) => { const r=reviewQuestion();r.q.subject=[];s.review=[r]; }],
 ];
 for (const [name, mutate] of invalid) {
   const test = boot(), before = [...test.values], playing = test.api.playing();
@@ -161,5 +176,20 @@ for (const [name, mutate] of invalid) {
   test.api.import(JSON.stringify(candidate));
   assert.deepEqual(clone(test.api.state().pet.egg), {need:Number(eggNeed),got:0,taps:0});
   assert.ok(test.api.state().house.homes.length > 1, "integer legacy house levels must still migrate");
+}
+{
+  const test = boot();
+  // Every supported tier/subject/rung must keep genuine generated review
+  // questions importable, including nullable speech and big-picture fields.
+  for (const tier of ["tot","early","mid","big","grown"]) {
+    for (const subject of ["math","word","wonder"]) {
+      for (let rung=1;rung<=5;rung++) {
+        const candidate=clone(test.initial);
+        const q=clone(test.api.ask(subject,tier,rung));
+        candidate.review=[{key:"review",tier,subject,misses:1,q}];
+        assert.equal(test.api.prepare(candidate).review.length,1,"real "+tier+"/"+subject+"/"+rung+" review question");
+      }
+    }
+  }
 }
 console.log("PASS Craepets import transactions: " + invalid.length + " invalid backups, storage failure, full and legacy transfers, reload and legacy eggs/houses");

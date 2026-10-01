@@ -31,7 +31,10 @@ async function check(browser, base, options) {
   try {
     await page.goto(base + "/games/craepets/", {waitUntil:"load"});
     await page.waitForFunction(() => window.Craepets && Craepets.state());
-    await page.evaluate(() => Craepets._events(false));
+    await page.evaluate(() => {
+      Craepets._events(false);
+      localStorage.setItem("craepets.news", JSON.stringify({seen:Craepets.news().id}));
+    });
     await page.locator("#pet-name").fill("Comet");
     await page.locator("#do-adopt").click();
     await page.locator('[data-go="farm"]').click();
@@ -91,8 +94,25 @@ async function check(browser, base, options) {
     await page.evaluate(() => Craepets.importJson(JSON.stringify({v:1,pet:{name:"Old pet",species:"blorb",colour:"meadow"}})));
     assert.equal(await page.evaluate(() => Craepets.state().pet.name), "Old pet");
     assert.equal(await page.evaluate(() => ["hunger","happy","energy","clean","xp","born"].every((key)=>Number.isFinite(Craepets.state().pet[key]))), true);
-    await page.locator('[data-go="farm"]').click();
-    await page.waitForSelector(".choice");
+    await page.evaluate(() => {
+      const candidate=JSON.parse(JSON.stringify(Craepets.state()));
+      candidate.harvest.farm=['<b id="import-markup-harvest">crop</b>'];
+      candidate.review=[{key:"fixture",tier:"mid",subject:"math",misses:1,q:{
+        q:"Choose two",subject:"math",tier:"mid",big:{emoji:'<b id="import-markup">2</b>'},
+        choices:[{t:"2",emoji:'<i id="import-markup-choice">two</i>',colour:'red" data-import-markup="yes'}, {t:"3"}],answer:0
+      }}];
+      Craepets.importJson(JSON.stringify(candidate));
+      window.importTestRandom=Math.random;Math.random=()=>0;
+    });
+    try {
+      await page.locator('[data-go="farm"]').click();
+      await page.waitForSelector(".choice");
+    } finally {
+      await page.evaluate(() => {Math.random=window.importTestRandom;delete window.importTestRandom;});
+    }
+    assert.equal(await page.evaluate(() => Craepets.session().q.fromReview), "fixture", "imported review question must actually be offered");
+    assert.equal(await page.locator("#import-markup, #import-markup-choice, #import-markup-harvest, [data-import-markup]").count(), 0, "imported display strings must stay text");
+    assert.match(await page.locator(".qbig").textContent(), /<b id="import-markup">/);
     const answer = await page.evaluate(() => Craepets.session().q.answer);
     await page.locator(".choice").nth(answer).click();
     assert.equal(await page.evaluate(() => Craepets.state().stats.correct), 1, "a transferred pet must still earn a correct answer");
