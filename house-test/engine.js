@@ -213,9 +213,15 @@
   }
 
   function load(id) {
-    var profile = D.profile(id);
     var s = null;
     try { s = JSON.parse(localStorage.getItem(slot(id))); } catch (e) { s = null; }
+    return normalizeSave(s, id);
+  }
+
+  // Also used before an imported valley is allowed to replace a saved one.
+  // This step operates in memory and never writes to storage.
+  function normalizeSave(s, id) {
+    var profile = D.profile(id);
     if (!s || typeof s !== "object" || s.v !== 1) s = blankSave(profile);
     // fill in anything a newer version added
     var fresh = blankSave(profile);
@@ -1460,7 +1466,7 @@
       (lines.length
         ? '<h3 style="margin:1rem 0 0.2rem;font-size:0.98rem">📔 From ' + esc(pet.name) + "'s diary</h3>" +
           lines.map(function (e) {
-            return '<div class="entry"><span class="em" aria-hidden="true">' + e.e + '</span><div class="etx">' + esc(e.s) +
+            return '<div class="entry"><span class="em" aria-hidden="true">' + esc(e.e) + '</span><div class="etx">' + esc(e.s) +
               "<small>" + esc(dayLabel(e.d).split(" · ")[0]) + "</small></div></div>";
           }).join("")
         : "") +
@@ -3096,7 +3102,7 @@
     var cells = [];
     for (var i = 0; i < SLOTS; i++) {
       cells.push('<div class="plot ' + place + (i < sess.plots.length ? " full" : "") + '">' +
-                 (i < sess.plots.length ? sess.plots[i] : info.empty) + "</div>");
+                 (i < sess.plots.length ? esc(sess.plots[i]) : info.empty) + "</div>");
     }
     var basket = '<div class="plots" aria-label="' + sess.plots.length + " of " + SLOTS +
                  ' filled" role="img">' + cells.join("") + "</div>";
@@ -3144,8 +3150,8 @@
     if (!Q) return "";
     var big = "";
     if (Q.big) {
-      if (Q.big.colour) big = '<div class="qbig swatch" style="background:' + Q.big.colour + '"></div>';
-      else if (Q.big.emoji) big = '<div class="qbig">' + Q.big.emoji + "</div>";
+      if (Q.big.colour) big = '<div class="qbig swatch" style="background:' + esc(Q.big.colour) + '"></div>';
+      else if (Q.big.emoji) big = '<div class="qbig">' + esc(Q.big.emoji) + "</div>";
       else if (Q.big.text) big = '<div class="qbig">' + esc(Q.big.text) + "</div>";
     }
     var longest = 0;
@@ -3154,8 +3160,8 @@
 
     var buttons = Q.choices.map(function (c, i) {
       var inner = "";
-      if (c.colour) inner = '<span class="paint" style="background:' + c.colour + '"></span>';
-      if (c.emoji) inner += '<span class="pic">' + c.emoji + "</span>";
+      if (c.colour) inner = '<span class="paint" style="background:' + esc(c.colour) + '"></span>';
+      if (c.emoji) inner += '<span class="pic">' + esc(c.emoji) + "</span>";
       if (c.t) inner += "<span" + (c.huge ? ' class="huge"' : "") + ">" + esc(c.t) + "</span>";
       var mark = "";
       if (q.state === "done") {
@@ -5856,15 +5862,126 @@
       '<p><textarea id="import-text" rows="4" placeholder="…or paste the file\'s contents here" aria-label="Pasted valley" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:0.8rem;border:3px solid #ddd4ff;border-radius:12px;padding:0.5rem"></textarea></p>' +
       '<p style="margin:0.6rem 0 0"><button class="act" id="import-go" style="--ac:var(--purple);width:100%"><span class="em">📂</span>Load it</button></p>');
   }
-  function importValley(text) {
-    var s = null;
-    try { s = JSON.parse(text); } catch (e) { s = null; }
-    if (!s || typeof s !== "object" || s.v !== 1 || !s.pet || typeof s.pet !== "object" || !s.pet.name) {
-      toast("That is not a Craepets valley file.");
-      return;
+  function saveRecord(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+  function invalidValley() { throw Error("That is not a usable Craepets valley file."); }
+
+  // Older backups may omit fields added later. Present fields must have their
+  // expected shapes: an array or a string in place of a record can survive the
+  // old loader and only fail after a later render, answer or purchase.
+  function validateSaveFields(value, defaults) {
+    if (!saveRecord(value)) invalidValley();
+    Object.keys(defaults).forEach(function (key) {
+      var got = value[key], want = defaults[key];
+      if (got === undefined || want === null) return;
+      if (Array.isArray(want)) {
+        if (!Array.isArray(got)) invalidValley();
+      } else if (saveRecord(want)) {
+        validateSaveFields(got, want);
+      } else if (typeof got !== typeof want ||
+                 (typeof want === "number" && (!Number.isFinite(got) || got < 0 || got > Number.MAX_SAFE_INTEGER))) {
+        invalidValley();
+      }
+    });
+  }
+  function validateSaveMap(value, type) {
+    if (value === undefined) return;
+    if (!saveRecord(value)) invalidValley();
+    Object.keys(value).forEach(function (key) {
+      var entry = value[key];
+      if (typeof entry !== type || (type === "number" &&
+          (!Number.isFinite(entry) || entry < 0 || entry > Number.MAX_SAFE_INTEGER))) invalidValley();
+    });
+  }
+  function validateReviewQuestion(q) {
+    validateSaveFields(q, { q: "", subject: "", tier: "", homeTier: "", kind: "", key: "", teach: "", rung: 0, step: 0, seen: 0, seenRight: 0 });
+    if (typeof q.q !== "string" || !Array.isArray(q.choices) || !q.choices.length ||
+        !Number.isSafeInteger(q.answer) || q.answer < 0 || q.answer >= q.choices.length) invalidValley();
+    if (q.big != null) validateSaveFields(q.big, { text: "", emoji: "", colour: "" });
+    ["say", "sayTeach"].forEach(function (key) {
+      if (q[key] != null && (!Array.isArray(q[key]) || !q[key].every(function (s) { return typeof s === "string"; }))) invalidValley();
+    });
+    if (q.sayA != null && typeof q.sayA !== "string") invalidValley();
+    q.choices.forEach(function (choice) { validateSaveFields(choice, { t: "", emoji: "", colour: "", huge: false }); });
+  }
+  function importCandidate(s, id) {
+    if (!saveRecord(s) || s.v !== 1 || !saveRecord(s.pet) ||
+        typeof s.pet.name !== "string" || !s.pet.name.trim() ||
+        !P.SPECIES.some(function (p) { return p.id === s.pet.species; }) ||
+        !P.COLOURS.some(function (c) { return c.id === s.pet.colour; })) invalidValley();
+    validateSaveFields(s, blankSave(D.profile(id)));
+    if (s.tier !== undefined && !D.TIERS.some(function (t) { return t.id === s.tier; })) invalidValley();
+    validateSaveFields(s, {
+      steps: {}, visited: {}, parties: {}, favFound: {}, petpetNames: {}, match: { best: 0, games: 0 },
+      bankNews: 0, dailyGift: false, beatShade: false, everBanked: false, everDressed: false,
+      everHatchday: false, everJackpot: false, everPainted: false, everRare: false, everStocked: false
+    });
+    (s.diary || []).forEach(function (row) { validateSaveFields(row, { d: 0, t: 0, e: "", s: "", me: false }); });
+    (s.mail || []).forEach(function (row) { validateSaveFields(row, { from: "", id: "", note: "", day: 0, t: 0 }); });
+    ["bag", "today"].forEach(function (key) { validateSaveMap(s[key], "number"); });
+    if (s.stats) validateSaveMap(s.stats.bySubject, "number");
+    ["bagNew", "claimed", "steps", "visited", "parties", "favFound"].forEach(function (key) { validateSaveMap(s[key], "boolean"); });
+    validateSaveMap(s.petpetNames, "string");
+    ["quests", "colours", "trophies", "wardrobe", "petpets"].forEach(function (key) {
+      if (s[key] && !s[key].every(function (value) { return typeof value === "string"; })) invalidValley();
+    });
+    if (s.house) {
+      if (s.house.level !== undefined && (!Number.isSafeInteger(s.house.level) || s.house.level < 0)) invalidValley();
+      ["homes", "owned", "placed", "walls", "floors", "views"].forEach(function (key) {
+        if (s.house[key] && !s.house[key].every(function (value) { return typeof value === "string"; })) invalidValley();
+      });
+      Object.keys(s.house.rooms || {}).forEach(function (key) {
+        validateSaveFields(s.house.rooms[key], { wall: "", floor: "", view: "", name: "" });
+      });
     }
-    try { localStorage.setItem(slot(who), JSON.stringify(s)); } catch (e) { toast("Could not save it here."); return; }
-    S = load(who);
+    if (s.wish != null) {
+      validateSaveFields(s.wish, { kind: "", id: "", at: 0, day: 0, done: false, doneAt: 0, need: 0, got: 0 });
+      if (typeof s.wish.kind !== "string" || typeof s.wish.id !== "string") invalidValley();
+    }
+    if (s.harvest) {
+      ["farm", "well", "pool"].forEach(function (key) {
+        if (s.harvest[key] && !s.harvest[key].every(function (crop) { return typeof crop === "string"; })) invalidValley();
+      });
+    }
+    if (s.stall) {
+      ["goods", "sales"].forEach(function (key) {
+        (s.stall[key] || []).forEach(function (row) {
+          validateSaveFields(row, key === "goods" ? { id: "", n: 0, price: 0 } : { id: "", from: "", price: 0, day: 0 });
+          if (typeof row.id !== "string") invalidValley();
+        });
+      });
+    }
+    (s.review || []).forEach(function (row) {
+      validateSaveFields(row, { key: "", tier: "", subject: "", misses: 0, q: {} });
+      validateReviewQuestion(row.q);
+    });
+    Object.keys(s.seen || {}).forEach(function (key) {
+      var row = s.seen[key];
+      if (!Array.isArray(row) || row.length !== 2 ||
+          !row.every(function (n) { return Number.isSafeInteger(n) && n >= 0; })) invalidValley();
+    });
+    var petDefaults = { born: Date.now(), hunger: 80, happy: 85, energy: 95, clean: 90, xp: 0, wear: {} };
+    validateSaveFields(s.pet, petDefaults);
+    Object.keys(petDefaults).forEach(function (key) { if (s.pet[key] === undefined) s.pet[key] = petDefaults[key]; });
+    if (s.pet.egg !== undefined) {
+      var eggDefaults = { need: EGG_NEED, got: 0, taps: 0 };
+      validateSaveFields(s.pet.egg, eggDefaults);
+      Object.keys(eggDefaults).forEach(function (key) { if (s.pet.egg[key] === undefined) s.pet.egg[key] = eggDefaults[key]; });
+      if (!s.pet.egg.need) invalidValley();
+    }
+    if (s.pet.petpet) validateSaveFields(s.pet.petpet, { id: "", name: "" });
+    return normalizeSave(s, id);
+  }
+
+  function importValley(text) {
+    var s;
+    try { s = importCandidate(JSON.parse(text), who); }
+    catch (e) { toast("That valley file could not be loaded. Your current pet is safe."); return; }
+    // Commit only a fully checked, normalized candidate. A failed write leaves
+    // the current in-memory valley and all active play exactly as they were.
+    try { localStorage.setItem(slot(who), JSON.stringify(s)); } catch (e) { toast("Could not save it here. Your current pet is safe."); return; }
+    S = s;
     sess = null; battle = null; visit = null; stopCatch(); stopMatch();
     view = "nest";
     closeSheet();
@@ -5926,7 +6043,7 @@
       var rows = entries.filter(function (e) { return e.d === d; });
       return '<h3 class="diaryday">' + esc(dayLabel(d)) + "</h3>" + rows.map(function (e) {
         var when = new Date(e.t || 0).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-        return '<div class="entry' + (e.me ? " mine" : "") + '"><span class="em" aria-hidden="true">' + e.e + "</span>" +
+        return '<div class="entry' + (e.me ? " mine" : "") + '"><span class="em" aria-hidden="true">' + esc(e.e) + "</span>" +
           '<div class="etx">' + esc(e.s) + '<small>' + (e.me ? esc(me.name) + " wrote this · " : esc(S.pet.name) + " · ") + esc(when) + "</small></div>" +
           '<button class="mini" data-say="' + S.diary.indexOf(e) + '" aria-label="Read this entry aloud">🔊</button></div>';
       }).join("");
