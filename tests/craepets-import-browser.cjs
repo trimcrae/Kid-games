@@ -16,7 +16,7 @@ async function startServer() {
       // A minimal same-origin house host exercises the actual activity fork,
       // bridge and save-mode scripts without loading unchanged 3D assets.
       if (pathname === "/house-import-host.html") {
-        res.writeHead(200, {"Content-Type":"text/html"}).end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0}iframe{display:block;width:100%;height:100vh;border:0}</style><iframe name="activity" src="/house-test/activity.html"></iframe>');
+        res.writeHead(200, {"Content-Type":"text/html"}).end('<!doctype html><link rel="icon" href="data:,"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0}iframe{display:block;width:100%;height:100vh;border:0}</style><iframe name="activity" src="/house-test/activity.html"></iframe>');
         return;
       }
       if (pathname.endsWith("/")) pathname += "index.html";
@@ -35,6 +35,7 @@ async function check(browser, base, options, mode = "game") {
   const context = await browser.newContext({serviceWorkers:"block",reducedMotion:"reduce",...options});
   const page = await context.newPage(), errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("response", (response) => { if(response.status()>=400) errors.push("HTTP " + response.status() + ": " + response.url()); });
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   let app;
   async function ready() {
