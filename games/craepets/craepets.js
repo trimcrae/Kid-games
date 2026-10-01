@@ -211,9 +211,15 @@
   }
 
   function load(id) {
-    var profile = D.profile(id);
     var s = null;
     try { s = JSON.parse(localStorage.getItem(slot(id))); } catch (e) { s = null; }
+    return normalizeSave(s, id);
+  }
+
+  // Also used before an imported valley is allowed to replace a saved one.
+  // This step operates in memory and never writes to storage.
+  function normalizeSave(s, id) {
+    var profile = D.profile(id);
     if (!s || typeof s !== "object" || s.v !== 1) s = blankSave(profile);
     // fill in anything a newer version added
     var fresh = blankSave(profile);
@@ -5863,15 +5869,101 @@
       '<p><textarea id="import-text" rows="4" placeholder="…or paste the file\'s contents here" aria-label="Pasted valley" style="width:100%;box-sizing:border-box;font-family:monospace;font-size:0.8rem;border:3px solid #ddd4ff;border-radius:12px;padding:0.5rem"></textarea></p>' +
       '<p style="margin:0.6rem 0 0"><button class="act" id="import-go" style="--ac:var(--purple);width:100%"><span class="em">📂</span>Load it</button></p>');
   }
-  function importValley(text) {
-    var s = null;
-    try { s = JSON.parse(text); } catch (e) { s = null; }
-    if (!s || typeof s !== "object" || s.v !== 1 || !s.pet || typeof s.pet !== "object" || !s.pet.name) {
-      toast("That is not a Craepets valley file.");
-      return;
+  function saveRecord(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+  function invalidValley() { throw Error("That is not a usable Craepets valley file."); }
+
+  // Older backups may omit fields added later. Present fields must have their
+  // expected shapes: an array or a string in place of a record can survive the
+  // old loader and only fail after a later render, answer or purchase.
+  function validateSaveFields(value, defaults) {
+    if (!saveRecord(value)) invalidValley();
+    Object.keys(defaults).forEach(function (key) {
+      var got = value[key], want = defaults[key];
+      if (got === undefined || want === null) return;
+      if (Array.isArray(want)) {
+        if (!Array.isArray(got)) invalidValley();
+      } else if (saveRecord(want)) {
+        validateSaveFields(got, want);
+      } else if (typeof got !== typeof want ||
+                 (typeof want === "number" && (!Number.isFinite(got) || got < 0 || got > Number.MAX_SAFE_INTEGER))) {
+        invalidValley();
+      }
+    });
+  }
+  function validateSaveMap(value, type) {
+    if (value === undefined) return;
+    if (!saveRecord(value)) invalidValley();
+    Object.keys(value).forEach(function (key) {
+      var entry = value[key];
+      if (typeof entry !== type || (type === "number" &&
+          (!Number.isFinite(entry) || entry < 0 || entry > Number.MAX_SAFE_INTEGER))) invalidValley();
+    });
+  }
+  function importCandidate(s, id) {
+    if (!saveRecord(s) || s.v !== 1 || !saveRecord(s.pet) ||
+        typeof s.pet.name !== "string" || !s.pet.name.trim() ||
+        !P.SPECIES.some(function (p) { return p.id === s.pet.species; }) ||
+        !P.COLOURS.some(function (c) { return c.id === s.pet.colour; })) invalidValley();
+    validateSaveFields(s, blankSave(D.profile(id)));
+    if (s.tier !== undefined && !D.TIERS.some(function (t) { return t.id === s.tier; })) invalidValley();
+    validateSaveFields(s, { steps: {}, visited: {}, parties: {}, favFound: {}, petpetNames: {}, match: { best: 0, games: 0 } });
+    ["bag", "today"].forEach(function (key) { validateSaveMap(s[key], "number"); });
+    if (s.stats) validateSaveMap(s.stats.bySubject, "number");
+    ["bagNew", "claimed", "steps", "visited", "parties", "favFound"].forEach(function (key) { validateSaveMap(s[key], "boolean"); });
+    validateSaveMap(s.petpetNames, "string");
+    ["quests", "colours", "trophies", "wardrobe", "petpets"].forEach(function (key) {
+      if (s[key] && !s[key].every(function (value) { return typeof value === "string"; })) invalidValley();
+    });
+    if (s.house) {
+      if (s.house.level !== undefined && (!Number.isSafeInteger(s.house.level) || s.house.level < 0)) invalidValley();
+      ["homes", "owned", "placed", "walls", "floors", "views"].forEach(function (key) {
+        if (s.house[key] && !s.house[key].every(function (value) { return typeof value === "string"; })) invalidValley();
+      });
+      Object.keys(s.house.rooms || {}).forEach(function (key) {
+        validateSaveFields(s.house.rooms[key], { wall: "", floor: "", view: "", name: "" });
+      });
     }
-    try { localStorage.setItem(slot(who), JSON.stringify(s)); } catch (e) { toast("Could not save it here."); return; }
-    S = load(who);
+    if (s.stall) {
+      ["goods", "sales"].forEach(function (key) {
+        (s.stall[key] || []).forEach(function (row) {
+          validateSaveFields(row, key === "goods" ? { id: "", n: 0, price: 0 } : { id: "", from: "", price: 0, day: 0 });
+        });
+      });
+    }
+    (s.review || []).forEach(function (row) {
+      validateSaveFields(row, { key: "", tier: "", subject: "", misses: 0, q: {} });
+      if (!saveRecord(row.q) || !Array.isArray(row.q.choices) || !row.q.choices.length ||
+          !Number.isSafeInteger(row.q.answer) || row.q.answer < 0 || row.q.answer >= row.q.choices.length ||
+          !row.q.choices.every(saveRecord)) invalidValley();
+    });
+    Object.keys(s.seen || {}).forEach(function (key) {
+      var row = s.seen[key];
+      if (!Array.isArray(row) || row.length !== 2 ||
+          !row.every(function (n) { return Number.isSafeInteger(n) && n >= 0; })) invalidValley();
+    });
+    var petDefaults = { born: Date.now(), hunger: 80, happy: 85, energy: 95, clean: 90, xp: 0, wear: {} };
+    validateSaveFields(s.pet, petDefaults);
+    Object.keys(petDefaults).forEach(function (key) { if (s.pet[key] === undefined) s.pet[key] = petDefaults[key]; });
+    if (s.pet.egg !== undefined) {
+      var eggDefaults = { need: EGG_NEED, got: 0, taps: 0 };
+      validateSaveFields(s.pet.egg, eggDefaults);
+      Object.keys(eggDefaults).forEach(function (key) { if (s.pet.egg[key] === undefined) s.pet.egg[key] = eggDefaults[key]; });
+      if (!s.pet.egg.need) invalidValley();
+    }
+    if (s.pet.petpet) validateSaveFields(s.pet.petpet, { id: "", name: "" });
+    return normalizeSave(s, id);
+  }
+
+  function importValley(text) {
+    var s;
+    try { s = importCandidate(JSON.parse(text), who); }
+    catch (e) { toast("That valley file could not be loaded. Your current pet is safe."); return; }
+    // Commit only a fully checked, normalized candidate. A failed write leaves
+    // the current in-memory valley and all active play exactly as they were.
+    try { localStorage.setItem(slot(who), JSON.stringify(s)); } catch (e) { toast("Could not save it here. Your current pet is safe."); return; }
+    S = s;
     sess = null; battle = null; visit = null; stopCatch(); stopMatch();
     view = "nest";
     closeSheet();
