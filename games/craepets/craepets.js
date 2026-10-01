@@ -1464,7 +1464,7 @@
       (lines.length
         ? '<h3 style="margin:1rem 0 0.2rem;font-size:0.98rem">📔 From ' + esc(pet.name) + "'s diary</h3>" +
           lines.map(function (e) {
-            return '<div class="entry"><span class="em" aria-hidden="true">' + e.e + '</span><div class="etx">' + esc(e.s) +
+            return '<div class="entry"><span class="em" aria-hidden="true">' + esc(e.e) + '</span><div class="etx">' + esc(e.s) +
               "<small>" + esc(dayLabel(e.d).split(" · ")[0]) + "</small></div></div>";
           }).join("")
         : "") +
@@ -5919,7 +5919,13 @@
         !P.COLOURS.some(function (c) { return c.id === s.pet.colour; })) invalidValley();
     validateSaveFields(s, blankSave(D.profile(id)));
     if (s.tier !== undefined && !D.TIERS.some(function (t) { return t.id === s.tier; })) invalidValley();
-    validateSaveFields(s, { steps: {}, visited: {}, parties: {}, favFound: {}, petpetNames: {}, match: { best: 0, games: 0 } });
+    validateSaveFields(s, {
+      steps: {}, visited: {}, parties: {}, favFound: {}, petpetNames: {}, match: { best: 0, games: 0 },
+      bankNews: 0, dailyGift: false, beatShade: false, everBanked: false, everDressed: false,
+      everHatchday: false, everJackpot: false, everPainted: false, everRare: false, everStocked: false
+    });
+    (s.diary || []).forEach(function (row) { validateSaveFields(row, { d: 0, t: 0, e: "", s: "", me: false }); });
+    (s.mail || []).forEach(function (row) { validateSaveFields(row, { from: "", id: "", note: "", day: 0, t: 0 }); });
     ["bag", "today"].forEach(function (key) { validateSaveMap(s[key], "number"); });
     if (s.stats) validateSaveMap(s.stats.bySubject, "number");
     ["bagNew", "claimed", "steps", "visited", "parties", "favFound"].forEach(function (key) { validateSaveMap(s[key], "boolean"); });
@@ -6043,7 +6049,7 @@
       var rows = entries.filter(function (e) { return e.d === d; });
       return '<h3 class="diaryday">' + esc(dayLabel(d)) + "</h3>" + rows.map(function (e) {
         var when = new Date(e.t || 0).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-        return '<div class="entry' + (e.me ? " mine" : "") + '"><span class="em" aria-hidden="true">' + e.e + "</span>" +
+        return '<div class="entry' + (e.me ? " mine" : "") + '"><span class="em" aria-hidden="true">' + esc(e.e) + "</span>" +
           '<div class="etx">' + esc(e.s) + '<small>' + (e.me ? esc(me.name) + " wrote this · " : esc(S.pet.name) + " · ") + esc(when) + "</small></div>" +
           '<button class="mini" data-say="' + S.diary.indexOf(e) + '" aria-label="Read this entry aloud">🔊</button></div>';
       }).join("");

@@ -118,6 +118,10 @@ const invalid = [
   ["review choice emoji record", (s) => { const r=reviewQuestion();r.q.choices[0].emoji={};s.review=[r]; }],
   ["review question record", (s) => { const r=reviewQuestion();r.q.q={};s.review=[r]; }],
   ["review subject array", (s) => { const r=reviewQuestion();r.q.subject=[];s.review=[r]; }],
+  ["bank notice record", (s) => { s.bankNews={toString:1}; }],
+  ["daily gift string", (s) => { s.dailyGift="broken"; }],
+  ["diary emoji record", (s) => { s.diary=[{s:"A day",e:{toString:1}}]; }],
+  ["mail note record", (s) => { s.mail=[{from:"ellie",id:"apple",note:{toString:1}}]; }],
 ];
 for (const [name, mutate] of invalid) {
   const test = boot(), before = [...test.values], playing = test.api.playing();
