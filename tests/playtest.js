@@ -1321,7 +1321,12 @@ const GAMES = {
 
     // ---- the pet wanders: point it somewhere and it walks there
     await page.evaluate(() => { const a = Craepets._anim(); a.x = 0.5; a.tx = 0.25; });
-    await page.waitForTimeout(700);
+    // Animation advances by frames. Wait for the movement itself so a busy
+    // test machine does not fail a working pet after a fixed short delay.
+    await page.waitForFunction(() => {
+      const a = Craepets._anim();
+      return a.x < 0.46 && a.face === -1;
+    }, null, { timeout: 5000 });
     const wandered = await page.evaluate(() => Craepets._anim());
     if (!(wandered.x < 0.46) || wandered.face !== -1) throw new Error("the pet does not wander about the room");
 
@@ -2190,10 +2195,14 @@ const GAMES = {
     await page.waitForTimeout(700);
     await page.evaluate(() => PhotoExpedition.expedition.shoot());
     await page.waitForSelector("#shot-card.show");
+    const pausedClock = await page.evaluate(() => PhotoExpedition.expedition.clock);
+    await page.waitForTimeout(250);
+    if (await page.evaluate(() => PhotoExpedition.expedition.clock) !== pausedClock) throw new Error("the expedition clock advances while reading photo feedback");
     const stars = (await page.locator("#shot-stars").textContent()).split("★").length - 1;
     const title = await page.locator("#shot-title").textContent();
     if (stars < 1) throw new Error("the photo was not scored");
     await page.locator("#shot-close").click();
+    await page.waitForFunction((clock) => PhotoExpedition.expedition.clock > clock, pausedClock, { timeout: 5000 });
     // the grid map opens with the treasure clue
     await page.locator("#btn-map").click();
     await page.waitForSelector("#bigmap-wrap.overlay", { state: "attached" });
@@ -2305,11 +2314,14 @@ const GAMES = {
 
   // Optional filter: `npm test -- comic` runs only games whose name matches.
   const only = process.argv.slice(2).join(" ").toLowerCase();
+  const requestedDevice = process.env.DEVICE;
+  const devices = Object.entries(DEVICES).filter(([name]) => !requestedDevice || name === requestedDevice);
+  if (!devices.length) throw new Error("DEVICE must be Desktop, iPad, or iPhone");
 
   for (const [game, play] of Object.entries(GAMES)) {
     if (only && !game.toLowerCase().includes(only)) continue;
     console.log(`▶ ${game}`);
-    for (const [device, cfg] of Object.entries(DEVICES)) {
+    for (const [device, cfg] of devices) {
       const ctx = await browser.newContext(cfg);
       const page = await ctx.newPage();
       watch(page, game, device);
@@ -2320,7 +2332,7 @@ const GAMES = {
         console.log(`    ✓ ${device.padEnd(7)} ${status || ""}`);
       } catch (e) {
         fail(game, device, e.message.split("\n")[0]);
-        console.log(`    ✗ ${device.padEnd(7)} ${e.message.split("\n")[0]}`);
+        console.log(`    ✗ ${device.padEnd(7)} ${e.message}`);
       }
       await ctx.close();
     }
@@ -2333,8 +2345,8 @@ const GAMES = {
   console.log("\n──────────────────────────────────────────────");
   if (issues.length === 0) {
     const gamesRun = Object.keys(GAMES).filter((g) => !only || g.toLowerCase().includes(only));
-    const checks = gamesRun.length * Object.keys(DEVICES).length;
-    console.log(`✅  All ${checks} checks passed — every game works on Desktop, iPad and iPhone.`);
+    const checks = gamesRun.length * devices.length;
+    console.log(`✅  All ${checks} checks passed on ${devices.map(([name]) => name).join(", ")}.`);
     process.exit(0);
   } else {
     console.log(`❌  ${issues.length} problem(s) found:\n`);

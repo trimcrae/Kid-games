@@ -1,130 +1,179 @@
 /* ===========================================================
-   Service worker — makes the whole arcade work offline
-   (car rides!) once it has been visited.
+   Service worker — keeps the arcade's visited pages available
+   for car rides. Images and narration cache as they are played.
 
-   Strategy, deliberately boring and safe:
-     • Pages, scripts and styles: network FIRST (revalidated), so
-       a page and the code it loads always come from the same
-       deploy — a stale script against a fresh page can crash a
-       game. Cached copies are only used when offline.
-     • Big stuff (images/audio): serve from cache, refresh the
-       cache in the background (stale-while-revalidate).
-     • One versioned cache — bump VERSION to flush everything.
+   Pages and code use the network first; artwork uses a cached
+   copy while refreshing in the background. Warming follows only
+   local code and styles, with a small queue and no media crawl.
    =========================================================== */
 
-const VERSION = "v11";  // v11: The Post Office — send letters to the rest of the family
-const CACHE = "arcade-" + VERSION;
+const VERSION = "v12";
+const SCOPE = new URL(self.registration.scope);
+// GitHub Pages projects share an origin, so each arcade scope owns
+// its cache names as well as its URLs.
+const CACHE_PREFIX = "arcade-" + encodeURIComponent(SCOPE.pathname) + "-";
+const CACHE = CACHE_PREFIX + VERSION;
 
 const CORE = [
   "./",
-  "assets/css/style.css?v=20260915-mystery",
+  "assets/css/style.css?v=20261001-improvements",
   "assets/js/games.js?v=20260915-mystery",
-  "assets/js/app.js?v=20260915-mystery",
+  "assets/js/app.js?v=20261001-improvements",
   "manifest.webmanifest",
   "assets/icons/icon-192.png",
 ];
+const MAX_WARM_PAGES = 64;
+const MAX_WARM_RESOURCES = 384;
+const WARM_CONCURRENCY = 4;
+const MAX_CODE_BYTES = 2 * 1024 * 1024;
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then((c) => c.addAll(CORE.map((u) => new URL(u, SCOPE).href)))
+      .then(() => self.skipWaiting())
   );
 });
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE)
+        .map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
-/* The landing page posts {warm: ["games/…/", …]} after registering.
-   We fetch each game page and the local scripts/styles it references,
-   so every game works offline even before its first play. (Audio and
-   images still cache lazily on first play — they're big.) */
+function localUrl(value, base) {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value, base);
+    if (url.origin !== SCOPE.origin || !url.pathname.startsWith(SCOPE.pathname)) return null;
+    url.hash = "";
+    return url;
+  } catch (e) { return null; }
+}
+
+// Keep cache writes inside the event's lifetime, but never let a
+// full cache or a partial media response interrupt the actual game.
+async function remember(cache, request, response) {
+  if (!response.ok || response.status === 206) return;
+  const finalUrl = response.url && localUrl(response.url, SCOPE);
+  if (response.url && !finalUrl) return;
+  try { await cache.put(request, response.clone()); } catch (e) { /* storage may be full */ }
+}
+
+async function saveResponse(request, response) {
+  // Clone before awaiting CacheStorage: the page may consume the body
+  // as soon as respondWith returns the original response.
+  const copy = response.clone();
+  const cache = await caches.open(CACHE);
+  await remember(cache, request, copy);
+}
+
+/* The landing page posts {warm: ["games/…/", …]}. Deduplicate its
+   installing/ready messages and limit concurrent downloads. Literal
+   static and dynamic imports include the 3D games' .mjs dependencies;
+   image, audio and model files still download only when needed. */
+const pendingPages = new Set();
+const queuedPages = new Set();
+let warmTask = null;
+
 self.addEventListener("message", (e) => {
   const urls = e.data && e.data.warm;
   if (!Array.isArray(urls)) return;
-  e.waitUntil(
-    caches.open(CACHE).then((cache) =>
-      Promise.all(urls.map((u) => warmPage(cache, u).catch(() => {})))
-    )
-  );
+  urls.slice(0, MAX_WARM_PAGES).forEach((value) => {
+    const url = localUrl(value, SCOPE);
+    if (!url || !(/\/$|\.html$/i.test(url.pathname)) || queuedPages.has(url.href)) return;
+    if (queuedPages.size >= MAX_WARM_PAGES) return;
+    queuedPages.add(url.href);
+    pendingPages.add(url.href);
+  });
+  if (!pendingPages.size && !warmTask) return;
+  if (!warmTask) {
+    warmTask = (async () => {
+      const cache = await caches.open(CACHE);
+      while (pendingPages.size) {
+        const pages = Array.from(pendingPages);
+        pendingPages.clear();
+        await warmPages(cache, pages);
+      }
+    })().catch(() => { /* offline or storage unavailable */ }).finally(() => {
+      queuedPages.clear();
+      warmTask = null;
+    });
+  }
+  e.waitUntil(warmTask);
 });
 
-function warmPage(cache, url) {
-  const pageUrl = new URL(url, self.registration.scope).href;
-  return fetch(pageUrl).then((res) => {
-    if (!res.ok) return;
-    cache.put(pageUrl, res.clone());
-    return res.text().then((html) => {
-      const subs = [];
-      // A page may ask for a script or style with a version query
-      // (…/craepets.js?v=2026…): warm that exact URL, or offline would
-      // fall back to a copy the page never asks for.
-      const re = /(?:src|href)="([^"]+\.(?:js|css)(?:\?[^"]*)?)"/g;
-      let m;
-      while ((m = re.exec(html))) {
-        if (!/^https?:/.test(m[1])) subs.push(new URL(m[1], pageUrl).href);
+async function warmPages(cache, pages) {
+  const queue = pages.map((url) => ({ url, page: true }));
+  const seen = new Set(pages);
+
+  function addCode(value, base) {
+    const url = localUrl(value, base);
+    if (!url || !/\.(?:m?js|css)$/i.test(url.pathname) || seen.has(url.href) || seen.size >= MAX_WARM_RESOURCES) return;
+    seen.add(url.href);
+    queue.push({ url: url.href, page: false });
+  }
+
+  async function warm(item) {
+    try {
+      const response = await fetch(item.url, { cache: "no-cache", redirect: "error" });
+      if (!response.ok || !localUrl(response.url || item.url, SCOPE)) return;
+      const length = Number(response.headers.get("content-length"));
+      if (length > MAX_CODE_BYTES) return;
+      const copy = response.clone();
+      const source = await response.text();
+      if (source.length > MAX_CODE_BYTES) return;
+      // Await the write before inspecting dependencies or finishing the
+      // message; unawaited puts can be lost when the worker goes idle.
+      await remember(cache, item.url, copy);
+      let match;
+      if (item.page) {
+        const attributes = /\b(?:src|href)\s*=\s*["']([^"']+)["']/gi;
+        while ((match = attributes.exec(source))) addCode(match[1].replace(/&amp;/g, "&"), item.url);
+      } else if (/\.css$/i.test(new URL(item.url).pathname)) {
+        const imports = /@import\s+(?:url\(\s*)?["']([^"']+)["']/gi;
+        while ((match = imports.exec(source))) addCode(match[1], item.url);
+      } else {
+        const imports = /\b(?:import|export)\s+(?:[^;"'()]*?\bfrom\s*)?["']([^"']+)["']|\bimport\s*\(\s*["']([^"']+)["']/g;
+        while ((match = imports.exec(source))) {
+          const value = match[1] || match[2];
+          // Bare module names need an import map, not URL resolution.
+          if (/^(?:\.{1,2}\/|\/|https?:\/\/)/.test(value)) addCode(value, item.url);
+        }
       }
-      return Promise.all(subs.map((s) =>
-        caches.match(s).then((hit) => hit || fetch(s).then((r) => { if (r.ok) cache.put(s, r.clone()); }).catch(() => {}))
-      ));
-    });
-  });
+    } catch (e) { /* a missing optional resource must not stop the queue */ }
+  }
+
+  while (queue.length) {
+    await Promise.all(queue.splice(0, WARM_CONCURRENCY).map(warm));
+  }
 }
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
-  const url = new URL(req.url);
-  if (url.origin !== self.location.origin) return;
+  const url = localUrl(req.url, SCOPE);
+  if (!url) return;
 
-  if (req.mode === "navigate") {
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          if (res.ok) {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => caches.match(req).then((r) => r || caches.match("./")))
-    );
+  if (req.mode === "navigate" || /\.(?:m?js|css)$/i.test(url.pathname)) {
+    const fresh = fetch(req, { cache: "no-cache" });
+    e.waitUntil(fresh.then((res) => saveResponse(req, res)).catch(() => {}));
+    e.respondWith(fresh.catch(async () => {
+      const cache = await caches.open(CACHE);
+      const cached = await cache.match(req);
+      if (cached) return cached;
+      if (req.mode === "navigate" && url.href !== SCOPE.href) return Response.redirect(SCOPE.href);
+      return new Response("This page is not available offline yet.", { status: 503 });
+    }));
     return;
   }
 
-  // Scripts and styles: network first with revalidation ("no-cache"
-  // still allows a 304, so it stays cheap), cache only as the
-  // offline fallback. Keeps the code in lockstep with the page.
-  if (/\.(?:js|css)$/.test(url.pathname)) {
-    e.respondWith(
-      fetch(req.url, { cache: "no-cache" })
-        .then((res) => {
-          if (res.ok) {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => caches.match(req))
-    );
-    return;
-  }
-
-  e.respondWith(
-    caches.match(req).then((cached) => {
-      const fresh = fetch(req)
-        .then((res) => {
-          if (res.ok) {
-            const copy = res.clone();
-            caches.open(CACHE).then((c) => c.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fresh;
-    })
-  );
+  const fresh = fetch(req);
+  e.waitUntil(fresh.then((res) => saveResponse(req, res)).catch(() => {}));
+  e.respondWith(caches.open(CACHE).then((cache) => cache.match(req)).then((cached) =>
+    cached || fresh.catch(() => new Response("Not available offline yet.", { status: 503 }))
+  ));
 });

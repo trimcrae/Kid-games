@@ -97,7 +97,7 @@
     ["i", "ice cream", "🍦"], ["j", "juice", "🧃"], ["k", "key", "🔑"], ["l", "lion", "🦁"],
     ["m", "moon", "🌙"], ["n", "nose", "👃"], ["o", "orange", "🍊"], ["p", "pig", "🐷"],
     ["q", "queen", "👑"], ["r", "rainbow", "🌈"], ["s", "sun", "☀️"], ["t", "tree", "🌳"],
-    ["u", "umbrella", "☂️"], ["v", "van", "🚐"], ["w", "whale", "🐳"], ["x", "fox", "🦊"],
+    ["u", "umbrella", "☂️"], ["v", "van", "🚐"], ["w", "whale", "🐳"], ["x", "xylophone", "🎶"],
     ["y", "yo-yo", "🪀"], ["z", "zebra", "🦓"]
   ];
   const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five",
@@ -115,7 +115,7 @@
   save.pops = Math.floor(save.pops);
   if (MODES.indexOf(save.mode) === -1) save.mode = "shapes";
   save.voice = save.voice !== false;
-  if (!save.found || typeof save.found !== "object") save.found = {};
+  if (!save.found || typeof save.found !== "object" || Array.isArray(save.found)) save.found = {};
 
   let persistT = null;
   function persist() {
@@ -495,6 +495,7 @@
   function popThing(thing, x, y) {
     if (!thing || thing.classList.contains("gone")) return;
     thing.classList.add("gone");
+    thing.disabled = true;
 
     const kind = thing.dataset.kind || "shape";
     const value = parseInt(thing.dataset.value || "0", 10);
@@ -568,13 +569,14 @@
 
   let lastPointer = 0;
   el.pit.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
     lastPointer = Date.now();
     if (e.pointerType !== "mouse") e.preventDefault();
     handle(e);
   }, { passive: false });
   // keyboard / assistive activation (and any click without a pointerdown)
   el.pit.addEventListener("click", function (e) {
-    if (Date.now() - lastPointer < 700) return;
+    if (e.detail !== 0 && Date.now() - lastPointer < 700) return;
     handle(e);
   });
   // belt and braces: never let the browser show a text-selection or

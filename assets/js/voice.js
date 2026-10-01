@@ -21,10 +21,19 @@
 
   var current = null;
 
+  function detach(clip) {
+    clip.audio.removeEventListener("ended", clip.ended);
+    clip.audio.removeEventListener("error", clip.error);
+  }
+
   function stop() {
     if (current) {
-      try { current.pause(); } catch (e) {}
+      var clip = current;
       current = null;
+      detach(clip);
+      try { clip.audio.pause(); } catch (e) {}
+      // Release a recording still loading or buffered after leaving a screen.
+      try { clip.audio.removeAttribute("src"); clip.audio.load(); } catch (e) {}
     }
   }
 
@@ -33,18 +42,39 @@
   // A missing or un-playable clip fails silently — the kids just read.
   function play(src, onended) {
     stop();
-    if (typeof Audio === "undefined") return null;
-    var a = new Audio(src);
-    a.preload = "auto";
-    current = a;
-    a.addEventListener("ended", function () {
-      if (current === a) current = null;
-      if (onended) onended();
-    });
-    var p = a.play();
-    if (p && p.catch) p.catch(function () { /* clip missing/blocked — stay silent */ });
-    return a;
+    if (document.hidden || typeof global.Audio === "undefined" || !src) return null;
+    try {
+      var a = new global.Audio(src);
+      a.preload = "auto";
+      var clip = { audio: a };
+      clip.ended = function () {
+        // A stopped/replaced clip must never continue an old narration chain.
+        if (current !== clip) return;
+        current = null;
+        detach(clip);
+        if (typeof onended === "function") onended();
+      };
+      clip.error = function () {
+        if (current !== clip) return;
+        current = null;
+        detach(clip);
+      };
+      current = clip;
+      a.addEventListener("ended", clip.ended);
+      a.addEventListener("error", clip.error);
+      var p = a.play();
+      if (p && p.catch) p.catch(function () {
+        // A late rejection from an earlier play must leave the new clip alone.
+        if (current === clip) stop();
+      });
+      return a;
+    } catch (e) {
+      stop();
+      return null;
+    }
   }
 
+  document.addEventListener("visibilitychange", function () { if (document.hidden) stop(); });
+  global.addEventListener("pagehide", stop);
   global.Voice = { play: play, stop: stop };
 })(window);

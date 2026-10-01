@@ -1,0 +1,9 @@
+/* Patrick Hand by Patrick Wagesreiter, distributed under the SIL OFL 1.1.
+   Keep the font on this device alongside the game, including offline play. */
+@font-face {
+  font-family: "Patrick Hand";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./PatrickHand-Regular.ttf") format("truetype");
+}

@@ -1,7 +1,8 @@
 # 🎮 Play-tests for the McRae Family Arcade
 
-A little robot that **plays every game** in a real browser at three screen
-sizes — **Desktop, iPad and iPhone** — and shouts if anything is broken.
+A little robot that **plays a broad collection of games** in a real browser
+at three screen sizes — **Desktop, iPad and iPhone** — and shouts if anything
+is broken.
 
 It's the automated version of the "serve it and click through it" check in
 [`CLAUDE.md`](../CLAUDE.md): start a game, press the buttons, and make sure
@@ -9,7 +10,8 @@ it actually works with no errors.
 
 ## What it checks
 
-For **every game** (and the landing page), at **each of the three sizes**:
+For **each game covered by the harness** (and the landing page), at
+**each of the three sizes**:
 
 - ✅ loads with **no JavaScript / console errors**
 - ✅ makes **no failed network requests** (missing files, etc.)
@@ -81,7 +83,9 @@ For **every game** (and the landing page), at **each of the three sizes**:
 
 ```bash
 cd tests
-npm install      # one-time — downloads playwright-core
+npm install      # one-time — installs the browser-driving library
+node node_modules/playwright-core/cli.js install chromium
+export CHROMIUM_PATH="$(node -e 'console.log(require("playwright-core").chromium.executablePath())')"
 npm test
 ```
 
@@ -89,21 +93,64 @@ You'll see a ✓ for each game/size and a final summary. The command exits with
 status **0** when everything passes and **1** if anything fails, so it also
 works as a pre-merge / CI gate.
 
+To run the broader harness at one screen size, set `DEVICE` to `Desktop`,
+`iPad` or `iPhone`, for example: `DEVICE=iPhone npm test`.
+
+### Focused regression checks
+
+For a quicker check of the arcade and recent reliability fixes, run:
+
+```bash
+cd tests
+CHROMIUM_PATH=/usr/bin/chromium npm run test:regressions
+```
+
+Use the browser path exported above if you installed Playwright's Chromium,
+or point `CHROMIUM_PATH` at your own Chrome/Chromium. The focused runner also
+detects Playwright's installed browser and Linux's `/usr/bin/chromium`.
+
+The suites cover shared audio and reduced motion, Photo Expedition's daily
+assignments, arcade search and keyboard navigation, math input and damaged
+saves, service-worker offline caching, the youngest kids' game controls and
+paused rounds, and Connections/Crossword solve, quit and replay lifecycles.
+Each suite starts its own server when needed, runs in a separate process,
+and has a timeout.
+Suites run sequentially; a failure is reported and the remaining suites
+still run. Any failure or timeout gives a nonzero exit status.
+
+To run just one focused suite:
+
+```bash
+npm run test:regressions -- math-reliability.test.js
+```
+
+The shared-media and photo-daily suites also run without Chromium when
+selected on their own.
+
+[`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
+for pull requests and pushes to `main`, with a ten-minute job limit. It
+installs Chromium through the existing `playwright-core` CLI and passes the
+installed executable path explicitly. The broader three-device playtest
+remains available through `npm test`.
+
 ### Notes
 
 - The harness starts its **own** little web-server, so you don't need to run
   `python3 -m http.server` separately.
-- It uses the **Chromium that comes with Playwright**. If you'd rather point it
-  at a Chrome you already have, set `CHROMIUM_PATH`:
+- `playwright-core` does **not** download a browser during `npm install`.
+  Install Chromium separately with the CLI command above. On Linux CI or a
+  machine missing Chromium's system libraries, use
+  `node node_modules/playwright-core/cli.js install --with-deps chromium`.
+  To use Chrome you already have, set `CHROMIUM_PATH`:
 
   ```bash
   CHROMIUM_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" npm test
   ```
 
-- The three "devices" are emulated (viewport size, touch, mobile user-agent) in
-  Chromium. That catches layout and interaction bugs, but for the final word on
-  real iOS Safari quirks, a quick check on an actual iPad/iPhone is still worth
-  it.
+- Both harnesses run in Chromium. Device sizes, touch and mobile user-agents
+  are emulated where relevant; they catch layout and interaction bugs, but
+  they do not verify real iOS Safari. A quick check on an actual iPad/iPhone
+  is still useful for Safari-specific behavior.
 
 > This folder is the **only** part of the repo with a dependency. The games
 > themselves stay pure HTML/CSS/vanilla JS with no build step — `node_modules`

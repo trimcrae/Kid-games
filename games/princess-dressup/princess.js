@@ -121,15 +121,17 @@
   var startBtn    = document.getElementById("start-btn");
 
   /* ---------- state ---------- */
-  var stars = parseInt(localStorage.getItem(STARS_KEY) || "0", 10) || 0;
-  var muted = localStorage.getItem(MUTE_KEY) === "1";
+  var stars = Math.max(0, parseInt(readStored(STARS_KEY) || "0", 10) || 0);
+  if (!Number.isSafeInteger(stars)) stars = 0;
+  var muted = readStored(MUTE_KEY) === "1";
   var saved = readSave();
 
   var slots      = Array.isArray(saved.slots) && saved.slots.length === PIECES_PER_PRINCESS
                      ? saved.slots.filter(validSlot) : null;
-  if (!slots || slots.length !== PIECES_PER_PRINCESS) slots = rollSlots();
-  var slotIndex  = clamp(parseInt(saved.slotIndex, 10) || 0, 0, PIECES_PER_PRINCESS);
-  var gownIdx    = clamp(parseInt(saved.gown, 10) || 0, 0, GOWNS.length - 1);
+  var validOutfit = slots && slots.length === PIECES_PER_PRINCESS && new Set(slots).size === PIECES_PER_PRINCESS;
+  if (!validOutfit) slots = rollSlots();
+  var slotIndex  = validOutfit ? clamp(parseInt(saved.slotIndex, 10) || 0, 0, PIECES_PER_PRINCESS) : 0;
+  var gownIdx    = clamp(parseInt(saved.gown, 10) || 0, 0, gownsUnlocked() - 1);
   var sceneIdx   = clamp(parseInt(saved.scene, 10) || 0, 0, SCENES.length - 1);
 
   var round = null;
@@ -164,15 +166,18 @@
 
   // one mute switch for EVERYTHING — narration and the little beeps alike
   function playClip(name) {
-    if (muted || !name) return;
+    if (muted || !name || document.hidden) return;
     if (window.Voice) Voice.play("audio/" + name + ".mp3");
   }
   function sfx(which, arg) {
-    if (muted || !window.SFX || !SFX[which]) return;
+    if (muted || document.hidden || !window.SFX || !SFX[which]) return;
     try { SFX[which](arg); } catch (e) { /* ignore */ }
   }
 
   /* ---------- saving ---------- */
+  function readStored(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
   function readSave() {
     try {
       var raw = localStorage.getItem(SAVE_KEY);
@@ -264,7 +269,7 @@
   function armIdleNudge() {
     clearTimeout(idleTimer);
     idleTimer = setTimeout(function () {
-      if (locked || !overlay.classList.contains("hidden")) return;
+      if (document.hidden || locked || !overlay.classList.contains("hidden")) return;
       playClip(currentClip);
       wiggleTarget();
       armIdleNudge();
@@ -407,6 +412,7 @@
   function newRound() {
     if (slotIndex >= slots.length) { finishPrincess(); return; }
     locked = false;
+    wardrobeBtn.disabled = false;
     wrongTries = 0;
     round = makeRound();
 
@@ -448,6 +454,8 @@
 
     if (c.key === round.correct) {
       locked = true;
+      wardrobeBtn.disabled = true;
+      [].forEach.call(choicesEl.children, function (gem) { gem.disabled = true; });
       clearTimeout(idleTimer);
       btn.classList.add("correct");
       sfx("good");
@@ -480,7 +488,7 @@
     } else {
       // third miss: the wrong gems step aside — the next tap must succeed
       gems.forEach(function (g, i) {
-        if (round.choices[i].key !== round.correct) g.classList.add("faded");
+        if (round.choices[i].key !== round.correct) { g.classList.add("faded"); g.disabled = true; }
         else g.classList.add("hint");
       });
       playClip("try-again");
@@ -619,18 +627,23 @@
     buildWardrobe();
     buildScenePicker();
     overlay.classList.remove("hidden");
+    document.querySelector(".stage").inert = true;
     try { startBtn.focus({ preventScroll: true }); } catch (e) { startBtn.focus(); }
   }
 
   function closeOverlay() {
     overlay.classList.add("hidden");
+    document.querySelector(".stage").inert = false;
     if (window.PrincessArt) PrincessArt.setDress(GOWNS[gownIdx].hex);
     applyScene();
 
     if (overlayMode === "wardrobe") {
       // straight back into the round she was already playing
       locked = false;
+      wardrobeBtn.disabled = false;
       if (round) { playClip(currentClip); armIdleNudge(); } else { newRound(); }
+      var firstGem = choicesEl.querySelector("button:not([disabled])");
+      if (firstGem) firstGem.focus({ preventScroll: true });
       return;
     }
     if (overlayMode === "resume") {
@@ -646,6 +659,8 @@
       showEarnedPieces();
     }
     newRound();
+    var firstGem = choicesEl.querySelector("button:not([disabled])");
+    if (firstGem) firstGem.focus({ preventScroll: true });
   }
 
   /* ---------- buttons ---------- */
@@ -669,11 +684,31 @@
   });
 
   wardrobeBtn.addEventListener("click", function () {
-    if (!overlay.classList.contains("hidden")) return;
+    if (locked || !overlay.classList.contains("hidden")) return;
     openOverlay("wardrobe");
   });
 
   startBtn.addEventListener("click", closeOverlay);
+
+  // Keep keyboard focus in the dressing room while it covers the game.
+  overlay.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab") return;
+    var buttons = [].slice.call(overlay.querySelectorAll("button:not([disabled])"));
+    var first = buttons[0], last = buttons[buttons.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      clearTimeout(idleTimer);
+      if (window.Voice) Voice.stop();
+      persist();
+    } else if (!locked && overlay.classList.contains("hidden")) {
+      playClip(currentClip);
+      armIdleNudge();
+    }
+  });
 
   /* ---------- boot ---------- */
   starsEl.textContent = String(stars);

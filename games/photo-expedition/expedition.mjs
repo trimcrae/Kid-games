@@ -621,6 +621,14 @@ export async function startExpedition(opts) {
   /* ---------- main loop ---------- */
   function frame(now) {
     if (!running) return;
+    // Reading a photo tip or map should freeze the expedition and leave the
+    // browser free to scroll the card, rather than render the covered world.
+    if (document.hidden || mapOpen || $("shot-card").classList.contains("show") ||
+        $("treasure-card").classList.contains("show")) {
+      last = now;
+      requestAnimationFrame(frame);
+      return;
+    }
     const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
     if (!mapOpen && !$("shot-card").classList.contains("show")) {
       clock += dt / ((clock % 1.25) <= 1 ? DAY_SECONDS : NIGHT_SECONDS * 4);

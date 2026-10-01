@@ -685,7 +685,7 @@
      saved.cur     : the half-finished puzzle, so a reload doesn't lose it */
   const SAVE_KEY = "connections.v1";
   function load() {
-    try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === "object") return s; }
+    try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === "object" && !Array.isArray(s)) return s; }
     catch (e) {}
     return {};
   }
@@ -713,6 +713,9 @@
   let solvedIdx = [];    // indexes (into puzzle.groups) already found
   let mistakes = 0;
   let over = false;
+  let resolving = false;
+  let solveTimer = 0;
+  let hintTimer = 0;
   let tried = [];        // wrong combos already guessed (repeats are free)
   let hinted = [];       // group indexes whose NAME has been revealed
   let revealed = null;   // one card given away as a last-resort hint
@@ -852,18 +855,19 @@
     if (!el.resumeBar) return;
     const c = saved.cur;
     const i = c ? PUZZLES.findIndex((p) => p.id === c.id) : -1;
-    const usable = i !== -1 && Array.isArray(c.tiles) && c.tiles.length > 0 &&
-      (c.solved || []).length < 4;
+    const restore = i !== -1 ? resumeState(i) : null;
+    const usable = !!restore;
     el.resumeBar.classList.toggle("hidden", !usable);
     if (usable) {
       el.resume.innerHTML = '<span aria-hidden="true">↩️</span> Carry on with ' + esc(PUZZLES[i].name) +
-        " (" + (c.solved || []).length + "/4 found)";
+        " (" + restore.solved.length + "/4 found)";
       el.resume.onclick = () => resumePuzzle(i);
     }
   }
 
   /* ---------- play ---------- */
   function startPuzzle(i, restore) {
+    settlePending();
     pi = i;
     selected = [];
     revealed = null;
@@ -897,16 +901,31 @@
   }
 
   function resumePuzzle(i) {
-    const c = saved.cur;
-    if (!c || PUZZLES[i].id !== c.id) { startPuzzle(i); return; }
-    // guard against a corrupted save: every stored tile must be a real card
-    const all = [];
-    PUZZLES[i].groups.forEach((g) => g.items.forEach((it) => all.push(it)));
-    const ok = c.tiles.every((t) => all.indexOf(t) !== -1) &&
-      (c.solved || []).every((k) => k >= 0 && k < 4);
-    if (!ok) { startPuzzle(i); return; }
-    startPuzzle(i, { solved: c.solved || [], mistakes: c.mistakes || 0, tried: c.tried || [], hinted: c.hinted || [], tiles: c.tiles });
+    const restore = resumeState(i);
+    if (!restore) { startPuzzle(i); return; }
+    startPuzzle(i, restore);
     flash("Welcome back — carry on! 👋", "var(--purple)");
+  }
+
+  function resumeState(i) {
+    const c = saved.cur;
+    const p = PUZZLES[i];
+    if (!c || !p || p.id !== c.id || !Array.isArray(c.tiles)) return null;
+    const solved = c.solved === undefined ? [] : c.solved;
+    if (!Array.isArray(solved) || solved.length >= p.groups.length ||
+        new Set(solved).size !== solved.length ||
+        solved.some((k) => !Number.isInteger(k) || k < 0 || k >= p.groups.length)) return null;
+    // The remaining board must contain every unsolved card exactly once.
+    const remaining = p.groups.filter((g, k) => solved.indexOf(k) === -1).flatMap((g) => g.items);
+    if (c.tiles.length !== remaining.length || new Set(c.tiles).size !== c.tiles.length ||
+        c.tiles.some((t) => remaining.indexOf(t) === -1)) return null;
+    const mistakes = c.mistakes === undefined ? 0 : c.mistakes;
+    if (!Number.isInteger(mistakes) || mistakes < 0 || mistakes >= livesFor(p)) return null;
+    return {
+      solved: solved.slice(), tiles: c.tiles.slice(), mistakes: mistakes,
+      tried: Array.isArray(c.tried) ? c.tried.filter((t) => typeof t === "string") : [],
+      hinted: Array.isArray(c.hinted) ? [...new Set(c.hinted.filter((k) => Number.isInteger(k) && k >= 0 && k < p.groups.length))] : [],
+    };
   }
 
   function persist() {
@@ -955,12 +974,13 @@
         '<span class="wd">' + esc(item) + "</span>";
       b.dataset.item = item;
       b.tabIndex = n === 0 ? 0 : -1;
+      b.disabled = over || resolving;
       b.setAttribute("aria-pressed", on ? "true" : "false");
       b.setAttribute("aria-label", item + (revealed === item ? " (hint card)" : ""));
       b.addEventListener("click", () => toggle(item, b));
       el.board.appendChild(b);
     });
-    el.submit.disabled = over || selected.length !== 4;
+    el.submit.disabled = over || resolving || selected.length !== 4;
   }
 
   function renderLives() {
@@ -973,7 +993,7 @@
   }
 
   function toggle(item, btn) {
-    if (over) return;
+    if (over || resolving || tiles.indexOf(item) === -1) return;
     const idx = selected.indexOf(item);
     if (idx !== -1) { selected.splice(idx, 1); btn.classList.remove("selected"); btn.setAttribute("aria-pressed", "false"); }
     else {
@@ -998,11 +1018,11 @@
     const hidden = hiddenGroups();
     const namesLeft = hidden.some((k) => hinted.indexOf(k) === -1);
     const canReveal = !revealed && hidden.length > 0;
-    el.hint.disabled = over || (!namesLeft && !canReveal);
+    el.hint.disabled = over || resolving || (!namesLeft && !canReveal);
     el.hint.textContent = el.hint.disabled ? "💡 No more hints" : namesLeft ? "💡 Hint" : "💡 Show me a card";
   }
   function giveHint() {
-    if (over) return;
+    if (over || resolving) return;
     const hidden = hiddenGroups();
     const next = hidden.find((k) => hinted.indexOf(k) === -1);
     if (next !== undefined) {
@@ -1021,7 +1041,7 @@
   }
 
   function submit() {
-    if (over || selected.length !== 4) return;
+    if (over || resolving || selected.length !== 4) return;
     const k = puz().groups.findIndex((grp) => selected.every((it) => grp.items.indexOf(it) !== -1));
     if (k !== -1) { solveGroup(k); return; }
 
@@ -1060,15 +1080,22 @@
     // a kind nudge for the littlest players
     const tier = puz().tier;
     if ((tier === "tot" || tier === "easy") && mistakes === 2 && hinted.length === 0) {
-      setTimeout(giveHint, 1200);
+      clearTimeout(hintTimer);
+      hintTimer = setTimeout(() => { hintTimer = 0; giveHint(); }, 1200);
     }
     persist();
   }
 
   function solveGroup(k) {
+    if (resolving || solvedIdx.indexOf(k) !== -1) return;
+    resolving = true;
+    el.submit.disabled = true;
+    el.shuffle.disabled = true;
+    el.deselect.disabled = true;
     solvedIdx.push(k);
     const g = puz().groups[k];
     [...el.board.children].forEach((b) => {
+      b.disabled = true;
       if (g.items.indexOf(b.dataset.item) !== -1) b.classList.add("pop");
     });
     tiles = tiles.filter((it) => g.items.indexOf(it) === -1);
@@ -1078,19 +1105,36 @@
     if (window.SFX) SFX.good();
     updateHintBtn();
     persist();
-    setTimeout(() => {
-      renderSolved();
-      renderBoard();
-      updateHintBtn();
-      if (solvedIdx.length === puz().groups.length) endGame(true);
-      else if (tiles.length === 4) {
-        // only one group left — hand it over rather than making them guess
-        flash("Only one group left — you've got this! 🎯", "var(--green)");
-      }
-    }, 350);
+    solveTimer = setTimeout(finishSolve, 350);
+  }
+
+  function finishSolve() {
+    if (!resolving) return;
+    clearTimeout(solveTimer);
+    solveTimer = 0;
+    resolving = false;
+    el.shuffle.disabled = false;
+    el.deselect.disabled = false;
+    renderSolved();
+    renderBoard();
+    updateHintBtn();
+    if (solvedIdx.length === puz().groups.length) endGame(true);
+    else if (tiles.length === 4) {
+      flash("Only one group left — you've got this! 🎯", "var(--green)");
+    }
+  }
+
+  // Finish an earned group before leaving, and keep its delayed work in this round.
+  function settlePending() {
+    clearTimeout(hintTimer);
+    hintTimer = 0;
+    finishSolve();
   }
 
   function endGame(won) {
+    if (over) return;
+    clearTimeout(hintTimer);
+    hintTimer = 0;
     over = true;
     el.submit.disabled = true;
     if (el.hint) el.hint.disabled = true;
@@ -1178,7 +1222,7 @@
 
   /* ---------- buttons ---------- */
   function doShuffle() {
-    if (over) return;
+    if (over || resolving) return;
     const focused = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.item : null;
     tiles = shuffle(tiles);
     renderBoard();
@@ -1188,8 +1232,8 @@
     if (again) { [...el.board.children].forEach((b) => (b.tabIndex = -1)); again.tabIndex = 0; again.focus(); }
     flash("Shuffled! Same cards, new places. 🔀", "var(--purple)");
   }
-  function clearPick() { if (!over) { selected = []; renderBoard(); flash("", "var(--purple)"); } }
-  function goPicker() { renderPuzzles(); show("puzzles"); window.scrollTo({ top: 0, behavior: "auto" }); }
+  function clearPick() { if (!over && !resolving) { selected = []; renderBoard(); flash("", "var(--purple)"); } }
+  function goPicker() { settlePending(); renderPuzzles(); show("puzzles"); window.scrollTo({ top: 0, behavior: "auto" }); }
 
   el.next.addEventListener("click", () => {
     const j = nextUnsolved();

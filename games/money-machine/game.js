@@ -66,7 +66,12 @@
   ];
   const TROPHY_KEY = "money-machine-trophies";
   let trophies = {};
-  try { trophies = JSON.parse(localStorage.getItem(TROPHY_KEY)) || {}; } catch (e) {}
+  try {
+    const saved = JSON.parse(localStorage.getItem(TROPHY_KEY));
+    if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+      CHALLENGES.forEach(c => { if (saved[c.id] === true) trophies[c.id] = true; });
+    }
+  } catch (e) {}
 
   const MAX_YEARS = 60;
 
@@ -158,20 +163,30 @@
   function restoreRun() {
     let r = null;
     try { r = JSON.parse(localStorage.getItem(RUN_KEY)); } catch (e) {}
-    if (!r || r.v !== 2 || !Array.isArray(r.history) || !r.history.length) return false;
+    if (!r || r.v !== 2) return false;
     if (r.place !== selectedPlace.id) return false;
     if (r.start !== +startAmt.value || r.add !== +addAmt.value) return false;
-    if (!Number.isFinite(r.balance) || !Number.isFinite(r.putIn)) return false;
     if (!Number.isInteger(r.year) || r.year < 1 || r.year > MAX_YEARS) return false;
 
+    // The machine is deterministic: the settings and year are enough to
+    // recover it. Rebuild each bank statement in integer cents rather than
+    // trusting a damaged chart or a balance that disagrees with its history.
     year = r.year;
-    balance = Math.round(r.balance);
-    putIn = Math.round(r.putIn);
-    history = r.history;
-    doublings = r.doublings || 0;
-    snowballed = !!r.snowballed;
+    balance = dollarsToCents(+startAmt.value);
+    putIn = balance;
+    history = [{ year: 0, balance: balance, putIn: putIn }];
+    const deposit = dollarsToCents(+addAmt.value);
+    snowballed = false;
+    for (let y = 1; y <= year; y++) {
+      const interest = Math.round(balance * selectedPlace.rate);
+      balance += interest + deposit;
+      putIn += deposit;
+      history.push({ year: y, balance: balance, putIn: putIn });
+      if (deposit > 0 && interest > deposit) snowballed = true;
+    }
+    doublings = 0;
+    while (balance >= putIn * Math.pow(2, doublings + 1)) doublings++;
     celebrated = {};
-    (r.celebrated || []).forEach(function (g) { celebrated[g] = true; });
 
     $("chart").innerHTML = "";
     barEls = [];

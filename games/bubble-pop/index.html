@@ -186,6 +186,7 @@
     @keyframes shimmer { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
 
     .bubble.hint .ball { animation: hint 0.9s ease-in-out infinite; }
+    #play-area.paused .bubble, #play-area.paused .bubble * { animation-play-state: paused !important; }
     @keyframes hint { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
     .bubble.wrong .ball { animation: wobble 0.4s ease; }

@@ -139,7 +139,10 @@
   ];
 
   /* ---------- who's playing ---------- */
-  var currentKid = localStorage.getItem(CURRENT_KID_KEY) || "cory";
+  // Keep a working copy for this visit too: blocked/full browser storage
+  // must not stop play or erase scores whenever a new word is added.
+  var sessionKeys = Object.create(null);
+  var currentKid = readKey(CURRENT_KID_KEY, "cory");
   if (!KIDS.some(function (k) { return k.id === currentKid; })) currentKid = "cory";
 
   var activeVariant = readKey(VARIANT_KEY, "start");
@@ -160,13 +163,21 @@
 
   /* ---------- tiny storage helpers (never throw) ---------- */
   function readKey(key, fallback) {
+    if (Object.prototype.hasOwnProperty.call(sessionKeys, key)) {
+      return sessionKeys[key] === null ? fallback : sessionKeys[key];
+    }
     try {
       var v = localStorage.getItem(key);
       return v === null ? fallback : v;
     } catch (e) { return fallback; }
   }
   function writeKey(key, value) {
+    sessionKeys[key] = value;
     try { localStorage.setItem(key, value); } catch (e) {}
+  }
+  function removeKey(key) {
+    sessionKeys[key] = null;
+    try { localStorage.removeItem(key); } catch (e) {}
   }
 
   /* ---------- counting letters ----------
@@ -230,14 +241,27 @@
   }
   function load() {
     try {
-      var raw = localStorage.getItem(storageKey());
+      var raw = readKey(storageKey(), null);
       var obj = raw ? JSON.parse(raw) : {};
       // be defensive: a hand-edited or half-written save must never crash us
-      if (!obj || typeof obj !== "object") return {};
+      if (!obj || typeof obj !== "object" || Array.isArray(obj)) return {};
+      var clean = {};
       Object.keys(obj).forEach(function (k) {
-        if (!Array.isArray(obj[k])) delete obj[k];
+        var bits = k.split("|");
+        if (bits.length !== 2 || LETTERS.indexOf(bits[0]) === -1 ||
+            NUMS.indexOf(Number(bits[1])) === -1 ||
+            String(Number(bits[1])) !== bits[1] || !Array.isArray(obj[k])) return;
+        var seen = Object.create(null);
+        var words = obj[k].filter(function (word) {
+          if (typeof word !== "string" || !word.trim() || !lenOf(word)) return false;
+          var lower = word.toLowerCase();
+          if (seen[lower]) return false;
+          seen[lower] = true;
+          return true;
+        });
+        if (words.length) clean[k] = words;
       });
-      return obj;
+      return clean;
     } catch (e) { return {}; }
   }
   function save() {
@@ -256,7 +280,10 @@
 
   /* ---------- quest stars (per kid) ---------- */
   function starsKey() { return "numberGrid.stars:" + currentKid; }
-  function loadStars() { return parseInt(readKey(starsKey(), "0"), 10) || 0; }
+  function loadStars() {
+    var stars = Number(readKey(starsKey(), "0"));
+    return Number.isSafeInteger(stars) && stars >= 0 ? stars : 0;
+  }
   function addStar() {
     writeKey(starsKey(), String(loadStars() + 1));
     renderStars();
@@ -267,8 +294,9 @@
   function scoreKey() { return "numberGrid.score:" + currentKid; }
   function loadScore() {
     try {
-      var raw = JSON.parse(localStorage.getItem(scoreKey()));
-      if (raw && typeof raw.right === "number" && typeof raw.tries === "number") return raw;
+      var raw = JSON.parse(readKey(scoreKey(), "null"));
+      if (raw && Number.isSafeInteger(raw.right) && raw.right >= 0 &&
+          Number.isSafeInteger(raw.tries) && raw.tries >= raw.right) return raw;
     } catch (e) {}
     return { right: 0, tries: 0 };
   }
@@ -290,8 +318,9 @@
   function streakKey() { return "numberGrid.streak:" + currentKid; }
   function loadStreak() {
     try {
-      var raw = JSON.parse(localStorage.getItem(streakKey()));
-      if (raw && typeof raw.cur === "number" && typeof raw.best === "number") return raw;
+      var raw = JSON.parse(readKey(streakKey(), "null"));
+      if (raw && Number.isSafeInteger(raw.cur) && raw.cur >= 0 &&
+          Number.isSafeInteger(raw.best) && raw.best >= raw.cur) return raw;
     } catch (e) {}
     return { cur: 0, best: 0 };
   }
@@ -734,7 +763,7 @@
     var cands = questCandidates();
     if (!cands.length) {
       quest = null;
-      try { localStorage.removeItem(questKey()); } catch (e) {}
+      removeKey(questKey());
       renderQuest();
       return;
     }
@@ -748,7 +777,7 @@
   function initQuest() {
     quest = null;
     try {
-      var raw = localStorage.getItem(questKey());
+      var raw = readKey(questKey(), null);
       if (raw) quest = JSON.parse(raw);
     } catch (e) { quest = null; }
     // a saved quest must still point at a real square

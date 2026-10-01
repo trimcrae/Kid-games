@@ -16,45 +16,92 @@ window.SFX = (function () {
   "use strict";
 
   let ctx = null;
-  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let motionQuery = null;
+  try { motionQuery = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)"); }
+  catch (e) { /* preferences may be unavailable */ }
+  const active = new Set();
+  const MAX_TONES = 32;
+
+  function ignoreRejection(promise) {
+    if (promise && promise.catch) promise.catch(function () {});
+  }
+
+  function release(node, stopEarly) {
+    active.delete(node);
+    if (node.o) {
+      node.o.onended = null;
+      if (stopEarly) { try { node.o.stop(); } catch (e) {} }
+      try { node.o.disconnect(); } catch (e) {}
+    }
+    if (node.g) { try { node.g.disconnect(); } catch (e) {} }
+  }
+
+  function stop() {
+    active.forEach(function (node) { release(node, true); });
+  }
+
+  function quiet() {
+    stop();
+    try { if (ctx && ctx.state !== "closed" && ctx.suspend) ignoreRejection(ctx.suspend()); }
+    catch (e) { /* audio may already be unavailable */ }
+  }
+
+  document.addEventListener("visibilitychange", function () { if (document.hidden) quiet(); });
+  window.addEventListener("pagehide", quiet);
+  if (motionQuery) {
+    const changed = function () { if (motionQuery.matches) quiet(); };
+    try {
+      if (motionQuery.addEventListener) motionQuery.addEventListener("change", changed);
+      else if (motionQuery.addListener) motionQuery.addListener(changed);
+    } catch (e) { /* older browsers still check the preference before playing */ }
+  }
 
   function ac() {
     try {
-      if (!ctx) {
+      if (!ctx || ctx.state === "closed") {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return null;
         ctx = new AC();
       }
-      if (ctx.state === "suspended" && ctx.resume) ctx.resume();
+      if (ctx.state === "suspended" && ctx.resume) ignoreRejection(ctx.resume());
       return ctx;
     } catch (e) { return null; }
   }
 
-  function tone(freq, start, dur, type, gain) {
-    const c = ac();
-    if (!c) return;
+  function tone(c, now, freq, start, dur, type, gain) {
+    const node = { o: null, g: null };
     try {
-      const o = c.createOscillator();
-      const g = c.createGain();
+      // A flurry of taps stays bounded, even before old notes finish.
+      if (active.size >= MAX_TONES) release(active.values().next().value, true);
+      const o = node.o = c.createOscillator();
+      const g = node.g = c.createGain();
       o.type = type || "sine";
       o.frequency.value = freq;
       o.connect(g); g.connect(c.destination);
-      const t = c.currentTime + start;
+      const t = now + start;
       g.gain.setValueAtTime(0.0001, t);
       g.gain.exponentialRampToValueAtTime(gain || 0.12, t + 0.012);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      active.add(node);
+      o.onended = function () { release(node, false); };
       o.start(t);
       o.stop(t + dur + 0.03);
-    } catch (e) { /* ignore */ }
+    } catch (e) { release(node, true); }
   }
 
   function play(notes) {
-    if (reduce) return; // be calm for kids who prefer reduced motion
-    try { notes.forEach((n) => tone(n.f, n.t || 0, n.d || 0.16, n.type, n.g)); }
+    if (document.hidden || (motionQuery && motionQuery.matches)) return;
+    try {
+      const c = ac();
+      if (!c) return;
+      const now = c.currentTime;
+      notes.forEach((n) => tone(c, now, n.f, n.t || 0, n.d || 0.16, n.type, n.g));
+    }
     catch (e) { /* ignore */ }
   }
 
   return {
+    stop,
     /* A creature's voice: two or three quick notes around a base pitch.
        `base` is the pitch in Hz, `type` the oscillator shape, so a low
        square wave growls and a high sine chirps. */

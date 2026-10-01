@@ -106,6 +106,7 @@
   let timeLeft = 45;
   let running = false;
   let paused = false;
+  let pausedAt = 0;
   let spawnTimer = null;
   let countdownTimer = null;
   let coachTimer = null;
@@ -118,15 +119,22 @@
 
   /* ---------------- saving ---------------- */
   function readJSON(key) {
-    try { return JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { return {}; }
+    try {
+      const value = JSON.parse(localStorage.getItem(key));
+      return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+    } catch (e) { return {}; }
   }
   function writeJSON(key, obj) {
     try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) { /* private mode */ }
   }
-  function bestFor(lv) { return readJSON(SAVE_KEY)[lv] || 0; }
-  function starsSaved(lv) { return readJSON(STARS_KEY)[lv] || 0; }
+  function savedNumber(value, max) {
+    return typeof value === "number" && Number.isFinite(value) && value >= 0
+      ? Math.min(Math.floor(value), max || Number.MAX_SAFE_INTEGER) : 0;
+  }
+  function bestFor(lv) { return savedNumber(readJSON(SAVE_KEY)[lv]); }
+  function starsSaved(lv) { return savedNumber(readJSON(STARS_KEY)[lv], 3); }
   function loadTotal() {
-    try { return parseInt(localStorage.getItem(TOTAL_KEY), 10) || 0; } catch (e) { return 0; }
+    try { return savedNumber(Number(localStorage.getItem(TOTAL_KEY))); } catch (e) { return 0; }
   }
   function addToTotal(n) {
     try { localStorage.setItem(TOTAL_KEY, String(loadTotal() + n)); } catch (e) { /* ignore */ }
@@ -436,6 +444,8 @@
 
   /* ---------------- start a fresh round ---------------- */
   function newRound(prefix) {
+    buf = "";
+    clearTimeout(bufTimer);
     round = makeRound();
     wrongThisRound = 0;
     hinting = false;
@@ -487,7 +497,7 @@
   }
 
   function spawnBubble() {
-    if (!running || !round || live.length >= maxBubbles()) return;
+    if (!running || paused || !round || live.length >= maxBubbles()) return;
 
     const dots = mode.kind === "dots";
     const blank = mode.kind === "popn";
@@ -646,7 +656,7 @@
 
   /* ---------------- tapping ---------------- */
   function tap(rec) {
-    if (!running || !round) return;
+    if (!running || paused || !round) return;
     if (rec.el.classList.contains("pop")) return;   // never count one bubble twice
     if (round.kind === "popn" && round.done) return; // set already finished — wait for the next one
     if (round.kind === "popn" || rec.value === round.answer) correct(rec);
@@ -684,8 +694,9 @@
         if (combo % 5 === 0) {
           window.Confetti && Confetti.burst({ count: 40, x: pos.r.left / window.innerWidth, y: pos.r.top / window.innerHeight });
         }
+        const completedRound = round;
         setTimeout(function () {
-          if (running) newRound("That makes " + numWord(round.need) + "!");
+          if (running && !paused && round === completedRound) newRound("That makes " + numWord(completedRound.need) + "!");
         }, 420);
       } else {
         say(numWord(running_total));
@@ -777,6 +788,7 @@
     timeLeft = mode.secs;
     running = true;
     paused = false;
+    playArea.classList.remove("paused");
     scoreEl.textContent = "0";
     timeEl.textContent = String(timeLeft);
     timeStat.classList.remove("time-low");
@@ -796,6 +808,7 @@
   }
 
   function tick() {
+    if (!running || paused) return;
     timeLeft -= 1;
     timeEl.textContent = String(Math.max(timeLeft, 0));
     timeStat.classList.toggle("time-low", timeLeft <= 10 && timeLeft > 0);
@@ -825,13 +838,13 @@
     if (pops > 0) addToTotal(pops);
 
     const bests = readJSON(SAVE_KEY);
-    const prev = bests[level] || 0;
+    const prev = bestFor(level);
     const beat = score > prev;
     if (beat) { bests[level] = score; writeJSON(SAVE_KEY, bests); }
 
     const earned = starsFor(score);
     const allStars = readJSON(STARS_KEY);
-    if (earned > (allStars[level] || 0)) { allStars[level] = earned; writeJSON(STARS_KEY, allStars); }
+    if (earned > starsSaved(level)) { allStars[level] = earned; writeJSON(STARS_KEY, allStars); }
 
     overlayTitle.textContent = beat && score > 0 ? "New best! 🏆" : "Great work! 🎉";
     overlayText.textContent = "You scored " + score + " on " + mode.label +
@@ -928,10 +941,10 @@
   }
 
   document.addEventListener("keydown", function (e) {
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (!running) return;
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!running || paused) return;
     const tag = document.activeElement && document.activeElement.tagName;
-    if (tag === "INPUT" || tag === "TEXTAREA") return;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (document.activeElement && document.activeElement.isContentEditable)) return;
 
     if (round && round.kind === "popn") {
       if ((e.key === " " || e.key === "Enter") && !(document.activeElement && document.activeElement.classList.contains("bubble"))) {
@@ -951,7 +964,7 @@
     bufTimer = setTimeout(function () {
       // a guess that never grew long enough: count it once the typing stops,
       // so you still get told WHY it was wrong
-      const late = (running && buf.length >= need) ? liveByValue(buf) : null;
+      const late = (running && !paused && buf.length >= need) ? liveByValue(buf) : null;
       buf = "";
       if (late) tap(late);
     }, 1100);
@@ -972,12 +985,22 @@
   document.addEventListener("visibilitychange", function () {
     if (!running) return;
     if (document.hidden) {
+      if (paused) return;
       paused = true;
+      pausedAt = Date.now();
+      playArea.classList.add("paused");
       clearTimeout(spawnTimer);
       clearInterval(countdownTimer);
+      clearTimeout(bufTimer);
+      buf = "";
       hush();
     } else if (paused) {
+      const elapsed = Date.now() - pausedAt;
       paused = false;
+      playArea.classList.remove("paused");
+      roundStart += elapsed;
+      live.forEach(function (r) { r.at += elapsed; });
+      if (round && round.done) newRound("That makes " + numWord(round.need) + "!");
       scheduleSpawn();
       countdownTimer = setInterval(tick, 1000);
     }
