@@ -77,3 +77,36 @@ export function coat(THREE,S,id) {
   const bump=new THREE.CanvasTexture(b);bump.wrapS=bump.wrapT=THREE.RepeatWrapping;
   return new THREE.MeshStandardMaterial({map:tex,bumpMap:bump,bumpScale:S.trunk?.06:.018,roughness:S.trunk?.93:.86,metalness:0});
 }
+
+// Pinniped skin is softly mottled, not long streaks stretched around an
+// ellipsoid. Walrus folds belong in a subtle bump map; seal spots stay on
+// the coat. A shared material per species avoids rebuilding these per herd.
+export function hide(THREE,S,id) {
+  let seed=Array.from(id).reduce((s,c)=>Math.imul(s,31)+c.charCodeAt(0),13)>>>0;
+  const rnd=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
+  const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');
+  g.fillStyle=S.colour;g.fillRect(0,0,256,256);
+  for(let i=0;i<160;i++) {
+    const x=rnd()*256,y=rnd()*256,r=6+rnd()*26;
+    const shade=g.createRadialGradient(x,y,0,x,y,r);
+    shade.addColorStop(0,rnd()<.5?'rgba(227,203,180,.08)':'rgba(31,29,26,.09)');shade.addColorStop(1,'transparent');
+    g.fillStyle=shade;g.fillRect(x-r,y-r,r*2,r*2);
+  }
+  if(S.pattern?.[0]==='spots')for(let i=0;i<90;i++) {
+    const x=rnd()*256,y=rnd()*256,r=2+rnd()*5;g.fillStyle='rgba(36,39,36,.52)';
+    g.beginPath();g.ellipse(x,y,r,r*(.45+rnd()*.55),rnd()*Math.PI,0,Math.PI*2);g.fill();
+  }
+  const underside=g.createLinearGradient(0,65,0,190);
+  underside.addColorStop(0,'transparent');underside.addColorStop(.5,id==='seal'?'rgba(223,222,212,.2)':'rgba(195,166,131,.12)');underside.addColorStop(1,'transparent');
+  g.fillStyle=underside;g.fillRect(0,0,256,256);
+  for(let i=0;i<5000;i++){g.fillStyle=rnd()<.5?'rgba(255,255,255,.035)':'rgba(0,0,0,.035)';g.fillRect(rnd()*256,rnd()*256,.7,.7)}
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.anisotropy=4;
+  const b=document.createElement('canvas');b.width=b.height=256;const bg=b.getContext('2d');bg.fillStyle='#888';bg.fillRect(0,0,256,256);
+  for(let i=0;i<4000;i++){bg.fillStyle=rnd()<.5?'#919191':'#818181';bg.fillRect(rnd()*256,rnd()*256,1,1)}
+  if(id==='walrus')for(let i=0;i<45;i++) {
+    const x=rnd()*256,y=rnd()*256;bg.strokeStyle='rgba(48,48,48,.24)';bg.lineWidth=.8;
+    bg.beginPath();bg.moveTo(x,y);bg.bezierCurveTo(x+3,y-5,x+11,y-2,x+15,y+1);bg.stroke();
+  }
+  const bump=new THREE.CanvasTexture(b);bump.wrapS=bump.wrapT=THREE.RepeatWrapping;
+  return new THREE.MeshStandardMaterial({map:tex,bumpMap:bump,bumpScale:id==='walrus'?.018:.005,roughness:id==='sealion'?.63:id==='seal'?.76:.88,metalness:0});
+}

@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260925-motion';
-import {createHouseLife} from './house-life.mjs?v=20260925-car';
+import {createHouseLife} from './house-life.mjs?v=20261001-visuals';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
 import {createHouseLighting} from './lighting.mjs?v=20260918-sky';
@@ -11,7 +11,7 @@ import {installPostPass} from './post-aa.mjs?v=20260916-use3';
 import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs?v=20260916-light';
 import {loadBakedLight,UNBAKED} from './baked-light.mjs?v=20260916-light';
-import {warmupCast} from './creatures.mjs?v=20260925-motion2';
+import {warmupCast} from './creatures.mjs?v=20261001-visuals';
 import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260925-motion';
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';

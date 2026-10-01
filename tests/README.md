@@ -113,6 +113,13 @@ The suites cover shared audio and reduced motion, Photo Expedition's daily
 assignments, arcade search and keyboard navigation, math input and damaged
 saves, service-worker offline caching, the youngest kids' game controls and
 paused rounds, and Connections/Crossword solve, quit and replay lifecycles.
+The 3D suite also renders all wildlife, pets and furnishings and checks animation,
+geometry, mobile quality and resource cleanup. It allows five minutes for machines
+using software WebGL. For an additional whole-house smoke at desktop and phone
+sizes, run `THREE_FULL_HOUSE=1 node three-model-visuals.cjs` (with `CHROMIUM_PATH`
+set if needed). This also visits three rooms in daylight and at night, using real
+mouse and touch input. The large house export can take several more minutes to
+render on software WebGL, so this check runs separately from focused CI.
 Each suite starts its own server when needed, runs in a separate process,
 and has a timeout.
 Suites run sequentially; a failure is reported and the remaining suites
@@ -128,7 +135,7 @@ The shared-media and photo-daily suites also run without Chromium when
 selected on their own.
 
 [`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
-for pull requests and pushes to `main`, with a ten-minute job limit. It
+for pull requests and pushes to `main`, with a fifteen-minute job limit. It
 installs Chromium through the existing `playwright-core` CLI and passes the
 installed executable path explicitly. The broader three-device playtest
 remains available through `npm test`.

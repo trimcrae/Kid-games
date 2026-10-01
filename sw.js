@@ -7,7 +7,7 @@
    local code and styles, with a small queue and no media crawl.
    =========================================================== */
 
-const VERSION = "v12";
+const VERSION = "v13";
 const SCOPE = new URL(self.registration.scope);
 // GitHub Pages projects share an origin, so each arcade scope owns
 // its cache names as well as its URLs.
