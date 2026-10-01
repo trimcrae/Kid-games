@@ -558,8 +558,9 @@
     }
 
     /* --- the farm's harvest grid --- */
-    .plots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.3rem; margin-bottom: 0.6rem; }
+    .plots { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0.3rem; margin-bottom: 0.6rem; }
     .plot {
+      min-width: 0; overflow: hidden; word-break: break-word;
       aspect-ratio: 1 / 1; border-radius: 10px; background: #e8f7dd; border: 2px solid #cfe9bd;
       display: flex; align-items: center; justify-content: center; font-size: clamp(0.85rem, 3.4vw, 1.4rem);
     }

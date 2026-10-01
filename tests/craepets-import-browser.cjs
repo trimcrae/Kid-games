@@ -125,7 +125,9 @@ async function check(browser, base, options) {
       throw error;
     }
     assert.equal(await page.evaluate(() => Craepets.state().stats.correct), 1, "a transferred pet must still earn a correct answer");
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true);
+    const layout=await page.evaluate(() => ({viewport:innerWidth,scroll:document.documentElement.scrollWidth}));
+    assert.ok(layout.viewport <= options.viewport.width+1 && layout.scroll <= options.viewport.width+1,
+      "imported harvest and lesson text must fit the configured viewport: " + JSON.stringify(layout));
     assert.deepEqual(errors, [], "imports and subsequent play must produce no browser errors");
   } finally {await context.close();}
 }
