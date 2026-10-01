@@ -131,8 +131,18 @@ To run just one focused suite:
 npm run test:regressions -- math-reliability.test.js
 ```
 
-The shared-media and photo-daily suites also run without Chromium when
-selected on their own.
+The shared-media, photo-daily and Craepets import transaction suites also run
+without Chromium when selected on their own. For save-transfer safety checks:
+
+```bash
+npm run test:regressions -- craepets-import.cjs
+npm run test:regressions -- craepets-import-browser.cjs
+```
+
+The import checks cover malformed backups, full storage, older backups,
+reloads and preserving each family member's saved pet. The browser suite also
+continues an active lesson after a rejected import and plays an imported pet
+on desktop and phone sizes.
 
 [`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
 for pull requests and pushes to `main`, with a fifteen-minute job limit. It
