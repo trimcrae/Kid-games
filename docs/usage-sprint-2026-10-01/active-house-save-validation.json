@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "ai_authored": true,
+  "repository": "trimcrae/Kid-games",
+  "scope": "Damaged active house-test activity save refusal in standalone-house and shared-game modes",
+  "pull_request": 6,
+  "baseline_commit": "f45ce83342e1562a8de8392d06cbd0ab6dac5c2e",
+  "reviewed_source_commit": "ac6a27c5f26da8946d6081a202b080e77069470a",
+  "reviewed_tree": "81dc0f3e7e41f7eb4fd6a0b82554bb47bfd3f1fe",
+  "merge_commit": "2af8008f63a1b391d739ab5e78ea66b77745b88e",
+  "merge_tree": "81dc0f3e7e41f7eb4fd6a0b82554bb47bfd3f1fe",
+  "merge_parents": [
+    "f45ce83342e1562a8de8392d06cbd0ab6dac5c2e",
+    "ac6a27c5f26da8946d6081a202b080e77069470a"
+  ],
+  "actual_validation": {
+    "run_id": 36964150346,
+    "run_url": "https://github.com/trimcrae/Kid-games/actions/runs/36964150346",
+    "job_id": 110704107890,
+    "conclusion": "success",
+    "node_version": "22.23.3",
+    "checkout_commit": "c6234f458acd96eb28741f5d43ce2cad281a5573",
+    "checkout_tree": "81dc0f3e7e41f7eb4fd6a0b82554bb47bfd3f1fe",
+    "command": "cd tests && npm run test:regressions",
+    "new_production_node_cases": 390,
+    "new_chromium_groups": [
+      "Desktop",
+      "iPad",
+      "iPhone"
+    ],
+    "active_profile_mode_cases_per_group": 14,
+    "total_suites": 18,
+    "passed_suites": 18,
+    "all_job_steps_succeeded": true,
+    "original_log_path": "docs/usage-sprint-2026-10-01/active-house-save-ci-final-original.log",
+    "original_log_git_blob": "308347350dd1f37973e91dc822903f43f8ba2cd4",
+    "original_log_utf8_bytes": 122682,
+    "original_log_sha256": "a30b6928371fd493f005de0d4ae053f2572f5008f0a314eb6c97825cd365804c",
+    "run_terminal_updated_at": "2026-10-02T04:26:00Z"
+  },
+  "initial_actual_failure": {
+    "source_commit": "aca8b135b5ab7cd46b177c0bf4bd35c35de3aa4e",
+    "source_tree": "de9f46d96355c667fd4ce4bc23a406b7714b5552",
+    "run_id": 36963266342,
+    "run_url": "https://github.com/trimcrae/Kid-games/actions/runs/36963266342",
+    "job_id": 110701389979,
+    "conclusion": "failure",
+    "checkout_commit": "31c0ecd11e1f83a8b1b17bd4ffbf7da0a3d21029",
+    "passed_suites": 14,
+    "total_suites": 18,
+    "failed_suites": [
+      "craepets-active-save.cjs",
+      "craepets-active-save-browser.cjs",
+      "craepets-auto-seeding-browser.cjs",
+      "craepets-import.cjs"
+    ],
+    "causes": [
+      "Node assertion compared plainJSON across VM prototypes before the full390case receipt",
+      "Blank-positive fixture let unchanged adopted-sibling policy redirect selection",
+      "Prior seeding positive fixture used invalid house WHO now deliberately refused",
+      "Pure equality guard included deliberately changed loader and imperative caller wrappers"
+    ],
+    "original_log_path": "docs/usage-sprint-2026-10-01/active-house-save-ci-initial-original.log",
+    "original_log_git_blob": "774e2917412c1bb162ddbb7a94634afd802de208",
+    "original_log_utf8_bytes": 138175,
+    "original_log_sha256": "5c00cf51526c2cdcdcb6f1e47f3417b4233f73947831222c60b884d898769c2d"
+  },
+  "baseline_evidence": {
+    "path": "docs/usage-sprint-2026-10-01/active-house-save-baseline.json",
+    "execution": "Preliminary isolated V8 production-section adapters, not actual Node/browser",
+    "cases": 14
+  },
+  "independent_review": {
+    "path": "docs/usage-sprint-2026-10-01/active-house-save-review.json",
+    "reviewers": [
+      "/root/apps_round3_review",
+      "/root"
+    ],
+    "code_method_and_actual_ci": "cleared"
+  },
+  "source_blob_inventory": {
+    "house-test/engine.js": "a91a21515192fc2fede73f72fcbae63c71abace1",
+    "house-test/save-copy.js": "ab31f9fe5604e8281b67ee9eae936f4587f5e424",
+    "house-test/activity.html": "104b77f29ce00e45e96336d04c183210010ec2ff",
+    "house-test/saves.html": "edfdf207421b76433885721a342d5fd517018a46",
+    "house-test/index.html": "5137cfd47de9fcfc87a5a55ff54bd66ab91a47ee",
+    "house-test/house-life.mjs": "804525278ddcbca8242ce394557b5c6a6134fa15",
+    "house-test/walkthrough.js": "04e48fd23b11fd4e48d047f7f5fc2d89ec155438",
+    "house-test/saved-data-recovery.mjs": "a7bf52c84ada4d13e9195a4210c202c085a9e828",
+    "tests/craepets-active-save.cjs": "634c5824a40a7f92f8afe449cfa1d8537258f28d",
+    "tests/craepets-active-save-browser.cjs": "4fe3ea001fa7a8aa74f4f22e56dd3f4a5523e6ba",
+    "tests/regressions.cjs": "307702480956bff6267badcf09f94b1d4ea8a520",
+    "tests/craepets-auto-seeding-browser.cjs": "0e017473f048ed7e33ca7283ef5cba7ec28a6864",
+    "tests/craepets-import.cjs": "35cd57edee851e4205bc55af0b8e9b3fa8106b86"
+  },
+  "unchanged_source": {
+    "normalizer": true,
+    "purePreparer": true,
+    "saveCopyOnlyOptionalRegistrationSkip": true,
+    "originalGameBlob": "5798211e613138a881ad8da7cf1f1f5e5338de1e"
+  },
+  "publication": {
+    "run_id": 36964649768,
+    "run_url": "https://github.com/trimcrae/Kid-games/actions/runs/36964649768",
+    "workflow_name": "pages build and deployment",
+    "conclusion": "success",
+    "head_sha": "2af8008f63a1b391d739ab5e78ea66b77745b88e",
+    "run_terminal_updated_at": "2026-10-02T04:28:43Z"
+  },
+  "limits": [
+    "Synthetic fixtures; no real child data or remote upload",
+    "Actual production activity and cold-start module gate/link in a minimal fixture host; full3D walkthrough and later parent warning behavior unverified",
+    "Chromium device emulation, not physical iOS Safari",
+    "Sequential other-document storage events, not simultaneous-tab atomicity or storage durability",
+    "Original main-game active loader not changed or proven; no reconstruction or new recovery-copy management"
+  ],
+  "next_bounded_task": "Fresh ownership + reproduce one active-load before-write defect in untouched games/craepets/craepets.js; stop with a no-change result if unproven. Do not execute in this finite task."
+}

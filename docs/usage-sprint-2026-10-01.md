@@ -44,9 +44,17 @@ See [the bounded handoff](usage-sprint-2026-10-01-post-office.md) and [machine-r
 
 See [the bounded handoff](usage-sprint-2026-10-01-house-auto-seeding.md) for source/log bindings, all-profile evidence and limits. This protects automatic seeding; the existing ordinary loader's behavior on an already damaged active save remains a separate audit.
 
+## Active house-save loader preservation — completed
+
+[PR #6](https://github.com/trimcrae/Kid-games/pull/6) refuses damaged active house/shared saves before automatic seeding or ordinary writes, preserves raw selection and profile bytes, and keeps a healthy lesson usable when a sibling is refused. Accessible local download/retry is available through the activity warning and the real house cold-start recovery link. Genuine absent, unadopted and legacy progress remains supported.
+
+Actual [CI36964150346](https://github.com/trimcrae/Kid-games/actions/runs/36964150346), job110704107890, passed18/18 suites, including390 new Node cases and Chromium Desktop/iPad/iPhone groups with all fourteen profile/mode refusals. Reviewed source `ac6a27c5f26da8946d6081a202b080e77069470a`, actual checkout and normal merge `2af8008f63a1b391d739ab5e78ea66b77745b88e` share tested tree `81dc0f3e7e41f7eb4fd6a0b82554bb47bfd3f1fe`. Pages [36964649768](https://github.com/trimcrae/Kid-games/actions/runs/36964649768) published that merge successfully.
+
+See [the bounded handoff](usage-sprint-2026-10-01-active-house-save.md) for exact source/tree/log bindings, the retained first failed CI, primary fixture evidence and limits. The original main-game runtime, pure preparer/normalizer and family journal are unchanged.
+
 ## Next bounded tasks
 
-1. **Audit damaged active house-save loading separately.** Reproduce exact raw preservation before the existing engine loader's ordinary normalization/write, with fresh ownership checks. Do not repeat completed automatic seeding or family restore.
+1. **Audit the untouched original main-game active-save loader separately.** At `games/craepets/craepets.js`, inspect fresh owners and reproduce one real loss of active raw bytes before its ordinary load/write path before deciding on a repair. Stop with a no-change receipt if no defect is demonstrated; do not repeat completed house loader, seeding, family restore, importer or Post Office repairs.
 2. Check transferred pet imports on a real iPad/iPhone when that environment is available.
 
 Before each follow-on, read the latest main HEAD and repository guidance, inspect ongoing PRs, choose a bounded task, and get meaningful checks plus independent review before publication. The existing focused runner is `cd tests && npm run test:regressions`; targeted import suites are `craepets-import.cjs` and `craepets-import-browser.cjs`. The repo's AGENTS/CLAUDE guidance requires reviewed work to reach main. A temporary PR is useful for real CI when no local runtime exists.

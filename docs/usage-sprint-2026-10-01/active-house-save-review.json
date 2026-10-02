@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "ai_authored": true,
+  "source_commit": "ac6a27c5f26da8946d6081a202b080e77069470a",
+  "source_tree": "81dc0f3e7e41f7eb4fd6a0b82554bb47bfd3f1fe",
+  "independent_reviewers": [
+    "/root/apps_round3_review",
+    "/root"
+  ],
+  "source_method_status": "cleared",
+  "actual_ci_status": "independently cleared",
+  "ci_run": 36964150346,
+  "job": 110704107890,
+  "reviewed_boundaries": [
+    "Read-only active preflight before automatic preparation registration",
+    "True absence versus unavailable storage read",
+    "Detached blank/legacy admission adapter",
+    "Rejection before healthy player/session/sibling mutations",
+    "Paused startup/refresh/external-update persistence",
+    "Production house startup refusal and local mode-bound recovery link",
+    "Accessible literal local download and retry",
+    "Unchanged pure preparer/normalizer, family journal and original main-game engine"
+  ],
+  "followup_corrections": [
+    "Only runtime delta from initial source is warning wording",
+    "JSON value field comparisons detached across VM realms; raw storage exact assertions independent",
+    "Positive blank fixture isolates unchanged adopted-sibling policy; fourteen corrupted-active healthy-sibling proofs retained",
+    "Absent selection seeding positive and invalid selection refusal separate",
+    "Precise pure-body equality replaces broad caller-wrapper equality"
+  ],
+  "unchanged_source_proof": {
+    "normalizer": true,
+    "purePreparer": true,
+    "saveCopyOnlyOptionalRegistrationSkip": true,
+    "originalGameBlob": "5798211e613138a881ad8da7cf1f1f5e5338de1e"
+  },
+  "limits": [
+    "Not a full3D walkthrough or later parent warning behavior test",
+    "Chromium device emulation, not physical iOS Safari",
+    "Sequential storage events, not simultaneous-tab atomicity",
+    "No original main-game loader claim or modification"
+  ]
+}
