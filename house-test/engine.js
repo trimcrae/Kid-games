@@ -326,7 +326,7 @@
 
   var quietSave = false;          // true while repainting a copy taken from another tab
   function save() {
-    if (!S || quietSave) return;
+    if (!S || quietSave || (window.HouseSaves && HouseSaves.isBlocked())) return;
     try { localStorage.setItem(slot(who), JSON.stringify(S)); } catch (e) {}
   }
 
@@ -337,7 +337,7 @@
     try { return JSON.parse(localStorage.getItem(slot(id))); } catch (e) { return null; }
   }
   function writeSlot(id, s) {
-    if (id === who) return;                 // never write over the live save
+    if (id === who || (window.HouseSaves && HouseSaves.isBlocked())) return;                 // never write over the live save
     try { localStorage.setItem(slot(id), JSON.stringify(s)); } catch (e) {}
   }
 
@@ -6158,6 +6158,7 @@
      ONE CLICK HANDLER FOR THE WHOLE VALLEY
      ========================================================= */
   function onClick(ev) {
+    if (window.HouseSaves && HouseSaves.isBlocked()) { toast("Saving is paused. Please reload to recover your pets."); return; }
     var t = ev.target;
     if (!t || !t.closest) return;
 
@@ -6490,6 +6491,7 @@
      trackpad at a button. Escape always backs out of a sheet.
      ========================================================= */
   function onKey(ev) {
+    if (window.HouseSaves && HouseSaves.isBlocked()) return;
     if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
     var el = document.activeElement;
     var typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
@@ -6551,6 +6553,7 @@
   }
 
   function switchTo(id) {
+    if (window.HouseSaves && HouseSaves.isBlocked()) return;
     if (id === who) return;
     save();
     hush();
@@ -6593,6 +6596,15 @@
      GO
      ========================================================= */
   function init() {
+    if (window.HouseSaves && HouseSaves.isBlocked()) {
+      var warning=document.createElement("p"),retry=document.createElement("button");
+      warning.setAttribute("role","status");
+      warning.textContent="Your saved pets are kept in a safety copy on this device. Free some browser space, then try again.";
+      retry.textContent="Try opening my pets again";
+      retry.addEventListener("click",function(){try{HouseSaves.recover();location.reload();}catch(e){warning.textContent=e.message;}});
+      $("#game").replaceChildren(warning,retry);
+      return;
+    }
     try { who = localStorage.getItem(WHO_KEY) || "cory"; } catch (e) { who = "cory"; }
     if (!D.PROFILES.some(function (p) { return p.id === who; })) who = "cory";
     S = load(who);
@@ -6606,6 +6618,7 @@
     document.addEventListener("keydown", onKey, false);
     // a saved valley chosen as a file
     document.addEventListener("change", function (ev) {
+      if (window.HouseSaves && HouseSaves.isBlocked()) return;
       var f = ev.target;
       if (!f || f.id !== "import-file" || !f.files || !f.files[0]) return;
       var reader = new FileReader();
@@ -6656,6 +6669,9 @@
     P.ready(go);
     setTimeout(go, 8000);
   }
+  // Family imports reuse the reviewed pure single-valley preparation, with
+  // the incoming profile's tier, without changing the active pet or lesson.
+  if (window.HouseSaves) HouseSaves.setPreparer(importCandidate);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 
@@ -6665,6 +6681,7 @@
   window.HouseActivity = {
     ready: function(){return !!S;},
     enter: function(station) {
+      if(window.HouseSaves&&HouseSaves.isBlocked())return;
       this.leave(); houseStation=station;
       if(station.owner && station.owner!==who){startVisit(station.owner);return;}
       view=station.view || 'nest';
@@ -6681,7 +6698,7 @@
     },
     profiles: function(){return D.PROFILES;},
     select: function(id){if(D.PROFILES.some(function(p){return p.id===id;}))switchTo(id);},
-    refreshSaves: function(){hush();stopCatch();stopMatch();sess=null;battle=null;clearTimeout(battleTimer);closeSheet();who=localStorage.getItem(WHO_KEY)||who;S=load(who);view='nest';render();},
+    refreshSaves: function(){if(window.HouseSaves&&HouseSaves.isBlocked())return;hush();stopCatch();stopMatch();sess=null;battle=null;clearTimeout(battleTimer);closeSheet();who=localStorage.getItem(WHO_KEY)||who;S=load(who);view='nest';render();},
     cuddle: function(){if(!S.pet)return;if(S.pet.egg){tapEgg();return;}S.pet.happy=clamp(S.pet.happy+1,0,100);var line=moodSay();say(line.text,2600,line.tok);sfx('pop');save();},
     /* Asleep in one of the house's beds: `amount` energy back now (a little
        every second while it sleeps); `done` at the end counts as a Rest for
@@ -6750,7 +6767,7 @@
     _setDate: function (s) { if (CAL) CAL._setDate(s); render(); },
     celebrations: celebrations,
     exportJson: function () { return JSON.stringify(S); },
-    importJson: importValley,
+    importJson: function(text){ if (!window.HouseSaves || !HouseSaves.isBlocked()) importValley(text); },
     steps: function () { return S.steps; },
     _anim: function () { return anim; },
     _setHour: function (h) { hourOverride = (h === null || h === undefined) ? null : h; render(); }
