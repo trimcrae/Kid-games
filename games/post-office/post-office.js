@@ -91,35 +91,127 @@
   ];
 
   /* ---------- storage ---------- */
-  var state = load();
-  function load() {
-    var s = null;
-    try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-    if (!s || typeof s !== "object") s = {};
-    if (!Array.isArray(s.letters)) s.letters = [];
-    if (!s.drafts || typeof s.drafts !== "object") s.drafts = {};
-    if (!s.last) s.last = null;
-    s.letters.forEach(function (l) {
-      if (l && OLD_IDS[l.from]) l.from = OLD_IDS[l.from];
-      if (l && OLD_IDS[l.to]) l.to = OLD_IDS[l.to];
-    });
-    Object.keys(OLD_IDS).forEach(function (old) {
-      if (s.drafts[old]) { if (!s.drafts[OLD_IDS[old]]) s.drafts[OLD_IDS[old]] = s.drafts[old]; delete s.drafts[old]; }
-      if (s.last === old) s.last = OLD_IDS[old];
-    });
-    return s;
+  var RECOVERY_KEY = "post-office.recovery.v1";
+  var MAX_RECOVERY_COPIES = 8;
+  var pendingRecovery = null;
+  var warnedAboutSave = false;
+  var state = load() || emptyState();
+
+  function emptyState() { return { letters: [], drafts: {}, last: null }; }
+  function record(value) { return !!value && typeof value === "object" && !Array.isArray(value); }
+  function own(value, key) { return Object.prototype.hasOwnProperty.call(value, key); }
+  function familyId(id) {
+    if (typeof id !== "string") return null;
+    if (own(OLD_IDS, id)) id = OLD_IDS[id];
+    return FAMILY.some(function (p) { return p.id === id; }) ? id : null;
   }
-  function save() {
-    // keep the mailbag a sensible size: drop the oldest letters that both sides have read
-    if (state.letters.length > MAX_LETTERS) {
-      state.letters.sort(function (a, b) { return a.sentAt - b.sentAt; });
-      var extra = state.letters.length - MAX_LETTERS;
-      state.letters = state.letters.filter(function (l) {
-        if (extra > 0 && l.readAt) { extra--; return false; }
-        return true;
+  function choice(items, id, fallback) {
+    return items.some(function (item) { return item.id === id; }) ? id : fallback;
+  }
+  function dateNumber(value) {
+    return typeof value === "number" && isFinite(value) && value > 0 && value <= 8640000000000000;
+  }
+  function normalizeLetter(value) {
+    if (!record(value) || typeof value.id !== "string" || !value.id ||
+        !familyId(value.from) || !familyId(value.to) ||
+        typeof value.body !== "string" || !dateNumber(value.sentAt)) return null;
+    var letter = {
+      id: value.id, from: familyId(value.from), to: familyId(value.to),
+      body: value.body, sentAt: value.sentAt,
+      paper: choice(PAPERS, value.paper, "plain"),
+      stamp: choice(STAMPS, value.stamp, STAMPS[0].id),
+      greeting: typeof value.greeting === "string" ? value.greeting : "Dear",
+      closing: typeof value.closing === "string" ? value.closing : "Love,",
+      readAt: dateNumber(value.readAt) ? value.readAt : null,
+    };
+    if (own(value, "trashedByFrom")) letter.trashedByFrom = value.trashedByFrom === true;
+    if (own(value, "trashedByTo")) letter.trashedByTo = value.trashedByTo === true;
+    return letter;
+  }
+  function normalizeDraft(value, owner) {
+    if (!record(value)) return null;
+    var recipients = [];
+    if (Array.isArray(value.to)) value.to.forEach(function (id) {
+      id = familyId(id);
+      if (id && id !== owner && recipients.indexOf(id) < 0) recipients.push(id);
+    });
+    return {
+      to: recipients, body: typeof value.body === "string" ? value.body : "",
+      paper: choice(PAPERS, value.paper, "plain"),
+      stamp: choice(STAMPS, value.stamp, STAMPS[0].id),
+      greeting: typeof value.greeting === "string" ? value.greeting : "Dear",
+      closing: typeof value.closing === "string" ? value.closing : "Love,",
+    };
+  }
+  function normalizeState(value) {
+    if (!record(value)) return null;
+    var next = emptyState();
+    var ids = Object.create(null);
+    if (Array.isArray(value.letters)) value.letters.forEach(function (raw) {
+      var letter = normalizeLetter(raw);
+      if (letter && !own(ids, letter.id)) { ids[letter.id] = true; next.letters.push(letter); }
+    });
+    if (record(value.drafts)) {
+      FAMILY.forEach(function (p) {
+        var raw = own(value.drafts, p.id) ? value.drafts[p.id] : null;
+        // A damaged modern draft must not hide a usable older Dad draft.
+        if (!record(raw) && p.id === "tristan" && own(value.drafts, "dad")) raw = value.drafts.dad;
+        var saved = normalizeDraft(raw, p.id);
+        if (saved) next.drafts[p.id] = saved;
       });
     }
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    next.last = familyId(value.last);
+    return next;
+  }
+  function sameValue(a, b) {
+    if (a === b) return true;
+    if (!a || !b || typeof a !== "object" || typeof b !== "object" || Array.isArray(a) !== Array.isArray(b)) return false;
+    var keys = Object.keys(a), other = Object.keys(b);
+    return keys.length === other.length && keys.every(function (key) { return own(b, key) && sameValue(a[key], b[key]); });
+  }
+  function load() {
+    var raw;
+    try { raw = localStorage.getItem(KEY); } catch (e) { return null; }
+    if (raw === null) return emptyState();
+    var parsed, next;
+    try { parsed = JSON.parse(raw); next = normalizeState(parsed); } catch (e) {}
+    if (!next || !sameValue(next, parsed)) pendingRecovery = raw;
+    return next || null;
+  }
+  function keepRecovery(raw) {
+    var stored = localStorage.getItem(RECOVERY_KEY);
+    var copies = stored === null ? [] : JSON.parse(stored);
+    if (!Array.isArray(copies) || copies.some(function (copy) {
+      return !record(copy) || typeof copy.raw !== "string" || !dateNumber(copy.savedAt);
+    })) throw new Error("The recovery copies must be preserved.");
+    if (copies.some(function (copy) { return copy.raw === raw; })) return;
+    if (copies.length >= MAX_RECOVERY_COPIES) throw new Error("The recovery copies are full.");
+    copies.push({ savedAt: Date.now(), raw: raw });
+    localStorage.setItem(RECOVERY_KEY, JSON.stringify(copies));
+  }
+  function save() {
+    // Retain the original damaged bytes before any user action repairs the mailbag.
+    try {
+      if (pendingRecovery !== null) { keepRecovery(pendingRecovery); pendingRecovery = null; }
+      // keep the mailbag a sensible size: drop the oldest letters that both sides have read
+      if (state.letters.length > MAX_LETTERS) {
+        state.letters.sort(function (a, b) { return a.sentAt - b.sentAt; });
+        var extra = state.letters.length - MAX_LETTERS;
+        state.letters = state.letters.filter(function (l) {
+          if (extra > 0 && l.readAt) { extra--; return false; }
+          return true;
+        });
+      }
+      localStorage.setItem(KEY, JSON.stringify(state));
+      warnedAboutSave = false;
+      return true;
+    } catch (e) {
+      if (!warnedAboutSave) {
+        warnedAboutSave = true;
+        toast("Your changes couldn't be saved. Keep this tab open and ask a grown-up to help with this device's storage.");
+      }
+      return false;
+    }
   }
 
   /* ---------- helpers ---------- */
@@ -309,8 +401,10 @@
 
   /* ---------- reading a letter ---------- */
   var reading = null;
+  var readingMine = false;
   function openLetter(l, mine) {
     reading = l;
+    readingMine = mine;
     var r = $("reader");
     var other = person(mine ? l.to : l.from) || { name: "?" };
     $("reader-title").textContent = mine ? "📤 Your letter to " + other.name : (l.readAt ? "💌 A letter from " + other.name : "📬 You've got mail!");
@@ -355,6 +449,7 @@
     sfx("crack");
     l.readAt = Date.now(); save();
     setTimeout(function () {
+      if (reading !== l) return;
       env.classList.remove("sealed", "opening");
       env.innerHTML = envelopeHtml(l, false);
       $("open-hint").classList.add("hidden");
@@ -535,6 +630,8 @@
     if (!draft.to.length) { sfx("nope"); toast("Who is it for? Tap a name first."); return; }
     if (!body) { sfx("nope"); toast("Write something in your letter first!"); return; }
     var now = Date.now();
+    var previousLetters = state.letters.slice();
+    var previousDraft = state.drafts[me.id];
     draft.to.forEach(function (to, i) {
       state.letters.push({
         id: uid(), from: me.id, to: to, paper: draft.paper, stamp: draft.stamp,
@@ -543,8 +640,11 @@
     });
     var names = recipientsLabel();
     var n = draft.to.length;
-    draft = blankDraft(); $("body").value = "";
-    save(); syncWrite();
+    var nextDraft = blankDraft();
+    state.drafts[me.id] = nextDraft;
+    if (!save()) { state.letters = previousLetters; state.drafts[me.id] = previousDraft; return; }
+    draft = nextDraft; $("body").value = "";
+    syncWrite();
     flyEnvelope();
     sfx("win");
     try { window.Confetti && Confetti.burst({ count: 70 }); } catch (e) {}
@@ -603,9 +703,16 @@
   window.addEventListener("storage", function (e) {
     if (e.key !== KEY) return;
     var fresh = load();
+    if (!fresh) return; // An invalid external snapshot cannot replace usable live mail.
     // keep our own draft, take everyone's letters
     if (draft && me) fresh.drafts[me.id] = draft;
     state = fresh;
+    if (reading) {
+      var current = state.letters.filter(function (l) { return l.id === reading.id; })[0];
+      if (current && me && (readingMine ? current.from === me.id : current.to === me.id) &&
+          !(readingMine ? current.trashedByFrom : current.trashedByTo)) openLetter(current, readingMine);
+      else closeReader();
+    }
     if (me) { var had = $("inbox-badge").textContent; refresh(); if ($("inbox-badge").textContent !== had && unreadCount(me.id)) { sfx("coin"); toast("📬 New mail just arrived!"); } }
     else renderWho();
   });
