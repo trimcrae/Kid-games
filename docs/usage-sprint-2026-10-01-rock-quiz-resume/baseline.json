@@ -1,0 +1,81 @@
+{
+  "status": "PRELIMINARY_V8_REPRODUCED",
+  "main": "7fd3f37c107e2c76e456bc6ab41c4806984dcaef",
+  "pins": {
+    "game_js": "65bf1b3a188a6ea54978c33510c654a515cd689c",
+    "rocks_js": "c67ae139ed35a7bc35c6d20ae35dd106cc7e5d7a",
+    "index_html": "4ef7f54e9820be1bf386e598d5587d039dd3b77d"
+  },
+  "runtime": "Isolated V8 whole unchanged production scripts in DOM/storage adapters. Actual makeQuestion factory observed through a transparent output wrapper; production handlers invoked through adapter clicks. No actual Node/browser baseline execution.",
+  "trigger": [
+    "Start Rockhound quiz",
+    "Answer Specimen 1 correctly",
+    "Reload before pressing Next specimen",
+    "Answer the regenerated Specimen 1 correctly",
+    "Finish the remaining nine specimens"
+  ],
+  "observed": {
+    "first_credit": 1,
+    "resumed_ordinal": 1,
+    "second_credit_at_ordinal_1": 2,
+    "final_visible_score": "11 / 10",
+    "saved_best": 11,
+    "final_correct_before_next_reload_score": "11 / 10",
+    "ordinary_control": "10 / 10"
+  },
+  "legacy_ambiguity": {
+    "unanswered4": {
+      "best": 17,
+      "bests": {
+        "rockhound": 17,
+        "junior": 8
+      },
+      "tier": "rockhound",
+      "tab": "quiz",
+      "clues": [
+        "look-speckled"
+      ],
+      "labSolved": 4,
+      "labBest": 2,
+      "round": {
+        "tier": "rockhound",
+        "qNum": 4,
+        "roundScore": 3
+      }
+    },
+    "wrongAnswered4": {
+      "best": 17,
+      "bests": {
+        "rockhound": 17,
+        "junior": 8
+      },
+      "tier": "rockhound",
+      "tab": "quiz",
+      "clues": [
+        "look-speckled"
+      ],
+      "labSolved": 4,
+      "labBest": 2,
+      "round": {
+        "tier": "rockhound",
+        "qNum": 4,
+        "roundScore": 3
+      }
+    },
+    "exactQuizBytesEqual": true,
+    "beforeProgress": "Specimen 4 of 10",
+    "afterFeedback": "❌ Not quite — it's Topaz."
+  },
+  "preservation": {
+    "historical_best": 17,
+    "other_tier_history": 8,
+    "labSolved": 4,
+    "labBest": 2,
+    "clues": [
+      "look-speckled"
+    ],
+    "collection_contains": "Quartz",
+    "unrelated_synthetic_namespace_bytes_exact": true
+  },
+  "agreed_policy": "Optional round answered/practice fields. Pending resumes current; accepted advances once or finalizes #10. Missing/nonboolean legacy phase preserves exact earned score/current ordinal as visible unscored practice, persisted before display and sticky on reload. Correct practice identification still follows existing museum collection rule. Historical bests are not reset."
+}
