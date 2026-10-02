@@ -134,7 +134,7 @@ async function check(browser, base, label, options, calm) {
       const abandoned = await state(); await page.waitForTimeout(850);
       assert.deepEqual(await state(), abandoned); assert.equal(abandoned.stats.blocks, before.stats.blocks + 12); assert.equal(abandoned.stats.quests, before.stats.quests + 1);
       assert.equal(await page.locator(".instruction").count(), 0); assert.equal(await page.locator(".win-banner").count(), 0);
-      assert.match(await page.locator(".readout").textContent(), /–/);
+      assert.equal(await page.locator("#f-clear").count(), 1, "Free Build remains current after abandoned feedback");
       await activate("#f-back"); await activate('.tier[data-tier="normal"]');
     }
     const final = await state();
