@@ -574,7 +574,13 @@
      SCREENS
      ============================================================ */
   const app = $("app");
-  function clearScreen() { boardCtx = null; app.innerHTML = ""; say(""); }
+  // A feedback timer belongs to the screen that scheduled it.
+  let screenId = 0, cancelRun = null;
+  function clearScreen() {
+    screenId++;
+    if (cancelRun) { cancelRun(); cancelRun = null; }
+    boardCtx = null; app.innerHTML = ""; say("");
+  }
 
   /* ---------- menu ---------- */
   function renderMenu() {
@@ -1065,7 +1071,14 @@
 
     let round = 0, score = 0, wrong = 0, misses = 0, streak = 0;
     let nums = startNums();
-    let q = null;
+    let q = null, transition = null;
+    const runId = screenId;
+    const isCurrent = () => runId === screenId;
+    cancelRun = () => {
+      q = null;
+      if (transition !== null) clearTimeout(transition);
+      transition = null;
+    };
 
     const hud = document.createElement("div");
     hud.className = "hud";
@@ -1126,6 +1139,7 @@
       return bag[round % bag.length];
     }
     function nextRound() {
+      if (!isCurrent()) return;
       if (round >= total) return done();
       clearBoard(); hideExplain(explain);
       misses = 0;
@@ -1239,12 +1253,12 @@
         b.type = "button";
         b.className = "choice";
         b.textContent = c.label;
-        b.onclick = () => answerChoice(c, b);
+        b.onclick = () => answerChoice(question, c, b);
         choices.appendChild(b);
       });
     }
-    function answerChoice(c, btn) {
-      if (!q || !q.choices) return;
+    function answerChoice(question, c, btn) {
+      if (!isCurrent() || q !== question || !q || !q.choices || btn.disabled) return;
       if (c.ok) {
         btn.classList.add("right");
         good();
@@ -1273,7 +1287,7 @@
       for (let y = y0; y <= y1; y++) ctx.flash(b.x, y, 1600);
     }
     function onTap(x, y, cell) {
-      if (!q) return;
+      if (!isCurrent() || !q) return;
       if (q.choices) { say("Tap one of the answer buttons below the grid."); return; }
       if (x === q.target.x && y === q.target.y) {
         place(cell, "gold", true);
@@ -1292,13 +1306,19 @@
       }
     }
     function good() {
+      if (!isCurrent() || !q) return;
+      q = null; // close this question before feedback can receive another tap
+      Array.from(choices.children).forEach((b) => { b.disabled = true; });
       if (misses === 0) score++;
       streak++; noteStreak(streak); addBlocks(1);
       Sound.gem(); sfx("good");
       hideExplain(explain);
       say(misses === 0 ? "Spot on! ⭐" : "Got it! 💪");
       round++;
-      setTimeout(nextRound, reduceMotion ? 250 : 650);
+      transition = setTimeout(() => {
+        transition = null;
+        nextRound();
+      }, reduceMotion ? 250 : 650);
     }
     function done() {
       q = null;
@@ -1342,7 +1362,14 @@
     const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
     let round = 0, score = 0, wrong = 0, misses = 0, quizIdx = 0;
     let nums = startNums();
-    let q = null, ctx = null;
+    let q = null, ctx = null, transition = null;
+    const runId = screenId;
+    const isCurrent = () => runId === screenId;
+    cancelRun = () => {
+      q = null; ctx = null;
+      if (transition !== null) clearTimeout(transition);
+      transition = null;
+    };
 
     const hud = document.createElement("div");
     hud.className = "hud";
@@ -1412,6 +1439,7 @@
     nextRound();
 
     function nextRound() {
+      if (!isCurrent()) return;
       if (round >= total) return done();
       hideExplain(explain);
       choices.hidden = true; choices.innerHTML = "";
@@ -1424,7 +1452,10 @@
       return askTop();
     }
     function buildBoard(opts) {
-      ctx = makeBoard(n, onTap, Object.assign({ numbers: nums }, opts));
+      const boardRound = round;
+      ctx = makeBoard(n, (x, y, cell) => {
+        if (round === boardRound) onTap(x, y, cell);
+      }, Object.assign({ numbers: nums }, opts));
       boardCtx = ctx;
       boardHost.appendChild(ctx.board);
       ctx.size();
@@ -1453,7 +1484,7 @@
     }
     function askQuiz() {
       const item = quizBag[quizIdx++ % quizBag.length];
-      q = { kind: "quiz", item };
+      const question = q = { kind: "quiz", item };
       ctx = null;
       instr.innerHTML = `🧊 ${item.q} <span class="step-of">round ${round + 1}/${total}</span>`;
       instr.setAttribute("aria-label", item.q.replace(/<[^>]+>/g, ""));
@@ -1462,6 +1493,7 @@
         const b = document.createElement("button");
         b.type = "button"; b.className = "choice big"; b.textContent = o;
         b.onclick = () => {
+          if (!isCurrent() || q !== question || b.disabled) return;
           if (o === item.ok) { b.classList.add("right"); good(); }
           else {
             b.classList.add("wrong"); b.disabled = true;
@@ -1476,7 +1508,7 @@
       });
     }
     function onTap(x, y, cell) {
-      if (!q || q.kind === "quiz") return;
+      if (!isCurrent() || !q || q.kind === "quiz") return;
       if (x === q.target.x && y === q.target.y) {
         place(cell, q.kind === "side" ? "diamond" : "planks", true);
         good();
@@ -1497,12 +1529,18 @@
       }
     }
     function good() {
+      if (!isCurrent() || !q) return;
+      q = null; // close this question before feedback can receive another tap
+      Array.from(choices.children).forEach((b) => { b.disabled = true; });
       if (misses === 0) score++;
       Sound.gem(); sfx("good"); addBlocks(1);
       hideExplain(explain);
       say(misses === 0 ? "Yes! ⭐" : "That's it! 💪");
       round++;
-      setTimeout(nextRound, reduceMotion ? 250 : 700);
+      transition = setTimeout(() => {
+        transition = null;
+        nextRound();
+      }, reduceMotion ? 250 : 700);
     }
     function done() {
       q = null; ctx = null;
