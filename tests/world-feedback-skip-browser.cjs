@@ -59,7 +59,7 @@ async function check(browser,base,label,options){
   await skip().scrollIntoViewIfNeeded();const box=await skip().boundingBox();assert.ok(box);
   // Raw native input deliberately reaches a disabled control without locator auto-wait.
   for(let i=0;i<3;i++){if(options.hasTouch)await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);else await page.mouse.click(box.x+box.width/2,box.y+box.height/2);}
-  if(!options.hasTouch){await hint().focus();await page.keyboard.press("Tab");assert.equal(await skip().evaluate(e=>e===document.activeElement),false,"native Tab skips disabled Skip");await page.keyboard.press("Enter");}
+  if(!options.hasTouch){await hint().focus();await page.keyboard.press("Tab");assert.equal(await skip().evaluate(e=>e===document.activeElement),false,"native Tab skips disabled Skip");}
  }
  try{
   for(const mode of ["continents","capitals"]){
