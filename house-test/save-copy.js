@@ -46,12 +46,12 @@
   }
   function bundle(source){var profiles={};ids.forEach(function(id){var s=read((source==='house'?prefix:'craepets.v1.')+id);if(valid(s))profiles[id]=s;});return {format:'craepets-family',version:1,profiles:profiles,who:localStorage.getItem(source==='house'?'craepets.house.who':'craepets.who'),exportedAt:new Date().toISOString()};}
   var prepare=null,autoSeed=false,recoveryKey='craepets.house.import-recovery.v1',blocked=false;
-  function setPreparer(fn){
+  function setPreparer(fn,skipAutoSeed){
     prepare=fn;
     // Registering the existing pure engine preparer is the first point when
     // content tables and legacy defaults are ready. Export-only pages do not
     // seed any progress or preferences.
-    if(autoSeed){autoSeed=false;try{copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
+    if(autoSeed){autoSeed=false;if(skipAutoSeed)return;try{copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
   }
   function record(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
   function recoveryAllowed(key){

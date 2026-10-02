@@ -29,6 +29,10 @@ export async function createHouseLife(tour){
   const began=performance.now();
   while(!api?.ready()){
     api=frame.contentWindow?.HouseActivity;
+    if(api?.loadProblem?.()){
+      const error=new Error('This saved pet could not be opened safely. Its saved data remains on this device. Open saved-data recovery to download it or try again.');
+      error.savedDataBlocked=true;throw error;
+    }
     if(performance.now()-began>30000)throw Error('Craepets activity engine did not load');
     await new Promise(resolve=>setTimeout(resolve,100));
   }
