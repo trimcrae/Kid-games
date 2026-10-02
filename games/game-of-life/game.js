@@ -1289,7 +1289,8 @@
   let predBoard = new Uint8Array(PSIZE * PSIZE);   // the generation shown
   let predGuess = new Uint8Array(PSIZE * PSIZE);   // what the player says
   let predAnswer = new Uint8Array(PSIZE * PSIZE);  // the truth
-  let predChecked = false, predRevealed = false;
+  // Credit and peeking belong to this puzzle, even after editing a guess.
+  let predChecked = false, predRevealed = false, predEarned = false;
   const pcells = [];
 
   pboardEl.style.gridTemplateColumns = "repeat(" + PSIZE + ", 1fr)";
@@ -1301,7 +1302,6 @@
     b.addEventListener("click", () => {
       predGuess[i] = predGuess[i] ? 0 : 1;
       predChecked = false;
-      predRevealed = false;
       predResult.textContent = "";
       predResult.className = "predict-result";
       renderPBoard();
@@ -1356,6 +1356,7 @@
     predGuess = predBoard.slice();     // start from "nothing changes"
     predChecked = false;
     predRevealed = false;
+    predEarned = false;
     predResult.textContent = "Yellow dashed squares are alive right now. Tap to show what's alive NEXT turn.";
     predResult.className = "predict-result";
     renderPBoard();
@@ -1367,7 +1368,8 @@
     predChecked = true;
     const total = predAnswer.length;
     const perfect = right === total;
-    if (perfect && !predRevealed) {
+    if (perfect && !predRevealed && !predEarned) {
+      predEarned = true;
       state.predStreak++;
       if (state.predStreak > state.predBest) state.predBest = state.predStreak;
       predResult.textContent = "🎉 Perfect! All " + total + " squares right. Streak " + state.predStreak + "!";
@@ -1375,11 +1377,14 @@
       window.SFX && SFX.win && SFX.win();
       party(60);
       if (state.predStreak >= 3) award("seer");
+    } else if (perfect && predEarned) {
+      predResult.textContent = "✅ Still correct! This puzzle already earned credit. Try a new puzzle to grow your streak.";
+      predResult.className = "predict-result good";
     } else if (perfect) {
       predResult.textContent = "👀 That's the right answer — now try the next one without peeking!";
       predResult.className = "predict-result good";
     } else {
-      state.predStreak = 0;
+      if (!predEarned) state.predStreak = 0;
       const wrong = total - right;
       predResult.textContent = "You got " + right + " of " + total + " right. The " + wrong +
         " red square" + (wrong === 1 ? "" : "s") + " show" + (wrong === 1 ? "s" : "") +
