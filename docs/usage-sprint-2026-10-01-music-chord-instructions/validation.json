@@ -117,10 +117,6 @@
       "sha256": "441310b18a88104eb0acd17782cce94e61ba8cdaebd606170c20bf0381622340"
     }
   ],
-  "unchangedPublicCatalog": {
-    "path": "games/music-lab/songs.js",
-    "gitBlob": "6ed9af559225e89a6db6e1fb042009184cc23644"
-  },
   "originalLog": {
     "job": 110844549150,
     "gitBlob": "4ed70c0d0e147a56a9406a2c7b132454f4961748",
@@ -219,5 +215,9 @@
       "observations": 1,
       "note": "Point-in-time automatic push observation, distinct from completed PR test evidence. No manual dispatch or terminal result claimed."
     }
+  },
+  "unchangedSongData": {
+    "path": "games/music-lab/songs.js",
+    "gitBlob": "6ed9af559225e89a6db6e1fb042009184cc23644"
   }
 }
