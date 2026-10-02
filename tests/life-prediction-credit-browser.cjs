@@ -4,7 +4,9 @@
 const assert=require("node:assert/strict"),fs=require("node:fs/promises"),http=require("node:http"),path=require("node:path"),{chromium}=require("playwright-core");
 const ROOT=path.resolve(__dirname,".."),ids=["jeannie","cory","ellie","kieran","shannon","tristan","guest"];
 async function server(){const s=http.createServer(async(req,res)=>{try{
- let p=decodeURIComponent(new URL(req.url,"http://localhost").pathname);if(p.endsWith("/"))p+="index.html";
+ let p=decodeURIComponent(new URL(req.url,"http://localhost").pathname);
+ if(p==="/life-prediction-fixture.html"){res.writeHead(200,{"Content-Type":"text/html"}).end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><p>Life prediction fixture</p>');return;}
+ if(p.endsWith("/"))p+="index.html";
  const f=path.resolve(ROOT,"."+p);if(!f.startsWith(ROOT+path.sep)){res.writeHead(403).end();return;}
  res.writeHead(200,{"Content-Type":({".html":"text/html",".js":"text/javascript",".css":"text/css",".svg":"image/svg+xml",".png":"image/png",".json":"application/json"})[path.extname(f)]||"application/octet-stream"}).end(await fs.readFile(f));
  }catch{res.writeHead(404).end();}});await new Promise((resolve,reject)=>{s.once("error",reject);s.listen(0,"127.0.0.1",resolve);});return s;}
@@ -33,7 +35,7 @@ async function check(browser,base,label,options){
  async function waitSaved(streak,best){await page.waitForFunction(({streak,best})=>{const s=JSON.parse(localStorage.getItem("life-lab-v1")||"null");return s&&s.predStreak===streak&&s.predBest===best;},{streak,best});}
  try{
   await context.addInitScript(()=>{Math.random=()=>0;}); // native blinker seed at offset1; no answer hook
-  await page.goto(base+"/games/game-of-life/",{waitUntil:"load"});
+  await page.goto(base+"/life-prediction-fixture.html",{waitUntil:"load"});
   const original=await page.evaluate(ids=>{
    localStorage.clear();for(const prefix of["craepets.","craepets.house."])for(const id of ids)localStorage.setItem(prefix+"v1."+id,"synthetic original bytes "+prefix+id+"\n😀");
    localStorage.setItem("craepets.who","cory");localStorage.setItem("craepets.house.who","ellie");localStorage.setItem("post-office.v1","unrelated synthetic mail");localStorage.setItem("arcade.kid","kieran");
@@ -41,7 +43,7 @@ async function check(browser,base,label,options){
    localStorage.setItem("life-lab-v1",JSON.stringify({sizeKey:"tiny",cols:24,rows:16,live:[],birth,survive,wrap:true,speed:10,generation:0,badges:{},stampsUsed:{},myPatterns:[],inspected:{},predStreak:0,predBest:0}));
    return Object.fromEntries(Object.keys(localStorage).filter(k=>k!=="life-lab-v1").sort().map(k=>[k,localStorage.getItem(k)]));
   },ids);
-  await page.reload({waitUntil:"load"});await page.waitForSelector("#pboard button");
+  await page.goto(base+"/games/game-of-life/",{waitUntil:"load"});await page.waitForSelector("#pboard button");
   assert.deepEqual(await stats(),{streak:0,best:0,seer:false});
   assert.equal(await page.locator("#predResult").getAttribute("aria-live"),"polite");
   assert.ok(await page.locator("#pboard button").first().evaluate(e=>e.getBoundingClientRect().height>=44),"prediction cells stay touch-sized");
@@ -75,8 +77,8 @@ async function check(browser,base,label,options){
   await waitSaved(2,3);await page.reload({waitUntil:"load"});assert.deepEqual(await stats(),{streak:2,best:3,seer:true});
   await solve();await activate("#checkBtn");assert.deepEqual(await stats(),{streak:3,best:3,seer:true});
   // Preserve an already-earned badge/best; never revoke historical progress.
-  await waitSaved(3,3);await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem("life-lab-v1"));s.predBest=19;s.predStreak=2;s.badges.seer=true;localStorage.setItem("life-lab-v1",JSON.stringify(s));});
-  await page.reload({waitUntil:"load"});assert.deepEqual(await stats(),{streak:2,best:19,seer:true});
+  await waitSaved(3,3);await page.goto(base+"/life-prediction-fixture.html",{waitUntil:"load"});await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem("life-lab-v1"));s.predBest=19;s.predStreak=2;s.badges.seer=true;localStorage.setItem("life-lab-v1",JSON.stringify(s));});
+  await page.goto(base+"/games/game-of-life/",{waitUntil:"load"});assert.deepEqual(await stats(),{streak:2,best:19,seer:true});
   await solve();await activate("#checkBtn");await activate("#checkBtn");assert.deepEqual(await stats(),{streak:3,best:19,seer:true});
   await waitSaved(3,19);assert.deepEqual(await unrelated(),original,"all seven original/house profile bytes and unrelated saves remain exact");
   assert.deepEqual(errors,[]);console.log("Life prediction "+label+": native checks/keyboard"+(options.hasTouch?"/touch":"")+", practice/reveal/new rounds, independent rule oracle and persisted progress passed.");
