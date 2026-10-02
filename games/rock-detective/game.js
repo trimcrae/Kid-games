@@ -618,7 +618,8 @@
 
   /* ---------------- Quiz ---------------------------------------------- */
   var ROUND_LEN = 10;
-  var q = null, answered = false, roundScore = 0, qNum = 0, streak = 0, lastName = null;
+  var q = null, answered = false, practice = false, quizFinished = false;
+  var roundScore = 0, qNum = 0, streak = 0, lastName = null;
   var tier = save.tier;
 
   function buildTiers() {
@@ -647,15 +648,25 @@
   }
 
   function newRound() {
+    quizFinished = false;
     roundScore = 0; qNum = 0; streak = 0; lastName = null;
     $("quizEnd").hidden = true;
     $("quizPlay").style.display = "";
     nextQuestion();
   }
 
-  function nextQuestion() {
+  function saveQuizRound() {
+    save.round = { tier: tier, qNum: qNum, roundScore: roundScore, answered: answered, practice: practice };
+    persist();
+  }
+
+  function nextQuestion(asPractice) {
     answered = false;
+    practice = asPractice === true;
     qNum++;
+    // Save the pending phase before rendering, including a legacy practice slot.
+    saveQuizRound();
+    $("quizPractice").hidden = !practice;
     $("nextQuiz").style.display = "none";
     $("quizFeedback").textContent = "";
     $("quizWhy").hidden = true;
@@ -676,6 +687,7 @@
     $("quizQ").innerHTML = q.prompt;
     $("quizHint").innerHTML = q.hintText || "";
 
+    var question = q;
     var box = $("quizOpts");
     box.innerHTML = "";
     box.style.gridTemplateColumns = q.options.length === 3 ? "1fr" : "1fr 1fr";
@@ -685,7 +697,7 @@
       b.className = "quiz-opt";
       b.textContent = o.text;
       b.setAttribute("aria-keyshortcuts", String(i + 1));
-      b.addEventListener("click", function () { answerQuiz(b, o); });
+      b.addEventListener("click", function () { answerQuiz(b, o, question); });
       box.appendChild(b);
     });
     var keys = [];
@@ -693,12 +705,10 @@
     $("keyHint").innerHTML = "⌨️ Big kids: press " + keys.slice(0, -1).join(", ") +
       " or " + keys[keys.length - 1] + " to answer.";
     updateQuizTop();
-    save.round = { tier: tier, qNum: qNum, roundScore: roundScore };
-    persist();
   }
 
-  function answerQuiz(btn, opt) {
-    if (answered) return;
+  function answerQuiz(btn, opt, question) {
+    if (quizFinished || answered || q !== question) return;
     answered = true;
     var buttons = $("quizOpts").querySelectorAll(".quiz-opt");
     for (var i = 0; i < buttons.length; i++) {
@@ -707,7 +717,8 @@
     }
     var fb = $("quizFeedback"), why = $("quizWhy");
     if (opt.correct) {
-      roundScore++; streak++;
+      if (!practice) roundScore++;
+      streak++;
       btn.classList.add("right");
       fb.style.color = "#1f9e57";
       fb.textContent = streak >= 3
@@ -737,8 +748,7 @@
       if (got) markFound(got.name);
     }
     updateQuizTop();
-    save.round = { tier: tier, qNum: qNum, roundScore: roundScore };
-    persist();
+    saveQuizRound();
     $("nextQuiz").textContent = qNum >= ROUND_LEN ? "See your score →" : "Next specimen →";
     $("nextQuiz").style.display = "inline-block";
     $("nextQuiz").focus();
@@ -752,6 +762,10 @@
   }
 
   function endRound() {
+    if (quizFinished) return;
+    quizFinished = true;
+    answered = true;
+    q = null;
     var stars = roundScore >= 9 ? 3 : roundScore >= 7 ? 2 : roundScore >= 5 ? 1 : 0;
     $("roundStars").textContent = "⭐".repeat(stars) + "☆".repeat(3 - stars);
     $("roundScore").textContent = roundScore + " / " + ROUND_LEN;
@@ -778,6 +792,7 @@
   }
 
   $("nextQuiz").addEventListener("click", function () {
+    if (quizFinished || !q || !answered) return;
     if (qNum >= ROUND_LEN) endRound(); else nextQuestion();
   });
   $("againQuiz").addEventListener("click", function () { sfx("good"); newRound(); });
@@ -807,14 +822,26 @@
     document.querySelectorAll(".panel").forEach(function (p) {
       p.classList.toggle("active", p.id === name);
     });
-    if (name === "quiz" && !q) {
+    if (name === "quiz" && !q && !quizFinished) {
       if (save.round && save.round.tier === tier && save.round.qNum > 0 && save.round.qNum <= ROUND_LEN) {
         roundScore = save.round.roundScore || 0;
-        qNum = save.round.qNum - 1;
+        var savedRound = save.round;
+        qNum = savedRound.qNum;
         streak = 0;
-        $("quizEnd").hidden = true;
-        $("quizPlay").style.display = "";
-        nextQuestion();
+        if (savedRound.answered === true && qNum === ROUND_LEN) {
+          endRound();
+        } else {
+          $("quizEnd").hidden = true;
+          $("quizPlay").style.display = "";
+          if (savedRound.answered === true) {
+            nextQuestion();
+          } else {
+            qNum--;
+            // Older saves cannot distinguish an unanswered slot from a scored one.
+            // Keep its earned score and replay that slot without awarding a point.
+            nextQuestion(savedRound.answered !== false || savedRound.practice === true);
+          }
+        }
       } else {
         newRound();
       }
