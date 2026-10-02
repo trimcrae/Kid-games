@@ -34,6 +34,8 @@ const suites = [
   { file: "coordinate-round-guard-browser.cjs", timeout: 180000, browser: true },
   { file: "rock-quiz-resume.cjs", timeout: 15000 },
   { file: "rock-quiz-resume-browser.cjs", timeout: 180000, browser: true },
+  { file: "world-feedback-skip.cjs", timeout: 15000 },
+  { file: "world-feedback-skip-browser.cjs", timeout: 180000, browser: true },
 ];
 
 let active;

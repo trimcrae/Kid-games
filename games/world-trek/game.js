@@ -425,6 +425,7 @@
       want = bag.pop();
       asked++;
       hinted = false;
+      skip.disabled = false;
       el.title.textContent = "Tap " + PLACES[want].name + " " + PLACES[want].emoji;
       el.text.textContent = "Find it on the map and tap it!";
       show(el.info, false);
@@ -437,13 +438,14 @@
       litWorld(want, "lit", 1400);
       el.text.textContent = PLACES[want].where;
     }, true);
-    button("⏭ Skip", function () { ask(); }, true);
+    const skip = button("⏭ Skip", function () { if (want) ask(); }, true);
 
     onWorld = function (code) {
       if (!want) return;                       // answered already — don't score twice
       if (code === want) {
         const got = want;
         want = null;
+        skip.disabled = true;
         litWorld(got, "lit", 900);
         right++;
         if (!hinted) { streak++; save.stars++; }
@@ -494,6 +496,7 @@
       want = bag.pop();
       asked++;
       hinted = false;
+      skip.disabled = false;
       const s = STATES[want];
       el.title.textContent = "Find " + s[0] + "!";
       el.text.textContent = save.diff === "expert"
@@ -505,7 +508,7 @@
     }
 
     button("💡 Show me", function () { if (want) { hinted = true; litState(want, "lit", 1500); } }, true);
-    button("⏭ Skip", function () { ask(); }, true);
+    const skip = button("⏭ Skip", function () { if (want) ask(); }, true);
 
     onState = function (code) {
       if (!want) return;
@@ -513,6 +516,7 @@
       const s = STATES[target];
       if (code === target) {
         want = null;
+        skip.disabled = true;
         litState(code, "good", 1200);
         right++;
         if (!hinted) { streak++; save.stars++; }
@@ -560,6 +564,7 @@
       want = bag.pop();
       asked++;
       hinted = false;
+      skip.disabled = false;
       el.title.textContent = STATES[want][1] + " is the capital of…?";
       el.text.textContent = "Tap that state on the map.";
       show(el.info, false);
@@ -572,7 +577,7 @@
       litState(want, "lit", 1500);
       el.text.textContent = "It's in the " + STATES[want][2] + " — " + STATES[want][0] + ".";
     }, true);
-    button("⏭ Skip", function () { ask(); }, true);
+    const skip = button("⏭ Skip", function () { if (want) ask(); }, true);
 
     onState = function (code) {
       if (!want) return;
@@ -580,6 +585,7 @@
       const s = STATES[target];
       if (code === target) {
         want = null;
+        skip.disabled = true;
         litState(code, "good", 1200);
         right++;
         if (!hinted) { streak++; save.stars++; }
