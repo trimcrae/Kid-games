@@ -88,6 +88,19 @@ async function exercise(context, base, name) {
   assert.equal((await readSave(page)).letters.some(l => l.id === "new"), true);
   assert.equal(await page.locator("#reader").isVisible(), false);
 
+  // Keyboard switching profiles during unseal must cancel the old owner's reader callback.
+  const switchMail = await readSave(page); switchMail.letters.push(mail("switch"));
+  await setPeer(peer, JSON.stringify(switchMail));
+  await page.waitForFunction(() => !!document.querySelector('.mail-item[data-id="switch"]'));
+  await page.locator('.mail-item[data-id="switch"]').click();
+  await page.locator("#reader-env").click();
+  await page.locator("#switch-btn").focus();
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(550);
+  assert.equal(await page.locator("#who").isVisible(), true);
+  assert.equal(await page.locator("#reader").isVisible(), false, "Switching profiles closes the old reader");
+  await page.locator('.who-btn[data-id="ellie"]').click();
+
   // Removal in another tab closes a reader; its pending unseal callback stays cancelled.
   await page.locator('.mail-item[data-id="new"]').click();
   await page.locator("#reader-env").click();
@@ -115,6 +128,13 @@ async function exercise(context, base, name) {
   await page.evaluate(() => { Storage.prototype.setItem = window.originalSetItem; });
   await page.locator("#send-btn").click();
   assert.equal((await readSave(page)).letters.filter(l => l.body === "Do not lose this unsent letter").length, 1);
+  // A sender opening their Sent envelope cannot mark it opened by its recipient.
+  const posted = (await readSave(page)).letters.find(l => l.body === "Do not lose this unsent letter");
+  await page.locator('#sent-list .mail-item[data-id="' + posted.id + '"]').click();
+  await page.locator("#reader-env").click();
+  await page.waitForTimeout(500);
+  assert.equal((await readSave(page)).letters.find(l => l.id === posted.id).readAt, null, "Sent preview leaves the recipient's letter unread");
+  await page.locator("#close-btn").click();
   await page.reload();
   await page.locator('.who-btn[data-id="cory"]').click();
   assert.equal(await page.locator("#inbox-list .mail-item").count(), 1, "Successful retry delivers exactly one letter after reload");
@@ -127,7 +147,7 @@ async function exercise(context, base, name) {
   const width = await page.evaluate(() => ({ root: document.documentElement.scrollWidth, viewport: window.innerWidth }));
   assert.ok(width.root <= width.viewport + 1, name + " fits its configured viewport");
   assert.deepEqual(errors, [], "Post Office has no browser errors"); assert.deepEqual(requests, [], "Post Office has no failed requests");
-  console.log("PASS Post Office " + name + ": damaged save recovery, six drafts, real storage events, rebound read/delete, removed-reader cancellation, quota retry, reload, namespaces and literal text");
+  console.log("PASS Post Office " + name + ": damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text");
 }
 async function main() {
   await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));

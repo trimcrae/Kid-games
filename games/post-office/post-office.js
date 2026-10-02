@@ -326,7 +326,7 @@
     var t = ev.target.closest(".tab"); if (!t) return;
     sfx("pop"); showTab(t.dataset.tab);
   });
-  $("switch-btn").addEventListener("click", function () { me = null; sfx("pop"); renderWho(); });
+  $("switch-btn").addEventListener("click", function () { closeReader(); me = null; sfx("pop"); renderWho(); });
 
   /* ---------- inbox ---------- */
   function mailItem(l, mine) {
@@ -443,13 +443,13 @@
   }
 
   function unseal() {
-    var l = reading; if (!l || l.readAt) return;
+    var l = reading; if (!l || l.readAt || readingMine || !me || l.to !== me.id) return;
     var env = $("reader-env");
     env.classList.add("opening");
     sfx("crack");
     l.readAt = Date.now(); save();
     setTimeout(function () {
-      if (reading !== l) return;
+      if (reading !== l || readingMine || !me || l.to !== me.id) return;
       env.classList.remove("sealed", "opening");
       env.innerHTML = envelopeHtml(l, false);
       $("open-hint").classList.add("hidden");
