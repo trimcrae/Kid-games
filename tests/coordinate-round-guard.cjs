@@ -154,6 +154,7 @@ for (const mode of ["walk", "f3"]) for (const calm of [false, true]) {
     right.click(); const once = f.state(), effects = { ...f.effects }; oldRight(); oldWrong(); assert.deepEqual(f.state(), once); assert.deepEqual(f.effects, effects);
     assert.ok(f.choices().children.every(b => b.disabled));
     f.run(f.delay); const fresh = f.state(), nextEffects = { ...f.effects }, prompt = f.instr().innerHTML;
+    right.disabled = false; wrong.disabled = false; // adversarial retained callbacks: isolate the question-identity guard
     oldRight(); oldWrong(); assert.deepEqual(f.state(), fresh); assert.deepEqual(f.effects, nextEffects); assert.equal(f.instr().innerHTML, prompt);
     f.solveRound(); assert.equal(f.state().stats.blocks, mode === "walk" ? 3 : 4); f.unchanged();
   });

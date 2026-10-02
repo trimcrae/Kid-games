@@ -144,7 +144,7 @@ async function check(browser, base, label, options, calm) {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, "fits device width");
     assert.deepEqual(await unrelated(), original, "14 original/house profiles and other saves keep exact bytes");
     assert.deepEqual(errors, []);
-    console.log("Coordinates " + label + (calm ? " calm250" : " normal650/700") + ": native pointer/keyboard" + (options.hasTouch ? "/touch" : "") + ", one answer credit, correction, completion/Again/exit and exact profile preservation passed.");
+    console.log("Coordinates " + label + (calm ? " calm250" : " normal650/700") + ": native pointer/keyboard" + (options.hasTouch ? "/touch" : "") + (calm ? ", one answer credit, next-round transition, idle exit and exact profile preservation passed." : ", one answer credit, correction, completion/Again/final-feedback exit and exact profile preservation passed."));
   } finally { await context.close(); }
 }
 (async () => {
