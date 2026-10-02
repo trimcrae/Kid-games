@@ -10,7 +10,7 @@ This applies to `house-test/engine.js` in its standalone-house and shared-game s
 
 - Startup reads active selection and raw active slot before the existing pure preparer is registered. If this active state cannot be read/admitted, registration consumes only that automatic seeding cycle so a healthy sibling cannot hide the refusal. Every existing original/house raw profile and selection remains untouched.
 - Genuine absence, legitimate current/legacy unadopted valleys and valid earned progress remain admissible. Detached temporary blank validation uses the unchanged pure preparer; the temporary pet is removed before any live result.
-- Selection, owner visits, neighborhood reads, refresh and ordinary save callers validate before changing live state or writing. Storage read failure remains distinct from absence.
+- Selection, owner visits, neighborhood reads and refresh validate before replacing live state. Ordinary saves validate before writing. Storage read failure remains distinct from absence.
 - The real house cold-start module recognizes refusal before its generic timeout and exposes a local, mode-bound recovery link. Paused native import/reset/read callbacks remain disabled; accessible recovery is download and retry.
 - Existing automatic copy preparation, family journal/recovery/restore and pure normalizer/preparer bodies remain unchanged. Only the optional preparer-registration skip is new in `save-copy.js`; related cache tokens advance together.
 
