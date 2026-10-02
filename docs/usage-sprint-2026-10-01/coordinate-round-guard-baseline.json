@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "ai_assisted": true,
+  "repository": "trimcrae/Kid-games",
+  "baseline_commit": "846067891bcd8e3e5b0a238cc245ca5d68a500e9",
+  "file": "games/block-coordinates/game.js",
+  "utf8_bytes": 71771,
+  "sha256": "afe0e0aa44d7a2974082cc892ce81c1ddda27f67d72fa69a7d8b52f9a83011b5",
+  "git_blob": "31f22b7f4aa5591ded6cea5ee85db3345a01e4e3",
+  "verification": "Preliminary unchanged-production-source execution in isolated V8 adapters. Not actual Node or browser; synthetic data only.",
+  "scout_witness": {
+    "scope": "Unchanged startF3, makeBoard, defaults, tier helpers, addBlocks and persist; actual makeBoard click listeners called through simulated DOM button clicks. DOM, timers, visual/audio effects and storage are adapters.",
+    "random": 0.1,
+    "first_target": {
+      "x": 1,
+      "y": 1
+    },
+    "cases": [
+      {
+        "tier": "normal",
+        "same_correct_clicks_before_feedback": 1,
+        "blocks": 1,
+        "queued_ms": [
+          700
+        ],
+        "after_first_callback": "Map view round 2/6"
+      },
+      {
+        "tier": "normal",
+        "same_correct_clicks_before_feedback": 2,
+        "blocks": 2,
+        "queued_ms": [
+          700,
+          700
+        ],
+        "after_first_callback": "Quiz round 3/6; map question skipped"
+      },
+      {
+        "tier": "easy",
+        "same_correct_clicks_before_feedback": 4,
+        "blocks": 4,
+        "queued_ms": [
+          700,
+          700,
+          700,
+          700
+        ],
+        "after_first_callback": {
+          "banner": "4 / 4 first try",
+          "saved_best": 4,
+          "quests": 1,
+          "pending_callbacks": 3
+        }
+      }
+    ]
+  },
+  "independent_root_witness": {
+    "scope": "Unchanged startF3 body with isolated DOM, board, audio and timer adapters; board helper stub differs from scout's actual makeBoard.",
+    "observed": "Two correct callbacks before feedback yielded two credits and two 700 ms transitions.",
+    "verification": "Preliminary V8, not Node/browser."
+  },
+  "regression_source_witness": {
+    "scope": "The new Node-test source evaluated in V8 with fs/path/vm/assert adapters against the unchanged original blob.",
+    "observed": "First duplicate Walk test rejected original state: blocks 6/bestStreak 6 versus accepted-once blocks 1/bestStreak 1.",
+    "verification": "Preliminary V8; not an actual Node baseline run."
+  },
+  "policy": {
+    "acceptance": "One block and at most one first-try point per current question; wrong-before-correct remains learnable.",
+    "feedback": "Accepted questions ignore further grid/choice input during feedback; one next-round transition.",
+    "identity": "Retained choices and detached F3 boards cannot answer a different question or screen.",
+    "exit": "Leaving/restarting cancels pending transition and invalidates old callbacks, including final feedback after tier changes.",
+    "history": "Keep historical bests, ranks, completed/perfect builds, free worlds and save schema. No historical score cleanup."
+  },
+  "deferred_lead": {
+    "game": "Rock Detective",
+    "status": "Independent scout's preliminary V8 lead only; not implemented or queued as an active task.",
+    "fingerprints": {
+      "games/rock-detective/game.js": "65bf1b3a188a6ea54978c33510c654a515cd689c",
+      "games/rock-detective/rocks.js": "c67ae139ed35a7bc35c6d20ae35dd106cc7e5d7a",
+      "games/rock-detective/index.html": "4ef7f54e9820be1bf386e598d5587d039dd3b77d"
+    },
+    "trigger": "Answer Specimen 1 correctly; reload before Next. Resume subtracts qNum by 1 while retaining credited roundScore. Answer the replacement first specimen correctly: visible score 2 at specimen 1. Finish the remaining nine: visible/saved best 11/10.",
+    "evidence_scope": "Reported unchanged game+rocks V8 DOM/storage witness with unrelated sentinel preserved; no actual Node/browser execution.",
+    "future_gate": "Re-read fresh priorities/owners/fingerprints and independently reproduce the exact trigger before any future repair. No second worker or job is active."
+  }
+}

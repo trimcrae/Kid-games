@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "ai_assisted": true,
+  "repository": "trimcrae/Kid-games",
+  "baseline_commit": "846067891bcd8e3e5b0a238cc245ca5d68a500e9",
+  "source_branch": "codex/usage-sprint-2026-10-01-coordinate-round-guard",
+  "source_head": "29ccecaf7b3cfba7f5dbc4469f34440dc0d0eefc",
+  "source_tree": "c6c2bc0b877d709024c8f8c8e095a26ff4ac9acb",
+  "actual_pr_checkout": "ae02525a00535c009d9713ecd951a4db9654ba4b",
+  "checkout_tree_matches": true,
+  "source_merge": "68a49928bac7a2d02c38b754d6fff23b74b534c5",
+  "source_merge_parents": [
+    "846067891bcd8e3e5b0a238cc245ca5d68a500e9",
+    "29ccecaf7b3cfba7f5dbc4469f34440dc0d0eefc"
+  ],
+  "source_merge_tree_matches": true,
+  "pr": 9,
+  "merge_method": "merge",
+  "files": [
+    {
+      "path": "games/block-coordinates/game.js",
+      "utf8_bytes": 73282,
+      "sha256": "2613b2b70055679b0bd7f30e1237a622f6aa88c5591733febf869a0b6dd6de24",
+      "git_blob": "b61e0ee2eaa049a6e59b4b8fff2088e10ec06066"
+    },
+    {
+      "path": "games/block-coordinates/index.html",
+      "utf8_bytes": 22374,
+      "sha256": "ace5a99e21838d257acc3ced29943cd59cdb83b5c7594ff4fba5c0a1f203e376",
+      "git_blob": "cbb22b6af200ab886992f123884982c2973c5ece"
+    },
+    {
+      "path": "tests/coordinate-round-guard.cjs",
+      "utf8_bytes": 13431,
+      "sha256": "3bc4cd94b8cc7feb607dd0a28baac8d9817191f860600e580d3639e5c6bb4b99",
+      "git_blob": "b1d5e7f05bb82c92e6acb1446f3972c9d1a6ee16"
+    },
+    {
+      "path": "tests/coordinate-round-guard-browser.cjs",
+      "utf8_bytes": 12848,
+      "sha256": "6712f47d96332535650502c3f63dc8b18c6eb6dbed0af7ab465b9a3bebe7bc90",
+      "git_blob": "36274eafed969cde20314b2357e3d3a71d9c1cf3"
+    },
+    {
+      "path": "tests/regressions.cjs",
+      "utf8_bytes": 6137,
+      "sha256": "f80e00e460d31b0b0504119e4598a9a6be5550d7eb21caec7b10c41391822ac2",
+      "git_blob": "0a3fa433901aec36d12e58f56563e2031fe2a588"
+    }
+  ],
+  "unchanged_workflow": {
+    "path": ".github/workflows/playtests.yml",
+    "git_blob": "5e58022b9ae9bd2cb7850d7a27440d74ca732e9c",
+    "manual_dispatches": 0
+  },
+  "actual_source_ci": {
+    "run": 36993088839,
+    "job": 110793558720,
+    "conclusion": "success",
+    "node_version": "22.23.3",
+    "node_production_cases": 20,
+    "focused_suites": "24/24",
+    "chromium_groups": 6,
+    "chromium_duration_seconds": 75.7,
+    "normal_browser_scope": "Desktop/iPad/iPhone full production page: native mouse/touch and Enter/Space, independent public-coordinate/axis oracle, duplicate answers, wrong-before-correct recovery, one completed run, Again and abandonment during final feedback with tier change and another mode.",
+    "calm_browser_scope": "Desktop/iPad/iPhone full production page: first answer earns once, 250 ms next-round transition, subsequent idle exit into Free Build and unchanged state.",
+    "node_scope": "Actual production functions in Node VM with isolated DOM, timer and visual/audio adapters; complete lifecycle at both normal and calm timing, retained handlers including synthetic re-enabled detached choices, completion/Again, final-feedback exit, historical progress.",
+    "privacy": "Exact synthetic bytes in seven original-game and seven house profile slots, profile selections and unrelated synthetic saves unchanged. Existing Coordinates completed/perfect builds, free world, historical bests and rank/streak retained."
+  },
+  "original_logs": [
+    {
+      "kind": "superseded initial CI",
+      "path": "coordinate-round-guard-ci-initial-cancelled-original.log",
+      "run": 36991980640,
+      "job": 110790058506,
+      "head_sha": "b6c132d19f697ab77b1ce77cddafd7bb89050ab6",
+      "conclusion": "cancelled",
+      "utf8_bytes": 101219,
+      "sha256": "38b389a796eccad7ff8639733c58294cfbbb9a5d438e041a0b74fb33914ef16e",
+      "git_blob": "01757152fd3711272b044615304d861e7d16a903",
+      "scope": "Automatically superseded by the requested coverage-log/test-identity refinement. Did not reach Coordinates suites; no Coordinates Node/browser pass or failure claimed."
+    },
+    {
+      "kind": "test expectation failure",
+      "path": "coordinate-round-guard-ci-test-failure-original.log",
+      "run": 36992167348,
+      "job": 110790916038,
+      "head_sha": "572ddcd380886600f08b8955165500ff939b504c",
+      "conclusion": "failure",
+      "utf8_bytes": 149927,
+      "sha256": "ba4548f5f96c8a6b33ed0e18b5146723dbea4b5e82c75e2d90a0f8fb86a80e05",
+      "git_blob": "8f77f1816fae559824a8b708d5362df2d0862d5a",
+      "scope": "20 actual Coordinates Node cases passed; full focused runner 23/24. First Desktop browser group failed because native Free Build hover readout (8, 3) was incorrectly expected to remain the placeholder. No device group completed. Test-only correction checks the Free Build control's presence; production source remained unchanged."
+    },
+    {
+      "kind": "final source CI",
+      "path": "coordinate-round-guard-ci-final-original.log",
+      "run": 36993088839,
+      "job": 110793558720,
+      "head_sha": "29ccecaf7b3cfba7f5dbc4469f34440dc0d0eefc",
+      "conclusion": "success",
+      "utf8_bytes": 150355,
+      "sha256": "fda0a6e2b316f291d7bf70e1e079d69b569e554d5593b0c9e8df6eb59885ff99",
+      "git_blob": "fba5349cb5ed43ee80b2db3d53ae56faa93a7c07",
+      "scope": "20 production Node cases, six full-page Chromium groups with accurately separated normal/calm scopes, 24/24 focused suites."
+    }
+  ],
+  "code_pages": {
+    "run": 36994186333,
+    "status": "completed",
+    "conclusion": "success",
+    "head_sha": "68a49928bac7a2d02c38b754d6fff23b74b534c5"
+  },
+  "limits": [
+    "Preliminary V8 baseline and builtin adapters are not actual Node/browser evidence.",
+    "Chromium mobile device emulation is not physical iOS Safari.",
+    "No simultaneous-tab or storage-durability guarantee was added."
+  ],
+  "documentation_publication": "Final docs-only main CI and Pages will be observed and reported separately without another receipt/deployment commit."
+}

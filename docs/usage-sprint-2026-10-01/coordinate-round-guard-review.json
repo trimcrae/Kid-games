@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "ai_assisted": true,
+  "repository": "trimcrae/Kid-games",
+  "source_head": "29ccecaf7b3cfba7f5dbc4469f34440dc0d0eefc",
+  "source_tree": "c6c2bc0b877d709024c8f8c8e095a26ff4ac9acb",
+  "reviews": [
+    {
+      "reviewer": "root",
+      "result": "clear",
+      "scope": "Narrow production answer/lifecycle guards, unchanged saves/history/other modes/workflow, independent V8 source witness, exact test-only repair and original CI log/tree gate.",
+      "actual_ci_gate": {
+        "run": 36993088839,
+        "job": 110793558720,
+        "conclusion": "success",
+        "node_cases": 20,
+        "chromium_groups": 6,
+        "focused_suites": "24/24",
+        "actual_pr_checkout": "ae02525a00535c009d9713ecd951a4db9654ba4b",
+        "tree_match": true,
+        "original_log_sha256": "fda0a6e2b316f291d7bf70e1e079d69b569e554d5593b0c9e8df6eb59885ff99"
+      }
+    },
+    {
+      "reviewer": "accessibility_scout",
+      "result": "clear",
+      "scope": "Independent read-only production, stale choice/board and screen/tier/Again lifecycle review; 20-case V8 adapter check plus two synthetic re-enabled retained-choice witnesses; actual original Node/Chromium CI transcript and checkout/tree review.",
+      "actual_ci_gate": {
+        "run": 36993088839,
+        "job": 110793558720,
+        "conclusion": "success",
+        "node_cases": 20,
+        "chromium_groups": 6,
+        "focused_suites": "24/24",
+        "actual_pr_checkout": "ae02525a00535c009d9713ecd951a4db9654ba4b",
+        "tree_match": true
+      },
+      "preliminary_limitation": "Independent V8 adapter checks are not Node/browser. Actual Node/browser proof comes from the final source CI."
+    }
+  ],
+  "test_error_review": "Root and accessibility_scout independently matched the original failed transcript and the unchanged Free Build pointer/focus readout behavior. The one-line expectation correction is test-only.",
+  "source_merge_gate": "Both actual-source gates cleared before normal PR9 merge68a49928bac7a2d02c38b754d6fff23b74b534c5."
+}
