@@ -52,10 +52,17 @@ Actual [CI36964150346](https://github.com/trimcrae/Kid-games/actions/runs/369641
 
 See [the bounded handoff](usage-sprint-2026-10-01-active-house-save.md) for exact source/tree/log bindings, the retained first failed CI, primary fixture evidence and limits. The original main-game runtime, pure preparer/normalizer and family journal are unchanged.
 
-## Next bounded tasks
+## Original game active-save loader preservation — completed
 
-1. **Audit the untouched original main-game active-save loader separately.** At `games/craepets/craepets.js`, inspect fresh owners and reproduce one real loss of active raw bytes before its ordinary load/write path before deciding on a repair. Stop with a no-change receipt if no defect is demonstrated; do not repeat completed house loader, seeding, family restore, importer or Post Office repairs.
-2. Check transferred pet imports on a real iPad/iPhone when that environment is available.
+[PR #7](https://github.com/trimcrae/Kid-games/pull/7) refuses damaged original-game active saves before ordinary writes and preserves exact raw bytes for all seven native profiles in the original and house namespaces, and their selection. Local literal download/retry remains accessible after existing news or delayed prize callbacks. Safe blank/legacy/adopted learning and a healthy lesson after sibling refusal remain supported.
+
+Actual [CI36971653812](https://github.com/trimcrae/Kid-games/actions/runs/36971653812), job110726688606, passed **20/20 suites**:198 new Node production cases and all three Chromium Desktop/iPad/iPhone groups, plus18 inherited suites. Reviewed source `5123281553c335250bd8952f4da757353b7273e1`, actual checkout and normal merge `e01ce7c048b7052fb9aa2bec4e0ffead116e5a95` share exact tested tree `86f5375be7186073ea098089c3065fffb029cd1d`. Pages [36972324871](https://github.com/trimcrae/Kid-games/actions/runs/36972324871) published the tested merge successfully.
+
+See [the bounded handoff](usage-sprint-2026-10-01-original-game-save.md) for source/tree/log bindings, the retained first actual19/20 failed run and exact browser/adapter limits. House, family, seeding and Post Office runtime files and pure preparation/normalization remain unchanged.
+
+## Sprint stopping point
+
+This finite original-game task returns ownership after reviewed publication. No additional independently demonstrated defect is queued and no second task is started. Transferred-pet checks on physical iPad/iPhone remain outstanding until such an environment is available.
 
 Before each follow-on, read the latest main HEAD and repository guidance, inspect ongoing PRs, choose a bounded task, and get meaningful checks plus independent review before publication. The existing focused runner is `cd tests && npm run test:regressions`; targeted import suites are `craepets-import.cjs` and `craepets-import-browser.cjs`. The repo's AGENTS/CLAUDE guidance requires reviewed work to reach main. A temporary PR is useful for real CI when no local runtime exists.
 

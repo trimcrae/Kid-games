@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "ai_authored": true,
+  "repository": "trimcrae/Kid-games",
+  "scope": "Original-game active save admission before ordinary persistence and accessible local raw recovery",
+  "pull_request": 7,
+  "baseline_commit": "8c59ec949b67681aa976f1dd9de03312b847c044",
+  "baseline_engine_blob": "5798211e613138a881ad8da7cf1f1f5e5338de1e",
+  "reviewed_source_commit": "5123281553c335250bd8952f4da757353b7273e1",
+  "reviewed_tree": "86f5375be7186073ea098089c3065fffb029cd1d",
+  "merge_commit": "e01ce7c048b7052fb9aa2bec4e0ffead116e5a95",
+  "merge_tree": "86f5375be7186073ea098089c3065fffb029cd1d",
+  "merge_parents": [
+    "8c59ec949b67681aa976f1dd9de03312b847c044",
+    "5123281553c335250bd8952f4da757353b7273e1"
+  ],
+  "actual_validation": {
+    "run_id": 36971653812,
+    "run_url": "https://github.com/trimcrae/Kid-games/actions/runs/36971653812",
+    "job_id": 110726688606,
+    "conclusion": "success",
+    "run_terminal_updated_at": "2026-10-02T06:08:33Z",
+    "node_version": "22.23.3",
+    "checkout_commit": "f2f1e19f53a60c205496dbb2c8b8d12012835bcc",
+    "checkout_tree": "86f5375be7186073ea098089c3065fffb029cd1d",
+    "command": "npm run test:regressions",
+    "working_directory": "tests",
+    "new_production_node_cases": 198,
+    "new_chromium_groups": [
+      "Desktop",
+      "iPad",
+      "iPhone"
+    ],
+    "native_profiles_per_group": 7,
+    "original_and_house_profile_slots_per_group": 14,
+    "passed_suites": 20,
+    "total_suites": 20,
+    "inherited_suites": 18,
+    "all_job_steps_succeeded": true,
+    "original_log_path": "docs/usage-sprint-2026-10-01/original-game-save-ci-final-original.log",
+    "original_log_git_blob": "35237b530c42f13a7d45705fa35b1c2fef6ac160",
+    "original_log_utf8_bytes": 143417,
+    "original_log_sha256": "e854c6853ba86bc54091f6aaa320de93e9fd1d87ee87229610f171ef8f79714d"
+  },
+  "initial_actual_failure": {
+    "source_commit": "b5f35db34f219df2148eb2ad23d7235f8446f99e",
+    "source_tree": "189f5221ebcc83b2bf61f6d25d598622a303dbe3",
+    "run_id": 36970776392,
+    "run_url": "https://github.com/trimcrae/Kid-games/actions/runs/36970776392",
+    "job_id": 110724091654,
+    "conclusion": "failure",
+    "checkout_commit": "e2349d450381510e58223a10c01a3b6033cc2288",
+    "passed_suites": 19,
+    "total_suites": 20,
+    "new_node_cases_passed": 196,
+    "new_browser_groups_completed": [
+      "Desktop"
+    ],
+    "full_browser_matrix_passed": false,
+    "failed_suite": "craepets-game-active-save-browser.cjs",
+    "cause": "iPad blocked-startup exact comparison used incomplete observer-side setup snapshot. Writer-owned complete snapshot and observer propagation barrier repair test setup; exact raw assertions retained.",
+    "original_log_path": "docs/usage-sprint-2026-10-01/original-game-save-ci-initial-original.log",
+    "original_log_git_blob": "b27b61e4736318d4b1136438fe9e6f94e282b27d",
+    "original_log_utf8_bytes": 214094,
+    "original_log_sha256": "0fb04476afd90117700b246dbadf85987dbcd81d09ea54bfbd4b0169fbb90160"
+  },
+  "baseline_evidence": {
+    "path": "docs/usage-sprint-2026-10-01/original-game-save-baseline.json",
+    "execution": "Preliminary isolated V8 production-section adapters, not Node/browser",
+    "native_profile_cases": 7,
+    "fixture_only": true
+  },
+  "independent_review": {
+    "path": "docs/usage-sprint-2026-10-01/original-game-save-review.json",
+    "reviewers": [
+      "/root/apps_round3_review",
+      "/root/rare_specimen_crosswalk",
+      "/root"
+    ],
+    "source_method_and_actual_ci": "cleared",
+    "distinct_overlay_findings_fixed": [
+      "Pending wheel award",
+      "Existing news modal"
+    ]
+  },
+  "source_blob_inventory": {
+    "games/craepets/craepets.js": "af0f7f3620cb8da20c3454b94a22140ac4fcd6f3",
+    "games/craepets/index.html": "c068423a8df9758903c790619dce9c22cab65097",
+    "tests/craepets-game-active-save.cjs": "0261a0a7edcc6c5fbb86b31567e489c49d158032",
+    "tests/craepets-game-active-save-browser.cjs": "e60dd01212bd39b50f9f8a747e997e2db92fb24d",
+    "tests/regressions.cjs": "c59eb1d03243a22df4aeb988d3a272b91c0642fb"
+  },
+  "unchanged_pure_bodies": [
+    "blankSave",
+    "normalizeSave",
+    "saveRecord through importCandidate"
+  ],
+  "unchanged_runtime_scope": "Complete compare changes exactly original runtime/index, two new test files and runner. All house/family/seeding/PostOffice runtime paths unchanged.",
+  "publication": {
+    "run_id": 36972324871,
+    "run_url": "https://github.com/trimcrae/Kid-games/actions/runs/36972324871",
+    "workflow_name": "pages build and deployment",
+    "head_sha": "e01ce7c048b7052fb9aa2bec4e0ffead116e5a95",
+    "conclusion": "success",
+    "run_terminal_updated_at": "2026-10-02T06:12:12Z"
+  },
+  "limits": [
+    "Synthetic fixtures only; local raw download, no remote upload",
+    "New browser tests load full standalone production game; Chromium mobile emulation is not physical iOS",
+    "Native FileReader and wheel closure delivery deliberately held; actual read/native delay still occur",
+    "Sequential storage events/visibility transitions do not establish simultaneous-tab atomicity or storage durability",
+    "Ordinary action may mutate healthy memory before save's pre-write recheck; no universal transaction claim"
+  ],
+  "stop_condition": "Reviewed source with actual20/20 CI, normal main integration, Pages publication and reviewed handoff. No additional independently demonstrated defect queued or second task started."
+}

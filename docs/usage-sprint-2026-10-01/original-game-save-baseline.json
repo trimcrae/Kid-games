@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "ai_authored": true,
+  "baseline_commit": "8c59ec949b67681aa976f1dd9de03312b847c044",
+  "engine_blob": "5798211e613138a881ad8da7cf1f1f5e5338de1e",
+  "execution": "Preliminary isolated V8 storage adapters executing actual original-game load/normalize/save and real content tables. Not Node or browser.",
+  "synthetic_fixture_only": true,
+  "cases": [
+    {
+      "profile": "jeannie",
+      "prior_raw": "{ valuable damaged active jeannie bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"big\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452105,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    },
+    {
+      "profile": "cory",
+      "prior_raw": "{ valuable damaged active cory bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"mid\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452110,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    },
+    {
+      "profile": "ellie",
+      "prior_raw": "{ valuable damaged active ellie bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"early\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452114,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    },
+    {
+      "profile": "kieran",
+      "prior_raw": "{ valuable damaged active kieran bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"tot\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452118,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    },
+    {
+      "profile": "shannon",
+      "prior_raw": "{ valuable damaged active shannon bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"grown\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452121,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    },
+    {
+      "profile": "tristan",
+      "prior_raw": "{ valuable damaged active tristan bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"grown\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452126,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    },
+    {
+      "profile": "guest",
+      "prior_raw": "{ valuable damaged active guest bytes",
+      "after_raw": "{\"v\":1,\"tier\":\"mid\",\"coins\":60,\"pet\":null,\"bag\":{},\"bagNew\":{},\"colours\":[\"berry\",\"sky\",\"meadow\",\"bubble\",\"tangerine\",\"lavender\"],\"lastTick\":1790919452131,\"day\":20728,\"quests\":[],\"claimed\":{},\"today\":{},\"review\":[],\"seen\":{},\"harvest\":{\"farm\":[],\"well\":[],\"pool\":[]},\"house\":{\"home\":\"nest\",\"homes\":[\"nest\"],\"rooms\":{},\"walls\":[],\"floors\":[],\"views\":[],\"owned\":[],\"placed\":[]},\"stall\":{\"name\":\"\",\"goods\":[],\"sales\":[]},\"adapt\":{\"math\":{\"rung\":1,\"hist\":[],\"best\":1},\"word\":{\"rung\":1,\"hist\":[],\"best\":1},\"wonder\":{\"rung\":1,\"hist\":[],\"best\":1}},\"arena\":{\"floor\":0,\"ally\":null,\"shadeWins\":0,\"hoardGot\":0,\"hoardIds\":[]},\"spinDay\":0,\"dayStreak\":0,\"lastPlayDay\":0,\"wardrobe\":[],\"wish\":null,\"diary\":[],\"mail\":[],\"petpets\":[],\"bank\":{\"balance\":0,\"day\":20728,\"earned\":0},\"catch\":{\"best\":0,\"games\":0},\"stats\":{\"correct\":0,\"wrong\":0,\"best\":0,\"streak\":0,\"farm\":0,\"well\":0,\"pool\":0,\"arena\":0,\"arenaWin\":0,\"feed\":0,\"play\":0,\"wash\":0,\"read\":0,\"buy\":0,\"quests\":0,\"coinsEarned\":0,\"fixed\":0,\"bestDayStreak\":0,\"bySubject\":{},\"spin\":0,\"placed\":0,\"stocked\":0,\"sold\":0,\"soldCoins\":0,\"styled\":0,\"newq\":0,\"repeatq\":0,\"heat\":0,\"stepup\":0,\"crit\":0,\"quick\":0,\"tower\":0,\"shadeWin\":0,\"allyHits\":0,\"allyWins\":0,\"bestFloor\":0,\"wishes\":0,\"dressed\":0,\"gifts\":0,\"received\":0,\"diary\":0,\"banked\":0,\"events\":0,\"catchGames\":0,\"matchGames\":0,\"visits\":0,\"parties\":0},\"trophies\":[]}",
+      "overwritten": true,
+      "pet": null,
+      "coins": 60,
+      "other_keys_unchanged": true
+    }
+  ]
+}

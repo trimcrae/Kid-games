@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "ai_authored": true,
+  "reviewed_source_commit": "5123281553c335250bd8952f4da757353b7273e1",
+  "reviewed_tree": "86f5375be7186073ea098089c3065fffb029cd1d",
+  "independent_reviewers": [
+    "/root/apps_round3_review",
+    "/root/rare_specimen_crosswalk",
+    "/root"
+  ],
+  "source_method_status": "cleared",
+  "baseline_reproduction": "Seven original-game profiles independently reproduced malformed raw overwrite with actual load/normalize/save in isolated V8 adapters; not Node/browser",
+  "findings_closed": [
+    "Already-paused delayed awardSpin mutated memory and mounted a Prize dialog",
+    "Existing news backdrop obscured paused recovery while input handlers could not dismiss it"
+  ],
+  "corrections": [
+    "Paused/null awardSpin guard",
+    "Paused openSheet guard",
+    "closeNews during pause before warning/focus",
+    "Real production wheel/news controls",
+    "Writer-owned fixture snapshot and explicit observer propagation barriers"
+  ],
+  "unchanged_pure_bodies": [
+    "blankSave",
+    "normalizeSave",
+    "saveRecord through importCandidate"
+  ],
+  "unchanged_runtime_scope": [
+    "house-test/*",
+    "Post Office runtime",
+    "original import preparation and shared normalizer"
+  ],
+  "limits": [
+    "Original-game browser checks load the production page, not a minimal house host",
+    "Native FileReader/wheel closure completion is deliberately held",
+    "Chromium emulation is not physical iOS",
+    "Sequential storage events are not simultaneous-tab atomicity",
+    "Ordinary pre-write validation does not imply every healthy in-memory mutation is prevalidated"
+  ],
+  "actual_validation_status": "independently cleared",
+  "run_id": 36971653812,
+  "job_id": 110726688606,
+  "actual_cases": 198,
+  "actual_chromium_groups": [
+    "Desktop",
+    "iPad",
+    "iPhone"
+  ],
+  "suites_passed": 20
+}
