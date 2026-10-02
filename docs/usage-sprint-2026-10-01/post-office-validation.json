@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "authorship": "AI-authored; separate independent source and receipt review",
+  "base_main": "9bf9b61f8f1a89493e919a76f57df086bd6bd916",
+  "source_revision": "9c377a2fc6d5d5f81bc5da3432418bb9e005d328",
+  "source_tree": "8805937f2e08312a0c6cce2921964489c4136db3",
+  "synthetic_checkout": "5c801072cd17ea7948be04b9a6fa092db7d687a0",
+  "workflow": {
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36947199408",
+    "run_id": 36947199408,
+    "job_id": 110651904041,
+    "head_sha": "9c377a2fc6d5d5f81bc5da3432418bb9e005d328",
+    "status": "completed",
+    "conclusion": "success",
+    "observed_complete_utc": "2026-10-02T00:44:56Z"
+  },
+  "checks": {
+    "node_storage_cases": 56,
+    "chromium_groups": [
+      {
+        "name": "Desktop",
+        "viewport": [
+          1280,
+          900
+        ]
+      },
+      {
+        "name": "iPad",
+        "viewport": [
+          820,
+          1180
+        ]
+      },
+      {
+        "name": "iPhone",
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    ],
+    "focused_suites_passed": 12,
+    "focused_suites_total": 12,
+    "real_other_tab_storage_events": true
+  },
+  "merge": {
+    "sha": "f400476238f786733291fca80ca6568447721704",
+    "tree": "8805937f2e08312a0c6cce2921964489c4136db3",
+    "parents": [
+      "9bf9b61f8f1a89493e919a76f57df086bd6bd916",
+      "9c377a2fc6d5d5f81bc5da3432418bb9e005d328"
+    ],
+    "matches_reviewed_tree": true
+  },
+  "pages": {
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36947678263",
+    "run_id": 36947678263,
+    "head_sha": "f400476238f786733291fca80ca6568447721704",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "limitations": [
+    "Chromium mobile emulation does not establish real iOS Safari behavior.",
+    "Sequential real storage events do not establish atomic simultaneous cross-tab writes.",
+    "Eight append-only distinct recovery copies; a full or malformed recovery store blocks additional repair writes without deleting earlier copies.",
+    "The family-bundle restore path in house-test/save-copy.js is unchanged."
+  ],
+  "next_bounded_task": "Audit Craepets house-test/save-copy.js family-bundle restore across real profile namespaces for malformed nested state and partial write failures."
+}

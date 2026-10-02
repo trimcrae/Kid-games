@@ -28,11 +28,16 @@ Independent isolated V8 review additionally checked all seven real profiles in b
 
 This repairs the activity engine's single-valley importer. The separate family-bundle importer in `house-test/save-copy.js` retains its existing behavior and needs its own future review.
 
+## Post Office damaged-save and live-reader recovery — completed
+
+[PR #3](https://github.com/trimcrae/Kid-games/pull/3) is reviewed, validated and merged as `f400476238f786733291fca80ca6568447721704`. Actual final CI [36947199408](https://github.com/trimcrae/Kid-games/actions/runs/36947199408) passed 12/12 suites: 56 Node storage cases and Desktop/iPad/iPhone real Chromium checks, including second-tab updates, reader ownership, posting quota retry, reload and unrelated saves. Pages [36947678263](https://github.com/trimcrae/Kid-games/actions/runs/36947678263) published the tested merge successfully.
+
+See [the bounded handoff](usage-sprint-2026-10-01-post-office.md) and [machine-readable receipt](usage-sprint-2026-10-01/post-office-validation.json). Original damaged bytes remain in local append-only safety copies before repaired writes; unusable external snapshots preserve live mail, and an unsafe write is refused visibly. The standalone family-bundle importer remains the next priority.
+
 ## Next bounded tasks
 
-1. **Check Post Office damaged saves and multiple tabs.** Its loader accepts arrays containing null/malformed letters and only loosely checks drafts. Investigate `games/post-office/post-office.js` load/storage-event paths, preserve valid mail and draft content, and add targeted regressions before changing storage writes.
-2. **Review house family-bundle restore separately.** `house-test/save-copy.js` uses a minimal pet check and pre-import snapshot/rollback. Audit malformed nested game state and partial storage failures without weakening profile isolation or changing the completed activity importer.
-3. Check transferred pet imports on a real iPad/iPhone when that environment is available.
+1. **Review house family-bundle restore separately.** `house-test/save-copy.js` uses a minimal pet check and pre-import snapshot/rollback. Audit malformed nested game state and partial storage failures without weakening profile isolation or changing the completed activity importer.
+2. Check transferred pet imports on a real iPad/iPhone when that environment is available.
 
 Before each follow-on, read the latest main HEAD and repository guidance, inspect ongoing PRs, choose a bounded task, and get meaningful checks plus independent review before publication. The existing focused runner is `cd tests && npm run test:regressions`; targeted import suites are `craepets-import.cjs` and `craepets-import-browser.cjs`. The repo's AGENTS/CLAUDE guidance requires reviewed work to reach main. A temporary PR is useful for real CI when no local runtime exists.
 

@@ -131,7 +131,7 @@ To run just one focused suite:
 npm run test:regressions -- math-reliability.test.js
 ```
 
-The shared-media, photo-daily and Craepets import transaction suites also run
+The Post Office storage, shared-media, photo-daily and Craepets import transaction suites also run
 without Chromium when selected on their own. For save-transfer safety checks:
 
 ```bash
@@ -149,6 +149,20 @@ preferences and reset flags, and transfer bought houses, equipped furniture
 and paid room styles. The browser suite loads the real activity iframe inside
 a minimal same-origin host and verifies a shared-profile round trip through
 both engines; it does not start the unchanged full 3D walkthrough.
+
+For Post Office recovery and live-mail regressions:
+
+```bash
+npm run test:regressions -- post-office-storage.cjs
+npm run test:regressions -- post-office-storage-browser.cjs
+```
+
+The storage suite checks all six family drafts, damaged letters and bodies,
+legacy IDs, native ID fences, preserved original recovery copies and refused
+unsafe writes. The browser suite runs Desktop/iPad/iPhone Chromium groups with
+real other-tab storage events, rebound reader actions, profile-switch and
+removed-reader cancellation, sender previews, failed-post retry and reload.
+Unrelated Craepets game and house saves remain intact.
 
 [`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
 for pull requests and pushes to `main`, with a fifteen-minute job limit. It

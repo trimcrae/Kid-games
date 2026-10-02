@@ -1,0 +1,132 @@
+2026-10-02T00:41:28.1224089Z ##[group]Run npm run test:regressions
+2026-10-02T00:41:28.1224674Z [36;1mnpm run test:regressions[0m
+2026-10-02T00:41:28.1282491Z shell: /usr/bin/bash -e {0}
+2026-10-02T00:41:28.1282932Z env:
+2026-10-02T00:41:28.1283534Z   CHROMIUM_PATH: /home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+2026-10-02T00:41:28.1284295Z ##[endgroup]
+2026-10-02T00:41:28.2306219Z 
+2026-10-02T00:41:28.2306815Z > kid-games-playtests@1.0.0 test:regressions
+2026-10-02T00:41:28.2307370Z > node regressions.cjs
+2026-10-02T00:41:28.2307526Z 
+2026-10-02T00:41:28.5303255Z Running 12 focused regression suites with /home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+2026-10-02T00:41:28.5304045Z 
+2026-10-02T00:41:28.5304329Z --- post-office-storage.cjs ---
+2026-10-02T00:41:28.5821516Z PASS normal saves and key ordering do not create recovery copies
+2026-10-02T00:41:28.5839426Z PASS all six drafts and valid family mail survive mixed damage without read-time writes
+2026-10-02T00:41:28.5842764Z PASS invalid letter 0 cannot hide a valid sibling
+2026-10-02T00:41:28.5844329Z PASS invalid letter 1 cannot hide a valid sibling
+2026-10-02T00:41:28.5845872Z PASS invalid letter 2 cannot hide a valid sibling
+2026-10-02T00:41:28.5848421Z PASS invalid letter 3 cannot hide a valid sibling
+2026-10-02T00:41:28.5850979Z PASS invalid letter 4 cannot hide a valid sibling
+2026-10-02T00:41:28.5852919Z PASS invalid letter 5 cannot hide a valid sibling
+2026-10-02T00:41:28.5855503Z PASS invalid letter 6 cannot hide a valid sibling
+2026-10-02T00:41:28.5860576Z PASS invalid letter 7 cannot hide a valid sibling
+2026-10-02T00:41:28.5863013Z PASS invalid letter 8 cannot hide a valid sibling
+2026-10-02T00:41:28.5864605Z PASS invalid letter 9 cannot hide a valid sibling
+2026-10-02T00:41:28.5865630Z PASS invalid letter 10 cannot hide a valid sibling
+2026-10-02T00:41:28.5866558Z PASS invalid letter 11 cannot hide a valid sibling
+2026-10-02T00:41:28.5874869Z PASS invalid letter 12 cannot hide a valid sibling
+2026-10-02T00:41:28.5875871Z PASS invalid letter 13 cannot hide a valid sibling
+2026-10-02T00:41:28.5876852Z PASS invalid letter 14 cannot hide a valid sibling
+2026-10-02T00:41:28.5877861Z PASS invalid letter 15 cannot hide a valid sibling
+2026-10-02T00:41:28.5878783Z PASS invalid letter 16 cannot hide a valid sibling
+2026-10-02T00:41:28.5879696Z PASS invalid letter 17 cannot hide a valid sibling
+2026-10-02T00:41:28.5880587Z PASS invalid letter 18 cannot hide a valid sibling
+2026-10-02T00:41:28.5881475Z PASS invalid letter 19 cannot hide a valid sibling
+2026-10-02T00:41:28.5882371Z PASS invalid letter 20 cannot hide a valid sibling
+2026-10-02T00:41:28.5883274Z PASS invalid letter 21 cannot hide a valid sibling
+2026-10-02T00:41:28.5884136Z PASS invalid letter 22 cannot hide a valid sibling
+2026-10-02T00:41:28.5884998Z PASS invalid letter 23 cannot hide a valid sibling
+2026-10-02T00:41:28.5885859Z PASS invalid letter 24 cannot hide a valid sibling
+2026-10-02T00:41:28.5886737Z PASS invalid letter 25 cannot hide a valid sibling
+2026-10-02T00:41:28.5887716Z PASS invalid letter 26 cannot hide a valid sibling
+2026-10-02T00:41:28.5888618Z PASS invalid letter 27 cannot hide a valid sibling
+2026-10-02T00:41:28.5889495Z PASS invalid letter 28 cannot hide a valid sibling
+2026-10-02T00:41:28.5890380Z PASS invalid letter 29 cannot hide a valid sibling
+2026-10-02T00:41:28.5900031Z PASS invalid letter 30 cannot hide a valid sibling
+2026-10-02T00:41:28.5900956Z PASS invalid letter 31 cannot hide a valid sibling
+2026-10-02T00:41:28.5901956Z PASS invalid letter 32 cannot hide a valid sibling
+2026-10-02T00:41:28.5902888Z PASS invalid letter 33 cannot hide a valid sibling
+2026-10-02T00:41:28.5903796Z PASS invalid letter 34 cannot hide a valid sibling
+2026-10-02T00:41:28.5904689Z PASS invalid letter 35 cannot hide a valid sibling
+2026-10-02T00:41:28.5905803Z PASS malformed draft repair preserves jeannie text and isolates recipients
+2026-10-02T00:41:28.5907186Z PASS malformed draft repair preserves cory text and isolates recipients
+2026-10-02T00:41:28.5908787Z PASS malformed draft repair preserves ellie text and isolates recipients
+2026-10-02T00:41:28.5910076Z PASS malformed draft repair preserves kieran text and isolates recipients
+2026-10-02T00:41:28.5911371Z PASS malformed draft repair preserves shannon text and isolates recipients
+2026-10-02T00:41:28.5912551Z PASS malformed draft repair preserves tristan text and isolates recipients
+2026-10-02T00:41:28.5915125Z PASS bad draft body cannot reach trim and valid siblings survive
+2026-10-02T00:41:28.5916678Z PASS old Dad draft migration uses only own known IDs
+2026-10-02T00:41:28.5918917Z PASS unusable snapshot stays intact until protected repair: {broken
+2026-10-02T00:41:28.5920045Z PASS unusable snapshot stays intact until protected repair: null
+2026-10-02T00:41:28.5921220Z PASS unusable snapshot stays intact until protected repair: []
+2026-10-02T00:41:28.5922325Z PASS unusable snapshot stays intact until protected repair: 45
+2026-10-02T00:41:28.5923497Z PASS unusable snapshot stays intact until protected repair: "broken"
+2026-10-02T00:41:28.5924615Z PASS backup quota failure refuses original overwrite and warns
+2026-10-02T00:41:28.5925748Z PASS mailbag quota failure retains the already captured damaged bytes
+2026-10-02T00:41:28.5929743Z PASS distinct recovery copies are append-only, deduplicated and bounded
+2026-10-02T00:41:28.5936900Z PASS damaged recovery storage is never overwritten
+2026-10-02T00:41:28.5938893Z PASS duplicate IDs cannot bind readers to multiple letters
+2026-10-02T00:41:28.5939736Z Post Office storage regressions: 56 checks passed.
+2026-10-02T00:41:28.5978633Z PASS: post-office-storage.cjs (0.1s)
+2026-10-02T00:41:28.5979207Z 
+2026-10-02T00:41:28.5979701Z --- post-office-storage-browser.cjs ---
+2026-10-02T00:42:05.9406182Z PASS Post Office Desktop: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T00:42:37.1578801Z PASS Post Office iPad: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T00:43:14.4207848Z PASS Post Office iPhone: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T00:43:14.4990592Z PASS: post-office-storage-browser.cjs (105.9s)
+2026-10-02T00:43:14.4992017Z 
+2026-10-02T00:43:14.4992427Z --- craepets-import.cjs ---
+2026-10-02T00:43:14.9155033Z PASS games/craepets/craepets.js [craepets.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T00:43:15.2897327Z PASS house-test/engine.js [craepets.house.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T00:43:15.6600603Z PASS house-test/engine.js [craepets.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T00:43:15.6739415Z PASS: craepets-import.cjs (1.2s)
+2026-10-02T00:43:15.6739790Z 
+2026-10-02T00:43:15.6740055Z --- craepets-import-browser.cjs ---
+2026-10-02T00:43:20.1262104Z PASS game import browser checks at desktop/phone
+2026-10-02T00:43:23.4085762Z PASS house import browser checks at desktop/phone
+2026-10-02T00:43:28.1013187Z PASS shared import browser checks at desktop/phone
+2026-10-02T00:43:28.1022307Z PASS Craepets browser imports: rejected files and quota failure preserve active lessons; current and legacy transfers reload and play on desktop/phone in game, standalone-house and shared-house modes
+2026-10-02T00:43:28.1829343Z PASS: craepets-import-browser.cjs (12.5s)
+2026-10-02T00:43:28.1831062Z 
+2026-10-02T00:43:28.1831264Z --- shared-media-lifecycle.cjs ---
+2026-10-02T00:43:28.2812395Z PASS shared media: canceled narration, audio failure recovery, bounded effects, live preferences, and background cleanup
+2026-10-02T00:43:28.2853661Z PASS: shared-media-lifecycle.cjs (0.1s)
+2026-10-02T00:43:28.2854111Z 
+2026-10-02T00:43:28.2854401Z --- photo-daily-assignment.cjs ---
+2026-10-02T00:43:28.3288302Z PASS: Photo daily assignments (300 date/explorer/unlock cases; 101 compatible low-bit hashes, 149 high-bit hashes), real map rendering and one daily reward
+2026-10-02T00:43:28.3316698Z PASS: photo-daily-assignment.cjs (0.0s)
+2026-10-02T00:43:28.3317232Z 
+2026-10-02T00:43:28.3317453Z --- arcade-usability.cjs ---
+2026-10-02T00:43:29.5584218Z PASS: corrupt saved preferences, canonical resume metadata and keyboard navigation
+2026-10-02T00:43:30.2517210Z PASS: search, kid filters, result status, empty state, reset and reduced motion at 1280px
+2026-10-02T00:43:30.8635116Z PASS: search, kid filters, result status, empty state, reset and reduced motion at 320px
+2026-10-02T00:43:31.3212439Z PASS: arcade remains playable without localStorage; Surprise me respects search
+2026-10-02T00:43:31.3921946Z PASS: arcade-usability.cjs (3.1s)
+2026-10-02T00:43:31.3922363Z 
+2026-10-02T00:43:31.3922577Z --- math-reliability.test.js ---
+2026-10-02T00:43:37.4559964Z Math/logic reliability checks passed (5 games, numeric answers, blocked storage, damaged saves, immediate reload and phone layouts).
+2026-10-02T00:43:37.8429042Z PASS: math-reliability.test.js (6.5s)
+2026-10-02T00:43:37.8429318Z 
+2026-10-02T00:43:37.8429451Z --- service-worker.cjs ---
+2026-10-02T00:43:40.2331342Z PASS: scoped cache cleanup, safe bounded warming, module refresh, nested/dynamic imports offline, partial responses, correct fallback URL
+2026-10-02T00:43:40.3061429Z PASS: service-worker.cjs (2.5s)
+2026-10-02T00:43:40.3061742Z 
+2026-10-02T00:43:40.3061912Z --- young-games-regressions.js ---
+2026-10-02T00:43:51.8767299Z PASS young games: Desktop
+2026-10-02T00:44:02.6905096Z PASS young games: Phone
+2026-10-02T00:44:03.6735677Z PASS young games: corrupt and blocked saves
+2026-10-02T00:44:03.7601782Z PASS: young-games-regressions.js (23.5s)
+2026-10-02T00:44:03.7603460Z 
+2026-10-02T00:44:03.7603946Z --- word-puzzles-lifecycle.cjs ---
+2026-10-02T00:44:05.8659852Z PASS word puzzles: Desktop, duplicate submit, disabled cards, solve/hint cancellation, stopped/restored clocks, Clear and crossing direction
+2026-10-02T00:44:07.3988967Z PASS word puzzles: Phone, duplicate submit, disabled cards, solve/hint cancellation, stopped/restored clocks, Clear and crossing direction
+2026-10-02T00:44:07.4753039Z PASS: word-puzzles-lifecycle.cjs (3.7s)
+2026-10-02T00:44:07.4753475Z 
+2026-10-02T00:44:07.4753828Z --- three-model-visuals.cjs ---
+2026-10-02T00:44:52.9075861Z PASS models: 35 wildlife, 18 pets/companions, 221 furnishings, 12 biome/quality variants; geometry, shaders, animation and disposal
+2026-10-02T00:44:52.9191951Z PASS real WebGL: 35 wildlife models, 18 pets and companions, 221 furnishings, 12 biome/quality variants; finite geometry and rigs, shaders, animation, quality and disposal.
+2026-10-02T00:44:52.9194145Z {"maxAnimalDraws":33,"maxAnimalTriangles":15564,"maxPetDraws":2,"maxFurnitureDraws":4,"maxFurnitureTriangles":2480,"maxWorldDraws":614,"maxWorldTriangles":1034478,"evidence":"/tmp/kid-games-visuals/validation"}
+2026-10-02T00:44:52.9922810Z PASS: three-model-visuals.cjs (45.5s)
+2026-10-02T00:44:52.9925633Z 
+2026-10-02T00:44:52.9925836Z Regressions: 12/12 passed.
