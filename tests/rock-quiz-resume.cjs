@@ -79,19 +79,20 @@ const people=["jeannie","cory","ellie","kieran","shannon","tristan","guest"];
 function unrelated(){
   const out={};
   for(const prefix of ["craepets.","craepets.house."])for(const who of people)out[prefix+"v1."+who]="synthetic original bytes "+prefix+who+"\n😀";
-  return Object.assign(out,{"craepets.who":"cory","craepets.house.who":"ellie","post-office.v1":"unrelated mail","arcade.kid":"kieran","block-coordinates-v1":"coordinates bytes","life-lab-v1":"life bytes"});
+  return Object.assign(out,{"craepets.who":"cory","craepets.house.who":"ellie","post-office.v1":"unrelated mail","arcade.kid":"kieran","block-coordinates.v2":"coordinates bytes","life-lab-v1":"life bytes"});
 }
 function fixture(tier="rockhound",round=null){
   const protectedBytes=unrelated(),storage=new Map(Object.entries(protectedBytes));
   storage.set("rockDetectiveFound",JSON.stringify(["Quartz"]));
-  storage.set("rockDetectiveQuiz",JSON.stringify({best:17,bests:{rockhound:17,explorer:17,geologist:17,retired:8},tier,tab:"quiz",clues:["look-speckled"],labSolved:4,labBest:2,round}));
+  storage.set("rockDetectiveQuiz",JSON.stringify({best:17,bests:{rockhound:17,explorer:17,geologist:17,retired:8},tier,tab:"quiz",clues:["t-speckled"],labSolved:4,labBest:2,round}));
   return {storage,protectedBytes};
 }
 const state=b=>b.snapshot().stored,round=b=>state(b).round;
 function preserve(f,b){
   for(const [key,value] of Object.entries(f.protectedBytes))assert.equal(f.storage.get(key),value,key);
+  assert.ok(b.ids.get("clueCount").textContent.includes("1 clue"),"saved clue remains active");
   const s=state(b);assert.equal(s.best,17);assert.equal(s.bests.rockhound,17);assert.equal(s.bests.explorer,17);assert.equal(s.bests.geologist,17);assert.equal(s.bests.retired,8);
-  assert.equal(s.labSolved,4);assert.equal(s.labBest,2);assert.deepEqual(s.clues,["look-speckled"]);
+  assert.equal(s.labSolved,4);assert.equal(s.labBest,2);assert.deepEqual(s.clues,["t-speckled"]);
   assert.ok(b.snapshot().found.includes("Quartz"));
   assert.ok(b.writes.every(key=>["rockDetectiveQuiz","rockDetectiveFound"].includes(key)));
 }

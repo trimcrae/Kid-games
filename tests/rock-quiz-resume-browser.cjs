@@ -22,7 +22,7 @@ async function server() {
 const people=["jeannie","cory","ellie","kieran","shannon","tristan","guest"];
 function unrelated(){
   const out={};for(const prefix of ["craepets.","craepets.house."])for(const who of people)out[prefix+"v1."+who]="synthetic original bytes "+prefix+who+"\n😀";
-  return Object.assign(out,{"craepets.who":"cory","craepets.house.who":"ellie","post-office.v1":"unrelated mail","arcade.kid":"kieran","block-coordinates-v1":"coordinates bytes","life-lab-v1":"life bytes"});
+  return Object.assign(out,{"craepets.who":"cory","craepets.house.who":"ellie","post-office.v1":"unrelated mail","arcade.kid":"kieran","block-coordinates.v2":"coordinates bytes","life-lab-v1":"life bytes"});
 }
 async function check(browser,base,label,options){
   const context=await browser.newContext({serviceWorkers:"block",...options}),page=await context.newPage(),errors=[];
@@ -35,7 +35,7 @@ async function check(browser,base,label,options){
     await page.evaluate(({protectedBytes,round})=>{
       localStorage.clear();for(const [key,value]of Object.entries(protectedBytes))localStorage.setItem(key,value);
       localStorage.setItem("rockDetectiveFound",JSON.stringify(["Quartz"]));
-      localStorage.setItem("rockDetectiveQuiz",JSON.stringify({best:17,bests:{rockhound:17,explorer:17,geologist:17,retired:8},tier:"explorer",tab:"quiz",clues:["look-speckled"],labSolved:4,labBest:2,round}));
+      localStorage.setItem("rockDetectiveQuiz",JSON.stringify({best:17,bests:{rockhound:17,explorer:17,geologist:17,retired:8},tier:"explorer",tab:"quiz",clues:["t-speckled"],labSolved:4,labBest:2,round}));
     },{protectedBytes,round});
     await page.goto(base+"/games/rock-detective/");
     await page.locator("#quiz.active").waitFor();
@@ -66,7 +66,8 @@ async function check(browser,base,label,options){
   }
   async function preserve(){
     const actual=await page.evaluate(keys=>Object.fromEntries(keys.map(key=>[key,localStorage.getItem(key)])),Object.keys(protectedBytes));assert.deepEqual(actual,protectedBytes);
-    const s=await state();assert.equal(s.best,17);assert.deepEqual(s.bests,{rockhound:17,explorer:17,geologist:17,retired:8});assert.deepEqual(s.clues,["look-speckled"]);assert.equal(s.labSolved,4);assert.equal(s.labBest,2);
+    assert.ok((await page.locator("#clueCount").innerText()).includes("1 clue"),"saved clue remains active");
+    const s=await state();assert.equal(s.best,17);assert.deepEqual(s.bests,{rockhound:17,explorer:17,geologist:17,retired:8});assert.deepEqual(s.clues,["t-speckled"]);assert.equal(s.labSolved,4);assert.equal(s.labBest,2);
     assert.ok((await page.evaluate(()=>JSON.parse(localStorage.getItem("rockDetectiveFound")))).includes("Quartz"));
   }
   try{
