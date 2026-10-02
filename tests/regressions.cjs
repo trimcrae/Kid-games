@@ -30,6 +30,8 @@ const suites = [
   { file: "young-games-regressions.js", timeout: 90000, browser: true },
   { file: "word-puzzles-lifecycle.cjs", timeout: 90000, browser: true },
   { file: "three-model-visuals.cjs", timeout: 300000, browser: true },
+  { file: "coordinate-round-guard.cjs", timeout: 15000 },
+  { file: "coordinate-round-guard-browser.cjs", timeout: 180000, browser: true },
 ];
 
 let active;
