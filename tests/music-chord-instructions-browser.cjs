@@ -24,7 +24,7 @@ async function server() {
 const people=["jeannie","cory","ellie","kieran","shannon","tristan","guest"];
 function unrelated(){const out={};for(const prefix of ["craepets.","craepets.house."])for(const who of people)out[prefix+"v1."+who]="synthetic original bytes "+prefix+who+"\n😀";return Object.assign(out,{"craepets.who":"cory","craepets.house.who":"ellie","post-office.v1":"unrelated mail","arcade.kid":"kieran","block-coordinates.v2":"coordinates bytes","life-lab-v1":"life bytes","rockDetectiveQuiz":"rock history","rockDetectiveFound":"rock museum","world-trek.v1":"world history"});}
 function fixture(){return {songs:{"Hot Cross Buns":true,"Twinkle, Twinkle":{stars:3}},echoBest:9,nameStars:13,staffStars:14,tune:[{note:"C4",t:0},{note:"F#4",t:120}],labels:true,flats:false,tempo:"steady",metro:false,scale:0,echoLevel:1,nameLevel:1,staffLevel:1,chordLevel:2,echoBestBy:{1:9,4:5},nameStreakBest:8,staffSpeedBest:6,chordCount:7,chordStreakBest:5,retiredHistory:"preserved"};}
-const pitch=note=>{const m=/^([A-G])(#?)(\d)$/.exec(note);assert.ok(m,note);return Number(m[3])*12+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+Number(Boolean(m[2]));};
+const pitch=note=>{const m=/^([A-G])(#?)(\d)$/.exec(note);assert.ok(m,note);return (Number(m[3])+1)*12+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+Number(Boolean(m[2]));};
 async function check(browser,base,label,options){
  const context=await browser.newContext({serviceWorkers:"block",...options}),page=await context.newPage(),errors=[],protectedBytes=unrelated();
  // Deterministic native factory selection: index7 of the unchanged10-entry pool is D major.

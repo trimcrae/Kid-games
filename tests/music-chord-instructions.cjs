@@ -43,7 +43,7 @@ const window={matchMedia:()=>({matches:false})};const MathProxy=Object.create(Ma
 new Function('window','document','localStorage','setTimeout','clearTimeout','Math','performance',DATA+'\n'+GAME)(window,document,localStorage,setTimeout,clearTimeout,MathProxy,{now:()=>now});
 return {ids,storage,timers,writes,advance,mode:name=>ids.modes.emit('click',{target:ids.modes.children.find(x=>x.dataset.mode===name)}),note:note=>ids.piano.children.find(x=>x.dataset.note===note).emit('click',{detail:0}),snapshot:()=>({title:ids['prompt-title'].textContent,prompt:ids['prompt-text'].textContent,chord:ids['big-note'].textContent,hint:ids['hint-line'].textContent,held:ids.piano.children.filter(x=>x.classList.contains('held')).map(x=>x.dataset.note),bad:ids.piano.children.filter(x=>x.classList.contains('bad')).map(x=>x.dataset.note),score:ids.scorebar.textContent,save:JSON.parse(storage.get('music-lab.v1'))})};
 }
-const pitch=note=>{const m=/^([A-G])(#?)(\d)$/.exec(note);assert.ok(m,note);return Number(m[3])*12+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+Number(Boolean(m[2]));};
+const pitch=note=>{const m=/^([A-G])(#?)(\d)$/.exec(note);assert.ok(m,note);return (Number(m[3])+1)*12+{C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+Number(Boolean(m[2]));};
 function recipe(b){
  const text=b.snapshot().prompt,name=b.snapshot().chord,root=/Start on ([A-G])\b/.exec(text);
  assert.ok(root,"public root is stated");
