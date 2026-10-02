@@ -1232,7 +1232,7 @@
     el.title.textContent = "Build a chord 🎸";
     show(el.bigNote, true);
     el.bigNote.classList.add("small");
-    el.hint.innerHTML = "A <b>triad</b> is three notes stacked up: play a key, skip one white key, play the next — then skip again.";
+    el.hint.innerHTML = "A <b>triad</b> is a three-note chord: the root, third and fifth. Some triads need black keys.";
 
     let want = null, found = [], built = 0, streak = 0;
     let level = Math.min(Math.max(save.chordLevel | 0, 1), 3);
@@ -1274,7 +1274,7 @@
           ? want.name + " is " + want.notes.map(letter).join(" + ") +
             ". It sounds " + want.mood + " because of the middle note. Press all three!"
           : "Find the three notes of " + want.name + ". Start on " + letter(want.notes[0]) +
-            ", then skip a key, then skip again.";
+            ". Move to the right, one key per step, counting both white and black keys. Do not count the starting key. Major: 4 steps, then 3. Minor: 3 steps, then 4.";
         later(function () { chordTone(want.notes, 1.1, 0); }, 150);
         if (level === 1) hintKeys(want.notes);
       }

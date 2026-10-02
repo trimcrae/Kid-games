@@ -36,6 +36,8 @@ const suites = [
   { file: "rock-quiz-resume-browser.cjs", timeout: 180000, browser: true },
   { file: "world-feedback-skip.cjs", timeout: 15000 },
   { file: "world-feedback-skip-browser.cjs", timeout: 180000, browser: true },
+  { file: "music-chord-instructions.cjs", timeout: 15000 },
+  { file: "music-chord-instructions-browser.cjs", timeout: 120000, browser: true },
 ];
 
 let active;
