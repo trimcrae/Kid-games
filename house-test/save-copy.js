@@ -1,4 +1,4 @@
-// House edition: retry missing/empty profiles on every visit. Never write
+// House edition: seed only absent profiles after deep preparation. Never write
 // original save keys. (In game mode nothing is copied at all; see below.)
 (function(){
   'use strict';
@@ -8,16 +8,51 @@
   function read(key){return parse(localStorage.getItem(key));}
   function scan(){return ids.map(function(id){return {id:id,original:read('craepets.v1.'+id),house:read(prefix+id)};});}
   function copyMissing(){
+    if(gameMode)return [];
+    if(!prepare)throw Error('The house is still opening. Saved pets have not been copied yet.');
     var copied=[];
-    scan().forEach(function(p){if(valid(p.original)&&!valid(p.house)&&!localStorage.getItem('craepets.house.reset.'+p.id)){localStorage.setItem(prefix+p.id,JSON.stringify(p.original));copied.push(p.id);}});
-    var who=localStorage.getItem('craepets.house.who'),oldWho=localStorage.getItem('craepets.who');
-    if(!who||!valid(read(prefix+who))){var fallback=ids.find(function(id){return valid(read(prefix+id));});if(valid(read(prefix+oldWho)))fallback=oldWho;if(fallback)localStorage.setItem('craepets.house.who',fallback);}
-    if(localStorage.getItem('craepets.house.voice')===null&&localStorage.getItem('craepets.voice')!==null)localStorage.setItem('craepets.house.voice',localStorage.getItem('craepets.voice'));
+    ids.forEach(function(id){
+      try{
+        // Presence protects every existing house byte, even an empty, damaged
+        // or older save. Only an absent slot can be seeded automatically.
+        if(localStorage.getItem(prefix+id)!==null||localStorage.getItem('craepets.house.reset.'+id)!==null)return;
+        var raw=localStorage.getItem('craepets.v1.'+id);
+        if(raw===null)return;
+        var candidate=prepare(JSON.parse(raw),id),text=JSON.stringify(candidate);
+        // Recheck after preparation; a newer target/reset must never be
+        // replaced by the snapshot that was just prepared.
+        if(localStorage.getItem(prefix+id)!==null||localStorage.getItem('craepets.house.reset.'+id)!==null)return;
+        localStorage.setItem(prefix+id,text);
+        if(localStorage.getItem(prefix+id)===text)copied.push(id);
+      }catch(e){console.warn('An original saved pet could not be copied safely: '+id+'.');}
+    });
+    function usable(id){
+      if(ids.indexOf(id)<0)return false;
+      try{var raw=localStorage.getItem(prefix+id);if(raw===null)return false;prepare(JSON.parse(raw),id);return true;}catch(e){return false;}
+    }
+    try{
+      var who=localStorage.getItem('craepets.house.who'),oldWho=localStorage.getItem('craepets.who');
+      if(!usable(who)){
+        var fallback=ids.find(usable);
+        if(usable(oldWho))fallback=oldWho;
+        if(fallback)localStorage.setItem('craepets.house.who',fallback);
+      }
+    }catch(e){console.warn('House player selection could not be saved.');}
+    try{
+      var voice=localStorage.getItem('craepets.voice');
+      if(localStorage.getItem('craepets.house.voice')===null&&voice!==null)localStorage.setItem('craepets.house.voice',voice);
+    }catch(e){console.warn('House voice preference could not be copied.');}
     return copied;
   }
   function bundle(source){var profiles={};ids.forEach(function(id){var s=read((source==='house'?prefix:'craepets.v1.')+id);if(valid(s))profiles[id]=s;});return {format:'craepets-family',version:1,profiles:profiles,who:localStorage.getItem(source==='house'?'craepets.house.who':'craepets.who'),exportedAt:new Date().toISOString()};}
-  var prepare=null,recoveryKey='craepets.house.import-recovery.v1',blocked=false;
-  function setPreparer(fn){prepare=fn;}
+  var prepare=null,autoSeed=false,recoveryKey='craepets.house.import-recovery.v1',blocked=false;
+  function setPreparer(fn){
+    prepare=fn;
+    // Registering the existing pure engine preparer is the first point when
+    // content tables and legacy defaults are ready. Export-only pages do not
+    // seed any progress or preferences.
+    if(autoSeed){autoSeed=false;try{copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
+  }
   function record(value){return value!==null&&typeof value==='object'&&!Array.isArray(value);}
   function recoveryAllowed(key){
     return key==='craepets.house.who'||ids.some(function(id){return key===prefix+id||key==='craepets.house.reset.'+id;});
@@ -121,5 +156,5 @@
   // (save-mode.js): nothing is copied, and the house edition is left alone.
   var gameMode=!!(window.CraepetsSaveMode&&window.CraepetsSaveMode.id==='game');
   window.HouseSaves.gameMode=gameMode;
-  if(!gameMode){try{if(!recover())copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
+  if(!gameMode){try{autoSeed=!recover();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
 })();
