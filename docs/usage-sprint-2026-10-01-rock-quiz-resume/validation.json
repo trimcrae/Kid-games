@@ -1,0 +1,151 @@
+{
+  "task": "Rock Detective quiz resume",
+  "baseline_main": "7fd3f37c107e2c76e456bc6ab41c4806984dcaef",
+  "source_head": "8f941c423e978076dd493fc3bea3b7908e43144e",
+  "source_tree": "91f6d0b260ca45de65336cf7ef90c6ca2fd051eb",
+  "actual_CI": {
+    "run_id": 36997670235,
+    "job_id": 110808191995,
+    "event": "pull_request",
+    "attempt": 1,
+    "status": "completed",
+    "conclusion": "success",
+    "head_sha": "8f941c423e978076dd493fc3bea3b7908e43144e",
+    "checkout_sha": "ce5a90c21316dbec3d58c06fce6b272f1c00ce3a",
+    "checkout_tree": "91f6d0b260ca45de65336cf7ef90c6ca2fd051eb",
+    "checkout_parents": [
+      "7fd3f37c107e2c76e456bc6ab41c4806984dcaef",
+      "8f941c423e978076dd493fc3bea3b7908e43144e"
+    ],
+    "runtime": "Node v22.23.3 and full production-page Chromium",
+    "command": "cd tests && npm run test:regressions",
+    "suites_passed": 26,
+    "suites_total": 26,
+    "rock_Node": {
+      "state_families": 8,
+      "tiers": [
+        "explorer",
+        "rockhound",
+        "geologist"
+      ],
+      "method": "Whole actual production game/data scripts in a Node VM. DOM/audio/storage adapters. Original actual makeQuestion observed only to select a fixture answer; gameplay-state checks, not independent science validation.",
+      "coverage_scope": "Eight families in total; pending, new accepted right/wrong, final right/wrong and unknown legacy phase families loop all three tiers. Ordinary full-round, legacy practice award/final practice and tab/tier/Again families use Rockhound, with Explorer tier reset."
+    },
+    "rock_browser": {
+      "completed_groups": 3,
+      "devices": [
+        "Desktop 1280x800",
+        "iPad 820x1180 Chromium emulation",
+        "iPhone 390x844 Chromium emulation"
+      ],
+      "method": "Full production HTML/data/game/effect scripts. Native pointer/keyboard on Desktop, touch on mobile emulation and native page reload. Explorer answers derive independently from visible public question/fact/family/options and immutable specimen catalog; no hidden answer/factory hook. Rockhound tier reset is checked. Synthetic saved-state setup is distinguished from native subsequent interaction.",
+      "console_page_HTTP_errors": 0
+    },
+    "original_log": {
+      "path": "logs/36997670235-job-110808191995-success.log",
+      "utf8_bytes": 152286,
+      "sha256": "a9dd4bf3f130d98c1d6892fe5077ede7cb3db8c100d2660da03d3f208d128d6d",
+      "git_blob": "ee0273931f3f2a36b175915e77d2a720f2864e70"
+    }
+  },
+  "initial_automatic_run": {
+    "run_id": 36997356716,
+    "job_id": 110807023835,
+    "head_sha": "7c130a8e5b3e6d90a271fb9f91d4ba8827446b03",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "reason": "Superseded by the later PR event after a two-file fixture precision correction. No Rock suites were reached. This is cancellation, not a failed Rock test.",
+    "original_log": {
+      "path": "logs/36997356716-job-110807023835-cancelled.log",
+      "utf8_bytes": 141134,
+      "sha256": "0738703241ff317fbd7fc96dae404e9e1e5cf1cea1de2403f62c983ed5e6b837",
+      "git_blob": "a4f9ec516617d3b81e41b59834c7abfbbb7c0d29"
+    }
+  },
+  "tested_files": [
+    {
+      "path": "games/rock-detective/game.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63564f94191f2f1e3763c29e6fdc5026423e5c07",
+      "utf8_bytes": 36566,
+      "sha256": "f594024bb977e53f5b8d23f14799d19e39360716e14b2825ab14c764e34f5dcc"
+    },
+    {
+      "path": "games/rock-detective/index.html",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf3bc00891d07ac8ca3454dc83510af089efe109",
+      "utf8_bytes": 25840,
+      "sha256": "34a28a8ac9e95d0475700c2e5577f81bd13c3979baf237cd560be251845ff816"
+    },
+    {
+      "path": "tests/rock-quiz-resume.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f671f8e144f37bc1bcdcfb8a3f3c0da15bcdcaf6",
+      "utf8_bytes": 12708,
+      "sha256": "109a236793c763ce490d661cbc01cd2cf9abfe11b5c9e13936058d82cd5bbc6a"
+    },
+    {
+      "path": "tests/rock-quiz-resume-browser.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "14ae4050f6d93b19c99410f50d8cfc5d334ecb55",
+      "utf8_bytes": 9090,
+      "sha256": "73446bed4a35bd32a72c2179edca91a81a336fbf2b9d48e27b8f53c1e604b924"
+    },
+    {
+      "path": "tests/regressions.cjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1ed2f2cc5705ad0cec95c0a62a5a9d050150671",
+      "utf8_bytes": 6265,
+      "sha256": "36e702531d217ba9bea970b71d381fc44ed36c2881472c2bc4bd7026773dc4b6"
+    }
+  ],
+  "preserved_science_blob": "c67ae139ed35a7bc35c6d20ae35dd106cc7e5d7a",
+  "workflow_unchanged": ".github/workflows/playtests.yml",
+  "retained_data": "Synthetic fixtures only: all 14 original/HOUSE profile bytes and unrelated sentinels (including block-coordinates.v2), valid active t-speckled clue, lab counters, Quartz collection and best 17 on all actual tiers plus retired history 8. Correct practice museum identification remains allowed; no quiz point is awarded.",
+  "limits": [
+    "Baseline was V8 only, not executed Node/browser",
+    "No physical iOS/Safari proof",
+    "No simultaneous-tab or storage-durability/quota guarantee",
+    "No old phase inference, original-question reconstruction, historical score reset or broad save loader change"
+  ],
+  "publication": "Source merge and its automatic main workflows are recorded separately. Final docs-main Pages will be observed after docs integration; no receipt-only deployment loop.",
+  "source_merge": {
+    "sha": "3e6e7d302f4f99a1192de428d251b280a08fac53",
+    "tree": "91f6d0b260ca45de65336cf7ef90c6ca2fd051eb",
+    "parents": [
+      "7fd3f37c107e2c76e456bc6ab41c4806984dcaef",
+      "8f941c423e978076dd493fc3bea3b7908e43144e"
+    ],
+    "pull_request": 10,
+    "method": "normal no-ff merge"
+  },
+  "source_main_automatic_workflows": {
+    "observed_at": "2026-10-02 11:03:12 UTC",
+    "runs": [
+      {
+        "id": 36998777128,
+        "name": "Focused playtests",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "3e6e7d302f4f99a1192de428d251b280a08fac53",
+        "event": "push",
+        "html_url": "https://github.com/trimcrae/Kid-games/actions/runs/36998777128"
+      },
+      {
+        "id": 36998776403,
+        "name": "pages build and deployment",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "3e6e7d302f4f99a1192de428d251b280a08fac53",
+        "event": "dynamic",
+        "html_url": "https://github.com/trimcrae/Kid-games/actions/runs/36998776403"
+      }
+    ],
+    "meaning": "Automatic source-main events are separate from final source PR proof; no manual dispatch. In-progress observation is not a completed validation claim."
+  }
+}
