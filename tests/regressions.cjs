@@ -8,6 +8,8 @@ const path = require("node:path");
 const { spawn } = require("node:child_process");
 
 const suites = [
+  { file: "craepets-family-restore.cjs", timeout: 30000 },
+  { file: "craepets-family-restore-browser.cjs", timeout: 120000, browser: true },
   { file: "post-office-storage.cjs", timeout: 15000 },
   { file: "post-office-storage-browser.cjs", timeout: 120000, browser: true },
   { file: "craepets-import.cjs", timeout: 15000 },
