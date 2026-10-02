@@ -17,3 +17,5 @@ Independent review corrected one browser expectation before PR/CI: Enter after T
 Receipts: [baseline](usage-sprint-2026-10-01-world-feedback-skip/baseline.json), [validation](usage-sprint-2026-10-01-world-feedback-skip/validation.json), [review](usage-sprint-2026-10-01-world-feedback-skip/review.json), [original CI log](usage-sprint-2026-10-01-world-feedback-skip/ci-37001617736-110820371130.log).
 
 The source merge and source Pages observation are recorded in validation. Final exact-main Pages publication is checked after this docs handoff is integrated.
+
+After final exact-main Pages succeeds, World Trek is closed and ownership returns to root; revisit this route only with new evidence. The next deferred candidate is Music Lab’s D-major/white-key recipe conflict (original blob `db5933eebf4daa784b36846631ebaa7e26d370e6`, preliminary V8 only, no actual Node/browser proof): fresh ownership review and exact-trigger reproduction must precede any authorized, small curriculum prose change that preserves notes, scoring and saves.
