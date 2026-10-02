@@ -1,0 +1,107 @@
+{
+  "recordedAt": "2026-10-02",
+  "repository": "trimcrae/Kid-games",
+  "main": "2b5cf134c337533b688e23324d817c0506bc4776",
+  "mainTree": "2b5cf134c337533b688e23324d817c0506bc4776",
+  "entry": {
+    "openIssues": [],
+    "openPullRequests": [],
+    "completeTreeEntries": 3422,
+    "truncated": false,
+    "ownership": "No World Trek branch or owner/claim/priority/status metadata; isolated task allocated by root."
+  },
+  "source": {
+    "game": "a347c10dc5217dd81a9da34e83929211c15a86b7",
+    "data": "0e94c9a7bb34532d23dc79f489a0c406c5084b8f",
+    "html": "3a559b4a1aba59a5902148c396d801da3531c203"
+  },
+  "trigger": "Answer correctly, press Skip 500ms into feedback, wait the original 2400ms (world) or 2600ms (state/capital) deadline.",
+  "witness": {
+    "method": "Preliminary V8 execution of full unmodified game and data with DOM/localStorage/fake-clock adapters and deterministic LCG; visible public prompt plus static catalog chooses the target. Not actual Node or Chromium.",
+    "allTiers": {
+      "modes": [
+        "continents",
+        "oceans",
+        "states",
+        "capitals"
+      ],
+      "tiers": [
+        "easy",
+        "normal",
+        "expert"
+      ],
+      "cases": 12,
+      "oldFeedbackTimerReplacedTheSkippedToQuestionInEveryCase": true
+    },
+    "examples": [
+      {
+        "mode": "continents",
+        "accepted": {
+          "title": "Tap South America 🦜",
+          "score": "Right: 1 / 1 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        },
+        "skipped": {
+          "title": "Tap Europe 🏰",
+          "score": "Right: 1 / 2 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        },
+        "oldDeadline": {
+          "title": "Tap Australia & Oceania 🦘",
+          "score": "Right: 1 / 3 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        }
+      },
+      {
+        "mode": "oceans",
+        "accepted": {
+          "title": "Tap Atlantic Ocean 🌊",
+          "score": "Right: 1 / 1 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        },
+        "skipped": {
+          "title": "Tap Southern Ocean 🧊",
+          "score": "Right: 1 / 2 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        },
+        "oldDeadline": {
+          "title": "Tap Arctic Ocean 🧊",
+          "score": "Right: 1 / 3 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        }
+      },
+      {
+        "mode": "states",
+        "accepted": {
+          "title": "Find Hawaii!",
+          "score": "Right: 1 / 1 &nbsp; Streak: 1 &nbsp; States found: 2 / 50"
+        },
+        "skipped": {
+          "title": "Find Mississippi!",
+          "score": "Right: 1 / 2 &nbsp; Streak: 1 &nbsp; States found: 2 / 50"
+        },
+        "oldDeadline": {
+          "title": "Find Montana!",
+          "score": "Right: 1 / 3 &nbsp; Streak: 1 &nbsp; States found: 2 / 50"
+        }
+      },
+      {
+        "mode": "capitals",
+        "accepted": {
+          "title": "Honolulu is the capital of…?",
+          "score": "Right: 1 / 1 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        },
+        "skipped": {
+          "title": "Jackson is the capital of…?",
+          "score": "Right: 1 / 2 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        },
+        "oldDeadline": {
+          "title": "Helena is the capital of…?",
+          "score": "Right: 1 / 3 &nbsp; Streak: 1 &nbsp; Stars: 8"
+        }
+      }
+    ],
+    "controls": {
+      "cases": 16,
+      "naturalAdvanceOnce": true,
+      "unansweredSkipStable": true,
+      "modeExitCancelsPriorAdvance": true,
+      "tierRestartCancelsPriorAdvance": true
+    },
+    "newSuiteBaselineFailure": "native feedback Skip is inert"
+  }
+}

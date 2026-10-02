@@ -1,0 +1,40 @@
+{
+  "head": "fe73bfb82634f478476085c7a655a88b16420c5c",
+  "tree": "b99dde46c3eafb94fd6daf051c805aeec5ec5a14",
+  "base": "2b5cf134c337533b688e23324d817c0506bc4776",
+  "reviewer": "/root/learning_scout",
+  "production": "No blocker: three guarded Skip callbacks and native disable on accepted answer / re-enable on ask; unchanged scores, awards, persistence, modes, timers and tiers.",
+  "testCorrection": {
+    "initialHead": "6bb48e686d67183e14d9aabf13c14ac7dc2d9043",
+    "reason": "Native Tab correctly skips disabled Skip, but Enter on the next arbitrary control can activate Capitals' zoom button.",
+    "resolution": "Removed that Enter; retained native Tab-order assertion and earlier map Enter answer. No production change."
+  },
+  "actualExecutionStatus": "Actual Node22.23.3 and full-page Chromium passed in automatic PR CI37001617736; original terminal log, exact synthetic checkout/tree and both independent runtime gates clear.",
+  "browserScope": "Continents and Capitals at Easy on Desktop/iPad/iPhone; expert-tier restart exit check. Native pointer/keyboard on Desktop, touch on mobile devices, real timers throughout; public visible prompt/static geography catalog oracle.",
+  "independentSourceMethodGate": {
+    "reviewer": "/root/learning_scout",
+    "head": "fe73bfb82634f478476085c7a655a88b16420c5c",
+    "status": "clear",
+    "method": "Exact source reversal, five-file scope, narrow final browser delta and V8 syntax only; actual runtime results pending."
+  },
+  "rootSourceMethodGate": {
+    "head": "fe73bfb82634f478476085c7a655a88b16420c5c",
+    "status": "clear",
+    "method": "Root independently read all five files and exact one-line browser correction; agrees with independent reviewer. Inherited Rock runner entries retained."
+  },
+  "rootActualGate": {
+    "status": "clear",
+    "run": 37001617736,
+    "job": 110820371130,
+    "method": "Independently fetched terminal run metadata, original 154644-byte decoded log/SHA256 and actual checkout Git commit/tree/parents; confirmed actual 72 Node cases, six native Chromium checks and 28/28 suites."
+  },
+  "independentActualGate": {
+    "reviewer": "/root/learning_scout",
+    "status": "clear",
+    "run": 37001617736,
+    "job": 110820371130,
+    "method": "Independently fetched terminal run/job, original decoded log and SHA256, actual checkout/head commit metadata; confirmed matching tree/parents and actual 72 Node/six native browser/28-suite results."
+  },
+  "openBlockers": [],
+  "followUpScope": "Receipt-only handoff and exact final-main Pages observation; no further source/tests/manual jobs."
+}
