@@ -268,7 +268,7 @@
     loadPaused = true; loadProblem = id;
     hush(); stopCatch(); stopMatch(); clearTimeout(battleTimer);
     sess = null; battle = null; visit = null;
-    closeSheet();
+    closeSheet(); closeNews();
     savedDataWarning(id, true);
   }
 
@@ -4740,6 +4740,7 @@
   }
 
   function awardSpin(prize, idx) {
+    if (!S || savingPaused()) return;
     earn(prize.coins);
     var extra = "";
     if (prize.xp) { giveXp(prize.xp); extra += '<p class="sub">⭐ ' + prize.xp + " XP for " + esc(S.pet.name) + ".</p>"; }
@@ -6169,6 +6170,7 @@
   var sheetReturn = null;   // where the keyboard was before the sheet opened
 
   function openSheet(html) {
+    if (savingPaused()) return;
     var had = !!$("#sheet-back");
     if (!had) sheetReturn = document.activeElement;
     dropSheet();

@@ -27,7 +27,7 @@ async function check(browser,base,label,options){
   });
   async function fixture(id,raw){
    await neutral();
-   await page.evaluate(({template,ids,id,raw})=>{
+   const exact=await page.evaluate(({template,ids,id,raw})=>{
     localStorage.clear();
     for(const prefix of["craepets.","craepets.house."])for(const who of ids){const s=JSON.parse(JSON.stringify(template.state));s.pet.name="Valid "+who;s.tier=template.profiles.find(p=>p.id===who).tier;s.coins=789;localStorage.setItem(prefix+"v1."+who,JSON.stringify(s,null,2));}
     localStorage.setItem("craepets.who",id);localStorage.setItem("craepets.house.who","ellie");
@@ -36,8 +36,12 @@ async function check(browser,base,label,options){
     localStorage.setItem("craepets.house.before-import","earlier safety bytes");localStorage.setItem("craepets.house.import-recovery.v1",' { "version":1,"records":[],"pending":0 } ');
     localStorage.setItem("post-office.v1","unrelated mail");for(const who of ids){localStorage.setItem("craepets.house.position."+who,"position "+who);localStorage.setItem("craepets.house.reset."+who,"reset "+who);}
     localStorage.setItem("__original_fault_key","");localStorage.setItem("__original_fault_on","0");
+    return Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]));
    },{template,ids,id,raw});
-   return snapshot();
+   // Setup owns these bytes. Wait for the observer renderer to receive the
+   // entire fixture cohort before taking any test-owned transaction snapshot.
+   await observer.waitForFunction(exact=>JSON.stringify(Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)])))===JSON.stringify(exact),exact);
+   return exact;
   }
   // The entire standalone production page loads, not a JS/browser adapter.
   for(const id of ids){
@@ -75,9 +79,30 @@ async function check(browser,base,label,options){
    const raw="{ changed after native reading began "+late+"\n😀";
    if(late==="storage event"){await observer.evaluate(raw=>localStorage.setItem("craepets.v1.cory",raw),raw);await page.waitForFunction(()=>Craepets.loadProblem());}
    else await page.evaluate(raw=>localStorage.setItem("craepets.v1.cory",raw),raw);
+   await observer.waitForFunction(raw=>localStorage.getItem("craepets.v1.cory")===raw,raw);
    const before=await snapshot();await page.evaluate(()=>window.__originalReaderDone());await page.waitForFunction(()=>Craepets.loadProblem());await observer.bringToFront();await page.bringToFront();await page.keyboard.press("Enter");
    assert.deepEqual(await snapshot(),before,"delayed native callback and visibility transitions cannot overwrite raw");assert.equal(await download(),raw);
   }
+  // The real wheel timeout/award closure is held after its native delay.
+  // Neither a delivered storage refusal nor the award's own save recheck may
+  // put a new Prize overlay in front of the local recovery controls.
+  for(const late of["storage event","before storage event"]){
+   await fixture("cory",null);await open();await ready();await page.locator('[data-go="quests"]').first().click();
+   await page.evaluate(()=>{const timer=window.setTimeout;window.setTimeout=function(fn,delay,...args){if(typeof fn==="function"&&fn.toString().includes("awardSpin(")){window.__originalWheelDone=()=>fn(...args);return timer(()=>{window.__originalWheelReady=true;},delay);}return timer(fn,delay,...args);};});
+   await page.locator("[data-spin]").click();await page.waitForFunction(()=>window.__originalWheelReady);
+   const raw="{ damaged during actual wheel "+late;
+   if(late==="storage event"){await observer.evaluate(raw=>localStorage.setItem("craepets.v1.cory",raw),raw);await page.waitForFunction(()=>Craepets.loadProblem());}
+   else await page.evaluate(raw=>localStorage.setItem("craepets.v1.cory",raw),raw);
+   await observer.waitForFunction(raw=>localStorage.getItem("craepets.v1.cory")===raw,raw);
+   const before=await snapshot(),coins=await page.evaluate(()=>Craepets.state().coins);await page.evaluate(()=>window.__originalWheelDone());await page.waitForFunction(()=>Craepets.loadProblem());
+   if(late==="storage event")assert.equal(await page.evaluate(()=>Craepets.state().coins),coins,"already paused award must not mutate healthy memory");
+   assert.equal(await page.locator("#sheet-back").count(),0,"stale prize cannot obscure paused recovery");assert.deepEqual(await snapshot(),before);assert.equal(await download(),raw);
+  }
+  // Existing news modal must be dismissed before paused recovery is focused.
+  await fixture("cory",null);await open();await ready();await page.locator("[data-news]").first().click();await page.waitForSelector("#news-back");
+  const newsRaw="{ damaged with news open\n😀";await observer.evaluate(raw=>localStorage.setItem("craepets.v1.cory",raw),newsRaw);await page.waitForFunction(()=>Craepets.loadProblem());
+  const newsBefore=await snapshot();assert.equal(await page.locator("#news-back").count(),0);assert.equal(await page.locator("#sheet-back").count(),0);assert.equal(await page.evaluate(()=>document.activeElement.getAttribute("role")),"alert");assert.equal(await download(),newsRaw);assert.deepEqual(await snapshot(),newsBefore);
+  await page.locator("[data-saved-data-retry]").click();await page.waitForSelector(".saved-data-warning");assert.equal(await page.locator("#news-back").count(),0);assert.deepEqual(await snapshot(),newsBefore,"retry retains the same damaged raw without a news overlay");
   // Valid legacy, intentional blank and truly absent slots still play/reload.
   for(const raw of[JSON.stringify({v:1,pet:{name:"Legacy cory",species:"blorb",colour:"meadow"},coins:321}),JSON.stringify({v:1,pet:null,coins:120}),undefined]){
    await fixture("cory",raw===undefined?null:raw);if(raw===undefined)await observer.evaluate(()=>localStorage.removeItem("craepets.v1.cory"));await open();await ready();

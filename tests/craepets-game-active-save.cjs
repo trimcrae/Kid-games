@@ -12,7 +12,7 @@ function boot(prefix="craepets.",initial={}){
  const timers=[],readers=[],context={window:{addEventListener(){}},localStorage:storage,document,Date,console,clearTimeout(){},setTimeout(){},setInterval(f){timers.push(f);},requestAnimationFrame(){},FileReader:function(){readers.push(this);this.readAsText=function(){};}};
  for(const file of["lines.js","pets.js","data.js"])vm.runInNewContext(fs.readFileSync(path.join(ROOT,"games/craepets",file),"utf8"),context);
  const stubs='var who="cory",S=null,sess=null,battle=null,visit=null,battleTimer=null,houseStation=null,view="nest",moodLine={},reviewGap=0,lastPlace="nest",pendingBuy=null,pendingSale=null,spinning=false,wheelAngle=0,pickName="",DESK=null,anim={},renders=0;'+
- 'function hush(){}function stopCatch(){}function stopMatch(){}function closeSheet(){}function passTime(){}function rollDay(){}function render(){renders++;}function sfx(){}function postWaiting(){}function toast(){}function onClick(){}function onKey(){}function loop(){}function styleAllowed(s,k,id){return STYLE[k].some(function(x){return x.id===id;});}'+
+ 'function hush(){}function stopCatch(){}function stopMatch(){}function closeSheet(){}function closeNews(){}function passTime(){}function rollDay(){}function render(){renders++;}function sfx(){}function postWaiting(){}function toast(){}function onClick(){}function onKey(){}function loop(){}function styleAllowed(s,k,id){return STYLE[k].some(function(x){return x.id===id;});}'+
  'function homeName(){return "Home";}function houseInfo(){return {};}function placedItems(){return [];}function wallNow(){return {};}function floorNow(){return {};}function timeOfDay(){}function weatherToday(){}function celebrations(){}' ;
  const code=section("  var D = window.CPData,","  /* ---------- little DOM helpers")+'function $(s){return document.querySelector(s);}\n'+
  'var SLOTS='+source.match(/var SLOTS = (\d+);/)[1]+',EGG_NEED='+source.match(/var EGG_NEED = (\d+),/)[1]+';\n'+stubs+
@@ -20,8 +20,8 @@ function boot(prefix="craepets.",initial={}){
  section("  var quietSave","  /* Somebody ELSE")+section("  function readSlot(","  /* NEW: walking")+
  section("  function saveRecord(","  function resetSheet()")+section("  function resetValley(","  function dayLabel(")+
  section("  function withSave(","  function visitHtml(")+section("  function switchTo(","  /* \"You have post!")+section("  function init()","  /* The clay creatures")+
- section("  window.Craepets = {","\n})();")+
- 'window.ActiveTest={blank:blankSave,load:load,save:save,write:writeSlot,init:init,switch:switchTo,visit:startVisit,sync:syncFromElsewhere,import:importValley,reset:resetValley,pause:pauseSavedData,activate:function(id,s){who=id;S=s;sess={question:"live"};},flags:function(){return {who:who,state:S,session:sess,paused:loadPaused,problem:loadProblem,renders:renders};}};';
+ section("  function awardSpin(","  /* =========================================================\n     THE MARKET")+section("  function openSheet(","  function refreshSheet(")+section("  window.Craepets = {","\n})();")+
+ 'window.ActiveTest={award:awardSpin,dialog:openSheet,blank:blankSave,load:load,save:save,write:writeSlot,init:init,switch:switchTo,visit:startVisit,sync:syncFromElsewhere,import:importValley,reset:resetValley,pause:pauseSavedData,activate:function(id,s){who=id;S=s;sess={question:"live"};},flags:function(){return {who:who,state:S,session:sess,paused:loadPaused,problem:loadProblem,renders:renders};}};';
  vm.runInNewContext(code,context);
  return {values,writes,reads,game,context,api:context.window.ActiveTest,runtime:context.window.Craepets,prefix,timers,readers,fault(fn){fault=fn;}};
 }
@@ -107,5 +107,11 @@ for(const id of ids)check("native original "+id+" paused startup inspector mutat
 });
 for(const late of["paused","before storage event"])check("pending native-reader callback "+late+" cannot overwrite damaged raw",()=>{
  const t=fixture("craepets.","cory");t.api.init();const handler=t.context.document.listeners.change;handler({target:{id:"import-file",files:[{}]}});assert.equal(t.readers.length,1);t.readers[0].result=JSON.stringify(saved(t,"cory"));t.values.set("craepets.v1.cory","{ changed after reading began");const before=snapshot(t);if(late==="paused")t.api.pause("cory");t.readers[0].onload();assert.equal(t.api.flags().paused,true);for(const timer of t.timers)timer();t.api.save();assert.deepEqual(snapshot(t),before);
+});
+check("pending actual wheel award refuses paused state before coin mutation",()=>{
+ const t=fixture("craepets.","cory");t.api.activate("cory",saved(t,"cory"));t.api.pause("cory");const state=t.api.flags().state,before=clone(state),raw=snapshot(t);t.api.award({coins:50,label:"test"},0);assert.equal(t.api.flags().state,state);assert.deepEqual(clone(state),before);assert.deepEqual(snapshot(t),raw);
+});
+check("new actual modal refuses paused recovery overlay",()=>{
+ const t=fixture("craepets.","cory");t.api.activate("cory",saved(t,"cory"));t.api.pause("cory");const children=t.context.document.body.children.slice(),before=snapshot(t);t.api.dialog('<div id="sheet-back">blocked prize</div>');assert.deepEqual(t.context.document.body.children,children);assert.deepEqual(snapshot(t),before);
 });
 console.log("PASS original-game active saved-data loader: "+checks+" production cases across seven original profiles; malformed/read-failure raw preservation, blank/legacy/earned progress, startup, sibling/visit admission, inspector safety and delayed-reader refusal.");
