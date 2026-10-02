@@ -1,0 +1,223 @@
+{
+  "repository": "trimcrae/Kid-games",
+  "reviewedSource": {
+    "head": "113e1fad8d8eb530ca95a28d6af0e928809d44d6",
+    "tree": "c47a903aaffb4fd771ea562c5ba86d744198c2a8",
+    "base": "41da3e68bc938b48ef2dcc1e55868184fc1dee82",
+    "pullRequest": 12,
+    "url": "https://github.com/trimcrae/Kid-games/pull/12"
+  },
+  "actualCI": {
+    "run": 37009185725,
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/37009185725",
+    "attempt": 1,
+    "event": "pull_request",
+    "head": "113e1fad8d8eb530ca95a28d6af0e928809d44d6",
+    "status": "completed",
+    "conclusion": "success",
+    "job": 110844549150,
+    "jobStatus": "completed",
+    "jobConclusion": "success",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install test dependency",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Chromium",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Select installed Chromium",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run focused regressions",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@v4",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@v4",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "node": "22.23.3",
+    "suites": {
+      "passed": 30,
+      "total": 30
+    },
+    "syntheticCheckout": {
+      "sha": "93e7d4b668703c35644775861e8906d31173fd51",
+      "parents": [
+        "41da3e68bc938b48ef2dcc1e55868184fc1dee82",
+        "113e1fad8d8eb530ca95a28d6af0e928809d44d6"
+      ],
+      "tree": "c47a903aaffb4fd771ea562c5ba86d744198c2a8",
+      "equalsReviewedTree": true
+    }
+  },
+  "testedFiles": [
+    {
+      "path": "games/music-lab/music-lab.js",
+      "gitBlob": "b90b35e35649b8062c41b618fe42fb20805c5b2e",
+      "utf8Bytes": 52894,
+      "sha256": "c9281d63731fa2c1ebf104de51a5b50b8ae9595d190ae65508c968e0d3344818"
+    },
+    {
+      "path": "games/music-lab/index.html",
+      "gitBlob": "730c83fe533289933f4ae3f4416241533f661d54",
+      "utf8Bytes": 14089,
+      "sha256": "1365b8c026f4e2a160108e2a5639bc78288d73a5e718aca30ee55f938e60d986"
+    },
+    {
+      "path": "tests/music-chord-instructions.cjs",
+      "gitBlob": "f39a1b5e6e47265f7002d2ed9b0ab57d8d17207b",
+      "utf8Bytes": 9913,
+      "sha256": "9e8e880d36b1fd0e7bcdc94111b89811139115856540ddc3ec7ce0d34849e105"
+    },
+    {
+      "path": "tests/music-chord-instructions-browser.cjs",
+      "gitBlob": "fcf110f9365a1a50316ea36f8af042c292119530",
+      "utf8Bytes": 7365,
+      "sha256": "9b775b9848bb3aba9159dfbdeb0f93cab898b4cd284d458bbcb0fa625eaef35d"
+    },
+    {
+      "path": "tests/regressions.cjs",
+      "gitBlob": "c7c550d37650b5d081040d65986f90f52b224b09",
+      "utf8Bytes": 6543,
+      "sha256": "441310b18a88104eb0acd17782cce94e61ba8cdaebd606170c20bf0381622340"
+    }
+  ],
+  "originalLog": {
+    "job": 110844549150,
+    "gitBlob": "4ed70c0d0e147a56a9406a2c7b132454f4961748",
+    "utf8Bytes": 157441,
+    "sha256": "baadff5fd5f09dc49a78f8987a3527ecdc366f0b9ad6ecd9bc50bab9d1e24dba",
+    "retainedPath": "docs/usage-sprint-2026-10-01-music-chord-instructions/ci-37009185725-job-110844549150.log",
+    "retention": "Exactly the original decoded transcript; fetched retained content compared equal with no added newline or transformation."
+  },
+  "methods": {
+    "node": {
+      "execution": "Actual supported Node 22.23.3 execution passed in the automatic PR workflow.",
+      "production": "Whole unmodified production scripts evaluated using DOM, silent-audio and fake-clock adapters; no source rewrite or hidden current-question hook.",
+      "oracle": "Parse the rendered Level 2 root/major-or-minor step recipe; sort actual public piano keys by an independent standard MIDI map; derive root/middle/last and compare with the unchanged static native catalog and the independent 4+3 / 3+4 semitone property.",
+      "groups": 12,
+      "freshBoots": 13,
+      "coverage": "Ten native Level 2 chords, targeted D-major wrong F4 versus correct F#4, and combined Level 1/3 native challenge contracts; wrong/duplicate input, award once and synthetic saved-history/14 profile namespace raw-byte preservation."
+    },
+    "browser": {
+      "execution": "Actual native full-page Chromium execution passed in the automatic PR workflow.",
+      "devices": [
+        "Desktop",
+        "iPad (Chromium emulation)",
+        "iPhone (Chromium emulation)"
+      ],
+      "groups": 3,
+      "dMajorRounds": 4,
+      "fixture": "Math.random=0.75, synthetic localStorage, blocked service workers and isolated contexts. No source rewrite or current-answer hook.",
+      "oracle": "Visible Level 2 prompt, actual public piano notes and native aria-keyshortcuts, interpreted with independent MIDI math.",
+      "input": "Desktop computer-key shortcuts then a separate native pointer round; one native touch round on each mobile emulation; each rejects F4 and completes D4/F#4/A4 once.",
+      "preservation": "Synthetic full Music historical fixture changes chordCount only; all fourteen unrelated profile namespace raw bytes remain exact.",
+      "limits": [
+        "Native WebAudio remains enabled but audible output is not captured.",
+        "Native timers remain enabled but the 1600 ms next-chord deadline is not asserted.",
+        "No browser Level 1/3 or all-ten-chord claim; those checks use Node adapters.",
+        "Chromium mobile emulation is not physical-device or Safari proof."
+      ]
+    },
+    "preliminary": "Exact patched Node CJS test executed with V8 builtin adapters: twelve groups passed. Test syntax compiled in V8. These are preliminary and not actual Node/browser execution."
+  },
+  "sourcePublication": {
+    "merge": "8f86728111c6459baf11757384998ed6ffc485e1",
+    "parents": [
+      "41da3e68bc938b48ef2dcc1e55868184fc1dee82",
+      "113e1fad8d8eb530ca95a28d6af0e928809d44d6"
+    ],
+    "tree": "c47a903aaffb4fd771ea562c5ba86d744198c2a8",
+    "equalsReviewedTree": true,
+    "sourcePages": {
+      "run": 37010561420,
+      "url": "https://github.com/trimcrae/Kid-games/actions/runs/37010561420",
+      "attempt": 1,
+      "event": "dynamic",
+      "head": "8f86728111c6459baf11757384998ed6ffc485e1",
+      "status": "completed",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 110849016955,
+          "name": "build",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 110849232941,
+          "name": "report-build-status",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 110849233012,
+          "name": "deploy",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "originalBuild": {
+        "job": 110849016955,
+        "utf8Bytes": 286735,
+        "sha256": "e8588712263341a20e64c19e973598c178ffd0abc81d96ec3c7a3a66b01aac76",
+        "checkout": "8f86728111c6459baf11757384998ed6ffc485e1"
+      },
+      "originalDeploy": {
+        "job": 110849233012,
+        "utf8Bytes": 3674,
+        "sha256": "02d1c10f4fcf9de3dd34dc5fdf8f02beb2813f38d94a01a71b755281f8513d63",
+        "pagesBuildVersion": "8f86728111c6459baf11757384998ed6ffc485e1",
+        "deployment": "8f86728111c6459baf11757384998ed6ffc485e1",
+        "url": "https://trimcrae.github.io/Kid-games/"
+      }
+    },
+    "separateAutomaticPushCI": {
+      "run": 37010562908,
+      "status": "in_progress",
+      "conclusion": null,
+      "head": "8f86728111c6459baf11757384998ed6ffc485e1",
+      "observations": 1,
+      "note": "Point-in-time automatic push observation, distinct from completed PR test evidence. No manual dispatch or terminal result claimed."
+    }
+  },
+  "unchangedSongData": {
+    "path": "games/music-lab/songs.js",
+    "gitBlob": "6ed9af559225e89a6db6e1fb042009184cc23644"
+  }
+}

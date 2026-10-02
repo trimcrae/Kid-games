@@ -1,0 +1,126 @@
+{
+  "task": "Music Lab chord instructions",
+  "repository": "trimcrae/Kid-games",
+  "scope": "Two curriculum instruction strings only; native notes, catalog, Level 1/3, scoring, saves, timers and other modes preserved.",
+  "entry": {
+    "main": "41da3e68bc938b48ef2dcc1e55868184fc1dee82",
+    "mainTree": "55c691aa134c3921735a008bda654fa3e2842de4",
+    "treeEntries": 3430,
+    "truncated": false,
+    "openIssues": 0,
+    "openPullRequests": 0,
+    "branches": 93,
+    "usageSprintBranches": 20,
+    "ownership": "No existing Music task or claim found in the fresh branch/tree/issue/PR inventory.",
+    "guidance": [
+      {
+        "path": "AGENTS.md",
+        "gitBlob": "1e46c4e76ff0c21765bbbf6f98015e76e801ccf5"
+      },
+      {
+        "path": "CLAUDE.md",
+        "gitBlob": "662ca10d6e8a820aa557b75b1cde7a30ed9bbf32"
+      },
+      {
+        "path": "tests/README.md",
+        "gitBlob": "7d1a74a473155114ab97630923cc41324423376d"
+      }
+    ],
+    "worldDocsHeadCI": {
+      "run": 37004346825,
+      "attempt": 1,
+      "event": "push",
+      "head": "41da3e68bc938b48ef2dcc1e55868184fc1dee82",
+      "status": "completed",
+      "conclusion": "success",
+      "observations": 1,
+      "note": "One fresh entry observation; no World test repetition."
+    }
+  },
+  "original": {
+    "game": {
+      "path": "games/music-lab/music-lab.js",
+      "gitBlob": "db5933eebf4daa784b36846631ebaa7e26d370e6"
+    },
+    "songs": {
+      "path": "games/music-lab/songs.js",
+      "gitBlob": "6ed9af559225e89a6db6e1fb042009184cc23644"
+    },
+    "html": {
+      "path": "games/music-lab/index.html",
+      "gitBlob": "b361b5b44512dbad1776f78b5e9c227e734a64ed"
+    }
+  },
+  "witness": {
+    "execution": "Preliminary isolated V8 execution of the complete unmodified production songs and Music scripts with DOM/storage/fake-clock adapters. Not actual Node, browser, audio or timer-deadline evidence.",
+    "fixture": "Synthetic save at Level 2, chordCount 7, historical best 5; Math.random fixed at 0.75 selects native D major.",
+    "trigger": "The visible white-key skip recipe suggests D4/F4/A4. D4 is accepted; F4 is rejected as 'Not F — D major needs F♯ and A.'; A4 and F#4 then complete once.",
+    "snapshots": {
+      "start": {
+        "prompt": "Find the three notes of D major. Start on D, then skip a key, then skip again.",
+        "chord": "D major",
+        "held": [],
+        "bad": [],
+        "chordCount": 7,
+        "historicalBest": 5,
+        "unrelated": "synthetic-unrelated-byte-sentinel"
+      },
+      "root": {
+        "prompt": "Yes — D. 2 more to find.",
+        "chord": "D major",
+        "held": [
+          "D4"
+        ],
+        "bad": [],
+        "chordCount": 7,
+        "historicalBest": 5,
+        "unrelated": "synthetic-unrelated-byte-sentinel"
+      },
+      "wrong": {
+        "prompt": "Not F — D major needs F♯ and A.",
+        "chord": "D major",
+        "held": [
+          "D4"
+        ],
+        "bad": [
+          "F4"
+        ],
+        "chordCount": 7,
+        "historicalBest": 5,
+        "unrelated": "synthetic-unrelated-byte-sentinel"
+      },
+      "two": {
+        "prompt": "Yes — A. 1 more to find.",
+        "chord": "D major",
+        "held": [
+          "D4",
+          "A4"
+        ],
+        "bad": [
+          "F4"
+        ],
+        "chordCount": 7,
+        "historicalBest": 5,
+        "unrelated": "synthetic-unrelated-byte-sentinel"
+      },
+      "done": {
+        "prompt": "D major = D + F♯ + A — a MAJOR chord, so it sounds happy.",
+        "chord": "D major 🎉",
+        "held": [
+          "D4",
+          "A4",
+          "F#4"
+        ],
+        "bad": [
+          "F4"
+        ],
+        "chordCount": 8,
+        "historicalBest": 5,
+        "unrelated": "synthetic-unrelated-byte-sentinel"
+      }
+    },
+    "patchedPropertyAgainstOriginal": "The later Node regression script, executed preliminarily with V8 builtin adapters against the original source, rejects the missing major/minor adjacent-key recipe. This is separate from the concrete original-source gameplay witness.",
+    "originalPrompt": "Find the three notes of D major. Start on D, then skip a key, then skip again.",
+    "originalHint": "A triad is three notes stacked up: play a key, skip one white key, play the next — then skip again."
+  }
+}
