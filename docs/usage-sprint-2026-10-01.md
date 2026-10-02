@@ -26,17 +26,21 @@ The actual Node suite ran 53 malformed cases and 75 genuine review-question comb
 
 Independent isolated V8 review additionally checked all seven real profiles in both namespaces, all 37 bought homes with named rooms/styles/furniture, and 42 extra malformed room/bank/stall cases. These preliminary JS checks are distinct from the actual Node/browser run above. The browser fixture loads the real activity iframe inside a minimal same-origin host; it does not start the unchanged full 3D walkthrough. Real iOS Safari remains untested.
 
-This repairs the activity engine's single-valley importer. The separate family-bundle importer in `house-test/save-copy.js` retains its existing behavior and needs its own future review.
+This repairs the activity engine's single-valley importer. The later family-bundle repair is documented below.
 
 ## Post Office damaged-save and live-reader recovery — completed
 
 [PR #3](https://github.com/trimcrae/Kid-games/pull/3) is reviewed, validated and merged as `f400476238f786733291fca80ca6568447721704`. Actual final CI [36947199408](https://github.com/trimcrae/Kid-games/actions/runs/36947199408) passed 12/12 suites: 56 Node storage cases and Desktop/iPad/iPhone real Chromium checks, including second-tab updates, reader ownership, posting quota retry, reload and unrelated saves. Pages [36947678263](https://github.com/trimcrae/Kid-games/actions/runs/36947678263) published the tested merge successfully.
 
-See [the bounded handoff](usage-sprint-2026-10-01-post-office.md) and [machine-readable receipt](usage-sprint-2026-10-01/post-office-validation.json). Original damaged bytes remain in local append-only safety copies before repaired writes; unusable external snapshots preserve live mail, and an unsafe write is refused visibly. The standalone family-bundle importer remains the next priority.
+See [the bounded handoff](usage-sprint-2026-10-01-post-office.md) and [machine-readable receipt](usage-sprint-2026-10-01/post-office-validation.json). Original damaged bytes remain in local append-only safety copies before repaired writes; unusable external snapshots preserve live mail, and an unsafe write is refused visibly. The later family-bundle repair is documented below.
+
+## Family-bundle restore — completed
+
+[PR #4](https://github.com/trimcrae/Kid-games/pull/4) repairs the separate family-bundle restore in `house-test/save-copy.js`. Every incoming profile is prepared before writing; a verified bounded journal preserves exact prior house bytes and supports interrupted recovery. Actual final CI [36952828714](https://github.com/trimcrae/Kid-games/actions/runs/36952828714) passed 14/14 suites, including 163 Node checks and Chromium Desktop/iPad/iPhone groups through the production save panel/activity iframe. See [the bounded handoff](usage-sprint-2026-10-01-family-restore.md) for exact source, publication receipts and limits.
 
 ## Next bounded tasks
 
-1. **Review house family-bundle restore separately.** `house-test/save-copy.js` uses a minimal pet check and pre-import snapshot/rollback. Audit malformed nested game state and partial storage failures without weakening profile isolation or changing the completed activity importer.
+1. **Audit automatic house profile seeding separately.** `copyMissing()` in `house-test/save-copy.js` still uses the older minimal pet check before deep engine preparation. Reproduce one useful malformed-source or damaged-target case, preserving exact house bytes and original namespaces. Keep it separate from the completed family restore.
 2. Check transferred pet imports on a real iPad/iPhone when that environment is available.
 
 Before each follow-on, read the latest main HEAD and repository guidance, inspect ongoing PRs, choose a bounded task, and get meaningful checks plus independent review before publication. The existing focused runner is `cd tests && npm run test:regressions`; targeted import suites are `craepets-import.cjs` and `craepets-import-browser.cjs`. The repo's AGENTS/CLAUDE guidance requires reviewed work to reach main. A temporary PR is useful for real CI when no local runtime exists.

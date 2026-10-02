@@ -1,0 +1,702 @@
+﻿2026-10-02T01:51:02.4952280Z Current runner version: '2.337.0'
+2026-10-02T01:51:02.4977579Z ##[group]Runner Image Provisioner
+2026-10-02T01:51:02.4978492Z Hosted Compute Agent
+2026-10-02T01:51:02.4979145Z Version: 20260901.588
+2026-10-02T01:51:02.4980034Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-02T01:51:02.4980819Z Build Date: 2026-09-01T19:56:44Z
+2026-10-02T01:51:02.4981561Z Worker ID: {e12b59cc-2ba9-4967-b854-22b7248d7212}
+2026-10-02T01:51:02.4982318Z Azure Region: centralus
+2026-10-02T01:51:02.4982970Z ##[endgroup]
+2026-10-02T01:51:02.4984720Z ##[group]Operating System
+2026-10-02T01:51:02.4985374Z Ubuntu
+2026-10-02T01:51:02.4985903Z 24.04.5
+2026-10-02T01:51:02.4986530Z LTS
+2026-10-02T01:51:02.4987113Z ##[endgroup]
+2026-10-02T01:51:02.4987712Z ##[group]Runner Image
+2026-10-02T01:51:02.4988395Z Image: ubuntu-24.04
+2026-10-02T01:51:02.4988982Z Version: 20260927.320.1
+2026-10-02T01:51:02.4990388Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-02T01:51:02.4991986Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-02T01:51:02.4992974Z ##[endgroup]
+2026-10-02T01:51:02.4994413Z ##[group]GITHUB_TOKEN Permissions
+2026-10-02T01:51:02.4996533Z Contents: read
+2026-10-02T01:51:02.4997131Z Metadata: read
+2026-10-02T01:51:02.4997836Z ##[endgroup]
+2026-10-02T01:51:02.4999871Z Secret source: Actions
+2026-10-02T01:51:02.5000960Z Cache mode: write
+2026-10-02T01:51:02.5001700Z Prepare workflow directory
+2026-10-02T01:51:02.5437024Z Prepare all required actions
+2026-10-02T01:51:02.5489834Z Getting action download info
+2026-10-02T01:51:02.8370586Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-02T01:51:02.9481523Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-02T01:51:03.1309030Z Complete job name: regressions
+2026-10-02T01:51:03.2050417Z ##[group]Run actions/checkout@v4
+2026-10-02T01:51:03.2051257Z with:
+2026-10-02T01:51:03.2051706Z   repository: trimcrae/Kid-games
+2026-10-02T01:51:03.2055617Z   token: ***
+2026-10-02T01:51:03.2056056Z   ssh-strict: true
+2026-10-02T01:51:03.2056497Z   ssh-user: git
+2026-10-02T01:51:03.2056955Z   persist-credentials: true
+2026-10-02T01:51:03.2057448Z   clean: true
+2026-10-02T01:51:03.2057893Z   sparse-checkout-cone-mode: true
+2026-10-02T01:51:03.2058413Z   fetch-depth: 1
+2026-10-02T01:51:03.2058849Z   fetch-tags: false
+2026-10-02T01:51:03.2059294Z   show-progress: true
+2026-10-02T01:51:03.2059736Z   lfs: false
+2026-10-02T01:51:03.2060148Z   submodules: false
+2026-10-02T01:51:03.2060594Z   set-safe-directory: true
+2026-10-02T01:51:03.2061095Z   allow-unsafe-pr-checkout: false
+2026-10-02T01:51:03.2061805Z ##[endgroup]
+2026-10-02T01:51:03.3066963Z Syncing repository: trimcrae/Kid-games
+2026-10-02T01:51:03.3069347Z ##[group]Getting Git version info
+2026-10-02T01:51:03.3070521Z Working directory is '/home/runner/work/Kid-games/Kid-games'
+2026-10-02T01:51:03.3072130Z [command]/usr/bin/git version
+2026-10-02T01:51:03.3105850Z git version 2.55.0
+2026-10-02T01:51:03.3126150Z ##[endgroup]
+2026-10-02T01:51:03.3140707Z Temporarily overriding HOME='/home/runner/work/_temp/0366de3d-0673-400b-a93b-eb4c9cdda48a' before making global git config changes
+2026-10-02T01:51:03.3143058Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-02T01:51:03.3145802Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Kid-games/Kid-games
+2026-10-02T01:51:03.3190586Z Deleting the contents of '/home/runner/work/Kid-games/Kid-games'
+2026-10-02T01:51:03.3199072Z ##[group]Initializing the repository
+2026-10-02T01:51:03.3200346Z [command]/usr/bin/git init /home/runner/work/Kid-games/Kid-games
+2026-10-02T01:51:03.3287138Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-02T01:51:03.3288928Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-02T01:51:03.3290032Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-02T01:51:03.3291203Z hint: call:
+2026-10-02T01:51:03.3291701Z hint:
+2026-10-02T01:51:03.3292331Z hint: 	git config --global init.defaultBranch <name>
+2026-10-02T01:51:03.3293079Z hint:
+2026-10-02T01:51:03.3293725Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-02T01:51:03.3294974Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-02T01:51:03.3295790Z hint:
+2026-10-02T01:51:03.3296276Z hint: 	git branch -m <name>
+2026-10-02T01:51:03.3296830Z hint:
+2026-10-02T01:51:03.3297508Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-02T01:51:03.3303297Z Initialized empty Git repository in /home/runner/work/Kid-games/Kid-games/.git/
+2026-10-02T01:51:03.3315314Z [command]/usr/bin/git remote add origin https://github.com/trimcrae/Kid-games
+2026-10-02T01:51:03.3358671Z ##[endgroup]
+2026-10-02T01:51:03.3359977Z ##[group]Disabling automatic garbage collection
+2026-10-02T01:51:03.3363432Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-02T01:51:03.3397019Z ##[endgroup]
+2026-10-02T01:51:03.3398457Z ##[group]Setting up auth
+2026-10-02T01:51:03.3404953Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-02T01:51:03.3440801Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-02T01:51:03.3791204Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-02T01:51:03.3829711Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-02T01:51:03.4095793Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-02T01:51:03.4131915Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-02T01:51:03.4372115Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-02T01:51:03.4413869Z ##[endgroup]
+2026-10-02T01:51:03.4414946Z ##[group]Fetching the repository
+2026-10-02T01:51:03.4423466Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0db69a71d2ee0e6c27b65663061ca492879901ec:refs/remotes/pull/4/merge
+2026-10-02T01:51:16.5910571Z From https://github.com/trimcrae/Kid-games
+2026-10-02T01:51:16.5912638Z  * [new ref]         0db69a71d2ee0e6c27b65663061ca492879901ec -> pull/4/merge
+2026-10-02T01:51:16.5925329Z ##[endgroup]
+2026-10-02T01:51:16.5926623Z ##[group]Determining the checkout info
+2026-10-02T01:51:16.5927884Z ##[endgroup]
+2026-10-02T01:51:16.5928713Z [command]/usr/bin/git sparse-checkout disable
+2026-10-02T01:51:16.5976650Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-02T01:51:16.6016780Z ##[group]Checking out the ref
+2026-10-02T01:51:16.6018410Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/4/merge
+2026-10-02T01:51:17.5092958Z Note: switching to 'refs/remotes/pull/4/merge'.
+2026-10-02T01:51:17.5093892Z 
+2026-10-02T01:51:17.5094719Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-02T01:51:17.5095669Z changes and commit them, and you can discard any commits you make in this
+2026-10-02T01:51:17.5096542Z state without impacting any branches by switching back to a branch.
+2026-10-02T01:51:17.5097024Z 
+2026-10-02T01:51:17.5097417Z If you want to create a new branch to retain commits you create, you may
+2026-10-02T01:51:17.5098227Z do so (now or later) by using -c with the switch command. Example:
+2026-10-02T01:51:17.5098706Z 
+2026-10-02T01:51:17.5098979Z   git switch -c <new-branch-name>
+2026-10-02T01:51:17.5099297Z 
+2026-10-02T01:51:17.5099524Z Or undo this operation with:
+2026-10-02T01:51:17.5100135Z 
+2026-10-02T01:51:17.5100315Z   git switch -
+2026-10-02T01:51:17.5100614Z 
+2026-10-02T01:51:17.5101013Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-02T01:51:17.5101532Z 
+2026-10-02T01:51:17.5102157Z HEAD is now at 0db69a7 Merge 628f53660e2b448369219adbdca816a49e7bc721 into 9ee843c7bfbf10ffd0c90ecde411b787dbf60ac9
+2026-10-02T01:51:17.5164754Z ##[endgroup]
+2026-10-02T01:51:17.5213084Z [command]/usr/bin/git log -1 --format=%H
+2026-10-02T01:51:17.5244284Z 0db69a71d2ee0e6c27b65663061ca492879901ec
+2026-10-02T01:51:17.5513112Z ##[group]Run actions/setup-node@v4
+2026-10-02T01:51:17.5513462Z with:
+2026-10-02T01:51:17.5513727Z   node-version: 22
+2026-10-02T01:51:17.5514241Z   always-auth: false
+2026-10-02T01:51:17.5586125Z   check-latest: false
+2026-10-02T01:51:17.5590428Z   token: ***
+2026-10-02T01:51:17.5590874Z ##[endgroup]
+2026-10-02T01:51:17.6994199Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-02T01:51:17.6998493Z (node:2296) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-02T01:51:17.6999264Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-02T01:51:17.7001753Z ##[group]Environment details
+2026-10-02T01:51:18.0120003Z node: v22.23.3
+2026-10-02T01:51:18.0120579Z npm: 10.9.9
+2026-10-02T01:51:18.0120917Z yarn: 1.22.22
+2026-10-02T01:51:18.0121806Z ##[endgroup]
+2026-10-02T01:51:18.0269552Z ##[group]Run npm install --no-package-lock --no-audit --no-fund
+2026-10-02T01:51:18.0270144Z [36;1mnpm install --no-package-lock --no-audit --no-fund[0m
+2026-10-02T01:51:18.0506253Z shell: /usr/bin/bash -e {0}
+2026-10-02T01:51:18.0506600Z ##[endgroup]
+2026-10-02T01:51:19.3374766Z 
+2026-10-02T01:51:19.3383182Z added 1 package in 1s
+2026-10-02T01:51:19.3843841Z ##[group]Run node node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
+2026-10-02T01:51:19.3844900Z [36;1mnode node_modules/playwright-core/cli.js install --with-deps --no-shell chromium[0m
+2026-10-02T01:51:19.3919095Z shell: /usr/bin/bash -e {0}
+2026-10-02T01:51:19.3919377Z ##[endgroup]
+2026-10-02T01:51:19.7189653Z Installing dependencies...
+2026-10-02T01:51:19.7295580Z Switching to root user to install dependencies...
+2026-10-02T01:51:19.8213718Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-02T01:51:19.8496348Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-02T01:51:19.8652382Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-02T01:51:19.8674815Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-02T01:51:19.8856148Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-02T01:51:19.8960027Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-02T01:51:19.9329789Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [510 kB]
+2026-10-02T01:51:19.9525613Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.6 kB]
+2026-10-02T01:51:19.9558354Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [458 kB]
+2026-10-02T01:51:20.0634695Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1364 kB]
+2026-10-02T01:51:20.0715696Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [304 kB]
+2026-10-02T01:51:20.0736157Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
+2026-10-02T01:51:20.0748766Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1699 kB]
+2026-10-02T01:51:20.0831020Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [341 kB]
+2026-10-02T01:51:20.0857774Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+2026-10-02T01:51:20.0885970Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1720 kB]
+2026-10-02T01:51:20.0984335Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [394 kB]
+2026-10-02T01:51:20.1011627Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+2026-10-02T01:51:20.1243573Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5760 B]
+2026-10-02T01:51:20.1693923Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]
+2026-10-02T01:51:20.1784362Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1069 kB]
+2026-10-02T01:51:20.1843323Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [221 kB]
+2026-10-02T01:51:20.1859446Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.4 kB]
+2026-10-02T01:51:20.1869180Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1216 kB]
+2026-10-02T01:51:20.1930540Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [244 kB]
+2026-10-02T01:51:20.1948124Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+2026-10-02T01:51:20.1957995Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1566 kB]
+2026-10-02T01:51:20.2037776Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [361 kB]
+2026-10-02T01:51:24.4611450Z Fetched 12.6 MB in 1s (8580 kB/s)
+2026-10-02T01:51:25.2559722Z Reading package lists...
+2026-10-02T01:51:25.2812454Z Reading package lists...
+2026-10-02T01:51:25.4624339Z Building dependency tree...
+2026-10-02T01:51:25.4630979Z Reading state information...
+2026-10-02T01:51:25.6186600Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+2026-10-02T01:51:25.6187522Z libasound2t64 set to manually installed.
+2026-10-02T01:51:25.6188213Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-02T01:51:25.6188944Z libatk-bridge2.0-0t64 set to manually installed.
+2026-10-02T01:51:25.6189631Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-02T01:51:25.6190245Z libatk1.0-0t64 set to manually installed.
+2026-10-02T01:51:25.6190903Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-02T01:51:25.6191540Z libatspi2.0-0t64 set to manually installed.
+2026-10-02T01:51:25.6192172Z libcairo2 is already the newest version (1.18.0-3build1).
+2026-10-02T01:51:25.6192755Z libcairo2 set to manually installed.
+2026-10-02T01:51:25.6193401Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+2026-10-02T01:51:25.6194251Z libcups2t64 set to manually installed.
+2026-10-02T01:51:25.6194907Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+2026-10-02T01:51:25.6195516Z libdbus-1-3 set to manually installed.
+2026-10-02T01:51:25.6196169Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+2026-10-02T01:51:25.6196794Z libdrm2 set to manually installed.
+2026-10-02T01:51:25.6197419Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+2026-10-02T01:51:25.6198305Z libglib2.0-0t64 set to manually installed.
+2026-10-02T01:51:25.6198948Z libnspr4 is already the newest version (2:4.35-1.1build1).
+2026-10-02T01:51:25.6199533Z libnspr4 set to manually installed.
+2026-10-02T01:51:25.6200244Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+2026-10-02T01:51:25.6200733Z libnss3 set to manually installed.
+2026-10-02T01:51:25.6201127Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+2026-10-02T01:51:25.6201539Z libpango-1.0-0 set to manually installed.
+2026-10-02T01:51:25.6202110Z libx11-6 is already the newest version (2:1.8.7-1build1).
+2026-10-02T01:51:25.6202483Z libx11-6 set to manually installed.
+2026-10-02T01:51:25.6202851Z libxcb1 is already the newest version (1.15-1ubuntu2).
+2026-10-02T01:51:25.6203210Z libxcb1 set to manually installed.
+2026-10-02T01:51:25.6203616Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+2026-10-02T01:51:25.6204486Z libxcomposite1 set to manually installed.
+2026-10-02T01:51:25.6204901Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+2026-10-02T01:51:25.6205385Z libxdamage1 set to manually installed.
+2026-10-02T01:51:25.6205779Z libxext6 is already the newest version (2:1.3.4-1build2).
+2026-10-02T01:51:25.6206148Z libxext6 set to manually installed.
+2026-10-02T01:51:25.6206552Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+2026-10-02T01:51:25.6206937Z libxfixes3 set to manually installed.
+2026-10-02T01:51:25.6207342Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+2026-10-02T01:51:25.6207807Z libxkbcommon0 set to manually installed.
+2026-10-02T01:51:25.6208207Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+2026-10-02T01:51:25.6208576Z libxrandr2 set to manually installed.
+2026-10-02T01:51:25.6208965Z xvfb is already the newest version (2:21.1.12-1ubuntu1.8).
+2026-10-02T01:51:25.6209518Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+2026-10-02T01:51:25.6210076Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+2026-10-02T01:51:25.6210487Z libfontconfig1 set to manually installed.
+2026-10-02T01:51:25.6210923Z libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.1).
+2026-10-02T01:51:25.6211339Z libfreetype6 set to manually installed.
+2026-10-02T01:51:25.6211743Z fonts-liberation is already the newest version (1:2.1.5-3).
+2026-10-02T01:51:25.6212164Z fonts-liberation set to manually installed.
+2026-10-02T01:51:25.6212564Z The following additional packages will be installed:
+2026-10-02T01:51:25.6213036Z   libgl1-mesa-dri libglx-mesa0 libwayland-server0 mesa-libgallium
+2026-10-02T01:51:25.6213430Z   xfonts-encodings xfonts-utils
+2026-10-02T01:51:25.6213870Z Recommended packages:
+2026-10-02T01:51:25.6214322Z   fonts-ipafont-mincho fonts-tlwg-loma
+2026-10-02T01:51:25.6378571Z The following NEW packages will be installed:
+2026-10-02T01:51:25.6379368Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+2026-10-02T01:51:25.6383904Z   fonts-wqy-zenhei libwayland-server0 xfonts-cyrillic xfonts-encodings
+2026-10-02T01:51:25.6384700Z   xfonts-scalable xfonts-utils
+2026-10-02T01:51:25.6387976Z The following packages will be upgraded:
+2026-10-02T01:51:25.6392180Z   libgbm1 libgl1-mesa-dri libglx-mesa0 mesa-libgallium
+2026-10-02T01:51:25.6565215Z 4 upgraded, 10 newly installed, 0 to remove and 21 not upgraded.
+2026-10-02T01:51:25.6566456Z Need to get 32.1 MB of archives.
+2026-10-02T01:51:25.6567111Z After this operation, 79.7 MB of additional disk space will be used.
+2026-10-02T01:51:25.7244415Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-02T01:51:25.7246354Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+2026-10-02T01:51:25.7992947Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+2026-10-02T01:51:25.9028244Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+2026-10-02T01:51:25.9376570Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+2026-10-02T01:51:25.9912237Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+2026-10-02T01:51:26.1022597Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgl1-mesa-dri amd64 25.2.8-0ubuntu0.24.04.3 [37.9 kB]
+2026-10-02T01:51:26.1365763Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libwayland-server0 amd64 1.22.0-2.1build1 [33.9 kB]
+2026-10-02T01:51:26.1709689Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglx-mesa0 amd64 25.2.8-0ubuntu0.24.04.3 [110 kB]
+2026-10-02T01:51:26.2067055Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgbm1 amd64 25.2.8-0ubuntu0.24.04.3 [34.3 kB]
+2026-10-02T01:51:26.2410726Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-libgallium amd64 25.2.8-0ubuntu0.24.04.3 [10.8 MB]
+2026-10-02T01:51:26.3911582Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+2026-10-02T01:51:26.4309567Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+2026-10-02T01:51:26.4665952Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+2026-10-02T01:51:26.5289153Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+2026-10-02T01:51:26.9160345Z Fetched 32.1 MB in 1s (31.6 MB/s)
+2026-10-02T01:51:26.9380606Z Selecting previously unselected package fonts-ipafont-gothic.
+2026-10-02T01:51:26.9593652Z (Reading database ... 
+2026-10-02T01:51:26.9594256Z (Reading database ... 5%
+2026-10-02T01:51:26.9594661Z (Reading database ... 10%
+2026-10-02T01:51:26.9595078Z (Reading database ... 15%
+2026-10-02T01:51:26.9595571Z (Reading database ... 20%
+2026-10-02T01:51:26.9596103Z (Reading database ... 25%
+2026-10-02T01:51:26.9596472Z (Reading database ... 30%
+2026-10-02T01:51:26.9597316Z (Reading database ... 35%
+2026-10-02T01:51:26.9597700Z (Reading database ... 40%
+2026-10-02T01:51:26.9598278Z (Reading database ... 45%
+2026-10-02T01:51:26.9598852Z (Reading database ... 50%
+2026-10-02T01:51:26.9630345Z (Reading database ... 55%
+2026-10-02T01:51:27.0931699Z (Reading database ... 60%
+2026-10-02T01:51:27.2819623Z (Reading database ... 65%
+2026-10-02T01:51:27.4872518Z (Reading database ... 70%
+2026-10-02T01:51:27.6939381Z (Reading database ... 75%
+2026-10-02T01:51:27.8365178Z (Reading database ... 80%
+2026-10-02T01:51:28.0416318Z (Reading database ... 85%
+2026-10-02T01:51:28.2302818Z (Reading database ... 90%
+2026-10-02T01:51:28.3993906Z (Reading database ... 95%
+2026-10-02T01:51:28.3994505Z (Reading database ... 100%
+2026-10-02T01:51:28.3994962Z (Reading database ... 202296 files and directories currently installed.)
+2026-10-02T01:51:28.4040008Z Preparing to unpack .../00-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+2026-10-02T01:51:28.4136108Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-02T01:51:28.6472259Z Selecting previously unselected package fonts-freefont-ttf.
+2026-10-02T01:51:28.6602484Z Preparing to unpack .../01-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+2026-10-02T01:51:28.6610249Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-02T01:51:28.7392776Z Selecting previously unselected package fonts-tlwg-loma-otf.
+2026-10-02T01:51:28.7524223Z Preparing to unpack .../02-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+2026-10-02T01:51:28.7530591Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-02T01:51:28.7733111Z Selecting previously unselected package fonts-unifont.
+2026-10-02T01:51:28.7857801Z Preparing to unpack .../03-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+2026-10-02T01:51:28.7863661Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+2026-10-02T01:51:28.8944940Z Selecting previously unselected package fonts-wqy-zenhei.
+2026-10-02T01:51:28.9078305Z Preparing to unpack .../04-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+2026-10-02T01:51:28.9188865Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-02T01:51:29.3964813Z Preparing to unpack .../05-libgl1-mesa-dri_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T01:51:29.4110216Z Unpacking libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T01:51:29.4461696Z Selecting previously unselected package libwayland-server0:amd64.
+2026-10-02T01:51:29.4588111Z Preparing to unpack .../06-libwayland-server0_1.22.0-2.1build1_amd64.deb ...
+2026-10-02T01:51:29.4602263Z Unpacking libwayland-server0:amd64 (1.22.0-2.1build1) ...
+2026-10-02T01:51:29.4924666Z Preparing to unpack .../07-libglx-mesa0_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T01:51:29.4945397Z Unpacking libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T01:51:29.5293684Z Preparing to unpack .../08-libgbm1_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T01:51:29.5312470Z Unpacking libgbm1:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T01:51:29.5663833Z Preparing to unpack .../09-mesa-libgallium_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T01:51:29.5683333Z Unpacking mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T01:51:29.7347253Z Selecting previously unselected package xfonts-encodings.
+2026-10-02T01:51:29.7479753Z Preparing to unpack .../10-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+2026-10-02T01:51:29.7487082Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-02T01:51:29.7761327Z Selecting previously unselected package xfonts-utils.
+2026-10-02T01:51:29.7886639Z Preparing to unpack .../11-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+2026-10-02T01:51:29.7893241Z Unpacking xfonts-utils (1:7.7+6build3) ...
+2026-10-02T01:51:29.8209847Z Selecting previously unselected package xfonts-cyrillic.
+2026-10-02T01:51:29.8337141Z Preparing to unpack .../12-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+2026-10-02T01:51:29.8343711Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-02T01:51:29.8670651Z Selecting previously unselected package xfonts-scalable.
+2026-10-02T01:51:29.8795302Z Preparing to unpack .../13-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+2026-10-02T01:51:29.8801871Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-02T01:51:29.9236271Z Setting up libwayland-server0:amd64 (1.22.0-2.1build1) ...
+2026-10-02T01:51:29.9258341Z Setting up mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T01:51:29.9275797Z Setting up libgbm1:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T01:51:29.9290748Z Setting up libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T01:51:29.9363101Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-02T01:51:29.9474320Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-02T01:51:29.9489152Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-02T01:51:29.9504130Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-02T01:51:29.9518951Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-02T01:51:29.9584684Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+2026-10-02T01:51:29.9598843Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+2026-10-02T01:51:29.9614938Z Setting up libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T01:51:29.9629453Z Setting up xfonts-utils (1:7.7+6build3) ...
+2026-10-02T01:51:29.9665149Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-02T01:51:29.9963746Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-02T01:51:30.0239555Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-02T01:51:30.0494980Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-10-02T01:51:30.0512464Z Not building database; man-db/auto-update is not 'true'.
+2026-10-02T01:51:30.0522199Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+2026-10-02T01:51:30.7146843Z 
+2026-10-02T01:51:30.7147472Z Running kernel seems to be up-to-date.
+2026-10-02T01:51:30.7147838Z 
+2026-10-02T01:51:30.7148070Z No services need to be restarted.
+2026-10-02T01:51:30.7148334Z 
+2026-10-02T01:51:30.7148559Z No containers need to be restarted.
+2026-10-02T01:51:30.7148826Z 
+2026-10-02T01:51:30.7149094Z No user sessions are running outdated binaries.
+2026-10-02T01:51:30.7149410Z 
+2026-10-02T01:51:30.7149828Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-02T01:51:31.6030750Z Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-linux64.zip
+2026-10-02T01:51:32.0393513Z |                                                                                |   0% of 186.8 MiB
+2026-10-02T01:51:32.3985636Z |■■■■■■■■                                                                        |  10% of 186.8 MiB
+2026-10-02T01:51:32.4927741Z |■■■■■■■■■■■■■■■■                                                                |  20% of 186.8 MiB
+2026-10-02T01:51:32.5614565Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 186.8 MiB
+2026-10-02T01:51:32.6224500Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 186.8 MiB
+2026-10-02T01:51:32.6844734Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 186.8 MiB
+2026-10-02T01:51:32.7421216Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 186.8 MiB
+2026-10-02T01:51:32.7990684Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 186.8 MiB
+2026-10-02T01:51:32.8586985Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 186.8 MiB
+2026-10-02T01:51:32.9191371Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 186.8 MiB
+2026-10-02T01:51:32.9801030Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 186.8 MiB
+2026-10-02T01:51:35.5461079Z Chrome for Testing 153.0.8010.12 (playwright chromium v1243) downloaded to /home/runner/.cache/ms-playwright/chromium-1243
+2026-10-02T01:51:35.5464242Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+2026-10-02T01:51:35.9415580Z |                                                                                |   0% of 2.3 MiB
+2026-10-02T01:51:35.9587896Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+2026-10-02T01:51:35.9691062Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+2026-10-02T01:51:35.9779145Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+2026-10-02T01:51:35.9852331Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+2026-10-02T01:51:35.9924224Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+2026-10-02T01:51:35.9947133Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+2026-10-02T01:51:35.9992514Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+2026-10-02T01:51:36.0023526Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+2026-10-02T01:51:36.0052538Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+2026-10-02T01:51:36.0090599Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+2026-10-02T01:51:36.0649301Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+2026-10-02T01:51:36.0798293Z ##[group]Run node -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'
+2026-10-02T01:51:36.0799982Z [36;1mnode -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'[0m
+2026-10-02T01:51:36.0868889Z shell: /usr/bin/bash -e {0}
+2026-10-02T01:51:36.0869165Z ##[endgroup]
+2026-10-02T01:51:36.4329540Z ##[group]Run npm run test:regressions
+2026-10-02T01:51:36.4330035Z [36;1mnpm run test:regressions[0m
+2026-10-02T01:51:36.4416994Z shell: /usr/bin/bash -e {0}
+2026-10-02T01:51:36.4417427Z env:
+2026-10-02T01:51:36.4418009Z   CHROMIUM_PATH: /home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+2026-10-02T01:51:36.4418731Z ##[endgroup]
+2026-10-02T01:51:36.5467927Z 
+2026-10-02T01:51:36.5468599Z > kid-games-playtests@1.0.0 test:regressions
+2026-10-02T01:51:36.5469201Z > node regressions.cjs
+2026-10-02T01:51:36.5469459Z 
+2026-10-02T01:51:36.8531841Z Running 14 focused regression suites with /home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+2026-10-02T01:51:36.8533010Z 
+2026-10-02T01:51:36.8533485Z --- craepets-family-restore.cjs ---
+2026-10-02T01:51:36.9160546Z PASS jeannie rejects stats string
+2026-10-02T01:51:36.9246510Z PASS jeannie rejects fractional house
+2026-10-02T01:51:36.9330362Z PASS jeannie rejects review null
+2026-10-02T01:51:36.9402795Z PASS jeannie rejects bag count string
+2026-10-02T01:51:36.9479361Z PASS jeannie rejects subject stats string
+2026-10-02T01:51:36.9562074Z PASS jeannie rejects room array
+2026-10-02T01:51:36.9642624Z PASS jeannie rejects pet unknown species
+2026-10-02T01:51:36.9719823Z PASS jeannie rejects pet unknown colour
+2026-10-02T01:51:36.9803585Z PASS jeannie rejects blank name
+2026-10-02T01:51:36.9874103Z PASS jeannie rejects invalid needs
+2026-10-02T01:51:36.9950411Z PASS jeannie rejects bad diary
+2026-10-02T01:51:37.0018238Z PASS jeannie rejects mail markup shape
+2026-10-02T01:51:37.0103243Z PASS jeannie rejects invalid quest
+2026-10-02T01:51:37.0169461Z PASS jeannie rejects bad coins
+2026-10-02T01:51:37.0234677Z PASS jeannie rejects bad bank
+2026-10-02T01:51:37.0309124Z PASS jeannie rejects seen string
+2026-10-02T01:51:37.0380257Z PASS jeannie rejects pet array
+2026-10-02T01:51:37.0461598Z PASS jeannie rejects bad version
+2026-10-02T01:51:37.0528550Z PASS jeannie rejects review answer
+2026-10-02T01:51:37.0605295Z PASS cory rejects stats string
+2026-10-02T01:51:37.0681728Z PASS cory rejects fractional house
+2026-10-02T01:51:37.0780137Z PASS cory rejects review null
+2026-10-02T01:51:37.0849322Z PASS cory rejects bag count string
+2026-10-02T01:51:37.0917215Z PASS cory rejects subject stats string
+2026-10-02T01:51:37.1009997Z PASS cory rejects room array
+2026-10-02T01:51:37.1081914Z PASS cory rejects pet unknown species
+2026-10-02T01:51:37.1147589Z PASS cory rejects pet unknown colour
+2026-10-02T01:51:37.1212936Z PASS cory rejects blank name
+2026-10-02T01:51:37.1280279Z PASS cory rejects invalid needs
+2026-10-02T01:51:37.1347383Z PASS cory rejects bad diary
+2026-10-02T01:51:37.1422932Z PASS cory rejects mail markup shape
+2026-10-02T01:51:37.1490048Z PASS cory rejects invalid quest
+2026-10-02T01:51:37.1556061Z PASS cory rejects bad coins
+2026-10-02T01:51:37.1622704Z PASS cory rejects bad bank
+2026-10-02T01:51:37.1712779Z PASS cory rejects seen string
+2026-10-02T01:51:37.1776059Z PASS cory rejects pet array
+2026-10-02T01:51:37.1839348Z PASS cory rejects bad version
+2026-10-02T01:51:37.1906752Z PASS cory rejects review answer
+2026-10-02T01:51:37.1974567Z PASS ellie rejects stats string
+2026-10-02T01:51:37.2051897Z PASS ellie rejects fractional house
+2026-10-02T01:51:37.2128879Z PASS ellie rejects review null
+2026-10-02T01:51:37.2206594Z PASS ellie rejects bag count string
+2026-10-02T01:51:37.2283307Z PASS ellie rejects subject stats string
+2026-10-02T01:51:37.2360687Z PASS ellie rejects room array
+2026-10-02T01:51:37.2448164Z PASS ellie rejects pet unknown species
+2026-10-02T01:51:37.2516300Z PASS ellie rejects pet unknown colour
+2026-10-02T01:51:37.2584582Z PASS ellie rejects blank name
+2026-10-02T01:51:37.2653194Z PASS ellie rejects invalid needs
+2026-10-02T01:51:37.2724829Z PASS ellie rejects bad diary
+2026-10-02T01:51:37.2802799Z PASS ellie rejects mail markup shape
+2026-10-02T01:51:37.2881242Z PASS ellie rejects invalid quest
+2026-10-02T01:51:37.2958932Z PASS ellie rejects bad coins
+2026-10-02T01:51:37.3060011Z PASS ellie rejects bad bank
+2026-10-02T01:51:37.3129830Z PASS ellie rejects seen string
+2026-10-02T01:51:37.3193499Z PASS ellie rejects pet array
+2026-10-02T01:51:37.3257742Z PASS ellie rejects bad version
+2026-10-02T01:51:37.3330097Z PASS ellie rejects review answer
+2026-10-02T01:51:37.3402970Z PASS kieran rejects stats string
+2026-10-02T01:51:37.3475648Z PASS kieran rejects fractional house
+2026-10-02T01:51:37.3551485Z PASS kieran rejects review null
+2026-10-02T01:51:37.3623694Z PASS kieran rejects bag count string
+2026-10-02T01:51:37.3723316Z PASS kieran rejects subject stats string
+2026-10-02T01:51:37.3795441Z PASS kieran rejects room array
+2026-10-02T01:51:37.3873291Z PASS kieran rejects pet unknown species
+2026-10-02T01:51:37.3944979Z PASS kieran rejects pet unknown colour
+2026-10-02T01:51:37.4015917Z PASS kieran rejects blank name
+2026-10-02T01:51:37.4089274Z PASS kieran rejects invalid needs
+2026-10-02T01:51:37.4163932Z PASS kieran rejects bad diary
+2026-10-02T01:51:37.4239685Z PASS kieran rejects mail markup shape
+2026-10-02T01:51:37.4339811Z PASS kieran rejects invalid quest
+2026-10-02T01:51:37.4412090Z PASS kieran rejects bad coins
+2026-10-02T01:51:37.4484618Z PASS kieran rejects bad bank
+2026-10-02T01:51:37.4556934Z PASS kieran rejects seen string
+2026-10-02T01:51:37.4621034Z PASS kieran rejects pet array
+2026-10-02T01:51:37.4684767Z PASS kieran rejects bad version
+2026-10-02T01:51:37.4758056Z PASS kieran rejects review answer
+2026-10-02T01:51:37.4831625Z PASS shannon rejects stats string
+2026-10-02T01:51:37.4906359Z PASS shannon rejects fractional house
+2026-10-02T01:51:37.5005826Z PASS shannon rejects review null
+2026-10-02T01:51:37.5079581Z PASS shannon rejects bag count string
+2026-10-02T01:51:37.5153950Z PASS shannon rejects subject stats string
+2026-10-02T01:51:37.5228320Z PASS shannon rejects room array
+2026-10-02T01:51:37.5301092Z PASS shannon rejects pet unknown species
+2026-10-02T01:51:37.5373575Z PASS shannon rejects pet unknown colour
+2026-10-02T01:51:37.5445789Z PASS shannon rejects blank name
+2026-10-02T01:51:37.5519563Z PASS shannon rejects invalid needs
+2026-10-02T01:51:37.5641703Z PASS shannon rejects bad diary
+2026-10-02T01:51:37.5714402Z PASS shannon rejects mail markup shape
+2026-10-02T01:51:37.5789115Z PASS shannon rejects invalid quest
+2026-10-02T01:51:37.5864413Z PASS shannon rejects bad coins
+2026-10-02T01:51:37.5937107Z PASS shannon rejects bad bank
+2026-10-02T01:51:37.6011212Z PASS shannon rejects seen string
+2026-10-02T01:51:37.6075795Z PASS shannon rejects pet array
+2026-10-02T01:51:37.6161494Z PASS shannon rejects bad version
+2026-10-02T01:51:37.6259656Z PASS shannon rejects review answer
+2026-10-02T01:51:37.6359831Z PASS tristan rejects stats string
+2026-10-02T01:51:37.6456424Z PASS tristan rejects fractional house
+2026-10-02T01:51:37.6532480Z PASS tristan rejects review null
+2026-10-02T01:51:37.6619984Z PASS tristan rejects bag count string
+2026-10-02T01:51:37.6716296Z PASS tristan rejects subject stats string
+2026-10-02T01:51:37.6792028Z PASS tristan rejects room array
+2026-10-02T01:51:37.6875198Z PASS tristan rejects pet unknown species
+2026-10-02T01:51:37.6944662Z PASS tristan rejects pet unknown colour
+2026-10-02T01:51:37.7018802Z PASS tristan rejects blank name
+2026-10-02T01:51:37.7146265Z PASS tristan rejects invalid needs
+2026-10-02T01:51:37.7250538Z PASS tristan rejects bad diary
+2026-10-02T01:51:37.7330969Z PASS tristan rejects mail markup shape
+2026-10-02T01:51:37.7404585Z PASS tristan rejects invalid quest
+2026-10-02T01:51:37.7478618Z PASS tristan rejects bad coins
+2026-10-02T01:51:37.7552394Z PASS tristan rejects bad bank
+2026-10-02T01:51:37.7626657Z PASS tristan rejects seen string
+2026-10-02T01:51:37.7689873Z PASS tristan rejects pet array
+2026-10-02T01:51:37.7755143Z PASS tristan rejects bad version
+2026-10-02T01:51:37.7899821Z PASS tristan rejects review answer
+2026-10-02T01:51:37.8012463Z PASS guest rejects stats string
+2026-10-02T01:51:37.8091290Z PASS guest rejects fractional house
+2026-10-02T01:51:37.8167283Z PASS guest rejects review null
+2026-10-02T01:51:37.8244160Z PASS guest rejects bag count string
+2026-10-02T01:51:37.8321106Z PASS guest rejects subject stats string
+2026-10-02T01:51:37.8398184Z PASS guest rejects room array
+2026-10-02T01:51:37.8473351Z PASS guest rejects pet unknown species
+2026-10-02T01:51:37.8573733Z PASS guest rejects pet unknown colour
+2026-10-02T01:51:37.8649174Z PASS guest rejects blank name
+2026-10-02T01:51:37.8723834Z PASS guest rejects invalid needs
+2026-10-02T01:51:37.8798811Z PASS guest rejects bad diary
+2026-10-02T01:51:37.8873683Z PASS guest rejects mail markup shape
+2026-10-02T01:51:37.8948523Z PASS guest rejects invalid quest
+2026-10-02T01:51:37.9022756Z PASS guest rejects bad coins
+2026-10-02T01:51:37.9097770Z PASS guest rejects bad bank
+2026-10-02T01:51:37.9197210Z PASS guest rejects seen string
+2026-10-02T01:51:37.9260603Z PASS guest rejects pet array
+2026-10-02T01:51:37.9323196Z PASS guest rejects bad version
+2026-10-02T01:51:37.9399364Z PASS guest rejects review answer
+2026-10-02T01:51:37.9461652Z PASS invalid JSON
+2026-10-02T01:51:37.9522317Z PASS empty family
+2026-10-02T01:51:37.9582536Z PASS unknown ID
+2026-10-02T01:51:37.9643095Z PASS array profiles
+2026-10-02T01:51:37.9703063Z PASS unsupported family version
+2026-10-02T01:51:37.9838322Z PASS prepare is detached; all seven profiles retain tier, progress and namespaces
+2026-10-02T01:51:37.9901746Z PASS jeannie legacy single-pet normalization
+2026-10-02T01:51:37.9965045Z PASS cory legacy single-pet normalization
+2026-10-02T01:51:38.0028113Z PASS ellie legacy single-pet normalization
+2026-10-02T01:51:38.0090185Z PASS kieran legacy single-pet normalization
+2026-10-02T01:51:38.0152195Z PASS shannon legacy single-pet normalization
+2026-10-02T01:51:38.0214406Z PASS tristan legacy single-pet normalization
+2026-10-02T01:51:38.0276250Z PASS guest legacy single-pet normalization
+2026-10-02T01:51:38.0358583Z PASS jeannie failed target write restores all original bytes
+2026-10-02T01:51:38.0463763Z PASS cory failed target write restores all original bytes
+2026-10-02T01:51:38.0541423Z PASS ellie failed target write restores all original bytes
+2026-10-02T01:51:38.0619290Z PASS kieran failed target write restores all original bytes
+2026-10-02T01:51:38.0697407Z PASS shannon failed target write restores all original bytes
+2026-10-02T01:51:38.0788595Z PASS tristan failed target write restores all original bytes
+2026-10-02T01:51:38.0896888Z PASS guest failed target write restores all original bytes
+2026-10-02T01:51:38.1007357Z PASS failure at craepets.house.import-recovery.v1
+2026-10-02T01:51:38.1121844Z PASS failure at craepets.house.reset.cory
+2026-10-02T01:51:38.1201788Z PASS failure at craepets.house.who
+2026-10-02T01:51:38.1287233Z PASS size quota rollback frees changed pets before restoring larger old bytes
+2026-10-02T01:51:38.1426882Z PASS persistent rollback failure preserves journal, blocks writes and recovers on next boot
+2026-10-02T01:51:38.2232706Z PASS full/malformed/foreign-key journals safely refuse imports
+2026-10-02T01:51:38.2296158Z PASS pending recovery failure blocks boot auto-copy
+2026-10-02T01:51:38.2376546Z PASS pending journal acknowledgment failure refuses import without stale writes
+2026-10-02T01:51:38.2519827Z PASS completed journal acknowledgment failure reports uncertainty and pauses stale engine
+2026-10-02T01:51:38.2578603Z PASS pending boot preserves exact damaged previous bytes instead of automatic recopy
+2026-10-02T01:51:38.2580905Z PASS family restore: 163 production checks; seven profile namespaces, malformed state, exact-byte recovery, real size quota and interrupted recovery.
+2026-10-02T01:51:38.2709837Z PASS: craepets-family-restore.cjs (1.4s)
+2026-10-02T01:51:38.2719644Z 
+2026-10-02T01:51:38.2720038Z --- craepets-family-restore-browser.cjs ---
+2026-10-02T01:51:42.2607513Z PASS family restore Chromium Desktop: real file preview/apply, seven profiles, literal text, quota retry, interrupted recovery/reload, original export and isolation.
+2026-10-02T01:51:44.7001978Z PASS family restore Chromium iPad: real file preview/apply, seven profiles, literal text, quota retry, interrupted recovery/reload, original export and isolation.
+2026-10-02T01:51:47.1183087Z PASS family restore Chromium iPhone: real file preview/apply, seven profiles, literal text, quota retry, interrupted recovery/reload, original export and isolation.
+2026-10-02T01:51:47.2098318Z PASS: craepets-family-restore-browser.cjs (8.9s)
+2026-10-02T01:51:47.2098813Z 
+2026-10-02T01:51:47.2099048Z --- post-office-storage.cjs ---
+2026-10-02T01:51:47.2409237Z PASS normal saves and key ordering do not create recovery copies
+2026-10-02T01:51:47.2421076Z PASS all six drafts and valid family mail survive mixed damage without read-time writes
+2026-10-02T01:51:47.2424388Z PASS invalid letter 0 cannot hide a valid sibling
+2026-10-02T01:51:47.2425915Z PASS invalid letter 1 cannot hide a valid sibling
+2026-10-02T01:51:47.2427145Z PASS invalid letter 2 cannot hide a valid sibling
+2026-10-02T01:51:47.2429194Z PASS invalid letter 3 cannot hide a valid sibling
+2026-10-02T01:51:47.2431349Z PASS invalid letter 4 cannot hide a valid sibling
+2026-10-02T01:51:47.2433065Z PASS invalid letter 5 cannot hide a valid sibling
+2026-10-02T01:51:47.2435421Z PASS invalid letter 6 cannot hide a valid sibling
+2026-10-02T01:51:47.2439049Z PASS invalid letter 7 cannot hide a valid sibling
+2026-10-02T01:51:47.2441407Z PASS invalid letter 8 cannot hide a valid sibling
+2026-10-02T01:51:47.2442707Z PASS invalid letter 9 cannot hide a valid sibling
+2026-10-02T01:51:47.2444152Z PASS invalid letter 10 cannot hide a valid sibling
+2026-10-02T01:51:47.2445192Z PASS invalid letter 11 cannot hide a valid sibling
+2026-10-02T01:51:47.2452402Z PASS invalid letter 12 cannot hide a valid sibling
+2026-10-02T01:51:47.2453102Z PASS invalid letter 13 cannot hide a valid sibling
+2026-10-02T01:51:47.2453835Z PASS invalid letter 14 cannot hide a valid sibling
+2026-10-02T01:51:47.2454883Z PASS invalid letter 15 cannot hide a valid sibling
+2026-10-02T01:51:47.2455642Z PASS invalid letter 16 cannot hide a valid sibling
+2026-10-02T01:51:47.2456418Z PASS invalid letter 17 cannot hide a valid sibling
+2026-10-02T01:51:47.2457221Z PASS invalid letter 18 cannot hide a valid sibling
+2026-10-02T01:51:47.2457954Z PASS invalid letter 19 cannot hide a valid sibling
+2026-10-02T01:51:47.2458705Z PASS invalid letter 20 cannot hide a valid sibling
+2026-10-02T01:51:47.2459646Z PASS invalid letter 21 cannot hide a valid sibling
+2026-10-02T01:51:47.2460431Z PASS invalid letter 22 cannot hide a valid sibling
+2026-10-02T01:51:47.2461333Z PASS invalid letter 23 cannot hide a valid sibling
+2026-10-02T01:51:47.2462185Z PASS invalid letter 24 cannot hide a valid sibling
+2026-10-02T01:51:47.2463044Z PASS invalid letter 25 cannot hide a valid sibling
+2026-10-02T01:51:47.2463900Z PASS invalid letter 26 cannot hide a valid sibling
+2026-10-02T01:51:47.2464949Z PASS invalid letter 27 cannot hide a valid sibling
+2026-10-02T01:51:47.2465793Z PASS invalid letter 28 cannot hide a valid sibling
+2026-10-02T01:51:47.2466602Z PASS invalid letter 29 cannot hide a valid sibling
+2026-10-02T01:51:47.2467463Z PASS invalid letter 30 cannot hide a valid sibling
+2026-10-02T01:51:47.2474723Z PASS invalid letter 31 cannot hide a valid sibling
+2026-10-02T01:51:47.2475432Z PASS invalid letter 32 cannot hide a valid sibling
+2026-10-02T01:51:47.2484999Z PASS invalid letter 33 cannot hide a valid sibling
+2026-10-02T01:51:47.2485637Z PASS invalid letter 34 cannot hide a valid sibling
+2026-10-02T01:51:47.2486673Z PASS invalid letter 35 cannot hide a valid sibling
+2026-10-02T01:51:47.2487438Z PASS malformed draft repair preserves jeannie text and isolates recipients
+2026-10-02T01:51:47.2488338Z PASS malformed draft repair preserves cory text and isolates recipients
+2026-10-02T01:51:47.2489035Z PASS malformed draft repair preserves ellie text and isolates recipients
+2026-10-02T01:51:47.2489583Z PASS malformed draft repair preserves kieran text and isolates recipients
+2026-10-02T01:51:47.2490134Z PASS malformed draft repair preserves shannon text and isolates recipients
+2026-10-02T01:51:47.2490823Z PASS malformed draft repair preserves tristan text and isolates recipients
+2026-10-02T01:51:47.2493053Z PASS bad draft body cannot reach trim and valid siblings survive
+2026-10-02T01:51:47.2493833Z PASS old Dad draft migration uses only own known IDs
+2026-10-02T01:51:47.2494874Z PASS unusable snapshot stays intact until protected repair: {broken
+2026-10-02T01:51:47.2495706Z PASS unusable snapshot stays intact until protected repair: null
+2026-10-02T01:51:47.2496521Z PASS unusable snapshot stays intact until protected repair: []
+2026-10-02T01:51:47.2497300Z PASS unusable snapshot stays intact until protected repair: 45
+2026-10-02T01:51:47.2498142Z PASS unusable snapshot stays intact until protected repair: "broken"
+2026-10-02T01:51:47.2498961Z PASS backup quota failure refuses original overwrite and warns
+2026-10-02T01:51:47.2499782Z PASS mailbag quota failure retains the already captured damaged bytes
+2026-10-02T01:51:47.2500666Z PASS distinct recovery copies are append-only, deduplicated and bounded
+2026-10-02T01:51:47.2505710Z PASS damaged recovery storage is never overwritten
+2026-10-02T01:51:47.2507002Z PASS duplicate IDs cannot bind readers to multiple letters
+2026-10-02T01:51:47.2507721Z Post Office storage regressions: 56 checks passed.
+2026-10-02T01:51:47.2542726Z PASS: post-office-storage.cjs (0.0s)
+2026-10-02T01:51:47.2543063Z 
+2026-10-02T01:51:47.2543324Z --- post-office-storage-browser.cjs ---
+2026-10-02T01:52:20.0847843Z PASS Post Office Desktop: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T01:52:52.3166748Z PASS Post Office iPad: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T01:53:31.5799932Z PASS Post Office iPhone: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T01:53:31.6648755Z PASS: post-office-storage-browser.cjs (104.4s)
+2026-10-02T01:53:31.6650804Z 
+2026-10-02T01:53:31.6651010Z --- craepets-import.cjs ---
+2026-10-02T01:53:32.0874576Z PASS games/craepets/craepets.js [craepets.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T01:53:32.4633608Z PASS house-test/engine.js [craepets.house.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T01:53:32.8279452Z PASS house-test/engine.js [craepets.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T01:53:32.8439501Z PASS: craepets-import.cjs (1.2s)
+2026-10-02T01:53:32.8439813Z 
+2026-10-02T01:53:32.8440066Z --- craepets-import-browser.cjs ---
+2026-10-02T01:53:37.5633226Z PASS game import browser checks at desktop/phone
+2026-10-02T01:53:41.1367571Z PASS house import browser checks at desktop/phone
+2026-10-02T01:53:46.1529323Z PASS shared import browser checks at desktop/phone
+2026-10-02T01:53:46.1531408Z PASS Craepets browser imports: rejected files and quota failure preserve active lessons; current and legacy transfers reload and play on desktop/phone in game, standalone-house and shared-house modes
+2026-10-02T01:53:46.2543539Z PASS: craepets-import-browser.cjs (13.4s)
+2026-10-02T01:53:46.2543842Z 
+2026-10-02T01:53:46.2544219Z --- shared-media-lifecycle.cjs ---
+2026-10-02T01:53:46.3560274Z PASS shared media: canceled narration, audio failure recovery, bounded effects, live preferences, and background cleanup
+2026-10-02T01:53:46.3617415Z PASS: shared-media-lifecycle.cjs (0.1s)
+2026-10-02T01:53:46.3617698Z 
+2026-10-02T01:53:46.3617866Z --- photo-daily-assignment.cjs ---
+2026-10-02T01:53:46.4042950Z PASS: Photo daily assignments (300 date/explorer/unlock cases; 101 compatible low-bit hashes, 149 high-bit hashes), real map rendering and one daily reward
+2026-10-02T01:53:46.4078703Z PASS: photo-daily-assignment.cjs (0.0s)
+2026-10-02T01:53:46.4079042Z 
+2026-10-02T01:53:46.4079241Z --- arcade-usability.cjs ---
+2026-10-02T01:53:47.6517553Z PASS: corrupt saved preferences, canonical resume metadata and keyboard navigation
+2026-10-02T01:53:48.3432984Z PASS: search, kid filters, result status, empty state, reset and reduced motion at 1280px
+2026-10-02T01:53:48.9723126Z PASS: search, kid filters, result status, empty state, reset and reduced motion at 320px
+2026-10-02T01:53:49.4288538Z PASS: arcade remains playable without localStorage; Surprise me respects search
+2026-10-02T01:53:49.5239174Z PASS: arcade-usability.cjs (3.1s)
+2026-10-02T01:53:49.5239531Z 
+2026-10-02T01:53:49.5239760Z --- math-reliability.test.js ---
+2026-10-02T01:53:55.6580682Z Math/logic reliability checks passed (5 games, numeric answers, blocked storage, damaged saves, immediate reload and phone layouts).
+2026-10-02T01:53:56.0390111Z PASS: math-reliability.test.js (6.5s)
+2026-10-02T01:53:56.0390496Z 
+2026-10-02T01:53:56.0390692Z --- service-worker.cjs ---
+2026-10-02T01:53:58.3844482Z PASS: scoped cache cleanup, safe bounded warming, module refresh, nested/dynamic imports offline, partial responses, correct fallback URL
+2026-10-02T01:53:58.4669763Z PASS: service-worker.cjs (2.4s)
+2026-10-02T01:53:58.4670172Z 
+2026-10-02T01:53:58.4670341Z --- young-games-regressions.js ---
+2026-10-02T01:54:10.3256646Z PASS young games: Desktop
+2026-10-02T01:54:21.0804292Z PASS young games: Phone
+2026-10-02T01:54:22.0775798Z PASS young games: corrupt and blocked saves
+2026-10-02T01:54:22.1665605Z PASS: young-games-regressions.js (23.7s)
+2026-10-02T01:54:22.1665892Z 
+2026-10-02T01:54:22.1666070Z --- word-puzzles-lifecycle.cjs ---
+2026-10-02T01:54:24.2088832Z PASS word puzzles: Desktop, duplicate submit, disabled cards, solve/hint cancellation, stopped/restored clocks, Clear and crossing direction
+2026-10-02T01:54:25.7085475Z PASS word puzzles: Phone, duplicate submit, disabled cards, solve/hint cancellation, stopped/restored clocks, Clear and crossing direction
+2026-10-02T01:54:25.7955512Z PASS: word-puzzles-lifecycle.cjs (3.6s)
+2026-10-02T01:54:25.7955883Z 
+2026-10-02T01:54:25.7956041Z --- three-model-visuals.cjs ---
+2026-10-02T01:55:11.0171755Z PASS models: 35 wildlife, 18 pets/companions, 221 furnishings, 12 biome/quality variants; geometry, shaders, animation and disposal
+2026-10-02T01:55:11.0296801Z PASS real WebGL: 35 wildlife models, 18 pets and companions, 221 furnishings, 12 biome/quality variants; finite geometry and rigs, shaders, animation, quality and disposal.
+2026-10-02T01:55:11.0323897Z {"maxAnimalDraws":33,"maxAnimalTriangles":15564,"maxPetDraws":2,"maxFurnitureDraws":4,"maxFurnitureTriangles":2480,"maxWorldDraws":614,"maxWorldTriangles":1034478,"evidence":"/tmp/kid-games-visuals/validation"}
+2026-10-02T01:55:11.1103053Z PASS: three-model-visuals.cjs (45.3s)
+2026-10-02T01:55:11.1103628Z 
+2026-10-02T01:55:11.1103865Z Regressions: 14/14 passed.
+2026-10-02T01:55:11.1361777Z Post job cleanup.
+2026-10-02T01:55:11.2623230Z (node:5186) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-02T01:55:11.2624179Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-02T01:55:11.2819469Z Post job cleanup.
+2026-10-02T01:55:11.3716452Z [command]/usr/bin/git version
+2026-10-02T01:55:11.3788976Z git version 2.55.0
+2026-10-02T01:55:11.3824193Z Temporarily overriding HOME='/home/runner/work/_temp/9e77db49-be8c-4d48-9bbe-961098e8b2be' before making global git config changes
+2026-10-02T01:55:11.3825833Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-02T01:55:11.3829368Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Kid-games/Kid-games
+2026-10-02T01:55:11.3867954Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-02T01:55:11.3903660Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-02T01:55:11.4163157Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-02T01:55:11.4196221Z http.https://github.com/.extraheader
+2026-10-02T01:55:11.4206882Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-02T01:55:11.4243685Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-02T01:55:11.4519376Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-02T01:55:11.4574671Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-02T01:55:11.5126055Z Cleaning up orphan processes
+2026-10-02T01:55:11.5422400Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

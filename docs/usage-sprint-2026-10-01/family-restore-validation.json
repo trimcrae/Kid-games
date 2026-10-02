@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "repository": "trimcrae/Kid-games",
+  "date": "2026-10-02",
+  "authorship": "AI-authored; independent AI source/method/receipt review; no human review claimed",
+  "branch": "codex/usage-sprint-2026-10-01-family-restore",
+  "pullRequest": "https://github.com/trimcrae/Kid-games/pull/4",
+  "baseCommit": "9ee843c7bfbf10ffd0c90ecde411b787dbf60ac9",
+  "reviewedSourceCommit": "628f53660e2b448369219adbdca816a49e7bc721",
+  "reviewedSourceTree": "8990e576e53c3a54e00a9051e7e4e5f4c9bcf724",
+  "syntheticCheckoutCommit": "0db69a71d2ee0e6c27b65663061ca492879901ec",
+  "syntheticCheckoutTree": "8990e576e53c3a54e00a9051e7e4e5f4c9bcf724",
+  "ci": {
+    "runId": 36952828714,
+    "jobId": 110669424101,
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36952828714",
+    "headSha": "628f53660e2b448369219adbdca816a49e7bc721",
+    "conclusion": "success",
+    "completedAt": "2026-10-02T01:55:13Z",
+    "node": "22.23.3",
+    "command": "cd tests && npm run test:regressions",
+    "suitesPassed": 14,
+    "suitesTotal": 14
+  },
+  "executedChecks": {
+    "nodeFamilyChecks": 163,
+    "nodeMalformedProfileCombinations": 133,
+    "profiles": [
+      "jeannie",
+      "cory",
+      "ellie",
+      "kieran",
+      "shannon",
+      "tristan",
+      "guest"
+    ],
+    "chromiumGroups": [
+      {
+        "name": "Desktop",
+        "width": 1280,
+        "height": 900
+      },
+      {
+        "name": "iPad",
+        "width": 820,
+        "height": 1180,
+        "touch": true
+      },
+      {
+        "name": "iPhone",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      }
+    ],
+    "browserScope": "Production save-panel.mjs, actual activity iframe and actual transfer page in minimal same-origin host; real timers/events/FileReader/localStorage; fixed Date only; induced DOMException write failures",
+    "nodeScope": "Production HouseSaves IIFE and existing pure preparation/normalization extracted from the actual house engine with actual content tables; deterministic storage adapters including UTF-16 size-limited quota"
+  },
+  "independentReview": {
+    "sourceAndMethodsClearedAt": "628f53660e2b448369219adbdca816a49e7bc721",
+    "reviewer": "apps_round3_review",
+    "rootCIAndTreeBindings": "independently confirmed",
+    "findingsClosed": [
+      "delayed FileReader completion while recovery paused",
+      "automatic recopy immediately after pending recovery",
+      "pending-journal verification acknowledgement",
+      "ambiguous final journal acknowledgement"
+    ],
+    "pureValleyPreparerAndNormalizerBodies": "byte-preserved"
+  },
+  "integration": {
+    "mergeCommit": "bdb9803d5f318526bab84a826f3f83b59d2a26c1",
+    "mergeTree": "8990e576e53c3a54e00a9051e7e4e5f4c9bcf724",
+    "pagesRunId": 36953336359,
+    "pagesHeadSha": "bdb9803d5f318526bab84a826f3f83b59d2a26c1",
+    "pagesConclusion": "success",
+    "pagesObservedUpdatedAt": "2026-10-02T01:58:20Z"
+  },
+  "sourceGitBlobs": {
+    "house-test/save-copy.js": "aecc7c714274ea0a593d31a7191d422fd5649b6e",
+    "house-test/engine.js": "2e2b7789a07807c265d69948661f0de4309f612b",
+    "tests/craepets-family-restore.cjs": "2f785bcf6f5a2ba264c0a5469b17fad5f8cc6d9a",
+    "tests/craepets-family-restore-browser.cjs": "d30a58bc7351fcca59bf017b0eeeed5d2b500e7a",
+    "tests/regressions.cjs": "4cad0ae2f67377dcc54709822c5da0455bc819cd",
+    "house-test/activity.html": "821ffac8d4c627e25d4e7d1b63d7e9ccb01d4122",
+    "house-test/saves.html": "67c71606ca95e093046a499ef9aeaa1befe4aa97"
+  },
+  "originalGameEngineGitBlob": "5798211e613138a881ad8da7cf1f1f5e5338de1e",
+  "transcripts": [
+    {
+      "path": "docs/usage-sprint-2026-10-01/family-restore-initial-ci-36951955565.log",
+      "runId": 36951955565,
+      "jobId": 110666617065,
+      "conclusion": "failure",
+      "gitBlobSha": "d2ed4e440a1679c0b8c9bfbda55cedac1d7c433c"
+    },
+    {
+      "path": "docs/usage-sprint-2026-10-01/family-restore-intermediate-ci-36952567474.log",
+      "runId": 36952567474,
+      "jobId": 110668481190,
+      "conclusion": "cancelled",
+      "gitBlobSha": "147d35175ef926eb0cb39e2ee61041abb23ea665"
+    },
+    {
+      "path": "docs/usage-sprint-2026-10-01/family-restore-final-ci-36952828714.log",
+      "runId": 36952828714,
+      "jobId": 110669424101,
+      "conclusion": "success",
+      "gitBlobSha": "ebc1f8524c2b211a58c29b0c052993d7a8c45572",
+      "sha256": "7ee5c32e29a7689754ff7122a82a9f32d13821f55cee186a922ed5dbaa1b69fc",
+      "sha256Verification": "independently computed by root from original acquired job log"
+    }
+  ],
+  "priorRuns": [
+    {
+      "source": "a7d520c7f0a6e72290c18c052604ae8a58e4c69e",
+      "runId": 36951955565,
+      "jobId": 110666617065,
+      "conclusion": "failure",
+      "actualNodeFamilyChecksPassed": 160,
+      "suitesPassed": 13,
+      "suitesTotal": 14,
+      "reason": "Family browser exact-byte assertion encountered legitimate unchanged-engine lastTick advancement after reload; Date-only fixture repair retained all byte assertions."
+    },
+    {
+      "source": "d6511b278422c7900e762ad620b827f3f4da52ba",
+      "runId": 36952567474,
+      "jobId": 110668481190,
+      "conclusion": "cancelled",
+      "actualNodeFamilyChecksPassed": 163,
+      "actualFamilyChromiumGroupsPassed": [
+        "Desktop",
+        "iPad",
+        "iPhone"
+      ],
+      "reason": "Existing Actions concurrency cancelled the overall run when paired-script delivery packaging advanced the PR."
+    }
+  ],
+  "limits": [
+    "Physical iOS Safari untested; Chromium mobile emulation only.",
+    "No full 3D walkthrough interaction claimed.",
+    "Sequential storage calls/events; simultaneous cross-tab transaction atomicity unverified.",
+    "Eight append-only distinct safety snapshots; malformed/full journals safely refuse. No recovery-copy management/export UI.",
+    "Exact raw restoration is a transaction-boundary property. Existing loader/ordinary gameplay may normalize or blank already-damaged current state; raw originals remain in journal.",
+    "No local Node/browser runtime or model API used; preliminary V8 adapters are separate from actual GitHub Actions receipts."
+  ],
+  "nextBoundedTask": "Audit automatic copyMissing profile seeding in house-test/save-copy.js for malformed source and damaged-target protection; reproduce one case and preserve house raw bytes/original namespaces separately from completed family restore."
+}
