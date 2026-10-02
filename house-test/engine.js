@@ -212,10 +212,65 @@
     };
   }
 
+  var loadPaused = false, loadProblem = null;
+  function savingPaused() {
+    return loadPaused || (window.HouseSaves && HouseSaves.isBlocked());
+  }
+  function loadedCandidate(raw, id) {
+    if (!D.PROFILES.some(function (p) { return p.id === id; })) invalidValley();
+    if (raw === null) return normalizeSave(null, id);
+    var s = JSON.parse(raw);
+    if (!saveRecord(s) || s.v !== 1) invalidValley();
+    // Validate an unadopted current/legacy valley through the same pure
+    // preparer. This detached temporary pet is never displayed or written.
+    var waiting = s.pet === null || s.pet === undefined;
+    if (waiting) s.pet = { name: "Unadopted valley", species: P.SPECIES[0].id, colour: P.COLOURS[0].id };
+    var candidate = importCandidate(s, id);
+    if (waiting) candidate.pet = null;
+    return candidate;
+  }
   function load(id) {
-    var s = null;
-    try { s = JSON.parse(localStorage.getItem(slot(id))); } catch (e) { s = null; }
-    return normalizeSave(s, id);
+    // A failed read is not an absent save. Loading never writes.
+    if (!D.PROFILES.some(function (p) { return p.id === id; })) invalidValley();
+    return loadedCandidate(localStorage.getItem(slot(id)), id);
+  }
+  function savedDataWarning(id, active) {
+    if (!D.PROFILES.some(function (p) { return p.id === id; })) id = who;
+    var game = $("#game");
+    if (!game) return;
+    var previous = game.querySelector(".saved-data-warning");
+    if (previous) previous.remove();
+    var panel = document.createElement("section"),warning = document.createElement("p"),
+        download = document.createElement("button"),retry = document.createElement("button");
+    panel.className = "panel saved-data-warning";
+    warning.setAttribute("role", "alert"); warning.tabIndex = -1;
+    warning.textContent = active
+      ? "This saved data could not be opened safely. Saving is paused for this pet, and nothing was replaced. You can download the saved data to keep it, or try opening again."
+      : "That saved pet could not be opened safely. Your current pet is still here, and the other saved data was not replaced.";
+    download.className = retry.className = "act";
+    download.textContent = "Download saved data"; download.dataset.savedDataDownload = id;
+    retry.textContent = "Try opening again"; retry.dataset.savedDataRetry = id;
+    download.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      try {
+        var raw = localStorage.getItem(slot(id));
+        if (raw === null) throw Error("No saved data");
+        var url = URL.createObjectURL(new Blob([raw], { type: "application/octet-stream" })),link = document.createElement("a");
+        link.href = url; link.download = "craepets-saved-data-" + id + ".txt";
+        document.body.append(link); link.click(); link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      } catch (e) { warning.textContent = "The saved data could not be read for download. Nothing was replaced. Try opening again when browser storage is available."; }
+    });
+    retry.addEventListener("click", function (ev) { ev.stopPropagation(); location.reload(); });
+    panel.append(warning,download,retry);
+    if (active) game.replaceChildren(panel); else game.append(panel);
+    try { warning.focus(); } catch (e) {}
+  }
+  function pauseSavedData(id) {
+    loadPaused = true; loadProblem = id;
+    hush(); stopCatch(); stopMatch(); clearTimeout(battleTimer);
+    sess = null; battle = null; visit = null;
+    savedDataWarning(id, true);
   }
 
   // Also used before an imported valley is allowed to replace a saved one.
@@ -326,7 +381,8 @@
 
   var quietSave = false;          // true while repainting a copy taken from another tab
   function save() {
-    if (!S || quietSave || (window.HouseSaves && HouseSaves.isBlocked())) return;
+    if (!S || quietSave || (savingPaused())) return;
+    try { load(who); } catch (e) { pauseSavedData(who); return; }
     try { localStorage.setItem(slot(who), JSON.stringify(S)); } catch (e) {}
   }
 
@@ -337,8 +393,8 @@
     try { return JSON.parse(localStorage.getItem(slot(id))); } catch (e) { return null; }
   }
   function writeSlot(id, s) {
-    if (id === who || (window.HouseSaves && HouseSaves.isBlocked())) return;                 // never write over the live save
-    try { localStorage.setItem(slot(id), JSON.stringify(s)); } catch (e) {}
+    if (id === who || (savingPaused())) return;                 // never write over the live save
+    try { load(id); localStorage.setItem(slot(id), JSON.stringify(s)); } catch (e) {}
   }
 
   /* The same valley open somewhere else — a second tab, or the walk round
@@ -346,16 +402,20 @@
      one in memory and save it back over the top later. A tab in the
      background also follows a change of player made elsewhere. */
   function syncFromElsewhere(ev) {
-    if (!S || !ev || !ev.key || ev.newValue === null) return;
+    if (!S || savingPaused() || !ev || !ev.key || ev.newValue === null) return;
     if (ev.key === slot(who)) {
-      S = load(who);
+      var next;
+      try { next = load(who); } catch (e) { pauseSavedData(who); return; }
+      S = next;
       // Repaint without saving straight back: two open tabs would otherwise
       // bounce the save between them for ever. The next real change saves.
       if (!document.hidden) { quietSave = true; try { render(); } finally { quietSave = false; } }
     } else if (ev.key === WHO_KEY && document.hidden && ev.newValue !== who &&
                D.PROFILES.some(function (p) { return p.id === ev.newValue; })) {
+      var selected;
+      try { selected = load(ev.newValue); } catch (e) { savedDataWarning(ev.newValue, false); return; }
       who = ev.newValue;
-      S = load(who);
+      S = selected;
       sess = null; battle = null; visit = null; view = "nest";
     }
   }
@@ -507,6 +567,7 @@
   var REGEN = 10;                                   // energy gained per hour
 
   function passTime() {
+    if (loadPaused) return;
     if (!S.pet) { S.lastTick = Date.now(); return; }
     // an egg does not get hungry, bored or grubby — it just waits
     if (S.pet.egg) { S.lastTick = Date.now(); rollDay(); return; }
@@ -1415,9 +1476,10 @@
     S = s;
     try { return fn(); } finally { S = keep; }
   }
-  function startVisit(id) {
-    if (id === who) return;
-    var s = load(id);
+  function startVisit(id, prepared) {
+    if (savingPaused() || id === who) return;
+    var s = prepared;
+    if (s === undefined) { try { s = load(id); } catch (e) { savedDataWarning(id, false); return; } }
     if (!s || !s.pet) { toast(D.profile(id).name + " has not adopted a Craepet yet."); return; }
     visit = { id: id, s: s };
     hush();
@@ -1985,6 +2047,7 @@
      RENDERING
      ========================================================= */
   function render() {
+    if (loadPaused) { savedDataWarning(loadProblem || who, true); return; }
     passTime();
     renderWho();
     var g = $("#game");
@@ -5975,6 +6038,7 @@
   }
 
   function importValley(text) {
+    if (savingPaused()) return;
     var s;
     try { s = importCandidate(JSON.parse(text), who); }
     catch (e) { toast("That valley file could not be loaded. Your current pet is safe."); return; }
@@ -6002,6 +6066,7 @@
       '<p style="margin:0.8rem 0 0"><button class="act" id="reset-go" style="--ac:var(--pink);width:100%"><span class="em">🥚</span>Yes, start over</button></p>');
   }
   function resetValley() {
+    if (savingPaused()) return;
     if(HOUSE_KEYS==="craepets.house.")localStorage.setItem("craepets.house.reset."+who,"1");
     var f = $("#reset-input");
     var typed = ((f ? f.value : "") || "").trim().toLowerCase();
@@ -6158,7 +6223,7 @@
      ONE CLICK HANDLER FOR THE WHOLE VALLEY
      ========================================================= */
   function onClick(ev) {
-    if (window.HouseSaves && HouseSaves.isBlocked()) { toast("Saving is paused. Please reload to recover your pets."); return; }
+    if (savingPaused()) { toast("Saving is paused. Please reload to recover your pets."); return; }
     var t = ev.target;
     if (!t || !t.closest) return;
 
@@ -6491,7 +6556,7 @@
      trackpad at a button. Escape always backs out of a sheet.
      ========================================================= */
   function onKey(ev) {
-    if (window.HouseSaves && HouseSaves.isBlocked()) return;
+    if (savingPaused()) return;
     if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
     var el = document.activeElement;
     var typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
@@ -6553,15 +6618,18 @@
   }
 
   function switchTo(id) {
-    if (window.HouseSaves && HouseSaves.isBlocked()) return;
+    if (savingPaused()) return;
     if (id === who) return;
+    var next;
+    try { next = load(id); } catch (e) { savedDataWarning(id, false); return; }
     save();
+    if (savingPaused()) return;
     hush();
     moodLine.m = null;              // a new pet gets its own greeting
     reviewGap = 0;
     who = id;
     try { localStorage.setItem(WHO_KEY, id); } catch (e) {}
-    S = load(id);
+    S = next;
     sess = null;
     battle = null;
     visit = null;
@@ -6596,7 +6664,8 @@
      GO
      ========================================================= */
   function init() {
-    if (window.HouseSaves && HouseSaves.isBlocked()) {
+    if (loadPaused) { savedDataWarning(loadProblem || who, true); return; }
+    if (savingPaused()) {
       var warning=document.createElement("p"),retry=document.createElement("button");
       warning.setAttribute("role","status");
       warning.textContent="Your saved pets are kept in a safety copy on this device. Free some browser space, then try again.";
@@ -6605,9 +6674,11 @@
       $("#game").replaceChildren(warning,retry);
       return;
     }
-    try { who = localStorage.getItem(WHO_KEY) || "cory"; } catch (e) { who = "cory"; }
-    if (!D.PROFILES.some(function (p) { return p.id === who; })) who = "cory";
-    S = load(who);
+    try {
+      who = localStorage.getItem(WHO_KEY) || "cory";
+      if (!D.PROFILES.some(function (p) { return p.id === who; })) { who = "cory"; throw Error("Invalid player"); }
+      S = load(who);
+    } catch (e) { pauseSavedData(who); return; }
     passTime();
     rollDay();
 
@@ -6618,11 +6689,11 @@
     document.addEventListener("keydown", onKey, false);
     // a saved valley chosen as a file
     document.addEventListener("change", function (ev) {
-      if (window.HouseSaves && HouseSaves.isBlocked()) return;
+      if (savingPaused()) return;
       var f = ev.target;
       if (!f || f.id !== "import-file" || !f.files || !f.files[0]) return;
       var reader = new FileReader();
-      reader.onload = function () { if (window.HouseSaves && HouseSaves.isBlocked()) return; importValley(String(reader.result || "")); };
+      reader.onload = function () { if (savingPaused()) return; importValley(String(reader.result || "")); };
       reader.readAsText(f.files[0]);
     }, false);
     window.addEventListener("resize", function () { anim.measure = true; });
@@ -6671,7 +6742,17 @@
   }
   // Family imports reuse the reviewed pure single-valley preparation, with
   // the incoming profile's tier, without changing the active pet or lesson.
-  if (window.HouseSaves) HouseSaves.setPreparer(importCandidate);
+  if (window.HouseSaves) {
+    var skipAutoSeed = false, startupWho;
+    if (!HouseSaves.isBlocked()) {
+      try { startupWho = localStorage.getItem(WHO_KEY) || "cory"; load(startupWho); }
+      catch (e) {
+        skipAutoSeed = true; loadPaused = true;
+        loadProblem = D.PROFILES.some(function(p){return p.id===startupWho;}) ? startupWho : "cory";
+      }
+    }
+    HouseSaves.setPreparer(importCandidate, skipAutoSeed);
+  }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 
@@ -6680,10 +6761,16 @@
   var houseStation = null;
   window.HouseActivity = {
     ready: function(){return !!S;},
+    loadProblem: function(){return loadPaused ? {profile:loadProblem} : null;},
     enter: function(station) {
-      if(window.HouseSaves&&HouseSaves.isBlocked())return;
+      if(savingPaused())return;
+      var visiting;
+      if(station.owner && station.owner!==who){
+        try{visiting=load(station.owner);}catch(e){savedDataWarning(station.owner,false);return;}
+        if(!visiting.pet){toast(D.profile(station.owner).name+" has not adopted a Craepet yet.");return;}
+      }
       this.leave(); houseStation=station;
-      if(station.owner && station.owner!==who){startVisit(station.owner);return;}
+      if(visiting){startVisit(station.owner,visiting);return;}
       view=station.view || 'nest';
       if(view==='bag' && S.pet)S.bagNew={};
       lastPlace=view; render();
@@ -6698,14 +6785,26 @@
     },
     profiles: function(){return D.PROFILES;},
     select: function(id){if(D.PROFILES.some(function(p){return p.id===id;}))switchTo(id);},
-    refreshSaves: function(){if(window.HouseSaves&&HouseSaves.isBlocked())return;hush();stopCatch();stopMatch();sess=null;battle=null;clearTimeout(battleTimer);closeSheet();who=localStorage.getItem(WHO_KEY)||who;S=load(who);view='nest';render();},
-    cuddle: function(){if(!S.pet)return;if(S.pet.egg){tapEgg();return;}S.pet.happy=clamp(S.pet.happy+1,0,100);var line=moodSay();say(line.text,2600,line.tok);sfx('pop');save();},
+    refreshSaves: function(){
+      if(savingPaused())return;
+      var selected,next;
+      try{selected=localStorage.getItem(WHO_KEY)||who;next=load(selected);}
+      catch(e){pauseSavedData(D.PROFILES.some(function(p){return p.id===selected;})?selected:who);return;}
+      hush();stopCatch();stopMatch();sess=null;battle=null;clearTimeout(battleTimer);closeSheet();
+      who=selected;S=next;view='nest';render();
+    },
+    cuddle: function(){if(savingPaused()||!S||!S.pet)return;if(S.pet.egg){tapEgg();return;}S.pet.happy=clamp(S.pet.happy+1,0,100);var line=moodSay();say(line.text,2600,line.tok);sfx('pop');save();},
     /* Asleep in one of the house's beds: `amount` energy back now (a little
        every second while it sleeps); `done` at the end counts as a Rest for
        its wishes, like a nap at the nest. Returns the energy it has now. */
-    rest: function(amount,done){if(!S.pet||S.pet.egg)return null;S.pet.energy=clamp(S.pet.energy+(amount||0),0,100);if(done){S.pet.happy=clamp(S.pet.happy+2,0,100);checkWish('act','rest');}save();return S.pet.energy;},
+    rest: function(amount,done){if(savingPaused()||!S||!S.pet||S.pet.egg)return null;S.pet.energy=clamp(S.pet.energy+(amount||0),0,100);if(done){S.pet.happy=clamp(S.pet.happy+2,0,100);checkWish('act','rest');}save();return S.pet.energy;},
     family: function(){return D.PROFILES.map(function(p){var s=p.id===who?S:readSlot(p.id);return {id:p.id,name:p.name,pet:s&&s.pet};});},
-    neighborhood: function(){return D.PROFILES.map(function(p){var s=p.id===who?S:load(p.id);return withSave(s,function(){return {id:p.id,pet:S.pet,home:S.pet?homeName():null,house:S.pet?houseInfo():null,items:S.pet?placedItems():[],style:S.pet?{wall:wallNow(),floor:floorNow()}:null};});});},
+    neighborhood: function(){return D.PROFILES.map(function(p){
+      var s;
+      try{if(p.id===who&&loadPaused)throw Error("Unavailable");s=p.id===who&&S?S:load(p.id);}
+      catch(e){return {id:p.id,pet:null,home:null,house:null,items:[],style:null,unavailable:true};}
+      return withSave(s,function(){return {id:p.id,pet:S.pet,home:S.pet?homeName():null,house:S.pet?houseInfo():null,items:S.pet?placedItems():[],style:S.pet?{wall:wallNow(),floor:floorNow()}:null};});
+    });},
     palette: function(id){var c=P.colour(id),pattern=null;if(typeof c.pal.B==='function'){pattern=[];for(var y=0;y<22;y++){var row=[];for(var x=0;x<16;x++)row.push(c.pal.B(x,y,16,22));pattern.push(row);}}return {body:typeof c.pal.B==='function'?c.pal.B(8,10,16,22):c.pal.B,accent:typeof c.pal.A==='function'?c.pal.A(8,10,16,22):c.pal.A,pattern:pattern};},
     placed: function(){return S.pet?placedItems():[];},
     style: function(){return S.pet?{room:room(),wall:wallNow(),floor:floorNow(),name:homeName()}:null;},
@@ -6767,7 +6866,7 @@
     _setDate: function (s) { if (CAL) CAL._setDate(s); render(); },
     celebrations: celebrations,
     exportJson: function () { return JSON.stringify(S); },
-    importJson: function(text){ if (!window.HouseSaves || !HouseSaves.isBlocked()) importValley(text); },
+    importJson: function(text){ if (!savingPaused()) importValley(text); },
     steps: function () { return S.steps; },
     _anim: function () { return anim; },
     _setHour: function (h) { hourOverride = (h === null || h === undefined) ? null : h; render(); }

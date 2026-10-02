@@ -1,6 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260925-motion';
-import {createHouseLife} from './house-life.mjs?v=20261001-visuals';
+import {createHouseLife} from './house-life.mjs?v=20261002-active-loader';
 import {rooms} from './rooms.mjs';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
 import {createHouseLighting} from './lighting.mjs?v=20260918-sky';
@@ -19,6 +19,7 @@ import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
 import {createInteractions} from './interactions.mjs?v=20260926-house-fixes';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
+import {showSavedDataRecovery} from './saved-data-recovery.mjs?v=20261002-active-loader';
 
 const $=id=>document.getElementById(id);
 // Loading steps are reported to the watchdog in boot.js, which says so when a
@@ -699,7 +700,12 @@ async function load(){
       map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),interactions:interactions?.state??null,
       turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,framesDrawn,bakedLight:baked?{vertices:baked.bakedVertices,blend:bakedLight.houseLightBlend.value.toArray()}:null,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,jungleTriangles:jungle.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
-    boot.fail(error,$('loading').textContent);}
+    if(error.savedDataBlocked)$('loading').textContent=error.message;
+    boot.fail(error,$('loading').textContent);
+    if(error.savedDataBlocked){
+      showSavedDataRecovery($('loading'),GAME_MODE);
+    }
+  }
 }
 // Loading starts before the first frame, so a problem drawing can't stop it.
 load();animate(performance.now());
