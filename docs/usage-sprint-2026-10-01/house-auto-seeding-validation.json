@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "ai_authored": true,
+  "repository": "trimcrae/Kid-games",
+  "task": "House automatic absent-profile seeding",
+  "branch": "codex/usage-sprint-2026-10-01-house-auto-seeding",
+  "pull_request": 5,
+  "baseline_commit": "8dc6b584488f34a2894bf4557bbb72db8ab6e864",
+  "reviewed_source": "341b5025b2671d74e29b6dfe3f3125f9144a8dc8",
+  "tested_tree": "47489070df8c2f6add3f4ad791fd5e91558ec327",
+  "synthetic_checkout": "37c6011104332b231112e0b2bc98ccb72b0a7aae",
+  "merge_commit": "f230ba5455ec9991befaede92dc49de3dd3a5fbc",
+  "merge_parents": [
+    "8dc6b584488f34a2894bf4557bbb72db8ab6e864",
+    "341b5025b2671d74e29b6dfe3f3125f9144a8dc8"
+  ],
+  "ci": {
+    "run_id": 36957439473,
+    "job_id": 110683453450,
+    "status": "completed",
+    "conclusion": "success",
+    "completed_at": "2026-10-02T02:54:24Z",
+    "node": "22.23.3",
+    "new_node_production_checks": 268,
+    "inherited_family_production_checks": 163,
+    "suites_passed": 16,
+    "suites_total": 16,
+    "browser_groups": [
+      "Chromium Desktop 1280x900",
+      "Chromium iPad 820x1180 touch/mobile emulation",
+      "Chromium iPhone 390x844 touch/mobile emulation"
+    ],
+    "command": "cd tests && npm run test:regressions",
+    "log": {
+      "path": "docs/usage-sprint-2026-10-01/house-auto-seeding/ci-36957439473-job-110683453450.log",
+      "git_blob": "ccdc55b5eda4147eef4328ba99a2618903da2de1",
+      "utf8_bytes": 82111,
+      "sha256": "617e3277f9f2a95409a7fd2f4ee34a3b8e377874869dc9d21cdf411125f2e6a0",
+      "sha256_verification": "Independently computed by sprint coordinator from original GitHub job log."
+    }
+  },
+  "source_blobs": {
+    "house-test/save-copy.js": "c6e41f10332d5c136932dabff888a2dca5ec61ee",
+    "house-test/activity.html": "40716261f2d73d2738dbcf69d9fce09f01190498",
+    "house-test/saves.html": "b1528551257969b660db688ac26b5355a776f069",
+    "tests/craepets-auto-seeding.cjs": "cdd411400283212646b0641f495f5ddf208d7367",
+    "tests/craepets-auto-seeding-browser.cjs": "9aaba62e7aa705ce9135438235e0734c99a4021e",
+    "tests/regressions.cjs": "a870b593e889937a6bc5e763aa062cf55bf5a510",
+    "tests/house-saves.cjs": "8aa408d60cb9006bac8b287ed3254def43c2f429"
+  },
+  "unchanged_blobs": {
+    "games/craepets/craepets.js": "5798211e613138a881ad8da7cf1f1f5e5338de1e",
+    "house-test/engine.js": "2e2b7789a07807c265d69948661f0de4309f612b",
+    "house-test/save-mode.js": "9615970c3ae7570e69564d9a22d90b200c8817f8",
+    "house-test/save-panel.mjs": "21189124b1cef32f20ed7198e2b75ea454c1d3a7",
+    "tests/craepets-family-restore-browser.cjs": "d30a58bc7351fcca59bf017b0eeeed5d2b500e7a",
+    "tests/craepets-family-restore.cjs": "2f785bcf6f5a2ba264c0a5469b17fad5f8cc6d9a"
+  },
+  "independent_review": {
+    "reviewer": "apps_round3_review",
+    "source_and_tests": "cleared exact source 341b5025",
+    "ci_checkout_tree_binding": "verified equal",
+    "scope": "Source/evidence review and independent V8 preliminary execution; actual Node/browser evidence comes from CI."
+  },
+  "publication": {
+    "run_id": 36957862837,
+    "status": "completed",
+    "conclusion": "success",
+    "head_sha": "f230ba5455ec9991befaede92dc49de3dd3a5fbc",
+    "updated_at": "2026-10-02T02:56:35Z",
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36957862837"
+  },
+  "limits": [
+    "Existing ordinary active damaged-save engine loading is unchanged; automatic-seeding protection does not prove that separate behavior.",
+    "Chromium device emulation does not establish physical iOS Safari behavior.",
+    "Minimal host loads real activity/shared/export pages; full 3D walkthrough is not exercised.",
+    "Per-profile admission/sequential rechecks do not establish simultaneous-tab or multi-key localStorage atomicity.",
+    "Legacy manual forwarder is not a separate default suite; its two target suites passed individually."
+  ]
+}

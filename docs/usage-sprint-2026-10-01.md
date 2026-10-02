@@ -38,9 +38,15 @@ See [the bounded handoff](usage-sprint-2026-10-01-post-office.md) and [machine-r
 
 [PR #4](https://github.com/trimcrae/Kid-games/pull/4) repairs the separate family-bundle restore in `house-test/save-copy.js`. Every incoming profile is prepared before writing; a verified bounded journal preserves exact prior house bytes and supports interrupted recovery. Actual final CI [36952828714](https://github.com/trimcrae/Kid-games/actions/runs/36952828714) passed 14/14 suites, including 163 Node checks and Chromium Desktop/iPad/iPhone groups through the production save panel/activity iframe. See [the bounded handoff](usage-sprint-2026-10-01-family-restore.md) for exact source, publication receipts and limits.
 
+## Automatic house profile seeding — completed
+
+[PR #5](https://github.com/trimcrae/Kid-games/pull/5) deeply prepares only absent house profile slots after engine preparation becomes available. Every present raw house value/reset marker is protected, all seven original namespaces are read-only, and export-only pages no longer seed progress or preferences. Actual CI [36957439473](https://github.com/trimcrae/Kid-games/actions/runs/36957439473) passed 16/16 suites, including 268 new Node checks and Chromium Desktop/iPad/iPhone groups. Reviewed source `341b5025b2671d74e29b6dfe3f3125f9144a8dc8` and normal merge `f230ba5455ec9991befaede92dc49de3dd3a5fbc` retain the identical tested tree. Pages [36957862837](https://github.com/trimcrae/Kid-games/actions/runs/36957862837) published the tested merge successfully.
+
+See [the bounded handoff](usage-sprint-2026-10-01-house-auto-seeding.md) for source/log bindings, all-profile evidence and limits. This protects automatic seeding; the existing ordinary loader's behavior on an already damaged active save remains a separate audit.
+
 ## Next bounded tasks
 
-1. **Audit automatic house profile seeding separately.** `copyMissing()` in `house-test/save-copy.js` still uses the older minimal pet check before deep engine preparation. Reproduce one useful malformed-source or damaged-target case, preserving exact house bytes and original namespaces. Keep it separate from the completed family restore.
+1. **Audit damaged active house-save loading separately.** Reproduce exact raw preservation before the existing engine loader's ordinary normalization/write, with fresh ownership checks. Do not repeat completed automatic seeding or family restore.
 2. Check transferred pet imports on a real iPad/iPhone when that environment is available.
 
 Before each follow-on, read the latest main HEAD and repository guidance, inspect ongoing PRs, choose a bounded task, and get meaningful checks plus independent review before publication. The existing focused runner is `cd tests && npm run test:regressions`; targeted import suites are `craepets-import.cjs` and `craepets-import-browser.cjs`. The repo's AGENTS/CLAUDE guidance requires reviewed work to reach main. A temporary PR is useful for real CI when no local runtime exists.

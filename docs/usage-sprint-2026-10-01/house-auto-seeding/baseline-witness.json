@@ -1,0 +1,16 @@
+{
+  "ai_authored": true,
+  "execution": "Preliminary V8 execution of the actual baseline production IIFE with isolated storage adapter; not Node or browser.",
+  "baseline_commit": "8dc6b584488f34a2894bf4557bbb72db8ab6e864",
+  "production_path": "house-test/save-copy.js",
+  "baseline_blob": "aecc7c714274ea0a593d31a7191d422fd5649b6e",
+  "synthetic_original_raw": "{\"v\":1,\"pet\":{\"name\":\"Original pet\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\",\"house\":{\"level\":1.5}}",
+  "existing_damaged_house_raw": "{ valuable existing house bytes",
+  "observed": {
+    "malformed_original_copied": true,
+    "existing_damaged_house_overwritten": true,
+    "original_game_bytes_preserved": true
+  },
+  "independent_replication": "apps_round3_review independently executed analogous production-IIFE witnesses for all seven native IDs; confirmed both failures.",
+  "scope": "Synthetic fixtures only. Existing ordinary engine loading was not executed in this baseline IIFE witness."
+}
