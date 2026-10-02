@@ -245,7 +245,7 @@
     panel.className = "panel saved-data-warning";
     warning.setAttribute("role", "alert"); warning.tabIndex = -1;
     warning.textContent = active
-      ? "This saved data could not be opened safely. Saving is paused for this pet, and nothing was replaced. Download the saved data to keep it, or restore a backup and try again."
+      ? "This saved data could not be opened safely. Saving is paused for this pet, and nothing was replaced. You can download the saved data to keep it, or try opening again."
       : "That saved pet could not be opened safely. Your current pet is still here, and the other saved data was not replaced.";
     download.className = retry.className = "act";
     download.textContent = "Download saved data"; download.dataset.savedDataDownload = id;

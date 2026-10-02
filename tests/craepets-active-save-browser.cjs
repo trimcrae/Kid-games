@@ -77,7 +77,11 @@ async function check(browser,base,label,options){
    const changed=await snapshot();await app.evaluate(()=>{HouseActivity.leave();Craepets.importJson('{}');});assert.deepEqual(await snapshot(),changed);assert.equal(await download(),damaged);
    // Valid legacy and unadopted states remain usable after ordinary reload.
    await fixture(mode,"cory",JSON.stringify({v:1,pet:{name:"Legacy cory",species:"blorb",colour:"meadow"},coins:321}));await open(mode);await ready();assert.equal(await app.evaluate(()=>Craepets.state().pet.name),"Legacy cory");assert.equal(await app.evaluate(()=>Craepets.state().coins),321);await page.reload({waitUntil:"load"});app=page.frame({name:"activity"});await ready();assert.equal(await app.evaluate(()=>Craepets.state().pet.name),"Legacy cory");
-   await fixture(mode,"cory",JSON.stringify({v:1,pet:null,coins:120}));await open(mode);await ready();assert.equal(await app.evaluate(()=>Craepets.state().pet),null);await app.locator("#pet-name").fill("New cory");await app.locator("#do-adopt").click();assert.equal(await app.evaluate(()=>Craepets.state().pet.name),"New cory");assert.equal(await app.evaluate(()=>HouseActivity.loadProblem()),null);
+   await fixture(mode,"cory",JSON.stringify({v:1,pet:null,coins:120}));
+   // Keep the unchanged adopted-sibling selection policy out of this blank
+   // loader check; damaged-active cases above still have healthy siblings.
+   if(mode==="house")await page.evaluate(ids=>{for(const id of ids)if(id!=="cory")localStorage.setItem("craepets.house.v1."+id,JSON.stringify({v:1,pet:null}));},ids);
+   await open(mode);await ready();assert.equal(await app.evaluate(()=>Craepets.state().pet),null);await app.locator("#pet-name").fill("New cory");await app.locator("#do-adopt").click();assert.equal(await app.evaluate(()=>Craepets.state().pet.name),"New cory");assert.equal(await app.evaluate(()=>HouseActivity.loadProblem()),null);
   }
   assert.deepEqual(errors,[]);console.log("PASS active loader Chromium "+label+": all fourteen active profile/mode refusals, exact namespaces/selection, real startup gate/link/download, unavailable reads/retry, sibling lesson preservation, other-document storage refusal and valid legacy/blank play.");
  }finally{await context.close();}

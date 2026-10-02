@@ -67,7 +67,7 @@ for(const prefix of["craepets.house.","craepets."])for(const id of ids){
   const t=fixture(prefix,id);t.values.delete(prefix+"v1."+id);const before=snapshot(t),s=t.api.load(id);assert.equal(s.pet,null);assert.equal(s.tier,t.context.window.CPData.profile(id).tier);assert.deepEqual(snapshot(t),before);t.api.activate(id,s);t.api.save();assert.equal(JSON.parse(t.values.get(prefix+"v1."+id)).pet,null);
  });
  check(prefix+id+" retains valid earned progress and legacy defaults",()=>{
-  const t=fixture(prefix,id),original=JSON.parse(t.values.get(prefix+"v1."+id)),before=snapshot(t),s=t.api.load(id);for(const key of["pet","coins","bag","bank","diary","house"])assert.deepEqual(s[key],original[key]);assert.deepEqual(snapshot(t),before);
+  const t=fixture(prefix,id),original=JSON.parse(t.values.get(prefix+"v1."+id)),before=snapshot(t),s=t.api.load(id);for(const key of["pet","coins","bag","bank","diary","house"])assert.deepEqual(clone(s[key]),original[key]);assert.deepEqual(snapshot(t),before);
   t.values.set(prefix+"v1."+id,JSON.stringify({v:1,pet:{name:"Legacy",species:"blorb",colour:"meadow"}}));const legacy=t.api.load(id);assert.equal(legacy.pet.name,"Legacy");assert.equal(legacy.tier,t.context.window.CPData.profile(id).tier);assert.ok(Number.isFinite(legacy.pet.energy));
  });
  check(prefix+id+" rejects sibling switch before changing healthy player/session",()=>{

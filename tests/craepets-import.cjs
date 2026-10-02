@@ -239,7 +239,16 @@ const house = check("house-test/engine.js", "craepets.house.", game);
 check("house-test/engine.js", "craepets.", house);
 const mainSource = fs.readFileSync(path.join(ROOT,"games/craepets/craepets.js"),"utf8");
 const forkSource = fs.readFileSync(path.join(ROOT,"house-test/engine.js"),"utf8");
-for (const [start,end] of [["  function blankSave(","  var quietSave"],["  function saveRecord(","  function resetSheet()"]]) {
-  const extract = source => source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
-  assert.equal(extract(forkSource),extract(mainSource),"reviewed importer/normalizer must agree across engines");
+function extract(source,start,end) {
+  const first=source.indexOf(start),last=source.indexOf(end,first);
+  assert.ok(first>=0 && last>first,"pure source markers must exist");
+  return source.slice(first,last);
+}
+// Admission/defaulting stays shared; the house loader and imperative callers
+// now have an independent refusal boundary before any ordinary persistence.
+const blank = source => extract(source,"  function blankSave(",
+  source.includes("  var loadPaused") ? "  var loadPaused" : "  function load(");
+assert.equal(blank(forkSource),blank(mainSource),"blank defaults must agree across engines");
+for (const [start,end] of [["  function normalizeSave(","  var quietSave"],["  function saveRecord(","  function importValley("]]) {
+  assert.equal(extract(forkSource,start,end),extract(mainSource,start,end),"reviewed pure importer/normalizer must agree across engines");
 }

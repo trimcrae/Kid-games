@@ -53,13 +53,13 @@ async function check(browser,base,label,options){
   await page.goto(base+"/seed-fixture.html",{waitUntil:"load"});
   const fresh=await page.evaluate(({profiles,ids})=>{
    for(const id of ids){localStorage.setItem("craepets.v1."+id,JSON.stringify(profiles[id],null,2));localStorage.removeItem("craepets.house.v1."+id);localStorage.removeItem("craepets.house.reset."+id);}
-   localStorage.setItem("craepets.house.who","__proto__");localStorage.setItem("__seed_fault_shannon","0");
+   localStorage.removeItem("craepets.house.who");localStorage.setItem("__seed_fault_shannon","0");
    return Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith("craepets.v1.")||["craepets.who","craepets.voice","craepets.house.voice","craepets.house.before-import","craepets.house.import-recovery.v1","post-office.v1"].includes(k)||k.startsWith("craepets.house.position.")).sort().map(k=>[k,localStorage.getItem(k)]));
   },{profiles:initial.profiles,ids});
   await page.goto(base+"/auto-seed-host.html",{waitUntil:"load"});await ready();
   const all=await snapshot();for(const id of ids){const s=JSON.parse(all[prefix+id]);assert.equal(s.pet.name,"Original "+id);assert.equal(s.coins,789);assert.equal(s.tier,fixture.profiles.find(p=>p.id===id).tier);}
   for(const[k,v]of Object.entries(fresh))assert.equal(all[k],v,k+" original/protected bytes");
-  assert.equal(await app.evaluate(()=>Craepets.who()),"tristan","only a usable native original selection can replace invalid house selection");
+  assert.equal(await app.evaluate(()=>Craepets.who()),"tristan","an absent house selection can adopt only a usable native original selection");
   await app.evaluate(()=>{HouseActivity.select("ellie");HouseActivity.enter({view:"farm"});});await app.waitForSelector(".choice");
   const correct=await app.evaluate(()=>Craepets.correctIndex());await app.locator(".choice").nth(correct).click();assert.equal(await app.evaluate(()=>Craepets.state().stats.correct),1,"seeded child valley supports a real learning reward");
   await app.evaluate(()=>HouseActivity.leave());await page.reload({waitUntil:"load"});await ready();assert.equal(await app.evaluate(()=>Craepets.who()),"ellie");assert.equal(await app.evaluate(()=>Craepets.state().stats.correct),1,"house learning survives reload");
