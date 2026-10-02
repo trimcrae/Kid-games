@@ -19,6 +19,7 @@ This applies to `house-test/engine.js` in its standalone-house and shared-game s
 [PR #6](https://github.com/trimcrae/Kid-games/pull/6) is merged as `2af8008f63a1b391d739ab5e78ea66b77745b88e`. Reviewed source `ac6a27c5f26da8946d6081a202b080e77069470a`, actual CI checkout `c6234f458acd96eb28741f5d43ce2cad281a5573` and merge have identical tree `81dc0f3e7e41f7eb4fd6a0b82554bb47bfd3f1fe`; the merge preserves baseline main plus reviewed source as its parents.
 
 Actual [CI36964150346](https://github.com/trimcrae/Kid-games/actions/runs/36964150346), job `110704107890`, completed **SUCCESS** with Node22.23.3 and **18/18 suites**:
+
 - **390 new Node production cases**, including all seven house/shared profiles, malformed/raw/read-failure preservation, legitimate absent/blank/legacy/earned state, startup, selection, visits, refresh and external-update refusal.
 - **Chromium Desktop/iPad/iPhone groups**, each checking fourteen active profile/mode refusal cases, exact namespace/selection bytes, production cold-start gate/link/download, failed-read retry, a healthy lesson after sibling refusal, sequential other-document active corruption and valid legacy/blank play.
 - All16 inherited suites, including268 seeding cases,163 family-restoration cases, prior import and Post Office coverage.
