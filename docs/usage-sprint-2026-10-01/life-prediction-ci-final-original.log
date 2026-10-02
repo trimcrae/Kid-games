@@ -1,0 +1,1625 @@
+﻿2026-10-02T07:47:46.4662693Z Current runner version: '2.337.0'
+2026-10-02T07:47:46.4686838Z ##[group]Runner Image Provisioner
+2026-10-02T07:47:46.4687740Z Hosted Compute Agent
+2026-10-02T07:47:46.4688336Z Version: 20260901.588
+2026-10-02T07:47:46.4689072Z Commit: f88ec8081b781fac6c440065ac7ff9e710ce3d0b
+2026-10-02T07:47:46.4689848Z Build Date: 2026-09-01T19:56:44Z
+2026-10-02T07:47:46.4690572Z Worker ID: {c4f0c5f8-5cae-4207-b5ca-37a7b7f99f16}
+2026-10-02T07:47:46.4691345Z Azure Region: westus
+2026-10-02T07:47:46.4691946Z ##[endgroup]
+2026-10-02T07:47:46.4693523Z ##[group]Operating System
+2026-10-02T07:47:46.4694234Z Ubuntu
+2026-10-02T07:47:46.4694858Z 24.04.5
+2026-10-02T07:47:46.4695411Z LTS
+2026-10-02T07:47:46.4696304Z ##[endgroup]
+2026-10-02T07:47:46.4696993Z ##[group]Runner Image
+2026-10-02T07:47:46.4697660Z Image: ubuntu-24.04
+2026-10-02T07:47:46.4698238Z Version: 20260927.320.1
+2026-10-02T07:47:46.4699683Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-02T07:47:46.4701290Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260927.320
+2026-10-02T07:47:46.4702333Z ##[endgroup]
+2026-10-02T07:47:46.4703507Z ##[group]GITHUB_TOKEN Permissions
+2026-10-02T07:47:46.4705366Z Contents: read
+2026-10-02T07:47:46.4706312Z Metadata: read
+2026-10-02T07:47:46.4706966Z ##[endgroup]
+2026-10-02T07:47:46.4708995Z Secret source: Actions
+2026-10-02T07:47:46.4710033Z Cache mode: write
+2026-10-02T07:47:46.4710735Z Prepare workflow directory
+2026-10-02T07:47:46.5128296Z Prepare all required actions
+2026-10-02T07:47:46.5179319Z Getting action download info
+2026-10-02T07:47:46.8899079Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-02T07:47:47.0044170Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-02T07:47:47.1916792Z Complete job name: regressions
+2026-10-02T07:47:47.2695246Z ##[group]Run actions/checkout@v4
+2026-10-02T07:47:47.2696397Z with:
+2026-10-02T07:47:47.2696897Z   repository: trimcrae/Kid-games
+2026-10-02T07:47:47.2700562Z   token: ***
+2026-10-02T07:47:47.2701006Z   ssh-strict: true
+2026-10-02T07:47:47.2701449Z   ssh-user: git
+2026-10-02T07:47:47.2701904Z   persist-credentials: true
+2026-10-02T07:47:47.2702402Z   clean: true
+2026-10-02T07:47:47.2702856Z   sparse-checkout-cone-mode: true
+2026-10-02T07:47:47.2703381Z   fetch-depth: 1
+2026-10-02T07:47:47.2703815Z   fetch-tags: false
+2026-10-02T07:47:47.2704266Z   show-progress: true
+2026-10-02T07:47:47.2704724Z   lfs: false
+2026-10-02T07:47:47.2705149Z   submodules: false
+2026-10-02T07:47:47.2705618Z   set-safe-directory: true
+2026-10-02T07:47:47.2706289Z   allow-unsafe-pr-checkout: false
+2026-10-02T07:47:47.2707090Z ##[endgroup]
+2026-10-02T07:47:47.3694155Z Syncing repository: trimcrae/Kid-games
+2026-10-02T07:47:47.3696609Z ##[group]Getting Git version info
+2026-10-02T07:47:47.3697595Z Working directory is '/home/runner/work/Kid-games/Kid-games'
+2026-10-02T07:47:47.3698826Z [command]/usr/bin/git version
+2026-10-02T07:47:47.3814169Z git version 2.55.0
+2026-10-02T07:47:47.3852313Z ##[endgroup]
+2026-10-02T07:47:47.3865240Z Temporarily overriding HOME='/home/runner/work/_temp/0603b103-7e75-4ea6-8fb7-8adcbfb760d0' before making global git config changes
+2026-10-02T07:47:47.3871736Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-02T07:47:47.3873466Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Kid-games/Kid-games
+2026-10-02T07:47:47.3967455Z Deleting the contents of '/home/runner/work/Kid-games/Kid-games'
+2026-10-02T07:47:47.3977876Z ##[group]Initializing the repository
+2026-10-02T07:47:47.3984689Z [command]/usr/bin/git init /home/runner/work/Kid-games/Kid-games
+2026-10-02T07:47:47.4125031Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-02T07:47:47.4127005Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-02T07:47:47.4128038Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-02T07:47:47.4129101Z hint: call:
+2026-10-02T07:47:47.4129530Z hint:
+2026-10-02T07:47:47.4130058Z hint: 	git config --global init.defaultBranch <name>
+2026-10-02T07:47:47.4130681Z hint:
+2026-10-02T07:47:47.4131268Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-02T07:47:47.4132213Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-02T07:47:47.4132957Z hint:
+2026-10-02T07:47:47.4133374Z hint: 	git branch -m <name>
+2026-10-02T07:47:47.4133851Z hint:
+2026-10-02T07:47:47.4134482Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-02T07:47:47.4140506Z Initialized empty Git repository in /home/runner/work/Kid-games/Kid-games/.git/
+2026-10-02T07:47:47.4150784Z [command]/usr/bin/git remote add origin https://github.com/trimcrae/Kid-games
+2026-10-02T07:47:47.4211608Z ##[endgroup]
+2026-10-02T07:47:47.4212745Z ##[group]Disabling automatic garbage collection
+2026-10-02T07:47:47.4216803Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-02T07:47:47.4259773Z ##[endgroup]
+2026-10-02T07:47:47.4260704Z ##[group]Setting up auth
+2026-10-02T07:47:47.4261481Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-02T07:47:47.4300462Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-02T07:47:47.4748883Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-02T07:47:47.4786977Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-02T07:47:47.5011533Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-02T07:47:47.5047914Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-02T07:47:47.5273523Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-02T07:47:47.5318228Z ##[endgroup]
+2026-10-02T07:47:47.5333149Z ##[group]Fetching the repository
+2026-10-02T07:47:47.5334778Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +05c5f570844251bffe1c03a4ae8e2af7902e4c19:refs/remotes/pull/8/merge
+2026-10-02T07:48:07.8512992Z From https://github.com/trimcrae/Kid-games
+2026-10-02T07:48:07.8514260Z  * [new ref]         05c5f570844251bffe1c03a4ae8e2af7902e4c19 -> pull/8/merge
+2026-10-02T07:48:07.8526676Z ##[endgroup]
+2026-10-02T07:48:07.8527804Z ##[group]Determining the checkout info
+2026-10-02T07:48:07.8528515Z ##[endgroup]
+2026-10-02T07:48:07.8528996Z [command]/usr/bin/git sparse-checkout disable
+2026-10-02T07:48:07.8586362Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-02T07:48:07.8620892Z ##[group]Checking out the ref
+2026-10-02T07:48:07.8624856Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/8/merge
+2026-10-02T07:48:08.7252295Z Note: switching to 'refs/remotes/pull/8/merge'.
+2026-10-02T07:48:08.7257057Z 
+2026-10-02T07:48:08.7257384Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-02T07:48:08.7257947Z changes and commit them, and you can discard any commits you make in this
+2026-10-02T07:48:08.7258507Z state without impacting any branches by switching back to a branch.
+2026-10-02T07:48:08.7259008Z 
+2026-10-02T07:48:08.7259273Z If you want to create a new branch to retain commits you create, you may
+2026-10-02T07:48:08.7259810Z do so (now or later) by using -c with the switch command. Example:
+2026-10-02T07:48:08.7260107Z 
+2026-10-02T07:48:08.7260311Z   git switch -c <new-branch-name>
+2026-10-02T07:48:08.7260549Z 
+2026-10-02T07:48:08.7260686Z Or undo this operation with:
+2026-10-02T07:48:08.7261151Z 
+2026-10-02T07:48:08.7261329Z   git switch -
+2026-10-02T07:48:08.7261523Z 
+2026-10-02T07:48:08.7261959Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-02T07:48:08.7276535Z 
+2026-10-02T07:48:08.7292666Z HEAD is now at 05c5f57 Merge 8d2fc33b0d89fa27fa3aead7e46d5199af0ad28e into 124c9cf34b2e40c40e255861e5916a4c0cbed856
+2026-10-02T07:48:08.7342476Z ##[endgroup]
+2026-10-02T07:48:08.7393843Z [command]/usr/bin/git log -1 --format=%H
+2026-10-02T07:48:08.7427494Z 05c5f570844251bffe1c03a4ae8e2af7902e4c19
+2026-10-02T07:48:08.7702089Z ##[group]Run actions/setup-node@v4
+2026-10-02T07:48:08.7768124Z with:
+2026-10-02T07:48:08.7768655Z   node-version: 22
+2026-10-02T07:48:08.7769192Z   always-auth: false
+2026-10-02T07:48:08.7769761Z   check-latest: false
+2026-10-02T07:48:08.7774360Z   token: ***
+2026-10-02T07:48:08.7774852Z ##[endgroup]
+2026-10-02T07:48:08.9198997Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-02T07:48:08.9203490Z (node:2330) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-02T07:48:08.9204913Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-02T07:48:08.9207553Z ##[group]Environment details
+2026-10-02T07:48:09.3771947Z node: v22.23.3
+2026-10-02T07:48:09.3772682Z npm: 10.9.9
+2026-10-02T07:48:09.3773400Z yarn: 1.22.22
+2026-10-02T07:48:09.3774544Z ##[endgroup]
+2026-10-02T07:48:09.3931927Z ##[group]Run npm install --no-package-lock --no-audit --no-fund
+2026-10-02T07:48:09.3932488Z [36;1mnpm install --no-package-lock --no-audit --no-fund[0m
+2026-10-02T07:48:09.4243102Z shell: /usr/bin/bash -e {0}
+2026-10-02T07:48:09.4243441Z ##[endgroup]
+2026-10-02T07:48:12.3511226Z 
+2026-10-02T07:48:12.3519163Z added 1 package in 3s
+2026-10-02T07:48:12.3976676Z ##[group]Run node node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
+2026-10-02T07:48:12.3977660Z [36;1mnode node_modules/playwright-core/cli.js install --with-deps --no-shell chromium[0m
+2026-10-02T07:48:12.4044830Z shell: /usr/bin/bash -e {0}
+2026-10-02T07:48:12.4045103Z ##[endgroup]
+2026-10-02T07:48:12.7886425Z Installing dependencies...
+2026-10-02T07:48:12.7984105Z Switching to root user to install dependencies...
+2026-10-02T07:48:12.9507658Z Get:1 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+2026-10-02T07:48:12.9767832Z Get:2 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-02T07:48:13.0077419Z Hit:3 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+2026-10-02T07:48:13.0107164Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+2026-10-02T07:48:13.0158999Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+2026-10-02T07:48:13.0189102Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+2026-10-02T07:48:13.0778422Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [510 kB]
+2026-10-02T07:48:13.0968057Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [458 kB]
+2026-10-02T07:48:13.1023011Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.6 kB]
+2026-10-02T07:48:13.1891493Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1364 kB]
+2026-10-02T07:48:13.1983313Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [304 kB]
+2026-10-02T07:48:13.2007260Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [180 kB]
+2026-10-02T07:48:13.2027175Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1699 kB]
+2026-10-02T07:48:13.2102013Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [341 kB]
+2026-10-02T07:48:13.2146743Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+2026-10-02T07:48:13.2177499Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1720 kB]
+2026-10-02T07:48:13.2250813Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [394 kB]
+2026-10-02T07:48:13.2274603Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+2026-10-02T07:48:13.2511174Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5764 B]
+2026-10-02T07:48:13.3017814Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]
+2026-10-02T07:48:13.3028485Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1069 kB]
+2026-10-02T07:48:13.3084470Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [221 kB]
+2026-10-02T07:48:13.3100391Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.3 kB]
+2026-10-02T07:48:13.3109319Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1216 kB]
+2026-10-02T07:48:13.3183134Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [244 kB]
+2026-10-02T07:48:13.3186718Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+2026-10-02T07:48:13.3207326Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1566 kB]
+2026-10-02T07:48:13.3277488Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [361 kB]
+2026-10-02T07:48:17.5555242Z Fetched 12.6 MB in 1s (8812 kB/s)
+2026-10-02T07:48:18.3676539Z Reading package lists...
+2026-10-02T07:48:18.3928178Z Reading package lists...
+2026-10-02T07:48:18.5694701Z Building dependency tree...
+2026-10-02T07:48:18.5702270Z Reading state information...
+2026-10-02T07:48:18.7046886Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+2026-10-02T07:48:18.7047574Z libasound2t64 set to manually installed.
+2026-10-02T07:48:18.7048213Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-02T07:48:18.7048858Z libatk-bridge2.0-0t64 set to manually installed.
+2026-10-02T07:48:18.7049463Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-02T07:48:18.7050273Z libatk1.0-0t64 set to manually installed.
+2026-10-02T07:48:18.7050866Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+2026-10-02T07:48:18.7051425Z libatspi2.0-0t64 set to manually installed.
+2026-10-02T07:48:18.7051963Z libcairo2 is already the newest version (1.18.0-3build1).
+2026-10-02T07:48:18.7052458Z libcairo2 set to manually installed.
+2026-10-02T07:48:18.7053011Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+2026-10-02T07:48:18.7053549Z libcups2t64 set to manually installed.
+2026-10-02T07:48:18.7054095Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+2026-10-02T07:48:18.7054623Z libdbus-1-3 set to manually installed.
+2026-10-02T07:48:18.7055184Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+2026-10-02T07:48:18.7055726Z libdrm2 set to manually installed.
+2026-10-02T07:48:18.7056463Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+2026-10-02T07:48:18.7057154Z libglib2.0-0t64 set to manually installed.
+2026-10-02T07:48:18.7057700Z libnspr4 is already the newest version (2:4.35-1.1build1).
+2026-10-02T07:48:18.7058206Z libnspr4 set to manually installed.
+2026-10-02T07:48:18.7058712Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+2026-10-02T07:48:18.7059246Z libnss3 set to manually installed.
+2026-10-02T07:48:18.7059926Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+2026-10-02T07:48:18.7060593Z libpango-1.0-0 set to manually installed.
+2026-10-02T07:48:18.7061150Z libx11-6 is already the newest version (2:1.8.7-1build1).
+2026-10-02T07:48:18.7061650Z libx11-6 set to manually installed.
+2026-10-02T07:48:18.7062433Z libxcb1 is already the newest version (1.15-1ubuntu2).
+2026-10-02T07:48:18.7062914Z libxcb1 set to manually installed.
+2026-10-02T07:48:18.7063447Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+2026-10-02T07:48:18.7064203Z libxcomposite1 set to manually installed.
+2026-10-02T07:48:18.7064755Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+2026-10-02T07:48:18.7065263Z libxdamage1 set to manually installed.
+2026-10-02T07:48:18.7065767Z libxext6 is already the newest version (2:1.3.4-1build2).
+2026-10-02T07:48:18.7066568Z libxext6 set to manually installed.
+2026-10-02T07:48:18.7067300Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+2026-10-02T07:48:18.7067697Z libxfixes3 set to manually installed.
+2026-10-02T07:48:18.7068107Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+2026-10-02T07:48:18.7068512Z libxkbcommon0 set to manually installed.
+2026-10-02T07:48:18.7068922Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+2026-10-02T07:48:18.7069520Z libxrandr2 set to manually installed.
+2026-10-02T07:48:18.7070179Z xvfb is already the newest version (2:21.1.12-1ubuntu1.8).
+2026-10-02T07:48:18.7071136Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+2026-10-02T07:48:18.7072131Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+2026-10-02T07:48:18.7072750Z libfontconfig1 set to manually installed.
+2026-10-02T07:48:18.7073200Z libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.1).
+2026-10-02T07:48:18.7073638Z libfreetype6 set to manually installed.
+2026-10-02T07:48:18.7074050Z fonts-liberation is already the newest version (1:2.1.5-3).
+2026-10-02T07:48:18.7074460Z fonts-liberation set to manually installed.
+2026-10-02T07:48:18.7074861Z The following additional packages will be installed:
+2026-10-02T07:48:18.7075308Z   libgl1-mesa-dri libglx-mesa0 libwayland-server0 mesa-libgallium
+2026-10-02T07:48:18.7075696Z   xfonts-encodings xfonts-utils
+2026-10-02T07:48:18.7076519Z Recommended packages:
+2026-10-02T07:48:18.7076973Z   fonts-ipafont-mincho fonts-tlwg-loma
+2026-10-02T07:48:18.7257772Z The following NEW packages will be installed:
+2026-10-02T07:48:18.7258489Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+2026-10-02T07:48:18.7263322Z   fonts-wqy-zenhei libwayland-server0 xfonts-cyrillic xfonts-encodings
+2026-10-02T07:48:18.7263913Z   xfonts-scalable xfonts-utils
+2026-10-02T07:48:18.7267776Z The following packages will be upgraded:
+2026-10-02T07:48:18.7272193Z   libgbm1 libgl1-mesa-dri libglx-mesa0 mesa-libgallium
+2026-10-02T07:48:18.7432721Z 4 upgraded, 10 newly installed, 0 to remove and 21 not upgraded.
+2026-10-02T07:48:18.7433215Z Need to get 32.1 MB of archives.
+2026-10-02T07:48:18.7433664Z After this operation, 79.7 MB of additional disk space will be used.
+2026-10-02T07:48:18.7434156Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-10-02T07:48:18.9148478Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+2026-10-02T07:48:19.2588095Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+2026-10-02T07:48:19.6191974Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+2026-10-02T07:48:19.7772939Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+2026-10-02T07:48:19.9963504Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+2026-10-02T07:48:20.3786292Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgl1-mesa-dri amd64 25.2.8-0ubuntu0.24.04.3 [37.9 kB]
+2026-10-02T07:48:20.4690642Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 libwayland-server0 amd64 1.22.0-2.1build1 [33.9 kB]
+2026-10-02T07:48:20.5381826Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglx-mesa0 amd64 25.2.8-0ubuntu0.24.04.3 [110 kB]
+2026-10-02T07:48:20.6074247Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libgbm1 amd64 25.2.8-0ubuntu0.24.04.3 [34.3 kB]
+2026-10-02T07:48:20.6762334Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 mesa-libgallium amd64 25.2.8-0ubuntu0.24.04.3 [10.8 MB]
+2026-10-02T07:48:20.9604723Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+2026-10-02T07:48:21.0332492Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+2026-10-02T07:48:21.1025442Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+2026-10-02T07:48:21.1758550Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+2026-10-02T07:48:21.4298720Z Fetched 32.1 MB in 2s (13.1 MB/s)
+2026-10-02T07:48:21.4568672Z Selecting previously unselected package fonts-ipafont-gothic.
+2026-10-02T07:48:21.4913935Z (Reading database ... 
+2026-10-02T07:48:21.4914660Z (Reading database ... 5%
+2026-10-02T07:48:21.4915217Z (Reading database ... 10%
+2026-10-02T07:48:21.4915763Z (Reading database ... 15%
+2026-10-02T07:48:21.4916360Z (Reading database ... 20%
+2026-10-02T07:48:21.4916683Z (Reading database ... 25%
+2026-10-02T07:48:21.4917003Z (Reading database ... 30%
+2026-10-02T07:48:21.4917317Z (Reading database ... 35%
+2026-10-02T07:48:21.4917625Z (Reading database ... 40%
+2026-10-02T07:48:21.4917939Z (Reading database ... 45%
+2026-10-02T07:48:21.4918258Z (Reading database ... 50%
+2026-10-02T07:48:21.4974170Z (Reading database ... 55%
+2026-10-02T07:48:21.6041305Z (Reading database ... 60%
+2026-10-02T07:48:21.8105964Z (Reading database ... 65%
+2026-10-02T07:48:22.0012648Z (Reading database ... 70%
+2026-10-02T07:48:22.1996752Z (Reading database ... 75%
+2026-10-02T07:48:22.3602227Z (Reading database ... 80%
+2026-10-02T07:48:22.5505739Z (Reading database ... 85%
+2026-10-02T07:48:22.7634400Z (Reading database ... 90%
+2026-10-02T07:48:22.9179089Z (Reading database ... 95%
+2026-10-02T07:48:22.9179752Z (Reading database ... 100%
+2026-10-02T07:48:22.9180675Z (Reading database ... 202296 files and directories currently installed.)
+2026-10-02T07:48:22.9221525Z Preparing to unpack .../00-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+2026-10-02T07:48:22.9315571Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-02T07:48:23.1564497Z Selecting previously unselected package fonts-freefont-ttf.
+2026-10-02T07:48:23.1690169Z Preparing to unpack .../01-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+2026-10-02T07:48:23.1699683Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-02T07:48:23.2468518Z Selecting previously unselected package fonts-tlwg-loma-otf.
+2026-10-02T07:48:23.2593667Z Preparing to unpack .../02-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+2026-10-02T07:48:23.2603603Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-02T07:48:23.2806192Z Selecting previously unselected package fonts-unifont.
+2026-10-02T07:48:23.2933513Z Preparing to unpack .../03-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+2026-10-02T07:48:23.2941549Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+2026-10-02T07:48:23.3968644Z Selecting previously unselected package fonts-wqy-zenhei.
+2026-10-02T07:48:23.4095798Z Preparing to unpack .../04-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+2026-10-02T07:48:23.4195895Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-02T07:48:23.9154742Z Preparing to unpack .../05-libgl1-mesa-dri_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T07:48:23.9300541Z Unpacking libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T07:48:23.9670522Z Selecting previously unselected package libwayland-server0:amd64.
+2026-10-02T07:48:23.9795058Z Preparing to unpack .../06-libwayland-server0_1.22.0-2.1build1_amd64.deb ...
+2026-10-02T07:48:23.9813278Z Unpacking libwayland-server0:amd64 (1.22.0-2.1build1) ...
+2026-10-02T07:48:24.0137385Z Preparing to unpack .../07-libglx-mesa0_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T07:48:24.0162663Z Unpacking libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T07:48:24.0538410Z Preparing to unpack .../08-libgbm1_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T07:48:24.0571525Z Unpacking libgbm1:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T07:48:24.0987194Z Preparing to unpack .../09-mesa-libgallium_25.2.8-0ubuntu0.24.04.3_amd64.deb ...
+2026-10-02T07:48:24.1023033Z Unpacking mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.3) over (25.2.8-0ubuntu0.24.04.2) ...
+2026-10-02T07:48:24.2708424Z Selecting previously unselected package xfonts-encodings.
+2026-10-02T07:48:24.2839362Z Preparing to unpack .../10-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+2026-10-02T07:48:24.2847988Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-02T07:48:24.3182578Z Selecting previously unselected package xfonts-utils.
+2026-10-02T07:48:24.3308643Z Preparing to unpack .../11-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+2026-10-02T07:48:24.3317845Z Unpacking xfonts-utils (1:7.7+6build3) ...
+2026-10-02T07:48:24.3770867Z Selecting previously unselected package xfonts-cyrillic.
+2026-10-02T07:48:24.3897067Z Preparing to unpack .../12-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+2026-10-02T07:48:24.3906488Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-02T07:48:24.4301206Z Selecting previously unselected package xfonts-scalable.
+2026-10-02T07:48:24.4428287Z Preparing to unpack .../13-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+2026-10-02T07:48:24.4445287Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-02T07:48:24.4901954Z Setting up libwayland-server0:amd64 (1.22.0-2.1build1) ...
+2026-10-02T07:48:24.4937364Z Setting up mesa-libgallium:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T07:48:24.4961531Z Setting up libgbm1:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T07:48:24.4984882Z Setting up libgl1-mesa-dri:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T07:48:24.5061578Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+2026-10-02T07:48:24.5181591Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+2026-10-02T07:48:24.5203939Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+2026-10-02T07:48:24.5225592Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+2026-10-02T07:48:24.5275022Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+2026-10-02T07:48:24.5344887Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+2026-10-02T07:48:24.5361962Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+2026-10-02T07:48:24.5381988Z Setting up libglx-mesa0:amd64 (25.2.8-0ubuntu0.24.04.3) ...
+2026-10-02T07:48:24.5409093Z Setting up xfonts-utils (1:7.7+6build3) ...
+2026-10-02T07:48:24.5450615Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+2026-10-02T07:48:24.5820757Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+2026-10-02T07:48:24.6112925Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+2026-10-02T07:48:24.6488247Z Processing triggers for man-db (2.12.0-4build2) ...
+2026-10-02T07:48:24.6510937Z Not building database; man-db/auto-update is not 'true'.
+2026-10-02T07:48:24.6521537Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+2026-10-02T07:48:25.5645251Z 
+2026-10-02T07:48:25.5646448Z Running kernel seems to be up-to-date.
+2026-10-02T07:48:25.5646887Z 
+2026-10-02T07:48:25.5647106Z No services need to be restarted.
+2026-10-02T07:48:25.5647343Z 
+2026-10-02T07:48:25.5647543Z No containers need to be restarted.
+2026-10-02T07:48:25.5647785Z 
+2026-10-02T07:48:25.5648024Z No user sessions are running outdated binaries.
+2026-10-02T07:48:25.5648300Z 
+2026-10-02T07:48:25.5648671Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-10-02T07:48:26.3849007Z Downloading Chrome for Testing 153.0.8010.12 (playwright chromium v1243) from https://cdn.playwright.dev/builds/cft/153.0.8010.12/linux64/chrome-linux64.zip
+2026-10-02T07:48:26.7886841Z |                                                                                |   0% of 186.8 MiB
+2026-10-02T07:48:26.9358624Z |■■■■■■■■                                                                        |  10% of 186.8 MiB
+2026-10-02T07:48:27.0263273Z |■■■■■■■■■■■■■■■■                                                                |  20% of 186.8 MiB
+2026-10-02T07:48:27.1013185Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 186.8 MiB
+2026-10-02T07:48:27.1774109Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 186.8 MiB
+2026-10-02T07:48:27.2530080Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 186.8 MiB
+2026-10-02T07:48:27.3309288Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 186.8 MiB
+2026-10-02T07:48:27.4092809Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 186.8 MiB
+2026-10-02T07:48:27.4896898Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 186.8 MiB
+2026-10-02T07:48:27.5722463Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 186.8 MiB
+2026-10-02T07:48:27.6519593Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 186.8 MiB
+2026-10-02T07:48:30.4762216Z Chrome for Testing 153.0.8010.12 (playwright chromium v1243) downloaded to /home/runner/.cache/ms-playwright/chromium-1243
+2026-10-02T07:48:30.4766938Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+2026-10-02T07:48:30.8297106Z |                                                                                |   0% of 2.3 MiB
+2026-10-02T07:48:30.8340893Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+2026-10-02T07:48:30.8370952Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+2026-10-02T07:48:30.8392646Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+2026-10-02T07:48:30.8409012Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+2026-10-02T07:48:30.8424536Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+2026-10-02T07:48:30.8438861Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+2026-10-02T07:48:30.8457588Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+2026-10-02T07:48:30.8478101Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+2026-10-02T07:48:30.8490927Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+2026-10-02T07:48:30.8510976Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+2026-10-02T07:48:30.9292909Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+2026-10-02T07:48:30.9451604Z ##[group]Run node -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'
+2026-10-02T07:48:30.9453453Z [36;1mnode -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'[0m
+2026-10-02T07:48:30.9522842Z shell: /usr/bin/bash -e {0}
+2026-10-02T07:48:30.9523107Z ##[endgroup]
+2026-10-02T07:48:31.3225612Z ##[group]Run npm run test:regressions
+2026-10-02T07:48:31.3226293Z [36;1mnpm run test:regressions[0m
+2026-10-02T07:48:31.3307992Z shell: /usr/bin/bash -e {0}
+2026-10-02T07:48:31.3308325Z env:
+2026-10-02T07:48:31.3308716Z   CHROMIUM_PATH: /home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+2026-10-02T07:48:31.3309194Z ##[endgroup]
+2026-10-02T07:48:31.4427735Z 
+2026-10-02T07:48:31.4428390Z > kid-games-playtests@1.0.0 test:regressions
+2026-10-02T07:48:31.4428959Z > node regressions.cjs
+2026-10-02T07:48:31.4429150Z 
+2026-10-02T07:48:31.7697053Z Running 22 focused regression suites with /home/runner/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome
+2026-10-02T07:48:31.7699307Z 
+2026-10-02T07:48:31.7699691Z --- life-prediction-credit.cjs ---
+2026-10-02T07:48:31.8217324Z PASS independent rule fixture: block
+2026-10-02T07:48:31.8218450Z PASS independent rule fixture: edge-reaching blinker
+2026-10-02T07:48:31.8237038Z PASS independent rule fixture: finite separated corners
+2026-10-02T07:48:31.8267151Z PASS independent rule fixture: corner L
+2026-10-02T07:48:31.8268247Z PASS wrapped corners distinguish finite prediction boundary
+2026-10-02T07:48:31.8269505Z PASS one credit despite repeated checks, start 0
+2026-10-02T07:48:31.8290532Z PASS earned wrong/edit/reset remain practice, start 0
+2026-10-02T07:48:31.8321511Z PASS wrong-before-credit correction stays learnable, start 0
+2026-10-02T07:48:31.8355348Z PASS Show stays ineligible after double edit, start 0
+2026-10-02T07:48:31.8356352Z PASS Show stays ineligible after reset, start 0
+2026-10-02T07:48:31.8362720Z PASS Show explicitly resets streak after earned credit, start 0
+2026-10-02T07:48:31.8376849Z PASS one credit despite repeated checks, start 2
+2026-10-02T07:48:31.8391713Z PASS earned wrong/edit/reset remain practice, start 2
+2026-10-02T07:48:31.8403794Z PASS wrong-before-credit correction stays learnable, start 2
+2026-10-02T07:48:31.8416741Z PASS Show stays ineligible after double edit, start 2
+2026-10-02T07:48:31.8456835Z PASS Show stays ineligible after reset, start 2
+2026-10-02T07:48:31.8457931Z PASS Show explicitly resets streak after earned credit, start 2
+2026-10-02T07:48:31.8468591Z PASS one credit despite repeated checks, start 7
+2026-10-02T07:48:31.8485427Z PASS earned wrong/edit/reset remain practice, start 7
+2026-10-02T07:48:31.8506393Z PASS wrong-before-credit correction stays learnable, start 7
+2026-10-02T07:48:31.8517274Z PASS Show stays ineligible after double edit, start 7
+2026-10-02T07:48:31.8529440Z PASS Show stays ineligible after reset, start 7
+2026-10-02T07:48:31.8542315Z PASS Show explicitly resets streak after earned credit, start 7
+2026-10-02T07:48:31.8557961Z PASS three new puzzle rounds legitimately earn Fortune Teller once
+2026-10-02T07:48:31.8569085Z PASS pre-existing best and badge retained without another badge reward
+2026-10-02T07:48:31.8580387Z PASS uncredited reset retains eligibility
+2026-10-02T07:48:31.8607539Z PASS native labels expose original board and current guesses
+2026-10-02T07:48:31.8608386Z Life prediction credit: 27 production cases passed.
+2026-10-02T07:48:31.8664562Z PASS: life-prediction-credit.cjs (0.1s)
+2026-10-02T07:48:31.8665486Z 
+2026-10-02T07:48:31.8666174Z --- life-prediction-credit-browser.cjs ---
+2026-10-02T07:48:39.1603336Z Life prediction Desktop: native checks/keyboard, practice/reveal/new rounds, independent rule oracle and persisted progress passed.
+2026-10-02T07:48:48.0430037Z Life prediction iPad: native checks/keyboard/touch, practice/reveal/new rounds, independent rule oracle and persisted progress passed.
+2026-10-02T07:48:55.7258198Z Life prediction iPhone: native checks/keyboard/touch, practice/reveal/new rounds, independent rule oracle and persisted progress passed.
+2026-10-02T07:48:55.8102776Z PASS: life-prediction-credit-browser.cjs (23.9s)
+2026-10-02T07:48:55.8103301Z 
+2026-10-02T07:48:55.8103531Z --- craepets-game-active-save.cjs ---
+2026-10-02T07:48:55.8583586Z PASS craepets.jeannie refuses partial JSON without replacing bytes
+2026-10-02T07:48:55.8679985Z PASS craepets.jeannie refuses empty string without replacing bytes
+2026-10-02T07:48:55.8766609Z PASS craepets.jeannie refuses whitespace without replacing bytes
+2026-10-02T07:48:55.8860200Z PASS craepets.jeannie refuses JSON null without replacing bytes
+2026-10-02T07:48:55.8954824Z PASS craepets.jeannie refuses array without replacing bytes
+2026-10-02T07:48:55.9039836Z PASS craepets.jeannie refuses number without replacing bytes
+2026-10-02T07:48:55.9124202Z PASS craepets.jeannie refuses boolean without replacing bytes
+2026-10-02T07:48:55.9202786Z PASS craepets.jeannie refuses old version without replacing bytes
+2026-10-02T07:48:55.9291576Z PASS craepets.jeannie refuses bad pet without replacing bytes
+2026-10-02T07:48:55.9386402Z PASS craepets.jeannie refuses stats string without replacing bytes
+2026-10-02T07:48:55.9483900Z PASS craepets.jeannie refuses fractional house without replacing bytes
+2026-10-02T07:48:55.9580432Z PASS craepets.jeannie refuses bad review without replacing bytes
+2026-10-02T07:48:55.9673783Z PASS craepets.jeannie refuses blank broken stats without replacing bytes
+2026-10-02T07:48:55.9772618Z PASS craepets.jeannie refuses blank broken house without replacing bytes
+2026-10-02T07:48:55.9850085Z PASS craepets.jeannie read failure is not absence
+2026-10-02T07:48:55.9932298Z PASS craepets.jeannie admits current blank without temporary pet or writes
+2026-10-02T07:48:56.0019303Z PASS craepets.jeannie admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:56.0094585Z PASS craepets.jeannie admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:56.0198565Z PASS craepets.jeannie admits genuinely absent new valley
+2026-10-02T07:48:56.0280209Z PASS craepets.jeannie retains valid earned progress and legacy defaults
+2026-10-02T07:48:56.0358638Z PASS craepets.jeannie rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:56.0439507Z PASS craepets.jeannie rejects damaged family visit without changing active lesson
+2026-10-02T07:48:56.0513152Z PASS craepets.jeannie active storage event pauses stale persistence
+2026-10-02T07:48:56.0596363Z PASS craepets.jeannie failed active startup is write-free
+2026-10-02T07:48:56.0672507Z PASS craepets.cory refuses partial JSON without replacing bytes
+2026-10-02T07:48:56.0747898Z PASS craepets.cory refuses empty string without replacing bytes
+2026-10-02T07:48:56.0842480Z PASS craepets.cory refuses whitespace without replacing bytes
+2026-10-02T07:48:56.0918771Z PASS craepets.cory refuses JSON null without replacing bytes
+2026-10-02T07:48:56.1003210Z PASS craepets.cory refuses array without replacing bytes
+2026-10-02T07:48:56.1092798Z PASS craepets.cory refuses number without replacing bytes
+2026-10-02T07:48:56.1194346Z PASS craepets.cory refuses boolean without replacing bytes
+2026-10-02T07:48:56.1270809Z PASS craepets.cory refuses old version without replacing bytes
+2026-10-02T07:48:56.1347661Z PASS craepets.cory refuses bad pet without replacing bytes
+2026-10-02T07:48:56.1435804Z PASS craepets.cory refuses stats string without replacing bytes
+2026-10-02T07:48:56.1530937Z PASS craepets.cory refuses fractional house without replacing bytes
+2026-10-02T07:48:56.1630986Z PASS craepets.cory refuses bad review without replacing bytes
+2026-10-02T07:48:56.1710904Z PASS craepets.cory refuses blank broken stats without replacing bytes
+2026-10-02T07:48:56.1791985Z PASS craepets.cory refuses blank broken house without replacing bytes
+2026-10-02T07:48:56.1867470Z PASS craepets.cory read failure is not absence
+2026-10-02T07:48:56.1962184Z PASS craepets.cory admits current blank without temporary pet or writes
+2026-10-02T07:48:56.2039022Z PASS craepets.cory admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:56.2114120Z PASS craepets.cory admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:56.2189121Z PASS craepets.cory admits genuinely absent new valley
+2026-10-02T07:48:56.2268848Z PASS craepets.cory retains valid earned progress and legacy defaults
+2026-10-02T07:48:56.2349029Z PASS craepets.cory rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:56.2443770Z PASS craepets.cory rejects damaged family visit without changing active lesson
+2026-10-02T07:48:56.2519413Z PASS craepets.cory active storage event pauses stale persistence
+2026-10-02T07:48:56.2593790Z PASS craepets.cory failed active startup is write-free
+2026-10-02T07:48:56.2672392Z PASS craepets.ellie refuses partial JSON without replacing bytes
+2026-10-02T07:48:56.2750142Z PASS craepets.ellie refuses empty string without replacing bytes
+2026-10-02T07:48:56.2845659Z PASS craepets.ellie refuses whitespace without replacing bytes
+2026-10-02T07:48:56.2923080Z PASS craepets.ellie refuses JSON null without replacing bytes
+2026-10-02T07:48:56.2999875Z PASS craepets.ellie refuses array without replacing bytes
+2026-10-02T07:48:56.3077057Z PASS craepets.ellie refuses number without replacing bytes
+2026-10-02T07:48:56.3171283Z PASS craepets.ellie refuses boolean without replacing bytes
+2026-10-02T07:48:56.3270843Z PASS craepets.ellie refuses old version without replacing bytes
+2026-10-02T07:48:56.3349678Z PASS craepets.ellie refuses bad pet without replacing bytes
+2026-10-02T07:48:56.3428762Z PASS craepets.ellie refuses stats string without replacing bytes
+2026-10-02T07:48:56.3527320Z PASS craepets.ellie refuses fractional house without replacing bytes
+2026-10-02T07:48:56.3610597Z PASS craepets.ellie refuses bad review without replacing bytes
+2026-10-02T07:48:56.3690615Z PASS craepets.ellie refuses blank broken stats without replacing bytes
+2026-10-02T07:48:56.3771488Z PASS craepets.ellie refuses blank broken house without replacing bytes
+2026-10-02T07:48:56.3847106Z PASS craepets.ellie read failure is not absence
+2026-10-02T07:48:56.3941478Z PASS craepets.ellie admits current blank without temporary pet or writes
+2026-10-02T07:48:56.4017859Z PASS craepets.ellie admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:56.4094228Z PASS craepets.ellie admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:56.4170396Z PASS craepets.ellie admits genuinely absent new valley
+2026-10-02T07:48:56.4250160Z PASS craepets.ellie retains valid earned progress and legacy defaults
+2026-10-02T07:48:56.4350634Z PASS craepets.ellie rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:56.4425814Z PASS craepets.ellie rejects damaged family visit without changing active lesson
+2026-10-02T07:48:56.4528327Z PASS craepets.ellie active storage event pauses stale persistence
+2026-10-02T07:48:56.4603213Z PASS craepets.ellie failed active startup is write-free
+2026-10-02T07:48:56.4680208Z PASS craepets.kieran refuses partial JSON without replacing bytes
+2026-10-02T07:48:56.4756494Z PASS craepets.kieran refuses empty string without replacing bytes
+2026-10-02T07:48:56.4831854Z PASS craepets.kieran refuses whitespace without replacing bytes
+2026-10-02T07:48:56.4919780Z PASS craepets.kieran refuses JSON null without replacing bytes
+2026-10-02T07:48:56.4995553Z PASS craepets.kieran refuses array without replacing bytes
+2026-10-02T07:48:56.5071583Z PASS craepets.kieran refuses number without replacing bytes
+2026-10-02T07:48:56.5146815Z PASS craepets.kieran refuses boolean without replacing bytes
+2026-10-02T07:48:56.5237861Z PASS craepets.kieran refuses old version without replacing bytes
+2026-10-02T07:48:56.5314093Z PASS craepets.kieran refuses bad pet without replacing bytes
+2026-10-02T07:48:56.5391653Z PASS craepets.kieran refuses stats string without replacing bytes
+2026-10-02T07:48:56.5471294Z PASS craepets.kieran refuses fractional house without replacing bytes
+2026-10-02T07:48:56.5550443Z PASS craepets.kieran refuses bad review without replacing bytes
+2026-10-02T07:48:56.5641344Z PASS craepets.kieran refuses blank broken stats without replacing bytes
+2026-10-02T07:48:56.5723854Z PASS craepets.kieran refuses blank broken house without replacing bytes
+2026-10-02T07:48:56.5796471Z PASS craepets.kieran read failure is not absence
+2026-10-02T07:48:56.5872858Z PASS craepets.kieran admits current blank without temporary pet or writes
+2026-10-02T07:48:56.5946471Z PASS craepets.kieran admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:56.6035568Z PASS craepets.kieran admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:56.6112204Z PASS craepets.kieran admits genuinely absent new valley
+2026-10-02T07:48:56.6189339Z PASS craepets.kieran retains valid earned progress and legacy defaults
+2026-10-02T07:48:56.6265499Z PASS craepets.kieran rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:56.6338188Z PASS craepets.kieran rejects damaged family visit without changing active lesson
+2026-10-02T07:48:56.6426097Z PASS craepets.kieran active storage event pauses stale persistence
+2026-10-02T07:48:56.6498474Z PASS craepets.kieran failed active startup is write-free
+2026-10-02T07:48:56.6573237Z PASS craepets.shannon refuses partial JSON without replacing bytes
+2026-10-02T07:48:56.6648123Z PASS craepets.shannon refuses empty string without replacing bytes
+2026-10-02T07:48:56.6723688Z PASS craepets.shannon refuses whitespace without replacing bytes
+2026-10-02T07:48:56.6814649Z PASS craepets.shannon refuses JSON null without replacing bytes
+2026-10-02T07:48:56.6892836Z PASS craepets.shannon refuses array without replacing bytes
+2026-10-02T07:48:56.6969547Z PASS craepets.shannon refuses number without replacing bytes
+2026-10-02T07:48:56.7044617Z PASS craepets.shannon refuses boolean without replacing bytes
+2026-10-02T07:48:56.7135644Z PASS craepets.shannon refuses old version without replacing bytes
+2026-10-02T07:48:56.7212015Z PASS craepets.shannon refuses bad pet without replacing bytes
+2026-10-02T07:48:56.7290075Z PASS craepets.shannon refuses stats string without replacing bytes
+2026-10-02T07:48:56.7371236Z PASS craepets.shannon refuses fractional house without replacing bytes
+2026-10-02T07:48:56.7463946Z PASS craepets.shannon refuses bad review without replacing bytes
+2026-10-02T07:48:56.7541352Z PASS craepets.shannon refuses blank broken stats without replacing bytes
+2026-10-02T07:48:56.7620075Z PASS craepets.shannon refuses blank broken house without replacing bytes
+2026-10-02T07:48:56.7692928Z PASS craepets.shannon read failure is not absence
+2026-10-02T07:48:56.7768442Z PASS craepets.shannon admits current blank without temporary pet or writes
+2026-10-02T07:48:56.7857818Z PASS craepets.shannon admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:56.7933757Z PASS craepets.shannon admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:56.8008147Z PASS craepets.shannon admits genuinely absent new valley
+2026-10-02T07:48:56.8086372Z PASS craepets.shannon retains valid earned progress and legacy defaults
+2026-10-02T07:48:56.8168842Z PASS craepets.shannon rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:56.8242183Z PASS craepets.shannon rejects damaged family visit without changing active lesson
+2026-10-02T07:48:56.8331117Z PASS craepets.shannon active storage event pauses stale persistence
+2026-10-02T07:48:56.8404583Z PASS craepets.shannon failed active startup is write-free
+2026-10-02T07:48:56.8481542Z PASS craepets.tristan refuses partial JSON without replacing bytes
+2026-10-02T07:48:56.8559322Z PASS craepets.tristan refuses empty string without replacing bytes
+2026-10-02T07:48:56.8649961Z PASS craepets.tristan refuses whitespace without replacing bytes
+2026-10-02T07:48:56.8725815Z PASS craepets.tristan refuses JSON null without replacing bytes
+2026-10-02T07:48:56.8801386Z PASS craepets.tristan refuses array without replacing bytes
+2026-10-02T07:48:56.8877687Z PASS craepets.tristan refuses number without replacing bytes
+2026-10-02T07:48:56.8955014Z PASS craepets.tristan refuses boolean without replacing bytes
+2026-10-02T07:48:56.9049908Z PASS craepets.tristan refuses old version without replacing bytes
+2026-10-02T07:48:56.9127989Z PASS craepets.tristan refuses bad pet without replacing bytes
+2026-10-02T07:48:56.9207291Z PASS craepets.tristan refuses stats string without replacing bytes
+2026-10-02T07:48:56.9288805Z PASS craepets.tristan refuses fractional house without replacing bytes
+2026-10-02T07:48:56.9388165Z PASS craepets.tristan refuses bad review without replacing bytes
+2026-10-02T07:48:56.9468111Z PASS craepets.tristan refuses blank broken stats without replacing bytes
+2026-10-02T07:48:56.9579028Z PASS craepets.tristan refuses blank broken house without replacing bytes
+2026-10-02T07:48:56.9651522Z PASS craepets.tristan read failure is not absence
+2026-10-02T07:48:56.9726890Z PASS craepets.tristan admits current blank without temporary pet or writes
+2026-10-02T07:48:56.9801131Z PASS craepets.tristan admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:56.9875153Z PASS craepets.tristan admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:56.9948718Z PASS craepets.tristan admits genuinely absent new valley
+2026-10-02T07:48:57.0036612Z PASS craepets.tristan retains valid earned progress and legacy defaults
+2026-10-02T07:48:57.0112772Z PASS craepets.tristan rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:57.0186149Z PASS craepets.tristan rejects damaged family visit without changing active lesson
+2026-10-02T07:48:57.0258702Z PASS craepets.tristan active storage event pauses stale persistence
+2026-10-02T07:48:57.0337022Z PASS craepets.tristan failed active startup is write-free
+2026-10-02T07:48:57.0430635Z PASS craepets.guest refuses partial JSON without replacing bytes
+2026-10-02T07:48:57.0505830Z PASS craepets.guest refuses empty string without replacing bytes
+2026-10-02T07:48:57.0581385Z PASS craepets.guest refuses whitespace without replacing bytes
+2026-10-02T07:48:57.0656741Z PASS craepets.guest refuses JSON null without replacing bytes
+2026-10-02T07:48:57.0748476Z PASS craepets.guest refuses array without replacing bytes
+2026-10-02T07:48:57.0825692Z PASS craepets.guest refuses number without replacing bytes
+2026-10-02T07:48:57.0903053Z PASS craepets.guest refuses boolean without replacing bytes
+2026-10-02T07:48:57.0981375Z PASS craepets.guest refuses old version without replacing bytes
+2026-10-02T07:48:57.1058984Z PASS craepets.guest refuses bad pet without replacing bytes
+2026-10-02T07:48:57.1151507Z PASS craepets.guest refuses stats string without replacing bytes
+2026-10-02T07:48:57.1231005Z PASS craepets.guest refuses fractional house without replacing bytes
+2026-10-02T07:48:57.1310889Z PASS craepets.guest refuses bad review without replacing bytes
+2026-10-02T07:48:57.1388432Z PASS craepets.guest refuses blank broken stats without replacing bytes
+2026-10-02T07:48:57.1482298Z PASS craepets.guest refuses blank broken house without replacing bytes
+2026-10-02T07:48:57.1554892Z PASS craepets.guest read failure is not absence
+2026-10-02T07:48:57.1630458Z PASS craepets.guest admits current blank without temporary pet or writes
+2026-10-02T07:48:57.1705216Z PASS craepets.guest admits legacy pet null without temporary pet or writes
+2026-10-02T07:48:57.1780043Z PASS craepets.guest admits legacy missing pet without temporary pet or writes
+2026-10-02T07:48:57.1867778Z PASS craepets.guest admits genuinely absent new valley
+2026-10-02T07:48:57.1944791Z PASS craepets.guest retains valid earned progress and legacy defaults
+2026-10-02T07:48:57.2021543Z PASS craepets.guest rejects sibling switch before changing healthy player/session
+2026-10-02T07:48:57.2093895Z PASS craepets.guest rejects damaged family visit without changing active lesson
+2026-10-02T07:48:57.2165935Z PASS craepets.guest active storage event pauses stale persistence
+2026-10-02T07:48:57.2239633Z PASS craepets.guest failed active startup is write-free
+2026-10-02T07:48:57.2324380Z PASS craepets. native-ID fence refuses unknown keys before reading
+2026-10-02T07:48:57.2396965Z PASS craepets.WHO read unavailable pauses startup without writes
+2026-10-02T07:48:57.2469022Z PASS craepets.invalid WHO pauses startup without writes
+2026-10-02T07:48:57.2541419Z PASS native original jeannie unsafe sibling writes are refused
+2026-10-02T07:48:57.2613514Z PASS native original cory unsafe sibling writes are refused
+2026-10-02T07:48:57.2701855Z PASS native original ellie unsafe sibling writes are refused
+2026-10-02T07:48:57.2778830Z PASS native original kieran unsafe sibling writes are refused
+2026-10-02T07:48:57.2851826Z PASS native original shannon unsafe sibling writes are refused
+2026-10-02T07:48:57.2924827Z PASS native original tristan unsafe sibling writes are refused
+2026-10-02T07:48:57.2997635Z PASS native original guest unsafe sibling writes are refused
+2026-10-02T07:48:57.3072729Z PASS native original jeannie hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3163757Z PASS native original cory hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3238220Z PASS native original ellie hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3311452Z PASS native original kieran hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3384152Z PASS native original shannon hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3457674Z PASS native original tristan hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3551272Z PASS native original guest hidden selection event preflights before live state changes
+2026-10-02T07:48:57.3642198Z PASS import independently rechecks corrupted active raw before writing
+2026-10-02T07:48:57.3714643Z PASS reset independently rechecks corrupted active raw before writing
+2026-10-02T07:48:57.3789135Z PASS native original jeannie paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.3861055Z PASS native original cory paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.3933394Z PASS native original ellie paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.4021476Z PASS native original kieran paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.4093258Z PASS native original shannon paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.4165277Z PASS native original tristan paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.4237795Z PASS native original guest paused startup inspector mutations are safe with null state
+2026-10-02T07:48:57.4316913Z PASS pending native-reader callback paused cannot overwrite damaged raw
+2026-10-02T07:48:57.4412702Z PASS pending native-reader callback before storage event cannot overwrite damaged raw
+2026-10-02T07:48:57.4489579Z PASS pending actual wheel award refuses paused state before coin mutation
+2026-10-02T07:48:57.4565060Z PASS new actual modal refuses paused recovery overlay
+2026-10-02T07:48:57.4567114Z PASS original-game active saved-data loader: 198 production cases across seven original profiles; malformed/read-failure raw preservation, blank/legacy/earned progress, startup, sibling/visit admission, inspector safety and delayed-reader refusal.
+2026-10-02T07:48:57.4720179Z PASS: craepets-game-active-save.cjs (1.7s)
+2026-10-02T07:48:57.4720650Z 
+2026-10-02T07:48:57.4720989Z --- craepets-game-active-save-browser.cjs ---
+2026-10-02T07:49:34.6544569Z PASS original-game loader Chromium Desktop: seven profiles, exact original/house/selection bytes, literal download, read/WHO refusal and retry, real sibling/visit controls, native deferred-reader/storage/visibility transitions, genuine learning and blank/legacy reload.
+2026-10-02T07:50:01.4078554Z PASS original-game loader Chromium iPad: seven profiles, exact original/house/selection bytes, literal download, read/WHO refusal and retry, real sibling/visit controls, native deferred-reader/storage/visibility transitions, genuine learning and blank/legacy reload.
+2026-10-02T07:50:31.5320845Z PASS original-game loader Chromium iPhone: seven profiles, exact original/house/selection bytes, literal download, read/WHO refusal and retry, real sibling/visit controls, native deferred-reader/storage/visibility transitions, genuine learning and blank/legacy reload.
+2026-10-02T07:50:31.6685759Z PASS: craepets-game-active-save-browser.cjs (94.2s)
+2026-10-02T07:50:31.6687622Z 
+2026-10-02T07:50:31.6687928Z --- craepets-active-save.cjs ---
+2026-10-02T07:50:31.7163036Z PASS craepets.house.jeannie refuses partial JSON without replacing bytes
+2026-10-02T07:50:31.7258205Z PASS craepets.house.jeannie refuses empty string without replacing bytes
+2026-10-02T07:50:31.7342957Z PASS craepets.house.jeannie refuses whitespace without replacing bytes
+2026-10-02T07:50:31.7436337Z PASS craepets.house.jeannie refuses JSON null without replacing bytes
+2026-10-02T07:50:31.7529011Z PASS craepets.house.jeannie refuses array without replacing bytes
+2026-10-02T07:50:31.7605168Z PASS craepets.house.jeannie refuses number without replacing bytes
+2026-10-02T07:50:31.7687811Z PASS craepets.house.jeannie refuses boolean without replacing bytes
+2026-10-02T07:50:31.7770622Z PASS craepets.house.jeannie refuses old version without replacing bytes
+2026-10-02T07:50:31.7855834Z PASS craepets.house.jeannie refuses bad pet without replacing bytes
+2026-10-02T07:50:31.7949784Z PASS craepets.house.jeannie refuses stats string without replacing bytes
+2026-10-02T07:50:31.8039678Z PASS craepets.house.jeannie refuses fractional house without replacing bytes
+2026-10-02T07:50:31.8139159Z PASS craepets.house.jeannie refuses bad review without replacing bytes
+2026-10-02T07:50:31.8225366Z PASS craepets.house.jeannie refuses blank broken stats without replacing bytes
+2026-10-02T07:50:31.8340810Z PASS craepets.house.jeannie refuses blank broken house without replacing bytes
+2026-10-02T07:50:31.8417970Z PASS craepets.house.jeannie read failure is not absence
+2026-10-02T07:50:31.8499379Z PASS craepets.house.jeannie admits current blank without temporary pet or writes
+2026-10-02T07:50:31.8586738Z PASS craepets.house.jeannie admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:31.8689135Z PASS craepets.house.jeannie admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:31.8762683Z PASS craepets.house.jeannie admits genuinely absent new valley
+2026-10-02T07:50:31.8842943Z PASS craepets.house.jeannie retains valid earned progress and legacy defaults
+2026-10-02T07:50:31.8927462Z PASS craepets.house.jeannie rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:31.9000106Z PASS craepets.house.jeannie rejects damaged family visit without changing active lesson
+2026-10-02T07:50:31.9072212Z PASS craepets.house.jeannie public owner activity rejects before leaving current lesson
+2026-10-02T07:50:31.9155272Z PASS craepets.house.jeannie active storage event pauses stale persistence
+2026-10-02T07:50:31.9228040Z PASS craepets.house.jeannie damaged refresh pauses before state/player mutation
+2026-10-02T07:50:31.9319939Z PASS craepets.house.jeannie failed active startup is write-free
+2026-10-02T07:50:31.9393528Z PASS craepets.house.cory refuses partial JSON without replacing bytes
+2026-10-02T07:50:31.9466365Z PASS craepets.house.cory refuses empty string without replacing bytes
+2026-10-02T07:50:31.9553394Z PASS craepets.house.cory refuses whitespace without replacing bytes
+2026-10-02T07:50:31.9640098Z PASS craepets.house.cory refuses JSON null without replacing bytes
+2026-10-02T07:50:31.9736867Z PASS craepets.house.cory refuses array without replacing bytes
+2026-10-02T07:50:31.9809909Z PASS craepets.house.cory refuses number without replacing bytes
+2026-10-02T07:50:31.9885882Z PASS craepets.house.cory refuses boolean without replacing bytes
+2026-10-02T07:50:31.9974125Z PASS craepets.house.cory refuses old version without replacing bytes
+2026-10-02T07:50:32.0063055Z PASS craepets.house.cory refuses bad pet without replacing bytes
+2026-10-02T07:50:32.0158356Z PASS craepets.house.cory refuses stats string without replacing bytes
+2026-10-02T07:50:32.0239071Z PASS craepets.house.cory refuses fractional house without replacing bytes
+2026-10-02T07:50:32.0318791Z PASS craepets.house.cory refuses bad review without replacing bytes
+2026-10-02T07:50:32.0398238Z PASS craepets.house.cory refuses blank broken stats without replacing bytes
+2026-10-02T07:50:32.0495191Z PASS craepets.house.cory refuses blank broken house without replacing bytes
+2026-10-02T07:50:32.0567972Z PASS craepets.house.cory read failure is not absence
+2026-10-02T07:50:32.0642999Z PASS craepets.house.cory admits current blank without temporary pet or writes
+2026-10-02T07:50:32.0717086Z PASS craepets.house.cory admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:32.0791014Z PASS craepets.house.cory admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:32.0863533Z PASS craepets.house.cory admits genuinely absent new valley
+2026-10-02T07:50:32.0961766Z PASS craepets.house.cory retains valid earned progress and legacy defaults
+2026-10-02T07:50:32.1037315Z PASS craepets.house.cory rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:32.1110427Z PASS craepets.house.cory rejects damaged family visit without changing active lesson
+2026-10-02T07:50:32.1182483Z PASS craepets.house.cory public owner activity rejects before leaving current lesson
+2026-10-02T07:50:32.1254394Z PASS craepets.house.cory active storage event pauses stale persistence
+2026-10-02T07:50:32.1346524Z PASS craepets.house.cory damaged refresh pauses before state/player mutation
+2026-10-02T07:50:32.1419836Z PASS craepets.house.cory failed active startup is write-free
+2026-10-02T07:50:32.1495133Z PASS craepets.house.ellie refuses partial JSON without replacing bytes
+2026-10-02T07:50:32.1570474Z PASS craepets.house.ellie refuses empty string without replacing bytes
+2026-10-02T07:50:32.1646022Z PASS craepets.house.ellie refuses whitespace without replacing bytes
+2026-10-02T07:50:32.1742477Z PASS craepets.house.ellie refuses JSON null without replacing bytes
+2026-10-02T07:50:32.1818436Z PASS craepets.house.ellie refuses array without replacing bytes
+2026-10-02T07:50:32.1893948Z PASS craepets.house.ellie refuses number without replacing bytes
+2026-10-02T07:50:32.1969502Z PASS craepets.house.ellie refuses boolean without replacing bytes
+2026-10-02T07:50:32.2064868Z PASS craepets.house.ellie refuses old version without replacing bytes
+2026-10-02T07:50:32.2146542Z PASS craepets.house.ellie refuses bad pet without replacing bytes
+2026-10-02T07:50:32.2224829Z PASS craepets.house.ellie refuses stats string without replacing bytes
+2026-10-02T07:50:32.2306439Z PASS craepets.house.ellie refuses fractional house without replacing bytes
+2026-10-02T07:50:32.2386223Z PASS craepets.house.ellie refuses bad review without replacing bytes
+2026-10-02T07:50:32.2513476Z PASS craepets.house.ellie refuses blank broken stats without replacing bytes
+2026-10-02T07:50:32.2592632Z PASS craepets.house.ellie refuses blank broken house without replacing bytes
+2026-10-02T07:50:32.2664011Z PASS craepets.house.ellie read failure is not absence
+2026-10-02T07:50:32.2739101Z PASS craepets.house.ellie admits current blank without temporary pet or writes
+2026-10-02T07:50:32.2811985Z PASS craepets.house.ellie admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:32.2887150Z PASS craepets.house.ellie admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:32.2971687Z PASS craepets.house.ellie admits genuinely absent new valley
+2026-10-02T07:50:32.3049186Z PASS craepets.house.ellie retains valid earned progress and legacy defaults
+2026-10-02T07:50:32.3124055Z PASS craepets.house.ellie rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:32.3195772Z PASS craepets.house.ellie rejects damaged family visit without changing active lesson
+2026-10-02T07:50:32.3267054Z PASS craepets.house.ellie public owner activity rejects before leaving current lesson
+2026-10-02T07:50:32.3338545Z PASS craepets.house.ellie active storage event pauses stale persistence
+2026-10-02T07:50:32.3427121Z PASS craepets.house.ellie damaged refresh pauses before state/player mutation
+2026-10-02T07:50:32.3497908Z PASS craepets.house.ellie failed active startup is write-free
+2026-10-02T07:50:32.3572565Z PASS craepets.house.kieran refuses partial JSON without replacing bytes
+2026-10-02T07:50:32.3647019Z PASS craepets.house.kieran refuses empty string without replacing bytes
+2026-10-02T07:50:32.3736801Z PASS craepets.house.kieran refuses whitespace without replacing bytes
+2026-10-02T07:50:32.3810825Z PASS craepets.house.kieran refuses JSON null without replacing bytes
+2026-10-02T07:50:32.3884281Z PASS craepets.house.kieran refuses array without replacing bytes
+2026-10-02T07:50:32.3957608Z PASS craepets.house.kieran refuses number without replacing bytes
+2026-10-02T07:50:32.4031601Z PASS craepets.house.kieran refuses boolean without replacing bytes
+2026-10-02T07:50:32.4124004Z PASS craepets.house.kieran refuses old version without replacing bytes
+2026-10-02T07:50:32.4199852Z PASS craepets.house.kieran refuses bad pet without replacing bytes
+2026-10-02T07:50:32.4276493Z PASS craepets.house.kieran refuses stats string without replacing bytes
+2026-10-02T07:50:32.4354633Z PASS craepets.house.kieran refuses fractional house without replacing bytes
+2026-10-02T07:50:32.4448442Z PASS craepets.house.kieran refuses bad review without replacing bytes
+2026-10-02T07:50:32.4527339Z PASS craepets.house.kieran refuses blank broken stats without replacing bytes
+2026-10-02T07:50:32.4604530Z PASS craepets.house.kieran refuses blank broken house without replacing bytes
+2026-10-02T07:50:32.4674823Z PASS craepets.house.kieran read failure is not absence
+2026-10-02T07:50:32.4748921Z PASS craepets.house.kieran admits current blank without temporary pet or writes
+2026-10-02T07:50:32.4836169Z PASS craepets.house.kieran admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:32.4910793Z PASS craepets.house.kieran admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:32.4983006Z PASS craepets.house.kieran admits genuinely absent new valley
+2026-10-02T07:50:32.5060030Z PASS craepets.house.kieran retains valid earned progress and legacy defaults
+2026-10-02T07:50:32.5135301Z PASS craepets.house.kieran rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:32.5207206Z PASS craepets.house.kieran rejects damaged family visit without changing active lesson
+2026-10-02T07:50:32.5297057Z PASS craepets.house.kieran public owner activity rejects before leaving current lesson
+2026-10-02T07:50:32.5368329Z PASS craepets.house.kieran active storage event pauses stale persistence
+2026-10-02T07:50:32.5439947Z PASS craepets.house.kieran damaged refresh pauses before state/player mutation
+2026-10-02T07:50:32.5511852Z PASS craepets.house.kieran failed active startup is write-free
+2026-10-02T07:50:32.5586067Z PASS craepets.house.shannon refuses partial JSON without replacing bytes
+2026-10-02T07:50:32.5677848Z PASS craepets.house.shannon refuses empty string without replacing bytes
+2026-10-02T07:50:32.5753394Z PASS craepets.house.shannon refuses whitespace without replacing bytes
+2026-10-02T07:50:32.5826813Z PASS craepets.house.shannon refuses JSON null without replacing bytes
+2026-10-02T07:50:32.5902047Z PASS craepets.house.shannon refuses array without replacing bytes
+2026-10-02T07:50:32.5992446Z PASS craepets.house.shannon refuses number without replacing bytes
+2026-10-02T07:50:32.6066083Z PASS craepets.house.shannon refuses boolean without replacing bytes
+2026-10-02T07:50:32.6142944Z PASS craepets.house.shannon refuses old version without replacing bytes
+2026-10-02T07:50:32.6218709Z PASS craepets.house.shannon refuses bad pet without replacing bytes
+2026-10-02T07:50:32.6296253Z PASS craepets.house.shannon refuses stats string without replacing bytes
+2026-10-02T07:50:32.6395053Z PASS craepets.house.shannon refuses fractional house without replacing bytes
+2026-10-02T07:50:32.6475169Z PASS craepets.house.shannon refuses bad review without replacing bytes
+2026-10-02T07:50:32.6555471Z PASS craepets.house.shannon refuses blank broken stats without replacing bytes
+2026-10-02T07:50:32.6636174Z PASS craepets.house.shannon refuses blank broken house without replacing bytes
+2026-10-02T07:50:32.6727719Z PASS craepets.house.shannon read failure is not absence
+2026-10-02T07:50:32.6804681Z PASS craepets.house.shannon admits current blank without temporary pet or writes
+2026-10-02T07:50:32.6879774Z PASS craepets.house.shannon admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:32.6954339Z PASS craepets.house.shannon admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:32.7028552Z PASS craepets.house.shannon admits genuinely absent new valley
+2026-10-02T07:50:32.7107583Z PASS craepets.house.shannon retains valid earned progress and legacy defaults
+2026-10-02T07:50:32.7205032Z PASS craepets.house.shannon rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:32.7280869Z PASS craepets.house.shannon rejects damaged family visit without changing active lesson
+2026-10-02T07:50:32.7353517Z PASS craepets.house.shannon public owner activity rejects before leaving current lesson
+2026-10-02T07:50:32.7425898Z PASS craepets.house.shannon active storage event pauses stale persistence
+2026-10-02T07:50:32.7499512Z PASS craepets.house.shannon damaged refresh pauses before state/player mutation
+2026-10-02T07:50:32.7614823Z PASS craepets.house.shannon failed active startup is write-free
+2026-10-02T07:50:32.7701831Z PASS craepets.house.tristan refuses partial JSON without replacing bytes
+2026-10-02T07:50:32.7775085Z PASS craepets.house.tristan refuses empty string without replacing bytes
+2026-10-02T07:50:32.7849862Z PASS craepets.house.tristan refuses whitespace without replacing bytes
+2026-10-02T07:50:32.7923463Z PASS craepets.house.tristan refuses JSON null without replacing bytes
+2026-10-02T07:50:32.7996739Z PASS craepets.house.tristan refuses array without replacing bytes
+2026-10-02T07:50:32.8082046Z PASS craepets.house.tristan refuses number without replacing bytes
+2026-10-02T07:50:32.8155716Z PASS craepets.house.tristan refuses boolean without replacing bytes
+2026-10-02T07:50:32.8231070Z PASS craepets.house.tristan refuses old version without replacing bytes
+2026-10-02T07:50:32.8305908Z PASS craepets.house.tristan refuses bad pet without replacing bytes
+2026-10-02T07:50:32.8399484Z PASS craepets.house.tristan refuses stats string without replacing bytes
+2026-10-02T07:50:32.8478372Z PASS craepets.house.tristan refuses fractional house without replacing bytes
+2026-10-02T07:50:32.8556351Z PASS craepets.house.tristan refuses bad review without replacing bytes
+2026-10-02T07:50:32.8632992Z PASS craepets.house.tristan refuses blank broken stats without replacing bytes
+2026-10-02T07:50:32.8717108Z PASS craepets.house.tristan refuses blank broken house without replacing bytes
+2026-10-02T07:50:32.8804088Z PASS craepets.house.tristan read failure is not absence
+2026-10-02T07:50:32.8878277Z PASS craepets.house.tristan admits current blank without temporary pet or writes
+2026-10-02T07:50:32.8950835Z PASS craepets.house.tristan admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:32.9023542Z PASS craepets.house.tristan admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:32.9095250Z PASS craepets.house.tristan admits genuinely absent new valley
+2026-10-02T07:50:32.9189026Z PASS craepets.house.tristan retains valid earned progress and legacy defaults
+2026-10-02T07:50:32.9264323Z PASS craepets.house.tristan rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:32.9335844Z PASS craepets.house.tristan rejects damaged family visit without changing active lesson
+2026-10-02T07:50:32.9407384Z PASS craepets.house.tristan public owner activity rejects before leaving current lesson
+2026-10-02T07:50:32.9478928Z PASS craepets.house.tristan active storage event pauses stale persistence
+2026-10-02T07:50:32.9551923Z PASS craepets.house.tristan damaged refresh pauses before state/player mutation
+2026-10-02T07:50:32.9641011Z PASS craepets.house.tristan failed active startup is write-free
+2026-10-02T07:50:32.9716983Z PASS craepets.house.guest refuses partial JSON without replacing bytes
+2026-10-02T07:50:32.9791773Z PASS craepets.house.guest refuses empty string without replacing bytes
+2026-10-02T07:50:32.9867320Z PASS craepets.house.guest refuses whitespace without replacing bytes
+2026-10-02T07:50:32.9958455Z PASS craepets.house.guest refuses JSON null without replacing bytes
+2026-10-02T07:50:33.0032469Z PASS craepets.house.guest refuses array without replacing bytes
+2026-10-02T07:50:33.0105655Z PASS craepets.house.guest refuses number without replacing bytes
+2026-10-02T07:50:33.0179497Z PASS craepets.house.guest refuses boolean without replacing bytes
+2026-10-02T07:50:33.0254068Z PASS craepets.house.guest refuses old version without replacing bytes
+2026-10-02T07:50:33.0344401Z PASS craepets.house.guest refuses bad pet without replacing bytes
+2026-10-02T07:50:33.0421054Z PASS craepets.house.guest refuses stats string without replacing bytes
+2026-10-02T07:50:33.0498853Z PASS craepets.house.guest refuses fractional house without replacing bytes
+2026-10-02T07:50:33.0577870Z PASS craepets.house.guest refuses bad review without replacing bytes
+2026-10-02T07:50:33.0668347Z PASS craepets.house.guest refuses blank broken stats without replacing bytes
+2026-10-02T07:50:33.0745613Z PASS craepets.house.guest refuses blank broken house without replacing bytes
+2026-10-02T07:50:33.0817835Z PASS craepets.house.guest read failure is not absence
+2026-10-02T07:50:33.0891437Z PASS craepets.house.guest admits current blank without temporary pet or writes
+2026-10-02T07:50:33.0963821Z PASS craepets.house.guest admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:33.1050862Z PASS craepets.house.guest admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:33.1124507Z PASS craepets.house.guest admits genuinely absent new valley
+2026-10-02T07:50:33.1200792Z PASS craepets.house.guest retains valid earned progress and legacy defaults
+2026-10-02T07:50:33.1275632Z PASS craepets.house.guest rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:33.1346786Z PASS craepets.house.guest rejects damaged family visit without changing active lesson
+2026-10-02T07:50:33.1418144Z PASS craepets.house.guest public owner activity rejects before leaving current lesson
+2026-10-02T07:50:33.1506196Z PASS craepets.house.guest active storage event pauses stale persistence
+2026-10-02T07:50:33.1581519Z PASS craepets.house.guest damaged refresh pauses before state/player mutation
+2026-10-02T07:50:33.1652617Z PASS craepets.house.guest failed active startup is write-free
+2026-10-02T07:50:33.1726756Z PASS craepets.jeannie refuses partial JSON without replacing bytes
+2026-10-02T07:50:33.1802075Z PASS craepets.jeannie refuses empty string without replacing bytes
+2026-10-02T07:50:33.1895009Z PASS craepets.jeannie refuses whitespace without replacing bytes
+2026-10-02T07:50:33.1969209Z PASS craepets.jeannie refuses JSON null without replacing bytes
+2026-10-02T07:50:33.2044754Z PASS craepets.jeannie refuses array without replacing bytes
+2026-10-02T07:50:33.2118751Z PASS craepets.jeannie refuses number without replacing bytes
+2026-10-02T07:50:33.2210367Z PASS craepets.jeannie refuses boolean without replacing bytes
+2026-10-02T07:50:33.2286769Z PASS craepets.jeannie refuses old version without replacing bytes
+2026-10-02T07:50:33.2361732Z PASS craepets.jeannie refuses bad pet without replacing bytes
+2026-10-02T07:50:33.2438254Z PASS craepets.jeannie refuses stats string without replacing bytes
+2026-10-02T07:50:33.2531253Z PASS craepets.jeannie refuses fractional house without replacing bytes
+2026-10-02T07:50:33.2609989Z PASS craepets.jeannie refuses bad review without replacing bytes
+2026-10-02T07:50:33.2686138Z PASS craepets.jeannie refuses blank broken stats without replacing bytes
+2026-10-02T07:50:33.2764517Z PASS craepets.jeannie refuses blank broken house without replacing bytes
+2026-10-02T07:50:33.2835626Z PASS craepets.jeannie read failure is not absence
+2026-10-02T07:50:33.2947935Z PASS craepets.jeannie admits current blank without temporary pet or writes
+2026-10-02T07:50:33.3037355Z PASS craepets.jeannie admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:33.3111511Z PASS craepets.jeannie admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:33.3189477Z PASS craepets.jeannie admits genuinely absent new valley
+2026-10-02T07:50:33.3272526Z PASS craepets.jeannie retains valid earned progress and legacy defaults
+2026-10-02T07:50:33.3354339Z PASS craepets.jeannie rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:33.3430692Z PASS craepets.jeannie rejects damaged family visit without changing active lesson
+2026-10-02T07:50:33.3518176Z PASS craepets.jeannie public owner activity rejects before leaving current lesson
+2026-10-02T07:50:33.3593039Z PASS craepets.jeannie active storage event pauses stale persistence
+2026-10-02T07:50:33.3669706Z PASS craepets.jeannie damaged refresh pauses before state/player mutation
+2026-10-02T07:50:33.3774121Z PASS craepets.jeannie failed active startup is write-free
+2026-10-02T07:50:33.3852705Z PASS craepets.cory refuses partial JSON without replacing bytes
+2026-10-02T07:50:33.3949532Z PASS craepets.cory refuses empty string without replacing bytes
+2026-10-02T07:50:33.4025446Z PASS craepets.cory refuses whitespace without replacing bytes
+2026-10-02T07:50:33.4100724Z PASS craepets.cory refuses JSON null without replacing bytes
+2026-10-02T07:50:33.4175385Z PASS craepets.cory refuses array without replacing bytes
+2026-10-02T07:50:33.4263270Z PASS craepets.cory refuses number without replacing bytes
+2026-10-02T07:50:33.4340541Z PASS craepets.cory refuses boolean without replacing bytes
+2026-10-02T07:50:33.4415031Z PASS craepets.cory refuses old version without replacing bytes
+2026-10-02T07:50:33.4490134Z PASS craepets.cory refuses bad pet without replacing bytes
+2026-10-02T07:50:33.4565830Z PASS craepets.cory refuses stats string without replacing bytes
+2026-10-02T07:50:33.4655552Z PASS craepets.cory refuses fractional house without replacing bytes
+2026-10-02T07:50:33.4733358Z PASS craepets.cory refuses bad review without replacing bytes
+2026-10-02T07:50:33.4808310Z PASS craepets.cory refuses blank broken stats without replacing bytes
+2026-10-02T07:50:33.4885718Z PASS craepets.cory refuses blank broken house without replacing bytes
+2026-10-02T07:50:33.4971397Z PASS craepets.cory read failure is not absence
+2026-10-02T07:50:33.5045185Z PASS craepets.cory admits current blank without temporary pet or writes
+2026-10-02T07:50:33.5116969Z PASS craepets.cory admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:33.5189309Z PASS craepets.cory admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:33.5261493Z PASS craepets.cory admits genuinely absent new valley
+2026-10-02T07:50:33.5339449Z PASS craepets.cory retains valid earned progress and legacy defaults
+2026-10-02T07:50:33.5431855Z PASS craepets.cory rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:33.5505321Z PASS craepets.cory rejects damaged family visit without changing active lesson
+2026-10-02T07:50:33.5576100Z PASS craepets.cory public owner activity rejects before leaving current lesson
+2026-10-02T07:50:33.5647601Z PASS craepets.cory active storage event pauses stale persistence
+2026-10-02T07:50:33.5719249Z PASS craepets.cory damaged refresh pauses before state/player mutation
+2026-10-02T07:50:33.5805052Z PASS craepets.cory failed active startup is write-free
+2026-10-02T07:50:33.5879017Z PASS craepets.ellie refuses partial JSON without replacing bytes
+2026-10-02T07:50:33.5952061Z PASS craepets.ellie refuses empty string without replacing bytes
+2026-10-02T07:50:33.6025108Z PASS craepets.ellie refuses whitespace without replacing bytes
+2026-10-02T07:50:33.6114171Z PASS craepets.ellie refuses JSON null without replacing bytes
+2026-10-02T07:50:33.6188180Z PASS craepets.ellie refuses array without replacing bytes
+2026-10-02T07:50:33.6261337Z PASS craepets.ellie refuses number without replacing bytes
+2026-10-02T07:50:33.6335539Z PASS craepets.ellie refuses boolean without replacing bytes
+2026-10-02T07:50:33.6411566Z PASS craepets.ellie refuses old version without replacing bytes
+2026-10-02T07:50:33.6503165Z PASS craepets.ellie refuses bad pet without replacing bytes
+2026-10-02T07:50:33.6579525Z PASS craepets.ellie refuses stats string without replacing bytes
+2026-10-02T07:50:33.6657001Z PASS craepets.ellie refuses fractional house without replacing bytes
+2026-10-02T07:50:33.6734867Z PASS craepets.ellie refuses bad review without replacing bytes
+2026-10-02T07:50:33.6823906Z PASS craepets.ellie refuses blank broken stats without replacing bytes
+2026-10-02T07:50:33.6901102Z PASS craepets.ellie refuses blank broken house without replacing bytes
+2026-10-02T07:50:33.6971913Z PASS craepets.ellie read failure is not absence
+2026-10-02T07:50:33.7045676Z PASS craepets.ellie admits current blank without temporary pet or writes
+2026-10-02T07:50:33.7124221Z PASS craepets.ellie admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:33.7210854Z PASS craepets.ellie admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:33.7283458Z PASS craepets.ellie admits genuinely absent new valley
+2026-10-02T07:50:33.7359571Z PASS craepets.ellie retains valid earned progress and legacy defaults
+2026-10-02T07:50:33.7434824Z PASS craepets.ellie rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:33.7506379Z PASS craepets.ellie rejects damaged family visit without changing active lesson
+2026-10-02T07:50:33.7577157Z PASS craepets.ellie public owner activity rejects before leaving current lesson
+2026-10-02T07:50:33.7666299Z PASS craepets.ellie active storage event pauses stale persistence
+2026-10-02T07:50:33.7736958Z PASS craepets.ellie damaged refresh pauses before state/player mutation
+2026-10-02T07:50:33.7807574Z PASS craepets.ellie failed active startup is write-free
+2026-10-02T07:50:33.7881340Z PASS craepets.kieran refuses partial JSON without replacing bytes
+2026-10-02T07:50:33.7954124Z PASS craepets.kieran refuses empty string without replacing bytes
+2026-10-02T07:50:33.8042575Z PASS craepets.kieran refuses whitespace without replacing bytes
+2026-10-02T07:50:33.8146325Z PASS craepets.kieran refuses JSON null without replacing bytes
+2026-10-02T07:50:33.8218954Z PASS craepets.kieran refuses array without replacing bytes
+2026-10-02T07:50:33.8292827Z PASS craepets.kieran refuses number without replacing bytes
+2026-10-02T07:50:33.8365652Z PASS craepets.kieran refuses boolean without replacing bytes
+2026-10-02T07:50:33.8440926Z PASS craepets.kieran refuses old version without replacing bytes
+2026-10-02T07:50:33.8525942Z PASS craepets.kieran refuses bad pet without replacing bytes
+2026-10-02T07:50:33.8602152Z PASS craepets.kieran refuses stats string without replacing bytes
+2026-10-02T07:50:33.8679890Z PASS craepets.kieran refuses fractional house without replacing bytes
+2026-10-02T07:50:33.8757068Z PASS craepets.kieran refuses bad review without replacing bytes
+2026-10-02T07:50:33.8846331Z PASS craepets.kieran refuses blank broken stats without replacing bytes
+2026-10-02T07:50:33.8923021Z PASS craepets.kieran refuses blank broken house without replacing bytes
+2026-10-02T07:50:33.8993406Z PASS craepets.kieran read failure is not absence
+2026-10-02T07:50:33.9066331Z PASS craepets.kieran admits current blank without temporary pet or writes
+2026-10-02T07:50:33.9137860Z PASS craepets.kieran admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:33.9222725Z PASS craepets.kieran admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:33.9293857Z PASS craepets.kieran admits genuinely absent new valley
+2026-10-02T07:50:33.9369177Z PASS craepets.kieran retains valid earned progress and legacy defaults
+2026-10-02T07:50:33.9443600Z PASS craepets.kieran rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:33.9514393Z PASS craepets.kieran rejects damaged family visit without changing active lesson
+2026-10-02T07:50:33.9585203Z PASS craepets.kieran public owner activity rejects before leaving current lesson
+2026-10-02T07:50:33.9671848Z PASS craepets.kieran active storage event pauses stale persistence
+2026-10-02T07:50:33.9742386Z PASS craepets.kieran damaged refresh pauses before state/player mutation
+2026-10-02T07:50:33.9812514Z PASS craepets.kieran failed active startup is write-free
+2026-10-02T07:50:33.9885735Z PASS craepets.shannon refuses partial JSON without replacing bytes
+2026-10-02T07:50:33.9958732Z PASS craepets.shannon refuses empty string without replacing bytes
+2026-10-02T07:50:34.0046857Z PASS craepets.shannon refuses whitespace without replacing bytes
+2026-10-02T07:50:34.0119625Z PASS craepets.shannon refuses JSON null without replacing bytes
+2026-10-02T07:50:34.0193037Z PASS craepets.shannon refuses array without replacing bytes
+2026-10-02T07:50:34.0265860Z PASS craepets.shannon refuses number without replacing bytes
+2026-10-02T07:50:34.0362887Z PASS craepets.shannon refuses boolean without replacing bytes
+2026-10-02T07:50:34.0428216Z PASS craepets.shannon refuses old version without replacing bytes
+2026-10-02T07:50:34.0501547Z PASS craepets.shannon refuses bad pet without replacing bytes
+2026-10-02T07:50:34.0576079Z PASS craepets.shannon refuses stats string without replacing bytes
+2026-10-02T07:50:34.0667845Z PASS craepets.shannon refuses fractional house without replacing bytes
+2026-10-02T07:50:34.0744613Z PASS craepets.shannon refuses bad review without replacing bytes
+2026-10-02T07:50:34.0819848Z PASS craepets.shannon refuses blank broken stats without replacing bytes
+2026-10-02T07:50:34.0895853Z PASS craepets.shannon refuses blank broken house without replacing bytes
+2026-10-02T07:50:34.0966556Z PASS craepets.shannon read failure is not absence
+2026-10-02T07:50:34.1053218Z PASS craepets.shannon admits current blank without temporary pet or writes
+2026-10-02T07:50:34.1131231Z PASS craepets.shannon admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:34.1203310Z PASS craepets.shannon admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:34.1274460Z PASS craepets.shannon admits genuinely absent new valley
+2026-10-02T07:50:34.1349261Z PASS craepets.shannon retains valid earned progress and legacy defaults
+2026-10-02T07:50:34.1423447Z PASS craepets.shannon rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:34.1508895Z PASS craepets.shannon rejects damaged family visit without changing active lesson
+2026-10-02T07:50:34.1578655Z PASS craepets.shannon public owner activity rejects before leaving current lesson
+2026-10-02T07:50:34.1648809Z PASS craepets.shannon active storage event pauses stale persistence
+2026-10-02T07:50:34.1718793Z PASS craepets.shannon damaged refresh pauses before state/player mutation
+2026-10-02T07:50:34.1788932Z PASS craepets.shannon failed active startup is write-free
+2026-10-02T07:50:34.1879076Z PASS craepets.tristan refuses partial JSON without replacing bytes
+2026-10-02T07:50:34.1951294Z PASS craepets.tristan refuses empty string without replacing bytes
+2026-10-02T07:50:34.2023114Z PASS craepets.tristan refuses whitespace without replacing bytes
+2026-10-02T07:50:34.2095434Z PASS craepets.tristan refuses JSON null without replacing bytes
+2026-10-02T07:50:34.2182013Z PASS craepets.tristan refuses array without replacing bytes
+2026-10-02T07:50:34.2254375Z PASS craepets.tristan refuses number without replacing bytes
+2026-10-02T07:50:34.2327506Z PASS craepets.tristan refuses boolean without replacing bytes
+2026-10-02T07:50:34.2400939Z PASS craepets.tristan refuses old version without replacing bytes
+2026-10-02T07:50:34.2473998Z PASS craepets.tristan refuses bad pet without replacing bytes
+2026-10-02T07:50:34.2561389Z PASS craepets.tristan refuses stats string without replacing bytes
+2026-10-02T07:50:34.2636897Z PASS craepets.tristan refuses fractional house without replacing bytes
+2026-10-02T07:50:34.2713436Z PASS craepets.tristan refuses bad review without replacing bytes
+2026-10-02T07:50:34.2788173Z PASS craepets.tristan refuses blank broken stats without replacing bytes
+2026-10-02T07:50:34.2878086Z PASS craepets.tristan refuses blank broken house without replacing bytes
+2026-10-02T07:50:34.2948462Z PASS craepets.tristan read failure is not absence
+2026-10-02T07:50:34.3021458Z PASS craepets.tristan admits current blank without temporary pet or writes
+2026-10-02T07:50:34.3092375Z PASS craepets.tristan admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:34.3163584Z PASS craepets.tristan admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:34.3274127Z PASS craepets.tristan admits genuinely absent new valley
+2026-10-02T07:50:34.3359567Z PASS craepets.tristan retains valid earned progress and legacy defaults
+2026-10-02T07:50:34.3433564Z PASS craepets.tristan rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:34.3503719Z PASS craepets.tristan rejects damaged family visit without changing active lesson
+2026-10-02T07:50:34.3574077Z PASS craepets.tristan public owner activity rejects before leaving current lesson
+2026-10-02T07:50:34.3644357Z PASS craepets.tristan active storage event pauses stale persistence
+2026-10-02T07:50:34.3714477Z PASS craepets.tristan damaged refresh pauses before state/player mutation
+2026-10-02T07:50:34.3796572Z PASS craepets.tristan failed active startup is write-free
+2026-10-02T07:50:34.3869375Z PASS craepets.guest refuses partial JSON without replacing bytes
+2026-10-02T07:50:34.3942206Z PASS craepets.guest refuses empty string without replacing bytes
+2026-10-02T07:50:34.4014809Z PASS craepets.guest refuses whitespace without replacing bytes
+2026-10-02T07:50:34.4103568Z PASS craepets.guest refuses JSON null without replacing bytes
+2026-10-02T07:50:34.4175800Z PASS craepets.guest refuses array without replacing bytes
+2026-10-02T07:50:34.4248769Z PASS craepets.guest refuses number without replacing bytes
+2026-10-02T07:50:34.4320683Z PASS craepets.guest refuses boolean without replacing bytes
+2026-10-02T07:50:34.4393792Z PASS craepets.guest refuses old version without replacing bytes
+2026-10-02T07:50:34.4483461Z PASS craepets.guest refuses bad pet without replacing bytes
+2026-10-02T07:50:34.4558227Z PASS craepets.guest refuses stats string without replacing bytes
+2026-10-02T07:50:34.4634129Z PASS craepets.guest refuses fractional house without replacing bytes
+2026-10-02T07:50:34.4710916Z PASS craepets.guest refuses bad review without replacing bytes
+2026-10-02T07:50:34.4799552Z PASS craepets.guest refuses blank broken stats without replacing bytes
+2026-10-02T07:50:34.4875332Z PASS craepets.guest refuses blank broken house without replacing bytes
+2026-10-02T07:50:34.4945850Z PASS craepets.guest read failure is not absence
+2026-10-02T07:50:34.5018494Z PASS craepets.guest admits current blank without temporary pet or writes
+2026-10-02T07:50:34.5090242Z PASS craepets.guest admits legacy pet null without temporary pet or writes
+2026-10-02T07:50:34.5177472Z PASS craepets.guest admits legacy missing pet without temporary pet or writes
+2026-10-02T07:50:34.5249009Z PASS craepets.guest admits genuinely absent new valley
+2026-10-02T07:50:34.5324269Z PASS craepets.guest retains valid earned progress and legacy defaults
+2026-10-02T07:50:34.5398648Z PASS craepets.guest rejects sibling switch before changing healthy player/session
+2026-10-02T07:50:34.5469285Z PASS craepets.guest rejects damaged family visit without changing active lesson
+2026-10-02T07:50:34.5556836Z PASS craepets.guest public owner activity rejects before leaving current lesson
+2026-10-02T07:50:34.5627142Z PASS craepets.guest active storage event pauses stale persistence
+2026-10-02T07:50:34.5697741Z PASS craepets.guest damaged refresh pauses before state/player mutation
+2026-10-02T07:50:34.5767848Z PASS craepets.guest failed active startup is write-free
+2026-10-02T07:50:34.5835843Z PASS craepets.house. native-ID fence refuses unknown keys before reading
+2026-10-02T07:50:34.5906700Z PASS craepets.house.WHO read unavailable pauses startup without writes
+2026-10-02T07:50:34.5994763Z PASS craepets.house.invalid WHO pauses startup without writes
+2026-10-02T07:50:34.6082277Z PASS craepets.house. unavailable sibling stays out of neighborhood without blocking healthy current
+2026-10-02T07:50:34.6153507Z PASS craepets.house. prior family pending guard remains effective
+2026-10-02T07:50:34.6222891Z PASS craepets. native-ID fence refuses unknown keys before reading
+2026-10-02T07:50:34.6293251Z PASS craepets.WHO read unavailable pauses startup without writes
+2026-10-02T07:50:34.6362953Z PASS craepets.invalid WHO pauses startup without writes
+2026-10-02T07:50:34.6463808Z PASS craepets. unavailable sibling stays out of neighborhood without blocking healthy current
+2026-10-02T07:50:34.6534457Z PASS craepets. prior family pending guard remains effective
+2026-10-02T07:50:34.6619939Z PASS craepets.house.jeannie actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.6697352Z PASS craepets.house.cory actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.6789718Z PASS craepets.house.ellie actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.6866774Z PASS craepets.house.kieran actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.6943291Z PASS craepets.house.shannon actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7020166Z PASS craepets.house.tristan actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7107880Z PASS craepets.house.guest actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7184669Z PASS craepets.jeannie actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7261637Z PASS craepets.cory actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7350988Z PASS craepets.ellie actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7427674Z PASS craepets.kieran actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7505187Z PASS craepets.shannon actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7583206Z PASS craepets.tristan actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7672448Z PASS craepets.guest actual registration refuses damaged active with all healthy siblings
+2026-10-02T07:50:34.7743666Z PASS actual house registration distinguishes WHO read unavailable and suppresses its one auto cycle
+2026-10-02T07:50:34.7814717Z PASS actual house registration distinguishes active read unavailable and suppresses its one auto cycle
+2026-10-02T07:50:34.7816541Z PASS active saved-data loader: 390 production checks across seven house/shared profiles; malformed/read-failure preservation, blank/legacy/earned states, startup, switching, refresh and external-update refusal.
+2026-10-02T07:50:34.7986196Z PASS: craepets-active-save.cjs (3.1s)
+2026-10-02T07:50:34.7986712Z 
+2026-10-02T07:50:34.7987087Z --- craepets-active-save-browser.cjs ---
+2026-10-02T07:50:45.4999439Z PASS active loader Chromium Desktop: all fourteen active profile/mode refusals, exact namespaces/selection, real startup gate/link/download, unavailable reads/retry, sibling lesson preservation, other-document storage refusal and valid legacy/blank play.
+2026-10-02T07:50:54.7368631Z PASS active loader Chromium iPad: all fourteen active profile/mode refusals, exact namespaces/selection, real startup gate/link/download, unavailable reads/retry, sibling lesson preservation, other-document storage refusal and valid legacy/blank play.
+2026-10-02T07:51:03.8753824Z PASS active loader Chromium iPhone: all fourteen active profile/mode refusals, exact namespaces/selection, real startup gate/link/download, unavailable reads/retry, sibling lesson preservation, other-document storage refusal and valid legacy/blank play.
+2026-10-02T07:51:04.0259824Z PASS: craepets-active-save-browser.cjs (29.2s)
+2026-10-02T07:51:04.0260147Z 
+2026-10-02T07:51:04.0260387Z --- craepets-auto-seeding.cjs ---
+2026-10-02T07:51:04.0740140Z PASS jeannie does not seed stats string
+2026-10-02T07:51:04.0842117Z PASS jeannie does not seed fractional legacy house
+2026-10-02T07:51:04.0937629Z PASS jeannie does not seed review null
+2026-10-02T07:51:04.1031703Z PASS jeannie does not seed bag string count
+2026-10-02T07:51:04.1125570Z PASS jeannie does not seed subject stats
+2026-10-02T07:51:04.1223521Z PASS jeannie does not seed room array
+2026-10-02T07:51:04.1323287Z PASS jeannie does not seed species
+2026-10-02T07:51:04.1406920Z PASS jeannie does not seed colour
+2026-10-02T07:51:04.1498378Z PASS jeannie does not seed blank pet name
+2026-10-02T07:51:04.1585274Z PASS jeannie does not seed null needs
+2026-10-02T07:51:04.1684065Z PASS jeannie does not seed diary record
+2026-10-02T07:51:04.1770477Z PASS jeannie does not seed mail record
+2026-10-02T07:51:04.1867063Z PASS jeannie does not seed quest record
+2026-10-02T07:51:04.1971480Z PASS jeannie does not seed negative coins
+2026-10-02T07:51:04.2065467Z PASS jeannie does not seed bank array
+2026-10-02T07:51:04.2156274Z PASS jeannie does not seed seen row
+2026-10-02T07:51:04.2247948Z PASS jeannie does not seed pet array
+2026-10-02T07:51:04.2347525Z PASS jeannie does not seed version
+2026-10-02T07:51:04.2432611Z PASS jeannie does not seed answer index
+2026-10-02T07:51:04.2513648Z PASS cory does not seed stats string
+2026-10-02T07:51:04.2626827Z PASS cory does not seed fractional legacy house
+2026-10-02T07:51:04.2706505Z PASS cory does not seed review null
+2026-10-02T07:51:04.2786448Z PASS cory does not seed bag string count
+2026-10-02T07:51:04.2865721Z PASS cory does not seed subject stats
+2026-10-02T07:51:04.2953968Z PASS cory does not seed room array
+2026-10-02T07:51:04.3031897Z PASS cory does not seed species
+2026-10-02T07:51:04.3109888Z PASS cory does not seed colour
+2026-10-02T07:51:04.3188074Z PASS cory does not seed blank pet name
+2026-10-02T07:51:04.3279045Z PASS cory does not seed null needs
+2026-10-02T07:51:04.3357731Z PASS cory does not seed diary record
+2026-10-02T07:51:04.3437138Z PASS cory does not seed mail record
+2026-10-02T07:51:04.3537366Z PASS cory does not seed quest record
+2026-10-02T07:51:04.3615461Z PASS cory does not seed negative coins
+2026-10-02T07:51:04.3693934Z PASS cory does not seed bank array
+2026-10-02T07:51:04.3773537Z PASS cory does not seed seen row
+2026-10-02T07:51:04.3859560Z PASS cory does not seed pet array
+2026-10-02T07:51:04.3947362Z PASS cory does not seed version
+2026-10-02T07:51:04.4038689Z PASS cory does not seed answer index
+2026-10-02T07:51:04.4131794Z PASS ellie does not seed stats string
+2026-10-02T07:51:04.4234113Z PASS ellie does not seed fractional legacy house
+2026-10-02T07:51:04.4316368Z PASS ellie does not seed review null
+2026-10-02T07:51:04.4399361Z PASS ellie does not seed bag string count
+2026-10-02T07:51:04.4484737Z PASS ellie does not seed subject stats
+2026-10-02T07:51:04.4578263Z PASS ellie does not seed room array
+2026-10-02T07:51:04.4669722Z PASS ellie does not seed species
+2026-10-02T07:51:04.4760825Z PASS ellie does not seed colour
+2026-10-02T07:51:04.4866250Z PASS ellie does not seed blank pet name
+2026-10-02T07:51:04.4949926Z PASS ellie does not seed null needs
+2026-10-02T07:51:04.5033851Z PASS ellie does not seed diary record
+2026-10-02T07:51:04.5117529Z PASS ellie does not seed mail record
+2026-10-02T07:51:04.5201608Z PASS ellie does not seed quest record
+2026-10-02T07:51:04.5285007Z PASS ellie does not seed negative coins
+2026-10-02T07:51:04.5369502Z PASS ellie does not seed bank array
+2026-10-02T07:51:04.5475748Z PASS ellie does not seed seen row
+2026-10-02T07:51:04.5557496Z PASS ellie does not seed pet array
+2026-10-02T07:51:04.5639516Z PASS ellie does not seed version
+2026-10-02T07:51:04.5724453Z PASS ellie does not seed answer index
+2026-10-02T07:51:04.5808519Z PASS kieran does not seed stats string
+2026-10-02T07:51:04.5892688Z PASS kieran does not seed fractional legacy house
+2026-10-02T07:51:04.5978082Z PASS kieran does not seed review null
+2026-10-02T07:51:04.6083771Z PASS kieran does not seed bag string count
+2026-10-02T07:51:04.6166315Z PASS kieran does not seed subject stats
+2026-10-02T07:51:04.6250054Z PASS kieran does not seed room array
+2026-10-02T07:51:04.6331561Z PASS kieran does not seed species
+2026-10-02T07:51:04.6414010Z PASS kieran does not seed colour
+2026-10-02T07:51:04.6504650Z PASS kieran does not seed blank pet name
+2026-10-02T07:51:04.6591579Z PASS kieran does not seed null needs
+2026-10-02T07:51:04.6698512Z PASS kieran does not seed diary record
+2026-10-02T07:51:04.6782198Z PASS kieran does not seed mail record
+2026-10-02T07:51:04.6865347Z PASS kieran does not seed quest record
+2026-10-02T07:51:04.6947692Z PASS kieran does not seed negative coins
+2026-10-02T07:51:04.7030586Z PASS kieran does not seed bank array
+2026-10-02T07:51:04.7114914Z PASS kieran does not seed seen row
+2026-10-02T07:51:04.7198521Z PASS kieran does not seed pet array
+2026-10-02T07:51:04.7303929Z PASS kieran does not seed version
+2026-10-02T07:51:04.7388275Z PASS kieran does not seed answer index
+2026-10-02T07:51:04.7473829Z PASS shannon does not seed stats string
+2026-10-02T07:51:04.7558032Z PASS shannon does not seed fractional legacy house
+2026-10-02T07:51:04.7672364Z PASS shannon does not seed review null
+2026-10-02T07:51:04.7755241Z PASS shannon does not seed bag string count
+2026-10-02T07:51:04.7837785Z PASS shannon does not seed subject stats
+2026-10-02T07:51:04.7921421Z PASS shannon does not seed room array
+2026-10-02T07:51:04.8003091Z PASS shannon does not seed species
+2026-10-02T07:51:04.8084042Z PASS shannon does not seed colour
+2026-10-02T07:51:04.8165754Z PASS shannon does not seed blank pet name
+2026-10-02T07:51:04.8248632Z PASS shannon does not seed null needs
+2026-10-02T07:51:04.8345620Z PASS shannon does not seed diary record
+2026-10-02T07:51:04.8427734Z PASS shannon does not seed mail record
+2026-10-02T07:51:04.8510175Z PASS shannon does not seed quest record
+2026-10-02T07:51:04.8591185Z PASS shannon does not seed negative coins
+2026-10-02T07:51:04.8673310Z PASS shannon does not seed bank array
+2026-10-02T07:51:04.8755486Z PASS shannon does not seed seen row
+2026-10-02T07:51:04.8836463Z PASS shannon does not seed pet array
+2026-10-02T07:51:04.8938224Z PASS shannon does not seed version
+2026-10-02T07:51:04.9021062Z PASS shannon does not seed answer index
+2026-10-02T07:51:04.9109290Z PASS tristan does not seed stats string
+2026-10-02T07:51:04.9190887Z PASS tristan does not seed fractional legacy house
+2026-10-02T07:51:04.9272866Z PASS tristan does not seed review null
+2026-10-02T07:51:04.9354191Z PASS tristan does not seed bag string count
+2026-10-02T07:51:04.9435765Z PASS tristan does not seed subject stats
+2026-10-02T07:51:04.9536388Z PASS tristan does not seed room array
+2026-10-02T07:51:04.9618544Z PASS tristan does not seed species
+2026-10-02T07:51:04.9699173Z PASS tristan does not seed colour
+2026-10-02T07:51:04.9779935Z PASS tristan does not seed blank pet name
+2026-10-02T07:51:04.9861595Z PASS tristan does not seed null needs
+2026-10-02T07:51:04.9943604Z PASS tristan does not seed diary record
+2026-10-02T07:51:05.0025624Z PASS tristan does not seed mail record
+2026-10-02T07:51:05.0111857Z PASS tristan does not seed quest record
+2026-10-02T07:51:05.0212144Z PASS tristan does not seed negative coins
+2026-10-02T07:51:05.0292694Z PASS tristan does not seed bank array
+2026-10-02T07:51:05.0374925Z PASS tristan does not seed seen row
+2026-10-02T07:51:05.0456563Z PASS tristan does not seed pet array
+2026-10-02T07:51:05.0537249Z PASS tristan does not seed version
+2026-10-02T07:51:05.0619583Z PASS tristan does not seed answer index
+2026-10-02T07:51:05.0701005Z PASS guest does not seed stats string
+2026-10-02T07:51:05.0807487Z PASS guest does not seed fractional legacy house
+2026-10-02T07:51:05.0888895Z PASS guest does not seed review null
+2026-10-02T07:51:05.0970292Z PASS guest does not seed bag string count
+2026-10-02T07:51:05.1051094Z PASS guest does not seed subject stats
+2026-10-02T07:51:05.1132770Z PASS guest does not seed room array
+2026-10-02T07:51:05.1213107Z PASS guest does not seed species
+2026-10-02T07:51:05.1294123Z PASS guest does not seed colour
+2026-10-02T07:51:05.1396160Z PASS guest does not seed blank pet name
+2026-10-02T07:51:05.1479021Z PASS guest does not seed null needs
+2026-10-02T07:51:05.1561080Z PASS guest does not seed diary record
+2026-10-02T07:51:05.1643568Z PASS guest does not seed mail record
+2026-10-02T07:51:05.1724678Z PASS guest does not seed quest record
+2026-10-02T07:51:05.1805228Z PASS guest does not seed negative coins
+2026-10-02T07:51:05.1886189Z PASS guest does not seed bank array
+2026-10-02T07:51:05.1986259Z PASS guest does not seed seen row
+2026-10-02T07:51:05.2066627Z PASS guest does not seed pet array
+2026-10-02T07:51:05.2147106Z PASS guest does not seed version
+2026-10-02T07:51:05.2229576Z PASS guest does not seed answer index
+2026-10-02T07:51:05.2310474Z PASS jeannie preserves present raw ""
+2026-10-02T07:51:05.2390666Z PASS jeannie preserves present raw "null"
+2026-10-02T07:51:05.2471173Z PASS jeannie preserves present raw "[]"
+2026-10-02T07:51:05.2571100Z PASS jeannie preserves present raw "0"
+2026-10-02T07:51:05.2652238Z PASS jeannie preserves present raw "  "
+2026-10-02T07:51:05.2735007Z PASS jeannie preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.2817727Z PASS jeannie preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.2899809Z PASS jeannie preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.2979330Z PASS cory preserves present raw ""
+2026-10-02T07:51:05.3058924Z PASS cory preserves present raw "null"
+2026-10-02T07:51:05.3161866Z PASS cory preserves present raw "[]"
+2026-10-02T07:51:05.3240693Z PASS cory preserves present raw "0"
+2026-10-02T07:51:05.3320031Z PASS cory preserves present raw "  "
+2026-10-02T07:51:05.3399526Z PASS cory preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.3479289Z PASS cory preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.3558781Z PASS cory preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.3640239Z PASS ellie preserves present raw ""
+2026-10-02T07:51:05.3770014Z PASS ellie preserves present raw "null"
+2026-10-02T07:51:05.3850113Z PASS ellie preserves present raw "[]"
+2026-10-02T07:51:05.3930191Z PASS ellie preserves present raw "0"
+2026-10-02T07:51:05.4010465Z PASS ellie preserves present raw "  "
+2026-10-02T07:51:05.4091602Z PASS ellie preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.4171380Z PASS ellie preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.4250904Z PASS ellie preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.4330913Z PASS kieran preserves present raw ""
+2026-10-02T07:51:05.4411016Z PASS kieran preserves present raw "null"
+2026-10-02T07:51:05.4503931Z PASS kieran preserves present raw "[]"
+2026-10-02T07:51:05.4585103Z PASS kieran preserves present raw "0"
+2026-10-02T07:51:05.4665044Z PASS kieran preserves present raw "  "
+2026-10-02T07:51:05.4745544Z PASS kieran preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.4827050Z PASS kieran preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.4908085Z PASS kieran preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.5008339Z PASS shannon preserves present raw ""
+2026-10-02T07:51:05.5087405Z PASS shannon preserves present raw "null"
+2026-10-02T07:51:05.5167221Z PASS shannon preserves present raw "[]"
+2026-10-02T07:51:05.5248424Z PASS shannon preserves present raw "0"
+2026-10-02T07:51:05.5328239Z PASS shannon preserves present raw "  "
+2026-10-02T07:51:05.5408231Z PASS shannon preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.5488648Z PASS shannon preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.5570720Z PASS shannon preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.5667924Z PASS tristan preserves present raw ""
+2026-10-02T07:51:05.5747317Z PASS tristan preserves present raw "null"
+2026-10-02T07:51:05.5827515Z PASS tristan preserves present raw "[]"
+2026-10-02T07:51:05.5907612Z PASS tristan preserves present raw "0"
+2026-10-02T07:51:05.5990619Z PASS tristan preserves present raw "  "
+2026-10-02T07:51:05.6072443Z PASS tristan preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.6152923Z PASS tristan preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.6251266Z PASS tristan preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.6330595Z PASS guest preserves present raw ""
+2026-10-02T07:51:05.6410233Z PASS guest preserves present raw "null"
+2026-10-02T07:51:05.6489994Z PASS guest preserves present raw "[]"
+2026-10-02T07:51:05.6569683Z PASS guest preserves present raw "0"
+2026-10-02T07:51:05.6649974Z PASS guest preserves present raw "  "
+2026-10-02T07:51:05.6730902Z PASS guest preserves present raw "{ valuable partial bytes"
+2026-10-02T07:51:05.6834005Z PASS guest preserves present raw "{\"v\":2,\"pet\":{\"name\":\"Future\",\"species\":\"blorb\",\"colour\":\"meadow\"}}"
+2026-10-02T07:51:05.6913044Z PASS guest preserves present raw "{\"v\":1,\"pet\":{\"name\":\"Damaged\",\"species\":\"blorb\",\"colour\":\"meadow\"},\"stats\":\"broken\"}"
+2026-10-02T07:51:05.6992442Z PASS jeannie respects reset marker "1"
+2026-10-02T07:51:05.7071674Z PASS jeannie respects reset marker ""
+2026-10-02T07:51:05.7151371Z PASS jeannie respects reset marker "0"
+2026-10-02T07:51:05.7228980Z PASS cory respects reset marker "1"
+2026-10-02T07:51:05.7306780Z PASS cory respects reset marker ""
+2026-10-02T07:51:05.7406245Z PASS cory respects reset marker "0"
+2026-10-02T07:51:05.7486859Z PASS ellie respects reset marker "1"
+2026-10-02T07:51:05.7567421Z PASS ellie respects reset marker ""
+2026-10-02T07:51:05.7647750Z PASS ellie respects reset marker "0"
+2026-10-02T07:51:05.7727960Z PASS kieran respects reset marker "1"
+2026-10-02T07:51:05.7809141Z PASS kieran respects reset marker ""
+2026-10-02T07:51:05.7895630Z PASS kieran respects reset marker "0"
+2026-10-02T07:51:05.7994223Z PASS shannon respects reset marker "1"
+2026-10-02T07:51:05.8074040Z PASS shannon respects reset marker ""
+2026-10-02T07:51:05.8155226Z PASS shannon respects reset marker "0"
+2026-10-02T07:51:05.8235086Z PASS tristan respects reset marker "1"
+2026-10-02T07:51:05.8315045Z PASS tristan respects reset marker ""
+2026-10-02T07:51:05.8395177Z PASS tristan respects reset marker "0"
+2026-10-02T07:51:05.8475962Z PASS guest respects reset marker "1"
+2026-10-02T07:51:05.8573692Z PASS guest respects reset marker ""
+2026-10-02T07:51:05.8654527Z PASS guest respects reset marker "0"
+2026-10-02T07:51:05.8742543Z PASS jeannie isolates set failure at craepets.house.v1.jeannie
+2026-10-02T07:51:05.8821940Z PASS jeannie isolates get failure at craepets.house.v1.jeannie
+2026-10-02T07:51:05.8900844Z PASS jeannie isolates get failure at craepets.v1.jeannie
+2026-10-02T07:51:05.8979883Z PASS jeannie isolates get failure at craepets.house.reset.jeannie
+2026-10-02T07:51:05.9059234Z PASS cory isolates set failure at craepets.house.v1.cory
+2026-10-02T07:51:05.9155937Z PASS cory isolates get failure at craepets.house.v1.cory
+2026-10-02T07:51:05.9233562Z PASS cory isolates get failure at craepets.v1.cory
+2026-10-02T07:51:05.9311136Z PASS cory isolates get failure at craepets.house.reset.cory
+2026-10-02T07:51:05.9393169Z PASS ellie isolates set failure at craepets.house.v1.ellie
+2026-10-02T07:51:05.9473938Z PASS ellie isolates get failure at craepets.house.v1.ellie
+2026-10-02T07:51:05.9585704Z PASS ellie isolates get failure at craepets.v1.ellie
+2026-10-02T07:51:05.9664467Z PASS ellie isolates get failure at craepets.house.reset.ellie
+2026-10-02T07:51:05.9747306Z PASS kieran isolates set failure at craepets.house.v1.kieran
+2026-10-02T07:51:05.9826465Z PASS kieran isolates get failure at craepets.house.v1.kieran
+2026-10-02T07:51:05.9909867Z PASS kieran isolates get failure at craepets.v1.kieran
+2026-10-02T07:51:05.9989792Z PASS kieran isolates get failure at craepets.house.reset.kieran
+2026-10-02T07:51:06.0071879Z PASS shannon isolates set failure at craepets.house.v1.shannon
+2026-10-02T07:51:06.0151544Z PASS shannon isolates get failure at craepets.house.v1.shannon
+2026-10-02T07:51:06.0247738Z PASS shannon isolates get failure at craepets.v1.shannon
+2026-10-02T07:51:06.0327507Z PASS shannon isolates get failure at craepets.house.reset.shannon
+2026-10-02T07:51:06.0409862Z PASS tristan isolates set failure at craepets.house.v1.tristan
+2026-10-02T07:51:06.0489466Z PASS tristan isolates get failure at craepets.house.v1.tristan
+2026-10-02T07:51:06.0568586Z PASS tristan isolates get failure at craepets.v1.tristan
+2026-10-02T07:51:06.0648091Z PASS tristan isolates get failure at craepets.house.reset.tristan
+2026-10-02T07:51:06.0728536Z PASS guest isolates set failure at craepets.house.v1.guest
+2026-10-02T07:51:06.0825843Z PASS guest isolates get failure at craepets.house.v1.guest
+2026-10-02T07:51:06.0905511Z PASS guest isolates get failure at craepets.v1.guest
+2026-10-02T07:51:06.0985550Z PASS guest isolates get failure at craepets.house.reset.guest
+2026-10-02T07:51:06.1078565Z PASS waits for preparation; then seeds all seven without losing earned progress
+2026-10-02T07:51:06.1161325Z PASS jeannie normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1242695Z PASS cory normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1324398Z PASS ellie normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1424071Z PASS kieran normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1506110Z PASS shannon normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1587771Z PASS tristan normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1668439Z PASS guest normalizes legacy original only in new house slot
+2026-10-02T07:51:06.1751379Z PASS jeannie rechecks newer slot after preparation
+2026-10-02T07:51:06.1834092Z PASS jeannie rechecks newer reset after preparation
+2026-10-02T07:51:06.1913486Z PASS cory rechecks newer slot after preparation
+2026-10-02T07:51:06.2010969Z PASS cory rechecks newer reset after preparation
+2026-10-02T07:51:06.2093336Z PASS ellie rechecks newer slot after preparation
+2026-10-02T07:51:06.2175531Z PASS ellie rechecks newer reset after preparation
+2026-10-02T07:51:06.2256375Z PASS kieran rechecks newer slot after preparation
+2026-10-02T07:51:06.2337893Z PASS kieran rechecks newer reset after preparation
+2026-10-02T07:51:06.2419403Z PASS shannon rechecks newer slot after preparation
+2026-10-02T07:51:06.2501983Z PASS shannon rechecks newer reset after preparation
+2026-10-02T07:51:06.2601894Z PASS tristan rechecks newer slot after preparation
+2026-10-02T07:51:06.2685254Z PASS tristan rechecks newer reset after preparation
+2026-10-02T07:51:06.2766518Z PASS guest rechecks newer slot after preparation
+2026-10-02T07:51:06.2848045Z PASS guest rechecks newer reset after preparation
+2026-10-02T07:51:06.2907500Z PASS shared game mode never seeds even on explicit request
+2026-10-02T07:51:06.2970416Z PASS export-only page does not seed or change selection/preferences
+2026-10-02T07:51:06.3048370Z PASS existing selection and voice are preserved
+2026-10-02T07:51:06.3150686Z PASS unknown original selection cannot redirect outside real profiles
+2026-10-02T07:51:06.3234126Z PASS metadata write failure preserves valid new copies: craepets.house.who
+2026-10-02T07:51:06.3316513Z PASS metadata write failure preserves valid new copies: craepets.house.voice
+2026-10-02T07:51:06.3414343Z PASS unacknowledged copy is not reported successful
+2026-10-02T07:51:06.3472168Z PASS completed pending recovery suppresses automatic recopy
+2026-10-02T07:51:06.3474537Z PASS house auto-seeding: 268 production checks across seven profiles; deep source admission, every present raw target, reset/game/recovery controls, delayed registration and storage failures.
+2026-10-02T07:51:06.3640092Z PASS: craepets-auto-seeding.cjs (2.3s)
+2026-10-02T07:51:06.3640368Z 
+2026-10-02T07:51:06.3640562Z --- craepets-auto-seeding-browser.cjs ---
+2026-10-02T07:51:09.8859567Z PASS auto-seeding Chromium Desktop: actual startup, damaged sibling/malformed source/reset/quota isolation, all seven original profiles, legacy defaults, real learning/reload, shared mode and downloaded export.
+2026-10-02T07:51:12.4147418Z PASS auto-seeding Chromium iPad: actual startup, damaged sibling/malformed source/reset/quota isolation, all seven original profiles, legacy defaults, real learning/reload, shared mode and downloaded export.
+2026-10-02T07:51:14.8982217Z PASS auto-seeding Chromium iPhone: actual startup, damaged sibling/malformed source/reset/quota isolation, all seven original profiles, legacy defaults, real learning/reload, shared mode and downloaded export.
+2026-10-02T07:51:14.9991057Z PASS: craepets-auto-seeding-browser.cjs (8.6s)
+2026-10-02T07:51:14.9991540Z 
+2026-10-02T07:51:14.9991816Z --- craepets-family-restore.cjs ---
+2026-10-02T07:51:15.0438636Z PASS jeannie rejects stats string
+2026-10-02T07:51:15.0522648Z PASS jeannie rejects fractional house
+2026-10-02T07:51:15.0603358Z PASS jeannie rejects review null
+2026-10-02T07:51:15.0681472Z PASS jeannie rejects bag count string
+2026-10-02T07:51:15.0751076Z PASS jeannie rejects subject stats string
+2026-10-02T07:51:15.0827593Z PASS jeannie rejects room array
+2026-10-02T07:51:15.0902539Z PASS jeannie rejects pet unknown species
+2026-10-02T07:51:15.0975903Z PASS jeannie rejects pet unknown colour
+2026-10-02T07:51:15.1053224Z PASS jeannie rejects blank name
+2026-10-02T07:51:15.1124226Z PASS jeannie rejects invalid needs
+2026-10-02T07:51:15.1200367Z PASS jeannie rejects bad diary
+2026-10-02T07:51:15.1269730Z PASS jeannie rejects mail markup shape
+2026-10-02T07:51:15.1379147Z PASS jeannie rejects invalid quest
+2026-10-02T07:51:15.1423463Z PASS jeannie rejects bad coins
+2026-10-02T07:51:15.1492078Z PASS jeannie rejects bad bank
+2026-10-02T07:51:15.1567384Z PASS jeannie rejects seen string
+2026-10-02T07:51:15.1639766Z PASS jeannie rejects pet array
+2026-10-02T07:51:15.1721141Z PASS jeannie rejects bad version
+2026-10-02T07:51:15.1790590Z PASS jeannie rejects review answer
+2026-10-02T07:51:15.1870660Z PASS cory rejects stats string
+2026-10-02T07:51:15.1947269Z PASS cory rejects fractional house
+2026-10-02T07:51:15.2038735Z PASS cory rejects review null
+2026-10-02T07:51:15.2109185Z PASS cory rejects bag count string
+2026-10-02T07:51:15.2206607Z PASS cory rejects subject stats string
+2026-10-02T07:51:15.2274943Z PASS cory rejects room array
+2026-10-02T07:51:15.2342621Z PASS cory rejects pet unknown species
+2026-10-02T07:51:15.2409924Z PASS cory rejects pet unknown colour
+2026-10-02T07:51:15.2476520Z PASS cory rejects blank name
+2026-10-02T07:51:15.2556148Z PASS cory rejects invalid needs
+2026-10-02T07:51:15.2624903Z PASS cory rejects bad diary
+2026-10-02T07:51:15.2694389Z PASS cory rejects mail markup shape
+2026-10-02T07:51:15.2763452Z PASS cory rejects invalid quest
+2026-10-02T07:51:15.2853563Z PASS cory rejects bad coins
+2026-10-02T07:51:15.2922052Z PASS cory rejects bad bank
+2026-10-02T07:51:15.2991551Z PASS cory rejects seen string
+2026-10-02T07:51:15.3061096Z PASS cory rejects pet array
+2026-10-02T07:51:15.3125953Z PASS cory rejects bad version
+2026-10-02T07:51:15.3201333Z PASS cory rejects review answer
+2026-10-02T07:51:15.3278161Z PASS ellie rejects stats string
+2026-10-02T07:51:15.3355363Z PASS ellie rejects fractional house
+2026-10-02T07:51:15.3433006Z PASS ellie rejects review null
+2026-10-02T07:51:15.3510918Z PASS ellie rejects bag count string
+2026-10-02T07:51:15.3600065Z PASS ellie rejects subject stats string
+2026-10-02T07:51:15.3670913Z PASS ellie rejects room array
+2026-10-02T07:51:15.3740397Z PASS ellie rejects pet unknown species
+2026-10-02T07:51:15.3812150Z PASS ellie rejects pet unknown colour
+2026-10-02T07:51:15.3884535Z PASS ellie rejects blank name
+2026-10-02T07:51:15.3965419Z PASS ellie rejects invalid needs
+2026-10-02T07:51:15.4045202Z PASS ellie rejects bad diary
+2026-10-02T07:51:15.4124708Z PASS ellie rejects mail markup shape
+2026-10-02T07:51:15.4227988Z PASS ellie rejects invalid quest
+2026-10-02T07:51:15.4299489Z PASS ellie rejects bad coins
+2026-10-02T07:51:15.4369965Z PASS ellie rejects bad bank
+2026-10-02T07:51:15.4441443Z PASS ellie rejects seen string
+2026-10-02T07:51:15.4507108Z PASS ellie rejects pet array
+2026-10-02T07:51:15.4573407Z PASS ellie rejects bad version
+2026-10-02T07:51:15.4646389Z PASS ellie rejects review answer
+2026-10-02T07:51:15.4721721Z PASS kieran rejects stats string
+2026-10-02T07:51:15.4796266Z PASS kieran rejects fractional house
+2026-10-02T07:51:15.4895572Z PASS kieran rejects review null
+2026-10-02T07:51:15.4969885Z PASS kieran rejects bag count string
+2026-10-02T07:51:15.5043417Z PASS kieran rejects subject stats string
+2026-10-02T07:51:15.5117383Z PASS kieran rejects room array
+2026-10-02T07:51:15.5190220Z PASS kieran rejects pet unknown species
+2026-10-02T07:51:15.5263714Z PASS kieran rejects pet unknown colour
+2026-10-02T07:51:15.5335989Z PASS kieran rejects blank name
+2026-10-02T07:51:15.5410650Z PASS kieran rejects invalid needs
+2026-10-02T07:51:15.5510400Z PASS kieran rejects bad diary
+2026-10-02T07:51:15.5584748Z PASS kieran rejects mail markup shape
+2026-10-02T07:51:15.5658028Z PASS kieran rejects invalid quest
+2026-10-02T07:51:15.5730633Z PASS kieran rejects bad coins
+2026-10-02T07:51:15.5803707Z PASS kieran rejects bad bank
+2026-10-02T07:51:15.5877732Z PASS kieran rejects seen string
+2026-10-02T07:51:15.5943272Z PASS kieran rejects pet array
+2026-10-02T07:51:15.6008827Z PASS kieran rejects bad version
+2026-10-02T07:51:15.6085851Z PASS kieran rejects review answer
+2026-10-02T07:51:15.6187387Z PASS shannon rejects stats string
+2026-10-02T07:51:15.6262483Z PASS shannon rejects fractional house
+2026-10-02T07:51:15.6338022Z PASS shannon rejects review null
+2026-10-02T07:51:15.6413548Z PASS shannon rejects bag count string
+2026-10-02T07:51:15.6489625Z PASS shannon rejects subject stats string
+2026-10-02T07:51:15.6565365Z PASS shannon rejects room array
+2026-10-02T07:51:15.6640704Z PASS shannon rejects pet unknown species
+2026-10-02T07:51:15.6715356Z PASS shannon rejects pet unknown colour
+2026-10-02T07:51:15.6842551Z PASS shannon rejects blank name
+2026-10-02T07:51:15.6916234Z PASS shannon rejects invalid needs
+2026-10-02T07:51:15.6990680Z PASS shannon rejects bad diary
+2026-10-02T07:51:15.7064155Z PASS shannon rejects mail markup shape
+2026-10-02T07:51:15.7139814Z PASS shannon rejects invalid quest
+2026-10-02T07:51:15.7213519Z PASS shannon rejects bad coins
+2026-10-02T07:51:15.7287581Z PASS shannon rejects bad bank
+2026-10-02T07:51:15.7362152Z PASS shannon rejects seen string
+2026-10-02T07:51:15.7426853Z PASS shannon rejects pet array
+2026-10-02T07:51:15.7491270Z PASS shannon rejects bad version
+2026-10-02T07:51:15.7585038Z PASS shannon rejects review answer
+2026-10-02T07:51:15.7660327Z PASS tristan rejects stats string
+2026-10-02T07:51:15.7736008Z PASS tristan rejects fractional house
+2026-10-02T07:51:15.7811952Z PASS tristan rejects review null
+2026-10-02T07:51:15.7887284Z PASS tristan rejects bag count string
+2026-10-02T07:51:15.7964280Z PASS tristan rejects subject stats string
+2026-10-02T07:51:15.8040038Z PASS tristan rejects room array
+2026-10-02T07:51:15.8114308Z PASS tristan rejects pet unknown species
+2026-10-02T07:51:15.8209530Z PASS tristan rejects pet unknown colour
+2026-10-02T07:51:15.8283974Z PASS tristan rejects blank name
+2026-10-02T07:51:15.8359067Z PASS tristan rejects invalid needs
+2026-10-02T07:51:15.8434618Z PASS tristan rejects bad diary
+2026-10-02T07:51:15.8509682Z PASS tristan rejects mail markup shape
+2026-10-02T07:51:15.8584928Z PASS tristan rejects invalid quest
+2026-10-02T07:51:15.8659583Z PASS tristan rejects bad coins
+2026-10-02T07:51:15.8734244Z PASS tristan rejects bad bank
+2026-10-02T07:51:15.8829898Z PASS tristan rejects seen string
+2026-10-02T07:51:15.8893538Z PASS tristan rejects pet array
+2026-10-02T07:51:15.8957404Z PASS tristan rejects bad version
+2026-10-02T07:51:15.9032948Z PASS tristan rejects review answer
+2026-10-02T07:51:15.9109311Z PASS guest rejects stats string
+2026-10-02T07:51:15.9191963Z PASS guest rejects fractional house
+2026-10-02T07:51:15.9268747Z PASS guest rejects review null
+2026-10-02T07:51:15.9345617Z PASS guest rejects bag count string
+2026-10-02T07:51:15.9442083Z PASS guest rejects subject stats string
+2026-10-02T07:51:15.9518837Z PASS guest rejects room array
+2026-10-02T07:51:15.9594585Z PASS guest rejects pet unknown species
+2026-10-02T07:51:15.9670278Z PASS guest rejects pet unknown colour
+2026-10-02T07:51:15.9745979Z PASS guest rejects blank name
+2026-10-02T07:51:15.9823445Z PASS guest rejects invalid needs
+2026-10-02T07:51:15.9900723Z PASS guest rejects bad diary
+2026-10-02T07:51:15.9977952Z PASS guest rejects mail markup shape
+2026-10-02T07:51:16.0075970Z PASS guest rejects invalid quest
+2026-10-02T07:51:16.0153512Z PASS guest rejects bad coins
+2026-10-02T07:51:16.0230599Z PASS guest rejects bad bank
+2026-10-02T07:51:16.0308256Z PASS guest rejects seen string
+2026-10-02T07:51:16.0372050Z PASS guest rejects pet array
+2026-10-02T07:51:16.0436151Z PASS guest rejects bad version
+2026-10-02T07:51:16.0514458Z PASS guest rejects review answer
+2026-10-02T07:51:16.0576961Z PASS invalid JSON
+2026-10-02T07:51:16.0659347Z PASS empty family
+2026-10-02T07:51:16.0720855Z PASS unknown ID
+2026-10-02T07:51:16.0782237Z PASS array profiles
+2026-10-02T07:51:16.0843103Z PASS unsupported family version
+2026-10-02T07:51:16.0955296Z PASS prepare is detached; all seven profiles retain tier, progress and namespaces
+2026-10-02T07:51:16.1019368Z PASS jeannie legacy single-pet normalization
+2026-10-02T07:51:16.1083003Z PASS cory legacy single-pet normalization
+2026-10-02T07:51:16.1145776Z PASS ellie legacy single-pet normalization
+2026-10-02T07:51:16.1209764Z PASS kieran legacy single-pet normalization
+2026-10-02T07:51:16.1294279Z PASS shannon legacy single-pet normalization
+2026-10-02T07:51:16.1357077Z PASS tristan legacy single-pet normalization
+2026-10-02T07:51:16.1419479Z PASS guest legacy single-pet normalization
+2026-10-02T07:51:16.1503163Z PASS jeannie failed target write restores all original bytes
+2026-10-02T07:51:16.1582677Z PASS cory failed target write restores all original bytes
+2026-10-02T07:51:16.1662024Z PASS ellie failed target write restores all original bytes
+2026-10-02T07:51:16.1741324Z PASS kieran failed target write restores all original bytes
+2026-10-02T07:51:16.1821496Z PASS shannon failed target write restores all original bytes
+2026-10-02T07:51:16.1928896Z PASS tristan failed target write restores all original bytes
+2026-10-02T07:51:16.2012053Z PASS guest failed target write restores all original bytes
+2026-10-02T07:51:16.2094995Z PASS failure at craepets.house.import-recovery.v1
+2026-10-02T07:51:16.2176073Z PASS failure at craepets.house.reset.cory
+2026-10-02T07:51:16.2258179Z PASS failure at craepets.house.who
+2026-10-02T07:51:16.2345143Z PASS size quota rollback frees changed pets before restoring larger old bytes
+2026-10-02T07:51:16.2518720Z PASS persistent rollback failure preserves journal, blocks writes and recovers on next boot
+2026-10-02T07:51:16.3075374Z PASS full/malformed/foreign-key journals safely refuse imports
+2026-10-02T07:51:16.3139192Z PASS pending recovery failure blocks boot auto-copy
+2026-10-02T07:51:16.3239873Z PASS pending journal acknowledgment failure refuses import without stale writes
+2026-10-02T07:51:16.3384181Z PASS completed journal acknowledgment failure reports uncertainty and pauses stale engine
+2026-10-02T07:51:16.3442095Z PASS pending boot preserves exact damaged previous bytes instead of automatic recopy
+2026-10-02T07:51:16.3443859Z PASS family restore: 163 production checks; seven profile namespaces, malformed state, exact-byte recovery, real size quota and interrupted recovery.
+2026-10-02T07:51:16.3568604Z PASS: craepets-family-restore.cjs (1.4s)
+2026-10-02T07:51:16.3569254Z 
+2026-10-02T07:51:16.3569990Z --- craepets-family-restore-browser.cjs ---
+2026-10-02T07:51:19.7589376Z PASS family restore Chromium Desktop: real file preview/apply, seven profiles, literal text, quota retry, interrupted recovery/reload, original export and isolation.
+2026-10-02T07:51:22.2214943Z PASS family restore Chromium iPad: real file preview/apply, seven profiles, literal text, quota retry, interrupted recovery/reload, original export and isolation.
+2026-10-02T07:51:24.6457108Z PASS family restore Chromium iPhone: real file preview/apply, seven profiles, literal text, quota retry, interrupted recovery/reload, original export and isolation.
+2026-10-02T07:51:24.7494144Z PASS: craepets-family-restore-browser.cjs (8.4s)
+2026-10-02T07:51:24.7494594Z 
+2026-10-02T07:51:24.7494767Z --- post-office-storage.cjs ---
+2026-10-02T07:51:24.7751959Z PASS normal saves and key ordering do not create recovery copies
+2026-10-02T07:51:24.7765008Z PASS all six drafts and valid family mail survive mixed damage without read-time writes
+2026-10-02T07:51:24.7768159Z PASS invalid letter 0 cannot hide a valid sibling
+2026-10-02T07:51:24.7769474Z PASS invalid letter 1 cannot hide a valid sibling
+2026-10-02T07:51:24.7770921Z PASS invalid letter 2 cannot hide a valid sibling
+2026-10-02T07:51:24.7773046Z PASS invalid letter 3 cannot hide a valid sibling
+2026-10-02T07:51:24.7775211Z PASS invalid letter 4 cannot hide a valid sibling
+2026-10-02T07:51:24.7777021Z PASS invalid letter 5 cannot hide a valid sibling
+2026-10-02T07:51:24.7779236Z PASS invalid letter 6 cannot hide a valid sibling
+2026-10-02T07:51:24.7782788Z PASS invalid letter 7 cannot hide a valid sibling
+2026-10-02T07:51:24.7785174Z PASS invalid letter 8 cannot hide a valid sibling
+2026-10-02T07:51:24.7786611Z PASS invalid letter 9 cannot hide a valid sibling
+2026-10-02T07:51:24.7787814Z PASS invalid letter 10 cannot hide a valid sibling
+2026-10-02T07:51:24.7788852Z PASS invalid letter 11 cannot hide a valid sibling
+2026-10-02T07:51:24.7796244Z PASS invalid letter 12 cannot hide a valid sibling
+2026-10-02T07:51:24.7797271Z PASS invalid letter 13 cannot hide a valid sibling
+2026-10-02T07:51:24.7798201Z PASS invalid letter 14 cannot hide a valid sibling
+2026-10-02T07:51:24.7799115Z PASS invalid letter 15 cannot hide a valid sibling
+2026-10-02T07:51:24.7799908Z PASS invalid letter 16 cannot hide a valid sibling
+2026-10-02T07:51:24.7800902Z PASS invalid letter 17 cannot hide a valid sibling
+2026-10-02T07:51:24.7801849Z PASS invalid letter 18 cannot hide a valid sibling
+2026-10-02T07:51:24.7802765Z PASS invalid letter 19 cannot hide a valid sibling
+2026-10-02T07:51:24.7803739Z PASS invalid letter 20 cannot hide a valid sibling
+2026-10-02T07:51:24.7804540Z PASS invalid letter 21 cannot hide a valid sibling
+2026-10-02T07:51:24.7805544Z PASS invalid letter 22 cannot hide a valid sibling
+2026-10-02T07:51:24.7806860Z PASS invalid letter 23 cannot hide a valid sibling
+2026-10-02T07:51:24.7807672Z PASS invalid letter 24 cannot hide a valid sibling
+2026-10-02T07:51:24.7808697Z PASS invalid letter 25 cannot hide a valid sibling
+2026-10-02T07:51:24.7809556Z PASS invalid letter 26 cannot hide a valid sibling
+2026-10-02T07:51:24.7810482Z PASS invalid letter 27 cannot hide a valid sibling
+2026-10-02T07:51:24.7811295Z PASS invalid letter 28 cannot hide a valid sibling
+2026-10-02T07:51:24.7812239Z PASS invalid letter 29 cannot hide a valid sibling
+2026-10-02T07:51:24.7813344Z PASS invalid letter 30 cannot hide a valid sibling
+2026-10-02T07:51:24.7820197Z PASS invalid letter 31 cannot hide a valid sibling
+2026-10-02T07:51:24.7820942Z PASS invalid letter 32 cannot hide a valid sibling
+2026-10-02T07:51:24.7821619Z PASS invalid letter 33 cannot hide a valid sibling
+2026-10-02T07:51:24.7822286Z PASS invalid letter 34 cannot hide a valid sibling
+2026-10-02T07:51:24.7822963Z PASS invalid letter 35 cannot hide a valid sibling
+2026-10-02T07:51:24.7824807Z PASS malformed draft repair preserves jeannie text and isolates recipients
+2026-10-02T07:51:24.7834911Z PASS malformed draft repair preserves cory text and isolates recipients
+2026-10-02T07:51:24.7836345Z PASS malformed draft repair preserves ellie text and isolates recipients
+2026-10-02T07:51:24.7837440Z PASS malformed draft repair preserves kieran text and isolates recipients
+2026-10-02T07:51:24.7838562Z PASS malformed draft repair preserves shannon text and isolates recipients
+2026-10-02T07:51:24.7839631Z PASS malformed draft repair preserves tristan text and isolates recipients
+2026-10-02T07:51:24.7840594Z PASS bad draft body cannot reach trim and valid siblings survive
+2026-10-02T07:51:24.7841391Z PASS old Dad draft migration uses only own known IDs
+2026-10-02T07:51:24.7842270Z PASS unusable snapshot stays intact until protected repair: {broken
+2026-10-02T07:51:24.7843193Z PASS unusable snapshot stays intact until protected repair: null
+2026-10-02T07:51:24.7844068Z PASS unusable snapshot stays intact until protected repair: []
+2026-10-02T07:51:24.7844933Z PASS unusable snapshot stays intact until protected repair: 45
+2026-10-02T07:51:24.7845844Z PASS unusable snapshot stays intact until protected repair: "broken"
+2026-10-02T07:51:24.7846951Z PASS backup quota failure refuses original overwrite and warns
+2026-10-02T07:51:24.7847839Z PASS mailbag quota failure retains the already captured damaged bytes
+2026-10-02T07:51:24.7848726Z PASS distinct recovery copies are append-only, deduplicated and bounded
+2026-10-02T07:51:24.7853348Z PASS damaged recovery storage is never overwritten
+2026-10-02T07:51:24.7854651Z PASS duplicate IDs cannot bind readers to multiple letters
+2026-10-02T07:51:24.7855344Z Post Office storage regressions: 56 checks passed.
+2026-10-02T07:51:24.7885387Z PASS: post-office-storage.cjs (0.0s)
+2026-10-02T07:51:24.7885871Z 
+2026-10-02T07:51:24.7886535Z --- post-office-storage-browser.cjs ---
+2026-10-02T07:51:59.4988080Z PASS Post Office Desktop: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T07:52:31.7487701Z PASS Post Office iPad: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T07:53:10.0446253Z PASS Post Office iPhone: damaged save recovery, six drafts, real storage events, rebound read/delete, removed/switch reader cancellation, sender preview, quota retry, reload, namespaces and literal text
+2026-10-02T07:53:10.1317038Z PASS: post-office-storage-browser.cjs (105.3s)
+2026-10-02T07:53:10.1317486Z 
+2026-10-02T07:53:10.1317704Z --- craepets-import.cjs ---
+2026-10-02T07:53:10.5780603Z PASS games/craepets/craepets.js [craepets.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T07:53:10.9483124Z PASS house-test/engine.js [craepets.house.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T07:53:11.3117788Z PASS house-test/engine.js [craepets.] import transactions: 53 invalid backups, storage failure, full and legacy transfers, reload, house progress and shared-profile interoperability
+2026-10-02T07:53:11.3279022Z PASS: craepets-import.cjs (1.2s)
+2026-10-02T07:53:11.3279345Z 
+2026-10-02T07:53:11.3279942Z --- craepets-import-browser.cjs ---
+2026-10-02T07:53:16.1510520Z PASS game import browser checks at desktop/phone
+2026-10-02T07:53:19.7727732Z PASS house import browser checks at desktop/phone
+2026-10-02T07:53:24.8992768Z PASS shared import browser checks at desktop/phone
+2026-10-02T07:53:24.8995767Z PASS Craepets browser imports: rejected files and quota failure preserve active lessons; current and legacy transfers reload and play on desktop/phone in game, standalone-house and shared-house modes
+2026-10-02T07:53:25.0066413Z PASS: craepets-import-browser.cjs (13.7s)
+2026-10-02T07:53:25.0066858Z 
+2026-10-02T07:53:25.0068561Z --- shared-media-lifecycle.cjs ---
+2026-10-02T07:53:25.1125801Z PASS shared media: canceled narration, audio failure recovery, bounded effects, live preferences, and background cleanup
+2026-10-02T07:53:25.1180315Z PASS: shared-media-lifecycle.cjs (0.1s)
+2026-10-02T07:53:25.1180689Z 
+2026-10-02T07:53:25.1180977Z --- photo-daily-assignment.cjs ---
+2026-10-02T07:53:25.1617602Z PASS: Photo daily assignments (300 date/explorer/unlock cases; 101 compatible low-bit hashes, 149 high-bit hashes), real map rendering and one daily reward
+2026-10-02T07:53:25.1651369Z PASS: photo-daily-assignment.cjs (0.0s)
+2026-10-02T07:53:25.1651825Z 
+2026-10-02T07:53:25.1652131Z --- arcade-usability.cjs ---
+2026-10-02T07:53:26.4335652Z PASS: corrupt saved preferences, canonical resume metadata and keyboard navigation
+2026-10-02T07:53:27.1575387Z PASS: search, kid filters, result status, empty state, reset and reduced motion at 1280px
+2026-10-02T07:53:27.8209077Z PASS: search, kid filters, result status, empty state, reset and reduced motion at 320px
+2026-10-02T07:53:28.3004299Z PASS: arcade remains playable without localStorage; Surprise me respects search
+2026-10-02T07:53:28.3779042Z PASS: arcade-usability.cjs (3.2s)
+2026-10-02T07:53:28.3779656Z 
+2026-10-02T07:53:28.3780125Z --- math-reliability.test.js ---
+2026-10-02T07:53:34.5675543Z Math/logic reliability checks passed (5 games, numeric answers, blocked storage, damaged saves, immediate reload and phone layouts).
+2026-10-02T07:53:34.9543490Z PASS: math-reliability.test.js (6.6s)
+2026-10-02T07:53:34.9543760Z 
+2026-10-02T07:53:34.9543896Z --- service-worker.cjs ---
+2026-10-02T07:53:37.4325767Z PASS: scoped cache cleanup, safe bounded warming, module refresh, nested/dynamic imports offline, partial responses, correct fallback URL
+2026-10-02T07:53:37.5220566Z PASS: service-worker.cjs (2.6s)
+2026-10-02T07:53:37.5220846Z 
+2026-10-02T07:53:37.5221021Z --- young-games-regressions.js ---
+2026-10-02T07:53:49.0648162Z PASS young games: Desktop
+2026-10-02T07:53:59.8452906Z PASS young games: Phone
+2026-10-02T07:54:00.8001318Z PASS young games: corrupt and blocked saves
+2026-10-02T07:54:00.8941058Z PASS: young-games-regressions.js (23.4s)
+2026-10-02T07:54:00.8941504Z 
+2026-10-02T07:54:00.8941787Z --- word-puzzles-lifecycle.cjs ---
+2026-10-02T07:54:03.0728624Z PASS word puzzles: Desktop, duplicate submit, disabled cards, solve/hint cancellation, stopped/restored clocks, Clear and crossing direction
+2026-10-02T07:54:04.5727636Z PASS word puzzles: Phone, duplicate submit, disabled cards, solve/hint cancellation, stopped/restored clocks, Clear and crossing direction
+2026-10-02T07:54:04.6658798Z PASS: word-puzzles-lifecycle.cjs (3.8s)
+2026-10-02T07:54:04.6659175Z 
+2026-10-02T07:54:04.6659352Z --- three-model-visuals.cjs ---
+2026-10-02T07:54:47.9433839Z PASS models: 35 wildlife, 18 pets/companions, 221 furnishings, 12 biome/quality variants; geometry, shaders, animation and disposal
+2026-10-02T07:54:47.9568186Z PASS real WebGL: 35 wildlife models, 18 pets and companions, 221 furnishings, 12 biome/quality variants; finite geometry and rigs, shaders, animation, quality and disposal.
+2026-10-02T07:54:47.9611153Z {"maxAnimalDraws":33,"maxAnimalTriangles":15564,"maxPetDraws":2,"maxFurnitureDraws":4,"maxFurnitureTriangles":2480,"maxWorldDraws":614,"maxWorldTriangles":1034478,"evidence":"/tmp/kid-games-visuals/validation"}
+2026-10-02T07:54:48.0266416Z PASS: three-model-visuals.cjs (43.4s)
+2026-10-02T07:54:48.0267760Z 
+2026-10-02T07:54:48.0268154Z Regressions: 22/22 passed.
+2026-10-02T07:54:48.0523005Z Post job cleanup.
+2026-10-02T07:54:48.1770826Z (node:6101) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-02T07:54:48.1771955Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-02T07:54:48.2008801Z Post job cleanup.
+2026-10-02T07:54:48.2890023Z [command]/usr/bin/git version
+2026-10-02T07:54:48.2936374Z git version 2.55.0
+2026-10-02T07:54:48.2978545Z Temporarily overriding HOME='/home/runner/work/_temp/b23dfa32-7ba0-4a96-8c84-2eb0752c3098' before making global git config changes
+2026-10-02T07:54:48.2980058Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-02T07:54:48.2983401Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/Kid-games/Kid-games
+2026-10-02T07:54:48.3022606Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-02T07:54:48.3058599Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-02T07:54:48.3313035Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-02T07:54:48.3346362Z http.https://github.com/.extraheader
+2026-10-02T07:54:48.3359523Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-02T07:54:48.3396365Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-02T07:54:48.3661533Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-02T07:54:48.3700528Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-02T07:54:48.4101793Z Cleaning up orphan processes
+2026-10-02T07:54:48.4398099Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

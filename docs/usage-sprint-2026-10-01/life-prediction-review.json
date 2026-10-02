@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "ai_assisted": true,
+  "repository": "trimcrae/Kid-games",
+  "source_commit": "8d2fc33b0d89fa27fa3aead7e46d5199af0ad28e",
+  "source_tree": "931210a37c9bbb14c9939bfb58699572d105413e",
+  "independent_reviews": [
+    {
+      "reviewer": "apps_round3_review",
+      "scope": "Production scoring/reveal/earned practice policy, unchanged rule/save/load/boot,27-case production-control suite, full-page independent DOM-rule browser method, neutral setup repair",
+      "result": "clear",
+      "actual_ci_gate": {
+        "run": 36980400766,
+        "job": 110753544789,
+        "conclusion": "success",
+        "node_cases": 27,
+        "browser_groups": 3,
+        "full_suites": "22/22",
+        "tree_match": true
+      }
+    },
+    {
+      "reviewer": "root",
+      "scope": "Production policy, source and oracle, unchanged pure rule/badge/save bodies, test-only neutral-page repair",
+      "result": "clear",
+      "actual_ci_gate": {
+        "run": 36980400766,
+        "job": 110753544789,
+        "conclusion": "success",
+        "original_log_sha256": "b74ea2d4d0430e03cc28cf3608db83d305615728b889316f6d3bd715699113c2",
+        "node_cases": 27,
+        "browser_groups": 3,
+        "full_suites": "22/22",
+        "tree_match": true
+      }
+    }
+  ],
+  "supplementary_review": {
+    "reviewer": "rare_specimen_crosswalk",
+    "completed": "Preliminary source-extracted V8 rule core agrees with independent four-fixture coordinate tally; provided DOM oracle boundary advice.",
+    "final_checkpoint": "Unavailable due model capacity; not claimed as a final source/method gate."
+  },
+  "limits": [
+    "V8 baseline/adapters are preliminary, not Node/browser",
+    "Actual Chromium device emulation is not physical iOS Safari",
+    "Existing check scheduling still persists; only extra credit/streak/badge/win/confetti is suppressed"
+  ]
+}

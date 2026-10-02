@@ -67,3 +67,10 @@ This finite original-game task returns ownership after reviewed publication. No 
 Before each follow-on, read the latest main HEAD and repository guidance, inspect ongoing PRs, choose a bounded task, and get meaningful checks plus independent review before publication. The existing focused runner is `cd tests && npm run test:regressions`; targeted import suites are `craepets-import.cjs` and `craepets-import-browser.cjs`. The repo's AGENTS/CLAUDE guidance requires reviewed work to reach main. A temporary PR is useful for real CI when no local runtime exists.
 
 No art, audio, private reference photos or generated-image cleanup was changed in this sprint.
+
+
+## Life Lab prediction credit, complete
+
+Repeated checks can no longer award multiple prediction credits for one puzzle, and edited or reset shown answers remain practice until New puzzle. Wrong-before-credit correction remains usable; Show retains its explicit streak reset. Existing bests/badges and all unrelated profile saves are retained.
+
+Reviewed source 8d2fc33b0d89fa27fa3aead7e46d5199af0ad28e passed [actual CI 36980400766](https://github.com/trimcrae/Kid-games/actions/runs/36980400766): 27 Node production-control cases, three full production-page Chromium Desktop/iPad/iPhone groups, and 22/22 suites. [PR8](https://github.com/trimcrae/Kid-games/pull/8) merged normally as 1141420a00e3e83e19eefa237a9dee09097bda31; [code Pages 36981846450](https://github.com/trimcrae/Kid-games/actions/runs/36981846450) succeeded on that merge. See [handoff and exact original receipts](usage-sprint-2026-10-01-life-prediction.md). Initial cancelled CI and its real test-fixture failure are preserved separately. Chromium emulation does not establish physical iOS Safari. No further demonstrated defect or task is queued; ownership returns to the coordinator after final docs Pages.

@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "ai_assisted": true,
+  "repository": "trimcrae/Kid-games",
+  "baseline_commit": "124c9cf34b2e40c40e255861e5916a4c0cbed856",
+  "file": "games/game-of-life/game.js",
+  "git_blob": "24a57c6dc3801f572ea5f77b2e0c0b3c3dfdb487",
+  "source_utf8_bytes": 60949,
+  "source_sha256": "69885734037c56f5fc52a21a48c62c13e9d86d56bc970d44626adcfa133a6298",
+  "production_check_function_utf8_bytes": 1363,
+  "production_check_function_sha256": "3708724eaa846b3fe03189c27c647776b99fefa86d693785ad7dadf9914bb4e9",
+  "verification": "Preliminary exact-source V8 adapter execution; not actual Node/browser and not real child data.",
+  "local_witness": {
+    "synthetic_answer_and_guess": [
+      1,
+      0,
+      1,
+      0
+    ],
+    "observed": [
+      {
+        "checks": 1,
+        "streak": 1,
+        "best": 1,
+        "awards": [],
+        "wins": 1,
+        "parties": 1,
+        "saves": 1
+      },
+      {
+        "checks": 2,
+        "streak": 2,
+        "best": 2,
+        "awards": [],
+        "wins": 2,
+        "parties": 2,
+        "saves": 2
+      },
+      {
+        "checks": 3,
+        "streak": 3,
+        "best": 3,
+        "awards": [
+          "seer"
+        ],
+        "wins": 3,
+        "parties": 3,
+        "saves": 3
+      }
+    ],
+    "scope": "Actual checkPuzzle body with isolated state and UI/reward/save adapters; award stub only records key, so its own additional badge reward effects are not counted."
+  },
+  "independent_witnesses": [
+    {
+      "reviewer": "apps_round3_review",
+      "execution": "Actual prediction controls and rule core in isolated V8 native-DOM adapters",
+      "board": "6x6 horizontal blinker at indices7,8,9; expected indices2,8,14",
+      "observations": [
+        "Three repeated correct checks earn streak3/best3/seer",
+        "Show→same-cell toggle twice→Check earns1 because edit clears predRevealed",
+        "Wrong before first success then correction earns1"
+      ],
+      "limitation": "Preliminary adapter proof; not Node/browser."
+    },
+    {
+      "reviewer": "rare_specimen_crosswalk",
+      "execution": "Actual @rule-core in isolated V8 compared with independent coordinate-set tally",
+      "fixtures": [
+        "stable block",
+        "edge-reaching blinker",
+        "finite separated corners versus wrapped four corners",
+        "corner L"
+      ],
+      "result": "All four finite expected outputs and the wrapped contrast matched.",
+      "limitation": "Completed preliminary methods review only; final checkpoint review was unavailable due model capacity."
+    }
+  ],
+  "policy": {
+    "credit": "At most one earned credit per New puzzle, including identical boards across different rounds.",
+    "practice": "After earned credit, edited/wrong/reset/rechecked guesses preserve earned streak/best and suppress answer/badge/win/confetti reward.",
+    "reveal": "Sticky until New puzzle. Show retains existing explicit streak reset, even after earned credit; no same-round recredit.",
+    "correction": "Uncredited, unpeeked wrong answer can be corrected for one credit.",
+    "history": "Existing stored bests and badges are retained; no historical badge revocation.",
+    "save": "Existing scheduleSave calls still occur on checks; no claim of zero save writes."
+  }
+}

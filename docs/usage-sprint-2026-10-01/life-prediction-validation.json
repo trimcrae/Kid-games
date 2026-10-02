@@ -1,0 +1,99 @@
+{
+  "version": 1,
+  "ai_assisted": true,
+  "repository": "trimcrae/Kid-games",
+  "baseline_commit": "124c9cf34b2e40c40e255861e5916a4c0cbed856",
+  "reviewed_source_commit": "8d2fc33b0d89fa27fa3aead7e46d5199af0ad28e",
+  "reviewed_source_tree": "931210a37c9bbb14c9939bfb58699572d105413e",
+  "pr_url": "https://github.com/trimcrae/Kid-games/pull/8",
+  "tested_inventory": [
+    {
+      "path": "games/game-of-life/game.js",
+      "git_blob": "d9e2afc5d620a276f2edc30e0b5a43404ea59ad5"
+    },
+    {
+      "path": "games/game-of-life/index.html",
+      "git_blob": "fbb9e5a36abacf0dae184f86080e538585425cf9"
+    },
+    {
+      "path": "tests/life-prediction-credit.cjs",
+      "git_blob": "071675df634cdd6d562068b7fbefb4991b0d4c9b"
+    },
+    {
+      "path": "tests/life-prediction-credit-browser.cjs",
+      "git_blob": "b73fb08e816345ba0bba8d089bc2f92341697ef1"
+    },
+    {
+      "path": "tests/regressions.cjs",
+      "git_blob": "9960c1b6eea93b563c592c83c16cae8f7129f555"
+    }
+  ],
+  "actual_final_ci": {
+    "run_id": 36980400766,
+    "job_id": 110753544789,
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36980400766",
+    "head_sha": "8d2fc33b0d89fa27fa3aead7e46d5199af0ad28e",
+    "checkout_sha": "05c5f570844251bffe1c03a4ae8e2af7902e4c19",
+    "checkout_tree": "931210a37c9bbb14c9939bfb58699572d105413e",
+    "conclusion": "success",
+    "node_version": "22.23.3",
+    "production_node_cases": 27,
+    "production_browser_groups": [
+      "Desktop Chromium",
+      "iPad Chromium emulation",
+      "iPhone Chromium emulation"
+    ],
+    "full_suites_passed": 22,
+    "full_suites_total": 22,
+    "original_log": {
+      "path": "docs/usage-sprint-2026-10-01/life-prediction-ci-final-original.log",
+      "git_blob": "2cdc162367367d66f70424186c4cf655e0862fbf",
+      "utf8_bytes": 146592,
+      "sha256": "b74ea2d4d0430e03cc28cf3608db83d305615728b889316f6d3bd715699113c2"
+    }
+  },
+  "actual_initial_ci": {
+    "run_id": 36980133994,
+    "job_id": 110752547757,
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36980133994",
+    "head_sha": "01e5bf728eca7c9117864d11639f8e2b6edc067c",
+    "checkout_sha": "f2769c2085c985158f7fe9a8aca8e822435c62cf",
+    "conclusion": "cancelled",
+    "production_node_cases_passed": 27,
+    "browser_suite": "failed during Desktop historical-progress fixture; no completed device group/full-suite result",
+    "failure": "Expected best19/streak2, observed best3/streak3 because old production pagehide saved over the edited fixture.",
+    "repair": "Stage initial and historical fixture writes on a neutral same-origin page before real production entry; preserve actual progress reload checks.",
+    "original_log": {
+      "path": "docs/usage-sprint-2026-10-01/life-prediction-ci-initial-original.log",
+      "git_blob": "e81e4fb3879c410f883ef41da1fb57202c81630e",
+      "utf8_bytes": 142418,
+      "sha256": "c9d372289f0dae5358b76585208567de6002fc2064afc1d7b1b811baff4aa596"
+    }
+  },
+  "boundaries": {
+    "executed": "Actual supported GitHub Actions Node22 and full production-page Chromium tests; preliminary V8 adapter results are distinct.",
+    "browser_oracle": "Read original now-state coordinate labels, independently tally eight finite B3/S23 neighbors; no production answer hook.",
+    "profiles": "Synthetic exact-byte controls retain all seven original-game and all seven house slots plus selections/unrelated saves.",
+    "historical_progress": "Existing bests/badges retained, not revoked. Existing save scheduling still occurs on repeated checks.",
+    "limitations": [
+      "Physical iOS Safari unverified",
+      "Chromium mobile device emulation only",
+      "Synthetic data only",
+      "No simultaneous-tab or broader storage durability guarantee"
+    ],
+    "stop": "One bounded Life prediction credit repair; no additional demonstrated defect/task is queued."
+  },
+  "source_merge_commit": "1141420a00e3e83e19eefa237a9dee09097bda31",
+  "source_merge_tree": "931210a37c9bbb14c9939bfb58699572d105413e",
+  "source_merge_parents": [
+    "124c9cf34b2e40c40e255861e5916a4c0cbed856",
+    "8d2fc33b0d89fa27fa3aead7e46d5199af0ad28e"
+  ],
+  "code_publication": {
+    "run_id": 36981846450,
+    "url": "https://github.com/trimcrae/Kid-games/actions/runs/36981846450",
+    "head_sha": "1141420a00e3e83e19eefa237a9dee09097bda31",
+    "conclusion": "success"
+  },
+  "final_docs_publication": "Reported separately after docs-only integration; no self-deployment receipt loop."
+}
