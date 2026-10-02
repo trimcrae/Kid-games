@@ -7,9 +7,9 @@ const prefix="craepets.house.v1.",recovery="craepets.house.import-recovery.v1";
 let checks=0;const clone=x=>JSON.parse(JSON.stringify(x));
 function section(start,end){const a=source.indexOf(start),b=source.indexOf(end,a);assert.ok(a>=0&&b>a);return source.slice(a,b);}
 function boot(initial={},options={}){
-  const values=new Map(Object.entries(initial)),writes=[];let fault=options.fault,limit=Infinity;
+  const values=new Map(Object.entries(initial)),writes=[];let fault=options.fault,readFault=null,limit=Infinity;
   const storage={
-    getItem:key=>values.get(key)??null,
+    getItem:key=>{if(readFault&&readFault(key,values.get(key)??null))throw Error('Storage read unavailable');return values.get(key)??null;},
     setItem(key,value){value=String(value);if(fault&&fault(key,value,"set"))throw Error("Storage unavailable");
       const size=[...values].reduce((n,[k,v])=>n+2*(k.length+v.length),0)-2*(key.length+(values.get(key)||"").length)*(values.has(key)?1:0)+2*(key.length+value.length);
       if(size>limit)throw Error("Quota exceeded");values.set(key,value);writes.push(["set",key,value]);},
@@ -24,7 +24,7 @@ function boot(initial={},options={}){
     section("  function saveRecord(","  function resetSheet()")+
     "window.HouseSaves.setPreparer(importCandidate);window.Test={blank:blankSave,load:load};",context);
   return {api:context.window.HouseSaves,values,writes,context,storage,limit(n){limit=n;},fault(fn){fault=fn;},
-    size(){return [...values].reduce((n,[k,v])=>n+2*(k.length+v.length),0);}};
+    readFault(fn){readFault=fn;},size(){return [...values].reduce((n,[k,v])=>n+2*(k.length+v.length),0);}};
 }
 function saved(test,id,name=id){
   const s=clone(test.context.window.Test.blank(test.context.window.CPData.profile(id)));
@@ -91,4 +91,18 @@ check("full/malformed/foreign-key journals safely refuse imports",()=>{
  const before=[...t.values];assert.throws(()=>t.api.restore(family(t)),/Eight/);assert.deepEqual([...t.values],before);
 });
 check("pending recovery failure blocks boot auto-copy",()=>{const j={version:1,records:[{date:"now",values:{[prefix+"cory"]:"original bytes"}}],pending:1};const t=boot({[recovery]:JSON.stringify(j),[prefix+"cory"]:"changed","craepets.v1.cory":JSON.stringify({v:1,pet:{name:"Source",species:"blorb",colour:"meadow"}})},{mode:"house",fault:(key,value,op)=>key===prefix+"cory"&&op==="set"});assert.equal(t.api.isBlocked(),true);assert.throws(()=>t.api.copyMissing(),/paused/);assert.equal(t.values.get("craepets.v1.cory").includes("Source"),true);});
+check("pending journal acknowledgment failure refuses import without stale writes",()=>{
+ const t=fixture(),before=[...t.values];let once=true;t.readFault((key,value)=>{if(once&&key===recovery&&value&&JSON.parse(value).pending){once=false;return true;}return false;});
+ assert.throws(()=>t.api.restore(family(t)),/No pets were imported/);unchanged(t,before);assert.equal(t.api.isBlocked(),false);assert.equal(JSON.parse(t.values.get(recovery)).pending,0);
+});
+check("completed journal acknowledgment failure reports uncertainty and pauses stale engine",()=>{
+ const t=fixture(),f=family(t);let sawPending=false,once=true;t.readFault((key,value)=>{if(key!==recovery||!value)return false;const j=JSON.parse(value);if(j.pending)sawPending=true;else if(sawPending&&once){once=false;return true;}return false;});
+ assert.throws(()=>t.api.restore(f),/status could not be confirmed/);assert.equal(t.api.isBlocked(),true);for(const id of t.api.ids)assert.equal(JSON.parse(t.values.get(prefix+id)).pet.name,"New "+id);
+ const next=boot(Object.fromEntries(t.values),{mode:"house"});assert.equal(next.api.isBlocked(),false);for(const id of next.api.ids)assert.equal(JSON.parse(next.values.get(prefix+id)).pet.name,"New "+id);
+});
+check("pending boot preserves exact damaged previous bytes instead of automatic recopy",()=>{
+ const old="{ valuable damaged house bytes",j={version:1,records:[{date:"now",values:{[prefix+"cory"]:old}}],pending:1};
+ const t=boot({[recovery]:JSON.stringify(j),[prefix+"cory"]:"partial","craepets.v1.cory":JSON.stringify({v:1,pet:{name:"Original",species:"blorb",colour:"meadow"}})},{mode:"house"});
+ assert.equal(t.values.get(prefix+"cory"),old);assert.equal(JSON.parse(t.values.get(recovery)).pending,0);assert.equal(t.api.isBlocked(),false);
+});
 console.log("PASS family restore: "+checks+" production checks; seven profile namespaces, malformed state, exact-byte recovery, real size quota and interrupted recovery.");

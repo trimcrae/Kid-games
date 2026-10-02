@@ -6622,7 +6622,7 @@
       var f = ev.target;
       if (!f || f.id !== "import-file" || !f.files || !f.files[0]) return;
       var reader = new FileReader();
-      reader.onload = function () { importValley(String(reader.result || "")); };
+      reader.onload = function () { if (window.HouseSaves && HouseSaves.isBlocked()) return; importValley(String(reader.result || "")); };
       reader.readAsText(f.files[0]);
     }, false);
     window.addEventListener("resize", function () { anim.measure = true; });

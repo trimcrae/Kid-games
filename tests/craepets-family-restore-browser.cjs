@@ -11,6 +11,10 @@ async function check(browser,base,label,options){
  const snapshot=()=>app.evaluate(()=>Object.fromEntries(Object.keys(localStorage).filter(k=>k!=="craepets.house.import-recovery.v1").sort().map(k=>[k,localStorage.getItem(k)])));
  const file=async f=>page.locator("#save-file").setInputFiles({name:"family.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(f))});
  try{
+  // Hold Date only, keeping real timers/events/reads alive. Otherwise the
+  // unchanged activity's legitimate reload/visibility saves advance lastTick
+  // between exact-byte snapshots and obscure the transaction being tested.
+  await page.clock.setFixedTime(new Date("2026-10-02T00:00:00Z"));
   await page.goto(base+"/family-restore-host.html",{waitUntil:"load"});await ready();
   await app.locator("#pet-name").fill("Cory old");await app.locator("#do-adopt").click();
   const family=await app.evaluate(ids=>{
@@ -52,11 +56,29 @@ async function check(browser,base,label,options){
   // engine saves and restores exact originals when the next boot can write.
   await page.reload({waitUntil:"load"});await ready();await page.locator("#welcome-saves").click();const prior=await snapshot();
   await file(family);await page.waitForFunction(()=>!document.querySelector("#apply-saves").hidden);
+  await app.evaluate(()=>{
+   const native=FileReader.prototype.readAsText;
+   FileReader.prototype.readAsText=function(file){const reader=this;reader.addEventListener("load",()=>window.delayedReadDone=true);window.releaseBackupRead=()=>native.call(reader,file);};
+   const input=document.createElement("input");input.id="import-file";input.type="file";document.body.append(input);
+  });
+  const delayed=JSON.parse(JSON.stringify(family.profiles.cory));delayed.pet.name="Delayed single import";
+  await app.locator("#import-file").setInputFiles({name:"delayed.json",mimeType:"application/json",buffer:Buffer.from(JSON.stringify(delayed))});
   await app.evaluate(()=>{const put=Storage.prototype.setItem;window.restoreStorage=()=>Storage.prototype.setItem=put;let reached=false;Storage.prototype.setItem=function(k,v){if(k==="craepets.house.v1.ellie"&&String(v).includes("<img"))reached=true;if(reached&&(k==="craepets.house.v1.ellie"||k==="craepets.house.v1.jeannie"))throw new DOMException("Unavailable","QuotaExceededError");return put.call(this,k,v);};});
   await page.locator("#apply-saves").click();await page.waitForFunction(()=>document.querySelector("#save-message").textContent.includes("safety copy"));
   assert.equal(await app.evaluate(()=>HouseSaves.isBlocked()),true);
-  const partial=await snapshot();await app.evaluate(()=>{Craepets.grant(5);HouseActivity.select("jeannie");});assert.deepEqual(await snapshot(),partial);
-  await app.evaluate(()=>window.restoreStorage());await page.reload({waitUntil:"load"});await ready();
+  const partial=await snapshot();await app.evaluate(()=>{Craepets.grant(5);HouseActivity.select("jeannie");window.releaseBackupRead();});
+  await app.waitForFunction(()=>window.delayedReadDone);assert.deepEqual(await snapshot(),partial,"a delayed real FileReader cannot bypass the pending recovery guard");
+  // A still-unavailable target on the next real boot must show the recovery
+  // retry screen before the engine loads a pet, installs autosave or recopies.
+  await context.addInitScript(()=>{
+    window.blockFamilyRecovery=true;const put=Storage.prototype.setItem;
+    Storage.prototype.setItem=function(k,v){if(window.blockFamilyRecovery&&k==="craepets.house.v1.jeannie")throw new DOMException("Unavailable","QuotaExceededError");return put.call(this,k,v);};
+  });
+  await app.evaluate(()=>window.restoreStorage());await page.reload({waitUntil:"load"});app=page.frame({name:"activity"});
+  await app.waitForFunction(()=>window.HouseSaves&&HouseSaves.isBlocked()&&window.Craepets);
+  assert.equal(await app.evaluate(()=>Craepets.state()),null,"blocked boot must not load a pet or install autosave");
+  await app.locator("#game button").waitFor({state:"visible"});await app.evaluate(()=>window.blockFamilyRecovery=false);
+  await app.locator("#game button").click();await ready();
   assert.deepEqual(await snapshot(),prior);assert.equal(await app.evaluate(()=>HouseSaves.isBlocked()),false);
   const transfer=await context.newPage();await transfer.goto(base+"/house-test/saves.html",{waitUntil:"load"});assert.equal(await transfer.locator("#saved-pets").textContent().then(s=>ids.every(id=>s.includes("Original "+id))),true);
   assert.deepEqual(await snapshot(),prior);await transfer.close();

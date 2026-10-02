@@ -41,7 +41,7 @@
   function recover(){
     var j;
     try{j=journal();}catch(e){blocked=true;throw e;}
-    if(!j.pending){blocked=false;return;}
+    if(!j.pending){blocked=false;return false;}
     blocked=true;
     var previous=j.records[j.pending-1].values,keys=Object.keys(previous),failed=false;
     // Free the changed entries first. The verified journal holds every original
@@ -56,7 +56,7 @@
     if(failed)throw Error('Your earlier pets are kept in a safety copy on this device. Saving is paused: free some browser space, then reload to recover them.');
     j.pending=0;
     try{saveJournal(j);}catch(e){throw Error('Your earlier pets are restored, but saving is paused until the safety copy can be checked. Please reload.');}
-    blocked=false;
+    blocked=false;return true;
   }
   function validate(input,profile){
     var parsed=typeof input==='string'?JSON.parse(input):input;
@@ -91,7 +91,11 @@
     j.pending=index+1;
     // No live key changes until the complete exact-byte rollback record is
     // durable and readable. A safety-copy failure refuses the import.
-    saveJournal(j);blocked=true;
+    blocked=true;
+    try{saveJournal(j);}catch(e){
+      try{recover();}catch(recoveryError){throw recoveryError;}
+      throw Error('The safety copy could not be saved and checked. No pets were imported.');
+    }
     try{
       Object.keys(incoming).forEach(function(key){
         if(incoming[key]===null)localStorage.removeItem(key);else localStorage.setItem(key,incoming[key]);
@@ -99,7 +103,15 @@
       });
       j.pending=0;saveJournal(j);blocked=false;
     }catch(e){
-      try{recover();}catch(recoveryError){throw recoveryError;}
+      var restored;
+      try{restored=recover();}catch(recoveryError){throw recoveryError;}
+      if(!restored){
+        // The completed transaction's final acknowledgment may have failed
+        // after its marker was cleared. Do not claim a rollback we did not do
+        // or let the stale active valley overwrite these coherent new saves.
+        blocked=true;
+        throw Error('The import status could not be confirmed. Safety copies remain on this device. Please reload before continuing.');
+      }
       throw Error('The family could not be saved here. Your earlier pets and settings were restored.');
     }
     return Object.keys(data.profiles);
@@ -109,5 +121,5 @@
   // (save-mode.js): nothing is copied, and the house edition is left alone.
   var gameMode=!!(window.CraepetsSaveMode&&window.CraepetsSaveMode.id==='game');
   window.HouseSaves.gameMode=gameMode;
-  if(!gameMode){try{recover();copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
+  if(!gameMode){try{if(!recover())copyMissing();}catch(e){console.warn('House saves are unavailable: '+e.message);}}
 })();
