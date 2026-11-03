@@ -406,7 +406,10 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     // so play never starts on a stall.
     prime(position){
       if(!loaded)return;
-      select(position,Infinity);captureRoom(performance.now(),true);
+      // Force one selection without poisoning the throttle's clock. Infinity
+      // kept every later tick on the first room's lamps, even across the street.
+      const now=performance.now();lastSelection=-Infinity;
+      select(position,now);captureRoom(now,true);
       for(const [i,slot] of slots.entries())slot.light.intensity=slot.target*mix.practical*(i===0?(PHASES[phaseName]?.key??1):.85);
       hemisphere.intensity=hemisphere.userData.target??hemisphere.intensity;
       petLight.intensity=petLight.userData.target??0;

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Master Kim’s · Interior review</title>
+<style>body{margin:0;background:#172b3b;color:#f4f0e6;font:15px system-ui}canvas{display:block}header{position:absolute;z-index:2;top:18px;left:20px;right:20px;display:flex;justify-content:space-between;gap:16px;align-items:start}h1{font-size:20px;margin:0 0 4px}p{margin:0;font-size:12px}nav{display:flex;gap:6px;flex-wrap:wrap}button{font:inherit;min-height:44px;padding:8px 14px;border:1px solid #bcc8c8;border-radius:22px;background:#f2ecdc;color:#253e48;cursor:pointer}button[aria-pressed=true]{background:#b7d3d4}footer{position:absolute;bottom:14px;left:20px;background:#152c3dd9;padding:10px 14px;border-radius:8px;font-size:12px;max-width:650px}@media(max-width:600px){header{display:block}nav{margin-top:10px}h1{font-size:18px}button{font-size:12px;padding:6px 10px}}</style>
+<header><div><h1>Master Kim’s Taekwondo</h1><p>Photo-referenced interior · procedural geometry</p></div><nav id="views" aria-label="Camera views"></nav></header>
+<footer>Estimated proportions. Generic awards and artwork. Exterior and street placement are fictional. Drag to look around. Play the connected interior in <a style="color:#c8e6ef" href="../../house-test/">Craepets at home</a>.</footer>
+<script type="module">
+import * as T from '../../house-test/vendor/three.module.min.js';
+import {createMasterKim} from '../../house-test/master-kim.mjs';
+const scene=new T.Scene();scene.background=new T.Color('#b5c4c5');
+const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=T.AgXToneMapping;renderer.toneMappingExposure=1.25;document.body.append(renderer.domElement);
+const camera=new T.PerspectiveCamera(66,innerWidth/innerHeight,.045,100);camera.rotation.order='YXZ';
+scene.add(new T.HemisphereLight('#e4f0fa','#8b8272',2.2));
+const point=new T.PointLight('#e6efff',38,13,2);scene.add(point);
+const model=await createMasterKim(scene,{mobile:innerWidth<600});
+const views={Dojang:[[42.9,.88,36.7],[39.5,1.0,50]],Lounge:[[44.6,.80,26.1],[44.2,.85,36]],Entrance:[[42.4,.80,21.9],[45.8,.75,23.3]],'Belt rack':[[45.3,.85,27.3],[48.1,.6,27.65]],Gear:[[49.1,.8,25],[51.7,.5,25.2]]};
+function view(name){const [p,target]=views[name];camera.position.set(...p);camera.lookAt(...target);point.position.set(p[0],1.7,p[2]+1);document.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.textContent===name)));renderer.render(scene,camera);}
+for(const name of Object.keys(views)){const b=document.createElement('button');b.textContent=name;b.onclick=()=>view(name);document.getElementById('views').append(b);}
+let drag=null;renderer.domElement.style.touchAction='none';renderer.domElement.onpointerdown=e=>{drag=[e.clientX,e.clientY];renderer.domElement.setPointerCapture(e.pointerId);};renderer.domElement.onpointerup=()=>drag=null;
+renderer.domElement.onpointermove=e=>{if(!drag)return;camera.rotation.y-=(e.clientX-drag[0])*.003;camera.rotation.x=T.MathUtils.clamp(camera.rotation.x-(e.clientY-drag[1])*.003,-1,1);drag=[e.clientX,e.clientY];renderer.render(scene,camera);};
+onresize=()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.render(scene,camera);};
+view('Dojang');window.kimPreview={view,ready:true,stats:()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles})};
+</script></html>

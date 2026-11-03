@@ -5,9 +5,12 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
   const context=await browser.newContext({viewport:{width:1360,height:900}}),page=await context.newPage();
+  // Optional QA render scale / timeout for CPU-only Chromium. Assertions and
+  // input paths stay the same; normal runs keep Playwright's default timeout.
+  if(process.env.HOUSE_TIMEOUT)page.setDefaultTimeout(Number(process.env.HOUSE_TIMEOUT));
   const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   try{
-    await page.goto(base+'/house-test/');
+    await page.goto(base+'/house-test/'+(process.env.HOUSE_QUERY||''));
     await page.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});
     await page.frame({url:/activity.html/}).evaluate(()=>Craepets._events(false));
     console.log('LOADED');
@@ -44,8 +47,10 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     // room's activity is opened with its own on-screen button, as a player would there.
     async function open(id,room){await jump(room);const button=page.locator('#nearby-actions [data-activity="'+id+'"]');
       // (A real click: the button must be visible and not covered.)
-      if(await button.count())await button.click();
-      else{await page.keyboard.press('KeyE');if(await page.locator('#activity-choices').isVisible())await page.locator('[data-choice="'+id+'"]').click();}await page.waitForTimeout(150);}
+      // Wait for the room's next update; an immediate count can see the old
+      // room and send E to a nearby object instead of opening this activity.
+      await button.waitFor({state:'visible'});await button.click();
+      await page.locator('#activity-panel').waitFor({state:'visible'});}
     for(const [id,room] of [['farm','Back yard'],['well',"Mom & Dad's office"],['pool','Sunroom'],['market','Garage'],['bank',"Mom & Dad's office"],['home','Living room'],['games','Basement playroom'],['arena','Front yard'],['bag','Shared bedroom entry'],['quests','Dining room'],['diary',"Ellie's bedroom"],['case',"Jeannie's bedroom"],['stall','Front porch'],['feed','Kitchen'],['wash','Green bathroom'],['rest',"Kieran's bedroom"],['dress',"Mom & Dad's bedroom"],['play','Family room'],['read',"Mom & Dad's office"]]){
       await open(id,room);assert(await f.locator('.panel').count()>0,id+' empty');console.log('OPEN',id);
       if(['farm','well','pool'].includes(id)){
@@ -137,9 +142,11 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     console.log('PASS desktop play, walk-up actions, family roaming, migration and reload');
     // Finger controls and activity layout use the same saved pets on an iPhone.
     const familyBackup=await runtime().evaluate(()=>HouseSaves.bundle('house'));
+    await context.close(); // desktop checks are complete; free its live WebGL scene
     const phone=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
     const mobile=await phone.newPage();mobile.on('pageerror',e=>errors.push(e.message));
-    await mobile.goto(base+'/house-test/');await mobile.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});
+    if(process.env.HOUSE_TIMEOUT)mobile.setDefaultTimeout(Number(process.env.HOUSE_TIMEOUT));
+    await mobile.goto(base+'/house-test/'+(process.env.HOUSE_QUERY||''));await mobile.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});
     await mobile.locator('#welcome-saves').tap();await mobile.locator('#save-file').setInputFiles({name:'family.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(familyBackup))});await mobile.locator('#apply-saves').tap();await mobile.locator('#close-saves').tap();
     assert.equal(await mobile.frame({url:/activity.html/}).evaluate(()=>Craepets.state().pet.name),'Cory Comet');assert.equal(await mobile.frame({url:/activity.html/}).evaluate(()=>HouseActivity.family().filter(p=>p.pet).length),2,'Complete family did not transfer');
     await mobile.locator('#rooms-button').tap();await mobile.locator('#rooms').waitFor({state:'visible'});await mobile.getByRole('button',{name:'Jump to Front entry',exact:true}).tap();await mobile.waitForTimeout(1100);

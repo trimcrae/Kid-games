@@ -8,6 +8,7 @@ import {gunzipSync} from 'node:zlib';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
+import {kimGuardData,combineGuards} from '../house-test/master-kim.mjs';
 import {createCameraGuard,guardGroups,nearPlaneReach,orbitCamera,arrivalHeading,createFollowRig,lookDown} from '../house-test/camera-guard.mjs';
 import {glazingBoxes} from '../house-test/glazing.mjs';
 import {routeSearch} from '../house-test/route-search.mjs';
@@ -17,7 +18,8 @@ const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.
 const mesh=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
 const binary=mesh.buffer.slice(mesh.byteOffset,mesh.byteOffset+mesh.byteLength);
 let began=performance.now();
-const guard=createCameraGuard(binary,guardGroups(data.groups));
+const kim=kimGuardData();
+const guard=combineGuards(createCameraGuard(binary,guardGroups(data.groups)),createCameraGuard(kim.binary,kim.groups));
 const built=performance.now()-began;
 // The walkthrough's own walking world: the exported colliders, the sunroom's
 // glass walls and the neighbourhood.

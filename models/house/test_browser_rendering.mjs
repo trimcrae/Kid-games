@@ -45,6 +45,13 @@ lighting.load({colliders:[],lights:[{name:'Fixture ceiling',type:'area',power:55
   position:[0,3,0],direction:[0,-1,0],color:[1,.8,.58]},
   {name:'Fixture lamp',type:'point',power:42,position:[-3,2,0],direction:[0,-1,0],color:[1,.8,.58]}]});
 const position={x:0,y:0,z:4};
+// Startup must not leave the nearby-light throttle at Infinity. Leaving the
+// lit room must clear its lamps, and coming back must select them again.
+lighting.prime(position);
+lighting.tick({x:30,y:0,z:30},performance.now()+1000,false);
+if(lighting.diagnostics().practicalLights.length)throw Error('Priming froze practical lights in the first room');
+lighting.tick(position,performance.now()+1500,false);
+if(!lighting.diagnostics().practicalLights.length)throw Error('Practical lights did not follow the player back');
 lighting.setRoom('Loading room',position);
 lighting.tick(position,performance.now()+2000,false);
 if(lighting.diagnostics().reflectionProbes!==0)throw Error('Room captures delayed initial controls');

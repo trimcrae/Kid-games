@@ -7,13 +7,14 @@
 // with "Mischief managed". Static ink (floors, walls, furniture, room names)
 // is drawn once per floor and kept; only the prints are redrawn while it's
 // open, a dozen times a second.
-import {rooms as houseRooms} from './rooms.mjs';
+import {rooms as houseRooms} from './rooms.mjs?v=20261102-master-kim';
+import {inKim} from './master-kim-layout.mjs';
 const $=id=>document.getElementById(id);
 const INK='#3d2510',INK_SOFT='rgba(61,37,16,.45)',INK_FAINT='rgba(61,37,16,.16)',FLOOR='rgba(120,78,28,.10)';
 const SCRIPT='"Brush Script MT","Segoe Script","Snell Roundhand","Bradley Hand","Apple Chancery","URW Chancery L",cursive';
 // The house's floors, by the level the walking boxes put them at. Outside is
 // the lawn level; the porch and the back step are within its reach.
-export const FLOORS=[['Main floor',0],['Upstairs',1.26],['Downstairs',-1.05],['Basement',-3.15],['Outside',-.82]];
+export const FLOORS=[['Main floor',0],['Upstairs',1.26],['Downstairs',-1.05],['Basement',-3.15],['Outside',-.82],["Master Kim's",-.82]];
 // Which floor someone is on. Indoors, the highest floor whose footprint
 // (its floor boxes, porches and paths not counted) they are standing on or a
 // little above — so a pet asleep up on a downstairs bed is downstairs, not
@@ -21,8 +22,9 @@ export const FLOORS=[['Main floor',0],['Upstairs',1.26],['Downstairs',-1.05],['B
 // somewhere in between (the stairs) goes by the nearest room.
 const OUTDOORS=/porch|deck|patio|step|lawn|path|drive|apron|walk strip|paver|mulch|yard|street|ground|grass|garden/i;
 export function createFloorFinder(world){
-  const footprints=FLOORS.filter(f=>f[0]!=='Outside').map(([name,L])=>[name,L,world.boxes.filter(b=>classify(b,L)==='floor'&&!OUTDOORS.test(b.name||''))]);
+  const footprints=FLOORS.filter(f=>!['Outside',"Master Kim's"].includes(f[0])).map(([name,L])=>[name,L,world.boxes.filter(b=>classify(b,L)==='floor'&&!OUTDOORS.test(b.name||''))]);
   return function floorOf(p){
+    if(inKim(p)&&p.y>=-.97&&p.y<2.8)return "Master Kim's";
     let best=null;
     for(const [name,L,boxes] of footprints){
       if(p.y<L-.15||p.y>L+1.4||(best&&L<=best[1]))continue;
@@ -56,7 +58,7 @@ export function createMaraudersMap({world,rooms,everyone,bindButton,reducedMotio
     const L=FLOORS.find(f=>f[0]===name)[1],boxes=[],outside=name==='Outside';
     // The page shows the house (or, outside, the house and its yards): the
     // street beyond the front lawn and stray boxes far off don't stretch it.
-    const lim=outside?{x0:-12,x1:24,y0:-9,y1:28}:{x0:-4,x1:19,y0:-3,y1:12};
+    const lim=name==="Master Kim's"?{x0:31.8,x1:52.2,y0:-53.2,y1:-20.8}:outside?{x0:-12,x1:24,y0:-9,y1:28}:{x0:-4,x1:19,y0:-3,y1:12};
     let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
     for(const b of world.boxes){
       const kind=classify(b,L);if(!kind)continue;

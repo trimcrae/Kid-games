@@ -1,10 +1,10 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260925-motion';
-import {createHouseLife} from './house-life.mjs?v=20261002-active-loader';
-import {rooms} from './rooms.mjs';
+import {createHouseLife} from './house-life.mjs?v=20261102-master-kim';
+import {rooms} from './rooms.mjs?v=20261102-master-kim';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
-import {createHouseLighting} from './lighting.mjs?v=20260918-sky';
-import {createJungle} from './jungle.mjs?v=20260918-leaves';
+import {createHouseLighting} from './lighting.mjs?v=20261102-master-kim';
+import {createJungle} from './jungle.mjs?v=20261102-master-kim';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs?v=20260916-use3';
@@ -15,8 +15,10 @@ import {warmupCast} from './creatures.mjs?v=20261001-visuals';
 import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260925-motion';
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
-import {createMaraudersMap} from './marauders-map.mjs?v=20260916-use2';
+import {createMaraudersMap} from './marauders-map.mjs?v=20261102-master-kim';
 import {createInteractions} from './interactions.mjs?v=20260926-house-fixes';
+import {createMasterKim,combineGuards} from './master-kim.mjs';
+import {kimBoxes} from './master-kim-layout.mjs';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 import {showSavedDataRecovery} from './saved-data-recovery.mjs?v=20261002-active-loader';
@@ -123,7 +125,7 @@ const BAKE_NIGHT=Number(query.get('bakenight'))||.5;
 const BAKE_GAIN=Number(query.get('bakegain'))||.75,BAKE_REPLACE=THREE.MathUtils.clamp(Number(query.get('bakemix')??1)||0,0,1);
 const PINNED_SKY=query.get('phase')?{time:query.get('phase'),weather:query.get('weather')||'sunny'}:null;
 
-let guard=null,cameraClearance=lensClearance(),monitor=null,map=null,interactions=null;
+let guard=null,cameraClearance=lensClearance(),monitor=null,map=null,interactions=null,masterKim=null;
 // The movable parts of the house (export_walkthrough.py props), by key.
 const propMeshes={};
 let world,life,player={x:5.65,y:.03,z:-.7},yaw=0,pitch=0,focusY=.03,active=false,ready=false,failed=false;
@@ -621,12 +623,15 @@ async function load(){
       if(g.prop){(propMeshes[g.prop]??=[]).push(mesh);mesh.frustumCulled=false;material.userData.houseFinish=false;}
     }
     performance.mark('house:meshes');
-    lighting.load(data);
+    masterKim=await createMasterKim(scene,{mobile:matchMedia('(pointer:coarse)').matches});
+    lighting.load({...data,lights:[...(data.lights||[]),...masterKim.lights],colliders:[...data.colliders,...kimBoxes]});
     // The living-room computer, playing Craepets (monitor.mjs). Its screen is
     // the 'Monitor screen' box in build.py: on the desk in the front-window
     // corner, facing +x into the room.
     monitor=createMonitor(scene,renderer,{x:.352,y:1.05,z:-.66,w:.56,h:.32,facing:[1,0,0]});
     const contact=createContactShadows(scene,data.colliders||[]);
+    const kimContact=createContactShadows(scene,kimBoxes);
+    if(kimContact)kimContact.mesh.position.y=.022; // above the thin carpet finish
     // Compile the house shaders in parallel on the GPU process while the main
     // thread builds the camera guard and walking world. Only the screen
     // variants gate Start; the reflection-probe variants finish in the
@@ -638,7 +643,7 @@ async function load(){
     const cast=warmupCast();scene.add(cast);
     const warming=warmShaders();lighting.warm();
     performance.mark('house:compile-issued');
-    guard=createCameraGuard(binary,guardGroups(data.groups));
+    guard=combineGuards(createCameraGuard(binary,guardGroups(data.groups)),masterKim.guard);
     world=new WalkingWorld(data.colliders,{height:1.05});
     body=new Body(world);
     // The sunroom's glass walls block walking too (see glazing.mjs).

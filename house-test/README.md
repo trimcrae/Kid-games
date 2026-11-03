@@ -340,3 +340,14 @@ unchanged. The original tour stays outside the arcade registry.
 
 The vendored rendering library is [Three.js r180](https://github.com/mrdoob/three.js/tree/r180),
 under its included MIT license in `vendor/THREE-LICENSE.txt`.
+
+### Master Kim’s Taekwondo
+
+A photo-referenced, code-built school now joins the east end of Craepet Street.
+Walk in from the pavement or use **Rooms → Master Kim’s** to visit the glazed
+entrance, spectator lounge, shoe/gear room, office and dojang. The observation
+window, its adjacent doorway, practice mats and padded mirror wall are solid
+parts of the walking and camera world. The school also has its own Map tab.
+Dimensions are estimates; its exterior and neighborhood placement are fictional.
+Private photos and people are not included. See [the model notes](../models/master-kim/README.md)
+for source, standalone Blender/GLB rebuilds, lighting tradeoffs and tests.

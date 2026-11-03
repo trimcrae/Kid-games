@@ -5,7 +5,8 @@
 // a clear view into the room rather than a doorway or a jamb. Arrival spots
 // were chosen with the real camera guard (clear boom, pet unobstructed, the
 // view staying inside the room).
-import {neighborhoodRooms} from './neighborhood-layout.mjs';
+import {neighborhoodRooms} from './neighborhood-layout.mjs?v=20261102-master-kim';
+import {kimRooms} from './master-kim-layout.mjs';
 export const rooms=[
   ['Main floor','Front entry',5.65,.7,0,0,[6.2,1.4,.35]],
   ['Main floor','Living room',5.8,2.0,0,-1.25,[5.8,2.0,.95]],
@@ -32,5 +33,6 @@ export const rooms=[
   // Garden & maths stands on the last stepping stone, facing the raised veg bed.
   ['Outside','Back yard',6.15,14.75,-.73,0],
   ...neighborhoodRooms,
+  ...kimRooms,
 ];
 export const familyRooms={cory:"Cory's bedroom",kieran:"Kieran's bedroom",ellie:"Ellie's bedroom",jeannie:"Jeannie's bedroom",shannon:"Mom & Dad's office",tristan:"Mom & Dad's office",guest:'Living room'};

@@ -7,8 +7,9 @@ import fs from 'node:fs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {FLOORS,createFloorFinder,classify} from '../house-test/marauders-map.mjs';
 import {rooms} from '../house-test/rooms.mjs';
+import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
-const world=new WalkingWorld(data.colliders,{height:1.05}),floorOf=createFloorFinder(world);
+const world=new WalkingWorld([...data.colliders,...neighborhoodBoxes],{height:1.05}),floorOf=createFloorFinder(world);
 const counts={};
 for(const [name,L] of FLOORS){
   const c={floor:0,wall:0,furniture:0};

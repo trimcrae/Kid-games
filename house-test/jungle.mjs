@@ -1,4 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
+import {kimClearing} from './master-kim-layout.mjs';
 // (The same URL as walkthrough.js and lighting.mjs, so the shared light
 // uniforms — the exterior dim and the leaf fill — are one copy.)
 import {EXTERIOR,FOLIAGE} from './materials.mjs?v=20260916-light';
@@ -221,7 +222,13 @@ const PARROTS=[['#e63946','#f4a261','#1d6fd1','#ffd166'],['#2a6fdb','#1b4fa8','#
 
 export function createJungle(scene,{reducedMotion=false}={}){
   const r=rng(20260918),solid=[],leaf=[],perches=[];
-  function add(p){solid.push(...p.solid);leaf.push(...p.leaf);if(p.perch)perches.push(p.perch);}
+  function add(p){
+    // Generate as before to preserve the random sequence everywhere else,
+    // then remove whole plants whose crowns would enter the new school.
+    const at=p.solid[0]?.matrix?.elements||p.leaf[0]?.matrix?.elements;
+    if(at&&kimClearing(at[12],at[14],7)){for(const q of [...p.solid,...p.leaf])q.geo.dispose();return;}
+    solid.push(...p.solid);leaf.push(...p.leaf);if(p.perch)perches.push(p.perch);
+  }
   function undergrowth(x,z,k){
     const pick=(k+Math.floor(r()*2))%4;
     if(pick===0)add(bananaPlant(x,z,r));else if(pick===1)add(fern(x,z,r,1.1));else if(pick===2)add(flowerBush(x,z,r));
@@ -331,7 +338,8 @@ export function createJungle(scene,{reducedMotion=false}={}){
     const a=k*Math.PI*2/18+j(.12),dist=54+r()*12,cx=6+Math.cos(a)*dist,cz=-4+Math.sin(a)*dist;
     const rx=14+r()*14,ry=6+r()*9,rz=10+r()*10;
     const g=new THREE.SphereGeometry(1,14,8);g.scale(rx,ry,rz);
-    hills.push(part(g,cx,GROUND-ry*.3,cz,k%2?'#4a7a55':'#41704e',{yaw:r()*Math.PI,shade:['#3d6647',k%2?'#5a8a5e':'#527f58']}));
+    const p=part(g,cx,GROUND-ry*.3,cz,k%2?'#4a7a55':'#41704e',{yaw:r()*Math.PI,shade:['#3d6647',k%2?'#5a8a5e':'#527f58']});
+    if(kimClearing(cx,cz,Math.max(rx,rz)))g.dispose();else hills.push(p);
   }
   const hillMesh=mesh(merge(hills),new THREE.MeshStandardMaterial({vertexColors:true,roughness:1}),{shadow:false});
   hillMesh.geometry.deleteAttribute('sway');
