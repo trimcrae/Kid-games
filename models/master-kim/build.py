@@ -13,7 +13,7 @@ data=json.loads(Path(args[0]).read_text());dest=Path(args[1]);dest.mkdir(parents
 root=Path(__file__).resolve().parents[2]
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 origin=data['origin'];materials={};buckets={}
-names=['logo','welcome','exterior','exit','motto','tenets','olympic','rings','us','korea','tenetPoster','promise','award','abstract','best','gear','office','training','street']
+names=['logo','welcome','exterior','exit','motto','tenets','olympic','rings','us','korea','tenetPoster','promise','award','abstract','best','gear','office','training','street','bathroom','supplies','signin']
 def xyz(p):return (p[0]-origin['x'],-(p[2]-origin['z']),p[1]-origin['floor'])
 def linear(x):return x/12.92 if x<=.04045 else ((x+.055)/1.055)**2.4
 def mat(color,finish):
@@ -49,9 +49,10 @@ for part in data['parts']:
     from mathutils import Matrix
     rotation=Matrix.Rotation(rx,3,'X') @ Matrix.Rotation(ry,3,'Y') @ Matrix.Rotation(rz,3,'Z')
     world=[xyz(rotation@Vector(v)+Vector(part['position'])) for v in verts]
-    append((part['color'],part['finish']),world,faces)
+    append((part['color'],part['finish'],part.get('door')),world,faces)
 for key,(vs,fs) in buckets.items():
-    mesh=bpy.data.meshes.new(key[1]);mesh.from_pydata(vs,[],fs);mesh.update();o=bpy.data.objects.new('Master Kim / '+key[1],mesh);bpy.context.collection.objects.link(o);o.data.materials.append(mat(*key))
+    mesh=bpy.data.meshes.new(key[1]);mesh.from_pydata(vs,[],fs);mesh.update();o=bpy.data.objects.new('Master Kim / '+key[1],mesh);bpy.context.collection.objects.link(o);o.data.materials.append(mat(*key[:2]))
+    if key[2]:o['door_id']=key[2]
     # Tiny bevels give the standalone model honest highlights at hard edges.
     if key[1] in ('wood','metal','paint'):
         bevel=o.modifiers.new('Edge highlights','BEVEL');bevel.width=.008;bevel.segments=2
@@ -63,17 +64,23 @@ signmat.node_tree.links.new(tex.outputs['Color'],signmat.node_tree.nodes.get('Pr
 for sign in data['signs']:
     w,h=sign['size'];angle=sign['yaw'];verts=[]
     for x,y in [(-w/2,-h/2),(w/2,-h/2),(w/2,h/2),(-w/2,h/2)]:
-        local=Vector((x,0,-y)) if sign.get('floor') else Vector((math.cos(angle)*x,y,-math.sin(angle)*x))
+        local=(Matrix.Rotation(sign['pitch'],3,'X') @ Matrix.Rotation(sign.get('roll',0),3,'Z') @ Vector((x,y,0))) if 'pitch' in sign else Vector((x,0,-y)) if sign.get('floor') else Vector((math.cos(angle)*x,y,-math.sin(angle)*x))
         verts.append(xyz(local+Vector(sign['position'])))
     mesh=bpy.data.meshes.new(sign['kind']);mesh.from_pydata(verts,[],[(0,1,2,3)]);mesh.update()
-    uv=mesh.uv_layers.new();idx=names.index(sign['kind']);x=idx%5;y=idx//5
-    for loop,coord in zip(uv.data,[(0,0),(1,0),(1,1),(0,1)]):loop.uv=((x+.004+coord[0]*.992)/5,1-(y+.004+(1-coord[1])*.992)/4)
+    uv=mesh.uv_layers.new();idx=names.index(sign['kind']);x=idx%6;y=idx//6
+    for loop,coord in zip(uv.data,[(0,0),(1,0),(1,1),(0,1)]):loop.uv=((x+.004+coord[0]*.992)/6,1-(y+.004+(1-coord[1])*.992)/4)
     o=bpy.data.objects.new('Sign / '+sign['kind'],mesh);bpy.context.collection.objects.link(o);o.data.materials.append(signmat)
+for door in data.get('doors',[]):
+    pivot=bpy.data.objects.new(door['label']+' hinge',None);bpy.context.collection.objects.link(pivot);pivot.location=xyz(door['pivot']);bpy.context.view_layer.update()
+    for obj in list(bpy.context.scene.objects):
+        if obj.get('door_id')==door['id']:obj.parent=pivot;obj.matrix_parent_inverse=pivot.matrix_world.inverted()
+    for frame,angle in [(1,0),(30,door['openAngle']),(60,door['openAngle']),(90,0)]:pivot.rotation_euler.z=angle;pivot.keyframe_insert(data_path='rotation_euler',frame=frame)
+bpy.context.scene.frame_end=90;bpy.context.scene.frame_set(1)
 for light in data['lights']:
     l=bpy.data.lights.new(light['name'],'AREA');l.energy=light['power'];l.shape='DISK';l.size=1.5;l.color=(.90,.95,1)
     o=bpy.data.objects.new(light['name'],l);bpy.context.collection.objects.link(o);o.location=xyz(light['position'])
 world=bpy.context.scene.world or bpy.data.worlds.new('World');bpy.context.scene.world=world;world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.55,.65,.75,1);world.node_tree.nodes['Background'].inputs[1].default_value=.35
-for name,at,target in [('Dojang',(8.9,-15.7,1.7),(5.5,-29,1.7)),('Lounge',(10.6,-5.1,1.6),(10.2,-15,1.6)),('Entry',(8.4,-.9,1.6),(11.8,-2.3,1.2))]:
+for name,at,target in [('Dojang',(8.9,-15.7,1.7),(5.5,-29,1.7)),('Lounge',(10.6,-5.1,1.6),(10.2,-15,1.6)),('Entry',(8.9,-1.1,1.62),(7.6,-6,1.62)),('Gear',(6.2,-4.1,1.62),(3.2,-3.9,1.37)),('Supply hallway',(12.3,-32.6,1.62),(12.3,-36.8,1.52)),('Bathroom',(12.3,-36.3,1.62),(12.6,-38.3,1.32))]:
     c=bpy.data.cameras.new(name);c.lens=22;o=bpy.data.objects.new(name,c);bpy.context.collection.objects.link(o);o.location=at;o.rotation_euler=(Vector(target)-o.location).to_track_quat('-Z','Y').to_euler()
     if name=='Dojang':bpy.context.scene.camera=o
 scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=64;scene.cycles.use_denoising=False;scene.render.resolution_x=1280;scene.render.resolution_y=800;scene.render.resolution_percentage=100

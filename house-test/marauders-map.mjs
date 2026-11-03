@@ -7,8 +7,9 @@
 // with "Mischief managed". Static ink (floors, walls, furniture, room names)
 // is drawn once per floor and kept; only the prints are redrawn while it's
 // open, a dozen times a second.
-import {rooms as houseRooms} from './rooms.mjs?v=20261102-master-kim';
-import {inKim} from './master-kim-layout.mjs';
+import {rooms as houseRooms} from './rooms.mjs?v=20261103-studio-life';
+import {inKim,KIM} from './master-kim-layout.mjs?v=20261103-studio-life';
+export const mapBounds=name=>name==="Master Kim's"?{x0:31.8,x1:52.2,y0:-(KIM.z+KIM.depth+.2),y1:-20.8}:name==='Outside'?{x0:-12,x1:24,y0:-9,y1:28}:{x0:-4,x1:19,y0:-3,y1:12};
 const $=id=>document.getElementById(id);
 const INK='#3d2510',INK_SOFT='rgba(61,37,16,.45)',INK_FAINT='rgba(61,37,16,.16)',FLOOR='rgba(120,78,28,.10)';
 const SCRIPT='"Brush Script MT","Segoe Script","Snell Roundhand","Bradley Hand","Apple Chancery","URW Chancery L",cursive';
@@ -33,7 +34,9 @@ export function createFloorFinder(world){
     if(best)return best[0];
     let room=null,bd=Infinity;
     for(const r of houseRooms){const dy=p.y-r[4],d=Math.hypot(p.x-r[2],p.z+r[3])+(dy<0?-dy*12:dy*4);if(d<bd){bd=d;room=r;}}
-    const f=room?room[0]:'Main floor';return f==='Craepet street'?'Outside':f;
+    // The school has an explicit footprint above: a nearby school room must
+    // not classify the pavement or removed gear annex as indoors.
+    const f=room?room[0]:'Main floor';return ['Craepet street',"Master Kim's"].includes(f)?'Outside':f;
   };
 }
 // What each box is, seen from a floor at height L: a floor to walk on, a wall
@@ -49,7 +52,7 @@ export function classify(b,L){
 export function createMaraudersMap({world,rooms,everyone,bindButton,reducedMotion=false,onOpen=()=>{},onClose=()=>{}}){
   const panel=$('map'),canvas=$('map-canvas'),tabs=$('map-floors'),elsewhere=$('map-elsewhere'),card=panel.querySelector('.parchment');
   const ctx=canvas.getContext('2d'),floorOf=createFloorFinder(world);
-  let floor=null,layers=new Map(),trails=new Map(),open=false,raf=0,lastDraw=0,lastEveryone=[];
+  let floor=null,layers=new Map(),trails=new Map(),open=false,raf=0,lastDraw=0,lastEveryone=[],mapRevision=-1;
   // Plan coordinates: x as in Blender, y = -z (north up on the page).
   const px=(x,f)=>f.ox+(x-f.minX)*f.scale,py=(y,f)=>f.oy+(f.maxY-y)*f.scale;
   // Fit a floor's footprint (its floor boxes; walls too, so a stairwell
@@ -58,7 +61,7 @@ export function createMaraudersMap({world,rooms,everyone,bindButton,reducedMotio
     const L=FLOORS.find(f=>f[0]===name)[1],boxes=[],outside=name==='Outside';
     // The page shows the house (or, outside, the house and its yards): the
     // street beyond the front lawn and stray boxes far off don't stretch it.
-    const lim=name==="Master Kim's"?{x0:31.8,x1:52.2,y0:-53.2,y1:-20.8}:outside?{x0:-12,x1:24,y0:-9,y1:28}:{x0:-4,x1:19,y0:-3,y1:12};
+    const lim=mapBounds(name);
     let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
     for(const b of world.boxes){
       const kind=classify(b,L);if(!kind)continue;
@@ -166,6 +169,7 @@ export function createMaraudersMap({world,rooms,everyone,bindButton,reducedMotio
   }
   function show(name){
     floor=name;fit();
+    if(mapRevision!==(world.dynamicRevision||0)){layers.clear();mapRevision=world.dynamicRevision||0;}
     if(!layers.has(name)){const f=frame(name);layers.set(name,drawStatic(f));layers.frame=f;}
     else layers.frame=frame(name);
     for(const t of tabs.children)t.setAttribute('aria-current',String(t.dataset.floor===name));

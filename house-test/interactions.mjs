@@ -4,6 +4,9 @@ import {hangBarInteractions} from './hang-bar.mjs?v=20260925-motion';
 import {roombaInteractions} from './roomba.mjs?v=20260925-motion';
 import {yotoInteractions} from './yoto.mjs?v=20260916-use3';
 import {bedInteractions} from './beds.mjs?v=20260925-motion2';
+import {studioInteractions} from './studio-interactions.mjs?v=20261103-studio-life';
+import {garageDoorInteraction} from './garage-door.mjs?v=20261103-studio-life';
+import {movingDoorGuard} from './moving-doors.mjs?v=20261103-studio-life';
 import {driveCar} from './car-driving.mjs?v=20260926-ground1';
 
 // Things in the house you can use with E: swing on the swings, bounce on the
@@ -67,7 +70,7 @@ function createSounds(){
   };
 }
 
-export function createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,tour,bindButton,reducedMotion=false,getDriveInput=()=>({throttle:0,steer:0})}){
+export function createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,tour,bindButton,masterKim,reducedMotion=false,getDriveInput=()=>({throttle:0,steer:0})}){
   const sounds=createSounds();
   const pill=$('interact'),label=$('interact-label');
   const info=data.props||{},propBoxes={};
@@ -449,8 +452,9 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   // tick?(dt) → null | {yaw?, done?}, key?(code), stop()}) and per-frame work
   // onto `ticking` (dt=>{}). `off` is what the pill says while you're on it;
   // a tick returning {done:true} gets off by itself.
-  const ctx={THREE,scene,world,renderer,data,player,keys,life,body,tour,reducedMotion,list,ticking,sounds,propMeshes,meshesOf,pose,hinge,isBusy:()=>!!active};
+  const ctx={THREE,scene,world,renderer,data,player,keys,life,body,tour,reducedMotion,list,ticking,sounds,propMeshes,meshesOf,pose,hinge,bindButton,masterKim,debug,isBusy:()=>!!active};
   for(const extend of [hangBarInteractions,roombaInteractions,yotoInteractions,bedInteractions]){try{extend(ctx);}catch(error){console.warn('An interaction module failed to load:',error);}}
+  const garageDoor=garageDoorInteraction(ctx);if(masterKim)studioInteractions(ctx);
   // Which one is in reach: the nearest on this floor within its radius.
   function findNear(){
     let best=null,bd=Infinity;
@@ -459,6 +463,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
   }
   function showPill(text){if(!text){pill.hidden=true;return;}if(label.textContent!==text)label.textContent=text;pill.hidden=false;}
   const api={
+    guard:movingDoorGuard([garageDoor]),
     get active(){return active;},get near(){return near;},
     controls(){return active&&(active.kind==='ride'||active.kind==='drive'||active.kind==='play');},
     start(it=near){
@@ -492,7 +497,7 @@ export function createInteractions({scene,world,renderer,data,propMeshes,player,
       if(!body.airborne&&onMat()&&!keys.has('ArrowDown')){body.vy=7;body.airborne=true;trampoline.bounces++;sounds.boing();life.hop(.9);if(trampoline.bounces===1)life.say('Boing!',1200);}
     },
     // For QA.
-     get state(){return {near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
+     get state(){return {studio:debug.studio?.()??null,garageDoor:{fraction:garageDoor.fraction,target:garageDoor.target,blocked:garageDoor.blocked},near:near?.id??null,active:active?.id??null,bounces:trampoline.bounces,keys:[...keys],cars:Object.fromEntries(Object.entries(debug.cars||{}).map(([k,c])=>[k,{x:+c.x.toFixed(2),y:+c.y.toFixed(2),z:+c.z.toFixed(2),heading:+c.heading.toFixed(2),speed:+c.speed.toFixed(2),lastFit:c.lastFit}]))};},
   };
   bindButton(pill,()=>{if(active)api.stop();else api.start();});
   return api;

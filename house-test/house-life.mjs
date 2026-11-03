@@ -3,14 +3,16 @@ import {activities,destinationFor} from './activities.mjs';
 import {creature,petpet,disposeCreature,labelSprite,PET_SCALE} from './creatures.mjs?v=20261001-visuals';
 import {createPetpetFollow} from './petpet-follow.mjs?v=20260925-motion2';
 import {furnishing} from './furnishings.mjs?v=20261001-visuals';
-import {familyRooms} from './rooms.mjs?v=20261102-master-kim';
+import {familyRooms} from './rooms.mjs?v=20261103-studio-life';
+import {restoreKimPosition,kimLayoutVersion} from './master-kim-layout.mjs?v=20261103-studio-life';
+import {uniformFor,dobokParts} from './taekwondo-uniform.mjs?v=20261103-studio-life';
 import {setupSaves} from './save-panel.mjs';
-import {createNeighborhood} from './neighborhood.mjs?v=20261102-master-kim';
+import {createNeighborhood} from './neighborhood.mjs?v=20261103-studio-life';
 import {ROUTINES,HOUSE_CATS,isFamily,resolveSpots,createCompanion,updateCompanion,seenFrom,freeSpot,plan,lineOfSight,callOver} from './companions.mjs?v=20260925-motion2';
 import {createGround} from './pet-ground.mjs?v=20260925-motion2';
 import {createPetBehaviour,angleTo,needsOf,needValue} from './pet-behaviour.mjs?v=20260925-motion2';
 import {createEmotes} from './emotes.mjs';
-import {createRouter,createPawTrail} from './wayfinding.mjs?v=20260925-motion';
+import {createRouter,createPawTrail} from './wayfinding.mjs?v=20261103-studio-life';
 import {easeRoute} from './route-ease.mjs';
 import {aftermathFor,createAftermath} from './aftermath.mjs?v=20260925-motion2';
 import {placeDecor} from './decor-slots.mjs';
@@ -67,9 +69,9 @@ export async function createHouseLife(tour){
   const positionKey=id=>'craepets.house.position.'+id;
   // The view direction is saved alongside the spot (an additive field; older
   // saves without it still load), so a reload doesn't stare at a wall.
-  function savePosition(){try{localStorage.setItem(positionKey(engine.who()),JSON.stringify({x:player.x,y:player.y,z:player.z,yaw:tour.yaw}));}catch{}}
+  function savePosition(){try{localStorage.setItem(positionKey(engine.who()),JSON.stringify({x:player.x,y:player.y,z:player.z,yaw:tour.yaw,kimLayout:kimLayoutVersion}));}catch{}}
   function restorePosition(id,switching=false){
-    try{const p=JSON.parse(localStorage.getItem(positionKey(id)));if(p&&[p.x,p.y,p.z].every(Number.isFinite)){const safe=world.safeSpot(p.x,p.y,p.z);if(safe){tour.place(safe,p.yaw);return;}}}catch{}
+    try{const p=restoreKimPosition(JSON.parse(localStorage.getItem(positionKey(id))));if(p&&[p.x,p.y,p.z].every(Number.isFinite)){const safe=world.safeSpot(p.x,p.y,p.z);if(safe){tour.place(safe,p.yaw);return;}}}catch{}
     // Switching to someone who hasn't played here yet: their pet is waiting in
     // their own room, not back at the front door.
     tour.teleport((switching&&rooms.find(r=>r[1]===familyRooms[id]))||rooms[0]);
@@ -202,11 +204,13 @@ export async function createHouseLife(tour){
   try{const probe='craepets.house.storage-check';localStorage.setItem(probe,'1');localStorage.removeItem(probe);}catch{$('save-status').textContent='Saving is unavailable in this browser. Keep this tab open to keep playing.';}
   function updateAvatar(snapshot){
     petNeeds=needsOf(snapshot.pet);
-    const key=JSON.stringify(snapshot.pet&&[snapshot.who,snapshot.pet.species,snapshot.pet.colour,!!snapshot.pet.egg,snapshot.pet.wear,snapshot.pet.petpet]);
+    const uniform=uniformFor(snapshot.who,player,snapshot.pet);
+    const key=JSON.stringify(snapshot.pet&&[uniform,snapshot.who,snapshot.pet.species,snapshot.pet.colour,!!snapshot.pet.egg,snapshot.pet.wear,snapshot.pet.petpet]);
     if(key===avatarKey)return;avatarKey=key;
     if(avatar)disposeCreature(avatar);avatar=null;
     if(!snapshot.pet)return;
-    avatar=creature(snapshot.pet,api.palette(snapshot.pet.colour));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
+    const shown=uniform?{...snapshot.pet,wear:{...snapshot.pet.wear,neck:null}}:snapshot.pet;
+    avatar=creature(shown,api.palette(snapshot.pet.colour),dobokParts(uniform));avatar.scale.setScalar(PET_SCALE);scene.add(avatar);
     // The petpet trots at the pet's heel; its height is its own, a beat
     // behind (petpet-follow.mjs), so a jump is two jumps, not one lump.
     if(snapshot.pet.petpet){const id=snapshot.pet.petpet.id,friend=petpet(id);friend.position.set(.4,0,-.3);avatar.add(friend);avatar.userData.petpet=friend;
@@ -461,6 +465,9 @@ export async function createHouseLife(tour){
     // The game clock and weather the HUD shows, for the 3D time of day.
     sky:()=>({time:engine.timeOfDay(),weather:engine.weather()?.id}),
     hasPet:()=>!!engine.state().pet,
+    profile:()=>engine.who(),pet:()=>engine.state().pet,
+    refreshUniform:()=>updateAvatar(api.snapshot()),
+    refreshDirections(){if(destination)planRoute();},
     // Going back to the Craepets game: finish any activity and save the
     // valley, and remember where the pet was standing in the house.
     leave(){closeActivity(false);api.leave();savePosition();},

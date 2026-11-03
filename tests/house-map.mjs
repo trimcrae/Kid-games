@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {WalkingWorld} from '../house-test/physics.mjs';
-import {FLOORS,createFloorFinder,classify} from '../house-test/marauders-map.mjs';
+import {FLOORS,createFloorFinder,classify,mapBounds} from '../house-test/marauders-map.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
@@ -30,3 +30,5 @@ assert.equal(floorOf({x:4.6,y:-.1,z:-11}),'Main floor','a cat at the sunroom doo
 assert.equal(floorOf({x:6,y:-.82,z:-15}),'Outside','the back lawn is outside');
 assert.equal(floorOf({x:8.6,y:-.5,z:-2.62}),'Downstairs','halfway down the flight to the family room');
 console.log(`PASS marauders map: ${FLOORS.length} floors drawn ${JSON.stringify(counts)}`);
+
+const bounds=mapBounds("Master Kim's");for(const r of rooms.filter(r=>r[0]==="Master Kim's"))assert(r[2]>=bounds.x0&&r[2]<=bounds.x1&&r[3]>=bounds.y0&&r[3]<=bounds.y1,r[1]+' is cropped off the school map');

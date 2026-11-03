@@ -9,7 +9,7 @@
 // Leaves are soft: the camera may brush through a canopy (as in any garden
 // game) rather than collapsing into the pet under every tree. Walls, glass,
 // trunks and everything else still stop it.
-export function guardGroups(groups){return groups.filter(g=>g.finish?.surface!=='foliage');}
+export function guardGroups(groups){return groups.filter(g=>g.finish?.surface!=='foliage'&&!g.dynamicDoor);}
 // Low furniture — chairs, tables, beds, sofas, counters, bath fixtures, below
 // about 1.25 m — is "soft" for the sightline only: a camera above it looks
 // over it at the pet instead of diving into the pet's back. It may look past

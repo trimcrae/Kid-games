@@ -8,15 +8,16 @@ export {routeSearch};
 // isn't held up by the page's own work (a shader compile, a room probe); if a
 // worker can't start, the same search runs here a few ms per frame.
 export function createRouter(world,warm=null){
-  let worker=null,sent=-1,next=1;const pending=new Map();
+  let worker=null,sent=-1,sentRevision=-1,next=1;const pending=new Map();
   function fallback(r){r.local=routeSearch(world,r.from,r.to);}
   try{
     worker=new Worker(new URL('./route-worker.mjs?v=20260925-motion',import.meta.url),{type:'module'});
     worker.onmessage=e=>{const m=e.data,r=pending.get(m.id);if(!r)return;pending.delete(m.id);r.state=m.state;r.path=m.path;r.expanded=m.expanded;r.ms=m.ms;};
     worker.onerror=e=>{e.preventDefault?.();worker=null;for(const r of pending.values())fallback(r);pending.clear();};
   }catch{worker=null;}
-  // Send the walls once (and again only if more were added since).
-  function sync(){if(worker&&sent!==world.boxes.length){sent=world.boxes.length;worker.postMessage({type:'init',radius:world.radius,height:world.height,warm:sent===world.boxes.length&&warm?warm:null,boxes:world.boxes.map(b=>({name:b.name,min:b.min,max:b.max}))});warm=null;}}
+  // Resend when boxes are added or a door pose changes, so later routes use
+  // the current open/closed passage.
+  function sync(){if(worker&&(sent!==world.boxes.length||sentRevision!==(world.dynamicRevision||0))){sent=world.boxes.length;sentRevision=world.dynamicRevision||0;worker.postMessage({type:'init',radius:world.radius,height:world.height,warm:sent===world.boxes.length&&warm?warm:null,boxes:world.boxes.map(b=>({name:b.name,min:b.min,max:b.max}))});warm=null;}}
   sync();
   return {
     request(from,to){

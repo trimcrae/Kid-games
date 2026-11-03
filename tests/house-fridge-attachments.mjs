@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import * as THREE from '../house-test/vendor/three.module.min.js';
 import {WalkingWorld,Body} from '../house-test/physics.mjs';
 import {createInteractions} from '../house-test/interactions.mjs';
+import {prepareGarageDoor} from '../house-test/garage-door.mjs';
 
 const source=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 globalThis.THREE=THREE;
@@ -18,6 +19,7 @@ function fridgePose(withShelf){
     data.colliders.push({name:'Water dispenser shelf',prop:'fridge-b',
       min:[2.74,1.068,-5.46],max:[2.96,1.082,-5.38]});
   }
+  prepareGarageDoor(data);
   const world=new WalkingWorld(data.colliders,{height:1.05});
   const player={x:2.68,y:0,z:-6.23},body=new Body(world),keys=new Set();
   const scene=new THREE.Scene(),meshA=new THREE.Object3D(),meshB=new THREE.Object3D();

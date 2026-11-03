@@ -1,10 +1,11 @@
 import * as THREE from './vendor/three.module.min.js';
+import {createDoorMotion,hingeMatrix,transformBounds,movingDoorGuard} from './moving-doors.mjs?v=20261103-studio-life';
 import {Reflector} from './vendor/Reflector.mjs';
-import {kimModel,KIM} from './master-kim-layout.mjs';
-import {createCameraGuard} from './camera-guard.mjs?v=20260925-motion';
+import {kimModel,KIM} from './master-kim-layout.mjs?v=20261103-studio-life';
+import {createCameraGuard} from './camera-guard.mjs?v=20261103-studio-life';
 
 // Every surface is code-authored. No source photographs or remote assets.
-const ATLAS=['logo','welcome','exterior','exit','motto','tenets','olympic','rings','us','korea','tenetPoster','promise','award','abstract','best','gear','office','training','street'];
+const ATLAS=['logo','welcome','exterior','exit','motto','tenets','olympic','rings','us','korea','tenetPoster','promise','award','abstract','best','gear','office','training','street','bathroom','supplies','signin'];
 function geometry(p){
   const g=p.shape==='cylinder'?new THREE.CylinderGeometry(p.size[0],p.size[2],p.size[1],12):new THREE.BoxGeometry(...p.size);
   const matrix=new THREE.Matrix4().compose(new THREE.Vector3(...p.position),new THREE.Quaternion().setFromEuler(new THREE.Euler(...p.rotation)),new THREE.Vector3(1,1,1));
@@ -48,6 +49,7 @@ function material(finish){
 export function kimGuardData(){
   const groups=[],arrays=[];let bytes=0;
   for(const p of kimModel.parts){
+    if(p.door)continue;
     const g=geometry(p),a=g.attributes.position,n=g.attributes.normal,out=new Float32Array(a.count*6);
     for(let i=0;i<a.count;i++)out.set([a.getX(i),a.getY(i),a.getZ(i),n.getX(i),n.getY(i),n.getZ(i)],i*6);
     // Low spectator furniture follows the house camera's soft-furniture rule.
@@ -66,23 +68,31 @@ export function combineGuards(...guards){
     blocked:(...a)=>guards.some(g=>g.blocked(...a)),softClear:(...a)=>guards.every(g=>g.softClear(...a)),
     softTriangles:()=>guards.reduce((n,g)=>n+g.softTriangles(),0)};
 }
+export function createKimDoors(world,player,apply=()=>{},onSettled=()=>{}){
+  return kimModel.doors.map(d=>{const originals=world.boxes.filter(b=>b.door===d.id),source=originals.map(b=>({name:b.name,min:[...b.min],max:[...b.max]}));
+    if(!source.length)throw Error('Missing school door collider: '+d.id);
+    const motion=createDoorMotion({world,originals,player,onSettled,sample:f=>source.map(b=>transformBounds(b,hingeMatrix(d.pivot,d.openAngle*f))),apply:f=>apply(d,f)});
+    return Object.assign(motion,{id:d.id,label:d.label,at:{x:d.at[0],y:d.at[1],z:d.at[2]}});
+  });
+}
 export async function createMasterKim(scene,{mobile=false,mirror=true}={}){
   const group=new THREE.Group();group.name="Master Kim's Taekwondo";scene.add(group);
   const buckets=new Map();
   for(const p of kimModel.parts){
-    if(p.finish==='mirror')continue;
+    if(p.finish==='mirror'||p.door)continue;
     const list=buckets.get(p.finish)||[];list.push({g:geometry(p),color:p.color});buckets.set(p.finish,list);
   }
   for(const [finish,parts] of buckets){
     const m=new THREE.Mesh(merge(parts),material(finish));m.name='Master Kim / '+finish;
     m.receiveShadow=true;m.castShadow=!['glass','glow'].includes(finish);m.layers.enable(1);group.add(m);
   }
-  const atlas=await new THREE.TextureLoader().loadAsync(new URL('./master-kim/signs.png',import.meta.url).href);
+  const atlas=await new THREE.TextureLoader().loadAsync(new URL('./master-kim/signs.png?v=20261103-studio-life',import.meta.url).href);
   atlas.colorSpace=THREE.SRGBColorSpace;atlas.anisotropy=4;
   const signs=kimModel.signs.map(p=>{
-    const g=new THREE.PlaneGeometry(...p.size).toNonIndexed(),uv=g.attributes.uv,index=ATLAS.indexOf(p.kind),cols=5,rows=4;
+    const g=new THREE.PlaneGeometry(...p.size).toNonIndexed(),uv=g.attributes.uv,index=ATLAS.indexOf(p.kind),cols=6,rows=4;
     for(let i=0;i<uv.count;i++)uv.setXY(i,((index%cols)+.004+uv.getX(i)*.992)/cols,1-(Math.floor(index/cols)+.004+(1-uv.getY(i))*.992)/rows);
-    if(p.floor)g.rotateX(-Math.PI/2);else g.rotateY(p.yaw);g.translate(...p.position);return {g};
+    if(p.roll)g.rotateZ(p.roll);
+    if(Number.isFinite(p.pitch))g.rotateX(p.pitch);else if(p.floor)g.rotateX(-Math.PI/2);else g.rotateY(p.yaw);g.translate(...p.position);return {g};
   });
   const signMaterial=new THREE.MeshStandardMaterial({map:atlas,roughness:.8,emissiveMap:atlas,emissive:'#ffffff',emissiveIntensity:.16});
   const signMesh=new THREE.Mesh(merge(signs),signMaterial);signMesh.name='Master Kim / code-drawn signage';signMesh.layers.enable(1);group.add(signMesh);
@@ -94,8 +104,14 @@ export async function createMasterKim(scene,{mobile=false,mirror=true}={}){
     if(renderer.getRenderTarget()||c.position.x<29||c.position.z<20||c.position.z>54)return;
     reflect.call(this,renderer,s,c);
   };}
+  const doorMeshes=new Map();
+  for(const d of kimModel.doors){const parts=kimModel.parts.filter(p=>p.door===d.id).map(p=>({g:geometry(p),color:p.color}));const mesh=new THREE.Mesh(merge(parts),material('paint'));mesh.name=d.label;mesh.matrixAutoUpdate=false;mesh.frustumCulled=false;group.add(mesh);doorMeshes.set(d.id,mesh);}
+  const motions=[];const doorGuard=movingDoorGuard(motions);
+  function connectDoors(world,player,onSettled){if(motions.length)return motions;
+    motions.push(...createKimDoors(world,player,(d,f)=>{doorMeshes.get(d.id).matrix.copy(hingeMatrix(d.pivot,d.openAngle*f));doorMeshes.get(d.id).matrixWorldNeedsUpdate=true;},onSettled));return motions;
+  }
   const data=kimGuardData();
-  return {group,guard:createCameraGuard(data.binary,data.groups),lights:kimModel.lights,
+  return {group,guard:combineGuards(createCameraGuard(data.binary,data.groups),doorGuard),lights:kimModel.lights,connectDoors,doors:motions,doorMeshes,
     triangles:[...buckets.values()].reduce((n,ps)=>n+ps.reduce((n,p)=>n+(p.g.attributes.position?.count||0)/3,0),0),
     dispose(){glass.dispose?.();group.traverse(o=>{o.geometry?.dispose();if(o.material&&!o.isReflector)o.material.dispose();});atlas.dispose();scene.remove(group);}};
 }

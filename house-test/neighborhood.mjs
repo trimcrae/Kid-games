@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {lots,neighborhoodBoxes} from './neighborhood-layout.mjs?v=20261102-master-kim';
+import {lots,neighborhoodBoxes} from './neighborhood-layout.mjs?v=20261103-studio-life';
 import {disposeCreature} from './creatures.mjs?v=20261001-visuals';
 import {furnishing} from './furnishings.mjs?v=20261001-visuals';
 // Craepet Street: an imaginary lane of little cottages beyond the real front

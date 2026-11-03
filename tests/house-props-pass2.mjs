@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import * as THREE from '../house-test/vendor/three.module.min.js';
 import {WalkingWorld,Body} from '../house-test/physics.mjs';
 import {createInteractions,carPoint} from '../house-test/interactions.mjs';
+import {prepareGarageDoor} from '../house-test/garage-door.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 globalThis.THREE=THREE;
@@ -12,6 +13,7 @@ globalThis.document={getElementById:id=>id==='interact'?pill:id==='interact-labe
 globalThis.window={};
 globalThis.Audio=class {addEventListener(){} pause(){} set volume(v){} set preload(v){}};
 
+prepareGarageDoor(data);
 const world=new WalkingWorld(data.colliders,{height:1.05});
 const player={x:1.05,y:-.06,z:1.4},body=new Body(world),keys=new Set();
 let ride=null;

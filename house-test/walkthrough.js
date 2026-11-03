@@ -1,10 +1,10 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260925-motion';
-import {createHouseLife} from './house-life.mjs?v=20261102-master-kim';
-import {rooms} from './rooms.mjs?v=20261102-master-kim';
+import {createHouseLife} from './house-life.mjs?v=20261103-studio-life';
+import {rooms} from './rooms.mjs?v=20261103-studio-life';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
-import {createHouseLighting} from './lighting.mjs?v=20261102-master-kim';
-import {createJungle} from './jungle.mjs?v=20261102-master-kim';
+import {createHouseLighting} from './lighting.mjs?v=20261103-studio-life';
+import {createJungle} from './jungle.mjs?v=20261103-studio-life';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
 import {installPostPass} from './post-aa.mjs?v=20260916-use3';
@@ -12,13 +12,14 @@ import {installDepthPrepass} from './depth-prepass.mjs';
 import {loadHouseOcclusion} from './ambient-occlusion.mjs?v=20260916-light';
 import {loadBakedLight,UNBAKED} from './baked-light.mjs?v=20260916-light';
 import {warmupCast} from './creatures.mjs?v=20261001-visuals';
-import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20260925-motion';
+import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHeading} from './camera-guard.mjs?v=20261103-studio-life';
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
-import {createMaraudersMap} from './marauders-map.mjs?v=20261102-master-kim';
-import {createInteractions} from './interactions.mjs?v=20260926-house-fixes';
-import {createMasterKim,combineGuards} from './master-kim.mjs';
-import {kimBoxes} from './master-kim-layout.mjs';
+import {createMaraudersMap} from './marauders-map.mjs?v=20261103-studio-life';
+import {createInteractions} from './interactions.mjs?v=20261103-studio-life';
+import {createMasterKim,combineGuards} from './master-kim.mjs?v=20261103-studio-life';
+import {prepareGarageDoor} from './garage-door.mjs?v=20261103-studio-life';
+import {kimBoxes} from './master-kim-layout.mjs?v=20261103-studio-life';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 import {showSavedDataRecovery} from './saved-data-recovery.mjs?v=20261002-active-loader';
@@ -49,7 +50,9 @@ let swallowClicksUntil=0;
 document.addEventListener('click',e=>{if(e.isTrusted&&performance.now()<swallowClicksUntil){e.stopPropagation();e.preventDefault();}},true);
 function bindButton(node,action){
   node.addEventListener('pointerup',e=>{if(e.pointerType==='touch'&&!node.disabled){swallowClicksUntil=performance.now()+450;e.preventDefault();action();}});
-  node.addEventListener('click',()=>{if(performance.now()>=swallowClicksUntil)action();});
+  // Software rendering can delay a compatibility click beyond the time
+  // window. Its touch origin still identifies the already-handled tap.
+  node.addEventListener('click',e=>{if(e.pointerType==='touch'||e.sourceCapabilities?.firesTouchEvents)return;if(performance.now()>=swallowClicksUntil)action();});
 }
 const canvas=$('view'), welcome=$('welcome'), start=$('start');
 const scene=new THREE.Scene();
@@ -567,7 +570,7 @@ async function warmShaders(){
 async function load(){
   try{
     boot.step('the house plan','Opening the front door…');
-    const response=await fetch('./house.json?v='+DATA_VERSION);if(!response.ok)throw new Error('Model manifest unavailable');const data=await response.json();
+    const response=await fetch('./house.json?v='+DATA_VERSION);if(!response.ok)throw new Error('Model manifest unavailable');const data=await response.json();prepareGarageDoor(data);
     boot.step('the rooms','Loading rooms and gardens…');
     const meshResponse=await fetch('./house.mesh.gz?v='+data.meshSha256.slice(0,16));if(!meshResponse.ok)throw new Error('Model geometry unavailable');
     // Count the download (8 MB) so a slow connection shows progress, not a stall.
@@ -666,14 +669,15 @@ async function load(){
       onClose(){$('map-button').setAttribute('aria-expanded','false');if(ready)resume();}});
     bindButton($('map-button'),()=>map.toggle());
     // Things to use with E (interactions.mjs): swings, the car, the fridge…
-    interactions=createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,bindButton,reducedMotion,
+    interactions=createInteractions({scene,world,renderer,data,propMeshes,player,keys,life,body,bindButton,reducedMotion,masterKim,
       getDriveInput:()=>({throttle:-joy.y,steer:-joy.x}),
-      tour:{setCameraRig(r){followRig.setRig(r);},hint(text,show){
+      tour:{camera,suspend,resume,get active(){return active;},setCameraRig(r){followRig.setRig(r);},hint(text,show){
         if(text){
           if(!finePointer()&&interactions?.active?.kind==='drive')text='Pad ↑ drive · ↓ brake / reverse · ← → steer · 📣 honk · Get out to park';
           setHint(text,show);
         }else setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · 🐾 to jump · tap an activity');
       }}});
+    guard=combineGuards(guard,interactions.guard);
     // The house follows the game's clock and weather (same as the HUD). The
     // lighting already starts on this hour's phase, so this rarely re-probes.
     if(life.sky){lighting.setClock(()=>PINNED_SKY||life.sky());lighting.prime(player);}

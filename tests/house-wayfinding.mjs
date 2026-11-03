@@ -10,11 +10,14 @@ import {WalkingWorld} from '../house-test/physics.mjs';
 import {routeSearch} from '../house-test/route-search.mjs';
 import {rooms} from '../house-test/rooms.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
+import {createKimDoors} from '../house-test/master-kim.mjs';
 
 const data=JSON.parse(fs.readFileSync(new URL('../house-test/house.json',import.meta.url),'utf8'));
 // The game's own walking world: the sunroom's glass walls block walking too.
 const meshBytes=gunzipSync(fs.readFileSync(new URL('../house-test/house.mesh.gz',import.meta.url)));
 const world=new WalkingWorld(data.colliders,{height:1.05});world.addBoxes(glazingBoxes(meshBytes.buffer.slice(meshBytes.byteOffset,meshBytes.byteOffset+meshBytes.byteLength),data.groups,world));world.addBoxes(neighborhoodBoxes);
+// Rear studio rooms are reachable when their user-operated doors are open.
+for(const d of createKimDoors(world,{x:0,y:0,z:0})){d.setOpen(true);d.update(1,true);}
 const at=(x,y,floor)=>{const p=world.safeSpot(x,floor,-y);assert(p,`no safe spot at ${x},${y}`);return p;};
 const room=name=>{const r=rooms.find(q=>q[1]===name);assert(r,name);return r;};
 function route(from,to){

@@ -1,5 +1,5 @@
 // A little imaginary street beyond the real front yard. Y is height here.
-import {kimBoxes} from './master-kim-layout.mjs';
+import {kimBoxes} from './master-kim-layout.mjs?v=20261103-studio-life';
 export const lots=['jeannie','cory','ellie','kieran','shannon','tristan','guest'].map((id,i)=>({
   id,name:id[0].toUpperCase()+id.slice(1),x:-10+i*6,z:26.5,
   room:`${id[0].toUpperCase()+id.slice(1)}'s Craepet house`

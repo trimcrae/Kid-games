@@ -4,6 +4,7 @@ import {driveCar} from '../house-test/car-driving.mjs';
 import fs from 'node:fs';
 import {WalkingWorld} from '../house-test/physics.mjs';
 import {createInteractions} from '../house-test/interactions.mjs';
+import {prepareGarageDoor} from '../house-test/garage-door.mjs';
 import {neighborhoodBoxes} from '../house-test/neighborhood-layout.mjs';
 
 const clear=()=>({n:0,ground:0});
@@ -28,11 +29,12 @@ function withHouseCar(key,extraBoxes,check,{spawn}={}){
       for(const box of [bounds,...data.colliders.filter(b=>b.prop===key)])
         for(const edge of [box.min,box.max])for(let axis=0;axis<3;axis++)edge[axis]+=shift[axis];
     }
+    prepareGarageDoor(data);
     const world=new WalkingWorld(data.colliders,{height:1.05});
     if(extraBoxes.length)world.addBoxes(structuredClone(extraBoxes));
     const b=data.props[key],player={x:(b.min[0]+b.max[0])/2,y:b.min[1]+.08,z:(b.min[2]+b.max[2])/2};
     let throttle=0,steer=0;
-    const api=createInteractions({scene:{add(){}},world,renderer:{render:{},getDrawingBufferSize(v){v.set(1280,720);}},data,propMeshes:{},player,keys:new Set(),life:{face(){},ride(){},say(){},airborne(){},hop(){}},body:{reset(){},vy:0,airborne:false},tour:{setCameraRig(){},hint(){}},bindButton(){},getDriveInput:()=>({throttle,steer})});
+    const api=createInteractions({scene:{add(){}},world,renderer:{render:{},getDrawingBufferSize(v){v.set(1280,720);}},data,propMeshes:{},player,keys:new Set(),life:{face(){},ride(){},say(){},airborne(){},hop(){},refreshDirections(){}},body:{reset(){},vy:0,airborne:false},tour:{setCameraRig(){},hint(){}},bindButton(){},getDriveInput:()=>({throttle,steer})});
     api.tick(.016,1);
     assert.equal(api.near?.id,key);
     api.start();
@@ -97,6 +99,7 @@ test('both exported cars respect the garage rear wall and reverse out through it
   try{
     for(const key of ['car','car2']){
       const data=structuredClone(source);
+      prepareGarageDoor(data);
       const world=new WalkingWorld(data.colliders,{height:1.05});
       const b=data.props[key];
       const player={x:(b.min[0]+b.max[0])/2,y:b.min[1]+.08,z:(b.min[2]+b.max[2])/2};
@@ -242,4 +245,13 @@ test('parking twice moves original collider indices without ghosts',()=>{
     assert.ok(otherIndexed(),'reparking leaves the other car intact');
     assert.equal(world.boxes.length,count,'parking never appends collision boxes');
   });
+});
+
+test('the operable garage door blocks both cars until opened',()=>{
+ for(const key of ['car','car2'])withHouseCar(key,[],({api,player,home,setThrottle,step})=>{
+  api.stop();Object.assign(player,{x:-6.1,y:-.16,z:2.65});api.tick(1/60,100);assert.equal(api.near.id,'garage-door');api.start();step(1);assert.equal(api.state.garageDoor.fraction,0);
+  Object.assign(player,home);api.tick(1/60,200);assert.equal(api.near.id,key);api.start();setThrottle(-1);step(6);assert(api.state.cars[key].z<0,'Car passed through the closed panels');
+  api.stop();Object.assign(player,{x:-6.1,y:-.16,z:2.65});api.tick(1/60,300);assert.equal(api.near.id,'garage-door');api.start();step(1);assert.equal(api.state.garageDoor.fraction,1);
+  const at=api.state.cars[key];Object.assign(player,{x:at.x,y:at.y,z:at.z});api.tick(1/60,400);assert.equal(api.near.id,key);api.start();setThrottle(-1);step(6);assert(api.state.cars[key].z>4,'Car did not pass through the open garage');
+ });
 });

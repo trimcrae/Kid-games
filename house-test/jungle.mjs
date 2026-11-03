@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {kimClearing} from './master-kim-layout.mjs';
+import {kimClearing} from './master-kim-layout.mjs?v=20261103-studio-life';
 // (The same URL as walkthrough.js and lighting.mjs, so the shared light
 // uniforms — the exterior dim and the leaf fill — are one copy.)
 import {EXTERIOR,FOLIAGE} from './materials.mjs?v=20260916-light';

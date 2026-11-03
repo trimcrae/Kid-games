@@ -5,8 +5,8 @@ import math
 ROOT=Path(__file__).resolve().parents[2]
 FONT='/usr/share/fonts/truetype/open-sans/OpenSans-Bold.ttf'
 REG='/usr/share/fonts/truetype/open-sans/OpenSans-Regular.ttf'
-NAMES=['logo','welcome','exterior','exit','motto','tenets','olympic','rings','us','korea','tenetPoster','promise','award','abstract','best','gear','office','training','street']
-ATLAS=Image.new('RGB',(2560,2048),'#d8dfde')
+NAMES=['logo','welcome','exterior','exit','motto','tenets','olympic','rings','us','korea','tenetPoster','promise','award','abstract','best','gear','office','training','street','bathroom','supplies','signin']
+ATLAS=Image.new('RGB',(3072,2048),'#d8dfde')
 
 def text(d,xy,s,size,fill='#293637',font=FONT):
     f=ImageFont.truetype(font,size);d.text(xy,s,font=f,fill=fill,anchor='mm')
@@ -30,7 +30,7 @@ def logo(im,box):
     for s,yy in [("MASTER KIM'S",y-r*.86),('TAE KWON DO',y+r*.86)]:fit(d,(x,yy),s,r*1.32,int(r*.15),'#fff9ed')
 
 def panel(kind):
-    ratio={'exterior':12,'welcome':5.5,'exit':2.7,'motto':13.6,'tenets':35,'olympic':24,'rings':2.35,'us':.69,'korea':.75,'tenetPoster':.58,'promise':11,'award':.8,'abstract':1.4,'best':5,'gear':5.6,'office':5.6,'training':3.2,'street':4}.get(kind,1)
+    ratio={'exterior':12,'welcome':5.5,'exit':2.7,'motto':13.6,'tenets':35,'olympic':24,'rings':2.35,'us':.69,'korea':.75,'tenetPoster':.58,'promise':11,'award':.8,'abstract':1.4,'best':5,'gear':5.6,'office':5.6,'training':3.2,'street':4,'bathroom':3,'supplies':4,'signin':1.36}.get(kind,1)
     w=1600 if ratio>6 else 900;h=int(w/ratio)
     im=Image.new('RGB',(w,h),'#d2dad9');d=ImageDraw.Draw(im)
     if kind=='logo':logo(im,(w/2,h/2,w*.49))
@@ -86,11 +86,17 @@ def panel(kind):
         d.rectangle((0,0,w,h),fill='#f2efe1');d.rectangle((5,5,w-5,h-5),outline='#9d9987',width=5);fit(d,(w/2,h/2),'Do Your Best Today!',w*.9,int(h*.55))
     elif kind in ['gear','office']:
         d.rectangle((0,0,w,h),fill='#ede9dd');fit(d,(w/2,h/2),'SHOES & GEAR' if kind=='gear' else 'OFFICE',w*.9,int(h*.55))
+    elif kind in ['bathroom','supplies']:
+        d.rectangle((0,0,w,h),fill='#ede9dd');fit(d,(w/2,h/2),'BATHROOM' if kind=='bathroom' else 'TRAINING SUPPLIES',w*.9,int(h*.55))
+    elif kind=='signin':
+        d.rectangle((0,0,w,h),fill='#e7f2ef');fit(d,(w/2,h*.2),"MASTER KIM'S",w*.9,int(h*.11),'#254659')
+        fit(d,(w/2,h*.42),'WELCOME, CRAEPETS!',w*.9,int(h*.09),'#254659')
+        d.rounded_rectangle((w*.12,h*.61,w*.88,h*.85),radius=24,fill='#28685f');fit(d,(w/2,h*.73),'SIGN IN',w*.65,int(h*.14),'#fffbed')
     elif kind=='training':
         d.rectangle((0,0,w,h),fill='#31598a');fit(d,(w/2,h*.34),'RESPECT • FOCUS • PRACTICE',w*.94,int(h*.19),'#d9e5e8');fit(d,(w/2,h*.68),'Count your steps: 1  2  3  4',w*.9,int(h*.17),'#e5d19a')
     elif kind=='street':
         d.rectangle((0,0,w,h),fill='#1d4357');fit(d,(w/2,h*.32),"MASTER KIM'S →",w*.9,int(h*.30),'#f3e5b9');fit(d,(w/2,h*.76),'Taekwondo • Come on in',w*.9,int(h*.18),'#d9e6e5')
     return im.resize((512,512),Image.Resampling.LANCZOS)
-for i,name in enumerate(NAMES):ATLAS.paste(panel(name),((i%5)*512,(i//5)*512))
+for i,name in enumerate(NAMES):ATLAS.paste(panel(name),((i%6)*512,(i//6)*512))
 p=ROOT/'house-test/master-kim/signs.png';p.parent.mkdir(exist_ok=True);ATLAS.save(p,optimize=True)
 print(p, p.stat().st_size)

@@ -15,7 +15,8 @@ async function check(browser,base,label,options){
  let app;const snapshot=()=>page.evaluate(()=>Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)])));
  const neutral=()=>page.goto(base+"/loader-fixture.html",{waitUntil:"load"});
  const open=async mode=>{await page.goto(base+"/loader-host.html"+(mode==="game"?"?from=game":""),{waitUntil:"load"});app=page.frame({name:"activity"});};
- const ready=async()=>{await app.waitForFunction(()=>Craepets.state());await app.evaluate(()=>{Craepets._events(false);localStorage.setItem("craepets.news",JSON.stringify({seen:Craepets.news().id}));});};
+ // Retry reloads the iframe; wait for its script before reading the state.
+ const ready=async()=>{await app.waitForFunction(()=>window.Craepets&&Craepets.state());await app.evaluate(()=>{Craepets._events(false);localStorage.setItem("craepets.news",JSON.stringify({seen:Craepets.news().id}));});};
  const download=async()=>{const [d]=await Promise.all([page.waitForEvent("download"),app.locator("[data-saved-data-download]").click()]);const stream=await d.createReadStream(),chunks=[];for await(const c of stream)chunks.push(c);return Buffer.concat(chunks).toString("utf8");};
  try{
   await page.clock.setFixedTime(new Date("2026-10-02T00:00:00Z"));
