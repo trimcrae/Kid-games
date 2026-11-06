@@ -139,6 +139,13 @@ unhatched pets. It uses a small host, not the full 3D walkthrough.
 `house-studio-life.mjs` and `house-master-kim.mjs` check the real studio/garage
 door collision, uniforms and walking routes without requiring a browser.
 
+`house-button-input.mjs` and `house-button-input-browser.cjs` cover the shared
+house touch-button handler: deliberate taps, drags, releases outside a control,
+cancelled/interrupted gestures, multiple fingers, room-list scrolling, and
+duplicate/click-through protection. Native touch runs at phone and tablet sizes
+alongside keyboard/mouse activation. The studio dialog suite uses this same
+production handler; these focused fixtures do not render the complete house.
+
 The Post Office storage, shared-media, photo-daily and Craepets import transaction suites also run
 without Chromium when selected on their own. For save-transfer safety checks:
 

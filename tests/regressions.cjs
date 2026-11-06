@@ -8,6 +8,8 @@ const path = require("node:path");
 const { spawn } = require("node:child_process");
 
 const suites = [
+  { file: "house-button-input.mjs", timeout: 15000 },
+  { file: "house-button-input-browser.cjs", timeout: 120000, browser: true },
   { file: "house-studio-save.mjs", timeout: 15000 },
   { file: "house-studio-save-browser.cjs", timeout: 120000, browser: true },
   { file: "house-studio-life.mjs", timeout: 30000 },

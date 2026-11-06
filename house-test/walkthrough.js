@@ -20,6 +20,7 @@ import {createInteractions} from './interactions.mjs?v=20261103-studio-life';
 import {createMasterKim,combineGuards} from './master-kim.mjs?v=20261103-studio-life';
 import {prepareGarageDoor} from './garage-door.mjs?v=20261103-studio-life';
 import {kimBoxes} from './master-kim-layout.mjs?v=20261103-studio-life';
+import {createButtonBinder} from './button-input.mjs';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 import {showSavedDataRecovery} from './saved-data-recovery.mjs?v=20261002-active-loader';
@@ -40,20 +41,7 @@ for(const link of document.querySelectorAll('[data-back-to-game]'))link.addEvent
   try{leaveHouse();}catch(error){console.warn(error);}
   location.href=GAME_URL;
 });
-// Touch buttons act on pointerup, so a finger doesn't wait for the click. The
-// browser's own click for that tap still follows ~0–300 ms later and lands on
-// whatever is now under the finger — once a panel has hidden, that was the
-// HUD button beneath it (tapping "Back to walking" opened Rooms). So after any
-// touch activation, every click for the next moment is swallowed, whichever
-// element it hits.
-let swallowClicksUntil=0;
-document.addEventListener('click',e=>{if(e.isTrusted&&performance.now()<swallowClicksUntil){e.stopPropagation();e.preventDefault();}},true);
-function bindButton(node,action){
-  node.addEventListener('pointerup',e=>{if(e.pointerType==='touch'&&!node.disabled){swallowClicksUntil=performance.now()+450;e.preventDefault();action();}});
-  // Software rendering can delay a compatibility click beyond the time
-  // window. Its touch origin still identifies the already-handled tap.
-  node.addEventListener('click',e=>{if(e.pointerType==='touch'||e.sourceCapabilities?.firesTouchEvents)return;if(performance.now()>=swallowClicksUntil)action();});
-}
+const bindButton=createButtonBinder(document);
 const canvas=$('view'), welcome=$('welcome'), start=$('start');
 const scene=new THREE.Scene();
 scene.background=new THREE.Color('#c2d5d5');
