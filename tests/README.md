@@ -180,7 +180,8 @@ removed-reader cancellation, sender previews, failed-post retry and reload.
 Unrelated Craepets game and house saves remain intact.
 
 [`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
-for pull requests and pushes to `main`, with a fifteen-minute job limit. It
+for pull requests and pushes to `main`, with a twenty-five-minute job limit
+including browser installation. Individual suite timeouts still apply. It
 installs Chromium through the existing `playwright-core` CLI and passes the
 installed executable path explicitly. The broader three-device playtest
 remains available through `npm test`.
