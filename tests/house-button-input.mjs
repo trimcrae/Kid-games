@@ -9,7 +9,7 @@ class Target{
 const doc=new Target();doc.defaultView=new Target();doc.hidden=false;
 let time=1000,calls=0,otherCalls=0;
 const bindButton=createButtonBinder(doc,()=>time);
-const button=()=>Object.assign(new Target(),{disabled:false,getBoundingClientRect:()=>({left:0,right:100,top:0,bottom:100})});
+const button=()=>Object.assign(new Target(),{disabled:false,getBoundingClientRect:()=>({left:0,right:100,top:0,bottom:100}),focus(options){assert.equal(options.preventScroll,true);doc.activeElement=this;}});
 const a=button(),b=button();bindButton(a,()=>calls++);bindButton(b,()=>otherCalls++);
 function event(type,node=a,patch={}){
   const e={pointerType:'touch',pointerId:1,isPrimary:true,clientX:50,clientY:50,isTrusted:true,preventDefault(){this.prevented=true;},stopPropagation(){this.stopped=true;},...patch};
@@ -18,7 +18,7 @@ function event(type,node=a,patch={}){
 function tap(node=a,patch={}){event('pointerdown',node,patch);event('pointerup',node,patch);}
 function rejects(name,fn){const before=calls;fn();assert.equal(calls,before,name);time+=1000;}
 
-tap();assert.equal(calls,1,'A tap responds at pointerup');
+tap();assert.equal(calls,1,'A tap responds at pointerup');assert.equal(doc.activeElement,a,'Touch activation retains a focusable dialog opener');
 assert(event('click').prevented,'Compatibility click must be swallowed globally');
 event('click',b);assert.equal(otherCalls,0,'Closing a panel must not click a control underneath');
 time+=1000;event('click');assert.equal(calls,1,'Delayed touch compatibility click must not repeat');

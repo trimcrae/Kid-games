@@ -33,7 +33,7 @@ async function check(browser,base,width){
     const cdp=await context.newCDPSession(page);
     const finger=(x,y,id=1)=>({x,y,id,radiusX:3,radiusY:3});
     const touch=(type,points=[])=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:points});
-    await page.locator('#primary').tap();assert.equal((await counts()).primary,1);
+    await page.locator('#primary').tap();assert.equal((await counts()).primary,1);assert.equal(await page.evaluate(()=>document.activeElement.id),'primary','Touch activation lost focus');
     await touch('touchStart',[finger(70,110)]);await touch('touchMove',[finger(130,110)]);await touch('touchMove',[finger(70,110)]);await touch('touchEnd');assert.equal((await counts()).primary,1,'Dragging out and back activated the control');
     await touch('touchStart',[finger(277,110)]);await touch('touchMove',[finger(284,110)]);await touch('touchEnd');assert.equal((await counts()).primary,1,'Releasing outside the edge activated the control');
     await touch('touchStart',[finger(70,110)]);await touch('touchCancel');assert.equal((await counts()).primary,1);

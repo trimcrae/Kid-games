@@ -34,6 +34,9 @@ export function createButtonBinder(doc=globalThis.document,now=()=>performance.n
       if(!p||p.node!==node||node.disabled||Math.hypot(e.clientX-p.x,e.clientY-p.y)>10)return;
       const r=node.getBoundingClientRect();
       if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)return;
+      // preventDefault suppresses the browser's normal click focus too. Give
+      // dialogs a real opener to return to, without scrolling the room list.
+      node.focus?.({preventScroll:true});
       action();
     });
     node.addEventListener('click',e=>{
