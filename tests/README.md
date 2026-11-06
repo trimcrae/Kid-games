@@ -139,6 +139,13 @@ unhatched pets. It uses a small host, not the full 3D walkthrough.
 `house-studio-life.mjs` and `house-master-kim.mjs` check the real studio/garage
 door collision, uniforms and walking routes without requiring a browser.
 
+`house-button-input.mjs` and `house-button-input-browser.cjs` cover the shared
+house touch-button handler: deliberate taps, drags, releases outside a control,
+cancelled/interrupted gestures, multiple fingers, room-list scrolling, and
+duplicate/click-through protection. Native touch runs at phone and tablet sizes
+alongside keyboard/mouse activation. The studio dialog suite uses this same
+production handler; these focused fixtures do not render the complete house.
+
 The Post Office storage, shared-media, photo-daily and Craepets import transaction suites also run
 without Chromium when selected on their own. For save-transfer safety checks:
 
@@ -173,7 +180,8 @@ removed-reader cancellation, sender previews, failed-post retry and reload.
 Unrelated Craepets game and house saves remain intact.
 
 [`playtests.yml`](../.github/workflows/playtests.yml) runs the focused suites
-for pull requests and pushes to `main`, with a fifteen-minute job limit. It
+for pull requests and pushes to `main`, with a twenty-five-minute job limit
+including browser installation. Individual suite timeouts still apply. It
 installs Chromium through the existing `playwright-core` CLI and passes the
 installed executable path explicitly. The broader three-device playtest
 remains available through `npm test`.

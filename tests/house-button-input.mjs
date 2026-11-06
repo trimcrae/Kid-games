@@ -1,0 +1,42 @@
+import assert from 'node:assert/strict';
+import {createButtonBinder} from '../house-test/button-input.mjs';
+
+class Target{
+  listeners=new Map();
+  addEventListener(type,fn,capture=false){const rows=this.listeners.get(type)||[];rows.push({fn,capture});this.listeners.set(type,rows);}
+  emit(type,e={},capture=false){for(const row of this.listeners.get(type)||[])if(row.capture===capture)row.fn(e);}
+}
+const doc=new Target();doc.defaultView=new Target();doc.hidden=false;
+let time=1000,calls=0,otherCalls=0;
+const bindButton=createButtonBinder(doc,()=>time);
+const button=()=>Object.assign(new Target(),{disabled:false,getBoundingClientRect:()=>({left:0,right:100,top:0,bottom:100}),focus(options){assert.equal(options.preventScroll,true);doc.activeElement=this;}});
+const a=button(),b=button();bindButton(a,()=>calls++);bindButton(b,()=>otherCalls++);
+function event(type,node=a,patch={}){
+  const e={pointerType:'touch',pointerId:1,isPrimary:true,clientX:50,clientY:50,isTrusted:true,preventDefault(){this.prevented=true;},stopPropagation(){this.stopped=true;},...patch};
+  doc.emit(type,e,true);if(!e.stopped){node.emit(type,e);doc.emit(type,e);}return e;
+}
+function tap(node=a,patch={}){event('pointerdown',node,patch);event('pointerup',node,patch);}
+function rejects(name,fn){const before=calls;fn();assert.equal(calls,before,name);time+=1000;}
+
+tap();assert.equal(calls,1,'A tap responds at pointerup');assert.equal(doc.activeElement,a,'Touch activation retains a focusable dialog opener');
+assert(event('click').prevented,'Compatibility click must be swallowed globally');
+event('click',b);assert.equal(otherCalls,0,'Closing a panel must not click a control underneath');
+time+=1000;event('click');assert.equal(calls,1,'Delayed touch compatibility click must not repeat');
+event('click',a,{pointerType:'mouse',sourceCapabilities:{firesTouchEvents:true}});assert.equal(calls,1);
+event('click',a,{pointerType:'mouse'});assert.equal(calls,2,'Mouse click remains available');
+event('click',a,{pointerType:'',detail:0});assert.equal(calls,3,'Keyboard activation remains available');
+rejects('A release without a press is not a tap',()=>event('pointerup'));
+rejects('Dragging away and back stays cancelled',()=>{event('pointerdown');event('pointermove',a,{clientX:80});event('pointermove');event('pointerup');});
+rejects('A missed move event still cannot turn a long release into a tap',()=>{event('pointerdown');event('pointerup',a,{clientX:90});});
+rejects('Release outside the edge is not a tap',()=>{event('pointerdown',a,{clientX:98});event('pointerup',a,{clientX:103});});
+for(const signal of ['pointercancel','lostpointercapture'])rejects(signal,()=>{event('pointerdown');event(signal);event('pointerup');});
+rejects('A lost window cancels held buttons',()=>{event('pointerdown');doc.defaultView.emit('blur');event('pointerup');});
+rejects('A hidden document cancels held buttons',()=>{event('pointerdown');doc.hidden=true;doc.emit('visibilitychange');doc.hidden=false;event('pointerup');});
+tap(a,{pointerId:2,isPrimary:false});assert.equal(calls,4,'A walking thumb must not disable the other finger’s button');time+=1000;
+rejects('An unrelated release cannot activate a different control',()=>{event('pointerdown',b);event('pointerup');});
+assert.equal(otherCalls,0);
+rejects('A button disabled during a press cannot activate',()=>{event('pointerdown');a.disabled=true;event('pointerup');a.disabled=false;});
+rejects('Disabled controls reject synthetic click events too',()=>{a.disabled=true;event('click',a,{pointerType:'mouse',isTrusted:false});a.disabled=false;});
+event('pointerdown');event('pointerdown',a,{pointerId:2,isPrimary:false});event('pointerup',a,{pointerId:2,isPrimary:false});event('pointerup');assert.equal(calls,5,'Two fingers on one control produce only its first tap');
+time+=1000;event('pointerdown');event('pointermove',a,{clientX:54,clientY:54});event('pointerup',a,{clientX:54,clientY:54});assert.equal(calls,6,'A little finger wobble remains a tap');
+console.log('PASS shared house buttons: taps, drag/cancel/interruption, release bounds, multiple fingers, disabled controls, keyboard/mouse and delayed/click-through deduplication');

@@ -16,7 +16,9 @@ concurrency:
 jobs:
   regressions:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Browser/system-package downloads can take several minutes before the
+    # ~10-minute suite starts. Individual suite timeouts still catch hangs.
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: tests

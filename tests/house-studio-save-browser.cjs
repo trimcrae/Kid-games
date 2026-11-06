@@ -29,6 +29,9 @@ async function check(browser,base,mobile){
     await page.evaluate(async({key,initial})=>{
       const THREE=await import('/house-test/vendor/three.module.min.js');
       const {studioInteractions}=await import('/house-test/studio-interactions.mjs');
+      const {createButtonBinder}=await import('/house-test/button-input.mjs');
+      const bind=createButtonBinder(document),actions=new Map();
+      const bindButton=(element,action)=>{actions.set(element,action);bind(element,action);};
       const actualGet=Storage.prototype.getItem,actualSet=Storage.prototype.setItem;
       window.fixture={pet:{name:'Studio Scout',species:'blorb'},profile:'cory',fault:null,refreshes:0,active:true};
       Storage.prototype.getItem=function(k){if(k===key&&fixture.fault==='read')throw Error('Read unavailable');return actualGet.call(this,k);};
@@ -40,10 +43,11 @@ async function check(browser,base,mobile){
       const list=[],tour={get active(){return fixture.active;},suspend(){fixture.active=false;},resume(){fixture.active=true;}};
       studioInteractions({scene:new THREE.Scene(),world:{addBoxes(){}},player:{x:43.45,y:-.82,z:21.95},
         life:{pet:()=>fixture.pet,profile:()=>fixture.profile,refreshUniform(){fixture.refreshes++;},refreshDirections(){},say(){}},
-        tour,list,ticking:[],reducedMotion:true,bindButton:(element,fn)=>element.addEventListener('click',fn),
+        tour,list,ticking:[],reducedMotion:true,bindButton,
         masterKim:{connectDoors:()=>[],doorMeshes:new Map()},renderer:{domElement:document.querySelector('canvas')},debug:{}});
-      document.querySelector('#open').addEventListener('click',()=>list.find(x=>x.id==='kim-signin').start());
+      bindButton(document.querySelector('#open'),()=>list.find(x=>x.id==='kim-signin').start());
       fixture.raw=()=>actualGet.call(localStorage,key);
+      fixture.chooseBlack=()=>actions.get(document.querySelector('[data-belt=black]'))();
     },{key:KEY,initial});
     const raw=()=>page.evaluate(()=>fixture.raw());
     await press(page.locator('#open'));
@@ -79,8 +83,10 @@ async function check(browser,base,mobile){
       assert.equal(await page.locator('#kim-wear').isDisabled(),true);
       assert.equal(await page.locator('#kim-belts button:disabled').count(),6);
       const before=await raw();
-      // A stale queued event cannot bypass the no-pet/egg guard.
+      // The real binder rejects disabled events, and the action itself also
+      // guards against a callback queued before the pet changed.
       await page.locator('[data-belt=black]').dispatchEvent('click');assert.equal(await raw(),before);
+      await page.evaluate(()=>fixture.chooseBlack());assert.equal(await raw(),before);
       await press(page.locator('.kim-close'));assert.equal(await page.evaluate(()=>fixture.active),true);
     }
     await page.evaluate(key=>{fixture.pet={name:'Studio Scout'};localStorage.setItem(key,'{ damaged original');},KEY);
