@@ -118,6 +118,9 @@ async function server() {
         assert.equal(await page.evaluate(() => localStorage.getItem('craepets.v1.jeannie')), 'untouched pet');
         assert.deepEqual(errors, []);
         console.log(`${label}: menu, touch/keyboard entry, notes/undo, fixed clues, mistakes, teaching hints, saves, profile isolation, cancel/Escape, level changes, layout and completion passed.`);
+      } catch (error) {
+        await page.screenshot({ path: `/tmp/sudoku-${label}-failure.png`, fullPage: true }).catch(() => {});
+        throw error;
       } finally { await context.close(); }
     }
     // Read/write faults and competing tabs may never destroy an existing save.

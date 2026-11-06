@@ -183,6 +183,7 @@ function hint() {
   say($('hint-text').textContent + ' Place it yourself, or use the Place button.');
 }
 function requestFresh(level) {
+  if ($('confirm-dialog').open) return;
   pendingLevel = level;
   $('level').value = state.puzzle.level;
   const edited = state.board.some((n, i) => n !== state.puzzle.givens[i]) || state.notes.some(Boolean);
@@ -193,8 +194,7 @@ function requestFresh(level) {
     $('confirm-dialog').showModal();
   } else startFresh();
 }
-function startFresh() {
-  const level = pendingLevel;
+function startFresh(level = pendingLevel) {
   pendingLevel = null;
   if (!level) return;
   // A replacement is explicit. Read again before writing; never clear other saves.
@@ -222,12 +222,16 @@ $('undo').addEventListener('click', undo);
 $('check').addEventListener('click', check);
 $('hint').addEventListener('click', hint);
 $('place-hint').addEventListener('click', () => { if (pendingHint) { const { index, value } = pendingHint; state.selected = index; enter(value, true); } });
-$('confirm-dialog').addEventListener('close', () => {
-  if ($('confirm-dialog').returnValue === 'replace') startFresh();
-  else pendingLevel = null;
-  // Clear the previous return value so Escape never repeats an earlier confirmation.
-  $('confirm-dialog').returnValue = '';
+$('confirm-dialog').querySelector('form').addEventListener('submit', event => {
+  event.preventDefault();
+  const level = pendingLevel, replace = event.submitter?.value === 'replace';
+  pendingLevel = null;
+  $('confirm-dialog').close();
+  if (replace) startFresh(level);
 });
+// Handle Escape synchronously. A queued `close` event must never cancel a
+// newer dialog or borrow its choice when the player moves quickly.
+$('confirm-dialog').addEventListener('cancel', () => { pendingLevel = null; });
 window.addEventListener('storage', event => {
   if ((event.key === key() || event.key === null) && event.newValue !== savedRaw) {
     saveBlocked = true; saveWarning = 'This puzzle changed in another tab. Reload to see that save. Your moves here will not overwrite it.'; showSave();

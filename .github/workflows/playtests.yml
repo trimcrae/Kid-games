@@ -36,8 +36,10 @@ jobs:
       - name: Select installed Chromium
         run: |
           node -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'
-      - name: Run focused regressions
-        run: npm run test:regressions
+      # Fail early on the new game and make its screenshots available while
+      # the broader arcade gate continues. The aggregate gate still runs all suites.
+      - name: Check Sudoku interactions
+        run: npm run test:regressions -- sudoku-engine.mjs sudoku-browser.cjs
       - name: Keep Sudoku layout previews
         if: always()
         uses: actions/upload-artifact@v4
@@ -46,3 +48,5 @@ jobs:
           path: /tmp/sudoku-*.png
           if-no-files-found: ignore
           retention-days: 7
+      - name: Run focused regressions
+        run: npm run test:regressions
