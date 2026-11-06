@@ -10,6 +10,7 @@ vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(root, 'classics.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(root, 'family-stories.js'), 'utf8'), context);
 vm.runInContext(fs.readFileSync(path.join(root, 'volume-two.js'), 'utf8'), context);
+vm.runInContext(fs.readFileSync(path.join(root, 'ellie-stories.js'), 'utf8'), context);
 const engine = fs.readFileSync(path.join(root, 'storybook.js'), 'utf8');
 const boundary = engine.indexOf('  // Painterly cover pictures rendered by the art pipeline');
 assert.ok(boundary > 0);
@@ -18,7 +19,7 @@ const { STORIES, VOCAB, QUIZZES } = context.window.catalog;
 const originals = ['giggly-ghost', 'costume-party', 'candy-monster', 'wobbly-spell'];
 originals.forEach(id => assert.ok(STORIES.some(s => s.id === id), 'Original retained: ' + id));
 assert.equal(new Set(STORIES.map(s => s.id)).size, STORIES.length, 'Stable unique bookmark IDs');
-assert.equal(STORIES.length, 39);
+assert.equal(STORIES.length, 42);
 
 // Exercise the same literal-token contract the Python narration builder reads.
 // Compare its result against the actual reader catalog, including the end page.
@@ -100,4 +101,4 @@ if (process.argv.includes('--audio')) {
   assert.equal(clips, 41);
   console.log('PASS: all 41 narration clips match their page/end/question text and have measured timings.');
 }
-console.log('PASS: 39 books; 3 classics; 29 classic story pages; 9 classic quizzes; vocabulary and narration match the reader' + (process.argv.includes('--media') ? '; all 29 classic illustrations present.' : '.'));
+console.log('PASS: 42 books; 3 classics; 29 classic story pages; 9 classic quizzes; vocabulary and narration match the reader' + (process.argv.includes('--media') ? '; all 29 classic illustrations present.' : '.'));

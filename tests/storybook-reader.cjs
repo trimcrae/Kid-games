@@ -43,18 +43,18 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
           const img = document.querySelector('.scene-img');
           return img && img.complete && img.naturalWidth > 0;
         });
-        assert.match(await page.locator('.scene-img').getAttribute('src'), /^art\/volume-two\/.+\.webp$/);
+        assert.match(await page.locator('.scene-img').getAttribute('src'), /^art\/(?:volume-two\/.+\.webp|ellie\/.+\.svg)$/);
       };
       page.on('pageerror',e=>errors.push(e.message));
       page.on('response',r=>{if(r.status()>=400) errors.push(`${r.status()} ${r.url()}`);});
       await page.goto(base+'/games/spooky-stories/');
-      assert.equal(await page.locator('.story-card').count(),39);
-      const total = process.argv.includes('--all') && width===1280 ? 39 : 10;
+      assert.equal(await page.locator('.story-card').count(),42);
+      const total = process.argv.includes('--all') && width===1280 ? 42 : 13;
       for (let i=0;i<total;i++) {
         allowed();
         await page.locator('.story-card').nth(i).click();
-        if (i<10) await checkGeneratedPicture();
-        if (process.argv.includes('--audio') && width===1280 && i<10) {
+        if (i<13) await checkGeneratedPicture();
+        if (process.argv.includes('--audio') && width===1280 && i<13) {
           await page.locator('#read-btn').click();
           await page.waitForFunction(() => window.testAudio.some(a => !a.paused && a.currentTime>0 && a.readyState>=2));
           await page.locator('#stop-btn').click();
@@ -72,7 +72,7 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
         if(width>760) assert.ok(art.x+art.width<=copy.x+1,'Facing pages');
         else assert.ok(art.y+art.height<=copy.y+1,'Phone stacks the spread');
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'No horizontal overflow');
-        if(width===1280 && i<10 || width===390 && i===1) {
+        if(width===1280 && i<13 || width===390 && i===1) {
           allowed();
           await page.screenshot({path:path.join(os.tmpdir(),`volume-two-${width}-${i}.png`),fullPage:true});
         }
@@ -81,14 +81,14 @@ const mime = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', 
             allowed();
             if((await page.locator('#next-btn').textContent()).includes('More stories')) break;
             await page.locator('#next-btn').click();
-            if (i<10) await checkGeneratedPicture();
+            if (i<13) await checkGeneratedPicture();
             const visible = await page.locator('#page-text').textContent();
             assert.ok((await page.locator('#transcript-copy').textContent()).includes(visible));
           }
           assert.ok(await page.locator('#again-btn').isVisible());
           await page.locator('#quiz-btn').click();
           assert.ok(await page.locator('.qa').count()>=2);
-          if(i<10) {
+          if(i<13) {
             while(!(await page.locator('#quiz-done').isVisible())) {
               allowed();
               await page.locator('.qa[data-correct="1"]').click();
