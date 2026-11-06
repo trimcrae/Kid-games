@@ -43,6 +43,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install storybook browser checker
+        timeout-minutes: 5
+        working-directory: tests
+        run: |
+          npm install --no-package-lock --no-audit --no-fund
+          # Hosted Ubuntu already has Chromium libraries and English/emoji fonts.
+          # Avoid optional font apt downloads before rendering the narration.
+          node node_modules/playwright-core/cli.js install --no-shell chromium
+          node -e 'const { chromium } = require("playwright-core"); require("node:fs").appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${chromium.executablePath()}\n`);'
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -64,18 +78,6 @@ jobs:
 
       - name: Check every book has matching narration
         run: node tests/storybook-library.cjs
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Install storybook browser checker
-        timeout-minutes: 5
-        working-directory: tests
-        run: |
-          npm install --no-package-lock --no-audit --no-fund
-          node node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
-          node -e 'const { chromium } = require("playwright-core"); require("node:fs").appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${chromium.executablePath()}\n`);'
 
       - name: Check illustrated reader and narration
         env:
