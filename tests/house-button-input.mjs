@@ -32,11 +32,11 @@ rejects('Release outside the edge is not a tap',()=>{event('pointerdown',a,{clie
 for(const signal of ['pointercancel','lostpointercapture'])rejects(signal,()=>{event('pointerdown');event(signal);event('pointerup');});
 rejects('A lost window cancels held buttons',()=>{event('pointerdown');doc.defaultView.emit('blur');event('pointerup');});
 rejects('A hidden document cancels held buttons',()=>{event('pointerdown');doc.hidden=true;doc.emit('visibilitychange');doc.hidden=false;event('pointerup');});
-rejects('A secondary finger cannot activate',()=>tap(a,{pointerId:2,isPrimary:false}));
+tap(a,{pointerId:2,isPrimary:false});assert.equal(calls,4,'A walking thumb must not disable the other finger’s button');time+=1000;
 rejects('An unrelated release cannot activate a different control',()=>{event('pointerdown',b);event('pointerup');});
 assert.equal(otherCalls,0);
 rejects('A button disabled during a press cannot activate',()=>{event('pointerdown');a.disabled=true;event('pointerup');a.disabled=false;});
 rejects('Disabled controls reject synthetic click events too',()=>{a.disabled=true;event('click',a,{pointerType:'mouse',isTrusted:false});a.disabled=false;});
-event('pointerdown');event('pointerdown',a,{pointerId:2,isPrimary:false});event('pointerup',a,{pointerId:2,isPrimary:false});event('pointerup');assert.equal(calls,4,'Two fingers produce only the primary tap');
-time+=1000;event('pointerdown');event('pointermove',a,{clientX:54,clientY:54});event('pointerup',a,{clientX:54,clientY:54});assert.equal(calls,5,'A little finger wobble remains a tap');
+event('pointerdown');event('pointerdown',a,{pointerId:2,isPrimary:false});event('pointerup',a,{pointerId:2,isPrimary:false});event('pointerup');assert.equal(calls,5,'Two fingers on one control produce only its first tap');
+time+=1000;event('pointerdown');event('pointermove',a,{clientX:54,clientY:54});event('pointerup',a,{clientX:54,clientY:54});assert.equal(calls,6,'A little finger wobble remains a tap');
 console.log('PASS shared house buttons: taps, drag/cancel/interruption, release bounds, multiple fingers, disabled controls, keyboard/mouse and delayed/click-through deduplication');

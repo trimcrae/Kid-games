@@ -1,5 +1,5 @@
 // Shared house controls respond on touch release, without treating a drag,
-// cancelled gesture or second finger as a new button press.
+// cancelled gesture or two fingers on one control as repeated button presses.
 export function createButtonBinder(doc=globalThis.document,now=()=>performance.now()){
   let swallowClicksUntil=0;
   const presses=new Map(),clear=()=>presses.clear();
@@ -20,7 +20,9 @@ export function createButtonBinder(doc=globalThis.document,now=()=>performance.n
   },true);
   return function bindButton(node,action){
     node.addEventListener('pointerdown',e=>{
-      if(e.pointerType==='touch'&&!node.disabled&&e.isPrimary){
+      // The walking thumb may already own the primary pointer. A different
+      // finger can still use a button, but only one finger owns each button.
+      if(e.pointerType==='touch'&&!node.disabled&&![...presses.values()].some(p=>p.node===node)){
         presses.set(e.pointerId,{node,x:e.clientX,y:e.clientY});
       }
     });

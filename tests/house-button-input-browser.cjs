@@ -8,9 +8,9 @@ async function server(){
     try{
       if(req.url==='/fixture.html')return res.writeHead(200,{'Content-Type':'text/html'}).end(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><style>
         body{margin:0;overflow:hidden}button{width:260px;height:70px;font:18px sans-serif;touch-action:manipulation}
-        #primary{position:absolute;left:20px;top:80px;touch-action:none}#under,#cover{position:absolute;left:20px;top:180px}#cover{z-index:2}
+        #primary{position:absolute;left:20px;top:80px;touch-action:none}#pad{position:absolute;left:300px;top:80px;width:70px;height:70px;touch-action:none;background:#ddd}#under,#cover{position:absolute;left:20px;top:180px}#cover{z-index:2}
         #scroll{position:absolute;left:20px;top:280px;height:220px;overflow:auto;width:280px}#scroll button{display:block;margin:0 0 10px}#count{position:absolute;top:520px}
-        </style><button id="primary">Use control</button><button id="under">Underlying control</button><button id="cover">Close panel</button><div id="scroll"></div><output id="count"></output>`);
+        </style><button id="primary">Use control</button><div id="pad">Walking pad</div><button id="under">Underlying control</button><button id="cover">Close panel</button><div id="scroll"></div><output id="count"></output>`);
       const file=path.resolve(ROOT,'.'+new URL(req.url,'http://localhost').pathname);
       if(!file.startsWith(ROOT+path.sep))return res.writeHead(403).end();
       res.writeHead(200,{'Content-Type':'text/javascript'}).end(await fs.readFile(file));
@@ -38,16 +38,17 @@ async function check(browser,base,width){
     await touch('touchStart',[finger(277,110)]);await touch('touchMove',[finger(284,110)]);await touch('touchEnd');assert.equal((await counts()).primary,1,'Releasing outside the edge activated the control');
     await touch('touchStart',[finger(70,110)]);await touch('touchCancel');assert.equal((await counts()).primary,1);
     await touch('touchStart',[finger(70,110),finger(100,110,2)]);await touch('touchEnd');assert.equal((await counts()).primary,2,'Two fingers must activate only once');
-    await touch('touchStart',[finger(70,110)]);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await touch('touchEnd');assert.equal((await counts()).primary,2,'Window interruption retained a held touch');
-    await touch('touchStart',[finger(70,110)]);await page.locator('#primary').evaluate(b=>{b.disabled=true;});await touch('touchEnd');assert.equal((await counts()).primary,2);await page.locator('#primary').evaluate(b=>{b.disabled=false;});
-    await page.locator('#primary').tap();assert.equal((await counts()).primary,3,'Valid tap did not recover after interruption');
+    await touch('touchStart',[finger(330,110)]);await touch('touchStart',[finger(330,110),finger(70,110,2)]);await touch('touchEnd');assert.equal((await counts()).primary,3,'Holding the walking pad must not disable a button tapped by the other finger');
+    await touch('touchStart',[finger(70,110)]);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));await touch('touchEnd');assert.equal((await counts()).primary,3,'Window interruption retained a held touch');
+    await touch('touchStart',[finger(70,110)]);await page.locator('#primary').evaluate(b=>{b.disabled=true;});await touch('touchEnd');assert.equal((await counts()).primary,3);await page.locator('#primary').evaluate(b=>{b.disabled=false;});
+    await page.locator('#primary').tap();assert.equal((await counts()).primary,4,'Valid tap did not recover after interruption');
 
     // Dismissing a panel cannot activate the newly exposed HUD control.
-    await page.locator('#cover').tap();assert.deepEqual(await counts(),{primary:3,under:0,cover:1,scroll:0});
+    await page.locator('#cover').tap();assert.deepEqual(await counts(),{primary:4,under:0,cover:1,scroll:0});
     await page.locator('#under').tap();assert.equal((await counts()).under,1,'The next deliberate tap was lost');
     await page.waitForTimeout(500);
     await page.locator('#under').evaluate(b=>b.dispatchEvent(new PointerEvent('click',{bubbles:true,pointerType:'touch'})));assert.equal((await counts()).under,1,'Delayed touch click repeated the action');
-    await page.locator('#primary').focus();await page.keyboard.press('Enter');await page.keyboard.press('Space');await page.locator('#primary').click();assert.equal((await counts()).primary,6,'Keyboard or mouse activation regressed');
+    await page.locator('#primary').focus();await page.keyboard.press('Enter');await page.keyboard.press('Space');await page.locator('#primary').click();assert.equal((await counts()).primary,7,'Keyboard or mouse activation regressed');
 
     // A real scroll beginning on a room button must not choose that room.
     await touch('touchStart',[finger(130,460)]);await touch('touchMove',[finger(130,420)]);await touch('touchMove',[finger(130,360)]);await touch('touchEnd');
