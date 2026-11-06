@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title description">
+<title id="title">Ellie and the Ribbon Parade: A parade for a bear</title><desc id="description">Ellie in a purple princess dress stands beside a teddy bear and separate piles of red and blue ribbons on a castle rug.</desc>
+<defs><pattern id="paper" width="29" height="31" patternUnits="userSpaceOnUse"><circle cx="4" cy="9" r=".8" fill="#69534d" opacity=".07"/><circle cx="19" cy="24" r=".6" fill="#fff" opacity=".24"/></pattern></defs>
+<rect x="0" y="0" width="960" height="720" rx="0" fill="#f6dfdc" /><rect x="0" y="532" width="960" height="188" rx="0" fill="#e7c9af" />
+    <path d="M0 534H960" stroke="#fff1df" stroke-width="12"/>
+    <rect x="58" y="63" width="208" height="275" rx="100" fill="#c4abbc" /><rect x="72" y="77" width="180" height="247" rx="90" fill="#add2d6" />
+    <ellipse cx="163" cy="248" rx="86" ry="67" fill="#d7e6bf" /><ellipse cx="208" cy="126" rx="25" ry="25" fill="#f5dd98" /><path d="M162 86L162 318" fill="none" stroke="#fcf0dd" stroke-width="9" stroke-linecap="round" /><path d="M77 200L247 200" fill="none" stroke="#fcf0dd" stroke-width="9" stroke-linecap="round" />
+    <path d="M61 75Q96 190 56 334H28Q62 197 29 75Z M262 75Q228 190 267 334H295Q260 197 294 75Z" fill="#c295ac"/>
+    <ellipse cx="567" cy="567" rx="335" ry="110" fill="#bd9fb8" /><ellipse cx="567" cy="567" rx="313" ry="94" fill="#ddc8d4" />
+    <path d="M344 657Q564 696 791 651" fill="none" stroke="#faf0df" stroke-width="4" stroke-dasharray="7 11"/><g transform="translate(160 382) scale(1.1)" data-character="pretend-princess">
+    <ellipse cx="0" cy="198" rx="78" ry="14" fill="#65526c" opacity=".13"/>
+    <path d="M-25 152l-8 42m58-42 8 42" stroke="#edc9b0" stroke-width="17" stroke-linecap="round"/>
+    <ellipse cx="-36" cy="195" rx="22" ry="10" fill="#986ea2" /><ellipse cx="36" cy="195" rx="22" ry="10" fill="#986ea2" />
+    <path d="M-29 55Q0 36 29 55L65 159Q0 188-65 159Z" fill="#a481bf"/>
+    <path d="M-26 66L-54 155Q-13 167 14 166L0 59Z" fill="#b99bd0"/>
+    <path d="M-28 58Q-52 72-47 91L-22 91Z M28 58Q52 72 47 91L22 91Z" fill="#cfb6dd"/>
+    <path d="M-38 91L-48 126" fill="none" stroke="#edc9b0" stroke-width="14" stroke-linecap="round" />
+    <path d="M38 91L83 59" fill="none" stroke="#edc9b0" stroke-width="14" stroke-linecap="round" />
+    <rect x="14" y="112" width="23" height="28" rx="5" fill="#dbbddf" /><path d="M17 115L34 115" fill="none" stroke="#956aab" stroke-width="2" stroke-linecap="round" />
+    <rect x="-11" y="28" width="22" height="31" rx="8" fill="#edc9b0" />
+    <ellipse cx="0" cy="5" rx="44" ry="53" fill="#60443d" /><ellipse cx="-33" cy="43" rx="16" ry="26" fill="#60443d" /><ellipse cx="34" cy="43" rx="16" ry="26" fill="#60443d" />
+    <ellipse cx="0" cy="9" rx="36" ry="40" fill="#f3d3b7" />
+    <path d="M-39-4Q-40-45 1-43Q41-42 39 5Q19-5 5-24Q-7-3-39-4Z" fill="#60443d"/>
+    <ellipse cx="-12" cy="11" rx="3" ry="3" fill="#493a40" /><ellipse cx="12" cy="11" rx="3" ry="3" fill="#493a40" />
+    <ellipse cx="-22" cy="23" rx="7" ry="4" fill="#e7a0a0" /><ellipse cx="22" cy="23" rx="7" ry="4" fill="#e7a0a0" />
+    <path d="M-9 27Q0 36 9 27" fill="none" stroke="#a76572" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-28-37L-34-61-12-49 0-70 13-49 34-61 28-37Z" fill="#e8b84d" stroke="#c99b39" stroke-width="2"/>
+    <ellipse cx="0" cy="-49" rx="4" ry="4" fill="#e9dbea" /><ellipse cx="-20" cy="-47" rx="3" ry="3" fill="#a97cbe" /><ellipse cx="20" cy="-47" rx="3" ry="3" fill="#a97cbe" />
+    <path d="M-15 66Q0 74 15 66" fill="none" stroke="#f3dbb1" stroke-width="3"/>
+  </g><ellipse cx="820" cy="362" rx="96" ry="28" fill="#aa8fba" /><g transform="translate(820 278) scale(0.72)" data-character="teddy">
+    <ellipse cx="0" cy="91" rx="72" ry="16" fill="#66555c" opacity=".15"/><ellipse cx="0" cy="44" rx="54" ry="61" fill="#bb865c" />
+    <ellipse cx="-49" cy="43" rx="18" ry="36" fill="#c89568" transform="rotate(22 -49 43)"/><ellipse cx="49" cy="43" rx="18" ry="36" fill="#c89568" transform="rotate(-22 49 43)"/>
+    <ellipse cx="-32" cy="87" rx="27" ry="18" fill="#c89568" /><ellipse cx="32" cy="87" rx="27" ry="18" fill="#c89568" />
+    <ellipse cx="-34" cy="-32" rx="22" ry="22" fill="#bb865c" /><ellipse cx="34" cy="-32" rx="22" ry="22" fill="#bb865c" /><ellipse cx="-34" cy="-32" rx="12" ry="12" fill="#dfb991" /><ellipse cx="34" cy="-32" rx="12" ry="12" fill="#dfb991" />
+    <ellipse cx="0" cy="-6" rx="47" ry="43" fill="#ca966d" /><ellipse cx="0" cy="12" rx="24" ry="19" fill="#e4bf96" />
+    <ellipse cx="-16" cy="-10" rx="3" ry="3" fill="#4f403c" /><ellipse cx="16" cy="-10" rx="3" ry="3" fill="#4f403c" /><ellipse cx="0" cy="6" rx="7" ry="5" fill="#57413b" />
+    <path d="M0 11v9m-10-2q10 10 20 0" fill="none" stroke="#715044" stroke-width="2.5"/>
+    
+  </g><g transform="translate(450 440) scale(0.75)" data-ribbon="red"><path d="M-26 0H26V108L0 92-26 108Z" fill="#db5265"/><path d="M-18 5v83" stroke="#fff" opacity=".2" stroke-width="5"/><path d="M-26 0q26-8 52 0" fill="none" stroke="#754254" stroke-width="3" opacity=".2"/></g><g transform="translate(462 450) scale(0.75)" data-ribbon="red"><path d="M-26 0H26V108L0 92-26 108Z" fill="#db5265"/><path d="M-18 5v83" stroke="#fff" opacity=".2" stroke-width="5"/><path d="M-26 0q26-8 52 0" fill="none" stroke="#754254" stroke-width="3" opacity=".2"/></g><g transform="translate(474 460) scale(0.75)" data-ribbon="red"><path d="M-26 0H26V108L0 92-26 108Z" fill="#db5265"/><path d="M-18 5v83" stroke="#fff" opacity=".2" stroke-width="5"/><path d="M-26 0q26-8 52 0" fill="none" stroke="#754254" stroke-width="3" opacity=".2"/></g><g transform="translate(660 440) scale(0.75)" data-ribbon="blue"><path d="M-26 0H26V108L0 92-26 108Z" fill="#3981be"/><path d="M-18 5v83" stroke="#fff" opacity=".2" stroke-width="5"/><path d="M-26 0q26-8 52 0" fill="none" stroke="#754254" stroke-width="3" opacity=".2"/></g><g transform="translate(672 450) scale(0.75)" data-ribbon="blue"><path d="M-26 0H26V108L0 92-26 108Z" fill="#3981be"/><path d="M-18 5v83" stroke="#fff" opacity=".2" stroke-width="5"/><path d="M-26 0q26-8 52 0" fill="none" stroke="#754254" stroke-width="3" opacity=".2"/></g><g transform="translate(684 460) scale(0.75)" data-ribbon="blue"><path d="M-26 0H26V108L0 92-26 108Z" fill="#3981be"/><path d="M-18 5v83" stroke="#fff" opacity=".2" stroke-width="5"/><path d="M-26 0q26-8 52 0" fill="none" stroke="#754254" stroke-width="3" opacity=".2"/></g>
+<rect x="0" y="0" width="960" height="720" rx="0" fill="url(#paper)" />
+</svg>

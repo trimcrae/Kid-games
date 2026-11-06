@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title description">
+<title id="title">Ellie and the Little Shape Castle: A round little window</title><desc id="description">The blue square castle has a coral triangle roof and a yellow circular window; the toy mouse looks toward the round window.</desc>
+<defs><pattern id="paper" width="29" height="31" patternUnits="userSpaceOnUse"><circle cx="4" cy="9" r=".8" fill="#69534d" opacity=".07"/><circle cx="19" cy="24" r=".6" fill="#fff" opacity=".24"/></pattern></defs>
+<rect x="0" y="0" width="960" height="720" rx="0" fill="#ddeaf0" /><rect x="0" y="532" width="960" height="188" rx="0" fill="#e7c9af" />
+    <path d="M0 534H960" stroke="#fff1df" stroke-width="12"/>
+    <rect x="58" y="63" width="208" height="275" rx="100" fill="#c4abbc" /><rect x="72" y="77" width="180" height="247" rx="90" fill="#add2d6" />
+    <ellipse cx="163" cy="248" rx="86" ry="67" fill="#d7e6bf" /><ellipse cx="208" cy="126" rx="25" ry="25" fill="#f5dd98" /><path d="M162 86L162 318" fill="none" stroke="#fcf0dd" stroke-width="9" stroke-linecap="round" /><path d="M77 200L247 200" fill="none" stroke="#fcf0dd" stroke-width="9" stroke-linecap="round" />
+    <path d="M61 75Q96 190 56 334H28Q62 197 29 75Z M262 75Q228 190 267 334H295Q260 197 294 75Z" fill="#92b1c7"/>
+    <ellipse cx="567" cy="567" rx="335" ry="110" fill="#bd9fb8" /><ellipse cx="567" cy="567" rx="313" ry="94" fill="#ddc8d4" />
+    <path d="M344 657Q564 696 791 651" fill="none" stroke="#faf0df" stroke-width="4" stroke-dasharray="7 11"/><g transform="translate(143 392) scale(1.05)" data-character="pretend-princess">
+    <ellipse cx="0" cy="198" rx="78" ry="14" fill="#65526c" opacity=".13"/>
+    <path d="M-25 152l-8 42m58-42 8 42" stroke="#edc9b0" stroke-width="17" stroke-linecap="round"/>
+    <ellipse cx="-36" cy="195" rx="22" ry="10" fill="#986ea2" /><ellipse cx="36" cy="195" rx="22" ry="10" fill="#986ea2" />
+    <path d="M-29 55Q0 36 29 55L65 159Q0 188-65 159Z" fill="#a481bf"/>
+    <path d="M-26 66L-54 155Q-13 167 14 166L0 59Z" fill="#b99bd0"/>
+    <path d="M-28 58Q-52 72-47 91L-22 91Z M28 58Q52 72 47 91L22 91Z" fill="#cfb6dd"/>
+    <path d="M-38 91L-48 126" fill="none" stroke="#edc9b0" stroke-width="14" stroke-linecap="round" />
+    <path d="M38 91L83 59" fill="none" stroke="#edc9b0" stroke-width="14" stroke-linecap="round" />
+    <rect x="14" y="112" width="23" height="28" rx="5" fill="#dbbddf" /><path d="M17 115L34 115" fill="none" stroke="#956aab" stroke-width="2" stroke-linecap="round" />
+    <rect x="-11" y="28" width="22" height="31" rx="8" fill="#edc9b0" />
+    <ellipse cx="0" cy="5" rx="44" ry="53" fill="#60443d" /><ellipse cx="-33" cy="43" rx="16" ry="26" fill="#60443d" /><ellipse cx="34" cy="43" rx="16" ry="26" fill="#60443d" />
+    <ellipse cx="0" cy="9" rx="36" ry="40" fill="#f3d3b7" />
+    <path d="M-39-4Q-40-45 1-43Q41-42 39 5Q19-5 5-24Q-7-3-39-4Z" fill="#60443d"/>
+    <ellipse cx="-12" cy="11" rx="3" ry="3" fill="#493a40" /><ellipse cx="12" cy="11" rx="3" ry="3" fill="#493a40" />
+    <ellipse cx="-22" cy="23" rx="7" ry="4" fill="#e7a0a0" /><ellipse cx="22" cy="23" rx="7" ry="4" fill="#e7a0a0" />
+    <path d="M-9 27Q0 36 9 27" fill="none" stroke="#a76572" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-28-37L-34-61-12-49 0-70 13-49 34-61 28-37Z" fill="#e8b84d" stroke="#c99b39" stroke-width="2"/>
+    <ellipse cx="0" cy="-49" rx="4" ry="4" fill="#e9dbea" /><ellipse cx="-20" cy="-47" rx="3" ry="3" fill="#a97cbe" /><ellipse cx="20" cy="-47" rx="3" ry="3" fill="#a97cbe" />
+    <path d="M-15 66Q0 74 15 66" fill="none" stroke="#f3dbb1" stroke-width="3"/>
+  </g><rect x="335" y="196" width="548" height="431" rx="13" fill="#c8b6a7" /><rect x="321" y="181" width="548" height="431" rx="13" fill="#fffcf0" /><rect x="468" y="338" width="218" height="218" rx="1" fill="#6eacd0" data-shape="square"/><path d="M479 351L675 351" fill="none" stroke="#a3c8de" stroke-width="4" stroke-linecap="round" /><path d="M577 215L443 338H711Z" fill="#e28f7f" stroke="#cb786e" stroke-width="2" data-shape="triangle"/><ellipse cx="577" cy="408" rx="43" ry="43" fill="#e8bd5a" stroke="#cda74f" stroke-width="4" data-shape="circle"/><g transform="translate(707 555) scale(0.7)" data-character="toy-mouse"><path d="M-25 13q-54 7-37-23" stroke="#c28a93" stroke-width="6" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="0" rx="37" ry="24" fill="#aba0ab" /><ellipse cx="14" cy="-18" rx="18" ry="18" fill="#b7aeba" /><ellipse cx="14" cy="-18" rx="11" ry="11" fill="#dfb9c1" /><ellipse cx="29" cy="-3" rx="3" ry="3" fill="#52464f" /><ellipse cx="39" cy="7" rx="4" ry="4" fill="#d58b9c" /><path d="M36 9l20-3m-20 6 20 7" stroke="#786573" stroke-width="2"/></g>
+<rect x="0" y="0" width="960" height="720" rx="0" fill="url(#paper)" />
+</svg>

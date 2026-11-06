@@ -8,14 +8,14 @@ const root = path.resolve(__dirname, '../games/spooky-stories');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const context = { window: {} };
 vm.createContext(context);
-for (const name of ['classics.js', 'family-stories.js', 'volume-two.js', 'family-art.js', 'audio/manifest.js']) vm.runInContext(read(name), context);
+for (const name of ['classics.js', 'family-stories.js', 'volume-two.js', 'ellie-stories.js', 'family-art.js', 'audio/manifest.js']) vm.runInContext(read(name), context);
 const engine = read('storybook.js');
 const boundary = engine.indexOf('  // Painterly cover pictures rendered by the art pipeline');
 vm.runInContext(engine.slice(0, boundary) + '\nwindow.catalog = { STORIES, QUIZZES, VOCAB };\n})();', context);
 const { STORIES, QUIZZES, VOCAB } = context.window.catalog;
 const parsed = new Map();
 let current;
-for (const match of [engine, read('classics.js'), read('family-stories.js'), read('volume-two.js')].join('\n').matchAll(/\b(id|text|ending|ask):\s*"((?:[^"\\]|\\.)*)"/g)) {
+for (const match of [engine, read('classics.js'), read('family-stories.js'), read('volume-two.js'), read('ellie-stories.js')].join('\n').matchAll(/\b(id|text|ending|ask):\s*"((?:[^"\\]|\\.)*)"/g)) {
   const key = match[1], value = JSON.parse('"' + match[2] + '"');
   if (key === 'id') {
     current = parsed.get(value) || { pages: [], questions: [] };
@@ -59,8 +59,8 @@ for (const story of context.window.FAMILY_STORIES) {
     else if (!p.img) assert.match(rendered.pages[i].art(), /<svg/);
   });
 }
-assert.equal(STORIES.length, 39);
-assert.equal(new Set(STORIES.map(s=>s.id)).size, 39);
+assert.equal(STORIES.length, 42);
+assert.equal(new Set(STORIES.map(s=>s.id)).size, 42);
 assert.equal(context.window.STORYBOOK_VOLUME_TWO.length, 10, 'Ten new stories');
 assert.equal(new Set(context.window.STORYBOOK_VOLUME_TWO.map(s=>s.artStyle)).size, 10, 'Ten different art styles');
 for (const story of context.window.STORYBOOK_VOLUME_TWO) {

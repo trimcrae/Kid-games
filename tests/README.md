@@ -218,3 +218,14 @@ remains available through `npm test`.
 > This folder is the **only** part of the repo with a dependency. The games
 > themselves stay pure HTML/CSS/vanilla JS with no build step — `node_modules`
 > here is just for the test robot and is git-ignored.
+
+### Ellie's new picture books
+
+`storybook-ellie.cjs` checks the Ribbon Parade, Little Shape Castle and Sleepy
+Sunflower stories, their 18 original vector illustrations, six comprehension
+questions and exact ribbon/shape/height-mark picture counts.
+`storybook-ellie-browser.cjs` reads all three books on desktop and phone, checks
+bookmark/reload, Back, replay, wrong-answer recovery and earned stickers/badges.
+The narration build also checks the illustrated reader with real MP3 playback
+before committing its new audio. Run `node tools/render-ellie-story-art.mjs` to
+rebuild the code-drawn illustrations without downloads or image-generation costs.

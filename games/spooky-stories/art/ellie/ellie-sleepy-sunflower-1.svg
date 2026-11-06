@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 720" role="img" aria-labelledby="title description">
+<title id="title">Ellie and the Sleepy Sunflower: A little drink</title><desc id="description">Ellie gives the planted seed a small drink from a watering can; the pot rests in sunshine with only soil visible above the rim.</desc>
+<defs><pattern id="paper" width="29" height="31" patternUnits="userSpaceOnUse"><circle cx="4" cy="9" r=".8" fill="#69534d" opacity=".07"/><circle cx="19" cy="24" r=".6" fill="#fff" opacity=".24"/></pattern></defs>
+<rect x="0" y="0" width="960" height="720" rx="0" fill="#dbe9d8" /><ellipse cx="799" cy="115" rx="53" ry="53" fill="#efd58b" />
+    <path d="M0 408Q190 322 389 397T960 364V720H0Z" fill="#a8c194"/><path d="M0 508Q360 442 960 526V720H0Z" fill="#86a780"/>
+    <path d="M30 344h900M30 397h900" stroke="#d4d4ae" stroke-width="13"/>
+    <path d="M35 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M132 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M229 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M326 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M423 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M520 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M617 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M714 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M811 440V308l12-16 12 16v132Z" fill="#e7e0bd"/><path d="M908 440V308l12-16 12 16v132Z" fill="#e7e0bd"/>
+    <ellipse cx="621" cy="610" rx="181" ry="29" fill="#557c62" opacity=".22"/><g transform="translate(169 380) scale(1.03)" data-character="pretend-princess">
+    <ellipse cx="0" cy="198" rx="78" ry="14" fill="#65526c" opacity=".13"/>
+    <path d="M-25 152l-8 42m58-42 8 42" stroke="#edc9b0" stroke-width="17" stroke-linecap="round"/>
+    <ellipse cx="-36" cy="195" rx="22" ry="10" fill="#986ea2" /><ellipse cx="36" cy="195" rx="22" ry="10" fill="#986ea2" />
+    <path d="M-29 55Q0 36 29 55L65 159Q0 188-65 159Z" fill="#a481bf"/>
+    <path d="M-26 66L-54 155Q-13 167 14 166L0 59Z" fill="#b99bd0"/>
+    <path d="M-28 58Q-52 72-47 91L-22 91Z M28 58Q52 72 47 91L22 91Z" fill="#cfb6dd"/>
+    <path d="M-38 91L-48 126" fill="none" stroke="#edc9b0" stroke-width="14" stroke-linecap="round" />
+    <path d="M38 91L83 59" fill="none" stroke="#edc9b0" stroke-width="14" stroke-linecap="round" />
+    <rect x="14" y="112" width="23" height="28" rx="5" fill="#dbbddf" /><path d="M17 115L34 115" fill="none" stroke="#956aab" stroke-width="2" stroke-linecap="round" />
+    <rect x="-11" y="28" width="22" height="31" rx="8" fill="#edc9b0" />
+    <ellipse cx="0" cy="5" rx="44" ry="53" fill="#60443d" /><ellipse cx="-33" cy="43" rx="16" ry="26" fill="#60443d" /><ellipse cx="34" cy="43" rx="16" ry="26" fill="#60443d" />
+    <ellipse cx="0" cy="9" rx="36" ry="40" fill="#f3d3b7" />
+    <path d="M-39-4Q-40-45 1-43Q41-42 39 5Q19-5 5-24Q-7-3-39-4Z" fill="#60443d"/>
+    <ellipse cx="-12" cy="11" rx="3" ry="3" fill="#493a40" /><ellipse cx="12" cy="11" rx="3" ry="3" fill="#493a40" />
+    <ellipse cx="-22" cy="23" rx="7" ry="4" fill="#e7a0a0" /><ellipse cx="22" cy="23" rx="7" ry="4" fill="#e7a0a0" />
+    <path d="M-9 27Q0 36 9 27" fill="none" stroke="#a76572" stroke-width="3" stroke-linecap="round"/>
+    <path d="M-28-37L-34-61-12-49 0-70 13-49 34-61 28-37Z" fill="#e8b84d" stroke="#c99b39" stroke-width="2"/>
+    <ellipse cx="0" cy="-49" rx="4" ry="4" fill="#e9dbea" /><ellipse cx="-20" cy="-47" rx="3" ry="3" fill="#a97cbe" /><ellipse cx="20" cy="-47" rx="3" ry="3" fill="#a97cbe" />
+    <path d="M-15 66Q0 74 15 66" fill="none" stroke="#f3dbb1" stroke-width="3"/>
+  </g>
+    <path d="M535 492H731L712 610Q633 637 555 610Z" fill="#c48662"/><path d="M548 500H579L593 617 565 612Z" fill="#dca17b"/>
+    <rect x="524" y="480" width="218" height="36" rx="10" fill="#d89972" /><ellipse cx="633" cy="484" rx="96" ry="17" fill="#6b5745" /><g transform="translate(355 418) rotate(14)"><rect x="-49" y="-57" width="92" height="65" rx="14" fill="#789eae" /><path d="M42-33L95-72 112-55 44-1Z" fill="#789eae"/><path d="M-46-50q-60-14-46 37q9 20 45 9" fill="none" stroke="#789eae" stroke-width="12"/></g><path d="M456 389l22 21m-1-36 25 21m-48 12 25 20" stroke="#acd4d6" stroke-width="5" stroke-linecap="round"/>
+<rect x="0" y="0" width="960" height="720" rx="0" fill="url(#paper)" />
+</svg>
