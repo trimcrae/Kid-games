@@ -25,6 +25,18 @@
 
 const GAMES = [
   {
+    title: "Sudoku Garden",
+    emoji: "🌷",
+    flag: "NEW · Made for Jeannie",
+    blurb: "Grow your logic with Sudoku: put each number once in every row, column and box. A gentle 4 × 4 starter and three 9 × 9 levels, including a grown-up challenge, all with one unique solution. Pencil notes, undo, checks and explaining clues help you reason instead of guess. Each player keeps a separate puzzle on this device. Logic, patterns and elimination.",
+    url: "games/sudoku/",
+    ages: "6+",
+    kids: ["jeannie", "cory", "shannon", "tristan"],
+    color: "#8b72b4",
+    ready: true
+  },
+
+  {
     title: "Photo Expedition",
     emoji:  "📸",
     flag:   "NEW · Explore the world, shoot like a pro",
