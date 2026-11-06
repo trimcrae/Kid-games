@@ -60,7 +60,8 @@ const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg'
         assert.equal(await page.locator('#page-text').textContent(),story.ending);
         await activate('#quiz-btn');
         const question=await page.locator('#quiz-ask').textContent();
-        await activate('.qa:not([data-correct="1"])');
+        const wrong = page.locator('.qa:not([data-correct="1"])').first();
+        if(width<500) await wrong.tap(); else await wrong.click();
         assert.equal(await page.locator('#quiz-ask').textContent(),question,'Wrong choice keeps the question open');
         assert.equal(await page.locator('.qa.wrong:disabled').count(),1);
         await activate('.qa[data-correct="1"]');
