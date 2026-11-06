@@ -38,3 +38,11 @@ jobs:
           node -e 'const { chromium } = require("playwright-core"); const fs = require("node:fs"); const executable = chromium.executablePath(); fs.accessSync(executable, fs.constants.X_OK); fs.appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${executable}\n`);'
       - name: Run focused regressions
         run: npm run test:regressions
+      - name: Keep Sudoku layout previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sudoku-layout-previews
+          path: /tmp/sudoku-*.png
+          if-no-files-found: ignore
+          retention-days: 7

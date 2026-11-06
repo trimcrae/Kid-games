@@ -96,6 +96,16 @@ works as a pre-merge / CI gate.
 To run the broader harness at one screen size, set `DEVICE` to `Desktop`,
 `iPad` or `iPhone`, for example: `DEVICE=iPhone npm test`.
 
+### Sudoku Garden
+
+`node sudoku-engine.mjs` checks seeded 4 × 4 and 9 × 9 puzzles with an
+independent solution counter, logical hints, and strict save validation.
+`node sudoku-browser.cjs` covers menu discovery, mouse/keyboard/touch play,
+notes, undo, mistakes, clues, profile saves, completion, cancel/Escape, phone
+layout, storage faults and competing tabs at Desktop/iPad/iPhone sizes.
+Both run in the focused regression gate. The three easier tiers guarantee
+single-step logical deductions; Challenge keeps uniqueness with fewer clues.
+
 ### Focused regression checks
 
 For a quicker check of the arcade and recent reliability fixes, run:

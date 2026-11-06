@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Garden · McRae Family Arcade</title>
+  <meta name="theme-color" content="#5b4a9f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌷</text></svg>">
+  <link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#board">Skip to puzzle</a>
+  <a class="back-link" href="../../">← Back to the Arcade</a>
+  <header class="hero">
+    <p class="eyebrow">A little time to think</p>
+    <h1 class="title"><span class="emo">🌷</span> Sudoku Garden</h1>
+    <p class="subtitle">Made for Jeannie. A puzzle for everyone.</p>
+  </header>
+  <main class="sudoku-shell">
+    <section class="settings" aria-label="Choose your puzzle">
+      <label>Who's playing?
+        <select id="player"><option value="jeannie">Jeannie</option><option value="cory">Cory</option><option value="shannon">Shannon</option><option value="tristan">Tristan</option></select>
+      </label>
+      <label>Puzzle size & level
+        <select id="level"><option value="mini">Little grid · 4 × 4</option><option value="gentle">Gentle · 9 × 9</option><option value="classic">Classic · 9 × 9</option><option value="challenge">Challenge · 9 × 9</option></select>
+      </label>
+      <button id="new" class="primary">New puzzle</button>
+    </section>
+    <p id="save-status" class="save-status" role="status"></p>
+    <div class="puzzle-layout">
+      <section class="board-panel" aria-label="Sudoku puzzle">
+        <div class="board-heading"><h2 id="puzzle-title">Little grid</h2><span id="progress"></span></div>
+        <p id="rule" class="rule"></p>
+        <div class="board-scroll" tabindex="0" aria-label="Puzzle area. On a narrow screen, scroll sideways to see all columns.">
+          <div id="board" role="group" aria-label="Sudoku board" aria-describedby="rule keyboard-help"></div>
+        </div>
+        <p id="selection" class="selection"></p>
+        <div id="keypad" class="keypad" role="group" aria-label="Choose a number"></div>
+        <div class="tools" role="group" aria-label="Puzzle tools">
+          <button id="notes" aria-pressed="false">✎ Notes: off</button>
+          <button id="erase">Erase</button>
+          <button id="undo">↶ Undo</button>
+        </div>
+        <p id="message" class="message" role="status" aria-live="polite" aria-atomic="true"></p>
+        <div id="finished" class="finished" hidden><h2>🌼 Beautifully solved!</h2><p>Every row, column and box fits. Take a breath, then try another.</p></div>
+      </section>
+      <aside class="guide">
+        <div class="guide-card">
+          <span class="guide-icon" aria-hidden="true">🌱</span>
+          <h2>Grow your logic</h2>
+          <p>No timer. No lives to lose. Every puzzle has exactly one solution.</p>
+          <button id="check">Check my numbers</button>
+          <button id="hint">Give me a clue</button>
+          <div id="hint-panel" hidden><p id="hint-text"></p><button id="place-hint" class="primary"></button></div>
+        </div>
+        <details open>
+          <summary>How to play</summary>
+          <p>Fill each row, column and thick-bordered box with every number once. The dark numbers are clues and cannot change.</p>
+          <p>Pick a square, then tap a number. Turn on <strong>Notes</strong> to pencil in possibilities. A <strong>!</strong> means a number repeats in its row, column or box.</p>
+          <p>Little grid is a good place to begin. Gentle and Classic can be solved one logical step at a time. Challenge has fewer clues for a longer think.</p>
+          <p id="keyboard-help"><strong>Keyboard:</strong> Arrow keys move around the grid. Type a number to enter it; Backspace or Delete erases. N switches notes. Ctrl/Cmd + Z undoes your last move.</p>
+        </details>
+        <p class="quiet">Your puzzle saves on this device for each player. No sign-in needed.</p>
+      </aside>
+    </div>
+    <noscript><p>Please turn on JavaScript to play Sudoku.</p></noscript>
+  </main>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <h2 id="confirm-title">Start a fresh puzzle?</h2>
+    <p id="confirm-text">This will replace this player's current puzzle and pencil notes.</p>
+    <form method="dialog"><button value="cancel" autofocus>Keep playing</button><button value="replace" class="primary">Start fresh</button></form>
+  </dialog>
+  <script type="module" src="game.mjs"></script>
+</body>
+</html>
