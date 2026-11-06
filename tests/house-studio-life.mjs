@@ -35,6 +35,22 @@ motion.setOpen(true);motion.update(1,true);assert.equal(motion.fraction,1);asser
 carIn=true;motion.setOpen(false);motion.update(1,true);assert(motion.blocked);assert.equal(motion.fraction,1);carIn=false;Object.assign(pet,{z:1.77});motion.update(1,true);assert(motion.blocked);Object.assign(pet,{z:2.5});motion.update(1,true);assert.equal(motion.fraction,0);
 console.log('PASS garage original mesh/panel correspondence, unchanged vertex offsets, passage/camera open/closed, vehicle and pet interlocks');
 const memory=new Map(),storage={getItem:k=>memory.get(k)??null,setItem:(k,v)=>memory.set(k,v)};const petData={species:'blorb',name:'Practice Pet',wear:{neck:'medal',head:'partyhat'}};const before=JSON.stringify(petData);
-assert.equal(uniformFor('cory',{x:42,y:-.82,z:40},petData,storage),null);saveStudio('cory',{uniform:true,belt:'blue',signedIn:'2026-11-03'},storage);assert.equal(uniformFor('cory',{x:42,y:-.82,z:40},petData,storage).belt,'blue');assert.equal(uniformFor('cory',{x:1,y:0,z:1},petData,storage),null);assert.equal(uniformFor('ellie',{x:42,y:-.82,z:40},petData,storage),null);assert.equal(uniformFor('cory',{x:42,y:-.82,z:40},{...petData,egg:true},storage),null);assert.equal(JSON.stringify(petData),before);memory.set(studioKey('bad'),'{');assert.equal(readStudio('bad',storage).uniform,false);saveStudio('bad',{belt:'unknown'},storage);assert.equal(readStudio('bad',storage).belt,'white');
-for(const species of ['craepet','snorbit','puddlepop','flarn','twiggle','glimmr','zibbit','blorb']){const p=creature({species},{body:'#71ad9c',accent:'#e2efe0'},dobokParts({jacket:'#b63f3d',belt:'black'}));p.scale.setScalar(PET_SCALE);const rig=p.userData.rig;for(let i=0;i<60;i++)rig.update(1/60,{moving:true,speed:1.9});p.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(p,true);assert([...b.min.toArray(),...b.max.toArray()].every(Number.isFinite));let meshes=0;p.traverse(o=>{if(o.isMesh)meshes++});assert(meshes<=3);assert(b.max.y<.85);}
+assert.equal(uniformFor('cory',{x:42,y:-.82,z:40},petData,storage),null);saveStudio('cory',{uniform:true,belt:'blue',signedIn:'2026-11-03'},storage);assert.equal(uniformFor('cory',{x:42,y:-.82,z:40},petData,storage).belt,'blue');assert.equal(uniformFor('cory',{x:1,y:0,z:1},petData,storage),null);assert.equal(uniformFor('ellie',{x:42,y:-.82,z:40},petData,storage),null);assert.equal(uniformFor('cory',{x:42,y:-.82,z:40},{...petData,egg:true},storage),null);assert.equal(JSON.stringify(petData),before);memory.set(studioKey('bad'),'{');assert.equal(readStudio('bad',storage).uniform,false);assert.throws(()=>saveStudio('bad',{belt:'unknown'},storage));assert.equal(memory.get(studioKey('bad')),'{');memory.delete(studioKey('bad'));saveStudio('bad',{belt:'unknown'},storage);assert.equal(readStudio('bad',storage).belt,'white');
+// The Snorbit's ears can naturally reach above .85 m in some random gait
+// phases, even without a uniform. Compare matched animation phases instead of
+// making clothing coverage depend on that unrelated random pose.
+const random=Math.random;
+try{
+ for(const species of ['craepet','snorbit','puddlepop','flarn','twiggle','glimmr','zibbit','blorb'])for(const seed of [1,17,29,40]){
+  const bounds=[];
+  for(const dressed of [false,true]){
+   let n=seed;Math.random=()=>{n=(1664525*n+1013904223)>>>0;return n/2**32;};
+   const p=creature({species},{body:'#71ad9c',accent:'#e2efe0'},dressed?dobokParts({jacket:'#b63f3d',belt:'black'}):[]);
+   p.scale.setScalar(PET_SCALE);for(let i=0;i<60;i++)p.userData.rig.update(1/60,{moving:true,speed:1.9});p.updateMatrixWorld(true);
+   const b=new THREE.Box3().setFromObject(p,true);assert([...b.min.toArray(),...b.max.toArray()].every(Number.isFinite));
+   let meshes=0;p.traverse(o=>{if(o.isMesh)meshes++;});assert(meshes<=3);bounds.push(b);
+  }
+  assert(bounds[1].max.y<=bounds[0].max.y+.02,species+' uniform enlarged the creature height at seed '+seed);
+ }
+}finally{Math.random=random;}
 console.log('PASS uniform opt-in, location scope, per-profile persistence, eggs/malformed storage, wardrobe preservation and all eight creature rigs');

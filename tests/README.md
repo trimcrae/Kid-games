@@ -131,6 +131,14 @@ To run just one focused suite:
 npm run test:regressions -- math-reliability.test.js
 ```
 
+The studio checks run in focused CI too: `house-studio-save.mjs` protects
+practice choices from unreadable or damaged storage and tests retry and profile
+isolation. `house-studio-save-browser.cjs` exercises the production sign-in
+dialog with desktop and phone controls, storage faults, close/Escape focus and
+unhatched pets. It uses a small host, not the full 3D walkthrough.
+`house-studio-life.mjs` and `house-master-kim.mjs` check the real studio/garage
+door collision, uniforms and walking routes without requiring a browser.
+
 The Post Office storage, shared-media, photo-daily and Craepets import transaction suites also run
 without Chromium when selected on their own. For save-transfer safety checks:
 

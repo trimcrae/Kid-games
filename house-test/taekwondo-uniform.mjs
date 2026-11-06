@@ -3,11 +3,31 @@ import {inKim} from './master-kim-layout.mjs?v=20261103-studio-life';
 export const BELTS={white:'#f3edda',yellow:'#e8c542',green:'#397956',blue:'#356ba6',red:'#bd4d42',black:'#25282c'};
 const box=new THREE.BoxGeometry(1,1,1),jacket=new THREE.CylinderGeometry(.28,.30,.44,20),belt=new THREE.CylinderGeometry(.306,.306,.062,20,1,true);
 export const studioKey=id=>'craepets.house.master-kim.'+id;
-export function readStudio(id,storage=globalThis.localStorage){
-  try{const p=JSON.parse(storage.getItem(studioKey(id)));return {uniform:p?.uniform===true,belt:Object.hasOwn(BELTS,p?.belt)?p.belt:'white',signedIn:typeof p?.signedIn==='string'?p.signedIn:null};}catch{return {uniform:false,belt:'white',signedIn:null};}
+const blankStudio=()=>({uniform:false,belt:'white',signedIn:null});
+function loadStudio(id,storage){
+  const raw=storage.getItem(studioKey(id));
+  if(raw===null)return blankStudio();
+  const p=JSON.parse(raw);
+  if(!p||typeof p!=='object'||Array.isArray(p)||
+    (p.uniform!==undefined&&typeof p.uniform!=='boolean')||
+    (p.belt!==undefined&&!Object.hasOwn(BELTS,p.belt))||
+    (p.signedIn!==undefined&&p.signedIn!==null&&typeof p.signedIn!=='string')){
+    throw Error('Saved practice choices could not be read safely');
+  }
+  return {uniform:p.uniform===true,belt:p.belt??'white',signedIn:p.signedIn??null};
 }
-export function saveStudio(id,patch,storage=globalThis.localStorage){const p={...readStudio(id,storage),...patch};if(!Object.hasOwn(BELTS,p.belt))p.belt='white';storage.setItem(studioKey(id),JSON.stringify(p));return p;}
-export function uniformFor(id,position,pet,storage=globalThis.localStorage){if(!pet||pet.egg||!inKim(position))return null;const s=readStudio(id,storage);return s.uniform?{jacket:'#eeeade',belt:s.belt}:null;}
+export function readStudio(id,storage){
+  try{return loadStudio(id,storage??globalThis.localStorage);}catch{return blankStudio();}
+}
+export function saveStudio(id,patch,storage){
+  storage??=globalThis.localStorage;
+  // Rendering can fall back to ordinary clothes, but saving must not turn a
+  // failed read or damaged record into a new profile and erase its old bytes.
+  const p={...loadStudio(id,storage),...patch};
+  if(!Object.hasOwn(BELTS,p.belt))p.belt='white';
+  storage.setItem(studioKey(id),JSON.stringify(p));return p;
+}
+export function uniformFor(id,position,pet,storage){if(!pet||pet.egg||!inKim(position))return null;const s=readStudio(id,storage);return s.uniform?{jacket:'#eeeade',belt:s.belt}:null;}
 // These cloth pieces join the creature's existing skinned mesh and skeleton.
 // The player's saved wardrobe is never changed. Sleeves and trouser legs move
 // on the same bones as the paws, including all playable species.
