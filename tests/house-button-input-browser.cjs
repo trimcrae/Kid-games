@@ -25,7 +25,8 @@ async function check(browser,base,width){
     await page.goto(base+'/fixture.html');
     await page.evaluate(async()=>{
       const {createButtonBinder}=await import('/house-test/button-input.mjs');
-      const bind=createButtonBinder(document);window.counts={primary:0,under:0,cover:0,scroll:0};
+      window.buttonClock=null;
+      const bind=createButtonBinder(document,()=>window.buttonClock??performance.now());window.counts={primary:0,under:0,cover:0,scroll:0};
       for(const id of ['primary','under','cover'])bind(document.getElementById(id),()=>{counts[id]++;document.querySelector('#count').textContent=JSON.stringify(counts);if(id==='cover')document.getElementById(id).hidden=true;});
       for(let i=0;i<20;i++){const b=document.createElement('button');b.textContent='Room '+i;bind(b,()=>counts.scroll++);document.querySelector('#scroll').append(b);}
     });
@@ -54,7 +55,17 @@ async function check(browser,base,width){
     await touch('touchStart',[finger(130,460)]);await touch('touchMove',[finger(130,420)]);await touch('touchMove',[finger(130,360)]);await touch('touchEnd');
     assert.equal((await counts()).scroll,0);assert(await page.locator('#scroll').evaluate(e=>e.scrollTop>0),'Scroll gesture did not exercise scrolling');
     await page.locator('#scroll button').nth(4).tap();assert.equal((await counts()).scroll,1,'Room button failed after scrolling');
-    assert.deepEqual(errors,[]);console.log('PASS '+width+'px native house touch controls: drag, edge release, cancel, multiple fingers, interruption, scrolling, keyboard/mouse and click-through protection');
+    // A tablet keyboard can activate the control as soon as a touch finishes.
+    // Hold the injected clock inside the suppression window so a slow test
+    // runner cannot turn this regression into an unrelated timing failure.
+    await page.evaluate(()=>{window.buttonClock=performance.now();window.quickInput=[];document.querySelector('#primary').addEventListener('click',e=>quickInput.push({detail:e.detail,pointerType:e.pointerType}),true);});
+    const beforeQuick=(await counts()).primary;
+    await page.locator('#primary').tap();
+    await page.keyboard.press('Enter');await page.keyboard.press('Space');
+    assert.equal((await counts()).primary,beforeQuick+3,'Keyboard activation immediately after touch was swallowed');
+    const keys=await page.evaluate(()=>{window.buttonClock=null;return quickInput.filter(e=>e.detail===0&&!e.pointerType);});
+    assert.equal(keys.length,2,'Expected native non-pointer Enter and Space clicks');
+    assert.deepEqual(errors,[]);console.log('PASS '+width+'px native house touch controls: drag, edge release, cancel, multiple fingers, interruption, scrolling, immediate keyboard and click-through protection');
   }finally{await context.close();}
 }
 (async()=>{

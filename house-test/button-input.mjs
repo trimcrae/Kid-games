@@ -3,6 +3,9 @@
 export function createButtonBinder(doc=globalThis.document,now=()=>performance.now()){
   let swallowClicksUntil=0;
   const presses=new Map(),clear=()=>presses.clear();
+  // Keyboard and assistive clicks have no pointer and a zero click count.
+  // They remain deliberate actions even just after a finger leaves the screen.
+  const nonPointerClick=e=>e.detail===0&&!e.pointerType&&!e.sourceCapabilities?.firesTouchEvents;
   const forget=e=>presses.delete(e.pointerId);
   doc.addEventListener('pointermove',e=>{
     const p=presses.get(e.pointerId);
@@ -16,7 +19,7 @@ export function createButtonBinder(doc=globalThis.document,now=()=>performance.n
   // A touch action may dismiss its panel before the browser generates the
   // compatibility click. That click can land on another control underneath.
   doc.addEventListener('click',e=>{
-    if(e.isTrusted&&now()<swallowClicksUntil){e.stopPropagation();e.preventDefault();}
+    if(e.isTrusted&&!nonPointerClick(e)&&now()<swallowClicksUntil){e.stopPropagation();e.preventDefault();}
   },true);
   return function bindButton(node,action){
     node.addEventListener('pointerdown',e=>{
@@ -42,7 +45,7 @@ export function createButtonBinder(doc=globalThis.document,now=()=>performance.n
     node.addEventListener('click',e=>{
       // Slow rendering can delay a compatibility click beyond the time guard.
       if(node.disabled||e.pointerType==='touch'||e.sourceCapabilities?.firesTouchEvents)return;
-      if(now()>=swallowClicksUntil)action();
+      if(nonPointerClick(e)||now()>=swallowClicksUntil)action();
     });
   };
 }
