@@ -221,9 +221,11 @@ async function houseChecks(browser, base) {
     const page = await context.newPage(), errors = [];
     page.on("pageerror", error => errors.push(error.message));
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
+    // Use valid catalog IDs and omit egg for an already-hatched legacy save.
+    // The production loader deliberately refuses invalid saved pets.
     await context.addInitScript(() => {
       localStorage.setItem("craepets.house.who", "tristan");
-      localStorage.setItem("craepets.house.v1.tristan", JSON.stringify({ v: 1, pet: { name: "Visual test", species: "blorb", colour: "blue", egg: false }, coins: 20 }));
+      localStorage.setItem("craepets.house.v1.tristan", JSON.stringify({ v: 1, pet: { name: "Visual test", species: "blorb", colour: "sky" }, coins: 20 }));
     });
     try {
       console.log(`Checking full house: ${mobile ? "phone at night" : "desktop in daylight"}`);
