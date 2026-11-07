@@ -1,8 +1,5 @@
 name: Rebuild house model and walkthrough
 on:
-  # Temporary isolated-branch rebuild; removed after asset publication.
-  pull_request:
-    types: [opened]
   workflow_dispatch:
     inputs:
       views:
@@ -16,15 +13,12 @@ concurrency:
   cancel-in-progress: false
 jobs:
   house:
-    if: github.event_name == 'workflow_dispatch' || (github.head_ref == 'feat/craepets-house-polish' && github.event.pull_request.head.repo.full_name == github.repository)
-    env:
-      HOUSE_REF: ${{ github.head_ref || github.ref_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ env.HOUSE_REF }}
+          ref: ${{ github.ref_name }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -34,7 +28,7 @@ jobs:
           pip install --no-cache-dir bpy==4.5.3 pillow
       - name: Build editable model and changed previews
         env:
-          VIEWS: ${{ github.event_name == 'pull_request' && 'living,family,nursery,basement_play' || inputs.views }}
+          VIEWS: ${{ inputs.views }}
         run: |
           extra=()
           if [ -n "$VIEWS" ]; then
@@ -59,6 +53,6 @@ jobs:
           git add models/house/house.blend models/house/inventory.json models/house/previews/ house-test/house.json house-test/house.mesh.gz house-test/house.ao.gz house-test/house.lightuv.gz house-test/house.light.day.png house-test/house.light.night.png
           if ! git diff --cached --quiet; then
             git commit -m 'Rebuild house layout and browser geometry [house-export]'
-            git pull --rebase origin "${HOUSE_REF}"
-            git push origin "HEAD:${HOUSE_REF}"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
