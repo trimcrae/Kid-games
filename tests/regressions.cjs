@@ -8,6 +8,7 @@ const path = require("node:path");
 const { spawn } = require("node:child_process");
 
 const suites = [
+  { file: "house-upholstery-browser.cjs", timeout: 120000, browser: true },
   { file: "storybook-ellie.cjs", timeout: 15000 },
   { file: "storybook-ellie-browser.cjs", timeout: 120000, browser: true },
   { file: "sudoku-engine.mjs", timeout: 60000 },

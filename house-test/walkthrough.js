@@ -106,7 +106,7 @@ if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 // The export's data files are cached by content: the manifest by release, and
 // the mesh, AO and lightmaps by their own hashes from that manifest, so a new
 // manifest never meets an old mesh from a browser or offline cache.
-const DATA_VERSION='20260926-house-fixes';
+const DATA_VERSION='20261106-tailored-upholstery';
 // How long a ready house waits for a bake still downloading (?bakegrace= ms).
 const BAKE_GRACE=THREE.MathUtils.clamp(Number(query.get('bakegrace'))||3000,0,15000);
 // Calibrated against the matched captures (September 16): the day bake at 0.75,

@@ -208,11 +208,11 @@ class Geo:
         return self.raw(pts, faces, mat, True, at, rot)
 
     def soft(self, at, size, mat, rad=.04, rot=None):
-        """Pillowy rounded box: 3 x 3 quads a side (108 triangles)."""
+        """Pillowy rounded box: 5 x 5 quads a side (300 triangles)."""
         half = [v / 2 for v in size]
         rad = min(rad, min(half) * .95)
         inner = [h - rad for h in half]
-        levels = [[-h, -h + rad, h - rad, h] for h in half]
+        levels = [[-h, -h + rad * .45, -h + rad, h - rad, h - rad * .45, h] for h in half]
         pts, faces, index = [], [], {}
         for axis in range(3):
             u, v = (axis + 1) % 3, (axis + 2) % 3
@@ -231,8 +231,8 @@ class Geo:
                             pts.append(tuple(q))
                         row.append(index[key])
                     grid.append(row)
-                for j in range(3):
-                    for i in range(3):
+                for j in range(5):
+                    for i in range(5):
                         f = (grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i])
                         faces.append(f if sign > 0 else tuple(reversed(f)))
         return self.raw(pts, faces, mat, True, at, rot)

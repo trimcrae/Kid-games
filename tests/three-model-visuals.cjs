@@ -221,9 +221,11 @@ async function houseChecks(browser, base) {
     const page = await context.newPage(), errors = [];
     page.on("pageerror", error => errors.push(error.message));
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
+    // Use valid catalog IDs and omit egg for an already-hatched legacy save.
+    // The production loader deliberately refuses invalid saved pets.
     await context.addInitScript(() => {
       localStorage.setItem("craepets.house.who", "tristan");
-      localStorage.setItem("craepets.house.v1.tristan", JSON.stringify({ v: 1, pet: { name: "Visual test", species: "blorb", colour: "blue", egg: false }, coins: 20 }));
+      localStorage.setItem("craepets.house.v1.tristan", JSON.stringify({ v: 1, pet: { name: "Visual test", species: "blorb", colour: "sky" }, coins: 20 }));
     });
     try {
       console.log(`Checking full house: ${mobile ? "phone at night" : "desktop in daylight"}`);
@@ -231,7 +233,14 @@ async function houseChecks(browser, base) {
       // adaptive-resolution floor without disabling lighting or materials.
       await page.goto(base + "/house-test/?phase=" + (mobile ? "night" : "day") + "&pr=.6", { waitUntil: "domcontentloaded", timeout: 60000 });
       await page.waitForFunction(() => window.houseTest?.state.ready || window.houseBoot?.state === "failed", null, { polling: 100, timeout: 120000 });
-      assert.equal(await page.evaluate(() => !!window.houseTest?.state.ready), true, "House model failed to load");
+      const boot = await page.evaluate(() => ({ready:!!window.houseTest?.state.ready,
+        state:window.houseBoot?.state,stage:window.houseBoot?.stage,errors:window.houseBoot?.errors,
+        detail:document.getElementById("boot-detail")?.textContent}));
+      if (!boot.ready) {
+        await page.screenshot({path:path.join(OUT, "house-" + (mobile ? "mobile" : "desktop") + "-failure.png")});
+        console.error("House startup diagnostics", JSON.stringify({boot,errors}));
+      }
+      assert.equal(boot.ready, true, "House model failed to load: " + JSON.stringify({boot,errors}));
       // Locator stability polling needs animation frames, which software
       // rendering can delay for seconds. Verify a visible, enabled hit target
       // directly, then send a real mouse click or touch to its centre.

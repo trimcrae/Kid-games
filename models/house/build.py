@@ -269,19 +269,19 @@ def sofa(name, pos, width, upholstery, angle=0, photos='8', woven=False):
     asset(name, pos, angle, photos)
     body = wicker if woven else upholstery
     depth = .86 if width > 1.5 else .70
-    box('Seat foundation', (0, 0, .29), (width, depth, .25), body, .06)
-    box('Upholstered back' if not woven else 'Woven back', (0, depth / 2 - .075, .67),
+    (box if woven else padded_box)('Seat foundation', (0, 0, .29), (width, depth, .25), body, .06)
+    (box if woven else padded_box)('Upholstered back' if not woven else 'Woven back', (0, depth / 2 - .075, .67),
         (width, .16, .68), body, .06)
     for x in [-width / 2 + .10, width / 2 - .10]:
-        box('Arm', (x, 0, .54), (.20, depth, .36), body, .08 if not woven else .03)
+        (box if woven else padded_box)('Arm', (x, 0, .54), (.20, depth, .36), body, .08 if not woven else .03)
         for y in [-depth / 2 + .1, depth / 2 - .1]:
             box('Foot', (x, y, .095), (.075, .075, .19), walnut)
     count = 3 if width > 2 else (2 if width > 1.15 else 1)
     cw = (width - .43) / count
     for i in range(count):
         x = -(width - .43) / 2 + cw * (i + .5)
-        box('Separate seat cushion', (x, -.06, .46), (cw - .016, depth - .22, .18), upholstery, .065)
-        back = box('Separate back cushion', (x, depth / 2 - .20, .76),
+        tailored_cushion('Separate seat cushion', (x, -.06, .46), (cw - .016, depth - .22, .18), upholstery, .065)
+        back = tailored_cushion('Separate back cushion', (x, depth / 2 - .20, .76),
                    (cw - .012, .18, .48), upholstery, .075)
         back.rotation_euler.x = math.radians(-8)
     if woven:
@@ -342,6 +342,45 @@ def padded_box(name, loc, size, mat, radius=.06):
     return obj
 
 
+
+def tailored_cushion(name, loc, size, mat, radius=.06):
+    """Smooth, stitched upholstery within the existing collision footprint.
+
+    The welt follows a rounded cross-section on the upper/front face. It is
+    attached to the cushion, so tilting a back cushion moves both together.
+    Same material and merged export group: no extra browser draw calls.
+    """
+    obj = padded_box(name, loc, size, mat, radius)
+    half = [s / 2 for s in size]
+    radius = min(radius, min(half) * .95)
+    axis = min(range(3), key=lambda i: size[i])
+    u, v = (axis + 1) % 3, (axis + 2) % 3
+    # A thin raised seam, seated halfway into the surface. For a vertical
+    # back cushion, its visible face points toward local -Y.
+    sign = -1 if axis == 1 else 1
+    inset = radius * .62
+    height = half[axis] - inset
+    radial = math.sqrt(radius ** 2 - (radius - inset) ** 2)
+    thread = min(.0025, min(size) * .018)
+    points = []
+    for quadrant in range(4):
+        angle = quadrant * math.pi / 2
+        cu = (half[u] - radius) * (1 if quadrant in (0, 3) else -1)
+        cv = (half[v] - radius) * (1 if quadrant in (0, 1) else -1)
+        for step in range(7):
+            theta = angle + step * math.pi / 12
+            point = [0., 0., 0.]
+            point[axis] = sign * (height + thread * .45)
+            point[u] = cu + radial * math.cos(theta)
+            point[v] = cv + radial * math.sin(theta)
+            points.append(tuple(point))
+    seam = curve(name + ' sewn piping', points, thread, mat, True)
+    seam.parent = obj
+    seam['browser_collide'] = False
+    obj['tailored_cushion'] = True
+    return obj
+
+
 def living_sofa(name, pos, width, upholstery, angle=0):
     # H51.008: two broad seat cushions, rolled arms and a low upholstered base.
     # The loose cover hides the back construction; a continuous padded back
@@ -355,7 +394,7 @@ def living_sofa(name, pos, width, upholstery, angle=0):
         padded_box('Rounded sofa arm', (x, -.015, .52), (.30, .83, .36), upholstery, .14)
     cushion_width = (width - .62) / 2
     for x in [-(cushion_width + .015) / 2, (cushion_width + .015) / 2]:
-        padded_box('Broad sofa seat cushion', (x, -.085, .405),
+        tailored_cushion('Broad sofa seat cushion', (x, -.085, .405),
                    (cushion_width, .65, .15), upholstery, .065)
 
 
@@ -364,7 +403,7 @@ def living_tub_chair(name, pos, upholstery, angle=0):
     asset(name, pos, angle, 'House Tour 51.008s',
           'rounded tub silhouette observed; dimensions and concealed base estimated')
     padded_box('Tub chair upholstered base', (0, -.015, .205), (.90, .65, .32), upholstery, .12)
-    padded_box('Tub chair single seat', (0, -.065, .40), (.68, .53, .15), upholstery, .07)
+    tailored_cushion('Tub chair single seat', (0, -.065, .40), (.68, .53, .15), upholstery, .07)
     # Follow straight arm ends around an elliptical back. The shell itself is
     # curved geometry, including a rounded top and substantial upholstered ends.
     path = [(.355, -.23, 1, 0, .66), (.355, -.12, 1, 0, .70)]
@@ -419,7 +458,7 @@ def child_lounge(name, pos, width, upholstery, angle=0):
     asset(name, pos, angle, 'House Tour 51.008s',
           'low blue continuous seat, back tufts and short arms observed; dimensions estimated')
     padded_box('Child lounge low base', (0, 0, .13), (width, .70, .22), upholstery, .07)
-    padded_box('Child lounge continuous seat', (0, -.07, .245), (width - .12, .55, .11), upholstery, .048)
+    tailored_cushion('Child lounge continuous seat', (0, -.07, .245), (width - .12, .55, .11), upholstery, .048)
     padded_box('Child lounge tufted back', (0, .275, .38), (width, .15, .30), upholstery, .065)
     for x in [-(width - .13) / 2, (width - .13) / 2]:
         padded_box('Child lounge low arm', (x, -.02, .265), (.13, .61, .21), upholstery, .06)

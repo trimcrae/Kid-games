@@ -351,3 +351,15 @@ parts of the walking and camera world. The school also has its own Map tab.
 Dimensions are estimates; its exterior and neighborhood placement are fictional.
 Private photos and people are not included. See [the model notes](../models/master-kim/README.md)
 for source, standalone Blender/GLB rebuilds, lighting tradeoffs and tests.
+
+### Tailored upholstery
+
+The remaining blocky sofa, rocker, floor-cushion and office-chair parts now use
+closed rounded meshes with smooth edge normals, so the browser retains their
+soft silhouettes instead of reducing them to a single chamfer. Fitted sewn
+piping follows each cushion and its tilt, sharing the existing fabric draw
+group and adding no collision obstacles. Accent pillows have finer rounded
+corners, and the bunk pillows use the same sewn, gently lofted construction as
+the other beds. Furniture locations and dimensions remain unchanged. The mesh,
+AO and both lightmaps are rebuilt together; the manifest release changes with
+this geometry so returning players do not keep the old cached model.

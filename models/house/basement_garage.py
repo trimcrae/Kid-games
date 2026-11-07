@@ -163,7 +163,7 @@ for x in [-.73,.73]:
 for z,w in [(.31,1.47),(1.40,.90)]:
     box('Bunk mattress',(0,0,z+.12),(w,2.03,.23),bedding,.08)
     box('Bunk made cover',(0,-.22,z+.26),(w,1.54,.06),bedding,.04)
-    box('Bunk pillow',(0,.70,z+.28),(.65,.4,.12),bedding,.05)
+    soft_bedding('Bunk pillow',(0,.70,z+.28),(.65,.4,.12),bedding,nx=14,ny=10)
     for y in [-1.04,1.04]:rod('Bunk end crossbar',(-w/2,y,z),(w/2,y,z),.025,black)
 for y in [-1.03,1.03]:
     for z in [1.66,1.83]:rod('Upper bunk guard',(-.48,y,z),(.48,y,z),.023,black)
@@ -197,8 +197,8 @@ for x,a in [(-.25,-.48),(.25,.48)]:
 asset('Basement cream floor rocker',(2.49,4.20,BASEMENT_Z),90,
       'House Tour 219.012/219.412s',
       'rocker near bookcase and saucer chair observed; position and angle estimated')
-box('Floor rocker seat',(0,0,.18),(.61,.62,.23),linen,.10)
-o=box('Floor rocker back',(0,.25,.54),(.60,.18,.88),linen,.10);o.rotation_euler.x=-.14
+tailored_cushion('Floor rocker seat',(0,0,.18),(.61,.62,.23),linen,.10)
+o=tailored_cushion('Floor rocker back',(0,.25,.54),(.60,.18,.88),linen,.10);o.rotation_euler.x=-.14
 asset('Basement saucer chair',(1.35,4.25,BASEMENT_Z),90,
       'House Tour 217.410/219.412s',
       'pale saucer chair in front of dollhouse observed; position and angle estimated')
@@ -271,11 +271,11 @@ for i in range(5):
     a=i*math.tau/5
     rod('Office chair star foot',(0,0,.12),(.34*math.cos(a),.34*math.sin(a),.08),.024,black)
     sphere('Office chair caster',(.34*math.cos(a),.34*math.sin(a),.06),(.055,.037,.055),black)
-box('Black office chair seat',(0,0,.51),(.59,.57,.13),black,.09)
-box('Black office chair back',(0,.25,.86),(.57,.14,.68),black,.09)
+tailored_cushion('Black office chair seat',(0,0,.51),(.59,.57,.13),black,.09)
+tailored_cushion('Black office chair back',(0,.25,.86),(.57,.14,.68),black,.09)
 for x in [-.34,.34]:
     rod('Office chair arm upright',(x,.1,.49),(x,.1,.73),.021,black)
-    box('Office chair arm pad',(x,-.02,.75),(.075,.39,.065),black,.025)
+    tailored_cushion('Office chair arm pad',(x,-.02,.75),(.075,.39,.065),black,.025)
 table('Basement second workstation',(.43,7.20,BASEMENT_Z),(1.20,.65,.73),pine,90,'House Tour 228/231s')
 box('Second workstation screen',(0,.10,1.01),(.53,.065,.32),black)
 asset('Basement second office chair',(1.30,7.20,BASEMENT_Z),-90,'House Tour 228/231s')
