@@ -1,6 +1,6 @@
 {
   "status": "work-in-progress; not registered as a game",
-  "generator_sha256": "66a6c3f7f9056243f0913b393ffc4281126327ba679533b2ad9f4cee42ebf475",
+  "generator_sha256": "9f9f19ca13ac8d160451fc6fcda20cec2843535248f9ee949eafe2524e91a086",
   "source_files": [
     "build.py",
     "upstairs.py",
@@ -14,7 +14,7 @@
   ],
   "blender_version": "4.5.3 LTS",
   "units": "metres; estimated",
-  "objects": 8118,
+  "objects": 8150,
   "mesh_objects": 7020,
   "cameras": [
     "overview",
@@ -4837,7 +4837,7 @@
       "location_m": [
         1.0499999523162842,
         3.450000047683716,
-        -2.500000238418579
+        -2.500223159790039
       ]
     },
     {
