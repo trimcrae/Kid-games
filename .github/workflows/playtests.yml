@@ -48,13 +48,13 @@ jobs:
           path: /tmp/sudoku-*.png
           if-no-files-found: ignore
           retention-days: 7
-      - name: Run focused regressions
-        run: npm run test:regressions
       - name: Check complete house in daylight and at night
         timeout-minutes: 8
         env:
           THREE_FULL_HOUSE: '1'
         run: node three-model-visuals.cjs
+      - name: Run focused regressions
+        run: npm run test:regressions
       - name: Retain house walkthrough visual checks
         if: always()
         uses: actions/upload-artifact@v4
