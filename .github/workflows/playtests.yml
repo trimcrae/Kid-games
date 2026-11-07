@@ -50,3 +50,11 @@ jobs:
           retention-days: 7
       - name: Run focused regressions
         run: npm run test:regressions
+      - name: Retain house upholstery visual checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: house-upholstery-visuals
+          path: /tmp/house-upholstery-visuals/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -219,6 +219,17 @@ remains available through `npm test`.
 > themselves stay pure HTML/CSS/vanilla JS with no build step — `node_modules`
 > here is just for the test robot and is git-ignored.
 
+### House upholstery geometry
+
+`python models/house/test_upholstery.py` (from the repository root) checks closed
+rounded meshes, preserved furniture dimensions, unit smooth normals and fitted
+seams that move with their cushion without becoming obstacles. No Blender is
+needed for this source-level test. The house-build workflow also runs it.
+`house-upholstery-browser.cjs` is in the focused suite: it renders the real
+exported family-sofa and sunroom cushions with the actual house materials at
+desktop and phone sizes, checks shader errors/draw budgets/resource cleanup,
+and captures both views. CI retains those images for seven days. This small
+fixture complements, rather than replaces, the full-house walkthrough tests.
 ### Ellie's new picture books
 
 `storybook-ellie.cjs` checks the Ribbon Parade, Little Shape Castle and Sleepy

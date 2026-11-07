@@ -62,11 +62,13 @@ assert.deepEqual(failures,[],failures.join('\n'));
 const farm=blocking.find(b=>b.stationProp==='farm'),garden=rooms.find(r=>r[1]==='Back yard');
 assert(farm,'Raised vegetable bed must be tagged as the farm station prop');
 assert(rectDistance(farm,P(garden[2],garden[3]))<1.0,'Garden & maths station must stand at the vegetable bed');
-// Budgets: one draw group per dressing finish; <= 60k triangles, <= 30 draw calls.
+// Budgets: one draw group per dressing finish; <= 62k triangles, <= 30 draw calls.
+// The tailored-upholstery pass spends at most 2k extra triangles on rounded
+// accent pillows; it does not add draw calls or blocking objects.
 const groups=data.groups.filter(g=>g.name.startsWith('Lived-in dressing / '));
 const tris=groups.reduce((s,g)=>s+g.count/3,0);
 assert(groups.length>0&&groups.length<=30,`Dressing draw groups: ${groups.length}`);
-assert(tris<=60000,`Dressing triangles: ${tris}`);
+assert(tris<=62000,`Dressing triangles: ${tris}`);
 assert(!data.groups.some(g=>/^4[4-8] \|/.test(g.name)),'Dressing collections must export through the shared dressing groups');
 // Young trees: crown and twigs never collide; the staked trunk does, wide
 // enough (with the 0.17 m walker radius) that a pet stays outside the guard.

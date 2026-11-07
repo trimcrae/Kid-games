@@ -220,12 +220,12 @@ for x in [-.77,.77]:
     rod('Gym bar upright',(x,0,.04),(x,0,1.55),.024,bluegrey)
 rod('Gym horizontal practice bar',(-.77,0,1.55),(.77,0,1.55),.022,oak)
 asset('Lower green floor gym cushion',(11.30,1.50,-1.0),0,'V6')
-box('Clean folded green floor cushion',(0,0,.15),(1.38,.75,.30),green,.09)
+tailored_cushion('Clean folded green floor cushion',(0,0,.15),(1.38,.75,.30),green,.09)
 # Beside the piano, backrest to the front wall, seat facing into the room (was
 # (11.13, 1.98) at the stair foot facing +X). Clears the window sills by 1.5 cm.
 asset('Lower tan armless lounge seat',(10.97,.48,-1.025),180,'V6; House Tour 168.748/170.250/172.517s')
-box('Tan lounge seat cushion',(0,0,.37),(.70,.68,.19),linen,.075)
-box('Tan armless seat back',(0,.29,.64),(.70,.13,.62),linen,.06)
+tailored_cushion('Tan lounge seat cushion',(0,0,.37),(.70,.68,.19),linen,.075)
+tailored_cushion('Tan armless seat back',(0,.29,.64),(.70,.13,.62),linen,.06)
 for x in [-.26,.26]:
     for y in [-.24,.24]:box('Tan lounge seat foot',(x,y,.13),(.055,.055,.26),walnut)
 
