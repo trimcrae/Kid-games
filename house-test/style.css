@@ -308,3 +308,29 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   body:has(#nearby:not([hidden]) #nearby-actions button:nth-child(3)) .location{opacity:0;transition:none}
   body:has(.location.show) :is(#coach,#hint){visibility:hidden}
 }
+
+/* A compact, tappable weather readout; details stay readable on phones. */
+#weather-info{max-width:min(310px,52vw);font-size:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);line-height:1.4}
+#weather-info summary{cursor:pointer;min-height:44px;padding:7px 12px;font-weight:800}
+#weather-condition{display:block;font-size:12px;font-weight:600;color:var(--ink-soft)}
+#weather-info p{margin:8px 12px}
+#weather-info a{color:var(--nav);text-decoration:underline}
+#weather-info[open]{max-height:45vh;overflow:auto}
+#weather-info summary:focus-visible{outline:3px solid var(--nav);border-radius:14px}
+@media(max-width:520px) and (min-height:501px){
+  #weather-info{max-width:min(340px,calc(100vw - 24px))}
+  #weather-info[open]{position:relative;z-index:5}
+  /* The weather gets its own row above the four menu controls. */
+  .actions{top:184px}
+  body.from-game .actions{top:236px}
+  #coach,#hint{top:252px}
+  body.from-game #coach,body.from-game #hint{top:298px}
+  #journey{top:246px}
+  body.from-game #journey{top:292px}
+  #journey:not([hidden])~#coach{top:298px}
+  body.from-game #journey:not([hidden])~#coach{top:344px}
+}
+@media(pointer:coarse) and (max-width:520px) and (min-height:501px){
+  #interact,#nearby:not([hidden])~#interact{top:246px}
+  body.from-game #interact,body.from-game #nearby:not([hidden])~#interact{top:296px}
+}

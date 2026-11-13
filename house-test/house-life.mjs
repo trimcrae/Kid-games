@@ -334,7 +334,8 @@ export async function createHouseLife(tour){
     $('pet-status').textContent=s.pet?s.pet.name:profile.name;
     $('chip-coins').textContent=s.pet?`🪙 ${s.coins}`:'Adopt a Craepet';
     $('player-chip').setAttribute('aria-label',`${profile.name} playing${s.pet?` with ${s.pet.name}, ${s.coins} coins`:''}. Open family`);
-    const weather=engine.weather();$('weather-status').textContent=weather.emoji;$('weather-status').setAttribute('aria-label',weather.name);$('weather-status').title=weather.name;
+    // walkthrough owns the Rochester weather badge; game weather still drives
+    // saved activities and crops, independently of this world's live sky.
     updateNeeds(s.pet);
     $('welcome-pet').textContent=s.pet?`${s.pet.egg?'Your egg':s.pet.name} is waiting for you inside.`:'';
     $('pet-button').querySelector('.label').textContent=s.pet?.egg?'Tap egg':'Say hello';
@@ -462,8 +463,8 @@ export async function createHouseLife(tour){
   document.addEventListener('focusin',wakeHud);
   sync(true);
   return {
-    // The game clock and weather the HUD shows, for the 3D time of day.
-    sky:()=>({time:engine.timeOfDay(),weather:engine.weather()?.id}),
+    // Read the same environment as the 3D sky and weather badge.
+    sky:()=>tour.environment?.snapshot()??({time:engine.timeOfDay(),weather:engine.weather()?.id}),
     hasPet:()=>!!engine.state().pet,
     profile:()=>engine.who(),pet:()=>engine.state().pet,
     refreshUniform:()=>updateAvatar(api.snapshot()),

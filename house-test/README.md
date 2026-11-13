@@ -100,11 +100,11 @@ study:
   time of day and weather matching the HUD clock, and FXAA.
 - **The sky** (`sky.mjs`): one shader, no textures. Over the time-of-day
   gradient it draws drifting cumulus (noise clouds lit on the sun side and
-  shaded where thick; the game's weather sets the cover, so a cloudy or
-  rainy day is a grey blanket and a windy one races), a bright sun with its
-  glow, and after dark a cratered moon, a halo and twinkling stars. Colours
-  per phase and cover per weather live in `lighting.mjs` (`PHASES.clouds`,
-  `CLOUDS`). Still under `prefers-reduced-motion`.
+  shaded where thick; Rochester weather sets the cover and wind drift),
+  an astronomically positioned sun and decorative stars after dark. The
+  decorative moon is limited to explicit phase previews. Colours per phase
+  and preview presets live in `lighting.mjs` (`PHASES.clouds`, `CLOUDS`).
+  Still under `prefers-reduced-motion`.
 - **The jungle** (`jungle.mjs`): the exported yard ends at the property
   line, so beyond the back fence and the side plantings there is now an
   imaginary rainforest, code-drawn like Craepet Street: palms, broad canopy
@@ -363,3 +363,58 @@ corners, and the bunk pillows use the same sewn, gently lofted construction as
 the other beds. Furniture locations and dimensions remain unchanged. The mesh,
 AO and both lightmaps are rebuilt together; the manifest release changes with
 this geometry so returning players do not keep the old cached model.
+
+
+### Rochester weather and sunlight
+
+The 3D world's sky uses fixed Rochester, NY coordinates (43.1566, −77.6088),
+with no device location request. [Open-Meteo](https://open-meteo.com/en/docs)
+provides current model estimates, attributed in the weather disclosure under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It needs no API key.
+Cloud cover, wind direction/speed, rain and snow drive the scene; thunderstorm
+codes render rain without lightning. No accumulation or hail is simulated.
+
+Requests refresh at most every 15 minutes while visible, with a five-minute
+retry after failure, an eight-second deadline, one request in flight and a
+separate versioned weather cache. Data older than 45 minutes or retained after
+a failed refresh is visibly labelled **Cached** with its original observation
+time. After six hours, conditions become **Weather unavailable** and particles
+stop. Missing data uses a neutral sky; it never claims simulated game weather
+is a live observation. This cache does not modify pets, coins, saves or the
+underlying activities/crop simulation.
+
+Sun direction uses UTC date and NOAA/Meeus solar geometry for Rochester,
+independent of weather availability or the viewer's timezone. HUD time uses
+America/New_York (including DST), and the season label uses northern
+meteorological seasons. Day/twilight/night depend on solar elevation. The
+world convention is +x east and −z north, not a surveyed house compass bearing.
+The direction and static sun shadow map update at most once per minute;
+phase/weather changes update sooner. Room probes remain cached as the sun
+moves. Below the apparent horizon the sun supplies no direct light; practical
+lamps and diffuse fill preserve indoor readability. The live sky does not
+show a pretend astronomical moon; stars remain decorative. Sunrise visibility
+uses the standard −0.833° threshold; the reported elevation is geometric.
+
+Precipitation uses one draw call and reuses a bounded buffer (360 particles
+on desktop, 160 with coarse pointers, zero with reduced motion). A conservative
+height grid built once from walking colliders and exported roofs/ceilings
+keeps particles above shelters, including the garage, porch, studio and all
+neighborhood cottages. Roof
+edges may have a small dry margin. Clouds accumulate wind displacement without
+jumping when a new report arrives. Weather does not require a Blender rebuild.
+
+`?weather=sunny|cloudy|rainy|snowy|windy` independently previews weather while
+keeping the real sun. `?phase=day|dawn|dusk|night` retains deterministic phase
+lighting (and the old decorative preview moon); phase alone defaults to sunny.
+Both are labelled **Preview**, skip weather requests and leave the cache alone.
+Invalid override values are ignored.
+
+Verification: `node --test models/house/test_rochester_weather.mjs` covers
+astronomy, DST, mapping, cache failures, recovery and actual house shelters.
+`node tests/house-weather-browser.cjs` runs real Chromium/WebGL and saves
+screenshots/metrics under `/tmp/rochester-weather`; set `CHROMIUM_PATH` as in
+the other browser tests. The Rochester weather checks workflow runs these plus
+the material, walking, route, save and desktop/phone gameplay checks in a cloud
+runner before merging the weather branch, and on relevant main changes. A
+separate main job verifies matching published source and repeats the weather
+smoke against the actual GitHub Pages URL.

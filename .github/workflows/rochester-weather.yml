@@ -1,0 +1,144 @@
+name: Rochester weather checks
+on:
+  push:
+    branches: [main, codex/rochester-weather]
+    paths:
+      - 'house-test/**'
+      - 'models/house/test_rochester_weather.mjs'
+      - 'tests/house-weather-browser.cjs'
+      - 'tests/house-craepets.cjs'
+      - '.github/workflows/rochester-weather.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rochester-weather-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  weather:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        working-directory: tests
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Install Chromium
+        run: node tests/node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
+      - name: Select browser
+        run: |
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tests/node_modules" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_MODULE=playwright-core" >> "$GITHUB_ENV"
+          node -e 'const {chromium}=require("./tests/node_modules/playwright-core");require("fs").appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${chromium.executablePath()}\n`)'
+      - name: Deterministic weather, astronomy, shelter and house regressions
+        run: |
+          node --test models/house/test_rochester_weather.mjs
+          node models/house/test_browser_materials.mjs
+          node models/house/test_walkthrough.mjs
+          node tests/house-routes.mjs
+          node tests/house-saves.cjs
+      - name: Compile actual desktop and phone WebGL lighting
+        run: node models/house/test_browser_rendering.mjs
+      - name: Smoke test weather in complete desktop and phone worlds
+        timeout-minutes: 8
+        env:
+          LIVE_WEATHER_SMOKE: '1'
+        run: node tests/house-weather-browser.cjs
+      - name: Keep weather browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rochester-weather-browser
+          path: |
+            /tmp/rochester-weather/
+          if-no-files-found: ignore
+          retention-days: 7
+  gameplay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        working-directory: tests
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Install Chromium
+        run: node tests/node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
+      - name: Select browser
+        run: |
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tests/node_modules" >> "$GITHUB_ENV"
+          echo "PLAYWRIGHT_MODULE=playwright-core" >> "$GITHUB_ENV"
+          node -e 'const {chromium}=require("./tests/node_modules/playwright-core");require("fs").appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${chromium.executablePath()}\n`)'
+      - name: Verify gameplay and saved progress
+        timeout-minutes: 20
+        env:
+          HOUSE_QUERY: '?phase=day&weather=rainy&pr=.6'
+          HOUSE_TIMEOUT: '60000'
+          HOUSE_VIEWPORT: '1024x640'
+        run: |
+          python3 -m http.server 8765 > /tmp/rochester-http.log 2>&1 &
+          node tests/house-craepets.cjs
+      - name: Keep gameplay browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rochester-gameplay-browser
+          path: tests/house-*.png
+          if-no-files-found: ignore
+          retention-days: 7
+  published:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test dependency
+        working-directory: tests
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Install Chromium
+        run: node tests/node_modules/playwright-core/cli.js install --with-deps --no-shell chromium
+      - name: Select browser
+        run: |
+          echo "NODE_PATH=$GITHUB_WORKSPACE/tests/node_modules" >> "$GITHUB_ENV"
+          node -e 'const {chromium}=require("./tests/node_modules/playwright-core");require("fs").appendFileSync(process.env.GITHUB_ENV, `CHROMIUM_PATH=${chromium.executablePath()}\n`)'
+      - name: Wait for matching published source
+        run: |
+          python3 - <<'PY'
+          import hashlib, pathlib, time, urllib.request
+          files = ['index.html', 'walkthrough.js', 'style.css', 'lighting.mjs', 'sky.mjs', 'rochester-weather.mjs', 'precipitation.mjs', 'house-life.mjs']
+          expected = {f: hashlib.sha256(pathlib.Path('house-test', f).read_bytes()).hexdigest() for f in files}
+          for attempt in range(40):
+              try:
+                  matched = all(hashlib.sha256(urllib.request.urlopen('https://trimcrae.github.io/Kid-games/house-test/' + f, timeout=20).read()).hexdigest() == expected[f] for f in files)
+                  if matched:
+                      print('Published source matches checked-out commit for all eight runtime files')
+                      break
+              except Exception as error:
+                  print(type(error).__name__, str(error))
+              time.sleep(15)
+          else:
+              raise SystemExit('Published source did not match the tested commit')
+          PY
+      - name: Verify the published game in desktop and phone Chromium
+        timeout-minutes: 8
+        env:
+          HOUSE_BASE: 'https://trimcrae.github.io/Kid-games'
+          WEATHER_EVIDENCE_DIR: '/tmp/rochester-weather-live'
+          LIVE_WEATHER_SMOKE: '1'
+        run: node tests/house-weather-browser.cjs
+      - name: Keep published game evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rochester-weather-live
+          path: /tmp/rochester-weather-live/
+          if-no-files-found: ignore
+          retention-days: 7
