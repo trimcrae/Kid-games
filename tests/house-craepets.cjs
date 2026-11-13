@@ -4,30 +4,40 @@ const fs=require('node:fs');
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
 
 // This gameplay suite verifies DOM activities; the separate weather/WebGL
-// suite renders the complete worlds. Keep a still 3D backdrop during menus so
+// suite renders the complete worlds. Keep a still 3D backdrop during menus and
+// the desktop activity tour, permitting a real frame after each room jump, so
 // software rendering cannot starve the real iframe input and game assertions.
 // Only the named top-window scene loop is deferred, after startup is complete.
 function pauseBackdropDuringMenus(){
   if(window!==window.top)return;
   const nativeRAF=window.requestAnimationFrame.bind(window),nativeCancel=window.cancelAnimationFrame.bind(window);
   const jobs=new Map();let sequence=0;
-  const audit=window.__houseUiBackdrop={deferred:0,resumed:0,lastPanel:null};
-  const menu=()=>window.houseTest&&['activity-panel','family-panel','save-panel','rooms'].find(id=>{
-    const panel=document.getElementById(id);return panel&&!panel.hidden;
-  });
+  const audit=window.__houseUiBackdrop={deferred:0,resumed:0,lastPanel:null,tourHold:false,permitTarget:0};
+  const hold=()=>{
+    if(!window.houseTest)return null;
+    const panel=['activity-panel','family-panel','save-panel','rooms'].find(id=>{
+      const panel=document.getElementById(id);return panel&&!panel.hidden;
+    });
+    if(panel)return panel;
+    // Count actual rendered frames, not RAF callbacks (animate can return
+    // early at its 30 fps limit). Its already-queued successor rechecks too.
+    if(audit.tourHold&&(!audit.permitTarget||window.houseTest.state.framesDrawn>=audit.permitTarget))return 'activity-tour';
+    return null;
+  };
   window.requestAnimationFrame=callback=>{
     if(callback.name!=='animate')return nativeRAF(callback);
     const id=--sequence,job={raf:null,timer:null};jobs.set(id,job);
     const schedule=()=>{
       if(!jobs.has(id))return;
-      const panel=menu();
+      const panel=hold();
       if(panel){audit.deferred++;audit.lastPanel=panel;job.timer=setTimeout(schedule,75);return;}
       job.timer=null;
       job.raf=nativeRAF(timestamp=>{
         // A menu can open after the frame was queued. Recheck before the
         // expensive scene callback, while leaving anonymous fade RAFs alone.
-        if(menu()){schedule();return;}
+        if(hold()){schedule();return;}
         jobs.delete(id);audit.resumed++;callback(timestamp);
+        if(audit.tourHold&&audit.permitTarget&&window.houseTest.state.framesDrawn>=audit.permitTarget)audit.permitTarget=0;
       });
     };
     schedule();return id;
@@ -82,6 +92,12 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     await page.waitForTimeout(75);
   }
   assert.fail('Inaccessible real-input target '+locator+': '+JSON.stringify(last));
+}
+async function motionState(page,label){
+  const state=await page.evaluate(()=>{
+    const s=houseTest.state;return {position:s.position,yaw:s.yaw,frames:s.framesDrawn,nearby:s.nearby,active:s.active};
+  });
+  console.log('MOTION',label,JSON.stringify(state));return state;
 }
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-unsafe-swiftshader']});
@@ -140,8 +156,26 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     const runtime=()=>page.frame({url:/activity.html/});
     await runtime().evaluate(()=>Craepets._events(false));
     assert.equal(await runtime().evaluate(()=>Craepets.state().pet.name),'Cory Comet');
+    await page.evaluate(()=>{window.__houseUiBackdrop.tourHold=true;window.__houseUiBackdrop.permitTarget=0;});
     await clickReal(page.locator('#start'));
-    async function jump(room){if(await page.evaluate(()=>houseTest.state.active))await page.keyboard.press('KeyR');else await clickReal(page.locator('#welcome-rooms'));await clickReal(page.getByRole('button',{name:'Jump to '+room,exact:true}));await page.waitForTimeout(1100);}
+    async function jump(room){
+      if(await page.evaluate(()=>houseTest.state.active))await page.keyboard.press('KeyR');else await clickReal(page.locator('#welcome-rooms'));
+      await clickReal(page.getByRole('button',{name:'Jump to '+room,exact:true}));
+      if(await page.evaluate(()=>window.__houseUiBackdrop.tourHold)){
+        const before=await motionState(page,'tour jump '+room);
+        // life.tick refreshes nearby actions every 800 ms of real time.
+        // Keep the backdrop held through that interval, then let the real
+        // scene callback update it once. No game state or clock is changed.
+        await page.waitForTimeout(850);
+        const frames=await page.evaluate(()=>{
+          const frames=houseTest.state.framesDrawn;window.__houseUiBackdrop.permitTarget=frames+1;return frames;
+        });
+        assert.equal(frames,before.frames,'Activity-tour backdrop drew without a frame permit');
+        await page.waitForFunction(frames=>houseTest.state.framesDrawn>frames,frames,{polling:100,timeout:60000});
+        const after=await motionState(page,'tour ready '+room);
+        assert.equal(after.frames,frames+1,'Activity-tour permit drew more than one frame');
+      }else await page.waitForTimeout(1100);
+    }
     // E now uses a thing in reach first (the fridge, the swings…; interactions.mjs), so the
     // room's activity is opened with its own on-screen button, as a player would there.
     async function open(id,room){await jump(room);const button=page.locator('#nearby-actions [data-activity="'+id+'"]');
@@ -208,13 +242,26 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     }
     await open('pet-house-cory',"Cory's Craepet house");assert(await f.locator('[data-hometab="homes"]').count(),'Own house did not open decorating');await clickReal(page.locator('#close-activity'));
     await open('pet-house-ellie',"Ellie's Craepet house");assert.equal(await runtime().evaluate(()=>Craepets.visiting()),'ellie');await clickReal(page.locator('#close-activity'));
+    await page.evaluate(()=>{window.__houseUiBackdrop.tourHold=false;window.__houseUiBackdrop.permitTarget=0;});
     await jump('Craepet street');
-    // Steering is the arrow keys: ← turns the view.
-    const aimed=await page.evaluate(()=>houseTest.state.yaw);await page.keyboard.down('ArrowLeft');await page.waitForTimeout(300);await page.keyboard.up('ArrowLeft');assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'The arrow keys did not turn the view');
+    const resumeFrames=await page.evaluate(()=>houseTest.state.framesDrawn);
+    await page.waitForFunction(frames=>houseTest.state.framesDrawn>=frames+2,resumeFrames,{polling:100,timeout:60000});
+    // Steering is the arrow keys: ← turns the view. Wait for real motion,
+    // because a fixed wall-clock hold may contain no software-rendered frame.
+    const aimed=(await motionState(page,'ArrowLeft before')).yaw;
+    await page.keyboard.down('ArrowLeft');
+    try{await page.waitForFunction(yaw=>houseTest.state.yaw!==yaw,aimed,{polling:100,timeout:60000});}
+    finally{await page.keyboard.up('ArrowLeft');await motionState(page,'ArrowLeft after');}
+    assert.notEqual(await page.evaluate(()=>houseTest.state.yaw),aimed,'The arrow keys did not turn the view');
     await page.screenshot({path:'tests/house-neighborhood.png'});
     // Walk to a room through the model, rather than invoking the jump UI.
-    await jump('Front entry');const before=await page.evaluate(()=>houseTest.state.position);
-    await page.keyboard.down('ArrowUp');await page.waitForTimeout(850);await page.keyboard.up('ArrowUp');await page.waitForTimeout(1100);
+    await jump('Front entry');const before=(await motionState(page,'ArrowUp before')).position;
+    await page.keyboard.down('ArrowUp');
+    try{await page.waitForFunction(pos=>{
+      const s=houseTest.state;return s.position.z<pos.z-.45&&s.nearby.includes('nest');
+    },before,{polling:100,timeout:60000});}
+    finally{await page.keyboard.up('ArrowUp');await motionState(page,'ArrowUp after');}
+    await page.waitForTimeout(1100);
     const walking=await page.evaluate(()=>houseTest.state);assert(walking.position.z<before.z-.4,'The arrow keys did not walk');assert(walking.nearby.includes('nest'),'Walking did not reach the living activity');
     assert(walking.appearance.includes('partyhat')&&walking.appearance.includes('bluescarf'),'3D outfit was not updated');assert(walking.furniture>0,'Placed furniture is absent from the house');
     await page.keyboard.press('KeyE');await clickReal(page.locator('[data-choice="nest"]'));await page.locator('#activity-panel').waitFor({state:'visible'});
@@ -250,10 +297,14 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     await clickReal(mobile.locator('#welcome-saves'),{touch:true});await mobile.locator('#save-file').setInputFiles({name:'family.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(familyBackup))});await clickReal(mobile.locator('#apply-saves'),{touch:true});await clickReal(mobile.locator('#close-saves'),{touch:true});
     assert.equal(await mobile.frame({url:/activity.html/}).evaluate(()=>Craepets.state().pet.name),'Cory Comet');assert.equal(await mobile.frame({url:/activity.html/}).evaluate(()=>HouseActivity.family().filter(p=>p.pet).length),2,'Complete family did not transfer');
     await clickReal(mobile.locator('#rooms-button'),{touch:true});await mobile.locator('#rooms').waitFor({state:'visible'});await clickReal(mobile.getByRole('button',{name:'Jump to Front entry',exact:true}),{touch:true});await mobile.waitForTimeout(1100);
-    const pos=await mobile.evaluate(()=>houseTest.state.position),joystick=mobile.locator('#joystick');
+    const mobileResumeFrames=await mobile.evaluate(()=>houseTest.state.framesDrawn);
+    await mobile.waitForFunction(frames=>houseTest.state.framesDrawn>=frames+2,mobileResumeFrames,{polling:100,timeout:60000});
+    const pos=(await motionState(mobile,'joystick before')).position,joystick=mobile.locator('#joystick');
     const r=await joystick.boundingBox();
     const cdp=await phone.newCDPSession(mobile);
-    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x+r.width/2,y:r.y+10,id:1}]});await mobile.waitForTimeout(700);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x+r.width/2,y:r.y+10,id:1}]});
+    try{await mobile.waitForFunction(pos=>houseTest.state.position.z<pos.z-.35,pos,{polling:100,timeout:60000});}
+    finally{await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await motionState(mobile,'joystick after');}
     await mobile.waitForTimeout(1100);assert((await mobile.evaluate(()=>houseTest.state.position.z))<pos.z-.3,'Touch joystick did not walk');
     await mobile.screenshot({path:'tests/house-phone.png'});
     const yaw=await mobile.evaluate(()=>houseTest.state.yaw);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:330,y:350,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:250,y:360,id:2}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assert.notEqual(await mobile.evaluate(()=>houseTest.state.yaw),yaw,'Touch drag did not orbit');
