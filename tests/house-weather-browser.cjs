@@ -211,6 +211,13 @@ async function houseCheck(browser,base,mobile){
       if(room===route[0]||room==='Living room')await page.screenshot({path:path.join(OUT,tag+'-'+(room==='Living room'?'indoors':'outdoors')+'.png')});
     }
     assert.match(await page.locator('#weather-condition').innerText(),mobile?/Snow/:/Rain/);
+    const layout=await page.evaluate(()=>{
+      const weather=document.querySelector('#weather-info').getBoundingClientRect();
+      return [...document.querySelectorAll('.actions button')].filter(b=>b.offsetWidth>0).map(button=>{
+        const b=button.getBoundingClientRect();return {id:button.id,overlaps:Math.min(b.right,weather.right)>Math.max(b.left,weather.left)&&Math.min(b.bottom,weather.bottom)>Math.max(b.top,weather.top)};
+      });
+    });
+    assert(layout.every(item=>!item.overlaps),'Weather obscures menu controls: '+JSON.stringify(layout));
     await clickReal(page,'#weather-info summary',mobile);assert.equal(await page.locator('#weather-info').getAttribute('open'),'');
     assert.match(await page.locator('#weather-report').innerText(),/Rochester, NY.*Updated/);
     assert.equal(await page.locator('#weather-info a[href="https://open-meteo.com/"]').count(),1);
