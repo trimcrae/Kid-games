@@ -1,4 +1,4 @@
-const {chromium}=require('playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';

@@ -1,9 +1,9 @@
 import * as THREE from './vendor/three.module.min.js';
 import {WalkingWorld,Body} from './physics.mjs?v=20260925-motion';
-import {createHouseLife} from './house-life.mjs?v=20261103-studio-life';
+import {createHouseLife} from './house-life.mjs?v=20261113-rochester';
 import {rooms} from './rooms.mjs?v=20261103-studio-life';
 import {createHouseMaterial} from './materials.mjs?v=20260916-light';
-import {createHouseLighting} from './lighting.mjs?v=20261103-studio-life';
+import {createHouseLighting} from './lighting.mjs?v=20261113-rochester';
 import {createJungle} from './jungle.mjs?v=20261103-studio-life';
 import {createContactShadows} from './contact-shadows.mjs';
 import {createGpuTimer} from './gpu-timer.mjs';
@@ -21,6 +21,8 @@ import {createMasterKim,combineGuards} from './master-kim.mjs?v=20261103-studio-
 import {prepareGarageDoor} from './garage-door.mjs?v=20261103-studio-life';
 import {kimBoxes} from './master-kim-layout.mjs?v=20261103-studio-life';
 import {createButtonBinder} from './button-input.mjs';
+import {createWeatherClient,createRochesterEnvironment,weatherLabel} from './rochester-weather.mjs?v=20261113-rochester';
+import {createPrecipitation,createShelterMask} from './precipitation.mjs?v=20261113-rochester';
 
 import {GAME_MODE,GAME_URL} from './play-mode.mjs';
 import {showSavedDataRecovery} from './saved-data-recovery.mjs?v=20261002-active-loader';
@@ -114,7 +116,27 @@ const BAKE_GRACE=THREE.MathUtils.clamp(Number(query.get('bakegrace'))||3000,0,15
 // ?bakegain= and ?bakenight= override them for QA.
 const BAKE_NIGHT=Number(query.get('bakenight'))||.5;
 const BAKE_GAIN=Number(query.get('bakegain'))||.75,BAKE_REPLACE=THREE.MathUtils.clamp(Number(query.get('bakemix')??1)||0,0,1);
-const PINNED_SKY=query.get('phase')?{time:query.get('phase'),weather:query.get('weather')||'sunny'}:null;
+let weatherStorage=null;try{weatherStorage=localStorage;}catch{/* Weather remains available without storage. */}
+const weatherClient=createWeatherClient({storage:weatherStorage});
+const environment=createRochesterEnvironment({query,client:weatherClient});
+const precipitation=createPrecipitation(scene,{mobile:matchMedia('(pointer:coarse)').matches,reducedMotion:matchMedia('(prefers-reduced-motion: reduce)').matches});
+lighting.setClock(()=>environment.snapshot());
+function updateWeatherHud(){
+  const state=environment.snapshot(),label=weatherLabel(state),icon=$('weather-status');
+  // A clear night is not labelled with a sun icon. Moon geometry is not modelled.
+  icon.textContent=state.weather==='sunny'&&state.time==='night'?'✦':state.emoji;
+  icon.setAttribute('aria-label',label);icon.title=label;
+  $('weather-summary').textContent=`Rochester · ${state.local.label}`;
+  $('weather-condition').textContent=state.status==='unavailable'?'Weather unavailable':state.status==='loading'?'Loading weather…':`${state.status==='preview'?'Preview · ':state.status==='stale'?'Cached · ':''}${state.description}${state.temperature===null?'':` · ${Math.round(state.temperature)}°F`}`;
+  $('weather-report').textContent=label;
+  $('weather-sun').textContent=state.phaseOverride?'Time of day is pinned for this preview.':`${state.local.season[0].toUpperCase()+state.local.season.slice(1)} in Rochester · Sun ${Math.abs(Math.round(state.sun.elevation))}° ${state.sun.elevation<0?'below':'above'} the horizon. The sun follows Rochester’s date and daylight. The moon is not modelled.`;
+  precipitation.set(state);
+}
+async function refreshWeather(){if(document.hidden)return;const pending=environment.refresh();updateWeatherHud();await pending;updateWeatherHud();}
+const weatherTimer=setInterval(refreshWeather,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWeather();});
+window.addEventListener('pagehide',event=>{if(!event.persisted){clearInterval(weatherTimer);weatherClient.stop();}});
+refreshWeather();
 
 let guard=null,cameraClearance=lensClearance(),monitor=null,map=null,interactions=null,masterKim=null;
 // The movable parts of the house (export_walkthrough.py props), by key.
@@ -357,6 +379,7 @@ function render(){
   lighting.tick(player,now,ready);
   const view=placeCamera(dt);
   camera.position.set(view.position.x,view.position.y,view.position.z);camera.lookAt(view.target.x,view.target.y,view.target.z);
+  precipitation.tick(camera.position,dt);
   cameraBoom=Math.hypot(view.position.x-view.target.x,view.position.y-view.target.y,view.position.z-view.target.z);
   // Close in, the lens widens and the view tips up past the pet (eased
   // together). Only the aim turns: the camera stays where the guard put it, so
@@ -596,9 +619,11 @@ async function load(){
       lighting.useBakedLight(bakedLight.houseLightBlend.value);
     }
     performance.mark('house:baked-light');
+    const shelter=createShelterMask([...data.colliders,...kimBoxes]);
     for(const g of data.groups){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));
+      if(/roof|ceiling/i.test(g.name))shelter.addRoof(array);
       geometry.computeBoundingSphere();
       if(occlusion)geometry.setAttribute('houseOcclusion',new THREE.BufferAttribute(
         occlusion.bytes.subarray(g.offset/24,g.offset/24+g.count),1,true));
@@ -613,6 +638,7 @@ async function load(){
       // the depth prepass, whose merged depth would stay where it was modelled.
       if(g.prop){(propMeshes[g.prop]??=[]).push(mesh);mesh.frustumCulled=false;material.userData.houseFinish=false;}
     }
+    precipitation.setShelter(shelter);
     performance.mark('house:meshes');
     masterKim=await createMasterKim(scene,{mobile:matchMedia('(pointer:coarse)').matches});
     lighting.load({...data,lights:[...(data.lights||[]),...masterKim.lights],colliders:[...data.colliders,...kimBoxes]});
@@ -647,7 +673,7 @@ async function load(){
     lighting.prime(player);
     performance.mark('house:probe');
     boot.step('your Craepets','Welcoming your Craepets…');
-    life=await createHouseLife({scene,camera,world,player,rooms,teleport,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
+    life=await createHouseLife({scene,camera,world,player,rooms,teleport,environment,place(p,heading){placePlayer(p,Number.isFinite(heading)?heading:yaw);render();},suspend,resume,showRooms,bindButton,photo(){render();return canvas.toDataURL('image/png');},get active(){return active;},get yaw(){return yaw;},reducedMotion});
     life.face(yaw+Math.PI,true);performance.mark('house:life');
     leaveHouse=()=>life.leave();
     // The Marauder's Map (marauders-map.mjs): where everyone in the house is.
@@ -666,9 +692,8 @@ async function load(){
         }else setHint(finePointer()?KEYS_HINT:'Drag to look · left pad to walk · 🐾 to jump · tap an activity');
       }}});
     guard=combineGuards(guard,interactions.guard);
-    // The house follows the game's clock and weather (same as the HUD). The
-    // lighting already starts on this hour's phase, so this rarely re-probes.
-    if(life.sky){lighting.setClock(()=>PINNED_SKY||life.sky());lighting.prime(player);}
+    // Rochester sky is independent of the saved game's simulation clock.
+    lighting.prime(player);updateWeatherHud();
     // Pets, labels and markers bring their own materials.
     boot.step('your Craepets\' fur');
     await warmShaders();performance.mark('house:pets-compiled');render();performance.mark('house:first-frame');
@@ -695,7 +720,7 @@ async function load(){
       get state(){return {ready,active,position:{...player},camera:camera.position.toArray(),cameraClearance:guard?guard.clearanceAt(camera.position):null,cameraBoom,cameraLift:cameraLift*180/Math.PI,cameraForward:camera.getWorldDirection(new THREE.Vector3()).toArray(),petCover:pet.cover,petOpacity:pet.avatar?pet.opacity:null,petShown:pet.avatar?pet.avatar.visible&&pet.opacity>0:null,yaw,pitch,arrivalYaw,fov:camera.fov,
       airborne:!!body?.airborne,verticalSpeed:body?.vy??0,jumps:body?.jumps??0,standingOn:standingOn(),
       map:map&&{open:map.isOpen,floor:map.floor,shown:map.shown},everyone:life.everyone(),interactions:interactions?.state??null,
-      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,framesDrawn,bakedLight:baked?{vertices:baked.bakedVertices,blend:bakedLight.houseLightBlend.value.toArray()}:null,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,jungleTriangles:jungle.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics()};}};
+      turned,pixelRatio,ambientOcclusion:!!occlusion,ambientOcclusionStrength:occlusion?.strength??0,framesDrawn,bakedLight:baked?{vertices:baked.bakedVertices,blend:bakedLight.houseLightBlend.value.toArray()}:null,drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,jungleTriangles:jungle.triangles,gpuMs:gpuTimer?.median(1)??null,antialias:RENDER.aa,depthPrepass:{...renderer.houseDepthPrepass},programs:renderer.info.programs?.length??null,...shading,...lighting.diagnostics(),...life.diagnostics(),rochester:environment.snapshot(),precipitation:precipitation.diagnostics()};}};
   }catch(error){failed=true;console.error(error);$('loading').textContent='The house could not load. Try again, or go back to the Craepets game.';start.textContent='Try again';start.disabled=false;document.body.classList.add('house-failed');
     if(error.savedDataBlocked)$('loading').textContent=error.message;
     boot.fail(error,$('loading').textContent);

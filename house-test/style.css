@@ -308,3 +308,12 @@ body.overlay-open #pet-speech,body.overlay-open #coach{visibility:hidden}
   body:has(#nearby:not([hidden]) #nearby-actions button:nth-child(3)) .location{opacity:0;transition:none}
   body:has(.location.show) :is(#coach,#hint){visibility:hidden}
 }
+
+/* A compact, tappable weather readout; details stay readable on phones. */
+#weather-info{max-width:min(310px,52vw);font-size:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel);box-shadow:var(--shadow);line-height:1.4}
+#weather-info summary{cursor:pointer;min-height:44px;padding:7px 12px;font-weight:800}
+#weather-condition{display:block;font-size:12px;font-weight:600;color:var(--ink-soft)}
+#weather-info p{margin:8px 12px}
+#weather-info a{color:var(--nav);text-decoration:underline}
+#weather-info[open]{max-height:45vh;overflow:auto}
+#weather-info summary:focus-visible{outline:3px solid var(--nav);border-radius:14px}

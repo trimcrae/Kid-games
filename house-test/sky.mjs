@@ -4,12 +4,12 @@ import * as THREE from './vendor/three.module.min.js';
 // renders it (the player camera or a room reflection probe), so it is always
 // "at infinity" without a huge sphere, and it sits on layer 1 so room
 // reflections show sky instead of a grey void. Over the colour gradient it
-// draws real weather: drifting cumulus (value-noise fbm on a plane projected
+// draws weather effects: drifting cumulus (value-noise fbm on a plane projected
 // over the dome, lit on the sun side and shaded where they are thick, closing
 // to an overcast blanket on grey days), a bright sun disc with its glow, and
-// after dark a cratered moon with a halo and a twinkling star field. Colours,
+// a decorative star field at night. The fictional moon is only used in phase previews. Colours,
 // cloud cover and drift come from lighting.mjs with the time of day and the
-// game's weather; the clock is the mesh's own onBeforeRender.
+// Rochester weather; the clock is the mesh's own onBeforeRender.
 export function createSky(scene,{radius=48,reducedMotion=false}={}){
   const uniforms={
     skyTop:{value:new THREE.Color('#6fa8dc')},
@@ -22,6 +22,8 @@ export function createSky(scene,{radius=48,reducedMotion=false}={}){
     cloudShade:{value:new THREE.Color('#a9b9c9')},
     cloudCover:{value:.3},
     cloudDrift:{value:1},
+    cloudOffset:{value:new THREE.Vector2()},
+    celestialVisible:{value:1},
     stars:{value:0},
     moon:{value:0},
     time:{value:0},
@@ -37,7 +39,8 @@ export function createSky(scene,{radius=48,reducedMotion=false}={}){
       }`,
     fragmentShader:/* glsl */`
       uniform vec3 skyTop,skyHorizon,skyGround,sunDirection,sunColor,cloudLit,cloudShade;
-      uniform float sunGlow,cloudCover,cloudDrift,stars,moon,time;
+      uniform float sunGlow,cloudCover,cloudDrift,stars,moon,time,celestialVisible;
+      uniform vec2 cloudOffset;
       varying vec3 vDirection;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float hash3(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
@@ -60,11 +63,11 @@ export function createSky(scene,{radius=48,reducedMotion=false}={}){
           float st=step(.93,h)*smoothstep(.17,0.0,length(p-c))*tw*(.5+.7*hash3(i+9.0));
           col+=st*stars*smoothstep(0.0,.12,d.y)*vec3(1.0,.97,.9);
         }
-        if(moon<.5){
+        if(celestialVisible>.5&&moon<.5){
           // The sun: a hot disc, its bloom and a wide warm glow.
           col+=sunColor*(pow(s,420.0)*2.2+pow(s,12.0)*.22*sunGlow)*step(0.0,d.y+.02);
           col+=vec3(1.0,.98,.92)*smoothstep(.022,.013,ang)*2.0*step(0.0,d.y);
-        }else{
+        }else if(celestialVisible>.5){
           // The moon: a pale disc with faint seas, and a soft halo.
           float disc=smoothstep(.036,.029,ang)*step(0.0,d.y);
           float seas=.78+.22*noise(d.xz*160.0+d.y*70.0);
@@ -73,7 +76,7 @@ export function createSky(scene,{radius=48,reducedMotion=false}={}){
         }
         // Clouds on a plane over the dome (flattening toward the horizon), drifting.
         if(d.y>-.02){
-          vec2 pc=d.xz/(d.y+.15)*1.4+vec2(time*.0045,time*.0015)*cloudDrift;
+          vec2 pc=d.xz/(d.y+.15)*1.4+cloudOffset;
           float n=fbm(pc),thr=1.0-cloudCover*.95;
           float dens=smoothstep(thr-.12,thr+.22,n)*smoothstep(-.02,.1,d.y);
           float thick=smoothstep(thr,thr+.45,n);
@@ -90,13 +93,20 @@ export function createSky(scene,{radius=48,reducedMotion=false}={}){
   // Unnamed on purpose: house-life recolours named house meshes.
   mesh.userData.role='sky';mesh.frustumCulled=false;mesh.renderOrder=1000;
   mesh.layers.enable(1);
+  let lastTime=performance.now(),wind=null;
   mesh.onBeforeRender=(renderer,s,camera)=>{
     mesh.position.setFromMatrixPosition(camera.matrixWorld);mesh.updateMatrixWorld();
-    if(!reducedMotion)uniforms.time.value=(performance.now()*.001)%100000;
+    const now=performance.now(),dt=Math.min(.1,Math.max(0,(now-lastTime)/1000));lastTime=now;
+    if(!reducedMotion){
+      uniforms.time.value=(now*.001)%100000;
+      // Accumulate displacement: a new wind report never jumps the clouds.
+      uniforms.cloudOffset.value.x+=dt*(wind?wind[0]:.0045*uniforms.cloudDrift.value);
+      uniforms.cloudOffset.value.y+=dt*(wind?wind[1]:.0015*uniforms.cloudDrift.value);
+    }
   };
   scene.add(mesh);
   return {mesh,uniforms,
-    set({top,horizon,ground,sun,sunColor,glow,cloudLit,cloudShade,cloudCover,cloudDrift,stars,moon}){
+    set({top,horizon,ground,sun,sunColor,glow,cloudLit,cloudShade,cloudCover,cloudDrift,stars,moon,celestialVisible,cloudWind}){
       if(top)uniforms.skyTop.value.set(top);
       if(horizon)uniforms.skyHorizon.value.set(horizon);
       if(ground)uniforms.skyGround.value.set(ground);
@@ -109,6 +119,8 @@ export function createSky(scene,{radius=48,reducedMotion=false}={}){
       if(cloudDrift!==undefined)uniforms.cloudDrift.value=cloudDrift;
       if(stars!==undefined)uniforms.stars.value=stars;
       if(moon!==undefined)uniforms.moon.value=moon;
+      if(celestialVisible!==undefined)uniforms.celestialVisible.value=celestialVisible;
+      if(cloudWind!==undefined)wind=cloudWind;
     },
     dispose(){scene.remove(mesh);mesh.geometry.dispose();material.dispose();}};
 }

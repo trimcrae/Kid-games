@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three.module.min.js';
-import {createSky} from './sky.mjs?v=20260918-sky';
+import {createSky} from './sky.mjs?v=20261113-rochester';
 // (The same URL as walkthrough.js, so both share one copy and its uniforms.)
 import {FOLIAGE,EXTERIOR} from './materials.mjs?v=20260916-light';
 
@@ -30,8 +30,8 @@ export function choosePracticalLights(lights,position,occluders,limit=4){
     .sort((a,b)=>a.distance-b.distance).slice(0,limit).map(item=>item.light);
 }
 
-// Time of day follows the same clock as the HUD (engine.timeOfDay(): dawn,
-// day, dusk, night). Every phase uses the same lights, so switching never
+// Rochester solar elevation selects the phase; query previews keep these
+// artistic presets. Every phase uses the same lights, so switching never
 // recompiles a shader; only colours, intensities and the sun move.
 // sun: [azimuth offset from the exported sun (rad), elevation (rad)].
 // clouds: [lit side, shaded side]; stars: how bright the star field shows;
@@ -49,7 +49,7 @@ export const PHASES={
 };
 const OVERCAST=new Set(['cloudy','rainy','snowy','windy']);
 // Cloud cover (0 clear .. 1 blanket) and drift speed for the game's weather.
-const CLOUDS={sunny:[.38,1],cloudy:[.84,1],rainy:[.97,1.6],snowy:[.93,.8],windy:[.52,3]};
+const CLOUDS={unavailable:[.5,0],sunny:[.38,1],cloudy:[.84,1],rainy:[.97,1.6],snowy:[.93,.8],windy:[.52,3]};
 // Day-bake weight per phase (the rest is the night bake).
 const BAKED_DAY={day:1,dawn:.6,dusk:.4,night:0};
 const OUTDOOR=/yard|porch|garden|street|driveway|outside/i;
@@ -136,8 +136,9 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   let sources=[],occluders=[],loaded=false,lastSelection=-Infinity,lastProbe=-Infinity;
   let keyId='',pendingRoom=null,currentRoom='',selection=[],environment=base.texture;
   let glossy=[],emissive=[],windows=[],clock=null,lastClock=-Infinity,probeReady=true;
-  // Start on the phase the HUD clock will report (same rule as engine.js), so
-  // the clock arriving after load does not throw away the first probe.
+  let skyState=null,lastSolar=-Infinity,weatherSignature='';
+  // Standalone fixtures have a local-clock fallback. The walkthrough installs
+  // its Rochester environment before loading meshes or capturing any probes.
   let phaseName=phaseForHour(new Date().getHours()),weather='sunny',room={outdoor:false,tight:false},mix={hemi:.46,practical:.62,key:1};
   const warm=new THREE.Color(),cool=new THREE.Color();
 
@@ -171,16 +172,18 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
   // day bake shows against the night one, y = gain. Dawn and dusk sit between;
   // an overcast day bounces a little less.
   let baked=null;
+  function isOvercast(){return (Number.isFinite(skyState?.cloudCover)?skyState.cloudCover>=.65:OVERCAST.has(weather))&&phaseName!=='night';}
   function applyBaked(){
     if(!baked)return;
     baked.blend.x=BAKED_DAY[phaseName]??1;
-    baked.blend.y=baked.gain*(OVERCAST.has(weather)&&phaseName!=='night'?.8:1);
+    baked.blend.y=baked.gain*(isOvercast()?.8:1);
   }
   function applyPhase(force=false){
-    const phase=PHASES[phaseName]||PHASES.day,overcast=OVERCAST.has(weather)&&phaseName!=='night';
+    const phase=PHASES[phaseName]||PHASES.day,overcast=isOvercast();
     applyBaked();
-    const dir=sunDirection(phase);
-    sun.color.set(phase.sunColor);sun.intensity=phase.sunI*(overcast?.45:1);
+    const astronomical=skyState?.sun;
+    const dir=astronomical?new THREE.Vector3(...astronomical.direction).negate():sunDirection(phase);
+    sun.color.set(phase.sunColor);sun.intensity=phase.sunI*(Number.isFinite(skyState?.cloudCover)?1-.7*skyState.cloudCover:overcast?.45:1)*(astronomical?THREE.MathUtils.smoothstep(astronomical.elevation,-.833,8):1);
     sun.position.copy(sun.target.position).addScaledVector(dir,-54);
     hemisphere.color.set(phase.hemiSky);hemisphere.groundColor.set(phase.hemiGround);
     const [top,horizon,ground]=phase.sky;
@@ -188,11 +191,13 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     if(overcast){warm.lerp(new THREE.Color('#9aa6b4'),.6);cool.lerp(new THREE.Color('#d3d7da'),.5);}
     // Clouds: the phase colours them, the weather decides how much sky they
     // cover; a grey day also greys the lit side so they read as one blanket.
-    const [cover,drift]=CLOUDS[weather]||CLOUDS.sunny,[lit,shade]=phase.clouds;
+    const defaults=CLOUDS[weather]||CLOUDS.unavailable,cover=skyState?.cloudCover??defaults[0],drift=defaults[1],[lit,shade]=phase.clouds;
+    const windAngle=(skyState?.windDirection??0)*Math.PI/180,windSpeed=skyState?.windSpeed??0;
     const cloudLit=new THREE.Color(lit),cloudShade=new THREE.Color(shade);
     if(overcast){cloudLit.lerp(new THREE.Color('#c9ced4'),.55);cloudShade.lerp(new THREE.Color('#7f868f'),.4);}
     sky.set({top:'#'+warm.getHexString(),horizon:'#'+cool.getHexString(),ground,sun:dir.clone().negate(),sunColor:phase.sunColor,glow:overcast?0:phase.glow,
-      cloudLit:'#'+cloudLit.getHexString(),cloudShade:'#'+cloudShade.getHexString(),cloudCover:cover,cloudDrift:drift,stars:(phase.stars??0)*(1-cover*.8),moon:phase.moon??0});
+      cloudLit:'#'+cloudLit.getHexString(),cloudShade:'#'+cloudShade.getHexString(),cloudCover:cover,cloudDrift:drift,stars:(phase.stars??0)*(1-cover*.8),moon:astronomical?0:phase.moon??0,celestialVisible:astronomical?(astronomical.daylight?1:0):1,
+      cloudWind:skyState?[Math.sin(windAngle)*windSpeed*.001,-Math.cos(windAngle)*windSpeed*.001]:null});
     if(scene.background?.isColor)scene.background.copy(cool);
     if(scene.fog)scene.fog.color.copy(cool);
     renderer.toneMappingExposure=baseExposure*phase.exposure;
@@ -213,7 +218,7 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     }
   }
   function applyRoom(){
-    const phase=PHASES[phaseName]||PHASES.day,overcast=OVERCAST.has(weather)&&phaseName!=='night';
+    const phase=PHASES[phaseName]||PHASES.day,overcast=isOvercast();
     // Outdoors the open sky is the fill; indoors a low hemisphere keeps
     // corners and ceilings darker than lit walls. Overcast days flatten out.
     // Indoors the fill stays low enough for the key and window light to model
@@ -322,11 +327,16 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
     if(!clock||now-lastClock<2000)return;lastClock=now;
     let next;try{next=clock();}catch{return;}
     const p=typeof next==='string'?next:next?.time,w=typeof next==='object'?next?.weather:weather;
-    const phaseChanged=p&&PHASES[p]&&p!==phaseName,weatherChanged=w&&w!==weather;
-    if(phaseChanged||weatherChanged){
+    const phaseChanged=p&&PHASES[p]&&p!==phaseName;
+    const signature=JSON.stringify([w,next?.cloudCover,next?.windSpeed,next?.windDirection,next?.status]);
+    const weatherChanged=signature!==weatherSignature;
+    // The sun moves even within a phase. At most once per minute redraw its
+    // static shadow map; weather/phase changes can update it sooner. Keep probes.
+    const solarChanged=next?.sun&&now-lastSolar>=60000;
+    skyState=typeof next==='object'?next:null;
+    if(phaseChanged||weatherChanged||solarChanged){
       if(phaseChanged)phaseName=p;if(w)weather=w;
-      // Weather only dims the sun and greys the sky; reflections can stay.
-      applyPhase(!phaseChanged);
+      weatherSignature=signature;lastSolar=now;applyPhase(!phaseChanged);
     }
   }
   let lastTick=performance.now();
@@ -414,14 +424,14 @@ export function createHouseLighting(scene,renderer,{mobile=false,camera=null,pet
       hemisphere.intensity=hemisphere.userData.target??hemisphere.intensity;
       petLight.intensity=petLight.userData.target??0;
     },
-    // clock() returns engine.timeOfDay() or {time,weather}; polled every 2 s.
+    // clock() returns {time,weather,sun,cloudCover,windSpeed,windDirection}; polled every 2 s.
     setClock(fn){clock=fn;lastClock=-Infinity;readClock(performance.now());},
     // The shared blend uniform of a loaded bake: follows the phase from now on.
     useBakedLight(blend){baked={blend,gain:blend.y};applyBaked();},
-    setPhase(name,w){if(PHASES[name])phaseName=name;if(w)weather=w;if(loaded)applyPhase();},
+    setPhase(name,w){skyState=null;if(PHASES[name])phaseName=name;if(w)weather=w;if(loaded)applyPhase();},
     diagnostics(){return {practicalLights:selection.map(light=>light.name),shadowedLight:keyId,
       reflectionRoom:currentRoom,reflectionProbes:probes.size,shadowMapSize:sun.shadow.mapSize.x,
-      timeOfDay:phaseName,weather,glossyMaterials:glossy.length,keyShadow:key.castShadow,
+      timeOfDay:phaseName,weather,sunDirection:sky.uniforms.sunDirection.value.toArray(),solarElevation:skyState?.sun?.elevation??null,moonVisible:sky.uniforms.moon.value>0,cloudCover:sky.uniforms.cloudCover.value,glossyMaterials:glossy.length,keyShadow:key.castShadow,
       lightLevels:{sun:+sun.intensity.toFixed(2),hemisphere:+hemisphere.intensity.toFixed(2),pet:+petLight.intensity.toFixed(2),
         practical:slots.map(s=>+s.light.intensity.toFixed(2))}};},
     dispose(){for(const probe of probes.values())probe.dispose();base.dispose();cubeTarget.dispose();pmrem.dispose();sky.dispose();},
