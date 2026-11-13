@@ -3,6 +3,42 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
 
+// This gameplay suite verifies DOM activities; the separate weather/WebGL
+// suite renders the complete worlds. Keep a still 3D backdrop during menus so
+// software rendering cannot starve the real iframe input and game assertions.
+// Only the named top-window scene loop is deferred, after startup is complete.
+function pauseBackdropDuringMenus(){
+  if(window!==window.top)return;
+  const nativeRAF=window.requestAnimationFrame.bind(window),nativeCancel=window.cancelAnimationFrame.bind(window);
+  const jobs=new Map();let sequence=0;
+  const audit=window.__houseUiBackdrop={deferred:0,resumed:0,lastPanel:null};
+  const menu=()=>window.houseTest&&['activity-panel','family-panel','save-panel','rooms'].find(id=>{
+    const panel=document.getElementById(id);return panel&&!panel.hidden;
+  });
+  window.requestAnimationFrame=callback=>{
+    if(callback.name!=='animate')return nativeRAF(callback);
+    const id=--sequence,job={raf:null,timer:null};jobs.set(id,job);
+    const schedule=()=>{
+      if(!jobs.has(id))return;
+      const panel=menu();
+      if(panel){audit.deferred++;audit.lastPanel=panel;job.timer=setTimeout(schedule,75);return;}
+      job.timer=null;
+      job.raf=nativeRAF(timestamp=>{
+        // A menu can open after the frame was queued. Recheck before the
+        // expensive scene callback, while leaving anonymous fade RAFs alone.
+        if(menu()){schedule();return;}
+        jobs.delete(id);audit.resumed++;callback(timestamp);
+      });
+    };
+    schedule();return id;
+  };
+  window.cancelAnimationFrame=id=>{
+    const job=jobs.get(id);
+    if(!job){nativeCancel(id);return;}
+    jobs.delete(id);if(job.raf!==null)nativeCancel(job.raf);if(job.timer!==null)clearTimeout(job.timer);
+  };
+}
+
 // Real pointer input without Playwright's animation-frame stability/navigation
 // barriers: every action in this suite changes the existing game UI in place.
 // Keep visibility, enabled-state and hit testing, including each iframe ancestor.
@@ -37,6 +73,7 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
       const box=await locator.boundingBox();
       if(box&&Math.abs(box.x+box.width/2-last.x)<1&&Math.abs(box.y+box.height/2-last.y)<1){
         const x=box.x+box.width/2,y=box.y+box.height/2;
+        console.log('INPUT',String(locator),touch?'tap':'click');
         if(touch)await page.touchscreen.tap(x,y);else await page.mouse.click(x,y,{clickCount,delay});
         return;
       }
@@ -47,9 +84,10 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
   assert.fail('Inaccessible real-input target '+locator+': '+JSON.stringify(last));
 }
 (async()=>{
-  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-unsafe-swiftshader']});
   const [width,height]=(process.env.HOUSE_VIEWPORT||'1360x900').split('x').map(Number);
   const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();
+  await context.addInitScript(pauseBackdropDuringMenus);
   // Optional HOUSE_VIEWPORT=1024x640 plus render scale / timeout for CPU-only
   // Chromium keeps a desktop layout with fewer software-rendered pixels. Assertions and
   // input paths stay the same; normal runs keep Playwright's default timeout.
@@ -80,7 +118,10 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     assert.equal(adopted.name,'Cory Comet');assert(adopted.egg,'Adoption did not persist an egg');
     await clickReal(f.locator('[data-tapegg]'),{clickCount:8,delay:130});
     await activity.waitForFunction(()=>Craepets.state().pet?.name==='Cory Comet'&&!Craepets.state().pet.egg,null,{polling:100});
+    const beforeClose=await page.evaluate(()=>({frames:houseTest.state.framesDrawn,deferred:window.__houseUiBackdrop.deferred}));
+    assert(beforeClose.deferred>0,'Activity did not defer the expensive 3D backdrop');
     await clickReal(page.locator('#close-activity'));
+    await page.waitForFunction(frames=>houseTest.state.framesDrawn>frames,beforeClose.frames,{polling:100});
     await page.waitForTimeout(1000);
     assert((await page.evaluate(()=>houseTest.state)).avatar,'Player avatar missing');
     await page.screenshot({path:'tests/house-desktop.png'});
@@ -202,6 +243,7 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     const familyBackup=await runtime().evaluate(()=>HouseSaves.bundle('house'));
     await context.close(); // desktop checks are complete; free its live WebGL scene
     const phone=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1});
+    await phone.addInitScript(pauseBackdropDuringMenus);
     const mobile=await phone.newPage();mobile.on('pageerror',e=>errors.push(e.message));
     if(process.env.HOUSE_TIMEOUT)mobile.setDefaultTimeout(Number(process.env.HOUSE_TIMEOUT));
     await mobile.goto(base+'/house-test/'+(process.env.HOUSE_QUERY||''));await mobile.waitForFunction(()=>window.houseTest?.state.ready,{},{timeout:60000});
@@ -218,12 +260,15 @@ async function clickReal(locator,{clickCount=1,delay=0,touch=false}={}){
     await clickReal(mobile.locator('#rooms-button'),{touch:true});await mobile.locator('#rooms').waitFor({state:'visible'});await clickReal(mobile.getByRole('button',{name:'Jump to Back yard',exact:true}),{touch:true});await mobile.waitForTimeout(1100);await clickReal(mobile.locator('[data-activity="farm"]'),{touch:true});
     const mf=mobile.frameLocator('#activity-frame');await mf.locator('.choice').first().waitFor();
     assert(await mobile.frame({url:/activity.html/}).evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Phone activity overflows horizontally');
-    await mobile.screenshot({path:'tests/house-phone-activity.png'});await clickReal(mobile.locator('#close-activity'),{touch:true});
+    await mobile.screenshot({path:'tests/house-phone-activity.png'});
+    const phoneFrames=await mobile.evaluate(()=>houseTest.state.framesDrawn);
+    await clickReal(mobile.locator('#close-activity'),{touch:true});
+    await mobile.waitForFunction(frames=>houseTest.state.framesDrawn>frames,phoneFrames,{polling:100});
     // The tap's follow-up click must not fall through to the Rooms button under it.
     await mobile.waitForTimeout(600);
     assert(await mobile.locator('#rooms').isHidden(),'Closing an activity by touch opened Rooms (ghost click)');
     assert(await mobile.evaluate(()=>houseTest.state.active),'Closing an activity by touch did not return to walking');
     await phone.close();console.log('PASS phone touch walking and learning activity');
     console.log('ERRORS',JSON.stringify(errors));assert.deepEqual(errors,[]);
-  }catch(e){console.log('ERRORS',JSON.stringify(errors));console.log('FRAME_NAVIGATIONS',JSON.stringify(navigations));await page.screenshot({path:'tests/house-failure.png',timeout:10000}).catch(()=>{});throw e;}finally{await browser.close();}
+  }catch(e){console.error(e.stack||String(e));console.log('ERRORS',JSON.stringify(errors));console.log('FRAME_NAVIGATIONS',JSON.stringify(navigations));await page.screenshot({path:'tests/house-failure.png',timeout:10000}).catch(()=>{});throw e;}finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
