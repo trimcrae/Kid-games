@@ -100,11 +100,11 @@ study:
   time of day and weather matching the HUD clock, and FXAA.
 - **The sky** (`sky.mjs`): one shader, no textures. Over the time-of-day
   gradient it draws drifting cumulus (noise clouds lit on the sun side and
-  shaded where thick; the game's weather sets the cover, so a cloudy or
-  rainy day is a grey blanket and a windy one races), a bright sun with its
-  glow, and after dark a cratered moon, a halo and twinkling stars. Colours
-  per phase and cover per weather live in `lighting.mjs` (`PHASES.clouds`,
-  `CLOUDS`). Still under `prefers-reduced-motion`.
+  shaded where thick; Rochester weather sets the cover and wind drift),
+  an astronomically positioned sun and decorative stars after dark. The
+  decorative moon is limited to explicit phase previews. Colours per phase
+  and preview presets live in `lighting.mjs` (`PHASES.clouds`, `CLOUDS`).
+  Still under `prefers-reduced-motion`.
 - **The jungle** (`jungle.mjs`): the exported yard ends at the property
   line, so beyond the back fence and the side plantings there is now an
   imaginary rainforest, code-drawn like Craepet Street: palms, broad canopy
@@ -390,7 +390,7 @@ meteorological seasons. Day/twilight/night depend on solar elevation. The
 world convention is +x east and −z north, not a surveyed house compass bearing.
 The direction and static sun shadow map update at most once per minute;
 phase/weather changes update sooner. Room probes remain cached as the sun
-moves. Below the horizon the sun no longer supplies direct light; practical
+moves. Below the apparent horizon the sun supplies no direct light; practical
 lamps and diffuse fill preserve indoor readability. The live sky does not
 show a pretend astronomical moon; stars remain decorative. Sunrise visibility
 uses the standard −0.833° threshold; the reported elevation is geometric.
@@ -398,7 +398,8 @@ uses the standard −0.833° threshold; the reported elevation is geometric.
 Precipitation uses one draw call and reuses a bounded buffer (360 particles
 on desktop, 160 with coarse pointers, zero with reduced motion). A conservative
 height grid built once from walking colliders and exported roofs/ceilings
-keeps particles above shelters, including the garage, porch and studio. Roof
+keeps particles above shelters, including the garage, porch, studio and all
+neighborhood cottages. Roof
 edges may have a small dry margin. Clouds accumulate wind displacement without
 jumping when a new report arrives. Weather does not require a Blender rebuild.
 
@@ -414,4 +415,6 @@ astronomy, DST, mapping, cache failures, recovery and actual house shelters.
 screenshots/metrics under `/tmp/rochester-weather`; set `CHROMIUM_PATH` as in
 the other browser tests. The Rochester weather checks workflow runs these plus
 the material, walking, route, save and desktop/phone gameplay checks in a cloud
-runner before merging the weather branch, and on relevant main changes.
+runner before merging the weather branch, and on relevant main changes. A
+separate main job verifies matching published source and repeats the weather
+smoke against the actual GitHub Pages URL.

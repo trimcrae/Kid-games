@@ -7,7 +7,8 @@ import {readFileSync} from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import * as THREE from '../../house-test/vendor/three.module.min.js';
 import {createShelterMask,createPrecipitation} from '../../house-test/precipitation.mjs';
-import {kimBoxes,kimRooms} from '../../house-test/master-kim-layout.mjs';
+import {kimRooms} from '../../house-test/master-kim-layout.mjs';
+import {neighborhoodBoxes} from '../../house-test/neighborhood-layout.mjs';
 import {rooms} from '../../house-test/rooms.mjs';
 import {
   ROCHESTER,CACHE_KEY,WEATHER_URL,REFRESH_MS,RETRY_MS,FRESH_MS,MAX_AGE_MS,
@@ -209,6 +210,8 @@ test('weather and phase pins work independently and bypass network when previewi
   assert.equal(weatherOnly.snapshot().status,'preview');assert.equal(weatherOnly.snapshot().weather,'rainy');assert.deepEqual(weatherOnly.snapshot().sun,solarPosition(instant));assert.equal(weatherOnly.snapshot().phaseOverride,null);
   const phaseOnly=env('phase=night');await phaseOnly.refresh();assert.equal(phaseOnly.snapshot().weather,'sunny');assert.equal(phaseOnly.snapshot().time,'night');assert.equal(phaseOnly.snapshot().sun,null);
   const both=env('phase=dusk&weather=snowy');await both.refresh();assert.equal(both.snapshot().time,'dusk');assert.equal(both.snapshot().weather,'snowy');assert.equal(calls,0);
+  const invalidWeatherWithPhase=env('phase=night&weather=invalid');await invalidWeatherWithPhase.refresh();
+  assert.equal(invalidWeatherWithPhase.snapshot().status,'preview');assert.equal(invalidWeatherWithPhase.snapshot().weather,'sunny');assert.equal(invalidWeatherWithPhase.snapshot().time,'night');assert.equal(calls,0);
   const invalid=env('phase=wrong&weather=wrong');await invalid.refresh();assert.equal(calls,1);assert.equal(invalid.snapshot().weatherOverride,false);assert.equal(invalid.snapshot().phaseOverride,null);assert.deepEqual(invalid.snapshot().sun,solarPosition(instant));
 });
 
@@ -227,7 +230,7 @@ test('unavailable weather still has current astronomical time and honest localiz
 function houseShelter(){
   const data=JSON.parse(readFileSync(new URL('../../house-test/house.json',import.meta.url),'utf8'));
   const bytes=gunzipSync(readFileSync(new URL('../../house-test/house.mesh.gz',import.meta.url)));
-  const mask=createShelterMask([...data.colliders,...kimBoxes]),roofs=createShelterMask();
+  const mask=createShelterMask([...data.colliders,...neighborhoodBoxes]),roofs=createShelterMask();
   let faces=0;
   for(const group of data.groups)if(/roof|ceiling/i.test(group.name)){
     const array=new Float32Array(bytes.buffer,bytes.byteOffset+group.offset,group.count*6);
@@ -252,10 +255,11 @@ test('shelter grid handles negative coordinates, overlapping heights, roof faces
   assert.equal(mask.height(10,10),-1);
 });
 
-test('real exported roofs shelter house, garage, porch, and studio while leaving yards open',()=>{
+test('real roofs and ceilings shelter house, garage, porch, studio and cottages while leaving yards open',()=>{
   const {mask,roofs,faces}=houseShelter();assert(faces>0,'No exported roof faces tested');
   const indoor=rooms.filter(row=>['Main floor','Upstairs','Downstairs','Basement'].includes(row[0]));
-  for(const row of [...indoor,rooms.find(row=>row[1]==='Front porch'),...kimRooms]){
+  const cottages=rooms.filter(row=>row[1].includes('Craepet house'));assert.equal(cottages.length,7);
+  for(const row of [...indoor,rooms.find(row=>row[1]==='Front porch'),...kimRooms,...cottages]){
     const [,,x,planY,floor]=row,z=-planY;
     assert(mask.height(x,z)>floor+1.3,`${row[1]} lacks shelter above a pet's head`);
     // Arrival spots can differ from the room station; cover both paths.
@@ -293,7 +297,7 @@ test('seeded rain and snow stay above real shelter across room jumps, wind, and 
   for(const mobile of [false,true])for(const kind of ['rain','snow']){
     const scene=new THREE.Scene(),effect=createPrecipitation(scene,{mobile});effect.setShelter(mask);
     effect.set({precipitation:kind,windSpeed:12,windDirection:270});
-    const samples=['Garage','Front porch','Living room','Basement playroom',"Master Kim's dojang",'Shoe & gear room','Front yard','Back yard'];
+    const samples=['Garage','Front porch','Living room','Basement playroom',"Master Kim's dojang",'Shoe & gear room',"Cory's Craepet house",'Front yard','Back yard'];
     for(const name of samples){
       const row=rooms.find(r=>r[1]===name),camera={x:row[2],y:row[4]+1.3,z:-row[3]};
       for(let step=0;step<100;step++){

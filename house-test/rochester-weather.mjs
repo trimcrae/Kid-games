@@ -118,7 +118,7 @@ export function createWeatherClient({fetchFn=globalThis.fetch?.bind(globalThis),
 export function createRochesterEnvironment({query=new URLSearchParams(),client,now=Date.now}={}){
   const phase=['day','dawn','dusk','night'].includes(query.get('phase'))?query.get('phase'):null;
   // A phase-only pin retains the established sunny, deterministic comparison.
-  const preview=previewWeather(query.get('weather')||(phase?'sunny':''));
+  const preview=previewWeather(query.get('weather'))||(phase?previewWeather('sunny'):null);
   return {refresh:()=>preview?Promise.resolve():client.refresh(),snapshot(){
     const time=now(),sun=solarPosition(time),local=rochesterClock(time),data=preview?{...preview,status:'preview'}:client.snapshot();
     return {...data,time:phase||sun.time,sun:phase?null:sun,local,phaseOverride:phase,weatherOverride:!!preview};

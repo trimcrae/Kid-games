@@ -20,6 +20,7 @@ import {createInteractions} from './interactions.mjs?v=20261103-studio-life';
 import {createMasterKim,combineGuards} from './master-kim.mjs?v=20261103-studio-life';
 import {prepareGarageDoor} from './garage-door.mjs?v=20261103-studio-life';
 import {kimBoxes} from './master-kim-layout.mjs?v=20261103-studio-life';
+import {neighborhoodBoxes} from './neighborhood-layout.mjs?v=20261103-studio-life';
 import {createButtonBinder} from './button-input.mjs';
 import {createWeatherClient,createRochesterEnvironment,weatherLabel} from './rochester-weather.mjs?v=20261113-rochester';
 import {createPrecipitation,createShelterMask} from './precipitation.mjs?v=20261113-rochester';
@@ -619,7 +620,7 @@ async function load(){
       lighting.useBakedLight(bakedLight.houseLightBlend.value);
     }
     performance.mark('house:baked-light');
-    const shelter=createShelterMask([...data.colliders,...kimBoxes]);
+    const shelter=createShelterMask([...data.colliders,...neighborhoodBoxes]);
     for(const g of data.groups){
       const array=new Float32Array(binary,g.offset,g.count*6),buffer=new THREE.InterleavedBuffer(array,6);
       const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.InterleavedBufferAttribute(buffer,3,0));geometry.setAttribute('normal',new THREE.InterleavedBufferAttribute(buffer,3,3));

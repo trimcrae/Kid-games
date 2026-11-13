@@ -92,7 +92,7 @@ async function contractChecks(browser,base){
     const previews=await page.evaluate(async({base,now,key})=>{
       const m=await import(base+'/house-test/rochester-weather.mjs');localStorage.removeItem(key);
       const result=[];
-      for(const query of ['weather=rainy','phase=night','phase=dusk&weather=snowy']){
+      for(const query of ['weather=rainy','phase=night','phase=dusk&weather=snowy','phase=night&weather=invalid']){
         const client=m.createWeatherClient({storage:localStorage,now:()=>now});
         const env=m.createRochesterEnvironment({query:new URLSearchParams(query),client,now:()=>now});
         await env.refresh();const state=env.snapshot();result.push({query,state,label:m.weatherLabel(state)});client.stop();
@@ -103,6 +103,7 @@ async function contractChecks(browser,base){
     assert.equal(previews[0].state.weather,'rainy');assert.equal(previews[0].state.time,'day');assert(previews[0].state.sun.elevation>69);
     assert.equal(previews[1].state.time,'night');assert.equal(previews[1].state.weather,'sunny');assert.equal(previews[1].state.sun,null);
     assert.equal(previews[2].state.time,'dusk');assert.equal(previews[2].state.weather,'snowy');
+    assert.equal(previews[3].state.time,'night');assert.equal(previews[3].state.weather,'sunny');
     for(const preview of previews){assert.equal(preview.state.status,'preview');assert.match(preview.label,/Preview/);}
     metrics.fixture.push({case:'independent-preview-pins',previews});
     await page.locator('#result').evaluate((element,text)=>{element.textContent=text;},JSON.stringify({unavailable,stale,previews},null,2));
@@ -191,7 +192,7 @@ async function houseCheck(browser,base,mobile){
     await clickReal(page,'#start',mobile);
     await page.waitForFunction(()=>window.houseTest.state.active,null,{polling:100,timeout:10000});
     const views=[];
-    const route=mobile?['Back yard',"Master Kim's dojang",'Living room']:['Front yard','Garage','Front porch','Living room'];
+    const route=mobile?['Back yard',"Master Kim's dojang",'Living room']:['Front yard','Garage','Front porch',"Cory's Craepet house",'Living room'];
     for(const room of route){
       const before=await page.evaluate(()=>houseTest.state.framesDrawn);
       assert.equal(await page.evaluate(room=>houseTest.go(room),room),true,'Could not visit '+room);
@@ -208,6 +209,7 @@ async function houseCheck(browser,base,mobile){
       if(/yard/i.test(room))assert(state.precipitation.visible>0,'Outdoor precipitation is missing');
       if(room==='Living room')assert(state.lightLevels.hemisphere>=.3,'Interior became unreadably dark');
       views.push({room,weather:state.weather,timeOfDay:state.timeOfDay,solarElevation:state.solarElevation,sunDirection:state.sunDirection,precipitation:state.precipitation,lightLevels:state.lightLevels,drawCalls:state.drawCalls,triangles:state.triangles,programs:state.programs,pixelRatio:state.pixelRatio});
+      if(room.includes('Craepet house'))await page.screenshot({path:path.join(OUT,tag+'-cottage.png')});
       if(room===route[0]||room==='Living room')await page.screenshot({path:path.join(OUT,tag+'-'+(room==='Living room'?'indoors':'outdoors')+'.png')});
     }
     assert.match(await page.locator('#weather-condition').innerText(),mobile?/Snow/:/Rain/);
