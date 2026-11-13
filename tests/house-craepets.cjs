@@ -4,10 +4,13 @@ const fs=require('node:fs');
 const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
 (async()=>{
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
-  const context=await browser.newContext({viewport:{width:1360,height:900}}),page=await context.newPage();
-  // Optional QA render scale / timeout for CPU-only Chromium. Assertions and
+  const [width,height]=(process.env.HOUSE_VIEWPORT||'1360x900').split('x').map(Number);
+  const context=await browser.newContext({viewport:{width,height}}),page=await context.newPage();
+  // Optional HOUSE_VIEWPORT=1024x640 plus render scale / timeout for CPU-only
+  // Chromium keeps a desktop layout with fewer software-rendered pixels. Assertions and
   // input paths stay the same; normal runs keep Playwright's default timeout.
   if(process.env.HOUSE_TIMEOUT)page.setDefaultTimeout(Number(process.env.HOUSE_TIMEOUT));
+  const navigations=[];page.on('framenavigated',frame=>navigations.push({url:frame.url(),at:new Date().toISOString()}));
   const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
   try{
     await page.goto(base+'/house-test/'+(process.env.HOUSE_QUERY||''));
@@ -20,8 +23,19 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     assert(await page.locator('#save-panel').isHidden(),'First visit opened the save transfer form');
     await page.locator('[data-profile="cory"]').click();
     const f=page.frameLocator('#activity-frame');
-    await f.locator('#pet-name').fill('Cory Comet');await f.locator('#do-adopt').click();
-    await f.locator('[data-tapegg]').click({clickCount:8,delay:130});
+    await f.locator('#pet-name').fill('Cory Comet');
+    // adopt() saves an egg and replaces the activity DOM; it never navigates.
+    // Software Chromium completed this click but timed out in Playwright's
+    // unrelated scheduled-navigation barrier. Keep the real actionable click,
+    // then synchronize on adoption and persistence instead of navigation.
+    console.log('ADOPTING');
+    await f.locator('#do-adopt').click({noWaitAfter:true});
+    const activity=page.frame({url:/activity.html/});
+    await activity.waitForFunction(()=>Craepets.state().pet?.name==='Cory Comet'&&!!Craepets.state().pet.egg,null,{polling:100});
+    const adopted=await activity.evaluate(()=>JSON.parse(localStorage.getItem('craepets.house.v1.cory')).pet);
+    assert.equal(adopted.name,'Cory Comet');assert(adopted.egg,'Adoption did not persist an egg');
+    await f.locator('[data-tapegg]').click({clickCount:8,delay:130,noWaitAfter:true});
+    await activity.waitForFunction(()=>Craepets.state().pet?.name==='Cory Comet'&&!Craepets.state().pet.egg,null,{polling:100});
     await page.locator('#close-activity').click();
     await page.waitForTimeout(1000);
     assert((await page.evaluate(()=>houseTest.state)).avatar,'Player avatar missing');
@@ -167,5 +181,5 @@ const base=process.env.HOUSE_BASE||'http://127.0.0.1:8765';
     assert(await mobile.evaluate(()=>houseTest.state.active),'Closing an activity by touch did not return to walking');
     await phone.close();console.log('PASS phone touch walking and learning activity');
     console.log('ERRORS',JSON.stringify(errors));assert.deepEqual(errors,[]);
-  }catch(e){console.log('ERRORS',JSON.stringify(errors));await page.screenshot({path:'tests/house-failure.png',timeout:10000}).catch(()=>{});throw e;}finally{await browser.close();}
+  }catch(e){console.log('ERRORS',JSON.stringify(errors));console.log('FRAME_NAVIGATIONS',JSON.stringify(navigations));await page.screenshot({path:'tests/house-failure.png',timeout:10000}).catch(()=>{});throw e;}finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
