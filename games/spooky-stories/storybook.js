@@ -2516,7 +2516,7 @@
   let actx = null;
   function audio() {
     if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { actx = null; } }
-    if (actx && actx.state === "suspended") actx.resume();
+    if (actx && actx.state === "suspended") actx.resume().catch(() => {});
     return actx;
   }
   function tone(freq, dur, type, when, gain) {
@@ -2551,7 +2551,7 @@
   function playSound(name) { (SOUNDS[name] || SOUNDS.chime)(); }
 
   /* -----------------------------------------------------------
-     4. Narration — the pre-rendered neural-voice clips
+     4. Narration — recorded clips with a browser-voice fallback
      (warm Piper "lessac" voice, in audio/<storyId>-<page>.mp3),
      plus word-by-word highlighting timed to that voice so a new
      reader can follow along with their eyes while they listen.
@@ -2560,7 +2560,7 @@
   // audio/manifest.js (written by audio/build_audio.py) lists the clips that
   // actually exist and where the voice sounds in each sentence. Checking it
   // first means we never request an mp3 the audio pipeline has not rendered
-  // yet: brand-new story text is simply silent, with no failed requests.
+  // yet: new pages use the browser voice without requesting missing files.
   const CLIPS = window.SPOOKY_NARRATION || null;
   function clipTiming(name) {
     if (!CLIPS) return [];   // no manifest at all — be optimistic and try
@@ -2570,45 +2570,187 @@
   }
   function hasClip(name) { return clipTiming(name) !== null; }
 
-  const narrator = new Audio();
-  narrator.preload = "auto";
-
-  let currentClip = "";      // the clip loaded into the <audio> right now
+  let narrator = new Audio();
+  let activeMedia = null;    // null after Stop, even while an old play() settles
+  let currentClip = "";      // the clip loaded into the current <audio>
   let karaokeOn = false;     // highlight page words while this clip plays?
+  let narrationRequest = 0;
+  let speechRetryClip = "";  // retry a failed recording with speech on the next tap
+  let startTimer = 0;
+  let utterance = null;      // keep speech alive until it ends or is canceled
+  let removeMediaListeners = () => {};
+  const RETRY_NARRATION = "Tap the speaker to start reading. You can read along on the page.";
 
-  // Play clip `name` from `fromTime` seconds. Returns false when there is no
-  // such clip (the page then just stays quiet and the words stay on screen).
-  function narrate(name, fromTime, karaoke) {
-    if (!hasClip(name)) { stopNarration(); return false; }
-    document.getElementById("narration-status").textContent = "";
-    karaokeOn = !!karaoke;
-    if (currentClip !== name) {
-      try { narrator.pause(); } catch (e) {}
-      const revision = CLIPS && CLIPS[name] && CLIPS[name].text;
-      narrator.src = "audio/" + name + ".mp3" + (revision ? "?v=" + revision : "");
-      currentClip = name;
-    }
-    try { narrator.currentTime = fromTime || 0; } catch (e) { /* metadata not in yet */ }
-    const pr = narrator.play();
-    if (pr && pr.catch) pr.catch(error => {
-      paintWord(-1);
-      if (error.name !== "AbortError") document.getElementById("narration-status").textContent =
-        "Tap the speaker to start the recording. You can read along on the page.";
-    });
-    tickKaraoke();
-    return true;
+  function narrationStatus(message) {
+    document.getElementById("narration-status").textContent = message;
+  }
+  function clearStartTimer() {
+    clearTimeout(startTimer);
+    startTimer = 0;
   }
   function stopNarration() {
+    // Invalidate first: pause/cancel can synchronously dispatch callbacks, and
+    // a previous play() promise may settle after the next page has started.
+    narrationRequest++;
+    clearStartTimer();
+    removeMediaListeners();
+    removeMediaListeners = () => {};
+    activeMedia = null;
     karaokeOn = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
     try { narrator.pause(); } catch (e) {}
+    const wasSpeaking = utterance;
+    utterance = null;
+    if (wasSpeaking) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
     paintWord(-1);
+    narrationStatus("");
   }
-  narrator.addEventListener("ended", () => paintWord(-1));
-  narrator.addEventListener("error", () => {
-    paintWord(-1);
-    document.getElementById("narration-status").textContent =
-      "The recording could not load. Try the speaker again, or read the words on the page.";
-  });
+
+  // Keep missing-clip and replay calls synchronous with the user gesture.
+  // Waiting for voices or animation can lose mobile activation; a failed
+  // recording may arrive later, so that path also retains a direct retry.
+  function speakText(text, karaoke, startWord) {
+    stopNarration();
+    currentClip = "";
+    if (document.hidden) return false;
+    if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+      narrationStatus("Read-aloud is not available in this browser. You can read every word on the page.");
+      return false;
+    }
+    const tokens = Array.from(String(text || "").matchAll(/\S+/g)).filter(m => normWord(m[0]));
+    const firstWord = startWord || 0;
+    const offset = tokens[firstWord] ? tokens[firstWord].index : 0;
+    const spoken = String(text || "").slice(offset).trim();
+    if (!spoken) return false;
+    const request = narrationRequest;
+    const active = () => request === narrationRequest;
+    const failed = () => {
+      if (!active()) return;
+      stopNarration();
+      narrationStatus(RETRY_NARRATION);
+    };
+    try {
+      const voice = new window.SpeechSynthesisUtterance(spoken);
+      utterance = voice;
+      voice.lang = document.documentElement.lang || "en";
+      voice.rate = 0.9;
+      voice.onstart = () => {
+        if (!active()) return;
+        clearStartTimer();
+        narrationStatus("Reading with your browser's voice.");
+        if (karaoke) paintWord(firstWord);
+      };
+      voice.onboundary = event => {
+        if (!active() || !karaoke || event.name !== "word") return;
+        let i = firstWord;
+        while (i + 1 < tokens.length && tokens[i + 1].index - offset <= event.charIndex) i++;
+        paintWord(i);
+      };
+      voice.onend = () => { if (active()) stopNarration(); };
+      voice.onerror = event => {
+        if (!active()) return;
+        if (event.error === "canceled" || event.error === "interrupted") stopNarration();
+        else failed();
+      };
+      // Some mobile engines silently ignore speech before a user gesture.
+      // Offer a manual retry; never keep retrying or restart after Stop.
+      narrationStatus("Starting read-aloud…");
+      startTimer = setTimeout(failed, 5000);
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+      window.speechSynthesis.speak(voice);
+    } catch (e) { failed(); return false; }
+    return true;
+  }
+
+  // Prefer the existing recordings. Missing/failed clips use exactly the page
+  // text; a blocked play() asks for a fresh tap instead of fighting autoplay.
+  function narrate(name, fromTime, karaoke, fallbackText, startWord) {
+    stopNarration();
+    if (document.hidden) return false;
+    if (speechRetryClip === name || !hasClip(name)) return speakText(fallbackText, karaoke, startWord);
+    const request = narrationRequest;
+    const active = () => request === narrationRequest;
+    // Page gestures get isolated media events. Keep the unlocked element for
+    // the quiz's delayed next question: Safari grants autoplay per element.
+    const reuseQuizAudio = !karaoke && /-q\d+$/.test(currentClip);
+    const clip = reuseQuizAudio ? narrator : new Audio();
+    narrator = clip;
+    activeMedia = clip;
+    clip.preload = "auto";
+    currentClip = name;
+    karaokeOn = !!karaoke;
+    const revision = CLIPS && CLIPS[name] && CLIPS[name].text;
+    const failed = error => {
+      if (!active()) return;
+      if (error && (error.name === "NotAllowedError" || error.name === "AbortError")) {
+        stopNarration();
+        narrationStatus(RETRY_NARRATION);
+      } else if (fallbackText) {
+        // If asynchronous loading lost mobile activation, the next speaker
+        // tap must start speech directly rather than retry this broken clip.
+        speechRetryClip = name;
+        speakText(fallbackText, karaoke, startWord);
+      } else {
+        stopNarration();
+        narrationStatus("The recording could not load. Try the speaker again, or read the words on the page.");
+      }
+    };
+    const onPlaying = () => {
+      if (!active()) return;
+      if (reuseQuizAudio && (clip.paused || clip.currentSrc !== clip.src)) return;
+      clearStartTimer();
+      narrationStatus("");
+      tickKaraoke();
+    };
+    const onEnded = () => { if (active() && clip.ended) stopNarration(); };
+    // A queued event from the quiz's prior source must agree with the new
+    // element state. Assigning src clears error/ended on native media.
+    const onError = () => { if (!reuseQuizAudio || clip.error) failed(); };
+    clip.addEventListener("playing", onPlaying);
+    clip.addEventListener("ended", onEnded);
+    clip.addEventListener("error", onError);
+    clip.src = "audio/" + name + ".mp3" + (revision ? "?v=" + revision : "");
+    // Retry the seek after metadata on engines that cannot seek a new source.
+    const seek = () => {
+      if (active()) { try { clip.currentTime = fromTime || 0; } catch (e) {} }
+    };
+    clip.addEventListener("loadedmetadata", seek, { once: true });
+    removeMediaListeners = () => {
+      clip.removeEventListener("playing", onPlaying);
+      clip.removeEventListener("ended", onEnded);
+      clip.removeEventListener("error", onError);
+      clip.removeEventListener("loadedmetadata", seek);
+    };
+    seek();
+    startTimer = setTimeout(() => {
+      if (!active()) return;
+      stopNarration();
+      narrationStatus(RETRY_NARRATION);
+    }, 10000);
+    try {
+      const playing = clip.play();
+      if (playing && playing.then) playing.then(() => {
+        if (!active()) { if (clip !== activeMedia) clip.pause(); return; }
+        clearStartTimer();
+        tickKaraoke();
+      }, failed);
+    } catch (error) { failed(error); }
+    return true;
+  }
+
+  function narrateCurrentPage(startWord) {
+    if (!current) return;
+    const name = clipName(current.id, page);
+    let fromTime = 0;
+    if (startWord && currentClip === name) {
+      ensureTiming();
+      if (wordTimes && wordTimes[startWord]) fromTime = Math.max(0, wordTimes[startWord].a - 0.06);
+    }
+    narrate(name, fromTime, true, current.pages[page].text, startWord);
+  }
 
   /* ---- word highlighting ------------------------------------
      audio/manifest.js tells us, for every sentence in the clip,
@@ -3045,6 +3187,8 @@
   }
 
   function renderPage(animate) {
+    stopNarration();
+    speechRetryClip = "";
     const p = current.pages[page];
     hideWordCard();
     closeQuiz();
@@ -3082,8 +3226,6 @@
     const wonder = document.getElementById("wonder");
     wonder.textContent = p.wonder || "";
     wonder.hidden = !p.wonder;
-    document.getElementById("narration-status").textContent = hasClip(clipName(current.id, page))
-      ? "" : "The recording for this page is not available yet. You can read every word here.";
 
     // dots + a plain "page 3 of 6" for readers and screen readers
     dotsEl.innerHTML = "";
@@ -3133,20 +3275,12 @@
     }
 
     // read this page aloud — unless the reader is in "I'll read it myself" mode
-    if (prefs.self) stopNarration();
-    else narrate(clipName(current.id, page), 0, true);
+    if (!prefs.self) narrateCurrentPage();
   }
 
   // ---- tapping a word: hear it again, and learn the big ones ----
   function speakWordAt(i) {
-    if (!current) return;
-    const name = clipName(current.id, page);
-    if (!hasClip(name)) return;
-    // make sure we know where each word sits inside the clip
-    if (currentClip !== name) { narrate(name, 0, true); return; }
-    ensureTiming();
-    const t = (wordTimes && wordTimes[i]) ? Math.max(0, wordTimes[i].a - 0.06) : 0;
-    narrate(name, t, true);
+    narrateCurrentPage(i);
   }
 
   function onWordActivate(sp) {
@@ -3225,8 +3359,8 @@
       b.addEventListener("click", () => answerQuiz(b, ci === 0));
       quizChoicesEl.appendChild(b);
     });
-    // the question is narrated too, once the audio pipeline has rendered it
-    narrate(current.id + "-q" + quizI, 0, false);
+    // The same read-aloud preference applies to story questions.
+    if (!prefs.self) narrate(current.id + "-q" + quizI, 0, false, q.ask);
   }
 
   function answerQuiz(btn, right) {
@@ -3355,10 +3489,12 @@
   });
   quizBtn.addEventListener("click", openQuiz);
   homeBtn.addEventListener("click", goHome);
-  readBtn.addEventListener("click", () => {
+  function readSelection() {
     if (!current) return;
-    narrate(clipName(current.id, page), 0, true);
-  });
+    if (quizQs && quizDoneEl.hidden) narrate(current.id + "-q" + quizI, 0, false, quizQs[quizI].ask);
+    else narrateCurrentPage();
+  }
+  readBtn.addEventListener("click", readSelection);
   document.getElementById("stop-btn").addEventListener("click", stopNarration);
 
   // "Read it to me" <-> "I'll read it myself" — Jeannie can switch the voice
@@ -3372,7 +3508,7 @@
     savePrefs();
     paintSelfBtn();
     if (prefs.self) stopNarration();
-    else if (current) narrate(clipName(current.id, page), 0, true);
+    else readSelection();
   });
   paintSelfBtn();
 
