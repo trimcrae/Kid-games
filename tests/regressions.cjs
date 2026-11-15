@@ -11,6 +11,8 @@ const suites = [
   { file: "house-upholstery-browser.cjs", timeout: 120000, browser: true },
   { file: "storybook-ellie.cjs", timeout: 15000 },
   { file: "storybook-ellie-browser.cjs", timeout: 120000, browser: true },
+  { file: "storybook-narration-unit.cjs", timeout: 15000 },
+  { file: "storybook-narration.cjs", timeout: 120000, browser: true },
   { file: "sudoku-engine.mjs", timeout: 60000 },
   { file: "sudoku-browser.cjs", timeout: 180000, browser: true },
   { file: "house-button-input.mjs", timeout: 15000 },
