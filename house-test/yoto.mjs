@@ -1,6 +1,6 @@
 // The kids' Yoto players: one little cream cube with two orange knobs in each
 // of the four bedrooms, drawn here out of boxes and cylinders (no textures, no
-// downloads). E next to one plays today's episode of Yoto Daily; E again
+// downloads). E next to one plays the newest publicly available Yoto Daily; E again
 // pauses it, and starting one stops whichever was already going — four of them
 // playing over each other would be a lot, in the house as in real life.
 //
@@ -8,8 +8,8 @@
 // on another host and a static site may not read it (CORS). So a workflow does
 // it once a day on a runner with real internet
 // (.github/workflows/yoto-daily.yml) and commits the newest episode to
-// yoto-daily.json; the browser only reads that little file, and only the first
-// time somebody presses E. Everything in it is words and a URL — text for the
+// yoto-daily.json; the browser lazily reads that little file on demand.
+// Everything in it is words and a URL — text for the
 // speech bubble, a src for an <audio> — never anything that runs.
 const FEED='./yoto-daily.json';
 // The 5x5 face on the front: a smiley sitting there waiting, a note playing.
@@ -31,19 +31,37 @@ const PLAYERS=[
   ['yoto-kieran',"Kieran's Yoto player",{x:12.90,y:2.075,z:-.46},Math.PI,{x:12.40,y:1.29,z:-1.00}],
 ];
 
+const UTC_DATE=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+
+function publicEpisodeLabel(episode){
+  const time=typeof episode.date==='string'&&episode.date.trim()?Date.parse(episode.date):NaN;
+  const date=Number.isFinite(time)?` (${UTC_DATE.format(time)})`:'';
+  return `Most recent public episode${date}: ${episode.title.trim().slice(0,90)}`;
+}
+
+function playableEpisode(j){
+  if(!j||typeof j.title!=='string'||!j.title.trim()||typeof j.audio!=='string')return null;
+  try{
+    const url=new URL(j.audio);
+    return url.protocol==='http:'||url.protocol==='https:'?j:null;
+  }catch{return null;}
+}
+
 export function yotoInteractions(ctx){
   const {THREE,scene,world,life,list,ticking,sounds,reducedMotion}=ctx;
   // One player at a time, one element between them all: switching rooms
   // switches the card rather than starting a second copy of the episode.
   const audio=new Audio();audio.preload='none';audio.volume=.85;
-  let playing=null,episode=null,asked=null;
-  // The file is fetched once, lazily, on the first press — and a missing or
-  // unfinished one is not an error, just no card in the slot yet.
+  let playing=null,session=null,episode=null,pending=null;
+  // Share a fetch across all four players and cache only a playable result.
+  // An unavailable card is retried on the next press, never in the background.
   function loadEpisode(){
-    return asked??=Promise.resolve().then(()=>fetch(FEED+'?v='+Date.now(),{cache:'no-store'}))
+    if(episode)return Promise.resolve(episode);
+    return pending??=Promise.resolve().then(()=>fetch(FEED+'?v='+Date.now(),{cache:'no-store'}))
       .then(r=>r.ok?r.json():null)
-      .then(j=>episode=(j&&typeof j.title==='string'&&typeof j.audio==='string'&&/^https?:/.test(j.audio))?j:null)
-      .catch(()=>episode=null);
+      .then(j=>episode=playableEpisode(j))
+      .catch(()=>null)
+      .finally(()=>{pending=null;});
   }
   // ----- one player, built out of boxes.
   const shellMat=new THREE.MeshStandardMaterial({color:'#f4eee1',roughness:.72,metalness:0});
@@ -79,7 +97,7 @@ export function yotoInteractions(ctx){
   function stop(){
     if(!playing)return;
     try{audio.pause();}catch{}
-    draw(playing,SMILEY);playing.lit.emissiveIntensity=1.5;playing=null;
+    draw(playing,SMILEY);playing.lit.emissiveIntensity=1.5;playing=null;session=null;
   }
   audio.addEventListener('ended',()=>stop());
   audio.addEventListener('error',()=>{if(playing){life.say('That card will not play.',2400);stop();}});
@@ -88,18 +106,19 @@ export function yotoInteractions(ctx){
     const p=build(pos,yaw);p.id=id;draw(p,SMILEY);
     const spot=world.safeSpot(seed.x,seed.y,seed.z)||seed;
     list.push({id,icon:'🎧',name,kind:'toggle',at:{x:spot.x,y:spot.y,z:spot.z},radius:1.1,face:{x:pos.x,z:pos.z},
-      label:()=>playing===p?'Pause the Yoto':'Play Yoto Daily',
+      label:()=>playing===p?'Pause the Yoto':'Play a public Yoto Daily episode',
       start(){
         sounds?.click?.();
         if(playing===p){stop();life.say('Paused.',1200);return;}
         stop();playing=p;draw(p,NOTE);
-        loadEpisode().then(()=>{
-          if(playing!==p)return;                       // somebody pressed another one meanwhile
-          if(!episode){life.say("Yoto Daily hasn't arrived yet",2800);stop();return;}
+        const started=session=Symbol();
+        loadEpisode().then(current=>{
+          if(session!==started)return;                 // another press or pause since starting
+          if(!current){life.say('No public Yoto Daily episode loaded. Try again.',2800);stop();return;}
           // Only ever text and a src — the title goes in the speech bubble.
-          if(audio.src!==episode.audio){audio.src=episode.audio;audio.load();}
-          Promise.resolve(audio.play()).catch(()=>{if(playing===p){life.say("The Yoto won't start.",2400);stop();}});
-          life.say(String(episode.title).slice(0,90),5000);
+          if(audio.src!==current.audio){audio.src=current.audio;audio.load();}
+          Promise.resolve(audio.play()).catch(()=>{if(session===started){life.say("The Yoto won't start.",2400);stop();}});
+          life.say(publicEpisodeLabel(current),5000);
         });
       }});
     ticking.push(dt=>{

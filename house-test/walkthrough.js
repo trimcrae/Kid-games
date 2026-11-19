@@ -16,7 +16,7 @@ import {createCameraGuard,guardGroups,nearPlaneReach,createFollowRig,arrivalHead
 import {glazingBoxes} from './glazing.mjs';
 import {createMonitor} from './monitor.mjs?v=20260916-use3';
 import {createMaraudersMap} from './marauders-map.mjs?v=20261103-studio-life';
-import {createInteractions} from './interactions.mjs?v=20261103-studio-life';
+import {createInteractions} from './interactions.mjs?v=20261119-yoto-public';
 import {createMasterKim,combineGuards} from './master-kim.mjs?v=20261103-studio-life';
 import {prepareGarageDoor} from './garage-door.mjs?v=20261103-studio-life';
 import {kimBoxes} from './master-kim-layout.mjs?v=20261103-studio-life';

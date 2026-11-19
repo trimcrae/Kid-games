@@ -15,6 +15,7 @@ const suites = [
   { file: "storybook-narration.cjs", timeout: 120000, browser: true },
   { file: "sudoku-engine.mjs", timeout: 60000 },
   { file: "sudoku-browser.cjs", timeout: 180000, browser: true },
+  { file: "house-yoto.mjs", timeout: 15000 },
   { file: "house-button-input.mjs", timeout: 15000 },
   { file: "house-button-input-browser.cjs", timeout: 120000, browser: true },
   { file: "house-studio-save.mjs", timeout: 15000 },
