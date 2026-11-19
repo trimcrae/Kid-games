@@ -20,6 +20,7 @@ blue_wall = material('Nursery dusty blue plaster', (.24, .34, .51), .85, texture
 bed_wall = material('Upstairs warm grey plaster', (.60, .58, .53), .9, texture='plaster')
 mint = material('Bathroom sea green glazed tile', (.16, .43, .32), .26)
 darkmint = material('Bathroom dark green accent tile', (.025, .13, .085), .24)
+bath_lavender = material('Family bathroom muted lavender plaster', (.27, .30, .42), .90, texture='plaster')
 bedding = material('Clean ivory cotton bedding', (.84, .81, .71), .92, texture='fabric')
 curtainmat = material('Light grey woven curtains', (.57, .59, .56), .95, texture='fabric')
 darkcurtain = material('Charcoal patterned bedroom curtains', (.12, .14, .16), .94, texture='fabric')
@@ -241,6 +242,13 @@ upper_collection('18 | Upstairs bedroom walls and windows')
 asset('Blue nursery enclosure', photos='U6')
 partition('Nursery blue rear wall', (0,-3.65),(4.5,-3.65),blue_wall,[(1.12,2.42,.77,2.07)])
 partition('Nursery blue left wall', (0,-3.65),(0,-.55),blue_wall)
+# Keep the crib backdrop subtly darker without painting the window wall or exterior face.
+nursery_crib_blue = material('Nursery muted slate plaster', (.150,.189,.267), .85, texture='plaster')
+crib_wall = bpy.data.objects['Nursery blue left wall']
+crib_wall.data.materials.append(nursery_crib_blue)
+for face in crib_wall.data.polygons:
+    if (crib_wall.rotation_euler.to_matrix() @ face.normal).x > .99:
+        face.material_index = len(crib_wall.data.materials) - 1
 partition('Nursery blue right wall', (4.5,-3.65),(4.5,-.55),blue_wall,
           [(.03,1.22,0,2.05),(1.55,2.55,0,2.12)])
 # House Tour 126/129s reveals a closet behind Cory's bed headboard. Its depth
@@ -446,6 +454,12 @@ for x,y in [(-.10,0),(.10,0),(0,.10)]:
 upper_collection('22 | Family bathroom fixtures')
 asset('Family bathroom plaster enclosure',photos='U3-U5')
 partition('Bath left wall',(-1.15,.55),(-1.15,3.13),white)
+# Keep the lavender on the inward vanity face only, not the opposite room or end caps.
+vanity_wall = bpy.data.objects['Bath left wall']
+vanity_wall.data.materials.append(bath_lavender)
+for face in vanity_wall.data.polygons:
+    if (vanity_wall.rotation_euler.to_matrix() @ face.normal).x > .99:
+        face.material_index = len(vanity_wall.data.materials) - 1
 partition('Bath back wall',(-1.15,3.13),(1.25,3.13),white)
 # Primary left wall is the shared partition; avoid coincident duplicate surfaces.
 partition('Bath entry return',(-1.15,.55),(0,.55),white)
@@ -482,6 +496,29 @@ def basin(name, center, width, depth, rim_z, bottom_z, mat):
     return o
 
 
+def vanity_light(name, height, width=.48, shade_mat=glass):
+    # Vanity fixtures face local -Y, with glass shades open at the lower rim.
+    box(name+' backplate', (0,.25,height), (width+.09,.035,.045), black, .008)['browser_collide'] = False
+    for x in (-width/2, 0, width/2):
+        curve(name+' arm', [(x,.239,height), (x,.153,height), (x,.119,height-.025)],
+              .012, black)['browser_collide'] = False
+        cylinder(name+' socket', (x,.119,height-.031), .024,.033, black,12)['browser_collide'] = False
+        sphere(name+' bulb', (x,.119,height-.072), (.021,.021,.034), tilewhite)['browser_collide'] = False
+        # A thin open-bottom shell leaves the bulb visible without stacking capped panes.
+        rings, sides = [], 16
+        for radius,z in ((.033,height-.049),(.044,height-.151),(.042,height-.151),(.031,height-.049)):
+            rings.extend((x+radius*math.cos(a*math.tau/sides),.119+radius*math.sin(a*math.tau/sides),z)
+                         for a in range(sides))
+        faces = [(j*sides+a, ((j+1)%4)*sides+a, ((j+1)%4)*sides+(a+1)%sides, j*sides+(a+1)%sides)
+                 for j in range(4) for a in range(sides)]
+        mesh = bpy.data.meshes.new(name+' glass shade')
+        mesh.from_pydata(rings, [], faces)
+        obj = finish(bpy.data.objects.new(name+' glass shade',mesh),name+' glass shade',shade_mat)
+        for face in mesh.polygons:
+            face.use_smooth = True
+        obj['browser_collide'] = False
+
+
 asset('White bathroom vanity',(-.82,1.65,0),90,'U3,U5')
 box('White vanity cabinet',(0,0,.40),(1.20,.52,.80),white)
 for x in [-.39,0,.39]:
@@ -495,6 +532,7 @@ curve('Chrome vanity faucet',[(0,.23,.86),(0,.23,1.00),(0,.10,1.03),(0,.05,.97)]
 for x in [-.12,.12]:
     cylinder('Vanity faucet handle',(x,.22,.885),.024,.055,steel)
 frame('Large vanity mirror',(0,.27,1.46),1.15,.97,white,mirror)
+vanity_light('Family bath vanity light', 2.14,.58)
 asset('Bathroom recessed linen shelves',(-.87,.86,0),90,'U5; House Tour 104–106s',
       'cased linen closet beside entrance observed; enclosure dimensions estimated')
 for x in [-.25,.25]:

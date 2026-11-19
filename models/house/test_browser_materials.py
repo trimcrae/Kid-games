@@ -1,7 +1,7 @@
 """Finish/export contracts; no Blender runtime or private reference required."""
 import unittest
 from types import SimpleNamespace
-from browser_materials import (finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders,
+from browser_materials import (browser_material_name, finish_for_name, material_finish, keep_bevel, practical_light, ramp_colliders,
                                oriented_triangle_corners, group_key, dressing_collection, browser_flag)
 
 
@@ -29,6 +29,17 @@ class BrowserMaterials(unittest.TestCase):
         self.assertEqual(screen['surface'], 'screen')
         self.assertLess(window['opacity'], .4)
         self.assertEqual(window['surface'], 'glass')
+
+    def test_native_sunroom_daylight_keeps_the_same_exported_window(self):
+        old = SimpleNamespace(name='Window glass', use_nodes=False)
+        daylight = SimpleNamespace(name='Sunroom window glass', use_nodes=False)
+        screen = SimpleNamespace(name='Dark appliance glass', use_nodes=False)
+        self.assertEqual(browser_material_name(daylight), old.name)
+        self.assertEqual(material_finish(daylight), material_finish(old))
+        self.assertEqual(material_finish(daylight)['surface'], 'glass')
+        self.assertAlmostEqual(material_finish(daylight)['opacity'], .20)
+        self.assertEqual(browser_material_name(screen), screen.name)
+        self.assertEqual(material_finish(screen)['opacity'], 1)
 
     def test_finishes_have_meaningful_physical_differences(self):
         steel = finish_for_name('Brushed stainless')
