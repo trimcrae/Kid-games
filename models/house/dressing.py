@@ -3,8 +3,8 @@
 Runs after exterior.py, in world Blender coordinates (X right, +Y toward the
 back yard, Z up). Rugs, cushions, plants, kid art and in-use clusters make each
 room read as a family home, and the garden gets a raised vegetable bed at the
-Garden & maths spot, a stepping-stone path and flower beds. Everything here is
-invented dressing, not photographed. Kid art is code-drawn shapes only: no
+Garden & maths spot, a stepping-stone path and flower beds. Architectural floor finishes remain visible where the game
+does not need its own props. Kid art is code-drawn shapes only: no
 photographs and no generated images.
 
 Browser contract (export_walkthrough.py):
@@ -120,7 +120,7 @@ def down(x, y, top, reach=1.6):
 
 
 def down_max(x, y, top, dx, dy):
-    """Highest surface under a footprint (patterned tile has raised motifs)."""
+    """Highest surface under a footprint on floors with joints or trim."""
     return max(down(x + i * dx, y + j * dy, top) for i in (-1, 0, 1) for j in (-1, 0, 1))
 
 
@@ -628,26 +628,30 @@ def diamond(cx, cy, r):
 # ================================================================== MAIN FLOOR
 _use('main')
 
-# Living room: a soft rug under the whole seating group, cushions, a throw,
-# a half-done jigsaw on the tray table, toys, kid art and a plant.
-g, _ = rug_on('Living room coral bordered rug', 2.35, 2.30, .30, 3.2, 2.8, D['cream'], D['coral'], .12,
-              stripes=[(-1.40, -1.22, 1.40, -1.18, D['teal']), (-1.40, 1.18, 1.40, 1.22, D['teal']),
-                       (-1.40, -1.22, -1.36, 1.22, D['teal']), (1.36, -1.22, 1.40, 1.22, D['teal'])],
-              motifs=[(diamond(-1.2 + k * .30, y, .07), D['mustard'] if k % 2 else D['teal'])
-                      for k in range(9) for y in (-1.29, 1.29)]
-                     + [(diamond(x, y, .16), D['mustard']) for x in (-1.12, 1.12) for y in (-.92, .92)], nx=10, ny=8)
-g.done()
-
-g = prop('Living sofa accent cushions', .47, 2.28, 0)  # follows the sofa (build.py)
-for dy, mat in [(-.63, D['coral']), (0, D['mustard']), (.62, D['teal'])]:
-    g.soft((0, dy, .70), (.13, .42, .40), mat, .05, (0, -.26, 0))
-g.done()
-g = prop('Living sofa arm knit throw', .56, 3.23, 0)
-g.soft((0, 0, .738), (.62, .34, .032), D['rose'], .012)
-g.soft((0, -.172, .60), (.62, .03, .27), D['rose'], .012)
-g.done()
-g = prop('Living tub chair cushion', .99, 3.86, 0, 90)  # follows the chair
-g.soft((0, 0, .64), (.36, .12, .30), D['mustard'], .05, (-.25, 0, 0))
+# The play table and seats stand directly on the narrow oak strips.
+# Keep the existing main-floor boards exposed instead of adding a decorative rug.
+# Drape a thin cover over the padded back, leaving both taupe seats and arms visible.
+# Cross-section follows the sofa's rounded top; the very small variations are
+# folds, not an applied room texture. The tub chair stays uncovered.
+g = prop('Living neutral sofa back cover', .55, 2.25, .018, 90)
+profile = [(.389, .881), (.365, .923), (.330, .932), (.297, .930),
+           (.267, .916), (.238, .890), (.218, .857), (.211, .810),
+           (.207, .684), (.198, .519)]
+sections = 20
+points, cloth_faces = [], []
+for j, (depth, height) in enumerate(profile):
+    for i in range(sections + 1):
+        u = i / sections
+        wave = math.cos(4 * math.pi * u + .23 * j)
+        loose = j / (len(profile) - 1)
+        points.append(((u - .5) * 1.90,
+                       depth - .005 * loose * (1 + wave),
+                       height + .003 * wave + .012 * loose ** 2 * math.sin(3 * math.pi * u)))
+for j in range(len(profile) - 1):
+    for i in range(sections):
+        k = j * (sections + 1) + i
+        cloth_faces.append((k, k + sections + 1, k + sections + 2, k + 1))
+g.raw(points, cloth_faces, D['cream'], smooth=True)
 g.done()
 
 zt = down(1.82, 2.10, .80)
@@ -687,17 +691,7 @@ g = prop('Living side table trailing plant', 3.60, .50, down(3.60, .50, 1.0))
 plant(g, 0, 0, 0, .09, .14, trailing=True, count=30)
 g.done()
 
-# Foyer: the family's gathering spot (Pet & family, Furnish & decorate).
-g = prop('Foyer round mustard rug', 5.60, 2.10, down(5.60, 2.10, .30) + .0015)
-g.cyl((0, 0, .004), 1.10, .008, D['mustard'], 36)
-g.flat(ngon(.95, 36), .0092, D['cream'])
-g.flat(ngon(.45, 32), .0104, D['mustard'])
-g.flat(ngon(.30, 28), .0116, D['cream'])
-for k in range(10):
-    a = k * math.tau / 10
-    g.flat(ngon(.06, 10, .72 * math.cos(a), .72 * math.sin(a)), .0104, D['teal'])
-g.done()
-
+# Keep the foyer circulation area open, including the gathering spot.
 z0 = down(7.55, -.90, .30)
 g = prop('Entry shoe bench', 7.55, -.90, z0, 90, blocking=True)
 g.soft((0, 0, .43), (1.0, .38, .05), D['wood'], .012)
@@ -737,14 +731,14 @@ g.done()
 framed('Entry framed hill landscape', 4.45, .60, 1.85, (0, -1, 0), .60, .45, 'landscape')
 
 # Kitchen: counters in use, fridge drawings, herb pots and the pet's corner.
-zk = down_max(1.15, 6.00, .30, .25, .6)
-g, _ = rug_on('Kitchen striped runner', 1.15, 6.00, .30, .65, 1.60, D['cream'], None, z=zk,
-              stripes=[(-.32, y - .04, .32, y + .04, D['teal']) for y in (-.64, -.32, 0, .32, .64)], nx=3, ny=8)
+# The sink aisle exposes the tile; the low doormat sits at the garage approach.
+g, _ = rug_on('Kitchen garage approach mat', .43, 7.56, .30, .52, .57,
+              _dm('Dressing graphite doormat cotton', '#414245'), nx=2, ny=3, th=.004, footprint=True)
 g.done()
 zm = down_max(2.85, 7.15, .30, .2, .14)
-g, _ = rug_on('Kitchen pet feeding mat', 2.85, 7.15, .30, .60, .42, D['teal'], None, z=zm,
-              motifs=[(ngon(.035, 10, dx, dy), D['cream']) for dx, dy in [(.18, .08), (.13, .13), (.20, .15), (.25, .11)]]
-              + [(ngon(.05, 12, .19, .05), D['cream'])], nx=2, ny=2)
+# Leave the feeding activity's small visual cue at its fixed gameplay target.
+g, _ = rug_on('Kitchen pet feeding mat', 2.85, 7.15, .30, .46, .32,
+              D['cream'], z=zm, nx=2, ny=2, th=.003)
 g.done()
 g = prop('Kitchen fruit bowl', 1.00, 4.84, down(1.00, 4.84, 1.3))
 g.cyl((0, 0, .035), .08, .07, D['cream'], 16, top=.15, caps=(True, False))
@@ -795,21 +789,11 @@ g.soft((-.12, -.06, -.20), (.30, .085, .46), D['corn'], .04)
 g.soft((.14, -.06, -.23), (.30, .085, .50), D['coral'], .04)
 g.done()
 
-# Dining: rug, table runner and flowers, the family quest board.
-g, _ = rug_on('Dining teal striped rug', 5.52, 6.38, .30, 2.6, 1.9, D['cream'], D['teal'], .09,
-              stripes=[(-1.21, y - .035, 1.21, y + .035, D['teal']) for y in (-.45, 0, .45)], nx=8, ny=6)
-g.done()
-zt = down(5.52, 6.38, 1.2)
-g = prop('Dining table runner and flower jug', 5.52, 6.38, zt)
-g.box((0, 0, .002), (1.60, .32, .004), D['cream'])
-for x in (-.76, .76):
-    g.box((x, 0, .003), (.08, .32, .004), D['coral'])
-g.cyl((.10, 0, .085), .06, .16, D['corn'], 14, top=.045)
-for k in range(5):
-    a = k * math.tau / 5
-    flower(g, .10 + .03 * math.cos(a), .03 * math.sin(a), .15, .12 + .03 * (k % 2), FLOWERS[k % 3])
-g.cyl((-.40, .02, .005), .06, .01, D['paper'], 14)
-g.done()
+# Keep the dining tabletop and floor clear; the family quest board stays.
+# Each of the old five decorative flowers reserved three scalar random values
+# and two leaves of eight values. Keep later plants, books and toys deterministic.
+for _ in range(5 * (3 + 2 * 8)):
+    _rng.random()
 g = wall_prop('Dining family quest board', 6.80, 7.40, 1.45, (0, 1, 0))
 g.box((0, -.01, 0), (.90, .02, .60), D['kraft'])
 for dx in (-1, 1):
@@ -915,9 +899,6 @@ def small_toy(g, x, y, z, r, fur, ears=True):
 # ================================================================== UPSTAIRS
 _use('upper')
 
-g, _ = rug_on('Upstairs hall striped runner', 13.30, 4.01, 1.60, 3.6, .70, D['cream'], D['corn'], .07, nx=10, ny=2,
-              motifs=[(diamond(x, 0, .07), D['corn']) for x in (-1.2, -.4, .4, 1.2)])
-g.done()
 framed('Upstairs hall pet drawing', 13.35, 3.90, 2.75, (0, -1, 0), .30, .38, 'pet')
 framed('Upstairs hall flower drawing', 13.85, 3.90, 2.52, (0, -1, 0), .34, .26, 'flower')
 framed('Upstairs hall rainbow drawing', 12.52, 4.10, 2.70, (0, 1, 0), .28, .36, 'rainbow')
@@ -967,10 +948,7 @@ plant(g, 0, 0, 0, .065, .09, trailing=True, count=20)
 g.done()
 framed('Green bathroom whale picture', 10.40, 6.50, 2.42, (-1, 0, 0), .40, .30, 'whale')
 
-# Mom & Dad's bedroom = Wardrobe: rug, bed cushions and throw, closet garments and hats.
-g, _ = rug_on('Primary bedroom rose rug', 13.30, 6.40, 1.60, 1.6, 2.2, D['rose'], D['cream'], .09,
-              z=down(12.70, 6.40, 1.50), motifs=[(diamond(x, y, .12), D['cream']) for x, y in [(-.45, -.6), (-.45, .6)]])
-g.done()
+# Wardrobe: bed cushions and throw, closet garments and hats.
 # The bed head is on the entry wall (House Tour 138.508/139.577s): cushions in
 # front of the pillows, the throw across the foot toward the TV dresser.
 zb = down(14.63, 5.29, 2.5)
@@ -1072,18 +1050,8 @@ g = prop('Kieran chest top plant', 14.45, .70, down(14.45, .70, 3.0))
 plant(g, 0, 0, 0, .08, .12, .30, 22)
 g.done()
 
-# Cory's bedroom: a 100-square number grid, block tower, full bookcase, abacus.
+# Block tower, full bookcase and ten-frame activities; keep the existing floor rug.
 zg = down(17.20, 3.20, 1.6)
-g = prop('Cory hundred square number grid mat', 17.20, 3.20, zg + .0015)
-g.rug(-.75, -.75, .75, .75, 0, .006, D['cream'], 5, 5)
-for j in range(10):
-    for i in range(10):
-        n = j * 10 + i + 1
-        mat = D['coral'] if n % 10 == 0 else D['mustard'] if n % 5 == 0 else (D['corn'] if (i + j) % 2 == 0 else None)
-        if mat:
-            x, y = -.675 + i * .15, -.675 + j * .15
-            g.flat([(x - .065, y - .065), (x + .065, y - .065), (x + .065, y + .065), (x - .065, y + .065)], .0072, mat)
-g.done()
 g = prop('Cory block tower tree and loose blocks', 17.95, 3.90, zg)
 for z in (.06, .18):
     g.box((0, 0, z), (.12, .12, .12), D['wood'])
@@ -1164,12 +1132,7 @@ def lean_art(g, x, y, z, w, h, motif, tilt=-.14):
 # ================================================================== LOWER WING
 _use('lower')
 
-# Family room = Play together: rug, a board game in progress, throw, toys, plant.
-g, zrug = rug_on('Family room teal geometric rug', 12.60, 2.20, -.80, 2.2, 1.6, D['teal'], D['mustard'], .09,
-                 stripes=[(-.93, -.63, .93, -.60, D['cream']), (-.93, .60, .93, .63, D['cream']),
-                          (-.93, -.63, -.90, .63, D['cream']), (.90, -.63, .93, .63, D['cream'])],
-                 motifs=[(diamond(x, y, .10), D['mustard']) for x in (-.78, .78) for y in (-.47, .47)], nx=8, ny=6)
-g.done()
+# Family room = Play together: board game, toys and the existing carpet.
 zt = down(12.91, 1.60, -.25)  # on the coffee table, which now stands at the sofa
 g = prop('Family room board game in progress', 12.91, 1.60, zt)
 g.box((0, -.05, .003), (.36, .36, .006), D['paper'])
@@ -1189,7 +1152,9 @@ g.soft((0, .115, .85), (.90, .03, .40), D['mustard'], .012)
 for x, mat in [(-.45, D['coral']), (.55, D['cream'])]:
     g.soft((x, .30, .77), (.40, .13, .38), mat, .05, (.25, 0, 0))
 g.done()
-g = prop('Family room toy basket with balls', 11.80, 2.85, zrug, blocking=True)
+# Keep the blocking basket's established clearance above the fitted carpet.
+g = prop('Family room toy basket with balls', 11.80, 2.85,
+         down(12.60, 2.20, -.80) + .0015 + .008 + .0028, blocking=True)
 basket(g, 0, 0, 0, .36, .30, .24)
 g.ball((-.07, 0, .27), .08, D['coral'])
 g.ball((.08, .03, .26), .07, D['corn'])
@@ -1218,13 +1183,9 @@ g.leaves((0, 0, .72), 34, .22, .11, zspread=.24)
 g.done()
 
 # Shared entry (Your belongings) and the downstairs bathroom.
-g, _ = rug_on('Shared bedroom entry runner', 11.50, 5.60, -.70, .60, 1.60, D['corn'], D['cream'], .06, nx=2, ny=6)
-g.done()
 g = prop('Shared entry school backpack', 11.99, 6.45, down(11.99, 6.45, -.7))
 g.soft((0, 0, .16), (.14, .26, .32), D['mustard'], .05, (0, .12, 0))
 g.soft((-.075, 0, .20), (.02, .22, .13), D['corn'], .01, (0, .12, 0))
-g.done()
-g, _ = rug_on('Downstairs bathroom mat', 11.30, 7.55, -.70, .44, .70, D['teal'], D['cream'], .04, nx=2, ny=3)
 g.done()
 # House Tour 183.523s: the towel bar is on the vanity wall, between it and the door.
 g = wall_prop('Downstairs bathroom hanging towel', 11.80, 6.88, -.10, (1, 0, 0))
@@ -1283,11 +1244,6 @@ g.soft((0, 0, .015), (1.50, .45, .03), D['rose'], .012)
 for dx in (-.72, .72):
     g.soft((dx, 0, -.12), (.03, .45, .28), D['rose'], .012)
 g.done()
-# The video's road rug now lies inside the door, so the (unphotographed)
-# runner moves to the free strip along the front side of the bed.
-g, _ = rug_on('Ellie princess runner', 9.00, 5.96, -.70, .70, 1.35, D['rose'], D['cream'], .06, nx=2, ny=5,
-              motifs=[(star(.08, .035, cx=0, cy=y), D['mustard']) for y in (-.35, 0, .35)], angle=90)
-g.done()
 framed('Ellie castle drawing', 10.40, 7.30, .45, (1, 0, 0), .35, .45, 'castle')
 g = prop('Ellie hammock plush toys', 8.22, 8.50, 0)
 for y, mat in [(-.15, D['rose']), (.05, D['corn']), (.20, D['mustard'])]:
@@ -1307,9 +1263,6 @@ for top in (-.62, -.43, -.24):
 g.done()
 
 # Jeannie's bedroom: a reading nook, trophies (Trophies & visits), READ garland.
-g, _ = rug_on('Jeannie bedroom teal rug', 13.90, 6.30, -.70, 2.0, 1.5, D['cream'], D['teal'], .10,
-              motifs=[(diamond(x, 0, .14), m) for x, m in [(-.5, D['teal']), (0, D['mustard']), (.5, D['teal'])]])
-g.done()
 zf = down(14.55, 6.95, -.7)
 g = prop('Jeannie reading beanbag with open book', 14.55, 6.95, zf, blocking=True)
 g.ball((0, 0, .22), (.36, .36, .26), D['teal'], 14, 8)
@@ -1366,9 +1319,14 @@ g.done()
 # ================================================================== BASEMENT AND GARAGE
 _use('base')
 
-g, _ = rug_on('Basement games checker rug', 4.75, 3.00, -2.9, 2.8, 2.2, D['cream'], D['corn'], .10,
-              motifs=[(diamond(-1.05 + i * .35, -.75 + j * .375, .12), D['mustard'] if (i + j) % 2 else D['corn'])
-                      for i in range(7) for j in range(5)], nx=8, ny=6)
+# A small blue play mat beside the games table; leave the open circulation
+# strip and support legs visible. The round marks carry no lettering or logos.
+play_blue = _dm('Dressing play mat blue cotton', '#80abc1')
+g, _ = rug_on('Basement small play mat', 4.46, 2.95, -2.9, .82, .68,
+              play_blue, nx=4, ny=3, th=.005,
+              motifs=[(ngon(.072, 18, x, y), shade) for x, y, shade in
+                      [(-.20, .13, D['coral']), (.09, .15, D['cream']),
+                       (-.12, -.13, D['mustard']), (.19, -.12, D['corn'])]])
 g.done()
 g = prop('Basement word library books and reading basket', 3.75, 4.80, 0)
 tops = [down(3.75, 4.80, z, .4) for z in (-2.80, -2.35, -1.90, -1.45)]

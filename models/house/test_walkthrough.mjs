@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {checkRoomFinishes} from './test_room_finishes.mjs';
 import fs from 'node:fs';
 import {gunzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
@@ -8,6 +9,42 @@ const inventory=JSON.parse(fs.readFileSync(new URL('./inventory.json',import.met
 assert.equal(data.generator,inventory.generator_sha256,'Stale browser export');
 const mesh=gunzipSync(fs.readFileSync(new URL('../../house-test/house.mesh.gz',import.meta.url)));
 assert.equal(createHash('sha256').update(mesh).digest('hex'),data.meshSha256,'Mesh/manifest mismatch');
+// Check the actual exported top surface at four open spots around the low
+// living-room table. Walking collisions alone cannot detect nonblocking rugs.
+const floorProbes=[[1.55,-1.36],[2.84,-1.52],[2.95,-2.74],[2.23,-3.48]].map(([x,z])=>({x,z,y:-Infinity,name:''}));
+for(const g of data.groups){
+  const xyz=new Float32Array(mesh.buffer,mesh.byteOffset+g.offset,g.count*6);
+  for(let i=0;i<xyz.length;i+=18){
+    const ax=xyz[i],y=xyz[i+1],az=xyz[i+2],bx=xyz[i+6],bz=xyz[i+8],cx=xyz[i+12],cz=xyz[i+14];
+    if(y<-.02||y>.04||Math.abs(y-xyz[i+7])>.0001||Math.abs(y-xyz[i+13])>.0001)continue;
+    const cross=(x1,z1,x2,z2)=>x1*z2-z1*x2;
+    const area=cross(bx-ax,bz-az,cx-ax,cz-az);if(Math.abs(area)<1e-9)continue;
+    for(const p of floorProbes){
+      if(y<=p.y)continue;
+      const u=cross(p.x-ax,p.z-az,cx-ax,cz-az)/area,v=cross(bx-ax,bz-az,p.x-ax,p.z-az)/area;
+      if(u>=0&&v>=0&&u+v<=1){p.y=y;p.name=g.name;}
+    }
+  }
+}
+for(const p of floorProbes)assert.match(p.name,/Oak floor board tone/,`Living-room floor at ${p.x},${p.z} was ${p.name||'missing'}`);
+console.log('PASS exposed oak around living-room play table');
+
+// The kitchen's fine print is physically flat and remains visible in the
+// production mesh, rather than relying on a material node unavailable in WebGL.
+const printGroups=data.groups.filter(g=>/Kitchen floor (soft grey scroll|muted grey petals)$/.test(g.name));
+assert.equal(printGroups.length,2,'Missing kitchen tile print mesh');
+for(const g of printGroups){
+  assert(g.count>1000,'Expected print across the kitchen tile field');
+  const xyz=new Float32Array(mesh.buffer,mesh.byteOffset+g.offset,g.count*6);
+  for(let i=0;i<xyz.length;i+=6)assert(Math.abs(xyz[i+1]-.034)<.0001,
+    'Kitchen tile print must be flat rather than raised trim');
+}
+assert(data.groups.some(g=>/Dining chair soft white enamel$/.test(g.name)),'Missing dining chair finish');
+const partition=data.colliders.find(o=>o.name==='Kitchen front partition');
+assert(partition,'Open shelving must not remove the partition collision hull');
+assert.deepEqual(partition.min.concat(partition.max).map(v=>+v.toFixed(3)),[0,0,-4.51,3.24,2.6,-4.37]);
+console.log('PASS flat kitchen prints, white dining chairs and original partition collision envelope');
+checkRoomFinishes(data,mesh);
 const world=new WalkingWorld(data.colliders);
 function point(x,y,z){return {x,y:z,z:-y};}
 function route(name,waypoints){

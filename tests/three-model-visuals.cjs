@@ -216,6 +216,14 @@ async function modelChecks(page, base) {
 
 async function houseChecks(browser, base) {
   const results = [];
+  const manifest = JSON.parse(await fs.readFile(path.join(ROOT, "house-test", "house.json"), "utf8"));
+  // Resolve the established room by its general-purpose camera name; don't
+  // put personal display names in new screenshots, labels or metrics.
+  const {rooms: catalog} = await import("../tools/house-evidence/catalog.mjs");
+  const nursery = catalog.find(r => r.cameras.includes("nursery"));
+  assert.ok(nursery, "Nursery camera lacks a room destination");
+  const bakedVertices = manifest.bakedLight?.uv?.bakedVertices;
+  assert.ok(bakedVertices > 0 && manifest.ambientOcclusion, "A full-house pass must exercise the shipped lighting");
   for (const mobile of [false, true]) {
     const context = await browser.newContext({ viewport: mobile ? { width: 390, height: 844 } : { width: 1024, height: 640 }, isMobile: mobile, hasTouch: mobile, serviceWorkers: "block" });
     const page = await context.newPage(), errors = [];
@@ -231,7 +239,7 @@ async function houseChecks(browser, base) {
       console.log(`Checking full house: ${mobile ? "phone at night" : "desktop in daylight"}`);
       // The exported house is large on software WebGL. Pin the existing
       // adaptive-resolution floor without disabling lighting or materials.
-      await page.goto(base + "/house-test/?phase=" + (mobile ? "night" : "day") + "&pr=.6", { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.goto(base + "/house-test/?phase=" + (mobile ? "night" : "day") + "&pr=.6&bakegrace=15000", { waitUntil: "domcontentloaded", timeout: 60000 });
       await page.waitForFunction(() => window.houseTest?.state.ready || window.houseBoot?.state === "failed", null, { polling: 100, timeout: 120000 });
       const boot = await page.evaluate(() => ({ready:!!window.houseTest?.state.ready,
         state:window.houseBoot?.state,stage:window.houseBoot?.stage,errors:window.houseBoot?.errors,
@@ -254,18 +262,51 @@ async function houseChecks(browser, base) {
       if (mobile) await page.touchscreen.tap(point.x, point.y);
       else await page.mouse.click(point.x, point.y);
       assert.equal(await page.evaluate(() => houseTest.state.active), true, "Pointer activation did not start the house");
-      for (const room of ["Living room", "Kitchen", "Family room"]) {
+      // Cover the changed sightline, sunlight, upper/lower finishes and porch on
+      // two real WebGL sizes. Keep the established Family room summary shot.
+      const extras = mobile ? ["Upstairs hall", "Downstairs bathroom"] : ["Basement playroom", "Front porch", "Nursery"];
+      for (const room of ["Living room", "Kitchen", "Sunroom", ...extras, "Family room"]) {
         const frames = await page.evaluate(() => houseTest.state.framesDrawn);
-        assert.equal(await page.evaluate(room => houseTest.go(room), room), true, "Could not visit " + room);
+        const destination = room === "Nursery" ? nursery.name : room;
+        assert.equal(await page.evaluate(dest => houseTest.go(dest), destination), true, "Could not visit " + room);
         await page.waitForFunction(previous => houseTest.state.framesDrawn >= previous + 3, frames, { polling: 100, timeout: 30000 });
         const state = await page.evaluate(() => houseTest.state);
         assert.equal(state.timeOfDay, mobile ? "night" : "day", "House lighting did not use the requested phase");
         assert.ok(state.drawCalls > 0 && state.triangles > 0, room + " did not draw");
         assert.ok(state.camera.every(Number.isFinite), room + " has an invalid camera");
-        results.push({ mobile, room, draws: state.drawCalls, triangles: state.triangles, programs: state.programs, pixelRatio: state.pixelRatio, ambientOcclusion: state.ambientOcclusion });
+        assert.ok(state.ambientOcclusion, room + " did not load ambient occlusion");
+        assert.equal(state.bakedLight?.vertices, bakedVertices, room + " did not load the shipped bake");
+        assert.equal(state.bakedLight.blend[0], mobile ? 0 : 1, room + " selected the wrong lighting atlas");
+        results.push({ mobile, room, draws: state.drawCalls, triangles: state.triangles, programs: state.programs, pixelRatio: state.pixelRatio, ambientOcclusion: state.ambientOcclusion, bakedVertices });
+        if (room === "Sunroom" || extras.includes(room)) {
+          const view = room.toLowerCase().replaceAll(" ", "-");
+          // Capture the actual rendered room, not the HUD's personal display labels.
+          await page.screenshot({ style: "body > :not(#view), body > :not(#view) * { visibility: hidden !important; }",
+            path: path.join(OUT, "house-" + (mobile ? "mobile-night-" : "desktop-day-") + view + ".png") });
+        }
       }
       await page.screenshot({ path: path.join(OUT, "house-" + (mobile ? "mobile-night" : "desktop-day") + ".png") });
       assert.deepEqual(errors, [], "House browser errors");
+      if (!mobile) {
+        // An invalid optional PNG must not strand a player on the loading card.
+        // A 200 with bad bytes exercises digest validation, not a fake browser error.
+        let intercepted = 0; const warnings = [];
+        page.on("console", m => { if (m.type() === "warning") warnings.push(m.text()); });
+        await page.route(/\/house-test\/house\.light\.day\.png(?:\?|$)/, route => {
+          intercepted++;
+          return route.fulfill({status: 200, contentType: "image/png", body: "bad atlas"});
+        });
+        await page.reload({ waitUntil: "domcontentloaded", timeout: 60000 });
+        await page.waitForFunction(() => window.houseTest?.state.ready || window.houseBoot?.state === "failed", null, { polling: 100, timeout: 120000 });
+        assert.ok(intercepted > 0, "Corrupt atlas fixture was never requested");
+        assert.ok(warnings.some(w => /Baked lighting skipped/.test(w)), "Corrupt atlas produced no validation warning");
+        assert.equal(await page.evaluate(() => window.houseTest?.state.ready && houseTest.go("Sunroom")), true, "Corrupt atlas blocked the house");
+        const state = await page.evaluate(() => houseTest.state);
+        assert.equal(state.bakedLight, null, "Invalid atlas was applied");
+        assert.ok(state.drawCalls > 0 && state.triangles > 0, "Fallback did not render");
+        assert.deepEqual(errors, [], "Fallback browser errors");
+        results.push({ mobile, room: "Sunroom", fallback: "invalid-day-atlas", draws: state.drawCalls, triangles: state.triangles });
+      }
     } finally { await context.close(); }
   }
   return results;

@@ -20,7 +20,7 @@ from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from browser_materials import (material_finish, keep_bevel, practical_light, ramp_colliders,
+from browser_materials import (browser_material_name, material_finish, keep_bevel, practical_light, ramp_colliders,
                                oriented_triangle_corners, group_key, dressing_collection, browser_flag)
 from browser_ao import VertexAO, architectural_receiver, benchmark_samples, occludes, peak_memory_mib
 from browser_lightmap import Lightmap, DEFAULT_ROOMS, log as lightmap_log
@@ -230,7 +230,7 @@ for o in list(scene.objects):
     can_tessellate = bool(ao) and architectural_receiver(o.name, cname)
     for tri in mesh.loop_triangles:
         mat = materials[min(tri.material_index,len(materials)-1)] if materials else None
-        matname = mat.name if mat else 'Default'
+        matname = browser_material_name(mat)
         color = list(mat.diffuse_color[:3]) if mat else [.65,.65,.6]
         key = ('prop:' + prop, matname) if prop else group_key(cname, matname)
         if key not in groups:

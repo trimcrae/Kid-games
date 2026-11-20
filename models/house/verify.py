@@ -20,7 +20,40 @@ assert len({entry['name'] for entry in inventory['assets']}) == len(inventory['a
 assert len([o for o in scene.objects if o.type == 'CAMERA']) == 35
 assert 'START HERE - House study' in bpy.data.texts
 assert not bpy.data.libraries, 'Unexpected linked library'
-assert not [im for im in bpy.data.images if im.source == 'FILE'], 'Unexpected external image'
+assert not [im for im in bpy.data.images if im.source == 'FILE' or im.packed_file], 'Unexpected image dependency'
+# Relative Blender paths are portable; no workbench or host paths in the model.
+assert all(not path or path.startswith('//') for path in bpy.utils.blend_paths()), 'Unexpected saved absolute path'
+for screen in bpy.data.screens:
+    for area in screen.areas:
+        for space in area.spaces:
+            if space.type == 'FILE_BROWSER' and space.params:
+                assert space.params.directory == b'//', 'Nonportable file-browser directory'
+# The native daylight material is restricted to the fourteen exterior panes;
+# camera and glossy rays still see the original dielectric (not a clear hole).
+daylight = bpy.data.materials['Sunroom window glass']
+panes = [o for o in scene.objects if o.type == 'MESH' and daylight in o.data.materials[:]]
+assert len(panes) == 14 and all(o.name.startswith('Clear pane') and o.parent and
+    o.parent.name.startswith(('Sunroom rear sliding bay', 'Sunroom garage-side sliding leaf',
+                              'Sunroom wing-side sliding leaf')) for o in panes), 'Sunroom daylight scope'
+nodes = daylight.node_tree.nodes
+out = next(n for n in nodes if n.type == 'OUTPUT_MATERIAL' and n.is_active_output)
+mix = out.inputs['Surface'].links[0].from_node
+assert mix.type == 'MIX_SHADER' and mix.inputs[1].links[0].from_node.type == 'BSDF_PRINCIPLED'
+assert mix.inputs[2].links[0].from_node.type == 'BSDF_TRANSPARENT'
+flags = mix.inputs[0].links[0].from_node
+assert flags.type == 'MATH' and flags.operation == 'MAXIMUM'
+assert {x.links[0].from_socket.name for x in flags.inputs[:2]} == {'Is Shadow Ray', 'Is Diffuse Ray'}
+# A single inward face behind the crib changes tone. The window wall, far
+# face and furnishings must not acquire the accent material.
+accent = bpy.data.materials['Nursery muted slate plaster']
+backdrop = bpy.data.objects['Nursery blue left wall']
+affected = [(obj, face) for obj in scene.objects if obj.type == 'MESH' and accent in obj.data.materials[:]
+            for face in obj.data.polygons if obj.data.materials[face.material_index] == accent]
+assert len(affected) == 1 and affected[0][0] == backdrop
+normal = backdrop.rotation_euler.to_matrix() @ affected[0][1].normal
+assert normal.x > .99 and abs(normal.y) < .001 and abs(normal.z) < .001
+window_paint = bpy.data.materials['Nursery dusty blue plaster']
+assert all(accent.diffuse_color[i] < window_paint.diffuse_color[i] for i in range(3))
 required = ['Wooden indoor climbing gym', 'Wicker sunroom loveseat', 'French-door refrigerator',
             'Double basin sink and gooseneck faucet', 'Dark wood dining table',
             'Main oatmeal three-seat sofa', 'Tall living two-door wood cupboard', 'Living large television',
@@ -283,6 +316,27 @@ assert screen_x('kitchen_access','Kitchen glass cupboard') < screen_x('kitchen_a
 for z in [.15,.85,1.65]:
     hit=scene.ray_cast(depsgraph,Vector((1.00,7.56,z)),Vector((-1,0,0)),distance=1.60)
     assert not hit[0], 'Kitchen garage passage blocked by '+(hit[4].name if hit[0] else '')
+
+# The fitted motif exists in the game-exportable mesh, not as raised trim
+# or a Blender-only shader. All tinted top faces share one physical elevation.
+kitchen_tiles = [o for o in scene.objects if o.name.startswith('Ivory square tile')]
+assert len(kitchen_tiles) == 81, 'The patterned kitchen grid changed footprint'
+for tile in kitchen_tiles:
+    assert {m.name for m in tile.data.materials} == {
+        'Kitchen floor warm ivory', 'Kitchen floor soft grey scroll', 'Kitchen floor muted grey petals'}
+    tint = [f for f in tile.data.polygons if f.material_index]
+    assert tint and all(f.area > 0 and f.normal.z > .999 for f in tint), 'Invalid tile print polygon'
+    assert max(tile.data.vertices[i].co.z for f in tint for i in f.vertices) == \
+           min(tile.data.vertices[i].co.z for f in tint for i in f.vertices), 'Raised tile print'
+
+# Trace the full modeled scene through each open bay, then test that the
+# central panel still separates the kitchen from the dollhouse shelf.
+for x in [1.03, 1.30, 1.57, 1.84, 2.095]:
+    for y, direction in [(4.31, 1), (4.59, -1)]:
+        hit = scene.ray_cast(depsgraph, Vector((x, y, 1.315)), Vector((0, direction, 0)), distance=.28)
+        assert not hit[0], 'Blocked kitchen/living opening: ' + (hit[4].name if hit[0] else '')
+hit = scene.ray_cast(depsgraph, Vector((1.57, 4.23, 1.72)), Vector((0, 1, 0)), distance=.24)
+assert hit[0] and hit[4].name == 'Kitchen front partition', 'Missing panel above open bays'
 
 for view in inventory['cameras']:
     path = HERE / 'previews' / (view + '.png')

@@ -332,6 +332,35 @@ def glass(mat, tint=(.93, .97, .96)):
     return mat
 
 
+def sunroom_daylight_glass(window_glass):
+    # Keep the camera/reflections physically glazed, but let light reach
+    # matte surfaces through the sunroom's exterior panes without caustics.
+    mat = window_glass.copy()
+    mat.name = 'Sunroom window glass'
+    nt = mat.node_tree
+    out = next(n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL' and n.is_active_output)
+    surface = out.inputs['Surface'].links[0].from_socket
+    path = nt.nodes.new('ShaderNodeLightPath')
+    either = nt.nodes.new('ShaderNodeMath')
+    either.operation = 'MAXIMUM'
+    nt.links.new(path.outputs['Is Shadow Ray'], either.inputs[0])
+    nt.links.new(path.outputs['Is Diffuse Ray'], either.inputs[1])
+    pane = nt.nodes.new('ShaderNodeBsdfTransparent')
+    pane.inputs['Color'].default_value = (.92, .92, .92, 1)
+    mix = nt.nodes.new('ShaderNodeMixShader')
+    nt.links.new(either.outputs[0], mix.inputs[0])
+    nt.links.new(surface, mix.inputs[1])
+    nt.links.new(pane.outputs[0], mix.inputs[2])
+    nt.links.new(mix.outputs[0], out.inputs['Surface'])
+    prefixes = ('Sunroom rear sliding bay', 'Sunroom garage-side sliding leaf',
+                'Sunroom wing-side sliding leaf')
+    for obj in bpy.context.scene.objects:
+        if (obj.parent and obj.name.startswith('Clear pane')
+                and obj.parent.name.startswith(prefixes)
+                and obj.data.materials and obj.data.materials[0] == window_glass):
+            obj.data.materials[0] = mat
+
+
 def translucent_shade(mat, color):
     """Linen lampshade that glows when its bulb is on."""
     nt, bsdf, out = _principled(mat)
@@ -522,6 +551,7 @@ paint(_mat('Pale sage plaster'), (.58, .61, .51))
 paint(_mat('Warm dining plaster'), (.80, .71, .45))
 paint(_mat('Upstairs warm grey plaster'), (.60, .59, .56))
 paint(_mat('Nursery dusty blue plaster'), (.24, .34, .51))
+paint(_mat('Nursery muted slate plaster'), (.150, .189, .267))
 paint(_mat('Ensuite cream plaster'), (.80, .75, .60))
 paint(_mat('Ensuite grey vinyl floor'), (.30, .30, .29), .42, .03, .15)
 enamel(_mat('Ensuite taupe vanity cabinet'), (.26, .22, .19), .38, .2)
@@ -547,7 +577,7 @@ metal(_mat('Warm brass'), (.62, .45, .18), .32)
 metal(_mat('Silver mirror'), (.92, .93, .95), .02)
 metal(_mat('Black iron'), (.02, .02, .02), .42, metallic=.35)
 paint(_mat('Dark appliance glass'), (.01, .012, .015), .08, .01, 1)
-glass(_mat('Window glass'))
+sunroom_daylight_glass(glass(_mat('Window glass')))
 
 # Soft furnishings.
 carpet(_mat('Clean warm beige carpet'), (.55, .45, .31))

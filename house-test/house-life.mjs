@@ -159,8 +159,8 @@ export async function createHouseLife(tour){
   function say(text,ms=3500){$('pet-speech').textContent=text;$('pet-speech').hidden=false;clearTimeout(sayTimer);sayTimer=setTimeout(()=>$('pet-speech').hidden=true,ms);}
   function hush(){clearTimeout(sayTimer);$('pet-speech').hidden=true;}
   // After a Rooms jump the toast and label name the room you picked, until
-  // you've walked ~1.5 m (the arrival spot can stand closest to a neighbour's
-  // room spot, e.g. Front entry's on the living-room rug).
+  // you've walked ~1.5 m. Part of the living-room floor is closer to the
+  // Front entry spot than to the Living room spot.
   let pinned=null,lastTickSpot=null;
   window.houseBridge={
     route(view,action){

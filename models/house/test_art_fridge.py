@@ -116,11 +116,49 @@ class ArtTests(unittest.TestCase):
         self.assertEqual(picture_angle, 180)  # local -Y paper front faces the entry room
 
 
+class PreviewPrivacyTests(unittest.TestCase):
+    def test_preview_writer_strips_path_and_timestamp_without_touching_pixels(self):
+        import struct
+        import tempfile
+        import zlib
+
+        # Test the canonical writer without loading the rest of Blender.
+        source = HERE / 'build.py'
+        tree = ast.parse(source.read_text(encoding='utf-8'))
+        writer = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                      and n.name == 'sanitize_preview_png')
+        ns = {}
+        exec(compile(ast.Module(body=[writer], type_ignores=[]), str(source), 'exec'), ns)
+
+        def chunk(kind, body=b''):
+            return struct.pack('>I', len(body)) + kind + body + struct.pack('>I', zlib.crc32(kind + body))
+
+        header = b'\x89PNG\r\n\x1a\n'
+        start = chunk(b'IHDR', struct.pack('>IIBBBBB', 1, 1, 8, 6, 0, 0, 0))
+        color = chunk(b'sRGB', b'\0')
+        pixels = chunk(b'IDAT', zlib.compress(bytes([0, 16, 32, 48, 255])))
+        end = chunk(b'IEND')
+        marker = b'File\0/example/workspace/house.blend'
+        stamped = b''.join([header, start, color, chunk(b'tEXt', marker),
+                           chunk(b'zTXt', b'File\0\0'+zlib.compress(marker)),
+                           chunk(b'iTXt', b'Comment\0\0\0\0\0'+marker),
+                           chunk(b'eXIf', marker), pixels, chunk(b'tIME', bytes(7)), end])
+        expected = header + start + color + pixels + end
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'fresh.png'
+            path.write_bytes(stamped)
+            ns['sanitize_preview_png'](path)
+            self.assertEqual(path.read_bytes(), expected)
+            ns['sanitize_preview_png'](path)
+            self.assertEqual(path.read_bytes(), expected, 'Removal must be idempotent')
+
+
 class FridgeTests(unittest.TestCase):
     def test_fridge_papers_and_magnets_clear_dispenser_and_stay_on_doors(self):
         dressing = ast.parse((HERE / 'dressing.py').read_text(encoding='utf-8'))
         layout = next(node for node in ast.walk(dressing) if isinstance(node, ast.For)
                       and isinstance(node.target, ast.Tuple)
+                      and all(isinstance(item, ast.Name) for item in node.target.elts)
                       and [item.id for item in node.target.elts] == ['x', 'z', 'motif']
                       and any(isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
                               and call.func.id == 'wall_prop' and call.args

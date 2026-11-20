@@ -219,6 +219,14 @@ for i in range(47):
     box('Playroom LED emitter',(-.90+i*.039,-.009,2.06),(.006,.006,.006),ledmat,0)
 
 new_collection('33 | Basement office laundry and mechanical')
+# The farther workstation faces the west foundation wall. Keep the high
+# office strip on that solid wall, clear of the glass block on the adjacent wall.
+asset('Basement office LED strip',(.075,7.16,BASEMENT_Z),90,
+      confidence='wall-mounted near the ceiling; length and placement estimated')
+box('Office LED tape backing',(0,0,2.13),(1.32,.010,.012),white,0)['browser_collide'] = False
+for i in range(33):
+    box('Office LED emitter',(-.64+i*.04,-.009,2.13),(.006,.006,.006),ledmat,0)['browser_collide'] = False
+
 shelf_unit('Basement metal storage shelving',(.50,5.70,BASEMENT_Z),1.65,1.98,black,90,'W6')
 for z in [.20,.67,1.14]:
     for x in [-.52,0,.52]:box('Neatly stored closed bin',(x,0,z),(.46,.32,.27),bluegrey,.02)

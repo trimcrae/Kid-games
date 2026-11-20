@@ -51,9 +51,16 @@ for i in range(19):
     box('Porch horizontal lap siding',(-.015,-.90,.03+i*.13),(.08,1.80,.129),white,.003)
 for x in [.06,5.04]:box('White front porch column',(x,-1.77,1.27),(.085,.085,2.66),white)
 asset('Clean front porch foam mats',photos='V4')
+porch_mats = [
+    material('Porch foam muted sage', (.23, .32, .29), .92),
+    material('Porch foam muted blue grey', (.19, .25, .31), .92),
+    material('Porch foam dusty red', (.35, .21, .22), .92),
+]
+# Keep a visible band of the existing concrete between foam patches.
 for ix in range(7):
     for iy in range(2):
-        box('Porch colored foam square',(.70+ix*.59,-.43-iy*.59,-.045),(.58,.58,.024),[navy,bluegrey,green,red][(ix+iy)%4],.003)
+        mat = concrete if ix == 2 else porch_mats[(ix + iy) % len(porch_mats)]
+        box('Porch colored foam square',(.70+ix*.59,-.43-iy*.59,-.045),(.58,.58,.024),mat,.003)
 copy_furniture('Wood nursery rocking chair','Front porch wood rocking chair',(.53,-1.30,-.05),90,'V4; House Tour 42s')
 copy_furniture('Wood nursery rocking chair','Front porch white rocking chair',(.53,-.42,-.05),90,'V4; House Tour 42s')
 for o in ROOT.children:
@@ -66,6 +73,13 @@ o=cylinder('Rounded mailbox roof',(0,0,1.14),.215,.69,black)
 o.rotation_euler.x=math.pi/2
 box('Mailbox front door',(0,-.35,1.02),(.39,.02,.31),black,.065)
 box('Mailbox small front handle',(0,-.375,1.10),(.065,.028,.026),steel)
+mailbox_flag = material('Mailbox muted red flag', (.52, .065, .045), .55)
+for label, loc, size in [
+    ('Mailbox flag arm', (.217, -.017, 1.111), (.015, .044, .126)),
+    ('Mailbox flag face', (.217, -.060, 1.175), (.015, .126, .040)),
+]:
+    part = box(label, loc, size, mailbox_flag, .004)
+    part['browser_collide'] = False
 asset('Curved front paver walk',photos='V5',confidence='curve and stone border observed; length estimated')
 for i in range(27):
     t=i/26
@@ -105,8 +119,26 @@ partition('Lower bedroom front wall',(7.85,5.60),(10.85,5.60),bed_wall,[(1.87,2.
 partition('Lower bedroom right wall',(10.85,5.60),(10.85,10.0),bed_wall,height=2.21)
 upper_window('Lower bedroom far window',(8.78,9.99,1.415),1.35,0,'V9')
 upper_window('Lower bedroom side window',(7.86,8.29,1.415),1.40,90,'V9,V10; House Tour 199s')
+lower_bath_wood = material('Lower bathroom dark brown planks', (.16,.107,.072), .52, texture='wood')
+lower_bath_seam = material('Lower bathroom plank seams', (.09,.058,.038), .64)
+lower_bath_trim = material('Lower bathroom stained oak casing', (.135,.070,.036), .48, texture='wood')
+lower_bath_vanity = material('Lower bathroom taupe vanity enamel', (.32,.295,.25), .5)
+lower_bath_glass = material('Lower bathroom frosted shade glass', (.86,.89,.84), .30)
+lower_bath_glass.node_tree.nodes['Principled BSDF'].inputs['Transmission Weight'].default_value = .75
 asset('Lower bathroom shell',photos='V8')
-box('Lower bathroom wood floor',(11.50,7.84,-.02),(1.30,2.40,.055),oak)
+box('Lower bathroom wood floor',(11.50,7.84,-.02),(1.30,2.40,.055),lower_bath_wood)
+# Surface-only seams preserve the original floor solid and walking surface.
+for i in range(1,7):
+    x = 10.85+i*(1.30/7)
+    box('Lower bathroom long plank seam',(x,7.84,.008),(.0016,2.39,.002),lower_bath_seam,0)['browser_collide'] = False
+for i in range(7):
+    x = 10.85+(i+.5)*(1.30/7)
+    for y in (7.22+(i%3)*.25, 8.44+(i%3)*.25):
+        box('Lower bathroom short plank seam',(x,y,.008),(1.30/7,.0016,.002),lower_bath_seam,0)['browser_collide'] = False
+# Slim applied casing makes the threshold legible without moving either jamb.
+for x in (10.90,12.10):
+    box('Lower bathroom wood jamb',(x,6.64,1.055),(.065,.12,2.11),lower_bath_trim,.006)['browser_collide'] = False
+box('Lower bathroom wood header',(11.50,6.64,2.125),(1.265,.12,.063),lower_bath_trim,.006)['browser_collide'] = False
 partition('Lower bath end wall',(10.85,9.04),(12.15,9.04),white,[(.21,1.06,.95,2.03)],height=2.21)
 partition('Lower bath left wall',(10.85,6.64),(10.85,9.04),white,height=2.21)
 partition('Lower bath right wall',(12.15,6.64),(12.15,9.04),white,height=2.21)
@@ -167,11 +199,12 @@ for i in range(14):
         curve('Jeannie basket crossed fabric net',pts,.0025,bedding)
 for i in range(10):box('Gathered golden closet curtain',(-.36+i*.018,-.18+.014*math.cos(i),1.06),(.025,.027,2.12),shade,.006)
 asset('Lower bathroom white vanity',(11.88,7.49,0),-90,'V8')
-box('Lower bath cupboard',(0,0,.39),(.79,.48,.78),white)
-for x in [-.19,.19]:panel('Lower bath door',x,-.25,.38,.36,.64,white)
+box('Lower bath cupboard',(0,0,.39),(.79,.48,.78),lower_bath_vanity)
+for x in [-.19,.19]:panel('Lower bath door',x,-.25,.38,.36,.64,lower_bath_vanity)
 basin('Lower bath white sink',(0,0),.81,.53,.82,.65,tilewhite)
 curve('Lower bath chrome faucet',[(0,.24,.84),(0,.24,.98),(0,.05,.98),(0,0,.92)],.016,steel)
 frame('Lower bath mirror',(0,.255,1.41),.77,.90,white,mirror)
+vanity_light('Lower bath vanity light', 2.045,.47,lower_bath_glass)
 # House Tour 182.523/183.523s: the toilet stands against the window end wall,
 # beyond the vanity, its tank under the window and its bowl facing the door.
 asset('Lower bathroom toilet',(11.55,8.53,0),0,'V8; House Tour 182.523/183.523s')

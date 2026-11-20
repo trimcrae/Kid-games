@@ -608,7 +608,75 @@ wallbox('Rear wall right of porch door', (6.78, 8.04, 1.3), (2.04, .14, 2.6), cr
 wallbox('Porch doorway header', (5.20, 8.04, 2.4), (1.12, .14, .4), cream)
 for x in [4.62, 5.78]:
     box('Porch door casing', (x, 7.94, 1.1), (.075, .065, 2.2), white)
-wallbox('Kitchen front partition', (1.62, 4.44, 1.3), (3.24, .14, 2.6), cream)
+# Frame the current span without guessing the parked leaf or jamb width.
+sunroom_track = material('Sunroom slider light aluminium', (.59, .61, .60), .62)
+for y in (8.022, 8.065):
+    track = box('Sunroom connection head track', (5.20, y, 2.198),
+                (1.12, .018, .014), sunroom_track, .002)
+    track['browser_collide'] = False
+KITCHEN_LIVING_OPEN_SLOTS = [(l, r, 1.16, 1.43) for l, r in
+                             [(.92, 1.14), (1.19, 1.41), (1.46, 1.68), (1.73, 1.95), (2.00, 2.19)]]
+
+
+def kitchen_living_partition():
+    # The shelf wall has a row of narrow see-through bays below its central
+    # panel. The two taller display columns are shallow on the living side:
+    # higher openings would expose the backs of the existing kitchen fixtures.
+    # Keep one mesh with the former wall envelope for the game's collision AABB.
+    apertures = [(*slot, None) for slot in KITCHEN_LIVING_OPEN_SLOTS]
+    apertures += [(l, r, bottom, top, 4.43)
+                  for l, r in [(.87, 1.12), (1.96, 2.19)]
+                  for bottom, top in [(1.50, 1.79), (1.83, 2.13)]]
+    xs = sorted({0, 3.24, *(i for l, r, *_ in apertures for i in (l, r))})
+    zs = sorted({0, 2.60, *(i for _, _, b, t, _ in apertures for i in (b, t))})
+    depths = {}
+    front, back = 4.37, 4.51
+    for i, (l, r) in enumerate(zip(xs, xs[1:])):
+        for j, (b, t) in enumerate(zip(zs, zs[1:])):
+            x, z = (l + r) / 2, (b + t) / 2
+            depths[i, j] = next((y for a, c, e, f, y in apertures
+                                 if a < x < c and e < z < f), front)
+    vertices, faces, material_indices, index = [], [], [], {}
+
+    def face(points, trim):
+        inds = []
+        for point in points:
+            if point not in index:
+                index[point] = len(vertices)
+                vertices.append(point)
+            inds.append(index[point])
+        faces.append(inds)
+        material_indices.append(int(trim))
+
+    for (i, j), f in depths.items():
+        if f is None:
+            continue
+        l, r, b, t = xs[i], xs[i+1], zs[j], zs[j+1]
+        fl, fr, ft, fu = (l, f, b), (r, f, b), (r, f, t), (l, f, t)
+        bl, br, bt, bu = (l, back, b), (r, back, b), (r, back, t), (l, back, t)
+        face((fl, fr, ft, fu), f != front)
+        face((br, bl, bu, bt), False)
+        for adjacent, p, q in [((i, j-1), fr, fl), ((i+1, j), ft, fr),
+                               ((i, j+1), fu, ft), ((i-1, j), fl, fu)]:
+            y = depths.get(adjacent)
+            y = back if y is None else y
+            if y > f:
+                levels = [f, *([4.43] if f < 4.43 < y else []), y]
+                for lo, hi in zip(levels, levels[1:]):
+                    face(((p[0], lo, p[2]), (q[0], lo, q[2]),
+                          (q[0], hi, q[2]), (p[0], hi, p[2])), adjacent in depths)
+    name = 'Kitchen front partition'
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    obj = bpy.data.objects.new(name, mesh)
+    finish(obj, name, cream)
+    mesh.materials.append(white)
+    for polygon, mat_index in zip(mesh.polygons, material_indices):
+        polygon.material_index = mat_index
+
+
+kitchen_living_partition()
 wallbox('Kitchen gallery pier', (3.34, 4.72, 1.3), (.22, .62, 2.6), cream)
 wallbox('Kitchen entry soffit', (3.34, 6.515, 2.47), (.22, 2.97, .26), cream)
 box('Living side skirting', (.025, 2.22, .065), (.04, 4.44, .13), white)
@@ -786,23 +854,98 @@ for side in [-1, 1]:
         rod('Raised roof seam', (side * .02, -.43 + j * .14, 1.29),
             (side * .48, -.43 + j * .14, 1.02), .012, roofgreen)
 
+toy_shutter_blue = material('Playhouse blue shutter', (.085, .24, .66), .48)
+toy_door_rose = material('Playhouse muted rose door', (.54, .16, .23), .52)
+# The shutter is a molded divided arch. The partly open door stays out of
+# the main doorway; both details leave the existing collision unchanged.
+shutter_x, shutter_y = -.434, -.14
+shutter = curve('Playhouse arched shutter crown', [
+    (shutter_x, shutter_y + .13 * math.cos(i * math.pi / 16),
+     .76 + .13 * math.sin(i * math.pi / 16))
+    for i in range(17)
+], .022, toy_shutter_blue)
+shutter['browser_collide'] = False
+for name, y, z, width, height in [
+    ('Left', shutter_y - .13, .62, .043, .29),
+    ('Right', shutter_y + .13, .62, .043, .29),
+    ('Bottom', shutter_y, .475, .30, .039),
+    ('Crossbar', shutter_y, .65, .29, .036),
+    ('Centre', shutter_y, .67, .037, .39),
+]:
+    bar = box('Playhouse shutter ' + name, (shutter_x, y, z),
+              (.028, width, height), toy_shutter_blue, .006)
+    bar['browser_collide'] = False
+door = box('Playhouse parked rose door leaf', (.247, -.245, .270),
+           (.040, .30, .49), toy_door_rose, .016)
+door['browser_collide'] = False
+
 collection('07 | Kitchen floor and backsplash')
 asset('Grey and ivory patterned kitchen tiles', photos='6')
 box('Tile grout bed', (6.17, 6.38, .013), (3.23, 3.22, .022), grout, 0)
+kitchen_field = material('Kitchen floor warm ivory', (.71, .705, .67), .54)
+kitchen_scroll = material('Kitchen floor soft grey scroll', (.47, .48, .465), .54)
+kitchen_petals = material('Kitchen floor muted grey petals', (.55, .555, .531), .54)
+
+
+def kitchen_floor_tile(x, y):
+    # Subdivide only the top of the original tile envelope. The print is
+    # co-planar pigment: no bevel bumps, overlay z-fights, or separate props.
+    # The tapered, lightly scalloped rings also survive the color-only export.
+    half, hz, n = .351 / 2, .012 / 2, 32
+    xy = [(math.cos(i * math.tau / n), math.sin(i * math.tau / n)) for i in range(n)]
+    border = [(half * u / max(abs(u), abs(v)), half * v / max(abs(u), abs(v))) for u, v in xy]
+    rings = [border]
+    for r0, wave4, wave8 in [(.133, .010, -.007), (.123, .010, -.007),
+                              (.084, -.011, .002), (.074, -.011, .002),
+                              (.040, .011, -.004), (.028, .011, -.004)]:
+        radii = [r0 + wave4 * math.cos(i * math.tau * 4 / n)
+                 + wave8 * math.cos(i * math.tau * 8 / n) for i in range(n)]
+        rings.append([(r * u, r * v) for r, (u, v) in zip(radii, xy)])
+    vtx = [(u, v, hz) for ring in rings for u, v in ring]
+    floor_start = len(vtx)
+    vtx += [(u, v, -hz) for u, v in border]
+    center = len(vtx)
+    vtx.append((0, 0, hz))
+    faces, materials = [], []
+    for k, mat_index in enumerate([0, 1, 0, 2, 0, 1]):
+        for i in range(n):
+            j = (i + 1) % n
+            faces.append((k*n+i, k*n+j, (k+1)*n+j, (k+1)*n+i))
+            materials.append(mat_index)
+    for i in range(n):
+        j = (i + 1) % n
+        faces.extend([(6*n+i, 6*n+j, center),
+                      (floor_start+i, floor_start+j, j, i)])
+        materials.extend([0, 0])
+    # Close the bottom using every perimeter vertex shared with the sides.
+    faces.append(tuple(range(floor_start + n - 1, floor_start - 1, -1)))
+    materials.append(0)
+    name = 'Ivory square tile'
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vtx, [], faces)
+    obj = bpy.data.objects.new(name, mesh)
+    obj.location = (x, y, .028)
+    finish(obj, name, kitchen_field)
+    mesh.materials.append(kitchen_scroll)
+    mesh.materials.append(kitchen_petals)
+    for polygon, mat_index in zip(mesh.polygons, materials):
+        polygon.material_index = mat_index
+
+
 for ix in range(9):
     for iy in range(9):
-        x, y = 4.74 + ix * .357, 4.95 + iy * .357
-        box('Ivory square tile', (x, y, .028), (.351, .351, .012), tilewhite, .003)
-        # Procedural quatrefoil ornament, modeled in curves on the tile.
-        pts = []
-        for k in range(65):
-            t = k * math.tau / 64
-            r = .092 + .027 * math.cos(4 * t)
-            pts.append((x + r * math.cos(t), y + r * math.sin(t), .036))
-        curve('Grey quatrefoil tile motif', pts, .009, tilegrey, True)
-        for dx, dy in [(-.13, -.13), (.13, -.13), (-.13, .13), (.13, .13)]:
-            obj = box('Tile corner diamond', (x + dx, y + dy, .036), (.033, .033, .003), tilegrey, .002)
-            obj.rotation_euler.z = math.pi / 4
+        kitchen_floor_tile(4.74 + ix * .357, 4.95 + iy * .357)
+def subtract_rect(rect, cut):
+    l, r, b, t = rect
+    cl, cr, cb, ct = cut
+    x0, x1, z0, z1 = max(l, cl), min(r, cr), max(b, cb), min(t, ct)
+    if x0 >= x1 or z0 >= z1:
+        return [rect]
+    return [(a, c, e, f) for a, c, e, f in
+            [(l, x0, b, t), (x1, r, b, t), (x0, x1, b, z0), (x0, x1, z1, t)]
+            if c - a > 1e-5 and f - e > 1e-5]
+
+
 asset('White subway tile backsplash', photos='6')
 for row in range(7):
     for i in range(17):
@@ -812,7 +955,22 @@ for row in range(7):
     for i in range(10):
         y = 6.00 + .195 * i + (row % 2) * .095
         if y < 7.9:
-            box('Return subway tile', (4.57, y, 1.0 + row * .087), (.018, .189, .081), tilewhite, .005)
+            z = 1.0 + row * .087
+            rect = (y - .189/2, y + .189/2, z - .081/2, z + .081/2)
+            pieces = [rect]
+            # The sink run is built in kitchen-local axes; world X = 8 - y
+            # after the existing quarter-turn. Clip only tiles at an opening.
+            for l, r, b, t in KITCHEN_LIVING_OPEN_SLOTS:
+                pieces = [piece for p in pieces for piece in subtract_rect(p, (8-r, 8-l, b, t))]
+            if pieces == [rect]:
+                box('Return subway tile', (4.57, y, z), (.018, .189, .081), tilewhite, .005)
+            else:
+                for l, r, b, t in pieces:
+                    # Leave a tiny clearance so the tile does not protrude over a jamb.
+                    box('Trimmed return subway tile', (4.57, (l+r)/2, (b+t)/2),
+                        (.018, max((r-l)-.0005, (r-l)*.85),
+                         max((t-b)-.0005, (t-b)*.85)), tilewhite,
+                        min(.005, (r-l)*.14, (t-b)*.14))
 
 collection('08 | Kitchen cabinetry and appliances')
 
@@ -1043,15 +1201,18 @@ table('Dark wood dining table', (5.52, 6.38, .018), (1.90, 1.02, .77), walnut)
 box('Table leaf seam', (0, 0, .772), (.005, 1.0, .003), black, 0)
 
 
+dining_enamel = material('Dining chair soft white enamel', (.74, .75, .72), .44)
+
+
 def chair(name, pos, angle=0):
-    asset(name, pos, angle, '6,7', 'dining seating partly obscured; estimated chair design')
-    box('Chair seat', (0, 0, .46), (.43, .43, .065), walnut, .025)
+    asset(name, pos, angle, '6,7', 'slim slatted back and light frame; exact dimensions estimated')
+    box('Chair seat', (0, 0, .46), (.43, .43, .046), dining_enamel, .016)
     for x in [-.17, .17]:
         for y in [-.17, .17]:
-            box('Chair leg', (x, y, .22), (.045, .045, .44), walnut)
-        rod('Chair back upright', (x, .17, .45), (x, .17, .98), .023, walnut)
-    for z in [.64, .80, .95]:
-        box('Chair back slat', (0, .17, z), (.39, .04, .065), walnut)
+            rod('Chair leg', (x * 1.08, y * 1.08, .018), (x, y, .447), .015, dining_enamel)
+        rod('Chair back upright', (x, .17, .445), (x, .21, .98), .014, dining_enamel)
+    for z, y in [(.64, .185), (.80, .198), (.955, .208)]:
+        box('Chair back slat', (0, y, z), (.37, .024, .043), dining_enamel, .008)
 
 
 for x in [5.05, 5.98]:
@@ -1067,7 +1228,7 @@ chest('Entry tall chest of drawers', (4.45, .32, .018), .70, 1.22, 180, 5, 1, '7
 # clear beside the garage door and stop before the sunroom casing at X=4.58.
 kitchen_bin_ivory = material('Kitchen ivory fabric storage bins', (.75, .75, .69), .88, texture='fabric')
 kitchen_bin_grey = material('Kitchen grey fabric storage bins', (.43, .46, .46), .88, texture='fabric')
-kitchen_pantry_enamel = material('Kitchen cream pantry enamel', (.76, .73, .63), .43)
+kitchen_pantry_enamel = material('Kitchen cream pantry enamel', (.62, .52, .38), .49, texture='wood')
 asset('Kitchen window cubby worktop', (1.97, 7.72, .035), 0,
       'House Tour 60.012/63.013s',
       'window-wall worktop and two rows of bins observed; width, height and bin count estimated')
@@ -1464,6 +1625,41 @@ for label,pos in [('PLAY / BUNKS',(.40,3.2)),('OFFICE',(3.00,6.90)),('LAUNDRY',(
     obj.location=(*pos,.2)
 
 
+def sanitize_preview_png(path):
+    """Remove Blender's absolute source path and timestamp stamps losslessly."""
+    import struct
+    import zlib
+
+    png = path.read_bytes()
+    header = b'\x89PNG\r\n\x1a\n'
+    if not png.startswith(header):
+        raise ValueError('Invalid rendered preview PNG')
+    discard = {b'tEXt', b'zTXt', b'iTXt', b'eXIf', b'tIME'}
+    offset, retained = len(header), [header]
+    seen_pixels = seen_end = False
+    while offset < len(png):
+        length, kind = struct.unpack_from('>I4s', png, offset)
+        end = offset + length + 12
+        chunk = png[offset:end]
+        if len(chunk) != length + 12 or zlib.crc32(chunk[4:-4]) != int.from_bytes(chunk[-4:], 'big'):
+            raise ValueError('Invalid rendered preview PNG chunk')
+        # Retain the original chunk bytes, including all pixel and color data.
+        if kind not in discard:
+            retained.append(chunk)
+        seen_pixels |= kind == b'IDAT'
+        offset = end
+        if kind == b'IEND':
+            seen_end = True
+            break
+    if not (seen_pixels and seen_end and offset == len(png)):
+        raise ValueError('Incomplete rendered preview PNG')
+    clean = b''.join(retained)
+    if clean != png:
+        temporary = path.with_suffix('.png.clean')
+        temporary.write_bytes(clean)
+        temporary.replace(path)
+
+
 def set_view(name):
     scene.camera = CAMERAS[name]
     upper_view = name in {'upper_overview','upper_plan','hall','bathroom','nursery','bedroom','cory_nook','primary','ensuite'}
@@ -1561,8 +1757,16 @@ for screen_data in bpy.data.screens:
             a.spaces.active.shading.type = 'MATERIAL'
 bpy.ops.object.select_all(action='DESELECT')
 scene.render.filepath = '//previews/overview.png'
+# Blender's factory file browser can remember an absolute host directory.
+# Save a portable project-relative UI path; remapping it would restore a host path.
+for screen in bpy.data.screens:
+    for area in screen.areas:
+        for space in area.spaces:
+            if space.type == 'FILE_BROWSER' and space.params:
+                space.params.directory = b'//house-assets'
+                space.params.directory = b'//'
 bpy.context.preferences.filepaths.save_version = 0
-bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'house.blend'), compress=True)
+bpy.ops.wm.save_as_mainfile(filepath=str(HERE / 'house.blend'), compress=True, relative_remap=False)
 
 manifest = {
     'status': 'work-in-progress; not registered as a game',
@@ -1586,8 +1790,10 @@ if args.render:
         if view not in CAMERAS:
             raise ValueError('Unknown camera: ' + view)
         set_view(view)
-        scene.render.filepath = str(HERE / 'previews' / (view + '.png'))
+        preview = HERE / 'previews' / (view + '.png')
+        scene.render.filepath = str(preview)
         print('RENDERING:', view, flush=True)
         bpy.ops.render.render(write_still=True)
+        sanitize_preview_png(preview)
     set_view('overview')
 print('House build complete.', flush=True)

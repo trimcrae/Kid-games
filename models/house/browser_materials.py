@@ -19,6 +19,13 @@ def oriented_triangle_corners(vertices, loops, mirrored=False):
     return corners[::-1] if mirrored else corners
 
 
+def browser_material_name(mat):
+    # Native glazing uses a distinct shader; keep its game group and finish.
+    if mat and mat.name == 'Sunroom window glass':
+        return 'Window glass'
+    return mat.name if mat else 'Default'
+
+
 def finish_for_name(name):
     n = name.lower()
     finish = dict(surface='plain', roughness=.7, metalness=0.0, clearcoat=0.0,
@@ -87,7 +94,7 @@ def finish_for_name(name):
 
 
 def material_finish(mat):
-    finish = finish_for_name(mat.name if mat else 'Default')
+    finish = finish_for_name(browser_material_name(mat))
     if mat and mat.use_nodes and mat.node_tree:
         bsdf = next((n for n in mat.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
         if bsdf:

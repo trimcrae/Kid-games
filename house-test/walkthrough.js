@@ -109,7 +109,7 @@ if(query.get('shadow')==='basic')renderer.shadowMap.type=THREE.BasicShadowMap;
 // The export's data files are cached by content: the manifest by release, and
 // the mesh, AO and lightmaps by their own hashes from that manifest, so a new
 // manifest never meets an old mesh from a browser or offline cache.
-const DATA_VERSION='20261106-tailored-upholstery';
+const DATA_VERSION='20261119-house-reference';
 // How long a ready house waits for a bake still downloading (?bakegrace= ms).
 const BAKE_GRACE=THREE.MathUtils.clamp(Number(query.get('bakegrace'))||3000,0,15000);
 // Calibrated against the matched captures (September 16): the day bake at 0.75,
@@ -448,7 +448,7 @@ function fadePet(dt){
 function updateLocation(){
   // The room you're in is the nearest room spot you can actually see — no
   // wall, floor or window between — not merely the nearest one: on the
-  // living-room rug the porch spot is closer, but through the front wall.
+  // living-room floor the porch spot is closer, but through the front wall.
   // The name, the room lighting and its reflection probe all follow this.
   const ranked=rooms.map(r=>({r,d:Math.hypot(player.x-r[2],player.z+r[3])+Math.abs(player.y-r[4])*12})).sort((a,b)=>a.d-b.d);
   let closest=ranked[0]?.r;
