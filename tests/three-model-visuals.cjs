@@ -214,6 +214,67 @@ async function modelChecks(page, base) {
   });
 }
 
+// Isolated release QA: a genuinely empty browser context on the default URL.
+// Keep the existing day/night controls intact; this observation runs first in
+// the separate aggregate-suite browser and does not alter the game's files.
+async function normalColdHouse(browser, base) {
+  const candidate = "8c3ccaeede803e531860dbbf0dd8d59f77151d0c";
+  // GitHub's checkout is shallow. Compare every top-level tree/blob except
+  // tests, without relying on the candidate's parent being present locally.
+  const listing = require("node:child_process").execFileSync("git", ["ls-tree", "HEAD"], { cwd: ROOT, encoding: "utf8" })
+    .trimEnd().split("\n").filter(row => !row.endsWith("\ttests")).join("\n") + "\n";
+  const nonTestTree = require("node:crypto").createHash("sha256").update(listing).digest("hex");
+  assert.equal(nonTestTree, "a77ea883709409b51cd61c3b624e087b62c2476f7d60265a38c73b0941724cd2", "Checkout differs from candidate outside tests");
+  const manifest = JSON.parse(await fs.readFile(path.join(ROOT, "house-test", "house.json"), "utf8"));
+  const files = ["house.json", "house.mesh.gz", "house.ao.gz", "house.lightuv.gz", "house.light.day.png", "house.light.night.png"];
+  const filename = url => files.find(file => new URL(url).origin === base && new URL(url).pathname === "/house-test/" + file);
+  const ctx = await browser.newContext({ viewport: { width: 1024, height: 640 } }); // default cache, SW and device scale
+  const asked = new Set(), statuses = {}, warnings = [], errors = [];
+  try {
+    assert.deepEqual(await ctx.storageState(), { cookies: [], origins: [] }, "Expected a fresh visit");
+    const page = await ctx.newPage();
+    page.on("request", r => { const file = filename(r.url()); if (file) asked.add(file); });
+    page.on("response", r => { const file = filename(r.url()); if (file) statuses[file] = r.status(); });
+    page.on("pageerror", e => errors.push(e.message));
+    page.on("console", m => { if (/^Baked lighting skipped:/.test(m.text())) warnings.push(m.text()); });
+    // No fixture, seed, request interception, phase, resolution or bake-grace override.
+    await page.goto(base + "/house-test/", { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.waitForFunction(() => window.houseTest?.state.ready || window.houseBoot?.state === "failed", null, { polling: 200, timeout: 160000 });
+    const reached = await page.evaluate(() => ({ ready: !!window.houseTest?.state.ready, stage: window.houseBoot?.stage, state: window.houseBoot?.state }));
+    assert.ok(reached.ready, "Normal visit did not open: " + JSON.stringify({ reached, warnings, errors }));
+    const entry = await page.evaluate(() => {
+      const s = window.houseTest.state;
+      const marks = Object.fromEntries(performance.getEntriesByType("mark").filter(m => ["house:occlusion","house:baked-light","house:first-frame"].includes(m.name)).map(m => [m.name, m.startTime]));
+      return { path: location.pathname + location.search, phase: s.timeOfDay, ratio: s.pixelRatio, deviceRatio: devicePixelRatio,
+        ao: s.ambientOcclusion, bakedVertices: s.bakedLight?.vertices ?? null, blend: s.bakedLight?.blend ?? null,
+        draws: s.drawCalls, triangles: s.triangles, marks };
+    });
+    const bakeWaitMs = entry.marks["house:baked-light"] - entry.marks["house:occlusion"];
+    const lighting = entry.bakedVertices === null ? "live-fallback" : "baked";
+    const report = { candidate, checkout: process.env.GITHUB_SHA, nonTestTree, lighting, bakeWaitMs,
+      meshSha256: manifest.meshSha256, expectedBakedVertices: manifest.bakedLight.uv.bakedVertices,
+      ...entry, requested: [...asked].sort(), statuses, warnings, errors };
+    console.log("NORMAL_COLD_LIGHTING " + JSON.stringify(report));
+    assert.equal(entry.path, "/house-test/");
+    assert.deepEqual([...asked].sort(), [...files].sort(), "Missing cold asset request");
+    assert.ok(files.slice(0, 3).every(file => statuses[file] === 200), "Missing manifest, geometry or AO");
+    assert.ok(Object.values(statuses).every(code => code === 200), "House lighting request failed");
+    assert.ok(entry.ao && entry.draws > 0 && entry.triangles > 0 && Number.isFinite(bakeWaitMs) && bakeWaitMs >= 0 && entry.marks["house:first-frame"] >= entry.marks["house:baked-light"], "Invalid first draw or lighting marks");
+    assert.deepEqual(errors, [], "Runtime exceptions");
+    if (lighting === "baked") {
+      assert.equal(entry.bakedVertices, manifest.bakedLight.uv.bakedVertices);
+      assert.ok(entry.bakedVertices > 0 && files.every(file => statuses[file] === 200));
+      assert.deepEqual(warnings, [], "Unexpected bake warning");
+    } else {
+      assert.ok(bakeWaitMs >= 2950 && warnings.some(w => /not needed any more|baked light stopped|abort/i.test(w)), "Fallback was not explained by the ordinary three-second grace period");
+      assert.ok(warnings.every(w => !/checksum|mismatch|differs|invalid|unavailable/i.test(w)), "Invalid shipped lighting");
+    }
+    assert.ok(await page.evaluate(() => houseTest.go("Sunroom")), "Normal lighting could not draw the Sunroom");
+    await page.screenshot({ style: "body > :not(#view), body > :not(#view) * { visibility: hidden !important; }", path: path.join(OUT, "house-cold-start-sunroom.png") });
+    return report;
+  } finally { await ctx.close(); }
+}
+
 async function houseChecks(browser, base) {
   const results = [];
   const manifest = JSON.parse(await fs.readFile(path.join(ROOT, "house-test", "house.json"), "utf8"));
@@ -318,11 +379,14 @@ async function houseChecks(browser, base) {
   let browser;
   try {
     browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium", headless: true, args: ["--no-sandbox", "--enable-unsafe-swiftshader"] });
+    const base = "http://127.0.0.1:" + server.address().port;
+    // Independent of the 8-minute full-house step. The aggregate writes the
+    // retained metrics.json last and its browser has made no earlier visit.
+    const normalCold = process.env.GITHUB_ACTIONS === "true" && process.env.THREE_FULL_HOUSE !== "1" ? await normalColdHouse(browser, base) : null;
     const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, serviceWorkers: "block" });
     const errors = [];
     page.on("pageerror", error => errors.push(error.message));
     page.on("console", message => { if (message.type() === "error") errors.push(message.text()); });
-    const base = "http://127.0.0.1:" + server.address().port;
     const models = await modelChecks(page, base);
     assert.deepEqual(errors, [], "Model shaders or worlds produced browser errors");
     console.log(`PASS models: ${models.animals.length} wildlife, ${models.pets.length} pets/companions, ${models.furniture.length} furnishings, ${models.worlds.length} biome/quality variants; geometry, shaders, animation and disposal`);
@@ -331,7 +395,7 @@ async function houseChecks(browser, base) {
     // CI checks the changed procedural models. Whole-house smoke also loads
     // the much larger, unchanged architecture and is an explicit local run.
     const house = process.env.THREE_FULL_HOUSE === "1" ? await houseChecks(browser, base) : [];
-    await fs.writeFile(path.join(OUT, "metrics.json"), JSON.stringify({ ...models, house }, null, 2) + "\n");
+    await fs.writeFile(path.join(OUT, "metrics.json"), JSON.stringify({ ...models, house, ...(normalCold ? { normalCold } : {}) }, null, 2) + "\n");
     console.log(`PASS real WebGL: ${models.animals.length} wildlife models, ${models.pets.length} pets and companions, ${models.furniture.length} furnishings, ${models.worlds.length} biome/quality variants${house.length ? `, ${house.length} house views` : ""}; finite geometry and rigs, shaders, animation, quality and disposal.`);
     console.log(JSON.stringify({ maxAnimalDraws: Math.max(...models.animals.map(model => model.draws)), maxAnimalTriangles: Math.max(...models.animals.map(model => model.triangles)), maxPetDraws: Math.max(...models.pets.map(model => model.draws)), maxFurnitureDraws: Math.max(...models.furniture.map(model => model.draws)), maxFurnitureTriangles: Math.max(...models.furniture.map(model => model.triangles)), maxWorldDraws: Math.max(...models.worlds.map(model => model.draws)), maxWorldTriangles: Math.max(...models.worlds.map(model => model.renderedTriangles)), evidence: OUT }));
   } finally {
